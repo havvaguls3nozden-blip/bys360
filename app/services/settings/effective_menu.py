@@ -149,37 +149,6 @@ def _role_allowed_for_menu(item: dict[str, Any], role_name: str) -> bool:
     return True
 
 
-def _apply_core_menu_visibility_policy(
-    visibility: dict[str, bool],
-    role_name: str,
-    *,
-    source_map: dict[str, str] | None = None,
-) -> dict[str, bool]:
-    """Kritik canlı menüler DB senkron sorunu yaşasa bile kaybolmasın."""
-    normalized_role = normalize_role_name(role_name)
-    source_map = source_map or {}
-
-    for key in ("messages", "notifications", "surveys"):
-        if normalized_role in CORE_MENU_VISIBILITY_POLICY.get(key, set()):
-            visibility[key] = True
-
-    for key in (
-        "survey_manage",
-        "survey_results",
-        "feedback_dashboard",
-        "feedback_pulse",
-        "feedback_campaigns",
-        "feedback_results",
-        "feedback_actions",
-        "feedback_manager",
-        "feedback_admin",
-        "performance_reports",
-    ):
-        source = source_map.get(key, "")
-        if normalized_role in CORE_MENU_VISIBILITY_POLICY.get(key, set()) and source != "user_override":
-            visibility[key] = True
-
-    return visibility
 
 
 # BYS360_SETTINGS_ROLE_MATRIX_RUNTIME_V6_CORE_POLICY
@@ -490,78 +459,6 @@ def _settings_explicitly_controls_key(menu_key: str, role_state: dict[str, bool]
     return menu_key in role_state or menu_key in unit_state or menu_key in user_state
 
 
-def _apply_bys360_settings_live_authority_v1(
-    visibility: dict[str, bool],
-    user: Any,
-    role_name: str,
-    active_menu_items: list[dict[str, Any]],
-    *,
-    rollback: RollbackHook | None = None,
-) -> dict[str, bool]:
-    """Ayarlar ekranındaki kayıtları runtime menünün son kaynağı yapar.
-
-    V2 düzeltmesi:
-    - Rol matrisinde açık kayıt varsa eski required_roles/admin_only/faz
-      politikaları menüyü yeniden kapatamaz.
-    - Rol matrisinde kapalı kayıt varsa çekirdek savunma, force-visible veya
-      kişi override kaydı menüyü yeniden açamaz.
-    - Birim ve kişi profilleri yalnızca rol matrisi açık veya rol satırı yoksa
-      uygulanır; rol kapalıysa her zaman kapalı kalır.
-    """
-    normalized_role = normalize_role_name(role_name)
-    item_map = _menu_item_by_key(active_menu_items)
-    all_keys = [key for key in item_map.keys() if key]
-    role_state = _load_role_matrix_state(normalized_role, rollback=rollback)
-    unit_state = _load_unit_profile_state(user, rollback=rollback)
-    user_state = _load_user_override_state(user, rollback=rollback)
-
-    # Rol matrisi tabanı: satır varsa son karar rol matrisidir.
-    for key in all_keys:
-        if key in role_state:
-            visibility[key] = bool(role_state[key])
-
-    # Birim profili: rol kapalıysa açamaz, aksi halde son profil değerini uygular.
-    for key, is_visible in unit_state.items():
-        if key not in item_map:
-            continue
-        if role_state.get(key) is False:
-            visibility[key] = False
-            continue
-        visibility[key] = bool(is_visible)
-
-    # Kişi bazlı görünürlük: rol kapalıysa açamaz, aksi halde kişi istisnasıdır.
-    for key, is_visible in user_state.items():
-        if key not in item_map:
-            continue
-        if role_state.get(key) is False:
-            visibility[key] = False
-            continue
-        visibility[key] = bool(is_visible)
-
-    # Rol matrisi kapalı satırlar her durumda kapalı kalır.
-    for key, is_visible in role_state.items():
-        if key in visibility and is_visible is False:
-            visibility[key] = False
-
-    # Kaldırılmış/kapsam dışı anahtar hiçbir şekilde gösterilmez.
-    for key in list(visibility.keys()):
-        if is_removed_menu_key(key):
-            visibility[key] = False
-
-    # Statik rol kapısı artık yalnızca ayarlarda hiç açık kayıt yoksa yedek güvenliktir.
-    # Böylece rol matrisinde açılan özellik gerçekten menüye eklenir.
-    for key, current in list(visibility.items()):
-        if not current or key not in item_map:
-            continue
-        if _settings_explicitly_controls_key(key, role_state, unit_state, user_state):
-            continue
-        if not _allowed_by_static_gate(key, normalized_role, item_map):
-            visibility[key] = False
-
-    # Hesap ve çıkış güvenli kullanıcı deneyimi için açık kalır.
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 # BYS360_SETTINGS_LIVE_AUTHORITY_V2_END
 
 
