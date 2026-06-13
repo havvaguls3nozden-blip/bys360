@@ -345,19 +345,6 @@ def get_assistant_role_matrix_recommended_keys(role_key):
     return set(ASSISTANT_ROLE_MATRIX_RECOMMENDED.get((role_key or "").strip(), set()))
 
 
-def extend_flat_menu_items_with_assistant_role_matrix_items(flat_menu_items):
-    """Sanal asistan satırlarını Ayarlar rol matrisi kaydına dahil eder."""
-    if flat_menu_items is None:
-        flat_menu_items = []
-    existing = {item.get("key") for item in flat_menu_items if isinstance(item, dict)}
-    for item in ASSISTANT_ROLE_MATRIX_ITEMS:
-        if item["key"] not in existing:
-            enriched = dict(item)
-            enriched.setdefault("section", "Sanal Asistan")
-            enriched.setdefault("settings_key", item["key"])
-            flat_menu_items.append(enriched)
-            existing.add(item["key"])
-    return flat_menu_items
 
 ROLE_MATRIX_POLICY_CONFIGS = [
     {
@@ -476,44 +463,6 @@ def _find_menu_item_by_key(flat_menu_items, wanted_key):
     return None
 
 
-def _build_role_matrix_policy_items(grouped_menu_definitions, flat_menu_items, matrix_key):
-    config = _role_matrix_policy_config_map().get((matrix_key or "").strip())
-    if not config:
-        return []
-
-    items = []
-    seen = set()
-    for group_label in config.get("menu_groups", []):
-        for item in list(grouped_menu_definitions.get(group_label, []) or []):
-            if not isinstance(item, dict):
-                continue
-            key = item.get("key")
-            if not key or key in seen:
-                continue
-            seen.add(key)
-            items.append(item)
-
-    for extra_key in config.get("extra_keys", []):
-        if extra_key in seen:
-            continue
-        item = _find_menu_item_by_key(flat_menu_items, extra_key)
-        if item:
-            seen.add(extra_key)
-            items.append(item)
-
-
-    for synthetic_item in config.get("synthetic_items", []) or []:
-        if not isinstance(synthetic_item, dict):
-            continue
-        key = synthetic_item.get("key")
-        if not key or key in seen:
-            continue
-        seen.add(key)
-        enriched = dict(synthetic_item)
-        enriched.setdefault("settings_key", key)
-        enriched.setdefault("section", config.get("title") or "Sanal Asistan")
-        items.append(enriched)
-    return items
 
 
 def _build_role_matrix_group(matrix_key, policy_items):
@@ -780,22 +729,6 @@ _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_FOR_ASSISTANT = globals().get(
     "extend_flat_menu_items_with_assistant_role_matrix_items"
 )
 
-def extend_flat_menu_items_with_assistant_role_matrix_items(flat_menu_items):
-    """Sanal asistan satırlarıyla birlikte güncel Personel Yönetimi satırlarını da kayda dahil eder."""
-    if flat_menu_items is None:
-        flat_menu_items = []
-    if callable(_BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_FOR_ASSISTANT):
-        flat_menu_items = _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_FOR_ASSISTANT(flat_menu_items)
-
-    existing = {item.get("key") for item in flat_menu_items if isinstance(item, dict)}
-    for item in PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS:
-        if item["key"] not in existing:
-            enriched = dict(item)
-            enriched.setdefault("settings_key", item["key"])
-            enriched.setdefault("section", "Personel Yönetimi Rol Matrisi")
-            flat_menu_items.append(enriched)
-            existing.add(item["key"])
-    return flat_menu_items
 
 _BYS360_BASE_ROLE_MATRIX_POLICY_CONFIGS = list(globals().get("ROLE_MATRIX_POLICY_CONFIGS", []) or [])
 _BYS360_PERSONNEL_POLICY_CONFIG = {
@@ -994,29 +927,6 @@ ROLE_MATRIX_POLICY_CONFIGS = [
     },
 ]
 
-def extend_flat_menu_items_with_assistant_role_matrix_items(flat_menu_items):
-    """Rol matrisi kapsamındaki sentetik/canlı tüm sekmeleri kayıt listesine ekler.
-
-    Eski isim korunur; artık sadece asistanı değil, performansın yeni sekmelerini,
-    yardım merkezi satırlarını ve ayarlar/güvenlik satırlarını da RoleMenuDefault
-    kaydına dahil eder. Böylece kapatılan sekme sidebar'da görünmez, açılan sekme görünür.
-    """
-    if flat_menu_items is None:
-        flat_menu_items = []
-    existing = {item.get("key") for item in flat_menu_items if isinstance(item, dict)}
-    for config in ROLE_MATRIX_POLICY_CONFIGS:
-        for item in config.get("synthetic_items", []) or []:
-            if not isinstance(item, dict):
-                continue
-            key = item.get("key")
-            if not key or key in existing:
-                continue
-            enriched = dict(item)
-            enriched.setdefault("settings_key", key)
-            enriched.setdefault("section", config.get("title") or enriched.get("section") or "Rol Matrisi")
-            flat_menu_items.append(enriched)
-            existing.add(key)
-    return flat_menu_items
 # BYS360_SETTINGS_MENU_ROLE_MATRIX_ALL_TABS_V1_END
 
 # BYS360_ASSISTANT_TABS_ROLE_MATRIX_V2_BEGIN
@@ -1064,23 +974,6 @@ except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/main_handlers/account_communication_helpers.py)")
 
 # Eski tanımı geçersiz kıl: dinamik ayarlar listesi artık gerçek Asistan sekmelerini de taşır.
-def extend_flat_menu_items_with_assistant_role_matrix_items(flat_menu_items):
-    """BYS360 Asistanı gerçek sekmelerini ve rehber yetkilerini Ayarlar rol matrisi kaydına dahil eder."""
-    if flat_menu_items is None:
-        flat_menu_items = []
-    existing = {item.get("key") for item in flat_menu_items if isinstance(item, dict)}
-    for item in ASSISTANT_ROLE_MATRIX_ITEMS:
-        if not isinstance(item, dict):
-            continue
-        key = item.get("key")
-        if not key or key in existing:
-            continue
-        enriched = dict(item)
-        enriched.setdefault("section", "BYS360 Asistanı")
-        enriched.setdefault("settings_key", key)
-        flat_menu_items.append(enriched)
-        existing.add(key)
-    return flat_menu_items
 # BYS360_ASSISTANT_TABS_ROLE_MATRIX_V2_END
 
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_BEGIN
@@ -1216,38 +1109,6 @@ def _bys360_role_matrix_all_feature_items_v1():
     return result
 
 
-def extend_flat_menu_items_with_assistant_role_matrix_items(flat_menu_items):
-    """Rol matrisi kapsamındaki bütün canlı özellikleri kayıt listesine dahil eder.
-
-    Bu fonksiyon ismini geçmiş uyumluluk için korur; artık sadece BYS360 Asistanı
-    değil, Genel, Personel, Performans, KPI/Hedef, Yardım Merkezi, AI Karar Destek
-    ve Ayarlar-Güvenlik satırlarını da kapsar.
-    """
-    if flat_menu_items is None:
-        flat_menu_items = []
-    elif not isinstance(flat_menu_items, list):
-        flat_menu_items = list(flat_menu_items)
-
-    previous = _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_ALL_FEATURES_V1
-    if callable(previous):
-        try:
-            flat_menu_items = previous(flat_menu_items)
-        except Exception:
-            # Önceki uyumluluk katmanı sorun çıkarırsa mevcut liste korunur.
-            __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/main_handlers/account_communication_helpers.py:1231)")
-
-    existing = {
-        (_item.get("key") or _item.get("settings_key"))
-        for _item in flat_menu_items
-        if isinstance(_item, dict) and (_item.get("key") or _item.get("settings_key"))
-    }
-    for _item in _bys360_role_matrix_all_feature_items_v1():
-        _key = _item.get("key") or _item.get("settings_key")
-        if not _key or _key in existing:
-            continue
-        flat_menu_items.append(dict(_item))
-        existing.add(_key)
-    return flat_menu_items
 # BYS360_SETTINGS_ROLE_MATRIX_ALL_FEATURES_FINAL_FIX_V1_END
 
 # BYS360_PORTAL_SETTINGS_ROLE_MATRIX_V2_12_POLICY_BEGIN
