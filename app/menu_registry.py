@@ -188,7 +188,7 @@ def _resolve_badge(item: dict[str, Any], runtime_context: dict[str, Any]) -> Any
         return runtime_context.get(dynamic_badge, 0)
     return item.get("badge_value")
 
-def build_sidebar_menu_sections(menu_visibility_map: dict[str, bool], current_endpoint: str, current_path: str, runtime_context: dict[str, Any] | None = None, user=None) -> list[dict[str, Any]]:
+def _build_sidebar_menu_sections_base(menu_visibility_map: dict[str, bool], current_endpoint: str, current_path: str, runtime_context: dict[str, Any] | None = None, user=None) -> list[dict[str, Any]]:
     runtime_context = runtime_context or {}
     user = user or current_user
     role_name = (getattr(user, "role", "") or "").strip().lower()
@@ -987,15 +987,6 @@ except NameError:
     FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
 for _key in {'performance_module', 'performance_management', 'performans_yonetimi', 'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}:
     FORCE_VISIBLE_MENU_ROLES.pop(_key, None)  # noqa: F821 - dynamic menu registry global
-try:
-    _bys360_original_build_sidebar_menu_sections_perf_main_v3 = build_sidebar_menu_sections
-    def build_sidebar_menu_sections(menu_visibility_map, current_endpoint, current_path, runtime_context=None, user=None):
-        _sections = _bys360_original_build_sidebar_menu_sections_perf_main_v3(menu_visibility_map, current_endpoint, current_path, runtime_context, user)
-        for _section in _sections:
-            _section["items"] = [_item for _item in _section.get("items", []) if _item.get("key") != "performance_module"]
-        return [_section for _section in _sections if _section.get("items")]
-except Exception:
-    __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1881)")
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_END
 
 # BYS360_GENERAL_SECTION_RESTORE_V4_BEGIN
@@ -1286,18 +1277,45 @@ try:
             _current.extend([_key for _key in _keys if _key not in _current])
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:2178)")
-try:
-    _bys360_original_build_sidebar_menu_sections_perf_rm_v8 = build_sidebar_menu_sections
-    def build_sidebar_menu_sections(menu_visibility_map, current_endpoint, current_path, runtime_context=None, user=None):
-        _sections = _bys360_original_build_sidebar_menu_sections_perf_rm_v8(menu_visibility_map, current_endpoint, current_path, runtime_context, user)
-        for _section in _sections:
-            if _section.get("key") == "genel" or _section.get("label") == "Genel":
-                _section["items"] = [_item for _item in _section.get("items", []) if _item.get("key") not in _BYS360_PERF_RM_V8_GENERAL_REMOVE_KEYS]
-            if _section.get("key") == "performans" or _section.get("label") == "Performans Yönetimi":
-                _section["items"] = [_item for _item in _section.get("items", []) if _item.get("key") != "performance_module"]
-        return [_section for _section in _sections if _section.get("items")]
-except Exception:
-    __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:2190)")
+
+# PHASE3A_MENU_REGISTRY_EXPLICIT_SIDEBAR_BUILDER_BEGIN
+def build_sidebar_menu_sections(menu_visibility_map, current_endpoint, current_path, runtime_context=None, user=None):
+    """Build sidebar menu sections through one explicit public layer.
+
+    Flattened legacy wrapper chain:
+    - Base menu generation is handled by _build_sidebar_menu_sections_base.
+    - The legacy performance_module menu key is removed.
+    - Old performance role-matrix keys are removed from the General section.
+    """
+    _sections = _build_sidebar_menu_sections_base(
+        menu_visibility_map,
+        current_endpoint,
+        current_path,
+        runtime_context,
+        user,
+    )
+
+    for _section in _sections:
+        _items = list(_section.get("items", []) or [])
+
+        if _section.get("key") == "genel" or _section.get("label") == "Genel":
+            _items = [
+                _item
+                for _item in _items
+                if _item.get("key") not in _BYS360_PERF_RM_V8_GENERAL_REMOVE_KEYS
+            ]
+
+        _items = [
+            _item
+            for _item in _items
+            if _item.get("key") != "performance_module"
+        ]
+
+        _section["items"] = _items
+
+    return [_section for _section in _sections if _section.get("items")]
+# PHASE3A_MENU_REGISTRY_EXPLICIT_SIDEBAR_BUILDER_END
+
 # BYS360_PERFORMANCE_ROLE_MATRIX_PERSONNEL_V8_END
 
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_BEGIN
