@@ -568,6 +568,10 @@ def build_menu_visibility_map(
         rollback=rollback,
     )
     visibility = _apply_bys360_press_news_admin_only_policy(visibility, user)  # BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_APPLIED
+    visibility = _bys360_apply_performance_main_switch(visibility, user, role_name, rollback=rollback)
+    visibility = _bys360_restore_general_section_v4(visibility, user)
+    visibility = _bys360_apply_performance_shortcut_gate_v4(visibility)
+
     return visibility
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
@@ -1065,14 +1069,6 @@ def _bys360_apply_performance_main_switch(visibility, user, role_name, *, rollba
                 visibility[_key] = False
     return visibility
 
-try:
-    _bys360_original_build_menu_visibility_map_perf_main_v3 = build_menu_visibility_map
-    def build_menu_visibility_map(user, *, logger=None, rollback=None):
-        visibility = _bys360_original_build_menu_visibility_map_perf_main_v3(user, logger=logger, rollback=rollback)
-        role_name = normalize_role_name(getattr(user, "role", "")) if user is not None else ""
-        return _bys360_apply_performance_main_switch(visibility, user, role_name, rollback=rollback)
-except Exception:
-    __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1133)")
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_END
 
 # BYS360_GENERAL_SECTION_RESTORE_V4_BEGIN
@@ -1106,15 +1102,6 @@ def _bys360_apply_performance_shortcut_gate_v4(visibility):
             visibility[_key] = False
     return visibility
 
-try:
-    _bys360_original_build_menu_visibility_map_general_restore_v4 = build_menu_visibility_map
-    def build_menu_visibility_map(user, *, logger=None, rollback=None):
-        visibility = _bys360_original_build_menu_visibility_map_general_restore_v4(user, logger=logger, rollback=rollback)
-        visibility = _bys360_restore_general_section_v4(visibility, user)
-        visibility = _bys360_apply_performance_shortcut_gate_v4(visibility)
-        return visibility
-except Exception:
-    __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1173)")
 # BYS360_GENERAL_SECTION_RESTORE_V4_END
 
 # BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_EFFECTIVE_MENU_BEGIN
