@@ -560,34 +560,6 @@ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User
 
 
 
-def context(search: str | None = None) -> dict[str, Any]:
-    ensure_defaults()
-    cfg = get_config()
-    rec = get_recipients()
-    users = list_users(search=search, limit=800)
-    tasks = []
-    for key, meta in TASK_DEFINITIONS.items():
-        tcfg = cfg["tasks"].get(key, {})
-        tasks.append({"key": key, **meta, **tcfg, "subject": get_template(key)["subject"], "body": get_template(key)["body"]})
-    return {
-        "version": VERSION,
-        "config": cfg,
-        "tasks": tasks,
-        "task_definitions": TASK_DEFINITIONS,
-        "manager_recipients": rec["managers"],
-        "staff_recipients": rec["staff"],
-        "staff_mode": rec["staff_mode"],
-        "users": users,
-        "search": search or "",
-        "logs": get_recent_logs(80),
-        "location": cfg["location_name"],
-        "stats": {
-            "active_tasks": sum(1 for t in tasks if t.get("enabled")),
-            "manager_count": len(rec["managers"]),
-            "staff_count": len(rec["staff"]),
-            "last_status": get_setting(f"{BASE_KEY}.last_status", "Henüz gönderim yapılmadı"),
-        },
-    }
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
 
@@ -824,38 +796,6 @@ def _cic_phase3_last_result() -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def context(search: str | None = None) -> dict[str, Any]:
-    ensure_defaults()
-    cfg = get_config()
-    rec = get_recipients()
-    users = list_users(search=search, limit=800)
-    tasks = []
-    for key, meta in TASK_DEFINITIONS.items():
-        tcfg = cfg["tasks"].get(key, {})
-        tasks.append({"key": key, **meta, **tcfg, "subject": get_template(key)["subject"], "body": get_template(key)["body"]})
-    phase3_last_result = _cic_phase3_last_result()
-    logs = get_recent_logs(120)
-    return {
-        "version": VERSION,
-        "config": cfg,
-        "tasks": tasks,
-        "task_definitions": TASK_DEFINITIONS,
-        "manager_recipients": rec["managers"],
-        "staff_recipients": rec["staff"],
-        "staff_mode": rec["staff_mode"],
-        "users": users,
-        "search": search or "",
-        "logs": logs,
-        "location": cfg["location_name"],
-        "phase3_last_result": phase3_last_result,
-        "stats": {
-            "active_tasks": sum(1 for t in tasks if t.get("enabled")),
-            "manager_count": len(rec["managers"]),
-            "staff_count": len(rec["staff"]),
-            "last_status": get_setting(f"{BASE_KEY}.last_status", "Henüz gönderim yapılmadı"),
-            "last_phase3_status": phase3_last_result.get("message") or "Henüz Faz 3 gönderim testi yapılmadı.",
-        },
-    }
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_END
 
@@ -1095,7 +1035,7 @@ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User
     return result
 
 
-def context(search: str | None = None) -> dict[str, Any]:
+def _context_base(search: str | None = None) -> dict[str, Any]:
     ensure_defaults()
     cfg = get_config()
     rec = get_recipients()
@@ -1310,22 +1250,8 @@ def _cic_phase6_build(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-try:
-    _cic_phase6_previous_context
-except NameError:
-    _cic_phase6_previous_context = context
 
 
-def context(search: str | None = None) -> dict[str, Any]:
-    data = _cic_phase6_previous_context(search=search)
-    phase6 = _cic_phase6_build(data)
-    data["phase6"] = phase6
-    stats = data.setdefault("stats", {})
-    stats["phase6_uat_score"] = phase6.get("uat_score", 0)
-    stats["phase6_live_score"] = (phase6.get("live") or {}).get("score", 0)
-    stats["phase6_blocker_count"] = len(phase6.get("blockers") or [])
-    data["version"] = "BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY"
-    return data
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_END
 
@@ -1620,17 +1546,8 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
 
 
 
-try:
-    _cic_original_context_for_auto_scheduler = context
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:1634")
-    _cic_original_context_for_auto_scheduler = None
 
 
-def context(search: str | None = None) -> dict[str, Any]:  # type: ignore[override]
-    data = _cic_original_context_for_auto_scheduler(search) if _cic_original_context_for_auto_scheduler is not None else {}
-    data["auto_scheduler"] = get_auto_scheduler_config()
-    return data
 
 
 
@@ -1807,17 +1724,34 @@ def save_system(payload: dict[str, object], actor_user_id: int | None = None) ->
 
 
 
-try:
-    _cic_prev_context_weekday_only = context
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:1813")
-    _cic_prev_context_weekday_only = None
 
 
-def context(search: str | None = None) -> dict[str, _cic_typing_any]:  # type: ignore[override]
-    data = _cic_prev_context_weekday_only(search) if _cic_prev_context_weekday_only is not None else {}
+
+# PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
+def context(search: str | None = None) -> dict[str, Any]:
+    """Build CIC management context through one explicit public layer.
+
+    Flattened legacy wrapper chain:
+    - Core Phase 5 control-panel context is produced by _context_base.
+    - Phase 6 UAT/live readiness data is added explicitly.
+    - Auto scheduler configuration is added once.
+    """
+    data = _context_base(search=search)
+
+    phase6 = _cic_phase6_build(data)
+    data["phase6"] = phase6
+
+    stats = data.setdefault("stats", {})
+    stats["phase6_uat_score"] = phase6.get("uat_score", 0)
+    stats["phase6_live_score"] = (phase6.get("live") or {}).get("score", 0)
+    stats["phase6_blocker_count"] = len(phase6.get("blockers") or [])
+
     data["auto_scheduler"] = get_auto_scheduler_config()
+    data["version"] = "BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY"
+
     return data
+# PHASE3A_CIC_EXPLICIT_CONTEXT_END
+
 
 
 def _cic_auto_last_run_key(task_key: str) -> str:
