@@ -219,7 +219,7 @@ def can_manage(user: Any) -> bool:
     return role in ADMIN_ROLES
 
 
-def ensure_defaults(actor_user_id: int | None = None) -> None:
+def _ensure_defaults_base(actor_user_id: int | None = None) -> None:
     tasks = _loads_json(f"{BASE_KEY}.tasks", None)
     if not isinstance(tasks, dict):
         tasks = {}
@@ -1735,37 +1735,39 @@ def ensure_celebration_schema() -> dict[str, object]:
     return result
 
 
-try:
-    _cic_v40_previous_ensure_defaults = ensure_defaults
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:2106")
-    _cic_v40_previous_ensure_defaults = None
 
 
-def ensure_defaults(actor_user_id: int | None = None) -> None:  # type: ignore[override]
-    if _cic_v40_previous_ensure_defaults is not None:
-        _cic_v40_previous_ensure_defaults(actor_user_id=actor_user_id)
+
+# PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_BEGIN
+def ensure_defaults(actor_user_id: int | None = None) -> None:
+    """Ensure CIC default settings through one explicit public layer."""
+    _ensure_defaults_base(actor_user_id=actor_user_id)
+
     defaults = {
-        "celebrations_enabled": ("true", "Akıllı kutlama motoru", "boolean"),
-        "birthday_enabled": ("true", "Doğum günü kutlamaları", "boolean"),
-        "work_anniversary_enabled": ("true", "Göreve başlama yıl dönümü kutlamaları", "boolean"),
-        "special_day_enabled": ("true", "Özel gün bilgilendirmeleri", "boolean"),
-        "celebration_system_notifications_enabled": ("true", "Kutlamaları sistem içi bildirim olarak da oluştur", "boolean"),
-        "celebrations_include_weekend": ("false", "Hafta sonu kutlamaları otomatik çalışsın", "boolean"),
-        "special_day_recipient_mode": ("all_active", "Özel gün hedef kitlesi", "string"),
-        "special_days": (_dumps_json(_CIC_V40_SPECIAL_DAY_DEFAULTS), "Özel gün takvimi", "json"),
+        "celebrations_enabled": ("true", "Ak\u0131ll\u0131 kutlama motoru", "boolean"),
+        "birthday_enabled": ("true", "Do\u011fum g\u00fcn\u00fc kutlamalar\u0131", "boolean"),
+        "work_anniversary_enabled": ("true", "G\u00f6reve ba\u015flama y\u0131l d\u00f6n\u00fcm\u00fc kutlamalar\u0131", "boolean"),
+        "special_day_enabled": ("true", "\u00d6zel g\u00fcn bilgilendirmeleri", "boolean"),
+        "celebration_system_notifications_enabled": ("true", "Kutlamalar\u0131 sistem i\u00e7i bildirim olarak da olu\u015ftur", "boolean"),
+        "celebrations_include_weekend": ("false", "Hafta sonu kutlamalar\u0131 otomatik \u00e7al\u0131\u015fs\u0131n", "boolean"),
+        "special_day_recipient_mode": ("all_active", "\u00d6zel g\u00fcn hedef kitlesi", "string"),
+        "special_days": (_dumps_json(_CIC_V40_SPECIAL_DAY_DEFAULTS), "\u00d6zel g\u00fcn takvimi", "json"),
     }
+
     changed = False
     for key, (value, label, value_type) in defaults.items():
         full_key = f"{BASE_KEY}.{key}"
         if get_setting(full_key, "") == "":
             set_setting(full_key, value, label=label, value_type=value_type, actor_user_id=actor_user_id)
             changed = True
+
     if changed:
         try:
             db.session.commit()
         except Exception:
             db.session.rollback()
+# PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_END
+
 
 
 def _cic_v40_special_days() -> list[dict[str, object]]:
