@@ -323,7 +323,7 @@ def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) ->
     db.session.commit()
 
 
-def save_system(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
+def _save_system_base(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
     set_setting(f"{BASE_KEY}.location_name", (payload.get("location_name") or "Çanakkale").strip(), label="Hava durumu konumu", actor_user_id=actor_user_id)
     set_setting(f"{BASE_KEY}.latitude", (payload.get("latitude") or "40.1553").strip(), label="Enlem", actor_user_id=actor_user_id)
     set_setting(f"{BASE_KEY}.longitude", (payload.get("longitude") or "26.4142").strip(), label="Boylam", actor_user_id=actor_user_id)
@@ -1616,17 +1616,8 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
 
 
 
-try:
-    _cic_original_save_system_for_auto_scheduler = save_system
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:1622")
-    _cic_original_save_system_for_auto_scheduler = None
 
 
-def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:  # type: ignore[override]
-    if _cic_original_save_system_for_auto_scheduler is not None:
-        _cic_original_save_system_for_auto_scheduler(payload, actor_user_id=actor_user_id)
-    set_auto_scheduler_config(payload, actor_user_id=actor_user_id)
 
 
 try:
@@ -1799,17 +1790,21 @@ def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | N
         db.session.rollback()
 
 
-try:
-    _cic_prev_save_system_weekday_only = save_system
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:1801")
-    _cic_prev_save_system_weekday_only = None
 
 
-def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:  # type: ignore[override]
-    if _cic_prev_save_system_weekday_only is not None:
-        _cic_prev_save_system_weekday_only(payload, actor_user_id=actor_user_id)
+
+# PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_BEGIN
+def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:
+    """Persist CIC system settings through one explicit public layer.
+
+    Flattened legacy wrapper chain:
+    - Base weather/location settings are saved by _save_system_base.
+    - Auto scheduler settings are saved once by set_auto_scheduler_config.
+    """
+    _save_system_base(payload, actor_user_id=actor_user_id)
     set_auto_scheduler_config(payload, actor_user_id=actor_user_id)
+# PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_END
+
 
 
 try:
