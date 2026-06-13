@@ -35,3 +35,55 @@ Bundan sonra:
 - Dağınık rapor ve dokümanlar docs/archive/ ve eports/archive/ altında toplanacak.
 - Güncel mimari bilgi ARCHITECTURE.md, güncel durum bilgisi STATUS.md içinde tutulacak.
 
+
+<!-- PHASE2Y_ARCHITECTURE_DECISION_20260613 -->
+
+## Mimari Karar Kaydı - 2026-06-13 - Faz 2Y Repo Sadeleştirme
+
+### Bağlam
+
+Faz 2 boyunca proje içinde çok sayıda tek kullanımlık kalite/onarım scripti, SAFE/HOTFIX/OVERLAY dokümanı ve manifest oluşmuştur. Bu yapı teknik borcu azaltırken repo okunabilirliğini ve devredilebilirliği zorlaştırmaya başlamıştır.
+
+### Karar
+
+Repo artık iki ana doküman üzerinden yönetilecektir:
+
+- STATUS.md: güncel faz durumu, kapanış kararları, test sonuçları
+- ARCHITECTURE.md: mimari karar kayıtları, istisnalar, kalıcı geliştirme disiplini
+
+Geçici README / manifest / tek kullanımlık onarım scriptleri archive altına alınacaktır.
+
+### scripts/quality Politikası
+
+scripts/quality/ altında sadece aktif veya korunması gereken gate/kanıt dosyaları kalacaktır.
+
+Kalan ana sınıflar:
+
+- Security gate
+- Quality gate
+- Architecture gate
+- Mobile gate
+- Release / ops gate
+- Security hygiene evidence
+- Manuel review gerektiren geçiş dosyaları
+
+### Yasaklanan Eski Alışkanlık
+
+Aşağıdaki yaklaşım terk edilmiştir:
+
+- Her değişiklik için yeni repair scripti
+- Her küçük düzeltme için yeni SAFE/HOTFIX/OVERLAY paketi
+- Her işlem için yeni README veya manifest
+- Sürüm numarası şişiren V_SAFE_NN kültürü
+
+### Yeni Standart
+
+Bundan sonra geliştirmeler normal Git akışıyla yapılacaktır:
+
+1. Küçük ve açıklanabilir değişiklik
+2. Mevcut modül üzerinde düzenleme
+3. Mevcut testin güncellenmesi veya ilgili yeni testin doğrudan test dizinine eklenmesi
+4. STATUS.md / ARCHITECTURE.md güncellemesi
+5. Test kapıları
+6. Commit / PR özeti
+
