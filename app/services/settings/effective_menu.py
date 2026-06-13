@@ -572,6 +572,66 @@ def build_menu_visibility_map(
     visibility = _bys360_restore_general_section_v4(visibility, user)
     visibility = _bys360_apply_performance_shortcut_gate_v4(visibility)
 
+
+    # PHASE3A_EFFECTIVE_MENU_V7_V8_INLINE_BEGIN
+    if user:
+        role_name = normalize_role_name(getattr(user, "role", ""))
+        role_state = _load_role_matrix_state(role_name, rollback=rollback)
+        unit_state = _load_unit_profile_state(user, rollback=rollback)
+        user_state = _load_user_override_state(user, rollback=rollback)
+
+        for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS:
+            visibility[_key] = False
+
+        manager_norms = {
+            _phase3_2_normalize_role_name(_r)
+            for _r in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES
+        }
+
+        for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS:
+            if _key not in visibility:
+                visibility[_key] = False
+            if _key in role_state:
+                visibility[_key] = bool(role_state[_key])
+            elif role_name in manager_norms:
+                visibility[_key] = True
+            if role_state.get(_key) is not False and _key in unit_state:
+                visibility[_key] = bool(unit_state[_key])
+            if role_state.get(_key) is not False and _key in user_state:
+                visibility[_key] = bool(user_state[_key])
+            if role_name in {"personel", "user", "kullanici", "kullan\u0131c\u0131", "standart_personel", "rolsuz", "__none__"} and _key in {"admin_users", "org_units", "hr_management", "hr_reports"}:
+                if role_state.get(_key) is not True and user_state.get(_key) is not True:
+                    visibility[_key] = False
+
+        visibility["account"] = True
+        visibility["logout"] = True
+
+        role_name = _bys360_perf_rm_v8_norm_role(getattr(user, "role", ""))
+        try:
+            role_state = _load_role_matrix_state(role_name, rollback=rollback)
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=perf_rm_v8_role_state")
+            role_state = {}
+        try:
+            unit_state = _load_unit_profile_state(user, rollback=rollback)
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=perf_rm_v8_unit_state")
+            unit_state = {}
+        try:
+            user_state = _load_user_override_state(user, rollback=rollback)
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=perf_rm_v8_user_state")
+            user_state = {}
+
+        visibility = _bys360_perf_rm_v8_apply_aliases(visibility, role_state, unit_state, user_state)
+        visibility = _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_state)
+        visibility["account"] = True
+        visibility["logout"] = True
+    # PHASE3A_EFFECTIVE_MENU_V7_V8_INLINE_END
+
     return visibility
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
@@ -1153,36 +1213,7 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1221)")
 
-_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_PREVIOUS_BUILD = build_menu_visibility_map
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = dict(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_PREVIOUS_BUILD(user, logger=logger, rollback=rollback) or {})
-    if not user:
-        return visibility
-    role_name = normalize_role_name(getattr(user, "role", ""))
-    role_state = _load_role_matrix_state(role_name, rollback=rollback)
-    unit_state = _load_unit_profile_state(user, rollback=rollback)
-    user_state = _load_user_override_state(user, rollback=rollback)
-    for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS:
-        visibility[_key] = False
-    manager_norms = {_phase3_2_normalize_role_name(_r) for _r in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES}
-    for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS:
-        if _key not in visibility:
-            visibility[_key] = False
-        if _key in role_state:
-            visibility[_key] = bool(role_state[_key])
-        elif role_name in manager_norms:
-            visibility[_key] = True
-        if role_state.get(_key) is not False and _key in unit_state:
-            visibility[_key] = bool(unit_state[_key])
-        if role_state.get(_key) is not False and _key in user_state:
-            visibility[_key] = bool(user_state[_key])
-        if role_name in {"personel", "user", "kullanici", "kullanıcı", "standart_personel", "rolsuz", "__none__"} and _key in {"admin_users", "org_units", "hr_management", "hr_reports"}:
-            if role_state.get(_key) is not True and user_state.get(_key) is not True:
-                visibility[_key] = False
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 # BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_EFFECTIVE_MENU_END
 
 # BYS360_PERFORMANCE_ROLE_MATRIX_PERSONNEL_V8_BEGIN
@@ -1381,37 +1412,7 @@ def _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_
     return visibility
 
 
-_BYS360_PERF_RM_V8_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = dict(_BYS360_PERF_RM_V8_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, logger=logger, rollback=rollback) or {})
-    if not user:
-        return visibility
-    role_name = _bys360_perf_rm_v8_norm_role(getattr(user, "role", ""))
-    try:
-        role_state = _load_role_matrix_state(role_name, rollback=rollback)
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu guvenli fallback isleminde hata yakalandi | line=1491")
-        role_state = {}
-    try:
-        unit_state = _load_unit_profile_state(user, rollback=rollback)
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        unit_state = {}
-    try:
-        user_state = _load_user_override_state(user, rollback=rollback)
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        user_state = {}
-
-    visibility = _bys360_perf_rm_v8_apply_aliases(visibility, role_state, unit_state, user_state)
-    visibility = _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_state)
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 # BYS360_PERFORMANCE_ROLE_MATRIX_PERSONNEL_V8_END
 
 
