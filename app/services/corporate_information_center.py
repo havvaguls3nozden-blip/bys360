@@ -1552,84 +1552,6 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
 
 
 
-def run_due_tasks(*, now: datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, Any]:
-    """Sistem ayarlarina gore zamani gelen aktif mail gorevlerini calistirir.
-
-    Bu fonksiyon Windows Scheduled Task tarafindan sik araliklarla cagirilir. Gercek karar
-    BYS360 icindeki Gorevler ve Sistem ekranindaki aktif/pasif ve saat ayarlarindan alinir.
-    """
-    ensure_defaults(actor_user_id=actor_user_id)
-    scheduler = get_auto_scheduler_config()
-    current = now or _now()
-    today = current.strftime("%Y-%m-%d")
-    results: list[dict[str, Any]] = []
-
-    if not scheduler.get("enabled") and not force:
-        return {"ok": True, "scheduler_enabled": False, "message": "Otomatik mail zamanlayicisi BYS360 Sistem ekraninda pasif.", "ran": [], "skipped": []}
-
-    cfg = get_config()
-    tasks_cfg = cfg.get("tasks", {}) if isinstance(cfg, dict) else {}
-    late_window = int(scheduler.get("late_window_minutes") or 20)
-    ran_any = False
-
-    for task_key, meta in TASK_DEFINITIONS.items():
-        task_cfg = tasks_cfg.get(task_key, {}) if isinstance(tasks_cfg, dict) else {}
-        enabled = bool(task_cfg.get("enabled", False))
-        try:
-            hour = int(task_cfg.get("hour", meta.get("default_hour", 12)))
-            minute = int(task_cfg.get("minute", meta.get("default_minute", 0)))
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1681")
-            hour = int(meta.get("default_hour", 12))
-            minute = int(meta.get("default_minute", 0))
-        scheduled = current.replace(hour=max(0, min(23, hour)), minute=max(0, min(59, minute)), second=0, microsecond=0)
-        diff_minutes = (current - scheduled).total_seconds() / 60.0
-        last_run = get_setting(_cic_auto_last_run_key(task_key), "") or ""
-        already_today = last_run.startswith(today)
-
-        row = {
-            "task_key": task_key,
-            "task_label": meta.get("label", task_key),
-            "enabled": enabled,
-            "scheduled_time": f"{hour:02d}:{minute:02d}",
-            "last_auto_run": last_run,
-        }
-
-        if not enabled:
-            row.update({"action": "skipped", "reason": "Görev pasif"})
-            results.append(row)
-            continue
-        if already_today and not force:
-            row.update({"action": "skipped", "reason": "Bugün zaten otomatik çalıştı"})
-            results.append(row)
-            continue
-        if not force and not (0 <= diff_minutes <= late_window):
-            row.update({"action": "waiting", "reason": f"Zamanı gelmedi veya {late_window} dk tolerans dışında"})
-            results.append(row)
-            continue
-
-        result = send_task(task_key, dry_run=dry_run, actor_user_id=actor_user_id)
-        set_setting(_cic_auto_last_run_key(task_key), current.strftime("%Y-%m-%d %H:%M:%S"), label=f"{meta.get('label', task_key)} son otomatik çalışma", actor_user_id=actor_user_id)
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-        row.update({"action": "ran", "result": result})
-        results.append(row)
-        ran_any = True
-
-    return {
-        "ok": True,
-        "scheduler_enabled": True,
-        "dry_run": dry_run,
-        "force": force,
-        "now": current.strftime("%Y-%m-%d %H:%M:%S"),
-        "late_window_minutes": late_window,
-        "ran_any": ran_any,
-        "results": results,
-        "ran": [r for r in results if r.get("action") == "ran"],
-        "skipped": [r for r in results if r.get("action") != "ran"],
-    }
 
 
 # BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1
@@ -1758,7 +1680,7 @@ def _cic_auto_last_run_key(task_key: str) -> str:
     return f"{BASE_KEY}.auto.last_run.{task_key}"
 
 
-def run_due_tasks(*, now: _cic_dt_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_typing_any]:  # type: ignore[override]
+def _run_due_tasks_base(*, now: _cic_dt_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_typing_any]:  # type: ignore[override]
     """Zamanı gelen aktif mail görevlerini çalıştırır; hafta sonu otomatik gönderimi engeller."""
     ensure_defaults(actor_user_id=actor_user_id)
     scheduler = get_auto_scheduler_config()
@@ -2412,11 +2334,6 @@ def save_celebration_settings(payload: dict[str, object], actor_user_id: int | N
         raise
 
 
-try:
-    _cic_v40_previous_run_due_tasks = run_due_tasks
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:2467")
-    _cic_v40_previous_run_due_tasks = None
 
 
 def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
@@ -2450,20 +2367,30 @@ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool 
     return results
 
 
-def run_due_tasks(*, now: _cic_v40_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_v40_Any]:  # type: ignore[override]
-    if _cic_v40_previous_run_due_tasks is None:
-        return {"ok": False, "message": "Otomatik görev servisi bulunamadı."}
-    result = _cic_v40_previous_run_due_tasks(now=now, dry_run=dry_run, actor_user_id=actor_user_id, force=force)
+
+# PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_BEGIN
+def run_due_tasks(*, now: _cic_v40_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_v40_Any]:
+    """Run due CIC mail tasks through one explicit public layer.
+
+    Flattened legacy wrapper chain:
+    - Base scheduler execution is handled by _run_due_tasks_base.
+    - Weekend celebration exception tasks are applied explicitly after the base result.
+    """
+    result = _run_due_tasks_base(now=now, dry_run=dry_run, actor_user_id=actor_user_id, force=force)
+
     current = now or _now()
     if result.get("weekend_blocked") and not force:
         extra = _cic_v40_run_weekend_celebrations(current, dry_run=dry_run, actor_user_id=actor_user_id)
         if extra:
             result["weekend_blocked"] = False
-            result["message"] = "Hafta sonu genel gönderimler engellendi; kutlama görevleri ayar gereği çalıştırıldı."
+            result["message"] = "Hafta sonu genel gonderimler engellendi; kutlama gorevleri ayar geregi calistirildi."
             result.setdefault("results", []).extend(extra)
             result["ran"] = list(result.get("ran") or []) + extra
             result["ran_any"] = True
+
     return result
+# PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_END
+
 
 # BYS360_CIC_V4_0_SMART_CELEBRATIONS_END
 
