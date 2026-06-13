@@ -693,6 +693,47 @@ def build_menu_visibility_map(
     visibility = _bys360_force_home_menu_visible_v1(visibility, user)
     # PHASE3A_EFFECTIVE_MENU_V14_GENERAL_HOME_INLINE_END
 
+
+    # PHASE3A_EFFECTIVE_MENU_PORTAL_EXEC_INLINE_BEGIN
+    role = str(getattr(user, "role", "") or "").strip().lower()
+    for key, allowed_roles in PORTAL_MENU_VISIBILITY_POLICY.items():
+        if role in allowed_roles and not is_removed_menu_key(key):
+            visibility.setdefault(key, True)
+
+    visibility = _bys360_portal_role_matrix_v2_12_apply(visibility, user, rollback=rollback)
+
+    try:
+        exec_role = _bys360_exec_norm(getattr(user, "role", ""))
+        is_admin = exec_role in globals().get("_BYS360_EXEC_ADMIN_ONLY_ROLES", set())
+        try:
+            active_items = _active_menu_items()
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=exec_active_items")
+            active_items = []
+
+        exec_keys = set(globals().get("_BYS360_EXEC_KNOWN_KEYS", set()))
+        for item in active_items or []:
+            if isinstance(item, dict) and _bys360_exec_item_matches(item):
+                k = str(item.get("key") or "").strip()
+                if k:
+                    exec_keys.add(k)
+
+        for k in list(visibility.keys()):
+            if _bys360_is_exec_summary_menu_key(k):
+                exec_keys.add(k)
+
+        for k in exec_keys:
+            if k in visibility:
+                visibility[k] = bool(is_admin)
+
+        if "executive_summary" in visibility:
+            visibility["executive_summary"] = bool(is_admin)
+    except Exception:
+        log = __import__("logging").getLogger(__name__)
+        log.exception("BYS360 effective menu fallback failed | phase=exec_admin_only")
+    # PHASE3A_EFFECTIVE_MENU_PORTAL_EXEC_INLINE_END
+
     return visibility
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
@@ -1704,15 +1745,7 @@ except Exception:
     logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
     pass
 
-_BYS360_CORPORATE_PORTAL_V1_ORIGINAL_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
-def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
-    visibility = _BYS360_CORPORATE_PORTAL_V1_ORIGINAL_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs)
-    role = str(getattr(user, "role", "") or "").strip().lower()
-    for key, allowed_roles in PORTAL_MENU_VISIBILITY_POLICY.items():
-        if role in allowed_roles and not is_removed_menu_key(key):
-            visibility.setdefault(key, True)
-    return visibility
 # /BYS360_CORPORATE_PORTAL_V1_EFFECTIVE_MENU_POLICY
 
 # BYS360_PORTAL_SETTINGS_ROLE_MATRIX_V2_12_EFFECTIVE_MENU_BEGIN
@@ -1779,11 +1812,7 @@ def _bys360_portal_role_matrix_v2_12_apply(visibility, user, *, rollback=None):
                 visibility[key] = bool(user_state[key])
     return visibility
 
-_BYS360_PORTAL_ROLE_MATRIX_V2_12_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = _BYS360_PORTAL_ROLE_MATRIX_V2_12_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, logger=logger, rollback=rollback)
-    return _bys360_portal_role_matrix_v2_12_apply(visibility, user, rollback=rollback)
 # BYS360_PORTAL_SETTINGS_ROLE_MATRIX_V2_12_EFFECTIVE_MENU_END
 
 
@@ -1871,38 +1900,6 @@ def _bys360_exec_item_matches(item: dict[str, object]) -> bool:
         return False
 
 
-try:
-    _bys360_exec_original_build_menu_visibility_map = build_menu_visibility_map  # type: ignore[name-defined]
-
-    def build_menu_visibility_map(user: object, *args: object, **kwargs: object) -> dict[str, bool]:  # type: ignore[no-redef]
-        visibility = _bys360_exec_original_build_menu_visibility_map(user, *args, **kwargs)
-        role = _bys360_exec_norm(getattr(user, "role", ""))
-        is_admin = role in _BYS360_EXEC_ADMIN_ONLY_ROLES
-        try:
-            active_items = _active_menu_items()  # type: ignore[name-defined]
-        except Exception:
-            logger = __import__("logging").getLogger(__name__)
-            logger.exception("BYS360 effective menu isleminde hata yakalandi")
-            active_items = []
-        exec_keys = set(_BYS360_EXEC_KNOWN_KEYS)
-        for item in active_items or []:
-            if isinstance(item, dict) and _bys360_exec_item_matches(item):
-                k = str(item.get("key") or "").strip()
-                if k:
-                    exec_keys.add(k)
-        for k in list(visibility.keys()):
-            if _bys360_is_exec_summary_menu_key(k):
-                exec_keys.add(k)
-        for k in exec_keys:
-            if k in visibility:
-                visibility[k] = bool(is_admin)
-        # Üst anahtar yoksa alt sekme görünmesin diye ana modül de kapalı tutulur.
-        if "executive_summary" in visibility:
-            visibility["executive_summary"] = bool(is_admin)
-        return visibility
-except Exception:
-    import logging
-    logging.getLogger(__name__).exception("BYS360 Executive Summary admin-only menu lock uygulanamadı")
 # BYS360_EXECUTIVE_SUMMARY_V1_0_10_ADMIN_ONLY_MENU_LOCK_END
 
 # BYS360_PERFORMANCE_V2_1_3C_EFFECTIVE_MENU_FORCE_BEGIN
