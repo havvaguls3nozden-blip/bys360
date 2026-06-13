@@ -367,3 +367,52 @@ Karar:
 - Aktif kalan scripts/quality sayısı 119 değil, 123 olarak kabul edilmelidir.
 - Bu düzeltme uygulama koduna, migration dosyalarına veya canlı ortama dokunmamıştır.
 
+
+<!-- PHASE2Y_FINAL_CLOSURE_20260613 -->
+
+## 2026-06-13 13:39:45 - Faz 2Y Final Kapanış: Repo / Script / Doküman Sadeleştirme
+
+### Özet
+
+Faz 2Y kapsamında Faz 2Z sonrası repo sadeleştirme çalışması yapılmıştır.
+
+### Yapılanlar
+
+- Kök dizindeki eski SAFE / HOTFIX / MANIFEST dokümanları docs/archive/legacy-root/ altına taşındı.
+- scripts/quality/ içindeki eski tek kullanımlık repair/check/apply/analyze dosyaları iki dalgada arşive alındı.
+- Wave1 arşiv sayısı: 120
+- Wave2 ilk arşiv sayısı: 135
+- Wave2 düzeltmesiyle geri alınan aktif gate dosyası: 4
+- Wave2 net arşiv sayısı: 131
+- Toplam arşivlenen kalite scripti: 251
+- scripts/quality dosya sayısı: 374 -> 123
+
+### Kalan Aktif scripts/quality Sınıflandırması
+
+- architecture-gate: 9
+- mobile-gate: 31
+- quality-gate: 4
+- release-ops-gate: 9
+- review: 18
+- security-gate: 17
+- security-hygiene-history: 35
+
+### Karar
+
+Kalan 123 kalite scripti şimdilik korunacaktır. Bunlar aktif gate, test tarafından import edilen dosya, güvenlik kanıtı, mobil gate veya Faz 2 mimari kapanış kanıtı niteliğindedir.
+
+Bundan sonra yeni SAFE / HOTFIX / OVERLAY / manifest kültürü devam ettirilmeyecektir.
+
+Yeni geliştirme disiplini:
+
+- Mevcut modül düzenlenecek.
+- Mevcut test güncellenecek.
+- Güncel durum STATUS.md içinde tutulacak.
+- Güncel mimari karar ARCHITECTURE.md içinde tutulacak.
+- Eski tek kullanımlık scriptler archive altında kalacak.
+- Canlıya geçiş için ayrıca final release gate alınacak.
+
+### Canlı Durum
+
+Bu fazda canlı ortama dokunulmadı. Çalışma yerel Git dalında yapılmıştır: phase2y/repo-sadelestirme.
+
