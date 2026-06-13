@@ -1,0 +1,50 @@
+{% macro premium_context_banner(title='', text='', kicker='Kurumsal çalışma alanı', icon='fa-solid fa-layer-group', badges=None, side_title='', side_text='') -%}
+<div class="bys-workspace-banner">
+    <div class="bys-workspace-banner-main">
+        <span class="bys-workspace-kicker"><i class="{{ icon }}"></i> {{ kicker }}</span>
+        <h3 class="bys-workspace-title">{{ title }}</h3>
+        {% if text %}<p class="bys-workspace-text">{{ text }}</p>{% endif %}
+        {% if badges %}
+        <div class="bys-workspace-badges">
+            {% for badge in badges %}
+            <span class="bys-workspace-badge {{ badge.tone if badge.tone is defined else '' }}">
+                {% if badge.icon %}<i class="{{ badge.icon }}"></i>{% endif %}
+                {{ badge.text }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% if side_title or side_text %}
+    <div class="bys-workspace-banner-side">
+        {% if side_title %}<div class="bys-workspace-side-title">{{ side_title }}</div>{% endif %}
+        {% if side_text %}<div class="bys-workspace-side-text">{{ side_text }}</div>{% endif %}
+    </div>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro premium_metric_card(label='', value='', icon='fa-solid fa-chart-column', sub='', tone='') -%}
+<div class="bys-metric-card {{ tone }}">
+    <div class="bys-metric-icon"><i class="{{ icon }}"></i></div>
+    <div class="bys-metric-label">{{ label }}</div>
+    <div class="bys-metric-value">{{ value }}</div>
+    {% if sub %}<div class="bys-metric-sub">{{ sub }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro premium_action_shell(title='', text='', icon='fa-solid fa-sliders', compact=False) -%}
+<div class="bys-action-shell {% if compact %}compact{% endif %}">
+    <div class="bys-action-shell-head">
+        <div>
+            {% if title %}<h4 class="bys-action-shell-title"><i class="{{ icon }}"></i> {{ title }}</h4>{% endif %}
+            {% if text %}<p class="bys-action-shell-text">{{ text }}</p>{% endif %}
+        </div>
+    </div>
+    <div class="bys-action-shell-body">{{ caller() }}</div>
+</div>
+{%- endmacro %}
+
+{% macro premium_helper_note(text='', icon='fa-solid fa-circle-info') -%}
+<div class="bys-helper-note"><i class="{{ icon }}"></i><span>{{ text }}</span></div>
+{%- endmacro %}

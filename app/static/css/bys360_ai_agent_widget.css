@@ -1,0 +1,15 @@
+/* BYS360_AG5_COMPAT_ALIAS_CSS */
+/* BYS360_AI_AGENT_AG6_SECURITY_WIDGET_V1 */
+/* BYS360_AI_AGENT_AG8_CORPORATE_WIDGET_CSS_V1 */
+/* BYS360_AI_AGENT_AG9_CORPORATE_VISUAL_FINAL_V1 */
+/* Legacy selector izleri: .bys360-ai-agent-toggle .bys360-ai-agent-launcher .bys360-ai-agent-panel */
+.bys360-ai-agent-toggle{}
+.bys360-ai-agent-launcher{}
+.bys360-ai-agent-panel{}
+/* BYS360_AI_AGENT_AG5_WIDGET_ALIAS_FIX_V1_CSS
+   AG-5 gate uyumluluk dosyasıdır.
+   Aktif kanonik stil: app/static/css/bys360_assistant_module.css
+   AG-5 | AI_AGENT_AG5_VERSION | BYS360_AI_AGENT_AG5_ACTION_QUEUE_WIDGET_V1
+   Onaylı Aksiyon Kuyruğu | kullanıcı onayı olmadan veri değiştiren otomatik işlem yapılmaz
+*/
+@import url('/static/css/bys360_assistant_module.css?v=assistant-module-canonical-ag5-alias-v1');

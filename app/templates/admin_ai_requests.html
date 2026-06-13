@@ -1,0 +1,47 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek İşlem Günlükleri - BYS360{% endblock %}
+{% block page_kicker %}Yönetim & Denetim{% endblock %}
+{% block page_title %}Karar Destek İşlem Günlükleri{% endblock %}
+{% block page_subtitle %}Modül, özellik, istem sürümü ve maskeleme durumuna göre filtrelenebilir AI çağrı kayıtları{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">AI denetim izi</div>
+    <h3 class="ai-title">Kim, hangi modülde, hangi AI işlemini tetikledi?</h3>
+    <p class="ai-sub">Bu ekran AI çağrı kayıtlarını, hata durumlarını, istem sürümlerini ve maskeleme görünürlüğünü görünür yapar.</p>
+  </section>
+  <form class="ai-form-wrap" method="get">
+    <div class="ai-filters ai-filters-wide">
+      <div class="ai-group"><label>Modül</label><select class="ai-select" name="module_type"><option value="">Tümü</option>{% for value in module_options %}<option value="{{ value }}" {{ 'selected' if selected_module_type == value|lower else '' }}>{{ value|ai_module_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Özellik</label><select class="ai-select" name="feature_type"><option value="">Tümü</option>{% for value in feature_options %}<option value="{{ value }}" {{ 'selected' if selected_feature_type == value|lower else '' }}>{{ value|ai_feature_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Durum</label><select class="ai-select" name="status"><option value="">Tümü</option>{% for value in status_options %}<option value="{{ value }}" {{ 'selected' if selected_status == value|lower else '' }}>{{ value|ai_status_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>İstem sürümü</label><select class="ai-select" name="prompt_version"><option value="">Tümü</option>{% for value in prompt_version_options %}<option value="{{ value }}" {{ 'selected' if selected_prompt_version == value|lower else '' }}>{{ value }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Maskeleme</label><select class="ai-select" name="masked_state"><option value="">Tümü</option><option value="masked" {{ 'selected' if selected_masked_state == 'masked' else '' }}>Maskeli</option><option value="unmasked" {{ 'selected' if selected_masked_state == 'unmasked' else '' }}>Maskesiz</option></select></div>
+      <div class="ai-group"><label>Toplam kayıt</label><div class="ai-note">{{ pagination.total }} kayıt</div></div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Filtrele</button>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_requests_export', module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status, prompt_version=selected_prompt_version, masked_state=selected_masked_state) }}"><i class="fa-solid fa-file-arrow-down"></i> CSV dışa aktar</a>
+    </div>
+  </form>
+  <section class="ai-table-wrap">
+    <table class="ai-table">
+      <thead><tr><th>Zaman</th><th>Modül</th><th>Özellik</th><th>Durum</th><th>İstem</th><th>Maskeli</th><th>Gecikme</th><th>Kullanıcı</th><th>Model</th><th>Hedef</th><th>Not</th></tr></thead>
+      <tbody>
+        {% for row in rows %}<tr>
+          <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+          <td>{{ row.module_type|ai_module_label }}</td>
+          <td>{{ row.feature_type|ai_feature_label }}</td>
+          <td><span class="ai-badge {{ 'success' if row.status == 'completed' else 'warning' if row.status in ['warning','failed'] else 'muted' }}">{{ row.status|ai_status_label }}</span></td>
+          <td>{{ row.prompt_version or '-' }}</td>
+          <td><span class="ai-badge {{ 'success' if row.was_masked else 'warning' }}">{{ 'Evet' if row.was_masked else 'Hayır' }}</span></td>
+          <td>{{ row.latency_ms or '-' }}{% if row.latency_ms %} ms{% endif %}</td>
+          <td>{{ row.user.display_name() if row.user else '-' }}</td>
+          <td>{{ row.model_name or row.provider_name or '-' }}</td>
+          <td>{{ row.target_table|ai_target_label if row.target_table else '-' }}{% if row.target_id %} #{{ row.target_id }}{% endif %}</td>
+          <td>{{ row.error_message or (row.response_text[:120] ~ ('…' if row.response_text and row.response_text|length > 120 else '')) or '-' }}</td>
+        </tr>{% else %}<tr><td colspan="11"><div class="ai-note">Filtrelere uyan AI işlem kaydı bulunamadı.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <div class="pagination-shell">{% if pagination.pages > 1 %}<div class="ai-actions">{% if pagination.has_prev %}<a class="ai-link" href="{{ url_for('main.admin_ai_requests', page=pagination.prev_num, module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status, prompt_version=selected_prompt_version, masked_state=selected_masked_state) }}">Önceki</a>{% endif %}<span class="ai-link">Sayfa {{ pagination.page }} / {{ pagination.pages }}</span>{% if pagination.has_next %}<a class="ai-link" href="{{ url_for('main.admin_ai_requests', page=pagination.next_num, module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status, prompt_version=selected_prompt_version, masked_state=selected_masked_state) }}">Sonraki</a>{% endif %}</div>{% endif %}</div>
+  </section>
+</div>
+{% endblock %}

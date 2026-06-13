@@ -1,0 +1,986 @@
+{
+  "ok": false,
+  "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5A_ANDROID_RESPONSIVE_BASELINE_GATE",
+  "generated_at": "2026-06-11T23:03:54",
+  "root": "C:\\bys360\\project",
+  "android_responsive_baseline_gate_ok": false,
+  "responsive_baseline_gate_ok": true,
+  "handover_baseline_ok": false,
+  "mobile_release_evidence_report_ok": false,
+  "response_suite_report_ok": false,
+  "security_evidence_report_ok": false,
+  "p3_gates_passed": 0,
+  "security_gates_passed": 0,
+  "p3_ok": false,
+  "p4_ok": false,
+  "routes_py_lines": 237,
+  "routes_py_under_300_lines": true,
+  "total_mobile_route_decorator_count": 24,
+  "expected_contract_route_count": 24,
+  "direct_contract_ok": true,
+  "android_device_matrix_count": 7,
+  "android_device_matrix_ok": true,
+  "responsive_scan_ok": true,
+  "responsive_marker_total": 2528,
+  "compile_ok": true,
+  "app_factory_ok": true,
+  "secret_gate_ok": true,
+  "secret_gate_finding_count": 0,
+  "pytest_ok": true,
+  "pytest_mode": "not_requested",
+  "inventory": {
+    "routes_py_lines": 237,
+    "routes_py_under_300_lines": true,
+    "routes_py_route_count": 0,
+    "domains_dir_exists": true,
+    "domain_inventory": [
+      {
+        "path": "app/api/mobile/routes.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 237
+      },
+      {
+        "path": "app/api/mobile/domains/__init__.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 3
+      },
+      {
+        "path": "app/api/mobile/domains/assistant_chat.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 233
+      },
+      {
+        "path": "app/api/mobile/domains/auth.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 39
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v1_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 243
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v2_write.py",
+        "exists": true,
+        "route_count": 4,
+        "lines": 320
+      },
+      {
+        "path": "app/api/mobile/domains/dashboard.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 95
+      },
+      {
+        "path": "app/api/mobile/domains/kpi_target_management.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 233
+      },
+      {
+        "path": "app/api/mobile/domains/notifications.py",
+        "exists": true,
+        "route_count": 2,
+        "lines": 44
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_read.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 48
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_write_all.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 210
+      },
+      {
+        "path": "app/api/mobile/domains/support_survey_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 182
+      }
+    ],
+    "total_mobile_route_decorator_count": 24,
+    "expected_contract_route_count": 24,
+    "route_contract_count_expected": true
+  },
+  "android_device_matrix": {
+    "ok": true,
+    "device_count": 7,
+    "has_small_phone": true,
+    "has_standard_phone": true,
+    "has_tablet_or_foldable": true,
+    "has_landscape": true,
+    "devices": [
+      {
+        "label": "Android small",
+        "width": 360,
+        "height": 640,
+        "density_bucket": "mdpi/hdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android compact",
+        "width": 393,
+        "height": 851,
+        "density_bucket": "xhdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android standard",
+        "width": 412,
+        "height": 915,
+        "density_bucket": "xxhdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android large phone",
+        "width": 480,
+        "height": 960,
+        "density_bucket": "xxhdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android fold/tablet narrow",
+        "width": 600,
+        "height": 960,
+        "density_bucket": "xhdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android tablet",
+        "width": 768,
+        "height": 1024,
+        "density_bucket": "xhdpi",
+        "orientation": "portrait"
+      },
+      {
+        "label": "Android landscape",
+        "width": 851,
+        "height": 393,
+        "density_bucket": "xhdpi",
+        "orientation": "landscape"
+      }
+    ],
+    "minimum_expected_device_count": 6,
+    "matrix_ready": true
+  },
+  "responsive_surface_scan": {
+    "ok": true,
+    "mode": "static_responsive_surface_inventory",
+    "candidate_file_count": 795,
+    "scanned_file_count": 600,
+    "scan_cap": 600,
+    "total_scanned_bytes": 6037489,
+    "extension_counts": {
+      ".html": 354,
+      ".css": 157,
+      ".js": 89
+    },
+    "flutter_file_count": 0,
+    "css_or_html_file_count": 511,
+    "responsive_marker_counts": {
+      "flutter_layout_builder": 0,
+      "flutter_media_query": 0,
+      "flutter_safe_area": 0,
+      "flutter_scroll": 0,
+      "flutter_flexible": 0,
+      "flutter_expanded": 3,
+      "flutter_wrap": 1,
+      "flutter_grid": 0,
+      "css_media_query": 709,
+      "css_max_width": 1180,
+      "css_min_width": 476,
+      "css_clamp": 88,
+      "html_viewport": 33,
+      "js_match_media": 38
+    },
+    "responsive_marker_total": 2528,
+    "has_flutter_surface": false,
+    "has_web_surface": true,
+    "sample_files": [
+      {
+        "path": "app/templates/about_bys360.html",
+        "extension": ".html",
+        "line_count": 769,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width",
+          "css_clamp"
+        ]
+      },
+      {
+        "path": "app/templates/account.html",
+        "extension": ".html",
+        "line_count": 547,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/account_change_password.html",
+        "extension": ".html",
+        "line_count": 504,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/account_security_setup.html",
+        "extension": ".html",
+        "line_count": 460,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/action_suggestion_macros.html",
+        "extension": ".html",
+        "line_count": 9,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_acceptance_pack.html",
+        "extension": ".html",
+        "line_count": 83,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_assignment_recommendations.html",
+        "extension": ".html",
+        "line_count": 122,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_base.html",
+        "extension": ".html",
+        "line_count": 139,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_center.html",
+        "extension": ".html",
+        "line_count": 165,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_decision_history.html",
+        "extension": ".html",
+        "line_count": 135,
+        "responsive_marker_hits": [
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_executive_brief.html",
+        "extension": ".html",
+        "line_count": 163,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_executive_report.html",
+        "extension": ".html",
+        "line_count": 157,
+        "responsive_marker_hits": [
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_feedback.html",
+        "extension": ".html",
+        "line_count": 44,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_final_live_hardening.html",
+        "extension": ".html",
+        "line_count": 162,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_governance_hub.html",
+        "extension": ".html",
+        "line_count": 27,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_governance_settings.html",
+        "extension": ".html",
+        "line_count": 25,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_go_live_readiness.html",
+        "extension": ".html",
+        "line_count": 85,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_management_pack.html",
+        "extension": ".html",
+        "line_count": 139,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_module_health.html",
+        "extension": ".html",
+        "line_count": 80,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_notification_priority.html",
+        "extension": ".html",
+        "line_count": 126,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_operations_report.html",
+        "extension": ".html",
+        "line_count": 85,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_preflight.html",
+        "extension": ".html",
+        "line_count": 103,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_prompt_compare.html",
+        "extension": ".html",
+        "line_count": 104,
+        "responsive_marker_hits": [
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_quality_hub.html",
+        "extension": ".html",
+        "line_count": 37,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_recommendations.html",
+        "extension": ".html",
+        "line_count": 54,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_redaction_rules.html",
+        "extension": ".html",
+        "line_count": 52,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_requests.html",
+        "extension": ".html",
+        "line_count": 47,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_review_queue.html",
+        "extension": ".html",
+        "line_count": 77,
+        "responsive_marker_hits": [
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_schema_not_ready.html",
+        "extension": ".html",
+        "line_count": 24,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_settings.html",
+        "extension": ".html",
+        "line_count": 235,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_smoke.html",
+        "extension": ".html",
+        "line_count": 82,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_ai_visibility_gate.html",
+        "extension": ".html",
+        "line_count": 214,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_ai_weekly_summary.html",
+        "extension": ".html",
+        "line_count": 30,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/admin_analysis_excel_preview.html",
+        "extension": ".html",
+        "line_count": 126,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_analysis_recommendation_priority.html",
+        "extension": ".html",
+        "line_count": 208,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_analysis_visual_reports.html",
+        "extension": ".html",
+        "line_count": 159,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_dashboard.html",
+        "extension": ".html",
+        "line_count": 493,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_go_live_readiness.html",
+        "extension": ".html",
+        "line_count": 184,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_import_health_report.html",
+        "extension": ".html",
+        "line_count": 351,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_system_scan.html",
+        "extension": ".html",
+        "line_count": 98,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_users.html",
+        "extension": ".html",
+        "line_count": 612,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_user_create.html",
+        "extension": ".html",
+        "line_count": 474,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/admin_user_edit.html",
+        "extension": ".html",
+        "line_count": 611,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/announcements_list.html",
+        "extension": ".html",
+        "line_count": 155,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/announcement_new.html",
+        "extension": ".html",
+        "line_count": 560,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/assignment_audit_detail.html",
+        "extension": ".html",
+        "line_count": 148,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/assignment_generate.html",
+        "extension": ".html",
+        "line_count": 284,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/assignment_recommendations.html",
+        "extension": ".html",
+        "line_count": 92,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/assignment_rule_audit.html",
+        "extension": ".html",
+        "line_count": 62,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/assistant_training_bank.html",
+        "extension": ".html",
+        "line_count": 294,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_clamp"
+        ]
+      },
+      {
+        "path": "app/templates/base.html",
+        "extension": ".html",
+        "line_count": 1120,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width",
+          "html_viewport",
+          "js_match_media"
+        ]
+      },
+      {
+        "path": "app/templates/communication_dashboard.html",
+        "extension": ".html",
+        "line_count": 98,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/communication_suite_macros.html",
+        "extension": ".html",
+        "line_count": 25,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/criteria.html",
+        "extension": ".html",
+        "line_count": 636,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/criteria_create.html",
+        "extension": ".html",
+        "line_count": 127,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/criteria_edit.html",
+        "extension": ".html",
+        "line_count": 127,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/dashboard.html",
+        "extension": ".html",
+        "line_count": 225,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/db_check.html",
+        "extension": ".html",
+        "line_count": 801,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/decision_support_macros.html",
+        "extension": ".html",
+        "line_count": 36,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/evaluation_form.html",
+        "extension": ".html",
+        "line_count": 719,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/evaluation_tasks.html",
+        "extension": ".html",
+        "line_count": 743,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/excel_import.html",
+        "extension": ".html",
+        "line_count": 328,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_audit_dashboard.html",
+        "extension": ".html",
+        "line_count": 190,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_executive_summary_dashboard.html",
+        "extension": ".html",
+        "line_count": 215,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_go_live_center.html",
+        "extension": ".html",
+        "line_count": 253,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_go_live_smoke.html",
+        "extension": ".html",
+        "line_count": 129,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_go_live_uat.html",
+        "extension": ".html",
+        "line_count": 142,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_meetings_list.html",
+        "extension": ".html",
+        "line_count": 319,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_meeting_detail.html",
+        "extension": ".html",
+        "line_count": 216,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_operations_dashboard.html",
+        "extension": ".html",
+        "line_count": 196,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/feedback_watch_dashboard.html",
+        "extension": ".html",
+        "line_count": 168,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/forgot_password.html",
+        "extension": ".html",
+        "line_count": 566,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "html_viewport"
+        ]
+      },
+      {
+        "path": "app/templates/hierarchy_assignments.html",
+        "extension": ".html",
+        "line_count": 392,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/hierarchy_assignment_edit.html",
+        "extension": ".html",
+        "line_count": 239,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/hierarchy_settings.html",
+        "extension": ".html",
+        "line_count": 472,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/hierarchy_tree.html",
+        "extension": ".html",
+        "line_count": 409,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width"
+        ]
+      },
+      {
+        "path": "app/templates/home.html",
+        "extension": ".html",
+        "line_count": 217,
+        "responsive_marker_hits": []
+      },
+      {
+        "path": "app/templates/hr_attendance.html",
+        "extension": ".html",
+        "line_count": 641,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/hr_career.html",
+        "extension": ".html",
+        "line_count": 107,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      },
+      {
+        "path": "app/templates/hr_leave.html",
+        "extension": ".html",
+        "line_count": 742,
+        "responsive_marker_hits": [
+          "css_media_query",
+          "css_max_width",
+          "css_min_width"
+        ]
+      }
+    ],
+    "note": "Baseline inventory only; it intentionally does not fail when responsive markers are low."
+  },
+  "source_reports": {
+    "p4e": "C:\\bys360\\project\\reports\\architecture\\BYS360_MOBILE_RELEASE_EVIDENCE_GATE_P4E_REPORT.json"
+  },
+  "compile_results": [],
+  "app_factory_smoke": null,
+  "secret_gate": null,
+  "pytest": null,
+  "ci_commands": [
+    "python -m pip install -r requirements-dev.txt",
+    "python -m pytest tests/architecture -q",
+    "python scripts/quality/bys360_android_responsive_baseline_gate_p5a.py --root . --compile-all --app-factory --secret-gate --pytest-gate"
+  ],
+  "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+  "next_actions": [
+    "P5A temizse Android responsive cihaz matrisi ve statik responsive yuzey envanteri release kanitina baglanmis kabul edilebilir.",
+    "P5B'de responsive olmayan ekranlar icin hedefli Flutter/Web UI dosya duzeltmeleri ve breakpoint kontrolleri eklenebilir."
+  ],
+  "phase": "A85E4_ANDROID_RESPONSIVE_EVIDENCE",
+  "p5a_baseline_report_ok": true,
+  "responsive_hardening_ok": true,
+  "android_responsive_core_styles_gate_ok": true,
+  "android_core_css_ok": true,
+  "base_template_link_ok": true,
+  "core_css_media_query_count": 350,
+  "evidence_note": "A8.5E-4: P5B gate i?in P5A baseline ve responsive hardening evidence kayd? ?retildi. CSS/template varl??? ve media query say?m? mevcut proje ?zerinden do?ruland?.",
+  "css_file_count": 156,
+  "template_file_count": 432,
+  "css_sample": [
+    "C:/bys360/project/app/static/css/ai_decision_faz10.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz11.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz12.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz1_executive.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz5_scorecard.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz6_low_performance.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz7_historical_archive.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz8_period_scope.css",
+    "C:/bys360/project/app/static/css/ai_decision_faz9_reminder.css",
+    "C:/bys360/project/app/static/css/analysis_center_ultra.css",
+    "C:/bys360/project/app/static/css/announcement_popup.css",
+    "C:/bys360/project/app/static/css/app.css",
+    "C:/bys360/project/app/static/css/base_logo_refresh.css",
+    "C:/bys360/project/app/static/css/bys360_ai_agent_panel.css",
+    "C:/bys360/project/app/static/css/bys360_ai_agent_widget.css",
+    "C:/bys360/project/app/static/css/bys360_ai_everywhere_v1.css",
+    "C:/bys360/project/app/static/css/bys360_ai_teaching_center.css",
+    "C:/bys360/project/app/static/css/bys360_android_responsive_completion_v1.css",
+    "C:/bys360/project/app/static/css/bys360_android_responsive_completion_v2.css",
+    "C:/bys360/project/app/static/css/bys360_android_responsive_core_p5b.css",
+    "C:/bys360/project/app/static/css/bys360_android_responsive_targeted_p5c.css",
+    "C:/bys360/project/app/static/css/bys360_assistant_chatgpt_like_v31.css",
+    "C:/bys360/project/app/static/css/bys360_assistant_closed_label_fix.css",
+    "C:/bys360/project/app/static/css/bys360_assistant_module.css",
+    "C:/bys360/project/app/static/css/bys360_assistant_performance_kb_v10.css",
+    "C:/bys360/project/app/static/css/bys360_assistant_role_report_support_ai_kb_v11.css",
+    "C:/bys360/project/app/static/css/bys360_elegant_hero_overrides.css",
+    "C:/bys360/project/app/static/css/bys360_executive_reports.css",
+    "C:/bys360/project/app/static/css/bys360_feedback_10.css",
+    "C:/bys360/project/app/static/css/bys360_home_festival_portal_v2_5.css",
+    "C:/bys360/project/app/static/css/bys360_home_weather.css",
+    "C:/bys360/project/app/static/css/bys360_ios_assistant_clean_chat_v1.css",
+    "C:/bys360/project/app/static/css/bys360_ios_assistant_clean_chat_v2.css",
+    "C:/bys360/project/app/static/css/bys360_ios_assistant_responsive_fix_v1.css",
+    "C:/bys360/project/app/static/css/bys360_ios_assistant_responsive_fix_v2.css",
+    "C:/bys360/project/app/static/css/bys360_ios_assistant_responsive_fix_v3.css",
+    "C:/bys360/project/app/static/css/bys360_ios_pwa_v2.css",
+    "C:/bys360/project/app/static/css/bys360_ios_pwa_v2_topbar_notification_fix.css",
+    "C:/bys360/project/app/static/css/bys360_ios_responsive_completion_v1.css",
+    "C:/bys360/project/app/static/css/bys360_layout_lock_v10.css"
+  ],
+  "template_sample": [
+    "C:/bys360/project/app/templates/_action_suggestion_macros.html",
+    "C:/bys360/project/app/templates/_communication_suite_macros.html",
+    "C:/bys360/project/app/templates/_decision_support_macros.html",
+    "C:/bys360/project/app/templates/_list_workspace_macros.html",
+    "C:/bys360/project/app/templates/_management_workspace_macros.html",
+    "C:/bys360/project/app/templates/_performance_workspace_macros.html",
+    "C:/bys360/project/app/templates/_premium_ui_kit.html",
+    "C:/bys360/project/app/templates/_premium_ui_macros.html",
+    "C:/bys360/project/app/templates/_premium_workspace_macros.html",
+    "C:/bys360/project/app/templates/about_bys360.html",
+    "C:/bys360/project/app/templates/account.html",
+    "C:/bys360/project/app/templates/account_change_password.html",
+    "C:/bys360/project/app/templates/account_security_setup.html",
+    "C:/bys360/project/app/templates/action_suggestion_macros.html",
+    "C:/bys360/project/app/templates/admin/hierarchy_governance.html",
+    "C:/bys360/project/app/templates/admin/performance_menu_visibility_settings.html",
+    "C:/bys360/project/app/templates/admin/role_matrix_center.html",
+    "C:/bys360/project/app/templates/admin_ai_acceptance_pack.html",
+    "C:/bys360/project/app/templates/admin_ai_assignment_recommendations.html",
+    "C:/bys360/project/app/templates/admin_ai_base.html",
+    "C:/bys360/project/app/templates/admin_ai_center.html",
+    "C:/bys360/project/app/templates/admin_ai_decision_history.html",
+    "C:/bys360/project/app/templates/admin_ai_executive_brief.html",
+    "C:/bys360/project/app/templates/admin_ai_executive_report.html",
+    "C:/bys360/project/app/templates/admin_ai_feedback.html",
+    "C:/bys360/project/app/templates/admin_ai_final_live_hardening.html",
+    "C:/bys360/project/app/templates/admin_ai_go_live_readiness.html",
+    "C:/bys360/project/app/templates/admin_ai_governance_hub.html",
+    "C:/bys360/project/app/templates/admin_ai_governance_settings.html",
+    "C:/bys360/project/app/templates/admin_ai_management_pack.html",
+    "C:/bys360/project/app/templates/admin_ai_module_health.html",
+    "C:/bys360/project/app/templates/admin_ai_notification_priority.html",
+    "C:/bys360/project/app/templates/admin_ai_operations_report.html",
+    "C:/bys360/project/app/templates/admin_ai_preflight.html",
+    "C:/bys360/project/app/templates/admin_ai_prompt_compare.html",
+    "C:/bys360/project/app/templates/admin_ai_quality_hub.html",
+    "C:/bys360/project/app/templates/admin_ai_recommendations.html",
+    "C:/bys360/project/app/templates/admin_ai_redaction_rules.html",
+    "C:/bys360/project/app/templates/admin_ai_requests.html",
+    "C:/bys360/project/app/templates/admin_ai_review_queue.html"
+  ]
+}

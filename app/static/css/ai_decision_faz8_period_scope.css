@@ -1,0 +1,68 @@
+/* BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_CSS */
+.ai-decision-faz8-panel {
+  border: 1px solid rgba(139, 0, 0, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 42px rgba(44, 24, 24, 0.08);
+  padding: 22px;
+  margin: 18px 0;
+}
+.ai-decision-faz8-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+.ai-decision-faz8-kicker {
+  color: #8B0000;
+  font-weight: 700;
+  letter-spacing: .02em;
+  margin: 0 0 4px;
+}
+.ai-decision-faz8-head h3 {
+  margin: 0 0 8px;
+  color: #241313;
+  font-size: 1.25rem;
+}
+.ai-decision-faz8-head p,
+.ai-decision-faz8-grid span,
+.ai-decision-faz8-note {
+  color: #5c4a4a;
+  line-height: 1.55;
+}
+.ai-decision-faz8-link {
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #8B0000;
+  color: #fff !important;
+  text-decoration: none;
+  font-weight: 700;
+}
+.ai-decision-faz8-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.ai-decision-faz8-grid article {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(139, 0, 0, .10);
+  padding: 14px;
+}
+.ai-decision-faz8-grid strong {
+  display: block;
+  color: #2e1b1b;
+  margin-bottom: 6px;
+}
+.ai-decision-faz8-note {
+  margin: 16px 0 0;
+  font-size: .95rem;
+}
+@media (max-width: 900px) {
+  .ai-decision-faz8-head { flex-direction: column; }
+  .ai-decision-faz8-link { width: 100%; text-align: center; }
+  .ai-decision-faz8-grid { grid-template-columns: 1fr; }
+}

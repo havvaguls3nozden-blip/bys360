@@ -1,0 +1,78 @@
+/* BYS360_MOBILE_PWA_FAZ2_V1_CSS
+   Ana ekrana ekle kartı ve PWA standalone küçük iyileştirmeler.
+*/
+:root{
+  --bys360-pwa-red:#8B0000;
+  --bys360-pwa-red-dark:#660000;
+  --bys360-pwa-card:#ffffff;
+  --bys360-pwa-text:#111827;
+  --bys360-pwa-muted:#667085;
+  --bys360-pwa-border:rgba(139,0,0,.14);
+  --bys360-pwa-shadow:0 18px 46px rgba(15,23,42,.16);
+  --bys360-pwa-safe-bottom:env(safe-area-inset-bottom,0px);
+}
+body.bys360-pwa-standalone{
+  overscroll-behavior-y:contain;
+}
+.bys360-pwa-install-card{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:calc(14px + var(--bys360-pwa-safe-bottom));
+  z-index:4200;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:12px;
+  align-items:center;
+  max-width:560px;
+  margin:0 auto;
+  padding:14px;
+  background:rgba(255,255,255,.97);
+  border:1px solid var(--bys360-pwa-border);
+  border-radius:22px;
+  box-shadow:var(--bys360-pwa-shadow);
+  backdrop-filter:blur(12px);
+  color:var(--bys360-pwa-text);
+}
+.bys360-pwa-install-mark{
+  width:46px;
+  height:46px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--bys360-pwa-red),var(--bys360-pwa-red-dark));
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+.bys360-pwa-install-copy{min-width:0;display:flex;flex-direction:column;gap:3px;line-height:1.28;}
+.bys360-pwa-install-copy strong{font-size:14px;font-weight:800;}
+.bys360-pwa-install-copy span{font-size:12px;color:var(--bys360-pwa-muted);}
+.bys360-pwa-install-actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.bys360-pwa-install-primary,
+.bys360-pwa-install-secondary{
+  appearance:none;
+  border:0;
+  border-radius:14px;
+  padding:10px 13px;
+  font-weight:800;
+  font-size:13px;
+  cursor:pointer;
+}
+.bys360-pwa-install-primary{background:var(--bys360-pwa-red);color:#fff;}
+.bys360-pwa-install-secondary{background:#f2f4f7;color:#344054;}
+@media (min-width: 720px){
+  .bys360-pwa-install-card{grid-template-columns:auto 1fr auto;left:auto;right:18px;bottom:18px;width:min(560px, calc(100vw - 36px));}
+  .bys360-pwa-install-actions{grid-column:auto;}
+}
+@media (max-width: 420px){
+  .bys360-pwa-install-card{border-radius:20px;padding:12px;}
+  .bys360-pwa-install-actions{justify-content:stretch;}
+  .bys360-pwa-install-primary,.bys360-pwa-install-secondary{flex:1 1 auto;}
+}

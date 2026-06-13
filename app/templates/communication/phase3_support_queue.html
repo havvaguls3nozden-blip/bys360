@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Destek Kuyruğu | BYS360{% endblock %}
+{% block page_title %}Destek Kuyruğu{% endblock %}
+{% block page_subtitle %}SLA görünümü, atama ve durum takibi ile destek taleplerini yönetin{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <a class="btn btn-sm {% if payload.filter_name=='all' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_support_queue', filter='all') }}">Tümü</a>
+      <a class="btn btn-sm {% if payload.filter_name=='open' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_support_queue', filter='open') }}">Açıklar</a>
+      <a class="btn btn-sm {% if payload.filter_name=='mine' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_support_queue', filter='mine') }}">Bana Atananlar</a>
+      <a class="btn btn-sm {% if payload.filter_name=='closed' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_support_queue', filter='closed') }}">Kapananlar</a>
+    </div>
+
+    {% if payload.rows %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Talep</th>
+            <th>Oluşturan</th>
+            <th>Atanan</th>
+            <th>Durum</th>
+            <th>SLA</th>
+            <th class="text-end">İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in payload.rows %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ row.ticket.ticket_no }} · {{ row.ticket.title }}</div>
+              <div class="small text-muted">{{ row.ticket.module_name }} · {{ row.ticket.priority|upper }}</div>
+            </td>
+            <td>{{ row.creator_name }}</td>
+            <td>{{ row.assignee_name }}</td>
+            <td><span class="badge text-bg-light">{{ row.status_label }}</span></td>
+            <td>
+              <div class="small">İlk cevap: <span class="fw-semibold">{{ row.sla.first_state }}</span></div>
+              <div class="small">Çözüm: <span class="fw-semibold">{{ row.sla.resolution_state }}</span></div>
+            </td>
+            <td class="text-end"><a class="btn btn-sm btn-danger rounded-pill" href="{{ url_for('main.communication_phase3_support_detail', ticket_id=row.ticket.id) }}">Aç</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <div class="alert alert-light border rounded-4">Seçili filtre için destek kaydı bulunamadı.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

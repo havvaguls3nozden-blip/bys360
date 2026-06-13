@@ -1,0 +1,45 @@
+{# BYS360_AI_DECISION_FAZ11_PANEL_OK #}
+{% set guidance_context = guidance_context if guidance_context is defined else context if context is defined else {} %}
+{% if guidance_context %}
+<section class="ai-dev-guidance-panel" aria-label="Gelişim önerisi karar destek alanı">
+  <div class="ai-dev-guidance-head">
+    <div>
+      <span class="ai-dev-guidance-eyebrow">Karar Destek Merkezi</span>
+      <h2>Gelişim Önerisi ve Rehber Alanı</h2>
+      <p>{{ guidance_context.principle or 'Bu alan, yetkili kullanıcının gelişim notunu daha düzenli hazırlamasına yardımcı olur.' }}</p>
+    </div>
+    <div class="ai-dev-guidance-count">
+      <strong>{{ guidance_context.recommendation_count or 0 }}</strong>
+      <span>öneri</span>
+    </div>
+  </div>
+
+  {% set summary = guidance_context.summary or {} %}
+  <div class="ai-dev-guidance-summary">
+    <div><span>Puan durumu</span><strong>{{ summary.score_band or 'puan yok' }}</strong></div>
+    <div><span>Geçmiş eğilim</span><strong>{{ summary.trend_label or 'Kayıt bulunmuyor' }}</strong></div>
+    <div><span>Mevcut öneri</span><strong>{{ summary.existing_recommendation_count or 0 }}</strong></div>
+  </div>
+
+  <div class="ai-dev-guidance-grid">
+    {% for card in guidance_context.cards or [] %}
+    <article class="ai-dev-guidance-card priority-{{ card.priority or 'normal' }}">
+      <div class="ai-dev-guidance-card-top">
+        <span>{{ card.guidance_type }}</span>
+        <em>{{ card.priority or 'normal' }}</em>
+      </div>
+      <h3>{{ card.title }}</h3>
+      <p>{{ card.message }}</p>
+      <small>{{ card.suggested_action }}</small>
+    </article>
+    {% else %}
+    <article class="ai-dev-guidance-card">
+      <h3>Gelişim önerisi hazırlanabilir</h3>
+      <p>Bu kayıt için otomatik bağlayıcı karar üretilmez. Yetkili kullanıcı gerekirse kısa bir rehber not ekleyebilir.</p>
+    </article>
+    {% endfor %}
+  </div>
+
+  <p class="ai-dev-guidance-note">{{ guidance_context.safe_visibility_note or 'Hassas içerik gösterilmez; yalnızca yetki kapsamındaki güvenli özetler kullanılır.' }}</p>
+</section>
+{% endif %}

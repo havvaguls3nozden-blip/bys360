@@ -1,0 +1,55 @@
+/* BYS360 iOS Safari PWA helpers. This file is intentionally small and safe. */
+html.bys360-pwa-standalone body {
+  min-height: 100vh;
+}
+
+.bys360-ios-install-hint {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: 16px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(139, 0, 0, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16);
+  color: #232323;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  backdrop-filter: blur(12px);
+}
+
+.bys360-ios-install-hint strong {
+  color: #8B0000;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.bys360-ios-install-hint span {
+  flex: 1;
+}
+
+.bys360-ios-install-hint button {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: #8B0000;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+@media (min-width: 768px) {
+  .bys360-ios-install-hint {
+    left: auto;
+    right: 22px;
+    bottom: 22px;
+    max-width: 480px;
+  }
+}

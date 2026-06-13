@@ -1,0 +1,99 @@
+{% macro styles() -%}
+<style>
+  .pw-shell{display:grid;gap:18px}
+  .pw-hero{
+    position:relative;overflow:hidden;padding:24px;border-radius:28px;
+    border:1px solid rgba(139,0,0,.10);
+    background:linear-gradient(135deg, rgba(255,255,255,.97), rgba(250,244,244,.95));
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+  }
+  .pw-hero::before{
+    content:"";position:absolute;inset:auto -56px -62px auto;width:210px;height:210px;border-radius:50%;
+    background:radial-gradient(circle, rgba(139,0,0,.12), rgba(139,0,0,0) 70%);pointer-events:none;
+  }
+  .pw-hero-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
+  .pw-hero-main{display:flex;gap:14px;align-items:flex-start;max-width:920px}
+  .pw-hero-icon{
+    width:62px;height:62px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    border-radius:18px;background:rgba(139,0,0,.08);color:#8B0000;font-size:1.25rem;
+  }
+  .pw-kicker{
+    display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;
+    background:rgba(139,0,0,.08);color:#8B0000;font-size:.78rem;font-weight:900;margin-bottom:10px;
+  }
+  .pw-title{margin:0;font-size:1.3rem;font-weight:900;color:#111827}
+  .pw-text{margin:10px 0 0;color:#6b7280;font-size:.94rem;line-height:1.8;max-width:860px}
+  .pw-side{
+    display:grid;gap:10px;align-content:start;min-width:260px;padding:16px 18px;border-radius:20px;
+    background:rgba(255,255,255,.88);border:1px solid rgba(15,23,42,.08);
+  }
+  .pw-side-label{font-size:.78rem;font-weight:900;color:#8B0000;text-transform:uppercase;letter-spacing:.04em}
+  .pw-side-title{font-size:1rem;font-weight:900;color:#111827;line-height:1.4}
+  .pw-side-text{color:#6b7280;font-size:.86rem;line-height:1.75}
+  .pw-nav{
+    display:flex;gap:10px;flex-wrap:wrap;padding:2px 0 4px;
+  }
+  .pw-nav-link{
+    display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:12px;
+    text-decoration:none;font-size:.84rem;font-weight:800;background:#fff;
+    border:1px solid rgba(15,23,42,.08);color:#4b5563;transition:all .18s ease;
+    box-shadow:0 10px 20px rgba(15,23,42,.04);
+  }
+  .pw-nav-link:hover{border-color:rgba(139,0,0,.18);color:#8B0000;transform:translateY(-1px)}
+  .pw-nav-link.active{
+    background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.18);color:#8B0000;
+    box-shadow:0 10px 18px rgba(139,0,0,.08);
+  }
+  .pw-note{
+    padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.88);
+    border:1px solid rgba(139,0,0,.08);box-shadow:0 14px 28px rgba(15,23,42,.06);
+    color:#6b7280;font-size:.87rem;line-height:1.75;
+  }
+  .pw-note strong{color:#111827}
+  @media (max-width:880px){
+    .pw-hero{padding:20px}
+    .pw-side{min-width:100%}
+    .pw-nav-link{width:100%;justify-content:center}
+  }
+</style>
+{%- endmacro %}
+
+{% macro hero(title='', text='', icon='fa-solid fa-chart-line', kicker='Performans', side_label='Görünüm', side_title='Düzen', side_text='') -%}
+<div class="pw-hero">
+  <div class="pw-hero-grid">
+    <div class="pw-hero-main">
+      <div class="pw-hero-icon"><i class="{{ icon }}"></i></div>
+      <div>
+        <div class="pw-kicker"><i class="fa-solid fa-swatchbook"></i>{{ kicker }}</div>
+        <h2 class="pw-title">{{ title }}</h2>
+        {% if text %}<p class="pw-text">{{ text }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="pw-side">
+      <div class="pw-side-label">{{ side_label }}</div>
+      <div class="pw-side-title">{{ side_title }}</div>
+      <div class="pw-side-text">{{ side_text }}</div>
+    </div>
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro nav(active='') -%}
+<div class="pw-nav">
+  <a href="/performance/mail-reminders" class="pw-nav-link {% if active == 'mail' %}active{% endif %}"><i class="fa-solid fa-envelope-circle-check"></i>Mail Hatırlatmaları</a>
+  <a href="/performance/mail-reminders/templates" class="pw-nav-link {% if active == 'templates' %}active{% endif %}"><i class="fa-solid fa-pen-to-square"></i>Mail Şablonları</a>
+  <a href="/performance/import/history" class="pw-nav-link {% if active == 'import' %}active{% endif %}"><i class="fa-solid fa-file-arrow-up"></i>Geçmiş Aktarım</a>
+  <a href="/performance/task-management" class="pw-nav-link {% if active == 'tasks' %}active{% endif %}"><i class="fa-solid fa-list-check"></i>Görev Yönetimi</a>
+  <a href="/performance/feedback-requests" class="pw-nav-link {% if active == 'feedback' %}active{% endif %}"><i class="fa-solid fa-comments"></i>Geri Bildirim Talepleri</a>
+  <a href="/performance/hierarchy/tree" class="pw-nav-link {% if active == 'tree' %}active{% endif %}"><i class="fa-solid fa-diagram-project"></i>Hiyerarşi Ağacı</a>
+  <a href="/performance/hierarchy/settings" class="pw-nav-link {% if active == 'settings' %}active{% endif %}"><i class="fa-solid fa-sliders"></i>Hiyerarşi Ayarları</a>
+  <a href="/performance/personel-analizi" class="pw-nav-link {% if active == 'compare' %}active{% endif %}"><i class="fa-solid fa-chart-column"></i>Personel Analizi</a>
+  <a href="/performance/personel-analizi-history" class="pw-nav-link {% if active == 'compare_history' %}active{% endif %}"><i class="fa-solid fa-clock-rotate-left"></i>Analiz Geçmişi</a>
+  <a href="/performance/v2/faz5/publish" class="pw-nav-link {% if active == 'publish' %}active{% endif %}"><i class="fa-solid fa-bullhorn"></i>Yayın Merkezi</a>
+  <a href="/performance/low-score-processes" class="pw-nav-link {% if active == 'low_score' %}active{% endif %}"><i class="fa-solid fa-timeline"></i>70 Altı Süreçleri</a>
+</div>
+{%- endmacro %}
+
+{% macro note(text='') -%}
+<div class="pw-note"><strong>Çalışma alanı notu:</strong> {{ text }}</div>
+{%- endmacro %}

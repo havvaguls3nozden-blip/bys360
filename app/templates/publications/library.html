@@ -1,0 +1,904 @@
+{% extends "base.html" %}
+{% block title %}Kurumsal Yayınlar · BYS360{% endblock %}
+{% block page_kicker %}Kurumsal İçerik{% endblock %}
+{% block page_title %}Kurumsal Yayınlar{% endblock %}
+{% block page_subtitle %}İçses, kurumsal bültenler ve özel yayınlar aynı kurumsal çizgide tek merkezden yönetilir, sunulur ve arşivlenir.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/publications.css') }}">
+<style>
+  .pub-shell {
+    --pub-bordo: #8b0000;
+    --pub-bordo-soft: rgba(139, 0, 0, .08);
+    --pub-text: #2b1717;
+    --pub-muted: #6d5858;
+    --pub-panel: rgba(255,255,255,.96);
+    --pub-shadow: 0 24px 55px rgba(36, 25, 25, .08);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pub-shell .pub-hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, .95fr);
+    gap: 18px;
+    padding: 28px;
+    border-radius: 30px;
+    border: 1px solid rgba(139, 0, 0, .12);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(139,0,0,.14), transparent 36%),
+      radial-gradient(circle at 0% 100%, rgba(139,0,0,.08), transparent 26%),
+      linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,248,248,.96));
+    box-shadow: var(--pub-shadow);
+  }
+
+  .pub-shell .pub-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -40px auto;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,0,0,.10), transparent 68%);
+    pointer-events: none;
+  }
+
+  .pub-kicker,
+  .pub-card-kicker,
+  .pub-cover-kicker,
+  .pub-mini-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--pub-bordo);
+    font-weight: 800;
+  }
+
+  .pub-shell .pub-hero h2 {
+    margin: 10px 0 12px;
+    font-size: clamp(1.95rem, 2.5vw, 2.9rem);
+    line-height: 1.12;
+    color: var(--pub-text);
+    max-width: 14ch;
+  }
+
+  .pub-shell .pub-hero p,
+  .pub-shell .pub-summary,
+  .pub-shell .pub-empty p,
+  .pub-shell .pub-feature-note {
+    color: var(--pub-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .pub-hero-actions,
+  .pub-card-actions,
+  .pub-form-actions,
+  .pub-hero-ticks,
+  .pub-mini-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pub-hero-ticks {
+    margin-top: 16px;
+  }
+
+  .pub-hero-ticks span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.75);
+    border: 1px solid rgba(139,0,0,.10);
+    color: #5b4545;
+    font-size: .88rem;
+    font-weight: 600;
+  }
+
+  .pub-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(139, 0, 0, .14);
+    background: #fff;
+    color: #5f1717;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+  }
+
+  .pub-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(139,0,0,.10);
+    border-color: rgba(139,0,0,.22);
+  }
+
+  .pub-btn.primary {
+    background: linear-gradient(135deg, #8b0000, #b71c1c);
+    border-color: transparent;
+    color: #fff;
+  }
+
+  .pub-btn.soft {
+    background: rgba(139,0,0,.06);
+  }
+
+  .pub-btn.full { width: 100%; }
+
+  .pub-hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pub-spotlight-card,
+  .pub-stat-panel,
+  .pub-sidebar,
+  .pub-block,
+  .pub-card,
+  .pub-feature-card,
+  .pub-empty,
+  .pub-upload-card {
+    background: var(--pub-panel);
+    border: 1px solid rgba(139,0,0,.10);
+    border-radius: 24px;
+    box-shadow: 0 18px 42px rgba(36,25,25,.06);
+  }
+
+  .pub-spotlight-card {
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 118px minmax(0,1fr);
+    gap: 14px;
+    padding: 16px;
+    min-height: 222px;
+  }
+
+  .pub-book-mock {
+    min-height: 190px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 32px rgba(32,20,20,.16);
+    background: linear-gradient(155deg, #5f0d0d, #ae2626);
+  }
+
+  .pub-book-mock.magazine { background: linear-gradient(160deg, #53111f, #b84f73); }
+  .pub-book-mock.annual_report { background: linear-gradient(160deg, #6f4d12, #d08d29); }
+  .pub-book-mock.special_publication { background: linear-gradient(160deg, #164665, #4b8fca); }
+
+  .pub-book-mock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.18), transparent 34%),
+      radial-gradient(circle at top right, rgba(255,255,255,.22), transparent 36%);
+  }
+
+  .pub-book-spine {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    bottom: 8px;
+    width: 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.18);
+  }
+
+  .pub-book-title {
+    position: absolute;
+    inset: auto 16px 18px 24px;
+    z-index: 1;
+    color: #fff;
+  }
+
+  .pub-book-title strong {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1.15;
+    margin-top: 8px;
+  }
+
+  .pub-book-title span {
+    display: block;
+    opacity: .9;
+    font-size: .88rem;
+    margin-top: 6px;
+  }
+
+  .pub-spotlight-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .pub-spotlight-meta h3 {
+    margin: 4px 0 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    color: var(--pub-text);
+  }
+
+  .pub-spotlight-meta .pub-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pub-stat-panel {
+    padding: 16px;
+  }
+
+  .pub-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+  }
+
+  .pub-stat-card {
+    border-radius: 18px;
+    padding: 16px;
+    background: rgba(255,255,255,.9);
+    border: 1px solid rgba(139,0,0,.08);
+  }
+
+  .pub-stat-card strong {
+    display: block;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--pub-text);
+  }
+
+  .pub-stat-card span {
+    display: block;
+    margin-top: 6px;
+    color: var(--pub-muted);
+    font-size: .92rem;
+  }
+
+  .pub-stat-card.accent {
+    background: linear-gradient(135deg, rgba(139,0,0,.96), rgba(176,27,27,.94));
+  }
+  .pub-stat-card.accent strong,
+  .pub-stat-card.accent span { color: #fff; }
+  .pub-stat-card.soft { background: #fff7ec; }
+  .pub-stat-card.soft-success { background: #f1fbf4; }
+
+  .pub-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pub-chip,
+  .pub-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgba(139,0,0,.10);
+    color: #5d4b4b;
+    font-size: .86rem;
+  }
+
+  .pub-chip strong { color: var(--pub-bordo); }
+  .pub-badge.featured { background: #fff6dc; }
+  .pub-badge.status-published { background: #eefbf2; }
+  .pub-badge.status-draft { background: #fff7e8; }
+  .pub-badge.status-archived { background: #f4f4f4; }
+
+  .pub-layout {
+    display: grid;
+    grid-template-columns: minmax(310px, 360px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .pub-sidebar {
+    position: sticky;
+    top: 92px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .pub-block,
+  .pub-upload-card {
+    padding: 18px;
+  }
+
+  .pub-card-head,
+  .pub-main-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pub-card-head h3,
+  .pub-main-head h3 {
+    margin: 4px 0 0;
+    color: var(--pub-text);
+    font-size: 1.16rem;
+  }
+
+  .pub-head-meta {
+    color: var(--pub-bordo);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .pub-filter-form,
+  .pub-upload-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+  }
+
+  .pub-field,
+  .pub-check {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pub-field.full,
+  .pub-check.full,
+  .pub-form-actions.full,
+  .pub-note.full {
+    grid-column: 1 / -1;
+  }
+
+  .pub-field > span,
+  .pub-check > span,
+  .pub-note {
+    color: var(--pub-muted);
+    font-size: .88rem;
+    font-weight: 700;
+  }
+
+  .pub-input-wrap {
+    position: relative;
+  }
+
+  .pub-input-wrap i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a26a6a;
+  }
+
+  .pub-input,
+  .pub-select,
+  .pub-textarea,
+  .pub-file {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(139,0,0,.13);
+    background: #fffdfa;
+    color: var(--pub-text);
+    padding: 0 14px;
+    outline: none;
+    transition: border-color .16s ease, box-shadow .16s ease;
+  }
+
+  .pub-input-wrap .pub-input { padding-left: 38px; }
+  .pub-textarea { min-height: 100px; padding: 12px 14px; resize: vertical; }
+  .pub-file { padding: 10px 12px; }
+  .pub-select:focus,
+  .pub-input:focus,
+  .pub-textarea:focus,
+  .pub-file:focus {
+    border-color: rgba(139,0,0,.35);
+    box-shadow: 0 0 0 4px rgba(139,0,0,.08);
+  }
+
+  .pub-check {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .pub-check input { accent-color: var(--pub-bordo); }
+
+  .pub-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pub-section-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr);
+    gap: 18px;
+  }
+
+  .pub-featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 16px;
+  }
+
+  .pub-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 16px;
+  }
+
+  .pub-card,
+  .pub-feature-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pub-cover {
+    min-height: 210px;
+    padding: 18px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .pub-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.20)),
+      radial-gradient(circle at top right, rgba(255,255,255,.25), transparent 34%);
+    z-index: -1;
+  }
+
+  .pub-cover.type-bulletin { background: linear-gradient(145deg, #8B0000, #c13a3a); }
+  .pub-cover.type-internal_magazine { background: linear-gradient(145deg, #5a1121, #b1466b); }
+  .pub-cover.type-annual_report { background: linear-gradient(145deg, #5a3b10, #c37a17); }
+  .pub-cover.type-special_publication { background: linear-gradient(145deg, #1c3f5c, #4180be); }
+
+  .pub-cover::after {
+    content: "";
+    position: absolute;
+    inset: 14px auto 14px 12px;
+    width: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.18);
+  }
+
+  .pub-cover-inner {
+    color: #fff;
+    position: relative;
+    z-index: 1;
+    padding-left: 12px;
+  }
+
+  .pub-cover-inner h4 {
+    margin: 8px 0 8px;
+    font-size: 1.28rem;
+    line-height: 1.18;
+  }
+
+  .pub-cover-inner p {
+    margin: 0;
+    color: rgba(255,255,255,.92);
+  }
+
+  .pub-cover-kicker { color: rgba(255,255,255,.86); }
+
+  .pub-card-body,
+  .pub-feature-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pub-meta-list {
+    display: grid;
+    gap: 8px;
+    color: var(--pub-muted);
+    font-size: .92rem;
+  }
+
+  .pub-meta-list > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pub-feature-note {
+    font-size: .92rem;
+  }
+
+  .pub-mini-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pub-mini-card {
+    padding: 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(139,0,0,.10);
+    background: rgba(255,255,255,.96);
+    box-shadow: 0 14px 28px rgba(36,25,25,.05);
+  }
+
+  .pub-mini-card h4 {
+    margin: 6px 0 8px;
+    color: var(--pub-text);
+    font-size: 1rem;
+  }
+
+  .pub-mini-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--pub-muted);
+    font-size: .9rem;
+  }
+
+  .pub-list-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pub-empty {
+    padding: 52px 24px;
+    text-align: center;
+  }
+
+  .pub-empty i {
+    font-size: 2rem;
+    color: var(--pub-bordo);
+    margin-bottom: 12px;
+  }
+
+  .pub-empty h3 {
+    margin: 0 0 8px;
+    color: var(--pub-text);
+  }
+
+  @media (max-width: 1280px) {
+    .pub-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+
+  @media (max-width: 1100px) {
+    .pub-shell .pub-hero,
+    .pub-layout,
+    .pub-section-grid {
+      grid-template-columns: 1fr;
+    }
+    .pub-sidebar { position: static; }
+  }
+
+  @media (max-width: 840px) {
+    .pub-featured-grid,
+    .pub-grid,
+    .pub-filter-form,
+    .pub-upload-form,
+    .pub-stat-grid {
+      grid-template-columns: 1fr;
+    }
+    .pub-spotlight-card {
+      grid-template-columns: 1fr;
+    }
+    .pub-shell .pub-hero { padding: 22px; }
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% set spotlight_item = publication_featured_items[0] if publication_featured_items else (publication_items[0] if publication_items else none) %}
+{% set spotlight_row = spotlight_item.row if spotlight_item else none %}
+{% set spotlight_type = spotlight_row.publication_type if spotlight_row else 'bulletin' %}
+<div class="pub-shell">
+  <section class="pub-hero">
+    <div class="pub-hero-copy">
+      <div class="pub-kicker"><i class="fa-solid fa-newspaper"></i> Kurumsal yayın merkezi</div>
+      <h2>İçses, bültenler ve özel yayınlar aynı görsel dilde güçlü bir vitrine kavuşur.</h2>
+      <p>Kurumsal yayınlar tek merkezden yönetilir, öne çıkarılır ve güvenli biçimde arşivlenir. Bu ekran yayın yükleme, erişim, okuma ve arşiv düzenini tek bakışta daha net göstermesi için yeniden kurgulandı.</p>
+      <div class="pub-hero-ticks">
+        <span><i class="fa-solid fa-layer-group"></i> Düzenli arşiv görünümü</span>
+        <span><i class="fa-solid fa-book-open-reader"></i> Flipbook açılışı</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Kurumsal yayın akışı</span>
+      </div>
+      <div class="pub-hero-actions" style="margin-top:18px;">
+        {% if spotlight_row %}
+        <a class="pub-btn primary" href="{{ url_for('main.publication_view', publication_id=spotlight_row.id) }}"><i class="fa-solid fa-book-open"></i><span>Son yayını aç</span></a>
+        {% endif %}
+        <a class="pub-btn" href="{{ url_for('main.education_ebook_library') }}"><i class="fa-solid fa-book"></i><span>Dijital Eğitim Kitaplığı</span></a>
+        <a class="pub-btn soft" href="{{ url_for('main.education_management') }}"><i class="fa-solid fa-graduation-cap"></i><span>Eğitim Yönetimi</span></a>
+      </div>
+    </div>
+
+    <div class="pub-hero-side">
+      {% if spotlight_row %}
+      <article class="pub-spotlight-card">
+        <div class="pub-book-mock {{ spotlight_type }}">
+          <div class="pub-book-spine"></div>
+          <div class="pub-book-title">
+            <div class="pub-cover-kicker">{{ spotlight_item.type_label if spotlight_item else 'Kurumsal Yayın' }}</div>
+            <strong>{{ spotlight_row.title }}</strong>
+            <span>{{ spotlight_row.publication_period or spotlight_item.date_label }}</span>
+          </div>
+        </div>
+        <div class="pub-spotlight-meta">
+          <div>
+            <div class="pub-card-kicker"><i class="fa-solid fa-star"></i> Odak yayın</div>
+            <h3>{{ spotlight_row.title }}</h3>
+          </div>
+          <div class="pub-badge-row">
+            {% if spotlight_row.is_featured %}<span class="pub-badge featured">Öne Çıkan</span>{% endif %}
+            <span class="pub-badge status-{{ spotlight_row.status }}">{{ spotlight_item.status_label if spotlight_item else 'Yayında' }}</span>
+            {% if spotlight_row.issue_no %}<span class="pub-badge">{{ spotlight_row.issue_no }}</span>{% endif %}
+          </div>
+          <p class="pub-feature-note">{{ spotlight_row.summary or spotlight_row.subtitle or 'Kurumsal yayınlar bu alanda sade, okunur ve düzenli bir biçimde sunulur.' }}</p>
+          <div class="pub-mini-actions">
+            <a class="pub-btn primary" href="{{ url_for('main.publication_view', publication_id=spotlight_row.id) }}"><i class="fa-solid fa-book-open"></i><span>Oku</span></a>
+            {% if spotlight_row.allow_download %}
+            <a class="pub-btn" href="{{ url_for('main.publication_download', publication_id=spotlight_row.id) }}"><i class="fa-solid fa-download"></i><span>PDF</span></a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endif %}
+
+      <div class="pub-stat-panel">
+        <div class="pub-stat-grid">
+          <div class="pub-stat-card accent"><strong>{{ publication_stats.total_count }}</strong><span>Toplam yayın</span></div>
+          <div class="pub-stat-card"><strong>{{ publication_stats.featured_count }}</strong><span>Öne çıkan</span></div>
+          <div class="pub-stat-card"><strong>{{ publication_stats.magazine_count }}</strong><span>İçses / dergi</span></div>
+          <div class="pub-stat-card"><strong>{{ publication_stats.bulletin_count }}</strong><span>Bülten</span></div>
+          {% if can_manage_publications %}
+          <div class="pub-stat-card soft"><strong>{{ publication_stats.draft_count }}</strong><span>Taslak</span></div>
+          {% endif %}
+          <div class="pub-stat-card soft-success"><strong>{{ publication_stats.published_count }}</strong><span>Yayında</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-chip-row">
+    {% for item in publication_type_summary %}
+    <div class="pub-chip"><i class="fa-solid fa-layer-group"></i><span>{{ item.label }}</span><strong>{{ item.count }}</strong></div>
+    {% endfor %}
+  </section>
+
+  <section class="pub-layout">
+    <aside class="pub-sidebar">
+      <div class="pub-block">
+        <div class="pub-card-head">
+          <div>
+            <div class="pub-card-kicker">Filtreler</div>
+            <h3>Yayınları daralt</h3>
+          </div>
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <form method="get" class="pub-filter-form" style="margin-top:16px;">
+          <label class="pub-field full">
+            <span>Arama</span>
+            <div class="pub-input-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input class="pub-input" type="text" name="q" value="{{ publication_search_query }}" placeholder="Başlık, sayı no, dönem...">
+            </div>
+          </label>
+
+          <label class="pub-field">
+            <span>Yayın türü</span>
+            <select class="pub-select" name="publication_type">
+              <option value="">Tümü</option>
+              {% for key, label in publication_type_labels.items() %}
+              <option value="{{ key }}" {% if publication_filter_type == key %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="pub-field">
+            <span>Yıl</span>
+            <select class="pub-select" name="year">
+              <option value="">Tüm yıllar</option>
+              {% for year in publication_year_options %}
+              <option value="{{ year }}" {% if publication_selected_year == year %}selected{% endif %}>{{ year }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          {% if can_manage_publications %}
+          <label class="pub-field full">
+            <span>Durum</span>
+            <select class="pub-select" name="status">
+              <option value="">Tümü</option>
+              <option value="draft" {% if publication_filter_status == 'draft' %}selected{% endif %}>Taslak</option>
+              <option value="published" {% if publication_filter_status == 'published' %}selected{% endif %}>Yayında</option>
+              <option value="archived" {% if publication_filter_status == 'archived' %}selected{% endif %}>Arşiv</option>
+            </select>
+          </label>
+          {% endif %}
+
+          <div class="pub-form-actions full">
+            <button class="pub-btn primary" type="submit"><i class="fa-solid fa-filter"></i><span>Filtrele</span></button>
+            <a class="pub-btn" href="{{ url_for('main.publication_library') }}"><i class="fa-solid fa-rotate-left"></i><span>Sıfırla</span></a>
+          </div>
+        </form>
+      </div>
+
+      {% if can_manage_publications %}
+      <div class="pub-upload-card">
+        <div class="pub-card-head">
+          <div>
+            <div class="pub-card-kicker">Yükleme</div>
+            <h3>Yeni yayın ekle</h3>
+          </div>
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <form method="post" action="{{ url_for('main.publication_upload') }}" enctype="multipart/form-data" class="pub-upload-form" style="margin-top:16px;">
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <label class="pub-field full"><span>Başlık</span><input class="pub-input" type="text" name="title" required></label>
+          <label class="pub-field full"><span>Alt başlık</span><input class="pub-input" type="text" name="subtitle"></label>
+          <label class="pub-field"><span>Yayın türü</span>
+            <select class="pub-select" name="publication_type">
+              <option value="bulletin">Kurumsal Bülten</option>
+              <option value="internal_magazine">İçses Dergisi</option>
+              <option value="annual_report">Faaliyet / Yıllık Yayın</option>
+              <option value="special_publication">Özel Yayın</option>
+            </select>
+          </label>
+          <label class="pub-field"><span>Sayı No</span><input class="pub-input" type="text" name="issue_no" placeholder="Örn. Sayı 12"></label>
+          <label class="pub-field"><span>Dönem</span><input class="pub-input" type="text" name="publication_period" placeholder="Örn. Nisan 2026"></label>
+          <label class="pub-field"><span>Yayın tarihi</span><input class="pub-input" type="date" name="publication_date"></label>
+          <label class="pub-field full"><span>Özet</span><textarea class="pub-textarea" name="summary" rows="4"></textarea></label>
+          <label class="pub-field full"><span>PDF dosyası</span><input class="pub-file" type="file" name="publication_file" accept="application/pdf,.pdf" required></label>
+          <label class="pub-check full"><input type="checkbox" name="allow_download" value="1" checked><span>PDF indirilebilir olsun</span></label>
+          <label class="pub-check full"><input type="checkbox" name="is_featured" value="1"><span>Vitrinde öne çıkar</span></label>
+          <label class="pub-field full"><span>İlk durum</span>
+            <select class="pub-select" name="status">
+              <option value="published">Yayında</option>
+              <option value="draft">Taslak</option>
+            </select>
+          </label>
+          <button class="pub-btn primary full" type="submit"><i class="fa-solid fa-plus"></i><span>Yayınla</span></button>
+        </form>
+      </div>
+      {% endif %}
+    </aside>
+
+    <div class="pub-main">
+      <section class="pub-section-grid">
+        <section class="pub-block">
+          <div class="pub-main-head">
+            <div>
+              <div class="pub-card-kicker">Vitrin</div>
+              <h3>Öne çıkan yayınlar</h3>
+            </div>
+            <div class="pub-head-meta">{{ publication_featured_items|length }} kayıt</div>
+          </div>
+          {% if publication_featured_items %}
+          <div class="pub-featured-grid" style="margin-top:16px;">
+            {% for item in publication_featured_items %}
+            {% set row = item.row %}
+            <article class="pub-feature-card">
+              <div class="pub-cover type-{{ row.publication_type }}">
+                <div class="pub-cover-inner">
+                  <div class="pub-cover-kicker">{{ item.type_label }}</div>
+                  <h4>{{ row.title }}</h4>
+                  <p>{{ row.publication_period or item.date_label }}</p>
+                </div>
+              </div>
+              <div class="pub-feature-body">
+                <div class="pub-badge-row">
+                  <span class="pub-badge featured">Öne Çıkan</span>
+                  <span class="pub-badge status-{{ row.status }}">{{ item.status_label }}</span>
+                  {% if row.issue_no %}<span class="pub-badge">{{ row.issue_no }}</span>{% endif %}
+                </div>
+                <p class="pub-summary">{{ row.summary or row.subtitle or 'Kurumsal yayın PDF görünümünde sunulur.' }}</p>
+                <div class="pub-card-actions">
+                  <a class="pub-btn primary" href="{{ url_for('main.publication_view', publication_id=row.id) }}"><i class="fa-solid fa-book-open"></i><span>Oku</span></a>
+                  {% if row.allow_download %}<a class="pub-btn" href="{{ url_for('main.publication_download', publication_id=row.id) }}"><i class="fa-solid fa-download"></i><span>PDF</span></a>{% endif %}
+                </div>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="pub-empty" style="margin-top:16px;">
+            <i class="fa-regular fa-star"></i>
+            <h3>Henüz öne çıkan yayın yok</h3>
+            <p>Yeni bir yayını öne çıkararak vitrinde görünmesini sağlayabilirsiniz.</p>
+          </div>
+          {% endif %}
+        </section>
+
+        <aside class="pub-mini-stack">
+          <div class="pub-mini-card">
+            <div class="pub-mini-kicker"><i class="fa-solid fa-bullhorn"></i> Yayın görünürlüğü</div>
+            <h4>Portal vitriniyle uyumlu</h4>
+            <div class="pub-mini-line"><i class="fa-solid fa-check"></i><span>Öne çıkan yayınlar portal ana sayfasında da görünür.</span></div>
+            <div class="pub-mini-line" style="margin-top:8px;"><i class="fa-solid fa-check"></i><span>Dijital dergi ve bülten mantığı aynı çizgide korunur.</span></div>
+          </div>
+          <div class="pub-mini-card">
+            <div class="pub-mini-kicker"><i class="fa-solid fa-folder-tree"></i> Arşiv düzeni</div>
+            <h4>Takibi kolay yayın akışı</h4>
+            <div class="pub-mini-line"><i class="fa-regular fa-calendar"></i><span>{{ publication_year_options|length }} farklı yıl arşivi</span></div>
+            <div class="pub-mini-line" style="margin-top:8px;"><i class="fa-regular fa-folder-open"></i><span>{{ publication_items|length }} yayın görünür durumda</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="pub-list-section">
+        <div class="pub-main-head">
+          <div>
+            <div class="pub-card-kicker">Arşiv</div>
+            <h3>Tüm kurumsal yayınlar</h3>
+          </div>
+          <div class="pub-head-meta">{{ publication_items|length }} sonuç</div>
+        </div>
+
+        {% if publication_items %}
+        <div class="pub-grid">
+          {% for item in publication_items %}
+          {% set row = item.row %}
+          <article class="pub-card">
+            <div class="pub-cover type-{{ row.publication_type }}">
+              <div class="pub-cover-inner">
+                <div class="pub-cover-kicker">{{ item.type_label }}</div>
+                <h4>{{ row.title }}</h4>
+                <p>{{ row.publication_period or item.date_label }}</p>
+              </div>
+            </div>
+            <div class="pub-card-body">
+              <div class="pub-badge-row">
+                {% if row.is_featured %}<span class="pub-badge featured">Öne Çıkan</span>{% endif %}
+                <span class="pub-badge status-{{ row.status }}">{{ item.status_label }}</span>
+                {% if row.issue_no %}<span class="pub-badge">{{ row.issue_no }}</span>{% endif %}
+                {% if item.year_value %}<span class="pub-badge">{{ item.year_value }}</span>{% endif %}
+              </div>
+              <div class="pub-meta-list">
+                <div><i class="fa-regular fa-calendar"></i><span>{{ item.date_label }}</span></div>
+                <div><i class="fa-regular fa-file-lines"></i><span>{% if row.page_count %}{{ row.page_count }} sayfa{% else %}Sayfa bilgisi yok{% endif %}</span></div>
+                <div><i class="fa-solid fa-download"></i><span>İndirme {% if row.allow_download %}Açık{% else %}Kapalı{% endif %}</span></div>
+              </div>
+              {% if row.subtitle or row.summary %}
+              <p class="pub-summary">{{ row.summary or row.subtitle }}</p>
+              {% endif %}
+              <div class="pub-card-actions">
+                <a class="pub-btn primary" href="{{ url_for('main.publication_view', publication_id=row.id) }}"><i class="fa-solid fa-book-open"></i><span>Oku</span></a>
+                {% if row.allow_download %}
+                <a class="pub-btn" href="{{ url_for('main.publication_download', publication_id=row.id) }}"><i class="fa-solid fa-download"></i><span>PDF İndir</span></a>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="pub-empty">
+          <i class="fa-regular fa-folder-open"></i>
+          <h3>Gösterilecek yayın bulunamadı</h3>
+          <p>Filtreleri sıfırlayıp tekrar deneyin veya yeni kurumsal yayın ekleyin.</p>
+        </div>
+        {% endif %}
+      </section>
+    </div>
+  </section>
+</div>
+{% endblock %}

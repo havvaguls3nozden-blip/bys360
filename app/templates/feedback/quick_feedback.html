@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Geri Bildirim Gönder - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Geri Bildirim Gönder{% endblock %}
+{% block page_subtitle %}Görüş, öneri, hata bildirimi ve teşekkürlerinizi kayıtlı şekilde iletin.{% endblock %}
+
+{% block extra_head %}
+{{ workspace.styles() }}
+<style>
+  /* BYS360_FEEDBACK_EXECUTIVE_UI_V2_17_72 */
+  .gbd-exec-shell{display:grid;gap:20px;--gbd-red:#8B0000;--gbd-red-dark:#650000;--gbd-text:#101828;--gbd-muted:#667085;--gbd-border:#e7eaf2;--gbd-soft:#f8fafc;}
+  .gbd-exec-hero{position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(139,0,0,.10);background:radial-gradient(circle at top right,rgba(139,0,0,.14),transparent 34%),linear-gradient(135deg,#fff 0%,#fff7f7 48%,#f8fafc 100%);box-shadow:0 22px 48px rgba(15,23,42,.08);}
+  .gbd-exec-hero::before{content:"";position:absolute;inset:0 auto 0 0;width:7px;background:linear-gradient(180deg,var(--gbd-red),#b91c1c);}
+  .gbd-hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:22px;padding:28px;align-items:stretch;}
+  .gbd-hero-main{display:flex;gap:17px;align-items:flex-start;min-width:0;}
+  .gbd-hero-icon{width:58px;height:58px;flex:0 0 auto;border-radius:20px;background:#fff;color:var(--gbd-red);display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:1px solid rgba(139,0,0,.12);box-shadow:0 14px 26px rgba(139,0,0,.10);}
+  .gbd-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 11px;border-radius:999px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.11);color:var(--gbd-red);font-size:.76rem;font-weight:950;margin-bottom:10px;}
+  .gbd-hero-title{margin:0;color:var(--gbd-text);font-size:1.54rem;line-height:1.15;font-weight:950;letter-spacing:-.025em;}
+  .gbd-hero-text{margin:11px 0 0;color:#475467;line-height:1.78;font-size:.98rem;max-width:900px;}
+  .gbd-hero-chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px;}
+  .gbd-chip{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:0 11px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#344054;font-weight:900;font-size:.76rem;box-shadow:0 8px 18px rgba(15,23,42,.04);}
+  .gbd-hero-side{background:rgba(255,255,255,.78);border:1px solid rgba(139,0,0,.10);border-radius:22px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7);backdrop-filter:blur(12px);}
+  .gbd-side-title{font-weight:950;color:var(--gbd-text);margin:0 0 12px;font-size:.98rem;}
+  .gbd-flow{display:grid;gap:10px;}
+  .gbd-flow-item{display:flex;gap:10px;align-items:flex-start;color:#475467;font-size:.84rem;line-height:1.55;}
+  .gbd-flow-no{width:26px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;background:var(--gbd-red);color:#fff;font-weight:950;font-size:.74rem;box-shadow:0 8px 18px rgba(139,0,0,.16);}
+  .gbd-nav-wrap{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;}
+  .gbd-safe-note{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid var(--gbd-border);color:#475467;font-size:.82rem;font-weight:900;box-shadow:0 10px 20px rgba(15,23,42,.04);}
+  .gbd-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+  .gbd-info-card{position:relative;overflow:hidden;background:#fff;border:1px solid var(--gbd-border);border-radius:22px;padding:17px;box-shadow:0 14px 30px rgba(15,23,42,.055);}
+  .gbd-info-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:rgba(139,0,0,.72);}
+  .gbd-info-icon{width:40px;height:40px;border-radius:14px;background:rgba(139,0,0,.07);color:var(--gbd-red);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+  .gbd-info-title{font-weight:950;color:var(--gbd-text);font-size:.94rem;margin:0 0 6px;}
+  .gbd-info-text{color:var(--gbd-muted);font-size:.82rem;line-height:1.65;margin:0;}
+  .gbd-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,.45fr);gap:20px;align-items:start;}
+  .gbd-form-panel,.gbd-panel{background:#fff;border:1px solid var(--gbd-border);border-radius:26px;box-shadow:0 18px 42px rgba(15,23,42,.07);overflow:hidden;}
+  .gbd-panel{padding:0;}
+  .gbd-panel-body,.gbd-form-body{padding:24px;}
+  .gbd-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+  .gbd-section-kicker{display:inline-flex;align-items:center;gap:7px;min-height:28px;padding:0 10px;border-radius:999px;background:#f4f6fb;border:1px solid #e7eaf2;color:#475467;font-size:.74rem;font-weight:950;margin-bottom:8px;}
+  .gbd-section-title{font-size:1.15rem;font-weight:950;color:var(--gbd-text);margin:0;letter-spacing:-.015em;}
+  .gbd-section-text{font-size:.89rem;color:var(--gbd-muted);line-height:1.7;margin:8px 0 0;}
+  .gbd-status{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border-radius:999px;background:#f4f6fb;border:1px solid #e7eaf2;color:#475467;font-size:.74rem;font-weight:950;white-space:nowrap;}
+  .gbd-status.red{background:rgba(139,0,0,.07);border-color:rgba(139,0,0,.12);color:var(--gbd-red);}
+  .gbd-topic-box{position:relative;overflow:hidden;margin-bottom:24px;padding:24px;border-radius:26px;border:1px solid var(--gbd-border);background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);box-shadow:0 18px 42px rgba(15,23,42,.055);}
+  .gbd-topic-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px;}
+  .gbd-topic-icon{width:54px;height:54px;border-radius:999px;background:#fff;color:var(--gbd-red);border:1px solid #e4e8f1;display:flex;align-items:center;justify-content:center;font-size:1.13rem;box-shadow:0 12px 24px rgba(15,23,42,.045);flex:0 0 auto;}
+  .gbd-topic-title{margin:0;color:var(--gbd-text);font-size:1.42rem;line-height:1.15;font-weight:950;letter-spacing:-.025em;}
+  .gbd-topic-text{margin:8px 0 0;color:#667085;font-size:.96rem;line-height:1.65;max-width:900px;}
+  .gbd-topic-divider{height:1px;background:#e7eaf2;margin:0 0 22px;}
+  .gbd-topic-foot{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid #edf0f5;color:#667085;font-size:.86rem;font-weight:850;text-align:center;}
+  .gbd-topic-foot i{color:#7a8497;font-size:.98rem;}
+  .gbd-kind-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 20px;margin:0;}
+  .gbd-kind-card{position:relative;display:block;margin:0;cursor:pointer;min-height:100%;}
+  .gbd-kind-card input{position:absolute;opacity:0;pointer-events:none;}
+  .gbd-kind-ui{position:relative;display:flex;flex-direction:column;min-height:178px;height:100%;border:1px solid #e3e7ef;background:#fff;border-radius:18px;padding:28px 26px 24px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 10px 24px rgba(15,23,42,.045);}
+  .gbd-kind-ui:hover{transform:translateY(-2px);border-color:rgba(139,0,0,.24);box-shadow:0 16px 34px rgba(15,23,42,.075);}
+  .gbd-kind-card input:focus-visible + .gbd-kind-ui{outline:4px solid rgba(139,0,0,.10);outline-offset:3px;}
+  .gbd-kind-card input:checked + .gbd-kind-ui{border-color:var(--gbd-red);background:linear-gradient(135deg,#fff 0%,#fff8f8 100%);box-shadow:0 18px 38px rgba(139,0,0,.12);}
+  .gbd-kind-card input:checked + .gbd-kind-ui::after{content:"✓";position:absolute;right:20px;top:20px;width:34px;height:34px;border-radius:999px;background:var(--gbd-red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:950;box-shadow:0 10px 22px rgba(139,0,0,.18);}
+  .gbd-kind-icon{width:58px;height:58px;border-radius:999px;background:#f8eded;color:var(--gbd-red);display:flex;align-items:center;justify-content:center;margin:4px 0 20px;font-size:1.36rem;}
+  .gbd-kind-title{display:block;font-weight:950;color:var(--gbd-text);font-size:1.06rem;line-height:1.25;margin:0 36px 10px 0;letter-spacing:-.01em;}
+  .gbd-kind-card input:checked + .gbd-kind-ui .gbd-kind-title{color:var(--gbd-red);}
+  .gbd-kind-text{color:#667085;font-size:.91rem;line-height:1.72;margin:0;}
+  .gbd-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;}
+  .gbd-field{min-width:0;}
+  .gbd-field.full{grid-column:1/-1;}
+  .gbd-label{display:flex;align-items:center;gap:7px;font-weight:950;color:#344054;margin-bottom:8px;font-size:.84rem;}
+  .gbd-control{width:100%;min-height:48px;border:1px solid #d8dce6;border-radius:15px;background:#fff;padding:11px 13px;color:#111827;outline:none;transition:border-color .18s ease, box-shadow .18s ease;font-size:.93rem;}
+  .gbd-control:focus{border-color:rgba(139,0,0,.5);box-shadow:0 0 0 4px rgba(139,0,0,.08);}
+  textarea.gbd-control{min-height:158px;resize:vertical;line-height:1.72;}
+  .gbd-help{font-size:.78rem;color:var(--gbd-muted);margin-top:7px;line-height:1.55;}
+  .gbd-help.strong{color:#475467;font-weight:800;}
+  .gbd-divider{height:1px;background:#edf0f5;margin:22px 0;}
+  .gbd-tip{border:1px solid #eceff5;background:#fff;border-radius:18px;padding:14px 15px;display:flex;gap:12px;align-items:flex-start;}
+  .gbd-tip i{color:var(--gbd-red);margin-top:3px;}
+  .gbd-tip strong{color:var(--gbd-text);font-size:.89rem;}
+  .gbd-muted{color:var(--gbd-muted);}
+  .gbd-checkbox{display:flex;gap:10px;align-items:flex-start;padding:14px 15px;border:1px solid #eceff5;border-radius:18px;background:#fbfcfe;}
+  .gbd-checkbox input{margin-top:4px;accent-color:var(--gbd-red);}
+  .gbd-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-top:1px solid #edf0f5;padding:18px 24px;background:#fbfcfe;}
+  .gbd-actions-left{font-size:.78rem;color:var(--gbd-muted);line-height:1.55;max-width:520px;}
+  .gbd-actions-right{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;}
+  .gbd-btn{border:1px solid transparent;min-height:46px;padding:0 18px;border-radius:15px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;transition:all .18s ease;cursor:pointer;}
+  .gbd-btn:hover{transform:translateY(-1px);}
+  .gbd-btn.primary{background:var(--gbd-red);color:#fff;box-shadow:0 12px 26px rgba(139,0,0,.18);}
+  .gbd-btn.secondary{background:#fff;color:#344054;border-color:#d0d5dd;}
+  .gbd-btn:disabled{opacity:.62;cursor:not-allowed;transform:none;}
+  .gbd-side-stack{display:grid;gap:18px;}
+  .gbd-timeline{display:grid;gap:12px;}
+  .gbd-timeline-row{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:flex-start;}
+  .gbd-timeline-dot{width:30px;height:30px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--gbd-red);display:flex;align-items:center;justify-content:center;font-size:.8rem;border:1px solid rgba(139,0,0,.10);}
+  .gbd-timeline-title{font-weight:950;color:var(--gbd-text);font-size:.88rem;margin:0 0 3px;}
+  .gbd-timeline-text{color:var(--gbd-muted);font-size:.79rem;line-height:1.55;margin:0;}
+  .gbd-mini-list{display:grid;gap:10px;}
+  .gbd-mini-item{border:1px solid #edf0f5;border-radius:17px;background:#fff;padding:13px 14px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;text-decoration:none;transition:all .18s ease;}
+  .gbd-mini-item:hover{transform:translateY(-1px);border-color:rgba(139,0,0,.20);box-shadow:0 12px 24px rgba(139,0,0,.06);}
+  .gbd-mini-title{display:block;font-size:.87rem;font-weight:950;color:var(--gbd-text);line-height:1.4;}
+  .gbd-mini-meta{display:block;font-size:.75rem;color:var(--gbd-muted);margin-top:5px;}
+  .gbd-empty{padding:26px 18px;border-radius:18px;border:1px dashed #d0d5dd;background:#fafbfc;text-align:center;color:var(--gbd-muted);}
+  .gbd-empty i{font-size:1.8rem;color:var(--gbd-red);margin-bottom:10px;}
+  .gbd-empty strong{display:block;color:var(--gbd-text);font-size:.96rem;margin-bottom:6px;}
+  @media (max-width:1180px){.gbd-hero-inner,.gbd-layout{grid-template-columns:1fr}.gbd-info-grid{grid-template-columns:1fr 1fr}.gbd-kind-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  @media (max-width:720px){.gbd-hero-inner{padding:22px}.gbd-hero-main{display:block}.gbd-hero-icon{margin-bottom:12px}.gbd-info-grid,.gbd-kind-grid,.gbd-field-grid{grid-template-columns:1fr}.gbd-form-body,.gbd-panel-body{padding:19px}.gbd-actions{padding:16px 18px;display:grid}.gbd-actions-right{display:grid;width:100%}.gbd-btn{width:100%}.gbd-mini-item{display:block}.gbd-status{margin-top:8px}.gbd-trust-card{grid-template-columns:1fr;padding:17px}.gbd-trust-mark{width:46px;height:46px}.gbd-hero-title{font-size:1.34rem}.gbd-nav-wrap .cw-nav,.gbd-nav-wrap .gbd-safe-note{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gbd-exec-shell">
+  <section class="gbd-exec-hero" aria-label="BYS360 geri bildirim giriş alanı">
+    <div class="gbd-hero-inner">
+      <div class="gbd-hero-main">
+        <div class="gbd-hero-icon"><i class="fa-solid fa-comment-dots"></i></div>
+        <div>
+          <div class="gbd-kicker"><i class="fa-solid fa-building-shield"></i> Kurumsal geri bildirim hattı</div>
+          <h2 class="gbd-hero-title">Görüşünüz kayıtlı, izlenebilir ve değerlendirilebilir hale gelir.</h2>
+          <p class="gbd-hero-text">BYS360’da fark ettiğiniz ekran hatası, eksik alan, kullanım kolaylığı önerisi, tebrik veya teşekkür kaydı bu form üzerinden destek ve talep omurgasına bağlanır. Böylece geri bildirim kişisel yazışmada kalmaz; kurumsal takip sürecine dönüşür.</p>
+          <div class="gbd-hero-chips">
+            <span class="gbd-chip"><i class="fa-solid fa-lock"></i> Yetki kontrollü</span>
+            <span class="gbd-chip"><i class="fa-solid fa-clock-rotate-left"></i> Durum geçmişiyle takip</span>
+            <span class="gbd-chip"><i class="fa-solid fa-paperclip"></i> Ekran görüntüsü eklenebilir</span>
+          </div>
+        </div>
+      </div>
+      <aside class="gbd-hero-side" aria-label="Geri bildirim süreci">
+        <h3 class="gbd-side-title">Kayıt süreci</h3>
+        <div class="gbd-flow">
+          <div class="gbd-flow-item"><span class="gbd-flow-no">1</span><span>Geri bildirim türünü ve ilgili ekranı seçin.</span></div>
+          <div class="gbd-flow-item"><span class="gbd-flow-no">2</span><span>Kısa konu başlığı ve açıklamayı yazın.</span></div>
+          <div class="gbd-flow-item"><span class="gbd-flow-no">3</span><span>Kayıt destek/talep sürecine alınır ve takip edilebilir.</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="gbd-nav-wrap">
+    {{ workspace.feedback_nav('') }}
+    <span class="gbd-safe-note"><i class="fa-solid fa-circle-info"></i> Hassas kişisel veri paylaşmadan, işlem adımını açık yazmanız yeterlidir.</span>
+  </div>
+
+  {% if not is_feedback_ready %}
+  <div class="gbd-tip">
+    <i class="fa-solid fa-circle-info"></i>
+    <div>
+      <strong>Geri bildirim altyapısı hazırlanıyor.</strong>
+      <div class="gbd-muted" style="margin-top:5px;line-height:1.7;">Destek ve talep tabloları henüz hazır değilse yetkili kullanıcı kurulum ekranından altyapıyı aktifleştirebilir.</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="gbd-info-grid">
+    <div class="gbd-info-card"><div class="gbd-info-icon"><i class="fa-solid fa-inbox"></i></div><h3 class="gbd-info-title">Tek merkezde toplanır</h3><p class="gbd-info-text">Hata, öneri ve teşekkür kayıtları destek omurgasında düzenli şekilde saklanır.</p></div>
+    <div class="gbd-info-card"><div class="gbd-info-icon"><i class="fa-solid fa-list-check"></i></div><h3 class="gbd-info-title">Sürece dönüşür</h3><p class="gbd-info-text">Gerekli görülen kayıtlar atanabilir, yanıtlanabilir ve kapatma sürecine alınabilir.</p></div>
+    <div class="gbd-info-card"><div class="gbd-info-icon"><i class="fa-solid fa-chart-line"></i></div><h3 class="gbd-info-title">İyileştirmeyi besler</h3><p class="gbd-info-text">Tekrar eden talepler ve kullanım sorunları yönetsel değerlendirme için görünür hale gelir.</p></div>
+  </div>
+
+  <div class="gbd-layout">
+    <form class="gbd-form-panel" method="post" enctype="multipart/form-data" data-feedback-form="1">
+      {% if csrf_token is defined %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% endif %}
+      <div class="gbd-form-body">
+        <section class="gbd-topic-box" aria-label="Geri bildirim konusu seçimi">
+          <div class="gbd-topic-head">
+            <div class="gbd-topic-icon"><i class="fa-regular fa-message"></i></div>
+            <div>
+              <h3 class="gbd-topic-title">Geri Bildirim Konusu</h3>
+              <p class="gbd-topic-text">Geri bildiriminizin en uygun şekilde yönlendirilmesi için lütfen konusunu seçiniz.</p>
+            </div>
+          </div>
+          <div class="gbd-topic-divider"></div>
+          <div class="gbd-kind-grid" role="radiogroup" aria-label="Geri bildirim konusu">
+            {% for item in feedback_kinds %}
+            <label class="gbd-kind-card">
+              <input type="radio" name="feedback_kind" value="{{ item.key }}" {% if loop.first %}checked{% endif %}>
+              <span class="gbd-kind-ui">
+                <span class="gbd-kind-icon"><i class="{{ item.icon }}"></i></span>
+                <span class="gbd-kind-title">{{ item.label }}</span>
+                <p class="gbd-kind-text">{{ item.description }}</p>
+              </span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="gbd-topic-foot"><i class="fa-solid fa-shield-halved"></i> Geri bildirimleriniz gizlidir ve yalnızca iyileştirme amacıyla kullanılmaktadır.</div>
+        </section>
+
+        <div class="gbd-divider"></div>
+
+        <div class="gbd-field-grid">
+          <div class="gbd-field">
+            <label class="gbd-label" for="module_name"><i class="fa-solid fa-layer-group"></i> İlgili modül / ekran</label>
+            <select class="gbd-control" id="module_name" name="module_name">
+              {% for module in modules %}
+              <option value="{{ module }}">{{ module }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="gbd-field">
+            <label class="gbd-label" for="priority"><i class="fa-solid fa-flag"></i> Öncelik</label>
+            <select class="gbd-control" id="priority" name="priority">
+              <option value="low">Düşük</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">Yüksek</option>
+              <option value="critical">Kritik</option>
+            </select>
+            <div class="gbd-help">Tebrik ve teşekkür kayıtları sistem tarafından düşük öncelikli tutulur.</div>
+          </div>
+          <div class="gbd-field full">
+            <label class="gbd-label" for="title"><i class="fa-solid fa-heading"></i> Kısa konu başlığı</label>
+            <input class="gbd-control" id="title" name="title" maxlength="180" placeholder="Örn. Portal profil kartı mobilde taşma yapıyor" required>
+          </div>
+          <div class="gbd-field full">
+            <label class="gbd-label" for="description"><i class="fa-solid fa-align-left"></i> Açıklama</label>
+            <textarea class="gbd-control" id="description" name="description" maxlength="4000" placeholder="Ne oldu? Hangi ekranda oldu? Siz ne bekliyordunuz? Tebrik veya teşekkür ise hangi çalışma için olduğunu yazabilirsiniz." required></textarea>
+            <div class="gbd-help strong">Ekran hatası bildiriyorsanız mümkünse işlem adımlarını sırayla yazın. Hassas kişisel bilgi paylaşmamaya dikkat edin.</div>
+          </div>
+          <div class="gbd-field">
+            <label class="gbd-label" for="page_url"><i class="fa-solid fa-link"></i> Sayfa bağlantısı</label>
+            <input class="gbd-control" id="page_url" name="page_url" maxlength="255" placeholder="İlgili ekran bağlantısını yazabilirsiniz">
+            <div class="gbd-help">Form başka bir sayfadan açıldıysa bağlantı otomatik önerilir.</div>
+          </div>
+          <div class="gbd-field">
+            <label class="gbd-label" for="attachment"><i class="fa-solid fa-paperclip"></i> Ekran görüntüsü / belge</label>
+            <input class="gbd-control" id="attachment" name="attachment" type="file" accept=".png,.jpg,.jpeg,.pdf,.docx,.xlsx,.txt,.webp">
+            <div class="gbd-help">PNG, JPG, PDF, DOCX, XLSX, TXT veya WEBP eklenebilir.</div>
+          </div>
+          <div class="gbd-field full">
+            <label class="gbd-checkbox">
+              <input type="checkbox" name="is_private" value="1">
+              <span><strong>Özel kayıt olarak işaretle</strong><br><span class="gbd-muted">Kayıt yetkili kişiler tarafından görülebilir; genel listelerde daha dikkatli ele alınması için işaretlenir.</span></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="gbd-actions">
+        <div class="gbd-actions-left"><i class="fa-solid fa-circle-check"></i> Gönderim sonrası kayıt numarası oluşur. Kayıt detayını destek/talep ekranından takip edebilirsiniz.</div>
+        <div class="gbd-actions-right">
+          <a class="gbd-btn secondary" href="{{ url_for('main.feedback_dashboard') }}"><i class="fa-solid fa-arrow-left"></i> Panele Dön</a>
+          <button class="gbd-btn primary" type="submit" {% if not is_feedback_ready %}disabled{% endif %}><i class="fa-solid fa-paper-plane"></i> Geri Bildirimi Gönder</button>
+        </div>
+      </div>
+    </form>
+
+    <aside class="gbd-side-stack">
+      <div class="gbd-panel">
+        <div class="gbd-panel-body">
+          <h3 class="gbd-section-title" style="font-size:1.04rem;">Nasıl değerlendirilir?</h3>
+          <p class="gbd-section-text">Kayıt, destek ve talep sürecine bağlanarak yetkili kullanıcılar tarafından takip edilir.</p>
+          <div class="gbd-timeline" style="margin-top:16px;">
+            <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-file-circle-plus"></i></div><div><p class="gbd-timeline-title">Kayıt oluşur</p><p class="gbd-timeline-text">Geri bildirim numarası ve durum geçmişi hazırlanır.</p></div></div>
+            <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-user-check"></i></div><div><p class="gbd-timeline-title">Yetkili inceler</p><p class="gbd-timeline-text">Hata, öneri veya teşekkür türüne göre ilgili süreç yürütülür.</p></div></div>
+            <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-chart-simple"></i></div><div><p class="gbd-timeline-title">İyileştirme verisi olur</p><p class="gbd-timeline-text">Tekrar eden konular rapor ve geliştirme kararlarını besler.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gbd-panel">
+        <div class="gbd-panel-body">
+          <div class="gbd-section-head" style="margin-bottom:14px;">
+            <div>
+              <h3 class="gbd-section-title" style="font-size:1.04rem;">Son kayıtlarım</h3>
+              <p class="gbd-section-text" style="margin-top:5px;">Daha önce gönderdiğiniz geri bildirimler.</p>
+            </div>
+            <a class="gbd-btn secondary" style="min-height:36px;padding:0 12px;font-size:.78rem;" href="{{ url_for('main.support_my_tickets') }}">Tümünü Gör</a>
+          </div>
+          <div class="gbd-mini-list">
+            {% for row in recent_feedback %}
+            <a class="gbd-mini-item" href="{{ url_for('main.support_detail', ticket_id=row.id) }}">
+              <span>
+                <span class="gbd-mini-title">{{ row.title }}</span>
+                <span class="gbd-mini-meta">{{ row.ticket_no }} · {{ row.created_at.strftime('%d.%m.%Y') if row.created_at else '-' }}</span>
+              </span>
+              <span class="gbd-status">{{ row.status_label }}</span>
+            </a>
+            {% else %}
+            <div class="gbd-empty"><i class="fa-regular fa-message"></i><strong>Henüz kayıt yok</strong><span>Gönderdiğiniz geri bildirimler burada görünecek.</span></div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="gbd-panel">
+        <div class="gbd-panel-body">
+          <h3 class="gbd-section-title" style="font-size:1.04rem;">Kısa yazım rehberi</h3>
+          <div style="display:grid;gap:11px;margin-top:15px;">
+            <div class="gbd-tip"><i class="fa-solid fa-bug"></i><div><strong>Hata bildirirken</strong><div class="gbd-muted">Ekran adı, işlem adımı ve beklenen sonucu yazın.</div></div></div>
+            <div class="gbd-tip"><i class="fa-solid fa-lightbulb"></i><div><strong>Öneri yazarken</strong><div class="gbd-muted">Hangi süreci kolaylaştıracağını bir iki cümleyle anlatın.</div></div></div>
+            <div class="gbd-tip"><i class="fa-solid fa-heart"></i><div><strong>Tebrik / teşekkür</strong><div class="gbd-muted">Beğendiğiniz ekranı veya katkı sağlayan çalışmayı doğrudan yazabilirsiniz.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  function initFeedbackForm(){
+    var form = document.querySelector('form[data-feedback-form="1"]');
+    if (!form) return;
+
+    var pageInput = document.getElementById('page_url');
+    if (pageInput && !pageInput.value) {
+      try {
+        var ref = document.referrer ? new URL(document.referrer) : null;
+        if (ref && ref.origin === window.location.origin && ref.pathname.indexOf('/feedback/gonder') === -1) {
+          pageInput.value = ref.href;
+        }
+      } catch(e) {}
+    }
+
+    function ensureTokenInput() {
+      var input = form.querySelector('input[name="csrf_token"]');
+      if (!input) {
+        input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'csrf_token';
+        form.insertBefore(input, form.firstChild);
+      }
+      return input;
+    }
+
+    function setToken(token) {
+      if (!token) return;
+      ensureTokenInput().value = token;
+      var metas = document.querySelectorAll('meta[name="csrf-token"], meta[name="csrf_token"]');
+      metas.forEach(function(meta) { meta.setAttribute('content', token); });
+    }
+
+    async function refreshToken() {
+      if (!window.fetch) return false;
+      try {
+        var controller = window.AbortController ? new AbortController() : null;
+        var timer = controller ? setTimeout(function() { controller.abort(); }, 2500) : null;
+        var response = await fetch('/pwa/csrf-refresh', {
+          method: 'GET',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: {'Accept':'application/json','X-Requested-With':'XMLHttpRequest'},
+          signal: controller ? controller.signal : undefined
+        });
+        if (timer) clearTimeout(timer);
+        if (!response.ok) return false;
+        var data = await response.json();
+        if (data && data.csrf_token) { setToken(data.csrf_token); return true; }
+      } catch (err) { return false; }
+      return false;
+    }
+
+    form.addEventListener('submit', async function(event) {
+      if (form.dataset.bys360CsrfReady === '1') return;
+      event.preventDefault();
+      if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+      var button = form.querySelector('button[type="submit"]');
+      if (button) {
+        button.disabled = true;
+        button.dataset.originalText = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Güvenlik doğrulanıyor...';
+      }
+      await refreshToken();
+      form.dataset.bys360CsrfReady = '1';
+      if (button && button.dataset.originalText) {
+        button.innerHTML = button.dataset.originalText;
+        button.disabled = false;
+      }
+      HTMLFormElement.prototype.submit.call(form);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFeedbackForm);
+  } else {
+    initFeedbackForm();
+  }
+})();
+</script>
+{% endblock %}

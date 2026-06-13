@@ -1,0 +1,688 @@
+{% extends "base.html" %}
+
+{% block title %}Hatırlatma ve Gelişim Takibi{% endblock %}
+
+{% block content %}
+{% set page_summary = page_summary if page_summary is defined and page_summary else {} %}
+{% set reminder_items = reminder_items if reminder_items is defined and reminder_items else [] %}
+{% set overdue_items = overdue_items if overdue_items is defined and overdue_items else [] %}
+{% set development_items = development_items if development_items is defined and development_items else [] %}
+{% set mail_items = mail_items if mail_items is defined and mail_items else [] %}
+
+<style>
+    .bys-md-shell {
+        --bys-red: #8B0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .10);
+        --bys-card: rgba(255, 255, 255, .86);
+        --bys-soft: rgba(255, 255, 255, .62);
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 18px 18px 42px;
+    }
+
+    .bys-md-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 34%),
+            linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.72));
+        box-shadow: 0 24px 70px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin-bottom: 18px;
+    }
+
+    .bys-md-hero::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -90px;
+        width: 260px;
+        height: 260px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .08);
+        pointer-events: none;
+    }
+
+    .bys-md-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: .02em;
+        margin-bottom: 14px;
+    }
+
+    .bys-md-title {
+        font-size: clamp(26px, 3vw, 42px);
+        line-height: 1.05;
+        font-weight: 850;
+        color: var(--bys-ink);
+        margin: 0;
+        letter-spacing: -.04em;
+    }
+
+    .bys-md-subtitle {
+        max-width: 840px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .bys-md-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
+        margin: 18px 0;
+        align-items: center;
+    }
+
+    .bys-md-input,
+    .bys-md-select {
+        width: 100%;
+        border: 1px solid var(--bys-line);
+        background: rgba(255,255,255,.92);
+        border-radius: 16px;
+        padding: 12px 14px;
+        color: var(--bys-ink);
+        outline: none;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, .05);
+    }
+
+    .bys-md-input:focus,
+    .bys-md-select:focus {
+        border-color: rgba(139, 0, 0, .35);
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+    }
+
+    .bys-md-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .bys-md-stat {
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: var(--bys-card);
+        padding: 18px;
+        box-shadow: 0 16px 42px rgba(31, 41, 55, .08);
+        min-height: 132px;
+    }
+
+    .bys-md-stat-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 14px;
+    }
+
+    .bys-md-stat-number {
+        font-size: 30px;
+        font-weight: 850;
+        color: var(--bys-ink);
+        letter-spacing: -.03em;
+        margin-bottom: 2px;
+    }
+
+    .bys-md-stat-label {
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .bys-md-section-grid {
+        display: grid;
+        grid-template-columns: 1.2fr .8fr;
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .bys-md-card {
+        border: 1px solid var(--bys-line);
+        border-radius: 24px;
+        background: var(--bys-card);
+        box-shadow: 0 18px 52px rgba(31, 41, 55, .08);
+        overflow: hidden;
+    }
+
+    .bys-md-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--bys-line);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .bys-md-card-title {
+        margin: 0;
+        font-size: 18px;
+        color: var(--bys-ink);
+        font-weight: 820;
+        letter-spacing: -.02em;
+    }
+
+    .bys-md-card-desc {
+        margin: 6px 0 0;
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .bys-md-card-body {
+        padding: 18px 22px 22px;
+    }
+
+    .bys-md-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .bys-md-list-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid var(--bys-line);
+        border-radius: 18px;
+        background: rgba(255,255,255,.62);
+    }
+
+    .bys-md-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background: var(--bys-red);
+        box-shadow: 0 0 0 5px rgba(139, 0, 0, .08);
+    }
+
+    .bys-md-item-title {
+        margin: 0;
+        font-weight: 760;
+        color: var(--bys-ink);
+        font-size: 14px;
+    }
+
+    .bys-md-item-meta {
+        margin-top: 5px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .bys-md-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, .06);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .bys-md-badge-danger {
+        background: rgba(139, 0, 0, .10);
+        color: var(--bys-red);
+    }
+
+    .bys-md-badge-success {
+        background: rgba(22, 101, 52, .10);
+        color: #166534;
+    }
+
+    .bys-md-badge-warning {
+        background: rgba(146, 64, 14, .10);
+        color: #92400e;
+    }
+
+    .bys-md-actions {
+        display: grid;
+        gap: 10px;
+    }
+
+    .bys-md-action {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 15px;
+        border: 1px solid var(--bys-line);
+        border-radius: 18px;
+        background: rgba(255,255,255,.66);
+        text-decoration: none;
+        color: var(--bys-ink);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .bys-md-action:hover {
+        transform: translateY(-1px);
+        border-color: rgba(139, 0, 0, .24);
+        box-shadow: 0 12px 32px rgba(31, 41, 55, .09);
+        color: var(--bys-red);
+    }
+
+    .bys-md-action strong {
+        display: block;
+        font-size: 14px;
+    }
+
+    .bys-md-action span {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--bys-muted);
+    }
+
+    .bys-md-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--bys-line);
+        border-radius: 20px;
+        background: rgba(255,255,255,.64);
+    }
+
+    .bys-md-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 860px;
+    }
+
+    .bys-md-table th {
+        text-align: left;
+        padding: 14px 16px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        font-weight: 800;
+        border-bottom: 1px solid var(--bys-line);
+        background: rgba(31, 41, 55, .035);
+    }
+
+    .bys-md-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid rgba(31, 41, 55, .08);
+        color: var(--bys-ink);
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .bys-md-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .bys-md-empty {
+        text-align: center;
+        padding: 34px 18px;
+        border: 1px dashed rgba(31, 41, 55, .18);
+        border-radius: 20px;
+        background: rgba(255,255,255,.52);
+        color: var(--bys-muted);
+    }
+
+    .bys-md-empty i {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        border-radius: 18px;
+        align-items: center;
+        justify-content: center;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 12px;
+    }
+
+    .bys-md-note {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--bys-red-soft);
+        color: #5f0b0b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1120px) {
+        .bys-md-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .bys-md-section-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .bys-md-shell {
+            padding: 12px 10px 30px;
+        }
+        .bys-md-hero {
+            padding: 22px;
+            border-radius: 22px;
+        }
+        .bys-md-toolbar {
+            grid-template-columns: 1fr;
+        }
+        .bys-md-grid {
+            grid-template-columns: 1fr;
+        }
+        .bys-md-card-header {
+            display: block;
+        }
+        .bys-md-list-item {
+            grid-template-columns: auto 1fr;
+        }
+        .bys-md-list-item .bys-md-badge {
+            grid-column: 2;
+            width: max-content;
+        }
+    }
+</style>
+
+<div class="bys-md-shell" data-page="meeting-development-clean">
+    <section class="bys-md-hero">
+        <div class="bys-md-eyebrow">
+            <i class="fa-solid fa-bell"></i>
+            Performans Yönetimi
+        </div>
+
+        <h1 class="bys-md-title">Hatırlatma ve Gelişim Takibi</h1>
+
+        <p class="bys-md-subtitle">
+            Değerlendirme sürecindeki bekleyen işler, geciken değerlendirmeler, gelişim önerileri ve bildirim kayıtları
+            tek ekranda izlenir. Bu ekran yalnızca yetki kapsamındaki bilgileri gösterir; karar veya puan üretmez.
+        </p>
+
+        <div class="bys-md-grid">
+            <div class="bys-md-stat">
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                <div class="bys-md-stat-number">{{ page_summary.pending_count|default(0) }}</div>
+                <div class="bys-md-stat-label">Bekleyen değerlendirme ve takip işi</div>
+            </div>
+
+            <div class="bys-md-stat">
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-clock"></i></div>
+                <div class="bys-md-stat-number">{{ page_summary.overdue_count|default(0) }}</div>
+                <div class="bys-md-stat-label">Süresi geçen veya dikkat isteyen kayıt</div>
+            </div>
+
+            <div class="bys-md-stat">
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                <div class="bys-md-stat-number">{{ page_summary.reminder_count|default(0) }}</div>
+                <div class="bys-md-stat-label">Gönderilen hatırlatma ve bilgilendirme</div>
+            </div>
+
+            <div class="bys-md-stat">
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-seedling"></i></div>
+                <div class="bys-md-stat-number">{{ page_summary.development_count|default(0) }}</div>
+                <div class="bys-md-stat-label">Gelişim önerisi veya takip notu</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bys-md-toolbar">
+        <input id="bysMdSearch" class="bys-md-input" type="search" placeholder="Personel, birim, amir veya süreç başlığı ara...">
+        <select id="bysMdStatus" class="bys-md-select">
+            <option value="">Tüm durumlar</option>
+            <option value="bekliyor">Bekliyor</option>
+            <option value="gecikti">Gecikti</option>
+            <option value="tamamlandi">Tamamlandı</option>
+            <option value="gelisim">Gelişim Takibi</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.location.reload()">
+            <i class="fa-solid fa-rotate-right me-1"></i> Yenile
+        </button>
+    </div>
+
+    <section class="bys-md-section-grid">
+        <div class="bys-md-card">
+            <div class="bys-md-card-header">
+                <div>
+                    <h2 class="bys-md-card-title">Süreçte Dikkat Gerektiren Kayıtlar</h2>
+                    <p class="bys-md-card-desc">
+                        Süresi yaklaşan, geciken veya yöneticinin kontrol etmesi gereken kayıtlar burada özetlenir.
+                    </p>
+                </div>
+                <span class="bys-md-badge bys-md-badge-warning">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Yetki kapsamlı görünüm
+                </span>
+            </div>
+            <div class="bys-md-card-body">
+                {% if overdue_items %}
+                <div class="bys-md-list">
+                    {% for item in overdue_items %}
+                    <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default('') ~ ' ' ~ item.manager_name|default(''))|lower }}" data-status="{{ item.status_key|default('gecikti') }}">
+                        <span class="bys-md-dot"></span>
+                        <div>
+                            <h3 class="bys-md-item-title">{{ item.title|default('Dikkat gerektiren kayıt') }}</h3>
+                            <div class="bys-md-item-meta">
+                                {{ item.personnel_name|default('Personel bilgisi') }}
+                                {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
+                                {% if item.manager_name is defined and item.manager_name %} · Sorumlu: {{ item.manager_name }}{% endif %}
+                            </div>
+                        </div>
+                        <span class="bys-md-badge bys-md-badge-danger">
+                            {{ item.status_label|default('Kontrol Gerekiyor') }}
+                        </span>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bys-md-empty">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div><strong>Dikkat gerektiren gecikmiş kayıt görünmüyor.</strong></div>
+                    <div>Yetki kapsamınızda açık bir aksama yoksa bu alan boş kalır.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside class="bys-md-card">
+            <div class="bys-md-card-header">
+                <div>
+                    <h2 class="bys-md-card-title">Hızlı İşlemler</h2>
+                    <p class="bys-md-card-desc">Sık kullanılan performans takip ekranlarına güvenli geçiş.</p>
+                </div>
+            </div>
+            <div class="bys-md-card-body">
+                <div class="bys-md-actions">
+                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_tracking') }}">
+                        <div>
+                            <strong>Süreç Takibine Git</strong>
+                            <span>Bekleyen ve tamamlanan süreçleri incele.</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_reports') }}">
+                        <div>
+                            <strong>Süreç Raporlarını Aç</strong>
+                            <span>Geciken işler ve yoğunlukları değerlendir.</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_interim_notes_manager') }}">
+                        <div>
+                            <strong>Dönem İçi Notlar</strong>
+                            <span>Gelişim, başarı ve gözlem notlarını yönet.</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_development_guidance') }}">
+                        <div>
+                            <strong>Gelişim Rehberi</strong>
+                            <span>Karne sonrası öneri ve takip alanını aç.</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="bys-md-note">
+                    <strong>Bilgi:</strong> Bu ekran performans puanı üretmez ve idari karar vermez. Yalnızca
+                    yetkili olduğunuz süreçleri takip etmenizi ve gerekli ekrana güvenli şekilde geçmenizi sağlar.
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <section class="bys-md-card" style="margin-top:16px;">
+        <div class="bys-md-card-header">
+            <div>
+                <h2 class="bys-md-card-title">Hatırlatma ve Bildirim Kayıtları</h2>
+                <p class="bys-md-card-desc">
+                    Değerlendirme sürecindeki hatırlatma, bildirim ve e-posta kayıtları kurumsal takip amacıyla listelenir.
+                </p>
+            </div>
+            <span class="bys-md-badge">
+                <i class="fa-solid fa-envelope-open-text"></i>
+                Kayıtlı iletişim
+            </span>
+        </div>
+
+        <div class="bys-md-card-body">
+            {% if reminder_items or mail_items %}
+            <div class="bys-md-table-wrap">
+                <table class="bys-md-table">
+                    <thead>
+                        <tr>
+                            <th>Kayıt</th>
+                            <th>İlgili Kişi / Birim</th>
+                            <th>Tür</th>
+                            <th>Durum</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reminder_items %}
+                        <tr data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="{{ item.status_key|default('bekliyor') }}">
+                            <td><strong>{{ item.title|default('Hatırlatma kaydı') }}</strong></td>
+                            <td>
+                                {{ item.personnel_name|default('Yetki kapsamındaki kayıt') }}
+                                {% if item.unit_name is defined and item.unit_name %}<br><small class="text-muted">{{ item.unit_name }}</small>{% endif %}
+                            </td>
+                            <td>{{ item.type_label|default('Sistem içi hatırlatma') }}</td>
+                            <td><span class="bys-md-badge">{{ item.status_label|default('Bekliyor') }}</span></td>
+                            <td>{{ item.created_at_label|default('-') }}</td>
+                        </tr>
+                        {% endfor %}
+
+                        {% for item in mail_items %}
+                        <tr data-search="{{ (item.subject|default('') ~ ' ' ~ item.recipient_label|default(''))|lower }}" data-status="{{ item.status_key|default('tamamlandi') }}">
+                            <td><strong>{{ item.subject|default('E-posta bilgilendirmesi') }}</strong></td>
+                            <td>{{ item.recipient_label|default('Alıcı bilgisi') }}</td>
+                            <td>{{ item.type_label|default('E-posta') }}</td>
+                            <td>
+                                <span class="bys-md-badge {% if item.status_key|default('') == 'tamamlandi' %}bys-md-badge-success{% endif %}">
+                                    {{ item.status_label|default('Kayıt Oluştu') }}
+                                </span>
+                            </td>
+                            <td>{{ item.created_at_label|default('-') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="bys-md-empty">
+                <i class="fa-solid fa-inbox"></i>
+                <div><strong>Henüz görüntülenecek hatırlatma kaydı yok.</strong></div>
+                <div>Süreç ilerledikçe bildirim ve e-posta kayıtları burada listelenir.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="bys-md-card" style="margin-top:16px;">
+        <div class="bys-md-card-header">
+            <div>
+                <h2 class="bys-md-card-title">Gelişim Takibi</h2>
+                <p class="bys-md-card-desc">
+                    Performans sonucunun yalnızca puanla kapanmaması için gelişim önerileri ve takip notları burada izlenir.
+                </p>
+            </div>
+            <span class="bys-md-badge bys-md-badge-success">
+                <i class="fa-solid fa-seedling"></i>
+                Gelişim odaklı takip
+            </span>
+        </div>
+
+        <div class="bys-md-card-body">
+            {% if development_items %}
+            <div class="bys-md-list">
+                {% for item in development_items %}
+                <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="gelisim">
+                    <span class="bys-md-dot"></span>
+                    <div>
+                        <h3 class="bys-md-item-title">{{ item.title|default('Gelişim önerisi') }}</h3>
+                        <div class="bys-md-item-meta">
+                            {{ item.personnel_name|default('Personel') }}
+                            {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
+                            {% if item.note is defined and item.note %}<br>{{ item.note }}{% endif %}
+                        </div>
+                    </div>
+                    <span class="bys-md-badge bys-md-badge-success">
+                        {{ item.status_label|default('Takipte') }}
+                    </span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bys-md-empty">
+                <i class="fa-solid fa-seedling"></i>
+                <div><strong>Gelişim takibi için açık kayıt bulunmuyor.</strong></div>
+                <div>Gelişim önerileri oluşturuldukça bu alanda yetki kapsamına göre görüntülenir.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("bysMdSearch");
+    const status = document.getElementById("bysMdStatus");
+
+    function normalize(value) {
+        return (value || "").toLocaleLowerCase("tr-TR").trim();
+    }
+
+    function applyFilters() {
+        const q = normalize(search ? search.value : "");
+        const selected = normalize(status ? status.value : "");
+        const rows = document.querySelectorAll("[data-search][data-status]");
+
+        rows.forEach(function (row) {
+            const haystack = normalize(row.getAttribute("data-search"));
+            const state = normalize(row.getAttribute("data-status"));
+            const matchesSearch = !q || haystack.indexOf(q) !== -1;
+            const matchesStatus = !selected || state === selected;
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+        });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (status) status.addEventListener("change", applyFilters);
+})();
+</script>
+{% endblock %}

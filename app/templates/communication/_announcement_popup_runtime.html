@@ -1,0 +1,35 @@
+{% if current_user.is_authenticated %}
+<div
+  id="bys-announcement-popup-root"
+  class="bys-announcement-popup-root"
+  data-runtime-url="{{ url_for('main.announcement_popup_runtime_pending') }}"
+  data-token="{{ announcement_popup_runtime_token|default('', true) }}"
+  data-csrf-token="{{ csrf_token() if csrf_token is defined else '' }}"
+  aria-live="polite"
+>
+  <div class="bys-announcement-backdrop" data-announcement-close aria-hidden="true"></div>
+  <section class="bys-announcement-modal" role="dialog" aria-modal="true" aria-labelledby="bys-announcement-title" aria-describedby="bys-announcement-body" tabindex="-1">
+    <div class="bys-announcement-topline">
+      <span class="bys-announcement-kicker" data-announcement-type-label>BYS360 Duyuru</span>
+      <button class="bys-announcement-x" type="button" data-announcement-close aria-label="Duyuruyu kapat">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="bys-announcement-header">
+      <div class="bys-announcement-icon" aria-hidden="true"><i class="fa-solid fa-bullhorn"></i></div>
+      <div>
+        <h2 id="bys-announcement-title" data-announcement-title>Duyuru</h2>
+        <p class="bys-announcement-sub" data-announcement-required-note>Kurumsal bilgilendirme</p>
+      </div>
+    </div>
+    <div class="bys-announcement-media" data-announcement-media hidden></div>
+    <p id="bys-announcement-body" class="bys-announcement-body" data-announcement-body></p>
+    <div class="bys-announcement-actions">
+      <a class="bys-announcement-cta" data-announcement-cta href="#" target="_blank" rel="noopener noreferrer" hidden>Detaya Git</a>
+      <button class="bys-announcement-secondary" type="button" data-announcement-dismiss>Daha sonra</button>
+      <button class="bys-announcement-primary" type="button" data-announcement-ack>Okudum</button>
+    </div>
+    <p class="bys-announcement-status" data-announcement-status role="status" aria-live="polite"></p>
+  </section>
+</div>
+{% endif %}

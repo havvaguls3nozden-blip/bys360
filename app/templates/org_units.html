@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Birimleri Yönet - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Yapı{% endblock %}
+{% block page_title %}Birimleri Yönet{% endblock %}
+{% block page_subtitle %}Kurumsal hiyerarşideki birimleri ekleyin, düzenleyin ve yönetin{% endblock %}
+
+{% block content %}
+<style>
+    .units-top{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+        margin-bottom:18px;
+    }
+
+    .units-hero,
+    .units-stat,
+    .search-panel,
+    .units-table-wrap{
+        background:rgba(255,255,255,.68);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:22px;
+        box-shadow:0 16px 34px rgba(15,23,42,.08);
+    }
+
+    .units-hero{ padding:24px; }
+    .units-hero h3{
+        margin:0 0 10px;
+        font-size:1.45rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+    .units-hero p{
+        margin:0;
+        color:#6b7280;
+        line-height:1.7;
+    }
+
+    .units-actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:18px;
+    }
+
+    .units-stat-grid{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:14px;
+    }
+
+    .units-stat{ padding:18px; }
+    .units-stat .label{
+        font-size:.88rem;
+        color:#6b7280;
+        margin-bottom:8px;
+    }
+    .units-stat .value{
+        font-size:1.9rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .search-panel{
+        padding:18px;
+        margin-bottom:18px;
+    }
+
+    .search-form{
+        display:grid;
+        grid-template-columns:1fr auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .units-table-wrap{
+        padding:18px;
+        overflow:auto;
+    }
+
+    .cell-stack{
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+    }
+
+    .cell-main{
+        font-weight:800;
+        color:#1f2937;
+    }
+
+    .cell-sub{
+        font-size:.88rem;
+        color:#6b7280;
+        line-height:1.6;
+    }
+
+    .type-badge,
+    .status-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:90px;
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:.85rem;
+        font-weight:700;
+    }
+
+    .type-badge{
+        background:rgba(139,0,0,.10);
+        color:#8B0000;
+    }
+
+    .status-active{
+        background:#ecfdf5;
+        color:#065f46;
+    }
+
+    .status-passive{
+        background:#fef2f2;
+        color:#991b1b;
+    }
+
+    .action-stack{
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+    }
+
+    .action-stack form{ margin:0; }
+
+    .mini-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        min-height:36px;
+        padding:8px 12px;
+        border:none;
+        border-radius:12px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:700;
+        font-size:.88rem;
+        color:#fff !important;
+        background:linear-gradient(180deg, #8B0000, #650000);
+        box-shadow:0 10px 20px rgba(139,0,0,.16);
+    }
+
+    .mini-btn.secondary{
+        background:linear-gradient(180deg, #4b5563, #374151);
+        box-shadow:0 10px 20px rgba(55,65,81,.14);
+    }
+
+    @media (max-width: 1100px){
+        .units-top{
+            grid-template-columns:1fr;
+        }
+        .search-form{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="units-top">
+    <div class="units-hero">
+        <h3>Kurumsal birim ağacını yönetin</h3>
+        <p>
+            Bu alanda başkanlık, başkan yardımcılığı, grup başkanlığı, çalışma grubu,
+            koordinatörlük ve diğer tüm birimleri hiyerarşik olarak yönetebilirsiniz.
+        </p>
+
+        <div class="units-actions">
+            <a class="btn" href="{{ url_for('main.admin_org_unit_create') }}">
+                <i class="fa-solid fa-plus"></i>
+                Yeni Birim Ekle
+            </a>
+        </div>
+    </div>
+
+    <div class="units-stat-grid">
+        <div class="units-stat">
+            <div class="label">Toplam Birim</div>
+            <div class="value">{{ total_count }}</div>
+        </div>
+        <div class="units-stat">
+            <div class="label">Aktif Birim</div>
+            <div class="value">{{ active_count }}</div>
+        </div>
+        <div class="units-stat">
+            <div class="label">Pasif Birim</div>
+            <div class="value">{{ passive_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="search-panel">
+    <form method="get" class="search-form">
+        <div class="form-group">
+            <label>Birim Ara</label>
+            <input type="text" name="q" value="{{ q or '' }}" placeholder="Birim adı, tür veya üst birim">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Ara
+            </button>
+        </div>
+
+        <div class="form-group">
+            <a href="{{ url_for('main.admin_org_units') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-rotate-left"></i>
+                Temizle
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="units-table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Birim</th>
+                <th>Üst Birim</th>
+                <th>Tür</th>
+                <th>Alt Birim</th>
+                <th>Personel</th>
+                <th>Durum</th>
+                <th style="min-width:260px;">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit, parent_name, child_count, user_count in rows %}
+            <tr>
+                <td>
+                    <div class="cell-stack">
+                        <span class="cell-main">{{ unit.name }}</span>
+                        <span class="cell-sub">ID: {{ unit.id }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="cell-stack">
+                        <span class="cell-sub">{{ parent_name or '-' }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <span class="type-badge">{{ get_unit_type_label(unit.unit_type) }}</span>
+                </td>
+
+                <td>{{ child_count }}</td>
+                <td>{{ user_count }}</td>
+
+                <td>
+                    {% if unit.is_active %}
+                        <span class="status-badge status-active">Aktif</span>
+                    {% else %}
+                        <span class="status-badge status-passive">Pasif</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <div class="action-stack">
+                        <a class="mini-btn" href="{{ url_for('main.admin_org_unit_edit', unit_id=unit.id) }}">
+                            <i class="fa-solid fa-pen"></i> Düzenle
+                        </a>
+
+                        <form method="post" action="{{ url_for('main.admin_org_unit_toggle_active', unit_id=unit.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="mini-btn secondary">
+                                {% if unit.is_active %}
+                                    <i class="fa-solid fa-toggle-left"></i> Pasif Yap
+                                {% else %}
+                                    <i class="fa-solid fa-toggle-right"></i> Aktif Yap
+                                {% endif %}
+                            </button>
+                        </form>
+
+                        <form method="post"
+                              action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}"
+                              onsubmit="return confirm('Bu birimi silmek istediğinize emin misiniz?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="mini-btn secondary">
+                                <i class="fa-solid fa-trash"></i> Sil
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">Arama kriterine uygun birim bulunamadı.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{# BYS360_PORTAL_EXPERIENCE_V2B_FEED_SIDEBAR #}
+{% set v2 = portal_v2 if portal_v2 is defined and portal_v2 else {} %}
+{% set pulse = v2.pulse if v2.pulse is defined else {} %}
+<section class="portal-card portal-v2b-side-card portal-v2b-pulse" aria-label="Portal özeti">
+  <h3><i class="fa-solid fa-chart-simple"></i> Portal Özeti</h3>
+  <div class="portal-v2b-mini-stats">
+    <div><b>{{ pulse.post_count|default(0, true) }}</b><span>Paylaşım</span></div>
+    <div><b>{{ pulse.announcement_count|default(0, true) }}</b><span>Duyuru</span></div>
+    <div><b>{{ pulse.recognition_count|default(0, true) }}</b><span>Teşekkür</span></div>
+  </div>
+</section>
+
+{# BYS360_PORTAL_EXPERIENCE_V2F_RIGHT_NEWS_MOVED_LEFT: Duyurular sol vitrinde gösterilir. #}
+<section class="portal-card portal-v2b-side-card">
+  <h3><i class="fa-solid fa-award"></i> Teşekkür ve İyi Uygulamalar</h3>
+  <div class="portal-v2b-side-list">
+    {% for item in v2.recognition_highlights|default([], true) %}
+      <a href="{{ item.link_url }}"><b>{{ item.title }}</b><small>{{ item.author }}</small></a>
+    {% else %}
+      <p class="portal-v2b-empty">İlk teşekkür veya iyi uygulama paylaşımı bekleniyor.</p>
+    {% endfor %}
+  </div>
+</section>

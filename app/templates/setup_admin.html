@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}İlk Admin Kurulumu - BYS360{% endblock %}
+{% block page_kicker %}BYS360{% endblock %}
+{% block page_title %}İlk Admin Kurulumu{% endblock %}
+{% block page_subtitle %}Sistemde henüz kullanıcı yok. İlk yönetici hesabını oluşturarak kurulumu başlatın.{% endblock %}
+{% block content %}
+<div class="content-card glass-card" style="max-width:880px; margin:0 auto;">
+  <div class="card-body p-4 p-lg-5">
+    <div class="d-flex flex-column flex-lg-row gap-4 align-items-start">
+      <div style="flex:1 1 320px;">
+        <div class="section-kicker">Kurulum</div>
+        <h3 class="mb-2">İlk yönetici hesabını oluşturun</h3>
+        <p class="text-muted mb-4">Bu hesap sistemin başlangıç yöneticisi olacaktır. Kurulum tamamlandıktan sonra diğer personel kayıtları güvenli şekilde eklenebilir.</p>
+        <div class="mini-grid">
+          <div class="mini-box"><div class="label">Rol</div><div class="value">Admin</div></div>
+          <div class="mini-box"><div class="label">Birim</div><div class="value">Başkanlık</div></div>
+          <div class="mini-box"><div class="label">Durum</div><div class="value">İlk kurulum</div></div>
+          <div class="mini-box"><div class="label">Sonraki adım</div><div class="value">Güvenli giriş</div></div>
+        </div>
+      </div>
+      <div style="flex:1 1 420px; width:100%;">
+        <form method="post" class="row g-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="col-md-6">
+            <label class="form-label">Ad</label>
+            <input type="text" name="ad" class="form-control" required autofocus>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Soyad</label>
+            <input type="text" name="soyad" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sicil No</label>
+            <input type="text" name="sicil_no" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Kurumsal E-posta</label>
+            <input type="email" name="email" class="form-control" placeholder="ad.soyad@ktb.gov.tr" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Şifre</label>
+            <input type="password" name="password" class="form-control" minlength="6" required>
+            <div class="form-text">İlk girişten sonra güçlü ve kişisel bir şifre ile güncellenmesi önerilir.</div>
+          </div>
+          <div class="col-12 d-flex gap-2 flex-wrap pt-2">
+            <button type="submit" class="btn btn-danger px-4">İlk Admini Oluştur</button>
+            <a href="{{ url_for('main.login') }}" class="btn btn-outline-secondary">Giriş ekranına dön</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

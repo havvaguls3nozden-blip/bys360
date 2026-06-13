@@ -1,0 +1,44 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Geri Bildirimleri - BYS360{% endblock %}
+{% block page_kicker %}Yönetim & Denetim{% endblock %}
+{% block page_title %}Karar Destek Geri Bildirimleri{% endblock %}
+{% block page_subtitle %}Kullanıcıların AI çıktıları için verdiği yararlı, hatalı veya güvensiz geri bildirimleri tek yerden takip edin{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">AI kullanıcı sesi</div>
+    <h3 class="ai-title">Çıktı kalitesini gerçek kullanım verisiyle takip edin</h3>
+    <p class="ai-sub">Bu ekran, AI yanıtlarının ne kadar faydalı bulunduğunu ve hangi modüllerde daha fazla düzeltme baskısı oluştuğunu görünür kılar.</p>
+  </section>
+  <form class="ai-form-wrap" method="get">
+    <div class="ai-filters">
+      <div class="ai-group"><label>Geri bildirim tipi</label><select class="ai-select" name="feedback_type"><option value="">Tümü</option>{% for value in feedback_type_options %}<option value="{{ value }}" {{ 'selected' if selected_feedback_type == value|lower else '' }}>{{ value|ai_feedback_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Modül</label><select class="ai-select" name="module_type"><option value="">Tümü</option>{% for value in module_options %}<option value="{{ value }}" {{ 'selected' if selected_module_type == value|lower else '' }}>{{ value|ai_module_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Toplam kayıt</label><div class="ai-note">{{ pagination.total }} geri bildirim</div></div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Filtrele</button>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_feedback_export', feedback_type=selected_feedback_type, module_type=selected_module_type) }}"><i class="fa-solid fa-file-export"></i> CSV dışa aktar</a>
+    </div>
+  </form>
+  <section class="ai-table-wrap">
+    <table class="ai-table">
+      <thead><tr><th>Zaman</th><th>Tip</th><th>Modül</th><th>Özellik</th><th>İstem</th><th>Kullanıcı</th><th>Not</th><th>Hedef</th></tr></thead>
+      <tbody>
+        {% for row in rows %}
+        {% set req = row.ai_request_log %}
+        <tr>
+          <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+          <td><span class="ai-badge {{ 'warning' if row.feedback_type in ['not_helpful','wrong','unsafe'] else 'success' }}">{{ row.feedback_type|ai_feedback_label }}</span></td>
+          <td>{{ req.module_type|ai_module_label if req else '-' }}</td>
+          <td>{{ req.feature_type|ai_feature_label if req else '-' }}</td>
+          <td>{{ req.prompt_version if req and req.prompt_version else '-' }}</td>
+          <td>{{ row.user.display_name() if row.user else '-' }}</td>
+          <td>{{ row.feedback_note or '-' }}</td>
+          <td>{{ req.target_table|ai_target_label if req else '-' }}{% if req and req.target_id %} #{{ req.target_id }}{% endif %}</td>
+        </tr>
+        {% else %}<tr><td colspan="8"><div class="ai-note">Filtrelere uyan AI geri bildirimi bulunamadı.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <div class="pagination-shell">{% if pagination.pages > 1 %}<div class="ai-actions">{% if pagination.has_prev %}<a class="ai-link" href="{{ url_for('main.admin_ai_feedback', page=pagination.prev_num, feedback_type=selected_feedback_type, module_type=selected_module_type) }}">Önceki</a>{% endif %}<span class="ai-link">Sayfa {{ pagination.page }} / {{ pagination.pages }}</span>{% if pagination.has_next %}<a class="ai-link" href="{{ url_for('main.admin_ai_feedback', page=pagination.next_num, feedback_type=selected_feedback_type, module_type=selected_module_type) }}">Sonraki</a>{% endif %}</div>{% endif %}</div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,390 @@
+/* BYS360 Survey mobile hardening overlay */
+
+@media (max-width: 991px) {
+  .builder-shell,
+  .survey-manage-shell,
+  .survey-shell,
+  .take-shell {
+    gap: 16px !important;
+  }
+
+  .builder-grid,
+  .jotform-builder-grid,
+  .summary-grid,
+  .form-grid,
+  .template-grid,
+  .survey-summary-grid,
+  .metric-grid,
+  .insight-list,
+  .trend-grid,
+  .manager-grid,
+  .spotlight-grid,
+  .mix-grid,
+  .question-metrics {
+    grid-template-columns: 1fr !important;
+  }
+
+  .panel-card,
+  .soft-panel-body,
+  .share-dialog {
+    padding: 18px !important;
+  }
+
+  .sticky-stack,
+  .toolbar-card,
+  .question-nav-wrap,
+  .progress-wrap {
+    position: static !important;
+  }
+
+  .builder-rail,
+  .jotform-rail,
+  .jotform-builder-grid > aside,
+  .jotform-builder-grid > form,
+  .builder-grid > * {
+    min-width: 0 !important;
+  }
+
+  .search-row,
+  .share-link-row,
+  .share-link-box {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .search-item,
+  .mini-item,
+  .selected-user-chip {
+    width: 100% !important;
+  }
+
+  .search-item,
+  .mini-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .search-item button,
+  .share-actions .btn-soft,
+  .share-actions .mini-btn,
+  .question-tools .btn-soft,
+  .question-tools .mini-btn,
+  .action-row .btn-soft,
+  .action-row .mini-btn,
+  .selection-actions .mini-btn,
+  .selection-actions .btn-soft {
+    width: 100% !important;
+  }
+
+  .search-box,
+  .search-box input,
+  .toolbar-form input,
+  .share-link-box input,
+  .share-link-row input,
+  .target-stat,
+  .muted-chip {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .toolbar,
+  .toolbar-main,
+  .toolbar-secondary,
+  .toolbar-form,
+  .selection-bar,
+  .selection-meta,
+  .selection-actions,
+  .chip-row,
+  .share-actions,
+  .action-bar,
+  .draft-row,
+  .progress-top,
+  .action-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .table-wrap {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  .table-wrap::after {
+    content: "Yatay kaydır";
+    position: sticky;
+    right: 10px;
+    bottom: 10px;
+    float: right;
+    margin: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #6b7280;
+    background: rgba(255,255,255,.92);
+    border: 1px solid rgba(15,23,42,.08);
+    pointer-events: none;
+  }
+
+  .table-wrap table,
+  .table-wrap > table {
+    min-width: 980px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .panel-card,
+  .soft-panel-body {
+    padding: 16px !important;
+  }
+
+  .glass-card,
+  .soft-panel,
+  .share-dialog,
+  .survey-card,
+  .question-card,
+  .summary-box,
+  .metric-card,
+  .status-item,
+  .insight-chip {
+    border-radius: 18px !important;
+  }
+
+  .survey-card,
+  .survey-actions,
+  .survey-meta,
+  .hero-grid,
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .survey-card {
+    padding: 14px !important;
+    gap: 14px !important;
+  }
+
+  .question-card {
+    padding: 14px !important;
+    scroll-margin-top: 88px !important;
+  }
+
+  .question-title,
+  .survey-title,
+  .summary-title,
+  .hero-title {
+    line-height: 1.55 !important;
+  }
+
+  .question-sub,
+  .survey-note,
+  .helper-box,
+  .summary-sub,
+  .survey-intro-note {
+    line-height: 1.75 !important;
+  }
+
+  .question-nav-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 2px !important;
+    margin-inline: -4px;
+  }
+
+  .question-nav,
+  #questionJumpNav {
+    flex-wrap: nowrap !important;
+    width: max-content;
+    padding-bottom: 2px;
+    scroll-snap-type: x proximity;
+  }
+
+  .question-jump {
+    min-width: 36px !important;
+    min-height: 36px !important;
+    scroll-snap-align: start;
+  }
+
+  .choice-item {
+    padding: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .choice-item label {
+    font-size: .92rem !important;
+    line-height: 1.7 !important;
+  }
+
+  .rating-grid,
+  .rating-grid.ten {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rating-item label {
+    min-height: 46px !important;
+  }
+
+  .mobile-dock {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .mobile-dock-progress {
+    text-align: center;
+  }
+
+  .mobile-dock-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px !important;
+    width: 100%;
+    justify-content: stretch !important;
+  }
+
+  .mobile-dock .btn-soft,
+  .mobile-dock-actions .btn-soft {
+    width: 100% !important;
+    min-height: 42px !important;
+  }
+
+  .progress-wrap {
+    bottom: 94px !important;
+    padding: 12px 14px !important;
+  }
+
+  .btn-soft,
+  .mini-btn,
+  .filter-pill,
+  .chip-link {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .builder-tool-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rail-step,
+  .mini-item,
+  .status-item,
+  .helper-box,
+  .safe-box,
+  .notice-box,
+  .validation-box,
+  .help-box {
+    border-radius: 16px !important;
+  }
+
+  .share-dialog {
+    width: min(100%, 100vw - 16px) !important;
+    padding: 16px !important;
+  }
+
+  .share-dialog-head {
+    align-items: flex-start !important;
+  }
+
+  .share-actions-row,
+  .share-actions {
+    display: grid !important;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-card,
+  .soft-panel-body,
+  .share-dialog {
+    padding: 14px !important;
+  }
+
+  .builder-shell,
+  .survey-manage-shell,
+  .survey-shell,
+  .take-shell,
+  .question-list {
+    gap: 12px !important;
+  }
+
+  .hero-title,
+  .summary-title,
+  .survey-title,
+  .question-title,
+  .summary-value,
+  .metric-value,
+  .stat-value {
+    font-size: .98rem !important;
+  }
+
+  .summary-label,
+  .meta-label,
+  .action-label,
+  .stat-label {
+    font-size: .72rem !important;
+  }
+
+  .summary-sub,
+  .meta-value,
+  .survey-desc,
+  .survey-note,
+  .helper-box,
+  .question-sub,
+  .survey-intro-note,
+  .side-sub,
+  .stat-sub {
+    font-size: .82rem !important;
+  }
+
+  .pill-row,
+  .meta-row,
+  .toolbar,
+  .chip-row,
+  .question-tools {
+    gap: 8px !important;
+  }
+
+  .btn-soft,
+  .mini-btn,
+  .filter-pill,
+  .chip-link {
+    min-height: 42px !important;
+    font-size: .84rem !important;
+    padding-inline: 12px !important;
+  }
+
+  .question-card,
+  .survey-card,
+  .summary-box,
+  .metric-card,
+  .insight-chip,
+  .status-item,
+  .action-card,
+  .meta-box {
+    padding: 12px !important;
+  }
+
+  .builder-tool-grid,
+  .mobile-dock-actions,
+  .rating-grid,
+  .rating-grid.ten {
+    grid-template-columns: 1fr !important;
+  }
+
+  .question-jump {
+    min-width: 34px !important;
+    min-height: 34px !important;
+    font-size: .74rem !important;
+  }
+
+  .table-wrap::after {
+    font-size: 10px;
+    padding: 5px 9px;
+  }
+}

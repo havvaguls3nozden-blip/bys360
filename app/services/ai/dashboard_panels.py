@@ -1,0 +1,80 @@
+
+"""AI panel public facade.
+
+Bu modül eski import yolunu korur; gerçek üreticiler küçük dosyalara bölünmüştür.
+Yeni kod doğrudan ilgili dashboard_panel_* modülünü kullanabilir.
+"""
+from __future__ import annotations
+
+from app.services.ai.dashboard_panel_performance import *  # noqa: F401,F403
+from app.services.ai.dashboard_panel_personnel import *  # noqa: F401,F403
+from app.services.ai.dashboard_panel_hr import *  # noqa: F401,F403
+from app.services.ai.dashboard_panel_communication import *  # noqa: F401,F403
+from app.services.ai.dashboard_panel_operations import *  # noqa: F401,F403
+
+
+def build_repository_dashboard_ai_panel(*args, **kwargs):
+    """Repository dashboard AI panel public facade export.
+
+    Eski import s?zle?mesini korur. Ger?ek repository panel ?reticisi ayr?
+    mod?le ta??nm??sa onu kullan?r; yoksa operasyon k?pr?s?ne g?venli d??er.
+    """
+    candidate_names = (
+        "_build_repository_dashboard_ai_panel",
+        "build_repository_ai_panel",
+        "build_repository_panel",
+        "build_dashboard_ai_operations_bridge",
+    )
+    for candidate_name in candidate_names:
+        candidate = globals().get(candidate_name)
+        if callable(candidate):
+            return candidate(*args, **kwargs)
+
+    return {
+        "key": "repository_dashboard",
+        "title": "Repository Dashboard",
+        "summary": "",
+        "items": [],
+    }
+
+
+__all__ = [
+    "build_repository_dashboard_ai_panel",
+    "build_dashboard_ai_panel",
+    "build_management_ai_panel",
+    "build_scorecard_ai_panel",
+    "build_publish_ai_panel",
+    "build_periods_ai_panel",
+    "build_period_form_ai_panel",
+    "build_task_generation_ai_panel",
+    "build_task_preflight_ai_panel",
+    "build_hierarchy_ai_panel",
+    "build_mail_reminder_ai_panel",
+    "build_feedback_requests_ai_panel",
+    "build_feedback_schedule_ai_panel",
+    "build_feedback_meetings_ai_panel",
+    "build_personnel_profile_chain_ai_panel",
+    "build_admin_user_form_ai_panel",
+    "build_excel_fix_preview_ai_panel",
+    "build_personnel_list_ai_panel",
+    "build_admin_users_risk_ai_panel",
+    "build_import_health_priority_ai_panel",
+    "build_org_unit_detail_ai_panel",
+    "build_personnel_density_ai_panel",
+    "build_import_health_simulation_ai_panel",
+    "build_hierarchy_tree_ai_panel",
+    "build_hierarchy_bulk_edit_ai_panel",
+    "build_hierarchy_assignment_person_ai_panel",
+    "build_org_units_risk_map_ai_panel",
+    "build_assignment_recommendation_center_ai_panel",
+    "build_assignment_delegation_pressure_ai_panel",
+    "build_hr_leave_ai_panel",
+    "build_hr_attendance_ai_panel",
+    "build_message_compose_ai_panel",
+    "build_message_inbox_ai_panel",
+    "build_message_thread_ai_panel",
+    "build_notification_priority_ai_panel",
+    "build_announcements_ai_panel",
+    "build_announcement_form_ai_panel",
+    "build_dashboard_ai_operations_bridge",
+]

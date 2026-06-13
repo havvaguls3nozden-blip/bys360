@@ -1,0 +1,17 @@
+{
+  "treat_as_info_contains": [
+    "Hukuk Müşavirliği zinciri düzeltildi",
+    "tek amir kuralı",
+    "Üst yönetim düğümü",
+    "evaluator gerekmeyebilir"
+  ],
+  "optional_third_manager_patterns": [
+    "3. amir",
+    "Birim Amiri bulunamadı"
+  ],
+  "ui_policy": {
+    "info_color": "soft",
+    "warning_color": "amber",
+    "critical_color": "red"
+  }
+}

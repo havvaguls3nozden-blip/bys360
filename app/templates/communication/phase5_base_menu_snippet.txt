@@ -1,0 +1,35 @@
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_dashboard_view') }}">
+    <i class="fa-solid fa-gears me-2"></i> İletişim Faz 5 Paneli
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_automation_center') }}">
+    <i class="fa-solid fa-robot me-2"></i> Otomasyon Merkezi
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_preferences') }}">
+    <i class="fa-solid fa-sliders me-2"></i> Bildirim Tercihleri
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_escalations') }}">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> Eskalasyon Merkezi
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_retention') }}">
+    <i class="fa-solid fa-box-archive me-2"></i> Saklama Politikaları
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_health') }}">
+    <i class="fa-solid fa-heart-pulse me-2"></i> Operasyon Sağlığı
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase5_audit_logs') }}">
+    <i class="fa-solid fa-clipboard-list me-2"></i> İşlem Logları
+  </a>
+</li>

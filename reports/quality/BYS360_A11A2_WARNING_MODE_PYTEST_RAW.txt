@@ -1,0 +1,2 @@
+
+C:\bys360\project\.venv\Scripts\python.exe: No module named pytest

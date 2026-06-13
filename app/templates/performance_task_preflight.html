@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Görev Üretimi Ön Kontrolü - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Görev Üretimi Ön Kontrolü{% endblock %}
+{% block page_subtitle %}
+Canlı öncesi dönem, kriter, görev ve amir zinciri riskleri bu ekrandan topluca doğrulanır.
+{% endblock %}
+
+{% block content %}
+<style>
+    .preflight-shell{display:grid;gap:18px}
+    .glass-card{background:rgba(255,255,255,.86);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(12px)}
+    .panel-card{padding:22px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .stat-card{padding:22px}
+    .stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:10px}
+    .stat-value{color:#111827;font-size:1.95rem;font-weight:900;line-height:1}
+    .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .section-title{margin:0;color:#111827;font-size:1.08rem;font-weight:900}
+    .section-sub{color:#6b7280;font-size:.92rem;line-height:1.7}
+    .action-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .btn-soft.warning{background:linear-gradient(180deg,#b45309,#92400e);color:#fff}
+    .note-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .note-card{padding:18px;border-radius:20px;border:1px solid rgba(15,23,42,.08)}
+    .note-card.blocker{background:rgba(127,29,29,.06);border-color:rgba(127,29,29,.18)}
+    .note-card.warning{background:rgba(180,83,9,.06);border-color:rgba(180,83,9,.18)}
+    .note-card.info{background:rgba(15,118,110,.06);border-color:rgba(15,118,110,.18)}
+    .note-card h4{margin:0 0 8px;font-size:1rem;font-weight:900;color:#111827}
+    .note-card p{margin:0;color:#4b5563;line-height:1.7}
+    .check-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .check-card{padding:16px 18px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}
+    .check-card.ok{border-color:rgba(5,150,105,.18);background:rgba(5,150,105,.05)}
+    .check-card.fail{border-color:rgba(185,28,28,.18);background:rgba(185,28,28,.05)}
+    .check-label{font-size:.88rem;font-weight:900;color:#111827;margin-bottom:8px}
+    .check-detail{font-size:.85rem;color:#6b7280;line-height:1.6}
+    .table-wrap{width:100%;overflow-x:auto;border-radius:18px}
+    table{width:100%;min-width:900px;border-collapse:collapse;background:#fff}
+    th,td{padding:14px 12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+    th{background:rgba(248,250,252,.96);color:#6b7280;font-size:.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.35px}
+    td{color:#111827;font-size:.9rem}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 12px;border-radius:999px;font-size:.78rem;font-weight:900}
+    .pill.ok{background:rgba(5,150,105,.10);color:#065f46}
+    .pill.fail{background:rgba(185,28,28,.10);color:#991b1b}
+    @media (max-width:1100px){.stats-grid,.note-grid,.check-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:720px){.stats-grid,.note-grid,.check-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="preflight-shell">
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Canlı ön kontrol özeti</h3>
+                <div class="section-sub">
+                    Seçili dönem: <strong>{{ selected_period.title if selected_period else 'Aktif dönem bulunamadı' }}</strong>
+                    {% if scope_label %} · Kapsam: <strong>{{ scope_label }}</strong>{% endif %}
+                </div>
+            </div>
+            <div class="action-bar">
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-arrow-left"></i> Görev Yönetimi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management_health', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-heart-pulse"></i> Sağlık Raporu</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management_audit_detail', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-clipboard-check"></i> Denetim Detayı</a>
+                {% if selected_period %}
+                <form method="post" action="{{ url_for('main.performance_task_management_generate') }}" style="display:inline-flex;gap:10px;flex-wrap:wrap;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="period_id" value="{{ selected_period.id }}">
+                    <input type="hidden" name="scope" value="{{ selected_scope or '' }}">
+                    <input type="hidden" name="force_generate" value="1">
+                    <button type="submit" class="btn-soft warning"><i class="fa-solid fa-triangle-exclamation"></i> Blokaja rağmen üret</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Hazır oluş puanı</div>
+            <div class="stat-value">{{ preflight_report.readiness_score or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Blokaj</div>
+            <div class="stat-value">{{ preflight_report.blockers|length }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Uyarı</div>
+            <div class="stat-value">{{ preflight_report.warnings|length }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Bilgi</div>
+            <div class="stat-value">{{ preflight_report.infos|length }}</div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Kritik sonuçlar</h3>
+                <div class="section-sub">Görev üretimini durdurması gereken maddeler önce, takip maddeleri sonra listelenir.</div>
+            </div>
+        </div>
+        <div class="note-grid">
+            {% for row in preflight_report.blockers %}
+            <div class="note-card blocker">
+                <h4><i class="fa-solid fa-octagon-exclamation"></i> {{ row.title }}</h4>
+                <p>{{ row.detail }}</p>
+            </div>
+            {% endfor %}
+            {% for row in preflight_report.warnings %}
+            <div class="note-card warning">
+                <h4><i class="fa-solid fa-triangle-exclamation"></i> {{ row.title }}</h4>
+                <p>{{ row.detail }}</p>
+            </div>
+            {% endfor %}
+            {% for row in preflight_report.infos %}
+            <div class="note-card info">
+                <h4><i class="fa-solid fa-circle-info"></i> {{ row.title }}</h4>
+                <p>{{ row.detail }}</p>
+            </div>
+            {% endfor %}
+            {% if not preflight_report.blockers and not preflight_report.warnings and not preflight_report.infos %}
+            <div class="note-card info">
+                <h4><i class="fa-solid fa-badge-check"></i> Ön kontrol temiz</h4>
+                <p>Seçili dönemde kritik blokaj veya takip notu bulunmadı.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Temel kontroller</h3>
+                <div class="section-sub">Dönem, ağırlık, kriter ve görev bütünlüğü aynı ekranda özetlenir.</div>
+            </div>
+        </div>
+        <div class="check-grid">
+            {% for row in preflight_report.release_checks %}
+            <div class="check-card {{ 'ok' if row.ok else 'fail' }}">
+                <div class="check-label">{{ row.label }}</div>
+                <div class="check-detail">{{ row.detail }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Kriter toplamı</div>
+            <div class="stat-value">{{ '%.2f'|format(preflight_report.summary.criteria_total or 0) }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Mükerrer görev</div>
+            <div class="stat-value">{{ preflight_report.summary.duplicate_level_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Amir eşleşme farkı</div>
+            <div class="stat-value">{{ preflight_report.summary.mismatch_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Açıkta kayıt</div>
+            <div class="stat-value">{{ preflight_report.summary.uncovered_count or 0 }}</div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Bağlayıcı kurallar</h3>
+                <div class="section-sub">Kontrol 1 ile görev üretimi artık bu sabit kurallar üzerinden korunur.</div>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card ok">
+                <div class="check-label">Varsayılan ağırlık</div>
+                <div class="check-detail">{{ preflight_report.rules_snapshot.default_weights.manager_1 }} / {{ preflight_report.rules_snapshot.default_weights.manager_2 }} / {{ preflight_report.rules_snapshot.default_weights.manager_3 }}</div>
+            </div>
+            <div class="check-card ok">
+                <div class="check-label">3. amir modu</div>
+                <div class="check-detail">{{ preflight_report.rules_snapshot.level_3_default_mode }}</div>
+            </div>
+            <div class="check-card {{ 'fail' if preflight_report.rules_snapshot.blind_review_allowed else 'ok' }}">
+                <div class="check-label">Kör değerlendirme</div>
+                <div class="check-detail">{{ 'Açık' if preflight_report.rules_snapshot.blind_review_allowed else 'Kapalı' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Aktif kriter özeti</h3>
+                <div class="section-sub">Kriter toplamı görev üretimi öncesi burada hızlıca doğrulanır.</div>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Ağırlık</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in preflight_report.criteria_snapshot.rows %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ '%.2f'|format(row.weight or 0) }}</td>
+                        <td><span class="pill ok">Aktif</span></td>
+                    </tr>
+                    {% endfor %}
+                    {% if not preflight_report.criteria_snapshot.rows %}
+                    <tr>
+                        <td colspan="3">Aktif kriter bulunamadı.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

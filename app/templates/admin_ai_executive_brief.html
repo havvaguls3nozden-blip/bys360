@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}AI Yönetici Özeti - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Yönetici Özeti{% endblock %}
+{% block page_subtitle %}Kalite, yönetişim, risk ve aksiyon görünümünü yönetici raporu formatında toplar.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <form class="d-flex gap-2" method="get">
+      <input class="form-control" type="number" name="lookback_days" min="1" max="180" value="{{ lookback_days or 14 }}">
+      <button class="btn btn-catab">Güncelle</button>
+    </form>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_executive_brief_export_md', lookback_days=lookback_days) }}">Markdown</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_executive_brief_export_json', lookback_days=lookback_days) }}">JSON</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_share_export_hub', lookback_days=lookback_days) }}">Paylaşım merkezi</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-md-6">
+    <div class="glass-card p-4 h-100">
+      <div class="text-muted small">Yönetişim skoru</div>
+      <div class="display-6 fw-bold">{{ executive_summary.governance_score or 0 }}</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="glass-card p-4 h-100">
+      <div class="text-muted small">Kalite skoru</div>
+      <div class="display-6 fw-bold">{{ executive_summary.quality_score or 0 }}</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="glass-card p-4 h-100">
+      <div class="text-muted small">Toplam çağrı</div>
+      <div class="display-6 fw-bold">{{ executive_summary.request_total or 0 }}</div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="glass-card p-4 h-100">
+      <div class="text-muted small">Açık öneri</div>
+      <div class="display-6 fw-bold">{{ executive_summary.open_recommendations or 0 }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card p-4 mb-4">
+  <h4 class="mb-3">Yönetici özeti</h4>
+  <div class="alert alert-warning border-0 rounded-4 mb-3">{{ executive_summary.priority_message }}</div>
+  <ul class="mb-0 ps-3">
+    {% for line in narrative_lines %}
+    <li class="mb-2">{{ line }}</li>
+    {% else %}
+    <li class="text-muted">Özet üretilemedi.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Öne çıkan başlıklar</h4>
+      {% for item in highlights %}
+      <div class="border rounded-4 p-3 mb-3">
+        <div class="fw-semibold">{{ item.title }}</div>
+        <div class="small text-muted mt-1">{{ item.body }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Başlık bulunmuyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Öncelikli riskler</h4>
+      {% for item in alerts %}
+      <div class="border rounded-4 p-3 mb-3">
+        <div class="d-flex justify-content-between gap-2 align-items-center">
+          <div class="fw-semibold">{{ item.title }}</div>
+          <span class="badge text-bg-secondary">{{ item.severity or 'bilgi' }}</span>
+        </div>
+        <div class="small text-muted mt-2">{{ item.body }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Risk görünmüyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Önerilen aksiyonlar</h4>
+      {% for item in actions %}
+      <div class="border rounded-4 p-3 mb-3">
+        <div class="fw-semibold">{{ item.title }}</div>
+        <div class="small text-muted mt-1">{{ item.body }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Aksiyon görünmüyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Paylaşım önerisi</h4>
+      <div class="fw-semibold mb-2">{{ share_pack.suggested_subject }}</div>
+      <div class="small text-muted mb-3">{{ share_pack.suggested_message }}</div>
+      <div class="small"><strong>Önerilen alıcı grupları:</strong> {{ (share_pack.default_recipients or [])|join(', ') }}</div>
+      <div class="small mt-2"><strong>Önerilen formatlar:</strong> {{ (share_pack.recommended_formats or [])|join(', ') }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="glass-card p-4">
+      <h4 class="mb-3">Modül görünümü</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Modül</th><th>Kalite</th><th>Başarı</th><th>Backlog</th></tr></thead>
+          <tbody>
+            {% for row in module_rows %}
+            <tr>
+              <td>{{ row.module_label or row.module_type }}</td>
+              <td>%{{ row.quality_score }}</td>
+              <td>%{{ row.success_rate }}</td>
+              <td>{{ row.backlog_total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted">Kayıt yok.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4">
+      <h4 class="mb-3">İstem görünümü</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>İstem</th><th>Kalite</th><th>Başarı</th><th>Açık öneri</th></tr></thead>
+          <tbody>
+            {% for row in prompt_rows %}
+            <tr>
+              <td>{{ row.prompt_version }}</td>
+              <td>%{{ row.quality_score }}</td>
+              <td>%{{ row.success_rate }}</td>
+              <td>{{ row.open_recommendations }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-muted">Kayıt yok.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

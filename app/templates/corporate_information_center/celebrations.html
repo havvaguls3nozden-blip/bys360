@@ -1,0 +1,163 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='celebrations' %}
+{% block cic_content %}
+{% set _c = celebration|default({}, true) %}
+{% set _stats = _c.stats|default({}, true) %}
+{% set _settings = _c.settings|default({}, true) %}
+{% set _score = readiness_score|default(uat_score|default(100, true), true) %}
+{% set _birthdays = _c.today_birthdays|default([], true) %}
+{% set _anniversaries = _c.today_anniversaries|default([], true) %}
+{% set _specials = _c.today_specials|default([], true) %}
+{% set _users = _c.users|default([], true) %}
+<div class="cic-celeb-studio" id="kutlamalar-calisma-alani">
+  <section class="cic-celeb-hero" aria-label="Kutlama yönetimi özet alanı">
+    <div>
+      <span class="cic-celeb-eyebrow"><i class="fa-solid fa-cake-candles"></i> Akıllı Kutlama Yönetimi</span>
+      <h1>Personel doğum günü, hizmet yılı ve özel gün kutlamaları tek merkezde</h1>
+      <p>Doğum günü, göreve başlama yıl dönümü ve kurumsal özel gün mesajları; yaş bilgisi göstermeden, ön kontrol yapılmış ve kayıt altına alınmış şekilde yönetilir.</p>
+      <div class="cic-celeb-actions">
+        <a class="cic-celeb-btn primary" href="#excel-yukleme"><i class="fa-solid fa-file-excel"></i> Excel ile tarih yükle</a>
+        <a class="cic-celeb-btn soft" href="#bugun"><i class="fa-solid fa-calendar-day"></i> Bugün kutlanacaklar</a>
+        <a class="cic-celeb-btn" href="#personel-tarihleri"><i class="fa-solid fa-users-gear"></i> Personel tarihleri</a>
+      </div>
+    </div>
+    <aside class="cic-celeb-readiness">
+      <div class="cic-celeb-ring" style="--score:{{ _score }}"><strong>{{ _score }}</strong></div>
+      <div>
+        <h3>Gönderim hazırlığı</h3>
+        <p>Alıcı, şablon, ön kontrol ve log kayıtları birlikte izlenir.</p>
+        <span class="cic-celeb-status"><i class="fa-solid fa-circle-check"></i> Aktif / Pasif yönetimli</span>
+      </div>
+    </aside>
+  </section>
+
+  <section class="cic-celeb-kpis" aria-label="Kutlama kısa durum kartları">
+    <div class="cic-celeb-kpi"><span>Bugün doğum günü</span><strong>{{ _stats.birthday_count|default(_birthdays|length, true) }}</strong></div>
+    <div class="cic-celeb-kpi"><span>Bugün hizmet yılı</span><strong>{{ _stats.anniversary_count|default(_anniversaries|length, true) }}</strong></div>
+    <div class="cic-celeb-kpi"><span>Bugünkü özel gün</span><strong>{{ _stats.special_day_count|default(_specials|length, true) }}</strong></div>
+    <div class="cic-celeb-kpi"><span>Durum yönetimi</span><strong>Aktif / Pasif</strong></div>
+  </section>
+
+  <form method="post" class="cic-celeb-grid" id="kutlama-ayarlari-formu">
+    {{ cic_csrf() }}
+    <section class="cic-celeb-card span-7">
+      <div class="cic-celeb-card-head">
+        <div><h2>Genel ayarlar</h2><p>Kutlama motorunun hangi başlıklarda çalışacağını ve hedef kitle ayarını belirleyin.</p></div>
+        <button class="cic-celeb-btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Ayarları kaydet</button>
+      </div>
+      <div class="cic-celeb-card-body">
+        <div class="cic-celeb-switch-grid">
+          <label class="cic-celeb-switch"><input type="checkbox" name="celebrations_enabled" {% if _settings.celebrations_enabled|default(true, true) %}checked{% endif %}><span><b>Akıllı kutlama motoru</b><small>Tüm kutlama görevleri için ana aç/kapat ayarıdır.</small></span></label>
+          <label class="cic-celeb-switch"><input type="checkbox" name="birthday_enabled" {% if _settings.birthday_enabled|default(true, true) %}checked{% endif %}><span><b>Doğum günü kutlaması</b><small>Yaş ve doğum yılı mesajlarda gösterilmez.</small></span></label>
+          <label class="cic-celeb-switch"><input type="checkbox" name="work_anniversary_enabled" {% if _settings.work_anniversary_enabled|default(true, true) %}checked{% endif %}><span><b>Göreve başlama yıl dönümü</b><small>Hizmet yılına göre teşekkür mesajı hazırlar.</small></span></label>
+          <label class="cic-celeb-switch"><input type="checkbox" name="special_day_enabled" {% if _settings.special_day_enabled|default(true, true) %}checked{% endif %}><span><b>Özel gün takvimi</b><small>Resmî ve kurumsal özel günlerde çalışır.</small></span></label>
+          <label class="cic-celeb-switch"><input type="checkbox" name="celebration_system_notifications_enabled" {% if _settings.system_notifications_enabled|default(true, true) %}checked{% endif %}><span><b>Sistem içi bildirim</b><small>E-postaya ek olarak BYS360 bildirimi oluşturur.</small></span></label>
+          <label class="cic-celeb-switch"><input type="checkbox" name="celebrations_include_weekend" {% if _settings.include_weekend|default(false, true) %}checked{% endif %}><span><b>Hafta sonu kutlamaları</b><small>İstenirse sadece kutlama görevleri hafta sonu da çalışır.</small></span></label>
+        </div>
+        <div class="cic-celeb-field">
+          <label for="special_day_recipient_mode">Özel gün hedef kitlesi</label>
+          <select id="special_day_recipient_mode" class="cic-celeb-input" name="special_day_recipient_mode">
+            <option value="all_active" {% if _settings.special_day_recipient_mode|default('all_active', true) == 'all_active' %}selected{% endif %}>Tüm aktif personel</option>
+            <option value="manual" {% if _settings.special_day_recipient_mode|default('all_active', true) == 'manual' %}selected{% endif %}>Alıcılar ekranındaki seçili personel</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="cic-celeb-card span-5" id="bugun">
+      <div class="cic-celeb-card-head"><div><h2>Bugün kutlanacaklar</h2><p>Sistem günün kutlama kayıtlarını otomatik hesaplar.</p></div></div>
+      <div class="cic-celeb-card-body">
+        <div class="cic-celeb-list">
+          {% for u in _birthdays %}<div class="cic-celeb-person-row"><i class="fa-solid fa-cake-candles"></i><span><strong>{{ user_full_name(u) }}</strong><small>{{ u.birim or u.ust_birim or 'Birim bilgisi yok' }}</small></span><b class="cic-celeb-pill">Doğum günü</b></div>{% endfor %}
+          {% for u in _anniversaries %}<div class="cic-celeb-person-row"><i class="fa-solid fa-award"></i><span><strong>{{ user_full_name(u) }}</strong><small>{{ u.birim or u.ust_birim or 'Birim bilgisi yok' }}</small></span><b class="cic-celeb-pill">Hizmet yılı</b></div>{% endfor %}
+          {% for d in _specials %}<div class="cic-celeb-person-row"><i class="fa-solid fa-flag"></i><span><strong>{{ d.name }}</strong><small>Özel gün takvimi</small></span><b class="cic-celeb-pill">Özel gün</b></div>{% endfor %}
+          {% if not _birthdays and not _anniversaries and not _specials %}<div class="cic-celeb-empty"><strong>Bugün için kutlama kaydı bulunmuyor.</strong><br>Yaklaşan kutlamalar ve Excel tarih yükleme alanından kayıtları kontrol edebilirsiniz.</div>{% endif %}
+        </div>
+        <div class="cic-celeb-run-actions">
+          <button class="cic-celeb-btn soft" formaction="/dashboard/kurumsal-bilgilendirme/kutlamalar/staff_birthday/calistir" formmethod="post" name="dry_run" value="1" type="submit">Doğum günü ön kontrol</button>
+          <button class="cic-celeb-btn soft" formaction="/dashboard/kurumsal-bilgilendirme/kutlamalar/work_anniversary/calistir" formmethod="post" name="dry_run" value="1" type="submit">Hizmet yılı ön kontrol</button>
+          <button class="cic-celeb-btn soft" formaction="/dashboard/kurumsal-bilgilendirme/kutlamalar/special_day/calistir" formmethod="post" name="dry_run" value="1" type="submit">Özel gün ön kontrol</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="cic-celeb-card span-12">
+      <div class="cic-celeb-card-head"><div><h2>Yaklaşan kutlamalar</h2><p>Doğum günü, hizmet yılı ve özel günler dengeli ve okunabilir kartlarla izlenir.</p></div></div>
+      <div class="cic-celeb-card-body">
+        <div class="cic-celeb-upcoming">
+          <div class="cic-celeb-upcoming-col"><h3><i class="fa-solid fa-cake-candles"></i> Doğum günleri</h3>{% for row in _c.upcoming_birthdays|default([], true) %}{% if loop.index <= 8 %}<p><b>{{ user_full_name(row.user) }}</b><span>{{ row.days_left }} gün</span></p>{% endif %}{% else %}<div class="cic-celeb-empty">Yaklaşan kayıt yok.</div>{% endfor %}</div>
+          <div class="cic-celeb-upcoming-col"><h3><i class="fa-solid fa-award"></i> Hizmet yılları</h3>{% for row in _c.upcoming_anniversaries|default([], true) %}{% if loop.index <= 8 %}<p><b>{{ user_full_name(row.user) }}</b><span>{{ row.service_year }}. yıl · {{ row.days_left }} gün</span></p>{% endif %}{% else %}<div class="cic-celeb-empty">Yaklaşan kayıt yok.</div>{% endfor %}</div>
+          <div class="cic-celeb-upcoming-col"><h3><i class="fa-solid fa-flag"></i> Özel günler</h3>{% for row in _c.upcoming_special_days|default([], true) %}{% if loop.index <= 8 %}<p><b>{{ row.name }}</b><span>{{ row.days_left }} gün</span></p>{% endif %}{% else %}<div class="cic-celeb-empty">Yaklaşan kayıt yok.</div>{% endfor %}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cic-celeb-card span-12" id="personel-tarihleri">
+      <div class="cic-celeb-card-head">
+        <div><h2>Personel tarihleri</h2><p>Doğum tarihi ve göreve başlama tarihi yalnızca kutlama motoru için kullanılır. Doğum yılı/personel yaşı mesajlarda gösterilmez.</p></div>
+        <button class="cic-celeb-btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Tarihleri kaydet</button>
+      </div>
+      <div class="cic-celeb-card-body">
+        <div class="cic-celeb-table-wrap">
+          <table class="cic-celeb-table">
+            <thead><tr><th>Personel</th><th>Birim</th><th>E-posta</th><th>Doğum Tarihi</th><th>Göreve Başlama</th><th>Kutlama</th></tr></thead>
+            <tbody>
+              {% for u in _users %}
+              <tr>
+                <td><input type="hidden" name="user_ids" value="{{ u.id }}"><strong>{{ user_full_name(u) }}</strong><br><small>{{ u.sicil_no or '-' }}</small></td>
+                <td>{{ u.birim or u.ust_birim or '-' }}</td>
+                <td>{{ u.email or '-' }}</td>
+                <td><input class="cic-celeb-input" type="date" name="birth_date_{{ u.id }}" value="{{ u.birth_date.isoformat() if u.birth_date else '' }}"></td>
+                <td><input class="cic-celeb-input" type="date" name="hire_date_{{ u.id }}" value="{{ u.hire_date.isoformat() if u.hire_date else '' }}"></td>
+                <td><label class="cic-celeb-mini-check"><input type="checkbox" name="celebration_opt_out_{{ u.id }}" {% if u.celebration_opt_out %}checked{% endif %}> Kutlama dışı</label></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6">Personel kaydı bulunamadı.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="cic-celeb-card span-12">
+      <div class="cic-celeb-card-head"><div><h2>Özel gün takvimi</h2><p>JSON formatı korunmalıdır. Tarih alanı ay-gün biçimindedir: <code>MM-DD</code>.</p></div></div>
+      <div class="cic-celeb-card-body">
+        <textarea class="cic-celeb-input cic-celeb-json" name="special_days_json" rows="10">{{ _c.special_days_json|default('', true) }}</textarea>
+        <div class="cic-celeb-empty" style="margin-top: .85rem;"><strong>KVKK notu:</strong> Doğum günü mesajlarında yaş/doğum yılı gösterilmez. Sadece gün/ay eşleşmesi kullanılır.</div>
+      </div>
+    </section>
+  </form>
+
+  <section class="cic-celeb-card cic-celeb-excel" id="excel-yukleme" style="margin-top:16px;">
+    <div class="cic-celeb-card-head">
+      <div><h2><i class="fa-solid fa-file-excel"></i> Excel ile personel kutlama tarihleri yükle</h2><p>Sicil No esaslı listeyle doğum günü ve işe başlama tarihlerini toplu güncelleyin. Ön kontrol veri yazmaz.</p></div>
+      <a class="cic-celeb-btn" href="/dashboard/kurumsal-bilgilendirme/kutlamalar/excel-sablon"><i class="fa-solid fa-download"></i> Excel şablonu indir</a>
+    </div>
+    <div class="cic-celeb-card-body">
+      <div class="cic-celeb-upload-zone">
+        <form class="cic-celeb-drop" method="post" enctype="multipart/form-data" action="/dashboard/kurumsal-bilgilendirme/kutlamalar/excel-yukle">
+          {{ cic_csrf() }}
+          <label for="celebration_excel">Yüklenecek Excel dosyası</label>
+          <input id="celebration_excel" class="cic-celeb-file" type="file" name="celebration_excel" accept=".xlsx,.xlsm" required>
+          <p class="cic-celeb-empty" data-cic-v46-file-name style="margin:.7rem 0 0;">Dosya seçilmedi</p>
+          <div class="cic-celeb-upload-actions">
+            <button class="cic-celeb-btn soft" type="submit" name="mode" value="preview"><i class="fa-solid fa-magnifying-glass-chart"></i> Ön kontrol yap</button>
+            <button class="cic-celeb-btn primary" type="submit" name="mode" value="apply"><i class="fa-solid fa-circle-check"></i> Kontrol ederek uygula</button>
+          </div>
+        </form>
+        <aside class="cic-celeb-help"><h3>Beklenen kolonlar</h3><ul><li><strong>Sicil No</strong> eşleştirme için önerilir.</li><li><strong>Doğum Tarihi</strong> ve <strong>İşe Başlama Tarihi</strong> GG.AA.YYYY biçiminde olabilir.</li><li><strong>Kutlama Dışı</strong> alanına Evet/Hayır yazılabilir.</li><li>Ön kontrol veri yazmaz; önce eşleşmeyen satırları gösterir.</li></ul></aside>
+      </div>
+      {% set _import = session.get('cic_celebration_import_result') %}
+      {% if _import %}
+      <div class="cic-celeb-import-result">
+        <div class="cic-celeb-import-head"><span>Son Excel yükleme sonucu</span><b>{{ 'Uygulandı' if _import.mode == 'apply' else 'Ön kontrol' }}</b></div>
+        <div class="cic-celeb-import-summary"><div><span>Okunan satır</span><b>{{ _import.total_rows }}</b></div><div><span>Eşleşen</span><b>{{ _import.matched }}</b></div><div><span>Güncellenen</span><b>{{ _import.updated }}</b></div><div><span>Eşleşmeyen</span><b>{{ _import.unmatched }}</b></div></div>
+        {% if _import.warnings %}<div class="cic-celeb-result-list"><strong>Uyarılar:</strong><br>{% for w in _import.warnings %}{% if loop.index <= 8 %}<div>• {{ w }}</div>{% endif %}{% endfor %}</div>{% endif %}
+        {% if _import.preview_rows %}<div class="cic-celeb-result-list"><strong>İlk eşleşen kayıtlar:</strong><br>{% for r in _import.preview_rows %}{% if loop.index <= 8 %}<div><code>Satır {{ r.row }}</code> {{ r.ad_soyad or r.sicil_no }} — {{ r.match_by }}</div>{% endif %}{% endfor %}</div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

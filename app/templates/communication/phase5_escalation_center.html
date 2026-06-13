@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}SLA ve Escalation Merkezi{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <h3 class="mb-2">SLA ve Escalation Merkezi</h3>
+    <p class="text-muted mb-0">SLA baskısı, yaklaşan ihlaller ve escalation kuralları aynı panelde görünür.</p>
+  </div></div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Kural sayısı</div><div class="fs-4 fw-semibold">{{ payload.summary.rule_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">İhlal sayısı</div><div class="fs-4 fw-semibold">{{ payload.summary.breach_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Yaklaşan ihlal</div><div class="fs-4 fw-semibold">{{ payload.summary.nearing_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Kritik ihlal</div><div class="fs-4 fw-semibold">{{ payload.summary.critical_breach_count }}</div></div></div></div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h5 class="mb-3">Yeni kural ekle</h5>
+        <form method="post" action="{{ url_for('main.communication_phase5_save_escalation_rule') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Modül</label><input class="form-control" name="module_name" value="support"></div>
+            <div class="col-md-6"><label class="form-label">Öncelik</label><select class="form-select" name="priority"><option value="low">Düşük</option><option value="normal" selected>Normal</option><option value="high">Yüksek</option><option value="critical">Kritik</option></select></div>
+            <div class="col-md-6"><label class="form-label">Tetik tipi</label><input class="form-control" name="trigger_type" value="sla_breach"></div>
+            <div class="col-md-6"><label class="form-label">Eşik (saat)</label><input class="form-control" type="number" min="1" max="720" name="threshold_hours" value="24"></div>
+            <div class="col-md-6"><label class="form-label">Hedef rol</label><input class="form-control" name="target_role" placeholder="grup_baskani"></div>
+            <div class="col-md-6"><label class="form-label">Hedef kullanıcı ID</label><input class="form-control" type="number" min="0" name="target_user_id"></div>
+            <div class="col-12"><label class="form-label">Bildirim şablonu</label><input class="form-control" name="notify_template" placeholder="SLA ihlali bildirimi"></div>
+            <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked><label class="form-check-label" for="is_active">Kural aktif</label></div>
+          </div>
+          <button class="btn btn-danger mt-3">Kuralı Kaydet</button>
+        </form>
+      </div></div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h5 class="mb-3">Kurallar</h5>
+        <div class="table-responsive"><table class="table align-middle">
+          <thead><tr><th>Öncelik</th><th>Eşik</th><th>Rol</th><th>Şablon</th><th>Aktif</th></tr></thead>
+          <tbody>
+            {% for row in payload.rules %}
+            <tr><td>{{ row.priority }}</td><td>{{ row.threshold_hours }} saat</td><td>{{ row.target_role or '-' }}</td><td>{{ row.notify_template or '-' }}</td><td>{{ 'Evet' if row.is_active else 'Hayır' }}</td></tr>
+            {% else %}
+            <tr><td colspan="5" class="text-muted">Kural bulunamadı.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Yaklaşan SLA baskısı</h5>
+      <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Talep</th><th>Öncelik</th><th>Yaş</th><th>Hedef</th></tr></thead><tbody>
+        {% for item in payload.nearing %}
+        <tr><td>#{{ item.ticket.id }} - {{ item.ticket.title }}</td><td>{{ item.priority_label }}</td><td>{{ item.age_hours }} saat</td><td>{{ item.target_hours }} saat</td></tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">Yaklaşan ihlal bulunmadı.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Sorumlu yük dağılımı</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Sorumlu</th><th>Açık kayıt</th></tr></thead><tbody>
+        {% for item in payload.assignee_load %}
+        <tr><td>{{ item.name }}</td><td>{{ item.open_count }}</td></tr>
+        {% else %}
+        <tr><td colspan="2" class="text-muted">Açık yük görünmüyor.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+  </div>
+
+  <div class="card border-0 shadow-sm"><div class="card-body">
+    <h5 class="mb-3">SLA ihlal listesi</h5>
+    <div class="table-responsive"><table class="table table-striped align-middle">
+      <thead><tr><th>Talep</th><th>Öncelik</th><th>Yaş</th><th>Hedef</th><th>Aşım</th></tr></thead>
+      <tbody>
+        {% for item in payload.breaches %}
+        <tr><td>#{{ item.ticket.id }} - {{ item.ticket.title }}</td><td>{{ item.priority_label }}</td><td>{{ item.age_hours }} saat</td><td>{{ item.target_hours }} saat</td><td>{{ item.breach_hours }} saat</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Aktif ihlal bulunmadı.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+  </div></div>
+</div>
+{% endblock %}

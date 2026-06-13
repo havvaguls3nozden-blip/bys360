@@ -1,0 +1,7 @@
+{# BYS360_AI_DECISION_FAZ11_PAGE_OK #}
+{% extends "base.html" %}
+{% block title %}Gelişim Önerisi ve Rehber Alanı{% endblock %}
+{% block content %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz11.css') }}">
+  {% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}

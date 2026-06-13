@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.title }}{% endblock %}
+{% block content %}
+<style>
+  .take-shell{--red:#8B0000;--red-soft:rgba(139,0,0,.08);--shadow:0 20px 44px rgba(15,23,42,.08);--muted:#6b7280}
+  .take-shell .hero-card,.take-shell .question-card{border:none;border-radius:28px;box-shadow:var(--shadow)}
+  .take-shell .hero-card{background:linear-gradient(135deg,#fff,#fbf6f6)}
+  .take-shell .hero-icon{width:64px;height:64px;border-radius:22px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+  .take-shell .question-card{background:#fff}
+  .take-shell .q-badge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:14px;background:var(--red-soft);color:var(--red);font-weight:800}
+  .take-shell .scale-input,.take-shell .option-input,.take-shell .pulse-input{display:none}
+  .take-shell .scale-label,.take-shell .pulse-label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;padding:1rem .75rem;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff;cursor:pointer;transition:all .18s ease;font-weight:700;color:#111827;height:100%}
+  .take-shell .scale-label small,.take-shell .pulse-label small{font-weight:600;color:var(--muted)}
+  .take-shell .scale-input:checked + .scale-label,.take-shell .option-input:checked + .option-card,.take-shell .pulse-input:checked + .pulse-label{border-color:rgba(139,0,0,.35);background:linear-gradient(180deg, rgba(139,0,0,.08), rgba(255,255,255,.98));box-shadow:0 18px 28px rgba(139,0,0,.10)}
+  .take-shell .scale-label:hover,.take-shell .option-card:hover,.take-shell .pulse-label:hover{transform:translateY(-2px);box-shadow:0 14px 24px rgba(15,23,42,.08)}
+  .take-shell .option-card{display:block;border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:1rem;background:#fff;cursor:pointer;transition:all .18s ease}
+  .take-shell textarea.form-control{min-height:150px;border-radius:18px;border-color:rgba(15,23,42,.10);padding:1rem;box-shadow:none}
+  .take-shell .btn-main{background:var(--red);border-color:var(--red);color:#fff;border-radius:14px;padding:.84rem 1.1rem;font-weight:700}
+  .take-shell .btn-main:hover{background:#6f0000;border-color:#6f0000;color:#fff}
+  .take-shell .pulse-note{min-height:110px !important}
+</style>
+<div class="container-fluid py-4 take-shell">
+  <div class="row justify-content-center g-4">
+    <div class="col-xl-10">
+      <div class="card hero-card mb-4">
+        <div class="card-body p-4 p-xl-5">
+          <div class="d-flex gap-3 align-items-start">
+            <div class="hero-icon"><i class="fa-solid fa-messages"></i></div>
+            <div>
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                <span class="badge rounded-pill text-bg-light border">{{ campaign_type_label }}</span>
+                {% if includes_pulse %}<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis border"><i class="fa-solid fa-heart-pulse me-1"></i>Nabız entegre</span>{% endif %}
+                {% if campaign.is_anonymous %}<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis border"><i class="fa-solid fa-user-secret me-1"></i>Anonim</span>{% endif %}
+              </div>
+              <h1 class="h3 mb-2">{{ campaign.title }}</h1>
+              <p class="text-muted mb-0">{{ campaign.description or 'Lütfen soruları dikkatle yanıtlayın.' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if already_answered and not campaign.allow_multiple_submissions %}
+      <div class="alert alert-success border-0 rounded-4 shadow-sm"><i class="fa-solid fa-circle-check me-2"></i>Bu kampanya için yanıtınız zaten kayıtlı.</div>
+      {% else %}
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if includes_pulse %}
+        <div class="card question-card mb-3">
+          <div class="card-body p-4 p-xl-4">
+            <div class="d-flex gap-3 align-items-start mb-4">
+              <div class="q-badge"><i class="fa-solid fa-heart-pulse"></i></div>
+              <div>
+                <div class="fw-bold fs-5 mb-1">Bugünkü nabız işaretin</div>
+                <div class="small text-muted">Kampanya yanıtınla birlikte bugünkü kısa duygu sinyali de kaydedilir.</div>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              {% for value, emoji, label in [(1,'🆘','Düşük'),(2,'😟','Zayıf'),(3,'😐','Orta'),(4,'🙂','İyi'),(5,'😄','Çok iyi')] %}
+              <div class="col-md col-sm-6">
+                <input type="radio" class="pulse-input" id="pulse_{{ value }}" name="pulse_mood_value" value="{{ value }}" {% if today_pulse and today_pulse.mood_value == value %}checked{% elif not today_pulse and value == 3 %}checked{% endif %}>
+                <label class="pulse-label" for="pulse_{{ value }}">
+                  <span style="font-size:1.7rem;line-height:1;">{{ emoji }}</span>
+                  <span>{{ value }}</span>
+                  <small>{{ label }}</small>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="row g-3 align-items-start">
+              <div class="col-lg-8"><textarea class="form-control pulse-note" name="pulse_short_note" rows="3" placeholder="İstersen bugünü etkileyen kısa notu ekle.">{{ today_pulse.short_note if today_pulse else '' }}</textarea></div>
+              <div class="col-lg-4">
+                <label class="d-flex gap-2 align-items-start p-3 border rounded-4 h-100" style="border-color:rgba(15,23,42,.08)!important;">
+                  <input type="checkbox" name="pulse_is_anonymous" style="margin-top:4px;" {% if today_pulse and today_pulse.is_anonymous %}checked{% endif %}>
+                  <span><strong>Anonim nabız</strong><br><span class="small text-muted">Yalnızca toplu eğilim ekranına dahil edilir.</span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% for question in campaign.questions.order_by(question.__class__.sort_order.asc(), question.__class__.id.asc()).all() %}
+        <div class="card question-card mb-3">
+          <div class="card-body p-4 p-xl-4">
+            <div class="d-flex gap-3 align-items-start mb-4">
+              <div class="q-badge">{{ loop.index }}</div>
+              <div>
+                <div class="fw-bold fs-5 mb-1">{{ question.question_text }}</div>
+                <div class="small text-muted">{{ '1-5 arası seçim yapın' if question.question_type == 'scale_1_5' else 'Uygun seçeneği işaretleyin' if question.question_type == 'single_choice' else 'Dilerseniz detaylı yazabilirsiniz' }}</div>
+              </div>
+            </div>
+
+            {% if question.question_type == 'scale_1_5' %}
+            <div class="row g-3">
+              {% for value, emoji, label in [(1,'🆘','Düşük'),(2,'😟','Zayıf'),(3,'😐','Orta'),(4,'🙂','İyi'),(5,'😄','Çok iyi')] %}
+              <div class="col-md col-sm-6">
+                <input type="radio" class="scale-input" id="question_{{ question.id }}_{{ value }}" name="question_{{ question.id }}" value="{{ value }}" {% if value == 3 %}checked{% endif %}>
+                <label class="scale-label" for="question_{{ question.id }}_{{ value }}">
+                  <span style="font-size:1.7rem;line-height:1;">{{ emoji }}</span>
+                  <span>{{ value }}</span>
+                  <small>{{ label }}</small>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            {% elif question.question_type == 'single_choice' %}
+            <div class="row g-3">
+              {% for option in question.options.order_by(option.__class__.sort_order.asc(), option.__class__.id.asc()).all() %}
+              <div class="col-md-6">
+                <input class="option-input" type="radio" name="question_{{ question.id }}" id="opt_{{ option.id }}" value="{{ option.id }}">
+                <label class="option-card" for="opt_{{ option.id }}">
+                  <div class="fw-semibold">{{ option.option_text }}</div>
+                  <div class="small text-muted mt-1">Bu seçeneği işaretlemek için kartın üzerine tıklayın.</div>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <textarea class="form-control" name="question_{{ question.id }}" rows="4" placeholder="Görüşünüzü buraya yazabilirsiniz..."></textarea>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+          <a href="{{ url_for('main.feedback_campaigns') }}" class="btn btn-outline-secondary" style="border-radius:14px;padding:.84rem 1.1rem;font-weight:700;"><i class="fa-solid fa-arrow-left me-2"></i>Listeye Dön</a>
+          <button type="submit" class="btn btn-main"><i class="fa-solid fa-paper-plane me-2"></i>Gönder</button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_MACROS #}
+{% macro phase5_status(value) -%}{{ phase5_status_label(value) }}{%- endmacro %}
+{% macro phase5_score(value) -%}{{ phase5_score_display(value) }}{%- endmacro %}
+{% macro phase5_empty(kind='scoring') -%}<div class="bys360-phase5-empty">{{ phase5_empty_message(kind) }}</div>{%- endmacro %}

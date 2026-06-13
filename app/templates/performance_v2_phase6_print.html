@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>Performans Yönetimi Yönetici Özeti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        @page { size: A4 landscape; margin: 12mm; }
+        body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#111827;background:#fff}
+        .toolbar{display:flex;justify-content:flex-end;gap:10px;padding:16px;border-bottom:1px solid #e5e7eb;position:sticky;top:0;background:#fff}
+        .btn{padding:10px 14px;border-radius:10px;border:1px solid #d1d5db;background:#fff;font-weight:700;cursor:pointer}
+        .btn.primary{background:#8B0000;color:#fff;border-color:#8B0000}
+        .page{padding:18px}
+        .hero{border:1px solid #d1d5db;border-radius:18px;overflow:hidden;margin-bottom:16px}
+        .hero-top{padding:18px 22px;border-bottom:4px solid #8B0000}
+        .kicker{font-size:12px;font-weight:800;color:#8B0000;text-transform:uppercase;letter-spacing:.08em}
+        h1{margin:8px 0 6px 0;font-size:26px}
+        .muted{color:#6b7280;line-height:1.6}
+        .meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+        .box{border:1px solid #d1d5db;border-radius:14px;padding:14px;background:#fff}
+        .label{font-size:11px;font-weight:800;text-transform:uppercase;color:#6b7280;letter-spacing:.06em}
+        .value{margin-top:8px;font-size:24px;font-weight:800}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        table{width:100%;border-collapse:collapse;font-size:12px}
+        th,td{border:1px solid #e5e7eb;padding:10px;vertical-align:top;text-align:left}
+        th{background:#f8fafc;font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.04em}
+        .section{border:1px solid #d1d5db;border-radius:16px;overflow:hidden;margin-top:14px}
+        .section-head{padding:12px 14px;background:#f8fafc;border-bottom:1px solid #e5e7eb}
+        .section-head h2{margin:0;font-size:15px}
+        .section-head p{margin:6px 0 0 0;color:#6b7280;font-size:12px}
+        @media print {.toolbar{display:none}.page{padding:0}}
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button class="btn" type="button" onclick="window.close()">Kapat</button>
+        <button class="btn primary" type="button" onclick="window.print()">Yazdır</button>
+    </div>
+    <div class="page">
+        <div class="hero">
+            <div class="hero-top">
+                <div class="kicker">BYS360 · Performans Yönetimi</div>
+                <h1>Yönetici Özeti</h1>
+                <div class="muted">{{ period.title if period else '-' }} dönemi için görev ilerleme, yayın hazırlığı ve yönetici bazlı özet tek sayfada toplandı.</div>
+            </div>
+        </div>
+
+        <div class="meta">
+            <div class="box"><div class="label">Toplam Görev</div><div class="value">{{ dashboard.assignment_total if dashboard else 0 }}</div></div>
+            <div class="box"><div class="label">Tamamlanan Görev</div><div class="value">{{ dashboard.assignment_completed if dashboard else 0 }}</div></div>
+            <div class="box"><div class="label">Yayın İçin Hazır</div><div class="value">{{ publish_summary.ready_count if publish_summary else 0 }}</div></div>
+            <div class="box"><div class="label">Bloke Kayıt</div><div class="value">{{ publish_summary.blocked_count if publish_summary else 0 }}</div></div>
+        </div>
+
+        <div class="grid">
+            <div class="section">
+                <div class="section-head"><h2>Yönetici Bazlı Özet</h2><p>Görev yükü, tamamlama ve gecikme görünümü.</p></div>
+                <table>
+                    <thead><tr><th>Yönetici</th><th>Toplam</th><th>Tamamlanan</th><th>Geciken</th></tr></thead>
+                    <tbody>
+                        {% for row in dashboard.manager_summary.rows if dashboard %}
+                        <tr><td>{{ row.display_name }}</td><td>{{ row.total }}</td><td>{{ row.completed }}</td><td>{{ row.overdue }}</td></tr>
+                        {% else %}
+                        <tr><td colspan="4">Veri bulunmuyor.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="section">
+                <div class="section-head"><h2>Bloke Neden Özeti</h2><p>Yayın öncesi hangi engeller baskın görünüyor.</p></div>
+                <table>
+                    <thead><tr><th>Neden</th><th>Adet</th></tr></thead>
+                    <tbody>
+                        {% for reason, count in (publish_summary.blocked_reasons_summary if publish_summary else [])[:8] %}
+                        <tr><td>{{ reason }}</td><td>{{ count }}</td></tr>
+                        {% else %}
+                        <tr><td colspan="2">Bloke neden görünmüyor.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-head"><h2>Geciken Görevler</h2><p>Öncelikli müdahale gerektiren kayıtlar.</p></div>
+            <table>
+                <thead><tr><th>Personel</th><th>Değerlendirici</th><th>Seviye</th><th>Son Tarih</th></tr></thead>
+                <tbody>
+                    {% for item in dashboard.overdue_rows if dashboard %}
+                    <tr>
+                        <td>{{ item.employee_name }}</td>
+                        <td>{{ item.evaluator_name }}</td>
+                        <td>{{ item.manager_level if item.manager_level is not none else '-' }}</td>
+                        <td>{{ item.due_date.strftime('%d.%m.%Y %H:%M') if item.due_date else '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">Geciken görev bulunmuyor.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+
+{% block title %}Sorular / Kriterler - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Sorular / Kriterler{% endblock %}
+{% block page_subtitle %}Performans değerlendirmesinde kullanılacak kriterleri, ağırlıkları ve görünürlük durumlarını kurumsal arayüz üzerinden yönetin{% endblock %}
+
+{% block content %}
+<style>
+    .criteria-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.72));
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        padding:20px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        top:-18px;
+        width:92px;
+        height:92px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.88rem;
+        font-weight:700;
+        margin-bottom:10px;
+    }
+
+    .stat-value{
+        font-size:2rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1;
+    }
+
+    .stat-value.active{ color:#166534; }
+    .stat-value.passive{ color:#92400e; }
+
+    .criteria-layout{
+        display:grid;
+        grid-template-columns: 430px 1fr;
+        gap:18px;
+        align-items:start;
+    }
+
+    .premium-card{
+        background:rgba(255,255,255,.78);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        padding:22px;
+    }
+
+    .section-title{
+        margin:0 0 8px;
+        color:#8B0000;
+        font-size:1.08rem;
+        font-weight:900;
+    }
+
+    .section-text{
+        margin:0 0 18px;
+        color:#6b7280;
+        line-height:1.75;
+        font-size:.94rem;
+    }
+
+    .form-grid{
+        display:grid;
+        gap:14px;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-weight:800;
+        color:#374151;
+        font-size:.92rem;
+    }
+
+    .form-group input,
+    .form-group textarea{
+        width:100%;
+        min-height:48px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:12px 14px;
+        font-size:.95rem;
+        outline:none;
+        color:#111827;
+    }
+
+    .form-group textarea{
+        min-height:120px;
+        resize:vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus{
+        border-color:rgba(139,0,0,.25);
+        box-shadow:0 0 0 4px rgba(139,0,0,.08);
+    }
+
+    .row-2{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px;
+    }
+
+    .toolbar{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:2px;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:44px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.92rem;
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.warning{
+        background:linear-gradient(180deg,#b45309,#92400e);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(146,64,14,.16);
+    }
+
+    .list-topbar{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:16px;
+    }
+
+    .search-box{
+        position:relative;
+        min-width:min(100%, 320px);
+        flex:1;
+    }
+
+    .search-box i{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#9ca3af;
+    }
+
+    .search-box input{
+        width:100%;
+        min-height:46px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:0 14px 0 42px;
+        font-size:.94rem;
+        outline:none;
+    }
+
+    .search-box input:focus{
+        border-color:rgba(139,0,0,.25);
+        box-shadow:0 0 0 4px rgba(139,0,0,.08);
+    }
+
+    .criteria-list{
+        display:grid;
+        gap:14px;
+    }
+
+    .criterion-card{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:22px;
+        background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(249,250,251,.94));
+        box-shadow:0 12px 24px rgba(15,23,42,.05);
+        overflow:hidden;
+    }
+
+    .criterion-head{
+        padding:18px 18px 14px;
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:16px;
+    }
+
+    .criterion-title{
+        margin:0;
+        color:#111827;
+        font-size:1.02rem;
+        font-weight:900;
+        line-height:1.5;
+    }
+
+    .criterion-meta{
+        margin-top:8px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        padding:7px 10px;
+        border-radius:999px;
+        font-size:.82rem;
+        font-weight:800;
+    }
+
+    .pill.weight{
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+    }
+
+    .pill.order{
+        background:#eef2f7;
+        color:#374151;
+    }
+
+    .pill.active{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .pill.passive{
+        background:rgba(146,64,14,.10);
+        color:#92400e;
+    }
+
+    .criterion-actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        justify-content:flex-end;
+    }
+
+    .mini-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        min-height:38px;
+        padding:0 12px;
+        border:none;
+        border-radius:12px;
+        cursor:pointer;
+        font-size:.84rem;
+        font-weight:800;
+    }
+
+    .mini-btn.edit{
+        background:#eef2f7;
+        color:#374151;
+    }
+
+    .mini-btn.toggle{
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+    }
+
+    .mini-btn.delete{
+        background:rgba(220,38,38,.10);
+        color:#b91c1c;
+    }
+
+    .criterion-body{
+        padding:0 18px 18px;
+    }
+
+    .criterion-desc{
+        margin:0;
+        color:#4b5563;
+        line-height:1.8;
+        font-size:.93rem;
+        white-space:pre-line;
+    }
+
+    .criterion-edit{
+        display:none;
+        margin-top:16px;
+        padding:16px;
+        border-radius:18px;
+        background:rgba(139,0,0,.03);
+        border:1px solid rgba(139,0,0,.08);
+    }
+
+    .criterion-edit.show{
+        display:block;
+    }
+
+    .criterion-edit-grid{
+        display:grid;
+        gap:12px;
+    }
+
+    .criterion-edit .row-2{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .criterion-edit input,
+    .criterion-edit textarea{
+        width:100%;
+        min-height:44px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 12px;
+        outline:none;
+    }
+
+    .criterion-edit textarea{
+        min-height:110px;
+        resize:vertical;
+    }
+
+    .criterion-edit label{
+        display:block;
+        margin-bottom:6px;
+        font-size:.88rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .empty-box{
+        padding:30px 20px;
+        border-radius:20px;
+        border:1px dashed rgba(15,23,42,.12);
+        text-align:center;
+        color:#6b7280;
+        background:#f8fafc;
+        line-height:1.8;
+    }
+
+    @media (max-width:1100px){
+        .criteria-layout{
+            grid-template-columns:1fr;
+        }
+
+        .stats-grid{
+            grid-template-columns:1fr;
+        }
+
+        .row-2,
+        .criterion-edit .row-2{
+            grid-template-columns:1fr;
+        }
+
+        .criterion-head{
+            flex-direction:column;
+        }
+
+        .criterion-actions{
+            justify-content:flex-start;
+        }
+    }
+</style>
+
+<div class="criteria-shell">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Toplam Kriter</div>
+            <div class="stat-value">{{ total_count or (criteria_list|length) }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Aktif Kriter</div>
+            <div class="stat-value active">{{ active_count if active_count is defined else (criteria_list|selectattr('is_active')|list|length) }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pasif Kriter</div>
+            <div class="stat-value passive">{{ passive_count if passive_count is defined else (criteria_list|rejectattr('is_active')|list|length) }}</div>
+        </div>
+    </div>
+
+    <div class="criteria-layout">
+        <div class="premium-card">
+            <h3 class="section-title">Yeni Kriter Ekle</h3>
+            <p class="section-text">
+                Performans değerlendirmesinde kullanılacak yeni soruyu veya kriteri burada tanımlayabilirsin.
+            </p>
+
+            <form method="post" action="{{ url_for('main.performance_criteria') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Kriter Adı</label>
+                        <input type="text" id="name" name="name" placeholder="Örn: İş Kalitesi" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Açıklama</label>
+                        <textarea id="description" name="description" placeholder="Kriterin detaylı açıklamasını yaz..."></textarea>
+                    </div>
+
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label for="weight">Ağırlık</label>
+                            <input type="number" step="0.01" id="weight" name="weight" value="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sort_order">Sıralama</label>
+                            <input type="number" id="sort_order" name="sort_order" value="{{ (criteria_list|length) + 1 }}">
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <button type="submit" class="btn-soft primary">
+                            <i class="fa-solid fa-plus"></i>
+                            Kriter Ekle
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <hr style="border:none; border-top:1px solid rgba(15,23,42,.08); margin:20px 0;">
+
+            <h3 class="section-title">Hazır Varsayılanlar</h3>
+            <p class="section-text">
+                Sistemin önerdiği standart performans kriterlerini tek tıkla ekleyebilirsin.
+            </p>
+
+            <form method="post" action="{{ url_for('main.performance_criteria_seed_defaults') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-soft warning">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Varsayılan Kriterleri Yükle
+                </button>
+            </form>
+        </div>
+
+        <div class="premium-card">
+            <div class="list-topbar">
+                <div>
+                    <h3 class="section-title" style="margin-bottom:4px;">Kriter Listesi</h3>
+                    <p class="section-text" style="margin:0;">Mevcut kriterleri düzenle, pasif yap veya sil.</p>
+                </div>
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="criteriaSearch" placeholder="Kriter ara...">
+                </div>
+            </div>
+
+            {% if criteria_list %}
+                <div class="criteria-list" id="criteriaList">
+                    {% for item in criteria_list %}
+                        <div class="criterion-card" data-criterion-card data-label="{{ ((item.name or '') ~ ' ' ~ (item.description or ''))|lower }}">
+                            <div class="criterion-head">
+                                <div>
+                                    <h4 class="criterion-title">{{ item.name }}</h4>
+                                    <div class="criterion-meta">
+                                        <span class="pill weight">
+                                            <i class="fa-solid fa-scale-balanced"></i>
+                                            Ağırlık: {{ item.weight }}
+                                        </span>
+                                        <span class="pill order">
+                                            <i class="fa-solid fa-arrow-down-1-9"></i>
+                                            Sıra: {{ item.sort_order }}
+                                        </span>
+                                        {% if item.is_active %}
+                                            <span class="pill active">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Aktif
+                                            </span>
+                                        {% else %}
+                                            <span class="pill passive">
+                                                <i class="fa-solid fa-circle-pause"></i>
+                                                Pasif
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="criterion-actions">
+                                    <button type="button" class="mini-btn edit" onclick="toggleEditBox('edit-box-{{ item.id }}')">
+                                        <i class="fa-solid fa-pen"></i>
+                                        Düzenle
+                                    </button>
+
+                                    <form method="post" action="{{ url_for('main.performance_criteria_toggle_active', criteria_id=item.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="mini-btn toggle">
+                                            {% if item.is_active %}
+                                                <i class="fa-solid fa-eye-slash"></i>
+                                                Pasif Yap
+                                            {% else %}
+                                                <i class="fa-solid fa-eye"></i>
+                                                Aktif Yap
+                                            {% endif %}
+                                        </button>
+                                    </form>
+
+                                    <form method="post" action="{{ url_for('main.performance_criteria_delete', criteria_id=item.id) }}" onsubmit="return confirm('Bu kriter silinsin mi?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="mini-btn delete">
+                                            <i class="fa-solid fa-trash"></i>
+                                            Sil
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="criterion-body">
+                                <p class="criterion-desc">{{ item.description or 'Açıklama girilmemiş.' }}</p>
+
+                                <div class="criterion-edit" id="edit-box-{{ item.id }}">
+                                    <form method="post" action="{{ url_for('main.performance_criteria_edit', criteria_id=item.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                        <div class="criterion-edit-grid">
+                                            <div>
+                                                <label for="edit-name-{{ item.id }}">Kriter Adı</label>
+                                                <input type="text" id="edit-name-{{ item.id }}" name="name" value="{{ item.name }}" required>
+                                            </div>
+
+                                            <div>
+                                                <label for="edit-description-{{ item.id }}">Açıklama</label>
+                                                <textarea id="edit-description-{{ item.id }}" name="description">{{ item.description or '' }}</textarea>
+                                            </div>
+
+                                            <div class="row-2">
+                                                <div>
+                                                    <label for="edit-weight-{{ item.id }}">Ağırlık</label>
+                                                    <input type="number" step="0.01" id="edit-weight-{{ item.id }}" name="weight" value="{{ item.weight }}">
+                                                </div>
+
+                                                <div>
+                                                    <label for="edit-sort-{{ item.id }}">Sıralama</label>
+                                                    <input type="number" id="edit-sort-{{ item.id }}" name="sort_order" value="{{ item.sort_order }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="toolbar">
+                                                <button type="submit" class="btn-soft primary">
+                                                    <i class="fa-solid fa-floppy-disk"></i>
+                                                    Güncelle
+                                                </button>
+                                                <button type="button" class="btn-soft secondary" onclick="toggleEditBox('edit-box-{{ item.id }}')">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    Kapat
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-box">
+                    Henüz tanımlı kriter bulunmuyor. Soldaki formdan yeni kriter ekleyebilir veya varsayılan kriterleri yükleyebilirsin.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleEditBox(id) {
+        const box = document.getElementById(id);
+        if (!box) return;
+        box.classList.toggle("show");
+    }
+
+    (function () {
+        const searchInput = document.getElementById("criteriaSearch");
+        const cards = document.querySelectorAll("[data-criterion-card]");
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener("input", function () {
+            const q = (searchInput.value || "").toLowerCase().trim();
+
+            cards.forEach(card => {
+                const label = card.dataset.label || "";
+                const match = !q || label.includes(q);
+                card.style.display = match ? "" : "none";
+            });
+        });
+    })();
+</script>
+{% endblock %}

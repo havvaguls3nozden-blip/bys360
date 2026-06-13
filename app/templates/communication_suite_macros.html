@@ -1,0 +1,25 @@
+{% from "_premium_ui_macros.html" import premium_hub_strip %}
+{% from "_premium_workspace_macros.html" import premium_context_banner, premium_metric_card %}
+
+{% macro communication_workspace_header(active='', title='', text='', icon='fa-solid fa-comments', kicker='Kurumsal iletişim çalışma alanı', badges=None, side_title='', side_text='', metric_cards=None, hub_note='', hub_metric='', hub_secondary='') -%}
+{{ premium_context_banner(title=title, text=text, icon=icon, kicker=kicker, badges=badges, side_title=side_title, side_text=side_text) }}
+{{ premium_hub_strip(active=active, note=hub_note, metric=hub_metric, secondary=hub_secondary) }}
+{% if metric_cards %}
+<div class="bys-metric-grid">
+    {% for item in metric_cards %}
+    {{ premium_metric_card(label=item.label if item.label is defined else '', value=item.value if item.value is defined else '', icon=item.icon if item.icon is defined else 'fa-solid fa-chart-column', sub=item.sub if item.sub is defined else '', tone=item.tone if item.tone is defined else '') }}
+    {% endfor %}
+</div>
+{% endif %}
+{%- endmacro %}
+
+{% macro communication_panel_header(title='', text='', badge='', badge_tone='', icon='fa-solid fa-layer-group') -%}
+<div class="bys-panel-head">
+    <div>
+        <span class="bys-panel-kicker"><i class="{{ icon }}"></i> Çalışma alanı görünümü</span>
+        <h4 class="bys-panel-title">{{ title }}</h4>
+        {% if text %}<p class="bys-panel-text">{{ text }}</p>{% endif %}
+    </div>
+    {% if badge %}<span class="bys-panel-badge {{ badge_tone }}">{{ badge }}</span>{% endif %}
+</div>
+{%- endmacro %}

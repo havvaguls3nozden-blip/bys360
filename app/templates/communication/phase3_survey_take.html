@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Anket Yanıtla | BYS360{% endblock %}
+{% block page_title %}{{ payload.survey.title }}{% endblock %}
+{% block page_subtitle %}Yanıtlarınızı kaydedebilir veya anketi tamamlayabilirsiniz{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <div class="mb-4">
+      <div class="text-muted small">{{ payload.survey.survey_type }} · Durum: {{ payload.survey.status }}</div>
+      <div>{{ payload.survey.description or 'Anket açıklaması girilmemiş.' }}</div>
+    </div>
+
+    {% if not payload.is_open %}
+      <div class="alert alert-warning rounded-4">Bu anket şu an yanıtlamaya açık değil.</div>
+    {% endif %}
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for question in payload.questions %}
+      {% set existing = payload.answers_map.get(question.id, []) %}
+      <div class="border rounded-4 p-4 mb-4">
+        <div class="d-flex justify-content-between gap-3 mb-3">
+          <div>
+            <div class="fw-bold">{{ loop.index }}. {{ question.question_text }}</div>
+            <div class="small text-muted">{{ payload.question_type_labels.get(question.question_type, question.question_type) }}{% if question.is_required %} · Zorunlu{% endif %}</div>
+          </div>
+        </div>
+
+        {% if question.question_type == 'text' %}
+          <textarea class="form-control rounded-4" rows="4" name="q_{{ question.id }}_text">{{ existing[0].answer_text if existing else '' }}</textarea>
+        {% elif question.question_type in ['single_choice', 'yes_no', 'likert'] %}
+          {% for option in question.options.order_by('sort_order asc').all() %}
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="q_{{ question.id }}_single" id="q{{ question.id }}_opt{{ option.id }}" value="{{ option.id }}" {% if existing and existing[0].selected_option_id == option.id %}checked{% endif %}>
+            <label class="form-check-label" for="q{{ question.id }}_opt{{ option.id }}">{{ option.option_text }}</label>
+          </div>
+          {% endfor %}
+        {% elif question.question_type == 'multi_choice' %}
+          {% set selected_ids = existing|map(attribute='selected_option_id')|list %}
+          {% for option in question.options.order_by('sort_order asc').all() %}
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="q_{{ question.id }}_multi" id="q{{ question.id }}_multi{{ option.id }}" value="{{ option.id }}" {% if option.id in selected_ids %}checked{% endif %}>
+            <label class="form-check-label" for="q{{ question.id }}_multi{{ option.id }}">{{ option.option_text }}</label>
+          </div>
+          {% endfor %}
+        {% elif question.question_type == 'score' %}
+          <input class="form-control rounded-4" type="number" step="0.1" min="0" max="100" name="q_{{ question.id }}_number" value="{{ existing[0].answer_number if existing else '' }}">
+        {% else %}
+          <input class="form-control rounded-4" type="text" name="q_{{ question.id }}_text" value="{{ existing[0].answer_text if existing else '' }}">
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="d-flex flex-wrap gap-2 justify-content-end">
+        <button type="submit" class="btn btn-outline-danger rounded-pill">Taslak Kaydet</button>
+        <button type="submit" name="complete" value="1" class="btn btn-danger rounded-pill" {% if not payload.is_open %}disabled{% endif %}>Anketi Tamamla</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

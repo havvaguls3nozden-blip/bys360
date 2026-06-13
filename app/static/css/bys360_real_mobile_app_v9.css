@@ -1,0 +1,151 @@
+/* BYS360_REAL_MOBILE_APP_V9_CSS
+   Gerçek Capacitor app kabuğu için güvenli CSS. Mobil tarayıcıyı app gibi göstermeye çalışmaz;
+   yalnızca native WebView içinde çalışan sayfayı düzgün, kaydırılabilir ve güvenli hale getirir. */
+
+html.bys360-real-mobile-app,
+html.bys360-real-mobile-app body{
+  min-height: 100% !important;
+  width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(139,0,0,.12);
+}
+
+html.bys360-real-mobile-app body{
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: #f6f7fb !important;
+}
+
+html.bys360-real-mobile-app .page-loader{
+  z-index: 99999 !important;
+}
+
+html.bys360-real-mobile-app .page-loader.hidden,
+html.bys360-real-mobile-app body.bys360-native-ready .page-loader{
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html.bys360-real-mobile-app .app-shell,
+html.bys360-real-mobile-app .app-main,
+html.bys360-real-mobile-app .content-wrap,
+html.bys360-real-mobile-app main{
+  min-height: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+html.bys360-real-mobile-app .content-wrap{
+  padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* Native app içinde sahte alt tab/app bar gösterilmez. App kabuğu Android'in kendisidir. */
+html.bys360-real-mobile-app .bys360-mobile-bottom-nav,
+html.bys360-real-mobile-app .mobile-bottom-nav,
+html.bys360-real-mobile-app .bys360-bottom-app-nav,
+html.bys360-real-mobile-app [data-mobile-bottom-nav],
+html.bys360-real-mobile-app .pwa-install-banner,
+html.bys360-real-mobile-app .bys360-pwa-install-banner,
+html.bys360-real-mobile-app [data-pwa-install-banner]{
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Tek menü davranışı: mevcut resmi hamburger korunur, kopyalar gizlenir. */
+@media (max-width: 991.98px){
+  html.bys360-real-mobile-app .sidebar-toggle{
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  html.bys360-real-mobile-app .mobile-menu-toggle:not(.sidebar-toggle),
+  html.bys360-real-mobile-app .bys360-mobile-menu-toggle:not(.sidebar-toggle),
+  html.bys360-real-mobile-app [data-mobile-menu-toggle]:not(.sidebar-toggle):not(#sidebarToggle){
+    display:none!important;
+  }
+  html.bys360-real-mobile-app .app-sidebar{
+    top: var(--topbar-h, 58px) !important;
+    height: calc(100vh - var(--topbar-h, 58px)) !important;
+    max-height: calc(100vh - var(--topbar-h, 58px)) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  html.bys360-real-mobile-app body.sidebar-mobile-open,
+  html.bys360-real-mobile-app body.sidebar-mobile-open .app-main,
+  html.bys360-real-mobile-app body.sidebar-mobile-open .content-wrap{
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+}
+
+/* Asistan tek widget olarak sağ altta kalır; eski bozuk konumlar baskılanır. */
+html.bys360-real-mobile-app #bys360-assistant-module-root,
+html.bys360-real-mobile-app #bys360-ai-agent-widget-root,
+html.bys360-real-mobile-app .bys360-ai-agent-widget-root{
+  z-index: 1065 !important;
+}
+
+html.bys360-real-mobile-app .bys360-ai-agent-launcher,
+html.bys360-real-mobile-app .bys360-assistant-launcher,
+html.bys360-real-mobile-app [data-ai-agent-launcher]{
+  position: fixed !important;
+  right: max(14px, env(safe-area-inset-right, 0px)) !important;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+  top: auto !important;
+  left: auto !important;
+  z-index: 1070 !important;
+}
+
+html.bys360-real-mobile-app .bys360-ai-agent-panel,
+html.bys360-real-mobile-app .bys360-assistant-panel,
+html.bys360-real-mobile-app [data-ai-agent-panel]{
+  z-index: 1071 !important;
+}
+
+@media (max-width: 640px){
+  html.bys360-real-mobile-app .bys360-ai-agent-panel,
+  html.bys360-real-mobile-app .bys360-assistant-panel,
+  html.bys360-real-mobile-app [data-ai-agent-panel]{
+    position: fixed !important;
+    inset: auto 10px calc(76px + env(safe-area-inset-bottom, 0px)) 10px !important;
+    max-height: min(74vh, 620px) !important;
+    overflow: hidden !important;
+    border-radius: 22px !important;
+  }
+}
+
+html.bys360-real-mobile-app.keyboard-open .bys360-ai-agent-launcher,
+html.bys360-real-mobile-app.keyboard-open .bys360-assistant-launcher,
+html.bys360-real-mobile-app.keyboard-open [data-ai-agent-launcher]{
+  display: none !important;
+}
+
+html.bys360-real-mobile-app textarea,
+html.bys360-real-mobile-app input,
+html.bys360-real-mobile-app select,
+html.bys360-real-mobile-app button,
+html.bys360-real-mobile-app a{
+  font-size: 16px;
+}
+
+html.bys360-real-mobile-app table{
+  max-width: 100%;
+}
+
+html.bys360-real-mobile-app .table-responsive,
+html.bys360-real-mobile-app .data-table-wrap,
+html.bys360-real-mobile-app .report-table-wrap{
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}

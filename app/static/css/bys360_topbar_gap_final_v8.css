@@ -1,0 +1,267 @@
+/* BYS360_TOPBAR_GAP_FINAL_V8
+   Amaç: topbar üst boşluk/yükseklik sorununu yalnızca CSS ile düzeltmek.
+   Not: Sidebar menü yapısına, kullanıcı bölümünün yerine ve HTML akışına dokunmaz. */
+
+:root{
+    --topbar-h:62px !important;
+}
+
+html,
+body{
+    margin:0 !important;
+    padding:0 !important;
+}
+
+body,
+.app-shell,
+.app-main,
+main.app-main{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+.app-main > .topbar,
+header.topbar,
+.topbar{
+    position:sticky !important;
+    top:0 !important;
+    margin:0 !important;
+    min-height:62px !important;
+    height:62px !important;
+    max-height:62px !important;
+    padding:7px 18px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+    z-index:1200 !important;
+    overflow:visible !important;
+}
+
+.topbar-left{
+    height:48px !important;
+    min-height:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+}
+
+.topbar-brand{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 auto !important;
+    height:42px !important;
+    max-height:42px !important;
+    overflow:hidden !important;
+}
+
+.topbar-brand-logo{
+    display:block !important;
+    height:36px !important;
+    max-height:36px !important;
+    width:auto !important;
+    max-width:150px !important;
+    object-fit:contain !important;
+}
+
+.page-meta{
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+.page-kicker,
+.page-subtitle{
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    line-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+.page-title{
+    margin:0 !important;
+    padding:0 !important;
+    font-size:1.05rem !important;
+    line-height:1.12 !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+}
+
+.topbar-right{
+    height:48px !important;
+    min-height:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    flex-shrink:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+.quick-link{
+    min-height:36px !important;
+    height:36px !important;
+    padding:0 10px !important;
+    border-radius:12px !important;
+    font-size:.8rem !important;
+}
+
+.user-summary{
+    min-height:42px !important;
+    height:42px !important;
+    padding:5px 9px !important;
+    border-radius:14px !important;
+    gap:8px !important;
+}
+
+.user-avatar{
+    width:32px !important;
+    height:32px !important;
+    border-radius:11px !important;
+}
+
+.user-name{
+    font-size:.82rem !important;
+    line-height:1.15 !important;
+}
+
+.user-role{
+    font-size:.68rem !important;
+    line-height:1.15 !important;
+}
+
+.content-wrap{
+    padding-top:18px !important;
+}
+
+@media (max-width:1100px){
+    .app-sidebar{
+        top:62px !important;
+        bottom:0 !important;
+        height:calc(100vh - 62px) !important;
+        max-height:calc(100vh - 62px) !important;
+        overflow-y:auto !important;
+    }
+
+    .app-sidebar.mobile-open{
+        transform:translateX(0) !important;
+    }
+
+    .mobile-overlay{
+        top:62px !important;
+        height:calc(100vh - 62px) !important;
+    }
+
+    .app-main{
+        margin-left:0 !important;
+    }
+}
+
+@media (max-width:768px){
+    :root{
+        --topbar-h:58px !important;
+    }
+
+    .app-main > .topbar,
+    header.topbar,
+    .topbar{
+        min-height:58px !important;
+        height:58px !important;
+        max-height:58px !important;
+        padding:6px 10px !important;
+        flex-direction:row !important;
+        flex-wrap:nowrap !important;
+        align-items:center !important;
+        gap:8px !important;
+    }
+
+    .topbar-left{
+        height:44px !important;
+        gap:8px !important;
+    }
+
+    .menu-toggle{
+        width:38px !important;
+        height:38px !important;
+        border-radius:12px !important;
+        flex:0 0 auto !important;
+    }
+
+    .topbar-brand{
+        height:38px !important;
+        max-height:38px !important;
+    }
+
+    .topbar-brand-logo{
+        height:30px !important;
+        max-height:30px !important;
+        max-width:118px !important;
+    }
+
+    .page-title{
+        font-size:.94rem !important;
+        max-width:42vw !important;
+    }
+
+    .topbar-right{
+        width:auto !important;
+        height:44px !important;
+        margin-left:auto !important;
+        justify-content:flex-end !important;
+        gap:6px !important;
+    }
+
+    .quick-link{
+        display:none !important;
+    }
+
+    .user-summary{
+        width:40px !important;
+        min-width:40px !important;
+        height:40px !important;
+        min-height:40px !important;
+        padding:4px !important;
+        justify-content:center !important;
+    }
+
+    .user-summary > i,
+    .user-meta{
+        display:none !important;
+    }
+
+    .user-avatar{
+        width:30px !important;
+        height:30px !important;
+        border-radius:10px !important;
+    }
+
+    .app-sidebar{
+        top:58px !important;
+        height:calc(100vh - 58px) !important;
+        max-height:calc(100vh - 58px) !important;
+        overflow-y:auto !important;
+    }
+
+    .mobile-overlay{
+        top:58px !important;
+        height:calc(100vh - 58px) !important;
+    }
+
+    .content-wrap{
+        padding-top:12px !important;
+    }
+}

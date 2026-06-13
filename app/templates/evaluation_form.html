@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+
+{% block title %}Değerlendirme Formu - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Değerlendirme Formu{% endblock %}
+{% block page_subtitle %}
+Değerlendirme kriterleri, önceki amir görüşleri ve nihai puan etkisi aynı ekranda güvenli biçimde izlenir.
+{% endblock %}
+
+{% block content %}
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+{% set phase5_guide_title = "Bu ekranda değerlendirme kararı güvenli biçimde tamamlanır" %}
+{% set phase5_guide_text = "Puan girişleri, zorunlu açıklamalar ve süreç adımları aynı yüzeyde toplandığı için yönetici yanlış gönderim yapmadan önce formu kontrol edebilir." %}
+{% set phase5_guide_points = [
+    {'title': 'Önce kontrol et', 'text': '1 ve 5 puanlarda gerekçe, 70 altı ve 90 üstünde genel görüş alanını boş bırakmayın.'},
+    {'title': 'Akışı izle', 'text': 'Gönder, iade ve geri çek adımları görünür olduğu için formun hangi aşamada olduğunu tek bakışta anlayabilirsiniz.'},
+    {'title': 'Önceki amiri gör', 'text': 'Şeffaf değerlendirme kuralı gereği önceki amirin puanı ve kanaati aynı sayfada izlenebilir.'}
+] %}
+{% set phase5_guide_note = "Bu ekran, kurumsal işleyişe uygun olarak kör değerlendirme mantığıyla değil; görünür, kontrollü ve denetlenebilir akış mantığıyla kullanılmalıdır." %}
+{% include "performance/_phase5_microguide.html" %}
+
+{% set phase5_3_comment_rule_from_settings = phase5_3_comment_rule_from_settings if phase5_3_comment_rule_from_settings is defined else true %}
+{% set phase5_3_interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+{% set phase5_3_interim_notes = phase5_3_interim_ctx.notes if phase5_3_interim_ctx.notes is defined else [] %}
+<section class="phase5-3-manager-context" data-bys360-marker="BYS360_PHASE5_3_MANAGER_SCORING_SCREEN" aria-label="Amir puanlama karar özeti">
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-eye"></i> Önceki Amir Puanı</div><div class="phase5-3-manager-value" data-bys360-marker="phase5_3_previous_manager_score">{% if previous_general_comments %}{% for prev in previous_general_comments %}{% if prev.score and prev.score > 0 %}{{ '%.2f'|format(prev.score) }}{% endif %}{% endfor %}{% else %}-{% endif %}</div><div class="phase5-3-manager-text">Önceki amirin puanı karar öncesi görünür.</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-comment-dots"></i> Önceki Amir Görüşü</div><div class="phase5-3-manager-text" data-bys360-marker="phase5_3_previous_manager_comment">{% if previous_general_comments %}{% for prev in previous_general_comments %}{% if prev.comment %}<strong>{{ prev.label }}:</strong> {{ prev.comment }}{% endif %}{% endfor %}{% else %}Henüz önceki amir görüşü görünmüyor.{% endif %}</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-regular fa-note-sticky"></i> Dönem İçi Notlar</div><div class="phase5-3-manager-value" data-bys360-marker="phase5_3_interim_notes_reminder">{{ phase5_3_interim_notes|length }} not</div><div class="phase5-3-manager-text">Notlar otomatik puan üretmez; yalnızca hatırlatma sağlar.</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-asterisk"></i> Açıklama Zorunluluğu</div>{% if phase5_3_comment_rule_from_settings %}<span class="phase5-3-manager-pill phase5-3-rule-on" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar açık · 1 ve 5 puanlarda açıklama zorunludur</span>{% else %}<span class="phase5-3-manager-pill phase5-3-rule-off" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar kapalı · açıklama isteğe bağlı</span>{% endif %}<div class="phase5-3-manager-text">70 altı / 90 üstü genel görüş kuralı ayrıca korunur.</div></article>
+</section>
+
+
+{% set level3_general_comment_text = ((evaluation.level_3_general_comment if evaluation else '') or (evaluation.level_3_comment if evaluation else '') or '') %}
+{% set level2_general_comment_text = ((evaluation.level_2_general_comment if evaluation else '') or (evaluation.level_2_comment if evaluation else '') or '') %}
+{% set level3_evaluator_name = ((evaluation.level_3_evaluator.full_name if evaluation and evaluation.level_3_evaluator else '') or ((((evaluation.level_3_evaluator.ad if evaluation and evaluation.level_3_evaluator else '') ~ ' ' ~ (evaluation.level_3_evaluator.soyad if evaluation and evaluation.level_3_evaluator else '')) | trim)) or '') %}
+{% include 'partials/evaluation_form/_evaluation_form_styles.html' %}
+{% set back_url = request.referrer or url_for('main.performance_tasks') %}
+
+<div class="eval-shell">
+    <div class="glass-card workspace-hero">
+        <div class="workspace-layout">
+            <div>
+                <div class="workspace-kicker">Performans Yönetimi</div>
+                <h2 class="workspace-title-main">Değerlendirme Çalışma Alanı</h2>
+                <div class="workspace-desc">
+                    {% if assignment.manager_level == 2 %}
+                        Bu ekran 2. amir için sadeleştirildi. Yalnızca önceki seviyelerin görüşleri gösterilir; kendi seviyenize ait tekrar eden alanlar görünmez.
+                    {% elif assignment.manager_level == 1 %}
+                        Nihai değerlendirme aşamasındasınız. Alt seviyelerin görüşleri korunur, siz yalnızca son kararı ve genel değerlendirmeyi netleştirirsiniz.
+                    {% elif assignment.manager_level == 3 and level_3_scoring_enabled %}
+                        3. amir puanlayıcı modunda çalışıyorsunuz. Bu ekrandaki puanlar ağırlıklı sonuca dahil edilir.
+                    {% else %}
+                        Bu ekran görev seviyenize göre sadeleştirildi. Puan, yorum ve süreç bilgileri tek bakışta okunur halde tutulur.
+                    {% endif %}
+                </div>
+
+                <div class="workspace-badges">
+                    <span class="workspace-badge emphasis"><i class="fa-solid fa-user-check"></i>
+                        {% if assignment.manager_level == 1 %}1. Amir
+                        {% elif assignment.manager_level == 2 %}2. Amir
+                        {% elif level_3_scoring_enabled %}3. Amir · Puanlayıcı
+                        {% else %}3. Amir · Yorumcu{% endif %}
+                    </span>
+                    <span class="workspace-badge"><i class="fa-solid fa-diagram-project"></i> {{ workflow.label }}</span>
+                    <span class="workspace-badge"><i class="fa-solid fa-calendar-days"></i> {{ period.title if period else '-' }}</span>
+                    {% if assignment.manager_level == 1 and workflow.can_level_1_edit %}
+                        <span class="workspace-badge"><i class="fa-solid fa-pen-to-square"></i> Düzenleme açık</span>
+                    {% elif assignment.manager_level == 1 %}
+                        <span class="workspace-badge"><i class="fa-solid fa-lock"></i> 2. amir gördüğü için kilitli</span>
+                    {% elif assignment.manager_level == 2 and workflow.can_level_2_return %}
+                        <span class="workspace-badge"><i class="fa-solid fa-reply"></i> İade / tamamlama açık</span>
+                    {% endif %}
+                    {% if evaluation_window and evaluation_window.not_started %}
+                        <span class="workspace-badge"><i class="fa-solid fa-hourglass-start"></i> Takvim henüz başlamadı</span>
+                    {% elif evaluation_window and evaluation_window.expired %}
+                        <span class="workspace-badge"><i class="fa-solid fa-hourglass-end"></i> Takvim sona erdi</span>
+                    {% endif %}
+                </div>
+
+                <div class="saved-mini-row">
+                    <span class="saved-mini"><i class="fa-solid fa-layer-group"></i> 1. Amir kayıtlı: {{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</span>
+                    {% if evaluation.level_2_evaluator_id %}
+                        <span class="saved-mini"><i class="fa-solid fa-layer-group"></i> 2. Amir kayıtlı: {{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</span>
+                    {% endif %}
+                    {% if evaluation.level_3_evaluator_id %}
+                        <span class="saved-mini"><i class="fa-solid fa-layer-group"></i> 3. Amir kayıtlı: {{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="workspace-totals">
+                <div class="glass-card total-box current">
+                    <div class="total-label">Bu Formun Canlı Toplamı</div>
+                    <div class="total-value current" id="liveLevelTotal">{{ "%.2f"|format(current_saved_level_total or 0) }}</div>
+                </div>
+                <div class="glass-card total-box current">
+                    <div class="total-label">Kaydedilirse Nihai Toplam</div>
+                    <div class="total-value current" id="livePredictedFinal">{{ "%.2f"|format(evaluation.final_total_100 or 0) }}</div>
+                </div>
+                <div class="glass-card total-box">
+                    <div class="total-label">Resmi Nihai Toplam</div>
+                    <div class="total-value" id="savedOfficialFinal">{{ "%.2f"|format(evaluation.final_total_100 or 0) }}</div>
+                </div>
+                <div class="glass-card total-box">
+                    <div class="total-label">Kayıt Durumu</div>
+                    <div class="total-value" style="font-size:1.05rem; line-height:1.35;">{% if saved %}Taslak / kayıt mevcut{% else %}Yeni giriş{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace-grid">
+        <div class="glass-card workspace-card">
+            <h3 class="workspace-card-title">Form Özeti</h3>
+            <div class="workspace-meta-grid">
+                <div class="workspace-meta">
+                    <div class="info-label">Personel</div>
+                    <div class="info-value">{{ employee.full_name if employee else '-' }}</div>
+                </div>
+                <div class="workspace-meta">
+                    <div class="info-label">Birim</div>
+                    <div class="info-value">{{ employee.birim if employee else '-' }}</div>
+                </div>
+                <div class="workspace-meta">
+                    <div class="info-label">Dönem</div>
+                    <div class="info-value">{{ period.title if period else '-' }}</div>
+                </div>
+                <div class="workspace-meta">
+                    <div class="info-label">Değerlendirme Seviyesi</div>
+                    <div class="info-value">
+                        {% if assignment.manager_level == 1 %}1. Amir
+                        {% elif assignment.manager_level == 2 %}2. Amir
+                        {% elif level_3_scoring_enabled %}3. Amir (Puanlayıcı)
+                        {% else %}3. Amir (Yorumcu){% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card workspace-card">
+            <h3 class="workspace-card-title">Süreç ve Kayıt Bilgisi</h3>
+            <div class="workspace-meta-grid">
+                <div class="workspace-meta">
+                    <div class="info-label">İş Akışı</div>
+                    <div class="info-value">{{ workflow.label }}</div>
+                </div>
+                <div class="workspace-meta">
+                    <div class="info-label">Düzenleme Hakkı</div>
+                    <div class="info-value">
+                        {% if assignment.manager_level == 1 and workflow.can_level_1_edit %}
+                            1. amir düzenleyebilir
+                        {% elif assignment.manager_level == 1 %}
+                            2. amir gördüğü için kilitli
+                        {% elif assignment.manager_level == 2 and workflow.can_level_2_return %}
+                            İade / tamamlama açık
+                        {% else %}
+                            Salt görünüm
+                        {% endif %}
+                    </div>
+                </div>
+                {% if assignment.manager_level == 1 %}
+                <div class="workspace-meta">
+                    <div class="info-label">2. Amir Görülme</div>
+                    <div class="info-value">
+                        {% if evaluation.level_2_seen_level_1_at %}
+                            {{ evaluation.level_2_seen_level_1_at.strftime('%d.%m.%Y %H:%M') }}
+                        {% else %}
+                            Henüz görüntülenmedi
+                        {% endif %}
+                    </div>
+                </div>
+                {% elif evaluation_window and evaluation_window.start and evaluation_window.end %}
+                <div class="workspace-meta">
+                    <div class="info-label">Puanlama Takvimi</div>
+                    <div class="info-value">{{ evaluation_window.start.strftime('%d.%m.%Y') }} - {{ evaluation_window.end.strftime('%d.%m.%Y') }}</div>
+                </div>
+                {% else %}
+                <div class="workspace-meta">
+                    <div class="info-label">Puanlama Takvimi</div>
+                    <div class="info-value">Tanımlı pencere bilgisi yok</div>
+                </div>
+                {% endif %}
+                <div class="workspace-meta">
+                    <div class="info-label">İade Notu</div>
+                    <div class="info-value">{{ workflow_return_note or '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card workspace-rule-strip">
+        <h3 class="workspace-card-title" style="margin-bottom:12px;">Kayıt Kuralları</h3>
+        <div class="workspace-rule-grid">
+            <div class="workspace-rule">
+                <strong>Uç puan açıklaması</strong>
+                <span>{% if phase5_3_comment_rule_from_settings %}1 ve 5 puanlarda açıklama zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}</span>
+            </div>
+            <div class="workspace-rule">
+                <strong>Genel görüş zorunluluğu</strong>
+                <span>Bu formun canlı toplamı 70 altı ya da 90 üstü ise genel değerlendirme beklenir.</span>
+            </div>
+            <div class="workspace-rule">
+                <strong>2. amir yorumu</strong>
+                <span>1. amirin herhangi bir kriterde 3 vermesi durumunda üst yorum alanı önem kazanır.</span>
+            </div>
+            <div class="workspace-rule">
+                <strong>Zincir görünürlüğü</strong>
+                <span>Bu ekran mevcut seviyeye göre sadeleştirildi; önceki görüşler korunur, aynı seviyeye ait tekrar alanları gösterilmez.</span>
+            </div>
+        </div>
+    </div>
+
+    {% if assignment.manager_level in [1, 2] and evaluation and evaluation.level_3_evaluator_id and level3_general_comment_text %}
+    <div class="glass-card panel-card focus-comment-card">
+        <div class="focus-comment-alert-row">
+            <span class="focus-comment-alert-icon"><i class="fa-solid fa-comment-dots"></i></span>
+            <span>Öncelikli üst görüş alanı · karar öncesi mutlaka görülmelidir</span>
+        </div>
+        <div class="focus-comment-header">
+            <div>
+                <div class="workspace-kicker" style="margin-bottom:6px;">İlk Bakışta Gör</div>
+                <h3 class="section-title" style="margin-bottom:6px;">3. Amir Yorumu · Öncelikli Görüş Paneli</h3>
+                <div class="section-sub">
+                    {% if assignment.manager_level == 2 %}
+                        2. amir ekranı açıldığında 3. amirin yorumu üstte sabit ve dikkat çeken biçimde gösterilir.
+                    {% else %}
+                        1. amir nihai karar öncesinde 3. amirin yorumunu üstte, ilk bakışta görünür halde görür.
+                    {% endif %}
+                </div>
+                <div class="focus-comment-badges">
+                    {% if not level_3_scoring_enabled %}<span class="focus-comment-badge">3. Amir · Yorumcu</span>{% endif %}
+                    <span class="focus-comment-badge soft">{{ '2. Amir ekranı' if assignment.manager_level == 2 else '1. Amir ekranı' }}</span>
+                    {% if level3_evaluator_name %}<span class="focus-comment-badge soft">Görüş sahibi: {{ level3_evaluator_name }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="focus-comment-body">{{ level3_general_comment_text }}</div>
+        <div class="focus-comment-note">
+            Bu panel yorumun gözden kaçmaması için üst bölümde vurgulu tutulur. Kriter satırlarında ayrıca aramanıza gerek kalmaz.
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="evaluationForm" class="eval-shell">        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {% if assignment.manager_level == 3 and not level_3_scoring_enabled %}
+            <div class="glass-card panel-card">
+                <h3 class="section-title">3. Amir Değerlendirme Notu</h3>
+                <div class="section-sub">Bu dönemde 3. amir puan katkısı kapalıdır. Sadece genel görüş kaydedilecektir.</div>
+
+                <textarea
+                    name="general_comment"
+                    class="general-box"
+                    placeholder="Genel değerlendirmenizi yazınız..." {% if assignment.manager_level == 1 and not workflow.can_level_1_edit %}readonly{% endif %}>{{ current_general_comment or '' }}</textarea>
+            </div>
+        {% else %}
+            <div class="matrix-section-head">
+                <div>
+                    <h3 class="section-title">Değerlendirme Alanı</h3>
+                    <div class="matrix-section-note">Kriterler, puan girişleri ve önceki seviyelerin görüşleri tek akışta düzenlendi.</div>
+                </div>
+                <div class="matrix-compact-badges">
+                    <span class="saved-mini"><i class="fa-solid fa-list-check"></i> Kriter sayısı: {{ criteria_list|length }}</span>
+                    <span class="saved-mini"><i class="fa-solid fa-comment-dots"></i> Genel görüş aşağıda yer alır</span>
+                </div>
+            </div>
+
+            {% if assignment.manager_level != 1 or workflow.can_level_1_edit %}
+            <div class="bulk-score-toolbar">
+                <div class="bulk-score-main">
+                    <div>
+                        <div class="bulk-score-title">Toplu Puan Ver</div>
+                        <div class="bulk-score-sub">Tüm kriterleri tek dokunuşla aynı puana çekebilirsiniz.</div>
+                    </div>
+
+                    <div class="bulk-score-buttons">
+                        {% for bulk_value in [1, 2, 3, 4, 5] %}
+                        <button type="button" class="bulk-chip" onclick="applyBulkScore({{ bulk_value }})">Hepsini {{ bulk_value }} Yap</button>
+                        {% endfor %}
+                        <button type="button" class="bulk-chip clear" onclick="clearBulkScores()">Seçimleri Temizle</button>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+                    <div class="bulk-score-scope" role="group" aria-label="Toplu puan kapsamı">
+                        <label>
+                            <input type="radio" name="bulk_scope" value="empty" checked>
+                            <span class="bulk-scope-chip">Sadece boş kriterler</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="bulk_scope" value="all">
+                            <span class="bulk-scope-chip">Tüm kriterler</span>
+                        </label>
+                    </div>
+                    <span class="bulk-score-feedback" id="bulkScoreFeedback">Hazır</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="glass-card matrix-card">
+                <div class="matrix-head">
+                    <div>Temel Kriter</div>
+                    <div>Puanlama</div>
+                    <div>Yorum / Gerekçe</div>
+                    <div class="head-side">Önceki Görüşler</div>
+                </div>
+
+                <div class="criteria-list">
+                    {% for criteria in criteria_list %}
+                        {% set current_item = current_items_map.get(criteria.id) %}
+                        {% set level1_item = level_1_items_map.get(criteria.id) %}
+                        {% set level2_item = level_2_items_map.get(criteria.id) %}
+
+                        <div class="criteria-row" data-weight="{{ criteria.weight }}">
+                            <div class="criteria-cell">
+                                <div class="criteria-title">{{ criteria.name }}</div>
+                                <span class="criteria-weight">Ağırlık: %{{ criteria.weight }}</span>
+                                <div class="criteria-desc" style="margin-top:12px;">{{ criteria.description or "-" }}</div>
+                            </div>
+
+                            <div class="criteria-cell">
+                                <div class="score-grid">
+                                    {% for value in [1,2,3,4,5] %}
+                                        <label class="score-option">
+                                            <input
+                                                type="radio"
+                                                name="score_{{ criteria.id }}"
+                                                value="{{ value }}"
+                                                data-weight="{{ criteria.weight }}"
+                                                data-criterion-id="{{ criteria.id }}"
+                                                {% if current_item and (current_item.score|int == value) %}checked{% endif %} {% if assignment.manager_level == 1 and not workflow.can_level_1_edit %}disabled{% endif %}>
+                                            <span class="score-label">{{ value }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="score-help">
+                                    <div>Çok Başarısız</div>
+                                    <div>Başarısız</div>
+                                    <div>Beklenenin Altı</div>
+                                    <div>Başarılı</div>
+                                    <div>Çok Başarılı</div>
+                                </div>
+
+                                <div class="selected-score-preview {% if current_item and current_item.score %}active{% endif %}" id="preview_{{ criteria.id }}">
+                                    {% if current_item and current_item.score %}
+                                        Seçilen Puan: {{ current_item.score }}
+                                    {% else %}
+                                        Henüz puan seçilmedi
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="criteria-cell">
+                                <textarea
+                                    name="comment_{{ criteria.id }}"
+                                    class="comment-box"
+                                    placeholder="Açıklama / gerekçe giriniz..." {% if assignment.manager_level == 1 and not workflow.can_level_1_edit %}readonly{% endif %}>{% if current_item and current_item.comment %}{{ current_item.comment }}{% endif %}</textarea>
+
+                                <div style="margin-top:10px; color:#6b7280; font-size:.8rem; line-height:1.6;">
+                                    {% if phase5_3_comment_rule_from_settings %}1 ve 5 puanlarda açıklama zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="criteria-cell side">
+                                <div class="side-panel">
+                                    {% if assignment.manager_level == 2 %}
+                                        {% set level3_item = level_3_items_map.get(criteria.id) %}
+                                        <div class="history-box">
+                                            <div class="history-title">3. Amir</div>
+                                            <div class="history-line {% if not level3_item and level3_general_comment_text and not level_3_scoring_enabled %}muted-note{% endif %}">
+                                                {% if level3_item %}
+                                                    {{ level3_item.comment or "Yorum girilmedi." }}
+                                                {% elif level3_general_comment_text and not level_3_scoring_enabled %}
+                                                    3. amir bu dönemde yorumcu modunda. Genel üst görüş yukarıda görünür.
+                                                {% else %}
+                                                    Henüz değerlendirme yok.
+                                                {% endif %}
+                                            </div>
+                                            {% if level3_item and level_3_scoring_enabled %}
+                                                <div class="history-score">Puan: {{ level3_item.score }}</div>
+                                            {% elif level3_general_comment_text and not level_3_scoring_enabled %}
+                                                <div class="history-score">Genel üst görüş kaydedildi</div>
+                                            {% endif %}
+                                        </div>
+                                    {% elif assignment.manager_level == 1 %}
+                                        {% set level2_item = level_2_items_map.get(criteria.id) %}
+                                        {% set level3_item = level_3_items_map.get(criteria.id) %}
+                                        {% if evaluation.level_2_evaluator_id %}
+                                            <div class="history-box">
+                                                <div class="history-title">2. Amir</div>
+                                                <div class="history-line">
+                                                    {% if level2_item %}
+                                                        {{ level2_item.comment or "Yorum girilmedi." }}
+                                                    {% else %}
+                                                        Henüz değerlendirme yok.
+                                                    {% endif %}
+                                                </div>
+                                                {% if level2_item %}
+                                                    <div class="history-score">Puan: {{ level2_item.score }}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                        {% if evaluation.level_3_evaluator_id %}
+                                            <div class="history-box">
+                                                <div class="history-title">3. Amir</div>
+                                                <div class="history-line {% if not level3_item and level3_general_comment_text and not level_3_scoring_enabled %}muted-note{% endif %}">
+                                                    {% if level3_item %}
+                                                        {{ level3_item.comment or "Yorum girilmedi." }}
+                                                    {% elif level3_general_comment_text and not level_3_scoring_enabled %}
+                                                        3. amir bu dönemde yorumcu modunda. Genel üst görüş yukarıda görünür.
+                                                    {% else %}
+                                                        Henüz değerlendirme yok.
+                                                    {% endif %}
+                                                </div>
+                                                {% if level3_item and level_3_scoring_enabled %}
+                                                    <div class="history-score">Puan: {{ level3_item.score }}</div>
+                                                {% elif level3_general_comment_text and not level_3_scoring_enabled %}
+                                                    <div class="history-score">Genel üst görüş kaydedildi</div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="history-box">
+                                            <div class="history-title">Bilgi</div>
+                                            <div class="history-line">Bu seviyede önceki amir görüşü bulunmuyor.</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Genel Değerlendirme</h3>
+                <div class="section-sub">
+                    70 altı / 90 üstü sonuçlarda ve uç puanlarda genel değerlendirme yorumu zorunludur.
+                </div>
+
+                <textarea
+                    name="general_comment"
+                    class="general-box"
+                    placeholder="Genel değerlendirmenizi yazınız..." {% if assignment.manager_level == 1 and not workflow.can_level_1_edit %}readonly{% endif %}>{{ current_general_comment or '' }}</textarea>
+
+                {% if previous_general_comments %}
+                    <div style="display:grid; gap:12px; margin-top:16px;">
+                        {% for prev in previous_general_comments %}
+                            {% set skip_current_prev = (assignment.manager_level == 1 and prev.label and '1.' in prev.label)
+                                or (assignment.manager_level == 2 and prev.label and '2.' in prev.label)
+                                or (assignment.manager_level == 3 and prev.label and '3.' in prev.label) %}
+                            {% if not skip_current_prev %}
+                            <div class="history-box">
+                                <div class="history-title">{{ prev.label }} Genel Görüşü</div>
+                                <div class="history-line">{{ prev.comment or 'Henüz genel görüş girilmedi.' }}</div>
+                                {% if prev.score and prev.score > 0 %}
+                                    <div class="history-score">Toplam: {{ '%.2f'|format(prev.score) }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+            </div>
+        {% endif %}
+
+        {% if assignment.manager_level == 1 and can_return_to_level_1 %}
+            <div class="glass-card panel-card">
+                <h3 class="section-title">2. Amire İade Notu</h3>
+                <div class="section-sub">Beğenmediğiniz nokta varsa bu notla birlikte iade edebilirsiniz.</div>
+                <textarea name="return_note" class="general-box" placeholder="İade gerekçesini yazınız...">{{ workflow_return_note or '' }}</textarea>
+                <div class="toolbar" style="margin-top:14px;">
+                    <button type="submit" name="form_action" value="return_to_level_1" class="btn-soft secondary">
+                        <i class="fa-solid fa-reply"></i>
+                        2. Amire İade Et
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if assignment.manager_level == 2 and can_withdraw_level_1 %}
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Gönderimi Geri Çekme Notu</h3>
+                <div class="section-sub">1. amir henüz görmeden geri çekebilirsiniz. Bu not süreç geçmişine işlenir.</div>
+                <textarea name="withdraw_note" class="general-box" placeholder="Geri çekme gerekçesini yazınız (opsiyonel)..."></textarea>
+            </div>
+        {% endif %}
+
+        <div class="sticky-save-bar">
+            <div class="save-left">
+                <span>Bu Formun Canlı Toplamı:</span>
+                <strong id="liveLevelTotalBottom" style="color:#8B0000;">{{ "%.2f"|format(current_saved_level_total or 0) }}</strong>
+                {% if saved %}
+                    <span class="save-badge"><i class="fa-solid fa-check"></i> Kayıt güncel</span>
+                {% endif %}
+            </div>
+
+            <div class="save-right">
+                <a href="{{ back_url }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Listeye Dön
+                </a>
+                <a href="{{ history_url }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-timeline"></i>
+                    Süreç Geçmişi
+                </a>
+                {% if assignment.manager_level == 1 %}
+                    <button type="submit" name="form_action" value="save" class="btn-soft secondary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Taslak Kaydet
+                    </button>
+                    <button type="submit" name="form_action" value="complete_level_2" class="btn-soft primary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                        <i class="fa-solid fa-check"></i>
+                        Onayla ve Tamamla
+                    </button>
+                {% elif assignment.manager_level == 2 %}
+                    <button type="submit" name="form_action" value="save" class="btn-soft secondary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Taslak Kaydet
+                    </button>
+                    <button type="submit" name="form_action" value="submit_to_level_2" class="btn-soft primary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                        <i class="fa-solid fa-paper-plane"></i>
+                        1. Amire Gönder
+                    </button>
+                    {% if can_withdraw_level_1 %}
+                        <button type="submit" name="form_action" value="withdraw_level_1" class="btn-soft secondary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Geri Çek
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <button type="submit" name="form_action" value="save_level_3" class="btn-soft primary" {% if evaluation_window and not evaluation_window.can_submit %}disabled title="Puanlama takvimi dışındasınız"{% endif %}>
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        {% if level_3_scoring_enabled %}Kaydet ve Zinciri Aç{% else %}Üst Görüşü Kaydet{% endif %}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+(function () {
+    const managerLevel = {{ assignment.manager_level|int }};
+    const savedL1 = parseFloat("{{ (evaluation.level_1_total_100 or 0)|float }}");
+    const savedL2 = parseFloat("{{ (evaluation.level_2_total_100 or 0)|float }}");
+    const savedL3 = parseFloat("{{ (evaluation.level_3_total_100 or 0)|float }}");
+
+    const w1 = parseFloat("{{ (effective_weights.evaluator_1_weight or 0)|float }}") / 100.0;
+    const w2 = parseFloat("{{ (effective_weights.evaluator_2_weight or 0)|float }}") / 100.0;
+    const w3 = parseFloat("{{ (effective_weights.evaluator_3_weight or 0)|float }}") / 100.0;
+
+    function calculateLiveLevelTotal() {
+        let total = 0;
+
+        document.querySelectorAll('#evaluationForm input[type="radio"]:checked').forEach(function (radio) {
+            const score = parseFloat(radio.value || "0");
+            const weight = parseFloat(radio.getAttribute("data-weight") || "0");
+
+            if (!isNaN(score) && !isNaN(weight)) {
+                total += (score / 5.0) * weight;
+            }
+        });
+
+        return total;
+    }
+
+    function updateScorePreview(radio) {
+        const name = radio.name || "";
+        const score = radio.checked ? (radio.value || "") : "";
+        const previewId = name.replace("score_", "preview_");
+        const preview = document.getElementById(previewId);
+
+        if (!preview) return;
+
+        if (score) {
+            preview.textContent = "Seçilen Puan: " + score;
+            preview.classList.add("active");
+        } else {
+            preview.textContent = "Henüz puan seçilmedi";
+            preview.classList.remove("active");
+        }
+    }
+
+    function initializePreviews() {
+        document.querySelectorAll('#evaluationForm input[type="radio"]:checked').forEach(function (radio) {
+            updateScorePreview(radio);
+        });
+    }
+
+    function getBulkScope() {
+        const checkedScope = document.querySelector('input[name="bulk_scope"]:checked');
+        return checkedScope ? checkedScope.value : "empty";
+    }
+
+    function setBulkFeedback(message, active) {
+        const feedback = document.getElementById("bulkScoreFeedback");
+        if (!feedback) return;
+        feedback.textContent = message;
+        feedback.classList.toggle("active", !!active);
+    }
+
+    function applyBulkScore(score) {
+        const scope = getBulkScope();
+        const criterionRows = document.querySelectorAll('.criteria-row');
+        let changedCount = 0;
+
+        criterionRows.forEach(function (row) {
+            const radios = row.querySelectorAll('input[type="radio"][name^="score_"]');
+            if (!radios.length) return;
+
+            const editableRadios = Array.from(radios).filter(function (radio) {
+                return !radio.disabled;
+            });
+            if (!editableRadios.length) return;
+
+            const checkedRadio = editableRadios.find(function (radio) {
+                return radio.checked;
+            });
+
+            if (scope === 'empty' && checkedRadio) {
+                return;
+            }
+
+            const targetRadio = editableRadios.find(function (radio) {
+                return String(radio.value) === String(score);
+            });
+            if (!targetRadio) return;
+            if (targetRadio.checked) return;
+
+            targetRadio.checked = true;
+            targetRadio.dispatchEvent(new Event('change', { bubbles: true }));
+            changedCount += 1;
+        });
+
+        if (changedCount > 0) {
+            setBulkFeedback(changedCount + ' kriter ' + score + ' puan oldu', true);
+        } else if (scope === 'empty') {
+            setBulkFeedback('Boş kriter bulunamadı', false);
+        } else {
+            setBulkFeedback('Tüm kriterler zaten bu puanda', false);
+        }
+    }
+
+    function clearBulkScores() {
+        const scope = getBulkScope();
+        const criterionRows = document.querySelectorAll('.criteria-row');
+        let clearedCount = 0;
+
+        criterionRows.forEach(function (row) {
+            const radios = Array.from(row.querySelectorAll('input[type="radio"][name^="score_"]')).filter(function (radio) {
+                return !radio.disabled;
+            });
+            if (!radios.length) return;
+
+            const checkedRadio = radios.find(function (radio) {
+                return radio.checked;
+            });
+            if (!checkedRadio) return;
+            if (scope === 'empty') return;
+
+            checkedRadio.checked = false;
+            checkedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+            clearedCount += 1;
+        });
+
+        if (clearedCount > 0) {
+            setBulkFeedback(clearedCount + ' kriter temizlendi', true);
+        } else if (scope === 'empty') {
+            setBulkFeedback('Temizleme için Tüm kriterler seçeneğini açın', false);
+        } else {
+            setBulkFeedback('Temizlenecek seçim bulunamadı', false);
+        }
+    }
+
+    function recalculate() {
+        const liveLevelTotal = calculateLiveLevelTotal();
+
+        const liveLevelTargetTop = document.getElementById("liveLevelTotal");
+        const liveLevelTargetBottom = document.getElementById("liveLevelTotalBottom");
+        const livePredictedFinal = document.getElementById("livePredictedFinal");
+
+        if (liveLevelTargetTop) liveLevelTargetTop.textContent = liveLevelTotal.toFixed(2);
+        if (liveLevelTargetBottom) liveLevelTargetBottom.textContent = liveLevelTotal.toFixed(2);
+
+        let calcL1 = savedL1;
+        let calcL2 = savedL2;
+        let calcL3 = savedL3;
+
+        if (managerLevel === 1) calcL1 = liveLevelTotal;
+        if (managerLevel === 2) calcL2 = liveLevelTotal;
+        if (managerLevel === 3) calcL3 = liveLevelTotal;
+
+        const predictedFinal = (calcL1 * w1) + (calcL2 * w2) + (calcL3 * w3);
+
+        if (livePredictedFinal) {
+            livePredictedFinal.textContent = predictedFinal.toFixed(2);
+        }
+    }
+
+    document.querySelectorAll('#evaluationForm input[type="radio"]').forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            updateScorePreview(radio);
+            recalculate();
+        });
+    });
+
+    initializePreviews();
+    recalculate();
+})();
+</script>
+{% endblock %}
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Geri Bildirim Görüşme Rehberi{% endblock %}
+
+{% block content %}
+{% set guide_stats = guide_stats if guide_stats is defined else {} %}
+{% set selected_scenario = selected_scenario if selected_scenario is defined else {} %}
+{% set scenarios = scenarios if scenarios is defined else [] %}
+{% set flow_steps = flow_steps if flow_steps is defined else [] %}
+{% set sbi_examples = sbi_examples if sbi_examples is defined else [] %}
+{% set disc_tips = disc_tips if disc_tips is defined else [] %}
+{% set checklists = checklists if checklists is defined else {} %}
+{% set can_view_guide = can_view_guide if can_view_guide is defined else true %}
+
+<style>
+    .bys-guide-shell{--r:#8B0000;--r2:#6f0000;--ink:#172033;--muted:#697386;--line:rgba(23,32,51,.10);--card:rgba(255,255,255,.91);max-width:1580px;margin:0 auto;padding:18px 18px 46px;}
+    .bys-guide-top{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(255,255,255,.82));box-shadow:0 24px 70px rgba(23,32,51,.10);padding:26px;margin-bottom:16px;position:relative;overflow:hidden;}
+    .bys-guide-top:after{content:"";position:absolute;right:-90px;top:-110px;width:270px;height:270px;border-radius:999px;background:rgba(139,0,0,.08);pointer-events:none;}
+    .bys-guide-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--r);font-weight:850;font-size:12px;margin-bottom:12px;}
+    .bys-guide-title{font-size:clamp(26px,3vw,42px);line-height:1.06;font-weight:880;color:var(--ink);margin:0;letter-spacing:-.04em;}
+    .bys-guide-subtitle{max-width:1020px;margin:12px 0 0;color:var(--muted);font-size:15px;line-height:1.7;}
+    .bys-guide-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1;}
+    .bys-guide-btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:14px;padding:11px 14px;font-weight:820;background:var(--r);color:#fff;box-shadow:0 14px 30px rgba(139,0,0,.18);}
+    .bys-guide-btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+    .bys-guide-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:20px;position:relative;z-index:1;}
+    .bys-guide-stat{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:15px;box-shadow:0 14px 34px rgba(23,32,51,.07);}
+    .bys-guide-stat strong{display:block;font-size:27px;letter-spacing:-.03em;color:var(--ink);}
+    .bys-guide-stat span{display:block;font-size:12px;color:var(--muted);margin-top:2px;}
+    .bys-guide-nav{position:sticky;top:94px;z-index:5;display:flex;gap:8px;flex-wrap:wrap;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);padding:10px;margin-bottom:16px;box-shadow:0 10px 30px rgba(23,32,51,.06);}
+    .bys-guide-nav a{display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;border-radius:999px;padding:9px 12px;color:var(--ink);font-size:12px;font-weight:800;background:rgba(23,32,51,.045);}
+    .bys-guide-nav a:hover{border-color:rgba(139,0,0,.18);background:rgba(139,0,0,.07);color:var(--r);}
+    .bys-guide-card{border:1px solid var(--line);border-radius:24px;background:var(--card);box-shadow:0 18px 52px rgba(23,32,51,.08);overflow:hidden;margin-bottom:16px;}
+    .bys-guide-card-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+    .bys-guide-card-title{font-size:20px;font-weight:850;color:var(--ink);margin:0;letter-spacing:-.02em;}
+    .bys-guide-card-desc{color:var(--muted);font-size:13px;line-height:1.55;margin:6px 0 0;}
+    .bys-guide-card-b{padding:18px 20px;}
+    .bys-flow-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    .bys-flow-item{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.72);padding:15px;min-height:100%;}
+    .bys-flow-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+    .bys-flow-no{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(139,0,0,.08);color:var(--r);font-weight:900;}
+    .bys-flow-time{font-size:12px;color:var(--muted);font-weight:800;background:rgba(23,32,51,.06);border-radius:999px;padding:6px 9px;}
+    .bys-flow-title{font-size:16px;font-weight:850;color:var(--ink);margin:0 0 6px;}
+    .bys-flow-purpose{font-size:13px;line-height:1.55;color:var(--muted);}
+    .bys-mini-list{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:7px;}
+    .bys-mini-list li{position:relative;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.45;}
+    .bys-mini-list li:before{content:"";position:absolute;left:0;top:.58em;width:7px;height:7px;border-radius:999px;background:rgba(139,0,0,.35);}
+    .bys-two{display:grid;grid-template-columns:370px 1fr;gap:16px;align-items:start;}
+    .bys-scenario-list{display:grid;gap:8px;max-height:650px;overflow:auto;padding-right:3px;}
+    .bys-scenario-link{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.72);padding:11px 12px;color:var(--ink);font-size:13px;font-weight:800;}
+    .bys-scenario-link.active{border-color:rgba(139,0,0,.34);background:rgba(139,0,0,.07);color:var(--r);}
+    .bys-select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 13px;color:var(--ink);outline:none;}
+    .bys-scenario-box{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.72);padding:16px;margin-bottom:12px;}
+    .bys-scenario-label{font-size:11px;color:var(--r);font-weight:900;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px;}
+    .bys-scenario-text{color:var(--muted);font-size:13px;line-height:1.55;margin:0;}
+    .bys-copy-row{display:grid;gap:8px;}
+    .bys-copy-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74);padding:12px;}
+    .bys-copy-text{color:var(--ink);font-size:13px;line-height:1.55;}
+    .bys-copy-btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:850;color:var(--ink);}
+    .bys-copy-btn:hover{color:var(--r);border-color:rgba(139,0,0,.25);}
+    .bys-sbi-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    .bys-sbi-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.72);padding:15px;}
+    .bys-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:850;background:rgba(139,0,0,.08);color:var(--r);}
+    .bys-weak{font-size:12px;color:#9a3412;background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.20);padding:9px;border-radius:12px;margin:10px 0;}
+    .bys-sbi-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+    .bys-sbi-part{background:rgba(23,32,51,.04);border:1px solid var(--line);border-radius:14px;padding:10px;}
+    .bys-sbi-part b{display:block;font-size:11px;color:var(--r);margin-bottom:5px;}
+    .bys-sbi-part span{display:block;color:var(--muted);font-size:12px;line-height:1.4;}
+    .bys-sbi-sentence{margin-top:10px;color:var(--ink);font-size:13px;line-height:1.55;font-weight:650;}
+    .bys-builder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    .bys-input,.bys-textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 13px;color:var(--ink);outline:none;}
+    .bys-textarea{min-height:92px;resize:vertical;line-height:1.5;}
+    .bys-label{font-size:12px;font-weight:850;color:var(--ink);margin-bottom:7px;display:block;}
+    .bys-preview{white-space:pre-wrap;border:1px solid rgba(139,0,0,.18);border-radius:18px;background:rgba(139,0,0,.055);padding:14px;color:var(--ink);font-size:13px;line-height:1.55;}
+    .bys-check-grid,.bys-disc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    .bys-check-card,.bys-disc-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.72);padding:15px;}
+    .bys-disc-code{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:14px;background:rgba(139,0,0,.08);color:var(--r);font-weight:900;margin-bottom:8px;}
+    .bys-muted{color:var(--muted);font-size:13px;line-height:1.55;}
+    .bys-noaccess{border:1px dashed rgba(139,0,0,.24);border-radius:22px;background:rgba(255,255,255,.76);padding:30px;text-align:center;color:var(--muted);}
+    @media(max-width:1200px){.bys-flow-grid,.bys-sbi-grid,.bys-check-grid,.bys-disc-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.bys-two{grid-template-columns:1fr}.bys-scenario-list{max-height:none}.bys-guide-stats{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    @media(max-width:760px){.bys-guide-shell{padding:10px}.bys-guide-top{padding:20px;border-radius:22px}.bys-flow-grid,.bys-sbi-grid,.bys-check-grid,.bys-disc-grid,.bys-builder,.bys-sbi-parts,.bys-guide-stats{grid-template-columns:1fr}.bys-copy-item{grid-template-columns:1fr}.bys-guide-nav{position:relative;top:auto}}
+</style>
+
+<div class="bys-guide-shell">
+    <section class="bys-guide-top">
+        <div class="bys-guide-eyebrow"><i class="fa-solid fa-comments"></i> Performans Görüşmeleri Rehberi</div>
+        <h1 class="bys-guide-title">60 Dakikalık Görüşme Akış Rehberi</h1>
+        <p class="bys-guide-subtitle">Bu ekran; yöneticinin görüşmeye hazırlıklı girmesi, görüşmeyi altı adımlı kurumsal akışla yürütmesi, senaryo bazlı açılış cümlesi seçmesi ve geri bildirimi SBI modeliyle somutlaştırması için hazırlandı.</p>
+        <div class="bys-guide-actions">
+            <a class="bys-guide-btn" href="#akis"><i class="fa-solid fa-route"></i> Akışı Gör</a>
+            <a class="bys-guide-btn secondary" href="#senaryolar"><i class="fa-solid fa-layer-group"></i> Senaryo Seç</a>
+            <a class="bys-guide-btn secondary" href="#sbi"><i class="fa-solid fa-cubes-stacked"></i> SBI Örnekleri</a>
+            <a class="bys-guide-btn secondary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlara Git</a>
+        </div>
+        <div class="bys-guide-stats">
+            <div class="bys-guide-stat"><strong>{{ guide_stats.flow_steps|default(6) }}</strong><span>Akış adımı</span></div>
+            <div class="bys-guide-stat"><strong>{{ guide_stats.minutes|default(60) }}</strong><span>Dakikalık görüşme</span></div>
+            <div class="bys-guide-stat"><strong>{{ guide_stats.scenarios|default(15) }}</strong><span>Senaryo</span></div>
+            <div class="bys-guide-stat"><strong>{{ guide_stats.opening_sentences|default(75) }}</strong><span>Açılış cümlesi</span></div>
+            <div class="bys-guide-stat"><strong>{{ guide_stats.sbi_examples|default(10) }}</strong><span>SBI örneği</span></div>
+        </div>
+    </section>
+
+    {% if not can_view_guide %}
+    <div class="bys-noaccess">
+        <h2 class="bys-guide-card-title">Bu sayfaya erişim yetkiniz bulunmamaktadır.</h2>
+        <p class="bys-muted mt-2">Geri bildirim görüşme rehberi; performans sürecinde görevli yönetici ve yetkili kullanıcılar için hazırlanmıştır.</p>
+    </div>
+    {% else %}
+
+    <nav class="bys-guide-nav">
+        <a href="#akis"><i class="fa-solid fa-route"></i> 60 Dakika Akış</a>
+        <a href="#senaryolar"><i class="fa-solid fa-message"></i> Senaryo Bazlı Açılış Cümleleri</a>
+        <a href="#sbi"><i class="fa-solid fa-cubes-stacked"></i> SBI Örnek Bankası</a>
+        <a href="#kontrol"><i class="fa-solid fa-list-check"></i> Kontrol Listeleri</a>
+        <a href="#disc"><i class="fa-solid fa-user-group"></i> İletişim Stili Notları</a>
+    </nav>
+
+    <section id="akis" class="bys-guide-card">
+        <div class="bys-guide-card-h">
+            <div>
+                <h2 class="bys-guide-card-title">60 dakikada 6 adım</h2>
+                <p class="bys-guide-card-desc">Her adım görüşmenin dağılmasını engeller: önce güvenli alan, sonra dinleme, sonra somut değerlendirme, en son aksiyon ve takip.</p>
+            </div>
+        </div>
+        <div class="bys-guide-card-b">
+            <div class="bys-flow-grid">
+                {% for step in flow_steps %}
+                <article class="bys-flow-item">
+                    <div class="bys-flow-head"><span class="bys-flow-no">{{ step.no }}</span><span class="bys-flow-time">{{ step.time }}</span></div>
+                    <h3 class="bys-flow-title">{{ step.title }}</h3>
+                    <div class="bys-flow-purpose">{{ step.purpose }}</div>
+                    <ul class="bys-mini-list">
+                        {% for item in step.do[:3] %}<li>{{ item }}</li>{% endfor %}
+                    </ul>
+                    {% if step.questions %}
+                    <div class="bys-scenario-box mt-3">
+                        <div class="bys-scenario-label">Soru / cümle</div>
+                        <p class="bys-scenario-text">{{ step.questions[0] }}</p>
+                    </div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="senaryolar" class="bys-guide-card">
+        <div class="bys-guide-card-h">
+            <div>
+                <h2 class="bys-guide-card-title">Senaryo Bazlı Açılış Cümleleri</h2>
+                <p class="bys-guide-card-desc">İlk 30 saniye görüşmenin tonunu belirler. Cümleyi aynen okumayın; kendi sesinize uyarlayın.</p>
+            </div>
+            <form method="get" action="{{ safe_url_for('main.performance_feedback_meeting_guide') }}">
+                <select class="bys-select" name="scenario" onchange="this.form.submit()">
+                    {% for scenario in scenarios %}<option value="{{ scenario.key }}" {% if selected_scenario.key == scenario.key %}selected{% endif %}>{{ scenario.title }}</option>{% endfor %}
+                </select>
+            </form>
+        </div>
+        <div class="bys-guide-card-b">
+            <div class="bys-two">
+                <aside class="bys-scenario-list">
+                    {% for scenario in scenarios %}
+                    <a class="bys-scenario-link {% if selected_scenario.key == scenario.key %}active{% endif %}" href="{{ safe_url_for('main.performance_feedback_meeting_guide', scenario=scenario.key) }}#senaryolar">
+                        <i class="fa-solid fa-angle-right"></i><span>{{ scenario.title }}</span>
+                    </a>
+                    {% endfor %}
+                </aside>
+                <main>
+                    <div class="bys-scenario-box">
+                        <div class="bys-scenario-label">Durum</div>
+                        <p class="bys-scenario-text">{{ selected_scenario.situation }}</p>
+                    </div>
+                    <div class="bys-scenario-box">
+                        <div class="bys-scenario-label">Dikkat</div>
+                        <p class="bys-scenario-text">{{ selected_scenario.attention }}</p>
+                    </div>
+                    <div class="bys-guide-card-title mb-2" style="font-size:17px;">Açılış cümlesi önerileri</div>
+                    <div class="bys-copy-row mb-3">
+                        {% for sentence in selected_scenario.openings %}
+                        <div class="bys-copy-item"><div class="bys-copy-text">{{ sentence }}</div><button type="button" class="bys-copy-btn" data-copy="{{ sentence|e }}"><i class="fa-regular fa-copy"></i> Kopyala</button></div>
+                        {% endfor %}
+                    </div>
+                    <div class="bys-guide-card-title mb-2" style="font-size:17px;">İçgörü soruları</div>
+                    <div class="bys-copy-row">
+                        {% for question in selected_scenario.questions %}
+                        <div class="bys-copy-item"><div class="bys-copy-text">{{ question }}</div><button type="button" class="bys-copy-btn" data-copy="{{ question|e }}"><i class="fa-regular fa-copy"></i> Kopyala</button></div>
+                        {% endfor %}
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <section id="sbi" class="bys-guide-card">
+        <div class="bys-guide-card-h">
+            <div>
+                <h2 class="bys-guide-card-title">SBI Örnek Bankası</h2>
+                <p class="bys-guide-card-desc">SBI modeli geri bildirimi kişilik yargısından çıkarır: Durum, Davranış ve Etki netleşir.</p>
+            </div>
+        </div>
+        <div class="bys-guide-card-b">
+            <div class="bys-guide-card mb-3" style="box-shadow:none;background:rgba(255,255,255,.62);">
+                <div class="bys-guide-card-h"><div><h3 class="bys-guide-card-title" style="font-size:18px;">SBI cümle oluşturucu</h3><p class="bys-guide-card-desc">Görüşmeden önce kendi örneğinizi yazın; çıktı metnini hazırlık notuna taşıyın.</p></div></div>
+                <div class="bys-guide-card-b">
+                    <div class="bys-builder">
+                        <div><label class="bys-label">S - Durum</label><textarea class="bys-textarea" id="sbiS" placeholder="Ne zaman, nerede, hangi olayda?"></textarea></div>
+                        <div><label class="bys-label">B - Davranış</label><textarea class="bys-textarea" id="sbiB" placeholder="Gözlemlenebilir olarak ne yaptı?"></textarea></div>
+                        <div><label class="bys-label">I - Etki</label><textarea class="bys-textarea" id="sbiI" placeholder="Sonuca, ekibe, hizmete etkisi ne oldu?"></textarea></div>
+                    </div>
+                    <div class="bys-guide-actions"><button class="bys-guide-btn" type="button" id="buildSbiBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Cümleyi Oluştur</button><button class="bys-guide-btn secondary" type="button" data-copy-target="sbiPreview"><i class="fa-regular fa-copy"></i> Çıktıyı Kopyala</button></div>
+                    <div class="bys-preview mt-3" id="sbiPreview">Durum + davranış + etki alanlarını doldurduğunuzda görüşmede kullanılabilir bir SBI cümlesi burada oluşur.</div>
+                </div>
+            </div>
+            <div class="bys-sbi-grid">
+                {% for item in sbi_examples %}
+                <article class="bys-sbi-card">
+                    <span class="bys-pill">{{ item.category }}</span>
+                    <div class="bys-weak"><b>Kaçınılacak genel ifade:</b> {{ item.weak }}</div>
+                    <div class="bys-sbi-parts">
+                        <div class="bys-sbi-part"><b>S - Durum</b><span>{{ item.situation }}</span></div>
+                        <div class="bys-sbi-part"><b>B - Davranış</b><span>{{ item.behavior }}</span></div>
+                        <div class="bys-sbi-part"><b>I - Etki</b><span>{{ item.impact }}</span></div>
+                    </div>
+                    <div class="bys-sbi-sentence">{{ item.sentence }}</div>
+                    <div class="mt-2"><button type="button" class="bys-copy-btn" data-copy="{{ item.sentence|e }}"><i class="fa-regular fa-copy"></i> Cümleyi Kopyala</button></div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="kontrol" class="bys-guide-card">
+        <div class="bys-guide-card-h"><div><h2 class="bys-guide-card-title">Görüşme kontrol listeleri</h2><p class="bys-guide-card-desc">Görüşmenin hazırlık, yürütme ve kapanış kalitesini hızlı kontrol etmek için kullanılır.</p></div></div>
+        <div class="bys-guide-card-b">
+            <div class="bys-check-grid">
+                <article class="bys-check-card"><span class="bys-pill">Görüşmeden Önce</span><ul class="bys-mini-list">{% for item in checklists.before %}<li>{{ item }}</li>{% endfor %}</ul></article>
+                <article class="bys-check-card"><span class="bys-pill">Görüşme Sırasında</span><ul class="bys-mini-list">{% for item in checklists.during %}<li>{{ item }}</li>{% endfor %}</ul></article>
+                <article class="bys-check-card"><span class="bys-pill">Görüşmeden Sonra</span><ul class="bys-mini-list">{% for item in checklists.after %}<li>{{ item }}</li>{% endfor %}</ul></article>
+            </div>
+        </div>
+    </section>
+
+    <section id="disc" class="bys-guide-card">
+        <div class="bys-guide-card-h"><div><h2 class="bys-guide-card-title">İletişim stili notları</h2><p class="bys-guide-card-desc">Bu alan envanter sonucu saklamaz; yalnızca yöneticinin görüşme dilini kişiye göre yumuşatmasına yardımcı olur.</p></div></div>
+        <div class="bys-guide-card-b">
+            <div class="bys-disc-grid">
+                {% for item in disc_tips %}
+                <article class="bys-disc-card"><div class="bys-disc-code">{{ item.code }}</div><h3 class="bys-flow-title">{{ item.name }}</h3><div class="bys-muted"><b>Önemsediği:</b> {{ item.need }}</div><div class="bys-muted mt-2">{{ item.tip }}</div></article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+(function(){
+    function copyText(text){
+        if(!text){ return; }
+        if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text); }
+        else{
+            var area=document.createElement('textarea'); area.value=text; document.body.appendChild(area); area.select(); document.execCommand('copy'); document.body.removeChild(area);
+        }
+    }
+    document.querySelectorAll('[data-copy]').forEach(function(btn){
+        btn.addEventListener('click', function(){ copyText(btn.getAttribute('data-copy') || ''); btn.innerHTML='<i class="fa-solid fa-check"></i> Kopyalandı'; setTimeout(function(){btn.innerHTML='<i class="fa-regular fa-copy"></i> Kopyala';},1400); });
+    });
+    document.querySelectorAll('[data-copy-target]').forEach(function(btn){
+        btn.addEventListener('click', function(){ var el=document.getElementById(btn.getAttribute('data-copy-target')); copyText(el ? el.innerText : ''); });
+    });
+    var build=document.getElementById('buildSbiBtn');
+    if(build){
+        build.addEventListener('click', function(){
+            var s=(document.getElementById('sbiS').value || '').trim();
+            var b=(document.getElementById('sbiB').value || '').trim();
+            var i=(document.getElementById('sbiI').value || '').trim();
+            var out=document.getElementById('sbiPreview');
+            if(!s || !b || !i){ out.innerText='Lütfen Durum, Davranış ve Etki alanlarını doldurun.'; return; }
+            out.innerText=s + ' ' + b + '; bu nedenle ' + i + '.';
+        });
+    }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,169 @@
+{# BYS360_AI_KNOWLEDGE_BANK_SEED_DISPLAY_V1 #}
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_ai_teaching_center.css') }}">
+
+<div class="ai-teaching-breadcrumb">
+  <a href="/ai-agent/panel">AI Karar Destek Merkezi</a>
+  <span>Asistan Bilgi Bankası</span>
+</div>
+
+<div class="ai-teaching-page" data-page="BYS360_AI_KNOWLEDGE_BANK_SEED_DISPLAY_V1">
+  <section class="ai-teaching-hero">
+    <div>
+      <span class="ai-teaching-kicker">AI Karar Destek Merkezi / Asistan Bilgi Bankası</span>
+      <h1>Asistan Bilgi Bankası</h1>
+      <p>
+        BYS360 Asistan’a öğretilen tüm kurumsal bilgiler burada listelenir. Yeni bilgi ekleyebilir,
+        mevcut bilgileri aktif/pasif yapabilir ve asistanın hangi soru kalıplarına nasıl cevap vereceğini görebilirsiniz.
+      </p>
+    </div>
+    <aside>
+      <strong>Öğretilmiş bilgi görünürlüğü</strong>
+      <span>Önceden öğretilen performans, selamlaşma, geliştirici bilgisi ve süreç cevapları da bilgi bankasında kayıtlı görünür.</span>
+    </aside>
+  </section>
+
+  <section class="ai-knowledge-summary-grid">
+    <article>
+      <span>Toplam Bilgi</span>
+      <strong>{{ entries|length if entries else 0 }}</strong>
+      <em>Aktif ve pasif kayıtlar</em>
+    </article>
+    <article>
+      <span>Aktif Bilgi</span>
+      <strong>{{ entries|selectattr('is_active')|list|length if entries else 0 }}</strong>
+      <em>Asistan cevaplarında kullanılabilir</em>
+    </article>
+    <article>
+      <span>Bilgi Türü</span>
+      <strong>Kurumsal</strong>
+      <em>Rehber cevap ve yönlendirme</em>
+    </article>
+  </section>
+
+  <section class="ai-teaching-grid">
+    <article class="ai-teaching-form-card">
+      <div class="ai-teaching-section-head">
+        <span>Yeni bilgi öğret</span>
+        <h2>Soru kalıbı ve cevap ekle</h2>
+        <p>Birden fazla soru kalıbını alt alta yazabilirsiniz. Asistan soru geldiğinde önce bu bilgi bankasında arama yapar.</p>
+      </div>
+
+      <form method="post" class="ai-teaching-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+
+        <label>
+          <span>Başlık</span>
+          <input type="text" name="title" maxlength="240" required placeholder="Örn. Karne görünürlüğü">
+        </label>
+
+        <label>
+          <span>Soru kalıpları</span>
+          <textarea name="question_patterns" rows="5" required placeholder="karnem nerede&#10;karnemi göremiyorum&#10;puanım neden görünmüyor"></textarea>
+        </label>
+
+        <label>
+          <span>Asistan cevabı</span>
+          <textarea name="answer" rows="8" required placeholder="Kullanıcıya verilecek kurumsal ve sade cevabı yazın."></textarea>
+        </label>
+
+        <div class="ai-teaching-form-row">
+          <label>
+            <span>Etiketler</span>
+            <input type="text" name="tags" maxlength="500" placeholder="performans, karne, yayın">
+          </label>
+          <label>
+            <span>Hedef kullanıcı</span>
+            <select name="audience">
+              <option value="all">Tüm yetkili kapsamlar</option>
+              <option value="personel">Personel</option>
+              <option value="yonetici">Yönetici</option>
+              <option value="admin">Admin / Başkan</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          <span>Öncelik</span>
+          <input type="number" name="priority" value="50" min="0" max="100">
+        </label>
+
+        <button type="submit">Bilgiyi asistana öğret</button>
+      </form>
+    </article>
+
+    <aside class="ai-teaching-help-card">
+      <h2>Bilgi Bankası nasıl kullanılır?</h2>
+      <ol>
+        <li>Asistana öğretilecek başlığı ve soru kalıplarını yazın.</li>
+        <li>Kullanıcıya gösterilecek cevabı kurumsal ve sade dille girin.</li>
+        <li>Kayıt aktifse asistan bu bilgiyi cevap üretirken kullanır.</li>
+        <li>Pasif kayıtlar bilgi bankasında görünür ama cevaplarda kullanılmaz.</li>
+      </ol>
+      <div class="ai-teaching-example">
+        <strong>Öğretilmiş örnekler</strong>
+        <p>Merhaba / iyi misin / geliştiricin kim / 70 altı süreç / 3. amir / karne görünürlüğü / performans dönemi</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ai-teaching-list-card">
+    <div class="ai-teaching-section-head">
+      <span>Bilgi Bankası</span>
+      <h2>Asistanın öğrendiği bilgiler</h2>
+      <p>Bu liste, asistana kodla veya ekran üzerinden öğretilen kurumsal cevapların tamamını gösterir.</p>
+    </div>
+
+    {% if entries %}
+      <div class="ai-knowledge-bank-list">
+        {% for item in entries %}
+          <article class="ai-knowledge-entry-card">
+            <header>
+              <div>
+                {% if item.is_active %}
+                  <span class="ai-teaching-status active">Aktif</span>
+                {% else %}
+                  <span class="ai-teaching-status passive">Pasif</span>
+                {% endif %}
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.tags or 'Etiket yok' }}</p>
+              </div>
+              <strong>Öncelik {{ item.priority or 0 }}</strong>
+            </header>
+
+            <div class="ai-knowledge-entry-body">
+              <div>
+                <span>Soru kalıpları</span>
+                <pre>{{ item.question_patterns }}</pre>
+              </div>
+              <div>
+                <span>Asistan cevabı</span>
+                <p>{{ item.answer }}</p>
+              </div>
+            </div>
+
+            <footer>
+              <small>Hedef kullanıcı: {{ item.audience or 'all' }}</small>
+              <div class="ai-teaching-actions">
+                <form method="post" action="{{ url_for('.ag5_knowledge_toggle', entry_id=item.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                  <button type="submit">{{ 'Pasifleştir' if item.is_active else 'Aktifleştir' }}</button>
+                </form>
+                <form method="post" action="{{ url_for('.ag5_knowledge_delete', entry_id=item.id) }}" onsubmit="return confirm('Bu bilgi kaydı silinsin mi?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+                  <button type="submit" class="danger">Sil</button>
+                </form>
+              </div>
+            </footer>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="ai-teaching-empty">
+        Henüz asistana öğretilmiş bilgi kaydı bulunmuyor.
+      </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

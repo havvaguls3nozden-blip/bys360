@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Birim Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Yapı{% endblock %}
+{% block page_title %}Birim Düzenle{% endblock %}
+{% block page_subtitle %}Seçili birimin bilgilerini güncelleyin{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Birim Adı</label>
+                <input type="text" name="name" value="{{ unit_obj.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Birim Türü</label>
+                <select name="unit_type" required>
+                    <option value="">Seçiniz</option>
+                    {% for value, label in unit_type_choices %}
+                        <option value="{{ value }}" {% if unit_obj.unit_type == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Üst Birim</label>
+                <select name="parent_id">
+                    <option value="">Üst Birim Yok</option>
+                    {% for item in parent_units %}
+                        <option value="{{ item.id }}" {% if unit_obj.parent_id == item.id %}selected{% endif %}>
+                            {{ item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group full">
+                <label class="checkbox-row">
+                    <input type="checkbox" name="is_active" {% if unit_obj.is_active %}checked{% endif %}>
+                    Aktif olsun
+                </label>
+            </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:16px;">
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-floppy-disk"></i> Güncelle
+            </button>
+            <a href="{{ url_for('main.admin_org_units') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

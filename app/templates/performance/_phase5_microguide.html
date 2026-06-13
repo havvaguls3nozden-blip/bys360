@@ -1,0 +1,39 @@
+{% set _guide_points = phase5_guide_points if phase5_guide_points is defined else [] %}
+<style>
+.phase5-guide{display:grid;gap:14px;margin-bottom:18px}
+.phase5-guide-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.10);border-radius:22px;box-shadow:0 14px 28px rgba(15,23,42,.06);padding:18px}
+.phase5-guide-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.phase5-guide-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:900}
+.phase5-guide-title{margin:10px 0 6px;color:#111827;font-size:1.02rem;font-weight:900}
+.phase5-guide-text{margin:0;color:#6b7280;font-size:.9rem;line-height:1.8}
+.phase5-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.phase5-guide-item{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px}
+.phase5-guide-item strong{display:block;color:#111827;font-size:.85rem;margin-bottom:6px}
+.phase5-guide-item span{display:block;color:#6b7280;font-size:.8rem;line-height:1.65}
+.phase5-guide-note{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:13px 14px;border-radius:16px;background:rgba(248,250,252,.96);border:1px solid rgba(15,23,42,.06);color:#374151;font-size:.84rem;line-height:1.7}
+@media (max-width: 1100px){.phase5-guide-grid{grid-template-columns:1fr}}
+</style>
+<div class="phase5-guide">
+    <div class="phase5-guide-card">
+        <div class="phase5-guide-head">
+            <div>
+                <span class="phase5-guide-kicker"><i class="fa-solid fa-circle-info"></i> Canlı kullanım notu</span>
+                <h3 class="phase5-guide-title">{{ phase5_guide_title }}</h3>
+                <p class="phase5-guide-text">{{ phase5_guide_text }}</p>
+            </div>
+        </div>
+        {% if _guide_points %}
+        <div class="phase5-guide-grid">
+            {% for item in _guide_points %}
+            <div class="phase5-guide-item">
+                <strong>{{ item.title }}</strong>
+                <span>{{ item.text }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if phase5_guide_note is defined and phase5_guide_note %}
+        <div class="phase5-guide-note"><i class="fa-solid fa-shield-heart" style="margin-top:2px;color:#8B0000;"></i><div>{{ phase5_guide_note }}</div></div>
+        {% endif %}
+    </div>
+</div>

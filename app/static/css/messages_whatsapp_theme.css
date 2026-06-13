@@ -1,0 +1,499 @@
+/* =========================================================
+   BYS360 - Mesajlar: WhatsApp Tarzı Tema v2 (GÜVENLİ)
+   
+   Felsefe:
+   - Mobilde LAYOUT'a dokunmaz (pointer-events, display, position yok)
+   - Sadece renk, şekil, font boyutu override eder
+   - Mevcut messages_whatsapp_mobile.css mobil yapıyı kuruyor - biz üzerine tema koyuyoruz
+   - Desktop'ta daha zengin override (desktop'ta sorun yoktu)
+   ========================================================= */
+
+:root{
+  --wat-brand:#8B0000;
+  --wat-brand-dark:#6f0000;
+  --wat-bubble-mine:#e7c9c9;
+  --wat-bubble-theirs:#ffffff;
+  --wat-chat-bg:#ece5dd;
+  --wat-chat-pattern:rgba(139,0,0,.035);
+  --wat-list-bg:#f6f1ee;
+  --wat-header-bg:#f3ece8;
+  --wat-border:#e1d2cb;
+  --wat-text:#111b21;
+  --wat-text-soft:#667781;
+  --wat-tick:#8a7a7a;
+  --wat-tick-read:#1f7a1f;
+}
+
+/* =========================================================
+   1) ORTAK - Tarih ayracı + tik (her iki taraf)
+   ========================================================= */
+
+.wa-date-divider{
+  display:flex;
+  justify-content:center;
+  margin:14px 0 8px;
+  width:100%;
+}
+.wa-date-divider-inner{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:8px;
+  background:rgba(225,245,254,.92);
+  color:#3c5c6e;
+  font-size:.74rem;
+  font-weight:700;
+  box-shadow:0 1px 1px rgba(17,27,33,.08);
+  letter-spacing:.02em;
+}
+
+.wa-time-inline{
+  font-size:inherit;
+  color:inherit;
+  margin-right:2px;
+}
+.wa-tick{
+  display:inline-flex;
+  align-items:center;
+  font-size:.85em;
+  line-height:1;
+  margin-left:2px;
+  color:var(--wat-tick);
+  letter-spacing:-1px;
+}
+.wa-tick.read{ color:var(--wat-tick-read); }
+
+/* Mobil için tarih ayracı küçülsün */
+@media (max-width: 767.98px){
+  .wa-date-divider{ margin:10px 0 6px; }
+  .wa-date-divider-inner{ font-size:.7rem; padding:4px 10px; }
+}
+
+/* =========================================================
+   2) DESKTOP - TAM WHATSAPP GÖRÜNÜM
+   Sadece geniş ekranda (> 767px) uygulanır
+   Mobilde mevcut messages_whatsapp_mobile.css yapıyı koruyor
+   ========================================================= */
+
+@media (min-width: 768px){
+
+  /* Sohbet arkaplanı */
+  .wa-main,
+  .chat-main{
+    background:var(--wat-chat-bg) !important;
+    background-image:
+      radial-gradient(var(--wat-chat-pattern) 1px, transparent 1px),
+      radial-gradient(var(--wat-chat-pattern) 1px, transparent 1px) !important;
+    background-size:22px 22px, 22px 22px !important;
+    background-position:0 0, 11px 11px !important;
+  }
+
+  /* Mesaj alanı */
+  .wa-messages,
+  .chat-messages,
+  #chatMessages{
+    padding:16px 18px;
+    gap:3px;
+  }
+
+  /* Balon - karşı taraf (beyaz) */
+  .wa-bubble,
+  .chat-bubble{
+    max-width:min(68%, 560px);
+    padding:6px 10px 8px 12px;
+    border-radius:8px;
+    background:var(--wat-bubble-theirs);
+    border:none;
+    box-shadow:0 1px 2px rgba(17,27,33,.1);
+    position:relative;
+  }
+
+  /* Balon - benim mesajım (açık bordo) */
+  .wa-row.mine .wa-bubble,
+  .chat-row.mine .chat-bubble{
+    background:var(--wat-bubble-mine);
+    border:none;
+  }
+
+  /* Balon kuyruğu - karşı taraf */
+  .wa-row:not(.mine) .wa-bubble::before,
+  .chat-row:not(.mine) .chat-bubble::before{
+    content:"";
+    position:absolute;
+    top:0; left:-7px;
+    width:11px; height:12px;
+    background:var(--wat-bubble-theirs);
+    clip-path:polygon(100% 0, 100% 100%, 0 0);
+  }
+
+  /* Balon kuyruğu - benim */
+  .wa-row.mine .wa-bubble::before,
+  .chat-row.mine .chat-bubble::before{
+    content:"";
+    position:absolute;
+    top:0; right:-7px;
+    width:11px; height:12px;
+    background:var(--wat-bubble-mine);
+    clip-path:polygon(0 0, 100% 0, 0 100%);
+  }
+
+  /* Yazar adı */
+  .wa-author,
+  .chat-author{
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--wat-brand);
+    margin:0 0 2px;
+  }
+  .wa-row.mine .wa-author,
+  .chat-row.mine .chat-author{ display:none; }
+
+  /* Mesaj metni */
+  .wa-text,
+  .chat-text{
+    color:var(--wat-text);
+    font-size:.92rem;
+    line-height:1.42;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
+  /* Saat + tik - alt sağ */
+  .wa-meta,
+  .chat-meta{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    float:right;
+    margin:-2px 0 -4px 8px;
+    padding:0;
+    font-size:.68rem;
+    color:var(--wat-text-soft);
+    font-weight:500;
+    line-height:1;
+    position:relative;
+    top:6px;
+  }
+  .wa-row.mine .wa-meta,
+  .chat-row.mine .chat-meta{ color:#5d2525; }
+
+  /* Mini butonlar (düzenle/sil) */
+  .wa-mini-actions,
+  .chat-row .chat-bubble > div[style*="justify-content:flex-end"]{
+    clear:both;
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+    margin-top:6px;
+  }
+  .wa-mini-btn,
+  .chat-mini-action{
+    min-height:26px;
+    padding:0 8px;
+    border-radius:6px;
+    font-size:.7rem;
+    font-weight:700;
+    background:rgba(0,0,0,.05);
+    border:none;
+    color:#444;
+  }
+  .wa-mini-btn.danger,
+  .chat-mini-action.danger{ color:#991b1b; }
+
+  /* Compose alanı */
+  .wa-compose,
+  .chat-compose{
+    padding:8px 12px;
+    background:var(--wat-header-bg);
+    border-top:none;
+  }
+
+  .wa-form,
+  .chat-form{
+    display:flex;
+    grid-template-columns:none;
+    gap:8px;
+    align-items:flex-end;
+  }
+
+  .wa-textarea,
+  .chat-textarea{
+    flex:1;
+    min-height:44px;
+    max-height:140px;
+    border-radius:22px;
+    border:none;
+    background:#fff;
+    padding:11px 16px;
+    font:inherit;
+    font-size:.95rem;
+    line-height:1.4;
+    color:var(--wat-text);
+    outline:none;
+    box-shadow:0 1px 2px rgba(17,27,33,.08);
+    resize:none;
+  }
+  .wa-textarea:focus,
+  .chat-textarea:focus{
+    box-shadow:0 1px 2px rgba(17,27,33,.08), 0 0 0 2px rgba(139,0,0,.15);
+  }
+
+  .wa-send,
+  .chat-send{
+    flex-shrink:0;
+    width:44px;
+    min-width:44px;
+    height:44px;
+    min-height:44px;
+    padding:0;
+    border-radius:50%;
+    background:linear-gradient(180deg, var(--wat-brand), var(--wat-brand-dark));
+    color:#fff;
+    border:none;
+    box-shadow:0 2px 6px rgba(139,0,0,.25);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wa-send:hover,
+  .chat-send:hover{ transform:scale(1.04); }
+
+  /* Inbox - sidebar */
+  .wa-sidebar{
+    background:var(--wat-list-bg) !important;
+    border-right:1px solid var(--wat-border);
+  }
+  .wa-sidebar-top{
+    background:var(--wat-header-bg) !important;
+    border-bottom:1px solid var(--wat-border);
+  }
+  .wa-thread-list{
+    padding:0;
+    gap:0;
+    background:var(--wat-list-bg);
+  }
+  .wa-thread-item{
+    padding:12px 16px;
+    border-radius:0;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid rgba(139,0,0,.06);
+    gap:12px;
+    align-items:center;
+  }
+  .wa-thread-item:hover{
+    background:rgba(139,0,0,.04);
+    transform:none;
+  }
+  .wa-thread-item.active{
+    background:rgba(139,0,0,.08);
+    box-shadow:inset 3px 0 0 var(--wat-brand);
+  }
+
+  /* YUVARLAK avatar */
+  .wa-avatar{
+    width:50px; height:50px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--wat-brand), var(--wat-brand-dark));
+    color:#fff;
+    font-size:1rem;
+    font-weight:700;
+    box-shadow:0 2px 6px rgba(139,0,0,.18);
+  }
+
+  .wa-thread-name{
+    font-weight:600;
+    color:var(--wat-text);
+  }
+  .wa-thread-time{
+    font-size:.72rem;
+    color:var(--wat-text-soft);
+  }
+  .wa-thread-snippet{
+    color:var(--wat-text-soft);
+    font-size:.84rem;
+    line-height:1.35;
+    -webkit-line-clamp:1;
+  }
+
+  /* Unread rozet - bordo yuvarlak */
+  .wa-unread{
+    min-width:20px;
+    height:20px;
+    padding:0 6px;
+    border-radius:10px;
+    background:var(--wat-brand);
+    font-size:.7rem;
+  }
+
+  /* Main head - sohbet üstü */
+  .wa-main-head,
+  .chat-main-head{
+    padding:10px 16px;
+    background:var(--wat-header-bg) !important;
+    border-bottom:1px solid var(--wat-border);
+    backdrop-filter:none !important;
+  }
+  .wa-main-avatar,
+  .chat-main-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--wat-brand), var(--wat-brand-dark));
+  }
+  .wa-main-name,
+  .chat-main-name{
+    font-weight:600;
+    color:var(--wat-text);
+  }
+  .wa-main-sub,
+  .chat-main-sub{
+    color:var(--wat-text-soft);
+  }
+
+  /* Üstteki ekstra süsler - gereksizse gizlensin */
+  .wa-status-list,
+  .wa-presence-line,
+  .wa-status-strip,
+  .wa-quick-reactions{ display:none !important; }
+}
+
+/* =========================================================
+   3) DESKTOP - Chat shell görünümü (konuşma ekranı)
+   ========================================================= */
+
+@media (min-width: 1101px){
+  .chat-shell{
+    grid-template-columns:340px minmax(0,1fr);
+    gap:0;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--wat-border);
+    box-shadow:0 8px 24px rgba(17,27,33,.08);
+    background:#fff;
+  }
+  .chat-side{
+    border-right:1px solid var(--wat-border);
+    background:var(--wat-list-bg) !important;
+    border-radius:0 !important;
+  }
+  .chat-main{ border-radius:0 !important; }
+  .chat-card{
+    border:none !important;
+    box-shadow:none !important;
+    border-radius:0 !important;
+  }
+  .chat-side-head{
+    background:var(--wat-header-bg) !important;
+    border-bottom:1px solid var(--wat-border);
+  }
+}
+
+/* =========================================================
+   4) MOBİL - SADECE RENK VE TİPOGRAFİ
+   Layout (pointer-events, display, position) asla dokunma!
+   ========================================================= */
+
+@media (max-width: 767.98px){
+
+  /* Balon renkleri - WhatsApp tonlarına çevir */
+  #messageShell .wa-row.mine .wa-bubble,
+  .chat-row.mine .chat-bubble{
+    background:var(--wat-bubble-mine) !important;
+  }
+  #messageShell .wa-row:not(.mine) .wa-bubble,
+  .chat-row:not(.mine) .chat-bubble{
+    background:var(--wat-bubble-theirs) !important;
+  }
+
+  /* Mesaj metni rengi */
+  #messageShell .wa-text,
+  .chat-text{
+    color:var(--wat-text) !important;
+  }
+
+  /* Yazar adı - karşı tarafta göster, benim mesajımda gizle (zaten gizli) */
+  .wa-row:not(.mine) .wa-author,
+  .chat-row:not(.mine) .chat-author{
+    display:block !important;
+    font-size:.72rem !important;
+    font-weight:700 !important;
+    color:var(--wat-brand) !important;
+    margin:0 0 2px !important;
+  }
+
+  /* Meta - float yapmadan, satır içi sade */
+  #messageShell .wa-meta,
+  .chat-meta{
+    font-size:.65rem !important;
+    color:var(--wat-text-soft) !important;
+    gap:3px !important;
+  }
+  .wa-row.mine .wa-meta,
+  .chat-row.mine .chat-meta{
+    color:#5d2525 !important;
+  }
+
+  /* Sohbet listesi - avatar yuvarlak ve renk */
+  #messageShell .wa-avatar{
+    border-radius:50% !important;
+    background:linear-gradient(135deg, var(--wat-brand), var(--wat-brand-dark)) !important;
+  }
+  #messageShell .wa-unread{
+    background:var(--wat-brand) !important;
+    border-radius:10px !important;
+  }
+
+  /* Üst header ve compose arkaplan - WhatsApp tonu */
+  #messageShell .wa-main-head,
+  .chat-main-head{
+    background:var(--wat-header-bg) !important;
+  }
+  #messageShell .wa-compose,
+  .chat-compose{
+    background:var(--wat-header-bg) !important;
+  }
+  #messageShell .wa-sidebar-top{
+    background:var(--wat-header-bg) !important;
+  }
+  #messageShell .wa-sidebar,
+  #messageShell .wa-thread-list{
+    background:var(--wat-list-bg) !important;
+  }
+
+  /* Chat arkaplanı doodle */
+  #messageShell .wa-main,
+  .chat-main{
+    background-color:var(--wat-chat-bg) !important;
+  }
+
+  /* Gönder butonu bordo yuvarlak - mevcut CSS zaten yaptı ama rengini garanti edelim */
+  #messageShell .wa-send,
+  .chat-send{
+    background:linear-gradient(180deg, var(--wat-brand), var(--wat-brand-dark)) !important;
+    color:#fff !important;
+  }
+
+  /* Textarea iOS zoom engeli */
+  #messageShell textarea.wa-input,
+  #messageShell .wa-textarea,
+  .chat-textarea,
+  #threadMessageBody{
+    font-size:16px !important;
+  }
+}
+
+/* =========================================================
+   5) İNCE KAYDIRMA ÇUBUĞU (desktop)
+   ========================================================= */
+
+@media (min-width: 768px){
+  .wa-messages::-webkit-scrollbar,
+  .chat-messages::-webkit-scrollbar,
+  .wa-thread-list::-webkit-scrollbar{ width:6px; }
+  .wa-messages::-webkit-scrollbar-thumb,
+  .chat-messages::-webkit-scrollbar-thumb,
+  .wa-thread-list::-webkit-scrollbar-thumb{
+    background:rgba(139,0,0,.18);
+    border-radius:3px;
+  }
+}

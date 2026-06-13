@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Basında Tarihi Alan - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Portal{% endblock %}
+{% block page_title %}Basında Tarihi Alan{% endblock %}
+{% block page_subtitle %}Haber adayları yetkili onayından sonra portalda paylaşılır.{% endblock %}
+{% block extra_head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v3a_press_news.css') }}?v=3a2">
+{% endblock %}
+{% block content %}
+{% set review = press_news_review if press_news_review is defined and press_news_review else {} %}
+{% set health = review.last_health if review.last_health is defined and review.last_health else {} %}
+<div class="press-news-review-v3a press-news-review-v3a2">
+  <section class="press-news-review-hero">
+    <div>
+      <span>Basında Tarihi Alan</span>
+      <h1>Haber Adayları</h1>
+      <p>Bu ekrandaki kayıtlar otomatik yayınlanmaz. Yetkili kullanıcı onayladıktan sonra portal gönderisine dönüşür.</p>
+      <small>Son tarama: {{ review.last_scan_at or 'Henüz tarama yapılmadı' }}</small>
+    </div>
+    <form method="post" action="{{ url_for('main.portal_press_news_scan_now') }}">
+      <button type="submit"><i class="fa-solid fa-rotate"></i> Şimdi Tara</button>
+    </form>
+  </section>
+
+  <section class="press-news-health-grid-v3a2">
+    <article><span>Yeni Aday</span><b>{{ health.added|default(0) }}</b></article>
+    <article><span>Benzer Birleşti</span><b>{{ health.duplicates_merged|default(0) }}</b></article>
+    <article><span>Elenen</span><b>{{ health.rejected|default(0) }}</b></article>
+    <article><span>İnceleme Gerekli</span><b>{{ health.risk_candidates|default(0) }}</b></article>
+  </section>
+
+  <section class="press-news-policy-box">
+    <i class="fa-solid fa-shield-halved"></i>
+    <div>
+      <b>Yayın güvenliği</b>
+      <p>Haber metni ve görseli kopyalanmaz. Portal paylaşımında kısa bilgi ve kaynak bağlantısı kullanılır. V3A2 filtresi konu alakasını, kaynak güvenini, riskli kelimeleri ve benzer haberleri kontrol eder.</p>
+    </div>
+  </section>
+
+  <section class="press-news-list-section">
+    <div class="press-news-section-head">
+      <h2>Onay Bekleyen Haberler</h2>
+      <small class="press-news-order-note-v3b8">En yeni haberler üstte gösterilir.</small>
+      <span>{{ (review.items_new or [])|length }} kayıt</span>
+    </div>
+    {% if review.items_new %}
+      <div class="press-news-candidate-list">
+        {% for item in review.items_new %}
+          <article class="press-news-candidate-card risk-{{ item.risk_level|default('Normal', true)|replace(' ', '-')|lower }}">
+            <div class="press-news-candidate-main">
+              <div class="press-news-candidate-top">
+                <span>{{ item.source }}</span>
+                <em>{{ item.risk_level }}</em>
+              </div>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.summary or 'Kısa özet bulunamadı. Kaynak bağlantısından kontrol ediniz.' }}</p>
+              <div class="press-news-v3a2-tags">
+                <span>Alaka: {{ item.relevance_score|default(0) }}</span>
+                <span>Kaynak: {{ item.source_score|default(0) }}</span>
+                {% if item.duplicate_sources %}<span>{{ item.duplicate_sources|length }} benzer kaynak</span>{% endif %}
+              </div>
+              {% if item.filter_notes %}
+                <ul class="press-news-v3a2-notes">
+                  {% for note in item.filter_notes[:3] %}<li>{{ note }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+              <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">Kaynağı aç</a>
+              <small>Arama: {{ item.query }}{% if item.published_at_text %} · {{ item.published_at_text }}{% endif %}</small>
+            </div>
+            <div class="press-news-candidate-actions">
+              <form method="post" action="{{ url_for('main.portal_press_news_publish', candidate_id=item.id) }}">
+                <button class="publish" type="submit"><i class="fa-solid fa-check"></i> Portalda Yayınla</button>
+              </form>
+              <form method="post" action="{{ url_for('main.portal_press_news_archive', candidate_id=item.id) }}">
+                <button class="archive" type="submit"><i class="fa-solid fa-box-archive"></i> Arşivle</button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="press-news-empty">Onay bekleyen haber adayı bulunmuyor.</div>
+    {% endif %}
+  </section>
+
+  <section class="press-news-history-grid">
+    <div>
+      <h2>Yayınlananlar</h2>
+      {% for item in review.items_published or [] %}
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+      {% else %}
+        <p>Henüz yayınlanan haber yok.</p>
+      {% endfor %}
+    </div>
+    <div>
+      <h2>Son Elenenler</h2>
+      {% for item in review.last_rejected or [] %}
+        <span>{{ item.title }}{% if item.reason %} — {{ item.reason }}{% endif %}</span>
+      {% else %}
+        <p>Son taramada elenen haber bulunmuyor.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

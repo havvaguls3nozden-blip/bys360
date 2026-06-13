@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% block title %}Bildirim Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Genel{% endblock %}
+{% block page_title %}Bildirim Merkezi{% endblock %}
+{% block page_subtitle %}Canlı omurgadaki destek, performans, anket ve sistem bildirimlerini tek ekranda izleyin.{% endblock %}
+{% block content %}
+<style>@import url("{{ url_for('static', filename='css/faz3_communication_hr_mobile.css') }}");</style>
+<style>
+.notification-page{display:grid;gap:18px}
+.notification-card,.notification-hero,.notification-toolbar{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 16px 34px rgba(15,23,42,.06)}
+.notification-hero{padding:24px;display:grid;grid-template-columns:minmax(0,1.35fr) 320px;gap:18px;position:relative;overflow:hidden}
+.notification-hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.08), transparent 30%);pointer-events:none}
+.notification-hero>*{position:relative;z-index:1}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.78rem;font-weight:800}
+.hero-title{margin:14px 0 8px;font-size:1.3rem;font-weight:900;color:#1f2937}
+.hero-text{margin:0;color:#6b7280;line-height:1.8}
+.hero-list{margin:14px 0 0;padding-left:18px;color:#6b7280;line-height:1.8}
+.hero-side{display:grid;gap:12px}
+.side-panel{padding:16px;border-radius:18px;background:#faf7f7;border:1px solid rgba(139,0,0,.08)}
+.side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}
+.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.5}
+.stats-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.stat-box{padding:18px 16px}
+.stat-label{color:#6b7280;font-size:.77rem;font-weight:800;margin-bottom:10px}
+.stat-value{color:#111827;font-size:1.6rem;font-weight:900;line-height:1}
+.stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;line-height:1.6}
+.notification-toolbar{padding:18px}
+.toolbar-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap}
+.filter-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#4b5563;font-size:.8rem;font-weight:800;text-decoration:none}
+.filter-chip.active{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.18);color:#8B0000}
+.count-pill{display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;padding:0 8px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.72rem;font-weight:900}
+.filter-chip.active .count-pill{background:rgba(139,0,0,.14);color:#8B0000}
+.toolbar-search{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toolbar-search input{min-width:280px;min-height:42px;padding:0 14px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff}
+.btn-main,.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:14px;text-decoration:none;font-weight:800;border:none;cursor:pointer}
+.btn-main{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+.btn-soft{background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#374151}
+.toolbar-foot{margin-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800}
+.bulk-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.notification-list{display:grid;gap:14px}
+.notification-card{padding:18px;display:grid;grid-template-columns:42px minmax(0,1fr) 220px;gap:16px;transition:transform .16s ease, box-shadow .16s ease,border-color .16s ease}
+.notification-card:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(15,23,42,.08)}
+.notification-card.unread{background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(255,255,255,.98));border-color:rgba(139,0,0,.12)}
+.notification-select{padding-top:6px;display:flex;justify-content:center}
+.notification-select input{width:18px;height:18px;accent-color:#8B0000}
+.notification-top{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.notification-title{margin:0;color:#111827;font-size:1rem;font-weight:900;line-height:1.5}
+.notification-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.72rem;font-weight:900}
+.notification-pill.unread{background:rgba(139,0,0,.08);color:#8B0000}
+.notification-pill.priority{background:rgba(202,138,4,.15);color:#a16207}
+.notification-body{margin:10px 0 0;color:#6b7280;line-height:1.8;font-size:.9rem}
+.notification-meta{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;color:#6b7280;font-size:.78rem;font-weight:700}
+.notification-note{margin-top:12px;padding:12px 14px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.83rem;line-height:1.7}
+.notification-side{display:grid;gap:10px;align-content:start}
+.side-box{padding:14px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#faf7f7}
+.side-box-label{color:#6b7280;font-size:.74rem;font-weight:800;margin-bottom:6px}
+.side-box-value{color:#111827;font-size:.88rem;font-weight:900;line-height:1.55}
+.action-hata ayrıntısı{display:grid;gap:10px}
+.empty-box{padding:36px 22px;border-radius:20px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;text-align:center;color:#6b7280}
+.empty-box i{font-size:2rem;color:#8B0000;margin-bottom:10px}
+.inline-empty{display:none;padding:16px 18px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280}
+@media (max-width:1200px){.notification-hero{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.notification-card{grid-template-columns:1fr}}
+@media (max-width:768px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar-search input{min-width:0;width:100%}.btn-main,.btn-soft{width:100%}.notification-card{padding:16px}.notification-select{justify-content:flex-start;padding-top:0}}
+</style>
+
+{% set current_view = current_view or 'all' %}
+{% set source_label_map = {
+    'support_ticket': 'Yardım Merkezi / Destek',
+    'feedback_request': 'Performans Geri Bildirim',
+    'feedback_meeting': 'Geri Bildirim Görüşmesi',
+    'feedback_digest': 'Yönetici Özeti',
+    'system_published': 'Performans Yayını',
+    'survey': 'Anket Yönetimi',
+    'message_thread': 'İletişim',
+    'communication_bulletin': 'Duyuru',
+    'education_video': 'Eğitim',
+    'education_video_campaign': 'Eğitim Kampanyası',
+    'portal_post': 'Portal',
+    'portal_comment': 'Portal',
+    'portal_group': 'Portal Grupları',
+    'portal_headline': 'Portal Üst Alan',
+    'portal_banner': 'Portal Banner',
+    'manual': 'Sistem Kaydı',
+    'seeded': 'Sistem Kaydı',
+    'rollback': 'Ayar Geri Alma',
+    'user_override': 'Kişisel Ayar',
+} %}
+
+{% set priority_label_map = {
+    'urgent': 'Acil',
+    'critical': 'Kritik',
+    'high': 'Yüksek',
+    'warning': 'Uyarı',
+    'medium': 'Orta',
+    'normal': 'Normal',
+    'low': 'Düşük',
+    'info': 'Bilgilendirme'
+} %}
+
+<div class="notification-page">
+    <section class="notification-hero">
+        <div>
+            <div class="hero-kicker"><i class="fa-solid fa-bell"></i> Canlı Bildirim Merkezi</div>
+            <h2 class="hero-title">Çalışan sistemde önemli uyarıları tek yerden takip edin</h2>
+            <p class="hero-text">Bu ekran artık canlı omurgaya göre sadeleştirildi. Yardım merkezi, performans süreçleri, anketler ve sistem kayıtları aynı listede toplanır; her kartta bildirimin hangi modülden geldiği ve tıklanınca nereye açılacağı görünür.</p>
+            <ul class="hero-list">
+                <li>Okunmamış kayıtlar üstte tutulur.</li>
+                <li>Öncelikli kayıtlar ayrı filtreyle ayıklanır.</li>
+                <li>Destek, performans, anket ve sistem ayrımı doğrudan ekranda görünür.</li>
+            </ul>
+        </div>
+        <div class="hero-side">
+            <div class="side-panel">
+                <div class="side-label">Bugünkü görünüm</div>
+                <div class="side-value">{{ visible_notification_count }} kayıt açık filtrede görünüyor.</div>
+            </div>
+            <div class="side-panel">
+                <div class="side-label">İş akışı notu</div>
+                <div class="side-value">Bildirim kartındaki “Aç” düğmesi varsa ilgili ekranı açar; yoksa kayıt bilgi amaçlı tutulur.</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-grid">
+        <article class="notification-card stat-box"><div><div class="stat-label">Toplam</div><div class="stat-value">{{ filter_counts.get('all', notifications|length) }}</div><div class="stat-sub">Bu kullanıcı için oluşan bütün bildirimler.</div></div></article>
+        <article class="notification-card stat-box"><div><div class="stat-label">Okunmamış</div><div class="stat-value">{{ unread_count }}</div><div class="stat-sub">Henüz görülmeyen kayıtlar.</div></div></article>
+        <article class="notification-card stat-box"><div><div class="stat-label">Öncelikli</div><div class="stat-value">{{ priority_count }}</div><div class="stat-sub">Uyarı veya yüksek öncelik işaretli kayıtlar.</div></div></article>
+        <article class="notification-card stat-box"><div><div class="stat-label">Destek</div><div class="stat-value">{{ filter_counts.get('support', 0) }}</div><div class="stat-sub">Yardım merkezi ve destek hareketleri.</div></div></article>
+        <article class="notification-card stat-box"><div><div class="stat-label">Performans</div><div class="stat-value">{{ filter_counts.get('performance', 0) }}</div><div class="stat-sub">Geri bildirim, yayın ve değerlendirme akışı.</div></div></article>
+        <article class="notification-card stat-box"><div><div class="stat-label">Bugün</div><div class="stat-value">{{ today_count }}</div><div class="stat-sub">Bugün üretilen kayıtlar.</div></div></article>
+    </section>
+
+    <section class="notification-toolbar">
+        <div class="toolbar-top">
+            <div class="filter-row">
+                {% set filter_items = [
+                    ('all', 'Tümü', 'fa-solid fa-inbox'),
+                    ('unread', 'Okunmamış', 'fa-solid fa-envelope-open-text'),
+                    ('read', 'Okunmuş', 'fa-solid fa-envelope-open'),
+                    ('priority', 'Öncelikli', 'fa-solid fa-triangle-exclamation'),
+                    ('support', 'Destek', 'fa-solid fa-life-ring'),
+                    ('performance', 'Performans', 'fa-solid fa-chart-line'),
+                    ('surveys', 'Anket', 'fa-solid fa-clipboard-question'),
+                    ('system', 'Sistem', 'fa-solid fa-gear')
+                ] %}
+                {% for key, label, icon in filter_items %}
+                <a class="filter-chip {% if current_view == key %}active{% endif %}" href="{{ url_for('main.notifications_list', view=key, q=search_query or None) }}">
+                    <i class="{{ icon }}"></i> {{ label }}
+                    <span class="count-pill">{{ filter_counts.get(key, 0) }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            <form class="toolbar-search" method="GET" action="{{ url_for('main.notifications_list') }}">
+                <input id="notifSearchInput" type="search" name="q" value="{{ search_query or '' }}" placeholder="Başlık, açıklama, modül ya da kaynak ara">
+                <input type="hidden" name="view" value="{{ current_view }}">
+                <button class="btn-main" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Ara</button>
+                <a class="btn-soft" href="{{ url_for('main.notifications_list', view=current_view) }}"><i class="fa-solid fa-rotate-left"></i> Temizle</a>
+            </form>
+        </div>
+        <div class="toolbar-foot">
+            <div id="notifVisibleCounter">{{ visible_notification_count }} bildirim gösteriliyor.</div>
+            <div class="bulk-bar">
+                <button type="button" class="btn-soft" id="notifSelectAllBtn"><i class="fa-solid fa-check-double"></i> Görünenleri Seç</button>
+                <button type="button" class="btn-soft" id="notifClearSelectionBtn"><i class="fa-solid fa-xmark"></i> Temizle</button>
+                <span id="notifSelectedCounter">0 bildirim seçili</span>
+                <form method="POST" action="{{ url_for('main.notifications_mark_all_read') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="current_view" value="{{ current_view }}">
+                    {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                    <button class="btn-soft" type="submit"><i class="fa-solid fa-envelope-open"></i> Tümünü Okundu Yap</button>
+                </form>
+            </div>
+        </div>
+        <div class="bulk-bar" style="margin-top:14px;">
+            <form method="POST" action="{{ url_for('main.notifications_bulk_mark_read') }}" id="bulkReadForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="current_view" value="{{ current_view }}">
+                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                <div id="notifBulkReadFields"></div>
+                <button class="btn-soft" type="submit" id="notifBulkReadBtn"><i class="fa-solid fa-check"></i> Seçilenleri Okundu Yap</button>
+            </form>
+            <form method="POST" action="{{ url_for('main.notifications_bulk_mark_unread') }}" id="bulkUnreadForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="current_view" value="{{ current_view }}">
+                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                <div id="notifBulkUnreadFields"></div>
+                <button class="btn-soft" type="submit" id="notifBulkUnreadBtn"><i class="fa-solid fa-envelope"></i> Seçilenleri Okunmamış Yap</button>
+            </form>
+            <form method="POST" action="{{ url_for('main.notifications_bulk_delete') }}" id="bulkDeleteForm" onsubmit="return confirm('Seçilen bildirimler kaldırılacak. Devam edilsin mi?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="current_view" value="{{ current_view }}">
+                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                <div id="notifBulkDeleteFields"></div>
+                <button class="btn-soft" type="submit" id="notifBulkDeleteBtn"><i class="fa-solid fa-trash-can"></i> Seçilenleri Kaldır</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="notification-list" id="notificationList">
+        {% if notifications %}
+            {% for notification in notifications %}
+                {% set source_key = (notification.source_type or '')|lower %}
+                {% set type_key = (notification.notification_type or '')|lower %}
+                {% set source_label = source_label_map.get(source_key) %}
+                {% if not source_label %}
+                    {% if 'support' in source_key or 'ticket' in source_key or type_key == 'support' %}
+                        {% set source_label = 'Yardım Merkezi / Destek' %}
+                    {% elif type_key.startswith('performance_') or source_key.startswith('feedback_') or source_key in ['feedback_digest', 'system_published'] %}
+                        {% set source_label = 'Performans Yönetimi' %}
+                    {% elif type_key.startswith('survey') or source_key == 'survey' %}
+                        {% set source_label = 'Anket Yönetimi' %}
+                    {% elif 'message' in source_key or 'message' in type_key or 'announcement' in type_key %}
+                        {% set source_label = 'İletişim' %}
+                    {% elif 'portal' in source_key or 'portal' in type_key %}
+                        {% set source_label = 'Portal' %}
+                    {% else %}
+                        {% set source_label = 'Sistem Bildirimi' %}
+                    {% endif %}
+                {% endif %}
+                {% set target_label = 'Bağlantı bulunmuyor' %}
+                {% set link_value = (notification.link_url or '')|lower %}
+                {% if link_value %}
+                    {% if '/support' in link_value or '/help' in link_value %}
+                        {% set target_label = 'Yardım Merkezi ekranı' %}
+                    {% elif '/performance' in link_value %}
+                        {% set target_label = 'Performans ekranı' %}
+                    {% elif '/survey' in link_value %}
+                        {% set target_label = 'Anket ekranı' %}
+                    {% elif '/messages' in link_value %}
+                        {% set target_label = 'Mesaj ekranı' %}
+                    {% elif '/notifications' in link_value %}
+                        {% set target_label = 'Bildirim detayı' %}
+                    {% elif '/account' in link_value or '/settings' in link_value %}
+                        {% set target_label = 'Hesap / Ayarlar' %}
+                    {% else %}
+                        {% set target_label = 'Bağlantılı kayıt ekranı' %}
+                    {% endif %}
+                {% endif %}
+                {% set search_blob = ((notification.title or '') ~ ' ' ~ (notification.body or '') ~ ' ' ~ (notification.notification_type or '') ~ ' ' ~ (notification.source_type or '') ~ ' ' ~ source_label ~ ' ' ~ target_label)|lower %}
+                <article class="notification-card {% if not notification.is_read %}unread{% endif %}" data-search="{{ search_blob }}">
+                    <div class="notification-select">
+                        <input class="notif-bulk-checkbox" type="checkbox" value="{{ notification.id }}" data-is-read="{{ 1 if notification.is_read else 0 }}" aria-label="{{ notification.title }} kaydını seç">
+                    </div>
+                    <div>
+                        <div class="notification-top">
+                            <h3 class="notification-title">{{ notification.title }}</h3>
+                            {% if not notification.is_read %}<span class="notification-pill unread">Yeni</span>{% endif %}
+                            {% if notification.notification_type %}<span class="notification-pill">{{ notification.notification_type }}</span>{% endif %}
+                            {% set priority_key = (notification.priority or '')|lower %}{% if priority_key in ['high', 'urgent', 'warning', 'critical'] %}<span class="notification-pill priority">{{ priority_label_map.get(priority_key, notification.priority) }}</span>{% endif %}
+                        </div>
+                        <p class="notification-body">{{ notification.body or 'Bu kayıt için açıklama bulunmuyor.' }}</p>
+                        <div class="notification-meta">
+                            <span><i class="fa-regular fa-clock"></i> {{ notification.created_at.strftime('%d.%m.%Y %H:%M') if notification.created_at else '-' }}</span>
+                            <span><i class="fa-solid fa-layer-group"></i> {{ source_label }}</span>
+                            {% if notification.source_id %}<span><i class="fa-solid fa-hashtag"></i> Kayıt #{{ notification.source_id }}</span>{% endif %}
+                        </div>
+                        <div class="notification-note">
+                            {% if not notification.is_read %}Bu kayıt henüz okunmadı.{% else %}Bu kayıt daha önce görüntülendi.{% endif %}
+                            {% if notification.link_url %} Karttaki Aç düğmesi ilgili ekrana gider.{% else %} Bu kayıt bilgi amaçlı tutuluyor; doğrudan hedef ekran tanımlı değil.{% endif %}
+                        </div>
+                    </div>
+                    <div class="notification-side">
+                        <div class="side-box">
+                            <div class="side-box-label">Geldiği Modül</div>
+                            <div class="side-box-value">{{ source_label }}</div>
+                        </div>
+                        <div class="side-box">
+                            <div class="side-box-label">Açılacak Yer</div>
+                            <div class="side-box-value">{{ target_label }}</div>
+                        </div>
+                        <div class="action-stack">
+                            {% if notification.link_url %}
+                            <a href="{{ notification.link_url }}" class="btn-soft notification-action-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Aç</a>
+                            {% endif %}
+                            {% if not notification.is_read %}
+                            <form method="POST" action="{{ url_for('main.notifications_mark_read', notification_id=notification.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="current_view" value="{{ current_view }}">
+                                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                                <button class="btn-soft" type="submit"><i class="fa-solid fa-check"></i> Okundu Yap</button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('main.notifications_mark_unread', notification_id=notification.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="current_view" value="{{ current_view }}">
+                                {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                                <button class="btn-soft" type="submit"><i class="fa-solid fa-envelope"></i> Okunmamış Yap</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+            <div class="inline-empty" id="notifInlineEmpty"><i class="fa-solid fa-magnifying-glass"></i> Bu arama ile eşleşen bildirim görünmüyor.</div>
+        {% else %}
+            <div class="empty-box">
+                <i class="fa-solid fa-bell-slash"></i>
+                <h5 style="margin:0;color:#111827;font-size:1rem;font-weight:900;">Bildirim görünmüyor</h5>
+                <p style="margin:0;line-height:1.8;">Bu görünümde henüz listelenecek bir kayıt yok.</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+(function(){
+    const input = document.getElementById('notifSearchInput');
+    const cards = Array.from(document.querySelectorAll('.notification-card[data-search]'));
+    const inlineEmpty = document.getElementById('notifInlineEmpty');
+    const counter = document.getElementById('notifVisibleCounter');
+    const bulkDeleteFields = document.getElementById('notifBulkDeleteFields');
+    const bulkReadFields = document.getElementById('notifBulkReadFields');
+    const bulkUnreadFields = document.getElementById('notifBulkUnreadFields');
+    const selectAllBtn = document.getElementById('notifSelectAllBtn');
+    const clearSelectionBtn = document.getElementById('notifClearSelectionBtn');
+    const selectedCounter = document.getElementById('notifSelectedCounter');
+    const bulkDeleteBtn = document.getElementById('notifBulkDeleteBtn');
+    const bulkReadBtn = document.getElementById('notifBulkReadBtn');
+    const bulkUnreadBtn = document.getElementById('notifBulkUnreadBtn');
+    const bulkCheckboxes = Array.from(document.querySelectorAll('.notif-bulk-checkbox'));
+
+    function setDisabled(button, disabled){
+        if (!button) return;
+        button.disabled = !!disabled;
+        button.style.opacity = disabled ? '.55' : '';
+        button.style.cursor = disabled ? 'not-allowed' : '';
+    }
+    function visibleCards(){
+        return cards.filter(card => card.style.display !== 'none');
+    }
+    function selectedVisible(){
+        return bulkCheckboxes.filter(cb => cb.checked && cb.closest('.notification-card') && cb.closest('.notification-card').style.display !== 'none');
+    }
+    function syncFieldContainer(container){
+        if (!container) return;
+        container.innerHTML = '';
+        selectedVisible().forEach(cb => {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'notification_ids';
+            hidden.value = cb.value;
+            container.appendChild(hidden);
+        });
+    }
+    function syncSelection(){
+        const selected = selectedVisible();
+        const unreadCount = selected.filter(cb => cb.dataset.isRead === '0').length;
+        const readCount = selected.filter(cb => cb.dataset.isRead === '1').length;
+        syncFieldContainer(bulkDeleteFields);
+        syncFieldContainer(bulkReadFields);
+        syncFieldContainer(bulkUnreadFields);
+        if (selectedCounter) selectedCounter.textContent = `${selected.length} bildirim seçili`;
+        setDisabled(bulkDeleteBtn, selected.length === 0);
+        setDisabled(bulkReadBtn, unreadCount === 0);
+        setDisabled(bulkUnreadBtn, readCount === 0);
+    }
+    function syncCounter(){
+        const visible = visibleCards().length;
+        if (counter) counter.textContent = `${visible} bildirim gösteriliyor.`;
+        if (inlineEmpty) inlineEmpty.style.display = cards.length && visible === 0 ? 'block' : 'none';
+    }
+    function applySearch(){
+        const q = (input && input.value || '').trim().toLowerCase();
+        cards.forEach(card => {
+            const matches = !q || (card.dataset.search || '').includes(q);
+            card.style.display = matches ? '' : 'none';
+        });
+        syncCounter();
+        syncSelection();
+    }
+    if (input) {
+        input.addEventListener('input', applySearch);
+        document.addEventListener('keydown', function(event){
+            if (event.key === '/' && document.activeElement !== input && !event.target.matches('input, textarea, select')) {
+                event.preventDefault();
+                input.focus();
+            }
+        });
+    }
+    bulkCheckboxes.forEach(cb => cb.addEventListener('change', syncSelection));
+    if (selectAllBtn) selectAllBtn.addEventListener('click', function(){
+        bulkCheckboxes.forEach(cb => {
+            const card = cb.closest('.notification-card');
+            if (card && card.style.display !== 'none') cb.checked = true;
+        });
+        syncSelection();
+    });
+    if (clearSelectionBtn) clearSelectionBtn.addEventListener('click', function(){
+        bulkCheckboxes.forEach(cb => cb.checked = false);
+        syncSelection();
+    });
+    document.querySelectorAll('.notification-action-link').forEach(function(link){
+        link.addEventListener('click', function(){
+            link.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Açılıyor';
+        });
+    });
+    syncCounter();
+    syncSelection();
+})();
+</script>
+
+<script src="{{ url_for('static', filename='js/faz3_communication_hr_mobile.js') }}"></script>
+{% endblock %}

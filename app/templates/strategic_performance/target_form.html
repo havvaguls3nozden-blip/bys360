@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title|default('Yeni KPI / Hedef Oluştur') }} | BYS360{% endblock %}
+{% block content %}
+{% set target = target|default({}) %}
+{% set form_mode = form_mode|default('create') %}
+{% set is_edit = form_mode == 'edit' %}
+{% set page_title = page_title|default('KPI / Hedef Düzenle' if is_edit else 'Yeni KPI / Hedef Oluştur') %}
+{% set list_url = safe_url_for('strategic_performance.target_list', fallback='/performans/stratejik/hedefler') if safe_url_for is defined else '/performans/stratejik/hedefler' %}
+{% set dashboard_url = safe_url_for('strategic_performance.kpi_dashboard', fallback='/performans/stratejik/kpi-dashboard') if safe_url_for is defined else '/performans/stratejik/kpi-dashboard' %}
+
+<div class="page-shell sp3y-page">
+  <section class="sp3y-hero sp3y-glass">
+    <div>
+      <p class="sp3y-eyebrow">Stratejik Performans</p>
+      <h1>{{ page_title }}</h1>
+      <p class="sp3y-subtitle">Kurumsal hedefleri ölçülebilir, izlenebilir ve performans sürecine bağlanabilir şekilde tanımlayın. Bu form KPI Dashboardu ve yönetici analizlerinin temel veri kaynağıdır.</p>
+    </div>
+    <div class="sp3y-actions">
+      <a class="sp3y-btn sp3y-light" href="{{ list_url }}"><i class="fa-solid fa-arrow-left"></i> Listeye Dön</a>
+      <a class="sp3y-btn sp3y-primary" href="{{ dashboard_url }}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    </div>
+  </section>
+
+  <section class="sp3y-steps sp3y-glass">
+    <div class="sp3y-step active"><b>1</b><span>Hedef Kimliği</span></div>
+    <div class="sp3y-step"><b>2</b><span>Kapsam ve Sorumluluk</span></div>
+    <div class="sp3y-step"><b>3</b><span>Ölçüm ve Risk</span></div>
+    <div class="sp3y-step"><b>4</b><span>Kanıt ve Açıklama</span></div>
+  </section>
+
+  <form method="post" class="sp3y-layout">
+    {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+    <main class="sp3y-main">
+      <section class="sp3y-card sp3y-glass">
+        <div class="sp3y-head"><div><p class="sp3y-eyebrow">Hedef Kimliği</p><h2>Temel bilgiler</h2></div><span class="sp3y-badge">Zorunlu Alanlar</span></div>
+        <div class="sp3y-grid">
+          <label class="wide">Hedef Adı<input id="sp3yName" name="name" value="{{ target.name|default('') }}" placeholder="Örn. Ziyaretçi memnuniyet oranının artırılması" required></label>
+          <label>KPI / Hedef Kodu<input id="sp3yCode" name="code" value="{{ target.code|default('') }}" placeholder="KPI-2026-01"></label>
+          <label>Kategori<select id="sp3yCategory" name="category"><option value="kpi">KPI</option><option value="stratejik">Stratejik Hedef</option><option value="operasyon">Operasyonel Hedef</option><option value="gelisim">Gelişim Hedefi</option></select></label>
+          <label class="wide">Kısa Açıklama<textarea name="description" rows="4" placeholder="Hedefin amacı, beklenen çıktısı ve kurumsal karşılığını yazın.">{{ target.description|default('') }}</textarea></label>
+        </div>
+      </section>
+
+      <section class="sp3y-card sp3y-glass">
+        <div class="sp3y-head"><div><p class="sp3y-eyebrow">Kapsam ve Sorumluluk</p><h2>Hedefin sahibi</h2></div><span class="sp3y-badge">Kurumsal Bağlantı</span></div>
+        <div class="sp3y-grid">
+          <label>Kapsam<select id="sp3yScope" name="scope_type"><option value="kurumsal">Kurumsal</option><option value="birim">Birim</option><option value="personel">Personel</option></select></label>
+          <label>Sorumlu Birim / Sahip<input name="owner_name" value="{{ target.owner_name|default('') }}" placeholder="Örn. Eğitim ve Performans Çalışma Grubu"></label>
+          <label>Başlangıç Tarihi<input type="date" name="start_date" value="{{ target.start_date|default('') }}"></label>
+          <label>Bitiş Tarihi<input type="date" name="end_date" value="{{ target.end_date|default('') }}"></label>
+        </div>
+      </section>
+
+      <section class="sp3y-card sp3y-glass">
+        <div class="sp3y-head"><div><p class="sp3y-eyebrow">Ölçüm ve Risk</p><h2>Başarı nasıl ölçülecek?</h2></div><span class="sp3y-badge">KPI Motoru</span></div>
+        <div class="sp3y-grid">
+          <label>Hedef Değer<input id="sp3yTarget" type="number" step="0.01" name="target_value" value="{{ target.target_value|default('') }}" placeholder="100"></label>
+          <label>Gerçekleşen Değer<input id="sp3yActual" type="number" step="0.01" name="actual_value" value="{{ target.actual_value|default('') }}" placeholder="0"></label>
+          <label>Ağırlık<input type="number" step="0.01" name="weight" value="{{ target.weight|default('') }}" placeholder="Örn. 20"></label>
+          <label>Risk Seviyesi<select name="risk_level"><option value="dusuk">Düşük</option><option value="orta">Orta</option><option value="yuksek">Yüksek</option></select></label>
+          <label>Durum<select name="status"><option value="active">Aktif</option><option value="watch">Takip Edilmeli</option><option value="risk">Riskli</option><option value="completed">Tamamlandı</option></select></label>
+          <label>İzleme Sıklığı<select name="review_frequency"><option value="monthly">Aylık</option><option value="quarterly">Üç Aylık</option><option value="periodic">Dönemsel</option><option value="manual">İhtiyaç Oldukça</option></select></label>
+          <label class="wide">Ölçüm Yöntemi<textarea name="measurement_method" rows="4" placeholder="Hedefin hangi veri, rapor, belge veya sistem çıktısıyla ölçüleceğini yazın.">{{ target.measurement_method|default('') }}</textarea></label>
+        </div>
+      </section>
+
+      <section class="sp3y-card sp3y-glass">
+        <div class="sp3y-head"><div><p class="sp3y-eyebrow">Kanıt ve Açıklama</p><h2>Doğrulama bilgileri</h2></div><span class="sp3y-badge">Denetlenebilirlik</span></div>
+        <div class="sp3y-grid">
+          <label class="wide">Kanıt Kaynağı<input name="evidence_source" value="{{ target.evidence_source|default('') }}" placeholder="Örn. Anket raporu, faaliyet raporu, sistem kaydı, tutanak"></label>
+          <label class="wide">Yönetici Notu<textarea name="manager_note" rows="4" placeholder="Bu hedefin dönem içinde nasıl takip edileceğine ilişkin iç not girin.">{{ target.manager_note|default('') }}</textarea></label>
+        </div>
+      </section>
+    </main>
+
+    <aside class="sp3y-side">
+      <section class="sp3y-card sp3y-glass">
+        <p class="sp3y-eyebrow">Canlı Önizleme</p><h2 id="previewTitle">Yeni KPI / Hedef</h2>
+        <div class="sp3y-code" id="previewCode">KPI kodu bekleniyor</div>
+        <div class="sp3y-rate"><span>Gerçekleşme</span><b id="previewRate">%0</b></div>
+        <div class="sp3y-bar"><span id="previewBar"></span></div>
+        <div class="sp3y-mini"><div><span>Kapsam</span><b id="previewScope">Kurumsal</b></div><div><span>Kategori</span><b id="previewCategory">KPI</b></div></div>
+      </section>
+      <section class="sp3y-card sp3y-glass"><p class="sp3y-eyebrow">Kalite Kontrol</p><h2>İyi hedef kontrol listesi</h2><ul class="sp3y-check"><li>Hedef açık ve anlaşılır yazıldı.</li><li>Ölçüm yöntemi belirtildi.</li><li>Başlangıç ve bitiş tarihi tanımlandı.</li><li>Kanıt kaynağı denetlenebilir.</li></ul></section>
+      <section class="sp3y-note"><b>Not</b><p>Bu hedefler KPI Dashboardu, KPI Analiz Merkezi ve performans bağlantılı karar destek ekranlarında kullanılacaktır.</p></section>
+    </aside>
+
+    <section class="sp3y-submit sp3y-glass"><div><p class="sp3y-eyebrow">Gönderim</p><h2>{{ 'Hedef kartını güncelle' if is_edit else 'Hedef kartını oluştur' }}</h2><p>Kaydetmeden önce hedef adı, ölçüm yöntemi ve dönem bilgilerini kontrol edin.</p></div><div class="sp3y-actions"><a class="sp3y-btn sp3y-light" href="{{ list_url }}">Vazgeç</a><button type="submit" class="sp3y-btn sp3y-primary">{{ 'Güncelle' if is_edit else 'Kaydet' }}</button></div></section>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){const n=document.getElementById("sp3yName"),c=document.getElementById("sp3yCode"),t=document.getElementById("sp3yTarget"),a=document.getElementById("sp3yActual"),s=document.getElementById("sp3yScope"),g=document.getElementById("sp3yCategory"),pt=document.getElementById("previewTitle"),pc=document.getElementById("previewCode"),pr=document.getElementById("previewRate"),pb=document.getElementById("previewBar"),ps=document.getElementById("previewScope"),pg=document.getElementById("previewCategory");function label(x){return x&&x.selectedIndex>=0?x.options[x.selectedIndex].text:""}function u(){const tv=parseFloat(t&&t.value||"0")||0,av=parseFloat(a&&a.value||"0")||0,r=tv>0?Math.max(0,Math.min(150,av/tv*100)):0;if(pt)pt.textContent=n&&n.value.trim()||"Yeni KPI / Hedef";if(pc)pc.textContent=c&&c.value.trim()||"KPI kodu bekleniyor";if(pr)pr.textContent="%"+r.toFixed(1);if(pb)pb.style.width=Math.min(100,r)+"%";if(ps)ps.textContent=label(s)||"Kurumsal";if(pg)pg.textContent=label(g)||"KPI"} [n,c,t,a,s,g].forEach(x=>{if(x){x.addEventListener("input",u);x.addEventListener("change",u)}});u();});
+</script>
+
+<style>
+.sp3y-page{display:grid;gap:18px}.sp3y-hero{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:24px;border-radius:26px}.sp3y-glass{background:rgba(255,255,255,.86);border:1px solid rgba(139,0,0,.10);box-shadow:0 18px 45px rgba(15,23,42,.08);backdrop-filter:blur(10px)}.sp3y-eyebrow{margin:0 0 6px;text-transform:uppercase;letter-spacing:.07em;font-size:12px;font-weight:850;color:#8B0000}.sp3y-hero h1{margin:0;font-size:31px;letter-spacing:-.025em;color:#20242c}.sp3y-subtitle{margin:8px 0 0;color:#59606b;max-width:820px;line-height:1.6}.sp3y-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.sp3y-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;text-decoration:none;font-weight:850;border:0;cursor:pointer;white-space:nowrap}.sp3y-primary{background:#8B0000;color:#fff}.sp3y-light{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.18)}.sp3y-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px;border-radius:22px}.sp3y-step{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:rgba(139,0,0,.045);color:#48505c;font-weight:750}.sp3y-step b{width:28px;height:28px;border-radius:10px;display:grid;place-items:center;background:#fff;color:#8B0000}.sp3y-step.active{background:rgba(139,0,0,.10);color:#8B0000}.sp3y-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.sp3y-main{display:grid;gap:18px}.sp3y-side{display:grid;gap:14px;position:sticky;top:18px}.sp3y-card{border-radius:24px;padding:20px}.sp3y-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}.sp3y-head h2,.sp3y-card h2,.sp3y-submit h2{margin:0;font-size:20px;color:#20242c}.sp3y-badge{display:inline-flex;padding:8px 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:12px;font-weight:850}.sp3y-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.sp3y-grid label{display:grid;gap:7px;font-size:13px;font-weight:850;color:#344054}.sp3y-grid small{color:#7a8290;line-height:1.45}.wide{grid-column:1/-1}input,select,textarea{width:100%;border:1px solid rgba(15,23,42,.13);border-radius:15px;padding:12px 13px;background:#fff;outline:none;font:inherit}textarea{resize:vertical}input:focus,select:focus,textarea:focus{border-color:#8B0000;box-shadow:0 0 0 4px rgba(139,0,0,.08)}.sp3y-code{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:12px;font-weight:850;margin-bottom:16px}.sp3y-rate{display:flex;justify-content:space-between;color:#48505c;font-weight:800}.sp3y-bar{height:10px;border-radius:999px;background:#edf0f4;overflow:hidden;margin:10px 0 16px}.sp3y-bar span{display:block;height:100%;width:0;background:#8B0000;border-radius:999px;transition:width .2s}.sp3y-mini{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sp3y-mini div{padding:12px;border-radius:16px;background:rgba(139,0,0,.045);display:grid;gap:4px}.sp3y-mini span{font-size:12px;color:#667085;font-weight:800}.sp3y-check{padding-left:18px;margin:14px 0 0;display:grid;gap:10px;color:#48505c}.sp3y-note{padding:16px;border-radius:20px;background:rgba(139,0,0,.055);color:#344054;line-height:1.55;border:1px solid rgba(139,0,0,.08)}.sp3y-note p{margin:4px 0 0;color:#667085}.sp3y-submit{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:16px;border-radius:24px;padding:20px}.sp3y-submit p{margin:6px 0 0;color:#667085}@media(max-width:1180px){.sp3y-layout{grid-template-columns:1fr}.sp3y-side{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}.sp3y-note{grid-column:1/-1}}@media(max-width:800px){.sp3y-steps,.sp3y-grid,.sp3y-side{grid-template-columns:1fr}.wide{grid-column:auto}.sp3y-hero,.sp3y-submit{flex-direction:column;align-items:flex-start}}
+</style>
+{% endblock %}

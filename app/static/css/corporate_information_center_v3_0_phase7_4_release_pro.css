@@ -1,0 +1,428 @@
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_4_RELEASE_PRO_UI */
+/* Kurumsal Bilgilendirme Merkezi - Canlı Geçiş ekranı sade profesyonel arayüz */
+
+#release.cic-release-pro-panel,
+.cic-release-pro-panel {
+  --cic-red: #8B0000;
+  --cic-red-dark: #640000;
+  --cic-red-soft: rgba(139, 0, 0, .08);
+  --cic-ink: #1f2937;
+  --cic-muted: #64748b;
+  --cic-border: rgba(148, 163, 184, .30);
+  --cic-card: rgba(255,255,255,.92);
+  --cic-soft: #f8fafc;
+  --cic-ok: #0f766e;
+  --cic-warn: #b45309;
+  --cic-danger: #b91c1c;
+  position: relative;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.cic-release-pro-panel .cic-release-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(139,0,0,.14);
+  border-radius: 28px;
+  padding: 28px;
+  margin: 0 0 22px 0;
+  color: #fff;
+  background:
+    radial-gradient(circle at 88% 16%, rgba(255,255,255,.25) 0 0, transparent 260px),
+    linear-gradient(135deg, var(--cic-red-dark), var(--cic-red));
+  box-shadow: 0 22px 55px rgba(139, 0, 0, .22);
+}
+
+.cic-release-pro-panel .cic-release-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -80px -110px auto;
+  width: 270px;
+  height: 270px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  pointer-events: none;
+}
+
+.cic-release-pro-panel .cic-release-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,.30);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.12);
+}
+
+.cic-release-pro-panel .cic-release-title {
+  max-width: 980px;
+  margin: 14px 0 8px 0;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+
+.cic-release-pro-panel .cic-release-lead {
+  max-width: 880px;
+  margin: 0;
+  color: rgba(255,255,255,.86);
+  font-size: 15.5px;
+  line-height: 1.72;
+}
+
+.cic-release-pro-panel .cic-release-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.cic-release-pro-panel .cic-release-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.22);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cic-release-pro-panel .cic-release-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 22px 0;
+}
+
+.cic-release-pro-panel .cic-release-kpi {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 18px;
+  background: var(--cic-card);
+  border: 1px solid var(--cic-border);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, .07);
+  backdrop-filter: blur(12px);
+}
+
+.cic-release-pro-panel .cic-release-kpi::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: var(--cic-red);
+}
+
+.cic-release-pro-panel .cic-release-kpi-label {
+  color: var(--cic-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.cic-release-pro-panel .cic-release-kpi-value {
+  margin-top: 8px;
+  color: var(--cic-ink);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -.03em;
+}
+
+.cic-release-pro-panel .cic-release-kpi-note {
+  margin-top: 5px;
+  color: var(--cic-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.cic-release-pro-panel .cic-release-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, .75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.cic-release-pro-panel .cic-release-card,
+.cic-release-pro-panel .cic-release-side-card {
+  border-radius: 24px;
+  background: var(--cic-card);
+  border: 1px solid var(--cic-border);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .075);
+  overflow: hidden;
+}
+
+.cic-release-pro-panel .cic-release-card-head,
+.cic-release-pro-panel .cic-release-side-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(148,163,184,.20);
+  background: linear-gradient(180deg, #fff, #fbfcff);
+}
+
+.cic-release-pro-panel .cic-release-card-title,
+.cic-release-pro-panel .cic-release-side-title {
+  margin: 0;
+  color: var(--cic-ink);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+
+.cic-release-pro-panel .cic-release-card-subtitle,
+.cic-release-pro-panel .cic-release-side-subtitle {
+  margin: 5px 0 0 0;
+  color: var(--cic-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.cic-release-pro-panel .cic-release-list {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.cic-release-pro-panel .cic-release-step {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 13px;
+  align-items: start;
+  padding: 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: linear-gradient(180deg, #fff, #f9fafb);
+}
+
+.cic-release-pro-panel .cic-release-step-no {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cic-red), var(--cic-red-dark));
+  box-shadow: 0 10px 20px rgba(139,0,0,.16);
+}
+
+.cic-release-pro-panel .cic-release-step-title {
+  margin: 0;
+  color: var(--cic-ink);
+  font-size: 14.5px;
+  font-weight: 900;
+}
+
+.cic-release-pro-panel .cic-release-step-desc {
+  margin: 4px 0 0 0;
+  color: var(--cic-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.cic-release-pro-panel .cic-release-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(15,118,110,.20);
+  color: var(--cic-ok);
+  background: rgba(15,118,110,.08);
+}
+
+.cic-release-pro-panel .cic-release-badge.warn {
+  border-color: rgba(180,83,9,.20);
+  color: var(--cic-warn);
+  background: rgba(180,83,9,.09);
+}
+
+.cic-release-pro-panel .cic-release-side-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.cic-release-pro-panel .cic-release-side-body {
+  padding: 18px;
+}
+
+.cic-release-pro-panel .cic-release-checklist {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cic-release-pro-panel .cic-release-checklist li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 13px;
+  border-radius: 16px;
+  color: var(--cic-ink);
+  background: #fff;
+  border: 1px solid rgba(148,163,184,.22);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.cic-release-pro-panel .cic-release-checklist li::before {
+  content: "✓";
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 900;
+  font-size: 12px;
+  background: var(--cic-ok);
+}
+
+.cic-release-pro-panel .cic-release-note-box {
+  padding: 15px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(139,0,0,.08), rgba(255,255,255,.92));
+  border: 1px solid rgba(139,0,0,.14);
+  color: #334155;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.cic-release-pro-panel .cic-release-note-box strong {
+  color: var(--cic-red-dark);
+}
+
+/* Eski karışık içerikler varsa altta sade bir bölümde toplansın */
+.cic-release-pro-panel .cic-release-legacy-wrap {
+  margin-top: 18px;
+  border-radius: 22px;
+  border: 1px dashed rgba(148,163,184,.45);
+  background: rgba(248,250,252,.75);
+  overflow: hidden;
+}
+
+.cic-release-pro-panel .cic-release-legacy-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--cic-ink);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cic-release-pro-panel .cic-release-legacy-content {
+  display: none;
+  padding: 0 18px 18px 18px;
+}
+
+.cic-release-pro-panel .cic-release-legacy-wrap.is-open .cic-release-legacy-content {
+  display: block;
+}
+
+.cic-release-pro-panel table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.cic-release-pro-panel th,
+.cic-release-pro-panel td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(148,163,184,.18);
+}
+
+.cic-release-pro-panel th {
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1100px) {
+  .cic-release-pro-panel .cic-release-kpi-grid,
+  .cic-release-pro-panel .cic-release-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cic-release-pro-panel .cic-release-layout { align-items: stretch; }
+}
+
+@media (max-width: 760px) {
+  .cic-release-pro-panel .cic-release-hero { padding: 22px; border-radius: 22px; }
+  .cic-release-pro-panel .cic-release-kpi-grid,
+  .cic-release-pro-panel .cic-release-layout { grid-template-columns: 1fr; }
+  .cic-release-pro-panel .cic-release-step { grid-template-columns: auto 1fr; }
+  .cic-release-pro-panel .cic-release-step > .cic-release-badge { grid-column: 1 / -1; justify-content: center; }
+}
+
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_10_STATUS_PILL_FIX */
+.cic-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:28px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color:#1f2937;
+  box-shadow:0 8px 22px rgba(15,23,42,.05);
+}
+.cic-badge.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+.cic-badge.warning{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.cic-badge.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca;}
+.cic-badge.neutral{background:#f8fafc;color:#334155;border-color:#e2e8f0;}
+.cic-badge i{font-size:12px;}
+
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_11_TEMPLATE_COMPAT_FIX */
+.cic-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:28px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color:#1f2937;
+  box-shadow:0 8px 22px rgba(15,23,42,.05);
+}
+.cic-badge.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+.cic-badge.warning{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.cic-badge.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca;}
+.cic-badge.neutral{background:#f8fafc;color:#334155;border-color:#e2e8f0;}
+.cic-badge i{font-size:12px;}

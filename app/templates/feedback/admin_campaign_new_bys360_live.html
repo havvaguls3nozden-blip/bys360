@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Geri Bildirim Kampanyası Oluştur{% endblock %}
+{% block content %}
+<section class="bys360-live-panel">
+  <h2>Geri Bildirim Kampanyası Oluştur</h2>
+  <p>Bu ekran; ekran hatası, eksik bildirme, öneri, tebrik ve teşekkür gibi kurumsal geri bildirimleri belirli dönem veya hedef kitle için toplamak amacıyla kullanılır.</p>
+  <div class="bys360-live-actions">
+    <span class="bys360-live-pill">Kolay kullanım</span>
+    <span class="bys360-live-pill">Yetki kontrollü</span>
+    <span class="bys360-live-pill">Raporlanabilir</span>
+    <span class="bys360-live-pill">Kurumsal takip</span>
+  </div>
+</section>
+
+<div class="card shadow-sm border-0 rounded-4">
+  <div class="card-body p-4">
+    <form method="post">
+      {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+      <div class="row g-3">
+        <div class="col-12 col-lg-8">
+          <label class="form-label fw-semibold">Kampanya adı</label>
+          <input class="form-control" name="title" placeholder="Örn. BYS360 ekran geri bildirimleri" required>
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label fw-semibold">Durum</label>
+          <select class="form-select" name="status">
+            <option value="active">Aktif</option>
+            <option value="draft">Taslak</option>
+            <option value="closed">Kapalı</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Açıklama</label>
+          <textarea class="form-control" name="description" rows="4" placeholder="Kampanyanın amacını kısa ve anlaşılır yazın."></textarea>
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">Başlangıç tarihi</label>
+          <input class="form-control" type="date" name="start_date">
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label fw-semibold">Bitiş tarihi</label>
+          <input class="form-control" type="date" name="end_date">
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Hedef kitle</label>
+          <select class="form-select" name="audience_scope">
+            <option value="all">Tüm kullanıcılar</option>
+            <option value="unit">Birim bazlı</option>
+            <option value="role">Rol bazlı</option>
+            <option value="selected">Seçili personel</option>
+          </select>
+          <div class="form-text">Hedef kitle görünürlüğü mevcut rol ve menü yetkileriyle birlikte çalışmalıdır.</div>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <button type="submit" class="btn btn-primary px-4">Kampanyayı Kaydet</button>
+        <a href="{{ url_for('feedback.admin_campaigns') if false else '/feedback/admin/campaigns' }}" class="btn btn-outline-secondary">Listeye Dön</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

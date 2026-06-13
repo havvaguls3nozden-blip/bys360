@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% set k = kunye|default({}) %}
+
+{% block page_kicker %}Kurumsal Bilgi{% endblock %}
+{% block page_title %}{{ k.page_title|default("BYS360 Sistem Künyesi") }}{% endblock %}
+{% block page_subtitle %}Kurumsal sahiplik, proje sorumluluğu ve sistem/yazılım yönetimi bilgileri{% endblock %}
+
+{% block content %}
+<style>
+    .kunye-page{display:grid;gap:22px;}
+    .kunye-hero{position:relative;overflow:hidden;border-radius:28px;padding:30px;background:linear-gradient(135deg, rgba(139,0,0,.96), rgba(94,9,9,.92));color:#fff;box-shadow:0 22px 46px rgba(139,0,0,.18);}
+    .kunye-hero::after{content:"";position:absolute;right:-100px;top:-130px;width:340px;height:340px;border-radius:999px;background:rgba(255,255,255,.10);}
+    .kunye-hero::before{content:"";position:absolute;left:-100px;bottom:-145px;width:290px;height:290px;border-radius:999px;background:rgba(255,255,255,.07);}
+    .kunye-hero-top{position:relative;z-index:1;}
+    .kunye-eyebrow{margin:0 0 8px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;opacity:.86;font-weight:800;}
+    .kunye-title{margin:0;font-size:clamp(1.55rem, 3vw, 2.55rem);font-weight:900;letter-spacing:-.03em;}
+    .kunye-subtitle{position:relative;z-index:1;margin:18px 0 0;max-width:920px;color:rgba(255,255,255,.90);line-height:1.8;font-weight:600;}
+    .kunye-grid{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:18px;}
+    .kunye-card{border:1px solid rgba(15,23,42,.07);border-radius:24px;background:rgba(255,255,255,.92);box-shadow:0 16px 34px rgba(15,23,42,.06);padding:22px;}
+    .kunye-card.full{grid-column:1 / -1;}
+    .kunye-card-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+    .kunye-icon{width:42px;height:42px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#8B0000;background:rgba(139,0,0,.08);flex:0 0 auto;}
+    .kunye-card-title{margin:0;color:#111827;font-size:1.02rem;font-weight:900;}
+    .kunye-row{display:grid;grid-template-columns:240px 1fr;gap:14px;padding:13px 0;border-top:1px solid rgba(15,23,42,.07);}
+    .kunye-row:first-of-type{border-top:0;padding-top:0;}
+    .kunye-label{color:#6b7280;font-size:.86rem;font-weight:800;}
+    .kunye-value{color:#111827;font-weight:800;line-height:1.65;}
+    .kunye-muted{color:#4b5563;font-weight:650;}
+    .kunye-note{border-radius:20px;padding:18px;background:linear-gradient(135deg, rgba(139,0,0,.07), rgba(255,255,255,.82));border:1px solid rgba(139,0,0,.10);color:#374151;line-height:1.8;font-weight:650;white-space:pre-line;}
+    .kunye-settings-link{display:inline-flex;align-items:center;gap:8px;margin-top:16px;color:#fff;text-decoration:none;font-weight:800;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.12);padding:9px 12px;border-radius:999px;position:relative;z-index:1;}
+    .kunye-settings-link:hover{background:rgba(255,255,255,.18);color:#fff;}
+    @media (max-width:900px){.kunye-grid{grid-template-columns:1fr;}.kunye-row{grid-template-columns:1fr;gap:4px;}.kunye-hero{padding:22px;}}
+</style>
+
+<div class="kunye-page" data-bys360-kunye="active" data-bys360-kunye-avatar-menu="active" data-bys360-kunye-settings="active">
+    <section class="kunye-hero" data-bys360-kunye-hero-no-logo="active">
+        <div class="kunye-hero-top">
+            <p class="kunye-eyebrow">{{ k.eyebrow|default("BYS360 Bütünleşik Yönetim Sistemi") }}</p>
+            <h2 class="kunye-title">{{ k.page_title|default("Sistem Künyesi") }}</h2>
+        </div>
+        <p class="kunye-subtitle">{{ k.subtitle|default("Bu sayfa, BYS360’ın kurumsal sahiplik bilgisini, proje sorumluluğunu ve sistem/yazılım yönetimi bilgisini sade, izlenebilir ve kurumsal bir çerçevede sunar.") }}</p>
+        {% if current_user.is_authenticated and current_user.role in ['admin', 'super_admin', 'sistem_yoneticisi'] %}
+        <a class="kunye-settings-link" href="{{ safe_url_for('main.settings_page') }}#system-group-kunye"><i class="fa-solid fa-gear"></i> Künye ayarlarını düzenle</a>
+        {% endif %}
+    </section>
+
+    <section class="kunye-grid">
+        <article class="kunye-card">
+            <div class="kunye-card-head"><span class="kunye-icon"><i class="fa-solid fa-building-shield"></i></span><h3 class="kunye-card-title">{{ k.corporate_section_title|default("Kurumsal Sahiplik") }}</h3></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.institution_authority_label|default("İmtiyaz Sahibi / Kurum Yetkilisi") }}</div><div class="kunye-value">{{ k.institution_authority_prefix|default("Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı adına") }}<br>{{ k.chair_name|default("İsmail KAŞDEMİR") }}<br><span class="kunye-muted">{{ k.chair_title|default("Başkan") }}</span></div></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.system_owner_label|default("Sistem Sahibi Kurum") }}</div><div class="kunye-value">{{ k.system_owner_value|default("Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı") }}</div></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.corporate_responsibility_label|default("Kurumsal Sorumluluk") }}</div><div class="kunye-value">{{ k.corporate_responsibility_value|default("Kurum içi dijital yönetim süreçlerinin kontrollü, güvenli ve izlenebilir yürütülmesi") }}</div></div>
+        </article>
+
+        <article class="kunye-card">
+            <div class="kunye-card-head"><span class="kunye-icon"><i class="fa-solid fa-diagram-project"></i></span><h3 class="kunye-card-title">{{ k.project_section_title|default("Proje Bilgileri") }}</h3></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.project_owner_label|default("Proje Yürütücüsü") }}</div><div class="kunye-value">{{ k.project_owner_name|default("Mustafa BEKTAŞ") }}<br><span class="kunye-muted">{{ k.project_owner_title|default("Personel ve İdari İşler Grup Başkanı") }}</span></div></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.developer_label|default("Proje Geliştiricisi") }}</div><div class="kunye-value">{{ k.developer_name|default("Personel Gülsen ÖZDEN") }}</div></div>
+            <div class="kunye-row"><div class="kunye-label">{{ k.software_management_label|default("Sistem ve Yazılım Yönetimi") }}</div><div class="kunye-value">{{ k.software_management_value|default("BYS360 Proje Ekibi") }}</div></div>
+        </article>
+
+        <article class="kunye-card full">
+            <div class="kunye-card-head"><span class="kunye-icon"><i class="fa-solid fa-shield-halved"></i></span><h3 class="kunye-card-title">{{ k.security_section_title|default("Güvenlik ve Kullanım İlkesi") }}</h3></div>
+            <div class="kunye-note">{{ k.security_text|default("BYS360, kurum içi dijital yönetim süreçlerinin rol bazlı yetkilendirme, kayıt altına alma, denetlenebilirlik ve insan denetimli karar destek ilkeleriyle yürütülmesi amacıyla geliştirilmiştir. Sistem, idari karar yerine geçmez; yetkili kullanıcıların süreçleri daha kontrollü, güvenli ve izlenebilir biçimde yürütmesine destek olur.") }}</div>
+        </article>
+
+        <article class="kunye-card full">
+            <div class="kunye-card-head"><span class="kunye-icon"><i class="fa-solid fa-copyright"></i></span><h3 class="kunye-card-title">{{ k.copyright_section_title|default("Telif ve Kullanım") }}</h3></div>
+            <div class="kunye-note">{{ k.copyright_text|default("© 2026 Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı. Her hakkı saklıdır. BYS360 yalnızca kurum içi yetkili kullanım amacıyla geliştirilmiş kurumsal dijital yönetim sistemidir.") }}</div>
+        </article>
+    </section>
+</div>
+{% endblock %}

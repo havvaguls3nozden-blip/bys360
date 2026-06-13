@@ -1,0 +1,15 @@
+<div class="support-tabs">
+    <a href="{{ url_for('main.support_index') }}" class="support-tab {% if current_view_key == 'support_index' %}active{% endif %}"><i class="fa-solid fa-circle-info"></i> Yardım Merkezi</a>
+    <a href="{{ url_for('main.support_new') }}" class="support-tab {% if current_view_key == 'support_new' %}active{% endif %}"><i class="fa-solid fa-plus"></i> Yeni Talep Aç</a>
+    <a href="{{ url_for('main.support_my_tickets') }}" class="support-tab {% if current_view_key == 'support_my_tickets' %}active{% endif %}"><i class="fa-solid fa-folder-open"></i> Taleplerim</a>
+    {% set support_menu_map = menu_visibility_map|default({}) %}
+    {% if support_menu_map.get('support_assigned', false) %}
+    <a href="{{ url_for('main.support_assigned') }}" class="support-tab {% if current_view_key == 'support_assigned' %}active{% endif %}"><i class="fa-solid fa-user-check"></i> Bana Atananlar</a>
+    {% endif %}
+    {% if support_menu_map.get('support_all', false) %}
+    <a href="{{ url_for('main.support_all') }}" class="support-tab {% if current_view_key == 'support_all' %}active{% endif %}"><i class="fa-solid fa-table-list"></i> Tüm Talepler</a>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <a href="{{ url_for('main.support_help_admin') }}" class="support-tab {% if current_view_key == 'support_help_admin' %}active{% endif %}"><i class="fa-solid fa-book-open-reader"></i> Rehber Yönetimi</a>
+    {% endif %}
+</div>

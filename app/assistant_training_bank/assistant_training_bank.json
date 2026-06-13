@@ -1,0 +1,279 @@
+{
+  "module_name": "BYS360 Asistanı Modülü",
+  "knowledge": [
+    {
+      "question": "Dönemler nerede",
+      "answer": "Performans Yönetimi > Dönemler ekranından erişebilirsiniz.",
+      "safe_url": "/performance/periods"
+    },
+    {
+      "id": "kb_periods_001",
+      "category": "Performans Yönetimi",
+      "question": "Dönemler nerede?",
+      "intent": "performance_periods",
+      "answer": "Performans Yönetimi > Dönemler ekranından performans dönemlerini görüntüleyebilir ve yetkiniz varsa yeni dönem oluşturabilirsiniz.",
+      "safe_url": "/performance/periods",
+      "menu_path": "Performans Yönetimi > Dönemler",
+      "roles": [
+        "Admin",
+        "Sistem Yöneticisi",
+        "Performans Yetkilisi"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "kb_leave_001",
+      "category": "Personel Yönetimi",
+      "question": "İzin nasıl çalışır?",
+      "intent": "leave_management",
+      "answer": "İzin işlemleri Personel Yönetimi > İzin ve Devamsızlık Takibi ekranından yürütülür. Personel, tarih aralığı ve izin türü kontrol edilerek kayıt oluşturulur.",
+      "safe_url": "/hr-management/leave",
+      "menu_path": "Personel Yönetimi > İzin ve Devamsızlık Takibi",
+      "roles": [
+        "Admin",
+        "Sistem Yöneticisi",
+        "Personel Yetkilisi"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "kb_delegation_001",
+      "category": "Personel Yönetimi",
+      "question": "Vekâlet nerede?",
+      "intent": "delegation_management",
+      "answer": "Vekâlet işlemleri Personel Yönetimi > Devamsızlık ve Vekâlet ekranından takip edilir. İzinli amir varsa süreçlerin doğru kişiye devredilmesi için vekâlet kaydı kontrol edilmelidir.",
+      "safe_url": "/hr-management/attendance",
+      "menu_path": "Personel Yönetimi > Devamsızlık ve Vekâlet",
+      "roles": [
+        "Admin",
+        "Sistem Yöneticisi",
+        "Personel Yetkilisi"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "kb_role_001",
+      "category": "Sistem Ayarları",
+      "question": "Menü görünmüyor, ne kontrol edilir?",
+      "intent": "role_matrix_visibility",
+      "answer": "Menü görünmüyorsa rol matrisi, kişi bazlı menü görünürlüğü, birim bazlı profil ve backend erişim yetkisi birlikte kontrol edilmelidir.",
+      "safe_url": "/settings/role-matrix",
+      "menu_path": "Sistem Ayarları > Rol Matrisi",
+      "roles": [
+        "Admin",
+        "Sistem Yöneticisi"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "kb_kpi_analysis_center_001",
+      "category": "Stratejik Performans",
+      "question": "KPI Analiz Merkezi ne işe yarar?",
+      "intent": "kpi_analysis_center",
+      "answer": "KPI Analiz Merkezi; KPI gerçekleşmeleri, riskli hedefler, yönetici önerileri ve performans bağlantıları için kullanılan karar destek ekranıdır.",
+      "safe_url": "/performans/stratejik/ai-kpi-analiz",
+      "menu_path": "Stratejik Performans > KPI Analiz Merkezi",
+      "roles": [
+        "Admin",
+        "Sistem Yöneticisi",
+        "Başkan",
+        "Yönetici"
+      ],
+      "status": "active"
+    }
+  ],
+  "blocked_urls": [
+    "eski izin bağlantısı",
+    {
+      "url": "eski izin bağlantısı",
+      "reason": "Eski/kırık izin yönlendirmesi. Bunun yerine /hr-management/leave kullanılmalıdır.",
+      "replacement_url": "/hr-management/leave",
+      "status": "blocked"
+    },
+    {
+      "url": "/performans/donem-yonetimi",
+      "reason": "Kullanıcıya görünen gerçek sekme adı Dönemler olmalıdır.",
+      "replacement_url": "/performance/periods",
+      "status": "blocked"
+    }
+  ],
+  "version": "V17",
+  "description": "BYS360 Asistanı Modülü eğitim bankası; soru-cevap, güvenli URL, yasaklı URL, yetki ve ekran bilgilerini yönetir.",
+  "identity_answers": {
+    "who_are_you": "Ben BYS360 Asistanı Modülü’yüm. BYS360 için ilgili personel Gülsen Özden tarafından geliştirildim.",
+    "what_do_you_do": "BYS360 içinde yetkiniz dâhilindeki işlemleri doğru ekrana ve doğru işlem sırasına göre anlatır; sistemi daha kolay, güvenli ve anlaşılır kullanmanıza yardımcı olurum.",
+    "safety": "İdari karar üretmem, performans puanı belirlemem ve hassas veri göstermem."
+  },
+  "last_updated": "2026-05-11T07:38:07",
+  "official_screen_identities": {
+    "/performans/stratejik/kpi-dashboard": {
+      "screen": "KPI Dashboard",
+      "module": "Stratejik Performans",
+      "help_key": "strategic_kpi_dashboard"
+    },
+    "/performans/stratejik/hedefler": {
+      "screen": "Hedefler",
+      "module": "Stratejik Performans",
+      "help_key": "strategic_targets"
+    },
+    "/performans/stratejik/yetkinlik-kutuphanesi": {
+      "screen": "Yetkinlik Kütüphanesi",
+      "module": "Stratejik Performans",
+      "help_key": "competency_library"
+    },
+    "/performans/stratejik/oz-degerlendirme": {
+      "screen": "Öz Değerlendirme",
+      "module": "Stratejik Performans",
+      "help_key": "self_assessment"
+    },
+    "/performans/stratejik/ai-kpi-analiz": {
+      "screen": "KPI Analiz Merkezi",
+      "module": "Stratejik Performans",
+      "help_key": "kpi_analysis_center"
+    },
+    "/performance/meeting-development/faz10": {
+      "screen": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi",
+      "help_key": "interim_notes_faz10"
+    },
+    "/performance/interim-notes": {
+      "screen": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi",
+      "help_key": "interim_notes"
+    },
+    "/performance/meeting-development/faz9": {
+      "screen": "Hatırlatma ve Aksatan Amirler",
+      "module": "Performans Yönetimi",
+      "help_key": "reminders_delayed_supervisors_faz9"
+    },
+    "/performance/personnel-support-publish-approvals": {
+      "screen": "Yayın Ön Onayı",
+      "module": "Performans Yönetimi",
+      "help_key": "personnel_support_publish_approvals"
+    },
+    "/performance/process-reports": {
+      "screen": "Süreç Raporları",
+      "module": "Performans Yönetimi",
+      "help_key": "process_reports"
+    },
+    "/performance/process-tracking": {
+      "screen": "Süreç Takibi",
+      "module": "Performans Yönetimi",
+      "help_key": "process_tracking"
+    }
+  },
+  "control_panel_title_fixes": {
+    "/performans/stratejik/kpi-dashboard": {
+      "title": "KPI Dashboard",
+      "module": "Stratejik Performans"
+    },
+    "/performans/stratejik/hedefler": {
+      "title": "Hedefler",
+      "module": "Stratejik Performans"
+    },
+    "/performans/stratejik/yetkinlik-kutuphanesi": {
+      "title": "Yetkinlik Kütüphanesi",
+      "module": "Stratejik Performans"
+    },
+    "/performans/stratejik/oz-degerlendirme": {
+      "title": "Öz Değerlendirme",
+      "module": "Stratejik Performans"
+    },
+    "/performans/stratejik/ai-kpi-analiz": {
+      "title": "KPI Analiz Merkezi",
+      "module": "Stratejik Performans"
+    },
+    "/performance/meeting-development/faz10": {
+      "title": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi"
+    },
+    "/performance/interim-notes": {
+      "title": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi"
+    },
+    "/performance/meeting-development/faz9": {
+      "title": "Hatırlatma ve Aksatan Amirler",
+      "module": "Performans Yönetimi"
+    },
+    "/performance/personnel-support-publish-approvals": {
+      "title": "Yayın Ön Onayı",
+      "module": "Performans Yönetimi"
+    },
+    "/performance/process-reports": {
+      "title": "Süreç Raporları",
+      "module": "Performans Yönetimi"
+    },
+    "/performance/process-tracking": {
+      "title": "Süreç Takibi",
+      "module": "Performans Yönetimi"
+    }
+  },
+  "safe_menu_full_map": {
+    "/performans/stratejik/kpi-dashboard": {
+      "title": "KPI Dashboard",
+      "module": "Stratejik Performans",
+      "help_key": "strategic_kpi_dashboard",
+      "summary": "KPI gerçekleşmeleri, hedef durumu, risk seviyeleri ve yönetici özetlerinin takip edildiği ekrandır."
+    },
+    "/performans/stratejik/hedefler": {
+      "title": "Hedefler",
+      "module": "Stratejik Performans",
+      "help_key": "strategic_targets",
+      "summary": "Hedef dönemleri, hedef kartları, hedef değerleri, gerçekleşen değerler ve hedef durumları burada yönetilir."
+    },
+    "/performans/stratejik/yetkinlik-kutuphanesi": {
+      "title": "Yetkinlik Kütüphanesi",
+      "module": "Stratejik Performans",
+      "help_key": "competency_library",
+      "summary": "Görev, rol, performans, gelişim önerisi ve analiz süreçlerinde kullanılacak yetkinlikler burada tanımlanır."
+    },
+    "/performans/stratejik/oz-degerlendirme": {
+      "title": "Öz Değerlendirme",
+      "module": "Stratejik Performans",
+      "help_key": "self_assessment",
+      "summary": "Personelin dönem özeti, başarıları, zorlandığı alanlar ve gelişim ihtiyacını yazdığı ekrandır."
+    },
+    "/performans/stratejik/ai-kpi-analiz": {
+      "title": "KPI Analiz Merkezi",
+      "module": "Stratejik Performans",
+      "help_key": "kpi_analysis_center",
+      "summary": "KPI gerçekleşmeleri, riskli hedefler, yönetici önerileri ve performans bağlantıları için karar destek ekranıdır."
+    },
+    "/performance/meeting-development/faz10": {
+      "title": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi",
+      "help_key": "interim_notes_faz10",
+      "summary": "Dönem içinde olumlu/olumsuz olay, başarı, gelişim ihtiyacı ve genel gözlem notlarının tutulduğu ekrandır."
+    },
+    "/performance/interim-notes": {
+      "title": "Dönem İçi Notlar",
+      "module": "Performans Yönetimi",
+      "help_key": "interim_notes",
+      "summary": "Dönem içi notlar ve ara geri bildirimlerin takip edildiği ekrandır."
+    },
+    "/performance/meeting-development/faz9": {
+      "title": "Hatırlatma ve Aksatan Amirler",
+      "module": "Performans Yönetimi",
+      "help_key": "reminders_delayed_supervisors_faz9",
+      "summary": "Bekleyen değerlendirme görevleri, yaklaşan son tarihler ve aksatan amirlerin takip edildiği ekrandır."
+    },
+    "/performance/personnel-support-publish-approvals": {
+      "title": "Yayın Ön Onayı",
+      "module": "Performans Yönetimi",
+      "help_key": "personnel_support_publish_approvals",
+      "summary": "Sonuçların nihai yayından önce Personel ve Destek Hizmetleri Grup Başkanı tarafından kontrol edildiği ekrandır."
+    },
+    "/performance/process-reports": {
+      "title": "Süreç Raporları",
+      "module": "Performans Yönetimi",
+      "help_key": "process_reports",
+      "summary": "Dönem, amir, yayın, onay, gecikme ve süreç durumlarına ilişkin raporların görüntülendiği ekrandır."
+    },
+    "/performance/process-tracking": {
+      "title": "Süreç Takibi",
+      "module": "Performans Yönetimi",
+      "help_key": "process_tracking",
+      "summary": "Değerlendirme, onay, yayın kilidi, düşük performans ve süreç durumlarının takip edildiği ekrandır."
+    }
+  }
+}

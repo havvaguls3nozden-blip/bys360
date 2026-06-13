@@ -1,0 +1,14 @@
+# Faz 9A | Environment Checklist
+
+Zorunlu değişkenler:
+- APP_ENV
+- DATABASE_URL
+- SECRET_KEY
+- UPLOAD_FOLDER
+- REPORT_FOLDER
+- LOG_FOLDER
+
+Önerilen doğrulamalar:
+- SESSION_COOKIE_SECURE
+- REMEMBER_COOKIE_SECURE
+- SESSION_COOKIE_SAMESITE

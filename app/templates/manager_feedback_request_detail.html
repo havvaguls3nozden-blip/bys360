@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Geri Bildirim Talep Detayı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Talep Detayı{% endblock %}
+{% block page_subtitle %}
+Talep detaylarını inceleyebilir, yanıt verebilir ve gerekirse geri bildirim görüşmesi için randevu planlayabilirsiniz.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Geri Bildirim Talebi Detayı', text='Talebin amir zinciri, notları ve işlem geçmişi aynı kurumsal yüzey içinde görünür kılındı.', icon='fa-solid fa-comment-dots') }}
+  {{ nav(active='feedback') }}
+  {{ note('Detay ekranı liste sayfasından kopmadan aynı görsel aile içinde kalır.') }}
+<style>
+  .detail-shell{
+    display:grid;
+    gap:18px;
+  }
+
+  .glass-card{
+    background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    backdrop-filter:blur(14px);
+  }
+
+  .hero-card{
+    padding:24px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .hero-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at top right, rgba(139,0,0,.06), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));
+    pointer-events:none;
+  }
+
+  .hero-top{
+    position:relative;
+    z-index:1;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+
+  .hero-title{
+    margin:0;
+    font-size:1.18rem;
+    font-weight:900;
+    color:#111827;
+    line-height:1.4;
+  }
+
+  .hero-sub{
+    margin-top:8px;
+    color:#6b7280;
+    font-size:.94rem;
+    line-height:1.8;
+  }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:9px 14px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:900;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  .pill.waiting{
+    background:rgba(146,64,14,.10);
+    color:#92400e;
+  }
+
+  .pill.reviewed{
+    background:rgba(29,78,216,.10);
+    color:#1d4ed8;
+  }
+
+  .pill.answered{
+    background:rgba(22,101,52,.10);
+    color:#166534;
+  }
+
+  .pill.closed{
+    background:rgba(107,114,128,.12);
+    color:#374151;
+  }
+
+  .info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+  }
+
+  .info-card{
+    padding:20px;
+  }
+
+  .info-box{
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    padding:16px;
+    height:100%;
+  }
+
+  .info-label{
+    color:#6b7280;
+    font-size:.78rem;
+    font-weight:800;
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+
+  .info-value{
+    color:#111827;
+    font-size:.96rem;
+    font-weight:800;
+    line-height:1.6;
+    word-break:break-word;
+  }
+
+  .note-card{
+    padding:22px;
+  }
+
+  .section-title{
+    margin:0 0 14px;
+    color:#111827;
+    font-size:1.06rem;
+    font-weight:900;
+  }
+
+  .section-sub{
+    margin:0 0 18px;
+    color:#6b7280;
+    font-size:.92rem;
+    line-height:1.75;
+  }
+
+  .note-box{
+    background:rgba(248,250,252,.96);
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    padding:18px;
+    color:#374151;
+    line-height:1.85;
+    font-size:.93rem;
+  }
+
+  .note-box strong{
+    color:#111827;
+  }
+
+  .action-row{
+    margin-top:16px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .form-card{
+    padding:22px;
+  }
+
+  .form-grid{
+    display:grid;
+    gap:14px;
+  }
+
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .form-group label{
+    font-weight:800;
+    color:#374151;
+    font-size:.92rem;
+  }
+
+  .form-group textarea,
+  .form-group select{
+    width:100%;
+    border-radius:14px;
+    border:1px solid rgba(15,23,42,.10);
+    padding:12px 14px;
+    background:#fff;
+    font:inherit;
+    outline:none;
+  }
+
+  .form-group textarea{
+    min-height:150px;
+    resize:vertical;
+  }
+
+  .btn-soft{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:44px;
+    padding:0 16px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:800;
+    font-size:.92rem;
+    white-space:nowrap;
+    transition:all .18s ease;
+  }
+
+  .btn-soft.primary{
+    background:linear-gradient(180deg,#8B0000,#6f0000);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(139,0,0,.16);
+  }
+
+  .btn-soft.secondary{
+    background:#eef2f7;
+    color:#374151;
+    border:1px solid rgba(15,23,42,.08);
+  }
+
+  .btn-soft.info{
+    background:linear-gradient(180deg,#1f3f8f,#173574);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(29,78,216,.16);
+  }
+
+  .btn-soft:hover{
+    transform:translateY(-1px);
+  }
+
+  .meeting-info{
+    margin-top:16px;
+    padding:16px;
+    border-radius:18px;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    line-height:1.8;
+    color:#374151;
+  }
+
+  .meeting-info strong{
+    color:#111827;
+  }
+
+  @media (max-width:1000px){
+    .info-grid{
+      grid-template-columns:1fr;
+    }
+
+    .hero-top{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+  }
+</style>
+
+<div class="detail-shell">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;">
+    <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}</div>
+    <span class="pill reviewed">Talep #{{ req.id }}</span>
+  </div>
+  <div class="glass-card hero-card">
+    <div class="hero-top">
+      <div>
+        <h2 class="hero-title">
+          {{ req.employee.ad }} {{ req.employee.soyad }} tarafından oluşturulan geri bildirim talebi
+        </h2>
+        <div class="hero-sub">
+          Talep No: #{{ req.id }}<br>
+          {% if req.requested_at %}
+            Talep Tarihi: {{ req.requested_at.strftime('%d.%m.%Y %H:%M') }}
+          {% endif %}
+        </div>
+      </div>
+
+      {% if req.status == 'bekliyor' %}
+        <span class="pill waiting">
+          <i class="fa-solid fa-clock"></i>
+          Bekliyor
+        </span>
+      {% elif req.status == 'incelendi' %}
+        <span class="pill reviewed">
+          <i class="fa-solid fa-eye"></i>
+          İncelendi
+        </span>
+      {% elif req.status in ['cevaplandi', 'gorusme_tamamlandi'] %}
+        <span class="pill answered">
+          <i class="fa-solid fa-reply"></i>
+          Cevaplandı
+        </span>
+      {% else %}
+        <span class="pill closed">
+          <i class="fa-solid fa-folder-closed"></i>
+          {{ req.status }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="glass-card info-card">
+      <div class="info-box">
+        <div class="info-label">Personel</div>
+        <div class="info-value">
+          {{ req.employee.ad }} {{ req.employee.soyad }}<br>
+          Sicil No: {{ req.employee.sicil_no or '-' }}<br>
+          Birim: {{ req.employee.birim or '-' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card info-card">
+      <div class="info-box">
+        <div class="info-label">Dönem</div>
+        <div class="info-value">
+          {{ req.period.title if req.period else '-' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card note-card">
+    <h3 class="section-title">Talep Açıklaması</h3>
+    <div class="note-box">
+      <strong>Personel Talebi:</strong><br>
+      {{ req.reason or '-' }}
+    </div>
+
+    <div class="action-row">
+      {% if not scheduled_meeting %}
+        <a href="{{ url_for('main.manager_feedback_request_schedule', request_id=req.id, scope=selected_scope) }}"
+          class="btn-soft secondary">
+          <i class="fa-solid fa-calendar-plus"></i>
+          Randevu Oluştur
+        </a>
+      {% else %}
+        <a href="{{ url_for('main.feedback_meeting_detail', meeting_id=scheduled_meeting.id, scope=selected_scope) }}"
+          class="btn-soft info">
+          <i class="fa-solid fa-calendar-check"></i>
+          Oluşturulan Randevuyu Gör
+        </a>
+      {% endif %}
+
+      <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft info">
+        <i class="fa-solid fa-shield-halved"></i>
+        Denetim Paneli
+      </a>
+      <a href="{{ url_for('main.manager_feedback_requests', scope=selected_scope) }}" class="btn-soft secondary">
+        <i class="fa-solid fa-arrow-left"></i>
+        Listeye Dön
+      </a>
+    </div>
+
+    {% if req.meeting %}
+    <div class="meeting-info">
+      <strong>Planlı Görüşme:</strong><br>
+      Tarih:
+      {{ scheduled_meeting.meeting_date.strftime('%d.%m.%Y') if scheduled_meeting.meeting_date else '-' }}<br>
+      Saat:
+      {{ scheduled_meeting.meeting_start.strftime('%H:%M') if scheduled_meeting.meeting_start else '-' }}
+      -
+      {{ scheduled_meeting.meeting_end.strftime('%H:%M') if scheduled_meeting.meeting_end else '-' }}<br>
+      Durum: {{ scheduled_meeting.status or '-' }}<br>
+      Konum / Bağlantı: {{ scheduled_meeting.location or '-' }}
+    </div>
+    {% endif %}
+  </div>
+
+
+  <div class="glass-card note-card">
+    <h3 class="section-title">İşlem İzi</h3>
+    <p class="section-sub">Talep ve bağlı randevu üzerinde yapılan son işlemler.</p>
+    {% if request_timeline %}
+      <div style="display:grid;gap:12px;">
+        {% for item in request_timeline %}
+          <div class="note-box" style="padding:14px 16px;">
+            <strong>{{ item.action_label }}</strong><br>
+            {{ item.summary }}<br>
+            <span style="color:#6b7280;font-size:.84rem;">{{ item.actor_name }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '-' }} · {{ item.entity_label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="note-box">Henüz audit kaydı oluşmadı.</div>
+    {% endif %}
+  </div>
+
+  <div class="glass-card form-card">    <h3 class="section-title">Yanıt ve Durum Güncelleme</h3>
+    <p class="section-sub">
+      Talebi inceleyebilir, personel için geri bildirim yazabilir ve sürecin durumunu güncelleyebilirsiniz.
+    </p>
+
+    <form method="post" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group">
+        <label for="response">Yanıtınız</label>
+        <textarea id="response" name="response" placeholder="Personele iletilecek yanıtı yazınız">{{ response_text or '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Durum</label>
+        <select id="status" name="status">
+          <option value="bekliyor" {% if req.status == 'bekliyor' %}selected{% endif %}>Bekliyor</option>
+          <option value="incelendi" {% if req.status == 'incelendi' %}selected{% endif %}>İncelendi</option>
+          <option value="cevaplandi" {% if req.status == 'cevaplandi' %}selected{% endif %}>Cevaplandı</option>
+          <option value="randevulandi" {% if req.status == 'randevulandi' %}selected{% endif %}>Randevulandı</option>
+          <option value="gorusme_tamamlandi" {% if req.status == 'gorusme_tamamlandi' %}selected{% endif %}>Görüşme Tamamlandı</option>
+          <option value="randevu_ertelendi" {% if req.status == 'randevu_ertelendi' %}selected{% endif %}>Randevu Ertelendi</option>
+          <option value="randevu_iptal" {% if req.status == 'randevu_iptal' %}selected{% endif %}>Randevu İptal</option>
+          <option value="kapatildi" {% if req.status == 'kapatildi' %}selected{% endif %}>Kapatıldı</option>
+        </select>
+      </div>
+
+      <div class="action-row">
+        <button type="submit" class="btn-soft primary">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Kaydet
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

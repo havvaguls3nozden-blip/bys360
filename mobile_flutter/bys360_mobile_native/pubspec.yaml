@@ -1,0 +1,45 @@
+name: bys360_mobile_native
+description: BYS360 Mobile V2 gerçek native Flutter uygulaması.
+publish_to: 'none'
+version: 2.8.87+87
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter_secure_storage: ^9.2.4
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+  webview_flutter: ^4.10.0
+
+  go_router: ^14.2.7
+  provider: ^6.1.2
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+
+# BYS360_MOBILE_V2_8_29_HARDENING_P0_PUBSPEC
+
+# BYS360_MOBILE_V2_8_60_ANDROID_LIVE_READY
+
+
+# BYS360_MOBILE_V2_8_72_SECURITY_IOS_10_10
+
+# BYS360_MOBILE_V2_8_73_QUALITY_ROUTER_FCM_TESTS
+
+# BYS360_MOBILE_V2_8_74_ANDROID_RELEASE_READY_P0_PUBSPEC
+
+# BYS360_MOBILE_V2_8_75_APP_MATURITY_P1_PUBSPEC
+
+# BYS360_MOBILE_CONSISTENCY_V2_17_64

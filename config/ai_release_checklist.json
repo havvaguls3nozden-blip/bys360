@@ -1,0 +1,25 @@
+{
+  "release_title": "BYS360 AI Canlıya Alma Kontrol Listesi",
+  "release_subtitle": "Yönetişim, kalite ve kabul görünümü",
+  "signoff_roles": [
+    "Üst Yönetim",
+    "BT",
+    "İK",
+    "Sistem Yöneticisi"
+  ],
+  "artifact_targets": [
+    "AI Kontrol Merkezi",
+    "AI Kalite Panosu",
+    "AI Yönetişim Merkezi",
+    "AI Yönetici Özeti",
+    "AI Paylaşım ve Dışa Aktarma"
+  ],
+  "gates": [
+    {
+      "key": "provider_ready",
+      "label": "Gerçek sağlayıcı hazır",
+      "owner": "BT",
+      "severity": "critical"
+    }
+  ]
+}

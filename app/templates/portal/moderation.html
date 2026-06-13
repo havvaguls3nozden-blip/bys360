@@ -1,0 +1,27 @@
+{# BYS360_CORPORATE_PORTAL_MATURITY_V1_6_MODERATION #}
+{% extends "base.html" %}
+{% block title %}Portal Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Portal{% endblock %}
+{% block page_title %}Portal Yönetimi{% endblock %}
+{% block page_subtitle %}Bildirilen, gizlenen, sabitlenen ve yönetim gerektiren paylaşımlar.{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=portal-iphone-responsive-v2-11">{% endblock %}
+{% block content %}
+<div class="portal-shell portal-maturity-shell">
+  {% include 'portal/_tabs.html' %}
+  <div class="portal-layout single-side">
+    <main class="portal-main wide">
+      <section class="portal-card portal-management-card"><div class="portal-section-head"><div><span class="portal-kicker"><i class="fa-regular fa-flag"></i> İçerik Kontrolü</span><h2>Bildirilen Paylaşımlar</h2><p>İnceleme bekleyen bildirimler burada listelenir.</p></div></div>
+        {% for report in portal_reports %}
+        <div class="portal-moderation-row"><div><b>{{ report.post.title if report.post and report.post.title else 'Paylaşım' }}</b><p>{{ report.reason or 'İnceleme talebi' }}</p><small>{{ report.created_at.strftime('%d.%m.%Y %H:%M') if report.created_at else '' }} · {{ report.status }}</small></div>{% if report.post %}<form method="post" action="{{ safe_url_for('main.portal_post_moderate', post_id=report.post.id, fallback='#') }}" data-portal-inline-form>{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<input type="hidden" name="action" value="hide"><input type="hidden" name="note" value="Bildirilen içerik yönetim tarafından gizlendi."><button class="portal-btn danger" type="submit"><i class="fa-regular fa-eye-slash"></i> Gizle</button></form>{% endif %}</div>
+        {% else %}<div class="portal-empty embedded"><i class="fa-regular fa-circle-check"></i><h3>Açık bildirim bulunmuyor</h3><p>İnceleme bekleyen portal bildirimi yok.</p></div>{% endfor %}
+      </section>
+      <section class="portal-card portal-management-card"><div class="portal-section-head"><div><span class="portal-kicker"><i class="fa-solid fa-eye-slash"></i> Gizli İçerik</span><h2>Gizlenen Paylaşımlar</h2><p>Gizlenen içerikler gerektiğinde yeniden yayına alınabilir.</p></div></div>
+        {% for post in portal_hidden_posts %}
+        <div class="portal-moderation-row"><div><b>{{ post.title or 'Paylaşım' }}</b><p>{{ post.body|truncate(140) }}</p><small>{{ post.hidden_reason or 'Gizlenmiş paylaşım' }}</small></div><form method="post" action="{{ safe_url_for('main.portal_post_moderate', post_id=post.id, fallback='#') }}" data-portal-inline-form>{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<input type="hidden" name="action" value="publish"><button class="portal-btn ghost" type="submit"><i class="fa-solid fa-rotate-left"></i> Yeniden Yayınla</button></form></div>
+        {% else %}<div class="portal-empty embedded"><i class="fa-regular fa-folder-open"></i><h3>Gizlenen paylaşım bulunmuyor</h3><p>Şu anda gizlenmiş portal içeriği yok.</p></div>{% endfor %}
+      </section>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-iphone-responsive-v2-11"></script>
+{% endblock %}

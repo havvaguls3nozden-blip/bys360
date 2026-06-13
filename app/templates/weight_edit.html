@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Puan Ağırlığı Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Puan Ağırlığı Düzenle{% endblock %}
+{% block page_subtitle %}Mevcut ağırlık kaydını güncelleyin{% endblock %}
+
+{% block content %}
+<style>
+    .weight-form-shell{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+    }
+
+    .form-card,
+    .info-card{
+        background:rgba(255,255,255,.68);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:22px;
+        box-shadow:0 16px 34px rgba(15,23,42,.08);
+        padding:22px;
+    }
+
+    .form-card h4,
+    .info-card h4{
+        margin:0 0 12px;
+        font-size:1.08rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .info-card p{
+        margin:0 0 12px;
+        color:#6b7280;
+        line-height:1.7;
+    }
+
+    .info-list{
+        display:grid;
+        gap:10px;
+    }
+
+    .info-item{
+        padding:12px 14px;
+        border-radius:14px;
+        background:rgba(255,255,255,.72);
+        border:1px solid rgba(15,23,42,.06);
+        color:#4b5563;
+        line-height:1.6;
+    }
+
+    .weight-total{
+        margin-top:14px;
+        padding:14px;
+        border-radius:16px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-weight:800;
+    }
+
+    @media (max-width: 1100px){
+        .weight-form-shell{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="weight-form-shell">
+    <div class="form-card">
+        <h4>Ağırlık Güncelleme Formu</h4>
+
+        <form method="post" id="weightForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Dönem</label>
+                    <select name="period_id">
+                        <option value="" {% if not weight_obj.period_id %}selected{% endif %}>Genel Varsayılan</option>
+                        {% for period in periods %}
+                            <option value="{{ period.id }}" {% if weight_obj.period_id == period.id %}selected{% endif %}>
+                                {{ period.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>1. Amir Ağırlığı</label>
+                    <input type="number" id="w1" name="evaluator_1_weight" step="0.01" min="0" max="100" value="{{ weight_obj.evaluator_1_weight }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Amir Ağırlığı</label>
+                    <input type="number" id="w2" name="evaluator_2_weight" step="0.01" min="0" max="100" value="{{ weight_obj.evaluator_2_weight }}" required>
+                </div>
+
+                <div class="form-group full">
+                    <label class="checkbox-row">
+                        <input type="checkbox" name="is_active" {% if weight_obj.is_active %}checked{% endif %}>
+                        Bu tanım aktif olsun
+                    </label>
+                </div>
+            </div>
+
+            <div class="weight-total">
+                Toplam: <span id="weightTotal">100.00</span>
+            </div>
+
+            <div class="btn-row" style="margin-top:16px;">
+                <button type="submit" class="btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Güncelle
+                </button>
+                <a class="btn btn-secondary" href="{{ safe_url_for('main.performance_hierarchy_settings') }}">
+                    <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-card">
+        <h4>Kayıt Özeti</h4>
+        <p>
+            Bu ekranda yalnızca puana etki eden amir oranları güncellenir.
+            3. amir koordinatöre bağlı opsiyonel birim amiridir. Varsayılan olarak yorumcudur; dönem ayarı açılırsa puan katkısı da verebilir.
+        </p>
+
+        <div class="info-list">
+            <div class="info-item">
+                <strong>Geçerlilik:</strong>
+                {% if weight_obj.period %}{{ weight_obj.period.title }}{% else %}Genel Varsayılan{% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Durum:</strong> {{ 'Aktif' if weight_obj.is_active else 'Pasif' }}
+            </div>
+            <div class="info-item">
+                <strong>Not:</strong> Nihai puan yalnız 1. ve 2. amirden oluşur.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const w1 = document.getElementById("w1");
+    const w2 = document.getElementById("w2");
+    const total = document.getElementById("weightTotal");
+
+    function num(v) {
+        let x = parseFloat(v || "0");
+        if (isNaN(x) || x < 0) x = 0;
+        if (x > 100) x = 100;
+        return x;
+    }
+
+    function syncFromFirst() {
+        const v1 = num(w1.value);
+        const v2 = 100 - v1;
+        w1.value = v1.toFixed(2);
+        w2.value = v2.toFixed(2);
+        total.textContent = "100.00";
+    }
+
+    function syncFromSecond() {
+        const v2 = num(w2.value);
+        const v1 = 100 - v2;
+        w2.value = v2.toFixed(2);
+        w1.value = v1.toFixed(2);
+        total.textContent = "100.00";
+    }
+
+    w1.addEventListener("input", syncFromFirst);
+    w2.addEventListener("input", syncFromSecond);
+
+    total.textContent = (num(w1.value) + num(w2.value)).toFixed(2);
+})();
+</script>
+{% endblock %}

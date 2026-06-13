@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>Personel Rapor Özeti - BYS360</title>
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#111827}
+        h1,h2,h3{margin:0 0 10px}
+        p{margin:0 0 10px;line-height:1.6;color:#4b5563}
+        .meta{margin-bottom:20px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}
+        .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+        .card{border:1px solid #e5e7eb;border-radius:12px;padding:14px 16px;background:#fff}
+        .card .label{font-size:12px;text-transform:uppercase;color:#6b7280;font-weight:700}
+        .card .value{margin-top:6px;font-size:20px;font-weight:800;color:#111827}
+        .section{margin-top:24px}
+        table{width:100%;border-collapse:collapse;margin-top:10px}
+        th,td{border:1px solid #e5e7eb;padding:8px 10px;text-align:left;vertical-align:top;font-size:13px}
+        th{background:#f8fafc}
+        ul{margin:10px 0 0 18px;color:#4b5563}
+        @media print { body{margin:12px} a{color:inherit;text-decoration:none} }
+    </style>
+</head>
+<body>
+    <h1>Personel Rapor Özeti</h1>
+    <div class="meta">
+        <p><strong>Üretim zamanı:</strong> {{ generated_at.strftime('%d.%m.%Y %H:%M') if generated_at else '-' }}</p>
+        <p><strong>Aktif dönem:</strong> {{ active_period.title if active_period else '-' }}</p>
+        <p><strong>Kapsam:</strong> {{ scope_label or (hr_scope.scope_label if hr_scope else '-') }}</p>
+        <p><strong>Readiness:</strong> {{ readiness.status if readiness else '-' }}</p>
+    </div>
+
+    <div class="grid">
+        <div class="card"><div class="label">İzin kaydı</div><div class="value">{{ leave_count }}</div></div>
+        <div class="card"><div class="label">Devamsızlık kaydı</div><div class="value">{{ attendance_count }}</div></div>
+        <div class="card"><div class="label">Vekâlet kaydı</div><div class="value">{{ delegation_count }}</div></div>
+        <div class="card"><div class="label">Muaf personel</div><div class="value">{{ exempt_count }}</div></div>
+    </div>
+
+    <div class="section">
+        <h2>Pilot / canlı öncesi hazırlık notları</h2>
+        <ul>
+            {% for note in readiness.notes or [] %}
+            <li>{{ note }}</li>
+            {% else %}
+            <li>Hazırlık notu yok.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Muafiyet listesi</h2>
+        <table>
+            <thead>
+                <tr><th>Personel</th><th>Fiili gün</th><th>İzin</th><th>Devamsızlık</th><th>Gerekçe</th></tr>
+            </thead>
+            <tbody>
+                {% for row in exempt_rows %}
+                <tr>
+                    <td>{{ row.user.full_name }}</td>
+                    <td>{{ row.impact.available_days }}</td>
+                    <td>{{ row.impact.leave_days }}</td>
+                    <td>{{ row.impact.absence_days }}</td>
+                    <td>{{ row.impact.reason or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">Muaf personel bulunmadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Açıkta kalan atamalar</h2>
+        <table>
+            <thead>
+                <tr><th>Personel</th><th>Seviye</th><th>Atanan</th><th>Kaynak</th><th>Not</th></tr>
+            </thead>
+            <tbody>
+                {% for row in uncovered_rows %}
+                <tr>
+                    <td>{{ row.employee.full_name if row.employee else '-' }}</td>
+                    <td>{{ row.manager_level or '-' }}</td>
+                    <td>{{ row.evaluator.full_name if row.evaluator else '-' }}</td>
+                    <td>{{ row.assignment_source or '-' }}</td>
+                    <td>{{ row.coverage_note or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">Açıkta kalan atama yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Son kapsama logları</h2>
+        <table>
+            <thead>
+                <tr><th>Personel</th><th>Birim</th><th>Olay</th><th>Seviye</th><th>Gerekçe</th></tr>
+            </thead>
+            <tbody>
+                {% for row in latest_assignment_logs_all or latest_assignment_logs %}
+                <tr>
+                    <td>{{ row.employee.full_name if row.employee else '-' }}</td>
+                    <td>{{ row.employee.birim if row.employee and row.employee.birim else 'Tanımsız' }}</td>
+                    <td>{{ row.event_type or '-' }}</td>
+                    <td>{{ row.manager_level or '-' }}</td>
+                    <td>{{ row.reason or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">Gösterilecek log yok.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+<div class="section">
+    <h2>Pilot kabul senaryoları</h2>
+    <table>
+        <thead>
+            <tr><th>Kod</th><th>Senaryo</th><th>Durum</th><th>Sorumlu</th><th>Kanıt</th></tr>
+        </thead>
+        <tbody>
+            {% for row in pilot_scenarios %}
+            <tr>
+                <td>{{ row.code }}</td>
+                <td>{{ row.title }}</td>
+                <td>{{ 'Geçti' if row.status == 'passed' else ('İzlenmeli' if row.status == 'watch' else 'Bloke') }}</td>
+                <td>{{ row.owner }}</td>
+                <td>{{ row.evidence }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5">Pilot kabul senaryosu bulunamadı.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Canlıya geçiş onay matrisi</h2>
+    <table>
+        <thead>
+            <tr><th>Rol</th><th>Durum</th><th>Kanıt</th><th>Not</th></tr>
+        </thead>
+        <tbody>
+            {% for row in go_live_approval_rows %}
+            <tr>
+                <td>{{ row.role }}</td>
+                <td>{{ 'Geçti' if row.status == 'passed' else ('İzlenmeli' if row.status == 'watch' else 'Bloke') }}</td>
+                <td>{{ row.evidence }}</td>
+                <td>{{ row.note }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Onay matrisi bulunamadı.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Pilot kapanış notları</h2>
+    <ul>
+        {% for note in pilot_notes %}
+        <li>{{ note }}</li>
+        {% else %}
+        <li>Not bulunamadı.</li>
+        {% endfor %}
+    </ul>
+    <p><strong>Canlıya geçiş yakınlık durumu:</strong> {{ 'Evet' if ready_for_go_live else 'Hayır' }}</p>
+</div>
+
+</body>
+</html>

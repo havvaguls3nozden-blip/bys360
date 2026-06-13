@@ -1,0 +1,37 @@
+/* BYS360_PWA_B73_CSS */
+:root {
+  --bys360-pwa-primary: #8B0000;
+  --bys360-pwa-safe-top: env(safe-area-inset-top, 0px);
+  --bys360-pwa-safe-right: env(safe-area-inset-right, 0px);
+  --bys360-pwa-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bys360-pwa-safe-left: env(safe-area-inset-left, 0px);
+}
+
+html.bys360-pwa-standalone body {
+  padding-top: var(--bys360-pwa-safe-top);
+  padding-bottom: var(--bys360-pwa-safe-bottom);
+  -webkit-tap-highlight-color: rgba(139, 0, 0, 0.12);
+  overscroll-behavior-y: contain;
+}
+
+html.bys360-pwa-ready input,
+html.bys360-pwa-ready textarea,
+html.bys360-pwa-ready select,
+html.bys360-pwa-ready button {
+  font-size: 16px;
+}
+
+.bys360-pwa-install-hint {
+  display: none;
+  margin: 10px 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(139,0,0,.14);
+  background: rgba(139,0,0,.06);
+  color: #3b1b1b;
+  font-size: 14px;
+}
+
+@media (display-mode: browser) and (max-width: 900px) {
+  body.bys360-show-pwa-hint .bys360-pwa-install-hint { display: block; }
+}

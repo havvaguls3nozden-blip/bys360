@@ -1,0 +1,253 @@
+{
+  "ok": false,
+  "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5F_ANDROID_RESPONSIVE_FINAL_EVIDENCE_GATE",
+  "android_responsive_final_evidence_gate_ok": false,
+  "final_handover_evidence_ok": false,
+  "responsive_release_suite_ok": false,
+  "visual_uat_evidence_ok": false,
+  "p5_phase_count": 5,
+  "p5_phases_passed": 0,
+  "responsive_css_evidence_ok": false,
+  "android_device_matrix_ok": false,
+  "android_device_matrix_count": 7,
+  "target_surface_inventory_ok": false,
+  "target_surface_count": 0,
+  "target_surface_exists_count": 0,
+  "responsive_marker_total": 2528,
+  "screenshot_evidence_optional_ok": true,
+  "screenshot_count": 0,
+  "final_markdown_ok": true,
+  "final_markdown_path": "C:\\bys360\\project\\docs\\qa\\BYS360_ANDROID_RESPONSIVE_FINAL_EVIDENCE_P5F.md",
+  "routes_py_lines": 237,
+  "routes_py_under_300_lines": true,
+  "total_mobile_route_decorator_count": 24,
+  "expected_contract_route_count": 24,
+  "direct_contract_ok": true,
+  "compile_ok": true,
+  "app_factory_ok": true,
+  "secret_gate_ok": true,
+  "secret_gate_finding_count": 0,
+  "pytest_ok": true,
+  "pytest_mode": "pytest_targeted_android_responsive_final_evidence_p5f",
+  "active_scope": {
+    "path": "C:\\bys360\\project\\tests\\architecture\\conftest.py",
+    "changed": false,
+    "reason": "already_present",
+    "compile_ok": true,
+    "compile_error": ""
+  },
+  "inventory": {
+    "routes_py_lines": 237,
+    "routes_py_under_300_lines": true,
+    "routes_py_route_count": 0,
+    "domains_dir_exists": true,
+    "domain_inventory": [
+      {
+        "path": "app/api/mobile/routes.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 237
+      },
+      {
+        "path": "app/api/mobile/domains/__init__.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 3
+      },
+      {
+        "path": "app/api/mobile/domains/assistant_chat.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 233
+      },
+      {
+        "path": "app/api/mobile/domains/auth.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 39
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v1_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 243
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v2_write.py",
+        "exists": true,
+        "route_count": 4,
+        "lines": 320
+      },
+      {
+        "path": "app/api/mobile/domains/dashboard.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 95
+      },
+      {
+        "path": "app/api/mobile/domains/kpi_target_management.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 233
+      },
+      {
+        "path": "app/api/mobile/domains/notifications.py",
+        "exists": true,
+        "route_count": 2,
+        "lines": 44
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_read.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 48
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_write_all.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 210
+      },
+      {
+        "path": "app/api/mobile/domains/support_survey_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 182
+      }
+    ],
+    "total_mobile_route_decorator_count": 24,
+    "expected_contract_route_count": 24,
+    "route_contract_count_expected": true
+  },
+  "android_responsive_final_evidence": {
+    "ok": false,
+    "p5_phase_count": 5,
+    "p5_phases_passed": 0,
+    "p5a_baseline_report_ok": false,
+    "p5b_core_styles_report_ok": false,
+    "p5c_targeted_templates_report_ok": false,
+    "p5d_release_suite_report_ok": false,
+    "p5e_visual_uat_report_ok": false,
+    "responsive_css_evidence_ok": false,
+    "visual_uat_evidence_ok": false,
+    "handover_evidence_ok": false,
+    "android_device_matrix_ok": false,
+    "android_device_matrix_count": 7,
+    "target_surface_inventory_ok": false,
+    "target_surface_count": 0,
+    "target_surface_exists_count": 0,
+    "responsive_marker_total": 2528,
+    "screenshot_evidence_optional_ok": true,
+    "screenshot_count": 0,
+    "missing_surface_flags": [],
+    "phase_results": [
+      {
+        "label": "P5A Android Responsive Baseline Gate",
+        "ok": false,
+        "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+        "key_metrics": {
+          "device_count": 7,
+          "responsive_marker_total": 2528
+        }
+      },
+      {
+        "label": "P5B Android Responsive Core Styles Gate",
+        "ok": false,
+        "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json",
+        "key_metrics": {
+          "media_query_count": 5,
+          "base_link_ok": true
+        }
+      },
+      {
+        "label": "P5C Android Responsive Targeted Templates Gate",
+        "ok": false,
+        "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_TARGETED_TEMPLATES_GATE_P5C_REPORT.json",
+        "key_metrics": {
+          "target_surface_count": null,
+          "target_surface_exists_count": null
+        }
+      },
+      {
+        "label": "P5D Android Responsive Release Suite Gate V2",
+        "ok": false,
+        "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE_P5D_V2_REPORT.json",
+        "key_metrics": {
+          "responsive_css_evidence_ok": null,
+          "expected_surface_coverage_ok": null
+        }
+      },
+      {
+        "label": "P5E Android Responsive Visual UAT Evidence Gate",
+        "ok": false,
+        "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_VISUAL_UAT_EVIDENCE_GATE_P5E_REPORT.json",
+        "key_metrics": {
+          "visual_uat_device_count": null,
+          "visual_uat_surface_count": null,
+          "screenshot_count": null
+        }
+      }
+    ],
+    "css_evidence": {
+      "p5b_css_exists": true,
+      "p5c_css_exists": true,
+      "p5b_css": "C:\\bys360\\project\\app\\static\\css\\bys360_android_responsive_core_p5b.css",
+      "p5c_css": "C:\\bys360\\project\\app\\static\\css\\bys360_android_responsive_targeted_p5c.css",
+      "p5b_css_lines": 263,
+      "p5c_css_lines": 393,
+      "p5b_linked_in_base": true,
+      "p5c_linked_in_base": true,
+      "ok": false
+    },
+    "visual_evidence": {
+      "checklist_path": "C:\\bys360\\project\\docs\\qa\\BYS360_ANDROID_RESPONSIVE_VISUAL_UAT_CHECKLIST_P5E.md",
+      "checklist_exists": true,
+      "checklist_line_count": 89,
+      "visual_uat_device_count": 0,
+      "visual_uat_surface_count": 0,
+      "screenshot_count": 0,
+      "screenshot_optional": true,
+      "ok": false
+    },
+    "source_reports": {
+      "p5a": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+      "p5b": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json",
+      "p5c": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_TARGETED_TEMPLATES_GATE_P5C_REPORT.json",
+      "p5d_v2": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE_P5D_V2_REPORT.json",
+      "p5e": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_VISUAL_UAT_EVIDENCE_GATE_P5E_REPORT.json"
+    }
+  },
+  "final_markdown": {
+    "path": "C:\\bys360\\project\\docs\\qa\\BYS360_ANDROID_RESPONSIVE_FINAL_EVIDENCE_P5F.md",
+    "exists": true,
+    "line_count": 33,
+    "ok": true
+  },
+  "compile_results": [],
+  "app_factory_smoke": {
+    "ok": true,
+    "skipped": true
+  },
+  "secret_gate": {
+    "ok": true,
+    "skipped": true,
+    "parsed": {
+      "finding_count": 0
+    }
+  },
+  "pytest": {
+    "ok": true,
+    "skipped": true,
+    "mode": "pytest_targeted_android_responsive_final_evidence_p5f"
+  },
+  "ci_commands": [
+    "python -m pip install -r requirements-dev.txt",
+    "python -m pytest tests/architecture -q",
+    "python scripts/quality/bys360_android_responsive_final_evidence_gate_p5f.py --root . --compile-all --app-factory --secret-gate --pytest-gate"
+  ],
+  "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROID_RESPONSIVE_FINAL_EVIDENCE_GATE_P5F_REPORT.json",
+  "next_actions": [
+    "P5F temizse Android responsive P5A-P5E zinciri final teslim kaniti olarak kapatilmis kabul edilebilir.",
+    "Sonraki asamada gorsel UAT bulgusu gelirse tekil ekran patchleri veya screenshot regression kanitlari eklenebilir."
+  ]
+}

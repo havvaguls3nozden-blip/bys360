@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}Görüşme Sonrası Notlar{% endblock %}
+
+{% block content %}
+{% set dashboard = dashboard if dashboard is defined else {} %}
+{% set meetings = meetings if meetings is defined else [] %}
+{% set selected_meeting = selected_meeting if selected_meeting is defined else None %}
+{% set preparation = preparation if preparation is defined else {} %}
+{% set after_note = after_note if after_note is defined else {} %}
+{% set actions = actions if actions is defined else [] %}
+{% set readiness = readiness if readiness is defined else [] %}
+{% set can_edit_aftercare = can_edit_aftercare if can_edit_aftercare is defined else false %}
+{% set phase7_usage_steps = phase7_usage_steps if phase7_usage_steps is defined else [] %}
+{% set phase7_detail_map = phase7_detail_map if phase7_detail_map is defined else [] %}
+{% set feedback_request_options = feedback_request_options if feedback_request_options is defined else [] %}
+{% set meeting_type_options = meeting_type_options if meeting_type_options is defined else [] %}
+{% set can_create_aftercare_meeting = can_create_aftercare_meeting if can_create_aftercare_meeting is defined else false %}
+{% set person_options = person_options if person_options is defined else [] %}
+{% set period_options = period_options if period_options is defined else [] %}
+{% set can_create_person_period_meeting = can_create_person_period_meeting if can_create_person_period_meeting is defined else false %}
+{% set meeting_period_map = meeting_period_map if meeting_period_map is defined else {} %}
+{% set active_create_tab = active_create_tab if active_create_tab is defined else 'person_period' %}
+
+<style>
+    .bys-aftercare-shell{--r:#8B0000;--ink:#172033;--muted:#657082;--line:rgba(23,32,51,.11);--soft:rgba(139,0,0,.07);--card:rgba(255,255,255,.92);max-width:1580px;margin:0 auto;padding:18px 18px 48px;}
+    .bys-hero{border:1px solid var(--line);border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,255,255,.82));box-shadow:0 24px 68px rgba(23,32,51,.10);padding:26px;margin-bottom:16px;overflow:hidden;position:relative;}
+    .bys-hero:after{content:"";position:absolute;right:-90px;top:-90px;width:250px;height:250px;border-radius:50%;background:var(--soft);pointer-events:none;}
+    .bys-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:var(--soft);color:var(--r);font-size:12px;font-weight:850;margin-bottom:12px;}
+    .bys-title{font-size:clamp(27px,3vw,43px);font-weight:880;color:var(--ink);letter-spacing:-.045em;line-height:1.05;margin:0;}
+    .bys-sub{max-width:1050px;color:var(--muted);font-size:15px;line-height:1.7;margin:12px 0 0;}
+    .bys-quick-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px;}
+    .bys-flow-card{border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.76);padding:15px;box-shadow:0 14px 34px rgba(23,32,51,.06);}
+    .bys-flow-no{font-size:12px;font-weight:900;color:var(--r);}
+    .bys-flow-title{font-size:14px;font-weight:850;color:var(--ink);margin-top:5px;}
+    .bys-flow-desc{font-size:12px;color:var(--muted);line-height:1.52;margin-top:5px;}
+    .bys-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+    .bys-stat{border:1px solid var(--line);border-radius:22px;background:var(--card);padding:16px;box-shadow:0 18px 48px rgba(23,32,51,.08);}
+    .bys-stat-value{font-size:28px;font-weight:880;color:var(--ink);letter-spacing:-.035em;}
+    .bys-stat-label{font-size:12px;color:var(--muted);font-weight:700;margin-top:3px;}
+    .bys-layout{display:grid;grid-template-columns:410px 1fr;gap:16px;align-items:start;}
+    .bys-card{border:1px solid var(--line);border-radius:24px;background:var(--card);box-shadow:0 18px 52px rgba(23,32,51,.08);overflow:hidden;margin-bottom:16px;}
+    .bys-card-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+    .bys-card-title{font-size:18px;font-weight:850;color:var(--ink);margin:0;letter-spacing:-.02em;}
+    .bys-card-desc{font-size:13px;color:var(--muted);line-height:1.55;margin:6px 0 0;}
+    .bys-card-b{padding:18px 20px;}
+    .bys-help-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+    .bys-help{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.68);padding:13px;}
+    .bys-help-title{font-size:13px;font-weight:850;color:var(--ink);}
+    .bys-help-text{font-size:12px;color:var(--muted);line-height:1.45;margin-top:5px;}
+    .bys-input,.bys-select,.bys-textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:15px;padding:11px 13px;color:var(--ink);outline:none;}
+    .bys-textarea{min-height:104px;resize:vertical;line-height:1.55;}
+    .bys-label{font-size:12px;font-weight:850;color:var(--ink);margin-bottom:7px;display:block;}
+    .bys-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .bys-form-full{grid-column:1/-1;}
+    .bys-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:11px 15px;font-weight:850;background:var(--r);color:#fff;box-shadow:0 12px 28px rgba(139,0,0,.18);text-decoration:none;}
+    .bys-btn:hover{color:#fff;transform:translateY(-1px);}
+    .bys-btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+    .bys-btn.soft{background:var(--soft);color:var(--r);box-shadow:none;}
+    .bys-filter{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;}
+    .bys-meeting-list{display:grid;gap:10px;max-height:700px;overflow:auto;padding-right:4px;}
+    .bys-meeting-item{display:block;border:1px solid var(--line);border-radius:18px;padding:13px;background:rgba(255,255,255,.74);text-decoration:none;color:inherit;transition:.18s ease;}
+    .bys-meeting-item:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(23,32,51,.08);}
+    .bys-meeting-item.active{border-color:rgba(139,0,0,.35);background:rgba(139,0,0,.055);}
+    .bys-person{font-weight:870;color:var(--ink);font-size:14px;}
+    .bys-meta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:5px;}
+    .bys-mini-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+    .bys-mini{border:1px solid var(--line);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800;background:#fff;color:var(--ink);}
+    .bys-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:850;background:var(--soft);color:var(--r);}
+    .bys-pill.muted{background:rgba(23,32,51,.07);color:var(--muted);}
+    .bys-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+    .bys-detail-title{font-size:25px;font-weight:880;letter-spacing:-.035em;margin:0;color:var(--ink);}
+    .bys-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px;}
+    .bys-detail-box{border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.70);padding:12px;}
+    .bys-detail-k{font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+    .bys-detail-v{font-size:13px;font-weight:850;color:var(--ink);margin-top:5px;}
+    .bys-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+    .bys-create-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .bys-create-tab{border:1px solid var(--line);border-radius:16px;background:#fff;padding:13px;text-align:left;}
+    .bys-create-tab strong{display:block;color:var(--ink);font-size:13px;}
+    .bys-create-tab span{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:4px;}
+    .bys-create-panel{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.66);padding:14px;margin-bottom:12px;}
+    .bys-create-panel-title{font-size:14px;font-weight:880;color:var(--ink);margin:0 0 4px;}
+    .bys-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 12px;color:var(--ink);font-weight:800;font-size:12px;text-decoration:none;}
+    .bys-section{scroll-margin-top:100px;}
+    .bys-section-head{display:flex;align-items:center;gap:12px;}
+    .bys-section-no{width:34px;height:34px;border-radius:12px;background:var(--soft);color:var(--r);display:flex;align-items:center;justify-content:center;font-weight:900;}
+    .bys-action{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.72);padding:14px;margin-bottom:12px;}
+    .bys-action-title{font-size:15px;font-weight:850;color:var(--ink);margin:0;}
+    .bys-mail{white-space:pre-wrap;background:#111827;color:#f9fafb;border-radius:18px;padding:16px;font-size:13px;line-height:1.55;max-height:380px;overflow:auto;}
+    .bys-empty{border:1px dashed rgba(23,32,51,.18);border-radius:20px;padding:24px;text-align:center;color:var(--muted);background:rgba(255,255,255,.55);}
+    .bys-callout{border:1px solid rgba(139,0,0,.16);background:rgba(139,0,0,.055);border-radius:18px;padding:14px;color:var(--ink);font-size:13px;line-height:1.55;margin-bottom:14px;}
+    .bys-checks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px;}
+    .bys-check{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.70);font-size:12px;color:var(--muted);}
+    .bys-check.ok{border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.07);color:#166534;}
+    @media(max-width:1200px){.bys-layout{grid-template-columns:1fr}.bys-quick-flow,.bys-stats,.bys-help-grid,.bys-detail-grid,.bys-checks{grid-template-columns:repeat(2,minmax(0,1fr));}.bys-meeting-list{max-height:none}}
+    @media(max-width:740px){.bys-aftercare-shell{padding:10px}.bys-hero{padding:20px;border-radius:22px}.bys-quick-flow,.bys-stats,.bys-help-grid,.bys-detail-grid,.bys-checks,.bys-form-grid,.bys-create-switch{grid-template-columns:1fr}.bys-card-h{display:block}.bys-detail-title{font-size:21px}}
+</style>
+
+<div class="bys-aftercare-shell">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    <section class="bys-hero">
+        <div class="bys-eyebrow"><i class="fa-solid fa-clipboard-check"></i> Performans Geri Bildirim Görüşmeleri</div>
+        <h1 class="bys-title">Görüşme Sonrası Notlar ve Eylem Planı</h1>
+        <p class="bys-sub">Bu sayfa görüşmenin ana dosyasıdır. Görüşme detayı, görüşme sonrası not, kararlaştırılan eylem planı ve takip sonucu aynı kayıt içinde tutulur.</p>
+        <div class="bys-quick-flow">
+            {% for step in phase7_usage_steps %}
+            <div class="bys-flow-card">
+                <div class="bys-flow-no">{{ step.no }}</div>
+                <div class="bys-flow-title">{{ step.title }}</div>
+                <div class="bys-flow-desc">{{ step.desc }}</div>
+            </div>
+            {% else %}
+            <div class="bys-flow-card"><div class="bys-flow-no">01</div><div class="bys-flow-title">Kayıt seç</div><div class="bys-flow-desc">Sol listeden görüşme kaydını aç.</div></div>
+            <div class="bys-flow-card"><div class="bys-flow-no">02</div><div class="bys-flow-title">Not yaz</div><div class="bys-flow-desc">Görüşme notları aynı kayıt içine yazılır.</div></div>
+            <div class="bys-flow-card"><div class="bys-flow-no">03</div><div class="bys-flow-title">Eylem ekle</div><div class="bys-flow-desc">Aksiyonlar görüşmeye bağlıdır.</div></div>
+            <div class="bys-flow-card"><div class="bys-flow-no">04</div><div class="bys-flow-title">Takip et</div><div class="bys-flow-desc">Durum ve sonuç daha sonra güncellenir.</div></div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+    <!-- BYS360_FEEDBACK_AFTERCARE_PHASE7_2_VISIBLE_NEW_BUTTON -->
+    <section class="bys-card" id="faz72-yeni-gorusme-kaydi" style="margin-bottom:16px;">
+        <div class="bys-card-b" style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+                <h2 class="bys-card-title" style="margin-bottom:4px;">Yeni Görüşme Kaydı Oluştur</h2>
+                <p class="bys-card-desc">Personel ve performans dönemi seçerek yeni görüşme dosyasını buradan açabilirsiniz. Sol liste yalnızca oluşturulmuş görüşmeleri gösterir; yeni kayıt açma işlemi bu butonla veya aşağıdaki Personel ve Dönem Görüşmesi alanıyla yapılır.</p>
+            </div>
+            <a class="bys-btn" href="{{ safe_url_for('main.performance_feedback_aftercare_new') }}"><i class="fa-solid fa-plus"></i> Yeni Görüşme Kaydı Oluştur</a>
+        </div>
+    </section>
+    <!-- /BYS360_FEEDBACK_AFTERCARE_PHASE7_2_VISIBLE_NEW_BUTTON -->
+
+    {% if not schema_ready %}
+    <div class="bys-card"><div class="bys-card-b"><div class="bys-empty">Görüşme kayıtları için gerekli ana tablolar henüz hazır görünmüyor. Geri bildirim görüşmeleri altyapısı kurulduktan sonra bu ekran kayıt göstermeye başlayacaktır.</div></div></div>
+    {% else %}
+    <div class="bys-stats">
+        <div class="bys-stat"><div class="bys-stat-value">{{ dashboard.total_meetings|default(0) }}</div><div class="bys-stat-label">Toplam görüşme kaydı</div></div>
+        <div class="bys-stat"><div class="bys-stat-value">{{ dashboard.prepared_meetings|default(0) }}</div><div class="bys-stat-label">Hazırlığı yazılan</div></div>
+        <div class="bys-stat"><div class="bys-stat-value">{{ dashboard.closed_meetings|default(0) }}</div><div class="bys-stat-label">Görüşme notu yazılan</div></div>
+        <div class="bys-stat"><div class="bys-stat-value">{{ dashboard.open_actions|default(0) }}</div><div class="bys-stat-label">Açık eylem planı</div></div>
+    </div>
+
+    <div class="bys-layout">
+        <aside>
+            <div class="bys-card" id="yeni-kayit">
+                <div class="bys-card-h">
+                    <div>
+                        <h2 class="bys-card-title">Yeni Görüşme Kaydı Oluştur</h2>
+                        <p class="bys-card-desc">Yeni kayıt doğrudan personel ve performans dönemi seçilerek açılır. Notlar kayıt oluşturulduktan sonra detay alanına yazılır.</p>
+                    </div>
+                </div>
+                <div class="bys-card-b">
+                    {% if can_create_aftercare_meeting %}
+
+                    <!-- BYS360_FEEDBACK_AFTERCARE_PHASE7_4_PERSON_PERIOD_SHORTCUT -->
+                    <div class="bys-callout" style="margin-bottom:14px;">
+                        <strong>Yeni kayıt nereden açılır?</strong> Personel ve dönem görüşmesi oluşturmak için aşağıdaki <strong>Personel ve Dönem Görüşmesi</strong> alanını kullanın. Sol liste yalnızca oluşturulmuş kayıtları gösterir.
+                    </div>
+                    <!-- /BYS360_FEEDBACK_AFTERCARE_PHASE7_4_PERSON_PERIOD_SHORTCUT -->
+                    <div class="bys-create-switch">
+                        <div class="bys-create-tab">
+                            <strong>Personel ve Dönem Görüşmesi</strong>
+                            <span>Talep oluşmamışsa buradan doğrudan personel ve performans dönemi seçilerek görüşme kaydı açılır.</span>
+                        </div>
+                        <div class="bys-create-tab">
+                            <strong>Açık Talep Üzerinden</strong>
+                            <span>Daha önce oluşturulmuş geri bildirim talebi varsa mevcut talebe bağlı görüşme kaydı açılır.</span>
+                        </div>
+                    </div>
+
+                    <div class="bys-create-panel" id="personel-donem-gorusmesi">
+                        <h3 class="bys-create-panel-title">Personel ve Dönem Görüşmesi</h3>
+                        <p class="bys-card-desc" style="margin-bottom:12px;">Görüşme sonrası not yazmaya başlamak için önce personel ve dönem seçilerek ana görüşme kaydı oluşturulur.</p>
+                        {% if can_create_person_period_meeting %}
+                            {% if person_options and period_options %}
+                            <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_create_person_period') }}" class="bys-form-grid">
+                                {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                                <div class="bys-form-full">
+                                    <label class="bys-label">Personel</label>
+                                    <select class="bys-select" name="employee_id" required>
+                                        <option value="">Personel seçiniz</option>
+                                        {% for person in person_options %}
+                                        <option value="{{ person.id }}">{{ person.label }}{% if person.sicil_no %} · Sicil: {{ person.sicil_no }}{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="bys-form-full">
+                                    <label class="bys-label">Performans dönemi</label>
+                                    <select class="bys-select" name="period_id" required>
+                                        <option value="">Dönem seçiniz</option>
+                                        {% for period in period_options %}
+                                        <option value="{{ period.id }}">{{ period.label }}{% if period.status_label %} · {{ period.status_label }}{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div><label class="bys-label">Görüşme tarihi</label><input class="bys-input" type="date" name="meeting_date"></div>
+                                <div><label class="bys-label">Görüşme türü</label><select class="bys-select" name="meeting_type">{% for opt in meeting_type_options %}<option value="{{ opt.value }}">{{ opt.label }}</option>{% endfor %}</select></div>
+                                <div><label class="bys-label">Başlangıç</label><input class="bys-input" type="time" name="meeting_start" value="09:00"></div>
+                                <div><label class="bys-label">Bitiş</label><input class="bys-input" type="time" name="meeting_end" value="10:00"></div>
+                                <div class="bys-form-full"><label class="bys-label">Yer / yöntem</label><input class="bys-input" name="location" placeholder="Yüz yüze, Teams, makam odası..."></div>
+                                <div class="bys-form-full"><label class="bys-label">Kısa açıklama</label><textarea class="bys-textarea" name="note" placeholder="Bu görüşme hangi dönem ve hangi amaçla yapılıyor?"></textarea></div>
+                                <div class="bys-form-full"><button class="bys-btn" type="submit"><i class="fa-solid fa-plus"></i> Personel ve Dönem Görüşmesi Oluştur</button></div>
+                            </form>
+                            {% elif not person_options %}
+                            <div class="bys-empty">Personel listesi alınamadı. Personel kayıtları ve kullanıcı tablosu kontrol edilmelidir.</div>
+                            {% else %}
+                            <div class="bys-empty">Performans dönemi bulunamadı. Önce Performans Yönetimi &gt; Dönemler ekranından dönem oluşturulmalıdır.</div>
+                            {% endif %}
+                        {% else %}
+                        <div class="bys-empty">Personel ve dönem seçerek görüşme kaydı oluşturma yetkiniz bulunmamaktadır.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bys-create-panel" id="acik-talep-gorusmesi">
+                        <h3 class="bys-create-panel-title">Açık Talep Üzerinden Görüşme</h3>
+                        <p class="bys-card-desc" style="margin-bottom:12px;">Önceden oluşturulmuş geri bildirim talebi varsa buradan aynı talebe bağlı görüşme kaydı açılır.</p>
+                        {% if feedback_request_options %}
+                        <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_create') }}" class="bys-form-grid">
+                            {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                            <div class="bys-form-full">
+                                <label class="bys-label">Açık geri bildirim talebi</label>
+                                <select class="bys-select" name="feedback_request_id" required>
+                                    <option value="">Seçiniz</option>
+                                    {% for req in feedback_request_options %}
+                                    <option value="{{ req.id }}">{{ req.employee_label }} · {{ req.period_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div><label class="bys-label">Görüşme tarihi</label><input class="bys-input" type="date" name="meeting_date"></div>
+                            <div><label class="bys-label">Görüşme türü</label><select class="bys-select" name="meeting_type">{% for opt in meeting_type_options %}<option value="{{ opt.value }}">{{ opt.label }}</option>{% endfor %}</select></div>
+                            <div><label class="bys-label">Başlangıç</label><input class="bys-input" type="time" name="meeting_start" value="09:00"></div>
+                            <div><label class="bys-label">Bitiş</label><input class="bys-input" type="time" name="meeting_end" value="10:00"></div>
+                            <div class="bys-form-full"><label class="bys-label">Yer / yöntem</label><input class="bys-input" name="location" placeholder="Yüz yüze, Teams, makam odası..."></div>
+                            <div class="bys-form-full"><label class="bys-label">Kısa açıklama</label><textarea class="bys-textarea" name="note" placeholder="Bu görüşme neden açılıyor?"></textarea></div>
+                            <div class="bys-form-full"><button class="bys-btn secondary" type="submit"><i class="fa-solid fa-link"></i> Talebe Bağlı Görüşme Oluştur</button></div>
+                        </form>
+                        {% else %}
+                        <div class="bys-empty">Açık geri bildirim talebi bulunamadı. Bu normaldir; talep yoksa yukarıdaki Personel ve Dönem Görüşmesi alanından kayıt açabilirsiniz.</div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="bys-empty">Bu alandan yeni görüşme kaydı oluşturma yetkiniz bulunmamaktadır.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="bys-card" id="liste">
+                <div class="bys-card-h">
+                    <div>
+                        <h2 class="bys-card-title">Mevcut Görüşme Kayıtları</h2>
+                        <p class="bys-card-desc">Sol liste yalnızca daha önce oluşturulmuş görüşme kayıtlarını gösterir. Yeni görüşme açmak için Yeni Görüşme Kaydı Oluştur butonunu veya Personel ve Dönem Görüşmesi alanını kullanın.</p>
+                    </div>
+                </div>
+                <div class="bys-card-b">
+                    <form class="bys-filter" method="get" action="{{ safe_url_for('main.performance_feedback_aftercare') }}">
+                        <input class="bys-input" name="q" value="{{ query|default('') }}" placeholder="Personel, amir veya açıklama ara">
+                        <select class="bys-select" name="status">
+                            <option value="all" {% if status == 'all' %}selected{% endif %}>Tüm durumlar</option>
+                            {% for opt in status_options %}<option value="{{ opt.value }}" {% if status == opt.value %}selected{% endif %}>{{ opt.label }}</option>{% endfor %}
+                        </select>
+                        <button class="bys-btn secondary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Listeyi Süz</button>
+                    </form>
+                    <div class="bys-meeting-list">
+                        {% for meeting in meetings %}
+                        <a class="bys-meeting-item {% if selected_meeting and selected_meeting.id == meeting.id %}active{% endif %}" href="{{ safe_url_for('main.performance_feedback_aftercare_detail', meeting_id=meeting.id) }}">
+                            <div class="bys-person">{{ meeting.employee_label or 'Personel' }}</div>
+                            <div class="bys-meta">Dönem: {{ meeting.period_label or meeting_period_map.get(meeting.id) or '-' }} · {{ meeting.meeting_date or '-' }} · {{ meeting.meeting_start or '-' }} · Amir: {{ meeting.manager_label or '-' }}</div>
+                            <div class="bys-mini-actions">
+                                <span class="bys-mini">Detayı Aç</span>
+                                {% if meeting.has_after_note or meeting.is_closed %}<span class="bys-mini">Not var</span>{% else %}<span class="bys-mini">Not bekliyor</span>{% endif %}
+                                {% if meeting.action_count %}<span class="bys-mini">{{ meeting.action_count }} eylem</span>{% else %}<span class="bys-mini">Eylem yok</span>{% endif %}
+                            </div>
+                        </a>
+                        {% else %}
+
+                        <div class="bys-empty">
+                            <strong>Henüz görüşme kaydı oluşturulmamış.</strong><br>
+                            Sol liste, kayıt açma alanı değildir; burada yalnızca oluşturulmuş görüşmeler görünür. Personel ve dönem seçerek yeni dosya açmak için aşağıdaki butonu kullanın.
+                            <div class="bys-mini-actions" style="margin-top:12px;">
+                                <a class="bys-btn" href="{{ safe_url_for('main.performance_feedback_aftercare_new') }}"><i class="fa-solid fa-plus"></i> Personel ve Dönem Görüşmesi Aç</a>
+                                <a class="bys-btn secondary" href="#yeni-kayit"><i class="fa-solid fa-arrow-up"></i> Sayfadaki Yeni Kayıt Alanına Git</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="bys-help-grid">
+                {% for item in phase7_detail_map %}
+                <div class="bys-help"><div class="bys-help-title">{{ item.title }}</div><div class="bys-help-text">{{ item.text }}</div></div>
+                {% endfor %}
+            </div>
+
+            {% if selected_meeting %}
+            <section class="bys-card" id="detay">
+                <div class="bys-card-h">
+                    <div class="bys-detail-head">
+                        <div>
+                            <h2 class="bys-detail-title">{{ selected_meeting.employee_label or 'Personel' }} görüşme dosyası</h2>
+                            <p class="bys-card-desc">Görüşme detayı, görüşme notu ve eylem planı bu tek kayda bağlıdır.</p>
+                        </div>
+                        <div class="bys-mini-actions">
+                            <a class="bys-btn soft" href="#notlar"><i class="fa-solid fa-pen"></i> Not Gir</a>
+                            <a class="bys-btn soft" href="#eylem"><i class="fa-solid fa-list-check"></i> Eylem Ekle</a>
+                            <a class="bys-btn secondary" href="{{ safe_url_for('main.performance_feedback_followup') }}"><i class="fa-solid fa-calendar-check"></i> Takip Ekranı</a>
+                        </div>
+                    </div>
+                    <div class="bys-detail-grid">
+                        <div class="bys-detail-box"><div class="bys-detail-k">Personel</div><div class="bys-detail-v">{{ selected_meeting.employee_label or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Dönem</div><div class="bys-detail-v">{{ selected_meeting.period_label or meeting_period_map.get(selected_meeting.id) or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Amir</div><div class="bys-detail-v">{{ selected_meeting.manager_label or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Tarih / Saat</div><div class="bys-detail-v">{{ selected_meeting.meeting_date or '-' }} · {{ selected_meeting.meeting_start or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Durum</div><div class="bys-detail-v">{{ selected_meeting.status_label or '-' }}</div></div>
+                    </div>
+                    <div class="bys-tabs">
+                        <a class="bys-tab" href="#bilgi">Görüşme Bilgisi</a>
+                        <a class="bys-tab" href="#notlar">Görüşme Notları</a>
+                        <a class="bys-tab" href="#eylem">Eylem Planları</a>
+                        <a class="bys-tab" href="#takip">Takip ve Mail Özeti</a>
+                    </div>
+                </div>
+                <div class="bys-card-b">
+                    <div class="bys-callout"><strong>Not nereye eklenecek?</strong> Görüşme notu aşağıdaki <strong>Görüşme Notları</strong> bölümüne yazılır. Eylem planı aynı kaydın altındaki <strong>Eylem Planları</strong> bölümüne eklenir. Daha sonra durum güncellemesi <strong>Takip</strong> alanından yapılır.</div>
+                    <div class="bys-checks">
+                        {% for check in readiness %}<div class="bys-check {% if check.ok %}ok{% endif %}"><i class="fa-solid {% if check.ok %}fa-check{% else %}fa-circle{% endif %}"></i> {{ check.label }}</div>{% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="bys-card bys-section" id="bilgi">
+                <div class="bys-card-h"><div class="bys-section-head"><div class="bys-section-no">1</div><div><h3 class="bys-card-title">Görüşme Bilgisi</h3><p class="bys-card-desc">Bu bölüm görüşmenin kimle, hangi tarihte ve hangi bağlamda yapıldığını gösterir.</p></div></div></div>
+                <div class="bys-card-b">
+                    <div class="bys-detail-grid">
+                        <div class="bys-detail-box"><div class="bys-detail-k">Sicil</div><div class="bys-detail-v">{{ selected_meeting.employee_sicil or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Yer / yöntem</div><div class="bys-detail-v">{{ selected_meeting.location or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Görüşme türü</div><div class="bys-detail-v">{{ selected_meeting.meeting_type or '-' }}</div></div>
+                        <div class="bys-detail-box"><div class="bys-detail-k">Bitiş</div><div class="bys-detail-v">{{ selected_meeting.meeting_end or '-' }}</div></div>
+                    </div>
+                    {% if selected_meeting.note %}<div class="bys-callout" style="margin-top:14px;">{{ selected_meeting.note }}</div>{% endif %}
+                </div>
+            </section>
+
+            <section class="bys-card bys-section" id="hazirlik">
+                <div class="bys-card-h"><div class="bys-section-head"><div class="bys-section-no">2</div><div><h3 class="bys-card-title">Görüşme Hazırlığı</h3><p class="bys-card-desc">Görüşmeden önce amaç, somut örnekler ve açılış dili burada hazırlanır.</p></div></div></div>
+                <div class="bys-card-b">
+                    <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_save_preparation', meeting_id=selected_meeting.id) }}" class="bys-form-grid">
+                        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                        <div class="bys-form-full"><label class="bys-label">Görüşmenin amacı</label><textarea class="bys-textarea" name="purpose" placeholder="Bu görüşmede neyi netleştirmek istiyoruz?">{{ preparation.purpose|default('') }}</textarea></div>
+                        <div><label class="bys-label">Çalışan özeti</label><textarea class="bys-textarea" name="employee_summary">{{ preparation.employee_summary|default('') }}</textarea></div>
+                        <div><label class="bys-label">SBI somut örnekleri</label><textarea class="bys-textarea" name="sbi_examples" placeholder="Durum - Davranış - Etki">{{ preparation.sbi_examples|default('') }}</textarea></div>
+                        <div><label class="bys-label">Güçlü yönler</label><textarea class="bys-textarea" name="strong_points">{{ preparation.strong_points|default('') }}</textarea></div>
+                        <div><label class="bys-label">Gelişim alanları</label><textarea class="bys-textarea" name="development_areas">{{ preparation.development_areas|default('') }}</textarea></div>
+                        <div class="bys-form-full"><label class="bys-label">Açılış cümlesi</label><textarea class="bys-textarea" name="opening_sentence" placeholder="Görüşmeye hangi cümleyle başlanacak?">{{ preparation.opening_sentence|default('') }}</textarea></div>
+                        <div><label class="bys-label">Hassas konu / beklenen itiraz</label><textarea class="bys-textarea" name="sensitive_topics">{{ preparation.sensitive_topics|default('') }}</textarea></div>
+                        <div><label class="bys-label">Taslak aksiyon önerileri</label><textarea class="bys-textarea" name="draft_actions">{{ preparation.draft_actions|default('') }}</textarea></div>
+                        <div class="bys-form-full"><button class="bys-btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Hazırlığı Kaydet</button></div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="bys-card bys-section" id="notlar">
+                <div class="bys-card-h"><div class="bys-section-head"><div class="bys-section-no">3</div><div><h3 class="bys-card-title">Görüşme Notları</h3><p class="bys-card-desc">Asıl görüşme sonrası not buraya yazılır. Bu alan görüşme detayının kalıcı özetidir.</p></div></div></div>
+                <div class="bys-card-b">
+                    <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_save_after_note', meeting_id=selected_meeting.id) }}" class="bys-form-grid">
+                        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                        <div class="bys-form-full"><label class="bys-label">Görüşme özeti</label><textarea class="bys-textarea" name="meeting_summary" placeholder="Görüşmede genel olarak ne konuşuldu?">{{ after_note.meeting_summary|default('') }}</textarea></div>
+                        <div><label class="bys-label">Personelin kendi değerlendirmesi</label><textarea class="bys-textarea" name="employee_self_assessment" placeholder="Personel kendi performansı hakkında ne söyledi?">{{ after_note.employee_self_assessment|default('') }}</textarea></div>
+                        <div><label class="bys-label">Amir gözlemi</label><textarea class="bys-textarea" name="manager_observation" placeholder="Amirin gözlemi ve değerlendirmesi">{{ after_note.manager_observation|default('') }}</textarea></div>
+                        <div><label class="bys-label">Güçlü yönler</label><textarea class="bys-textarea" name="strong_points">{{ after_note.strong_points|default('') }}</textarea></div>
+                        <div><label class="bys-label">Gelişim alanları</label><textarea class="bys-textarea" name="development_areas">{{ after_note.development_areas|default('') }}</textarea></div>
+                        <div class="bys-form-full"><label class="bys-label">Kararlaştırılan aksiyon özeti</label><textarea class="bys-textarea" name="agreed_actions_summary" placeholder="Görüşmede hangi aksiyonlar üzerinde anlaşıldı?">{{ after_note.agreed_actions_summary|default('') }}</textarea></div>
+                        <div><label class="bys-label">Personelin son sözü</label><textarea class="bys-textarea" name="employee_final_words" placeholder="Personelin eklemek istediği son görüş">{{ after_note.employee_final_words|default('') }}</textarea></div>
+                        <div><label class="bys-label">Kapanış durumu</label><select class="bys-select" name="closure_status"><option value="taslak" {% if after_note.closure_status|default('taslak') == 'taslak' %}selected{% endif %}>Taslak</option><option value="tamamlandi" {% if after_note.closure_status == 'tamamlandi' %}selected{% endif %}>Tamamlandı</option><option value="takipte" {% if after_note.closure_status == 'takipte' %}selected{% endif %}>Takipte</option></select><label class="mt-3 d-flex align-items-center gap-2"><input type="checkbox" name="summary_mail_sent" {% if after_note.summary_mail_sent %}checked{% endif %}> <span class="bys-meta">Özet maili gönderildi olarak işaretle</span></label></div>
+                        <div class="bys-form-full"><button class="bys-btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Görüşme Notlarını Kaydet</button></div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="bys-card bys-section" id="eylem">
+                <div class="bys-card-h"><div class="bys-section-head"><div class="bys-section-no">4</div><div><h3 class="bys-card-title">Eylem Planları</h3><p class="bys-card-desc">Görüşmede kararlaştırılan yapılacaklar aynı görüşme kaydının altına bağlanır.</p></div></div></div>
+                <div class="bys-card-b">
+                    <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_add_action', meeting_id=selected_meeting.id) }}" class="bys-form-grid mb-4">
+                        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                        <div><label class="bys-label">Aksiyon başlığı</label><input class="bys-input" name="title" placeholder="Örn. Rapor teslim sürelerini iyileştirme"></div>
+                        <div><label class="bys-label">Hedef tarih</label><input class="bys-input" type="date" name="target_date"></div>
+                        <div class="bys-form-full"><label class="bys-label">SMART açıklama</label><textarea class="bys-textarea" name="smart_description" placeholder="Belirli, ölçülebilir, ulaşılabilir, ilgili ve tarihli olacak şekilde yazın."></textarea></div>
+                        <div><label class="bys-label">Sorumlu</label><select class="bys-select" name="responsible_role">{% for opt in responsible_options %}<option value="{{ opt.value }}">{{ opt.label }}</option>{% endfor %}</select></div>
+                        <div><label class="bys-label">Durum</label><select class="bys-select" name="status">{% for opt in action_status_options %}<option value="{{ opt.value }}">{{ opt.label }}</option>{% endfor %}</select></div>
+                        <div class="bys-form-full"><button class="bys-btn" type="submit"><i class="fa-solid fa-plus"></i> Eylem Planı Ekle</button></div>
+                    </form>
+
+                    {% for action in actions %}
+                    <div class="bys-action">
+                        <div class="d-flex justify-content-between gap-2 flex-wrap"><h4 class="bys-action-title">{{ action.title }}</h4><div class="d-flex gap-2 flex-wrap"><span class="bys-pill">{{ action.status_label }}</span><span class="bys-pill muted">{{ action.responsible_label }}</span>{% if action.target_date %}<span class="bys-pill muted">Hedef: {{ action.target_date }}</span>{% endif %}</div></div>
+                        <div class="bys-meta mt-2">{{ action.smart_description or '-' }}</div>
+                        <form method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_update_action', action_id=action.id) }}" class="bys-form-grid mt-3" id="takip">
+                            {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                            <div><label class="bys-label">Durum</label><select class="bys-select" name="status">{% for opt in action_status_options %}<option value="{{ opt.value }}" {% if action.status == opt.value %}selected{% endif %}>{{ opt.label }}</option>{% endfor %}</select></div>
+                            <div><label class="bys-label">Sonuç özeti</label><input class="bys-input" name="result_summary" value="{{ action.result_summary or '' }}" placeholder="Gelişti, takip sürecek, tamamlandı..."></div>
+                            <div class="bys-form-full"><label class="bys-label">Takip notu</label><textarea class="bys-textarea" name="follow_up_note" placeholder="30 günlük kontrol veya ara takip notu">{{ action.follow_up_note or '' }}</textarea></div>
+                            <div class="bys-form-full"><button class="bys-btn secondary" type="submit"><i class="fa-solid fa-rotate"></i> Takip Bilgisini Güncelle</button></div>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="bys-empty">Bu görüşmeye bağlı eylem planı henüz eklenmemiş.</div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="bys-card bys-section" id="takip-ozeti">
+                <div class="bys-card-h"><div class="bys-section-head"><div class="bys-section-no">5</div><div><h3 class="bys-card-title">Takip ve Mail Özeti</h3><p class="bys-card-desc">Görüşme sonrası özet metin buradan kontrol edilir; takip ekranına da buradan geçilir.</p></div></div></div>
+                <div class="bys-card-b">
+                    <div class="bys-mini-actions" style="margin-bottom:14px;">
+                        <a class="bys-btn secondary" href="{{ safe_url_for('main.performance_feedback_followup') }}"><i class="fa-solid fa-calendar-check"></i> Eylem Planı Takibine Git</a>
+                        <a class="bys-btn secondary" href="{{ safe_url_for('main.performance_feedback_integration') }}"><i class="fa-solid fa-link"></i> Karne Entegrasyonunda Gör</a>
+                    </div>
+                    <div class="bys-mail">{{ mail_draft }}</div>
+                </div>
+            </section>
+            {% else %}
+            
+            <div class="bys-card" id="gorusme-akisi-netlestirme">
+                <div class="bys-card-h">
+                    <div>
+                        <h2 class="bys-card-title">Görüşme detayları burada açılır</h2>
+                        <p class="bys-card-desc">Önce personel ve performans dönemi seçilerek yeni görüşme dosyası oluşturulur. Kayıt oluştuktan sonra görüşme notu, eylem planı ve takip bilgisi aynı dosyanın içine yazılır.</p>
+                    </div>
+                    <a class="bys-btn" href="{{ safe_url_for('main.performance_feedback_aftercare_new') }}"><i class="fa-solid fa-plus"></i> Personel ve Dönem Görüşmesi Aç</a>
+                </div>
+                <div class="bys-card-b">
+                    <div class="bys-help-grid" style="margin-bottom:0;">
+                        <div class="bys-help"><div class="bys-help-title">1. Yeni dosya aç</div><div class="bys-help-text">Personel ve dönem seçilerek ana görüşme kaydı oluşturulur.</div></div>
+                        <div class="bys-help"><div class="bys-help-title">2. Notları yaz</div><div class="bys-help-text">Görüşme özeti, personelin değerlendirmesi ve amir gözlemi bu dosyaya kaydedilir.</div></div>
+                        <div class="bys-help"><div class="bys-help-title">3. Eylem planı ekle</div><div class="bys-help-text">Kararlaştırılan aksiyonlar aynı görüşme kaydının altında takip edilir.</div></div>
+                        <div class="bys-help"><div class="bys-help-title">4. Takibi güncelle</div><div class="bys-help-text">Hedef tarih yaklaşınca takip notu ve sonuç bilgisi güncellenir.</div></div>
+                    </div>
+                    <div class="bys-callout" style="margin-top:16px;">
+                        <strong>Önemli:</strong> Soldaki liste yeni kayıt açma alanı değildir. O liste, yalnızca daha önce oluşturulmuş görüşme dosyalarını gösterir. Henüz kayıt yoksa önce <strong>Personel ve Dönem Görüşmesi Aç</strong> butonunu kullanın.
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+    {% endif %}
+</div>
+
+{# BYS360_AI_DECISION_FAZ10_PANEL_INCLUDED #}
+{% include 'ai_decision/_interim_feedback_panel.html' ignore missing %}
+
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}

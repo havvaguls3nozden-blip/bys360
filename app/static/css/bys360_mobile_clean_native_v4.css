@@ -1,0 +1,242 @@
+/* BYS360 Mobile Clean Native V4
+   Amaç: V3 bottom bar/kötü kabuk etkisini kaldırmak, tek hamburger, çalışan drawer ve gerçek scroll.
+   Önceki Faz1/V2/V3 dosyaları base.html'den devre dışı bırakılır; bu dosya mobilde tek otoritedir. */
+
+:root{
+  --bys360-v4-red:#8B0000;
+  --bys360-v4-red-dark:#6f0000;
+  --bys360-v4-bg:#f6f3ef;
+  --bys360-v4-card:#ffffff;
+  --bys360-v4-text:#231f20;
+  --bys360-v4-muted:#6b5f5b;
+  --bys360-v4-border:rgba(139,0,0,.12);
+  --bys360-v4-shadow:0 10px 28px rgba(31,20,18,.10);
+  --bys360-v4-top-safe:env(safe-area-inset-top,0px);
+  --bys360-v4-bottom-safe:env(safe-area-inset-bottom,0px);
+}
+
+#bys360MobileTabbarV3,
+#bys360MobileNativeMenuV3,
+#bys360MobileNativeMenuV2,
+.bys360-mobile-native-menu-button,
+.bys360-mobile-app-bottom-nav,
+.bys360-mobile-tabbar,
+.bys360-bottom-tabbar{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+@media (max-width:1100px){
+  html.bys360-mobile-clean-v4,
+  body.bys360-mobile-clean-v4{
+    width:100%!important;
+    min-width:0!important;
+    min-height:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    position:static!important;
+    overscroll-behavior-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-y!important;
+    background:var(--bys360-v4-bg)!important;
+  }
+
+  body.bys360-mobile-clean-v4{
+    padding-bottom:calc(18px + var(--bys360-v4-bottom-safe))!important;
+    color:var(--bys360-v4-text)!important;
+  }
+
+  body.bys360-mobile-clean-v4::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 0 0, rgba(139,0,0,.10), transparent 34%),
+      linear-gradient(180deg,#fffaf7 0%,#f6f3ef 44%,#eee8e1 100%);
+  }
+
+  body.bys360-mobile-clean-v4 .app-shell,
+  body.bys360-mobile-clean-v4 .layout,
+  body.bys360-mobile-clean-v4 .wrapper,
+  body.bys360-mobile-clean-v4 .page-wrapper,
+  body.bys360-mobile-clean-v4 .main-wrapper,
+  body.bys360-mobile-clean-v4 .app-main,
+  body.bys360-mobile-clean-v4 .main-content,
+  body.bys360-mobile-clean-v4 .content-wrapper,
+  body.bys360-mobile-clean-v4 .page-content,
+  body.bys360-mobile-clean-v4 .app-content,
+  body.bys360-mobile-clean-v4 main,
+  body.bys360-mobile-clean-v4 #content,
+  body.bys360-mobile-clean-v4 #mainContent{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:visible!important;
+    position:relative!important;
+    margin-left:0!important;
+  }
+
+  body.bys360-mobile-clean-v4 .app-main,
+  body.bys360-mobile-clean-v4 .main-content,
+  body.bys360-mobile-clean-v4 .content-wrapper,
+  body.bys360-mobile-clean-v4 main{
+    padding-bottom:32px!important;
+  }
+
+  body.bys360-mobile-clean-v4 .topbar,
+  body.bys360-mobile-clean-v4 .navbar,
+  body.bys360-mobile-clean-v4 header.app-header,
+  body.bys360-mobile-clean-v4 .app-topbar{
+    position:sticky!important;
+    top:0!important;
+    z-index:1800!important;
+    min-height:58px!important;
+    height:auto!important;
+    padding-top:calc(8px + var(--bys360-v4-top-safe))!important;
+    padding-bottom:8px!important;
+    background:rgba(255,255,255,.96)!important;
+    backdrop-filter:blur(14px)!important;
+    -webkit-backdrop-filter:blur(14px)!important;
+    border-bottom:1px solid var(--bys360-v4-border)!important;
+    box-shadow:0 8px 22px rgba(31,20,18,.06)!important;
+  }
+
+  body.bys360-mobile-clean-v4 #menuToggle,
+  body.bys360-mobile-clean-v4 .menu-toggle[data-bys360-v4-primary="true"],
+  body.bys360-mobile-clean-v4 #bys360MobileMenuV4{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(139,0,0,.18)!important;
+    background:#fff!important;
+    color:var(--bys360-v4-red)!important;
+    box-shadow:0 8px 20px rgba(31,20,18,.10)!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+
+  body.bys360-mobile-clean-v4 button[data-bys360-v4-duplicate="true"],
+  body.bys360-mobile-clean-v4 .bys360-mobile-menu-toggle:not([data-bys360-v4-primary="true"]),
+  body.bys360-mobile-clean-v4 .bys360-mobile-toggle:not([data-bys360-v4-primary="true"]),
+  body.bys360-mobile-clean-v4 button[aria-label="Menüyü aç"]:not([data-bys360-v4-primary="true"]),
+  body.bys360-mobile-clean-v4 button[aria-label="Menüyü aç veya kapat"]:not([data-bys360-v4-primary="true"]){
+    display:none!important;
+  }
+
+  #bys360MobileMenuV4{
+    position:fixed!important;
+    top:calc(10px + var(--bys360-v4-top-safe))!important;
+    left:12px!important;
+    z-index:2300!important;
+  }
+
+  #bys360MobileMenuV4 span,
+  #bys360MobileMenuV4 span::before,
+  #bys360MobileMenuV4 span::after{
+    content:"";
+    display:block;
+    width:20px;
+    height:2px;
+    background:currentColor;
+    border-radius:999px;
+  }
+  #bys360MobileMenuV4 span::before{ transform:translateY(-6px); }
+  #bys360MobileMenuV4 span::after{ transform:translateY(4px); }
+
+  body.bys360-mobile-clean-v4 #appSidebar,
+  body.bys360-mobile-clean-v4 aside.sidebar,
+  body.bys360-mobile-clean-v4 .app-sidebar,
+  body.bys360-mobile-clean-v4 body > .sidebar{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    bottom:0!important;
+    width:min(86vw,330px)!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    transform:translateX(-105%)!important;
+    transition:transform .22s cubic-bezier(.2,.8,.2,1)!important;
+    z-index:2200!important;
+    box-shadow:24px 0 54px rgba(0,0,0,.25)!important;
+  }
+
+  body.bys360-mobile-menu-open #appSidebar,
+  body.bys360-mobile-menu-open aside.sidebar,
+  body.bys360-mobile-menu-open .app-sidebar,
+  body.bys360-mobile-menu-open body > .sidebar{
+    transform:translateX(0)!important;
+  }
+
+  #bys360MobileBackdropV4{
+    position:fixed;
+    inset:0;
+    z-index:2100;
+    background:rgba(25,15,12,.42);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  body.bys360-mobile-menu-open #bys360MobileBackdropV4{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  body.bys360-mobile-clean-v4 .card,
+  body.bys360-mobile-clean-v4 .panel,
+  body.bys360-mobile-clean-v4 .box,
+  body.bys360-mobile-clean-v4 .content-card,
+  body.bys360-mobile-clean-v4 .dashboard-card,
+  body.bys360-mobile-clean-v4 .stat-card,
+  body.bys360-mobile-clean-v4 form{
+    border-radius:18px!important;
+    border:1px solid var(--bys360-v4-border)!important;
+    background:rgba(255,255,255,.96)!important;
+    box-shadow:var(--bys360-v4-shadow)!important;
+  }
+
+  body.bys360-mobile-clean-v4 input,
+  body.bys360-mobile-clean-v4 select,
+  body.bys360-mobile-clean-v4 textarea,
+  body.bys360-mobile-clean-v4 button,
+  body.bys360-mobile-clean-v4 .btn{
+    min-height:44px;
+    font-size:16px!important;
+    border-radius:12px!important;
+  }
+
+  body.bys360-mobile-clean-v4 .table-responsive,
+  body.bys360-mobile-clean-v4 .table-container,
+  body.bys360-mobile-clean-v4 .table-wrap,
+  body.bys360-mobile-clean-v4 .data-table{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    -webkit-overflow-scrolling:touch!important;
+    border-radius:16px!important;
+  }
+  body.bys360-mobile-clean-v4 table{ min-width:640px; }
+
+  body.bys360-mobile-clean-v4 .bys360-assistant-panel,
+  body.bys360-mobile-clean-v4 .assistant-panel,
+  body.bys360-mobile-clean-v4 .chat-panel{
+    max-height:min(76dvh,620px)!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}

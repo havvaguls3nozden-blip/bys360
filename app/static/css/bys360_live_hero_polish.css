@@ -1,0 +1,271 @@
+
+/* BYS360 canlı ekran hero düzeltmesi
+   Amaç: verilen raporlama/analiz/geri bildirim ekranlarında kaba kırmızı hero alanlarını
+   beyaz-cam efektli, sade ve kurumsal başlık alanına dönüştürmek.
+*/
+:root{
+  --bys-hero-ink:#172033;
+  --bys-hero-muted:#667085;
+  --bys-hero-border:rgba(139,0,0,.12);
+  --bys-hero-accent:#8B0000;
+  --bys-hero-soft:#fffafa;
+  --bys-hero-card:#ffffff;
+  --bys-hero-shadow:0 18px 44px rgba(15,23,42,.075);
+  --bys-hero-shadow-soft:0 10px 24px rgba(15,23,42,.055);
+}
+
+/* Sadece rapor/analiz/feedback sınıflarını hedefler; sidebar rengini bozmaz. */
+body .bys-pro-shell .bys-pro-hero,
+body .fbx-shell .fbx-hero{
+  position:relative !important;
+  overflow:hidden !important;
+  min-height:unset !important;
+  margin:0 0 18px !important;
+  padding:20px 22px !important;
+  border-radius:24px !important;
+  border:1px solid var(--bys-hero-border) !important;
+  border-left:4px solid rgba(139,0,0,.42) !important;
+  background:
+    radial-gradient(circle at 96% -20%, rgba(139,0,0,.075), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,.99) 0%, rgba(255,253,253,.98) 58%, rgba(249,245,244,.96) 100%) !important;
+  box-shadow:var(--bys-hero-shadow) !important;
+  color:var(--bys-hero-ink) !important;
+}
+
+body .bys-pro-shell .bys-pro-hero::before,
+body .fbx-shell .fbx-hero::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  background:
+    linear-gradient(90deg, rgba(139,0,0,.048), transparent 34%),
+    radial-gradient(circle at 78% 20%, rgba(139,0,0,.055), transparent 27%) !important;
+  opacity:.95 !important;
+}
+
+body .bys-pro-shell .bys-pro-hero::after,
+body .fbx-shell .fbx-hero::after{
+  content:"" !important;
+  position:absolute !important;
+  right:22px !important;
+  bottom:16px !important;
+  width:128px !important;
+  height:128px !important;
+  border-radius:32px !important;
+  transform:rotate(8deg) !important;
+  border:1px solid rgba(139,0,0,.06) !important;
+  background:linear-gradient(135deg, rgba(139,0,0,.040), rgba(139,0,0,.010)) !important;
+  pointer-events:none !important;
+}
+
+body .bys-pro-shell .bys-pro-hero-grid,
+body .fbx-shell .fbx-hero-inner{
+  position:relative !important;
+  z-index:1 !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(230px,330px) !important;
+  gap:18px !important;
+  align-items:center !important;
+}
+
+body .bys-pro-shell .bys-pro-kicker,
+body .fbx-shell .fbx-kicker{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:auto !important;
+  min-height:28px !important;
+  margin:0 0 10px !important;
+  padding:6px 11px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(139,0,0,.11) !important;
+  background:rgba(139,0,0,.065) !important;
+  color:var(--bys-hero-accent) !important;
+  box-shadow:none !important;
+  font-size:.75rem !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  letter-spacing:.01em !important;
+  text-transform:none !important;
+}
+
+body .bys-pro-shell .bys-pro-kicker i,
+body .fbx-shell .fbx-kicker i{
+  color:var(--bys-hero-accent) !important;
+  text-shadow:none !important;
+}
+
+body .bys-pro-shell .bys-pro-title,
+body .fbx-shell .fbx-title{
+  margin:0 !important;
+  max-width:780px !important;
+  color:var(--bys-hero-ink) !important;
+  font-size:clamp(1.32rem,1.55vw,1.82rem) !important;
+  line-height:1.16 !important;
+  font-weight:850 !important;
+  letter-spacing:-.025em !important;
+  text-shadow:none !important;
+}
+
+/* Eski uzun açıklamalar kalmışsa görünmez; overlay template'lerinde zaten kaldırıldı. */
+body .bys-pro-shell .bys-pro-hero .bys-pro-sub,
+body .fbx-shell .fbx-hero .fbx-text{
+  display:none !important;
+}
+
+/* Hero içi butonlar daha küçük ve zarif. */
+body .bys-pro-shell .bys-pro-hero-actions,
+body .fbx-shell .fbx-actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:9px !important;
+  margin-top:14px !important;
+}
+
+body .bys-pro-shell .bys-pro-hero .bys-pro-btn,
+body .fbx-shell .fbx-hero .fbx-btn{
+  min-height:38px !important;
+  padding:.52rem .82rem !important;
+  border-radius:13px !important;
+  border:1px solid rgba(15,23,42,.09) !important;
+  background:#fff !important;
+  color:#344054 !important;
+  box-shadow:0 8px 18px rgba(15,23,42,.055) !important;
+  font-size:.86rem !important;
+  font-weight:760 !important;
+  text-decoration:none !important;
+}
+
+body .bys-pro-shell .bys-pro-hero .bys-pro-btn:hover,
+body .fbx-shell .fbx-hero .fbx-btn:hover{
+  transform:translateY(-1px) !important;
+  border-color:rgba(139,0,0,.22) !important;
+  color:#8B0000 !important;
+}
+
+/* Yan özet kutuları: kırmızı panel değil, açık cam kart. */
+body .bys-pro-shell .bys-pro-hero-panel,
+body .fbx-shell .fbx-hero-stat{
+  position:relative !important;
+  z-index:1 !important;
+  min-height:unset !important;
+  padding:16px !important;
+  border-radius:20px !important;
+  border:1px solid rgba(15,23,42,.075) !important;
+  background:rgba(255,255,255,.88) !important;
+  color:var(--bys-hero-ink) !important;
+  box-shadow:var(--bys-hero-shadow-soft) !important;
+  backdrop-filter:blur(10px) !important;
+}
+
+body .bys-pro-shell .bys-pro-hero-panel-title,
+body .fbx-shell .fbx-hero-stat .label{
+  margin:0 0 7px !important;
+  color:#7a2630 !important;
+  font-size:.72rem !important;
+  line-height:1.1 !important;
+  font-weight:850 !important;
+  letter-spacing:.035em !important;
+  text-transform:uppercase !important;
+  text-shadow:none !important;
+}
+
+body .bys-pro-shell .bys-pro-hero-panel-main,
+body .fbx-shell .fbx-hero-stat .value{
+  margin:0 !important;
+  color:var(--bys-hero-ink) !important;
+  font-size:clamp(1rem,1.18vw,1.34rem) !important;
+  line-height:1.25 !important;
+  font-weight:850 !important;
+  letter-spacing:-.02em !important;
+  text-shadow:none !important;
+}
+
+/* Kahraman alanında gereksiz ikinci açıklamalar. */
+body .bys-pro-shell .bys-pro-hero-panel-note,
+body .fbx-shell .fbx-hero-stat .sub{
+  display:none !important;
+}
+
+/* Hero içindeki mini istatistikler kırmızı blok gibi görünmesin. */
+body .bys-pro-shell .bys-pro-hero .bys-pro-mini-grid{
+  margin-top:13px !important;
+  gap:8px !important;
+}
+body .bys-pro-shell .bys-pro-hero .bys-pro-mini{
+  border-radius:14px !important;
+  border:1px solid rgba(15,23,42,.075) !important;
+  background:#fff !important;
+  box-shadow:none !important;
+}
+body .bys-pro-shell .bys-pro-hero .bys-pro-mini span{
+  color:var(--bys-hero-muted) !important;
+}
+body .bys-pro-shell .bys-pro-hero .bys-pro-mini strong{
+  color:var(--bys-hero-ink) !important;
+}
+
+/* Bootstrap veya önceki kırmızı zemin sınıfları hero içinde nötrlenir. */
+body .bys-pro-shell .bys-pro-hero :is(.text-white,.text-light),
+body .fbx-shell .fbx-hero :is(.text-white,.text-light){
+  color:var(--bys-hero-ink) !important;
+  text-shadow:none !important;
+}
+body .bys-pro-shell .bys-pro-hero :is(.bg-danger,.text-bg-danger,.badge.bg-danger),
+body .fbx-shell .fbx-hero :is(.bg-danger,.text-bg-danger,.badge.bg-danger){
+  background:#fff1f1 !important;
+  color:#9b1c1c !important;
+  border:1px solid rgba(139,0,0,.13) !important;
+}
+
+/* Feedback özel rozetler */
+body .fbx-shell .fbx-hero .fbx-chip{
+  background:#fff !important;
+  color:#344054 !important;
+  border:1px solid rgba(15,23,42,.085) !important;
+  box-shadow:none !important;
+}
+
+/* Mobil: ekranın üstünü kaplamasın. */
+@media (max-width: 992px){
+  body .bys-pro-shell .bys-pro-hero-grid,
+  body .fbx-shell .fbx-hero-inner{
+    grid-template-columns:1fr !important;
+  }
+  body .bys-pro-shell .bys-pro-hero-panel,
+  body .fbx-shell .fbx-hero-stat{
+    max-width:100% !important;
+  }
+}
+@media (max-width: 768px){
+  body .bys-pro-shell .bys-pro-hero,
+  body .fbx-shell .fbx-hero{
+    margin-bottom:14px !important;
+    padding:16px !important;
+    border-radius:20px !important;
+  }
+  body .bys-pro-shell .bys-pro-title,
+  body .fbx-shell .fbx-title{
+    font-size:1.30rem !important;
+  }
+  body .bys-pro-shell .bys-pro-hero::after,
+  body .fbx-shell .fbx-hero::after{
+    display:none !important;
+  }
+}
+
+/* Sayfa başlığı bloğu varsa orada da kırmızı dev banner etkisini azaltır. */
+body :is(.page-header,.hero-card,.hero-panel,.performance-hero){
+  background:
+    radial-gradient(circle at 96% -20%, rgba(139,0,0,.06), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,.99), rgba(250,246,246,.96)) !important;
+  color:var(--bys-hero-ink) !important;
+  border:1px solid var(--bys-hero-border) !important;
+  border-left:4px solid rgba(139,0,0,.38) !important;
+  box-shadow:var(--bys-hero-shadow) !important;
+}
+body :is(.page-header,.hero-card,.hero-panel,.performance-hero) :is(h1,h2,h3,p,.text-white){
+  color:var(--bys-hero-ink) !important;
+  text-shadow:none !important;
+}

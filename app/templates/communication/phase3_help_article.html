@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Bilgi Bankası Makalesi | BYS360{% endblock %}
+{% block page_title %}{{ payload.article.title }}{% endblock %}
+{% block page_subtitle %}Kategori: {{ payload.article.category_slug }} · Görüntülenme: {{ payload.recent_views }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        {% if payload.article.summary %}<div class="alert alert-light border rounded-4">{{ payload.article.summary }}</div>{% endif %}
+        {% if payload.article.content_text %}
+          <div class="mb-4">
+            <h5>İçerik</h5>
+            <div style="white-space:pre-line;">{{ payload.article.content_text }}</div>
+          </div>
+        {% endif %}
+        {% if payload.article.steps_text %}
+          <div class="mb-4">
+            <h5>Adımlar</h5>
+            <div style="white-space:pre-line;">{{ payload.article.steps_text }}</div>
+          </div>
+        {% endif %}
+        {% if payload.article.notes_text %}
+          <div>
+            <h5>Notlar</h5>
+            <div style="white-space:pre-line;">{{ payload.article.notes_text }}</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h6>Etiketler</h6>
+        <div class="d-flex flex-wrap gap-2">
+          {% for tag in payload.article.tags %}<span class="badge text-bg-light">{{ tag }}</span>{% else %}<span class="text-muted">Etiket yok.</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <h6>İlgili Makaleler</h6>
+        {% for article in payload.related_rows %}
+          <div class="mb-3"><a class="text-decoration-none fw-semibold" href="{{ url_for('main.communication_phase3_help_article', slug=article.slug) }}">{{ article.title }}</a></div>
+        {% else %}
+          <div class="text-muted">İlgili makale tanımlanmamış.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

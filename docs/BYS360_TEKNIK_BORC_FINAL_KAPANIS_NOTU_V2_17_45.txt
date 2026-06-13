@@ -1,0 +1,18 @@
+BYS360 Teknik Borc Final Kapanis V2.17.45
+
+Bu paket uygulama kodlarini degistirmez. P0-P3 teknik borc azaltma calismasinin kapanis raporunu uretir.
+
+Kapanis karari:
+- P0 repo hijyeni ve temizlik tamamlandi.
+- P1 mobil ana API servis delegasyonlari tamamlandi.
+- P2 mobil performans GET/okuma endpointleri servis delegasyonlari tamamlandi.
+- P3 mobil performans helper delegasyonlari tamamlandi.
+- P4 hassas POST/yazma endpointleri bu turda ertelendi.
+- Puan gonderme, score-action, donem ici not olusturma, yayin/onay gibi yazma islemleri yetkili mobil token smoke testi olmadan refactor edilmeyecek.
+
+Calistirma:
+cd C:\bys360\project
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_tech_debt_final_closure_v2_17_45.ps1 -ProjectRoot "C:\bys360\project" -Mode all
+
+Rapor:
+reports\quality\bys360_tech_debt_final_closure_v2_17_45_report.md

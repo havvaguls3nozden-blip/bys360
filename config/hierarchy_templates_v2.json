@@ -1,0 +1,200 @@
+{
+  "version": 2,
+  "default_weights": {
+    "manager_1": 50,
+    "manager_2": 50,
+    "manager_3": 0
+  },
+  "default_flow_orders": {
+    "none": [],
+    "single": [
+      1
+    ],
+    "double": [
+      2,
+      1
+    ],
+    "triple": [
+      3,
+      2,
+      1
+    ]
+  },
+  "third_manager_defaults": {
+    "enabled": false,
+    "mode": "comment_only"
+  },
+  "rules": [
+    {
+      "rule_key": "president",
+      "label": "Başkan",
+      "match": {
+        "role": [
+          "baskan"
+        ]
+      },
+      "chain_type": "none",
+      "order": []
+    },
+    {
+      "rule_key": "vice_president",
+      "label": "Başkan Yardımcısı",
+      "match": {
+        "role": [
+          "baskan_yardimcisi"
+        ]
+      },
+      "chain_type": "single",
+      "order": [
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "fixed_role",
+          "role": "baskan"
+        }
+      }
+    },
+    {
+      "rule_key": "special_presidency_president_only",
+      "label": "Danışman / Özel Kalem / İç Denetim",
+      "match": {
+        "birim": [
+          "DANIŞMANLIK",
+          "ÖZEL KALEM",
+          "İÇ DENETİM"
+        ]
+      },
+      "chain_type": "single",
+      "order": [
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "fixed_role",
+          "role": "baskan"
+        }
+      }
+    },
+    {
+      "rule_key": "law_counselor",
+      "label": "Hukuk Müşaviri",
+      "match": {
+        "birim": [
+          "HUKUK MÜŞAVİRLİĞİ"
+        ],
+        "unvan_contains": [
+          "HUKUK MÜŞAVİRİ",
+          "SORUMLU HUKUK MÜŞAVİRİ"
+        ]
+      },
+      "chain_type": "double",
+      "order": [
+        2,
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "fixed_role",
+          "role": "baskan"
+        },
+        "2": {
+          "source": "fixed_role",
+          "role": "baskan_yardimcisi"
+        }
+      }
+    },
+    {
+      "rule_key": "law_staff",
+      "label": "Hukuk Personeli Tek Amir",
+      "match": {
+        "birim": [
+          "HUKUK MÜŞAVİRLİĞİ"
+        ]
+      },
+      "chain_type": "single",
+      "order": [
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "law_counselor_in_same_unit_or_registry"
+        }
+      }
+    },
+    {
+      "rule_key": "group_president",
+      "label": "Grup Başkanı",
+      "match": {
+        "role": [
+          "grup_baskani"
+        ]
+      },
+      "chain_type": "double",
+      "order": [
+        2,
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "fixed_role",
+          "role": "baskan"
+        },
+        "2": {
+          "source": "fixed_role",
+          "role": "baskan_yardimcisi"
+        }
+      }
+    },
+    {
+      "rule_key": "coordinator",
+      "label": "Koordinatör",
+      "match": {
+        "role": [
+          "koordinator"
+        ]
+      },
+      "chain_type": "double",
+      "order": [
+        2,
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "fixed_role",
+          "role": "baskan_yardimcisi"
+        },
+        "2": {
+          "source": "group_manager_by_parent_unit_or_registry"
+        }
+      }
+    },
+    {
+      "rule_key": "regular_personnel",
+      "label": "Diğer Personel",
+      "match": {
+        "role": [
+          "personel",
+          "birim_sorumlusu"
+        ]
+      },
+      "chain_type": "double_or_triple",
+      "order": [
+        2,
+        1
+      ],
+      "levels": {
+        "1": {
+          "source": "group_manager_by_parent_unit_or_registry"
+        },
+        "2": {
+          "source": "coordinator_by_unit_or_registry"
+        },
+        "3": {
+          "source": "explicit_third_manager",
+          "mode": "comment_only"
+        }
+      }
+    }
+  ]
+}

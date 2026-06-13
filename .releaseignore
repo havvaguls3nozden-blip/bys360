@@ -1,0 +1,26 @@
+.env
+.env.*
+instance/
+*.sqlite3
+*.db
+*.log
+.venv/
+__pycache__/
+*.pyc
+reports/
+tests/_archive_a5_obsolete/
+*disabled_by_rollback*
+*.bak
+*.bak_*
+data/uploads/
+uploads/
+app/**/*snippet*.py
+app/portal/
+
+# BYS360 A6B release secret/database exclusion rules | 2026-06-12 13:08:46
+*.sqlite
+quarantine/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.pyo

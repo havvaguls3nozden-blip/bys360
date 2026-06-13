@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Faz 1 Duyuru Detayı - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Duyuru Detayı{% endblock %}
+{% block page_subtitle %}Teslim, hedefleme ve yayın durumu bu ekranda birlikte izlenir.{% endblock %}
+{% block content %}
+<style>
+.shell{display:grid;gap:18px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.meta-box{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.meta-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:8px}.meta-value{font-size:1rem;font-weight:900;color:#111827}.btn-main,.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 15px;border-radius:14px;text-decoration:none;font-weight:800;border:none}.btn-main{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.btn-soft{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.16)}.list{display:grid;gap:10px}.item{padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.item small{color:#6b7280}.content-box{white-space:pre-wrap;line-height:1.9;color:#374151}.toolbar{display:flex;gap:10px;flex-wrap:wrap}@media (max-width:920px){.grid{grid-template-columns:1fr}.meta{grid-template-columns:1fr}}
+</style>
+<div class="shell">
+    <div class="panel">
+        <div class="toolbar" style="justify-content:space-between;align-items:flex-start;">
+            <div>
+                <div style="font-size:1.18rem;font-weight:900;color:#111827;">{{ bulletin.title }}</div>
+                <div style="margin-top:8px;color:#6b7280;line-height:1.8;">{{ bulletin.summary or 'Özet girilmemiş.' }}</div>
+            </div>
+            <div class="toolbar">
+                <a class="btn-soft" href="{{ url_for('main.communication_phase1_bulletins') }}">Listeye dön</a>
+                {% if can_manage and bulletin.status != 'published' %}
+                <form method="post" action="{{ url_for('main.communication_phase1_bulletin_publish', bulletin_id=bulletin.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn-main" type="submit"><i class="fa-solid fa-paper-plane"></i> Yayımla</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="meta mt-4">
+            <div class="meta-box"><div class="meta-label">Durum</div><div class="meta-value">{{ status_labels.get(bulletin.status, bulletin.status) }}</div></div>
+            <div class="meta-box"><div class="meta-label">Öncelik</div><div class="meta-value">{{ priority_labels.get(bulletin.priority, bulletin.priority) }}</div></div>
+            <div class="meta-box"><div class="meta-label">Yayın</div><div class="meta-value">{{ bulletin.publish_at.strftime('%d.%m.%Y %H:%M') if bulletin.publish_at else 'Henüz yayımlanmadı' }}</div></div>
+        </div>
+        <div class="meta mt-3">
+            <div class="meta-box"><div class="meta-label">Hedeflenen kullanıcı</div><div class="meta-value">{{ receipt_summary.targeted if receipt_summary is defined else 0 }}</div></div>
+            <div class="meta-box"><div class="meta-label">Okundu</div><div class="meta-value">{{ receipt_summary.read if receipt_summary is defined else 0 }}</div></div>
+            <div class="meta-box"><div class="meta-label">Alındı onayı</div><div class="meta-value">{{ receipt_summary.acknowledged if receipt_summary is defined else 0 }}</div></div>
+        </div>
+        {% if my_receipt is defined and my_receipt %}
+        <div class="panel mt-3" style="padding:16px;background:#fff7ed;box-shadow:none;border-color:rgba(180,83,9,.14);">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+                <div>
+                    <div style="font-size:.84rem;font-weight:800;color:#92400e;">Kişisel teslim durumu</div>
+                    <div style="margin-top:6px;color:#7c2d12;line-height:1.7;">
+                        Okundu: <strong>{{ 'Evet' if my_receipt.is_read else 'Hayır' }}</strong>
+                        {% if my_receipt.read_at %} · {{ my_receipt.read_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}
+                        <br>
+                        Alındı onayı: <strong>{{ 'Evet' if my_receipt.is_acknowledged else 'Hayır' }}</strong>
+                        {% if my_receipt.acknowledged_at %} · {{ my_receipt.acknowledged_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}
+                    </div>
+                </div>
+                {% if bulletin.require_ack and not my_receipt.is_acknowledged %}
+                <form method="post" action="{{ url_for('main.communication_phase1_bulletin_acknowledge', bulletin_id=bulletin.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn-main" type="submit"><i class="fa-solid fa-check-double"></i> Alındı onayı ver</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="panel mt-4" style="padding:18px;background:#f8fafc;box-shadow:none;">
+            <div style="font-size:.84rem;font-weight:800;color:#6b7280;margin-bottom:8px;">İçerik</div>
+            <div class="content-box">{{ bulletin.content }}</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel">
+            <h3 style="margin:0 0 10px;font-size:1rem;font-weight:900;color:#111827;">Hedef kitle kayıtları</h3>
+            <div class="list">
+                {% for row in audiences %}
+                <div class="item"><strong>{{ row.target_type }}</strong><br><small>{{ row.target_value or 'Tüm kurum' }}</small></div>
+                {% else %}
+                <div class="item"><small>Hedef kaydı bulunamadı.</small></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h3 style="margin:0 0 10px;font-size:1rem;font-weight:900;color:#111827;">Teslim kayıtları</h3>
+            <div class="list">
+                {% for row in receipts %}
+                <div class="item"><strong>{{ row.user.full_name if row.user and row.user.full_name is defined and row.user.full_name else (row.user.ad ~ ' ' ~ row.user.soyad if row.user else '-') }}</strong><br><small>Teslim: {{ row.delivered_at.strftime('%d.%m.%Y %H:%M') if row.delivered_at else '-' }} · Okundu: {{ 'Evet' if row.is_read else 'Hayır' }}{% if row.read_at %} · {{ row.read_at.strftime('%d.%m.%Y %H:%M') }}{% endif %} · Alındı: {{ 'Evet' if row.is_acknowledged else 'Hayır' }}{% if row.acknowledged_at %} · {{ row.acknowledged_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}</small></div>
+                {% else %}
+                <div class="item"><small>Henüz teslim kaydı yok.</small></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

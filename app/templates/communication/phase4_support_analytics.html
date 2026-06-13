@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Destek Analitiği{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Destek Analitiği</h2>
+      <div class="text-muted">SLA, yaş dağılımı ve risk görünümü</div>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="get" class="d-flex gap-2">
+        <select name="days" class="form-select">
+          {% for day in [30, 60, 90, 180] %}
+            <option value="{{ day }}" {% if payload.days == day %}selected{% endif %}>Son {{ day }} gün</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline-secondary">Uygula</button>
+      </form>
+      <form method="post" action="{{ url_for('main.communication_phase4_export') }}">
+        <input type="hidden" name="export_type" value="support_analytics">
+        <input type="hidden" name="days" value="{{ payload.days }}">
+        <button class="btn btn-outline-danger">CSV dışa aktar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Toplam Talep</div><div class="display-6">{{ payload.totals.ticket_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Açık Talep</div><div class="display-6">{{ payload.totals.open_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">SLA Riski</div><div class="display-6">{{ payload.totals.sla_risk_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Ort. Yaş</div><div class="display-6">{{ payload.totals.average_age_days }}</div><div class="small text-muted">gün</div></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header"><strong>Durum dağılımı</strong></div><div class="card-body"><canvas id="supportStatusChart" height="120"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header"><strong>Yaş dağılımı</strong></div><div class="card-body"><canvas id="supportAgeChart" height="120"></canvas></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>SLA riski taşıyan kayıtlar</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>#</th><th>Başlık</th><th>Yaş</th><th>Atanan</th></tr></thead>
+            <tbody>
+            {% for row in payload.risk_rows %}
+              <tr><td>#{{ row.id }}</td><td>{{ row.title }}</td><td>{{ row.age_days }} gün</td><td>{{ row.assigned_to }}</td></tr>
+            {% else %}
+              <tr><td colspan="4" class="text-muted">Riskli kayıt yok.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>En yoğun atanan kişiler</strong></div>
+        <div class="card-body small">
+          {% for row in payload.top_assignees %}
+            <div class="d-flex justify-content-between border-bottom py-2"><span>{{ row.name }}</span><span>{{ row.count }}</span></div>
+          {% else %}
+            <div class="text-muted">Atama dağılımı verisi yok.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm"><div class="card-body table-responsive">
+    <table class="table table-sm align-middle">
+      <thead><tr><th>ID</th><th>Başlık</th><th>Durum</th><th>Öncelik</th><th>Yaş</th><th>Atanan</th><th>İlk Yanıt</th><th>Çözüm</th></tr></thead>
+      <tbody>
+      {% for row in payload.rows %}
+        <tr>
+          <td>#{{ row.id }}</td><td>{{ row.title }}</td><td>{{ row.status }}</td><td>{{ row.priority }}</td><td>{{ row.age_days }} gün</td><td>{{ row.assigned_to }}</td>
+          <td>{% if row.first_response_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
+          <td>{% if row.resolution_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="text-muted">Analiz edilecek destek kaydı bulunamadı.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div>
+</div>
+
+<script>
+(function () {
+  if (!window.Chart) return;
+  const statusEl = document.getElementById('supportStatusChart');
+  const ageEl = document.getElementById('supportAgeChart');
+  if (statusEl) {
+    new Chart(statusEl, {
+      type: 'bar',
+      data: { labels: {{ payload.status_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+  }
+  if (ageEl) {
+    new Chart(ageEl, {
+      type: 'bar',
+      data: { labels: {{ payload.age_buckets.keys()|list|tojson }}, datasets: [{ label: 'Kayıt', data: {{ payload.age_buckets.values()|list|tojson }}, borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+  }
+})();
+</script>
+{% endblock %}

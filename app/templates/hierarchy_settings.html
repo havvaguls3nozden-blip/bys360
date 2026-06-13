@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Hiyerarşi Atamaları & Ayarları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Hiyerarşi Atamaları & Ayarları{% endblock %}
+{% block page_subtitle %}
+Amir zincirlerini, zincir tiplerini ve dönem bazlı değerlendirme ağırlıklarını merkezi olarak yönetin.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Hiyerarşi ve Ağırlık Yönetimi', text='Amir zinciri, dönem ağırlıkları ve 3. amir kurgusunu merkezi ve daha rafine bir yönetim yüzeyinde düzenleyin.', icon='fa-solid fa-sliders') }}
+  {{ nav(active='settings') }}
+  
+<style>
+  .hier-shell{display:grid;gap:18px}
+  .glass-card{
+    background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    backdrop-filter:blur(14px);
+  }
+  .panel-card{padding:22px}
+
+  .intro-title{font-size:1.08rem;font-weight:900;color:#111827;margin:0 0 8px}
+  .intro-sub{color:#6b7280;font-size:.92rem;line-height:1.8;margin:0}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .stat-card{padding:22px;position:relative;overflow:hidden}
+  .stat-card::after{
+    content:"";position:absolute;right:-20px;bottom:-20px;width:84px;height:84px;border-radius:50%;
+    background:rgba(139,0,0,.06);
+  }
+  .stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}
+  .stat-value{color:#111827;font-size:1.7rem;font-weight:900;line-height:1;position:relative;z-index:1}
+
+  .layout-grid{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:18px;
+  }
+
+  .table-wrap{
+    overflow:auto;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    background:#fff;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:960px;
+  }
+
+  thead th{
+    background:#f8fafc;
+    color:#6b7280;
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.25px;
+    padding:12px 10px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    text-align:left;
+  }
+
+  tbody td{
+    padding:12px 10px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    color:#111827;
+    font-size:.88rem;
+    vertical-align:top;
+    line-height:1.65;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.76rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .badge.ok{background:rgba(22,101,52,.10);color:#166534}
+  .badge.warn{background:rgba(180,83,9,.10);color:#92400e}
+  .badge.info{background:rgba(37,99,235,.10);color:#1d4ed8}
+  .badge.soft{background:rgba(71,85,105,.08);color:#475569}
+
+  .form-grid{
+    display:grid;
+    gap:14px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .field label{
+    font-size:.9rem;
+    font-weight:800;
+    color:#374151;
+  }
+
+  .form-input,
+  .form-select{
+    min-height:48px;
+    border-radius:14px;
+    border:1px solid rgba(15,23,42,.10);
+    background:#fff;
+    padding:10px 14px;
+    font:inherit;
+    color:#111827;
+    outline:none;
+    width:100%;
+  }
+
+  .form-input:focus,
+  .form-select:focus{
+    border-color:rgba(139,0,0,.30);
+    box-shadow:0 0 0 4px rgba(139,0,0,.06);
+  }
+
+  .check-row{
+    display:grid;
+    gap:10px;
+    padding:14px 16px;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    background:#f8fafc;
+  }
+
+  .check-row label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#374151;
+    font-weight:700;
+  }
+
+  .btn-soft{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:48px;
+    padding:0 16px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:800;
+    font-size:.9rem;
+    white-space:nowrap;
+    transition:all .18s ease;
+  }
+
+  .btn-soft:hover{transform:translateY(-1px)}
+  .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+  .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+  .btn-soft.success{background:linear-gradient(180deg,#166534,#14532d);color:#fff}
+
+  .mini-list{display:grid;gap:10px}
+  .mini-item{
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:16px;
+    background:#fff;
+    padding:12px 14px;
+    color:#374151;
+    line-height:1.7;
+    font-size:.84rem;
+  }
+
+  .scope-panel{display:grid;gap:14px}
+  .scope-toolbar{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+  .scope-meta{display:flex;gap:10px;flex-wrap:wrap}
+  .scope-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900}
+  .scope-note{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#475569;line-height:1.75;font-size:.88rem}
+
+  .ai-summary-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+  .ai-summary-card{padding:22px;border-radius:24px;border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg,rgba(139,0,0,.05),rgba(255,255,255,.94));display:grid;gap:14px}
+  .ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18)}
+  .ai-summary-card.tone-watch{border-color:rgba(217,119,6,.18)}
+  .ai-kicker{display:inline-flex;align-items:center;gap:8px;color:#8B0000;font-size:.82rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+  .ai-title{font-size:1.08rem;font-weight:900;color:#111827;line-height:1.35}
+  .ai-text{color:#4b5563;line-height:1.8;font-size:.92rem}
+  .ai-bullets{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+  .ai-bullets li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem}
+  .ai-bullets li i{font-size:.5rem;color:#8B0000;margin-top:.5rem}
+  .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .ai-action{border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff;padding:14px 16px}
+  .ai-action.tone-critical{background:rgba(254,242,242,.95);border-color:rgba(220,38,38,.12)}
+  .ai-action.tone-watch{background:rgba(255,247,237,.96);border-color:rgba(217,119,6,.12)}
+  .ai-action-label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:6px}
+  .ai-action-value{font-size:1.4rem;color:#111827;font-weight:900;line-height:1}
+  .ai-spotlight{display:grid;gap:10px}
+  .ai-spotlight-row{display:flex;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#374151;font-size:.86rem}
+  .ai-spotlight-row strong{color:#111827;font-weight:900}
+
+  .empty-box{
+    padding:26px 20px;
+    border-radius:18px;
+    border:1px dashed rgba(15,23,42,.12);
+    background:#f8fafc;
+    color:#6b7280;
+    text-align:center;
+    line-height:1.9;
+  }
+
+  @media (max-width:1200px){
+    .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .layout-grid{grid-template-columns:1fr}
+    .ai-summary-grid{grid-template-columns:1fr}
+  }
+
+  @media (max-width:700px){
+    .stats-grid{grid-template-columns:1fr}
+  }
+  .bulk-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}.bulk-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;display:grid;gap:8px}.bulk-card.tone-critical{border-color:rgba(185,28,28,.18);background:rgba(254,242,242,.96)}.bulk-card.tone-watch{border-color:rgba(180,83,9,.18);background:rgba(255,251,235,.96)}.bulk-card-title{font-size:.92rem;font-weight:900;color:#111827}.bulk-card-sub{font-size:.8rem;color:#64748b}.bulk-card-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bulk-meta-box{border:1px solid rgba(15,23,42,.06);border-radius:12px;padding:10px;background:#fff}.bulk-meta-label{font-size:.7rem;text-transform:uppercase;font-weight:800;color:#64748b}.bulk-meta-value{margin-top:4px;font-size:.88rem;font-weight:900;color:#111827}@media(max-width:1100px){.bulk-detail-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.bulk-detail-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="hier-shell">
+  <div class="glass-card panel-card">
+    <h3 class="intro-title">Atama ve Ağırlık Merkezi</h3>
+    <p class="intro-sub">
+      Personel bazlı amir zincirlerini ve dönem bazlı değerlendirme dağılımlarını aynı ekrandan yönetin.
+    </p>
+  </div>
+
+
+  <section class="ai-summary-grid">
+    <article class="ai-summary-card tone-{{ ai_hierarchy_panel.tone if ai_hierarchy_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_hierarchy_panel.badge if ai_hierarchy_panel else 'AI özeti' }}</div>
+      <div class="ai-title">{{ ai_hierarchy_panel.headline if ai_hierarchy_panel else 'Hiyerarşi özeti hazır' }}</div>
+      <div class="ai-text">{{ ai_hierarchy_panel.summary if ai_hierarchy_panel else '' }}</div>
+      {% if ai_hierarchy_panel and ai_hierarchy_panel.bullets %}
+      <ul class="ai-bullets">
+        {% for bullet in ai_hierarchy_panel.bullets %}
+        <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </article>
+    <article class="ai-summary-card">
+      <div class="ai-kicker"><i class="fa-solid fa-sitemap"></i> Zincir sıcaklığı</div>
+      <div class="ai-action-grid">
+        {% for item in (ai_hierarchy_panel.actions if ai_hierarchy_panel else []) %}
+        <div class="ai-action tone-{{ item.tone }}">
+          <div class="ai-action-label">{{ item.label }}</div>
+          <div class="ai-action-value">{{ item.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if ai_hierarchy_panel and ai_hierarchy_panel.spotlight %}
+      <div class="ai-spotlight">
+        {% for row in ai_hierarchy_panel.spotlight %}
+        <div class="ai-spotlight-row"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% if ai_hierarchy_bulk_panel %}<article class="ai-summary-card tone-{{ ai_hierarchy_bulk_panel.tone }}"><div class="ai-kicker"><i class="fa-solid fa-user-gear"></i> {{ ai_hierarchy_bulk_panel.badge }}</div><div class="ai-title">{{ ai_hierarchy_bulk_panel.headline }}</div><div class="ai-text">{{ ai_hierarchy_bulk_panel.summary }}</div>{% if ai_hierarchy_bulk_panel.bullets %}<ul class="ai-bullets">{% for bullet in ai_hierarchy_bulk_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>{% endif %}<div class="ai-action-grid">{% for item in ai_hierarchy_bulk_panel.actions %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>{% if ai_hierarchy_bulk_panel.detail_cards %}<div class="bulk-detail-grid">{% for card in ai_hierarchy_bulk_panel.detail_cards %}<div class="bulk-card tone-{{ card.tone }}"><div class="bulk-card-title">{{ card.title }}</div><div class="bulk-card-sub">{{ card.subtitle }}</div><div class="bulk-card-meta">{% for meta in card.meta %}<div class="bulk-meta-box"><div class="bulk-meta-label">{{ meta.label }}</div><div class="bulk-meta-value">{{ meta.value }}</div></div>{% endfor %}</div></div>{% endfor %}</div>{% endif %}</article>{% endif %}
+  </section>
+
+
+  <div class="glass-card panel-card">
+    <div class="scope-panel">
+      <div>
+        <h3 class="intro-title">Kapsam görünümü</h3>
+        <p class="intro-sub">Hiyerarşi analizi ve atama listesi seçtiğiniz yönetim kapsamına göre daralır.</p>
+      </div>
+      <form method="get" class="scope-toolbar">
+        <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+        <div class="field">
+          <label>Kapsam</label>
+          <select name="scope" class="form-select">
+            {% for option in scope_options or [] %}
+              <option value="{{ option.value }}" {% if selected_scope == option.value %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-filter"></i>Uygula</button>
+      </form>
+      <div class="scope-meta">
+        <span class="scope-pill"><i class="fa-solid fa-layer-group"></i>{{ scope_label or 'Kapsam' }}</span>
+        <span class="scope-pill"><i class="fa-solid fa-users"></i>{{ scope_user_count or 0 }} kişi</span>
+        <span class="scope-pill"><i class="fa-solid fa-building"></i>{{ scope_unit_count or 0 }} birim</span>
+      </div>
+      <div class="scope-note">{{ scope_hint or 'Seçtiğiniz görünüm burada izlenir.' }} içindeki personel ve zincir kayıtları gösterilir.</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="glass-card stat-card">
+      <div class="stat-label">Toplam Personel</div>
+      <div class="stat-value">{{ users|length }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Eksik Zincir</div>
+      <div class="stat-value">{{ missing_count or 0 }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Tam Zincir</div>
+      <div class="stat-value">{{ complete_count or 0 }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Dönem</div>
+      <div class="stat-value">{{ selected_period.title if selected_period else '-' }}</div>
+    </div>
+  </div>
+
+  <div class="layout-grid">
+    <div class="glass-card panel-card">
+      <h3 class="intro-title">Hiyerarşi Analizi</h3>
+      <p class="intro-sub" style="margin-bottom:14px;">
+        Zorunlu zinciri eksik olan personelleri ve mevcut atama durumunu izleyin.
+      </p>
+      <div class="scope-note" style="margin-bottom:14px;">
+        <strong>Bu ekran nasıl okunur?</strong><br>
+        Tek amirli kayıtlar kurala göre <strong>Başkan</strong> veya amir olan <strong>Hukuk Müşaviri</strong> tarafından puanlanır. Başkanlık seviyesi akışı <strong>2 → 1</strong> şeklindedir. Grup / çalışma grubu seviyesinde ise kayıt <strong>2 amirli</strong> veya varsa <strong>3 amirli</strong> görünür; işlem sırası <strong>3 → 2 → 1</strong> ya da <strong>2 → 1</strong> olarak okunmalıdır.
+      </div>
+
+      {% if analysis_rows %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Personel</th>
+                <th>Birim</th>
+                <th>1. Amir</th>
+                <th>2. Amir</th>
+                <th>3. Amir</th>
+                <th>Zincir Tipi</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in analysis_rows %}
+                <tr>
+                  <td>
+                    <strong>{{ row.user.full_name or ((row.user.ad or '') ~ ' ' ~ (row.user.soyad or ''))|trim }}</strong><br>
+                    {{ row.user.unvan or '-' }}
+                  </td>
+                  <td>{{ row.user.birim or '-' }}</td>
+                  <td>{{ row.manager_1_name or '-' }}</td>
+                  <td>{{ row.manager_2_name or '-' }}</td>
+                  <td>{{ row.manager_3_name or '-' }}</td>
+                  <td>
+                    <span class="badge {% if row.is_single_manager_case %}ok{% elif row.has_level_3 %}warn{% else %}soft{% endif %}">{{ row.chain_type_label }}</span><br>
+                    <small class="helper-note">Akış: {{ row.flow_label }}<br>{{ row.chain_hint }}</small>
+                    <div class="helper-note" style="margin-top:6px;">{{ row.weight_summary }}</div>
+                  </td>
+                  <td>
+                    {% if row.issues %}
+                      <span class="badge warn"><i class="fa-solid fa-triangle-exclamation"></i> Eksik</span>
+                      <div class="helper-note" style="margin-top:6px;">{{ row.issues|join(', ') }}</div>
+                    {% elif row.info_notes %}
+                      <span class="badge info"><i class="fa-solid fa-circle-info"></i> Bilgi</span>
+                      <div class="helper-note" style="margin-top:6px;">{{ row.info_notes|join(', ') }}</div>
+                    {% else %}
+                      <span class="badge ok"><i class="fa-solid fa-circle-check"></i> Tam</span>
+                    {% endif %}
+                    {% if row.warnings %}
+                      <div class="helper-note" style="margin-top:6px;">{{ row.warnings|join(', ') }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{{ url_for('main.performance_hierarchy_assignment_edit', user_id=row.user.id, period_id=selected_period.id if selected_period else '', scope=selected_scope) }}" class="btn-soft secondary" style="min-height:38px;padding:0 12px;font-size:.8rem;">
+                      <i class="fa-solid fa-pen"></i>
+                      Düzenle
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-box">Gösterilecek analiz kaydı bulunamadı.</div>
+      {% endif %}
+    </div>
+
+    <div class="glass-card panel-card">
+      <h3 class="intro-title">Dönem Ağırlık Ayarları</h3>
+      <p class="intro-sub" style="margin-bottom:14px;">
+        1., 2. ve 3. amir değerlendirme etkisini dönem bazında buradan yönetebilirsiniz.
+      </p>
+
+      <form method="POST" style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="auto_build_chains">
+        <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+        <input type="hidden" name="scope" value="{{ selected_scope or 'all' }}">
+        <button type="submit" class="btn-soft primary">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          Exceli / Personel kartını otomatik tanı ve amir zincirini yeniden kur
+        </button>
+      </form>
+
+      <form method="POST" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="save_weights">
+        <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+
+        <div class="field">
+          <label>Dönem</label>
+          <select class="form-select" onchange="window.location='{{ url_for('main.performance_hierarchy_settings') }}?period_id=' + this.value + '&scope={{ selected_scope or '' }}'">
+            <option value="">Dönem seçiniz</option>
+            {% for p in periods %}
+              <option value="{{ p.id }}" {% if selected_period and selected_period.id == p.id %}selected{% endif %}>{{ p.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label>1. Amir Ağırlığı</label>
+          <input type="number" step="1" min="0" max="100" name="evaluator_1_weight" class="form-input" value="{{ weight_config.evaluator_1_weight if weight_config else 50 }}">
+        </div>
+
+        <div class="field">
+          <label>2. Amir Ağırlığı</label>
+          <input type="number" step="1" min="0" max="100" name="evaluator_2_weight" class="form-input" value="{{ weight_config.evaluator_2_weight if weight_config else 50 }}">
+        </div>
+
+        <div class="field">
+          <label>3. Amir Ağırlığı</label>
+          <input type="number" step="1" min="0" max="100" name="evaluator_3_weight" class="form-input" value="{{ weight_config.evaluator_3_weight if weight_config else 0 }}">
+        </div>
+
+        <div class="check-row">
+          <label><input type="checkbox" name="config_level_3_enabled" {% if period_level_3_enabled %}checked{% endif %}> 3. amir alanı açık</label>
+          <label><input type="checkbox" name="level_3_scoring_enabled" {% if period_level_3_scoring_enabled %}checked{% endif %}> 3. amir puana katkı sağlasın</label>
+        </div>
+        <div class="hint-box" style="margin-top:10px;">
+          3. amir alanı opsiyoneldir. Dönem bazında kapalı, sadece yorumcu veya yorum + puan katkısı modlarından biri uygulanabilir. Varsayılan kullanım yorumcu modudur; 3. amir başkan olamaz.
+        </div>
+
+        {% if can_manage_weights %}
+        <button type="submit" class="btn-soft success">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Ağırlıkları Kaydet
+        </button>
+        {% else %}
+        <div class="hint-box">Bu görünümde dönem ağırlıklarını izleyebilirsiniz; değiştirme yetkisi üst yönetim kapsamıyla sınırlıdır.</div>
+        {% endif %}
+      </form>
+
+      <h3 class="intro-title" style="margin-top:18px;">Eksik Zincir İlk 20</h3>
+      <div class="mini-list">
+        {% for row in analysis_rows[:20] if row.issues %}
+          <div class="mini-item">
+            <strong>{{ row.user.full_name or ((row.user.ad or '') ~ ' ' ~ (row.user.soyad or ''))|trim }}</strong><br>
+            {{ row.user.birim or '-' }} — {{ row.issues|join(', ') }}
+          </div>
+        {% else %}
+          <div class="mini-item">Eksik zincir kaydı bulunmuyor.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

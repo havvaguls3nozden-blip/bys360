@@ -1,0 +1,393 @@
+/* BYS360 P5C_ANDROID_RESPONSIVE_TARGETED */
+/*
+  Android responsive targeted layer.
+  Scope: high-risk templates from P5B report: dashboard, home, evaluation_form,
+  admin AI surfaces, wide forms/tables/cards, modal/sidebar and landscape.
+  This stylesheet is additive and low-risk: it avoids changing brand colors.
+*/
+
+:root {
+  --bys360-p5c-mobile-gap: clamp(10px, 3vw, 18px);
+  --bys360-p5c-card-radius: 16px;
+  --bys360-p5c-readable-width: min(100%, 1120px);
+}
+
+/* p5c-safe-overflow */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+pre,
+code,
+.bys360-code,
+.log-output,
+.json-output {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* p5c-wide-tables */
+.table-responsive,
+.responsive-table,
+.bys360-table-wrap,
+.table-container,
+.table-scroll,
+.data-table-wrap,
+.table-card,
+.table-panel,
+.table,
+table {
+  max-width: 100%;
+}
+
+.table-responsive,
+.responsive-table,
+.bys360-table-wrap,
+.table-container,
+.table-scroll,
+.data-table-wrap,
+.table-card,
+.table-panel {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  overflow-wrap: anywhere;
+}
+
+/* p5c-wide-forms */
+form,
+.form-grid,
+.form-row,
+.form-group,
+.input-group,
+.filter-bar,
+.search-row,
+.toolbar,
+.action-row,
+.actions,
+.button-row {
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button,
+.btn,
+.button,
+.form-control,
+.form-select {
+  max-width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* p5c-touch-targets */
+button,
+.btn,
+.button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.nav-link,
+.dropdown-item,
+.mobile-action {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* p5c-dashboard */
+.dashboard,
+.dashboard-container,
+.dashboard-grid,
+.dashboard-cards,
+.metric-grid,
+.stats-grid,
+.kpi-grid,
+.home-grid,
+.widget-grid {
+  min-width: 0;
+}
+
+.dashboard-card,
+.metric-card,
+.kpi-card,
+.widget-card,
+.stat-card,
+.card,
+.panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* p5c-home */
+.home,
+.home-page,
+.home-hero,
+.welcome-panel,
+.quick-actions,
+.shortcut-grid {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* p5c-evaluation-form */
+.evaluation-form,
+.evaluation-card,
+.criteria-list,
+.criteria-item,
+.score-form,
+.performance-form,
+.rating-grid,
+.score-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* p5c-admin-ai */
+.admin-ai,
+.ai-admin,
+.ai-panel,
+.ai-card,
+.ai-grid,
+.ai-center,
+.ai-governance,
+.ai-report,
+.ai-quality,
+.ai-preflight,
+.ai-recommendation,
+.ai-operations {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  body {
+    min-width: 0;
+  }
+
+  main,
+  .main,
+  .main-content,
+  .content,
+  .content-wrapper,
+  .page-content,
+  .container,
+  .container-fluid,
+  .admin-container,
+  .page-shell,
+  .bys360-shell,
+  .bys360-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: var(--bys360-p5c-mobile-gap) !important;
+    padding-right: var(--bys360-p5c-mobile-gap) !important;
+    box-sizing: border-box;
+  }
+
+  .row,
+  .grid,
+  .dashboard-grid,
+  .dashboard-cards,
+  .metric-grid,
+  .stats-grid,
+  .kpi-grid,
+  .home-grid,
+  .widget-grid,
+  .quick-actions,
+  .form-grid,
+  .filter-grid,
+  .ai-grid,
+  .cards-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: var(--bys360-p5c-mobile-gap) !important;
+  }
+
+  .col,
+  [class*="col-"],
+  .card,
+  .panel,
+  .dashboard-card,
+  .metric-card,
+  .kpi-card,
+  .widget-card,
+  .ai-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+  }
+
+  .toolbar,
+  .filter-bar,
+  .search-row,
+  .action-row,
+  .actions,
+  .button-row,
+  .form-actions,
+  .modal-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .toolbar > *,
+  .filter-bar > *,
+  .search-row > *,
+  .action-row > *,
+  .actions > *,
+  .button-row > *,
+  .form-actions > *,
+  .modal-footer > * {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .btn,
+  .button,
+  button,
+  input[type="submit"],
+  input[type="button"] {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .modal-dialog,
+  .modal-content,
+  .dialog,
+  .drawer,
+  .sidebar-panel,
+  .offcanvas {
+    max-width: calc(100vw - 20px) !important;
+    width: calc(100vw - 20px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  h1,
+  .page-title {
+    font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+    line-height: 1.2;
+  }
+
+  h2,
+  .section-title {
+    font-size: clamp(1.1rem, 4.4vw, 1.45rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .card,
+  .panel,
+  .dashboard-card,
+  .metric-card,
+  .kpi-card,
+  .widget-card,
+  .ai-card,
+  .evaluation-card {
+    border-radius: var(--bys360-p5c-card-radius);
+    padding: clamp(12px, 4vw, 18px) !important;
+  }
+
+  .table,
+  table {
+    font-size: 0.92rem;
+  }
+
+  td,
+  th {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .hide-on-android-small,
+  .desktop-only {
+    display: none !important;
+  }
+
+  .show-on-android-small,
+  .mobile-only {
+    display: initial !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .tablet-two-col,
+  .responsive-two-col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--bys360-p5c-mobile-gap) !important;
+  }
+}
+
+/* p5c-landscape */
+@media (orientation: landscape) and (max-height: 520px) {
+  .page-header,
+  .hero,
+  .home-hero,
+  .dashboard-header {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .modal-dialog,
+  .offcanvas,
+  .sidebar-panel {
+    max-height: calc(100vh - 16px) !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* p5c-bottom-nav-safe */
+@media (max-width: 768px) {
+  .bottom-nav,
+  .mobile-bottom-nav,
+  .app-bottom-nav,
+  .fixed-bottom {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  body.has-bottom-nav,
+  .has-mobile-bottom-nav main,
+  .has-mobile-bottom-nav .main-content {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* p5c-print-neutral */
+@media print {
+  .bottom-nav,
+  .mobile-bottom-nav,
+  .app-bottom-nav,
+  .sidebar,
+  .offcanvas {
+    display: none !important;
+  }
+
+  body {
+    overflow: visible !important;
+  }
+}

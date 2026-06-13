@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Mesaj - BYS360{% endblock %}
+{% block page_kicker %}İletişim{% endblock %}
+{% block page_title %}Yeni Mesaj{% endblock %}
+{% block page_subtitle %}Messenger benzeri yeni konuşma ekranı{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages_messenger_mobile.css') }}">
+
+<div class="messenger-shell compose-layout">
+  <aside class="messenger-sidebar compose-sidebar">
+    <div class="messenger-sidebar-head">
+      <div>
+        <h2 class="messenger-title">Yeni konuşma</h2>
+        <p class="messenger-subtitle">Alıcı seçin, mesajınızı yazın ve doğrudan sohbet başlatın. İsterseniz kendinize not da bırakabilirsiniz.</p>
+      </div>
+      <div class="messenger-head-actions">
+        <a class="msg-btn soft" href="{{ url_for('main.messages_inbox') }}"><i class="fa-solid fa-arrow-left"></i> Konuşmalar</a>
+        <a class="msg-btn soft" href="{{ url_for('main.messages_new', recipient_user_id=current_user.id) }}"><i class="fa-solid fa-note-sticky"></i> Kendime Not</a>
+      </div>
+    </div>
+
+    <div class="compose-help-list">
+      <div class="compose-help-card">
+        <i class="fa-solid fa-user-plus"></i>
+        <div>
+          <strong>Alıcı seçin</strong>
+          <span>Listeden bir kullanıcı seçin.</span>
+        </div>
+      </div>
+      <div class="compose-help-card">
+        <i class="fa-solid fa-comment-dots"></i>
+        <div>
+          <strong>Mesajınızı yazın</strong>
+          <span>Dilerseniz dosya veya görsel de ekleyin.</span>
+        </div>
+      </div>
+      <div class="compose-help-card">
+        <i class="fa-solid fa-paper-plane"></i>
+        <div>
+          <strong>Gönderin</strong>
+          <span>Sohbet doğrudan açılır.</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="messenger-panel compose-panel">
+    <div class="messenger-panel-head">
+      <div class="messenger-panel-user">
+        <div class="messenger-avatar big"><i class="fa-solid fa-pen-to-square"></i></div>
+        <div class="messenger-panel-meta">
+          <h2 class="messenger-panel-title">Yeni mesaj başlat</h2>
+          <p class="messenger-panel-sub">Masaüstünde Messenger benzeri düzen • Mobilde sade form</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="messenger-panel-body compose-body">
+      <form method="POST" action="{{ url_for('main.messages_new') }}" enctype="multipart/form-data" class="msg-form-grid" id="newMessageForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_form_token" value="{{ submit_token }}">
+
+        <div class="msg-field">
+          <label class="msg-label" for="recipient_user_id">Alıcı</label>
+          <select class="msg-select" name="recipient_user_id" id="recipient_user_id" required>
+            <option value="">Kişi seçiniz</option>
+            {% for user in users %}
+              {% set full_name = user.full_name if user.full_name else ((user.ad or '') ~ ' ' ~ (user.soyad or ''))|trim %}
+              <option value="{{ user.id }}" {% if recipient_user_id and recipient_user_id == user.id %}selected{% endif %}>{{ full_name }}{% if user.id == current_user.id %} (Kendim){% endif %}</option>
+            {% endfor %}
+          </select>
+          <div class="msg-help">Kendinize not bırakmak için listeden kendi adınızı seçebilirsiniz.</div>
+        </div>
+
+        <div class="msg-field">
+          <label class="msg-label" for="body">Mesaj</label>
+          <textarea class="msg-textarea-lg js-msg-autogrow" name="body" id="body" placeholder="Mesajınızı yazın..." required>{{ body or '' }}</textarea>
+        </div>
+
+        <div class="msg-field">
+          <label class="msg-label" for="attachments">Ek dosya</label>
+          <input type="file" id="attachments" name="attachments" class="msg-select" multiple>
+          <div class="msg-help">İsterseniz dosya veya görsel ekleyebilirsiniz.</div>
+        </div>
+
+        <div class="msg-action-row">
+          <a class="msg-btn soft" href="{{ url_for('main.messages_inbox') }}">Vazgeç</a>
+          <button type="submit" class="msg-btn primary"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}"></script>
+{% endblock %}

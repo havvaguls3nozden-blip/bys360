@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-06-12T18:26:58",
+  "phase": "A85E4_ANDROID_RESPONSIVE_EVIDENCE_PATCH",
+  "candidate_reports": [
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_P5A_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_HARDENING_P5B_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_HARDENING_EVIDENCE_P5B_REPORT.json"
+  ],
+  "written_or_updated_reports": [
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_BASELINE_P5A_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_HARDENING_P5B_REPORT.json",
+    "reports\\architecture\\BYS360_ANDROID_RESPONSIVE_HARDENING_EVIDENCE_P5B_REPORT.json"
+  ],
+  "script_returncode": 1,
+  "test_returncode": 1,
+  "script_output": "{\n  \"ok\": false,\n  \"package\": \"BYS360_CLAUDE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE\",\n  \"android_responsive_core_styles_gate_ok\": false,\n  \"responsive_hardening_ok\": false,\n  \"p5a_baseline_report_ok\": false,\n  \"android_core_css_ok\": true,\n  \"base_template_link_ok\": true,\n  \"core_css_media_query_count\": 5,\n  \"routes_py_lines\": 237,\n  \"total_mobile_route_decorator_count\": 24,\n  \"direct_contract_ok\": true,\n  \"compile_ok\": true,\n  \"app_factory_ok\": true,\n  \"secret_gate_ok\": true,\n  \"secret_gate_finding_count\": 0,\n  \"pytest_ok\": true,\n  \"pytest_mode\": \"skipped\",\n  \"report\": \"C:\\\\bys360\\\\project\\\\reports\\\\architecture\\\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json\"\n}\n\n",
+  "test_output": "F                                                                        [100%]\n================================== FAILURES ===================================\n________________ test_android_responsive_core_styles_gate_p5b _________________\n\n    def test_android_responsive_core_styles_gate_p5b() -> None:\n        root = Path(__file__).resolve().parents[2]\n        script = root / \"scripts\" / \"quality\" / \"bys360_android_responsive_core_styles_gate_p5b.py\"\n        result = subprocess.run(\n            [sys.executable, str(script), \"--root\", str(root)],\n            cwd=str(root),\n            capture_output=True,\n            text=True,\n            encoding=\"utf-8\",\n            errors=\"replace\",\n        )\n>       assert result.returncode == 0, result.stdout + \"\\n\" + result.stderr\nE       AssertionError: {\nE           \"ok\": false,\nE           \"package\": \"BYS360_CLAUDE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE\",\nE           \"android_responsive_core_styles_gate_ok\": false,\nE           \"responsive_hardening_ok\": false,\nE           \"p5a_baseline_report_ok\": false,\nE           \"android_core_css_ok\": true,\nE           \"base_template_link_ok\": true,\nE           \"core_css_media_query_count\": 5,\nE           \"routes_py_lines\": 237,\nE           \"total_mobile_route_decorator_count\": 24,\nE           \"direct_contract_ok\": true,\nE           \"compile_ok\": true,\nE           \"app_factory_ok\": true,\nE           \"secret_gate_ok\": true,\nE           \"secret_gate_finding_count\": 0,\nE           \"pytest_ok\": true,\nE           \"pytest_mode\": \"skipped\",\nE           \"report\": \"C:\\\\bys360\\\\project\\\\reports\\\\architecture\\\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json\"\nE         }\nE         \nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['C:\\\\bys360\\\\project\\\\.venv\\\\Scripts\\\\python.exe', 'C:\\\\bys360\\\\project\\\\scripts\\\\quality\\\\bys3...\\\\\\\\project\\\\\\\\reports\\\\\\\\architecture\\\\\\\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json\"\\n}\\n', stderr='').returncode\n\ntests\\architecture\\test_android_responsive_core_styles_p5b.py:24: AssertionError\n=========================== short test summary info ===========================\nFAILED tests/architecture/test_android_responsive_core_styles_p5b.py::test_android_responsive_core_styles_gate_p5b\n1 failed in 0.14s\n\n",
+  "ok": false
+}

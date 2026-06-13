@@ -1,0 +1,612 @@
+{% extends "base.html" %}
+{% from "_management_workspace_macros.html" import management_workspace_header %}
+{% from "_premium_workspace_macros.html" import premium_action_shell %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Personel Özlük Dosyaları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Özlük Dosyaları{% endblock %}
+{% block page_subtitle %}
+Personel kayıtlarını görüntüleyin, filtreleyin, düzenleyin ve kurumsal hiyerarşiyle uyumlu şekilde yönetin.
+{% endblock %}
+
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .personnel-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-row{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:16px;
+        flex-wrap:wrap;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.18rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.35;
+    }
+
+    .hero-text{
+        margin:8px 0 0;
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+        max-width:780px;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .ai-panel{border:1px solid rgba(139,0,0,.10); background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+    .ai-risk-list{display:grid;gap:10px;margin-top:14px}
+    .ai-risk-item{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .ai-risk-title{font-weight:900;color:#111827;font-size:.88rem;margin-bottom:4px}
+    .ai-risk-sub{color:#6b7280;font-size:.82rem;line-height:1.6}
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+        line-height:1.5;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.7rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .filter-grid{
+        display:grid;
+        grid-template-columns:1.6fr 1fr 1fr 1fr 1fr auto;
+        gap:14px;
+        align-items:end;
+    }
+
+    .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .field label{
+        font-size:.85rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select{
+        min-height:46px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .table-wrap{
+        overflow:auto;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:22px;
+        background:#fff;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:1480px;
+    }
+
+    th,td{
+        padding:15px 14px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        text-align:left;
+        vertical-align:middle;
+    }
+
+    th{
+        font-size:.8rem;
+        color:#6b7280;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+        white-space:nowrap;
+        font-weight:900;
+        background:rgba(248,250,252,.92);
+    }
+
+    td{
+        font-size:.9rem;
+        color:#111827;
+    }
+
+    tbody tr:hover{
+        background:rgba(248,250,252,.68);
+    }
+
+    .person-cell{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        min-width:260px;
+    }
+
+    .person-avatar{
+        width:46px;
+        height:46px;
+        border-radius:15px;
+        object-fit:cover;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        flex-shrink:0;
+        box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+
+    .person-avatar-fallback{
+        width:46px;
+        height:46px;
+        border-radius:15px;
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:.92rem;
+        font-weight:900;
+        flex-shrink:0;
+        box-shadow:0 10px 22px rgba(139,0,0,.16);
+    }
+
+    .person-name{
+        font-size:.94rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.4;
+        margin:0;
+    }
+
+    .person-sub{
+        margin:4px 0 0;
+        font-size:.78rem;
+        color:#6b7280;
+        line-height:1.6;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:24px;
+        padding:0 10px;
+        border-radius:999px;
+        font-size:.74rem;
+        font-weight:900;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .pill.passive{background:rgba(153,27,27,.10);color:#991b1b}
+    .pill.role{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .pill.unit{background:#eef2f7;color:#4b5563}
+
+    .action-row{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+    }
+
+    .mini-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        min-height:38px;
+        padding:0 12px;
+        border-radius:12px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        color:#374151;
+        font-size:.82rem;
+        font-weight:800;
+        text-decoration:none;
+    }
+
+    .mini-btn:hover{
+        color:#8B0000;
+        border-color:rgba(139,0,0,.16);
+    }
+
+    .mini-btn.danger{color:#991b1b}
+    .mini-btn.success{color:#166534}
+
+    .meta-stack{
+        display:grid;
+        gap:6px;
+    }
+
+    .meta-line{
+        color:#374151;
+        font-size:.85rem;
+        line-height:1.65;
+    }
+
+    .meta-line strong{
+        color:#111827;
+        font-weight:800;
+    }
+
+    .empty-box{
+        padding:36px 22px;
+        border-radius:20px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        text-align:center;
+        color:#6b7280;
+    }
+
+    .empty-box i{
+        font-size:2rem;
+        color:#8B0000;
+        margin-bottom:10px;
+    }
+
+    .empty-box h5{
+        margin:0 0 8px;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .empty-box p{
+        margin:0;
+        line-height:1.8;
+    }
+
+    @media (max-width:1300px){
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .filter-grid{grid-template-columns:1fr 1fr 1fr}
+    }
+
+    @media (max-width:768px){
+        .stats-grid,
+        .filter-grid{grid-template-columns:1fr}
+        .btn-soft{width:100%}
+    }
+</style>
+
+{% set total_users = users|length if users is defined else 0 %}
+{% set active_users = users|selectattr('is_active', 'equalto', true)|list|length if users is defined else 0 %}
+{% set passive_users = total_users - active_users %}
+{% set total_units = birim_options|length if birim_options is defined else 0 %}
+
+<div class="personnel-shell">
+    {{ management_workspace_header(
+        title='Kurumsal personel yönetim merkezi',
+        text='Personel kayıtlarını rol, birim ve amir zinciri üzerinden filtreleyerek yönetin.',
+        icon='fa-solid fa-users-gear',
+        kicker='İnsan kaynakları çalışma alanı',
+        badges=[
+            {'text':'Sicil bazlı kayıt', 'icon':'fa-solid fa-id-badge', 'tone':'soft-red'},
+            {'text':'Savunmacı görünüm', 'icon':'fa-solid fa-shield-halved', 'tone':'soft-blue'},
+            {'text':'Excel ve manuel akış', 'icon':'fa-solid fa-file-arrow-up', 'tone':'soft-green'}
+        ],
+        side_title='Bu ekran neyi yönetiyor?',
+        side_text='Personel oluşturma, toplu Excel akışı, rol ve birim görünürlüğü ile amir zinciri bu merkezden izlenir. Kurumsal yapı değiştiğinde en önce burası sakin ve güvenli kalmalı.',
+        metric_cards=[
+            {'label':'Toplam Personel', 'value': total_users, 'icon':'fa-solid fa-users'},
+            {'label':'Aktif Kayıt', 'value': active_users, 'icon':'fa-solid fa-user-check', 'tone':'success'},
+            {'label':'Pasif Kayıt', 'value': passive_users, 'icon':'fa-solid fa-user-slash', 'tone':'warning'},
+            {'label':'Birim Sayısı', 'value': total_units, 'icon':'fa-solid fa-sitemap'}
+        ]
+    ) }}
+
+    {% if ai_admin_users_panel %}
+    <div class="glass-card panel-card ai-panel">
+        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_admin_users_panel.badge or 'AI risk özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_admin_users_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_admin_users_panel.summary }}</p>
+        <ul class="ai-bullets">
+            {% for item in ai_admin_users_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        <div class="ai-actions">
+            {% for row in ai_admin_users_panel.actions or [] %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+        {% if ai_admin_users_panel.risk_rows %}
+        <div class="ai-risk-list">
+            {% for row in ai_admin_users_panel.risk_rows %}
+            <div class="ai-risk-item">
+                <div class="ai-risk-title">{{ row.name }} · {{ row.sicil_no }}</div>
+                <div class="ai-risk-sub">Veri Tamamlığı {{ row.score }} · {{ row.reasons }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% call premium_action_shell(title='Filtre ve hızlı aksiyonlar', text='Arama, rol, birim ve durum alanları aynı aksiyon kabuğunda toplandı. Böylece personel listesi ile üst yönetim ekranlarının ritmi aynı kalır.', icon='fa-solid fa-sliders') %}
+        <div style="display:grid;gap:16px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{{ url_for('main.admin_user_create') }}" class="btn-soft primary">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Yeni Personel
+                </a>
+
+                <a href="{{ url_for('main.personnel_excel_upload') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Excel Yükle
+                </a>
+            </div>
+
+            <form method="GET">
+                <div class="filter-grid">
+                    <div class="field">
+                        <label for="q">Arama</label>
+                        <input
+                            type="text"
+                            id="q"
+                            name="q"
+                            class="form-input"
+                            value="{{ request.args.get('q', '') }}"
+                            placeholder="Ad soyad, sicil no, e-posta, unvan...">
+                    </div>
+
+                    <div class="field">
+                        <label for="role">Rol</label>
+                        <select id="role" name="role" class="form-select">
+                            <option value="">Tümü</option>
+                            {% for item in role_options %}
+                                <option value="{{ item }}" {% if request.args.get('role') == item %}selected{% endif %}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="birim">Birim</label>
+                        <select id="birim" name="birim" class="form-select">
+                            <option value="">Tümü</option>
+                            {% for item in birim_options %}
+                                <option value="{{ item }}" {% if request.args.get('birim') == item %}selected{% endif %}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="ust_birim">Üst Birim</label>
+                        <select id="ust_birim" name="ust_birim" class="form-select">
+                            <option value="">Tümü</option>
+                            {% for item in ust_birim_options %}
+                                <option value="{{ item }}" {% if request.args.get('ust_birim') == item %}selected{% endif %}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="status">Durum</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Aktif</option>
+                            <option value="passive" {% if request.args.get('status') == 'passive' %}selected{% endif %}>Pasif</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <button type="submit" class="btn-soft primary" style="width:100%;">
+                            <i class="fa-solid fa-filter"></i>
+                            Filtrele
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    {% endcall %}
+
+    {% call list_workspace_panel(title='Personel özlük listesi', text='Filtre sonrası görünümde kalan kayıtlar burada. Kart, rozet ve aksiyon düzeni diğer kurumsal liste ekranlarıyla aynı omurgayı kullanır.', badge=total_users ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-address-book', note='Düzenle, profil ve aktif/pasif işlemleri bu listeden yürütülür.', note_icon='fa-solid fa-compass') %}
+        {% if users %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Sicil No</th>
+                            <th>Rol / Unvan</th>
+                            <th>Birim</th>
+                            <th>Üst Birim</th>
+                            <th>Amirler</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            {% set photo = user.profile_photo_url if user.profile_photo_url is defined and user.profile_photo_url else none %}
+                            {% set initials = ((user.ad or ' ')[:1] ~ (user.soyad or ' ')[:1])|upper %}
+                            <tr>
+                                <td>
+                                    <div class="person-cell">
+                                        {% if photo %}
+                                            <img src="{{ photo }}"
+                                                 alt="Avatar"
+                                                 class="person-avatar"
+                                                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                                        {% else %}
+                                            <div class="person-avatar-fallback">{{ initials }}</div>
+                                        {% endif %}
+
+                                        <div>
+                                            <p class="person-name">
+                                                {% if user.full_name %}
+                                                    {{ user.full_name }}
+                                                {% else %}
+                                                    {{ ((user.ad or '') ~ ' ' ~ (user.soyad or ''))|trim }}
+                                                {% endif %}
+                                            </p>
+                                            <p class="person-sub">
+                                                {{ user.email or 'E-posta tanımlı değil' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>{{ user.sicil_no or '-' }}</td>
+
+                                <td>
+                                    <div class="meta-stack">
+                                        <span class="pill role">{{ user.role_label or user.role or '-' }}</span>
+                                        <div class="meta-line">
+                                            <strong>Unvan:</strong> {{ user.unvan or '-' }}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="pill unit">{{ user.birim or '-' }}</span>
+                                </td>
+
+                                <td>{{ user.ust_birim or '-' }}</td>
+
+                                <td>
+                                    <div class="meta-stack">
+                                        <div class="meta-line"><strong>1. Amir:</strong> {{ user.yonetici_sicil or '-' }}</div>
+                                        <div class="meta-line"><strong>2. Amir:</strong> {{ user.ikinci_yonetici_sicil or '-' }}</div>
+                                        <div class="meta-line"><strong>3. Amir:</strong> {{ user.ucuncu_yonetici_sicil or '-' }}</div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="pill {% if user.is_active %}active{% else %}passive{% endif %}">
+                                        {% if user.is_active %}Aktif{% else %}Pasif{% endif %}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="action-row">
+                                        <a href="{{ url_for('main.personnel_edit', user_id=user.id) }}" class="mini-btn">
+                                            <i class="fa-solid fa-pen"></i>
+                                            Düzenle
+                                        </a>
+
+                                        <a href="{{ url_for('main.personnel_profile', user_id=user.id) }}" class="mini-btn">
+                                            <i class="fa-solid fa-address-card"></i>
+                                            Profil
+                                        </a>
+
+                                        <form method="POST" action="{{ url_for('main.admin_user_toggle_active', user_id=user.id) }}" style="display:inline;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="mini-btn {% if user.is_active %}danger{% else %}success{% endif %}">
+                                                <i class="fa-solid {% if user.is_active %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                                                {% if user.is_active %}Pasif Yap{% else %}Aktif Yap{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-box">
+                <i class="fa-solid fa-user-group"></i>
+                <h5>Personel kaydı bulunamadı</h5>
+                <p>Arama ve filtre kriterlerinize uygun personel listesi bulunmuyor.</p>
+            </div>
+        {% endif %}
+    {% endcall %}
+</div>
+{% endblock %}

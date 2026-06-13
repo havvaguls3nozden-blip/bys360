@@ -1,0 +1,55 @@
+/* BYS360_NATIVE_APP_BRIDGE_V1_CSS
+   Faz 3 gerçek mobil app kabuğu için güvenli UI uyum katmanı.
+   Hassas veri cache'lemez, veri göstermez; yalnızca native WebView görünümünü iyileştirir. */
+:root {
+  --bys360-native-safe-top: env(safe-area-inset-top, 0px);
+  --bys360-native-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bys360-native-app-red: #8B0000;
+}
+html.bys360-native-app,
+body.bys360-native-app {
+  min-height: 100%;
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: rgba(139, 0, 0, 0.12);
+}
+body.bys360-native-app {
+  padding-top: var(--bys360-native-safe-top);
+  padding-bottom: var(--bys360-native-safe-bottom);
+}
+body.bys360-native-app .bys360-pwa-install-card,
+body.bys360-native-app [data-bys360-pwa-install],
+body.bys360-native-app .pwa-install-card {
+  display: none !important;
+}
+body.bys360-native-app input,
+body.bys360-native-app textarea,
+body.bys360-native-app select,
+body.bys360-native-app button,
+body.bys360-native-app a {
+  touch-action: manipulation;
+}
+body.bys360-native-app table {
+  -webkit-overflow-scrolling: touch;
+}
+body.bys360-native-app .modal,
+body.bys360-native-app .offcanvas,
+body.bys360-native-app .dropdown-menu {
+  max-height: calc(100vh - var(--bys360-native-safe-top) - var(--bys360-native-safe-bottom));
+}
+body.bys360-native-app .bys360-assistant-panel,
+body.bys360-native-app #bys360AssistantPanel,
+body.bys360-native-app [data-bys360-assistant-panel] {
+  max-height: calc(100vh - 24px - var(--bys360-native-safe-top) - var(--bys360-native-safe-bottom)) !important;
+}
+@media (max-width: 768px) {
+  body.bys360-native-app .container,
+  body.bys360-native-app .container-fluid,
+  body.bys360-native-app main {
+    max-width: 100%;
+  }
+  body.bys360-native-app .card,
+  body.bys360-native-app .glass-card,
+  body.bys360-native-app .bys360-card {
+    border-radius: 18px;
+  }
+}

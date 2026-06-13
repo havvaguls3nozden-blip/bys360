@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Destek Operasyonları{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <h3 class="mb-2">Destek Operasyonları</h3>
+    <p class="text-muted mb-0">Açık kuyruk, atanmamış talepler, duran işler ve son hareketler tek ekranda görünür.</p>
+  </div></div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Açık kuyruk</div><div class="fs-4 fw-semibold">{{ payload.summary.open_total }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Atanmamış</div><div class="fs-4 fw-semibold">{{ payload.summary.unassigned_total }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">48 saattir duran</div><div class="fs-4 fw-semibold">{{ payload.summary.stale_total }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Kritik öncelik</div><div class="fs-4 fw-semibold">{{ payload.summary.critical_total }}</div></div></div></div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Açık kuyruk</h5>
+      <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Talep</th><th>Öncelik</th><th>Yaş</th><th>Hedef</th><th>Sorumlu</th></tr></thead><tbody>
+        {% for item in payload.queue %}
+        <tr><td>#{{ item.ticket.id }} - {{ item.ticket.title }}</td><td>{{ item.priority_label }}</td><td>{{ item.age_hours }} saat</td><td>{{ item.target_hours }} saat</td><td>{{ item.assigned_name }}</td></tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted">Açık kuyruk görünmüyor.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+    <div class="col-lg-5"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Sorumlu yük dağılımı</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Sorumlu</th><th>Açık kayıt</th></tr></thead><tbody>
+        {% for item in payload.assignee_load %}
+        <tr><td>{{ item.name }}</td><td>{{ item.open_count }}</td></tr>
+        {% else %}
+        <tr><td colspan="2" class="text-muted">Dağılım görünmüyor.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Atanmamış talepler</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Talep</th><th>Öncelik</th><th>Yaş</th></tr></thead><tbody>
+        {% for item in payload.unassigned_rows %}
+        <tr><td>#{{ item.ticket.id }} - {{ item.ticket.title }}</td><td>{{ item.priority_label }}</td><td>{{ item.age_hours }} saat</td></tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">Atanmamış talep yok.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+    <div class="col-lg-6"><div class="card border-0 shadow-sm"><div class="card-body">
+      <h5 class="mb-3">Duran talepler</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Talep</th><th>Öncelik</th><th>Yaş</th></tr></thead><tbody>
+        {% for item in payload.stale_rows %}
+        <tr><td>#{{ item.ticket.id }} - {{ item.ticket.title }}</td><td>{{ item.priority_label }}</td><td>{{ item.age_hours }} saat</td></tr>
+        {% else %}
+        <tr><td colspan="3" class="text-muted">Duran talep görünmüyor.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div></div>
+  </div>
+
+  <div class="card border-0 shadow-sm"><div class="card-body">
+    <h5 class="mb-3">Son hareketler</h5>
+    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Talep</th><th>Yeni durum</th><th>Not</th><th>Zaman</th></tr></thead><tbody>
+      {% for row in payload.recent_history %}
+      <tr><td>#{{ row.ticket_id }}</td><td>{{ row.new_status }}</td><td>{{ row.note or '-' }}</td><td>{{ row.created_at }}</td></tr>
+      {% else %}
+      <tr><td colspan="4" class="text-muted">Hareket kaydı bulunamadı.</td></tr>
+      {% endfor %}
+    </tbody></table></div>
+  </div></div>
+</div>
+{% endblock %}

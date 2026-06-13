@@ -1,0 +1,85 @@
+{% macro styles() -%}
+<style>
+    .cw-shell{display:grid;gap:20px}
+    .cw-hero{position:relative;overflow:hidden;padding:24px;border-radius:22px;border:1px solid #e6e8ef;background:#fff;box-shadow:0 14px 34px rgba(15,23,42,.06)}
+    .cw-hero::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:linear-gradient(180deg,#8B0000,#b91c1c)}
+    .cw-hero-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
+    .cw-hero-main{display:flex;gap:14px;align-items:flex-start;max-width:920px}
+    .cw-hero-icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:16px;background:#f6f7fb;color:#8B0000;font-size:1.05rem;flex:0 0 auto;border:1px solid #ebeef5}
+    .cw-kicker{display:inline-flex;align-items:center;gap:8px;min-height:28px;padding:0 10px;border-radius:999px;background:#f4f6fb;color:#475467;font-size:.75rem;font-weight:900;margin-bottom:10px;border:1px solid #eaecf3}
+    .cw-title{margin:0;font-size:1.32rem;font-weight:900;color:#101828;letter-spacing:-.02em}
+    .cw-text{margin:10px 0 0;color:#667085;font-size:.95rem;line-height:1.75;max-width:820px}
+    .cw-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .cw-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:800;font-size:.88rem;transition:all .18s ease;border:1px solid transparent;cursor:pointer}
+    .cw-btn:hover{transform:translateY(-1px)}
+    .cw-btn-primary{background:#8B0000;color:#fff;box-shadow:0 8px 22px rgba(139,0,0,.16)}
+    .cw-btn-secondary{background:#fff;color:#344054;border-color:#d0d5dd}
+    .cw-nav{display:flex;gap:10px;flex-wrap:wrap;padding:2px 0 0}
+    .cw-nav-link{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;text-decoration:none;font-size:.84rem;font-weight:800;background:#fff;border:1px solid #d8dce6;color:#475467;transition:all .18s ease}
+    .cw-nav-link:hover{border-color:#8B0000;color:#8B0000;transform:translateY(-1px)}
+    .cw-nav-link.active{background:#8B0000;color:#fff;border-color:#8B0000;box-shadow:0 10px 18px rgba(139,0,0,.12)}
+    .cw-panel{position:relative;overflow:hidden;background:#fff;border:1px solid #e7eaf2;border-radius:22px;box-shadow:0 14px 34px rgba(15,23,42,.06)}
+    .cw-panel-body{padding:22px;position:relative;z-index:1}
+    .cw-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .cw-metric{padding:18px;border-radius:18px;background:#fff;border:1px solid #edf0f5;box-shadow:0 6px 20px rgba(15,23,42,.03)}
+    .cw-metric-label{font-size:.77rem;font-weight:900;color:#667085;margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em}
+    .cw-metric-value{font-size:1.55rem;font-weight:900;color:#101828;line-height:1.1}
+    .cw-metric-sub{margin-top:8px;font-size:.82rem;color:#667085;line-height:1.6}
+    .cw-empty{padding:30px 20px;border-radius:18px;border:1px dashed #d0d5dd;background:#fafbfc;text-align:center;color:#667085}
+    .cw-empty i{font-size:2rem;color:#8B0000;margin-bottom:10px}
+    .cw-empty strong{display:block;color:#101828;font-size:1rem;margin-bottom:8px}
+    @media (max-width:1100px){.cw-metric-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:768px){.cw-hero{padding:20px}.cw-actions,.cw-nav{width:100%}.cw-btn,.cw-nav-link{width:100%;justify-content:center}.cw-metric-grid{grid-template-columns:1fr}}
+</style>
+{%- endmacro %}
+
+{% macro hero(title='', text='', icon='fa-solid fa-layer-group', kicker='Kurumsal çalışma alanı', primary_url='', primary_label='', secondary_url='', secondary_label='') -%}
+<div class="cw-hero">
+    <div class="cw-hero-grid">
+        <div class="cw-hero-main">
+            <div class="cw-hero-icon"><i class="{{ icon }}"></i></div>
+            <div>
+                <div class="cw-kicker"><i class="fa-solid fa-swatchbook"></i>{{ kicker }}</div>
+                <h2 class="cw-title">{{ title }}</h2>
+                {% if text %}<p class="cw-text">{{ text }}</p>{% endif %}
+            </div>
+        </div>
+        {% if primary_url or secondary_url %}
+        <div class="cw-actions">
+            {% if primary_url and primary_label %}<a href="{{ primary_url }}" class="cw-btn cw-btn-primary"><i class="fa-solid fa-plus"></i>{{ primary_label }}</a>{% endif %}
+            {% if secondary_url and secondary_label %}<a href="{{ secondary_url }}" class="cw-btn cw-btn-secondary"><i class="fa-solid fa-arrow-right"></i>{{ secondary_label }}</a>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro survey_nav(active='manage') -%}
+<div class="cw-nav">
+    <a href="{{ url_for('main.survey_manage') }}" class="cw-nav-link {% if active == 'manage' %}active{% endif %}"><i class="fa-solid fa-list-check"></i>Anket Yönetimi</a>
+    <a href="{{ url_for('main.survey_results') }}" class="cw-nav-link {% if active == 'results' %}active{% endif %}"><i class="fa-solid fa-chart-pie"></i>Anket Sonuçları</a>
+    <a href="{{ url_for('main.survey_create') }}" class="cw-nav-link {% if active == 'create' %}active{% endif %}"><i class="fa-solid fa-square-plus"></i>Yeni Anket</a>
+</div>
+{%- endmacro %}
+
+{% macro feedback_nav(active='dashboard') -%}
+<div class="cw-nav">
+    <a href="{{ url_for('main.feedback_dashboard') }}" class="cw-nav-link {% if active == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-comments"></i>Panel</a>
+    <a href="{{ url_for('main.feedback_pulse') }}" class="cw-nav-link {% if active == 'pulse' %}active{% endif %}"><i class="fa-solid fa-heart-pulse"></i>Nabız</a>
+    <a href="{{ url_for('main.feedback_campaigns') }}" class="cw-nav-link {% if active == 'campaigns' %}active{% endif %}"><i class="fa-solid fa-clipboard-list"></i>Kampanyalar</a>
+    {% set manager_roles = ['admin','baskan','baskan_yardimcisi','grup_baskani','mali_musavir','koordinator','birim_sorumlusu'] %}
+    {% if current_user.role in manager_roles %}
+    <a href="{{ url_for('main.feedback_results') }}" class="cw-nav-link {% if active == 'results' %}active{% endif %}"><i class="fa-solid fa-chart-column"></i>Sonuçlar</a>
+    <a href="{{ url_for('main.feedback_actions') }}" class="cw-nav-link {% if active == 'actions' %}active{% endif %}"><i class="fa-solid fa-list-check"></i>Aksiyonlar</a>
+    <a href="{{ url_for('main.feedback_manager') }}" class="cw-nav-link {% if active == 'manager' %}active{% endif %}"><i class="fa-solid fa-user-tie"></i>Yönetici</a>
+    <a href="{{ url_for('main.feedback_campaign_manage') }}" class="cw-nav-link {% if active == 'admin' %}active{% endif %}"><i class="fa-solid fa-sliders"></i>Kampanya Yönetimi</a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro announcement_nav(active='new') -%}
+<div class="cw-nav">
+    <a href="{{ url_for('main.announcements_list') }}" class="cw-nav-link"><i class="fa-solid fa-bullhorn"></i>Duyuru Akışı</a>
+    <a href="{{ url_for('main.announcements_new') }}" class="cw-nav-link {% if active == 'new' %}active{% endif %}"><i class="fa-solid fa-paper-plane"></i>Yeni Duyuru</a>
+</div>
+{%- endmacro %}

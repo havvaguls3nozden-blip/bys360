@@ -1,0 +1,11 @@
+BYS360 Mobile Support Service Delegate P1.5 V2.17.13
+
+Amaç:
+- app/api/mobile/routes.py içindeki mobil support/destek route fonksiyonlarını servis delegasyonuna almak.
+- URL, endpoint ve blueprint adını değiştirmemek.
+- Route fonksiyonlarının eski gövdesini _bys360_legacy_* fonksiyonuna taşıyıp servis dosyasından çağırmak.
+
+Güvenlik:
+- Syntax hatası oluşursa routes.py otomatik rollback yapılır.
+- NOOP başarısızlık sayılmaz; hedef fonksiyon bulunamazsa rapor üretir.
+- Her all/health modunda compileall + create_app testi yapılır.

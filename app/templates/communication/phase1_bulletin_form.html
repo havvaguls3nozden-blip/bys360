@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Yeni Faz 1 Duyuru - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Yeni Faz 1 Duyuru{% endblock %}
+{% block page_subtitle %}Yöneticiler için hedefli duyuru ve teslim altyapısının ilk kurgu ekranı.{% endblock %}
+{% block content %}
+<style>
+.form-shell{display:grid;gap:18px}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:24px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:grid;gap:8px}.field label{font-size:.88rem;font-weight:800;color:#374151}.input,.select,.textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:16px;background:#fff;padding:12px 14px;font-size:.95rem}.textarea{min-height:150px;resize:vertical}.checkboxes{display:flex;gap:16px;flex-wrap:wrap}.form-actions{display:flex;gap:10px;flex-wrap:wrap}.btn-main,.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:800;border:none}.btn-main{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.btn-soft{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.16)}@media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+<div class="form-shell">
+    <form method="post" class="panel">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="grid">
+            <div class="field">
+                <label>Başlık</label>
+                <input class="input" type="text" name="title" required>
+            </div>
+            <div class="field">
+                <label>Duyuru Türü</label>
+                <select class="select" name="bulletin_type">
+                    <option value="duyuru">Duyuru</option>
+                    <option value="bilgilendirme">Bilgilendirme</option>
+                    <option value="hatirlatma">Hatırlatma</option>
+                    <option value="aksiyon">Aksiyon Gerekli</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Özet</label>
+                <input class="input" type="text" name="summary" maxlength="500">
+            </div>
+            <div class="field">
+                <label>Öncelik</label>
+                <select class="select" name="priority">
+                    {% for key, label in priority_labels.items() %}
+                    <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="field mt-3">
+            <label>İçerik</label>
+            <textarea class="textarea" name="content" required></textarea>
+        </div>
+
+        <div class="grid mt-3">
+            <div class="field">
+                <label>Hedef Türü</label>
+                <select class="select" name="target_type" id="targetTypeSelect">
+                    <option value="all">Tüm kurum</option>
+                    <option value="role">Rol</option>
+                    <option value="unit">Birim</option>
+                    <option value="user">Kullanıcı</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Hedef Değerler</label>
+                <textarea class="textarea" name="target_values" style="min-height:110px;" placeholder="Rol için: grup_baskani, personel&#10;Birim için: 12, 14&#10;Kullanıcı için: 25, 37"></textarea>
+            </div>
+        </div>
+
+        <div class="panel mt-3" style="padding:18px;background:#f8fafc;box-shadow:none;">
+            <div style="font-weight:900;color:#111827;margin-bottom:8px;">Hazır seçenek listeleri</div>
+            <div class="grid">
+                <div>
+                    <div style="font-size:.84rem;font-weight:800;color:#6b7280;margin-bottom:6px;">Roller</div>
+                    <div style="color:#374151;font-size:.9rem;line-height:1.8;">{% for value, label in options.roles %}<span style="display:inline-block;margin:0 10px 8px 0;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);">{{ value }}</span>{% endfor %}</div>
+                </div>
+                <div>
+                    <div style="font-size:.84rem;font-weight:800;color:#6b7280;margin-bottom:6px;">Birimler</div>
+                    <div style="color:#374151;font-size:.9rem;line-height:1.8;">{% for value, label in options.units[:12] %}<span style="display:inline-block;margin:0 10px 8px 0;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);">{{ value }} · {{ label }}</span>{% endfor %}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="checkboxes mt-3">
+            <label><input type="checkbox" name="is_pinned" value="1"> Sabitle</label>
+            <label><input type="checkbox" name="require_ack" value="1"> Okundu teyidi iste</label>
+            <label><input type="checkbox" name="publish_now" value="1"> Kaydeder kaydetmez yayımla</label>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn-main"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
+            <a href="{{ url_for('main.communication_phase1_bulletins') }}" class="btn-soft">Listeye dön</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

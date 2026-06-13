@@ -1,0 +1,13 @@
+{# BYS360_PERFORMANCE_COMPLETION_PHASE6_LOW_SCORE_PROCESS_TEMPLATE #}
+{% set phase6_state = phase6_low_score_state|default(None) %}
+{% if phase6_state %}
+<section class="bys360-phase6-low-score-panel">
+  <div class="bys360-phase6-low-score-title">Düşük Performans Süreci</div>
+  <div class="bys360-phase6-low-score-grid">
+    <div><strong>Onay Durumu</strong><span>{{ phase6_state.approval_label|default('Başkan/Üst Onay Bekliyor') }}</span></div>
+    <div><strong>Yayın Durumu</strong><span>{{ phase6_state.publish_lock_label|default('Başkan/Üst Onay Yayın Kilidi') }}</span></div>
+    <div><strong>Süreç</strong><span>{{ phase6_state.warning_label|default('Düşük Performans Uyarısı Oluşturuldu') }}</span></div>
+  </div>
+  {% if phase6_state.next_action %}<p class="bys360-phase6-low-score-note">{{ phase6_state.next_action }}</p>{% endif %}
+</section>
+{% endif %}

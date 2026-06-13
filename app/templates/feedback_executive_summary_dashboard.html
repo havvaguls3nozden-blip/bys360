@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Yönetici Özet Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yönetici Özet Merkezi{% endblock %}
+{% block page_subtitle %}
+Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıtları okuyun ve özet akışını tek tıkla çalıştırın.
+{% endblock %}
+
+{% block content %}
+<style>
+.exec-shell{display:grid;gap:18px}
+.glass-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}
+.scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+.pill,.tone-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:900;white-space:nowrap}
+.pill{background:#eef2f7;color:#374151}.tone-pill.critical{background:rgba(185,28,28,.1);color:#991b1b}.tone-pill.watch{background:rgba(180,83,9,.12);color:#92400e}.tone-pill.info{background:rgba(139,0,0,.08);color:#8B0000}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) 360px;gap:18px}
+.hero-title{margin:0;color:#111827;font-size:1.15rem;font-weight:900;line-height:1.45}.hero-text{margin-top:10px;color:#6b7280;font-size:.93rem;line-height:1.85}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;text-decoration:none;cursor:pointer;font-weight:800;font-size:.9rem;transition:all .18s ease}
+.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+.btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}.btn-soft:hover{transform:translateY(-1px)}
+.stats-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:14px}.stat-card{position:relative;overflow:hidden}.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}
+.stat-label{color:#6b7280;font-size:.76rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}.stat-value{color:#111827;font-size:1.25rem;font-weight:900;line-height:1;position:relative;z-index:1}.stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;line-height:1.6;position:relative;z-index:1}
+.layout-grid{display:grid;grid-template-columns:minmax(0,1.08fr) 360px;gap:18px}
+.section-title{margin:0 0 12px;color:#111827;font-size:1.05rem;font-weight:900}.section-sub{margin:0 0 14px;color:#6b7280;font-size:.9rem;line-height:1.75}
+.tab-row{display:flex;gap:10px;flex-wrap:wrap}.tab-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(15,23,42,.08);background:#fff;color:#4b5563;font-weight:800;font-size:.84rem}.tab-pill.active{background:rgba(139,0,0,.08);color:#8B0000;border-color:rgba(139,0,0,.18)}
+.list-grid{display:grid;gap:12px}.item-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:16px;display:grid;gap:10px}.item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.item-title{margin:0;color:#111827;font-size:.98rem;font-weight:900;line-height:1.5}.item-meta{color:#6b7280;font-size:.84rem;line-height:1.75}.item-text{color:#4b5563;font-size:.86rem;line-height:1.8}.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:12px;text-decoration:none;background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08);font-size:.82rem;font-weight:800}
+.side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:#f8fafc;display:grid;gap:12px}.side-label{color:#6b7280;font-size:.78rem;font-weight:800}.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.55}.side-sub{color:#6b7280;font-size:.84rem;line-height:1.75}
+.meter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.meter{border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:14px;background:#fff}.meter-value{font-size:1.1rem;font-weight:900;color:#111827}.meter-label{margin-top:6px;color:#6b7280;font-size:.8rem;line-height:1.6}
+.manager-row,.recipient-row{display:grid;gap:8px;padding:14px;border:1px solid rgba(15,23,42,.08);border-radius:16px;background:#fff}.manager-top,.recipient-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.manager-name,.recipient-name{font-weight:900;color:#111827}.meta{color:#6b7280;font-size:.82rem;line-height:1.7}
+.preview-box{white-space:pre-line;border:1px dashed rgba(15,23,42,.12);border-radius:18px;padding:16px;background:#f8fafc;color:#374151;font-size:.86rem;line-height:1.85}
+.empty-box{padding:22px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;text-align:center;line-height:1.8}
+.checkline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#374151;font-size:.86rem;font-weight:700}
+@media (max-width:1280px){.hero-grid,.layout-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:768px){.stats-grid,.meter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.btn-soft,.mini-btn{width:100%}}
+</style>
+
+<div class="exec-shell">
+    <div class="scope-strip">
+        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için yönetici özeti hazırlanıyor.</span></div>
+        <span class="tone-pill info"><i class="fa-solid fa-chart-pie"></i> Yönetici Özet Merkezi</span>
+    </div>
+
+    <div class="glass-card">
+        <div class="hero-grid">
+            <div>
+                <div class="tab-row">
+                    {% for item in preset_options %}
+                    <a class="tab-pill {% if preset == item.value %}active{% endif %}" href="{{ url_for('main.feedback_executive_summary_dashboard', scope=selected_scope, preset=item.value) }}"><i class="fa-solid fa-calendar-day"></i> {{ item.label }} özet</a>
+                    {% endfor %}
+                </div>
+                <h3 class="hero-title" style="margin-top:14px;">Yöneticilere gidecek özetin önceliklerini ve alıcılarını göndermeden önce görün</h3>
+                <p class="hero-text">Bu ekran, açık talep yaşını, yaklaşan ve geciken görüşmeleri, yoğun yönetici yükünü ve önerilen alıcı listesini aynı yerde toplar. İstersen sadece uygulama içi özet üretir, istersen aynı anda e-posta denemesi de yapar.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+                    <span class="pill"><i class="fa-solid fa-inbox"></i> {{ cards.open_requests or 0 }} açık talep</span>
+                    <span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ cards.request_sla_risks or 0 }} SLA riski</span>
+                    <span class="tone-pill watch"><i class="fa-solid fa-calendar-check"></i> {{ cards.meetings_next_7d or 0 }} 7 gün içinde görüşme</span>
+                </div>
+                <div class="hero-actions">
+                    <a href="{{ url_for('main.feedback_watch_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-bell"></i> Takip ve Uyarı</a>
+                    <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-halved"></i> Audit Paneli</a>
+                    <a href="{{ url_for('main.performance_go_live_center', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-rocket"></i> Canlıya Çıkış</a>
+                    <form method="post" action="{{ url_for('main.feedback_executive_summary_run_digest', scope=selected_scope, preset=preset) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope }}">
+                        <input type="hidden" name="preset" value="{{ preset }}">
+                        <label class="checkline"><input type="checkbox" name="send_email" value="1"> E-posta da dene</label>
+                        <button type="submit" class="btn-soft primary"><i class="fa-solid fa-paper-plane"></i> Özeti Çalıştır</button>
+                    </form>
+                </div>
+            </div>
+            <div class="side-card">
+                <div>
+                    <div class="side-label">Hazır konu satırı</div>
+                    <div class="side-value">{{ digest_subject }}</div>
+                </div>
+                <div>
+                    <div class="side-label">Önerilen alıcı sayısı</div>
+                    <div class="side-value">{{ cards.recipient_suggestions or 0 }}</div>
+                    <div class="side-sub">Sistem açık talep ve görüşmelerden ilgili yönetici kümesini çıkarır.</div>
+                </div>
+                <div>
+                    <div class="side-label">Üretim zamanı</div>
+                    <div class="side-sub">{{ generated_at.strftime('%d.%m.%Y %H:%M') if generated_at else '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Açık Talep</div><div class="stat-value">{{ cards.open_requests or 0 }}</div><div class="stat-sub">Kapanmamış geri bildirim talepleri.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Hatırlatma</div><div class="stat-value">{{ cards.request_reminders or 0 }}</div><div class="stat-sub">İlk uyarı eşiğini geçen talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">SLA Riski</div><div class="stat-value">{{ cards.request_sla_risks or 0 }}</div><div class="stat-sub">Yönetici aksiyonu geciken kritik kayıtlar.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">24 Saat</div><div class="stat-value">{{ cards.meetings_next_24h or 0 }}</div><div class="stat-sub">Yaklaşan görüşmeler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">7 Gün</div><div class="stat-value">{{ cards.meetings_next_7d or 0 }}</div><div class="stat-sub">Önümüzdeki hafta planlı görüşmeler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Geciken</div><div class="stat-value">{{ cards.meeting_overdue or 0 }}</div><div class="stat-sub">Durumu güncellenmemiş görüşmeler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yoğun Yönetici</div><div class="stat-value">{{ cards.manager_hotspots or 0 }}</div><div class="stat-sub">Açık yük veya gecikme biriktiren yönetici sayısı.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Önerilen Alıcı</div><div class="stat-value">{{ cards.recipient_suggestions or 0 }}</div><div class="stat-sub">Özet gönderimi için önerilen aktif kullanıcı.</div></div>
+    </div>
+
+    <div class="layout-grid">
+        <div style="display:grid;gap:18px;">
+            <div class="glass-card">
+                <h3 class="section-title">Talep yaş dağılımı</h3>
+                <p class="section-sub">Açık taleplerin kaç gündür beklediğini tek bakışta görün.</p>
+                <div class="meter-grid">
+                    <div class="meter"><div class="meter-value">{{ request_age_buckets['0_1'] or 0 }}</div><div class="meter-label">0-1 gün arasında açık olanlar</div></div>
+                    <div class="meter"><div class="meter-value">{{ request_age_buckets['2_4'] or 0 }}</div><div class="meter-label">2-4 gün arasında açık olanlar</div></div>
+                    <div class="meter"><div class="meter-value">{{ request_age_buckets['5_plus'] or 0 }}</div><div class="meter-label">5 gün ve üzeri kritik açık talepler</div></div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Öncelikli talep listesi</h3>
+                <p class="section-sub">Özete girecek ilk kayıtlar burada sıralanır.</p>
+                {% if priority_requests %}
+                <div class="list-grid">
+                    {% for item in priority_requests %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <div class="tone-pill {{ item.tone }}">{{ item.kind }}</div>
+                                <h4 class="item-title" style="margin-top:10px;">{{ item.employee_name }}</h4>
+                                <div class="item-meta">{{ item.period_title }} · {{ item.status }} · {{ item.age_days }} gündür açık</div>
+                            </div>
+                            <span class="pill"><i class="fa-solid fa-user-check"></i> {{ item.manager_text }}</span>
+                        </div>
+                        <div class="item-text">{{ item.detail }}</div>
+                        <a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=item.request_id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Özete girecek kritik talep görünmüyor.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Yaklaşan görüşmeler</h3>
+                <p class="section-sub">Önümüzdeki 7 gün içindeki görüşmeler, yönetici planlamasını hızlandırır.</p>
+                {% if next_meetings %}
+                <div class="list-grid">
+                    {% for item in next_meetings %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <h4 class="item-title">{{ item.employee_name }}</h4>
+                                <div class="item-meta">{{ item.manager_name }} · {{ item.when_text }} · {{ item.status }}</div>
+                            </div>
+                            <span class="pill"><i class="fa-solid fa-location-dot"></i> {{ item.location }}</span>
+                        </div>
+                        <a class="mini-btn" href="{{ url_for('main.feedback_meeting_detail', meeting_id=item.meeting_id, scope=selected_scope) }}"><i class="fa-solid fa-calendar-check"></i> Randevuyu Aç</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Önümüzdeki 7 günde planlı aktif görüşme görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display:grid;gap:18px;align-content:start;">
+            <div class="glass-card">
+                <h3 class="section-title">Yoğun yönetici sıralaması</h3>
+                <p class="section-sub">Özette ilk görünmesi gereken yük sahipleri burada.</p>
+                {% if manager_rows %}
+                <div class="list-grid">
+                    {% for row in manager_rows %}
+                    <div class="manager-row">
+                        <div class="manager-top">
+                            <div class="manager-name">{{ row.manager_name }}</div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <span class="pill"><i class="fa-solid fa-inbox"></i> {{ row.open_requests }}</span>
+                                {% if row.sla_risk_requests %}<span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ row.sla_risk_requests }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="meta">En yaşlı açık talep: {{ row.max_request_age_days }} gün · Yaklaşan görüşme: {{ row.upcoming_meetings }} · Geciken görüşme: {{ row.overdue_meetings }}</div>
+                        <div class="meta">En yakın görüşme: {{ row.next_meeting_text or '-' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Yoğun yönetici görünmüyor.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Önerilen alıcı listesi</h3>
+                <p class="section-sub">Özet gönderimi için aktif ve ilgili kullanıcılar.</p>
+                {% if recipient_rows %}
+                <div class="list-grid">
+                    {% for row in recipient_rows %}
+                    <div class="recipient-row">
+                        <div class="recipient-top">
+                            <div class="recipient-name">{{ row.name }}</div>
+                            <span class="pill"><i class="fa-solid fa-user-shield"></i> {{ row.role }}</span>
+                        </div>
+                        <div class="meta">{{ row.email }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Önerilen alıcı bulunamadı.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Hazır metin önizlemesi</h3>
+                <p class="section-sub">Uygulama içi özet ve e-posta için temel içerik buradan üretilir.</p>
+                <div class="preview-box">{{ digest_body_plain }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

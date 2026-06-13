@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Stratejik Performans Merkezi{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="glass-card p-4 mb-4">
+    <h1 class="h4 mb-2">Stratejik Performans Merkezi</h1>
+    <p class="text-muted mb-0">KPI, hedef yönetimi, yetkinlik ve gelişim analizleri için kurumsal izleme alanı.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-3"><div class="glass-card p-3"><div class="text-muted small">Toplam Hedef</div><div class="h3 mb-0">{{ summary.total_targets }}</div></div></div>
+    <div class="col-md-3"><div class="glass-card p-3"><div class="text-muted small">Tamamlanan</div><div class="h3 mb-0">{{ summary.completed_targets }}</div></div></div>
+    <div class="col-md-3"><div class="glass-card p-3"><div class="text-muted small">Riskli</div><div class="h3 mb-0">{{ summary.risky_targets }}</div></div></div>
+    <div class="col-md-3"><div class="glass-card p-3"><div class="text-muted small">Kritik</div><div class="h3 mb-0">{{ summary.critical_targets }}</div></div></div>
+  </div>
+
+  <div class="glass-card p-4 mt-4">
+    <h2 class="h5">SP-1A Veri Omurgası Hazır</h2>
+    <p class="mb-0 text-muted">Bu ekran SP-1B aşamasında gerçek KPI listeleri, grafikler ve yönetici analiz kartlarıyla genişletilecektir.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Personel Duvarları - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Portal{% endblock %}
+{% block page_title %}Personel Duvarları{% endblock %}
+{% block page_subtitle %}Kurum içi profil duvarlarını arayın, inceleyin ve izin verilen duvarlara paylaşım bırakın.{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=portal-iphone-responsive-v2-11-5">{% endblock %}
+{% block content %}
+<div class="portal-shell portal-people-page people-premium-v210">
+  {% include 'portal/_tabs.html' %}
+
+  <section class="portal-people-hero-v210">
+    <div class="portal-people-hero-copy-v210">
+      <span class="portal-eyebrow-v210"><i class="fa-solid fa-users-viewfinder"></i> Kurumsal Profil Ağı</span>
+      <h2>Personel duvarlarını keşfedin</h2>
+      <p>Personel profillerine ulaşın, ilgili kişinin duvarına gidin ve izin verilen paylaşımları doğrudan profil duvarında yayınlayın.</p>
+      <div class="portal-people-hero-actions-v210">
+        <a class="portal-btn primary" href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-id-card"></i> Kendi Duvarım</a>
+        <a class="portal-btn ghost" href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}"><i class="fa-solid fa-stream"></i> Yayın Akışı</a>
+      </div>
+    </div>
+    <div class="portal-people-hero-panel-v210">
+      <div class="portal-people-orbit-v210"><i class="fa-regular fa-comments"></i></div>
+      <strong>{{ portal_people|length if portal_people is defined else 0 }}</strong>
+      <span>görüntülenen personel</span>
+      <small>Arama sonucuna göre listelenir.</small>
+    </div>
+  </section>
+
+  <section class="portal-card portal-people-search-premium-v210">
+    <div>
+      <h3><i class="fa-solid fa-magnifying-glass"></i> Personel ara</h3>
+      <p>Ad, soyad, birim, unvan veya sicil bilgisiyle profil duvarına hızlı ulaşın.</p>
+    </div>
+    <form method="get" action="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}" class="portal-people-search-form-v210">
+      <label class="sr-only" for="portal_people_q">Personel arama</label>
+      <input id="portal_people_q" class="portal-input" type="search" name="q" value="{{ portal_people_query or '' }}" placeholder="Örn. Gülsen, Bilgi Teknolojileri, Koordinatör">
+      <button class="portal-btn primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Ara</button>
+      {% if portal_people_query %}<a class="portal-btn ghost" href="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}">Temizle</a>{% endif %}
+    </form>
+  </section>
+
+  <section class="portal-people-note-v210">
+    <i class="fa-solid fa-shield-heart"></i>
+    <span>Profil duvarı paylaşımları yetki ve görünürlük kurallarına göre gösterilir. Uygun olmayan içerikler yayından kaldırılabilir.</span>
+  </section>
+
+  {% if portal_people %}
+    <section class="portal-people-grid-v210">
+      {% for person in portal_people %}
+        {% set person_name = person.full_name or ((person.ad or '') ~ ' ' ~ (person.soyad or '')) or person.email or 'Personel' %}
+        <article class="portal-person-card-v210">
+          <div class="portal-person-card-top-v210">
+            <div class="portal-person-avatar-v210">
+              {% if person.profile_photo_url is defined and person.profile_photo_url %}
+                <img src="{{ person.profile_photo_url }}" alt="{{ person_name }} profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">
+              {% else %}
+                <span>{{ (person_name[:1] or 'P')|upper }}</span>
+              {% endif %}
+            </div>
+            <div class="portal-person-main-v210">
+              <h3>{{ person_name }}</h3>
+              <p>{{ person.unvan or 'Kurumsal Kullanıcı' }}</p>
+            </div>
+          </div>
+          <div class="portal-person-meta-v210">
+            <span><i class="fa-regular fa-building"></i> {{ person.birim or 'Birim bilgisi yok' }}</span>
+            {% if person.email %}<span><i class="fa-regular fa-envelope"></i> {{ person.email }}</span>{% endif %}
+          </div>
+          <div class="portal-person-actions-v210">
+            <a class="portal-btn primary" href="{{ safe_url_for('main.portal_profile', user_id=person.id, fallback='/portal/profile/' ~ person.id) }}"><i class="fa-regular fa-id-card"></i> Duvarına Git</a>
+            <a class="portal-btn ghost" href="{{ safe_url_for('main.portal_profile', user_id=person.id, fallback='/portal/profile/' ~ person.id) }}#portal-wall-composer"><i class="fa-regular fa-pen-to-square"></i> Duvarına Yaz</a>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <section class="portal-card portal-empty portal-empty-v210">
+      <div class="portal-empty-icon-v210"><i class="fa-regular fa-face-smile"></i></div>
+      <h3>Bu aramada personel bulunamadı.</h3>
+      <p>Arama kelimesini sadeleştirerek yeniden deneyebilir veya tüm personel duvarlarına dönebilirsiniz.</p>
+      <a class="portal-btn primary" href="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}">Tümünü Göster</a>
+    </section>
+  {% endif %}
+</div>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-iphone-responsive-v2-11-5"></script>
+{% endblock %}
+
+<!-- BYS360_PORTAL_PROFILE_ME_LINK_V2_10_3: portal_my_profile endpoint bağlantısı portal_my_profile olarak düzeltildi. -->
+
+{# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

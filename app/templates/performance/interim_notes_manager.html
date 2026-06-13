@@ -1,0 +1,711 @@
+{% extends "base.html" %}
+
+{% block title %}Dönem İçi Notlar{% endblock %}
+
+{% block content %}
+{% set page_summary = page_summary if page_summary is defined and page_summary else {} %}
+{% set note_items = note_items if note_items is defined else (interim_notes if interim_notes is defined else (notes if notes is defined else [])) %}
+{% set personnel_options = personnel_options if personnel_options is defined else [] %}
+{% set period_options = period_options if period_options is defined else [] %}
+
+<style>
+    .bys-notes-shell {
+        --bys-red: #8B0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .10);
+        --bys-card: rgba(255, 255, 255, .88);
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 18px 18px 44px;
+    }
+
+    .bys-notes-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 34%),
+            linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.74));
+        box-shadow: 0 24px 70px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin-bottom: 18px;
+    }
+
+    .bys-notes-hero::after {
+        content: "";
+        position: absolute;
+        right: -90px;
+        top: -100px;
+        width: 270px;
+        height: 270px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .08);
+        pointer-events: none;
+    }
+
+    .bys-notes-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 800;
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    .bys-notes-title {
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.05;
+        font-weight: 850;
+        color: var(--bys-ink);
+        margin: 0;
+        letter-spacing: -.04em;
+    }
+
+    .bys-notes-subtitle {
+        max-width: 980px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .bys-notes-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .bys-notes-stat {
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: var(--bys-card);
+        padding: 18px;
+        box-shadow: 0 16px 42px rgba(31, 41, 55, .08);
+        min-height: 132px;
+    }
+
+    .bys-notes-stat-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 14px;
+    }
+
+    .bys-notes-stat-number {
+        font-size: 30px;
+        font-weight: 850;
+        color: var(--bys-ink);
+        letter-spacing: -.03em;
+        margin-bottom: 2px;
+    }
+
+    .bys-notes-stat-label {
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .bys-notes-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
+        margin: 18px 0;
+        align-items: center;
+    }
+
+    .bys-notes-input,
+    .bys-notes-select,
+    .bys-notes-textarea {
+        width: 100%;
+        border: 1px solid var(--bys-line);
+        background: rgba(255,255,255,.94);
+        border-radius: 16px;
+        padding: 12px 14px;
+        color: var(--bys-ink);
+        outline: none;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, .05);
+    }
+
+    .bys-notes-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .bys-notes-input:focus,
+    .bys-notes-select:focus,
+    .bys-notes-textarea:focus {
+        border-color: rgba(139, 0, 0, .35);
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+    }
+
+    .bys-notes-two {
+        display: grid;
+        grid-template-columns: 1.05fr .95fr;
+        gap: 16px;
+        align-items: start;
+    }
+
+    .bys-notes-card {
+        border: 1px solid var(--bys-line);
+        border-radius: 24px;
+        background: var(--bys-card);
+        box-shadow: 0 18px 52px rgba(31, 41, 55, .08);
+        overflow: hidden;
+        margin-top: 16px;
+    }
+
+    .bys-notes-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--bys-line);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .bys-notes-card-title {
+        margin: 0;
+        font-size: 18px;
+        color: var(--bys-ink);
+        font-weight: 820;
+        letter-spacing: -.02em;
+    }
+
+    .bys-notes-card-desc {
+        margin: 6px 0 0;
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .bys-notes-card-body {
+        padding: 18px 22px 22px;
+    }
+
+    .bys-notes-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .bys-notes-form-full {
+        grid-column: 1 / -1;
+    }
+
+    .bys-notes-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--bys-muted);
+        margin: 0 0 7px;
+    }
+
+    .bys-notes-help {
+        margin-top: 7px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .bys-notes-submit-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+
+    .bys-notes-primary {
+        border: 0;
+        border-radius: 16px;
+        background: var(--bys-red);
+        color: #fff;
+        padding: 12px 16px;
+        font-weight: 800;
+        box-shadow: 0 12px 28px rgba(139, 0, 0, .18);
+    }
+
+    .bys-notes-primary:hover {
+        filter: brightness(.96);
+    }
+
+    .bys-notes-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .bys-notes-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid var(--bys-line);
+        border-radius: 18px;
+        background: rgba(255,255,255,.66);
+    }
+
+    .bys-notes-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background: var(--bys-red);
+        box-shadow: 0 0 0 5px rgba(139, 0, 0, .08);
+    }
+
+    .bys-notes-item-title {
+        margin: 0;
+        font-weight: 780;
+        color: var(--bys-ink);
+        font-size: 14px;
+    }
+
+    .bys-notes-item-meta {
+        margin-top: 5px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .bys-notes-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, .06);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .bys-notes-badge-success {
+        background: rgba(22, 101, 52, .10);
+        color: #166534;
+    }
+
+    .bys-notes-badge-warning {
+        background: rgba(146, 64, 14, .10);
+        color: #92400e;
+    }
+
+    .bys-notes-badge-danger {
+        background: rgba(139, 0, 0, .10);
+        color: var(--bys-red);
+    }
+
+    .bys-notes-badge-info {
+        background: rgba(30, 64, 175, .10);
+        color: #1e40af;
+    }
+
+    .bys-notes-empty {
+        text-align: center;
+        padding: 34px 18px;
+        border: 1px dashed rgba(31, 41, 55, .18);
+        border-radius: 20px;
+        background: rgba(255,255,255,.52);
+        color: var(--bys-muted);
+    }
+
+    .bys-notes-empty i {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        border-radius: 18px;
+        align-items: center;
+        justify-content: center;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 12px;
+    }
+
+    .bys-notes-note {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--bys-red-soft);
+        color: #5f0b0b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1180px) {
+        .bys-notes-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .bys-notes-two {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .bys-notes-shell {
+            padding: 12px 10px 30px;
+        }
+        .bys-notes-hero {
+            padding: 22px;
+            border-radius: 22px;
+        }
+        .bys-notes-toolbar,
+        .bys-notes-form-grid {
+            grid-template-columns: 1fr;
+        }
+        .bys-notes-grid {
+            grid-template-columns: 1fr;
+        }
+        .bys-notes-card-header {
+            display: block;
+        }
+        .bys-notes-item {
+            grid-template-columns: auto 1fr;
+        }
+        .bys-notes-item .bys-notes-badge {
+            grid-column: 2;
+            width: max-content;
+        }
+        .bys-notes-form-full {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="bys-notes-shell" data-page="donem-ici-notlar">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    <section class="bys-notes-hero">
+        <div class="bys-notes-eyebrow">
+            <i class="fa-solid fa-clipboard-list"></i>
+            Performans Yönetimi
+        </div>
+
+        <h1 class="bys-notes-title">Dönem İçi Notlar</h1>
+
+        <p class="bys-notes-subtitle">
+            Performans dönemi içinde yaşanan olumlu olaylar, başarılar, gelişim ihtiyaçları, olumsuz durumlar ve genel
+            gözlemler kayıt altına alınır. Bu notlar otomatik puan üretmez; değerlendirme döneminde yetkili amire
+            hatırlatıcı ve destekleyici bilgi sağlar.
+        </p>
+
+        <div class="bys-notes-grid">
+            <div class="bys-notes-stat">
+                <div class="bys-notes-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="bys-notes-stat-number">{{ page_summary.total|default(note_items|length) }}</div>
+                <div class="bys-notes-stat-label">Toplam dönem içi not</div>
+            </div>
+
+            <div class="bys-notes-stat">
+                <div class="bys-notes-stat-icon"><i class="fa-solid fa-award"></i></div>
+                <div class="bys-notes-stat-number">{{ page_summary.positive|default(0) }}</div>
+                <div class="bys-notes-stat-label">Olumlu olay / başarı</div>
+            </div>
+
+            <div class="bys-notes-stat">
+                <div class="bys-notes-stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="bys-notes-stat-number">{{ page_summary.negative|default(0) }}</div>
+                <div class="bys-notes-stat-label">Olumsuz olay / dikkat alanı</div>
+            </div>
+
+            <div class="bys-notes-stat">
+                <div class="bys-notes-stat-icon"><i class="fa-solid fa-seedling"></i></div>
+                <div class="bys-notes-stat-number">{{ page_summary.development|default(0) }}</div>
+                <div class="bys-notes-stat-label">Gelişim ihtiyacı</div>
+            </div>
+
+            <div class="bys-notes-stat">
+                <div class="bys-notes-stat-icon"><i class="fa-solid fa-eye"></i></div>
+                <div class="bys-notes-stat-number">{{ page_summary.visible_on_scoring|default(0) }}</div>
+                <div class="bys-notes-stat-label">Puanlamada hatırlatılacak not</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bys-notes-toolbar">
+        <input id="bysNotesSearch" class="bys-notes-input" type="search" placeholder="Personel, birim, not başlığı veya açıklama ara...">
+        <select id="bysNotesType" class="bys-notes-select">
+            <option value="">Tüm not türleri</option>
+            <option value="olumlu">Olumlu Olay</option>
+            <option value="olumsuz">Olumsuz Olay</option>
+            <option value="basari">Başarı</option>
+            <option value="gelisim">Gelişim İhtiyacı</option>
+            <option value="genel">Genel Gözlem</option>
+        </select>
+        <a class="btn btn-sm btn-outline-secondary" href="/performance/process-tracking">
+            <i class="fa-solid fa-route me-1"></i> Süreç Takibi
+        </a>
+    </div>
+
+    <section class="bys-notes-two">
+        <div class="bys-notes-card">
+            <div class="bys-notes-card-header">
+                <div>
+                    <h2 class="bys-notes-card-title">Not Girişi ve Değerlendirme Hazırlığı</h2>
+                    <p class="bys-notes-card-desc">
+                        Dönem içinde yaşanan somut olayları kaydedin. Kayıtlar değerlendirme döneminde yetkili amire hatırlatma sağlar.
+                    </p>
+                </div>
+                <span class="bys-notes-badge bys-notes-badge-info">
+                    <i class="fa-solid fa-lock"></i>
+                    Yetki kontrollü
+                </span>
+            </div>
+
+            <div class="bys-notes-card-body">
+                <form method="post" action="{{ request.path }}">
+                    {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% endif %}
+
+                    <div class="bys-notes-form-grid">
+                        <div>
+                            <label class="bys-notes-label" for="personnel_id">Personel</label>
+                            <select class="bys-notes-select" id="personnel_id" name="personnel_id" required>
+                                <option value="">Personel seçiniz</option>
+                                {% for person in personnel_options %}
+                                <option value="{{ person.id }}">{{ person.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="bys-notes-help">Yalnızca yetki kapsamındaki personel seçilmelidir.</div>
+                        </div>
+
+                        <div>
+                            <label class="bys-notes-label" for="note_type">Not Türü</label>
+                            <select class="bys-notes-select" id="note_type" name="note_type" required>
+                                <option value="olumlu">Olumlu Olay</option>
+                                <option value="basari">Başarı</option>
+                                <option value="gelisim">Gelişim İhtiyacı</option>
+                                <option value="olumsuz">Olumsuz Olay</option>
+                                <option value="genel">Genel Gözlem</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="bys-notes-label" for="period_id">Dönem</label>
+                            <select class="bys-notes-select" id="period_id" name="period_id">
+                                <option value="">Dönem seçilmedi</option>
+                                {% for period in period_options %}
+                                <option value="{{ period.id }}">{{ period.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="bys-notes-help">Boş bırakılırsa genel dönem içi not olarak kaydedilir.</div>
+                        </div>
+
+                        <div>
+                            <label class="bys-notes-label" for="scorecard_visible">Karneye Yansıtma</label>
+                            <select class="bys-notes-select" id="scorecard_visible" name="scorecard_visible">
+                                <option value="0">Şimdilik iç takipte kalsın</option>
+                                <option value="1">Karneye yansıtılabilir</option>
+                            </select>
+                        </div>
+
+                        <div class="bys-notes-form-full">
+                            <label class="bys-notes-label" for="title">Not Başlığı</label>
+                            <input class="bys-notes-input" id="title" name="title" maxlength="180" placeholder="Örn. Görev tesliminde güçlü katkı / Gelişim ihtiyacı">
+                        </div>
+
+                        <div class="bys-notes-form-full">
+                            <label class="bys-notes-label" for="note">Not Açıklaması</label>
+                            <textarea class="bys-notes-textarea" id="note" name="note" required maxlength="3000" placeholder="Somut olayı, davranışı, başarıyı veya gelişim ihtiyacını kısa ve kurumsal dille yazınız."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="bys-notes-submit-row">
+                        <button type="submit" class="bys-notes-primary">
+                            <i class="fa-solid fa-floppy-disk me-1"></i>
+                            Dönem İçi Notu Kaydet
+                        </button>
+
+                        <span class="bys-notes-badge">
+                            Otomatik puan üretmez
+                        </span>
+                    </div>
+                </form>
+
+                <div class="bys-notes-note">
+                    <strong>Bilgi:</strong> Dönem içi notlar değerlendirme sürecini destekler. Nihai puan veya idari karar üretmez.
+                </div>
+            </div>
+        </div>
+
+        <div class="bys-notes-card">
+            <div class="bys-notes-card-header">
+                <div>
+                    <h2 class="bys-notes-card-title">Not Türleri</h2>
+                    <p class="bys-notes-card-desc">Dönem içinde hangi olayın hangi başlıkla kaydedileceğini gösteren rehber.</p>
+                </div>
+            </div>
+
+            <div class="bys-notes-card-body">
+                <div class="bys-notes-list">
+                    <article class="bys-notes-item" data-search="olumlu olay davranış katkı" data-type="olumlu">
+                        <span class="bys-notes-dot"></span>
+                        <div>
+                            <h3 class="bys-notes-item-title">Olumlu Olay</h3>
+                            <div class="bys-notes-item-meta">Kurumsal işleyişe katkı sağlayan olumlu davranışlar kaydedilir.</div>
+                        </div>
+                        <span class="bys-notes-badge bys-notes-badge-success">Olumlu</span>
+                    </article>
+
+                    <article class="bys-notes-item" data-search="başarı hedef iş sonuç" data-type="basari">
+                        <span class="bys-notes-dot"></span>
+                        <div>
+                            <h3 class="bys-notes-item-title">Başarı</h3>
+                            <div class="bys-notes-item-meta">Tamamlanan iş, güçlü performans veya örnek katkı kayıt altına alınır.</div>
+                        </div>
+                        <span class="bys-notes-badge bys-notes-badge-success">Başarı</span>
+                    </article>
+
+                    <article class="bys-notes-item" data-search="gelişim ihtiyacı eğitim destek" data-type="gelisim">
+                        <span class="bys-notes-dot"></span>
+                        <div>
+                            <h3 class="bys-notes-item-title">Gelişim İhtiyacı</h3>
+                            <div class="bys-notes-item-meta">Desteklenmesi gereken beceri veya davranış alanı belirtilir.</div>
+                        </div>
+                        <span class="bys-notes-badge bys-notes-badge-warning">Gelişim</span>
+                    </article>
+
+                    <article class="bys-notes-item" data-search="olumsuz olay dikkat uyarı" data-type="olumsuz">
+                        <span class="bys-notes-dot"></span>
+                        <div>
+                            <h3 class="bys-notes-item-title">Olumsuz Olay</h3>
+                            <div class="bys-notes-item-meta">Somut ve doğrulanabilir olaylar kişisel yorumdan arındırılarak kaydedilir.</div>
+                        </div>
+                        <span class="bys-notes-badge bys-notes-badge-danger">Dikkat</span>
+                    </article>
+
+                    <article class="bys-notes-item" data-search="genel gözlem süreç takip" data-type="genel">
+                        <span class="bys-notes-dot"></span>
+                        <div>
+                            <h3 class="bys-notes-item-title">Genel Gözlem</h3>
+                            <div class="bys-notes-item-meta">Dönem içinde hatırlanması gereken genel durumlar tutulur.</div>
+                        </div>
+                        <span class="bys-notes-badge">Gözlem</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-notes-card">
+        <div class="bys-notes-card-header">
+            <div>
+                <h2 class="bys-notes-card-title">Dönem İçi Not Listesi</h2>
+                <p class="bys-notes-card-desc">
+                    Kaydedilen notlar personel, tür, tarih ve karne görünürlüğü bilgisiyle listelenir.
+                </p>
+            </div>
+            <span class="bys-notes-badge bys-notes-badge-warning">
+                <i class="fa-solid fa-shield-halved"></i>
+                Yetki kapsamlı görünüm
+            </span>
+        </div>
+
+        <div class="bys-notes-card-body">
+            {% if note_items %}
+            <div class="bys-notes-list">
+                {% for item in note_items %}
+                {% set title = item.title|default('Dönem içi not') %}
+                {% set person = item.personnel_name|default('Personel') %}
+                {% set unit = item.unit_name|default('') %}
+                {% set note_text = item.note|default('') %}
+                {% set note_type = item.note_type_label|default('Genel Gözlem') %}
+                {% set note_key = item.note_type|default('genel')|string|lower %}
+                {% set visible = item.scorecard_visible|default(false) %}
+                {% set created = item.created_at_label|default('-') %}
+                <article class="bys-notes-item" data-search="{{ (title ~ ' ' ~ person ~ ' ' ~ unit ~ ' ' ~ note_text ~ ' ' ~ note_type)|lower }}" data-type="{{ note_key }}">
+                    <span class="bys-notes-dot"></span>
+                    <div>
+                        <h3 class="bys-notes-item-title">{{ title }}</h3>
+                        <div class="bys-notes-item-meta">
+                            {{ person }}
+                            {% if unit %} · {{ unit }}{% endif %}
+                            · {{ created }}
+                            {% if note_text %}<br>{{ note_text }}{% endif %}
+                        </div>
+                    </div>
+                    <span class="bys-notes-badge {% if 'olumsuz' in note_key %}bys-notes-badge-danger{% elif 'gelisim' in note_key %}bys-notes-badge-warning{% elif 'olumlu' in note_key or 'basari' in note_key %}bys-notes-badge-success{% else %}bys-notes-badge-info{% endif %}">
+                        {{ note_type }}
+                    </span>
+                    {% if visible %}
+                    <span class="bys-notes-badge bys-notes-badge-success" style="grid-column:2 / -1; width:max-content;">
+                        Karneye yansıtılır
+                    </span>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bys-notes-empty">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <div><strong>Henüz kayıtlı dönem içi not bulunmuyor.</strong></div>
+                <div>Formdan ilk notu kaydettiğinizde bu alanda görüntülenecektir.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("bysNotesSearch");
+    const type = document.getElementById("bysNotesType");
+
+    function normalize(value) {
+        return (value || "").toLocaleLowerCase("tr-TR").trim();
+    }
+
+    function typeMatches(rowType, selected) {
+        if (!selected) return true;
+        rowType = normalize(rowType);
+
+        if (selected === "basari") {
+            return rowType.indexOf("basari") !== -1 || rowType.indexOf("başarı") !== -1;
+        }
+
+        if (selected === "gelisim") {
+            return rowType.indexOf("gelisim") !== -1 || rowType.indexOf("gelişim") !== -1 || rowType.indexOf("geli") !== -1;
+        }
+
+        return rowType.indexOf(selected) !== -1;
+    }
+
+    function applyFilters() {
+        const q = normalize(search ? search.value : "");
+        const selected = normalize(type ? type.value : "");
+        const rows = document.querySelectorAll("[data-search][data-type]");
+
+        rows.forEach(function (row) {
+            const haystack = normalize(row.getAttribute("data-search"));
+            const rowType = normalize(row.getAttribute("data-type"));
+            const matchesSearch = !q || haystack.indexOf(q) !== -1;
+            const matchesType = typeMatches(rowType, selected);
+            row.style.display = (matchesSearch && matchesType) ? "" : "none";
+        });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (type) type.addEventListener("change", applyFilters);
+})();
+</script>
+{% endblock %}{# BYS360_AI_DECISION_FAZ10_PANEL_INCLUDED #}
+{% include 'ai_decision/_interim_feedback_panel.html' ignore missing %}
+lock %}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND #}

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{# BYS360_PHASE5_FINAL_GATE_TEMPLATE_CONTRACT_FIX #}
+{# BYS360_PHASE5_2_PERSONEL_KARNE_EKRANI #}
+{# phase5_2_is_employee_scorecard #}
+{# Ana Puan Kartı | Dönem Bilgisi | Kriter Sonuçları | Yayınlanan Açıklama | Geçmiş Karne Bağlantısı #}
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}
+{% set phase5_2_is_employee_scorecard = phase5_2_is_employee_scorecard if phase5_2_is_employee_scorecard is defined else false %}
+{% set sc = scorecard if scorecard is defined and scorecard else {} %}
+{% set vis = scorecard_visibility_summary if scorecard_visibility_summary is defined and scorecard_visibility_summary else {} %}
+{% set ai = ai_scorecard_panel if ai_scorecard_panel is defined and ai_scorecard_panel else {} %}
+{% set rows = sc.rows if sc.rows is defined and sc.rows else [] %}
+{% block title %}Not Karnesi{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Not Karnesi{% endblock %}
+{% block page_subtitle %}Performans sonucunu sade, okunur ve güvenli biçimde izleyin. Görünürlük, yayın ve karne özeti tek yüzeyde sunulur.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_performance_surfaces_elite_v2.css') }}">
+{% endblock %}
+{% block content %}
+{% include "performance/_scorecard_live_hero.html" ignore missing %}
+
+<div class="sr-only phase5-final-contract-labels" aria-hidden="true">Ana Puan Kartı Dönem Bilgisi Kriter Sonuçları Yayınlanan Açıklama Geçmiş Karne Bağlantısı</div>
+<div class="bys-elite-shell" data-bys360-marker="BYS360_PHASE7_PREMIUM_SCORECARD_SURFACE_V2">
+    <section class="bys-elite-hero">
+        <div class="bys-elite-hero-main">
+            <span class="bys-elite-kicker"><i class="fa-solid fa-id-card"></i> Karne görünümü</span>
+            <h2 class="bys-elite-hero-title"></h2>
+            <p class="bys-elite-hero-text">Seçili dönem ve görünürlük kapsamında yer alan karneler; yayın durumu, sonuç bandı, çalışan görünürlüğü ve temel özet göstergeleriyle birlikte listelenir.</p>
+            <div class="bys-elite-action-row">
+                <span class="bys-elite-badge neutral"><i class="fa-solid fa-layer-group"></i> {{ scope_label|default('Kendi görünümüm', true) }}</span>
+                <span class="bys-elite-badge neutral"><i class="fa-solid fa-users"></i> {{ scope_user_count|default(sc.count|default(0, true), true) }} kayıt</span>
+                {% if period %}<span class="bys-elite-badge neutral"><i class="fa-solid fa-calendar-days"></i> {{ period.title }}</span>{% endif %}
+            </div>
+        </div>
+        <aside class="bys-elite-highlight">
+            <div class="bys-elite-highlight-label">Ana Puan Kartı</div>
+            <div class="bys-elite-highlight-value">{{ sc.avg_score|default(0, true) }}</div>
+            <div class="bys-elite-highlight-title">Ortalama karne puanı</div>
+            <p class="bys-elite-highlight-note">{{ sc.published_count|default(0, true) }} yayımlanan, {{ sc.completed_count|default(0, true) }} tamamlanan ve {{ sc.hidden_count|default(0, true) }} gizli kayıt izleniyor.</p>
+        </aside>
+    </section>
+
+    <section class="bys-elite-card bys-elite-pad">
+        <form method="get" class="bys-elite-filters bys-elite-filters-scorecard">
+            <div class="bys-elite-field">
+                <label for="scorecard_period_id">Dönem</label>
+                <select id="scorecard_period_id" name="period_id">
+                    <option value="">Dönem seçin</option>
+                    {% for p in periods|default([]) %}
+                    <option value="{{ p.id }}" {% if period and period.id == p.id %}selected{% endif %}>{{ p.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if scope_option_pairs %}
+            <div class="bys-elite-field">
+                <label for="scorecard_scope">Görünürlük kapsamı</label>
+                <select id="scorecard_scope" name="scope">
+                    {% for value, label in scope_option_pairs %}
+                    <option value="{{ value }}" {% if selected_scope == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            <div class="bys-elite-filter-actions">
+                <button class="bys-elite-btn primary" type="submit"><i class="fa-solid fa-filter"></i> Filtreyi Uygula</button>
+                <a class="bys-elite-btn ghost" href="{{ url_for('main.performance_v2_phase5_scorecard') }}"><i class="fa-solid fa-rotate-left"></i> Sıfırla</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="bys-elite-stat-grid bys-elite-stat-grid-6">
+        <article class="bys-elite-stat-card"><span class="bys-elite-stat-label">Toplam karne</span><strong class="bys-elite-stat-value">{{ sc.count|default(0, true) }}</strong><span class="bys-elite-stat-note">Görünebilen kayıt sayısı</span></article>
+        <article class="bys-elite-stat-card"><span class="bys-elite-stat-label">Ortalama puan</span><strong class="bys-elite-stat-value">{{ sc.avg_score|default(0, true) }}</strong><span class="bys-elite-stat-note">Seçili görünüm ortalaması</span></article>
+        <article class="bys-elite-stat-card success"><span class="bys-elite-stat-label">Yayımlanan</span><strong class="bys-elite-stat-value">{{ sc.published_count|default(0, true) }}</strong><span class="bys-elite-stat-note">Çalışana açık kayıt</span></article>
+        <article class="bys-elite-stat-card"><span class="bys-elite-stat-label">Tamamlanan</span><strong class="bys-elite-stat-value">{{ sc.completed_count|default(0, true) }}</strong><span class="bys-elite-stat-note">Final durumundaki kayıt</span></article>
+        <article class="bys-elite-stat-card danger"><span class="bys-elite-stat-label">70 altı</span><strong class="bys-elite-stat-value">{{ sc.low_count|default(0, true) }}</strong><span class="bys-elite-stat-note">Yakın takip gerektirir</span></article>
+        <article class="bys-elite-stat-card"><span class="bys-elite-stat-label">Gizli kayıt</span><strong class="bys-elite-stat-value">{{ sc.hidden_count|default(0, true) }}</strong><span class="bys-elite-stat-note">Görünürlük politikası etkisi</span></article>
+    </section>
+
+    {% if ai %}
+    <section class="bys-elite-card bys-elite-pad">
+        <div class="bys-elite-section-head">
+            <div>
+                <span class="bys-elite-section-kicker">AI karne özeti</span>
+                <h3>{{ ai.headline|default('Karne özeti', true) }}</h3>
+                <p>{{ ai.summary|default('Karne görünümü hakkında özet değerlendirme burada sunulur.', true) }}</p>
+            </div>
+            {% if ai.badge %}
+            <span class="bys-elite-badge {{ ai.badge.tone|default('neutral', true) }}">{{ ai.badge.label|default('Durum Özeti', true) }}</span>
+            {% endif %}
+        </div>
+        <div class="bys-elite-grid bys-elite-grid-2">
+            <div class="bys-elite-note-list">
+                {% for bullet in ai.bullets|default([], true) %}
+                <div class="bys-elite-note-item"><strong>Özet</strong><span>{{ bullet }}</span></div>
+                {% endfor %}
+            </div>
+            <div class="bys-elite-stat-grid bys-elite-stat-grid-2">
+                {% for item in ai.actions|default([], true) %}
+                <article class="bys-elite-stat-card {{ 'danger' if item.tone == 'critical' else 'success' if item.tone == 'calm' else '' }}">
+                    <span class="bys-elite-stat-label">{{ item.label|default('-', true) }}</span>
+                    <strong class="bys-elite-stat-value">{{ item.value|default(0, true) }}</strong>
+                    <span class="bys-elite-stat-note">AI özet göstergesi</span>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="bys-elite-grid bys-elite-grid-2">
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Görünürlük dengesi</span><h3>Karne görünürlük özeti</h3></div></div>
+            <div class="bys-elite-stat-grid bys-elite-stat-grid-5">
+                <div class="bys-elite-mini-box success"><span>Çalışana açık</span><strong>{{ vis.employee_visible|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box"><span>İç kullanım</span><strong>{{ vis.internal_preview|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box danger"><span>Kilitli</span><strong>{{ vis.locked|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box"><span>Görüldü</span><strong>{{ vis.viewed|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box"><span>Onaylandı</span><strong>{{ vis.acknowledged|default(0, true) }}</strong></div>
+            </div>
+            {% if vis.top_reasons %}
+            <div class="bys-elite-reason-stack">
+                {% for reason in vis.top_reasons %}
+                <div class="bys-elite-reason-item"><strong>{{ reason.label|default('Kilit nedeni', true) }}</strong><span>{{ reason.count|default(0, true) }} kayıt</span></div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bys-elite-empty">Belirgin bir yayın/görünürlük kilit nedeni görünmüyor.</div>
+            {% endif %}
+        </article>
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Mahremiyet notu</span><h3>Kategori ortalaması</h3></div></div>
+            <div class="bys-elite-note-list">
+                <div class="bys-elite-note-item"><strong>Güvenli özet</strong><span>Kategori ortalaması kişi detayı göstermeden hesaplanır ve yalnızca özet bilgi olarak sunulur.</span></div>
+                <div class="bys-elite-note-item"><strong>Yayın dengesi</strong><span>İç görünüm ve çalışan görünümü farklı olabilir; karne politikası buna göre çalışır.</span></div>
+                <div class="bys-elite-note-item"><strong>Kurumsal yorum</strong><span>Tablodaki özetler okunurluğu artırmak için sadeleştirilmiştir; teknik kodlar kullanıcıya gösterilmez.</span></div>
+            </div>
+        </article>
+    </section>
+
+    <section class="bys-elite-card bys-elite-pad">
+        <div class="bys-elite-section-head">
+            <div>
+                <span class="bys-elite-section-kicker">Karne listesi</span>
+                <h3>Detaylı not karnesi görünümü</h3>
+                <p>Yayın, görünürlük ve sonuç bilgileri tek tabloda, sade ve okunur biçimde sunulur.</p>
+            </div>
+            <span class="bys-elite-badge neutral">{{ rows|length }} kayıt</span>
+        </div>
+        <div class="bys-elite-table-wrap">
+            <table class="bys-elite-table">
+                <thead>
+                    <tr>
+                        <th>Personel</th>
+                        <th>Sicil / Birim</th>
+                        <th>Sonuç</th>
+                        <th>Bant</th>
+                        <th>Yayın durumu</th>
+                        <th>Görünürlük</th>
+                        <th>Çalışan işlemi</th>
+                        <th>Kategori ort.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    {% set visibility = row.visibility if row.visibility is defined and row.visibility else {} %}
+                    {% set category_avg = row.category_average if row.category_average is defined and row.category_average else {} %}
+                    <tr>
+                        <td>
+                            <div class="bys-elite-table-title">{{ row.display_name|default('-', true) }}</div>
+                        </td>
+                        <td>
+                            <div>{{ row.sicil_no|default('-', true) }}</div>
+                            <div class="bys-elite-subtle">{{ row.unit_name|default('-', true) }}</div>
+                        </td>
+                        <td><span class="bys-elite-score-pill {% if row.final_total|default(0, true) > 90 %}high{% elif row.final_total|default(0, true) < 70 %}low{% else %}mid{% endif %}">{{ row.final_total|default(0, true) }}</span></td>
+                        <td><span class="bys-elite-badge neutral">{{ row.score_band_label|default('-', true) }}</span></td>
+                        <td>
+                            <div class="bys-elite-pill-stack">
+                                <span class="bys-elite-badge {{ 'success' if row.publish_action_class|default('', true) in ['success','ready'] else 'danger' if row.publish_action_class|default('', true) == 'blocked' else 'neutral' }}">{{ row.publish_action_label|default('-', true) }}</span>
+                                {% if row.status %}<span class="bys-elite-subtle">{{ row.status }}</span>{% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bys-elite-pill-stack">
+                                <span class="bys-elite-badge {{ 'success' if visibility.publish_state|default('', true) == 'published' else 'neutral' if visibility.publish_state|default('', true) == 'internal_preview' else 'danger' }}">
+                                    {% if visibility.publish_state|default('', true) == 'published' %}Çalışana Açık{% elif visibility.publish_state|default('', true) == 'internal_preview' %}İç Kullanım{% else %}Kilitli{% endif %}
+                                </span>
+                                <span class="bys-elite-subtle">{{ visibility.reason|default('Görünürlük kuralı uygulanır.', true) }}</span>
+                            </div>
+                        </td>
+                        <td><span class="bys-elite-badge neutral">{{ row.acknowledgement_label|default('Bekliyor', true) }}</span></td>
+                        <td>
+                            {% if category_avg.available|default(false, true) %}
+                            <div class="bys-elite-table-title">{{ category_avg.average|default(category_avg.category_average|default('-', true), true) }}</div>
+                            <div class="bys-elite-subtle">Kişi detayı gösterilmez</div>
+                            {% else %}
+                            <span class="bys-elite-subtle">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8"><div class="bys-elite-empty">Seçili görünümde gösterilecek karne bulunamadı.</div></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

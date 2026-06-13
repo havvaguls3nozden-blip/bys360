@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Rapor Detayı{% endblock %}
+{% set metrics = row.metrics_json or {} %}
+{% set headline = metrics.get('headline', {}).get('headline', {}) if metrics.get('headline') else {} %}
+{% set trend_root = metrics.get('headline', {}).get('trends', {}) if metrics.get('headline') else {} %}
+{% set survey_totals = metrics.get('surveys', {}).get('totals', {}) if metrics.get('surveys') else {} %}
+{% set support_totals = metrics.get('support', {}).get('totals', {}) if metrics.get('support') else {} %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">{{ row.title }}</h2>
+      <div class="text-muted">{{ row.period_label }} · Durum: {{ row.status }}</div>
+    </div>
+    <form method="post" action="{{ url_for('main.communication_phase4_submit_review', report_id=row.id) }}" class="d-flex gap-2">
+      <input type="text" name="note" class="form-control" placeholder="İnceleme notu">
+      <button class="btn btn-danger">İncelemeye gönder</button>
+    </form>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Duyuru</div><div class="display-6">{{ headline.get('published_bulletins', 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Anket</div><div class="display-6">{{ headline.get('survey_count', 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Açık Destek</div><div class="display-6">{{ headline.get('open_tickets', 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">SLA Riski</div><div class="display-6">{{ support_totals.get('sla_risk_count', 0) }}</div></div></div></div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header"><strong>Özet</strong></div>
+    <div class="card-body">
+      <p class="mb-0">{{ row.summary_text or 'Özet bilgisi bulunamadı.' }}</p>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Trend görünümü</strong></div>
+        <div class="card-body">
+          <canvas id="phase4ReportTrend" height="110"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Öneriler</strong></div>
+        <div class="card-body">
+          {% for item in row.recommendations_json or [] %}
+            <div class="mb-2">• {{ item }}</div>
+          {% else %}
+            <div class="text-muted">Öneri üretilmedi.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Anket özeti</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <tbody>
+              <tr><th>Toplam anket</th><td>{{ survey_totals.get('survey_count', 0) }}</td></tr>
+              <tr><th>Yayında olan</th><td>{{ survey_totals.get('published_count', 0) }}</td></tr>
+              <tr><th>Düşük katılım</th><td>{{ survey_totals.get('low_completion_count', 0) }}</td></tr>
+              <tr><th>Ortalama tamamlama</th><td>%{{ '%.1f'|format(survey_totals.get('average_completion_rate', 0) or 0) }}</td></tr>
+              <tr><th>Ort. yanıt süresi</th><td>{{ survey_totals.get('average_submit_minutes', 0) }} dk</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Destek özeti</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <tbody>
+              <tr><th>Toplam kayıt</th><td>{{ support_totals.get('ticket_count', 0) }}</td></tr>
+              <tr><th>Açık kayıt</th><td>{{ support_totals.get('open_count', 0) }}</td></tr>
+              <tr><th>SLA riski</th><td>{{ support_totals.get('sla_risk_count', 0) }}</td></tr>
+              <tr><th>Ort. yaş</th><td>{{ support_totals.get('average_age_days', 0) }} gün</td></tr>
+              <tr><th>Kritik bildirim</th><td>{{ headline.get('critical_unread', 0) }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  if (!window.Chart) return;
+  const el = document.getElementById('phase4ReportTrend');
+  if (!el) return;
+  const labels = {{ trend_root.get('surveys', {}).get('labels', []) | tojson }};
+  new Chart(el, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Anket', data: {{ trend_root.get('surveys', {}).get('values', []) | tojson }}, tension: 0.3, borderWidth: 2 },
+        { label: 'Açık Destek', data: {{ trend_root.get('open_tickets', {}).get('values', []) | tojson }}, tension: 0.3, borderWidth: 2 },
+        { label: 'Bildirim', data: {{ trend_root.get('unread_notifications', {}).get('values', []) | tojson }}, tension: 0.3, borderWidth: 2 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+  });
+})();
+</script>
+{% endblock %}

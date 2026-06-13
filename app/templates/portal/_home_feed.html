@@ -1,0 +1,157 @@
+{# BYS360_PORTAL_LIGHT_HOME_V2_8_81_HOME_STORY_BLOCK_HIDDEN #}
+{# BYS360_HOME_FESTIVAL_PORTAL_V2_5_1_BEGIN #}
+{% set portal_home_enabled_safe = portal_home_enabled if portal_home_enabled is defined else true %}
+{% set portal_home_posts_safe = portal_home_posts if portal_home_posts is defined and portal_home_posts else [] %}
+{% set portal_home_featured_safe = portal_home_featured if portal_home_featured is defined and portal_home_featured else portal_home_posts_safe[:3] %}
+{% set portal_home_stats_safe = portal_home_stats if portal_home_stats is defined and portal_home_stats else {} %}
+{% set portal_home_groups_safe = portal_home_groups if portal_home_groups is defined and portal_home_groups else [] %}
+{% set portal_home_instagram_stories_safe = portal_home_instagram_stories if portal_home_instagram_stories is defined and portal_home_instagram_stories else [] %}
+{% set portal_recent_interactions_safe = portal_recent_interactions if portal_recent_interactions is defined and portal_recent_interactions else [] %}
+
+{% macro _post_title(item) -%}
+  {%- set post = item.post if item.post is defined else item.get('post') -%}
+  {{- (post.title if post and post.title else post.body if post and post.body else 'Portal paylaşımı')|striptags|truncate(72, true, '…') -}}
+{%- endmacro %}
+
+{% macro _post_body(item) -%}
+  {%- set post = item.post if item.post is defined else item.get('post') -%}
+  {{- (post.body if post and post.body else 'Kurumsal portal içeriği')|striptags|truncate(132, true, '…') -}}
+{%- endmacro %}
+
+{% macro _post_author(item) -%}
+  {%- set post = item.post if item.post is defined else item.get('post') -%}
+  {{- (post.author.full_name if post and post.author is defined and post.author and post.author.full_name else post.author_user.full_name if post and post.author_user is defined and post.author_user and post.author_user.full_name else 'BYS360 Kullanıcısı') -}}
+{%- endmacro %}
+
+{% if portal_home_enabled_safe %}
+<section class="home-festival-portal-v25 home-festival-portal-v251" aria-label="Kurumsal Portal yayın akışı özeti">
+  <div class="home-festival-soft-glow" aria-hidden="true"></div>
+
+  <div class="home-v251-headline">
+    <div class="home-v251-title">
+      <span><i class="fa-solid fa-layer-group"></i> Kurumsal Portal</span>
+      <h2>Yayın Akışı Özeti</h2>
+      <p>Yetkiniz dahilindeki duyuru, grup ve paylaşımların sade anasayfa görünümü.</p>
+    </div>
+    <div class="home-v251-actions">
+      <a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Portala Git</a>
+      <a href="/portal/profile"><i class="fa-regular fa-user"></i> Profilim</a>
+    </div>
+  </div>
+
+  <div class="home-v251-pill-row" aria-label="Portal özetleri">
+    <div class="home-v251-pill"><i class="fa-regular fa-newspaper"></i><b>{{ portal_home_stats_safe.visible_posts|default(portal_home_posts_safe|length, true) }}</b><span>Paylaşım</span></div>
+    <div class="home-v251-pill"><i class="fa-regular fa-comment-dots"></i><b>{{ portal_home_stats_safe.comments|default(0, true) }}</b><span>Yorum</span></div>
+    <div class="home-v251-pill"><i class="fa-regular fa-heart"></i><b>{{ portal_home_stats_safe.reactions|default(0, true) }}</b><span>Tepki</span></div>
+    <div class="home-v251-pill"><i class="fa-solid fa-users"></i><b>{{ portal_home_groups_safe|length }}</b><span>Grup</span></div>
+  </div>
+
+
+  <div class="home-v251-layout">
+    <div class="home-v251-main">
+      <div class="home-v251-section-title">
+        <div>
+          <span>Öne Çıkanlar</span>
+          <h3>Kısa vitrin</h3>
+        </div>
+        <a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}">Tümünü gör</a>
+      </div>
+
+      {% if portal_home_featured_safe %}
+      <div class="home-v251-showcase">
+        {% for item in portal_home_featured_safe[:3] %}
+          {% set post = item.post if item.post is defined else item.get('post') %}
+          <article class="home-v251-showcase-card">
+            <div class="home-v251-showcase-icon"><i class="fa-regular fa-star"></i></div>
+            <div class="home-v251-showcase-body">
+              <span>{% if post and post.post_type == 'instagram' %}Instagram{% else %}{{ (post.post_type if post and post.post_type else 'Paylaşım')|replace('_',' ')|title }}{% endif %}</span>
+              <h4>{{ _post_title(item) }}</h4>
+              <p>{{ _post_body(item) }}</p>
+            </div>
+            <a class="home-v251-card-link" href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}#post-{{ post.id if post else '' }}" aria-label="Paylaşımı portalda aç"><i class="fa-solid fa-chevron-right"></i></a>
+          </article>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="home-v251-empty compact"><i class="fa-regular fa-compass"></i><b>Henüz öne çıkan paylaşım yok.</b><span>Portal akışı oluştukça burada kısa vitrin görünecek.</span></div>
+      {% endif %}
+
+      <div class="home-v251-section-title flow-title">
+        <div>
+          <span>Son Akış</span>
+          <h3>Yayın akışı önizlemesi</h3>
+        </div>
+      </div>
+
+      {% if portal_home_posts_safe %}
+      <div class="home-v251-feed-list">
+        {% for item in portal_home_posts_safe[:5] %}
+          {% set post = item.post if item.post is defined else item.get('post') %}
+          {% set image_count = item.image_attachments|length if item.image_attachments is defined and item.image_attachments else item.get('image_attachments', [])|length if item.get is defined else 0 %}
+          {% set has_video = item.video_embed_url if item.video_embed_url is defined else item.get('video_embed_url') if item.get is defined else none %}
+          <article class="home-v251-feed-row" id="post-{{ post.id if post else '' }}">
+            <div class="home-v251-avatar">{% if post and post.post_type == 'instagram' %}<i class="fa-brands fa-instagram"></i>{% else %}<i class="fa-regular fa-user"></i>{% endif %}</div>
+            <div class="home-v251-feed-content">
+              <div class="home-v251-meta">
+                <b>{{ _post_author(item) }}</b>
+                <span>{{ post.created_at.strftime('%d.%m.%Y') if post and post.created_at else 'Bugün' }}</span>
+              </div>
+              <h4>{{ _post_title(item) }}</h4>
+              <p>{{ _post_body(item) }}</p>
+              <div class="home-v251-badges">
+                {% if post and post.post_type in ['instagram', 'instagram_story'] %}<span class="home-v251-instagram-badge"><i class="fa-brands fa-instagram"></i> Instagram</span>{% endif %}
+                {# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_2_PORTAL_STORY_HOME_INSTAGRAM_BADGE #}
+                {% if image_count %}<span><i class="fa-regular fa-image"></i> {{ image_count }} fotoğraf</span>{% endif %}
+                {% if has_video %}<span><i class="fa-brands fa-youtube"></i> Video</span>{% endif %}
+                <span><i class="fa-regular fa-heart"></i> {{ item.total_reactions|default(0, true) }}</span>
+                <span><i class="fa-regular fa-comment"></i> {{ item.comments_count|default(0, true) }}</span>
+              </div>
+            </div>
+            <a class="home-v251-open" href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}#post-{{ post.id if post else '' }}">Aç</a>
+          </article>
+        {% endfor %}
+      </div>
+      {% else %}
+        <div class="home-v251-empty"><i class="fa-regular fa-newspaper"></i><b>Kurumsal portal henüz sakin.</b><span>Paylaşımlar oluştukça anasayfada sade akış olarak görünecek.</span><a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}">Portala Git</a></div>
+      {% endif %}
+    </div>
+
+    <aside class="home-v251-side" aria-label="Portal yardımcı alanları">
+      <div class="home-v251-side-card">
+        <div class="home-v251-side-head"><b>Hızlı Erişim</b><i class="fa-solid fa-bolt"></i></div>
+        <a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}"><i class="fa-solid fa-stream"></i> Yayın Akışı</a>
+        <a href="{{ safe_url_for('main.portal_groups', fallback='/portal/groups') }}"><i class="fa-solid fa-users"></i> Gruplar</a>
+        <a href="/notifications"><i class="fa-regular fa-bell"></i> Bildirimler</a>
+      </div>
+
+      <div class="home-v251-side-card">
+        <div class="home-v251-side-head"><b>Aktif Gruplar</b><i class="fa-regular fa-folder-open"></i></div>
+        {% if portal_home_groups_safe %}
+          {% for group in portal_home_groups_safe[:4] %}
+            <a class="home-v251-group-link" href="{{ safe_url_for('main.portal_groups', fallback='/portal/groups') }}"><strong>{{ group.name }}</strong><small>{{ group.member_count|default(0, true) }} üye • {{ group.visibility_label|default('Grup', true) }}</small></a>
+          {% endfor %}
+        {% else %}
+          <p class="home-v251-muted">Görüntülenecek aktif grup bulunmuyor.</p>
+        {% endif %}
+      </div>
+
+      <div class="home-v251-side-card">
+        <div class="home-v251-side-head"><b>Son Etkileşimler</b><i class="fa-regular fa-comments"></i></div>
+        {% if portal_recent_interactions_safe %}
+          <div class="home-v251-activity-list">
+            {% for activity in portal_recent_interactions_safe[:4] %}
+              <div><i class="fa-solid fa-circle-dot"></i><span>{{ activity.text }}</span></div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="home-v251-muted">Etkileşim oluştuğunda burada görünecek.</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</section>
+{% endif %}
+{# BYS360_HOME_FESTIVAL_PORTAL_V2_5_1_END #}
+{# BYS360_HOME_PORTAL_SAFE_LINKS_V2_7_APPLIED #}
+
+{# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_0_HOME_FEED_APPLIED #}

@@ -1,0 +1,38 @@
+{# BYS360_PORTAL_EXPERIENCE_V3A_HOME_HERO_TEMPLATE #}
+{# BYS360_HOME_PRESTIGE_SAFE_V1A_PRESS_NEWS_RELEVANCE_GUARD #}
+{% set pn = press_news if press_news is defined and press_news else {} %}
+{% set latest = pn.latest if pn.latest is defined else none %}
+{% set latest_title = latest.title if latest and latest.title else '' %}
+{% set latest_summary = latest.summary if latest and latest.summary else '' %}
+{% set latest_url = latest.url if latest and latest.url else '' %}
+{% set latest_text = (latest_title ~ ' ' ~ latest_summary ~ ' ' ~ latest_url)|lower %}
+{% set latest_relevant = latest and (
+  'tarihi alan' in latest_text or
+  'gelibolu' in latest_text or
+  'çanakkale savaşları' in latest_text or
+  'canakkale savaslari' in latest_text or
+  'canakkaletarihialan' in latest_text or
+  'şehitlik' in latest_text or
+  'sehitlik' in latest_text or
+  'anakkale savaş' in latest_text or
+  'canakkale savas' in latest_text
+) %}
+<section class="press-news-hero-v3a" aria-label="Basında Tarihi Alan">
+  <div class="press-news-hero-icon"><i class="fa-solid fa-newspaper"></i></div>
+  <div class="press-news-hero-main">
+    <span>Basında Tarihi Alan</span>
+    {% if latest and latest_relevant %}
+      <strong>{{ latest_title }}</strong>
+      <p>{{ latest_summary or 'Başkanlığımız hakkında yayımlanan haber onay sonrası portalda paylaşılmıştır.' }}</p>
+      {% if latest_url %}<a href="{{ latest_url }}" target="_blank" rel="noopener noreferrer">Haberi kaynağında görüntüle</a>{% endif %}
+    {% else %}
+      <strong>Başkanlığımızla ilgili haberler onay sonrası burada görünür.</strong>
+      <p>Haber takip sistemi bulunan haberleri önce inceleme havuzuna alır; Tarihi Alan ile doğrudan ilişkisi ve yetkili onayı olmadan anasayfada paylaşım yapmaz.</p>
+    {% endif %}
+  </div>
+  <div class="press-news-hero-meta">
+    <b>{{ pn.pending_count|default(0, true) }}</b>
+    <span>onay bekleyen</span>
+    {% if pn.can_review %}<a href="{{ pn.review_url|default('/portal/press-news', true) }}">İncele</a>{% endif %}
+  </div>
+</section>

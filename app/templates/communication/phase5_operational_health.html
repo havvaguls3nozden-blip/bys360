@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Operasyon Sağlığı{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div><h3 class="mb-2">Operasyon Sağlığı</h3><p class="text-muted mb-0">Bildirim, destek ve anket tarafının canlı sağlığı ile öncelikli aksiyon listesi.</p></div>
+    <form method="post" action="{{ url_for('main.communication_phase5_refresh_health') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger">Yenile</button></form>
+  </div></div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Veri Tamamlığı</div><div class="fs-3 fw-semibold">{{ payload.summary.risk_score }}</div></div></div></div>
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Okunmamış</div><div class="fs-3 fw-semibold">{{ payload.summary.unread_total }}</div></div></div></div>
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Açık talep</div><div class="fs-3 fw-semibold">{{ payload.summary.tickets_open }}</div></div></div></div>
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Aktif anket</div><div class="fs-3 fw-semibold">{{ payload.summary.survey_active }}</div></div></div></div>
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Başarısız otomasyon</div><div class="fs-3 fw-semibold">{{ payload.summary.failed_logs }}</div></div></div></div>
+    <div class="col-md-2"><div class="card border-0 shadow-sm"><div class="card-body"><div class="small text-muted">Duran talep</div><div class="fs-3 fw-semibold">{{ payload.support_ops.summary.stale_total }}</div></div></div></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+      <h5 class="mb-3">Anlık kontroller</h5>
+      <ul class="list-group list-group-flush">
+        {% for row in payload.synthetic_checks %}
+        <li class="list-group-item d-flex justify-content-between"><span>{{ row.check_name }}</span><strong>{{ row.status }} ({{ row.metric }})</strong></li>
+        {% endfor %}
+      </ul>
+      <hr>
+      <h6 class="mb-3">Önerilen aksiyonlar</h6>
+      <ol class="mb-0 ps-3">
+        {% for item in payload.action_items %}
+        <li class="mb-2">{{ item }}</li>
+        {% endfor %}
+      </ol>
+    </div></div></div>
+    <div class="col-lg-7"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+      <h5 class="mb-3">Geçmiş sağlık kayıtları</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kontrol</th><th>Durum</th><th>Zaman</th></tr></thead><tbody>{% for row in payload.recent_checks %}<tr><td>{{ row.check_name }}</td><td>{{ row.status }}</td><td>{{ row.checked_at }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Kayıt bulunamadı.</td></tr>{% endfor %}</tbody></table></div>
+    </div></div></div>
+  </div>
+</div>
+{% endblock %}

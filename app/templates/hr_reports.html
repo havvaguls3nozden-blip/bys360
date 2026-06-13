@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Personel Raporları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Raporları{% endblock %}
+{% block page_subtitle %}İzin, devamsızlık, vekâlet ve personel kapsamını kurumsal raporlama seviyesinde izleyin.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_reports_ai_pro.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+{% set readiness_data = readiness if readiness is defined and readiness else {} %}
+{% set unit_stats = unit_stats|default([], true) %}
+{% set leave_type_stats = leave_type_stats|default([], true) %}
+{% set attendance_type_stats = attendance_type_stats|default([], true) %}
+<div class="bys-pro-shell">
+  <section class="bys-pro-hero">
+    <div class="bys-pro-hero-grid">
+      <div>
+        <div class="bys-pro-kicker"><i class="fa-solid fa-user-clock"></i> Personel raporlama</div>
+        <h1 class="bys-pro-title">İzin, devamsızlık ve vekâlet kontrol paneli</h1>
+        <p class="bys-pro-sub">Personel durumu, izin kayıtları, devamsızlık istisnaları, aktif vekâletler ve canlı kapsam hazırlığı tek ekran üzerinden okunur.</p>
+        <div class="bys-pro-hero-actions">
+          <a class="bys-pro-btn light" href="{{ url_for('main.hr_reports_export') }}"><i class="fa-solid fa-file-export"></i> Dışa aktar</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.hr_reports_print') }}"><i class="fa-solid fa-print"></i> Yazdır</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        </div>
+      </div>
+      <aside class="bys-pro-hero-panel">
+        <div class="bys-pro-hero-panel-title">AI personel karar destek notu</div>
+        <div class="bys-pro-hero-panel-main">{{ leave_count|default(0, true) }} izin, {{ attendance_count|default(0, true) }} devamsızlık istisnası, {{ delegation_count|default(0, true) }} vekâlet kaydı izleniyor.</div>
+        <div class="bys-pro-hero-panel-note">İzinli amirin görevi boşa düşmemeli; aynı seviyedeki vekâlet ve performans görevi ilişkisi birlikte kontrol edilmelidir.</div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="bys-pro-stat-grid">
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Personel kapsamı</div><div class="bys-pro-stat-value" data-bys-count>{{ scope_user_count|default(0, true) }}</div><div class="bys-pro-stat-note">{{ scope_label|default('Yetkili kapsam', true) }}</div></div>
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">İzin kaydı</div><div class="bys-pro-stat-value" data-bys-count>{{ leave_count|default(0, true) }}</div><div class="bys-pro-stat-note">Seçili kapsam</div></div>
+    <div class="bys-pro-stat warning"><div class="bys-pro-stat-label">Devamsızlık / istisna</div><div class="bys-pro-stat-value" data-bys-count>{{ attendance_count|default(0, true) }}</div><div class="bys-pro-stat-note">Operasyon takibi</div></div>
+    <div class="bys-pro-stat success"><div class="bys-pro-stat-label">Vekâlet</div><div class="bys-pro-stat-value" data-bys-count>{{ delegation_count|default(0, true) }}</div><div class="bys-pro-stat-note">Süreç sürekliliği</div></div>
+  </section>
+
+  <section class="bys-pro-two">
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">İzin ve devamsızlık dağılımı</h2><p class="bys-pro-section-sub">Personel hareketleri türlerine göre görselleştirilir.</p></div></div>
+      <div class="bys-pro-chart compact"><canvas data-bys-chart="bar" data-labels='{{ ["İzin", "Devamsızlık", "Vekâlet", "Birim"]|tojson }}' data-datasets='{{ [{"label":"Personel hareketleri","data":[leave_count|default(0,true), attendance_count|default(0,true), delegation_count|default(0,true), scope_unit_count|default(0,true)]}]|tojson }}'></canvas></div>
+    </div>
+    <div class="bys-pro-card bys-pro-card-pad bys-pro-ai">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Canlı hazırlık ve AI kontrol</h2><p class="bys-pro-section-sub">Kritik uyarılar yayın öncesi kapatılmalı.</p></div><span class="bys-pro-chip"><i class="fa-solid fa-shield-halved"></i> Kontrol</span></div>
+      <div class="bys-pro-list">
+        <div class="bys-pro-list-row"><div><strong>Hazırlık durumu</strong><span>{{ 'Hazır görünüyor' if readiness_data.ready_for_go_live|default(false, true) else 'Kontrol bekliyor' }}</span></div><span class="bys-pro-badge {{ 'success' if readiness_data.ready_for_go_live|default(false, true) else 'warning' }}">{{ readiness_data.warning_count|default(0, true) }} uyarı</span></div>
+        <div class="bys-pro-list-row"><div><strong>Aktif dönem</strong><span>{{ active_period_title|default('Aktif dönem bulunamadı', true) }}</span></div></div>
+        <div class="bys-pro-list-row"><div><strong>Güvenlik</strong><span>Oturum, CSRF, dosya limiti ve yetki görünürlüğü canlı izlemeye dahil edilmeli.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bys-pro-two">
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Birim nabzı</h2><p class="bys-pro-section-sub">Birim bazlı personel, izin ve devamsızlık görünümü.</p></div><span class="bys-pro-chip">{{ unit_stats|default([], true)|length }} birim</span></div>
+      <div class="bys-pro-table-wrap"><table class="bys-pro-table"><thead><tr><th>Birim</th><th>Personel</th><th>İzin</th><th>Devamsızlık</th><th>Risk</th></tr></thead><tbody>{% for row in unit_stats %}<tr><td><div class="bys-pro-name">{{ row.unit_name }}</div></td><td>{{ row.user_count }}</td><td>{{ row.leave_count }}</td><td>{{ row.attendance_count }}</td><td><span class="bys-pro-badge {{ 'danger' if row.risk_score|default(0) > 5 else 'warning' if row.risk_score|default(0) > 0 else 'success' }}">{{ row.risk_score }}</span></td></tr>{% else %}<tr><td colspan="5"><div class="bys-pro-empty">Birim rapor kaydı bulunamadı.</div></td></tr>{% endfor %}</tbody></table></div>
+    </div>
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Tür kırılımı</h2><p class="bys-pro-section-sub">İzin ve devamsızlık türleri.</p></div></div>
+      <div class="bys-pro-list">
+        {% for row in leave_type_stats %}<div class="bys-pro-list-row"><div><strong>{{ row.label }}</strong><span>İzin türü</span></div><span class="bys-pro-badge">{{ row.count }}</span></div>{% else %}<div class="bys-pro-empty">İzin türü kaydı yok.</div>{% endfor %}
+        {% for row in attendance_type_stats %}<div class="bys-pro-list-row"><div><strong>{{ row.label }}</strong><span>Devamsızlık / istisna</span></div><span class="bys-pro-badge warning">{{ row.count }}</span></div>{% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_reports_ai_pro.js') }}"></script>
+{% endblock %}

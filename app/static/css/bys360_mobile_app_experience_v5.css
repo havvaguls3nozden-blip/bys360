@@ -1,0 +1,407 @@
+/* BYS360_MOBILE_UYUM_FAZ1_V1_CSS
+   Amaç: Mevcut BYS360 kurumsal tasarımını bozmadan telefon/tablet uyumunu güçlendirmek.
+   Kapsam: Responsive düzen, mobil sidebar, tablo kart/scroll davranışı, form/buton okunabilirliği,
+   BYS360 Asistanı mobil panel iyileştirmesi ve yatay taşma kilidi.
+*/
+:root{
+  --bys-mobile-red:#8B0000;
+  --bys-mobile-red-dark:#690000;
+  --bys-mobile-bg:#f7f8fb;
+  --bys-mobile-card:rgba(255,255,255,.94);
+  --bys-mobile-border:rgba(139,0,0,.12);
+  --bys-mobile-text:#111827;
+  --bys-mobile-muted:#667085;
+  --bys-mobile-shadow:0 16px 38px rgba(15,23,42,.12);
+  --bys-mobile-radius:20px;
+  --bys-mobile-gap:12px;
+  --bys-mobile-safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+html.bys360-mobile-faz1-v1,
+body.bys360-mobile-faz1-v1{
+  max-width:100%;
+  overflow-x:hidden!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+body.bys360-mobile-faz1-v1 *,
+body.bys360-mobile-faz1-v1 *::before,
+body.bys360-mobile-faz1-v1 *::after{box-sizing:border-box;}
+body.bys360-mobile-faz1-v1 img,
+body.bys360-mobile-faz1-v1 svg,
+body.bys360-mobile-faz1-v1 video,
+body.bys360-mobile-faz1-v1 canvas{max-width:100%;height:auto;}
+body.bys360-mobile-faz1-v1 .skip-mobile-normalize{max-width:none!important;overflow:visible!important;}
+
+.bys360-mobile-menu-toggle,
+.bys360-mobile-menu-backdrop{display:none;}
+
+@media (max-width: 1100px){
+  body.bys360-mobile-faz1-v1{
+    min-width:0!important;
+    background:var(--bys-mobile-bg);
+  }
+
+  body.bys360-mobile-faz1-v1 .app-main{
+    margin-left:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .app-sidebar{
+    width:min(88vw, 342px)!important;
+    max-width:342px!important;
+    transform:translateX(-110%)!important;
+    transition:transform .24s ease, box-shadow .24s ease!important;
+    z-index:2100!important;
+    will-change:transform;
+  }
+
+  body.bys360-mobile-menu-open .app-sidebar{
+    transform:translateX(0)!important;
+    box-shadow:24px 0 46px rgba(15,23,42,.28)!important;
+  }
+
+  .bys360-mobile-menu-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:2050;
+    background:rgba(15,23,42,.38);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s ease;
+    backdrop-filter:blur(2px);
+  }
+
+  body.bys360-mobile-menu-open .bys360-mobile-menu-backdrop{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .bys360-mobile-menu-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:44px;
+    min-width:44px;
+    border:1px solid rgba(139,0,0,.14);
+    border-radius:15px;
+    background:linear-gradient(135deg,#9b0b0b,#6d0000);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(139,0,0,.22);
+    appearance:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .bys360-mobile-menu-toggle:focus-visible{
+    outline:3px solid rgba(139,0,0,.22);
+    outline-offset:2px;
+  }
+
+  body.bys360-mobile-faz1-v1 .topbar{
+    left:0!important;
+    width:100%!important;
+    min-height:62px!important;
+    padding:9px 12px!important;
+    gap:10px!important;
+    z-index:1600!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .topbar-left,
+  body.bys360-mobile-faz1-v1 .topbar-right{
+    min-width:0!important;
+    gap:8px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .topbar-title,
+  body.bys360-mobile-faz1-v1 .page-title,
+  body.bys360-mobile-faz1-v1 h1{
+    font-size:clamp(1.08rem, 4vw, 1.36rem)!important;
+    line-height:1.18!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .content-block,
+  body.bys360-mobile-faz1-v1 .content-wrap,
+  body.bys360-mobile-faz1-v1 .page-content,
+  body.bys360-mobile-faz1-v1 .app-content,
+  body.bys360-mobile-faz1-v1 main,
+  body.bys360-mobile-faz1-v1 .container,
+  body.bys360-mobile-faz1-v1 .container-fluid{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+    overflow-x:hidden!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .content-block{padding-top:14px!important;}
+
+  body.bys360-mobile-faz1-v1 .page-header,
+  body.bys360-mobile-faz1-v1 .header,
+  body.bys360-mobile-faz1-v1 .toolbar,
+  body.bys360-mobile-faz1-v1 .page-actions,
+  body.bys360-mobile-faz1-v1 .header-actions,
+  body.bys360-mobile-faz1-v1 .action-row,
+  body.bys360-mobile-faz1-v1 .actions,
+  body.bys360-mobile-faz1-v1 .filters,
+  body.bys360-mobile-faz1-v1 .filter-row,
+  body.bys360-mobile-faz1-v1 .btn-toolbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:stretch!important;
+    gap:10px!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .row,
+  body.bys360-mobile-faz1-v1 .dashboard-grid,
+  body.bys360-mobile-faz1-v1 .stats-grid,
+  body.bys360-mobile-faz1-v1 .summary-grid,
+  body.bys360-mobile-faz1-v1 .kpi-grid,
+  body.bys360-mobile-faz1-v1 .ai-grid,
+  body.bys360-mobile-faz1-v1 .ai-grid-two,
+  body.bys360-mobile-faz1-v1 .ai-grid-four,
+  body.bys360-mobile-faz1-v1 .ai-grid-six,
+  body.bys360-mobile-faz1-v1 .cards-grid,
+  body.bys360-mobile-faz1-v1 .form-grid,
+  body.bys360-mobile-faz1-v1 .form-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:var(--bys-mobile-gap)!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  body.bys360-mobile-faz1-v1 [class*="col-"]{
+    width:100%!important;
+    max-width:100%!important;
+    flex:0 0 100%!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .card,
+  body.bys360-mobile-faz1-v1 .panel,
+  body.bys360-mobile-faz1-v1 .glass-card,
+  body.bys360-mobile-faz1-v1 .content-card,
+  body.bys360-mobile-faz1-v1 .dashboard-card,
+  body.bys360-mobile-faz1-v1 .metric-card,
+  body.bys360-mobile-faz1-v1 .summary-card,
+  body.bys360-mobile-faz1-v1 .scorecard-card,
+  body.bys360-mobile-faz1-v1 .performance-card,
+  body.bys360-mobile-faz1-v1 .settings-card,
+  body.bys360-mobile-faz1-v1 .ai-card,
+  body.bys360-mobile-faz1-v1 .ai-panel{
+    min-width:0!important;
+    max-width:100%!important;
+    border-radius:var(--bys-mobile-radius)!important;
+    overflow:hidden!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.bys360-mobile-faz1-v1 input,
+  body.bys360-mobile-faz1-v1 select,
+  body.bys360-mobile-faz1-v1 textarea,
+  body.bys360-mobile-faz1-v1 .form-control,
+  body.bys360-mobile-faz1-v1 .form-select{
+    min-height:46px!important;
+    width:100%!important;
+    max-width:100%!important;
+    font-size:16px!important;
+    border-radius:14px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 textarea{min-height:110px!important;}
+
+  body.bys360-mobile-faz1-v1 .btn,
+  body.bys360-mobile-faz1-v1 button,
+  body.bys360-mobile-faz1-v1 [role="button"]{
+    min-height:42px;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .btn-group,
+  body.bys360-mobile-faz1-v1 .input-group{
+    flex-wrap:wrap!important;
+    width:100%!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .btn-group > .btn,
+  body.bys360-mobile-faz1-v1 .input-group > .form-control,
+  body.bys360-mobile-faz1-v1 .input-group > .form-select,
+  body.bys360-mobile-faz1-v1 .input-group > .btn,
+  body.bys360-mobile-faz1-v1 .input-group > .input-group-text{
+    flex:1 1 100%!important;
+    width:100%!important;
+    border-radius:14px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .table-responsive,
+  body.bys360-mobile-faz1-v1 .table-wrapper,
+  body.bys360-mobile-faz1-v1 .mobile-table-wrap,
+  body.bys360-mobile-faz1-v1 .bys360-mobile-scroll-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch;
+    border-radius:18px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-scroll-table{
+    min-width:720px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table{
+    width:100%!important;
+    min-width:0!important;
+    border-collapse:separate!important;
+    border-spacing:0 12px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table thead{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    overflow:hidden!important;
+    clip:rect(0 0 0 0)!important;
+    white-space:nowrap!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table,
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table tbody,
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table tr,
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table td{
+    display:block!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table tr{
+    margin:0 0 12px!important;
+    padding:12px!important;
+    border-radius:18px!important;
+    border:1px solid rgba(15,23,42,.08)!important;
+    background:rgba(255,255,255,.94)!important;
+    box-shadow:0 10px 24px rgba(15,23,42,.06)!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table td{
+    min-height:34px;
+    padding:9px 0!important;
+    border:0!important;
+    border-bottom:1px dashed rgba(15,23,42,.08)!important;
+    text-align:left!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table td:last-child{border-bottom:0!important;}
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table td::before{
+    content:attr(data-label);
+    display:block;
+    margin-bottom:4px;
+    font-size:.74rem;
+    font-weight:800;
+    color:var(--bys-mobile-red);
+    letter-spacing:.01em;
+  }
+
+  body.bys360-mobile-faz1-v1 .bys360-mobile-sticky-actions{
+    position:sticky!important;
+    bottom:calc(8px + var(--bys-mobile-safe-bottom))!important;
+    z-index:1500!important;
+    padding:10px!important;
+    margin-top:14px!important;
+    border:1px solid rgba(139,0,0,.10)!important;
+    border-radius:18px!important;
+    background:rgba(255,255,255,.94)!important;
+    box-shadow:0 14px 34px rgba(15,23,42,.14)!important;
+    backdrop-filter:blur(10px);
+  }
+
+  body.bys360-mobile-faz1-v1 .bys360-mobile-sticky-actions .btn,
+  body.bys360-mobile-faz1-v1 .bys360-mobile-sticky-actions button{
+    flex:1 1 150px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .modal-dialog{
+    width:auto!important;
+    max-width:calc(100vw - 20px)!important;
+    margin:10px auto!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .modal-content{border-radius:22px!important;overflow:hidden;}
+  body.bys360-mobile-faz1-v1 .dropdown-menu{
+    max-width:calc(100vw - 20px)!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .page-loader-logo{width:132px!important;height:132px!important;}
+  body.bys360-mobile-faz1-v1 .page-loader-ring{width:158px!important;height:158px!important;}
+
+  body.bys360-mobile-faz1-v1 #bys360-assistant-module-root,
+  body.bys360-mobile-faz1-v1 [data-bys360-assistant-module],
+  body.bys360-mobile-faz1-v1 .bys360-assistant-widget,
+  body.bys360-mobile-faz1-v1 .bys360-assistant-panel,
+  body.bys360-mobile-faz1-v1 .assistant-panel{
+    max-width:100vw!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .bys360-assistant-panel,
+  body.bys360-mobile-faz1-v1 .assistant-panel,
+  body.bys360-mobile-faz1-v1 [class*="assistant"][class*="panel"]{
+    left:10px!important;
+    right:10px!important;
+    bottom:calc(10px + var(--bys-mobile-safe-bottom))!important;
+    width:auto!important;
+    max-width:calc(100vw - 20px)!important;
+    max-height:calc(100dvh - 84px)!important;
+    border-radius:22px!important;
+  }
+
+  body.bys360-mobile-faz1-v1 .bys360-assistant-messages,
+  body.bys360-mobile-faz1-v1 .assistant-messages,
+  body.bys360-mobile-faz1-v1 [class*="assistant"][class*="messages"]{
+    max-height:calc(100dvh - 220px)!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  body.bys360-mobile-faz1-v1 .mobile-hide-on-phone{display:none!important;}
+}
+
+@media (max-width: 640px){
+  body.bys360-mobile-faz1-v1 .topbar{
+    min-height:58px!important;
+  }
+  body.bys360-mobile-faz1-v1 .topbar-subtitle,
+  body.bys360-mobile-faz1-v1 .breadcrumb,
+  body.bys360-mobile-faz1-v1 .desktop-only,
+  body.bys360-mobile-faz1-v1 .hide-mobile{
+    display:none!important;
+  }
+  body.bys360-mobile-faz1-v1 .btn,
+  body.bys360-mobile-faz1-v1 button{
+    width:auto;
+  }
+  body.bys360-mobile-faz1-v1 .page-actions .btn,
+  body.bys360-mobile-faz1-v1 .actions .btn,
+  body.bys360-mobile-faz1-v1 .toolbar .btn,
+  body.bys360-mobile-faz1-v1 .filter-row .btn,
+  body.bys360-mobile-faz1-v1 .form-actions .btn{
+    flex:1 1 100%!important;
+    width:100%!important;
+  }
+  body.bys360-mobile-faz1-v1 table.bys360-mobile-card-table tr{padding:11px!important;}
+}
+
+@media (min-width: 1101px){
+  body.bys360-mobile-faz1-v1 .app-sidebar{transform:none!important;}
+}

@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block title %}BYS360 Asistanı Öğretim Merkezi{% endblock %}
+{% block page_kicker %}BYS360 Asistanı{% endblock %}
+{% block page_title %}Asistan Öğretim Merkezi{% endblock %}
+{% block page_subtitle %}Ekran Zekâsı, güvenli yönlendirme ve kurumsal rehberlik eğitim alanı{% endblock %}
+
+{% block extra_head %}
+<style>
+/* BYS360_ASSISTANT_TEACHING_CENTER_ADVANCED_UI_V1 */
+.bys360-teach-v1{--bys-red:#8B0000;--bys-red-2:#6f0000;--ink:#172033;--muted:#657085;--soft:#f8f4f2;--line:rgba(139,0,0,.14);--card:rgba(255,255,255,.88);--shadow:0 24px 60px rgba(31,41,55,.10);--radius:24px;color:var(--ink)}
+.bys360-teach-v1 *{box-sizing:border-box}
+.bys360-teach-hero{position:relative;overflow:hidden;border-radius:30px;padding:30px;background:linear-gradient(135deg,rgba(139,0,0,.98),rgba(72,0,0,.95));color:#fff;box-shadow:0 30px 70px rgba(139,0,0,.22);border:1px solid rgba(255,255,255,.14)}
+.bys360-teach-hero:before{content:"";position:absolute;inset:-80px -80px auto auto;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 64%)}
+.bys360-teach-hero:after{content:"";position:absolute;left:30px;bottom:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 67%)}
+.bys360-teach-hero-inner{position:relative;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);gap:24px;align-items:stretch;z-index:1}
+.bys360-teach-eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);padding:8px 12px;border-radius:999px;font-weight:800;font-size:.82rem;letter-spacing:.03em;text-transform:uppercase}
+.bys360-teach-hero h2{font-size:clamp(1.9rem,3vw,3rem);line-height:1.08;margin:18px 0 12px;letter-spacing:-.04em;color:#fff}
+.bys360-teach-hero p{max-width:820px;color:rgba(255,255,255,.88);font-size:1rem;line-height:1.75;margin:0}
+.bys360-teach-hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.bys360-teach-btn{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:16px;padding:12px 15px;font-weight:800;text-decoration:none;cursor:pointer;transition:.2s ease;background:#fff;color:var(--bys-red);box-shadow:0 14px 30px rgba(0,0,0,.14)}
+.bys360-teach-btn:hover{transform:translateY(-1px);color:var(--bys-red)}
+.bys360-teach-btn.secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);box-shadow:none}
+.bys360-teach-side{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);border-radius:24px;padding:18px;backdrop-filter:blur(14px)}
+.bys360-teach-side-title{font-weight:900;font-size:1rem;margin:0 0 12px;display:flex;align-items:center;gap:9px;color:#fff}
+.bys360-teach-side ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.bys360-teach-side li{display:flex;gap:10px;align-items:flex-start;color:rgba(255,255,255,.9);line-height:1.45;font-size:.92rem}
+.bys360-teach-side li i{margin-top:3px;color:#fff}
+.bys360-teach-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}
+.bys360-teach-stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:17px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.bys360-teach-stat:after{content:"";position:absolute;right:-32px;top:-32px;width:96px;height:96px;border-radius:50%;background:rgba(139,0,0,.06)}
+.bys360-teach-stat b{display:block;font-size:1.55rem;color:var(--bys-red);letter-spacing:-.03em;margin-bottom:4px}
+.bys360-teach-stat span{color:var(--muted);font-size:.9rem;font-weight:700}
+.bys360-teach-layout{display:grid;grid-template-columns:1.02fr .98fr;gap:18px;margin-top:18px;align-items:start}
+.bys360-teach-card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+.bys360-teach-card + .bys360-teach-card{margin-top:18px}
+.bys360-teach-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
+.bys360-teach-card h3{margin:0;color:var(--ink);font-size:1.18rem;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.bys360-teach-card h3 i{color:var(--bys-red)}
+.bys360-teach-note{color:var(--muted);line-height:1.65;margin:.35rem 0 0;font-size:.93rem}
+.bys360-teach-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:#fff5f5;border:1px solid rgba(139,0,0,.14);color:var(--bys-red);font-weight:800;font-size:.8rem;white-space:nowrap}
+.bys360-teach-search{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;margin:14px 0 16px}
+.bys360-teach-input,.bys360-teach-select{width:100%;border:1px solid rgba(101,112,133,.22);border-radius:16px;padding:12px 13px;font:inherit;background:#fff;color:var(--ink);outline:none}
+.bys360-teach-input:focus,.bys360-teach-select:focus{border-color:rgba(139,0,0,.45);box-shadow:0 0 0 4px rgba(139,0,0,.08)}
+.bys360-teach-track-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.bys360-teach-track{border:1px solid rgba(101,112,133,.16);border-radius:20px;padding:15px;background:linear-gradient(180deg,#fff,#fffaf9);transition:.2s ease;min-height:162px}
+.bys360-teach-track:hover{transform:translateY(-2px);box-shadow:0 16px 35px rgba(31,41,55,.09);border-color:rgba(139,0,0,.20)}
+.bys360-teach-track-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.bys360-teach-track-icon{width:42px;height:42px;border-radius:15px;background:#fff0f0;color:var(--bys-red);display:grid;place-items:center;font-size:1.05rem;flex:0 0 auto}
+.bys360-teach-track h4{margin:10px 0 7px;font-size:1rem;letter-spacing:-.02em;color:var(--ink)}
+.bys360-teach-track p{margin:0;color:var(--muted);line-height:1.55;font-size:.9rem}
+.bys360-teach-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.bys360-teach-tag{font-size:.74rem;font-weight:800;border-radius:999px;padding:5px 8px;background:#f4f6f8;color:#5d6678}
+.bys360-teach-flow{display:grid;gap:11px;counter-reset:flow}
+.bys360-teach-step{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr);gap:13px;align-items:start;padding:13px;border-radius:18px;border:1px solid rgba(101,112,133,.15);background:#fff}
+.bys360-teach-step:before{counter-increment:flow;content:counter(flow);width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,var(--bys-red),#ad1111);color:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 10px 20px rgba(139,0,0,.18)}
+.bys360-teach-step strong{display:block;margin-bottom:4px;color:var(--ink)}
+.bys360-teach-step span{color:var(--muted);line-height:1.52;font-size:.92rem}
+.bys360-teach-cockpit{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bys360-teach-mini{border-radius:20px;border:1px solid rgba(101,112,133,.15);background:#fff;padding:15px;min-height:128px}
+.bys360-teach-mini strong{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:.98rem;margin-bottom:7px}
+.bys360-teach-mini strong i{color:var(--bys-red)}
+.bys360-teach-mini p{margin:0;color:var(--muted);line-height:1.58;font-size:.9rem}
+.bys360-teach-scenario-list{display:grid;gap:10px}
+.bys360-teach-scenario{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 14px;border-radius:17px;background:#fff;border:1px solid rgba(101,112,133,.15)}
+.bys360-teach-scenario b{display:block;color:var(--ink);font-size:.94rem;margin-bottom:3px}
+.bys360-teach-scenario span{color:var(--muted);font-size:.84rem}
+.bys360-teach-copy{border:0;background:#fff0f0;color:var(--bys-red);border-radius:13px;padding:9px 10px;font-weight:900;cursor:pointer;white-space:nowrap}
+.bys360-teach-gates{display:grid;gap:10px}
+.bys360-teach-kontrol adımı{display:flex;gap:12px;align-items:center;padding:12px;border-radius:17px;background:#fff;border:1px solid rgba(101,112,133,.15)}
+.bys360-teach-kontrol adımı .ok{width:34px;height:34px;border-radius:12px;background:#ecfdf3;color:#15803d;display:grid;place-items:center;flex:0 0 auto}
+.bys360-teach-kontrol adımı b{display:block;font-size:.92rem;color:var(--ink)}
+.bys360-teach-kontrol adımı span{color:var(--muted);font-size:.82rem}
+.bys360-teach-warning{border-radius:22px;background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid rgba(245,158,11,.24);padding:17px;display:flex;gap:13px;align-items:flex-start;margin-top:18px}
+.bys360-teach-warning i{color:#b45309;font-size:1.15rem;margin-top:2px}
+.bys360-teach-warning strong{display:block;color:#7c2d12;margin-bottom:4px}
+.bys360-teach-warning p{margin:0;color:#7c4a24;line-height:1.55;font-size:.92rem}
+.bys360-teach-footer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:18px}
+.bys360-teach-policy{background:#fff;border:1px solid rgba(101,112,133,.15);border-radius:20px;padding:16px}
+.bys360-teach-policy b{display:flex;gap:8px;align-items:center;margin-bottom:6px;color:var(--ink)}
+.bys360-teach-policy i{color:var(--bys-red)}
+.bys360-teach-policy span{color:var(--muted);line-height:1.55;font-size:.9rem}
+@media (max-width:1180px){.bys360-teach-hero-inner,.bys360-teach-layout{grid-template-columns:1fr}.bys360-teach-strip{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:760px){.bys360-teach-hero{padding:22px;border-radius:22px}.bys360-teach-strip,.bys360-teach-track-grid,.bys360-teach-cockpit,.bys360-teach-footer-grid,.bys360-teach-search{grid-template-columns:1fr}.bys360-teach-card{padding:16px}.bys360-teach-scenario{align-items:flex-start;flex-direction:column}.bys360-teach-copy{width:100%}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bys360-teach-v1" data-bys360-screen="assistant-teaching-center" data-bys360-module="BYS360 Asistanı" data-bys360-version="V1">
+  <section class="bys360-teach-hero">
+    <div class="bys360-teach-hero-inner">
+      <div>
+        <span class="bys360-teach-eyebrow"><i class="fa-solid fa-chalkboard-user"></i> BYS360 Asistanı</span>
+        <h2>Asistan Öğretim Merkezi</h2>
+        <p>Bu ekran; BYS360 Asistanı’nın ekranları tanıması, kullanıcı niyetini anlaması, güvenli menü haritası üzerinden doğru yönlendirme yapması ve kurumsal cevap dilini koruması için tasarlanmış öğretim, kalite ve rehberlik merkezidir.</p>
+        <div class="bys360-teach-hero-actions">
+          <a class="bys360-teach-btn" href="/ai-agent/knowledge"><i class="fa-solid fa-book-open-reader"></i> Bilgi Bankasına Git</a>
+          <a class="bys360-teach-btn secondary" href="/ai-agent/panel"><i class="fa-solid fa-robot"></i> Asistan Panelini Aç</a>
+        </div>
+      </div>
+      <aside class="bys360-teach-side" aria-label="Öğretim merkezi güvenlik ilkeleri">
+        <div class="bys360-teach-side-title"><i class="fa-solid fa-shield-halved"></i> Güvenli Öğretim İlkesi</div>
+        <ul>
+          <li><i class="fa-solid fa-check"></i><span>Asistan idari karar üretmez; yalnızca rehberlik ve güvenli yönlendirme sunar.</span></li>
+          <li><i class="fa-solid fa-check"></i><span>Performans puanı, amir görüşü, mesaj içeriği ve anket cevabı doğrudan gösterilmez.</span></li>
+          <li><i class="fa-solid fa-check"></i><span>Ekran tanıma, URL ve aktif menü önceliğiyle yapılır; genel kelimeler özel ekranları ezemez.</span></li>
+          <li><i class="fa-solid fa-check"></i><span>Yanlış link riski varsa asistan bağlantı açmadan güvenli açıklama yapar.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="bys360-teach-strip" aria-label="Öğretim merkezi özet kartları">
+    <div class="bys360-teach-stat"><b>7</b><span>Modül ailesi tanıma</span></div>
+    <div class="bys360-teach-stat"><b>23+</b><span>Ekran yönlendirme senaryosu</span></div>
+    <div class="bys360-teach-stat"><b>4</b><span>Güvenli cevap katmanı</span></div>
+    <div class="bys360-teach-stat"><b>0</b><span>İdari karar yetkisi</span></div>
+  </section>
+
+  <div class="bys360-teach-layout">
+    <div>
+      <section class="bys360-teach-card">
+        <div class="bys360-teach-card-head">
+          <div>
+            <h3><i class="fa-solid fa-layer-group"></i> Öğretim Başlıkları</h3>
+            <p class="bys360-teach-note">Asistanın cevap üretirken kullandığı ana bilgi alanları. Arama yaparak ilgili başlığı süzebilirsiniz.</p>
+          </div>
+          <span class="bys360-teach-pill"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+        </div>
+        <div class="bys360-teach-search">
+          <input id="teachSearch" class="bys360-teach-input" type="search" placeholder="Örn. raporlar, KPI, dönem, rol matrisi, başkan onayı..." aria-label="Öğretim başlıklarında ara">
+          <select id="teachFilter" class="bys360-teach-select" aria-label="Modül filtresi">
+            <option value="all">Tüm modüller</option>
+            <option value="performans">Performans</option>
+            <option value="kpi">KPI/Hedef</option>
+            <option value="personel">Personel</option>
+            <option value="ayarlar">Ayarlar</option>
+            <option value="iletisim">İletişim</option>
+            <option value="ai">AI ve Asistan</option>
+          </select>
+        </div>
+        <div class="bys360-teach-track-grid" id="teachTrackGrid">
+          <article class="bys360-teach-track" data-tags="performans dönem karne başkan onayı raporlar">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-chart-line"></i></div><span class="bys360-teach-tag">Performans</span></div>
+            <h4>Performans Yönetimi Rehberliği</h4>
+            <p>Dönemler, değerlendirme kriterleri, görev üretimi, puanlama, karne, Başkan Onayları ve raporlar için işlem sırası öğretir.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">Dönemler</span><span class="bys360-teach-tag">Karne</span><span class="bys360-teach-tag">70 altı</span></div>
+          </article>
+          <article class="bys360-teach-track" data-tags="kpi hedef dashboard stratejik performans analiz">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-bullseye"></i></div><span class="bys360-teach-tag">KPI/Hedef</span></div>
+            <h4>KPI ve Hedef Ekranları</h4>
+            <p>KPI Dashboard, hedef listesi, hedef gerçekleşmeleri, AI KPI Analiz ve stratejik performans ekranlarını doğru ayırt eder.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">KPI Dashboard</span><span class="bys360-teach-tag">Hedef</span><span class="bys360-teach-tag">Risk</span></div>
+          </article>
+          <article class="bys360-teach-track" data-tags="personel izin devamsızlık vekalet organizasyon sicil">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-users-gear"></i></div><span class="bys360-teach-tag">Personel</span></div>
+            <h4>Personel ve Organizasyon</h4>
+            <p>Personel kaydı, sicil, birim, üst birim, yönetici, izin, devamsızlık ve vekâlet işlemlerini güvenli sırayla anlatır.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">Sicil</span><span class="bys360-teach-tag">İzin</span><span class="bys360-teach-tag">Vekâlet</span></div>
+          </article>
+          <article class="bys360-teach-track" data-tags="ayarlar rol matrisi menü görünürlüğü yetki kullanıcı">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-sliders"></i></div><span class="bys360-teach-tag">Ayarlar</span></div>
+            <h4>Rol Matrisi ve Menü Görünürlüğü</h4>
+            <p>Bir menü görünmüyorsa rol matrisi, kişi bazlı görünürlük, sistem yetki ve güvenli erişim kontrolünü birlikte öğretir.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">Rol</span><span class="bys360-teach-tag">Menü</span><span class="bys360-teach-tag">Yetki</span></div>
+          </article>
+          <article class="bys360-teach-track" data-tags="iletisim duyuru anket destek bildirim mesaj">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-comments"></i></div><span class="bys360-teach-tag">İletişim</span></div>
+            <h4>İletişim, Anket ve Destek</h4>
+            <p>Mesaj, duyuru, bildirim, destek talebi, anket ve geri bildirim süreçlerinde doğru ekran ve güvenli veri sınırını açıklar.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">Destek</span><span class="bys360-teach-tag">Anket</span><span class="bys360-teach-tag">Bildirim</span></div>
+          </article>
+          <article class="bys360-teach-track" data-tags="ai asistan karar destek öğretim merkezi bilgi bankası ekran tanıma">
+            <div class="bys360-teach-track-top"><div class="bys360-teach-track-icon"><i class="fa-solid fa-robot"></i></div><span class="bys360-teach-tag">AI/Asistan</span></div>
+            <h4>Asistan ve Karar Destek Sınırı</h4>
+            <p>AI Karar Destek ile BYS360 Asistanı’nın farkını; karar vermeme, hassas veri göstermeme ve güvenli özet ilkesiyle açıklar.</p>
+            <div class="bys360-teach-tags"><span class="bys360-teach-tag">Ekran Zekâsı</span><span class="bys360-teach-tag">Bilgi Bankası</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="bys360-teach-card">
+        <div class="bys360-teach-card-head">
+          <div>
+            <h3><i class="fa-solid fa-route"></i> Ekran Tanıma Akışı</h3>
+            <p class="bys360-teach-note">Asistan, ekranı ezberden değil; kanıtların ağırlığına göre tanır.</p>
+          </div>
+          <span class="bys360-teach-pill"><i class="fa-solid fa-magnifying-glass-location"></i> V23 uyumlu</span>
+        </div>
+        <div class="bys360-teach-flow">
+          <div class="bys360-teach-step"><div><strong>Sayfa yolu ve bağlantı okunur</strong><span>Öncelik gerçek sayfa yolundadır. Örneğin /performance/reports yolu Raporlar olarak yorumlanır.</span></div></div>
+          <div class="bys360-teach-step"><div><strong>Aktif sol menü ve breadcrumb kontrol edilir</strong><span>Aktif menü, genel dashboard kelimelerinden daha güçlü ipucu kabul edilir.</span></div></div>
+          <div class="bys360-teach-step"><div><strong>Başlık, buton, tablo ve form alanları puanlanır</strong><span>Sayfa içindeki görünür başlıklar, işlem butonları ve tablo kolonları modül ailesini netleştirir.</span></div></div>
+          <div class="bys360-teach-step"><div><strong>Güvenli cevap veya yönlendirme üretilir</strong><span>Eminlik yüksekse işlem sırası anlatılır; düşükse yanlış link açmadan seçenekli açıklama yapılır.</span></div></div>
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <section class="bys360-teach-card">
+        <div class="bys360-teach-card-head">
+          <div>
+            <h3><i class="fa-solid fa-gauge-high"></i> Öğretim Kokpiti</h3>
+            <p class="bys360-teach-note">Asistanın canlı kullanımda izlemesi gereken cevap katmanları.</p>
+          </div>
+          <span class="bys360-teach-pill"><i class="fa-solid fa-lock"></i> Güvenli</span>
+        </div>
+        <div class="bys360-teach-cockpit">
+          <div class="bys360-teach-mini"><strong><i class="fa-solid fa-brain"></i> Niyet Analizi</strong><p>Kullanıcının eksik, günlük veya kısa ifadesi işlem niyetine çevrilir.</p></div>
+          <div class="bys360-teach-mini"><strong><i class="fa-solid fa-sitemap"></i> Modül Ayrımı</strong><p>Performans, Personel, Ayarlar, KPI, İletişim, AI veya Asistan alanı seçilir.</p></div>
+          <div class="bys360-teach-mini"><strong><i class="fa-solid fa-user-shield"></i> Yetki Sınırı</strong><p>Kim yapabilir, hangi veri gösterilmez ve hangi ekran gizli kalır açıklanır.</p></div>
+          <div class="bys360-teach-mini"><strong><i class="fa-solid fa-list-check"></i> İşlem Sırası</strong><p>Menü, sekme, buton, zorunlu alan, kaydet ve kontrol adımları verilir.</p></div>
+        </div>
+      </section>
+
+      <section class="bys360-teach-card">
+        <div class="bys360-teach-card-head">
+          <div>
+            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Hazır Öğretim Senaryoları</h3>
+            <p class="bys360-teach-note">Bu örnekler asistanın doğal dili nasıl yorumlayacağını gösterir.</p>
+          </div>
+        </div>
+        <div class="bys360-teach-scenario-list">
+          <div class="bys360-teach-scenario"><div><b>“Raporlar sayfasındayım, ne yapabilirim?”</b><span>Performans Raporları ekranı olarak tanımalı; filtre, kapsam ve çıktı adımlarını anlatmalı.</span></div><button class="bys360-teach-copy" data-copy="Raporlar sayfasındayım, ne yapabilirim?">Kopyala</button></div>
+          <div class="bys360-teach-scenario"><div><b>“KPI Dashboard ne işe yarıyor?”</b><span>KPI ve Hedef Yönetimi kapsamında gerçekleşme, risk ve hedef kartlarını açıklamalı.</span></div><button class="bys360-teach-copy" data-copy="KPI Dashboard ne işe yarıyor?">Kopyala</button></div>
+          <div class="bys360-teach-scenario"><div><b>“Menü görünmüyor.”</b><span>Rol matrisi, kişi bazlı menü görünürlüğü ve sistem yetki kontrolünü birlikte anlatmalı.</span></div><button class="bys360-teach-copy" data-copy="Menü görünmüyor, ne kontrol etmeliyim?">Kopyala</button></div>
+          <div class="bys360-teach-scenario"><div><b>“Başkan onayı neden bekliyor?”</b><span>70 altı süreç, yayın kilidi ve süreç zinciri mantığını güvenli dille açıklamalı.</span></div><button class="bys360-teach-copy" data-copy="Başkan onayı neden bekliyor?">Kopyala</button></div>
+        </div>
+      </section>
+
+      <section class="bys360-teach-card">
+        <div class="bys360-teach-card-head">
+          <div>
+            <h3><i class="fa-solid fa-certificate"></i> Kalite Kapıları</h3>
+            <p class="bys360-teach-note">Öğretim Merkezi, final modül kalitesiyle aynı güvenlik çizgisinde çalışmalıdır.</p>
+          </div>
+        </div>
+        <div class="bys360-teach-gates">
+          <div class="bys360-teach-gate"><span class="ok"><i class="fa-solid fa-check"></i></span><div><b>Kanonik Asistan</b><span>Tek JS/CSS include, tek root ve temiz base yerleşimi.</span></div></div>
+          <div class="bys360-teach-gate"><span class="ok"><i class="fa-solid fa-check"></i></span><div><b>Güvenli Menü Haritası</b><span>Kırık link ve eski URL yönlendirmelerini engeller.</span></div></div>
+          <div class="bys360-teach-gate"><span class="ok"><i class="fa-solid fa-check"></i></span><div><b>Ekran Zekâsı</b><span>URL, menü, başlık, breadcrumb, buton ve tablo ipuçlarını puanlar.</span></div></div>
+          <div class="bys360-teach-gate"><span class="ok"><i class="fa-solid fa-check"></i></span><div><b>Repo Hijyeni</b><span>Teknik veya alaycı kullanıcı dili canlı ekrana taşınmaz.</span></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="bys360-teach-warning">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div>
+      <strong>Kurumsal kullanım sınırı</strong>
+      <p>Öğretim Merkezi asistanın cevap mantığını güçlendirir; ancak hiçbir kullanıcıya yetkisi dışındaki veri, performans detayı, mesaj içeriği, anket cevabı veya idari karar sonucu göstermez.</p>
+    </div>
+  </section>
+
+  <section class="bys360-teach-footer-grid" aria-label="Öğretim merkezi politika kartları">
+    <div class="bys360-teach-policy"><b><i class="fa-solid fa-language"></i> Kurumsal Dil</b><span>Geliştirici dili yerine sade ve resmi kullanıcı dili kullanılır.</span></div>
+    <div class="bys360-teach-policy"><b><i class="fa-solid fa-link"></i> Güvenli Bağlantı</b><span>Asistan sadece doğrulanmış BYS360 ekranlarına yönlendirir; emin değilse önce açıklama yapar.</span></div>
+    <div class="bys360-teach-policy"><b><i class="fa-solid fa-eye-slash"></i> Veri Minimizasyonu</b><span>Yanıtlar işlem rehberliği ve yetki kontrollü özet düzeyinde tutulur; hassas ayrıntı dökülmez.</span></div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+/* BYS360_ASSISTANT_TEACHING_CENTER_ADVANCED_UI_V1_SCRIPT */
+(function(){
+  const root = document.querySelector('.bys360-teach-v1');
+  if(!root) return;
+  const search = root.querySelector('#teachSearch');
+  const filter = root.querySelector('#teachFilter');
+  const cards = Array.from(root.querySelectorAll('.bys360-teach-track'));
+  function normalize(v){return String(v || '').toLocaleLowerCase('tr-TR');}
+  function applyFilter(){
+    const q = normalize(search && search.value);
+    const f = normalize(filter && filter.value);
+    cards.forEach(card => {
+      const hay = normalize(card.textContent + ' ' + (card.getAttribute('data-tags') || ''));
+      const okText = !q || hay.includes(q);
+      const okFilter = f === 'all' || hay.includes(f);
+      card.style.display = (okText && okFilter) ? '' : 'none';
+    });
+  }
+  if(search) search.addEventListener('input', applyFilter);
+  if(filter) filter.addEventListener('change', applyFilter);
+  root.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy') || '';
+      try{ await navigator.clipboard.writeText(text); btn.textContent = 'Kopyalandı'; setTimeout(()=>btn.textContent='Kopyala',1200); }
+      catch(e){ btn.textContent = 'Seçildi'; setTimeout(()=>btn.textContent='Kopyala',1200); }
+    });
+  });
+})();
+</script>
+{% endblock %}

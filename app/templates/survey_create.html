@@ -1,0 +1,862 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+
+{% block title %}Anket Oluştur - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Oluştur{% endblock %}
+{% block page_subtitle %}Kurumsal anket kaydını oluşturun ve hedef kitlesini belirleyin.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_formbricks_overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_jotform_phase1.css') }}">
+<style>
+    .builder-shell{display:grid;gap:18px}
+    .builder-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.95fr);gap:18px;align-items:start}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .section-title{margin:0 0 14px;font-size:1.02rem;font-weight:900;color:#111827}
+    .section-sub{margin:-4px 0 14px;color:#6b7280;font-size:.86rem;line-height:1.7}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field.full{grid-column:1/-1}
+    .field label{font-size:.88rem;font-weight:800;color:#374151}
+    .form-input,.form-select,.form-textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none}
+    .form-textarea{min-height:120px;resize:vertical}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(139,0,0,.32);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+    .check-row{display:flex;gap:16px;flex-wrap:wrap}
+    .check-item{display:flex;align-items:center;gap:8px;color:#374151;font-size:.9rem;font-weight:700}
+    .template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .template-card{position:relative;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:linear-gradient(180deg,#fff,#fcfcfd);padding:16px;cursor:pointer;transition:all .18s ease}
+    .template-card:hover{transform:translateY(-1px);border-color:rgba(139,0,0,.18);box-shadow:0 12px 22px rgba(15,23,42,.06)}
+    .template-card.active{border-color:rgba(139,0,0,.22);background:linear-gradient(180deg,rgba(139,0,0,.06),rgba(255,255,255,.98))}
+    .template-title{font-size:.92rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .template-text{margin:0;color:#6b7280;font-size:.82rem;line-height:1.7}
+    .template-badge{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.74rem;font-weight:900;margin-top:12px}
+    .help-box{border:1px solid rgba(139,0,0,.10);background:rgba(139,0,0,.04);color:#6b7280;border-radius:18px;padding:14px 16px;line-height:1.8;font-size:.86rem}
+    .validation-box{border:1px solid rgba(153,27,27,.16);background:rgba(153,27,27,.06);color:#991b1b;border-radius:18px;padding:14px 16px;line-height:1.8;font-size:.86rem}
+    .question-block{display:grid;gap:14px}
+    .question-card{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:20px;padding:16px}
+    .question-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .question-no{display:inline-flex;align-items:center;gap:8px;color:#8B0000;font-size:.84rem;font-weight:900}
+    .question-tools{display:flex;gap:8px;flex-wrap:wrap}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.88rem;white-space:nowrap;transition:all .18s ease}
+    .btn-soft:hover{transform:translateY(-1px)}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .btn-soft.danger{background:rgba(153,27,27,.08);color:#991b1b;border:1px solid rgba(153,27,27,.14)}
+    .sticky-hata ayrıntısı{position:sticky;top:18px;display:grid;gap:18px}
+    .summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .summary-card{padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.06)}
+    .summary-label{font-size:.78rem;color:#6b7280;font-weight:800;margin-bottom:8px}
+    .summary-value{font-size:1.2rem;color:#111827;font-weight:900}
+    .summary-sub{margin-top:6px;font-size:.8rem;color:#6b7280;line-height:1.7}
+    .mini-list{display:grid;gap:10px}
+    .mini-item{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.06)}
+    .mini-item strong{font-size:.88rem;color:#111827}
+    .mini-item span{font-size:.8rem;color:#6b7280}
+    .action-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .muted-chip{display:inline-flex;align-items:center;gap:8px;min-height:28px;padding:0 12px;border-radius:999px;background:rgba(15,23,42,.06);color:#4b5563;font-size:.76rem;font-weight:900}
+
+    .target-builder{display:grid;gap:12px}
+    .target-panel{display:grid;gap:12px;padding:16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff}
+    .target-panel[hidden]{display:none !important}
+    .target-hint{font-size:.82rem;color:#6b7280;line-height:1.7}
+    .target-stat{display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:0 14px;border-radius:999px;background:rgba(139,0,0,.06);color:#8B0000;font-weight:900;width:max-content}
+    .search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+    .search-results{display:grid;gap:8px;max-height:280px;overflow:auto}
+    .search-empty{padding:14px;border:1px dashed rgba(15,23,42,.12);border-radius:14px;color:#6b7280;font-size:.84rem;background:#fcfcfd}
+    .search-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid rgba(15,23,42,.08);border-radius:14px;background:#fff}
+    .search-item strong{display:block;font-size:.9rem;color:#111827}
+    .search-item span{display:block;font-size:.78rem;color:#6b7280;margin-top:4px}
+    .search-item button{flex:0 0 auto}
+    .selected-users{display:flex;flex-wrap:wrap;gap:10px}
+    .selected-user-chip{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(139,0,0,.06);border:1px solid rgba(139,0,0,.10)}
+    .selected-user-chip strong{display:block;font-size:.86rem;color:#111827}
+    .selected-user-chip span{display:block;font-size:.76rem;color:#6b7280;margin-top:3px}
+    .selected-user-chip button{border:none;background:transparent;color:#8B0000;font-weight:900;cursor:pointer;padding:0;line-height:1}
+    @media (max-width:1180px){.builder-grid{grid-template-columns:1fr}.sticky-hata ayrıntısı{position:static}}
+    @media (max-width:900px){.form-grid,.template-grid,.summary-grid{grid-template-columns:1fr}}
+    @media (max-width:768px){.btn-soft{width:100%}.action-row{flex-direction:column;align-items:stretch}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_mobile_hardening.css') }}">
+
+{% set form_state = form_state or {} %}
+{% set selected_target_type = form_state.get('target_type', 'all') %}
+{% set selected_target_values = form_state.get('target_values', []) %}
+{% set selected_user_items = selected_user_items or [] %}
+{% set initial_questions = form_state.get('questions', []) %}
+
+<div class="builder-shell jotform-phase1-shell" data-survey-studio="1">
+    {{ workspace.hero(
+        title='Anket oluştur',
+        text='Anket bilgilerini, hedef kitlesini ve soruları bu ekrandan tanımlayın.',
+        icon='fa-solid fa-square-poll-vertical',
+        kicker='Anket',
+        primary_url=url_for('main.survey_manage'),
+        primary_label='Yönetim Ekranı',
+        secondary_url=url_for('main.survey_results'),
+        secondary_label='Sonuçları Gör'
+    ) }}
+    {{ workspace.survey_nav('create') }}
+
+    <div class="builder-grid jotform-builder-grid">
+        <aside class="glass-card panel-card builder-rail jotform-rail">
+            <div class="rail-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> Soru araçları</div>
+            <h3 class="section-title">Soru bileşenleri</h3>
+            <p class="section-sub">Sık kullanılan soru türlerini bu panelden ekleyebilirsiniz.</p>
+            <div class="builder-tool-grid">
+                <button type="button" class="builder-tool-btn" data-quick-question-type="text" data-quick-label="Açık Uçlu Soru"><i class="fa-solid fa-align-left"></i><span>Metin</span></button>
+                <button type="button" class="builder-tool-btn" data-quick-question-type="single_choice" data-quick-label="Tek Seçim Sorusu"><i class="fa-solid fa-circle-dot"></i><span>Tek seçim</span></button>
+                <button type="button" class="builder-tool-btn" data-quick-question-type="multiple_choice" data-quick-label="Çoklu Seçim Sorusu"><i class="fa-solid fa-square-check"></i><span>Çoklu seçim</span></button>
+                <button type="button" class="builder-tool-btn" data-quick-question-type="rating_5" data-quick-label="1-5 Puan Sorusu"><i class="fa-solid fa-star-half-stroke"></i><span>1-5 puan</span></button>
+                <button type="button" class="builder-tool-btn" data-quick-question-type="rating_10" data-quick-label="1-10 Puan Sorusu"><i class="fa-solid fa-bars-progress"></i><span>1-10 puan</span></button>
+                <button type="button" class="builder-tool-btn" data-quick-question-type="yes_no" data-quick-label="Evet / Hayır Sorusu"><i class="fa-solid fa-toggle-on"></i><span>Evet / hayır</span></button>
+            </div>
+            <div class="rail-divider"></div>
+            <h3 class="section-title">Stüdyo akışı</h3>
+            <div class="rail-steps">
+                <div class="rail-step active"><b>1</b><div><strong>Şablon seç</strong><span>Hazır setle hızlı başla veya sıfırdan kur.</span></div></div>
+                <div class="rail-step"><b>2</b><div><strong>Hedefi belirle</strong><span>Birim, rol veya kullanıcıya göre dağıt.</span></div></div>
+                <div class="rail-step"><b>3</b><div><strong>Tuvali doldur</strong><span>Soruları ekle, sırala ve zorunlulukları ayarla.</span></div></div>
+                <div class="rail-step"><b>4</b><div><strong>Özetten kontrol et</strong><span>Sağ panelde soru akışını ve durumu izle.</span></div></div>
+            </div>
+            <div class="rail-divider"></div>
+            <div class="mini-list compact">
+                <div class="mini-item"><div><strong>Form düzeni</strong><span>Soruları ve hedeflemeyi aynı ekranda takip edin.</span></div><span class="muted-chip">Düzen</span></div>
+                <div class="mini-item"><div><strong>Kurumsal çizgi</strong><span>Yetki ve veri akışı korunur; sadece deneyim güçlenir.</span></div><span class="muted-chip">BYS360</span></div>
+            </div>
+        </aside>
+        <form method="POST" class="glass-card panel-card" id="surveyCreateForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <h3 class="section-title">1. Hızlı başlangıç şablonları</h3>
+            <p class="section-sub">Sıfırdan kurabilirsiniz; ama kurumsal kullanım için en sık gereken beş anket tipi hazır öneri olarak sunuluyor.</p>
+            <div class="template-grid" id="templateGrid">
+                <button type="button" class="template-card" data-template="egitim">
+                    <div class="template-title">Eğitim Memnuniyeti</div>
+                    <p class="template-text">Eğitim içeriği, eğitici, uygulama yararı ve açık uçlu öneri alanlarıyla hızlı başlangıç.</p>
+                    <span class="template-badge"><i class="fa-solid fa-graduation-cap"></i>Eğitim</span>
+                </button>
+                <button type="button" class="template-card" data-template="nabiz">
+                    <div class="template-title">Kurum İçi Nabız</div>
+                    <p class="template-text">Çalışma ortamı, iletişim, iş yükü ve genel memnuniyet için kısa ve ritmik yapı.</p>
+                    <span class="template-badge"><i class="fa-solid fa-heart-pulse"></i>Nabız</span>
+                </button>
+                <button type="button" class="template-card" data-template="etkinlik">
+                    <div class="template-title">Etkinlik Değerlendirme</div>
+                    <p class="template-text">Program akışı, organizasyon kalitesi ve genel etki için sonradan raporlamaya uygun set.</p>
+                    <span class="template-badge"><i class="fa-solid fa-calendar-check"></i>Etkinlik</span>
+                </button>
+                <button type="button" class="template-card" data-template="destek">
+                    <div class="template-title">Hizmet / Destek Memnuniyeti</div>
+                    <p class="template-text">Destek talebinin hızı, çözüm kalitesi ve geri bildirim alanlarını kapsayan pratik şablon.</p>
+                    <span class="template-badge"><i class="fa-solid fa-headset"></i>Destek</span>
+                </button>
+                <button type="button" class="template-card" data-template="iletisim">
+                    <div class="template-title">İç İletişim Geri Bildirimi</div>
+                    <p class="template-text">Duyuruların görünürlüğü, anlaşılabilirliği ve çalışan katılımını ölçen kompakt yapı.</p>
+                    <span class="template-badge"><i class="fa-solid fa-bullhorn"></i>İletişim</span>
+                </button>
+                <button type="button" class="template-card" data-template="temizle">
+                    <div class="template-title">Boş Başlangıç</div>
+                    <p class="template-text">Başlık, açıklama ve soruları temizleyerek sizi tamamen boş bir anket taslağına döndürür.</p>
+                    <span class="template-badge"><i class="fa-solid fa-pen-ruler"></i>Serbest</span>
+                </button>
+            </div>
+
+            <div style="height:18px"></div>
+
+            <h3 class="section-title">2. Anket çerçevesi</h3>
+            <div class="form-grid">
+                <div class="field full">
+                    <label for="title">Başlık</label>
+                    <input id="title" name="title" class="form-input" required value="{{ form_state.get('title', '') }}" placeholder="Örn. Mart 2026 Eğitim Memnuniyeti Anketi">
+                </div>
+
+                <div class="field full">
+                    <label for="description">Açıklama</label>
+                    <textarea id="description" name="description" class="form-textarea" placeholder="Anketin amacı, kapsamı ve varsa kısa bilgilendirme metni...">{{ form_state.get('description', '') }}</textarea>
+                </div>
+
+                <div class="field">
+                    <label for="survey_type">Anket türü</label>
+                    <select id="survey_type" name="survey_type" class="form-select">
+                        <option value="kurum_ici" {% if form_state.get('survey_type', 'kurum_ici') == 'kurum_ici' %}selected{% endif %}>Kurum İçi</option>
+                        <option value="memnuniyet" {% if form_state.get('survey_type') == 'memnuniyet' %}selected{% endif %}>Memnuniyet</option>
+                        <option value="egitim" {% if form_state.get('survey_type') == 'egitim' %}selected{% endif %}>Eğitim</option>
+                        <option value="nabiz" {% if form_state.get('survey_type') == 'nabiz' %}selected{% endif %}>Nabız</option>
+                        <option value="geri_bildirim" {% if form_state.get('survey_type') == 'geri_bildirim' %}selected{% endif %}>Geri Bildirim</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="status">Durum</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="draft" {% if form_state.get('status', 'draft') == 'draft' %}selected{% endif %}>Taslak</option>
+                        <option value="published" {% if form_state.get('status') == 'published' %}selected{% endif %}>Kaydeder kaydetmez yayımla</option>
+                        <option value="closed" {% if form_state.get('status') == 'closed' %}selected{% endif %}>Kapalı</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="start_at">Başlangıç</label>
+                    <input id="start_at" name="start_at" type="datetime-local" class="form-input" value="{{ form_state.get('start_at', '') }}">
+                </div>
+
+                <div class="field">
+                    <label for="end_at">Bitiş</label>
+                    <input id="end_at" name="end_at" type="datetime-local" class="form-input" value="{{ form_state.get('end_at', '') }}">
+                </div>
+
+                <div class="field full">
+                    <label>Ek ayarlar</label>
+                    <div class="check-row">
+                        <label class="check-item"><input type="checkbox" name="is_anonymous" {% if form_state.get('is_anonymous') %}checked{% endif %}> Anonim yanıt</label>
+                        <label class="check-item"><input type="checkbox" name="allow_multiple_submissions" {% if form_state.get('allow_multiple_submissions') %}checked{% endif %}> Çoklu yanıt izni</label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height:18px"></div>
+
+            <h3 class="section-title">3. Hedefleme</h3>
+            <p class="section-sub">1000 kişilik kullanım için kullanıcıları açılışta sayfaya gömmüyoruz. Rol ve birim hedefleri anında açılır; kullanıcı bazlı seçim ise arama ile çalışır.</p>
+            <div class="target-builder">
+                <div class="field">
+                    <label for="target_type">Hedef türü</label>
+                    <select id="target_type" name="target_type" class="form-select">
+                        <option value="all" {% if selected_target_type == 'all' %}selected{% endif %}>Tüm Personel</option>
+                        <option value="user" {% if selected_target_type == 'user' %}selected{% endif %}>Kullanıcı</option>
+                        <option value="role" {% if selected_target_type == 'role' %}selected{% endif %}>Rol</option>
+                        <option value="unit" {% if selected_target_type == 'unit' %}selected{% endif %}>Birim</option>
+                    </select>
+                </div>
+
+                <div class="target-panel" id="targetAllPanel">
+                    <div class="target-stat"><i class="fa-solid fa-users"></i>{{ active_user_count }} aktif personel</div>
+                    <div class="target-hint">Bu seçimde anket yayına alındığında tüm aktif kullanıcılara atanır. Açılış performansı için personel listesi tarayıcıya yüklenmez.</div>
+                </div>
+
+                <div class="target-panel" id="targetUserPanel" hidden>
+                    <label for="targetUserSearch">Kullanıcı ara</label>
+                    <div class="search-row">
+                        <input id="targetUserSearch" type="text" class="form-input" placeholder="İsim, sicil, birim, unvan ya da e-posta ile ara..." autocomplete="off">
+                        <button type="button" class="btn-soft secondary" id="targetUserSearchBtn"><i class="fa-solid fa-magnifying-glass"></i>Ara</button>
+                    </div>
+                    <div class="target-hint">En az 2 karakter yazın. Arama sonuçlarından seçtikleriniz aşağıda birikir.</div>
+                    <div class="search-results" id="targetUserSearchResults">
+                        <div class="search-empty">Henüz arama yapılmadı.</div>
+                    </div>
+                    <div>
+                        <label>Seçilen kullanıcılar</label>
+                        <div class="selected-users" id="selectedUsersContainer">
+                            {% for item in selected_user_items %}
+                            <div class="selected-user-chip" data-user-id="{{ item.id }}">
+                                <div>
+                                    <strong>{{ item.label }}</strong>
+                                    <span>{{ item.meta or 'Kullanıcı' }}</span>
+                                </div>
+                                <button type="button" class="remove-selected-user" aria-label="Kaldır">×</button>
+                                <input type="hidden" class="selected-user-input" name="target_values" value="{{ item.id }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="target-panel" id="targetRolePanel" hidden>
+                    <label for="target_roles">Rol seçimi</label>
+                    <select id="target_roles" name="target_values" class="form-select" multiple size="8">
+                        {% for role in roles %}
+                        <option value="{{ role }}" {% if selected_target_type == 'role' and role in selected_target_values %}selected{% endif %}>{{ role }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="target-panel" id="targetUnitPanel" hidden>
+                    <label for="target_units">Birim seçimi</label>
+                    <select id="target_units" name="target_values" class="form-select" multiple size="8">
+                        {% for birim in birimler %}
+                        <option value="{{ birim }}" {% if selected_target_type == 'unit' and birim in selected_target_values %}selected{% endif %}>{{ birim }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="height:18px"></div>
+
+            <h3 class="section-title">4. Soru tasarım alanı</h3>
+            <div class="help-box">Tek seçim, çoklu seçim ve evet/hayır sorularında seçenekleri alt alta yazın. Puan sorularında seçenek girmenize gerek yoktur. Şablon seçerseniz soru alanı otomatik doldurulur; sonrasında istediğiniz gibi düzenleyebilirsiniz.</div>
+            <div style="height:12px"></div>
+            <div class="validation-box" id="clientValidationBox" hidden></div>
+            <div id="questionBlock" class="question-block"></div>
+
+            <div class="action-row">
+                <button type="button" class="btn-soft secondary" id="addQuestionBtn"><i class="fa-solid fa-plus"></i>Soru Ekle</button>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <a href="{{ url_for('main.survey_manage') }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i>Geri Dön</a>
+                    <button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i>Anketi Kaydet</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="sticky-stack">
+            <div class="glass-card panel-card" id="builderLivePreviewMount"></div>
+            <div class="glass-card panel-card" id="builderPreviewMount"></div>
+            <div class="glass-card panel-card" id="builderQuestionOutlineMount"></div>
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Canlı özet</h3>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Toplam soru</div>
+                        <div class="summary-value" id="summaryQuestionCount">0</div>
+                        <div class="summary-sub">Formdaki aktif soru kartı sayısı.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Zorunlu soru</div>
+                        <div class="summary-value" id="summaryRequiredCount">0</div>
+                        <div class="summary-sub">Yanıtlayanı yönlendirecek zorunlu alanlar.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Hedefleme</div>
+                        <div class="summary-value" id="summaryTargetType">Tüm personel</div>
+                        <div class="summary-sub" id="summaryTargetCount">Toplu atama görünümü</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Durum</div>
+                        <div class="summary-value" id="summaryStatus">Taslak</div>
+                        <div class="summary-sub">Kaydetme anındaki yayın davranışı.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Kurumsal tasarım notları</h3>
+                <div class="mini-list">
+                    <div class="mini-item"><div><strong>Kısa anketler daha çok tamamlanır</strong><span>6-10 soru aralığı katılım için daha dengeli olur.</span></div><span class="muted-chip">Öneri</span></div>
+                    <div class="mini-item"><div><strong>Puan + metin dengesi kurun</strong><span>Yalnızca sayısal veri yerine en az 1 açık uçlu soru ekleyin.</span></div><span class="muted-chip">Denge</span></div>
+                    <div class="mini-item"><div><strong>Hedefi daraltmak sonucu güçlendirir</strong><span>Tüm kuruma açmak yerine ilgili birim veya rol seçmek içgörüyü artırır.</span></div><span class="muted-chip">Hedefleme</span></div>
+                </div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Soru türleri</h3>
+                <div class="mini-list">
+                    <div class="mini-item"><div><strong>Metin</strong><span>Gerekçe, öneri ve serbest görüş için.</span></div><span class="muted-chip">Açık uçlu</span></div>
+                    <div class="mini-item"><div><strong>Tek / Çoklu seçim</strong><span>Sabit seçenekli hızlı raporlama için.</span></div><span class="muted-chip">Dağılım</span></div>
+                    <div class="mini-item"><div><strong>1-5 / 1-10 puan</strong><span>Memnuniyet ve kıyas odaklı sonuçlarda kullanın.</span></div><span class="muted-chip">Ölçek</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const form = document.getElementById('surveyCreateForm');
+    const targetType = document.getElementById('target_type');
+    const targetAllPanel = document.getElementById('targetAllPanel');
+    const targetUserPanel = document.getElementById('targetUserPanel');
+    const targetRolePanel = document.getElementById('targetRolePanel');
+    const targetUnitPanel = document.getElementById('targetUnitPanel');
+    const targetRoleSelect = document.getElementById('target_roles');
+    const targetUnitSelect = document.getElementById('target_units');
+    const targetUserSearch = document.getElementById('targetUserSearch');
+    const targetUserSearchBtn = document.getElementById('targetUserSearchBtn');
+    const targetUserSearchResults = document.getElementById('targetUserSearchResults');
+    const selectedUsersContainer = document.getElementById('selectedUsersContainer');
+    const questionBlock = document.getElementById('questionBlock');
+    const addQuestionBtn = document.getElementById('addQuestionBtn');
+    const summaryQuestionCount = document.getElementById('summaryQuestionCount');
+    const summaryRequiredCount = document.getElementById('summaryRequiredCount');
+    const summaryTargetType = document.getElementById('summaryTargetType');
+    const summaryTargetCount = document.getElementById('summaryTargetCount');
+    const summaryStatus = document.getElementById('summaryStatus');
+    const statusSelect = document.getElementById('status');
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const surveyType = document.getElementById('survey_type');
+    const startAtInput = document.getElementById('start_at');
+    const endAtInput = document.getElementById('end_at');
+    const validationBox = document.getElementById('clientValidationBox');
+    const activeUserCount = {{ active_user_count|default(0) }};
+    const userSearchPath = {{ url_for('main.survey_target_users')|tojson }};
+    const initialQuestions = {{ initial_questions|tojson|safe }};
+    let qIndex = 0;
+    let searchTimer = null;
+    let submitLocked = false;
+
+    const templateMap = {
+        egitim: {
+            title: 'Eğitim Memnuniyeti Anketi',
+            description: 'Bu anket, eğitim içeriği ve uygulama yararı hakkında geri bildirim toplamak amacıyla hazırlanmıştır.',
+            survey_type: 'egitim',
+            questions: [
+                {question_text: 'Eğitimin genel içeriğini nasıl değerlendiriyorsunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Eğitici anlatımını nasıl değerlendiriyorsunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Bu eğitimin işinize katkısı oldu mu?', question_type: 'yes_no', is_required: true, options_text: 'Evet\nHayır'},
+                {question_text: 'Eğitimin en faydalı bölümü neydi?', question_type: 'text', is_required: false, options_text: ''},
+                {question_text: 'Bir sonraki eğitim için öneriniz nedir?', question_type: 'text', is_required: false, options_text: ''}
+            ]
+        },
+        nabiz: {
+            title: 'Kurumsal Nabız Anketi',
+            description: 'Çalışma ortamı, iletişim ve genel memnuniyet düzeyini kısa sorularla izlemek için hazırlanmıştır.',
+            survey_type: 'nabiz',
+            questions: [
+                {question_text: 'Son dönemde iş ortamını genel olarak nasıl değerlendiriyorsunuz?', question_type: 'rating_10', is_required: true, options_text: ''},
+                {question_text: 'Birim içi iletişimi yeterli buluyor musunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'İş yükünüz yönetilebilir düzeyde mi?', question_type: 'single_choice', is_required: true, options_text: 'Evet\nKısmen\nHayır'},
+                {question_text: 'En çok güçlendirilmesi gereken konu nedir?', question_type: 'text', is_required: false, options_text: ''}
+            ]
+        },
+        etkinlik: {
+            title: 'Etkinlik Değerlendirme Anketi',
+            description: 'Etkinlik planlaması, akış ve genel etki düzeyi için katılımcı görüşlerini toplar.',
+            survey_type: 'memnuniyet',
+            questions: [
+                {question_text: 'Etkinlik organizasyonunu nasıl değerlendiriyorsunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Program akışı beklentinizi karşıladı mı?', question_type: 'single_choice', is_required: true, options_text: 'Evet\nKısmen\nHayır'},
+                {question_text: 'En beğendiğiniz bölüm hangisiydi?', question_type: 'text', is_required: false, options_text: ''},
+                {question_text: 'Bir sonraki etkinlik için öneriniz nedir?', question_type: 'text', is_required: false, options_text: ''}
+            ]
+        },
+        destek: {
+            title: 'Hizmet ve Destek Memnuniyeti Anketi',
+            description: 'Destek taleplerinin hızını ve çözüm kalitesini ölçmeye yardımcı olur.',
+            survey_type: 'geri_bildirim',
+            questions: [
+                {question_text: 'Talebinizin ele alınma hızını nasıl değerlendiriyorsunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Sunulan çözüm ihtiyacınızı karşıladı mı?', question_type: 'single_choice', is_required: true, options_text: 'Evet\nKısmen\nHayır'},
+                {question_text: 'İletişim dili ve yönlendirme yeterli miydi?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Eklemek istediğiniz görüşünüz var mı?', question_type: 'text', is_required: false, options_text: ''}
+            ]
+        },
+        iletisim: {
+            title: 'İç İletişim Geri Bildirim Anketi',
+            description: 'Duyuruların görünürlüğü, açıklığı ve personel etkileşimini ölçmek için hazırlanmıştır.',
+            survey_type: 'kurum_ici',
+            questions: [
+                {question_text: 'Kurumsal duyurular size zamanında ulaşıyor mu?', question_type: 'single_choice', is_required: true, options_text: 'Evet\nKısmen\nHayır'},
+                {question_text: 'Duyuruların anlaşılabilirliğini nasıl değerlendiriyorsunuz?', question_type: 'rating_5', is_required: true, options_text: ''},
+                {question_text: 'Hangi iletişim kanalları sizin için daha etkili?', question_type: 'multiple_choice', is_required: false, options_text: 'Bildirimler\nE-posta\nPortal\nYöneticiden sözlü bilgilendirme'},
+                {question_text: 'İletişim akışı için öneriniz nedir?', question_type: 'text', is_required: false, options_text: ''}
+            ]
+        }
+    };
+
+    function escHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (char) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+        });
+    }
+
+    function selectedTargetLabel() {
+        if (!targetType) return 'Tüm personel';
+        const map = {all: 'Tüm personel', user: 'Kullanıcı bazlı', role: 'Rol bazlı', unit: 'Birim bazlı'};
+        return map[targetType.value] || 'Tüm personel';
+    }
+
+    function getSelectedUserIds() {
+        if (!selectedUsersContainer) return [];
+        return Array.from(selectedUsersContainer.querySelectorAll('.selected-user-input')).map((input) => input.value).filter(Boolean);
+    }
+
+    function setUserInputState(enabled) {
+        if (!selectedUsersContainer) return;
+        selectedUsersContainer.querySelectorAll('.selected-user-input').forEach((input) => {
+            input.disabled = !enabled;
+        });
+    }
+
+    function syncTargetPanels() {
+        const mode = targetType ? targetType.value : 'all';
+        if (targetAllPanel) targetAllPanel.hidden = mode !== 'all';
+        if (targetUserPanel) targetUserPanel.hidden = mode !== 'user';
+        if (targetRolePanel) targetRolePanel.hidden = mode !== 'role';
+        if (targetUnitPanel) targetUnitPanel.hidden = mode !== 'unit';
+        if (targetRoleSelect) targetRoleSelect.disabled = mode !== 'role';
+        if (targetUnitSelect) targetUnitSelect.disabled = mode !== 'unit';
+        setUserInputState(mode === 'user');
+        syncSummary();
+    }
+
+    function selectedTargetCount() {
+        const mode = targetType ? targetType.value : 'all';
+        if (mode === 'all') return `${activeUserCount} aktif personel`;
+        if (mode === 'user') return `${getSelectedUserIds().length} kullanıcı seçildi`;
+        if (mode === 'role' && targetRoleSelect) return `${Array.from(targetRoleSelect.selectedOptions).length} rol seçildi`;
+        if (mode === 'unit' && targetUnitSelect) return `${Array.from(targetUnitSelect.selectedOptions).length} birim seçildi`;
+        return 'Seçim yapılmadı';
+    }
+
+    function createUserChip(item) {
+        if (!selectedUsersContainer || !item || !item.id) return;
+        if (selectedUsersContainer.querySelector(`[data-user-id="${item.id}"]`)) return;
+        const chip = document.createElement('div');
+        chip.className = 'selected-user-chip';
+        chip.setAttribute('data-user-id', String(item.id));
+        chip.innerHTML = `
+            <div>
+                <strong>${escHtml(item.label || ('Kullanıcı #' + item.id))}</strong>
+                <span>${escHtml(item.meta || 'Kullanıcı')}</span>
+            </div>
+            <button type="button" class="remove-selected-user" aria-label="Kaldır">×</button>
+            <input type="hidden" class="selected-user-input" name="target_values" value="${escHtml(item.id)}">
+        `;
+        selectedUsersContainer.appendChild(chip);
+        syncTargetPanels();
+    }
+
+    function renderUserSearchResults(items, message) {
+        if (!targetUserSearchResults) return;
+        if (!Array.isArray(items) || !items.length) {
+            targetUserSearchResults.innerHTML = `<div class="search-empty">${escHtml(message || 'Sonuç bulunamadı.')}</div>`;
+            return;
+        }
+        targetUserSearchResults.innerHTML = items.map((item) => `
+            <div class="search-item">
+                <div>
+                    <strong>${escHtml(item.label || ('Kullanıcı #' + item.id))}</strong>
+                    <span>${escHtml(item.meta || 'Kullanıcı')}</span>
+                </div>
+                <button type="button" class="btn-soft secondary add-user-result" data-user-id="${escHtml(item.id)}" data-user-label="${escHtml(item.label || '')}" data-user-meta="${escHtml(item.meta || '')}">
+                    <i class="fa-solid fa-plus"></i>Seç
+                </button>
+            </div>
+        `).join('');
+    }
+
+    async function runUserSearch() {
+        if (!targetUserSearch) return;
+        const q = targetUserSearch.value.trim();
+        if (q.length < 2) {
+            renderUserSearchResults([], 'Aramak için en az 2 karakter yazın.');
+            return;
+        }
+        renderUserSearchResults([], 'Aranıyor...');
+        try {
+            const response = await fetch(`${userSearchPath}?q=${encodeURIComponent(q)}&limit=20`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) throw new Error(payload.message || 'Kullanıcı araması yapılamadı.');
+            renderUserSearchResults(payload.items || [], 'Sonuç bulunamadı.');
+        } catch (error) {
+            renderUserSearchResults([], error.message || 'Kullanıcı araması sırasında hata oluştu.');
+        }
+    }
+
+    function buildQuestionCard(prefill) {
+        qIndex += 1;
+        const data = prefill || {};
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `
+            <div class="question-head">
+                <div class="question-no"><i class="fa-solid fa-circle-dot"></i> Soru ${qIndex}</div>
+                <div class="question-tools">
+                    <button type="button" class="btn-soft danger remove-question-btn"><i class="fa-solid fa-trash"></i>Kaldır</button>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="field full">
+                    <label>Soru metni</label>
+                    <textarea name="question_text[]" class="form-textarea" required>${escHtml(data.question_text || '')}</textarea>
+                </div>
+                <div class="field">
+                    <label>Soru türü</label>
+                    <select name="question_type[]" class="form-select question-type-select">
+                        <option value="text" ${(!data.question_type || data.question_type === 'text') ? 'selected' : ''}>Metin</option>
+                        <option value="single_choice" ${data.question_type === 'single_choice' ? 'selected' : ''}>Tek Seçim</option>
+                        <option value="multiple_choice" ${data.question_type === 'multiple_choice' ? 'selected' : ''}>Çoklu Seçim</option>
+                        <option value="rating_5" ${data.question_type === 'rating_5' ? 'selected' : ''}>1-5 Puan</option>
+                        <option value="rating_10" ${data.question_type === 'rating_10' ? 'selected' : ''}>1-10 Puan</option>
+                        <option value="yes_no" ${data.question_type === 'yes_no' ? 'selected' : ''}>Evet / Hayır</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Zorunluluk</label>
+                    <select name="question_required[]" class="form-select question-required-select">
+                        <option value="1" ${(data.is_required ?? true) ? 'selected' : ''}>Zorunlu</option>
+                        <option value="0" ${data.is_required === false ? 'selected' : ''}>İsteğe Bağlı</option>
+                    </select>
+                </div>
+                <div class="field full options-field">
+                    <label>Seçenekler</label>
+                    <textarea name="question_options[]" class="form-textarea" placeholder="Her seçeneği yeni satıra yazın">${escHtml(data.options_text || '')}</textarea>
+                </div>
+                <div class="field full">
+                    <label>Yardım metni</label>
+                    <input name="question_helper_text[]" class="form-input" placeholder="Katılımcıya kısa yönlendirme göster" value="${escHtml(data.helper_text || '')}">
+                </div>
+                <div class="field">
+                    <label>Görünürlük</label>
+                    <select name="question_logic_mode[]" class="form-select question-logic-mode">
+                        <option value="always" ${(!data.logic_mode || data.logic_mode === 'always') ? 'selected' : ''}>Her zaman göster</option>
+                        <option value="conditional" ${data.logic_mode === 'conditional' ? 'selected' : ''}>Koşullu göster</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Koşul kaynağı</label>
+                    <input type="number" min="1" step="1" name="question_logic_source[]" class="form-input question-logic-source" placeholder="Örn: 2" value="${escHtml(data.logic_source || '')}">
+                </div>
+                <div class="field">
+                    <label>Operatör</label>
+                    <select name="question_logic_operator[]" class="form-select question-logic-operator">
+                        <option value="answered" ${(!data.logic_operator || data.logic_operator === 'answered') ? 'selected' : ''}>Yanıtlandıysa</option>
+                        <option value="selected_option" ${data.logic_operator === 'selected_option' ? 'selected' : ''}>Seçenek eşitse</option>
+                        <option value="equals" ${data.logic_operator === 'equals' ? 'selected' : ''}>Değer eşitse</option>
+                        <option value="contains" ${data.logic_operator === 'contains' ? 'selected' : ''}>İçeriyorsa</option>
+                        <option value="gte" ${data.logic_operator === 'gte' ? 'selected' : ''}>>=</option>
+                        <option value="lte" ${data.logic_operator === 'lte' ? 'selected' : ''}><=</option>
+                    </select>
+                </div>
+                <div class="field full">
+                    <label>Koşul değeri</label>
+                    <input name="question_logic_value[]" class="form-input question-logic-value" placeholder="Örn: Evet, 4 veya Memnun" value="${escHtml(data.logic_value || '')}">
+                    <div class="help-box" style="margin-top:8px;">Koşullu görünürlükte kaynak olarak bu sorudan önce gelen soru numarasını yazın. Seçimli sorularda seçenek metnini, puan sorularında sayıyı kullanın.</div>
+                </div>
+            </div>`;
+
+        const typeSelect = card.querySelector('.question-type-select');
+        const optionsField = card.querySelector('.options-field');
+        const removeBtn = card.querySelector('.remove-question-btn');
+        const logicModeSelect = card.querySelector('.question-logic-mode');
+        const logicSourceInput = card.querySelector('.question-logic-source');
+        const logicOperatorSelect = card.querySelector('.question-logic-operator');
+        const logicValueInput = card.querySelector('.question-logic-value');
+
+        function syncOptionsField() {
+            const show = ['single_choice', 'multiple_choice', 'yes_no'].includes(typeSelect.value);
+            optionsField.style.display = show ? '' : 'none';
+            const textarea = optionsField.querySelector('textarea');
+            if (typeSelect.value === 'yes_no' && textarea && !textarea.value.trim()) {
+                textarea.value = 'Evet\nHayır';
+            }
+            if (!show && textarea) textarea.value = '';
+            syncSummary();
+        }
+
+        function syncLogicFields() {
+            const conditional = logicModeSelect && logicModeSelect.value === 'conditional';
+            [logicSourceInput, logicOperatorSelect, logicValueInput].forEach((el) => {
+                if (!el) return;
+                el.disabled = !conditional;
+            });
+            if (!conditional) {
+                if (logicSourceInput) logicSourceInput.value = '';
+                if (logicOperatorSelect) logicOperatorSelect.value = 'answered';
+                if (logicValueInput) logicValueInput.value = '';
+            }
+            syncSummary();
+        }
+
+        typeSelect.addEventListener('change', syncOptionsField);
+        if (logicModeSelect) logicModeSelect.addEventListener('change', syncLogicFields);
+        removeBtn.addEventListener('click', () => {
+            card.remove();
+            syncSummary();
+        });
+        card.querySelectorAll('textarea, input, select').forEach((el) => {
+            el.addEventListener('input', syncSummary);
+            el.addEventListener('change', syncSummary);
+        });
+        syncOptionsField();
+        syncLogicFields();
+        return card;
+    }
+
+    function hydrateQuestions(items) {
+        if (!questionBlock) return;
+        questionBlock.innerHTML = '';
+        qIndex = 0;
+        const rows = Array.isArray(items) && items.length ? items : [{}];
+        rows.forEach((item) => questionBlock.appendChild(buildQuestionCard(item)));
+        syncSummary();
+    }
+
+    function applyTemplate(templateKey) {
+        document.querySelectorAll('.template-card').forEach((card) => {
+            card.classList.toggle('active', card.getAttribute('data-template') === templateKey);
+        });
+        if (templateKey === 'temizle') {
+            if (titleInput) titleInput.value = '';
+            if (descriptionInput) descriptionInput.value = '';
+            if (surveyType) surveyType.value = 'kurum_ici';
+            hydrateQuestions([{}]);
+            hideValidation();
+            return;
+        }
+        const tpl = templateMap[templateKey];
+        if (!tpl) return;
+        if (titleInput) titleInput.value = tpl.title;
+        if (descriptionInput) descriptionInput.value = tpl.description;
+        if (surveyType) surveyType.value = tpl.survey_type;
+        hydrateQuestions(tpl.questions);
+        hideValidation();
+    }
+
+    function syncSummary() {
+        const cards = Array.from(document.querySelectorAll('.question-card'));
+        const requiredCount = cards.reduce((acc, card) => {
+            const select = card.querySelector('.question-required-select');
+            return acc + ((select && select.value === '1') ? 1 : 0);
+        }, 0);
+        if (summaryQuestionCount) summaryQuestionCount.textContent = cards.length;
+        if (summaryRequiredCount) summaryRequiredCount.textContent = requiredCount;
+        if (summaryTargetType) summaryTargetType.textContent = selectedTargetLabel();
+        if (summaryTargetCount) summaryTargetCount.textContent = selectedTargetCount();
+        if (summaryStatus && statusSelect) {
+            const statusMap = {draft: 'Taslak', published: 'Yayımlanacak', closed: 'Kapalı'};
+            summaryStatus.textContent = statusMap[statusSelect.value] || 'Taslak';
+        }
+    }
+
+    function hideValidation() {
+        if (!validationBox) return;
+        validationBox.hidden = true;
+        validationBox.innerHTML = '';
+    }
+
+    function showValidation(errors) {
+        if (!validationBox) return;
+        if (!errors.length) {
+            hideValidation();
+            return;
+        }
+        validationBox.hidden = false;
+        validationBox.innerHTML = `<strong>Kaydetmeden önce düzeltmeniz gereken noktalar var:</strong><ul style="margin:10px 0 0 18px;padding:0;">${errors.map((error) => `<li>${escHtml(error)}</li>`).join('')}</ul>`;
+        validationBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function validateForm() {
+        const errors = [];
+        const mode = targetType ? targetType.value : 'all';
+        const cards = Array.from(document.querySelectorAll('.question-card'));
+        const filledCards = cards.filter((card) => {
+            const textValue = (card.querySelector('textarea[name="question_text[]"]')?.value || '').trim();
+            const optionsValue = (card.querySelector('textarea[name="question_options[]"]')?.value || '').trim();
+            const helperValue = (card.querySelector('input[name="question_helper_text[]"]')?.value || '').trim();
+            return textValue || optionsValue || helperValue || cards.length === 1;
+        });
+
+        if (!titleInput || !titleInput.value.trim()) errors.push('Anket başlığı zorunludur.');
+        if (startAtInput && endAtInput && startAtInput.value && endAtInput.value && endAtInput.value < startAtInput.value) {
+            errors.push('Bitiş tarihi başlangıç tarihinden önce olamaz.');
+        }
+        if (mode === 'user' && getSelectedUserIds().length === 0) errors.push('Kullanıcı bazlı hedeflemede en az bir kullanıcı seçilmelidir.');
+        if (mode === 'role' && targetRoleSelect && Array.from(targetRoleSelect.selectedOptions).length === 0) errors.push('Rol bazlı hedeflemede en az bir rol seçilmelidir.');
+        if (mode === 'unit' && targetUnitSelect && Array.from(targetUnitSelect.selectedOptions).length === 0) errors.push('Birim bazlı hedeflemede en az bir birim seçilmelidir.');
+
+        if (!filledCards.length) {
+            errors.push('En az bir soru girilmelidir.');
+        }
+
+        filledCards.forEach((card, index) => {
+            const rowNo = index + 1;
+            const textValue = (card.querySelector('textarea[name="question_text[]"]')?.value || '').trim();
+            const typeValue = card.querySelector('select[name="question_type[]"]')?.value || 'text';
+            const optionsValue = (card.querySelector('textarea[name="question_options[]"]')?.value || '').split('\n').map((item) => item.trim()).filter(Boolean);
+            const logicMode = card.querySelector('select[name="question_logic_mode[]"]')?.value || 'always';
+            const logicSource = (card.querySelector('input[name="question_logic_source[]"]')?.value || '').trim();
+            const logicOperator = card.querySelector('select[name="question_logic_operator[]"]')?.value || 'answered';
+            const logicValue = (card.querySelector('input[name="question_logic_value[]"]')?.value || '').trim();
+
+            if (!textValue) errors.push(`${rowNo}. sorunun metni boş bırakılamaz.`);
+            if ((typeValue === 'single_choice' || typeValue === 'multiple_choice') && optionsValue.length < 2) {
+                errors.push(`${rowNo}. soruda en az iki seçenek girilmelidir.`);
+            }
+            if (logicMode === 'conditional') {
+                const sourceNumber = Number(logicSource || 0);
+                if (!Number.isInteger(sourceNumber) || sourceNumber <= 0) {
+                    errors.push(`${rowNo}. soruda koşul kaynağı olarak geçerli bir önceki soru numarası girilmelidir.`);
+                } else if (sourceNumber >= rowNo) {
+                    errors.push(`${rowNo}. soruda koşul kaynağı yalnızca önceki sorulardan biri olabilir.`);
+                }
+                if (logicOperator !== 'answered' && !logicValue) {
+                    errors.push(`${rowNo}. soruda seçilen koşul operatörü için koşul değeri zorunludur.`);
+                }
+            }
+        });
+
+        return errors;
+    }
+
+    if (targetType) targetType.addEventListener('change', syncTargetPanels);
+    if (targetRoleSelect) targetRoleSelect.addEventListener('change', syncSummary);
+    if (targetUnitSelect) targetUnitSelect.addEventListener('change', syncSummary);
+    if (statusSelect) statusSelect.addEventListener('change', syncSummary);
+    if (addQuestionBtn) addQuestionBtn.addEventListener('click', () => { questionBlock.appendChild(buildQuestionCard()); syncSummary(); hideValidation(); });
+    if (targetUserSearchBtn) targetUserSearchBtn.addEventListener('click', runUserSearch);
+    if (targetUserSearch) {
+        targetUserSearch.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                runUserSearch();
+            }
+        });
+        targetUserSearch.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = window.setTimeout(runUserSearch, 280);
+        });
+    }
+    if (selectedUsersContainer) {
+        selectedUsersContainer.addEventListener('click', (event) => {
+            const removeBtn = event.target.closest('.remove-selected-user');
+            if (!removeBtn) return;
+            const chip = removeBtn.closest('.selected-user-chip');
+            if (chip) chip.remove();
+            syncSummary();
+        });
+    }
+    if (targetUserSearchResults) {
+        targetUserSearchResults.addEventListener('click', (event) => {
+            const addBtn = event.target.closest('.add-user-result');
+            if (!addBtn) return;
+            createUserChip({
+                id: addBtn.getAttribute('data-user-id'),
+                label: addBtn.getAttribute('data-user-label'),
+                meta: addBtn.getAttribute('data-user-meta')
+            });
+            syncSummary();
+            hideValidation();
+        });
+    }
+    document.querySelectorAll('.template-card').forEach((card) => {
+        card.addEventListener('click', () => applyTemplate(card.getAttribute('data-template')));
+    });
+
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            if (submitLocked) {
+                event.preventDefault();
+                return;
+            }
+            const errors = validateForm();
+            if (errors.length) {
+                event.preventDefault();
+                showValidation(errors);
+                submitLocked = false;
+                return;
+            }
+            hideValidation();
+            submitLocked = true;
+        });
+    }
+
+    syncTargetPanels();
+    if (Array.isArray(initialQuestions) && initialQuestions.length) {
+        hydrateQuestions(initialQuestions);
+    } else {
+        applyTemplate('temizle');
+    }
+})();
+</script>
+<script src="{{ url_for('static', filename='js/survey_formbricks_overlay.js') }}"></script>
+<script src="{{ url_for('static', filename='js/survey_builder_phase1.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Yeni Duyuru' if mode == 'new' else 'Duyuru Düzenle' }} - BYS360{% endblock %}
+{% block page_kicker %}Genel{% endblock %}
+{% block page_title %}{{ 'Yeni Pop-up Duyuru' if mode == 'new' else 'Pop-up Duyuru Düzenle' }}{% endblock %}
+{% block page_subtitle %}Ana ekranda gösterilecek video destekli duyuru içeriğini hazırlayın.{% endblock %}
+{% block content %}
+{% set data = form_data if form_data is defined and form_data else {} %}
+{% set value_title = data.get('title') if data else (announcement.title if announcement else '') %}
+{% set value_body = data.get('body') if data else (announcement.body if announcement else '') %}
+{% set value_type = data.get('announcement_type') if data else (announcement.announcement_type if announcement else 'info') %}
+{% set value_show_rule = data.get('show_rule') if data else (announcement.show_rule if announcement else 'once') %}
+{% set value_target_scope = data.get('target_scope') if data else (announcement.target_scope if announcement else 'all') %}
+{% set value_target_role = data.get('target_role') if data else (announcement.target_role if announcement else '') %}
+{% set value_target_unit_id = data.get('target_unit_id') if data else (announcement.target_unit_id if announcement else '') %}
+{% set value_media_type = data.get('media_type') if data else (announcement.media_type if announcement else 'none') %}
+{% set value_media_url = data.get('media_url') if data else (announcement.media_url if announcement else '') %}
+{% set value_media_file_path = data.get('media_file_path') if data else (announcement.media_file_path if announcement else '') %}
+{% set value_cover_image_path = data.get('cover_image_path') if data else (announcement.cover_image_path if announcement else '') %}
+{% set value_button_text = data.get('button_text') if data else (announcement.button_text if announcement else 'Okudum') %}
+{% set value_cta_text = data.get('cta_text') if data else (announcement.cta_text if announcement else '') %}
+{% set value_cta_url = data.get('cta_url') if data else (announcement.cta_url if announcement else '') %}
+<style>
+.ap-form-shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}.ap-panel{background:rgba(255,255,255,.94);border:1px solid rgba(139,0,0,.10);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:22px}.ap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.ap-field{display:grid;gap:7px}.ap-field.full{grid-column:1/-1}.ap-label{font-size:.84rem;font-weight:850;color:#374151}.ap-input,.ap-select,.ap-textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;background:#fff;padding:11px 12px}.ap-input,.ap-select{min-height:44px}.ap-textarea{min-height:180px;resize:vertical}.ap-hint{font-size:.8rem;color:#6b7280;line-height:1.6}.ap-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.ap-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 15px;border-radius:14px;font-weight:850;text-decoration:none;border:1px solid rgba(139,0,0,.16);background:#fff;color:#8B0000}.ap-btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}.ap-check{display:flex;gap:9px;align-items:center}.ap-side-title{font-weight:950;color:#111827;margin-bottom:8px}.ap-note{color:#6b7280;line-height:1.75;font-size:.9rem}.ap-rule{display:grid;gap:10px;margin-top:12px}.ap-rule-item{padding:12px;border:1px solid rgba(15,23,42,.08);border-radius:16px;background:#fafafa}.ap-rule-item strong{display:block;color:#111827}.ap-file-current{font-size:.82rem;color:#047857;background:#ecfdf5;border:1px solid #bbf7d0;border-radius:12px;padding:8px 10px}.ap-media-hint{display:grid;gap:6px;background:#fafafa;border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:12px;color:#6b7280;font-size:.84rem;line-height:1.6}@media(max-width:1100px){.ap-form-shell{grid-template-columns:1fr}.ap-grid{grid-template-columns:1fr}}
+</style>
+<form method="post" class="ap-form-shell" enctype="multipart/form-data">
+    {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+    <input type="hidden" name="form_token" value="{{ form_token }}">
+    <section class="ap-panel">
+        <div class="ap-grid">
+            <div class="ap-field full">
+                <label class="ap-label">Duyuru başlığı</label>
+                <input class="ap-input" name="title" value="{{ value_title or '' }}" maxlength="200" required>
+            </div>
+            <div class="ap-field full">
+                <label class="ap-label">Duyuru metni</label>
+                <textarea class="ap-textarea" name="body" required>{{ value_body or '' }}</textarea>
+                <div class="ap-hint">Serbest HTML/iframe kabul edilmez. Video bağlantısı aşağıdaki medya alanından güvenli şekilde yönetilir.</div>
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Duyuru türü</label>
+                <select class="ap-select" name="announcement_type">
+                    {% for key, label in announcement_types.items() %}<option value="{{ key }}" {% if value_type==key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Gösterim kuralı</label>
+                <select class="ap-select" name="show_rule">
+                    {% for key, label in show_rules.items() %}<option value="{{ key }}" {% if value_show_rule==key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Hedef kitle</label>
+                <select class="ap-select" name="target_scope" id="targetScope">
+                    {% for key, label in target_scopes.items() %}<option value="{{ key }}" {% if value_target_scope==key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field" data-target="role">
+                <label class="ap-label">Hedef rol</label>
+                <select class="ap-select" name="target_role">
+                    <option value="">Rol seçin</option>
+                    {% for role in roles %}<option value="{{ role }}" {% if value_target_role==role %}selected{% endif %}>{{ role }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field" data-target="unit">
+                <label class="ap-label">Hedef birim</label>
+                <select class="ap-select" name="target_unit_id">
+                    <option value="">Birim seçin</option>
+                    {% for unit in units %}<option value="{{ unit.id }}" {% if value_target_unit_id|string==unit.id|string %}selected{% endif %}>{{ unit.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Yayın başlangıcı</label>
+                <input class="ap-input" type="datetime-local" name="publish_start_at" value="{{ announcement.publish_start_at.strftime('%Y-%m-%dT%H:%M') if announcement and announcement.publish_start_at and not data else '' }}">
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Yayın bitişi</label>
+                <input class="ap-input" type="datetime-local" name="publish_end_at" value="{{ announcement.publish_end_at.strftime('%Y-%m-%dT%H:%M') if announcement and announcement.publish_end_at and not data else '' }}">
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Medya tipi</label>
+                <select class="ap-select" name="media_type" id="mediaType">
+                    {% for key, label in media_types.items() %}<option value="{{ key }}" {% if value_media_type==key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Medya bağlantısı</label>
+                <input class="ap-input" name="media_url" value="{{ value_media_url or '' }}" placeholder="YouTube, Shorts, Vimeo, Dailymotion, görsel ya da PDF bağlantısı">
+                <div class="ap-hint">YouTube/Vimeo/Dailymotion bağlantıları sistem tarafından güvenli oynatıcıya çevrilir; iframe kodu yapıştırılmaz.</div>
+            </div>
+            <div class="ap-field full">
+                <label class="ap-label">Kurum videosu / medya dosyası yükle</label>
+                <input class="ap-input" type="file" name="media_file" accept="video/mp4,video/webm,image/jpeg,image/png,image/webp,application/pdf">
+                <input type="hidden" name="media_file_path" value="{{ value_media_file_path or '' }}">
+                {% if value_media_file_path %}
+                <div class="ap-file-current"><i class="fa-solid fa-circle-check"></i> Kayıtlı medya dosyası: {{ value_media_file_path }}</div>
+                {% endif %}
+                <div class="ap-hint">Kurum videosu için .mp4 veya .webm; görsel için .jpg/.png/.webp; PDF için .pdf kabul edilir.</div>
+            </div>
+            <div class="ap-field full">
+                <label class="ap-label">Video kapak görseli bağlantısı</label>
+                <input class="ap-input" name="cover_image_path" value="{{ value_cover_image_path or '' }}" placeholder="/static/... veya https://...">
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Buton metni</label>
+                <input class="ap-input" name="button_text" value="{{ value_button_text or 'Okudum' }}" maxlength="80">
+            </div>
+            <div class="ap-field">
+                <label class="ap-label">Yönlendirme butonu metni</label>
+                <input class="ap-input" name="cta_text" value="{{ value_cta_text or '' }}" maxlength="120" placeholder="Detaya Git">
+            </div>
+            <div class="ap-field full">
+                <label class="ap-label">Yönlendirme bağlantısı</label>
+                <input class="ap-input" name="cta_url" value="{{ value_cta_url or '' }}" placeholder="/support veya https://...">
+            </div>
+            <div class="ap-field">
+                <label class="ap-check"><input type="checkbox" name="is_active" {% if data.get('is_active', announcement.is_active if announcement else True) %}checked{% endif %}> <span>Aktif</span></label>
+            </div>
+            <div class="ap-field">
+                <label class="ap-check"><input type="checkbox" name="is_required" {% if data.get('is_required', announcement.is_required if announcement else False) %}checked{% endif %}> <span>Zorunlu “Okudum” onayı</span></label>
+            </div>
+        </div>
+        <div class="ap-actions">
+            <button class="ap-btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
+            <a class="ap-btn" href="{{ url_for('main.announcement_popup_manage') }}">Vazgeç</a>
+        </div>
+    </section>
+    <aside class="ap-panel">
+        <div class="ap-side-title">Kontrol 4 kapsamı</div>
+        <div class="ap-note">Bu ekran duyuru kaydını, hedef kitlesini ve video/medya içeriğini yönetir. YouTube, Shorts, Vimeo, Dailymotion ve kurum içi video yükleme desteği güvenli şekilde aktiftir.</div>
+        <div class="ap-rule">
+            <div class="ap-rule-item"><strong>Güvenlik</strong><span class="ap-note">Serbest iframe/script kabul edilmez; sistem güvenli embed URL üretir.</span></div>
+            <div class="ap-rule-item"><strong>Hedefleme</strong><span class="ap-note">Tüm kullanıcılar, rol veya birim bazlı hedef seçilebilir.</span></div>
+            <div class="ap-rule-item"><strong>Medya</strong><span class="ap-note">Kurum videosu otomatik oynatılmaz; kullanıcı başlatınca yüklenir.</span></div>
+            <div class="ap-rule-item"><strong>Okundu</strong><span class="ap-note">Okundu ve görüldü kayıtları kullanıcı bazlı tutulur.</span></div>
+        </div>
+    </aside>
+</form>
+<script>
+(function(){
+  const scope=document.getElementById('targetScope');
+  const blocks=document.querySelectorAll('[data-target]');
+  const mediaType=document.getElementById('mediaType');
+  function sync(){ const v=scope ? scope.value : 'all'; blocks.forEach(b=>{ b.style.display = b.getAttribute('data-target')===v ? 'grid' : 'none'; }); }
+  if(scope){ scope.addEventListener('change',sync); sync(); }
+  if(mediaType){ mediaType.addEventListener('change',function(){ document.body.setAttribute('data-announcement-media-type', mediaType.value || 'none'); }); }
+})();
+</script>
+{% endblock %}

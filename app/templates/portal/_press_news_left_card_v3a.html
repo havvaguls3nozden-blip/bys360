@@ -1,0 +1,27 @@
+{# BYS360_PORTAL_EXPERIENCE_V3A_LEFT_CARD_TEMPLATE #}
+{% set pn = press_news if press_news is defined and press_news else {} %}
+<section class="portal-card press-news-left-card-v3a">
+  <div class="press-news-card-head">
+    <div>
+      <span>Basında Tarihi Alan</span>
+      <h3>Haber Takibi</h3>
+    </div>
+    <i class="fa-solid fa-newspaper"></i>
+  </div>
+  {% if pn.latest %}
+    <article class="press-news-mini-item">
+      <b>{{ pn.latest.title }}</b>
+      <small>{{ pn.latest.source }}</small>
+      <a href="{{ pn.latest.url }}" target="_blank" rel="noopener noreferrer">Kaynağa git</a>
+    </article>
+  {% else %}
+    <p>Onaylanan haberler portal akışında ve ana sayfa vitrininde gösterilir.</p>
+  {% endif %}
+  <div class="press-news-card-stats">
+    <span><b>{{ pn.pending_count|default(0, true) }}</b> bekleyen</span>
+    <span><b>{{ pn.risk_count|default(0, true) }}</b> inceleme</span>
+  </div>
+  {% if pn.can_review %}
+    <a class="press-news-card-btn" href="{{ pn.review_url|default('/portal/press-news', true) }}">Haber adaylarını incele</a>
+  {% endif %}
+</section>

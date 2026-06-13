@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-12T20:05:38",
+  "phase": "A10R3_CANONICAL_TECH_DEBT_EVIDENCE",
+  "ok": true,
+  "decision": "A10R3_CANONICAL_EVIDENCE_GREEN",
+  "source_a10r_ok": true,
+  "source_a10r_decision": "A10R_FINAL_TECH_DEBT_EVIDENCE_GREEN",
+  "source_a10r2_ok": true,
+  "source_a10r2_decision": "A10R2_CLEAN_ZIP_GREEN",
+  "evidence_zip": "C:\\bys360\\releases\\BYS360_A10R3_CANONICAL_TECH_DEBT_EVIDENCE_20260612_200538.zip",
+  "evidence_zip_sha256": "CCC554AABDB390EC9A8EB315A7FDCC5887C7327F398CE71C88E36FC4F5DA3205",
+  "evidence_file_count": 57,
+  "zip_entry_count": 58,
+  "duplicate_zip_entry_count": 0,
+  "duplicate_zip_entries": [],
+  "source_a10r_final_counts": {
+    "safe_quarantine_candidate_count": 0,
+    "referenced_keep_count": 45,
+    "historical_placeholder_keep_count": 7,
+    "compat_required_count": 7,
+    "compat_apply_candidate_count": 3,
+    "compat_keep_allowlist_count": 4,
+    "compat_applied_count": 3,
+    "compat_failed_count": 0,
+    "unclassified_count": 0,
+    "non_placeholder_low_risk_count": 0
+  },
+  "source_a10r_pytest_summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "canonical_rule": "ZIP SHA256 değeri ZIP dışındaki A10R3 manifestte tutulur. ZIP içine self-referential SHA yazılmaz.",
+  "next_phase": "A11_WARNING_ZERO"
+}

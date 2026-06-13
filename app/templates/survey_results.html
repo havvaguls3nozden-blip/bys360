@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Anket Sonuçları - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Sonuçları{% endblock %}
+{% block page_subtitle %}Yönetim özetleri, katılım görünümü ve soru bazlı dağılımlar tek ekranda izlenir.{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+{{ workspace.styles() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_formbricks_overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_jotform_phase1.css') }}">
+<style>
+  .results-shell{display:grid;gap:18px}
+  .soft-card{position:relative;overflow:hidden;border:none;border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);background:#fff}
+  .soft-card::after{content:"";position:absolute;inset:auto -30px -54px auto;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle, rgba(139,0,0,.08), rgba(139,0,0,0) 72%);pointer-events:none}
+  .card-body-strong{padding:22px;position:relative;z-index:1}
+  .survey-select{display:flex;justify-content:space-between;gap:14px;align-items:end;flex-wrap:wrap}
+  .survey-select .field{display:grid;gap:8px;min-width:320px;flex:1 1 320px}
+  .survey-select label{font-size:.82rem;font-weight:900;color:#374151;text-transform:uppercase;letter-spacing:.04em}
+  .survey-select select{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:0 14px;font-size:.92rem;color:#111827;background:#fff}
+  .survey-meta-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  .survey-head-title{margin:0;font-size:1.08rem;font-weight:900;color:#111827}
+  .survey-head-text{margin:8px 0 0;color:#6b7280;font-size:.92rem;line-height:1.8}
+  .meta-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .meta-pill{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.76rem;font-weight:900}
+  .status-panel{display:grid;gap:10px}
+  .status-box{padding:14px 16px;border-radius:18px;background:linear-gradient(180deg,#fff,#fcfcfd);border:1px solid rgba(15,23,42,.06)}
+  .status-box strong{display:block;font-size:.88rem;color:#111827;margin-bottom:6px}
+  .status-box span{display:block;font-size:.82rem;color:#6b7280;line-height:1.7}
+  .metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .metric-card{padding:18px;border-radius:22px;background:#fff;border:1px solid rgba(15,23,42,.06)}
+  .metric-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:10px}
+  .metric-value{font-size:1.55rem;font-weight:900;color:#111827;line-height:1.05}
+  .metric-sub{margin-top:8px;font-size:.8rem;color:#6b7280;line-height:1.55}
+  .spotlight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .spotlight-card{padding:20px;border-radius:22px;background:linear-gradient(180deg,#fff,#fcfcfd);border:1px solid rgba(15,23,42,.06)}
+  .spotlight-label{font-size:.78rem;font-weight:900;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+  .spotlight-title{font-size:1rem;font-weight:900;color:#111827;line-height:1.65}
+  .spotlight-sub{margin-top:10px;font-size:.82rem;color:#6b7280;line-height:1.7}
+  .spotlight-score{margin-top:12px;font-size:.88rem;font-weight:900;color:#8B0000}
+  .mix-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .mix-card{padding:18px;border-radius:20px;background:#fff;border:1px solid rgba(15,23,42,.06)}
+  .mix-label{font-size:.84rem;font-weight:900;color:#111827;margin-bottom:8px}
+  .mix-value{font-size:1.45rem;font-weight:900;color:#8B0000;line-height:1}
+  .mix-sub{margin-top:8px;font-size:.81rem;color:#6b7280}
+  .question-card{border:none;border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);background:#fff}
+  .question-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+  .question-title{font-size:1rem;font-weight:900;color:#111827;line-height:1.65}
+  .question-sub{margin-top:8px;font-size:.83rem;color:#6b7280}
+  .type-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.76rem;font-weight:900}
+  .bar-track{height:12px;border-radius:999px;background:rgba(15,23,42,.06);overflow:hidden}
+  .bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#8B0000,#b11f1f)}
+  .soft-item{border:1px solid rgba(15,23,42,.06);border-radius:18px;padding:14px;background:linear-gradient(180deg,#fff,#fcfcfd)}
+  .text-answer{height:100%;font-size:.88rem;color:#374151;line-height:1.8}
+  .question-metrics{display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:center}
+  .question-big-score{font-size:2rem;font-weight:900;color:#111827;line-height:1}
+  .question-big-sub{margin-top:8px;font-size:.83rem;color:#6b7280;line-height:1.6}
+  @media (max-width:1200px){.metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.survey-meta-grid{grid-template-columns:1fr}.spotlight-grid,.mix-grid{grid-template-columns:1fr}.question-metrics{grid-template-columns:1fr}}
+  @media (max-width:900px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  
+  .manager-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+  .executive-list{display:grid;gap:12px}
+  .executive-item{padding:16px;border-radius:18px;border:1px solid rgba(15,23,42,.06);background:linear-gradient(180deg,#fff,#fcfcfd)}
+  .executive-item strong{display:block;font-size:.86rem;color:#111827;margin-bottom:6px}
+  .executive-item span{display:block;font-size:.82rem;color:#6b7280;line-height:1.7}
+  .trend-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end}
+  .trend-item{display:grid;gap:8px}
+  .trend-bar{height:92px;border-radius:18px;background:rgba(15,23,42,.05);overflow:hidden;display:flex;align-items:flex-end}
+  .trend-bar span{display:block;width:100%;border-radius:18px 18px 10px 10px;background:linear-gradient(180deg,#d04848,#8B0000)}
+  .trend-label{font-size:.76rem;font-weight:800;color:#6b7280;text-align:center}
+  .health-list{display:grid;gap:10px}
+  .health-item{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.06)}
+  .health-item strong{display:block;font-size:.84rem;color:#111827;margin-bottom:6px}
+  .health-item b{display:block;font-size:1rem;color:#8B0000;margin-bottom:4px}
+  .health-item span{display:block;font-size:.8rem;color:#6b7280;line-height:1.65}
+  @media (max-width:1200px){.manager-grid{grid-template-columns:1fr}.trend-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  @media (max-width:768px){.trend-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:768px){.metric-grid{grid-template-columns:1fr}.survey-select,.survey-select .field{width:100%}.cw-btn{width:100%;justify-content:center}}
+</style>
+
+{% set survey_status = (selected_survey.status if selected_survey else '')|default('', true) %}
+{% set total_questions = summary|length if summary is defined else 0 %}
+
+<div class="results-shell jotform-phase1-shell">
+  {{ workspace.hero(
+      title='Anket sonuç görünümü',
+      text='Seçili anketin katılımı ve soru bazlı sonuçları bu ekranda izlenir.',
+      icon='fa-solid fa-chart-pie',
+      kicker='Anket',
+      secondary_url=url_for('main.survey_manage'),
+      secondary_label='Yönetim Ekranı'
+  ) }}
+  {{ workspace.survey_nav('results') }}
+
+
+  <div class="soft-card">
+    <div class="card-body-strong">
+      <form method="get" class="survey-select">
+        <div class="field">
+          <label>Anket seçin</label>
+          <select name="survey_id">
+            {% for survey in surveys %}
+              <option value="{{ survey.id }}" {% if selected_survey and survey.id == selected_survey.id %}selected{% endif %}>{{ survey.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"><button class="cw-btn cw-btn-primary" type="submit"><i class="fa-solid fa-filter"></i> Görünümü Güncelle</button>{% if selected_survey %}<a class="cw-btn cw-btn-ghost" href="{{ url_for('main.survey_results_export_csv', survey_id=selected_survey.id) }}"><i class="fa-solid fa-file-csv"></i> CSV İndir</a>{% endif %}</div>
+      </form>
+    </div>
+  </div>
+
+  {% if selected_survey %}
+  <div class="survey-meta-grid">
+    <div class="soft-card">
+      <div class="card-body-strong">
+        <h3 class="survey-head-title">{{ selected_survey.title }}</h3>
+        <p class="survey-head-text">{{ selected_survey.description or 'Bu anket için açıklama girilmemiş.' }}</p>
+        <div class="meta-pills">
+          <span class="meta-pill">{{ selected_survey.survey_type or 'kurum_ici' }}</span>
+          <span class="meta-pill">
+            {% if selected_survey.is_anonymous %}Anonim{% else %}Kimlikli{% endif %}
+          </span>
+          <span class="meta-pill">
+            {% if selected_survey.allow_multiple_submissions %}Çoklu yanıt açık{% else %}Tek yanıt akışı{% endif %}
+          </span>
+        </div>
+        {% if survey_status == 'published' %}
+        <div class="share-toolbar">
+          <button type="button" class="cw-btn cw-btn-ghost" data-share-survey data-share-title="{{ selected_survey.title|e }}" data-share-url="{{ url_for('main.survey_take', survey_id=selected_survey.id, _external=True) }}"><i class="fa-solid fa-share-nodes"></i>Paylaş</button>
+          <a class="cw-btn cw-btn-ghost" href="mailto:?subject={{ (selected_survey.title ~ ' anket bağlantısı')|urlencode }}&body={{ ((selected_survey.title ~ ' anketine aşağıdaki bağlantıdan erişebilirsiniz:') ~ '%0A' ~ url_for('main.survey_take', survey_id=selected_survey.id, _external=True))|urlencode }}"><i class="fa-solid fa-envelope"></i>E-posta</a>
+          <a class="cw-btn cw-btn-ghost" href="https://wa.me/?text={{ ((selected_survey.title ~ ' anket bağlantısı: ' ~ url_for('main.survey_take', survey_id=selected_survey.id, _external=True)))|urlencode }}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="soft-card">
+      <div class="card-body-strong">
+        <div class="status-panel">
+          <div class="status-box">
+            <strong>Durum</strong>
+            <span>
+              {% if survey_status == 'published' %}Yayımlanmış ve sonuç üretmeye açık bir kayıt.{% elif survey_status == 'closed' %}Kapatılmış; yeni yanıt alınmaz.{% elif survey_status == 'archived' %}Arşive alınmış; yalnızca referans amaçlı tutulur.{% else %}Taslak ya da geçiş durumundaki bir kayıt.{% endif %}
+            </span>
+          </div>
+          <div class="status-box">
+            <strong>Zaman penceresi</strong>
+            <span>
+              {% if selected_survey.start_at %}{{ selected_survey.start_at.strftime('%d.%m.%Y %H:%M') }}{% else %}Başlangıç tanımı yok{% endif %}
+              {% if selected_survey.end_at %}<br>{{ selected_survey.end_at.strftime('%d.%m.%Y %H:%M') }}{% else %}<br>Bitiş tanımı yok{% endif %}
+            </span>
+          </div>
+        </div>
+      <div class="status-box">
+            <strong>Son tamamlanan yanıt</strong>
+            <span>{{ latest_completed_label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="manager-grid">
+    <div class="soft-card">
+      <div class="card-body-strong">
+        <div class="survey-head-title">Yönetici özet notları</div>
+        <div class="survey-head-text">Öne çıkan başlıkları bu alandan takip edin.</div>
+        <div class="executive-list" style="margin-top:14px;">
+          {% for note in executive_notes %}
+          <div class="executive-item"><strong>{{ note.title }}</strong><span>{{ note.text }}</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="soft-card">
+      <div class="card-body-strong">
+        <div class="survey-head-title">Yanıt sağlığı</div>
+        <div class="survey-head-text">Katılım, taslak baskısı ve son gönderim akışı tek blokta görünür.</div>
+        <div class="health-list" style="margin-top:14px;">
+          {% for item in response_health %}
+          <div class="health-item"><strong>{{ item.label }}</strong><b>{{ item.value }}</b><span>{{ item.detail }}</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if completion_trend %}
+  <div class="soft-card">
+    <div class="card-body-strong">
+      <div class="survey-head-title">Son 7 gün gönderim trendi</div>
+      <div class="survey-head-text">Tamamlanan yanıtların günlük ritmi yönetici ekranında izlenir.</div>
+      <div class="trend-grid" style="margin-top:16px;">
+        {% for point in completion_trend %}
+        <div class="trend-item">
+          <div class="trend-bar"><span style="height: {{ point.pct }}%;"></span></div>
+          <div class="trend-label">{{ point.label }} • {{ point.count }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Tamamlanan</div><div class="metric-value">{{ total_completed }}</div><div class="metric-sub">Tam yanıt olarak kaydedilen anket sayısı.</div></div>
+    <div class="metric-card"><div class="metric-label">Tahmini Hedef</div><div class="metric-value">{{ estimated_target_count }}</div><div class="metric-sub">Atama ve hedefleme yapısına göre hesaplanır.</div></div>
+    <div class="metric-card"><div class="metric-label">Tamamlanma Oranı</div><div class="metric-value">%{{ completion_rate }}</div><div class="metric-sub">Tamamlanan yanıtların hedef kitleye oranı.</div></div>
+    <div class="metric-card"><div class="metric-label">Taslak Sayısı</div><div class="metric-value">{{ draft_count }}</div><div class="metric-sub">Henüz gönderilmemiş, kısmi yanıt içeren kayıtlar.</div></div>
+    <div class="metric-card"><div class="metric-label">Taslak Ortalama</div><div class="metric-value">%{{ avg_draft_progress }}</div><div class="metric-sub">Taslakların ortalama ilerleme yüzdesi.</div></div>
+    <div class="metric-card"><div class="metric-label">Puan Ortalaması</div><div class="metric-value">{{ rating_average if rating_average else '—' }}</div><div class="metric-sub">Puanlı sorulardan türetilen genel ortalama.</div></div>
+    <div class="metric-card"><div class="metric-label">Toplam Soru</div><div class="metric-value">{{ total_questions }}</div><div class="metric-sub">Seçili ankette yer alan toplam soru sayısı.</div></div>
+    <div class="metric-card"><div class="metric-label">Son Taslak Hareketi</div><div class="metric-value">{{ latest_partial_label }}</div><div class="metric-sub">En son güncellenen kısmi yanıt zamanı.</div></div>
+  </div>
+
+  <div class="spotlight-grid">
+    <div class="spotlight-card">
+      <div class="spotlight-label">En güçlü alan</div>
+      <div class="spotlight-title">{{ strongest_question.label if strongest_question else 'Veri yok' }}</div>
+      <div class="spotlight-score">{{ strongest_question.score if strongest_question else 0 }}</div>
+      <div class="spotlight-sub">En yüksek normalize puana ulaşan başlık burada gösterilir.</div>
+    </div>
+    <div class="spotlight-card">
+      <div class="spotlight-label">Dikkat isteyen alan</div>
+      <div class="spotlight-title">{{ weakest_question.label if weakest_question else 'Veri yok' }}</div>
+      <div class="spotlight-score">{{ weakest_question.score if weakest_question else 0 }}</div>
+      <div class="spotlight-sub">En düşük normalize puanlı başlık yönetici değerlendirmesi için öne çıkarılır.</div>
+    </div>
+    <div class="spotlight-card">
+      <div class="spotlight-label">Seçimli soru özeti</div>
+      <div class="spotlight-title">{{ highest_option_question.label if highest_option_question else 'Veri yok' }}</div>
+      <div class="spotlight-sub">{{ highest_option_question.detail if highest_option_question else 'Henüz seçim dağılımı oluşmadı.' }}</div>
+    </div>
+  </div>
+
+
+  {% if dropoff_rows %}
+  <div class="soft-card" style="margin-top:20px;">
+    <div class="card-body-strong">
+      <div class="survey-head-title">En çok bırakılan sorular</div>
+      <div class="survey-head-text">Kısmi yanıtlar üzerinden hesaplanan ilk bırakılma noktaları. Taslak sayısı arttıkça bu alan daha anlamlı hale gelir.</div>
+      <div class="row g-3" style="margin-top:6px;">
+        {% for item in dropoff_rows[:5] %}
+        <div class="col-lg-6">
+          <div class="soft-item">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+              <div>
+                <div style="font-size:.9rem;font-weight:900;color:#111827;line-height:1.6;">{{ item.question_text }}</div>
+                <div style="font-size:.82rem;color:#6b7280;line-height:1.7;">{{ item.count }} taslak bu soruda durmuş görünüyor.</div>
+              </div>
+              <span class="meta-pill">%{{ item.pct }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% if answer_mix %}
+  <div class="mix-grid">
+    {% for mix in answer_mix %}
+    <div class="mix-card">
+      <div class="mix-label">{{ mix.label }}</div>
+      <div class="mix-value">{{ mix.count }}</div>
+      <div class="mix-sub">Toplam soru içindeki payı %{{ mix.pct }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <div id="surveyResultsFilterMount"></div>
+  <div id="surveyResultsInsightMount"></div>
+
+  <div class="row g-4">
+    {% for row in summary %}
+    <div class="col-12">
+      <div class="question-card survey-result-card" data-mode="{{ row.mode }}" data-title="{{ (row.question.question_text or '')|lower }}">
+        <div class="card-body-strong">
+          <div class="question-header">
+            <div>
+              <div class="question-title">{{ row.question.question_text }}</div>
+              <div class="question-sub">
+                {% if row.mode == 'rating' %}Puanlı soru{% elif row.mode == 'options' %}Seçimli soru{% else %}Metin soru{% endif %}
+                {% if row.helper_text %}<br>{{ row.helper_text }}{% endif %}
+              </div>
+            </div>
+            <span class="type-pill">
+              {% if row.mode == 'options' %}{{ row.answer_count }} kayıt{% elif row.mode == 'rating' %}{{ row.count }} kayıt{% else %}{{ row.text_count }} kayıt{% endif %}
+            </span>
+          </div>
+
+          {% if row.mode == 'rating' %}
+          <div class="question-metrics">
+            <div>
+              <div class="question-big-score">{{ row.avg_value }}</div>
+              <div class="question-big-sub">{{ row.max_scale }} ölçeğinde hesaplanan ortalama. Bu değer aynı zamanda normalize çubuk görünümüne dönüştürülür.</div>
+            </div>
+            <div>
+              <div class="bar-track"><div class="bar-fill" style="width: {{ row.normalized_score }}%;"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:.8rem;color:#6b7280;"><span>0</span><span>{{ row.max_scale / 2 }}</span><span>{{ row.max_scale }}</span></div>
+            </div>
+          </div>
+          {% elif row.mode == 'options' %}
+          <div class="row g-3">
+            {% for option in row.option_stats %}
+            <div class="col-12">
+              <div class="soft-item">
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+                  <div style="font-size:.9rem;font-weight:800;color:#111827;">{{ option.label }}</div>
+                  <div style="font-size:.82rem;color:#6b7280;">{{ option.count }} yanıt • %{{ option.pct }}</div>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width: {{ option.pct }}%;"></div></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="row g-3">
+            {% for text in row.text_answers %}
+            <div class="col-lg-6">
+              <div class="soft-item text-answer">{{ text }}</div>
+            </div>
+            {% else %}
+            <div class="col-12"><div class="cw-empty"><i class="fa-solid fa-comment-slash"></i><strong>Metin yanıtı bulunmuyor</strong><span>Bu soru için henüz örnek yanıt oluşmadı.</span></div></div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12"><div class="cw-empty"><i class="fa-solid fa-chart-simple"></i><strong>Gösterilecek veri bulunmuyor</strong><span>Önce bir anket seçerek sonuç görünümünü açın.</span></div></div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="share-modal" id="surveyShareModal" hidden>
+  <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="surveyShareTitle">
+    <div class="share-dialog-head">
+      <div>
+        <h3 class="share-dialog-title" id="surveyShareTitle">Anket paylaşımı</h3>
+        <p class="share-dialog-sub">Bağlantıyı kopyalayabilir veya paylaşım uygulamalarıyla gönderebilirsiniz.</p>
+      </div>
+      <button type="button" class="cw-btn cw-btn-ghost" data-share-close><i class="fa-solid fa-xmark"></i>Kapat</button>
+    </div>
+    <div class="share-link-row">
+      <input type="text" id="surveyShareUrl" readonly>
+      <button type="button" class="cw-btn cw-btn-primary" id="surveyShareCopyBtn"><i class="fa-solid fa-copy"></i>Kopyala</button>
+    </div>
+    <div class="share-actions-row">
+      <a class="cw-btn cw-btn-ghost" id="surveyShareMailBtn" href="#"><i class="fa-solid fa-envelope"></i>E-posta</a>
+      <a class="cw-btn cw-btn-ghost" id="surveyShareWhatsappBtn" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+      <button type="button" class="cw-btn cw-btn-ghost" id="surveyShareNativeBtn" hidden><i class="fa-solid fa-arrow-up-from-bracket"></i>Paylaş</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/survey_formbricks_overlay.js') }}"></script><script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script><script src="{{ url_for('static', filename='js/survey_share_tools.js', v='20260417_sharefix') }}"></script>
+{% endblock %}

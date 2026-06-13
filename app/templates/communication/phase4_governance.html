@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Yönetişim Merkezi{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="mb-1">Yönetişim Merkezi</h2>
+      <div class="text-muted">İnceleme bekleyen rapor ve karar kayıtları</div>
+    </div>
+    <span class="badge bg-danger fs-6">Bekleyen: {{ payload.pending_count }}</span>
+  </div>
+  <div class="card shadow-sm"><div class="card-body table-responsive">
+    <table class="table table-sm align-middle">
+      <thead><tr><th>Tür</th><th>Hedef</th><th>Karar</th><th>Talep Eden</th><th>İnceleyen</th><th>Oluşturma</th><th>İnceleme</th><th>Not</th><th>İşlem</th></tr></thead>
+      <tbody>
+      {% for row in payload.rows %}
+        <tr>
+          <td>{{ row.review_type }}</td>
+          <td>
+            #{{ row.target_id }}
+            {% if row.review_type == 'report' %}
+              <div><a class="small" href="{{ url_for('main.communication_phase4_report_detail', report_id=row.target_id) }}">Raporu aç</a></div>
+            {% endif %}
+          </td>
+          <td>{{ row.decision }}</td>
+          <td>{{ row.requested_by }}</td>
+          <td>{{ row.reviewed_by }}</td>
+          <td>{{ row.created_at }}</td>
+          <td>{{ row.reviewed_at or '-' }}</td>
+          <td>{{ row.review_note }}</td>
+          <td>
+            <form method="post" action="{{ url_for('main.communication_phase4_governance_decide', review_id=row.id) }}" class="d-flex gap-1">
+              <select name="decision" class="form-select form-select-sm">
+                <option value="approved">Onayla</option>
+                <option value="revision">Revizyon</option>
+                <option value="rejected">Reddet</option>
+              </select>
+              <input type="text" name="note" class="form-control form-control-sm" placeholder="Not">
+              <button class="btn btn-sm btn-outline-danger">Kaydet</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="9" class="text-muted">İncelenecek kayıt bulunamadı.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div>
+</div>
+{% endblock %}

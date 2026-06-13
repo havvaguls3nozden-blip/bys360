@@ -1,0 +1,539 @@
+
+{# BYS360_PHASE4_4_TEMPLATE_GUARD_NOTE
+   3. amir ekran blokları phase4_4_show_third_col koşuluyla yönetilir.
+   3. amir yoksa boş sütun/kart/form alanı gösterilmez.
+#}
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_FLAG #}
+{% set phase4_4_show_third_col = phase4_4_show_third_col|default(show_third_supervisor_column|default(third_supervisor_show_column|default(has_third_supervisor|default(false)))) %}
+{% from "_management_workspace_macros.html" import management_workspace_header %}
+{% from "_premium_workspace_macros.html" import premium_action_shell %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Performans Raporları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Performans Raporları{% endblock %}
+{% block page_subtitle %}
+Performans değerlendirme sonuçlarını dönem, durum ve yayın bilgisine göre filtreleyebilir; Excel veya PDF çıktısı alabilirsiniz.
+{% endblock %}
+
+{% block content %}
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .report-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .glass-card{
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .filter-card{
+        padding:22px;
+    }
+
+    .filter-grid{
+        display:grid;
+        grid-template-columns:2fr 1fr auto auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        min-width:0;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-group select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        outline:none;
+        font:inherit;
+        color:#111827;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.excel{
+        background:linear-gradient(180deg,#166534,#14532d);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(22,101,52,.16);
+    }
+
+    .btn-soft.pdf{
+        background:linear-gradient(180deg,#1f3f8f,#173574);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(29,78,216,.16);
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:88px;
+        height:88px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:2rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .table-card{
+        padding:22px;
+    }
+
+    .section-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:16px;
+    }
+
+    .section-title{
+        margin:0;
+        color:#111827;
+        font-size:1.08rem;
+        font-weight:900;
+    }
+
+    .section-sub{
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.7;
+    }
+
+    .count-chip{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:36px;
+        padding:0 14px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.82rem;
+        font-weight:900;
+        border:1px solid rgba(139,0,0,.10);
+    }
+
+    .table-wrap{
+        width:100%;
+        overflow-x:auto;
+        border-radius:18px;
+    }
+
+    table{
+        width:100%;
+        min-width:1220px;
+        border-collapse:collapse;
+        background:#fff;
+        border-radius:18px;
+        overflow:hidden;
+    }
+
+    th, td{
+        padding:14px 12px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        text-align:left;
+        vertical-align:middle;
+        white-space:nowrap;
+    }
+
+    th{
+        background:rgba(248,250,252,.96);
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:900;
+        text-transform:uppercase;
+        letter-spacing:.35px;
+    }
+
+    td{
+        color:#111827;
+        font-size:.9rem;
+    }
+
+    tbody tr:hover{
+        background:rgba(139,0,0,.02);
+    }
+
+    .person-name{
+        font-weight:900;
+        color:#111827;
+        line-height:1.4;
+    }
+
+    .person-sub{
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.6;
+        white-space:normal;
+    }
+
+    .score-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:68px;
+        min-height:34px;
+        padding:0 10px;
+        border-radius:12px;
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        font-size:.86rem;
+        font-weight:900;
+        box-shadow:0 8px 18px rgba(139,0,0,.14);
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.76rem;
+        font-weight:900;
+        white-space:nowrap;
+    }
+
+    .pill.pending{
+        background:rgba(146,64,14,.10);
+        color:#92400e;
+    }
+
+    .pill.partial{
+        background:rgba(29,78,216,.10);
+        color:#1d4ed8;
+    }
+
+    .pill.done{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .pill.published{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .pill.unpublished{
+        background:rgba(107,114,128,.12);
+        color:#374151;
+    }
+
+    .empty-card{
+        padding:34px 24px;
+        text-align:center;
+    }
+
+    .empty-icon{
+        width:70px;
+        height:70px;
+        margin:0 auto 14px;
+        border-radius:22px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:1.45rem;
+    }
+
+    .empty-title{
+        margin:0 0 8px;
+        font-size:1.04rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .empty-text{
+        margin:0;
+        color:#6b7280;
+        line-height:1.8;
+        font-size:.94rem;
+    }
+
+    @media (max-width:1200px){
+        .filter-grid{
+            grid-template-columns:1fr 1fr;
+        }
+
+        .stats-grid{
+            grid-template-columns:repeat(2,minmax(0,1fr));
+        }
+    }
+
+    @media (max-width:700px){
+        .filter-grid,
+        .stats-grid{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+{% set selected_period = request.args.get('period_id', '') %}
+{% set selected_status = request.args.get('status', '') %}
+
+{% set total_count = evaluations|length if evaluations else 0 %}
+{% set completed_count = evaluations|selectattr('status', 'equalto', 'tamamlandi')|list|length if evaluations else 0 %}
+{% set partial_count = evaluations|selectattr('status', 'equalto', 'kismen_tamamlandi')|list|length if evaluations else 0 %}
+{% set published_count = evaluations|selectattr('is_published_to_employee', 'equalto', true)|list|length if evaluations else 0 %}
+
+<div class="report-shell">
+    {{ management_workspace_header(
+        title='Performans raporları çalışma alanı',
+        text='Dönem, durum ve yayın filtresiyle performans sonuçlarını aynı ekranda izleyin. Excel ve PDF çıktıları da aynı ritimde durduğu için rapor alma akışı kesilmez.',
+        icon='fa-solid fa-chart-column',
+        kicker='Performans analizi çalışma alanı',
+        badges=[
+            {'text':'1-5 → 100 ölçek', 'icon':'fa-solid fa-gauge-high', 'tone':'soft-red'},
+            {'text':'Excel ve PDF dışa aktarım', 'icon':'fa-solid fa-file-export', 'tone':'soft-blue'},
+            {'text':'Yayın durumu görünür', 'icon':'fa-solid fa-bullhorn', 'tone':'soft-green'}
+        ],
+        side_title='Mustafa Bey hassasiyeti',
+        side_text='Sonuçlar yayımlanmadan personele açılmamalı ve yöneticiler karşılaştırmalı görünümü rahat okuyabilmeli. Bu ekranı özellikle rapor alma ve kontrol ritmine göre toparladım.',
+        metric_cards=[
+            {'label':'Toplam Kayıt', 'value': total_count, 'icon':'fa-solid fa-table-list'},
+            {'label':'Tamamlanan', 'value': completed_count, 'icon':'fa-solid fa-circle-check', 'tone':'success'},
+            {'label':'Kısmi Tamamlanan', 'value': partial_count, 'icon':'fa-solid fa-hourglass-half', 'tone':'warning'},
+            {'label':'Yayımlanan', 'value': published_count, 'icon':'fa-solid fa-bullhorn'}
+        ]
+    ) }}
+
+    {% call premium_action_shell(title='Filtre ve dışa aktarım', text='Filtrele, temizle ve dışa aktar aksiyonları aynı kabukta. Böylece rapor ekranı diğer kurumsal çalışma alanlarıyla aynı elden çıkmış gibi davranır.', icon='fa-solid fa-sliders') %}
+        <form method="get">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="period_id">Dönem</label>
+                    <select name="period_id" id="period_id">
+                        <option value="">Tüm dönemler</option>
+                        {% for period in periods or [] %}
+                            <option value="{{ period.id }}" {% if selected_period|string == period.id|string %}selected{% endif %}>
+                                {{ period.title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Durum</label>
+                    <select name="status" id="status">
+                        <option value="">Tüm durumlar</option>
+                        <option value="bekliyor" {% if selected_status == 'bekliyor' %}selected{% endif %}>Bekliyor</option>
+                        <option value="kismen_tamamlandi" {% if selected_status == 'kismen_tamamlandi' %}selected{% endif %}>Kısmen Tamamlandı</option>
+                        <option value="tamamlandi" {% if selected_status == 'tamamlandi' %}selected{% endif %}>Tamamlandı</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrele
+                </button>
+
+                <a href="{{ url_for('main.performance_reports') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Temizle
+                </a>
+
+                <a href="{{ url_for('main.performance_reports_export_excel', period_id=request.args.get('period_id', ''), status=request.args.get('status', '')) }}"
+                   class="btn-soft excel">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Excel Dışa Aktar
+                </a>
+
+                <a href="{{ url_for('main.performance_reports_print', period_id=request.args.get('period_id', ''), status=request.args.get('status', '')) }}"
+                   class="btn-soft pdf">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    PDF / Yazdır
+                </a>
+            </div>
+        </form>
+    {% endcall %}
+
+    {% call list_workspace_panel(title='Performans sonuç listesi', text='Filtrelenen performans kayıtları aşağıda listelenir. Dönem, amir katkısı, nihai puan ve yayın durumu aynı tabloda kalır.', badge=total_count ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-clipboard-check', note='Bu tabloyu özellikle yönetici kontrol ritmine göre sakin bıraktım: önce dönem ve personel, sonra amir katkıları, en sonda sonuç ve yayın durumu.', note_icon='fa-solid fa-ranking-star') %}
+        {% if evaluations %}
+            <div class="table-wrap">
+                {# BYS360_PHASE4_4_PERFORMANCE_REPORTS_COLUMN #}
+                {% if phase4_4_show_third_col %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_START #}
+                {% set phase4_4_show_third_col = phase4_4_should_show_third_supervisor_column(evaluations) %}
+                {% endif %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_END #}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dönem</th>
+                            <th>Personel</th>
+                            <th>Birim</th>
+                            <th>1. Amir</th>
+                            <th>2. Amir</th>
+                            {% if phase4_4_show_third_col %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_START #}
+                            {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}{% if phase4_4_show_third_col %}<th>3. Amir</th>{% endif %}{% endif %} {# BYS360_PHASE4_THIRD_SUPERVISOR_COLUMN_GUARD #}
+                            {% endif %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_END #}
+                            <th>Nihai</th>
+                            <th>Durum</th>
+                            <th>Yayın</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in evaluations %}
+                        <tr>
+                            <td>{{ item.period.title if item.period else '-' }}</td>
+
+                            <td>
+                                <div class="person-name">
+                                    {{ item.employee.ad }} {{ item.employee.soyad if item.employee else '-' }}
+                                </div>
+                                <div class="person-sub">
+                                    Sicil No: {{ item.employee.sicil_no if item.employee and item.employee.sicil_no else '-' }}
+                                </div>
+                            </td>
+
+                            <td>{{ item.employee.birim if item.employee and item.employee.birim else '-' }}</td>
+
+                            <td>{{ item.level_1_total_100 if item.level_1_total_100 is not none else '-' }}</td>
+                            <td>{{ item.level_2_total_100 if item.level_2_total_100 is not none else '-' }}</td>
+                            {% if phase4_4_show_third_col %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_START #}
+                            {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}{% if phase4_4_show_third_col %}<td>{{ item.level_3_total_100 if item.level_3_total_100 is not none else '-' }}</td>{% endif %}{% endif %}
+                            {% endif %} {# BYS360_PHASE4_4_THIRD_SUPERVISOR_COLUMN_CONDITIONAL_END #}
+
+                            <td>
+                                <span class="score-badge">
+                                    {{ item.report_final_score if item.report_final_score is defined else (item.final_total_100 if item.final_total_100 is not none else '-') }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if item.status == 'tamamlandi' %}
+                                    <span class="pill done">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Tamamlandı
+                                    </span>
+                                {% elif item.status == 'kismen_tamamlandi' %}
+                                    <span class="pill partial">
+                                        <i class="fa-solid fa-hourglass-half"></i>
+                                        Kısmi
+                                    </span>
+                                {% else %}
+                                    <span class="pill pending">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Bekliyor
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.is_published_to_employee %}
+                                    <span class="pill published">
+                                        <i class="fa-solid fa-eye"></i>
+                                        Yayında
+                                    </span>
+                                {% else %}
+                                    <span class="pill unpublished">
+                                        <i class="fa-solid fa-eye-slash"></i>
+                                        Kapalı
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="glass-card empty-card" style="box-shadow:none;border-style:dashed;">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-file-circle-xmark"></i>
+                </div>
+                <h3 class="empty-title">Kayıt bulunamadı</h3>
+                <p class="empty-text">
+                    Seçilen filtrelere uygun performans kaydı bulunmamaktadır.
+                </p>
+            </div>
+        {% endif %}
+    {% endcall %}
+</div>
+{% endblock %}
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+
+{% block title %}Yazdırılabilir Performans Raporu - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yazdırılabilir Performans Raporu{% endblock %}
+{% block page_subtitle %}Bu ekran tarayıcıdan PDF olarak kaydedilebilir veya yazdırılabilir.{% endblock %}
+
+{% block content %}
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+<style>
+    .print-shell{display:grid;gap:16px}
+    .print-card{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:24px;padding:22px;box-shadow:0 18px 36px rgba(15,23,42,.08)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border:none;border-radius:12px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.86rem;background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .meta-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+    .meta-box{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;padding:14px}
+    .meta-label{color:#6b7280;font-size:.79rem;font-weight:800;margin-bottom:8px}
+    .meta-value{color:#111827;font-size:.92rem;font-weight:900;line-height:1.6}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;min-width:980px;border-collapse:collapse}
+    th,td{padding:12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+    th{background:#f8fafc;color:#6b7280;font-size:.82rem;text-transform:uppercase}
+    .empty-box{padding:24px;border:1px dashed rgba(15,23,42,.12);border-radius:18px;background:#f8fafc;color:#6b7280;text-align:center;line-height:1.8}
+    @media (max-width:1100px){.meta-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:700px){.meta-grid{grid-template-columns:1fr}}
+    @media print{
+        .toolbar, .topbar, .sidebar{display:none !important;}
+        .main{margin-left:0 !important;width:100% !important;}
+        .page-header{box-shadow:none;border:1px solid #ddd;}
+        .print-card{box-shadow:none;border:1px solid #ddd;}
+    }
+</style>
+
+<div class="print-shell">
+    <div class="print-card">
+        <div class="toolbar">
+            <button onclick="window.print()" class="btn-soft">
+                <i class="fa-solid fa-print"></i>
+                Yazdır / PDF Kaydet
+            </button>
+            <a href="{{ url_for('main.performance_reports', period_id=selected_period_id, q=q, scope=selected_scope_mode, status=selected_status) }}" class="btn-soft secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Raporlara Dön
+            </a>
+        </div>
+    </div>
+
+    <div class="print-card">
+        <div class="meta-grid">
+            <div class="meta-box"><div class="meta-label">Kapsam</div><div class="meta-value">{{ filter_summary.scope_label }}</div></div>
+            <div class="meta-box"><div class="meta-label">Dönem</div><div class="meta-value">{{ filter_summary.period_title }}</div></div>
+            <div class="meta-box"><div class="meta-label">Arama</div><div class="meta-value">{{ filter_summary.query_text }}</div></div>
+            <div class="meta-box"><div class="meta-label">Durum</div><div class="meta-value">{{ filter_summary.status }}</div></div>
+            <div class="meta-box"><div class="meta-label">Kayıt Sayısı</div><div class="meta-value">{{ filter_summary.row_count }}</div></div>
+        </div>
+        <p style="margin:14px 0 0;color:#6b7280;line-height:1.8;">{{ filter_summary.scope_description }}</p>
+    </div>
+
+    <div class="print-card">
+        {% if evaluations %}
+        <div class="table-wrap">
+            {# BYS360_PHASE4_4_PRINT_REPORTS_COLUMN #}
+{% set phase4_4_show_third_col = phase4_4_should_show_third_supervisor_column(evaluations if evaluations is defined else []) %}
+<table>
+                <thead>
+                    <tr>
+                        <th>Dönem</th>
+                        <th>Personel</th>
+                        <th>Sicil No</th>
+                        <th>Birim</th>
+                        <th>1. Amir</th>
+                        <th>2. Amir</th>
+                        {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}{% if phase4_4_show_third_col %}<th>3. Amir</th>{% endif %}{% endif %} {# BYS360_PHASE4_THIRD_SUPERVISOR_COLUMN_GUARD #}
+                        <th>Nihai</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in evaluations %}
+                    <tr>
+                        <td>{{ item.period.title if item.period else '-' }}</td>
+                        <td>{{ item.employee.full_name if item.employee and item.employee.full_name else ((item.employee.ad if item.employee else '') ~ ' ' ~ (item.employee.soyad if item.employee else ''))|trim or '-' }}</td>
+                        <td>{{ item.employee.sicil_no if item.employee and item.employee.sicil_no else '-' }}</td>
+                        <td>{{ item.employee.birim if item.employee and item.employee.birim else '-' }}</td>
+                        <td>{{ '%.2f'|format(item.level_1_total_100 or 0) }}</td>
+                        <td>{{ '%.2f'|format(item.level_2_total_100 or 0) }}</td>
+                        {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}<td>{{ '%.2f'|format(item.level_3_total_100 or 0) }}</td>{% endif %}
+                        <td><strong>{{ '%.2f'|format(item.report_final_score if item.report_final_score is defined else (item.final_total_100 or 0)) }}</strong></td>
+                        <td>{{ item.status or '-'|phase5_4_status_label }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-box">Seçili filtreye uygun yazdırılabilir kayıt bulunamadı.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

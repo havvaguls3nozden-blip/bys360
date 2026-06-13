@@ -1,0 +1,837 @@
+{% extends "base.html" %}
+
+{% block title %}Görevlerim - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Görevlerim{% endblock %}
+{% block page_subtitle %}
+Birim seçerek ilgili personelin değerlendirme görevlerini görüntüleyebilir, personel bazında toplu şekilde inceleyebilir ve uygun amir formuna geçebilirsiniz.
+{% endblock %}
+{% block body_class %}page-performance-tasks{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz2_performance_mobile.css') }}">
+{% endblock %}
+
+{% block content %}
+<style>
+    .tasks-shell{display:grid;gap:18px}
+
+    .glass-card{
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{padding:22px;}
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.95rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .section-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:16px;
+    }
+
+    .section-title{
+        margin:0;
+        color:#111827;
+        font-size:1.08rem;
+        font-weight:900;
+    }
+
+    .section-sub{
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.7;
+    }
+
+    .count-chip{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:36px;
+        padding:0 14px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.82rem;
+        font-weight:900;
+        border:1px solid rgba(139,0,0,.10);
+    }
+
+    .toolbar-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr 1fr auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .search-wrap{
+        position:relative;
+    }
+
+    .search-wrap i{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#8B0000;
+        font-size:.9rem;
+    }
+
+    .search-wrap .form-input{
+        padding-left:40px;
+    }
+
+    .action-bar{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px);}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.small{
+        min-height:40px;
+        padding:0 14px;
+        font-size:.86rem;
+    }
+
+    .unit-summary{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:12px;
+        margin-top:12px;
+    }
+
+    .unit-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .unit-box-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .unit-box-value{
+        color:#111827;
+        font-size:1.05rem;
+        font-weight:900;
+        line-height:1.4;
+    }
+
+    .task-list{
+        display:grid;
+        gap:14px;
+    }
+
+    .employee-card{
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:22px;
+        padding:20px;
+        transition:all .18s ease;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .employee-card.state-danger{
+        border-color:rgba(220,38,38,.18);
+        box-shadow:0 16px 30px rgba(220,38,38,.08);
+    }
+
+    .employee-card.state-warning{
+        border-color:rgba(180,83,9,.18);
+        box-shadow:0 16px 30px rgba(180,83,9,.08);
+    }
+
+    .employee-card.state-success{
+        border-color:rgba(22,101,52,.18);
+        box-shadow:0 16px 30px rgba(22,101,52,.08);
+    }
+
+    .employee-card.state-neutral{
+        border-color:rgba(15,23,42,.08);
+    }
+
+    .alert-strip{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        border-radius:16px;
+        padding:12px 14px;
+        margin-bottom:14px;
+        font-size:.88rem;
+        font-weight:800;
+    }
+
+    .alert-strip.danger{
+        background:rgba(220,38,38,.08);
+        color:#b91c1c;
+        border:1px solid rgba(220,38,38,.12);
+    }
+
+    .alert-strip.warning{
+        background:rgba(180,83,9,.08);
+        color:#92400e;
+        border:1px solid rgba(180,83,9,.12);
+    }
+
+    .alert-strip.success{
+        background:rgba(22,101,52,.08);
+        color:#166534;
+        border:1px solid rgba(22,101,52,.12);
+    }
+
+    .alert-strip.neutral{
+        background:#f8fafc;
+        color:#475569;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .employee-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:14px;
+        margin-bottom:14px;
+        flex-wrap:wrap;
+    }
+
+    .employee-title{
+        color:#111827;
+        font-size:1.02rem;
+        font-weight:900;
+        line-height:1.45;
+    }
+
+    .employee-sub{
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.7;
+        margin-top:4px;
+    }
+
+    .employee-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:12px;
+        margin-bottom:14px;
+    }
+
+    .mini-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .mini-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .mini-value{
+        color:#111827;
+        font-size:.95rem;
+        font-weight:900;
+        line-height:1.5;
+    }
+
+    .progress-card{
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        border-radius:18px;
+        padding:14px;
+        margin-bottom:14px;
+    }
+
+    .progress-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        margin-bottom:10px;
+        flex-wrap:wrap;
+    }
+
+    .progress-title{
+        color:#374151;
+        font-size:.9rem;
+        font-weight:900;
+    }
+
+    .progress-value{
+        color:#8B0000;
+        font-size:1rem;
+        font-weight:900;
+    }
+
+    .progress-bar{
+        width:100%;
+        height:10px;
+        border-radius:999px;
+        background:#eceff3;
+        overflow:hidden;
+    }
+
+    .progress-fill{
+        height:100%;
+        border-radius:999px;
+        background:linear-gradient(90deg,#8B0000,#b91c1c);
+    }
+
+    .progress-note{
+        margin-top:10px;
+        color:#6b7280;
+        font-size:.82rem;
+        line-height:1.6;
+    }
+
+    .coverage-panel{
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        border-radius:18px;
+        padding:14px;
+        margin-bottom:14px;
+    }
+
+    .coverage-panel.delegated{background:rgba(239,246,255,.94);border-color:rgba(29,78,216,.14)}
+    .coverage-panel.uncovered{background:rgba(255,247,237,.96);border-color:rgba(180,83,9,.18)}
+    .coverage-panel.direct{background:#f8fafc}
+    .coverage-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .coverage-title{font-size:.9rem;font-weight:900;color:#111827}
+    .coverage-chip{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:800}
+    .coverage-chip.delegated{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .coverage-chip.uncovered{background:rgba(180,83,9,.10);color:#92400e}
+    .coverage-chip.direct{background:rgba(107,114,128,.12);color:#374151}
+    .coverage-list{display:grid;gap:8px}
+    .coverage-note{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.06);font-size:.84rem;line-height:1.6;color:#475569}
+    .assignment-callout{margin-top:8px;padding:10px 12px;border-radius:14px;font-size:.83rem;line-height:1.6;border:1px solid rgba(15,23,42,.06)}
+    .assignment-callout.delegated{background:rgba(239,246,255,.96);border-color:rgba(29,78,216,.12);color:#1d4ed8}
+    .assignment-callout.uncovered{background:rgba(255,247,237,.96);border-color:rgba(180,83,9,.16);color:#9a3412}
+
+    .assignment-stack{
+        display:grid;
+        gap:12px;
+    }
+
+    .assignment-row{
+        display:grid;
+        grid-template-columns:180px 1fr auto;
+        gap:12px;
+        align-items:center;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:18px;
+        padding:14px;
+        background:linear-gradient(180deg, rgba(248,250,252,.85), #fff);
+    }
+
+    .assignment-level{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .assignment-meta{
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.7;
+    }
+
+    .assignment-actions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.pending{background:rgba(29,78,216,.10);color:#1d4ed8;}
+    .pill.partial{background:rgba(180,83,9,.10);color:#92400e;}
+    .pill.done{background:rgba(22,101,52,.10);color:#166534;}
+    .pill.level1{background:rgba(139,0,0,.10);color:#8B0000;}
+    .pill.level2{background:rgba(29,78,216,.10);color:#1d4ed8;}
+    .pill.level3{background:rgba(107,114,128,.12);color:#374151;}
+
+    .empty-box{
+        padding:24px;
+        border-radius:18px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        color:#6b7280;
+        text-align:center;
+        line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .toolbar-grid{grid-template-columns:1fr 1fr;}
+        .employee-grid{grid-template-columns:1fr 1fr;}
+        .unit-summary{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .assignment-row{grid-template-columns:1fr; align-items:flex-start;}
+        .assignment-actions{justify-content:flex-start;}
+    }
+
+    @media (max-width:700px){
+        .stats-grid,
+        .toolbar-grid,
+        .employee-grid,
+        .unit-summary{grid-template-columns:1fr;}
+        .employee-head{flex-direction:column;}
+    }
+</style>
+
+<div class="tasks-shell">
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Toplam Görev</div>
+            <div class="stat-value">{{ total_count or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Bekleyen</div>
+            <div class="stat-value">{{ pending_count or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Kısmen Tamamlanan</div>
+            <div class="stat-value">{{ partial_count or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Tamamlanan</div>
+            <div class="stat-value">{{ completed_count or 0 }}</div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Canlı kapsama görünümü</h3>
+                <div class="section-sub">Hangi görevlerin vekâletle yürüdüğü ve hangi kartlarda kapsama riski olduğu burada özetlenir.</div>
+            </div>
+            <div class="count-chip">Vekâlet: {{ delegated_assignment_count or 0 }} · Açıkta: {{ uncovered_assignment_count or 0 }}</div>
+        </div>
+        <div class="unit-summary" style="margin-top:0;">
+            <div class="unit-box">
+                <div class="unit-box-label">Doğrudan Yürüyen</div>
+                <div class="unit-box-value">{{ (total_count or 0) - (delegated_assignment_count or 0) - (uncovered_assignment_count or 0) }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Vekâletle Yürüyen</div>
+                <div class="unit-box-value">{{ delegated_assignment_count or 0 }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Açıkta Kalan</div>
+                <div class="unit-box-value">{{ uncovered_assignment_count or 0 }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Personel Kartı</div>
+                <div class="unit-box-value">{{ employee_card_count or 0 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Birim Bazlı Filtreleme</h3>
+                <div class="section-sub">
+                    İsterseniz tüm birimleri birlikte görüntüleyin, isterseniz tek birime daraltıp personelleri toplu kartlar halinde değerlendirin.
+                </div>
+            </div>
+            <div class="count-chip">{{ employee_card_count or 0 }} personel</div>
+        </div>
+
+        <form method="GET" action="{{ url_for('main.performance_tasks') }}">
+            <div class="toolbar-grid">
+                <div class="form-group">
+                    <label>Birim</label>
+                    <select name="unit" class="form-select">
+                        {% if unit_options %}
+                            <option value="" {% if not selected_unit %}selected{% endif %}>Tüm Birimler</option>
+                            {% for unit_name in unit_options %}
+                                <option value="{{ unit_name }}" {% if selected_unit == unit_name %}selected{% endif %}>
+                                    {{ unit_name }}
+                                </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">Birim bulunamadı</option>
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Seçili Kapsamda Arama</label>
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-input"
+                            value="{{ q or '' }}"
+                            placeholder="Örn: Erdem Salgın, uzman, 1003">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Durum</label>
+                    <select name="status" class="form-select">
+                        <option value="" {% if not selected_status %}selected{% endif %}>Tüm Görevler</option>
+                        <option value="bekliyor" {% if selected_status == 'bekliyor' %}selected{% endif %}>Bekliyor</option>
+                        <option value="kismen_tamamlandi" {% if selected_status == 'kismen_tamamlandi' %}selected{% endif %}>Kısmen Tamamlandı</option>
+                        <option value="tamamlandi" {% if selected_status == 'tamamlandi' %}selected{% endif %}>Tamamlandı</option>
+                    </select>
+                </div>
+
+                <div class="action-bar">
+                    <button type="submit" class="btn-soft primary">
+                        <i class="fa-solid fa-filter"></i>
+                        Uygula
+                    </button>
+                    <a href="{{ url_for('main.performance_tasks') }}" class="btn-soft secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Temizle
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        {% if unit_options %}
+        <div class="unit-summary">
+            <div class="unit-box">
+                <div class="unit-box-label">Seçili Kapsam</div>
+                <div class="unit-box-value">{{ selected_unit or "Tüm Birimler" }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Kapsamdaki Toplam Görev</div>
+                <div class="unit-box-value">{{ unit_total_count or 0 }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Bekleyen / Kısmi</div>
+                <div class="unit-box-value">{{ unit_pending_count or 0 }} / {{ unit_partial_count or 0 }}</div>
+            </div>
+            <div class="unit-box">
+                <div class="unit-box-label">Tamamlanan</div>
+                <div class="unit-box-value">{{ unit_completed_count or 0 }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Değerlendirme Görev Listesi</h3>
+                <div class="section-sub">
+                    {% if selected_unit %}
+                        {{ selected_unit }} birimine ait personeller tek kart halinde listeleniyor.
+                    {% else %}
+                        Tüm birimlerdeki uygun personeller tek kart halinde listeleniyor.
+                    {% endif %}
+                </div>
+            </div>
+            <div class="count-chip">{{ employee_card_count or 0 }} personel</div>
+        </div>
+
+        {% if employee_cards %}
+            <div class="task-list">
+                {% for card in employee_cards %}
+                    {% set employee = card.employee %}
+                    <div class="employee-card state-{{ card.summary_class }}">
+                        <div class="alert-strip {{ card.summary_class }}">
+                            <span>{{ card.summary_label }}</span>
+                            <span>%{{ card.progress_percent }}</span>
+                        </div>
+
+                        <div class="employee-head">
+                            <div>
+                                <div class="employee-title">{{ employee.full_name }}</div>
+                                <div class="employee-sub">
+                                    Sicil No: {{ employee.sicil_no or '-' }}
+                                </div>
+                            </div>
+
+                            <div>
+                                {% if card.summary_class == 'danger' %}
+                                    <span class="pill pending"><i class="fa-regular fa-clock"></i> Öncelikli</span>
+                                {% elif card.summary_class == 'warning' %}
+                                    <span class="pill partial"><i class="fa-solid fa-bars-progress"></i> Takip</span>
+                                {% elif card.summary_class == 'success' %}
+                                    <span class="pill done"><i class="fa-solid fa-check"></i> Tamam</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="employee-grid">
+                            <div class="mini-box">
+                                <div class="mini-label">Unvan</div>
+                                <div class="mini-value">{{ employee.unvan or '-' }}</div>
+                            </div>
+
+                            <div class="mini-box">
+                                <div class="mini-label">Birim</div>
+                                <div class="mini-value">{{ employee.birim or '-' }}</div>
+                            </div>
+
+                            <div class="mini-box">
+                                <div class="mini-label">Üst Birim</div>
+                                <div class="mini-value">{{ employee.ust_birim or '-' }}</div>
+                            </div>
+
+                            <div class="mini-box">
+                                <div class="mini-label">Son Değerlendirme Tarihi</div>
+                                <div class="mini-value">
+                                    {% if card.last_activity_at %}
+                                        {{ card.last_activity_at.strftime('%d.%m.%Y %H:%M') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="progress-card">
+                            <div class="progress-head">
+                                <div class="progress-title">Tamamlanma Yüzdesi</div>
+                                <div class="progress-value">%{{ card.progress_percent }}</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ card.progress_percent }}%;"></div>
+                            </div>
+                            <div class="progress-note">
+                                Bekleyen: {{ card.pending_count }} |
+                                Kısmi: {{ card.partial_count }} |
+                                Tamamlanan: {{ card.completed_count }}
+                            </div>
+                        </div>
+
+                        <div class="coverage-panel {{ card.coverage_class }}">
+                            <div class="coverage-head">
+                                <div class="coverage-title">Canlı kapsama durumu</div>
+                                <span class="coverage-chip {{ card.coverage_class }}">{{ card.coverage_label }}</span>
+                            </div>
+                            {% if card.coverage_notes %}
+                                <div class="coverage-list">
+                                    {% for note in card.coverage_notes %}
+                                        <div class="coverage-note">{{ note }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="assignment-stack">
+                            {% for assignment in card.assignments %}
+                                <div class="assignment-row">
+                                    <div class="assignment-level">
+                                        {% if assignment.manager_level == 1 %}
+                                            <span class="pill level1"><i class="fa-solid fa-user-tie"></i> 1. Amir</span>
+                                        {% elif assignment.manager_level == 2 %}
+                                            <span class="pill level2"><i class="fa-solid fa-user-tie"></i> 2. Amir</span>
+                                        {% else %}
+                                            <span class="pill level3"><i class="fa-solid fa-user-tie"></i> 3. Amir</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="assignment-meta">
+                                        Dönem: <strong>{{ assignment.period.title if assignment.period else '-' }}</strong><br>
+                                        {% if assignment.assignment_source == 'delegated' and assignment.original_evaluator %}
+                                            <div class="assignment-callout delegated">
+                                                <strong>Vekâlet devrede:</strong> {{ assignment.original_evaluator.full_name }} yerine <strong>{{ assignment.evaluator.full_name if assignment.evaluator else '-' }}</strong> görevde.
+                                                {% if assignment.coverage_note %}<br>{{ assignment.coverage_note }}{% endif %}
+                                            </div>
+                                        {% elif assignment.assignment_source == 'uncovered' %}
+                                            <div class="assignment-callout uncovered">
+                                                <strong>Kapsama sorunu:</strong> {{ assignment.coverage_note or 'Asıl amir müsait değil ve aktif vekâlet bulunamadı.' }}
+                                            </div>
+                                        {% endif %}
+                                        Durum:
+                                        {% if assignment.status == 'bekliyor' %}
+                                            <span class="pill pending">Bekliyor</span>
+                                        {% elif assignment.status == 'kismen_tamamlandi' %}
+                                            <span class="pill partial">Kısmen Tamamlandı</span>
+                                        {% elif assignment.status == 'tamamlandi' %}
+                                            <span class="pill done">Tamamlandı</span>
+                                        {% else %}
+                                            <span class="pill">{{ assignment.status }}</span>
+                                        {% endif %}
+                                        <br>
+                                        İş Akışı:
+                                        <span class="pill workflow-{{ assignment.workflow_badge_class|default('neutral') }}">{{ assignment.workflow_label|default('1. amirde taslak') }}</span>
+                                        {% if assignment.due_date %}
+                                            <br>
+                                            Son Tarih:
+                                            <strong>{{ assignment.due_date.strftime('%d.%m.%Y %H:%M') }}</strong>
+                                            {% if assignment.is_overdue %}
+                                                <span class="pill pending">Gecikti</span>
+                                            {% elif assignment.is_due_soon %}
+                                                <span class="pill partial">Yaklaşıyor</span>
+                                            {% else %}
+                                                <span class="pill done">Takvimde</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="assignment-actions">
+                                        <a href="{{ url_for('main.performance_v2_phase4_assignment', assignment_id=assignment.id) }}"
+                                           class="btn-soft primary small">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                            {% if assignment.manager_level == 1 %}
+                                                1. Amir Formu
+                                            {% elif assignment.manager_level == 2 %}
+                                                2. Amir Formu
+                                            {% else %}
+                                                3. Amir Formu
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-box">
+                {% if unit_options %}
+                    Seçilen birim ve filtrelere uygun personel görevi bulunamadı.
+                {% else %}
+                    Üzerinize atanmış görev bulunmuyor.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/faz2_performance_mobile.js') }}"></script>
+{% endblock %}

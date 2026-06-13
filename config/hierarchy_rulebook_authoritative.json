@@ -1,0 +1,23 @@
+{
+  "notes": [
+    "Bu kural seti kullanicinin son netlestirdigi amir zinciri mesajina gore hazirlanmistir.",
+    "Baskan puanlanmaz.",
+    "3. amir sabit unvan degil, secilen aktif personeldir.",
+    "3. amir modu defaultta yorumcu olabilir; mevcut secili kisi varsa korunur."
+  ],
+  "special_units_single_president": [
+    "DANIŞMANLIK",
+    "OZEL KALEM",
+    "ÖZEL KALEM",
+    "İÇ DENETİM",
+    "IC DENETIM"
+  ],
+  "hukuk_unit_names": [
+    "HUKUK MÜŞAVİRLİĞİ",
+    "HUKUK MUSAVIRLIGI"
+  ],
+  "third_manager_modes": [
+    "comment_only",
+    "comment_and_score"
+  ]
+}

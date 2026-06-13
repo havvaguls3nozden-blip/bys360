@@ -1,0 +1,187 @@
+
+/* Faz 4 responsive overlay: survey + support + settings + account */
+
+.faz4-mobile-table-cards{display:none;gap:12px;margin-top:16px}
+.faz4-mobile-record-card{background:rgba(255,255,255,.96);border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.06)}
+.faz4-mobile-record-card__head{display:grid;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(15,23,42,.08);margin-bottom:10px}
+.faz4-mobile-record-card__title{font-size:.98rem;font-weight:900;color:#111827;line-height:1.55}
+.faz4-mobile-record-card__meta{font-size:.8rem;color:#6b7280;line-height:1.6}
+.faz4-mobile-record-card__body{display:grid;gap:10px}
+.faz4-mobile-field{display:grid;gap:6px}
+.faz4-mobile-field__label{font-size:.75rem;font-weight:900;color:#8B0000;text-transform:uppercase;letter-spacing:.04em}
+.faz4-mobile-field__value{font-size:.88rem;color:#374151;line-height:1.7;word-break:break-word}
+.faz4-mobile-field__value .action-row,
+.faz4-mobile-field__value .actions,
+.faz4-mobile-field__value .toolbar,
+.faz4-mobile-field__value .selection-actions{display:grid;gap:8px}
+.faz4-mobile-field__value .mini-btn,
+.faz4-mobile-field__value .btn,
+.faz4-mobile-field__value .btn-soft,
+.faz4-mobile-field__value .support-btn{width:100%;justify-content:center}
+
+@media (max-width: 991.98px){
+  .settings-shell,
+  .security-setup-shell,
+  .credential-shell{grid-template-columns:1fr !important}
+
+  .left-card,
+  .security-side,
+  .credential-side{position:static !important; top:auto !important}
+
+  .settings-hero,
+  .hero-account,
+  .photo-grid,
+  .quick-grid,
+  .info-grid,
+  .security-grid,
+  .credential-steps{grid-template-columns:1fr !important}
+
+  .survey-meta-grid,
+  .manager-grid,
+  .support-hero,
+  .hero-grid,
+  .detail-grid,
+  .stream-grid,
+  .module-grid,
+  .card-grid,
+  .stats-grid,
+  .support-grid,
+  .settings-map,
+  .metric-grid,
+  .spotlight-grid,
+  .mix-grid{grid-template-columns:1fr !important}
+
+  .support-shell .toolbar,
+  .support-shell .toolbar form,
+  .search-form,
+  .action-row,
+  .actions,
+  .toolbar-main,
+  .toolbar-secondary,
+  .selection-actions,
+  .selection-meta{width:100%}
+
+  .search-form > *,
+  .action-row > *,
+  .actions > *,
+  .toolbar form > *,
+  .toolbar-main > *,
+  .toolbar-secondary > *,
+  .selection-actions > *{flex:1 1 100%; width:100%}
+
+  .search-box,
+  .search-input,
+  .survey-select .field,
+  .survey-select select,
+  .survey-select .cw-btn,
+  .search-form .btn-main,
+  .search-form .btn-soft{width:100% !important; min-width:0 !important}
+
+  .user-list{grid-template-columns:repeat(2,minmax(0,1fr)) !important; max-height:none !important}
+
+  .role-default-table,
+  .matrix-table{display:block; overflow-x:auto; white-space:nowrap}
+}
+
+@media (max-width: 767.98px){
+  .app-content__inner{padding-left:12px !important; padding-right:12px !important}
+
+  .user-list{grid-template-columns:1fr !important}
+
+  .hero-avatar,
+  .photo-preview img{width:104px !important; height:104px !important}
+
+  .hero-account,
+  .photo-grid,
+  .security-setup-shell,
+  .credential-shell{gap:14px !important}
+
+  .panel-card,
+  .card,
+  .form-card,
+  .support-card,
+  .soft-card,
+  .glass-card,
+  .security-panel,
+  .credential-panel{padding:16px !important; border-radius:20px !important}
+
+  .hero-name{font-size:1.3rem !important}
+  .hero-title,
+  .ticket-title{font-size:1.08rem !important}
+  .section-title,
+  .survey-head-title,
+  .summary-title,
+  .credential-form-title,
+  .security-form-title{font-size:1rem !important}
+
+  .search-box input,
+  .search-input,
+  .form-input,
+  .form-select,
+  .field input,
+  .field select,
+  .field textarea,
+  .credential-input,
+  .security-input,
+  .survey-select select{min-height:46px !important}
+
+  .btn-soft,
+  .btn-main,
+  .btn,
+  .support-btn,
+  .mini-btn,
+  .cw-btn{width:100%; justify-content:center}
+
+  .support-tabs,
+  .chip-row,
+  .hero-badges,
+  .meta-row,
+  .badge-row,
+  .meta-pills,
+  .question-nav{display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important}
+
+  .support-tab,
+  .chip,
+  .hero-badge,
+  .meta-pill,
+  .question-jump{width:100%; justify-content:center}
+
+  .metric-card,
+  .spotlight-card,
+  .mix-card,
+  .mini-stat,
+  .summary-box,
+  .status-box,
+  .executive-item,
+  .health-item{padding:14px !important}
+
+  .table-wrap.has-faz4-mobile-cards{display:none !important}
+  .faz4-mobile-table-cards{display:grid}
+
+  .selection-bar{padding:14px !important}
+
+  .mobile-dock{position:sticky; bottom:0; z-index:15; background:rgba(255,255,255,.96); backdrop-filter:blur(10px); border-top:1px solid rgba(15,23,42,.08); margin:18px -16px -16px; padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+  .mobile-dock-actions{display:grid; grid-template-columns:1fr; gap:8px}
+
+  .timeline-top{display:grid !important; gap:4px}
+  .attach-item{display:grid !important; gap:10px}
+
+  .question-nav{grid-template-columns:repeat(4,minmax(0,1fr)) !important}
+  .rating-grid.ten{grid-template-columns:repeat(5,minmax(0,1fr)) !important}
+  .rating-grid{grid-template-columns:repeat(5,minmax(0,1fr)) !important}
+
+  .survey-manage-shell .toolbar,
+  .survey-manage-shell .toolbar-main,
+  .survey-manage-shell .toolbar-secondary,
+  .survey-manage-shell .selection-bar,
+  .survey-manage-shell .selection-meta,
+  .survey-manage-shell .selection-actions{display:grid !important; gap:10px}
+
+  .support-shell .stream-item,
+  .article-item{display:grid !important; gap:10px}
+
+  .role-default-table th,
+  .role-default-table td,
+  .matrix-table th,
+  .matrix-table td{padding:10px 12px !important}
+}

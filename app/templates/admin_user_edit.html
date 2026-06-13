@@ -1,0 +1,611 @@
+{% extends "base.html" %}
+
+{% set person = user_obj if user_obj is defined else None %}
+
+{% block title %}Personel Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Düzenle{% endblock %}
+{% block page_subtitle %}
+Mevcut personel kaydını güncelleyin, organizasyon bilgilerini revize edin ve erişim durumunu yönetin.
+{% endblock %}
+
+{% block content %}
+<style>
+    .person-edit-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .intro-title{
+        font-size:1.08rem;
+        font-weight:900;
+        color:#111827;
+        margin:0 0 8px;
+        line-height:1.35;
+    }
+
+    .intro-sub{
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+        margin:0;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+        line-height:1.5;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.02rem;
+        font-weight:900;
+        line-height:1.45;
+        position:relative;
+        z-index:1;
+        word-break:break-word;
+    }
+
+    .profile-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:18px;
+        flex-wrap:wrap;
+    }
+
+    .profile-main{
+        display:flex;
+        gap:16px;
+        align-items:center;
+        flex-wrap:wrap;
+    }
+
+    .profile-avatar{
+        width:96px;
+        height:96px;
+        border-radius:24px;
+        object-fit:cover;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 24px rgba(15,23,42,.08);
+        flex-shrink:0;
+    }
+
+    .profile-name{
+        color:#111827;
+        font-size:1.08rem;
+        font-weight:900;
+        line-height:1.35;
+        margin:0 0 6px;
+    }
+
+    .profile-sub{
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.75;
+        margin:0;
+    }
+
+    .badge-stack{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .pill.passive{background:rgba(107,114,128,.12);color:#374151}
+    .pill.role{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .pill.unit{background:rgba(180,83,9,.10);color:#92400e}
+
+    .section-title{
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+        margin:0 0 14px;
+        line-height:1.3;
+    }
+
+    .notice-box{
+        border:1px solid rgba(139,0,0,.10);
+        background:rgba(139,0,0,.04);
+        color:#6b7280;
+        border-radius:18px;
+        padding:14px 16px;
+        line-height:1.8;
+        font-size:.86rem;
+    }
+
+    .form-grid{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .field.full{grid-column:1 / -1}
+
+    .field label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-textarea{
+        min-height:120px;
+        resize:vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .hint{
+        color:#6b7280;
+        font-size:.78rem;
+        line-height:1.6;
+    }
+
+    .avatar-box{
+        display:flex;
+        gap:16px;
+        align-items:center;
+        flex-wrap:wrap;
+        padding:14px;
+        border-radius:18px;
+        background:#f8fafc;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .avatar-preview{
+        width:82px;
+        height:82px;
+        border-radius:22px;
+        object-fit:cover;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 10px 20px rgba(15,23,42,.06);
+    }
+
+    .check-row{
+        display:flex;
+        gap:16px;
+        flex-wrap:wrap;
+    }
+
+    .check-item{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        color:#374151;
+        font-size:.9rem;
+        font-weight:700;
+    }
+
+    .btn-line{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+
+    .ai-panel{border:1px solid rgba(139,0,0,.10); background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+
+    @media (max-width:1350px){        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:900px){
+        .form-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:700px){
+        .stats-grid{grid-template-columns:1fr}
+        .btn-soft{width:100%}
+        .btn-line{flex-direction:column-reverse;align-items:stretch}
+    }
+</style>
+
+{% set current_photo = avatar_url if avatar_url is defined and avatar_url else url_for('static', filename='img/default-avatar.svg') %}
+{% set current_role = current_role if current_role is defined else (person.role if person else '') %}
+{% set current_m1 = manager_1_id if manager_1_id is defined else '' %}
+{% set current_m2 = manager_2_id if manager_2_id is defined else '' %}
+{% set current_m3 = manager_3_id if manager_3_id is defined else '' %}
+
+<div class="person-edit-shell">
+    <div class="glass-card panel-card">
+        <h3 class="intro-title">Personel Düzenleme Merkezi</h3>
+        <p class="intro-sub">
+            Mevcut personelin özlük, rol, amir ve organizasyon bilgilerini tek ekranda güncelleyebilirsiniz.
+            Bu alandaki değişiklikler hiyerarşi, görev ve performans akışlarını doğrudan etkileyebilir.
+        </p>
+    </div>
+
+    {% if person %}
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Personel</div>
+            <div class="stat-value">
+                {% if person.full_name %}
+                    {{ person.full_name }}
+                {% else %}
+                    {{ ((person.ad or '') ~ ' ' ~ (person.soyad or ''))|trim }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Sicil No</div>
+            <div class="stat-value">{{ person.sicil_no or '-' }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Birim</div>
+            <div class="stat-value">{{ person.birim or '-' }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Rol</div>
+            <div class="stat-value">{{ person.role or '-' }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        <div class="profile-head">
+            <div class="profile-main">
+                <img src="{{ current_photo }}"
+                     class="profile-avatar"
+                     id="profileMainPreview"
+                     alt="Profil"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+
+                <div>
+                    <h3 class="profile-name">
+                        {% if person and person.full_name %}
+                            {{ person.full_name }}
+                        {% elif person %}
+                            {{ ((person.ad or '') ~ ' ' ~ (person.soyad or ''))|trim }}
+                        {% else %}
+                            Personel Kaydı
+                        {% endif %}
+                    </h3>
+                    <p class="profile-sub">
+                        {% if person %}
+                            {% if person.sicil_no %}Sicil No: {{ person.sicil_no }}{% endif %}
+                            {% if person.unvan %}<br>{{ person.unvan }}{% endif %}
+                            {% if person.email %}<br>{{ person.email }}{% endif %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {% if person %}
+            <div class="badge-stack">
+                <span class="pill {% if person.is_active %}active{% else %}passive{% endif %}">
+                    {% if person.is_active %}Aktif{% else %}Pasif{% endif %}
+                </span>
+                <span class="pill role">{{ person.role or '-' }}</span>
+                <span class="pill unit">{{ person.birim or '-' }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="notice-box">
+            Amir alanları, performans zinciri ve görev üretim akışlarında kullanılır.
+            Birim ve üst birim değişiklikleri yapılırken kurumsal hiyerarşi dikkate alınmalıdır.
+        </div>
+    </div>
+
+    
+    {% if ai_user_form_panel %}
+    <div class="glass-card panel-card ai-panel">
+        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_user_form_panel.badge or 'AI form özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_user_form_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_user_form_panel.summary }}</p>
+        <ul class="ai-bullets">
+            {% for item in ai_user_form_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        <div class="ai-actions">
+            {% for row in ai_user_form_panel.actions or [] %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
+    <form method="POST" enctype="multipart/form-data" class="glass-card panel-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <h4 class="section-title">Temel Bilgiler</h4>
+        <div class="form-grid">
+            <div class="field">
+                <label for="ad">Ad</label>
+                <input id="ad" name="ad" class="form-input" value="{{ request.form.get('ad', person.ad if person else '') }}" required>
+            </div>
+
+            <div class="field">
+                <label for="soyad">Soyad</label>
+                <input id="soyad" name="soyad" class="form-input" value="{{ request.form.get('soyad', person.soyad if person else '') }}" required>
+            </div>
+
+            <div class="field">
+                <label for="sicil_no">Sicil No</label>
+                <input id="sicil_no" name="sicil_no" class="form-input" value="{{ request.form.get('sicil_no', person.sicil_no if person else '') }}" required>
+            </div>
+
+            <div class="field">
+                <label for="email">E-Posta</label>
+                <input id="email" name="email" type="email" class="form-input" value="{{ request.form.get('email', person.email if person else '') }}">
+            </div>
+
+            <div class="field">
+                <label for="unvan">Unvan</label>
+                <input id="unvan" name="unvan" class="form-input" value="{{ request.form.get('unvan', person.unvan if person else '') }}" required>
+            </div>
+
+            <div class="field">
+                            <div class="form-field" data-bys360-marker="BYS360_PHASE2_ADMIN_USER_EDIT_CATEGORY_FIELD">
+                <label for="personnel_category">Personel Kategorisi</label>
+                <select id="personnel_category" name="personnel_category" class="form-select">
+                    {% set selected_personnel_category = request.form.get('personnel_category', current_personnel_category if current_personnel_category is defined else 'Diğer') %}
+                    {% for category in personnel_category_options or [] %}
+                        <option value="{{ category }}" {% if selected_personnel_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+                <label for="role">Rol</label>
+                <select id="role" name="role" class="form-select">
+                    {% for value, label in role_choices %}
+                        <option value="{{ value }}" {% if request.form.get('role', current_role) == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="birim">Birim</label>
+                <input id="birim" name="birim" list="unitNameOptions" class="form-input" value="{{ request.form.get('birim', person.birim if person else '') }}" required>
+                <datalist id="unitNameOptions">
+                    {% for item in unit_name_options %}
+                        <option value="{{ item }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <div class="field">
+                <label for="ust_birim">Üst Birim</label>
+                <input id="ust_birim" name="ust_birim" list="parentUnitOptions" class="form-input" value="{{ request.form.get('ust_birim', person.ust_birim if person else '') }}" required>
+                <datalist id="parentUnitOptions">
+                    {% for item in parent_unit_options %}
+                        <option value="{{ item }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <h4 class="section-title">Amir ve Erişim Bilgileri</h4>
+        <div class="form-grid">
+            <div class="field">
+                <label for="manager_1_id">1. Amir</label>
+                <select id="manager_1_id" name="manager_1_id" class="form-select">
+                    <option value="">Seçiniz</option>
+                    {% for manager in manager_candidates %}
+                        <option value="{{ manager.id }}" {% if request.form.get('manager_1_id', current_m1|string) == manager.id|string %}selected{% endif %}>
+                            {{ (manager.full_name if manager.full_name else ((manager.ad or '') ~ ' ' ~ (manager.soyad or ''))|trim) }}{% if manager.unvan %} - {{ manager.unvan }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="manager_2_id">2. Amir</label>
+                <select id="manager_2_id" name="manager_2_id" class="form-select">
+                    <option value="">Seçiniz</option>
+                    {% for manager in manager_candidates %}
+                        <option value="{{ manager.id }}" {% if request.form.get('manager_2_id', current_m2|string) == manager.id|string %}selected{% endif %}>
+                            {{ (manager.full_name if manager.full_name else ((manager.ad or '') ~ ' ' ~ (manager.soyad or ''))|trim) }}{% if manager.unvan %} - {{ manager.unvan }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="manager_3_id">3. Amir</label>
+                <select id="manager_3_id" name="manager_3_id" class="form-select">
+                    <option value="">Seçiniz</option>
+                    {% for manager in manager_candidates %}
+                        <option value="{{ manager.id }}" {% if request.form.get('manager_3_id', current_m3|string) == manager.id|string %}selected{% endif %}>
+                            {{ (manager.full_name if manager.full_name else ((manager.ad or '') ~ ' ' ~ (manager.soyad or ''))|trim) }}{% if manager.unvan %} - {{ manager.unvan }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Durum</label>
+                <div class="check-row">
+                    <label class="check-item">
+                        <input type="checkbox" name="is_active" value="1" {% if request.form.get('is_active', '1' if person and person.is_active else '0') == '1' %}checked{% endif %}>
+                        Aktif personel
+                    </label>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label>Profil Fotoğrafı</label>
+                <div class="avatar-box">
+                    <img src="{{ current_photo }}"
+                         class="avatar-preview"
+                         id="avatarPreview"
+                         alt="Önizleme"
+                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+
+                    <div style="flex:1; min-width:220px;">
+                        <input type="file" name="profile_photo" id="profile_photo" class="form-input" accept="image/*">
+                        <div class="hint" style="margin-top:6px;">Yeni fotoğraf seçilirse mevcut profil görseli güncellenir.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="height:20px"></div>
+
+        <div class="btn-line">
+            <a href="{{ url_for('main.admin_users') }}" class="btn-soft secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Listeye Dön
+            </a>
+
+            <button type="submit" class="btn-soft primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Değişiklikleri Kaydet
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const photoInput = document.getElementById("profile_photo");
+    const avatarPreview = document.getElementById("avatarPreview");
+    const profileMainPreview = document.getElementById("profileMainPreview");
+
+    if (photoInput && avatarPreview) {
+        photoInput.addEventListener("change", function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatarPreview.src = e.target.result;
+                if (profileMainPreview) {
+                    profileMainPreview.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+})();
+</script>
+{% endblock %}

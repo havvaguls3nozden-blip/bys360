@@ -1,0 +1,115 @@
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_TEMPLATE #}
+<style>
+:root {
+  --phase5-cr: #8B0000;
+  --phase5-ink: #0f172a;
+  --phase5-muted: #64748b;
+  --phase5-edge: rgba(15,23,42,.10);
+  --phase5-soft: rgba(139,0,0,.07);
+}
+.bys360-phase5-scorecard {
+  display: grid;
+  gap: 16px;
+  max-width: 1560px;
+  margin: 0 auto 40px;
+}
+.bys360-phase5-score-hero {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.bys360-phase5-score-box {
+  border: 1px solid rgba(139,0,0,.16);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(139,0,0,.08), rgba(255,255,255,.98));
+  padding: 22px;
+  box-shadow: 0 16px 42px rgba(15,23,42,.06);
+}
+.bys360-phase5-score-value {
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  line-height: .95;
+  letter-spacing: -.06em;
+  color: var(--phase5-cr);
+  font-weight: 950;
+}
+.bys360-phase5-score-label {
+  margin-top: 8px;
+  color: var(--phase5-muted);
+  font-size: .85rem;
+  font-weight: 850;
+}
+.bys360-phase5-card {
+  border: 1px solid var(--phase5-edge);
+  border-radius: 22px;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 14px 34px rgba(15,23,42,.055);
+  padding: 18px;
+}
+.bys360-phase5-card-title {
+  color: var(--phase5-ink);
+  font-size: 1rem;
+  font-weight: 950;
+  margin: 0 0 8px;
+}
+.bys360-phase5-card-text {
+  color: var(--phase5-muted);
+  line-height: 1.65;
+  font-size: .9rem;
+}
+.bys360-phase5-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
+  gap: 12px;
+}
+.bys360-phase5-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--phase5-edge);
+  border-radius: 18px;
+  background: #fff;
+}
+.bys360-phase5-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+.bys360-phase5-table th,
+.bys360-phase5-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(15,23,42,.07);
+  text-align: left;
+  vertical-align: top;
+  font-size: .86rem;
+}
+.bys360-phase5-table th {
+  color: #334155;
+  background: rgba(248,250,252,.95);
+  font-weight: 900;
+}
+.bys360-phase5-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: .76rem;
+  font-weight: 900;
+  background: var(--phase5-soft);
+  color: var(--phase5-cr);
+}
+.bys360-phase5-muted {
+  color: var(--phase5-muted);
+}
+.bys360-phase5-technical-hidden {
+  display: none !important;
+}
+@media (max-width: 900px) {
+  .bys360-phase5-score-hero {
+    grid-template-columns: 1fr;
+  }
+  .bys360-phase5-card {
+    padding: 15px;
+    border-radius: 18px;
+  }
+}
+</style>

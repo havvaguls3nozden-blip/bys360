@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Aktarım Ön İzleme - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Aktarım Ön İzleme{% endblock %}
+{% block page_subtitle %}
+Excel dosyasından çözümlenen satırları kontrol edin; doğrulanan kayıtları tek tıkla sisteme işleyin.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Aktarım Ön İzleme', text='Yüklenen partiyi satır seviyesinde inceleyin, uyarıları görün ve sadece güvenli verileri sisteme işleyin.', icon='fa-solid fa-table-list') }}
+  {{ nav(active='import') }}
+  
+<style>
+  .detail-shell{display:grid;gap:18px}
+  .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+  .panel-card{padding:22px;position:relative;z-index:1}
+  .summary-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+  .summary-card{padding:18px;border-radius:20px;border:1px solid rgba(15,23,42,.08);background:#fff}
+  .summary-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px}
+  .summary-value{color:#111827;font-size:1.2rem;font-weight:900}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .panel-title{margin:0;font-size:1rem;font-weight:900;color:#111827}
+  .panel-sub{margin:4px 0 0;color:#6b7280;font-size:.88rem;line-height:1.75}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+  .btn-soft:hover{transform:translateY(-1px)}
+  .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+  .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+  .table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:1500px}
+  th,td{padding:15px 14px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+  th{font-size:.8rem;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;font-weight:900;background:rgba(248,250,252,.92)}
+  td{font-size:.92rem;color:#111827}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:.8rem;font-weight:800}
+  .badge.ok{background:rgba(22,101,52,.10);color:#166534}
+  .badge.error{background:rgba(153,27,27,.10);color:#991b1b}
+  .badge.preview{background:rgba(180,83,9,.10);color:#92400e}
+  .badge.info{background:rgba(37,99,235,.10);color:#1d4ed8}
+  .mono{font-family:Consolas, Monaco, monospace;font-size:.84rem}
+  .error-box{padding:10px 12px;border-radius:12px;background:#fff7f7;color:#7f1d1d;border:1px solid rgba(220,38,38,.14);line-height:1.7}
+  .warn-box{padding:10px 12px;border-radius:12px;background:#fffaf0;color:#92400e;border:1px solid rgba(245,158,11,.16);line-height:1.7}
+  .muted{color:#6b7280;font-size:.84rem;line-height:1.7}
+  .note-box{padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#475569;line-height:1.8}
+  @media (max-width:1200px){.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:720px){.summary-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="detail-shell">
+  <div class="glass-card panel-card">
+    <div class="panel-head">
+      <div>
+        <h3 class="panel-title">Parti #{{ batch.id }}</h3>
+        <p class="panel-sub">
+          Dönem: <strong>{{ batch.period.title if batch.period else '-' }}</strong> · Dosya: <strong>{{ batch.file_name or '-' }}</strong>
+        </p>
+      </div>
+      <div class="btn-row">
+        <a href="{{ url_for('main.performance_history_import') }}" class="btn-soft secondary">
+          <i class="fa-solid fa-arrow-left"></i>
+          Geri Dön
+        </a>
+        {% if batch.status != 'tamamlandi' %}
+        <form method="POST" action="{{ url_for('main.performance_history_import_commit', batch_id=batch.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-soft primary">
+            <i class="fa-solid fa-database"></i>
+            Geçmiş Sonuçları Sisteme İşle
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card"><div class="summary-label">Durum</div><div class="summary-value">{{ batch.status }}</div></div>
+      <div class="summary-card"><div class="summary-label">Toplam Satır</div><div class="summary-value">{{ preview_summary.total or batch.row_count or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Hazır</div><div class="summary-value">{{ preview_summary.ready or batch.success_count or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Hatalı</div><div class="summary-value">{{ preview_summary.errored or batch.error_count or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Uyarılı</div><div class="summary-value">{{ preview_summary.warned or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Veri Etiketi</div><div class="summary-value" style="font-size:1rem;">{{ history_source_label }}</div></div>
+    </div>
+
+    {% if batch.notes %}
+    <div class="note-box" style="margin-top:16px;">
+      <strong>Özet Not:</strong> {{ batch.notes }}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="glass-card panel-card">
+    <div class="panel-head">
+      <div>
+        <h3 class="panel-title">Satır Ön İzleme</h3>
+        <p class="panel-sub">Hatalı satırları düzeltip dosyayı tekrar yükleyebilir veya uygun satırları doğrudan içeri alabilirsiniz.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Satır</th>
+            <th>Durum</th>
+            <th>Etiket</th>
+            <th>Sicil No</th>
+            <th>Personel</th>
+            <th>Birim</th>
+            <th>Eşleşme</th>
+            <th>Uyarılar</th>
+            <th>Hata</th>
+            <th>Ham Veri</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          {% set meta = row.raw_payload_json.get('_history_meta', {}) if row.raw_payload_json else {} %}
+          <tr>
+            <td>#{{ row.row_no }}</td>
+            <td>
+              {% if row.status == 'tamamlandi' %}
+                <span class="badge ok"><i class="fa-solid fa-circle-check"></i> Tamamlandı</span>
+              {% elif row.status == 'hata' %}
+                <span class="badge error"><i class="fa-solid fa-triangle-exclamation"></i> Hata</span>
+              {% else %}
+                <span class="badge preview"><i class="fa-solid fa-eye"></i> {{ row.status }}</span>
+              {% endif %}
+            </td>
+            <td><span class="badge info">{{ meta.get('history_data_label', history_source_label) }}</span></td>
+            <td class="mono">{{ row.sicil_no or '-' }}</td>
+            <td>{{ row.employee_name_raw or '-' }}</td>
+            <td>
+              {{ row.birim_raw or '-' }}
+              {% if row.ust_birim_raw %}
+              <div class="muted">{{ row.ust_birim_raw }}</div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="muted">Personel: {{ meta.get('resolved_employee_name') or 'eşleşmedi' }}</div>
+              <div class="muted">Birim: {{ meta.get('resolved_unit_name') or 'eşleşmedi' }}</div>
+              {% if meta.get('existing_live_snapshot') %}
+              <div class="warn-box" style="margin-top:8px;">Canlı sonuç var; commit sırasında bloklanır.</div>
+              {% endif %}
+            </td>
+            <td>
+              {% set warnings = meta.get('validation_warnings', []) %}
+              {% if warnings %}
+                <div class="warn-box">{{ warnings|join('; ') }}</div>
+              {% else %}
+                <span class="muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if row.error_message %}
+                <div class="error-box">{{ row.error_message }}</div>
+              {% else %}
+                <span class="muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <details>
+                <summary class="mono">Veriyi göster</summary>
+                <pre class="mono" style="white-space:pre-wrap;max-width:440px;">{{ row.raw_payload_json | tojson(indent=2) }}</pre>
+              </details>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

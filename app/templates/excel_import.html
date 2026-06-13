@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Excel İçe Aktar - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Excel ile Toplu Personel Yükleme{% endblock %}
+{% block page_subtitle %}Excel dosyası üzerinden personel kayıtlarını sisteme toplu olarak ekleyin veya güncelleyin.{% endblock %}
+
+{% block content %}
+<style>
+    .import-shell{
+        display:grid;
+        grid-template-columns:360px 1fr;
+        gap:18px;
+        align-items:start;
+    }
+    .card{
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        padding:22px;
+    }
+    .side-card{
+        background:linear-gradient(180deg, rgba(139,0,0,.96), rgba(101,0,0,.94));
+        color:#fff;
+        position:sticky;
+        top:96px;
+        overflow:hidden;
+    }
+    .side-card::after{
+        content:"";
+        position:absolute;
+        right:-34px;
+        bottom:-34px;
+        width:130px;
+        height:130px;
+        border-radius:50%;
+        background:rgba(255,255,255,.07);
+    }
+    .icon-box{
+        width:96px;
+        height:96px;
+        border-radius:24px;
+        background:rgba(255,255,255,.12);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:2rem;
+        margin-bottom:16px;
+        position:relative;
+        z-index:1;
+    }
+    .section-title{
+        margin:0 0 8px;
+        font-size:1.08rem;
+        font-weight:900;
+        line-height:1.4;
+        color:#8B0000;
+    }
+    .side-card .section-title{color:#fff; position:relative; z-index:1;}
+    .section-text{
+        margin:0 0 16px;
+        color:#6b7280;
+        line-height:1.8;
+        font-size:.95rem;
+    }
+    .side-card .section-text{color:rgba(255,255,255,.88); position:relative; z-index:1;}
+    .info-list{
+        display:grid;
+        gap:12px;
+        position:relative;
+        z-index:1;
+    }
+    .info-item{
+        padding:14px 16px;
+        border-radius:18px;
+        background:rgba(255,255,255,.10);
+        border:1px solid rgba(255,255,255,.12);
+        line-height:1.75;
+        font-size:.9rem;
+    }
+    .form-grid{
+        display:grid;
+        gap:16px;
+    }
+    .upload-box{
+        border:2px dashed rgba(139,0,0,.18);
+        background:linear-gradient(180deg, rgba(139,0,0,.03), rgba(139,0,0,.01));
+        border-radius:22px;
+        padding:28px;
+        text-align:center;
+    }
+    .upload-icon{
+        width:74px;
+        height:74px;
+        border-radius:20px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.7rem;
+        margin-bottom:14px;
+    }
+    .upload-title{
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+        margin-bottom:8px;
+    }
+    .upload-sub{
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.8;
+        margin-bottom:16px;
+    }
+    .file-input{
+        width:100%;
+        min-height:50px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:12px 14px;
+        font-size:.95rem;
+        color:#111827;
+    }
+    .hint-box{
+        padding:16px 18px;
+        border-radius:18px;
+        background:rgba(139,0,0,.04);
+        border:1px solid rgba(139,0,0,.08);
+        color:#7c2d12;
+        line-height:1.8;
+        font-size:.9rem;
+    }
+    .error-box{
+        padding:16px 18px;
+        border-radius:18px;
+        background:rgba(254,242,242,.9);
+        border:1px solid rgba(239,68,68,.12);
+        color:#991b1b;
+    }
+    .error-box ul{
+        margin:10px 0 0;
+        padding-left:18px;
+    }
+    .toolbar{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.92rem;
+    }
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .ai-panel{margin-bottom:16px;padding:18px;border-radius:18px;border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+
+    @media (max-width:1100px){        .import-shell{grid-template-columns:1fr}
+        .side-card{position:relative; top:auto}
+    }
+
+    .row-fix-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    .row-fix-item{border:1px solid rgba(15,23,42,.08);border-radius:16px;background:#fff;padding:14px 16px;display:grid;gap:8px}
+    .row-fix-top{display:grid;gap:6px}
+    .row-fix-badge{display:inline-flex;width:max-content;align-items:center;justify-content:center;min-height:24px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.10);color:#8B0000;font-size:.74rem;font-weight:900}
+    .row-fix-item strong{font-size:.92rem;color:#111827;line-height:1.5}
+    .row-fix-item p{margin:0;color:#6b7280;font-size:.88rem;line-height:1.75}
+</style>
+
+<div class="import-shell">
+    <div class="card side-card">
+        <div class="icon-box">
+            <i class="fa-solid fa-file-excel"></i>
+        </div>
+
+        <h3 class="section-title">Toplu Personel Yükleme</h3>
+        <p class="section-text">
+            Excel dosyası üzerinden personel kayıtlarını sisteme toplu şekilde ekleyebilir veya mevcut kayıtları güncelleyebilirsiniz.
+        </p>
+
+        <div class="info-list">
+            <div class="info-item">
+                <strong>Yeni Kayıt</strong><br>
+                Sistemde olmayan sicil numaraları yeni personel olarak eklenir.
+            </div>
+            <div class="info-item">
+                <strong>Güncelleme</strong><br>
+                Var olan sicil numaraları ilgili kayıtları günceller.
+            </div>
+            <div class="info-item">
+                <strong>Başlangıç Şifresi</strong><br>
+                Yeni eklenen kullanıcılar için varsayılan ilk giriş şifresi uygulanır.
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="section-title">Excel Dosyası Yükle</h3>
+        <p class="section-text">
+            Şablona uygun Excel dosyasını seçin ve sisteme yükleyin.
+        </p>
+
+        {% if ai_excel_fix_panel %}
+        <div class="ai-panel">
+            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_excel_fix_panel.badge or 'AI düzeltme ön izlemi' }}</div>
+            <h4 class="ai-headline">{{ ai_excel_fix_panel.headline }}</h4>
+            <p class="ai-summary">{{ ai_excel_fix_panel.summary }}</p>
+            <ul class="ai-bullets">
+                {% for item in ai_excel_fix_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+            <div class="ai-actions">
+                {% for row in ai_excel_fix_panel.actions or [] %}
+                    <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+                {% endfor %}
+            </div>
+            {% if ai_excel_fix_panel.autofix_preview %}
+            <div class="ai-actions">
+                {% for row in ai_excel_fix_panel.autofix_preview %}
+                    <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if ai_excel_fix_panel.row_fix_cards %}
+            <div class="row-fix-grid">
+                {% for row in ai_excel_fix_panel.row_fix_cards %}
+                <div class="row-fix-item">
+                    <div class="row-fix-top">
+                        <span class="row-fix-badge">Satır {{ row.row }}</span>
+                        <strong>{{ row.issue }}</strong>
+                    </div>
+                    <p>{{ row.suggestion }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="quick_apply_ai" id="quick_apply_ai" value="0">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-grid">
+                <div class="upload-box">
+                    <div class="upload-icon">
+                        <i class="fa-solid fa-upload"></i>
+                    </div>
+                    <div class="upload-title">Excel Dosyanızı Seçin</div>
+                    <div class="upload-sub">
+                        Desteklenen formatlar: <strong>.xlsx</strong> <br>
+                        Şablon başlıkları sistemde beklenen alanlarla uyumlu olmalıdır.
+                    </div>
+
+                    <input type="file" name="excel_file" class="file-input" accept=".xlsx" required>
+                </div>
+
+                <div class="hint-box">
+                    Beklenen başlıklar: <strong>sicil_no, ad, soyad, email, unvan, role, birim, ust_birim, yonetici_sicil, ikinci_yonetici_sicil, ucuncu_yonetici_sicil, kategori, is_active</strong>
+                </div>
+
+
+                <div class="hint-box" data-bys360-marker="BYS360_PHASE2_3_IMPORT_CATEGORY_HINT">
+                    <strong>Kategori alanı:</strong> Excel dosyasında <strong>Kategori</strong> başlığı kullanılabilir. Desteklenen varsayılan değerler: Güvenlik, Temizlik, İdari Personel, Teknik Personel, Deneme Süreli Personel, Diğer.
+                </div>
+
+                <label class="check-item" style="margin-top:-4px;display:inline-flex;align-items:center;gap:10px;">
+                    <input type="checkbox" name="apply_ai_fixes" value="1" {% if apply_ai_fixes %}checked{% endif %}>
+                    AI önerilen otomatik düzeltmeleri uygula
+                </label>
+
+                {% if errors %}
+                    <div class="error-box">
+                        <strong>Yükleme sırasında hatalar oluştu:</strong>
+                        <ul>
+                            {% for err in errors %}
+                                <li>{{ err }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="toolbar">
+                    <button type="submit" class="btn-soft secondary" onclick="document.getElementById('quick_apply_ai').value='1';">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        AI düzeltmeleriyle yükle
+                    </button>
+                    <button type="submit" class="btn-soft primary" onclick="document.getElementById('quick_apply_ai').value='0';">
+                        <i class="fa-solid fa-file-import"></i>
+                        İçe Aktar
+                    </button>
+
+                    <a href="{{ url_for('main.admin_users') }}" class="btn-soft secondary">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Personel Yönetimine Dön
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

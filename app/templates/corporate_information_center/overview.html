@@ -1,0 +1,103 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='overview' %}
+{# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_10_STATUS_PILL_FIX #}
+{% macro status_pill(status, label=None) -%}
+ {% set _status = (status|string|lower) if status is not none else 'ok' %}
+ {% set _label = label if label is not none else (status if status is not none else 'Hazır') %}
+ {% if _status in ['ok', 'success', 'successful', 'ready', 'healthy', 'active', 'passed', 'complete', 'completed', 'sent', 'hazır', 'tamam', 'basarili', 'başarılı'] %}
+ <span class="cic-badge ok"><i class="fa-solid fa-circle-check"></i> {{ _label }}</span>
+ {% elif _status in ['warning', 'warn', 'pending', 'waiting', 'risk', 'attention', 'review', 'uyari', 'uyarı', 'bekliyor', 'kontrol'] %}
+ <span class="cic-badge warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ _label }}</span>
+ {% elif _status in ['danger', 'error', 'failed', 'fail', 'missing', 'critical', 'blocked', 'inactive', 'hata', 'hatali', 'hatalı', 'eksik', 'kritik'] %}
+ <span class="cic-badge danger"><i class="fa-solid fa-circle-xmark"></i> {{ _label }}</span>
+ {% else %}
+ <span class="cic-badge neutral"><i class="fa-solid fa-circle-info"></i> {{ _label }}</span>
+ {% endif %}
+{%- endmacro %}
+
+{% block cic_content %}
+<!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL -->
+<div class="cic-grid-v4">
+ <div class="cic-card-v4 cic-stat-card span-3"><div class="cic-stat-top"><div><div class="cic-stat-label">Hazırlık puanı</div><div class="cic-stat-number">{{ phase5.readiness.score }}</div></div><div class="cic-stat-icon"><i class="fa-solid fa-shield-halved"></i></div></div><p class="cic-muted-v4">{{ phase5.readiness.label }}</p></div>
+ <div class="cic-card-v4 cic-stat-card span-3"><div class="cic-stat-top"><div><div class="cic-stat-label">Başarı oranı</div><div class="cic-stat-number">%{{ phase5.metrics.success_rate }}</div></div><div class="cic-stat-icon"><i class="fa-solid fa-chart-line"></i></div></div><p class="cic-muted-v4">Son {{ phase5.metrics.total }} log kaydı üzerinden hesaplandı.</p></div>
+ <div class="cic-card-v4 cic-stat-card span-3"><div class="cic-stat-top"><div><div class="cic-stat-label">Gerçek gönderim</div><div class="cic-stat-number">{{ phase5.metrics.real_send }}</div></div><div class="cic-stat-icon"><i class="fa-solid fa-paper-plane"></i></div></div><p class="cic-muted-v4">Ön kontrol dışındaki gönderim kayıtları.</p></div>
+ <div class="cic-card-v4 cic-stat-card span-3"><div class="cic-stat-top"><div><div class="cic-stat-label">Ön kontrol</div><div class="cic-stat-number">{{ phase5.metrics.dry_run }}</div></div><div class="cic-stat-icon"><i class="fa-solid fa-vial-circle-check"></i></div></div><p class="cic-muted-v4">Gönderim öncesi kontrol kayıtları.</p></div>
+
+ 
+ <!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY -->
+ 
+ <!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_LIVE_RELEASE_USAGE -->
+ <section class="cic-card-v4 span-12 cic-phase7-release">
+ <div class="cic-card-header">
+ <div><h2>Canlı Geçiş ve Kullanım Hazırlığı</h2><p class="cic-muted-v4">Kontrol 7 ile modül, gönderimden canlı kullanıma kadar kontrollü release akışına alınır.</p></div>
+ <span class="cic-status-pill ok"><i class="fa-solid fa-lock"></i> Release kilidi aktif</span>
+ </div>
+ <div class="cic-phase7-release-grid">
+ <div class="cic-phase7-release-card"><i class="fa-solid fa-vial-circle-check"></i><strong>Önce ön kontrol</strong><span>Gerçek gönderimden önce test sonucu ve alıcı özeti incelenir.</span></div>
+ <div class="cic-phase7-release-card"><i class="fa-solid fa-users-viewfinder"></i><strong> gönderim</strong><span>İlk canlı deneme küçük ve kontrollü alıcı grubuyla yapılır.</span></div>
+ <div class="cic-phase7-release-card"><i class="fa-solid fa-clipboard-list"></i><strong>Log kontrolü</strong><span>Başarılı, hatalı ve atlanan kayıtlar gönderim sonrası doğrulanır.</span></div>
+ <div class="cic-phase7-release-card"><i class="fa-solid fa-rotate-left"></i><strong>Geri dönüş planı</strong><span>Beklenmeyen durumda template/CSS yedekleriyle hızlı geri dönüş yapılır.</span></div>
+ </div>
+ </section>
+
+<section class="cic-card-v4 span-12 cic-phase6-command">
+ <div class="cic-card-header">
+ <div><h2>Final UAT ve Canlı Hazırlık Paneli</h2><p class="cic-muted-v4">Ön kontrol, alıcı, şablon, mail altyapısı, denetim izi ve kullanıcı dostu hata dili tek kapıda doğrulanır.</p></div>
+ { status_pill(phase6.live.status, phase6.live.label) }
+ </div>
+ <div class="cic-phase6-score-row">
+ <div class="cic-phase6-score"><strong>{{ phase6.uat_score }}</strong><span>UAT puanı</span></div>
+ <div class="cic-phase6-score"><strong>{{ phase6.passed_count }}/{{ phase6.total_count }}</strong><span>Geçen senaryo</span></div>
+ <div class="cic-phase6-score"><strong>{{ phase6.live.score }}</strong><span>Canlı hazırlık</span></div>
+ <div class="cic-phase6-score"><strong>{{ phase6.blockers|length }}</strong><span>Kritik uyarı</span></div>
+ </div>
+ <div class="cic-phase6-blockers">
+ {% if phase6.blockers %}
+ {% for b in phase6.blockers[:4] %}<span class="cic-status-pill danger"><i class="fa-solid fa-triangle-exclamation"></i> {{ b }}</span>{% endfor %}
+ {% else %}
+ <span class="cic-status-pill ok"><i class="fa-solid fa-circle-check"></i> Kritik engel görünmüyor</span>
+ {% endif %}
+ <a class="cic-btn-v4 secondary" href="/dashboard/kurumsal-bilgilendirme/sistem#uat"><i class="fa-solid fa-list-check"></i> Senaryoları İncele</a>
+ </div>
+ </section>
+
+ <section class="cic-card-v4 span-8">
+ <div class="cic-card-header"><div><h2>Yönetici Kontrol Paneli</h2><p class="cic-muted-v4">Gönderim öncesi hazırlık, mail altyapısı ve alıcı durumunu tek panelden izleyin.</p></div><a class="cic-btn-v4 secondary" href="/dashboard/kurumsal-bilgilendirme/test"><i class="fa-solid fa-play"></i> Önizlemeye Git</a></div>
+ <div class="cic-phase5-checklist">
+ {% for item in phase5.readiness.checks %}
+ <div class="cic-phase5-check {{ 'is-ok' if item.ok else 'is-warn' }}"><i class="fa-solid {{ 'fa-circle-check' if item.ok else 'fa-triangle-exclamation' }}"></i><div><strong>{{ item.title }}</strong><span>{{ item.detail }}</span></div><em>{{ item.weight }} puan</em></div>
+ {% endfor %}
+ </div>
+ </section>
+
+ <aside class="cic-card-v4 span-4">
+ <div class="cic-card-header"><div><h2>Mail Altyapısı</h2><p class="cic-muted-v4">Gerçek gönderim öncesi temel sağlık kontrolü.</p></div>{{ status_pill(phase5.mail_health.status, phase5.mail_health.label) }}</div>
+ <div class="cic-phase5-health-list">
+ <div><span>Mail sunucusu</span><b>{{ 'Tanımlı' if phase5.mail_health.server_defined else 'Eksik' }}</b></div>
+ <div><span>Gönderici adresi</span><b>{{ 'Tanımlı' if phase5.mail_health.sender_defined else 'Eksik' }}</b></div>
+ <div><span>Mail servisi</span><b>{{ 'Yüklü' if phase5.mail_health.service_loaded else 'Yüklenemedi' }}</b></div>
+ <div><span>Gönderim durumu</span><b>{{ 'Bastırılmış' if phase5.mail_health.suppressed else 'Açık' }}</b></div>
+ </div>
+ {% if phase5.mail_health.problems %}<div class="cic-warning-box"><strong>Kontrol gerekli:</strong><br>{{ phase5.mail_health.problems|join('<br>')|safe }}</div>{% else %}<div class="cic-help-v4"><strong>Hazır:</strong> Mail altyapısı gerçek gönderim için uygun görünüyor.</div>{% endif %}
+ </aside>
+
+ <section class="cic-card-v4 span-12">
+ <div class="cic-card-header"><div><h2>Görev Bazlı Gönderim Ön İzleme</h2><p class="cic-muted-v4">Her görevin alıcı grubu, alıcı sayısı, plan saati ve risk seviyesi.</p></div><a class="cic-btn-v4 secondary" href="/dashboard/kurumsal-bilgilendirme/gorevler"><i class="fa-solid fa-gear"></i> Görevleri Yönet</a></div>
+ <div class="cic-table-wrap"><table class="cic-table-v4"><thead><tr><th>Görev</th><th>Durum</th><th>Saat</th><th>Alıcı grubu</th><th>Alıcı</th><th>Risk</th><th>Konu</th></tr></thead><tbody>{% for row in phase5.task_preview %}<tr><td><strong>{{ row.label }}</strong></td><td>{% if row.enabled %}<span class="cic-status-pill ok">Aktif</span>{% else %}<span class="cic-status-pill warn">Pasif</span>{% endif %}</td><td>{{ row.time }}</td><td>{{ 'Yönetici' if row.recipient_group=='managers' else 'Personel' }}</td><td>{{ row.recipient_count }}</td><td><span class="cic-status-pill {{ 'danger' if row.risk=='Yüksek' else ('warn' if row.risk=='Orta' else 'ok') }}">{{ row.risk }}</span></td><td>{{ row.subject }}</td></tr>{% endfor %}</tbody></table></div>
+ </section>
+
+ <section class="cic-card-v4 span-7">
+ <div class="cic-card-header"><div><h2>Son İşlem Özeti</h2><p class="cic-muted-v4">En son ön kontrol veya gerçek gönderim sonucu.</p></div><a class="cic-btn-v4 secondary" href="/dashboard/kurumsal-bilgilendirme/loglar"><i class="fa-solid fa-clock-rotate-left"></i> Loglar</a>
+  <a class="{{ 'active' if active=='celebrations' else '' }}" href="/dashboard/kurumsal-bilgilendirme/kutlamalar"><i class="fa-solid fa-cake-candles"></i><span>Kutlamalar</span></a></div>
+ {% if phase3_last_result %}
+ <div class="cic-phase5-result-grid"><div><span>Görev</span><b>{{ phase3_last_result.task_label }}</b></div><div><span>Alıcı</span><b>{{ phase3_last_result.recipient_count }}</b></div><div><span>Başarılı</span><b>{{ phase3_last_result.success_count }}</b></div><div><span>Hatalı</span><b>{{ phase3_last_result.fail_count }}</b></div></div>
+ <div class="cic-help-v4"><strong>{{ phase3_last_result.message }}</strong><br>{{ phase3_last_result.ran_at }} · {{ phase3_last_result.actor or 'Sistem' }}</div>
+ {% else %}<div class="cic-help-v4">Henüz işlem özeti yok. Önce Önizleme / Test’nde ön kontrol yapın.</div>{% endif %}
+ </section>
+
+ <section class="cic-card-v4 span-5">
+ <div class="cic-card-header"><div><h2>Son Denetim İzleri</h2><p class="cic-muted-v4">Kim, ne zaman, hangi gönderim kontrolünü çalıştırdı?</p></div></div>
+ <div class="cic-phase5-timeline">{% for item in phase5.audit[:6] %}<div><i class="fa-solid {{ 'fa-vial' if item.dry_run else 'fa-paper-plane' }}"></i><p><strong>{{ item.task_label }}</strong><span>{{ item.ran_at }} · {{ item.actor }} · {{ 'Ön kontrol' if item.dry_run else 'Gerçek gönderim' }}</span></p></div>{% else %}<div class="cic-help-v4">Henüz denetim izi oluşmadı.</div>{% endfor %}</div>
+ </section>
+</div>
+{% endblock %}

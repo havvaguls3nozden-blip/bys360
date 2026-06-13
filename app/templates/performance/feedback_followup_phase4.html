@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Eylem Planı Takibi{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Eylem Planı Takibi{% endblock %}
+{% block page_subtitle %}Görüşme sonrası aksiyonların 30 günlük takibi, gecikme uyarısı ve mail log kayıtları bu ekranda izlenir.{% endblock %}
+
+{% block content %}
+<style>
+.bys-fb4{--red:#8B0000;--ink:#111827;--muted:#64748b;--line:rgba(15,23,42,.09);display:grid;gap:18px;max-width:1500px;margin:0 auto;padding:4px 0 34px}.bys-fb4-card{background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.07);padding:20px}.bys-fb4-hero{display:grid;grid-template-columns:minmax(0,1.2fr) 380px;gap:18px;align-items:stretch;background:linear-gradient(135deg,rgba(139,0,0,.07),rgba(255,255,255,.96));border-color:rgba(139,0,0,.13)}.bys-fb4-eyebrow{display:inline-flex;gap:8px;align-items:center;color:var(--red);font-weight:950;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}.bys-fb4-title{margin:8px 0 8px;color:var(--ink);font-size:1.55rem;font-weight:950;line-height:1.24}.bys-fb4-sub{margin:0;color:var(--muted);line-height:1.75}.bys-fb4-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.bys-fb4-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:10px 13px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font-weight:900;cursor:pointer}.bys-fb4-btn.primary{background:var(--red);border-color:var(--red);color:#fff}.bys-fb4-btn.soft{background:rgba(139,0,0,.07);border-color:rgba(139,0,0,.14);color:var(--red)}.bys-fb4-btn.warn{background:rgba(185,28,28,.08);border-color:rgba(185,28,28,.17);color:#991b1b}.bys-fb4-filter{display:grid;gap:12px}.bys-fb4-label{font-size:.75rem;font-weight:950;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.bys-fb4-input,.bys-fb4-select,.bys-fb4-textarea{width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;padding:11px 12px;color:var(--ink);font-weight:800}.bys-fb4-textarea{min-height:74px;resize:vertical;font-weight:700;line-height:1.55}.bys-fb4-stat-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.bys-fb4-stat{border:1px solid var(--line);border-radius:18px;background:#fff;padding:15px}.bys-fb4-stat strong{display:block;color:var(--red);font-size:1.55rem;font-weight:950}.bys-fb4-stat span{display:block;color:var(--muted);font-size:.82rem;font-weight:850;margin-top:5px;line-height:1.45}.bys-fb4-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(340px,.75fr);gap:16px}.bys-fb4-section-title{margin:0;color:var(--ink);font-size:1.08rem;font-weight:950}.bys-fb4-section-sub{margin:5px 0 0;color:var(--muted);line-height:1.6}.bys-fb4-list{display:grid;gap:12px;margin-top:14px}.bys-fb4-item{border:1px solid var(--line);border-radius:20px;background:#fff;padding:15px}.bys-fb4-item.overdue{border-color:rgba(185,28,28,.20);background:linear-gradient(135deg,rgba(254,242,242,.92),#fff)}.bys-fb4-item.upcoming,.bys-fb4-item.today{border-color:rgba(139,0,0,.18);background:linear-gradient(135deg,rgba(139,0,0,.045),#fff)}.bys-fb4-item.closed{opacity:.78}.bys-fb4-item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;color:var(--muted);font-size:.82rem;font-weight:850}.bys-fb4-item h4{margin:8px 0 6px;color:var(--ink);font-weight:950}.bys-fb4-item p{margin:0;color:#374151;line-height:1.65;white-space:pre-line}.bys-fb4-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;background:rgba(15,23,42,.06);color:#334155;font-size:.76rem;font-weight:900;white-space:nowrap}.bys-fb4-pill.red{background:rgba(185,28,28,.09);color:#991b1b}.bys-fb4-pill.maroon{background:rgba(139,0,0,.08);color:var(--red)}.bys-fb4-pill.green{background:rgba(22,101,52,.09);color:#166534}.bys-fb4-form-grid{display:grid;grid-template-columns:170px 1fr;gap:10px;margin-top:12px}.bys-fb4-empty{border:1px dashed rgba(139,0,0,.22);background:rgba(139,0,0,.035);border-radius:18px;padding:16px;color:#7f1d1d;font-weight:850;line-height:1.65}.bys-fb4-small{color:var(--muted);font-size:.82rem;line-height:1.55}.bys-fb4-notice{border-left:4px solid rgba(139,0,0,.55);padding-left:12px}.bys-fb4-warning{border-color:rgba(185,28,28,.20);background:rgba(254,242,242,.96)}@media(max-width:1100px){.bys-fb4-hero,.bys-fb4-grid{grid-template-columns:1fr}.bys-fb4-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.bys-fb4-stat-grid,.bys-fb4-form-grid{grid-template-columns:1fr}.bys-fb4-card{padding:16px}.bys-fb4-title{font-size:1.28rem}.bys-fb4-actions{flex-direction:column}.bys-fb4-btn{width:100%}.bys-fb4-item-top{display:grid}}
+</style>
+
+<div class="bys-fb4" data-bys="feedback-followup-phase4">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    {% if not schema_ready %}
+    <section class="bys-fb4-card bys-fb4-warning">
+        <div class="bys-fb4-eyebrow"><i class="fa-solid fa-triangle-exclamation"></i> Ön Koşul Kontrolü</div>
+        <h2 class="bys-fb4-title">Görüşme sonrası eylem planı tablosu bulunamadı.</h2>
+        <p class="bys-fb4-sub">{{ schema_message or 'Eylem planı takibi için önce Görüşme Sonrası Notlar ekranının kurulmuş olması gerekir.' }}</p>
+    </section>
+    {% endif %}
+
+    <section class="bys-fb4-card bys-fb4-hero">
+        <div>
+            <div class="bys-fb4-eyebrow"><i class="fa-solid fa-calendar-check"></i> Görüşme Sonrası Takip</div>
+            <h1 class="bys-fb4-title">Eylem planları artık takip tarihi, gecikme ve bildirim kaydıyla izlenir</h1>
+            <p class="bys-fb4-sub">Bu ekran performans görüşmesi sonrasında kararlaştırılan aksiyonların unutulmaması için tasarlandı. Hedef tarihi boş olan aksiyonlarda sistem 30 günlük mini takip tarihi oluşturur; yaklaşan veya geciken aksiyonlar için bildirim ve mail log kaydı üretir.</p>
+            <div class="bys-fb4-actions">
+                <a class="bys-fb4-btn primary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlar</a>
+                <a class="bys-fb4-btn soft" href="{{ safe_url_for('main.performance_feedback_integration') }}"><i class="fa-solid fa-link"></i> Entegrasyon Ekranı</a>
+                <a class="bys-fb4-btn" href="{{ safe_url_for('main.performance_feedback_meeting_guide') }}"><i class="fa-solid fa-comments"></i> Görüşme Rehberi</a>
+
+                {# BYS360_FEEDBACK_CORPORATE_CLEANUP_PHASE6_FOLLOWUP_LINK #}
+                <a class="bys-fb4-btn" href="{{ safe_url_for('main.performance_feedback_corporate_cleanup') }}"><i class="fa-solid fa-shield-heart"></i> Canlı Kontrol</a>
+                {# /BYS360_FEEDBACK_CORPORATE_CLEANUP_PHASE6_FOLLOWUP_LINK #}
+
+
+                {# BYS360_FEEDBACK_FINAL_GATE_PHASE5_FOLLOWUP_LINK #}
+                <a class="bys-fb4-btn" href="{{ safe_url_for('main.performance_feedback_final_gate') }}"><i class="fa-solid fa-circle-check"></i> Final Kontrol</a>
+                {# /BYS360_FEEDBACK_FINAL_GATE_PHASE5_FOLLOWUP_LINK #}
+
+            </div>
+        </div>
+        <div class="bys-fb4-card">
+            <form class="bys-fb4-filter" method="get" action="{{ safe_url_for('main.performance_feedback_followup') }}">
+                <div>
+                    <label class="bys-fb4-label" for="filter">Takip filtresi</label>
+                    <select class="bys-fb4-select" id="filter" name="filter">
+                        {% for opt in filter_options %}<option value="{{ opt.value }}" {% if opt.value == due_filter %}selected{% endif %}>{{ opt.label }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="bys-fb4-label" for="q">Arama</label>
+                    <input class="bys-fb4-input" id="q" name="q" value="{{ query }}" placeholder="Personel, amir, aksiyon başlığı...">
+                </div>
+                <button class="bys-fb4-btn primary" type="submit"><i class="fa-solid fa-filter"></i> Listele</button>
+            </form>
+            {% if can_generate_notices %}
+            <form method="post" action="{{ safe_url_for('main.performance_feedback_followup_generate_notices') }}" style="margin-top:12px;">
+                <button class="bys-fb4-btn warn" type="submit"><i class="fa-solid fa-bell"></i> Takip Bildirimlerini Üret</button>
+                <div class="bys-fb4-small" style="margin-top:8px;">Yaklaşan 7 gün ve geciken aksiyonlar için sistem içi kayıt/mail log kaydı oluşturur.</div>
+            </form>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="bys-fb4-stat-grid">
+        <div class="bys-fb4-stat"><strong>{{ dashboard.total }}</strong><span>Toplam eylem</span></div>
+        <div class="bys-fb4-stat"><strong>{{ dashboard.open }}</strong><span>Açık / takipte</span></div>
+        <div class="bys-fb4-stat"><strong>{{ dashboard.overdue }}</strong><span>Geciken aksiyon</span></div>
+        <div class="bys-fb4-stat"><strong>{{ dashboard.upcoming }}</strong><span>7 gün içinde takip</span></div>
+        <div class="bys-fb4-stat"><strong>{{ dashboard.no_date }}</strong><span>Tarihsiz takip</span></div>
+        <div class="bys-fb4-stat"><strong>{{ dashboard.closed }}</strong><span>Kapanan aksiyon</span></div>
+    </section>
+
+    <section class="bys-fb4-grid">
+        <div class="bys-fb4-card">
+            <h3 class="bys-fb4-section-title">Eylem Planı Takip Listesi</h3>
+            <p class="bys-fb4-section-sub">Her aksiyon için takip tarihi, sorumlu taraf, durum ve mini takip notu aynı kartta güncellenir.</p>
+            <div class="bys-fb4-list">
+                {% for action in actions %}
+                <article class="bys-fb4-item {{ action.due_state }}">
+                    <div class="bys-fb4-item-top">
+                        <span>{{ action.employee_name or 'Personel' }} · {{ action.manager_name or 'Amir' }}</span>
+                        <span class="bys-fb4-pill {% if action.due_state == 'overdue' %}red{% elif action.due_state in ['today','upcoming'] %}maroon{% elif action.due_state == 'closed' %}green{% endif %}">{{ action.due_state_label }}</span>
+                    </div>
+                    <h4>{{ action.title }}</h4>
+                    <p>{{ action.smart_description or 'SMART açıklama girilmemiş.' }}</p>
+                    <div class="bys-fb4-actions">
+                        <span class="bys-fb4-pill">Durum: {{ action.status_label }}</span>
+                        <span class="bys-fb4-pill">Sorumlu: {{ action.responsible_label }}</span>
+                        <span class="bys-fb4-pill">Takip: {{ action.due_date or '-' }}</span>
+                        {% if action.reminder_sent_at %}<span class="bys-fb4-pill green">Hatırlatma kayıtlı</span>{% endif %}
+                        {% if action.overdue_notice_sent_at %}<span class="bys-fb4-pill red">Gecikme kayıtlı</span>{% endif %}
+                    </div>
+                    <form method="post" action="{{ safe_url_for('main.performance_feedback_followup_quick_update', action_id=action.action_id) }}" class="bys-fb4-form-grid">
+                        <div>
+                            <label class="bys-fb4-label">Durum</label>
+                            <select class="bys-fb4-select" name="status">
+                                {% for opt in status_options %}<option value="{{ opt.value }}" {% if opt.value == action.status %}selected{% endif %}>{{ opt.label }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="bys-fb4-label">Takip tarihi</label>
+                            <input class="bys-fb4-input" type="date" name="follow_up_check_date" value="{{ action.due_date }}">
+                        </div>
+                        <div style="grid-column:1/-1;">
+                            <label class="bys-fb4-label">Mini takip notu</label>
+                            <textarea class="bys-fb4-textarea" name="follow_up_note" placeholder="Takip görüşmesinde ne konuşuldu?">{{ action.follow_up_note or '' }}</textarea>
+                        </div>
+                        <div style="grid-column:1/-1;">
+                            <label class="bys-fb4-label">Sonuç özeti</label>
+                            <textarea class="bys-fb4-textarea" name="result_summary" placeholder="Gelişti / kısmen gelişti / ilerleme yok gibi kısa sonuç...">{{ action.result_summary or '' }}</textarea>
+                        </div>
+                        <div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="bys-fb4-btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Takibi Güncelle</button>
+                            <a class="bys-fb4-btn soft" href="/performance/feedback-aftercare/{{ action.meeting_id }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Görüşme Kaydını Aç</a>
+                        </div>
+                    </form>
+                </article>
+                {% else %}
+                <div class="bys-fb4-empty">Seçili filtrede eylem planı bulunamadı.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <aside class="bys-fb4-card">
+            <h3 class="bys-fb4-section-title">Bildirim ve Mail Log Kayıtları</h3>
+            <p class="bys-fb4-section-sub">Sistem e-posta göndermeden önce izlenebilir bildirim/mail log kaydı oluşturur. Gönderim altyapısı varsa mevcut mail servisleri bu kayıtları kullanabilir.</p>
+            <div class="bys-fb4-list">
+                {% for notice in recent_notices %}
+                <article class="bys-fb4-item bys-fb4-notice">
+                    <div class="bys-fb4-item-top"><span>{{ notice.created_at or '-' }}</span><span class="bys-fb4-pill maroon">{{ notice.notice_type_label }}</span></div>
+                    <h4>{{ notice.subject }}</h4>
+                    <p>{{ notice.recipient_name or 'Alıcı' }} · {{ notice.status_label }}</p>
+                    {% if notice.related_url %}<div class="bys-fb4-actions"><a class="bys-fb4-btn soft" href="{{ notice.related_url }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> İlgili Görüşme</a></div>{% endif %}
+                </article>
+                {% else %}
+                <div class="bys-fb4-empty">Henüz takip bildirimi veya mail log kaydı oluşturulmadı.</div>
+                {% endfor %}
+            </div>
+        </aside>
+    </section>
+</div>
+{% endblock %}

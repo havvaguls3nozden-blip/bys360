@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Geri Bildirim Talepleri - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Talepleri{% endblock %}
+{% block page_subtitle %}
+Size iletilen geri bildirim taleplerini buradan görüntüleyebilir ve detayına gidebilirsiniz.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Geri Bildirim Talepleri', text='Personelden gelen talepleri, kapsam filtresini ve yönetsel görünürlüğü daha temiz bir izleme düzeniyle yönetin.', icon='fa-solid fa-comments') }}
+  {{ nav(active='feedback') }}
+  {{ note('Talep listesi artık performans modülündeki diğer yönetim ekranlarıyla aynı üst dilde açılır.') }}
+<style>
+  .panel-card{
+    background:rgba(255,255,255,.88);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    padding:22px;
+  }
+
+  .table-wrap{
+    width:100%;
+    overflow-x:auto;
+    border-radius:18px;
+  }
+
+  table{
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+    background:#fff;
+  }
+
+  th, td{
+    padding:14px 12px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    text-align:left;
+    vertical-align:middle;
+  }
+
+  th{
+    font-size:.84rem;
+    color:#6b7280;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+  }
+
+  .person-name{
+    font-weight:800;
+    color:#111827;
+    line-height:1.45;
+  }
+
+  .muted-line{
+    color:#6b7280;
+    font-size:.87rem;
+    line-height:1.65;
+  }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .pill.waiting{background:rgba(146,64,14,.10);color:#92400e;}
+  .pill.reviewed{background:rgba(37,99,235,.10);color:#1d4ed8;}
+  .pill.answered{background:rgba(22,101,52,.10);color:#166534;}
+  .pill.closed{background:rgba(107,114,128,.12);color:#374151;}
+
+  .btn-soft{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    padding:0 12px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:800;
+    font-size:.84rem;
+    background:linear-gradient(180deg,#8B0000,#6f0000);
+    color:#fff;
+  }
+
+  .btn-soft.secondary{
+    background:#eef2f7;
+    color:#374151;
+    border:1px solid rgba(15,23,42,.08);
+  }
+
+  .empty-box{
+    padding:24px;
+    border-radius:18px;
+    border:1px dashed rgba(15,23,42,.12);
+    background:#f8fafc;
+    color:#6b7280;
+    text-align:center;
+    line-height:1.8;
+  }
+
+  .ai-summary-grid{display:grid;grid-template-columns:1.2fr .95fr;gap:16px;margin:16px 0 0}
+  .ai-summary-card{background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:22px;box-shadow:0 14px 30px rgba(15,23,42,.06);padding:18px}
+  .ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.92),rgba(255,255,255,.94))}
+  .ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,247,237,.92),rgba(255,255,255,.94))}
+  .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(139,0,0,.08);color:#7a1111;font-size:.77rem;font-weight:900}
+  .ai-title{margin-top:12px;font-size:1.02rem;font-weight:900;color:#111827;line-height:1.5}
+  .ai-text{margin-top:10px;color:#6b7280;font-size:.9rem;line-height:1.78}
+  .ai-bullets{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+  .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#4b5563;font-size:.86rem;line-height:1.7}
+  .ai-bullets i{font-size:.5rem;margin-top:.5rem;color:#8B0000}
+  .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+  .ai-action{border-radius:16px;padding:12px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+  .ai-action.tone-critical{background:rgba(254,242,242,.92);border-color:rgba(185,28,28,.14)}
+  .ai-action.tone-watch{background:rgba(255,247,237,.94);border-color:rgba(180,83,9,.14)}
+  .ai-action-label{color:#6b7280;font-size:.75rem;font-weight:800;margin-bottom:6px}
+  .ai-action-value{color:#111827;font-size:1.2rem;font-weight:900;line-height:1}
+  @media (max-width:1180px){.ai-summary-grid{grid-template-columns:1fr}}
+
+</style>
+
+<div class="panel-card">
+  <div class="scope-strip" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;margin-bottom:16px;"><div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için talepler listeleniyor.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><a href="{{ url_for('main.feedback_operations_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-wave-square"></i> Operasyon Paneli</a><span class="pill waiting">{{ requests|length if requests else 0 }} talep</span></div></div>
+  <section class="ai-summary-grid">
+    <article class="ai-summary-card tone-{{ ai_feedback_requests_panel.tone if ai_feedback_requests_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_feedback_requests_panel.badge if ai_feedback_requests_panel else 'AI özeti' }}</div>
+      <div class="ai-title">{{ ai_feedback_requests_panel.headline if ai_feedback_requests_panel else 'Talep özeti hazır' }}</div>
+      <div class="ai-text">{{ ai_feedback_requests_panel.summary if ai_feedback_requests_panel else '' }}</div>
+      {% if ai_feedback_requests_panel and ai_feedback_requests_panel.bullets %}
+      <ul class="ai-bullets">{% for bullet in ai_feedback_requests_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>
+      {% endif %}
+    </article>
+    <article class="ai-summary-card">
+      <div class="ai-kicker"><i class="fa-solid fa-wave-square"></i> AI aksiyon sıcaklığı</div>
+      <div class="ai-action-grid">{% for item in (ai_feedback_requests_panel.actions if ai_feedback_requests_panel else []) %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>
+    </article>
+  </section>
+
+  {% if requests %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Personel</th>
+          <th>Dönem</th>
+          <th>Talep</th>
+          <th>Durum</th>
+          <th>Tarih</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td>
+            <div class="person-name">{{ r.employee.ad }} {{ r.employee.soyad }}</div>
+            <div class="muted-line">{{ r.employee.sicil_no or '-' }}</div>
+          </td>
+          <td>{{ r.period.title if r.period else '-' }}</td>
+          <td>{{ (r.reason or '-')[:120] }}{% if r.reason and r.reason|length > 120 %}...{% endif %}</td>
+          <td>
+            {% if r.status in ['bekliyor', 'beklemede'] %}
+              <span class="pill waiting">Bekliyor</span>
+            {% elif r.status == 'incelendi' %}
+              <span class="pill reviewed">İncelendi</span>
+            {% elif r.status == 'cevaplandi' %}
+              <span class="pill answered">Cevaplandı</span>
+            {% elif r.status == 'randevulandi' %}
+              <span class="pill reviewed">Randevulandı</span>
+            {% elif r.status == 'gorusme_tamamlandi' %}
+              <span class="pill answered">Görüşme Tamamlandı</span>
+            {% else %}
+              <span class="pill closed">{{ r.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ r.requested_at.strftime('%d.%m.%Y %H:%M') if r.requested_at else '-' }}</td>
+          <td>
+            <a href="{{ url_for('main.manager_feedback_request_detail', request_id=r.id, scope=selected_scope) }}" class="btn-soft">
+              Detay
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-box">
+    Size atanmış geri bildirim talebi bulunmuyor.
+  </div>
+  {% endif %}
+</div>
+</div>
+{% endblock %}

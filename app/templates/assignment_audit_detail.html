@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Atama Denetim Detayı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Atama Denetim Detayı{% endblock %}
+{% block page_subtitle %}Son görev üretim koşusundaki kapsam kayıtları, risk kümeleri ve kişi bazlı zincir önizlemesi burada görünür olur.{% endblock %}
+{% block content %}
+<style>
+.audit-shell{display:grid;gap:18px}.glass{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.toolbar{display:grid;grid-template-columns:1fr 1fr 1.3fr 1.3fr auto auto;gap:12px;align-items:end}.field{display:flex;flex-direction:column;gap:8px}.field label{font-size:.88rem;font-weight:800;color:#374151}.field input,.field select{min-height:46px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:10px 12px;background:#fff}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;font-weight:800;text-decoration:none;cursor:pointer}.btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff}.btn.soft{background:#f8fafc;color:#111827;border:1px solid rgba(15,23,42,.08)}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.ai-card{padding:22px;border-radius:22px;border:1px solid rgba(15,23,42,.08);background:#fff}.ai-kicker{font-size:.8rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.ai-title{font-size:1.08rem;font-weight:900;color:#111827;margin-top:8px}.ai-text{font-size:.95rem;color:#4b5563;line-height:1.75;margin-top:8px}.ai-bullets{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}.shortcut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.shortcut{display:flex;align-items:center;gap:10px;padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08);text-decoration:none;color:#111827;font-weight:800}.shortcut.critical{background:linear-gradient(180deg,rgba(254,242,242,.9),#fff)}.shortcut.watch{background:linear-gradient(180deg,rgba(255,247,237,.9),#fff)}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.summary-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.summary-card{padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.summary-label{font-size:.8rem;color:#6b7280;font-weight:800}.summary-value{font-size:1.35rem;font-weight:900;color:#111827;margin-top:8px}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.pill.critical{background:#fef2f2;color:#b91c1c}.pill.watch{background:#fff7ed;color:#9a3412}.pill.calm{background:#ecfdf5;color:#166534}.chain-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.chain-box{padding:18px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.chain-line{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(15,23,42,.06)}.chain-line:last-child{border-bottom:none;padding-bottom:0}.chain-label{font-weight:800;color:#374151}.chain-value{font-weight:900;color:#111827;text-align:right}.muted{color:#6b7280;line-height:1.7}.tag-list{display:flex;flex-wrap:wrap;gap:8px}.tag{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-size:.78rem;font-weight:800;color:#334155}.actions-cell{display:flex;gap:8px;flex-wrap:wrap}table{width:100%;min-width:1080px;border-collapse:collapse}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}th{background:#f8fafc;font-size:.8rem;color:#6b7280;text-transform:uppercase}.empty{padding:16px;border:1px dashed rgba(15,23,42,.12);border-radius:18px;background:#f8fafc;color:#475569}@media (max-width:1200px){.toolbar,.hero-grid,.shortcut-grid,.summary-grid,.chain-grid{grid-template-columns:1fr}}
+</style>
+<div class="audit-shell">
+  <form method="get" class="glass toolbar">
+    <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+    <input type="hidden" name="scope" value="{{ selected_scope or '' }}">
+    <div class="field"><label>Önem düzeyi</label><input type="text" name="severity" value="{{ severity or '' }}" placeholder="info / warning / error"></div>
+    <div class="field"><label>Olay tipi</label><input type="text" name="event_type" value="{{ event_type or '' }}" placeholder="delegated / uncovered / chain_issue"></div>
+    <div class="field"><label>Personel ara</label><input type="text" name="q" value="{{ q or '' }}" placeholder="ad, sicil, birim veya gerekçe"></div>
+    <div class="field"><label>Kişi önizlemesi</label>
+      <select name="employee_id">
+        <option value="">Genel görünüm</option>
+        {% for item in employee_options or [] %}
+        <option value="{{ item.id }}" {% if employee_id == item.id %}selected{% endif %}>{{ item.full_name }}{% if item.birim %} · {{ item.birim }}{% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field"><button type="submit" class="btn primary"><i class="fa-solid fa-filter"></i> Filtrele</button></div>
+    <div class="field"><a href="{{ url_for('main.performance_task_management_audit_export', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type, q=q, employee_id=employee_id) }}" class="btn soft"><i class="fa-solid fa-file-csv"></i> CSV İndir</a></div>
+  </form>
+
+  <div class="hero-grid">
+    <article class="ai-card">
+      <div class="ai-kicker"><i class="fa-solid fa-clipboard-check"></i> Denetim özeti</div>
+      <div class="ai-title">{{ ai_recommendation_panel.headline if ai_recommendation_panel else 'Atama denetimi hazır' }}</div>
+      <div class="ai-text">{{ ai_recommendation_panel.summary if ai_recommendation_panel else '' }}</div>
+      <ul class="ai-bullets">{% for bullet in (ai_recommendation_panel.bullets if ai_recommendation_panel else []) %}<li><i class="fa-solid fa-angle-right"></i> <span>{{ bullet }}</span></li>{% endfor %}</ul>
+    </article>
+    <article class="ai-card">
+      <div class="ai-kicker"><i class="fa-solid fa-building-shield"></i> Baskı haritası</div>
+      <div class="ai-title">En yüksek riskli birimler</div>
+      <ul class="ai-bullets">
+        {% for row in pressure_rows[:5] %}
+        <li><i class="fa-solid fa-circle"></i> <span>{{ row.unit_name }} · risk {{ row.risk_score }} · {{ row.detail }}</span></li>
+        {% else %}
+        <li><i class="fa-solid fa-circle"></i> <span>Birim bazlı baskı kaydı görünmüyor.</span></li>
+        {% endfor %}
+      </ul>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+        <a href="{{ url_for('main.performance_task_management_recommendations', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type) }}" class="btn soft"><i class="fa-solid fa-sparkles"></i> AI Öneri Merkezi</a>
+        <a href="{{ url_for('main.performance_task_management', period_id=selected_period.id if selected_period else None, scope=selected_scope) }}" class="btn soft"><i class="fa-solid fa-arrow-left"></i> Görev Yönetimi</a>
+      </div>
+    </article>
+  </div>
+
+  <section class="glass">
+    <div class="summary-grid">
+      <div class="summary-card"><div class="summary-label">Kayıt</div><div class="summary-value">{{ visible_rows|length }}</div></div>
+      <div class="summary-card"><div class="summary-label">Açıkta</div><div class="summary-value">{{ summary.uncovered or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Zincir sorunu</div><div class="summary-value">{{ summary.chain_issue or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Vekâlet</div><div class="summary-value">{{ summary.delegated or 0 }}</div></div>
+      <div class="summary-card"><div class="summary-label">Bilgi</div><div class="summary-value">{{ severity_summary.get('info', 0) }}</div></div>
+      <div class="summary-card"><div class="summary-label">Hata</div><div class="summary-value">{{ severity_summary.get('error', 0) }}</div></div>
+    </div>
+  </section>
+
+  <section class="glass">
+    <div class="ai-kicker"><i class="fa-solid fa-bolt"></i> Tek tık filtre kısayolları</div>
+    <div class="shortcut-grid" style="margin-top:14px">
+      {% for row in shortcut_rows %}
+      <a href="{{ row.url }}" class="shortcut {{ row.tone }}"><i class="fa-solid {{ row.icon }}"></i><span>{{ row.label }}</span></a>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if selected_employee_preview and selected_employee %}
+  <section class="glass">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <div class="ai-kicker"><i class="fa-solid fa-user-check"></i> Kişi bazlı görev önizlemesi</div>
+        <div class="ai-title">{{ selected_employee.full_name }}{% if selected_employee.birim %} · {{ selected_employee.birim }}{% endif %}</div>
+        <div class="muted">Bu bölüm, seçili personelin zincirinin neden görev ürettiğini veya üretmediğini canlı kuralla gösterir.</div>
+      </div>
+      <div class="tag-list">
+        {% for issue in selected_employee_preview.resolved_chain.issues or [] %}
+        <span class="tag">{{ issue.message }}</span>
+        {% else %}
+        <span class="tag">Zincir sorunu görünmüyor</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="chain-grid" style="margin-top:16px">
+      <div class="chain-box">
+        <div class="ai-kicker"><i class="fa-solid fa-share-nodes"></i> Çözümlenen zincir</div>
+        {% for level in selected_employee_preview.assignments or [] %}
+        <div class="chain-line">
+          <div>
+            <div class="chain-label">{{ level.label }}</div>
+            <div class="muted">{{ 'Puanlayıcı' if level.score_enabled else 'Yorumcu' }}</div>
+          </div>
+          <div class="chain-value">{{ level.evaluator_name or '-' }}{% if level.evaluator_role %}<br><span class="muted">{{ level.evaluator_role }}</span>{% endif %}</div>
+        </div>
+        {% else %}
+        <div class="empty">Aktif görev seviyesi görünmüyor.</div>
+        {% endfor %}
+      </div>
+      <div class="chain-box">
+        <div class="ai-kicker"><i class="fa-solid fa-scale-balanced"></i> Ağırlık ve kaynak alanları</div>
+        <div class="chain-line"><div class="chain-label">1. Amir</div><div class="chain-value">%{{ selected_employee_preview.weight_plan.level_1_weight }}</div></div>
+        <div class="chain-line"><div class="chain-label">2. Amir</div><div class="chain-value">%{{ selected_employee_preview.weight_plan.level_2_weight }}</div></div>
+        <div class="chain-line"><div class="chain-label">3. Amir</div><div class="chain-value">%{{ selected_employee_preview.weight_plan.level_3_weight }}</div></div>
+        <div class="chain-line"><div class="chain-label">1. Amir Sicil</div><div class="chain-value">{{ selected_employee_preview['de' ~ 'bug'].explicit_manager_fields.yonetici_sicil or '-' }}</div></div>
+        <div class="chain-line"><div class="chain-label">2. Amir Sicil</div><div class="chain-value">{{ selected_employee_preview['de' ~ 'bug'].explicit_manager_fields.ikinci_yonetici_sicil or '-' }}</div></div>
+        <div class="chain-line"><div class="chain-label">3. Amir Sicil</div><div class="chain-value">{{ selected_employee_preview['de' ~ 'bug'].explicit_manager_fields.ucuncu_yonetici_sicil or '-' }}</div></div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="glass">
+    <div class="ai-kicker"><i class="fa-solid fa-table-list"></i> Kapsam kayıtları</div>
+    <div class="table-wrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Personel</th><th>Birim</th><th>Seviye</th><th>Olay</th><th>Önem</th><th>Gerekçe</th><th>Asıl Amir</th><th>İşleyen Amir</th><th>İşlem</th></tr></thead>
+        <tbody>
+          {% for row in visible_rows %}
+          <tr>
+            <td>{{ row.employee.ad if row.employee else '' }} {{ row.employee.soyad if row.employee else '' }}{% if row.employee and row.employee.sicil_no %}<br><span class="muted">{{ row.employee.sicil_no }}</span>{% endif %}</td>
+            <td>{{ row.employee.birim if row.employee and row.employee.birim else (row.employee.ust_birim if row.employee and row.employee.ust_birim else '-') }}</td>
+            <td>{{ row.manager_level or '-' }}</td>
+            <td>{{ row.event_type or '-' }}</td>
+            <td><span class="pill {{ 'critical' if row.severity == 'error' else ('watch' if row.severity == 'warning' else 'calm') }}">{{ row.severity or '-' }}</span></td>
+            <td>{{ row.reason or '-' }}</td>
+            <td>{% if row.original_evaluator %}{{ row.original_evaluator.ad }} {{ row.original_evaluator.soyad }}{% else %}-{% endif %}</td>
+            <td>{% if row.acting_evaluator %}{{ row.acting_evaluator.ad }} {{ row.acting_evaluator.soyad }}{% else %}-{% endif %}</td>
+            <td>
+              <div class="actions-cell">
+                <a class="btn soft" href="{{ url_for('main.performance_task_management_audit_detail', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type, q=q, employee_id=row.employee_id) }}"><i class="fa-solid fa-user-magnifying-glass"></i> Önizle</a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="9">Seçili filtrelerde kayıt bulunamadı.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

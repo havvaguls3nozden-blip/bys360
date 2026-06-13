@@ -1,0 +1,615 @@
+{
+  "generated_at": "2026-06-12T13:13:48",
+  "releaseignore_exists": true,
+  "releaseignore_pattern_count": 24,
+  "included_file_count": 4068,
+  "excluded_file_count": 16484,
+  "leak_count": 0,
+  "leak_counts": {},
+  "missing_releaseignore_rules": [],
+  "leaks": [],
+  "included_sample": [
+    ".dockerignore",
+    ".gitignore",
+    ".releaseignore",
+    "alembic.ini",
+    "BYS360_HANDOVER_MANIFEST.json",
+    "BYS360_OPS_HARDENING_V1_MANIFEST.json",
+    "BYS360_OPS_HARDENING_V2_TRIAGE_MANIFEST.json",
+    "CLEAN_PACKAGE_REPORT.md",
+    "config.py",
+    "CONTRIBUTING.md",
+    "docker-compose.yml",
+    "Dockerfile",
+    "manifest.json",
+    "pyproject.toml",
+    "pytest.ini",
+    "README.md",
+    "README_BYS360_F821_CLEANUP_SAFE_V1.md",
+    "README_BYS360_F821_CLEANUP_SAFE_V2.md",
+    "README_BYS360_TECH_DEBT_CLEANUP_SAFE_V17.md",
+    "README_BYS360_TECH_DEBT_CLEANUP_SAFE_V18.md",
+    "README_BYS360_TECH_DEBT_CLEANUP_SAFE_V22.md",
+    "README_SAFE_V20.txt",
+    "README_SAFE_V21.txt",
+    "release_manifest.json",
+    "requirements-dev.txt",
+    "requirements.txt",
+    "run.py",
+    "run_server.py",
+    "wsgi.py",
+    "app/blueprint_registry.py",
+    "app/compat_endpoint_cleanup.py",
+    "app/error_handlers.py",
+    "app/error_support.py",
+    "app/extensions.py",
+    "app/live_scope.py",
+    "app/menu_registry.py",
+    "app/menu_registry_data_performance.py",
+    "app/menu_registry_data_personnel.py",
+    "app/menu_registry_data_sections.py",
+    "app/model_mixins.py",
+    "app/model_registry.py",
+    "app/pwa_blueprint.py",
+    "app/pwa_routes.py",
+    "app/routes.py",
+    "app/routes_admin_personnel.py",
+    "app/routes_auth.py",
+    "app/routes_communication.py",
+    "app/routes_dashboard.py",
+    "app/routes_hr.py",
+    "app/routes_performance_admin.py",
+    "app/routes_president_scorecard_v2.py",
+    "app/route_family_loader.py",
+    "app/route_registry.py",
+    "app/route_support.py",
+    "app/schema_guard.py",
+    "app/schema_guard_core_repairs.py",
+    "app/schema_guard_engine.py",
+    "app/schema_guard_patches.py",
+    "app/schema_guard_types.py",
+    "app/security_audit.py",
+    "app/security_guards.py",
+    "app/security_headers.py",
+    "app/startup_checks.py",
+    "app/template_safety.py",
+    "app/view_helpers.py",
+    "app/__init__.py",
+    "config/ai_executive_report_template.json",
+    "config/ai_governance_settings.json",
+    "config/ai_management_pack_template.json",
+    "config/ai_prompt_registry.json",
+    "config/ai_release_checklist.json",
+    "config/dashboard_risk_rules.json",
+    "config/faz3_5_explicit_chain_map.json",
+    "config/hierarchy_position_registry_v1.json",
+    "config/hierarchy_rulebook_authoritative.json",
+    "config/hierarchy_rulebook_v2.json",
+    "config/hierarchy_rulebook_v3.json",
+    "config/hierarchy_rulebook_v4.json",
+    "config/hierarchy_templates_v1.json",
+    "config/hierarchy_templates_v2.json",
+    "config/security_role_baseline.json",
+    "docker/entrypoint.sh",
+    "docker/gunicorn.conf.py",
+    "docs/BYS360_AI_EVERYWHERE_V1_INCELEME_NOTU.md",
+    "docs/BYS360_AI_EVERYWHERE_V1_README.md",
+    "docs/BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_README.md",
+    "docs/BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_RESUME_V2_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_RESUME_V3_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_RESUME_V4_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_RESUME_V5_DIRECT_STABLE_NOTES.md",
+    "docs/BYS360_CIC_V3_0_LIVE_FINAL_RELEASE_RESUME_V6_LOCK_SAFE_NOTES.md",
+    "docs/BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1.md",
+    "docs/BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1_1.md",
+    "docs/BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1_NOTES.md",
+    "docs/BYS360_CIC_V4_0A_MENU_TAB_FIX_README.md",
+    "docs/BYS360_CIC_V4_0_SMART_CELEBRATIONS_README.md",
+    "docs/BYS360_CIC_V4_3_FULL_PRO_UI_SIDEBAR_ACTIVE_README.md",
+    "docs/BYS360_CIC_V4_4A_SYSTEM_LINK_POLISH_README.md",
+    "docs/BYS360_CIC_V4_4B_SYSTEM_PAGE_FINAL_POLISH_README.md",
+    "docs/BYS360_CIC_V4_4_PERFORMANCE_STYLE_RESET_README.md",
+    "docs/BYS360_CIC_V4_5A_CELEBRATION_EXCEL_IMPORT_LOCK_FIX_README.md",
+    "docs/BYS360_CIC_V4_5_CELEBRATION_EXCEL_IMPORT_README.md",
+    "docs/BYS360_CIC_V4_6A_JINJA_SLICE_FIX_README.md",
+    "docs/BYS360_CIC_V4_6B_CELEBRATIONS_TEMPLATE_FINAL_FIX_README.md",
+    "docs/BYS360_CIC_V4_6_CELEBRATIONS_STUDIO_PRO_UI_README.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_README.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_1_GATE_FIX_README.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL_README.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_README.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_UAT_LIVE_READY_REPORT.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_1_BASE_CSS_LINK_FIX.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_9_BASE_REAL_NEWLINES_FIX.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_LIVE_RELEASE_CHECKLIST.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_ROLLBACK_PLAN.md",
+    "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_USAGE_GUIDE.md",
+    "docs/BYS360_CSRF_FORM_TOKEN_AND_REFERRER_HOTFIX_V2_15_15_README.md",
+    "docs/BYS360_ENCODING_QUALITY_FIX_V2_17_63_NOTES.md"
+  ],
+  "excluded_sample": [
+    {
+      "file": ".env",
+      "reason": ".env"
+    },
+    {
+      "file": ".env.docker.example",
+      "reason": ".env.*"
+    },
+    {
+      "file": ".env.example",
+      "reason": ".env.*"
+    },
+    {
+      "file": ".env.production.example",
+      "reason": ".env.*"
+    },
+    {
+      "file": ".pytest_cache/.gitignore",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".pytest_cache/CACHEDIR.TAG",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".pytest_cache/README.md",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/.gitignore",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/CACHEDIR.TAG",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/pyvenv.cfg",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": "instance/bys360_local_dev.sqlite3",
+      "reason": "instance/"
+    },
+    {
+      "file": "logs/bys360-app.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "logs/bys360-ops.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "logs/executive_summary_0001.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "logs/executive_summary_0830.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "logs/executive_summary_morning.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "logs/executive_summary_night.log",
+      "reason": "*.log"
+    },
+    {
+      "file": "__pycache__/config.cpython-312.pyc",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": "__pycache__/wsgi.cpython-312.pyc",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".pytest_cache/v/cache/lastfailed",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".pytest_cache/v/cache/nodeids",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/10616114117444164289",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/11220741982652567301",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/11748958261190629482",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12185055978104215531",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12293825322468531727",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12418095014911363865",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12488709766450695097",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12505623913698978806",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/12700512007705341821",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/13435195100967004901",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/13889652963898937957",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/14183370346214198102",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/14285417678727044943",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/14439777602237409291",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/1491087510926347530",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15285897964549555629",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15388016311843207859",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15425838296628387281",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15676152897980875151",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15733055122158684068",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/15863474198636064391",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/16229195324006224157",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/1680710283687205054",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/16908080590325738023",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/16965119509545823417",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/17044739394616928779",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/17085154976307321509",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/17167214832368263177",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/17260526389982591717",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/2359853738714041807",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/2565322506409621547",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/3036564602387853494",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/3346692701099283126",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/3402613088806336274",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/4226817709335667319",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/4277082792089671410",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/4537456653581181828",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/5493742563999793281",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/5510911904888069416",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/5752656089873972945",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/6069559301777858606",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/6760441346430277591",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/7093362963785115191",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/7194696145741313118",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/7743797725753859813",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/8020431724840345202",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/8639069365082890925",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/9214904675445379956",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/9350113597777770836",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/9361597056367457591",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/943738088943181444",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/9575796664368392091",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".ruff_cache/0.15.17/9725871971915391003",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/activate",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/activate.bat",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/Activate.ps1",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/alembic.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/deactivate.bat",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/doesitcache.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/dotenv.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/email_validator.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/f2py.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/flask.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/gunicorn.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/gunicornc.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/idna.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/mako-render.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/markdown-it.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/normalizer.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/numpy-config.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pip-audit.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pip.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pip3.12.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pip3.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/py.test.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pygmentize.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pytest.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/python.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/pythonw.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/rq.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/rqinfo.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/rqworker.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/ruff.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/vba_extract.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Scripts/waitress-serve.exe",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Include/site/python3.12/greenlet/greenlet.h",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/81d243bd2c585b0f4821__mypyc.cp312-win_amd64.pyd",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/packaging_legacy_version.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/pip_requirements_parser.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/py.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/six.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/typing_extensions.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/_cffi_backend.cp312-win_amd64.pyd",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/command.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/config.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/context.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/context.pyi",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/environment.py",
+      "reason": "always_exclude_dir"
+    },
+    {
+      "file": ".venv/Lib/site-packages/alembic/migration.py",
+      "reason": "always_exclude_dir"
+    }
+  ]
+}

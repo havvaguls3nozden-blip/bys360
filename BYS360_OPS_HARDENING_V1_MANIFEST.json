@@ -1,0 +1,18 @@
+{
+  "package": "BYS360_OPS_HARDENING_V1_OVERLAY",
+  "purpose": "Docker + CI/CD + env template + operations audit baseline",
+  "files": [
+    ".dockerignore",
+    ".env.docker.example",
+    ".github/workflows/bys360-ci.yml",
+    "Dockerfile",
+    "docker-compose.yml",
+    "docker/entrypoint.sh",
+    "docker/gunicorn.conf.py",
+    "docs/BYS360_OPS_HARDENING_V1_COMMANDS.md",
+    "docs/BYS360_OPS_HARDENING_V1_README.md",
+    "scripts/quality/bys360_ops_audit.py",
+    "scripts/windows/repair_bys360_ops_hardening_v1.ps1",
+    "scripts/windows/run_bys360_ops_audit_v1.ps1"
+  ]
+}

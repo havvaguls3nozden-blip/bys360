@@ -1,0 +1,73 @@
+{% set ai = ai_operations_bridge if ai_operations_bridge is defined and ai_operations_bridge else {} %}
+{% set hints = dashboard_focus_hints if dashboard_focus_hints is defined and dashboard_focus_hints else [] %}
+{% set period_rows = period_risk_rows if period_risk_rows is defined and period_risk_rows else [] %}
+<div class="bys-pro-two">
+  <section class="bys-pro-card bys-pro-card-pad bys-pro-ai">
+    <div class="bys-pro-section-head">
+      <div>
+        <h2 class="bys-pro-section-title">Modüller arası AI operasyon görünümü</h2>
+        <p class="bys-pro-section-sub">Dashboard, performans, İK, iletişim ve destek tarafındaki AI izleri tek karar yüzeyinde toplanır.</p>
+      </div>
+      <span class="bys-pro-chip"><i class="fa-solid fa-brain"></i> {{ ai.badge|default('AI özeti', true) }}</span>
+    </div>
+    {% if ai %}
+      <div class="bys-pro-list">
+        <div class="bys-pro-list-row">
+          <div><strong>{{ ai.headline|default('AI operasyon görünümü hazır', true) }}</strong><span>{{ ai.summary|default('AI kayıtları ve önerileri kontrollü karar destek mantığıyla izlenir.', true) }}</span></div>
+        </div>
+      </div>
+      <div class="bys-pro-stat-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px">
+        <div class="bys-pro-stat"><div class="bys-pro-stat-label">AI istekleri</div><div class="bys-pro-stat-value" data-bys-count>{{ ai.totals.requests|default(0, true) }}</div><div class="bys-pro-stat-note">Canlı kapsam kayıtları</div></div>
+        <div class="bys-pro-stat warning"><div class="bys-pro-stat-label">Açık öneri</div><div class="bys-pro-stat-value" data-bys-count>{{ ai.totals.open_recommendations|default(0, true) }}</div><div class="bys-pro-stat-note">Yönetici incelemesi</div></div>
+        <div class="bys-pro-stat danger"><div class="bys-pro-stat-label">Yönetişim uyarısı</div><div class="bys-pro-stat-value" data-bys-count>{{ ai.totals.negative_feedback|default(0, true) + ai.totals.unmasked_requests|default(0, true) }}</div><div class="bys-pro-stat-note">Öncelikli kontrol</div></div>
+      </div>
+    {% else %}
+      <div class="bys-pro-empty">AI operasyon paneli korumalı modda. Ana dashboard çalışmaya devam ediyor.</div>
+    {% endif %}
+  </section>
+
+  <section class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-section-head">
+      <div>
+        <h2 class="bys-pro-section-title">Dönem risk izlemi</h2>
+        <p class="bys-pro-section-sub">Kapsam, zincir ve yayın hazırlığı dönemlere göre izlenir.</p>
+      </div>
+      <span class="bys-pro-chip"><i class="fa-solid fa-shield-halved"></i> Kontrol</span>
+    </div>
+    {% if period_rows %}
+      <div class="bys-pro-list">
+        {% for row in period_rows[:6] %}
+        <div class="bys-pro-list-row">
+          <div><strong>{{ row.period.title if row.period else '-' }}</strong><span>Risk puanı: {{ row.risk_score|default(0, true) }} · {{ row.risk_label|default('Dengeli', true) }}</span></div>
+          <span class="bys-pro-badge {{ 'danger' if row.risk_tone == 'critical' else 'warning' if row.risk_tone == 'watch' else 'success' }}">{{ row.summary.uncovered|default(0, true) + row.summary.chain_issue|default(0, true) }} uyarı</span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bys-pro-empty">Dönem risk kaydı henüz oluşmadı.</div>
+    {% endif %}
+  </section>
+</div>
+
+<section class="bys-pro-card bys-pro-card-pad">
+  <div class="bys-pro-section-head">
+    <div>
+      <h2 class="bys-pro-section-title">Yönetici odak notları</h2>
+      <p class="bys-pro-section-sub">Sistemin ürettiği öncelik notları, karar kalitesini artırmak için bu alanda özetlenir.</p>
+    </div>
+    <span class="bys-pro-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> AI destek</span>
+  </div>
+  {% if hints %}
+    <div class="bys-pro-three">
+      {% for hint in hints[:3] %}
+      <div class="bys-pro-ai-box"><b>{{ hint.title|default('Odak', true) }}</b><span>{{ hint.text|default(hint.summary|default('-', true), true) }}</span></div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bys-pro-three">
+      <div class="bys-pro-ai-box"><b>Yayın öncesi kontrol</b><span>Tamamlanan ama personele açılmamış kayıtlar idari onaydan sonra yayınlanmalı.</span></div>
+      <div class="bys-pro-ai-box"><b>Eşik denetimi</b><span>70 altı ve 90 üstü puanlar açıklama ve genel görüş bakımından kontrol edilmeli.</span></div>
+      <div class="bys-pro-ai-box"><b>Şeffaf değerlendirme</b><span>Sonraki amir önceki amirin puan ve kanaatini görür; kör değerlendirme yapılmaz.</span></div>
+    </div>
+  {% endif %}
+</section>

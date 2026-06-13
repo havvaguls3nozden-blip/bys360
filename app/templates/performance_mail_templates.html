@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Mail Şablonları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Mail Şablonları{% endblock %}
+{% block page_subtitle %}Görev hatırlatma ve sonuç yayın bilgilendirme e-postalarının konu ve içerik metinlerini buradan yönetebilirsiniz.{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Mail Şablonları', text='Görev hatırlatma ve sonuç bilgilendirme metinlerini kurumsal tona uygun biçimde düzenleyin.', icon='fa-solid fa-pen-to-square') }}
+  {{ nav(active='templates') }}
+  {{ note('Şablon dili bu ekranda net, sade ve tek bakışta düzenlenebilir olacak şekilde öne çıkarıldı.') }}
+<style>
+ .template-grid{display:grid;gap:18px}
+ .panel-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}
+ .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+ .template-card{display:grid;gap:14px}
+ .field-label{font-weight:900;color:#111827}
+ .field-help{color:#6b7280;font-size:.9rem;line-height:1.65}
+ .text-input,.text-area{width:100%;border-radius:16px;border:1px solid rgba(15,23,42,.10);padding:12px 14px;font:inherit;background:#fff}
+ .text-area{min-height:220px;resize:vertical;line-height:1.75}
+ .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.92rem;white-space:nowrap}
+ .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+ .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+ .placeholder-list{display:flex;gap:10px;flex-wrap:wrap}
+ .placeholder-pill{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:#fff5f5;border:1px solid rgba(139,0,0,.12);color:#8B0000;font-weight:800;font-size:.84rem}
+</style>
+
+<form method="post" class="template-grid">
+ <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+ <div class="panel-card toolbar">
+  <div>
+   <div style="font-weight:900;color:#111827;font-size:1.05rem;">Performans mail metinleri</div>
+   <div class="field-help">Şablonlarda aşağıdaki yer tutucuları olduğu gibi bırakın. Sistem mail gönderirken bunları gerçek verilerle değiştirir.</div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+   <a class="btn-soft secondary" href="{{ url_for('main.performance_mail_reminders') }}"><i class="fa-solid fa-arrow-left"></i> Hatırlatma Merkezine Dön</a>
+   <button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i> Şablonları Kaydet</button>
+  </div>
+ </div>
+
+ {% for row in template_rows %}
+ <section class="panel-card template-card">
+  <div>
+   <div style="font-weight:900;color:#111827;font-size:1.02rem;">{{ row.label }}</div>
+   <div class="field-help">Aktif konu ve içerik burada düzenlenir.</div>
+  </div>
+
+  <div>
+   <label class="field-label" for="{{ row.mail_type }}_subject">Konu</label>
+   <input id="{{ row.mail_type }}_subject"
+       class="text-input"
+       type="text"
+       name="{{ 'reminder_subject' if row.mail_type == 'performance_assignment_reminder' else 'result_subject' }}"
+       value="{{ row.subject }}">
+  </div>
+
+  <div>
+   <label class="field-label" for="{{ row.mail_type }}_body">İçerik</label>
+   <textarea id="{{ row.mail_type }}_body"
+        class="text-area"
+        name="{{ 'reminder_body' if row.mail_type == 'performance_assignment_reminder' else 'result_body' }}">{{ row.body }}</textarea>
+  </div>
+
+  <div>
+   <div class="field-label">Kullanılabilir yer tutucular</div>
+   <div class="placeholder-list" style="margin-top:10px;">
+    {% for item in row.placeholders %}
+    <span class="placeholder-pill">{{ item }}</span>
+    {% endfor %}
+   </div>
+  </div>
+ </section>
+ {% endfor %}
+</form>
+</div>
+{% endblock %}

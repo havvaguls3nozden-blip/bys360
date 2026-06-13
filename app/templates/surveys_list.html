@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "_premium_workspace_macros.html" import premium_action_shell, premium_helper_note %}
+{% from "_communication_suite_macros.html" import communication_workspace_header %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Anketler - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anketler{% endblock %}
+{% block page_subtitle %}
+Size atanmış anketleri sadece açık olanlar olarak değil, yaklaşan ve süresi dolan durumlarıyla birlikte izleyin.
+{% endblock %}
+
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .survey-shell{display:grid;gap:18px}.glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}.panel-card{padding:22px;position:relative;z-index:1}.hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.06), transparent 28%),linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,0));pointer-events:none}.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) 320px;gap:18px;align-items:start}.hero-title{margin:0;font-size:1.14rem;font-weight:900;color:#111827;line-height:1.4}.hero-text{margin:8px 0 0;color:#6b7280;font-size:.92rem;line-height:1.85}.hero-side{display:grid;gap:12px}.side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:rgba(248,250,252,.85)}.side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.55}.side-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.75}.pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.soft-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.76rem;font-weight:900}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.stat-card{padding:22px;position:relative;overflow:hidden}.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:80px;height:80px;border-radius:50%;background:rgba(139,0,0,.06)}.stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}.stat-value{color:#111827;font-size:1.6rem;font-weight:900;line-height:1;position:relative;z-index:1}.stat-sub{margin-top:9px;color:#6b7280;font-size:.78rem;font-weight:700;position:relative;z-index:1;line-height:1.6}.toolbar-card{position:sticky;top:10px;z-index:6}.toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}.chip-row{display:flex;gap:8px;flex-wrap:wrap}.chip-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#4b5563;font-size:.78rem;font-weight:900;text-decoration:none;transition:all .18s ease}.chip-link:hover,.survey-card:hover,.btn-soft:hover,.mini-btn:hover{transform:translateY(-1px)}.chip-link.active{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.16);color:#8B0000}.count-pill{display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;padding:0 8px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.72rem;font-weight:900}.chip-link.active .count-pill{background:rgba(139,0,0,.14);color:#8B0000}.toolbar-form{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.toolbar-form input{min-height:42px;border-radius:12px;border:1px solid rgba(15,23,42,.08);padding:0 14px;background:#fff;min-width:260px}.toolbar-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800;margin-top:12px}.switch-row{display:inline-flex;align-items:center;gap:8px;padding:0 12px;min-height:38px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.78rem;font-weight:900;color:#4b5563}.btn-soft,.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all .18s ease}.btn-soft{min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;font-weight:800;font-size:.88rem;white-space:nowrap}.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}.btn-soft.secondary,.mini-btn{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}.survey-list{display:grid;gap:14px}.survey-card{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:16px;border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:22px;padding:18px;transition:all .18s ease}.survey-card.clickable{cursor:pointer}.survey-card.processing{opacity:.72;pointer-events:none}.survey-inline-empty{display:none;padding:18px 20px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.88rem;line-height:1.8}.survey-main{min-width:0}.survey-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:8px}.survey-title{margin:0;font-size:1rem;font-weight:900;color:#111827;line-height:1.5}.pill{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 10px;border-radius:999px;font-size:.74rem;font-weight:900}.pill.type{background:#eef2f7;color:#4b5563}.pill.status-open{background:rgba(22,101,52,.10);color:#166534}.pill.status-done{background:rgba(29,78,216,.10);color:#1d4ed8}.pill.status-draft{background:rgba(180,83,9,.10);color:#92400e}.pill.status-upcoming{background:rgba(14,116,144,.10);color:#0f766e}.pill.status-expired{background:rgba(153,27,27,.10);color:#991b1b}.survey-desc{margin:0;color:#6b7280;font-size:.9rem;line-height:1.8}.survey-meta{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.meta-box{border:1px solid rgba(15,23,42,.06);border-radius:16px;background:#f8fafc;padding:12px}.meta-label{color:#6b7280;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}.meta-value{color:#111827;font-size:.88rem;font-weight:800;line-height:1.6}.survey-note{margin-top:12px;padding:12px 14px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.83rem;line-height:1.75}.survey-actions{display:grid;gap:10px;align-content:start}.action-card{border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#faf7f7;padding:14px}.action-label{color:#6b7280;font-size:.74rem;font-weight:800;margin-bottom:6px}.action-value{color:#111827;font-size:.88rem;font-weight:900;line-height:1.55}.helper-box{padding:14px 16px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#f8fafc;color:#6b7280;font-size:.84rem;line-height:1.75}.empty-box{padding:32px 20px;border-radius:20px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;text-align:center;color:#6b7280;display:grid;gap:10px}.empty-box i{font-size:2rem;color:#8B0000}.empty-title{margin:0;font-size:1rem;font-weight:900;color:#111827}.empty-text{margin:0;font-size:.9rem;line-height:1.8}.mobile-toggle,.mobile-toolbar-note{display:none}.survey-shell.filters-collapsed .toolbar,.survey-shell.filters-collapsed .toolbar-foot{display:none}@media (max-width:1100px){.hero-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.survey-card{grid-template-columns:1fr}}@media (max-width:768px){.stats-grid,.survey-meta{grid-template-columns:1fr}.toolbar-form input{min-width:0;width:100%}.mobile-toggle,.mobile-toolbar-note{display:flex;align-items:center;justify-content:center;gap:8px}.mobile-toggle{min-height:42px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-weight:900;cursor:pointer}.btn-soft,.mini-btn{width:100%}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_mobile_hardening.css') }}">
+
+<div class="survey-shell bys-premium-page">
+    {{ communication_workspace_header(
+        active='surveys',
+        title='Atanmış anketleriniz daha görünür ve kaybolmayan bir listede',
+        text='Açık anketler hemen yanıtlanabilir, yakında başlayacak olanlar görünür kalır, süresi dolanlar da sessizce kaybolmaz. Böylece “anket yok oldu” hissi yerine izlenebilir bir akış kalır.',
+        icon='fa-solid fa-list-check',
+        badges=[
+            {'icon': 'fa-solid fa-list-check', 'text': 'Görünür: ' ~ visible_survey_count},
+            {'icon': 'fa-solid fa-bolt', 'text': 'Açık: ' ~ status_counts.get('active', 0)},
+            {'icon': 'fa-solid fa-check-double', 'text': 'Tamamlanan: ' ~ status_counts.get('completed', 0)}
+        ],
+        side_title='Takip kolaylığı',
+        side_text='Yaklaşan ve süresi dolan anketler artık listede tutuluyor. Bu küçük ama kritik fark, personele “bana bir şey atanmış mıydı” diye tekrar tekrar düşündürmüyor.',
+        metric_cards=[
+            {'label': 'Toplam', 'value': status_counts.get('all', 0), 'icon': 'fa-solid fa-layer-group', 'sub': 'Atanmış bütün anketler.'},
+            {'label': 'Açık', 'value': status_counts.get('active', 0), 'icon': 'fa-solid fa-bolt', 'sub': 'Şu an yanıtlanabilir durumda olanlar.', 'tone': 'success'},
+            {'label': 'Yaklaşan', 'value': status_counts.get('upcoming', 0), 'icon': 'fa-solid fa-hourglass-start', 'sub': 'Henüz başlamamış ama görünür bırakılanlar.', 'tone': 'info'},
+            {'label': 'Tamamlanan', 'value': status_counts.get('completed', 0), 'icon': 'fa-solid fa-check-double', 'sub': 'Yanıt verdiğiniz anketler.', 'tone': 'warning'}
+        ],
+        hub_note='Atanmış anketleri sadece listelemek yerine hangi durumda olduklarını ilk bakışta ayıran, daha sakin bir çalışma akışına çektik.',
+        hub_metric=visible_survey_count ~ ' görünür anket',
+        hub_secondary=status_counts.get('active', 0) ~ ' açık anket'
+    ) }}
+    <div class="glass-card panel-card toolbar-card">
+        {% call premium_action_shell(title='Anket görünümünü sakinleştir', text='Durum çipleri, arama ve yalnızca şu an açılabilenler filtresi aynı yerde dursun; kullanıcı da neyin neden görünmediğini anlasın.', icon='fa-solid fa-sliders', compact=True) %}
+        <div class="helper-box" style="margin-bottom:16px;">Açık anketler hemen yanıtlanabilir. Yakında başlayacak anketler için başlangıç saati görünür. Süresi dolan ve tamamlanan anketler listede kalır ama yeniden yanıtlanamaz.</div>
+        <button type="button" class="mobile-toggle" id="surveyToolbarToggle"><i class="fa-solid fa-sliders"></i> Filtreleri Aç / Kapat</button>
+        <div class="mobile-toolbar-note" id="surveyToolbarNote">Filtreler açık.</div>
+        <div class="toolbar">
+            <div class="chip-row">
+                {% for key, label in [('all','Tümü'), ('active','Açık'), ('completed','Tamamlandı'), ('upcoming','Yakında'), ('expired','Süresi Doldu')] %}
+                    <a href="{{ url_for('main.surveys_list', status=key, q=search_query) }}" class="chip-link {% if current_status == key %}active{% endif %}">{{ label }} <span class="count-pill">{{ status_counts.get(key, 0) }}</span></a>
+                {% endfor %}
+            </div>
+            <form method="GET" class="toolbar-form">
+                <input type="hidden" name="status" value="{{ current_status }}">
+                <input type="text" id="surveySearchInput" name="q" value="{{ search_query }}" placeholder="Anket ara...">
+                <button type="submit" class="mini-btn"><i class="fa-solid fa-filter"></i> Filtrele</button>
+                {% if search_query or current_status != 'all' %}<a href="{{ url_for('main.surveys_list') }}" class="mini-btn"><i class="fa-solid fa-rotate-left"></i> Temizle</a>{% endif %}
+            </form>
+        </div>
+        <div class="toolbar-foot"><div class="bys-premium-toolbar-hint"><i class="fa-solid fa-circle-info"></i><strong>İpucu:</strong> Yakında başlayacak ve süresi dolmuş anketler de aynı kart dilinde görünür.</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><span id="surveyVisibleCounter">{{ visible_survey_count }} / {{ status_counts.get(current_status, status_counts.get('all', 0)) }} anket gösteriliyor.</span><div><label class="switch-row"><input type="checkbox" id="surveyActionableOnly"> Yalnızca şu an açılabilenler</label></div></div></div>
+        {{ premium_helper_note('Kart sağındaki alan size anketin gerçekten açılıp açılamayacağını söyler; böylece boşuna form aramazsınız.') }}
+        {% endcall %}
+    </div>
+
+    <div class="glass-card panel-card">
+        {% call list_workspace_panel(title='Açık ve görünür anketler', text='Atandığınız ve görünüm filtresine giren kayıtlar burada. Kart sağındaki eylem alanı, anketi açmadan önce durumunu netleştirir.', badge=visible_survey_count ~ ' görünür', badge_tone='gray', icon='fa-solid fa-list-check', note='Her kart aynı sırayı korur: durum, tarih aralığı, hedef ve aksiyon. Böylece farklı anket tiplerinde tekrar öğrenme gerekmez.', note_icon='fa-solid fa-route') %}
+    {% if survey_rows %}
+        <div class="survey-list">
+            {% for row in survey_rows %}
+                {% set survey = row.survey %}
+                {% set response = row.response %}
+                {% set state = row.state %}
+                <div class="survey-card {% if state.is_actionable %}clickable{% endif %}" tabindex="0" data-actionable="{{ 1 if state.is_actionable else 0 }}" data-search="{{ ((survey.title or '') ~ ' ' ~ (survey.description or '') ~ ' ' ~ (survey.survey_type or ''))|lower }}">
+                    <div class="survey-main">
+                        <div class="survey-top">
+                            <h4 class="survey-title">{{ survey.title }}</h4>
+                            <span class="pill type">{{ survey.survey_type or 'kurum_ici' }}</span>
+                            <span class="pill {{ state.badge_class }}">{{ state.label }}</span>
+                            {% if survey.is_anonymous %}<span class="pill type">Anonim</span>{% endif %}
+                        </div>
+                        <p class="survey-desc">{{ survey.description or 'Bu anket için açıklama bulunmuyor.' }}</p>
+                        <div class="survey-meta">
+                            <div class="meta-box"><div class="meta-label">Yayın / Başlangıç</div><div class="meta-value">{{ survey.published_at.strftime('%d.%m.%Y %H:%M') if survey.published_at else 'Taslak / planlanmamış' }}{% if survey.start_at %}<br>Başlangıç: {{ survey.start_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}</div></div>
+                            <div class="meta-box"><div class="meta-label">Bitiş / Yanıt</div><div class="meta-value">{% if survey.end_at %}{{ survey.end_at.strftime('%d.%m.%Y %H:%M') }}{% else %}Bitiş yok{% endif %}{% if response and response.is_completed %}<br>Yanıtlandı: {{ response.completed_at.strftime('%d.%m.%Y %H:%M') if response.completed_at else 'tamamlandı' }}{% endif %}</div></div>
+                        </div>
+                        <div class="survey-note">{% if state.key == 'active' %}Bu anket şu an açılabilir durumda. İsterseniz doğrudan yanıt ekranına geçebilirsiniz.{% elif state.key == 'upcoming' %}Bu anket size atanmış ama henüz başlangıç zamanı gelmemiş.{% elif state.key == 'expired' %}Bu anketin süresi dolmuş durumda; kayıt izlenebilir ama yeniden yanıtlanamaz.{% else %}Bu anketi daha önce tamamladığınız için liste bilgilendirme amaçlı tutuluyor.{% endif %}</div>
+                    </div>
+                    <div class="survey-actions">
+                        <div class="action-card"><div class="action-label">İşlem Durumu</div><div class="action-value">{% if state.is_actionable %}Yanıt vermeye hazır{% elif state.key == 'completed' %}Tamamlanmış kayıt{% else %}Bilgilendirme görünümü{% endif %}</div></div>
+                        {% if state.is_actionable %}
+                            <a href="{{ url_for('main.survey_take', survey_id=survey.id) }}" class="btn-soft primary survey-action-link"><i class="fa-solid fa-pen"></i> Ankete Başla</a>
+                        {% else %}
+                            <a href="{{ url_for('main.surveys_list', status=current_status, q=search_query) }}" class="btn-soft secondary"><i class="fa-solid fa-list"></i> Listede Kal</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    <div class="survey-inline-empty" id="surveyInlineEmpty"><i class="fa-solid fa-magnifying-glass"></i> Bu filtre veya arama ile eşleşen anket görünmüyor.</div>
+        {% else %}
+        <div class="empty-box"><i class="fa-solid fa-square-poll-vertical"></i><h5 class="empty-title">Anket görünmüyor</h5><p class="empty-text">Bu görünüm altında listelenecek bir anket yok.</p></div>
+        {% endif %}
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+    const input = document.getElementById('surveySearchInput');
+    const cards = Array.from(document.querySelectorAll('.survey-card'));
+    const inlineEmpty = document.getElementById('surveyInlineEmpty');
+    const counter = document.getElementById('surveyVisibleCounter');
+    const actionableOnly = document.getElementById('surveyActionableOnly');
+    const shell = document.querySelector('.survey-shell');
+    const toolbarToggle = document.getElementById('surveyToolbarToggle');
+    const toolbarNote = document.getElementById('surveyToolbarNote');
+    const storageKey = 'bys360-survey-toolbar-collapsed';
+    function sync(){
+        const visible = cards.filter(card => card.style.display !== 'none').length;
+        if (inlineEmpty) inlineEmpty.style.display = cards.length && visible === 0 ? 'block' : 'none';
+        if (counter) counter.textContent = `${visible} / {{ status_counts.get(current_status, status_counts.get('all', 0)) }} anket gösteriliyor.`;
+        if (toolbarNote && !(shell && shell.classList.contains('filters-collapsed'))) toolbarNote.textContent = `${visible} anket görünür.`;
+    }
+    function applyFilters(){
+        const q = (input && input.value || '').trim().toLowerCase();
+        cards.forEach(card => {
+            const searchMatch = !q || (card.dataset.search || '').includes(q);
+            const actionableMatch = !(actionableOnly && actionableOnly.checked) || card.dataset.actionable === '1';
+            card.style.display = searchMatch && actionableMatch ? '' : 'none';
+        });
+        sync();
+    }
+    function syncToolbarState(){
+        if (!shell || !toolbarNote || window.innerWidth > 768) return;
+        toolbarNote.textContent = shell.classList.contains('filters-collapsed') ? 'Filtreler kapalı.' : 'Filtreler açık.';
+    }
+    if (shell && window.innerWidth <= 768 && localStorage.getItem(storageKey) === '1') shell.classList.add('filters-collapsed');
+    syncToolbarState();
+    if (toolbarToggle && shell) toolbarToggle.addEventListener('click', function(){ shell.classList.toggle('filters-collapsed'); localStorage.setItem(storageKey, shell.classList.contains('filters-collapsed') ? '1' : '0'); syncToolbarState(); });
+    if (input) { input.addEventListener('input', applyFilters); document.addEventListener('keydown', function(event){ if (event.key === '/' && document.activeElement !== input && !event.target.matches('input, textarea, select')) { event.preventDefault(); input.focus(); }}); }
+    if (actionableOnly) actionableOnly.addEventListener('change', applyFilters);
+    document.querySelectorAll('.survey-action-link').forEach(function(link){ link.addEventListener('click', function(){ const card = link.closest('.survey-card'); if (card) card.classList.add('processing'); link.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Açılıyor'; }); });
+    cards.forEach(function(card){ const link = card.querySelector('.survey-action-link'); if (!link) return; card.addEventListener('click', function(event){ if (event.target.closest('a, button, input, textarea, select, label, form')) return; link.click(); }); card.addEventListener('keydown', function(event){ if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, input, textarea, select, label, form')) { event.preventDefault(); link.click(); } }); });
+    applyFilters();
+})();
+</script>
+{% endblock %}

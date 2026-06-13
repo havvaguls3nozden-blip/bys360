@@ -1,0 +1,208 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}AI Öneri Motoru ve Risk Önceliklendirme - BYS360{% endblock %}
+{% block page_kicker %}AI Karar Destek / Analiz Merkezi{% endblock %}
+{% block page_title %}AI Öneri Motoru ve Risk Önceliklendirme{% endblock %}
+{% block page_subtitle %}Açık AI önerilerini, KVKK sinyallerini, hata/uyarı yoğunluğunu ve modül risklerini insan onaylı öncelik listesine dönüştürür.{% endblock %}
+{% block ai_inner %}
+<style>
+  .priority-hero{background:linear-gradient(135deg, rgba(139,0,0,.10), rgba(255,255,255,.96) 52%, rgba(15,23,42,.03));}
+  .priority-card-danger{background:linear-gradient(180deg, rgba(220,38,38,.12), rgba(255,255,255,.96));}
+  .priority-card-warning{background:linear-gradient(180deg, rgba(245,158,11,.14), rgba(255,255,255,.96));}
+  .priority-card-calm{background:linear-gradient(180deg, rgba(59,130,246,.10), rgba(255,255,255,.96));}
+  .priority-card-success{background:linear-gradient(180deg, rgba(16,185,129,.12), rgba(255,255,255,.96));}
+  .priority-rank{width:46px;height:46px;border-radius:16px;background:#8B0000;color:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 12px 22px rgba(139,0,0,.18)}
+  .priority-meter{height:9px;border-radius:999px;background:#eef2f7;overflow:hidden;margin-top:8px}
+  .priority-meter span{display:block;height:100%;border-radius:999px;background:#8B0000}
+  .priority-reason-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .priority-reason{font-size:.76rem;font-weight:800;padding:5px 8px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#475569}
+  .priority-contract{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+  .priority-contract .item{padding:12px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.07)}
+  .priority-contract .k{font-size:.72rem;color:#6b7280;font-weight:900;text-transform:uppercase;letter-spacing:.03em}.priority-contract .v{margin-top:6px;font-weight:900;color:#111827}
+  @media (max-width:1200px){.priority-contract{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:768px){.priority-contract{grid-template-columns:1fr}.priority-rank{width:40px;height:40px}}
+</style>
+<div class="ai-shell">
+  <section class="ai-panel priority-hero">
+    <div class="ai-hero-grid">
+      <div>
+        <div class="ai-kicker">Kontrol 9 · Salt-okunur öneri motoru</div>
+        <h3 class="ai-title">Riskleri ve açık önerileri yönetici inceleme sırasına dizer</h3>
+        <p class="ai-sub">Bu ekran AI çıktısını nihai karar haline getirmez. Önerileri yalnızca Veri Tamamlığı, güvenlik gerekçesi ve aksiyon notuyla görünür kılar; uygulama, kapatma veya veri değiştirme işlemi yapmaz.</p>
+        <div class="ai-actions" style="margin-top:16px">
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_center', fallback='/admin/ai-center') }}"><i class="fa-solid fa-arrow-left"></i> AI Karar Destek Merkezi</a>
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_visual_reports', fallback='#') }}"><i class="fa-solid fa-chart-pie"></i> Kontrol 8 grafikler</a>
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_recommendation_priority_export', fallback='#', **filters) }}"><i class="fa-solid fa-file-csv"></i> CSV dışa aktar</a>
+        </div>
+      </div>
+      <div>
+        <div class="ai-note">
+          <strong>Güvenli çalışma sözleşmesi</strong>
+          <div class="priority-contract">
+            <div class="item"><div class="k">Nihai karar</div><div class="v">{{ 'Açık' if safety_contract.AI_FINAL_DECISION_ENABLED else 'Kapalı' }}</div></div>
+            <div class="item"><div class="k">Otomatik uygulama</div><div class="v">{{ 'Açık' if safety_contract.AI_AUTO_APPLY_ENABLED else 'Kapalı' }}</div></div>
+            <div class="item"><div class="k">DB yazımı</div><div class="v">{{ 'Açık' if safety_contract.DB_WRITE_ENABLED else 'Kapalı' }}</div></div>
+            <div class="item"><div class="k">Panel</div><div class="v">Salt-okunur</div></div>
+            <div class="item"><div class="k">İnceleme</div><div class="v">İnsan onayı</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <form class="ai-form-wrap" method="get" action="{{ safe_url_for('main.admin_ai_recommendation_priority', fallback='/admin/ai-recommendation-priority') }}">
+    <div class="ai-filters-wide">
+      <div class="ai-group">
+        <label>Gün aralığı</label>
+        <input class="ai-input" type="number" min="1" max="180" name="lookback_days" value="{{ lookback_days }}">
+      </div>
+      <div class="ai-group">
+        <label>Modül</label>
+        <select class="ai-select" name="module_type">
+          <option value="">Tümü</option>
+          {% for option in module_options %}
+          <option value="{{ option.value }}" {% if filters.module_type == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ai-group">
+        <label>Durum</label>
+        <select class="ai-select" name="status">
+          <option value="">Tümü</option>
+          {% for option in status_options %}
+          <option value="{{ option.value }}" {% if filters.status == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ai-group">
+        <label>Önem</label>
+        <select class="ai-select" name="severity">
+          <option value="">Tümü</option>
+          {% for option in severity_options %}
+          <option value="{{ option.value }}" {% if filters.severity == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ai-group">
+        <label>Limit</label>
+        <input class="ai-input" type="number" min="5" max="250" name="limit" value="{{ filters.limit }}">
+      </div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-magnifying-glass-chart"></i> Uygula</button>
+    </div>
+  </form>
+
+  <section class="ai-grid ai-grid-five">
+    {% for card in summary_cards %}
+    <article class="ai-card priority-card-{{ card.tone }}">
+      <div class="ai-label">{{ card.label }}</div>
+      <div class="ai-value">{{ card.value }}</div>
+      <div class="ai-mini">{{ card.mini }}</div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-grid ai-grid-six">
+    {% for card in risk_cards %}
+    <article class="ai-card priority-card-{{ card.tone }}">
+      <div class="ai-label">{{ card.title }}</div>
+      <div class="ai-value">{{ card.value }}</div>
+      <div class="ai-mini">{{ card.body }}</div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Önceliklendirilmiş açık öneriler</div>
+    <h3 class="ai-title">İlk incelenecek AI önerileri</h3>
+    <p class="ai-sub">Skor; önem derecesi, açık durum, KVKK/maskeleme sinyali, hata, negatif geri bildirim ve gecikme yoğunluğu birlikte okunarak hesaplanır.</p>
+    <table class="ai-table">
+      <thead>
+        <tr>
+          <th>Öncelik</th>
+          <th>Öneri</th>
+          <th>Modül / Hedef</th>
+          <th>Gerekçe</th>
+          <th>Güvenli aksiyon</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in priority_rows %}
+        <tr>
+          <td style="width:120px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="priority-rank">{{ row.score }}</div>
+              <div>
+                <span class="ai-badge {{ 'warning' if row.tone == 'warning' else 'success' if row.tone == 'success' else 'muted' }}">{{ row.priority_label }}</span>
+                <div class="priority-meter"><span style="width:{{ row.score }}%"></span></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong>{{ row.title }}</strong>
+            <div class="ai-mini">{{ row.body or 'Açıklama girilmemiş.' }}</div>
+            <div class="ai-mini">{{ row.recommendation_type }} · {{ row.created_at }}</div>
+          </td>
+          <td>
+            <strong>{{ row.module_label }}</strong>
+            <div class="ai-mini">{{ row.target_table }} #{{ row.target_id }}</div>
+            <div style="margin-top:8px"><span class="ai-badge muted">{{ row.severity_label }}</span> <span class="ai-badge muted">{{ row.status_label }}</span></div>
+          </td>
+          <td>
+            <div class="priority-reason-list">
+              {% for reason in row.reasons %}<span class="priority-reason">{{ reason }}</span>{% endfor %}
+            </div>
+          </td>
+          <td><div class="ai-note">{{ row.safe_action }}</div></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5"><div class="ai-note">Bu filtrelerle önceliklendirilecek AI önerisi bulunamadı. Modül riskleri ve üretilen izleme notları aşağıda izlenebilir.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Modül risk sırası</div>
+      <h3 class="ai-title">Sinyal yoğunluğu yüksek modüller</h3>
+      <table class="ai-table">
+        <thead><tr><th>Modül</th><th>Risk</th><th>Sinyaller</th><th>Aksiyon</th></tr></thead>
+        <tbody>
+          {% for row in module_rows %}
+          <tr>
+            <td><strong>{{ row.module_label }}</strong><div class="ai-mini">{{ row.request_total }} istek · {{ row.target_signal_total }} hedef sinyali</div></td>
+            <td><div class="priority-rank">{{ row.risk_score }}</div><div class="ai-mini">{{ row.risk_label }}</div></td>
+            <td>
+              <div class="priority-reason-list">
+                {% for reason in row.reasons %}<span class="priority-reason">{{ reason }}</span>{% endfor %}
+              </div>
+              <div class="ai-mini">Açık {{ row.open_recommendations }} · Hata {{ row.failed_total }} · Maske uyarısı {{ row.unmasked_total }}</div>
+            </td>
+            <td><div class="ai-mini">{{ row.safe_action }}</div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Motorun ürettiği aksiyon notları</div>
+      <h3 class="ai-title">Otomatik uygulama değil, yönetici kontrol listesi</h3>
+      <ul class="ai-list" style="margin-top:14px">
+        {% for action in generated_actions %}
+        <li class="ai-list-item priority-card-{{ action.tone }}" style="align-items:flex-start">
+          <div>
+            <strong>{{ action.title }}</strong>
+            <div class="ai-mini">{{ action.body }}</div>
+            <div class="priority-reason-list">
+              {% for reason in action.reasons %}<span class="priority-reason">{{ reason }}</span>{% endfor %}
+            </div>
+          </div>
+          <span class="ai-badge muted">{{ action.score }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="ai-note" style="margin-top:14px">Bu notlar karar değildir. Kurumsal süreçlerde ilgili yönetici/İK/Admin incelemesi olmadan sonuç, yaptırım veya otomatik işlem oluşturulmaz.</div>
+    </article>
+  </section>
+</div>
+{% endblock %}

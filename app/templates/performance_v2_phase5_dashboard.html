@@ -1,0 +1,114 @@
+{# BYS360_AI_DECISION_FAZ9_REMINDER_CSS_LINK #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz9_reminder.css') }}">
+{# BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_CSS_LINK #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz8_period_scope.css') }}">
+{% extends "base.html" %}
+{% block title %}Rapor Özeti - BYS360{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/performance_phase3.css') }}">{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Rapor Özeti{% endblock %}
+{% block page_subtitle %}Dönem bazlı sonuçlar, yönetici yükü ve yayın görünümü aynı tasarım diliyle izlenir.{% endblock %}
+
+{% block content %}
+{# BYS360_AI_DECISION_FAZ9_REMINDER_PANEL_INCLUDE #}
+{% include "ai_decision/_faz9_reminder_panel.html" ignore missing %}
+
+{# BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_PANEL_INCLUDE #}
+{% include "ai_decision/_faz8_period_scope_panel.html" ignore missing %}
+
+{# BYS360_AI_DECISION_FAZ5_SCORECARD_PANEL_INCLUDE #}
+{% include "ai_decision/_faz5_scorecard_decision_panel.html" ignore missing %}
+
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+<div class="performance-ui">
+    <section class="performance-surface performance-hero">
+        <div class="performance-hero-main">
+            <span class="performance-kicker"><i class="fa-solid fa-chart-column"></i> Yönetim özeti</span>
+            <h2 class="performance-title">Rapor akışı tek yüzeyde toplandı</h2>
+            <p class="performance-text">Dönem seçimi, istatistikler ve yönetici bazlı özet kartları aynı görsel çizgide ilerler. Bu sayede karar ekranı daha sakin ve okunur hale gelir.</p>
+            <div class="performance-badges">
+                <span class="performance-badge"><i class="fa-regular fa-calendar"></i> {{ period.title if period else 'Dönem seçiniz' }}</span>
+                <span class="performance-badge"><i class="fa-solid fa-address-card"></i> {{ scorecard.count }} kayıt</span>
+                <span class="performance-badge"><i class="fa-solid fa-bullhorn"></i> {{ scorecard.published_count }} yayımlanan</span>
+            </div>
+        </div>
+        <div class="performance-hero-side">
+            <div class="performance-side-label">İşlem hattı</div>
+            <div class="performance-side-value">Önce özet, sonra karne, sonra yayın.</div>
+            <div class="performance-side-text">Yöneticiler için rapor alanı ile yayın alanı arasındaki geçişler tek satırda toplanmıştır.</div>
+        </div>
+    </section>
+
+    <section class="performance-surface">
+        <form method="get" class="performance-toolbar">
+            <div class="performance-field" style="min-width:280px;">
+                <label class="performance-field-label">Dönem</label>
+                <select class="performance-select" name="period_id">
+                    {% for item in periods %}<option value="{{ item.id }}" {% if period and item.id == period.id %}selected{% endif %}>{{ item.title }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="performance-toolbar-actions">
+                <button class="performance-btn primary" type="submit"><i class="fa-solid fa-eye"></i> Görüntüle</button>
+                <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase5_scorecard', period_id=period.id if period else None) }}"><i class="fa-solid fa-id-card"></i> Not karnesi</a>
+                <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase5_publish', period_id=period.id if period else None) }}"><i class="fa-solid fa-share-nodes"></i> Sonuç yayınlama</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="performance-metrics">
+        <article class="performance-metric">
+            <div class="performance-metric-label">Toplam kayıt</div>
+            <div class="performance-metric-value">{{ scorecard.count }}</div>
+            <div class="performance-metric-sub">Seçili dönemin değerlendirme sayısı.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Yayımlanan sonuç</div>
+            <div class="performance-metric-value">{{ scorecard.published_count }}</div>
+            <div class="performance-metric-sub">Personelin görüntüleyebildiği sonuç sayısı.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Yönetici özeti</div>
+            <div class="performance-metric-value">{{ manager_summary.rows|length }}</div>
+            <div class="performance-metric-sub">Bu dönemde görev alan yönetici görünümü.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Bekleyen yayın</div>
+            <div class="performance-metric-value">{{ (scorecard.count or 0) - (scorecard.published_count or 0) }}</div>
+            <div class="performance-metric-sub">Henüz personele açılmamış sonuç sayısı.</div>
+        </article>
+    </section>
+
+    <section class="performance-surface">
+        <div class="performance-toolbar">
+            <div>
+                <h3 class="performance-section-title">Yönetici bazlı özet</h3>
+                <p class="performance-section-text">Görev yükü, tamamlanma ve gecikme görünümü tek tabloda okunur.</p>
+            </div>
+        </div>
+        <div class="performance-table-wrap" style="margin-top:16px;">
+            <table class="performance-table">
+                <thead><tr><th>Yönetici</th><th>Toplam görev</th><th>Tamamlanan</th><th>Geciken</th></tr></thead>
+                <tbody>
+                    {% for row in manager_summary.rows %}
+                    <tr>
+                        <td>{{ row.user.full_name if row.user else '-' }}</td>
+                        <td>{{ row.total }}</td>
+                        <td>{{ row.completed }}</td>
+                        <td>{{ row.overdue }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4"><div class="performance-empty">Özet verisi bulunmuyor.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE11_REPORTING_RISK_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_READINESS_BOUND #}

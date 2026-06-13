@@ -1,0 +1,146 @@
+{# BYS360_PHASE3_4_CORPORATE_ACCESS_DENIED_TEMPLATE #}
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>403 - {{ title or "Erişim Yetkisi Bulunmamaktadır" }}</title>
+  <style>
+    :root {
+      --bys-red: #8B0000;
+      --bys-red-soft: rgba(139, 0, 0, .10);
+      --bys-red-line: rgba(139, 0, 0, .22);
+      --bys-bg: #f7f4f2;
+      --bys-card: rgba(255, 255, 255, .92);
+      --bys-text: #262123;
+      --bys-muted: #6f6668;
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--bys-text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(139, 0, 0, .12), transparent 28rem),
+        radial-gradient(circle at 88% 18%, rgba(139, 0, 0, .06), transparent 22rem),
+        linear-gradient(135deg, #fffdfc, var(--bys-bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+    }
+    .access-card {
+      width: min(820px, 100%);
+      background: var(--bys-card);
+      border: 1px solid var(--bys-red-line);
+      border-radius: 28px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .12);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+    .top-line { height: 8px; background: var(--bys-red); }
+    .content { padding: clamp(28px, 5vw, 44px); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: var(--bys-red-soft);
+      color: var(--bys-red);
+      font-weight: 700;
+      letter-spacing: .02em;
+      margin-bottom: 18px;
+    }
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: inline-grid;
+      place-items: center;
+      background: var(--bys-red);
+      color: #fff;
+      font-weight: 800;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 28px rgba(139, 0, 0, .20);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(25px, 4vw, 36px);
+      line-height: 1.15;
+      color: var(--bys-text);
+    }
+    p {
+      margin: 0;
+      line-height: 1.7;
+      font-size: 16px;
+      color: var(--bys-muted);
+    }
+    .message {
+      margin-top: 14px;
+      padding: 16px 18px;
+      border: 1px solid rgba(139, 0, 0, .14);
+      background: rgba(255, 255, 255, .72);
+      border-radius: 18px;
+      color: #433b3d;
+      font-weight: 600;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 15px;
+      padding: 12px 18px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform .16s ease, box-shadow .16s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .primary {
+      color: #fff;
+      background: var(--bys-red);
+      box-shadow: 0 12px 26px rgba(139, 0, 0, .18);
+    }
+    .secondary {
+      color: var(--bys-red);
+      background: #fff;
+      border: 1px solid var(--bys-red-line);
+    }
+    .note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #817879;
+    }
+    @media (max-width: 520px) {
+      body { padding: 18px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="access-card" role="main" aria-labelledby="access-title">
+    <div class="top-line" aria-hidden="true"></div>
+    <section class="content">
+      <div class="eyebrow">BYS360</div>
+      <div class="icon" aria-hidden="true">!</div>
+      <h1 id="access-title">{{ title or "Erişim Yetkisi Bulunmamaktadır" }}</h1>
+      <p>Bu alan rol ve yetki sınırları kapsamında korunmaktadır.</p>
+      <div class="message">{{ message or "Bu sayfaya erişim yetkiniz bulunmamaktadır." }}</div>
+      <div class="actions">
+        <a class="btn primary" href="{{ back_url or url_for('main.dashboard') }}">Ana sayfaya dön</a>
+        <a class="btn secondary" href="javascript:history.back()">Geri dön</a>
+      </div>
+      <div class="note">Yetki gerektiğini düşünüyorsanız sistem yöneticisiyle iletişime geçiniz.</div>
+    </section>
+  </main>
+</body>
+</html>

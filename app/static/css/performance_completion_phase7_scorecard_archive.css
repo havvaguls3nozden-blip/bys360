@@ -1,0 +1,13 @@
+/* BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_CSS */
+.bys360-phase7-archive-panel{margin:18px 0;padding:18px;border:1px solid rgba(139,0,0,.16);border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 12px 32px rgba(31,41,55,.08);backdrop-filter:blur(8px)}
+.bys360-phase7-archive-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
+.bys360-phase7-archive-head h3{margin:2px 0 6px;font-size:1.18rem;color:#2f1720;font-weight:800}
+.bys360-phase7-archive-head p{margin:0;color:#5f6673;line-height:1.55}
+.bys360-phase7-kicker{font-size:.78rem;color:#8B0000;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin:0!important}
+.bys360-phase7-badge{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:rgba(139,0,0,.1);color:#8B0000;font-weight:800;white-space:nowrap}
+.bys360-phase7-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.bys360-phase7-card{padding:14px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.9));border:1px solid rgba(15,23,42,.08)}
+.bys360-phase7-card strong{display:block;color:#1f2937;margin-bottom:6px;font-size:.94rem}
+.bys360-phase7-card span{display:block;color:#64748b;font-size:.86rem;line-height:1.45}
+@media (max-width: 980px){.bys360-phase7-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bys360-phase7-archive-head{flex-direction:column}.bys360-phase7-badge{white-space:normal}}
+@media (max-width: 560px){.bys360-phase7-grid{grid-template-columns:1fr}.bys360-phase7-archive-panel{padding:14px;border-radius:14px}}

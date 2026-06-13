@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Duyuru Okunma Raporu - BYS360{% endblock %}
+{% block page_kicker %}Genel · Duyuru Yönetimi{% endblock %}
+{% block page_title %}Duyuru Okunma Raporu{% endblock %}
+{% block page_subtitle %}Pop-up duyurunun hedef kitle, görüldü, okundu ve kapatıldı kayıtlarını kişi bazında izleyin.{% endblock %}
+{% block content %}
+<style>
+.apr-shell{display:grid;gap:18px}.apr-head,.apr-card,.apr-panel{background:rgba(255,255,255,.95);border:1px solid rgba(139,0,0,.10);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08)}.apr-head{padding:20px;display:grid;gap:14px}.apr-title{margin:0;font-size:1.28rem;font-weight:950;color:#111827}.apr-muted{color:#6b7280;font-size:.88rem;line-height:1.65}.apr-actions{display:flex;gap:10px;flex-wrap:wrap}.apr-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:14px;font-weight:850;text-decoration:none;border:1px solid rgba(139,0,0,.16);background:#fff;color:#8B0000}.apr-btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}.apr-btn.muted{color:#374151;border-color:rgba(15,23,42,.12)}.apr-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.apr-card{padding:16px}.apr-label{font-size:.74rem;font-weight:850;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}.apr-value{font-size:1.42rem;font-weight:950;color:#111827;margin-top:6px}.apr-panel{padding:18px}.apr-filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.apr-input,.apr-select{min-height:42px;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:0 12px;background:#fff}.apr-input{min-width:280px}.apr-table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff}.apr-table{width:100%;min-width:1180px;border-collapse:collapse}.apr-table th{font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;background:#fafafa;text-align:left;padding:13px}.apr-table td{padding:13px;border-top:1px solid rgba(15,23,42,.08);vertical-align:top}.apr-name{font-weight:900;color:#111827}.apr-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:850;background:#f3f4f6;color:#374151}.apr-pill.green{background:#ecfdf5;color:#047857}.apr-pill.red{background:#fef2f2;color:#991b1b}.apr-pill.amber{background:#fffbeb;color:#92400e}.apr-pill.gray{background:#f3f4f6;color:#374151}.apr-progress{height:9px;border-radius:99px;background:#f1f5f9;overflow:hidden}.apr-progress span{display:block;height:100%;background:linear-gradient(90deg,#8B0000,#b91c1c);border-radius:99px}.apr-empty{text-align:center;color:#6b7280;padding:34px 10px}@media(max-width:1200px){.apr-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:720px){.apr-stats{grid-template-columns:1fr}.apr-input,.apr-select,.apr-btn{width:100%;min-width:0}.apr-head,.apr-panel{padding:15px}}
+</style>
+<div class="apr-shell">
+  <section class="apr-head">
+    <div>
+      <h3 class="apr-title">{{ announcement.title }}</h3>
+      <div class="apr-muted">{{ announcement.body[:260] }}{% if announcement.body|length > 260 %}...{% endif %}</div>
+    </div>
+    <div class="apr-actions">
+      <a class="apr-btn" href="{{ url_for('main.announcement_popup_manage') }}"><i class="fa-solid fa-arrow-left"></i> Duyurulara Dön</a>
+      <a class="apr-btn" href="{{ url_for('main.announcement_popup_edit', announcement_id=announcement.id) }}"><i class="fa-solid fa-pen"></i> Düzenle</a>
+      <a class="apr-btn primary" href="{{ url_for('main.announcement_popup_report_csv', announcement_id=announcement.id) }}"><i class="fa-solid fa-file-csv"></i> CSV İndir</a>
+    </div>
+    <div class="apr-progress" title="Okundu oranı"><span style="width: {{ summary.acceptance_rate }}%"></span></div>
+    <div class="apr-muted">Okundu oranı: <strong>{{ summary.acceptance_rate }}%</strong> · Görülme oranı: <strong>{{ summary.seen_rate }}%</strong> · Filtrelenen kayıt: {{ filtered_row_count }} / {{ all_row_count }}</div>
+  </section>
+
+  <section class="apr-stats">
+    <div class="apr-card"><div class="apr-label">Hedef kullanıcı</div><div class="apr-value">{{ summary.target_count }}</div></div>
+    <div class="apr-card"><div class="apr-label">Gördü</div><div class="apr-value">{{ summary.seen_count }}</div></div>
+    <div class="apr-card"><div class="apr-label">Okudu</div><div class="apr-value">{{ summary.acknowledged_count }}</div></div>
+    <div class="apr-card"><div class="apr-label">Kapattı</div><div class="apr-value">{{ summary.dismissed_count }}</div></div>
+    <div class="apr-card"><div class="apr-label">Henüz görmedi</div><div class="apr-value">{{ summary.not_seen_count }}</div></div>
+    <div class="apr-card"><div class="apr-label">Onay bekliyor</div><div class="apr-value">{{ summary.pending_count }}</div></div>
+  </section>
+
+  <section class="apr-panel">
+    <form method="get" class="apr-filter">
+      <input class="apr-input" name="q" value="{{ q }}" placeholder="Ad, sicil, e-posta, birim veya rolde ara">
+      <select class="apr-select" name="status">
+        {% for key, label in status_options.items() %}<option value="{{ key }}" {% if status==key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <button class="apr-btn muted" type="submit"><i class="fa-solid fa-filter"></i> Filtrele</button>
+      <a class="apr-btn muted" href="{{ url_for('main.announcement_popup_report', announcement_id=announcement.id) }}">Temizle</a>
+    </form>
+  </section>
+
+  <section class="apr-table-wrap">
+    <table class="apr-table">
+      <thead>
+        <tr>
+          <th>Kullanıcı</th>
+          <th>Sicil / E-posta</th>
+          <th>Birim / Rol</th>
+          <th>Durum</th>
+          <th>İlk gösterim</th>
+          <th>Son gösterim</th>
+          <th>Okuma</th>
+          <th>Kapatma</th>
+          <th>Gösterim</th>
+          <th>Teknik iz</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><div class="apr-name">{{ row.full_name }}</div><div class="apr-muted">ID: {{ row.user_id }}</div></td>
+          <td><div>{{ row.sicil_no or '-' }}</div><div class="apr-muted">{{ row.email or '-' }}</div></td>
+          <td><div>{{ row.unit_name or '-' }}</div><div class="apr-muted">{{ row.role or '-' }}</div></td>
+          <td><span class="apr-pill {{ row.status_color }}">{{ row.status_label }}</span>{% if row.is_pending %}<div class="apr-muted">Onay bekliyor</div>{% endif %}</td>
+          <td>{{ row.first_seen_at.strftime('%d.%m.%Y %H:%M') if row.first_seen_at else '-' }}</td>
+          <td>{{ row.last_seen_at.strftime('%d.%m.%Y %H:%M') if row.last_seen_at else '-' }}</td>
+          <td>{{ row.acknowledged_at.strftime('%d.%m.%Y %H:%M') if row.acknowledged_at else '-' }}</td>
+          <td>{{ row.dismissed_at.strftime('%d.%m.%Y %H:%M') if row.dismissed_at else '-' }}</td>
+          <td>{{ row.seen_count }}</td>
+          <td><div class="apr-muted">{{ row.ip_address or '-' }}</div><div class="apr-muted">{{ row.user_agent[:120] if row.user_agent else '-' }}</div></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="apr-empty">Bu filtreye uygun kayıt bulunamadı.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

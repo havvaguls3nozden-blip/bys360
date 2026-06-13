@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% block title %}Başkan Onayı Karne İncelemesi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Başkan Onayı Karne İncelemesi{% endblock %}
+{% block page_subtitle %}70 altı performans sonucu için detaylı karne, süreç ve karar ekranı.{% endblock %}
+{% block content %}
+{# BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_PANEL_INCLUDE #}
+{% include "ai_decision/_faz6_low_performance_approval_panel.html" ignore missing %}
+
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+<!-- BYS360_PHASE5_1_PRESIDENT_SCORECARD_REVIEW -->
+<style>
+.phase5-scorecard{display:flex;flex-direction:column;gap:18px}.phase5-hero{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:18px;align-items:stretch;border:1px solid rgba(139,0,0,.14);border-radius:28px;background:linear-gradient(135deg,rgba(139,0,0,.075),rgba(255,255,255,.97));box-shadow:0 22px 48px rgba(15,23,42,.07);padding:22px}.phase5-kicker{font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.phase5-title{font-size:1.65rem;font-weight:950;color:#111827;margin:6px 0}.phase5-sub{color:#64748b;line-height:1.65;margin:0}.phase5-scorebox{border-radius:24px;background:#fff;border:1px solid rgba(139,0,0,.14);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px;text-align:center}.phase5-scorebox span{font-size:.78rem;font-weight:950;color:#64748b;text-transform:uppercase}.phase5-scorebox strong{font-size:2.55rem;line-height:1;color:#991b1b;margin-top:8px}.phase5-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.phase5-card{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:rgba(255,255,255,.96);box-shadow:0 16px 32px rgba(15,23,42,.052);padding:16px}.phase5-label{font-size:.74rem;font-weight:950;text-transform:uppercase;letter-spacing:.05em;color:#64748b}.phase5-value{font-size:1rem;font-weight:950;color:#111827;margin-top:7px;word-break:break-word}.phase5-section{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:rgba(255,255,255,.96);box-shadow:0 18px 34px rgba(15,23,42,.055);overflow:hidden}.phase5-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(15,23,42,.07);background:linear-gradient(180deg,#fff,#f8fafc)}.phase5-section-title{font-weight:950;color:#111827;font-size:1.08rem}.phase5-section-sub{color:#64748b;font-size:.86rem;margin-top:4px;line-height:1.5}.phase5-section-body{padding:18px 20px}.phase5-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 11px;background:rgba(139,0,0,.08);color:#8B0000;font-weight:950;font-size:.82rem}.phase5-pill.warn{background:rgba(185,28,28,.09);color:#991b1b}.phase5-pill.ok{background:rgba(22,101,52,.09);color:#166534}.phase5-muted{color:#64748b;font-size:.88rem;line-height:1.55}.phase5-note{border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.07);padding:14px 16px;color:#334155;line-height:1.6}.phase5-table-wrap{overflow-x:auto}.phase5-table{width:100%;border-collapse:collapse;min-width:820px}.phase5-table th{background:#f8fafc;color:#475569;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.08)}.phase5-table td{padding:14px;border-bottom:1px solid rgba(15,23,42,.06);vertical-align:top}.phase5-empty{padding:18px;color:#64748b;font-weight:850;background:#f8fafc;border-radius:18px;border:1px solid rgba(15,23,42,.07)}.phase5-manager-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.phase5-manager-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff;padding:16px;box-shadow:0 12px 28px rgba(15,23,42,.045)}.phase5-comment{margin-top:10px;border-radius:14px;background:#f8fafc;color:#334155;padding:11px;line-height:1.55;font-size:.9rem}.phase5-timeline{display:flex;flex-direction:column;gap:10px}.phase5-step{border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:13px 14px;background:#f8fafc}.phase5-step-title{font-weight:950;color:#111827}.phase5-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.phase5-action-card{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff;padding:16px}.phase5-textarea{width:100%;min-height:92px;border:1px solid rgba(15,23,42,.16);border-radius:16px;padding:12px 14px;resize:vertical;font:inherit}.phase5-btn{border:0;border-radius:999px;padding:10px 16px;font-weight:950;cursor:pointer;display:inline-flex;gap:8px;align-items:center;text-decoration:none}.phase5-btn.approve{background:#166534;color:#fff}.phase5-btn.return{background:#8B0000;color:#fff}.phase5-btn.soft{background:#f1f5f9;color:#334155}.phase5-toolbar{display:flex;gap:10px;flex-wrap:wrap}.phase5-mobile-label{display:none;font-size:.74rem;font-weight:950;text-transform:uppercase;color:#64748b;margin-bottom:3px}@media(max-width:1100px){.phase5-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.phase5-manager-grid{grid-template-columns:1fr}.phase5-actions{grid-template-columns:1fr}}@media(max-width:760px){.phase5-hero{grid-template-columns:1fr}.phase5-grid{grid-template-columns:1fr}.phase5-scorebox{align-items:flex-start;text-align:left}.phase5-table{min-width:0}.phase5-table thead{display:none}.phase5-table,.phase5-table tbody,.phase5-table tr,.phase5-table td{display:block;width:100%}.phase5-table tr{border-bottom:1px solid rgba(15,23,42,.08);padding:8px 0}.phase5-table td{border-bottom:0;padding:9px 14px}.phase5-mobile-label{display:block}.phase5-section-head{flex-direction:column}.phase5-toolbar{flex-direction:column}.phase5-btn{justify-content:center;width:100%}}
+</style>
+<div class="phase5-scorecard">
+  <div class="phase5-toolbar">
+    <a class="phase5-btn soft" href="{{ url_for('main.performance_president_approvals') }}">← Başkan Onaylarına Dön</a>
+    {% if approval and approval.approval_id %}<a class="phase5-btn soft" href="{{ url_for('main.performance_president_card_review', approval_id=approval.approval_id) }}">Ekranı Yenile</a>{% endif %}
+  </div>
+
+  {% if not approval %}
+    <section class="phase5-section"><div class="phase5-section-body"><div class="phase5-empty">İncelenecek Başkan onayı kaydı bulunamadı.</div></div></section>
+  {% else %}
+  <section class="phase5-hero">
+    <div>
+      <div class="phase5-kicker">Başkan Onayı · Karne İncelemesi</div>
+      <h2 class="phase5-title">{{ approval.employee_name }}</h2>
+      <p class="phase5-sub">{{ approval.period_title }} dönemi için düşük performans süreci, yayın kilidi ve karar adımı bu ekrandan incelenir. Başkan onayı tamamlanmadan sonuç kesinleşmiş veya personele yayınlanmış sayılmaz.</p>
+    </div>
+    <div class="phase5-scorebox"><span>Nihai Puan</span><strong>{{ approval.final_score }}</strong><div class="phase5-muted">70 altı inceleme süreci</div></div>
+  </section>
+
+  <section class="phase5-grid">
+    <article class="phase5-card"><div class="phase5-label">Personel Bilgisi</div><div class="phase5-value">{{ approval.employee_name }}</div><div class="phase5-muted">Sicil: {{ approval.sicil_no }}</div></article>
+    <article class="phase5-card"><div class="phase5-label">Birim / Unvan</div><div class="phase5-value">{{ approval.birim or approval.unit or '-' }}</div><div class="phase5-muted">{{ approval.title or approval.unvan or '-' }}</div></article>
+    <article class="phase5-card"><div class="phase5-label">Dönem Bilgisi</div><div class="phase5-value">{{ approval.period_title }}</div><div class="phase5-muted">Talep: {{ approval.requested_at }}</div></article>
+    <article class="phase5-card"><div class="phase5-label">Başkan Onayı</div><div class="phase5-value"><span class="phase5-pill">{{ approval.approval_status }}</span></div><div class="phase5-muted">Bekleyen makam: Başkan</div></article>
+    <article class="phase5-card"><div class="phase5-label">Süreç Aşaması</div><div class="phase5-value"><span class="phase5-pill">{{ approval.process_stage }}</span></div></article>
+    <article class="phase5-card"><div class="phase5-label">Yayın Kilidi</div><div class="phase5-value"><span class="phase5-pill warn">{{ approval.publish_lock_status }}</span></div></article>
+    <article class="phase5-card"><div class="phase5-label">70 Altı Gerekçesi</div><div class="phase5-value">Düşük performans incelemesi</div><div class="phase5-muted">{{ approval.low_score_reason if approval.low_score_reason is defined and approval.low_score_reason else (approval.publish_lock_reason or 'Nihai puan 70 puan sınırının altında olduğu için Başkan onayı ve yayın kilidi süreci uygulanır.') }}</div></article>
+    <article class="phase5-card"><div class="phase5-label">Karar Durumu</div><div class="phase5-value">{{ approval.approval_status }}</div><div class="phase5-muted">Onay veya iade işlemi aşağıdaki karar alanından yapılır.</div></article>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">70 Altı Gerekçesi ve Yayın Kilidi</div><div class="phase5-section-sub">Düşük performans sonucu kesinleşmeden önce Başkan onayı ve kurumsal yayın kontrolü gerekir.</div></div><span class="phase5-pill warn">Yayın Kilidi</span></div>
+    <div class="phase5-section-body"><div class="phase5-note">{{ approval.publish_lock_reason or 'Bu karne Başkan onayı beklediği için personele kesin/yayınlanmış sonuç olarak açılmaz. Onay tamamlandığında süreç İK/Admin yayın adımına devam eder.' }}</div></div>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">Kriter Bazlı Puanlar</div><div class="phase5-section-sub">Değerlendirme kriterleri, amir puanları, açıklamalar ve ortalama puanlar.</div></div>{% if scorecard_interpretation and scorecard_interpretation.label %}<span class="phase5-pill warn">{{ scorecard_interpretation.label }}</span>{% endif %}</div>
+    <div class="phase5-section-body">
+      {% if scorecard_interpretation and scorecard_interpretation.text %}<div class="phase5-note" style="margin-bottom:14px">{{ scorecard_interpretation.text }}</div>{% endif %}
+      {% if scorecard_items %}
+      <div class="phase5-table-wrap"><table class="phase5-table">
+        <thead><tr><th>Değerlendirme Kriteri</th><th>Ağırlık</th><th>3. Amir</th><th>2. Amir</th><th>1. Amir</th><th>Ortalama</th></tr></thead>
+        <tbody>
+        {% for item in scorecard_items %}
+          <tr>
+            <td><div class="phase5-mobile-label">Kriter</div><strong>{{ item.criteria_name }}</strong>{% if item.criteria_description %}<div class="phase5-muted">{{ item.criteria_description }}</div>{% endif %}</td>
+            <td><div class="phase5-mobile-label">Ağırlık</div>{{ item.criteria_weight }}</td>
+            {% for level in [3,2,1] %}
+              {% set level_item = item.get('level_' ~ level, {}) %}
+              <td><div class="phase5-mobile-label">{{ level }}. Amir</div><span class="phase5-pill">{{ level_item.score_100 }}</span><div class="phase5-muted">1-5 puan: {{ level_item.raw_score }}</div>{% if level_item.note %}<div class="phase5-comment">{{ level_item.note }}</div>{% endif %}</td>
+            {% endfor %}
+            <td><div class="phase5-mobile-label">Ortalama</div><span class="phase5-pill {% if item.low_flag %}warn{% endif %}">{{ item.average_score_100 }}</span><div class="phase5-muted">Ortalama 1-5: {{ item.average_raw_score }}</div></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      {% else %}<div class="phase5-empty">Kriter bazlı puan kaydı bulunamadı. Başkan incelemesi nihai puan, amir görüşleri ve süreç geçmişi üzerinden yapılabilir.</div>{% endif %}
+    </div>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">Amir Bazlı Değerlendirme Dökümü ve Görüşleri</div><div class="phase5-section-sub">Her amir seviyesinin toplam puanı, durumu ve genel kanaati.</div></div></div>
+    <div class="phase5-section-body">
+      {% if manager_totals %}<div class="phase5-manager-grid">{% for manager in manager_totals %}<article class="phase5-manager-card"><div class="phase5-label">{{ manager.label }}</div><div class="phase5-value">{{ manager.evaluator_name }}</div><div style="margin:10px 0"><span class="phase5-pill">Toplam: {{ manager.total_score }}</span></div><div class="phase5-muted">{{ manager.status }} · Kriter sayısı: {{ manager.item_count }}</div>{% if manager.general_comment %}<div class="phase5-comment">{{ manager.general_comment }}</div>{% else %}<div class="phase5-muted">Genel görüş kaydı bulunmuyor.</div>{% endif %}</article>{% endfor %}</div>{% else %}<div class="phase5-empty">Amir bazlı değerlendirme özeti bulunamadı.</div>{% endif %}
+    </div>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">Puanlama Geçmişi</div><div class="phase5-section-sub">Puanlama işlemlerinin amir seviyesi, puan, durum ve tarih bilgileri.</div></div></div>
+    <div class="phase5-section-body">
+      {% if scoring_history %}<div class="phase5-table-wrap"><table class="phase5-table"><thead><tr><th>Amir</th><th>Seviye</th><th>Puan</th><th>Durum</th><th>Sonraki Aşama</th><th>Tarih</th></tr></thead><tbody>{% for item in scoring_history %}<tr><td><div class="phase5-mobile-label">Amir</div><strong>{{ item.scorer_name }}</strong>{% if item.comment %}<div class="phase5-muted">{{ item.comment }}</div>{% endif %}</td><td><div class="phase5-mobile-label">Seviye</div>{{ item.manager_level }}. amir</td><td><div class="phase5-mobile-label">Puan</div><span class="phase5-pill">{{ item.score }}</span></td><td><div class="phase5-mobile-label">Durum</div>{{ item.status }}</td><td><div class="phase5-mobile-label">Sonraki Aşama</div>{{ item.next_stage }}{% if item.next_owner_name and item.next_owner_name != '-' %}<div class="phase5-muted">{{ item.next_owner_name }}</div>{% endif %}</td><td><div class="phase5-mobile-label">Tarih</div>{{ item.action_at }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="phase5-empty">Bu değerlendirme için gösterilebilir puanlama geçmişi kaydı bulunamadı.</div>{% endif %}
+    </div>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">Süreç Geçmişi</div><div class="phase5-section-sub">Başkan onayı, yayın kilidi ve işlem adımlarının kurumsal akışı.</div></div></div>
+    <div class="phase5-section-body">{% if flow_steps %}<div class="phase5-timeline">{% for step in flow_steps %}<div class="phase5-step"><div class="phase5-step-title">{{ step.title }}</div><div class="phase5-muted">{{ step.status }} · {{ step.date }}{% if step.actor and step.actor != '-' %} · {{ step.actor }}{% endif %}</div>{% if step.summary %}<div class="phase5-muted">{{ step.summary }}</div>{% endif %}</div>{% endfor %}</div>{% else %}<div class="phase5-empty">Süreç adımı kaydı bulunamadı. Başkan onayı kaydı üzerinden inceleme yapılabilir.</div>{% endif %}</div>
+  </section>
+
+  <section class="phase5-section">
+    <div class="phase5-section-head"><div><div class="phase5-section-title">Onay / Ret İşlem Alanı</div><div class="phase5-section-sub">Başkan onayı veya iade kararı burada kayıt altına alınır.</div></div><span class="phase5-pill">Karar Alanı</span></div>
+    <div class="phase5-section-body"><div class="phase5-actions">
+      <form class="phase5-action-card" method="post" action="{{ url_for('main.performance_president_approval_approve', approval_id=approval.approval_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}"><div class="phase5-label">Onay İşlemi</div><p class="phase5-muted">Karne incelendiğinde ve Başkan onayı uygun görüldüğünde bu alan kullanılır.</p><textarea class="phase5-textarea" name="note" placeholder="Başkan onay notu yazılabilir..."></textarea><br><br><button class="phase5-btn approve" type="submit">Onayla</button></form>
+      <form class="phase5-action-card" method="post" action="{{ url_for('main.performance_president_approval_return', approval_id=approval.approval_id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}"><div class="phase5-label">İade İşlemi</div><p class="phase5-muted">Eksik açıklama, süreç veya veri kontrolü gerekiyorsa karne iade edilir.</p><textarea class="phase5-textarea" name="note" placeholder="İade gerekçesi yazınız..."></textarea><br><br><button class="phase5-btn return" type="submit">İade Et</button></form>
+    </div></div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE6_LOW_SCORE_APPROVAL_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND #}

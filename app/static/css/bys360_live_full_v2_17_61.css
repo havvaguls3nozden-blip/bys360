@@ -1,0 +1,13 @@
+/* BYS360_LIVE_FULL_OVERLAY_V2_17_61 */
+:root { --bys360-live-red:#8B0000; --bys360-live-border:rgba(15,23,42,.10); }
+.bys360-live-safe-note{border:1px solid rgba(139,0,0,.12);border-left:5px solid var(--bys360-live-red);background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 12px 26px rgba(15,23,42,.06)}
+.table-responsive,.role-matrix-wrap,.settings-table-wrap,.cic-table-wrap{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.content-block img,.content-block iframe,.content-block video,.portal-card img{max-width:100%;height:auto;}
+.alert,.flash-alert{border-radius:14px;}
+input[name="csrf_token"]{display:none!important;}
+@media (max-width:768px){
+  .content-wrap,#contentWrap{padding:14px!important;}
+  .quick-link span,.user-role{display:none!important;}
+  .page-title{max-width:58vw!important;font-size:1rem!important;}
+  .table{min-width:680px;}
+}

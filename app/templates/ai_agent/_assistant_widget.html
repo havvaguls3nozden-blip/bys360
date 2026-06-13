@@ -1,0 +1,67 @@
+<!-- BYS360_AI_AGENT_AG8_CORPORATE_WIDGET_PARTIAL_V1 | eski gate etiketi: Güvenli Asistan | görünür ad: BYS360 Asistanı -->
+<template data-bys360-agent-content="compatibility-alias"></template>
+{# BYS360_AI_AGENT_INSTANT_SHELL_V5_SERVER_SHELL #}
+{# BYS360 Asistanı kabuğu: initial HTML içinde gelir; içerik/özet güvenli şekilde sonradan yüklenir. #}
+<div id="bys360-ai-agent-widget-root" class="bys360-ai-agent-widget-root" data-instant-shell="v5" data-agent-bound="false" data-agent-bound-version="">
+  <button type="button" class="bys360-ai-agent-launcher" data-ai-agent-launcher aria-expanded="false" aria-controls="bys360-ai-agent-panel">
+    <span class="bys360-ai-agent-orb" aria-hidden="true">✦</span>
+    <span>
+      <span class="bys360-ai-agent-launcher-title">BYS360 Asistanı</span>
+      <span class="bys360-ai-agent-launcher-subtitle">Adım adım sistem rehberi</span>
+    </span>
+  </button>
+
+  <section id="bys360-ai-agent-panel" class="bys360-ai-agent-panel bys360-ai-agent-panel-chat" data-ai-agent-panel data-state="closed" aria-hidden="true" aria-label="BYS360 Asistanı">
+    <header class="bys360-ai-agent-panel-header">
+      <div class="bys360-ai-agent-panel-kicker">BYS360 Asistanı</div>
+      <div class="bys360-ai-agent-panel-title-row">
+        <div>
+          <h2 class="bys360-ai-agent-panel-title">BYS360 Asistanı</h2>
+          <p class="bys360-ai-agent-panel-description">Merhaba. Sorunuzu yazın; BYS360 ekranlarında adım adım yol göstereyim.</p>
+        </div>
+        <button type="button" class="bys360-ai-agent-close" data-ai-agent-close aria-label="BYS360 Asistanı kapat">×</button>
+      </div>
+    </header>
+
+    <div class="bys360-ai-agent-tabs" role="tablist" aria-label="BYS360 Asistanı sekmeleri">
+      <button type="button" class="bys360-ai-agent-tab is-active" data-agent-tab="chat">Kullanım sor</button>
+      <button type="button" class="bys360-ai-agent-tab" data-agent-tab="summary">Özetler</button>
+    </div>
+
+    <div class="bys360-ai-agent-body">
+      <div class="bys360-ai-agent-chat" data-agent-chat>
+        <div class="bys360-ai-agent-message bys360-ai-agent-message-assistant">
+          <strong>Merhaba, ben BYS360 Asistanı.</strong>
+          <p>Personel, performans, karne, görevler, destek talepleri, anketler, bildirimler, ayarlar ve KPI/Hedef ekranları hakkında soru sorabilirsiniz. Size adım adım rehberlik ederim; yetki dışı kişisel veya hassas içerik göstermem.</p>
+        </div>
+        <div class="bys360-ai-agent-suggestions">
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Merhaba">Merhaba</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Ne yapabilirsin?">Ne yapabilirsin?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Performans dönemleri nasıl çalışır?">Performans dönemleri nasıl çalışır?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="3. amir ne yapar?">3. amir ne yapar?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="70 altı olursa ne olur?">70 altı olursa ne olur?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Seni kim geliştirdi?">Seni kim geliştirdi?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="İyi misin?">İyi misin?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Karnemi nereden görürüm?">Karnemi nereden görürüm?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Bekleyen görevlerim nerede?">Bekleyen görevlerim nerede?</button>
+          <button type="button" class="bys360-ai-agent-chip" data-agent-question="Destek talebi nasıl oluşturulur?">Destek talebi nasıl oluşturulur?</button>
+        </div>
+        <div class="bys360-ai-agent-messages" data-agent-messages></div>
+      </div>
+
+      <div class="bys360-ai-agent-summary-view" data-agent-summary-view hidden>
+        <div class="bys360-ai-agent-loading">BYS360 Asistanı özeti hazırlanıyor...</div>
+      </div>
+    </div>
+
+    <form class="bys360-ai-agent-ask-form" data-agent-form autocomplete="off">
+      <label class="sr-only" for="bys360-ai-agent-question">BYS360 Asistanı sorusu</label>
+      <textarea id="bys360-ai-agent-question" data-agent-input rows="2" maxlength="700" placeholder="Örn. Merhaba, karnemi nereden görebilirim?"></textarea>
+      <button type="submit" data-agent-submit>Sor</button>
+    </form>
+
+    <footer class="bys360-ai-agent-footer">
+      <div class="bys360-ai-agent-notice"><strong>Güvenli kullanım:</strong> BYS360 Asistanı idari karar vermez, puan değiştirmez ve yetki dışı veri göstermez.</div>
+    </footer>
+  </section>
+</div>

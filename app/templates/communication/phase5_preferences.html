@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Bildirim Tercihleri{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <h3 class="mb-2">Bildirim Tercihleri</h3>
+    <p class="text-muted mb-0">Kullanıcı bazlı bildirim, özet akışı ve sessiz saat davranışı bu ekrandan yönetilir.</p>
+  </div></div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {% set p = payload.preference %}
+          <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="in_app_enabled" id="in_app_enabled" {% if p.in_app_enabled %}checked{% endif %}><label class="form-check-label" for="in_app_enabled">Uygulama içi bildirim açık</label></div>
+          <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="email_enabled" id="email_enabled" {% if p.email_enabled %}checked{% endif %}><label class="form-check-label" for="email_enabled">E-posta bildirim açık</label></div>
+          <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="daily_digest_enabled" id="daily_digest_enabled" {% if p.daily_digest_enabled %}checked{% endif %}><label class="form-check-label" for="daily_digest_enabled">Günlük özet açık</label></div>
+          <div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="weekly_digest_enabled" id="weekly_digest_enabled" {% if p.weekly_digest_enabled %}checked{% endif %}><label class="form-check-label" for="weekly_digest_enabled">Haftalık özet açık</label></div>
+          <div class="row g-3">
+            <div class="col-md-4"><label class="form-label">Özet saati</label><input class="form-control" type="number" min="0" max="23" name="digest_hour" value="{{ p.digest_hour }}"></div>
+            <div class="col-md-4"><label class="form-label">Sessiz başlangıç</label><input class="form-control" type="number" min="0" max="23" name="quiet_hours_start" value="{{ p.quiet_hours_start }}"></div>
+            <div class="col-md-4"><label class="form-label">Sessiz bitiş</label><input class="form-control" type="number" min="0" max="23" name="quiet_hours_end" value="{{ p.quiet_hours_end }}"></div>
+          </div>
+          <div class="form-check mt-3 mb-3"><input class="form-check-input" type="checkbox" name="quiet_hours_enabled" id="quiet_hours_enabled" {% if p.quiet_hours_enabled %}checked{% endif %}><label class="form-check-label" for="quiet_hours_enabled">Sessiz saatler etkin</label></div>
+          <button class="btn btn-danger">Kaydet</button>
+        </form>
+      </div></div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5>Özet oluştur</h5>
+        <form method="post" action="{{ url_for('main.communication_phase5_create_digest') }}" class="d-flex gap-2">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select class="form-select" name="digest_type"><option value="daily">Günlük</option><option value="weekly">Haftalık</option></select>
+          <button class="btn btn-outline-danger">Oluştur</button>
+        </form>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Özet görünümü</h5>
+        <ul class="list-group list-group-flush mb-3">
+          <li class="list-group-item d-flex justify-content-between"><span>Günlük açık</span><strong>{{ 'Evet' if payload.summary.daily_enabled else 'Hayır' }}</strong></li>
+          <li class="list-group-item d-flex justify-content-between"><span>Haftalık açık</span><strong>{{ 'Evet' if payload.summary.weekly_enabled else 'Hayır' }}</strong></li>
+          <li class="list-group-item d-flex justify-content-between"><span>Sessiz saat</span><strong>{{ 'Evet' if payload.summary.quiet_hours else 'Hayır' }}</strong></li>
+          <li class="list-group-item d-flex justify-content-between"><span>Son özet sayısı</span><strong>{{ payload.summary.digest_job_count }}</strong></li>
+        </ul>
+        <h6>Son özet kayıtları</h6>
+        <ul class="list-group list-group-flush">
+          {% for row in payload.digest_jobs %}
+          <li class="list-group-item px-0"><div class="fw-semibold">{{ row.period_label }}</div><div class="small text-muted">{{ row.result_summary or '-' }}</div></li>
+          {% else %}
+          <li class="list-group-item px-0 text-muted">Henüz özet kaydı oluşmadı.</li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

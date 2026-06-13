@@ -1,0 +1,298 @@
+/* BYS360_PHASE11_PROCESS_UI_POLISH
+   Kurumsal arayüz standardı: süreç ekranları için sade, ölçülü ve erişilebilir görünüm.
+   Bu dosya yalnızca sunum katmanıdır; puanlama, Başkan onayı, yayın kilidi ve veri akışına dokunmaz.
+*/
+:root{
+  --bys-p11-red:#8B0000;
+  --bys-p11-red-dark:#650000;
+  --bys-p11-red-soft:rgba(139,0,0,.075);
+  --bys-p11-text:#111827;
+  --bys-p11-muted:#64748b;
+  --bys-p11-border:rgba(15,23,42,.085);
+  --bys-p11-surface:rgba(255,255,255,.94);
+  --bys-p11-surface-strong:#ffffff;
+  --bys-p11-bg:#f7f8fb;
+  --bys-p11-shadow:0 18px 42px rgba(15,23,42,.075);
+  --bys-p11-shadow-soft:0 10px 24px rgba(15,23,42,.055);
+  --bys-p11-radius-xl:28px;
+  --bys-p11-radius-lg:22px;
+  --bys-p11-radius-md:16px;
+}
+
+.president-shell,
+.process-tracking-shell,
+.process-report-shell,
+.pw-shell{
+  isolation:isolate;
+}
+
+.president-hero,
+.tracking-hero,
+.process-report-hero,
+.performance-hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:var(--bys-p11-radius-xl)!important;
+  border:1px solid rgba(139,0,0,.13)!important;
+  background:
+    radial-gradient(circle at 92% 14%, rgba(139,0,0,.12), transparent 30%),
+    linear-gradient(135deg, rgba(139,0,0,.075), rgba(255,255,255,.96) 58%, rgba(248,250,252,.96))!important;
+  box-shadow:var(--bys-p11-shadow)!important;
+}
+
+.president-hero::after,
+.tracking-hero::after,
+.process-report-hero::after,
+.performance-hero::after{
+  content:"";
+  position:absolute;
+  right:-44px;
+  bottom:-66px;
+  width:180px;
+  height:180px;
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(139,0,0,.11), rgba(139,0,0,0) 70%);
+  pointer-events:none;
+}
+
+.president-title,
+.tracking-hero h2,
+.process-report-title,
+.workspace-title,
+.performance-title{
+  letter-spacing:-.025em;
+  color:var(--bys-p11-text)!important;
+}
+
+.president-text,
+.tracking-hero p,
+.process-report-text,
+.workspace-text,
+.performance-text,
+.tracking-muted,
+.person-meta,
+.history-meta,
+.timeline-meta{
+  color:var(--bys-p11-muted)!important;
+}
+
+.president-summary,
+.tracking-cards,
+.process-report-cards,
+.low-grid{
+  gap:16px!important;
+}
+
+.president-card,
+.tracking-card,
+.process-report-card,
+.low-card,
+.performance-surface,
+.tracking-filter,
+.tracking-item,
+.mini-section{
+  border:1px solid var(--bys-p11-border)!important;
+  background:var(--bys-p11-surface)!important;
+  box-shadow:var(--bys-p11-shadow-soft)!important;
+  border-radius:var(--bys-p11-radius-lg)!important;
+}
+
+.president-value,
+.tracking-card .value,
+.process-report-value,
+.low-value{
+  color:var(--bys-p11-red)!important;
+  font-weight:950!important;
+}
+
+.president-label,
+.tracking-card .label,
+.process-report-label,
+.low-label{
+  color:var(--bys-p11-muted)!important;
+  font-weight:900!important;
+  letter-spacing:.055em!important;
+}
+
+.president-tab,
+.process-report-tab,
+.tracking-filter .btn,
+.president-btn,
+.performance-btn{
+  transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+}
+
+.president-tab:hover,
+.process-report-tab:hover,
+.tracking-filter .btn:hover,
+.president-btn:hover,
+.performance-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 18px rgba(15,23,42,.075);
+}
+
+.president-tab.active,
+.process-report-tab.active,
+.btn-danger,
+.performance-btn.primary,
+.president-btn.return{
+  background:linear-gradient(135deg, var(--bys-p11-red), var(--bys-p11-red-dark))!important;
+  border-color:var(--bys-p11-red)!important;
+  color:#fff!important;
+}
+
+.score-pill,
+.status-pill,
+.low-score,
+.low-status{
+  border:1px solid rgba(139,0,0,.10)!important;
+  box-shadow:0 8px 16px rgba(15,23,42,.045);
+}
+
+.status-pill.president_pending,
+.low-status:not(.ready),
+.score-pill,
+.low-score{
+  background:rgba(139,0,0,.08)!important;
+  color:var(--bys-p11-red)!important;
+}
+
+.status-pill.completed,
+.status-pill.ok,
+.low-status.ready,
+.president-btn.approve{
+  background:rgba(22,101,52,.10)!important;
+  color:#166534!important;
+  border-color:rgba(22,101,52,.16)!important;
+}
+
+.status-pill.waiting{
+  background:rgba(154,52,18,.10)!important;
+  color:#9a3412!important;
+  border-color:rgba(154,52,18,.16)!important;
+}
+
+.status-pill.overdue{
+  background:rgba(153,27,27,.10)!important;
+  color:#991b1b!important;
+  border-color:rgba(153,27,27,.16)!important;
+}
+
+.president-table td,
+.low-table td,
+.history-table td{
+  background:var(--bys-p11-surface-strong)!important;
+}
+
+.president-table th,
+.low-table th{
+  color:var(--bys-p11-muted)!important;
+  font-weight:950!important;
+}
+
+.tracking-item-head,
+.tracking-body{
+  background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,250,252,.92));
+}
+
+.timeline,
+.low-timeline{
+  position:relative;
+}
+
+.timeline-item,
+.history-item,
+.low-step{
+  border-color:var(--bys-p11-border)!important;
+  background:linear-gradient(180deg, #fff, #f8fafc)!important;
+}
+
+.timeline-title,
+.history-title,
+.timeline-row .timeline-title,
+.mini-title{
+  color:var(--bys-p11-text)!important;
+  font-weight:900!important;
+}
+
+.dot{
+  background:var(--bys-p11-red)!important;
+  box-shadow:0 0 0 5px rgba(139,0,0,.10)!important;
+}
+
+.low-step.current{
+  background:rgba(139,0,0,.08)!important;
+  color:var(--bys-p11-red)!important;
+  border-color:rgba(139,0,0,.18)!important;
+}
+
+.low-step.done{
+  background:rgba(22,101,52,.10)!important;
+  color:#166534!important;
+  border-color:rgba(22,101,52,.18)!important;
+}
+
+.empty-state,
+.empty-low,
+.process-report-empty{
+  border:1px dashed rgba(139,0,0,.24)!important;
+  background:rgba(255,255,255,.90)!important;
+  color:var(--bys-p11-muted)!important;
+  border-radius:var(--bys-p11-radius-lg)!important;
+}
+
+.tracking-filter .form-control,
+.tracking-filter .form-select,
+.performance-select,
+.approval-actions textarea,
+.low-note-input{
+  border-radius:14px!important;
+  border-color:rgba(15,23,42,.12)!important;
+  box-shadow:none!important;
+}
+
+.tracking-filter .form-control:focus,
+.tracking-filter .form-select:focus,
+.performance-select:focus,
+.approval-actions textarea:focus,
+.low-note-input:focus{
+  border-color:rgba(139,0,0,.42)!important;
+  box-shadow:0 0 0 .22rem rgba(139,0,0,.08)!important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .president-tab,
+  .process-report-tab,
+  .tracking-filter .btn,
+  .president-btn,
+  .performance-btn{
+    transition:none!important;
+  }
+  .president-tab:hover,
+  .process-report-tab:hover,
+  .tracking-filter .btn:hover,
+  .president-btn:hover,
+  .performance-btn:hover{
+    transform:none!important;
+  }
+}
+
+@media(max-width:900px){
+  .president-hero,
+  .tracking-hero,
+  .process-report-hero,
+  .performance-hero{
+    border-radius:22px!important;
+    padding:18px!important;
+  }
+  .president-card,
+  .tracking-card,
+  .process-report-card,
+  .low-card,
+  .performance-surface,
+  .tracking-filter,
+  .tracking-item,
+  .mini-section{
+    border-radius:18px!important;
+  }
+}

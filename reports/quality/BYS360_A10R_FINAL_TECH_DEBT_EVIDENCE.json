@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-06-12T20:01:05",
+  "phase": "A10R_FINAL_TECH_DEBT_EVIDENCE",
+  "ok": true,
+  "decision": "A10R_FINAL_TECH_DEBT_EVIDENCE_GREEN",
+  "source_reports": {
+    "a10n": "reports\\quality\\BYS360_A10N_HISTORICAL_PLACEHOLDER_KEEP_ALLOWLIST_DECISION.json",
+    "a10o": "reports\\quality\\BYS360_A10O_FINAL_KEEP_COMPAT_PLAN.json",
+    "a10p": "reports\\quality\\BYS360_A10P_COMPAT_WRAPPER_RENAME_PLAN.json",
+    "a10q": "reports\\quality\\BYS360_A10Q_COMPAT_WRAPPER_RENAME_APPLY_DECISION.json"
+  },
+  "final_counts": {
+    "safe_quarantine_candidate_count": 0,
+    "referenced_keep_count": 45,
+    "historical_placeholder_keep_count": 7,
+    "compat_required_count": 7,
+    "compat_apply_candidate_count": 3,
+    "compat_keep_allowlist_count": 4,
+    "compat_applied_count": 3,
+    "compat_failed_count": 0,
+    "unclassified_count": 0,
+    "non_placeholder_low_risk_count": 0
+  },
+  "wrapper_check_count": 3,
+  "wrapper_not_ok_count": 0,
+  "wrapper_checks": [
+    {
+      "old_path": "app/schema_guard_core_repairs.py",
+      "new_path": "app/schema_guard_core_maintenances.py",
+      "old_exists": true,
+      "new_exists": true,
+      "wrapper_has_marker": true,
+      "wrapper_mentions_new_module": true,
+      "status": "ok"
+    },
+    {
+      "old_path": "app/refactor/hotfix_merge_registry.py",
+      "new_path": "app/refactor/maintenance_merge_registry.py",
+      "old_exists": true,
+      "new_exists": true,
+      "wrapper_has_marker": true,
+      "wrapper_mentions_new_module": true,
+      "status": "ok"
+    },
+    {
+      "old_path": "app/services/performance/common_admin_scope_hotfix.py",
+      "new_path": "app/services/performance/common_admin_scope_maintenance.py",
+      "old_exists": true,
+      "new_exists": true,
+      "wrapper_has_marker": true,
+      "wrapper_mentions_new_module": true,
+      "status": "ok"
+    }
+  ],
+  "compileall_returncode": 0,
+  "import_smoke_returncode": 0,
+  "import_smoke_tail": "A10R_IMPORT_SMOKE_OK\n\n",
+  "pytest_returncode": 0,
+  "pytest_summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "pytest_tail": "......ss................................................................ [  9%]\n........................................................................ [ 19%]\n........................................................................ [ 28%]\n........................................................................ [ 38%]\n........................................................................ [ 48%]\n........................................................................ [ 57%]\n........................................................................ [ 67%]\n........................................................................ [ 77%]\n........................................................................ [ 86%]\n........................................................................ [ 96%]\n..........................                                               [100%]\n============================== warnings summary ===============================\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b.py:14: P6B report is generated by the repair/quality gate before targeted pytest.\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b_v2.py:14: P6B V2 report is generated by the repair/quality gate before targeted pytest.\n744 passed, 2 skipped, 34 deselected, 32 warnings in 37.77s\n\n",
+  "remaining_quality_work": {
+    "warnings": 32,
+    "next_phase": "A11_WARNING_ZERO",
+    "note": "A10 teknik borç temizliği kapandı; kalan 32 warning A11 Warning Zero fazının konusudur."
+  },
+  "live_note": "Bu A10 kapanışı local/repo kalite kanıtıdır. Canlı ortam için ayrıca gerçek .env, Sentry DSN, DB SSL/TLS, canlı backup ve URL smoke gate yapılmalıdır.",
+  "evidence_zip": "C:\\bys360\\releases\\BYS360_A10R_FINAL_TECH_DEBT_EVIDENCE_20260612_200025.zip",
+  "evidence_zip_sha256": "2D60A8C3A58471F542D3F790FC0A8BF103368FFD2CBE8587D5AF29C25110036E",
+  "evidence_file_count": 54
+}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% block title %}Başkan Onayı Karne İncelemesi{% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+{% endblock %}
+
+{% block content %}
+{# BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_PANEL_INCLUDE #}
+{% include "ai_decision/_faz6_low_performance_approval_panel.html" ignore missing %}
+
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+<div class="container-fluid py-4 president-scorecard-v2">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <div class="text-muted small">Performans Yönetimi / Başkan Onayları</div>
+      <h1 class="h3 mb-1">Başkan Onayı Karne İncelemesi</h1>
+      <div class="text-muted">70 altı performans sonucu için başkan onayı öncesi kurumsal karne özeti.</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('president_scorecard_v2.president_approvals_tr_v2') }}" class="btn btn-outline-secondary">Başkan Onaylarına Dön</a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-xl-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+              <h2 class="h5 mb-3">Personel ve Karne Özeti</h2>
+              <div class="row g-3">
+                <div class="col-md-6"><div class="text-muted small">Personel</div><div class="fw-semibold">{{ data.employee_name }}</div></div>
+                <div class="col-md-3"><div class="text-muted small">Sicil No</div><div class="fw-semibold">{{ data.sicil_no }}</div></div>
+                <div class="col-md-3"><div class="text-muted small">Dönem</div><div class="fw-semibold">{{ data.period_name }}</div></div>
+                <div class="col-md-6"><div class="text-muted small">Birim</div><div class="fw-semibold">{{ data.unit_name }}</div></div>
+                <div class="col-md-3"><div class="text-muted small">Süreç Aşaması</div><span class="badge text-bg-warning">{{ data.status_label }}</span></div>
+                <div class="col-md-3"><div class="text-muted small">Yayın Kilidi</div><span class="badge text-bg-danger">{{ data.publish_lock_label }}</span></div>
+              </div>
+            </div>
+            <div class="text-center rounded-4 border p-3 min-w-160">
+              <div class="text-muted small">Nihai Puan</div>
+              <div class="display-6 fw-bold">{{ data.final_score if data.final_score is not none else '—' }}</div>
+              <div class="small text-muted">Başkan onayı bekliyor</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">Yayın Kilidi</h2>
+          <p class="mb-2"><strong>{{ data.publish_lock_label }}</strong></p>
+          <p class="small text-muted mb-2">Başkan onayı beklediği için yayın kilitli</p>
+          <p class="text-muted mb-0">Başkan onayı tamamlanmadan sonuç personele kesinleşmiş/yayınlanmış sonuç olarak açılmaz.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12 col-xl-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-3">
+            <h2 class="h5 mb-0">Puanlama Geçmişi</h2>
+            <span class="badge text-bg-light border">{{ data.history_source }}</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Aşama</th>
+                  <th>Değerlendiren</th>
+                  <th>Puan</th>
+                  <th>Görüş / Özet</th>
+                  <th>Tarih</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in data.history %}
+                <tr>
+                  <td class="fw-semibold">{{ row.stage }}</td>
+                  <td>{{ row.manager }}</td>
+                  <td>{{ row.score if row.score is not none else '—' }}</td>
+                  <td>{{ row.comment }}</td>
+                  <td class="text-muted small">{{ row.created_at }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="5" class="text-muted">Puanlama geçmişi için gösterilebilir kayıt bulunamadı.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">Süreç Akışı</h2>
+          <ol class="list-group list-group-numbered list-group-flush">
+            {% for item in data.process_flow %}
+            <li class="list-group-item px-0 d-flex justify-content-between align-items-start">
+              <span>{{ item }}</span>
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

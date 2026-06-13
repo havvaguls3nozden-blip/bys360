@@ -1,0 +1,279 @@
+/* BYS360 Mobile Native App Feel V3
+   Amaç: mobilde tek hamburger, açılan sol şerit, sayfa kaydırma ve uygulama hissi.
+   Masaüstü görünümü etkilemez. */
+
+@media (max-width: 900px) {
+  :root {
+    --bys360-mobile-red: #8B0000;
+    --bys360-mobile-red-2: #6f0000;
+    --bys360-mobile-bg: #f5f1ee;
+    --bys360-mobile-card: rgba(255, 255, 255, 0.94);
+    --bys360-mobile-border: rgba(139, 0, 0, 0.12);
+    --bys360-mobile-shadow: 0 14px 34px rgba(55, 31, 25, 0.14);
+    --bys360-mobile-bottom-h: 72px;
+    --bys360-mobile-top-h: 58px;
+  }
+
+  html,
+  body {
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    scroll-behavior: smooth;
+    background: var(--bys360-mobile-bg) !important;
+  }
+
+  body.bys360-mobile-native-v3 {
+    padding-bottom: calc(var(--bys360-mobile-bottom-h) + env(safe-area-inset-bottom, 0px)) !important;
+    color: #2b1f1b;
+  }
+
+  body.bys360-mobile-native-v3::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at top left, rgba(139, 0, 0, 0.16), transparent 30%),
+      linear-gradient(180deg, #fffaf7 0%, #f4efeb 48%, #ede5df 100%);
+  }
+
+  /* Ana içerik scroll kilidi düzeltmesi */
+  body.bys360-mobile-native-v3 .main-content,
+  body.bys360-mobile-native-v3 .content-wrapper,
+  body.bys360-mobile-native-v3 .page-content,
+  body.bys360-mobile-native-v3 .app-content,
+  body.bys360-mobile-native-v3 main,
+  body.bys360-mobile-native-v3 #content,
+  body.bys360-mobile-native-v3 #mainContent {
+    height: auto !important;
+    min-height: calc(100vh - var(--bys360-mobile-top-h) - var(--bys360-mobile-bottom-h)) !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    padding-bottom: calc(var(--bys360-mobile-bottom-h) + 24px) !important;
+  }
+
+  /* Üst barı app header gibi hissettir */
+  body.bys360-mobile-native-v3 .topbar,
+  body.bys360-mobile-native-v3 .navbar,
+  body.bys360-mobile-native-v3 header.app-header,
+  body.bys360-mobile-native-v3 .app-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    min-height: var(--bys360-mobile-top-h) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255, 250, 247, 0.92) !important;
+    border-bottom: 1px solid rgba(139, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 24px rgba(55, 31, 25, 0.08) !important;
+  }
+
+  /* Tek hamburger: önceki çift butonları gizle, V3 butonu kalsın */
+  body.bys360-mobile-native-v3 .bys360-mobile-menu-toggle:not(#bys360MobileNativeMenuV3),
+  body.bys360-mobile-native-v3 .bys360-mobile-toggle:not(#bys360MobileNativeMenuV3),
+  body.bys360-mobile-native-v3 #bys360MobileNativeMenuV2,
+  body.bys360-mobile-native-v3 #bys360MobileMenuToggle,
+  body.bys360-mobile-native-v3 button[aria-label="Menüyü aç"]:not(#bys360MobileNativeMenuV3) {
+    display: none !important;
+  }
+
+  #bys360MobileNativeMenuV3 {
+    position: fixed;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    left: 12px;
+    z-index: 2200;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(139, 0, 0, 0.2);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 12px 26px rgba(55, 31, 25, 0.18);
+    color: var(--bys360-mobile-red);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #bys360MobileNativeMenuV3 span,
+  #bys360MobileNativeMenuV3 span::before,
+  #bys360MobileNativeMenuV3 span::after {
+    content: "";
+    display: block;
+    width: 19px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  #bys360MobileNativeMenuV3 span::before { transform: translateY(-6px); }
+  #bys360MobileNativeMenuV3 span::after { transform: translateY(4px); }
+
+  body.bys360-mobile-drawer-open #bys360MobileNativeMenuV3 span { transform: rotate(45deg); }
+  body.bys360-mobile-drawer-open #bys360MobileNativeMenuV3 span::before { transform: translateY(0) rotate(90deg); }
+  body.bys360-mobile-drawer-open #bys360MobileNativeMenuV3 span::after { opacity: 0; }
+
+  /* Sol şerit gerçek mobil drawer */
+  body.bys360-mobile-native-v3 #appSidebar,
+  body.bys360-mobile-native-v3 .sidebar,
+  body.bys360-mobile-native-v3 aside.sidebar,
+  body.bys360-mobile-native-v3 .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(86vw, 332px) !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    z-index: 2100 !important;
+    transform: translateX(-105%) !important;
+    transition: transform 0.24s cubic-bezier(.2,.8,.2,1) !important;
+    box-shadow: 24px 0 54px rgba(0, 0, 0, 0.28) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.16) !important;
+  }
+
+  body.bys360-mobile-drawer-open #appSidebar,
+  body.bys360-mobile-drawer-open .sidebar,
+  body.bys360-mobile-drawer-open aside.sidebar,
+  body.bys360-mobile-drawer-open .app-sidebar {
+    transform: translateX(0) !important;
+  }
+
+  #bys360MobileDrawerBackdropV3 {
+    position: fixed;
+    inset: 0;
+    z-index: 2050;
+    background: rgba(30, 16, 12, 0.42);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  body.bys360-mobile-drawer-open #bys360MobileDrawerBackdropV3 {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Web tablolari telefonda karta/kaydırmaya yakın dursun */
+  body.bys360-mobile-native-v3 table {
+    min-width: 640px;
+  }
+
+  body.bys360-mobile-native-v3 .table-responsive,
+  body.bys360-mobile-native-v3 .data-table,
+  body.bys360-mobile-native-v3 .table-wrap,
+  body.bys360-mobile-native-v3 .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 18px !important;
+  }
+
+  body.bys360-mobile-native-v3 .card,
+  body.bys360-mobile-native-v3 .panel,
+  body.bys360-mobile-native-v3 .box,
+  body.bys360-mobile-native-v3 .stat-card,
+  body.bys360-mobile-native-v3 .dashboard-card,
+  body.bys360-mobile-native-v3 form,
+  body.bys360-mobile-native-v3 .content-card {
+    border-radius: 22px !important;
+    border: 1px solid var(--bys360-mobile-border) !important;
+    background: var(--bys360-mobile-card) !important;
+    box-shadow: var(--bys360-mobile-shadow) !important;
+  }
+
+  body.bys360-mobile-native-v3 button,
+  body.bys360-mobile-native-v3 .btn,
+  body.bys360-mobile-native-v3 input,
+  body.bys360-mobile-native-v3 select,
+  body.bys360-mobile-native-v3 textarea {
+    min-height: 44px;
+    font-size: 16px !important; /* iOS/Android zoom etkisini azaltır */
+    border-radius: 14px;
+  }
+
+  body.bys360-mobile-native-v3 a,
+  body.bys360-mobile-native-v3 button,
+  body.bys360-mobile-native-v3 .btn {
+    -webkit-tap-highlight-color: rgba(139, 0, 0, 0.12);
+  }
+
+  /* Alt native tab bar */
+  #bys360MobileTabbarV3 {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(9px + env(safe-area-inset-bottom, 0px));
+    z-index: 2000;
+    height: 62px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    align-items: center;
+    padding: 7px;
+    border: 1px solid rgba(139, 0, 0, 0.16);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 42px rgba(55, 31, 25, 0.20);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #bys360MobileTabbarV3 button,
+  #bys360MobileTabbarV3 a {
+    border: 0;
+    background: transparent;
+    color: #4b3933;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    border-radius: 18px;
+    font-size: 11px !important;
+    font-weight: 700;
+  }
+
+  #bys360MobileTabbarV3 .tab-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  #bys360MobileTabbarV3 .is-active,
+  #bys360MobileTabbarV3 button:active,
+  #bys360MobileTabbarV3 a:active {
+    background: linear-gradient(180deg, var(--bys360-mobile-red), var(--bys360-mobile-red-2));
+    color: #fff;
+    box-shadow: 0 10px 18px rgba(139, 0, 0, 0.22);
+  }
+
+  /* Asistan mobilde tab bar üstüne taşmasın */
+  body.bys360-mobile-native-v3 .bys360-assistant-widget,
+  body.bys360-mobile-native-v3 #bys360Assistant,
+  body.bys360-mobile-native-v3 .assistant-widget,
+  body.bys360-mobile-native-v3 .chat-widget {
+    bottom: calc(var(--bys360-mobile-bottom-h) + 14px + env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(100dvh - 120px) !important;
+  }
+
+  /* Kırık literal metin görünümünü maskeleme yedeği */
+  body.bys360-mobile-native-v3 > :last-child:not(script):not(style) {
+    margin-bottom: 0;
+  }
+}

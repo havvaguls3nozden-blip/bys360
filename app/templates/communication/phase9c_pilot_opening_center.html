@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Pilot Açılış Merkezi{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+      <div>
+        <h3 class="mb-2">Pilot Açılış Merkezi</h3>
+        <p class="text-muted mb-0">Kontrollü kullanıcı grubu, açılış kararı, destek kuyruğu ve ilk olay kayıtları tek merkezde yönetilir.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('main.communication_phase9_dashboard') }}" class="btn btn-outline-danger">Kontrol 9 Ana Ekran</a>
+        <a href="{{ url_for('main.communication_phase9_release_center') }}" class="btn btn-outline-danger">Canlıya Geçiş Merkezi</a>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Pilot açılış kapıları</h5>
+          <span class="badge text-bg-{{ 'success' if payload.tone == 'success' else 'warning' if payload.tone == 'warning' else 'danger' }}">{{ payload.decision }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Durum</th><th>Sahip</th><th>Detay</th><th>Aksiyon</th></tr></thead>
+            <tbody>
+              {% for row in payload.gates %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td>{{ row.owner }}</td>
+                <td>{{ row.detail }}</td>
+                <td class="small text-muted">{{ row.action or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">Kapı kaydı</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9c_gate_create') }}" class="vstack gap-3">
+          <input type="hidden" name="gate_token" value="{{ gate_token }}">
+          <div>
+            <label class="form-label">Kapı anahtarı</label>
+            <input class="form-control" name="gate_key" placeholder="örn. support_channel">
+          </div>
+          <div>
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="status">
+              <option value="pass">pass</option>
+              <option value="warn">warn</option>
+              <option value="fail">fail</option>
+              <option value="pending" selected>pending</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Kısa pilot notu"></textarea>
+          </div>
+          <button class="btn btn-danger" type="submit">Kapı kaydet</button>
+        </form>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Pilot karar kaydı</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9c_decision_create') }}" class="vstack gap-3">
+          <input type="hidden" name="decision_token" value="{{ decision_token }}">
+          <div>
+            <label class="form-label">Karar</label>
+            <input class="form-control" name="decision" placeholder="örn. dalga 1 açılışı onaylandı">
+          </div>
+          <div>
+            <label class="form-label">Karar tipi</label>
+            <select class="form-select" name="status">
+              <option value="controlled" selected>controlled</option>
+              <option value="approved">approved</option>
+              <option value="blocked">blocked</option>
+              <option value="paused">paused</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Yönetici / BT kararı"></textarea>
+          </div>
+          <button class="btn btn-outline-danger" type="submit">Kararı kaydet</button>
+        </form>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h5 class="mb-3">Açılış dalgaları</h5>
+        <div class="accordion" id="phase9cWaves">
+          {% for row in payload.wave_rows %}
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#w{{ loop.index }}">
+                {{ row.title }}
+              </button>
+            </h2>
+            <div id="w{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#phase9cWaves">
+              <div class="accordion-body">
+                <div class="small text-muted mb-2">{{ row.scope }}</div>
+                <div class="small fw-semibold mb-2">Sahip: {{ row.owner }}</div>
+                <ul class="mb-0">
+                  {% for item in row.criteria %}<li>{{ item }}</li>{% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div></div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">Pilot olay kaydı</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9c_incident_create') }}" class="vstack gap-3">
+          <input type="hidden" name="incident_token" value="{{ incident_token }}">
+          <div>
+            <label class="form-label">Başlık</label>
+            <input class="form-control" name="title" placeholder="örn. ilk açılışta export gecikmesi">
+          </div>
+          <div>
+            <label class="form-label">Şiddet</label>
+            <select class="form-select" name="severity">
+              <option value="low">low</option>
+              <option value="medium" selected>medium</option>
+              <option value="high">high</option>
+              <option value="critical">critical</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Kısa olay özeti ve aksiyon"></textarea>
+          </div>
+          <button class="btn btn-outline-secondary" type="submit">Olay kaydet</button>
+        </form>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Son kayıtlar</h5>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>İşlem</th><th>Durum</th><th>Zaman</th></tr></thead>
+            <tbody>
+              {% for row in payload.recent_logs %}
+              <tr><td>{{ row.summary or row.action_type }}</td><td>{{ row.status }}</td><td>{{ row.executed_at }}</td></tr>
+              {% else %}
+              <tr><td colspan="3" class="text-muted">Henüz Kontrol 9C kaydı yok.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

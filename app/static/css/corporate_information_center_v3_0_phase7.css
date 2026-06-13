@@ -1,0 +1,71 @@
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_LIVE_RELEASE_USAGE */
+.cic-phase7-release{border:1px solid rgba(139,0,0,.16);background:linear-gradient(135deg,#ffffff 0%,#fff7f4 55%,#fff 100%);position:relative;overflow:hidden}
+.cic-phase7-release:before{content:"";position:absolute;right:-80px;top:-80px;width:220px;height:220px;border-radius:50%;background:rgba(139,0,0,.08)}
+.cic-phase7-release-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px;position:relative;z-index:1}
+.cic-phase7-release-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;background:rgba(255,255,255,.88);padding:16px;box-shadow:0 14px 28px rgba(15,23,42,.06)}
+.cic-phase7-release-card i{width:38px;height:38px;border-radius:15px;display:grid;place-items:center;background:#fff1f3;color:#8B0000;margin-bottom:10px}
+.cic-phase7-release-card strong{display:block;color:#101828;font-size:15px}
+.cic-phase7-release-card span{display:block;color:#667085;font-size:12.5px;line-height:1.45;margin-top:5px}
+.cic-phase7-timeline{display:grid;gap:10px;margin-top:12px}
+.cic-phase7-step{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:start;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px}
+.cic-phase7-step b{width:34px;height:34px;border-radius:13px;display:grid;place-items:center;background:#fff1f3;color:#8B0000}
+.cic-phase7-step strong{display:block;color:#101828}
+.cic-phase7-step p{margin:4px 0 0;color:#667085;font-size:13px;line-height:1.45}
+.cic-phase7-step em{font-style:normal;font-weight:800;font-size:12px;white-space:nowrap;border-radius:999px;padding:7px 9px;background:#ecfdf3;color:#087443}
+.cic-phase7-step.warn em{background:#fffaeb;color:#b54708}
+.cic-phase7-doc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+.cic-phase7-doc{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;text-decoration:none;color:inherit}
+.cic-phase7-doc i{width:36px;height:36px;border-radius:14px;display:grid;place-items:center;background:#f2f4f7;color:#344054;flex:0 0 auto}
+.cic-phase7-doc strong{display:block;color:#101828}
+.cic-phase7-doc span{display:block;color:#667085;font-size:12.5px;margin-top:3px;line-height:1.4}
+.cic-phase7-warning{padding:14px 16px;border-radius:18px;background:#fffaeb;border:1px solid #fedf89;color:#93370d;line-height:1.55}
+@media(max-width:980px){.cic-phase7-release-grid,.cic-phase7-doc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.cic-phase7-release-grid,.cic-phase7-doc-grid{grid-template-columns:1fr}.cic-phase7-step{grid-template-columns:34px 1fr}.cic-phase7-step em{grid-column:2}}
+
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_10_STATUS_PILL_FIX */
+.cic-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:28px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color:#1f2937;
+  box-shadow:0 8px 22px rgba(15,23,42,.05);
+}
+.cic-badge.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+.cic-badge.warning{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.cic-badge.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca;}
+.cic-badge.neutral{background:#f8fafc;color:#334155;border-color:#e2e8f0;}
+.cic-badge i{font-size:12px;}
+
+/* BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_11_TEMPLATE_COMPAT_FIX */
+.cic-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:28px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  border:1px solid rgba(15,23,42,.10);
+  background:#fff;
+  color:#1f2937;
+  box-shadow:0 8px 22px rgba(15,23,42,.05);
+}
+.cic-badge.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+.cic-badge.warning{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.cic-badge.danger{background:#fef2f2;color:#991b1b;border-color:#fecaca;}
+.cic-badge.neutral{background:#f8fafc;color:#334155;border-color:#e2e8f0;}
+.cic-badge i{font-size:12px;}

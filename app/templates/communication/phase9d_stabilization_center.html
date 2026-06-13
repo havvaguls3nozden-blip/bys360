@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Stabilizasyon Merkezi{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+      <div>
+        <h3 class="mb-2">Stabilizasyon Merkezi</h3>
+        <p class="text-muted mb-0">İlk 72 saatte günlük kontrol, acil düzeltme ve saha sinyalleri aynı merkezden kayıt altına alınır.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('main.communication_phase9_dashboard') }}" class="btn btn-outline-danger">Kontrol 9 Ana Ekran</a>
+        <a href="{{ url_for('main.communication_phase9d_dashboard') }}" class="btn btn-danger">Kontrol 9D Özet</a>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Stabilizasyon kapıları</h5>
+          <span class="badge text-bg-{{ 'success' if payload.tone == 'success' else 'warning' if payload.tone == 'warning' else 'danger' }}">{{ payload.decision }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Durum</th><th>Sahip</th><th>Detay</th><th>Aksiyon</th></tr></thead>
+            <tbody>
+              {% for row in payload.gates %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td>{{ row.owner }}</td>
+                <td>{{ row.detail }}</td>
+                <td class="small text-muted">{{ row.action or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">72 saat check-in</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9d_checkin_create') }}" class="vstack gap-3">
+          <input type="hidden" name="checkin_token" value="{{ checkin_token }}">
+          <div>
+            <label class="form-label">Pencere</label>
+            <select class="form-select" name="window_key">
+              <option value="0_24" selected>0–24 Saat</option>
+              <option value="24_48">24–48 Saat</option>
+              <option value="48_72">48–72 Saat</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="status">
+              <option value="pass">pass</option>
+              <option value="watch" selected>watch</option>
+              <option value="risk">risk</option>
+              <option value="critical">critical</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Kısa vardiya / operasyon notu"></textarea>
+          </div>
+          <button class="btn btn-danger" type="submit">Check-in kaydet</button>
+        </form>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Acil düzeltme kaydı</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9d_hotfix_create') }}" class="vstack gap-3">
+          <input type="hidden" name="hotfix_token" value="{{ hotfix_token }}">
+          <div>
+            <label class="form-label">Başlık</label>
+            <input class="form-control" name="title" placeholder="örn. bildirim redirect düzeltmesi">
+          </div>
+          <div>
+            <label class="form-label">Seviye</label>
+            <select class="form-select" name="severity">
+              <option value="low">low</option>
+              <option value="medium" selected>medium</option>
+              <option value="high">high</option>
+              <option value="critical">critical</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="3" placeholder="Etkilenen akış ve uygulanan düzeltme"></textarea>
+          </div>
+          <button class="btn btn-outline-danger" type="submit">Acil düzeltme kaydet</button>
+        </form>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h5 class="mb-3">Saha izleme sinyali</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9d_signal_create') }}" class="row g-3 align-items-end">
+          <input type="hidden" name="signal_token" value="{{ signal_token }}">
+          <div class="col-md-4">
+            <label class="form-label">Başlık</label>
+            <input class="form-control" name="signal_type" placeholder="örn. mobil giriş akışı">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="status">
+              <option value="stable">stable</option>
+              <option value="watch" selected>watch</option>
+              <option value="risk">risk</option>
+              <option value="critical">critical</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label">Not</label>
+            <input class="form-control" name="note" placeholder="Gözlem veya kullanıcı geri bildirimi">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-danger" type="submit">Sinyal kaydet</button>
+          </div>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Son kayıtlar</h5>
+          <span class="small text-muted">İlk 72 saat</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>İşlem</th><th>Durum</th><th>Zaman</th></tr></thead>
+            <tbody>
+              {% for row in payload.recent_logs %}
+              <tr>
+                <td>{{ row.summary or row.action_type }}</td>
+                <td>{{ row.status }}</td>
+                <td>{{ row.executed_at }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="3" class="text-muted">Henüz 9D kaydı yok.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">72 saat pencereleri</h5>
+        <ul class="list-group list-group-flush">
+          {% for row in payload.window_rows %}
+          <li class="list-group-item px-0">
+            <div class="d-flex justify-content-between gap-2">
+              <div class="fw-semibold">{{ row.title }}</div>
+              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'secondary' if row.status == 'pending' else 'danger' }}">{{ row.status }}</span>
+            </div>
+            <div class="small text-muted mt-1">{{ row.focus }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Handoff notları</h5>
+        <ul class="list-group list-group-flush">
+          {% for row in payload.handoff_rows %}
+          <li class="list-group-item px-0">
+            <div class="fw-semibold">{{ row.title }}</div>
+            <div class="small text-muted">{{ row.body }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

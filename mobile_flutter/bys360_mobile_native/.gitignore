@@ -1,0 +1,25 @@
+
+# BYS360_MOBILE_V2_8_74_ANDROID_RELEASE_READY_P0_GITIGNORE_BEGIN
+# Flutter / Android generated outputs
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Local SDK and IDE files
+android/local.properties
+.idea/
+.vscode/
+*.iml
+
+# Android release signing secrets - never commit or place in release zip
+android/key.properties
+android/app/key.properties
+android/**/*.jks
+android/**/*.keystore
+keystores/*.jks
+keystores/*.keystore
+# BYS360_MOBILE_V2_8_74_ANDROID_RELEASE_READY_P0_GITIGNORE_END

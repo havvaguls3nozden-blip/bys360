@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Zimmet Devir Akışı - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Zimmet Devir Akışı{% endblock %}
+{% block page_subtitle %}Demirbaş devirlerini kontrollü biçimde kaydedin ve teslim geçmişini görünür tutun.{% endblock %}
+{% block content %}
+<style>.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.field{display:grid;gap:6px}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:90px;resize:vertical}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid rgba(15,23,42,.12);font-weight:800;cursor:pointer;background:#fff;color:#374151}.btn-soft.primary{background:#8B0000;color:#fff;border-color:#8B0000}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:760px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.empty-state{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:980px){.grid,.stats{grid-template-columns:1fr}}</style>
+<div class="panel">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_assets_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Zimmet merkezine dön</a>
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">Özlük operasyonları</a>
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_dashboard', scope=selected_scope_mode) }}">Personel dashboard</a>
+    </div>
+    {% if transfers_ready %}
+    <div class="stats">
+        <div class="stat"><div class="label">Aktif seçili zimmet</div><div class="value">{{ transfer_summary.active_assets }}</div></div>
+        <div class="stat"><div class="label">Toplam devir kaydı</div><div class="value">{{ transfer_summary.transfers_total }}</div></div>
+        <div class="stat"><div class="label">Son 30 gün</div><div class="value">{{ transfer_summary.recent_30 }}</div></div>
+    </div>
+    <div class="grid">
+        <div class="panel" style="padding:0;border:none;box-shadow:none;background:transparent">
+            <form method="get" action="{{ url_for('main.hr_personnel_asset_transfer_center') }}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="field" style="min-width:280px"><label>Kaynak personel</label><select name="user_id">{% for row in scope_user_options %}<option value="{{ row.id }}" {% if row.id == selected_user_id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>{% endfor %}</select></div>
+                <button class="btn-soft primary" type="submit">Aç</button>
+            </form>
+            <form method="post" action="{{ url_for('main.hr_personnel_asset_transfer_save') }}">
+                <input type="hidden" name="form_token" value="{{ transfer_form_token }}">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="field" style="margin-bottom:12px"><label>Kaynak personel</label><select name="from_user_id">{% for row in scope_user_options %}<option value="{{ row.id }}" {% if row.id == selected_user_id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>{% endfor %}</select></div>
+                <div class="field" style="margin-bottom:12px"><label>Devredilecek zimmet</label><select name="asset_id">{% for row in active_assets %}<option value="{{ row.id }}" {% if selected_asset and row.id == selected_asset.id %}selected{% endif %}>{{ row.asset_name }} · {{ row.asset_code }} · {{ row.serial_no }}</option>{% endfor %}</select></div>
+                <div class="field" style="margin-bottom:12px"><label>Hedef personel</label><select name="to_user_id">{% for row in scope_user_options %}{% if row.id != selected_user_id %}<option value="{{ row.id }}">{{ row.full_name }} · {{ row.unit_name }}</option>{% endif %}{% endfor %}</select></div>
+                <div class="field" style="margin-bottom:12px"><label>Devir tarihi</label><input type="date" name="transfer_date"></div>
+                <div class="field" style="margin-bottom:12px"><label>Teslim / devir belge no</label><input type="text" name="handover_document_no" placeholder="Örn. ZM-2026-014"></div>
+                <div class="field" style="margin-bottom:12px"><label>Not</label><textarea name="note" placeholder="Devir nedeni, teslim açıklaması veya kısa not"></textarea></div>
+                <button class="btn-soft primary" type="submit">Devir kaydını oluştur</button>
+            </form>
+        </div>
+        <div class="panel" style="padding:0;border:none;box-shadow:none;background:transparent">
+            <h4 style="margin:0 0 12px">Seçili personelin aktif zimmetleri</h4>
+            {% if active_assets %}<div class="table-wrap"><table class="table-clean"><thead><tr><th>Demirbaş</th><th>Kod</th><th>Tarih</th></tr></thead><tbody>{% for row in active_assets %}<tr><td><strong>{{ row.asset_name }}</strong><br><span class="muted">{{ row.serial_no }}</span></td><td>{{ row.asset_code }}</td><td>{{ row.assigned_date }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">Seçili personelde aktif zimmet görünmüyor.</div>{% endif %}
+        </div>
+    </div>
+    <div class="panel" style="padding:0;border:none;box-shadow:none;background:transparent;margin-top:18px">
+        <h4 style="margin:0 0 12px">Son devir kayıtları</h4>
+        {% if recent_transfers %}<div class="table-wrap"><table class="table-clean"><thead><tr><th>Tarih</th><th>Demirbaş</th><th>Kaynak</th><th>Hedef</th><th>Belge No</th><th>Durum</th></tr></thead><tbody>{% for row in recent_transfers %}<tr><td>{{ row.transfer_date }}</td><td><strong>{{ row.asset_name }}</strong><br><span class="muted">{{ row.asset_code }}</span></td><td>{{ row.from_user_name }}</td><td>{{ row.to_user_name }}</td><td>{{ row.document_no }}</td><td><span class="tag good">{{ row.status_label }}</span>{% if row.note %}<br><span class="muted">{{ row.note }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">Henüz zimmet devir kaydı yok.</div>{% endif %}
+    </div>
+    {% else %}<div class="empty-state">Devir tabloları veri geçişi sonrası aktifleşecek.</div>{% endif %}
+</div>
+{% endblock %}

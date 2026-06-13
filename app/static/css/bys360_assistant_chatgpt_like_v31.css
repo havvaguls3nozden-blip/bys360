@@ -1,0 +1,160 @@
+/* BYS360_ASSISTANT_CHATGPT_LIKE_V31 */
+:root {
+  --bys360-assistant-red: #8B0000;
+  --bys360-assistant-border: rgba(139, 0, 0, .16);
+  --bys360-assistant-ink: #241414;
+}
+#bys360-assistant-module-root .bys360-assistant-panel,
+.bys360-assistant-panel {
+  border-radius: 24px !important;
+  border: 1px solid var(--bys360-assistant-border) !important;
+  box-shadow: 0 28px 80px rgba(42, 0, 0, .22) !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(18px);
+}
+#bys360-assistant-module-root .bys360-assistant-panel-header,
+.bys360-assistant-panel-header {
+  min-height: 64px !important;
+  padding: 14px 16px !important;
+  background: linear-gradient(135deg, #8B0000 0%, #6f0000 54%, #3d0000 100%) !important;
+  color: #fff !important;
+}
+#bys360-assistant-module-root .bys360-assistant-panel-header *,
+.bys360-assistant-panel-header * { color: #fff !important; }
+#bys360-assistant-module-root .bys360-assistant-tabs,
+.bys360-assistant-tabs { display: none !important; }
+#bys360-assistant-module-root .bys360-assistant-body,
+.bys360-assistant-body {
+  background: radial-gradient(circle at top left, rgba(139,0,0,.06), transparent 34%), linear-gradient(180deg, #fff 0%, #fbf7f7 100%) !important;
+}
+#bys360-assistant-module-root .bys360-assistant-messages,
+.bys360-assistant-messages {
+  padding: 18px !important;
+  gap: 12px !important;
+  scroll-behavior: smooth;
+}
+#bys360-assistant-module-root .bys360-assistant-message,
+.bys360-assistant-message {
+  max-width: 86% !important;
+  border-radius: 18px !important;
+  line-height: 1.55 !important;
+  font-size: 14px !important;
+}
+#bys360-assistant-module-root .bys360-assistant-message-user,
+.bys360-assistant-message-user {
+  margin-left: auto !important;
+  background: linear-gradient(135deg, #8B0000, #6f0000) !important;
+  color: #fff !important;
+  border-bottom-right-radius: 7px !important;
+}
+#bys360-assistant-module-root .bys360-assistant-message-agent,
+.bys360-assistant-message-agent {
+  margin-right: auto !important;
+  background: rgba(255,255,255,.92) !important;
+  color: var(--bys360-assistant-ink) !important;
+  border: 1px solid rgba(139,0,0,.10) !important;
+  border-bottom-left-radius: 7px !important;
+}
+#bys360-assistant-module-root .bys360-assistant-composer,
+.bys360-assistant-composer {
+  border-top: 1px solid rgba(139,0,0,.10) !important;
+  background: rgba(255,255,255,.94) !important;
+  padding: 12px !important;
+}
+#bys360-assistant-module-root textarea,
+#bys360-assistant-module-root input[type="text"],
+.bys360-assistant-composer textarea,
+.bys360-assistant-composer input[type="text"] {
+  border-radius: 18px !important;
+  border: 1px solid rgba(139,0,0,.18) !important;
+  background: #fff !important;
+  min-height: 44px !important;
+}
+#bys360-assistant-module-root button[type="submit"],
+.bys360-assistant-composer button[type="submit"],
+.bys360-assistant-send {
+  border-radius: 16px !important;
+  background: var(--bys360-assistant-red) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 12px 26px rgba(139,0,0,.22) !important;
+}
+#bys360-assistant-module-root .bys360-assistant-quick-actions,
+.bys360-assistant-quick-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+#bys360-assistant-module-root .bys360-assistant-quick-actions button,
+.bys360-assistant-quick-actions button {
+  border-radius: 999px !important;
+  border: 1px solid rgba(139,0,0,.18) !important;
+  color: #8B0000 !important;
+  background: rgba(139,0,0,.045) !important;
+  padding: 7px 11px !important;
+}
+@media (max-width: 720px) {
+  #bys360-assistant-module-root .bys360-assistant-panel,
+  .bys360-assistant-panel {
+    width: calc(100vw - 18px) !important;
+    right: 9px !important;
+    left: 9px !important;
+    bottom: 9px !important;
+    max-height: calc(100vh - 18px) !important;
+    border-radius: 22px !important;
+  }
+}
+
+/* BYS360_ASSISTANT_VISIBILITY_RESTORE_V31_1_ACTUAL_AM_CLASSES */
+#bys360-assistant-module-root .bys360-am-tabs { display: none !important; }
+#bys360-assistant-module-root .bys360-am-panel {
+  width: min(560px, calc(100vw - 28px)) !important;
+  height: min(760px, calc(100vh - 92px)) !important;
+  border-radius: 26px !important;
+}
+#bys360-assistant-module-root .bys360-am-header {
+  min-height: 66px !important;
+  padding: 14px 16px !important;
+}
+#bys360-assistant-module-root .bys360-am-note,
+#bys360-assistant-module-root [data-panel="guide"],
+#bys360-assistant-module-root [data-panel="summary"],
+#bys360-assistant-module-root [data-panel="security"] { display: none !important; }
+#bys360-assistant-module-root [data-panel="chat"] { display: flex !important; }
+#bys360-assistant-module-root .bys360-am-log {
+  padding: 18px !important;
+  gap: 12px !important;
+  background: radial-gradient(circle at top left, rgba(139,0,0,.055), transparent 34%), linear-gradient(180deg, #fff 0%, #fbf7f7 100%) !important;
+}
+#bys360-assistant-module-root .bys360-am-form {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+#bys360-assistant-module-root .bys360-am-form textarea {
+  min-height: 54px !important;
+  max-height: 138px !important;
+  border-radius: 18px !important;
+}
+#bys360-assistant-module-root .bys360-am-bubble {
+  font-size: 14px !important;
+  line-height: 1.56 !important;
+}
+#bys360-assistant-module-root .bys360-am-message.is-user .bys360-am-bubble {
+  background: linear-gradient(135deg, #8B0000, #650000) !important;
+}
+#bys360-assistant-module-root .bys360-am-launcher {
+  min-width: 244px !important;
+  border-radius: 999px !important;
+}
+@media (max-width: 720px) {
+  #bys360-assistant-module-root .bys360-am-panel {
+    width: calc(100vw - 18px) !important;
+    height: min(82vh, 720px) !important;
+    right: 0 !important;
+    bottom: 70px !important;
+  }
+}

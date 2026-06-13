@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Onay İstasyonları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Onay İstasyonları{% endblock %}
+{% block page_subtitle %}Devir teslim ve ilişik kesme süreçlerinde hangi onayın kimde beklediğini tek panelden yönetin.{% endblock %}
+{% block content %}
+<style>
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.stack{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.value{font-size:1.6rem;font-weight:900;color:#111827}.grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field{display:grid;gap:6px}.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:96px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.btn-row{display:flex;flex-wrap:wrap;gap:10px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:760px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.soft{background:#f3f4f6;color:#374151}.empty{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:980px){.grid,.subgrid,.stats,.form-grid{grid-template-columns:1fr}}
+</style>
+<div class="stack">
+  <div class="stats">
+    <div class="stat"><div class="label">Bekleyen istasyon</div><div class="value">{{ approval_summary.pending }}</div></div>
+    <div class="stat"><div class="label">Onaylanan</div><div class="value">{{ approval_summary.approved }}</div></div>
+    <div class="stat"><div class="label">Revizyon</div><div class="value">{{ approval_summary.revision }}</div></div>
+    <div class="stat"><div class="label">Reddedilen</div><div class="value">{{ approval_summary.rejected }}</div></div>
+  </div>
+  {% if not ready %}<div class="panel empty">Onay istasyonu tabloları veri geçişi sonrası aktifleşecek.</div>{% else %}
+  <div class="grid">
+    <div class="panel stack">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h3 style="margin:0">Onay akışı listesi</h3><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_digital_handover_documents', scope=selected_scope_mode, user_id=selected_user_id) }}">Dijital tutanaklara geç</a></div>
+      {% if station_rows %}
+      <div class="table-wrap"><table class="table-clean"><thead><tr><th>İstasyon</th><th>Atanan</th><th>Durum</th><th>Termin</th><th></th></tr></thead><tbody>
+      {% for row in station_rows %}<tr><td><strong>{{ row.station_name }}</strong><div class="label">{{ row.user_name }} · Sıra {{ row.station_order }} · {{ row.role_label }}</div></td><td>{{ row.assigned_name }}</td><td><span class="tag {% if row.status == 'approved' %}good{% elif row.status == 'revision' %}warn{% elif row.status == 'rejected' %}bad{% else %}soft{% endif %}">{{ row.status_label }}</span></td><td>{{ row.due_date or '-' }}</td><td><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_approval_station_center', scope=selected_scope_mode, user_id=selected_user_id, station_id=row.id) }}">Aç</a></td></tr>{% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty">Seçili personel için onay istasyonu bulunmuyor.</div>{% endif %}
+    </div>
+    <div class="panel stack">
+      <h3 style="margin:0">İstasyon kartı</h3>
+      <form method="post" action="{{ url_for('main.hr_personnel_approval_station_save') }}" class="stack">
+        <input type="hidden" name="form_token" value="{{ approval_form_token }}"><input type="hidden" name="station_id" value="{{ selected_station.id if selected_station else '' }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+        <div class="form-grid">
+          <div class="field"><label>Personel</label><select name="user_id">{% for row in scope_user_options %}<option value="{{ row.id }}" {% if selected_user_id == row.id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>{% endfor %}</select></div>
+          <div class="field"><label>Modül</label><select name="module_name"><option value="clearance">İlişik kesme</option><option value="handover">Devir teslim</option><option value="lifecycle">Yaşam döngüsü</option></select></div>
+          <div class="field"><label>Yaşam döngüsü vakası</label><select name="lifecycle_case_id"><option value="">Seçiniz</option>{% for row in available_cases %}<option value="{{ row.id }}" {% if selected_station and selected_station.lifecycle_case_id == row.id %}selected{% endif %}>{{ row.title }}</option>{% endfor %}</select></div>
+          <div class="field"><label>Devir teslim kaydı</label><select name="handover_id"><option value="">Seçiniz</option>{% for row in available_handovers %}<option value="{{ row.id }}" {% if selected_station and selected_station.handover_id == row.id %}selected{% endif %}>{{ row.title }}</option>{% endfor %}</select></div>
+          <div class="field"><label>İstasyon adı</label><input type="text" name="station_name" value="{{ selected_station.station_name if selected_station else '' }}" required></div>
+          <div class="field"><label>Rol etiketi</label><input type="text" name="role_label" value="{{ selected_station.role_label if selected_station else '' }}" placeholder="Örn: Birim sorumlusu"></div>
+          <div class="field"><label>Atanan kullanıcı</label><select name="assigned_user_id"><option value="">Seçiniz</option>{% for row in scope_user_options %}<option value="{{ row.id }}" {% if selected_station and selected_station.assigned_user_id == row.id %}selected{% endif %}>{{ row.full_name }}</option>{% endfor %}</select></div>
+          <div class="field"><label>İşlem sırası</label><input type="number" min="1" name="station_order" value="{{ selected_station.station_order if selected_station else 1 }}"></div>
+          <div class="field"><label>Durum</label><select name="status"><option value="pending">Bekliyor</option><option value="approved">Onaylandı</option><option value="revision">Revizyon</option><option value="rejected">Reddedildi</option></select></div>
+          <div class="field"><label>Termin</label><input type="date" name="due_date" value="{{ selected_station.due_date.isoformat() if selected_station and selected_station.due_date else '' }}"></div>
+          <div class="field" style="grid-column:1/-1"><label>Karar notu</label><textarea name="decision_note">{{ selected_station.decision_note if selected_station else '' }}</textarea></div>
+        </div>
+        <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'İstasyonu güncelle' if selected_station else 'İstasyon oluştur' }}</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="panel stack">
+    <h3 style="margin:0">Hızlı karar</h3>
+    {% if selected_station %}
+    <form method="post" action="{{ url_for('main.hr_personnel_approval_station_decide') }}" class="form-grid">
+      <input type="hidden" name="form_token" value="{{ approval_status_token }}"><input type="hidden" name="station_id" value="{{ selected_station.id }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+      <div class="field"><label>Yeni durum</label><select name="status"><option value="pending">Bekliyor</option><option value="approved">Onaylandı</option><option value="revision">Revizyon</option><option value="rejected">Reddedildi</option></select></div>
+      <div class="field"><label>Kısa not</label><input type="text" name="decision_note" value="{{ selected_station.decision_note or '' }}"></div>
+      <div class="btn-row" style="grid-column:1/-1"><button class="btn-soft secondary" type="submit">Kararı kaydet</button></div>
+    </form>
+    {% else %}<div class="empty">Hızlı karar alanı için soldan bir istasyon açın.</div>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

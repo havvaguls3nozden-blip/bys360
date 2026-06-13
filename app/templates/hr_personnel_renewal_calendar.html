@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Evrak Yenileme Takvimi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Evrak Yenileme Takvimi{% endblock %}
+{% block page_subtitle %}Belge geçerlilik tarihlerini ay bazlı izleyin ve yenileme yükünü önceden görün.{% endblock %}
+{% block content %}
+<style>.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827}.field{display:grid;gap:6px}.field input,.field select{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid rgba(15,23,42,.12);font-weight:800;cursor:pointer;background:#fff;color:#374151}.btn-soft.primary{background:#8B0000;color:#fff;border-color:#8B0000}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:760px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.good{background:#ecfdf5;color:#065f46}.empty-state{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:900px){.stats{grid-template-columns:1fr 1fr}}@media (max-width:640px){.stats{grid-template-columns:1fr}}</style>
+<div class="panel">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">Özlük operasyonlarına dön</a>
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_reminder_center', scope=selected_scope_mode) }}">Hatırlatma merkezi</a>
+        <a class="btn-soft" href="{{ url_for('main.hr_personnel_dashboard', scope=selected_scope_mode) }}">Personel dashboard</a>
+    </div>
+    {% if calendar_ready %}
+    <div class="stats">
+        <div class="stat"><div class="label">İzlenen evrak</div><div class="value">{{ renewal_summary.tracked }}</div></div>
+        <div class="stat"><div class="label">Süresi dolan</div><div class="value">{{ renewal_summary.expired }}</div></div>
+        <div class="stat"><div class="label">Kritik 15 gün</div><div class="value">{{ renewal_summary.critical }}</div></div>
+        <div class="stat"><div class="label">90 gün içinde</div><div class="value">{{ renewal_summary.next_90 }}</div></div>
+    </div>
+    <form method="get" action="{{ url_for('main.hr_personnel_renewal_calendar') }}" style="display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:18px">
+        <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+        <div class="field" style="min-width:280px"><label>Personel seç</label><select name="user_id"><option value="">Tüm kapsam</option>{% for row in scope_user_options %}<option value="{{ row.id }}" {% if row.id == selected_user_id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>{% endfor %}</select></div>
+        <button class="btn-soft primary" type="submit">Filtrele</button>
+    </form>
+    {% if month_groups %}
+        {% for group in month_groups %}
+        <div class="panel" style="padding:0;border:none;box-shadow:none;background:transparent;margin-bottom:18px">
+            <h4 style="margin:0 0 12px">{{ group.label }}</h4>
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Personel</th><th>Belge</th><th>Kategori</th><th>Tarih</th><th>Kalan</th></tr></thead><tbody>{% for row in group.rows %}<tr><td>{{ row.user_name }}</td><td><strong>{{ row.title }}</strong></td><td>{{ row.category }}</td><td>{{ row.expiry_date }}</td><td><span class="tag {% if row.severity == 'expired' %}bad{% elif row.severity == 'critical' %}warn{% else %}good{% endif %}">{{ row.days_left }} gün</span></td></tr>{% endfor %}</tbody></table></div>
+        </div>
+        {% endfor %}
+    {% else %}<div class="empty-state">Takvimde gösterilecek belge bulunamadı.</div>{% endif %}
+    {% else %}<div class="empty-state">Yenileme takvimi tabloları veri geçişi sonrası aktifleşecek.</div>{% endif %}
+</div>
+{% endblock %}

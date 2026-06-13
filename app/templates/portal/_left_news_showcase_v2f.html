@@ -1,0 +1,44 @@
+{# BYS360_PORTAL_EXPERIENCE_V2F_LEFT_NEWS_SHOWCASE_TEMPLATE #}
+{% set v2 = portal_v2 if portal_v2 is defined and portal_v2 else {} %}
+{% set news_items = v2.featured_announcements|default([], true) %}
+<section class="portal-card portal-v2f-news-showcase" aria-label="Duyurular ve İç Haberler">
+  <div class="portal-v2f-news-head">
+    <span><i class="fa-solid fa-bullhorn"></i></span>
+    <div>
+      <h3>Duyurular ve İç Haberler</h3>
+      <p>Güncel kurumsal bilgilendirmeler, etkinlikler ve iç haberler.</p>
+    </div>
+  </div>
+
+  {% if news_items %}
+    {% set main_news = news_items[0] %}
+    <a class="portal-v2f-featured-news" href="{{ main_news.link_url|default('/portal', true) }}">
+      <span class="portal-v2f-news-badge">
+        {% if main_news.type == 'event' %}Etkinlik{% elif main_news.type == 'training' %}Eğitim{% else %}Duyuru{% endif %}
+      </span>
+      <b>{{ main_news.title|default('Kurumsal duyuru', true) }}</b>
+      <small>{{ main_news.body|default('Güncel bilgilendirme.', true) }}</small>
+    </a>
+
+    <div class="portal-v2f-news-list">
+      {% for item in news_items[1:4] %}
+        <a href="{{ item.link_url|default('/portal', true) }}">
+          <i class="fa-regular fa-newspaper"></i>
+          <span>
+            <b>{{ item.title|default('Kurumsal bilgilendirme', true) }}</b>
+            <small>{{ item.body|default('Detayları görüntüleyin.', true) }}</small>
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="portal-v2f-news-empty">
+      <i class="fa-regular fa-newspaper"></i>
+      <p>Henüz duyuru veya iç haber paylaşımı bulunmuyor.</p>
+    </div>
+  {% endif %}
+
+  <a class="portal-v2f-news-all" href="/portal?type=corporate_announcement">
+    Tüm duyuruları görüntüle <i class="fa-solid fa-arrow-right"></i>
+  </a>
+</section>

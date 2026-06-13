@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}Yeni Görüşme Kaydı Oluştur{% endblock %}
+{% block content %}
+<!-- BYS360_FEEDBACK_AFTERCARE_NEW_ADVANCED_UI -->
+<style>
+    .phase73-page{max-width:1320px;margin:0 auto;padding:18px;color:#172033;}
+    .phase73-hero{position:relative;overflow:hidden;border:1px solid rgba(23,32,51,.10);border-radius:30px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(139,0,0,.055));box-shadow:0 22px 55px rgba(23,32,51,.08);padding:26px;margin-bottom:18px;}
+    .phase73-hero:after{content:"";position:absolute;right:-80px;top:-80px;width:220px;height:220px;border-radius:999px;background:rgba(139,0,0,.09);filter:blur(2px);}
+    .phase73-topline{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:relative;z-index:1;}
+    .phase73-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(139,0,0,.14);background:rgba(139,0,0,.07);color:#8B0000;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;letter-spacing:.025em;}
+    .phase73-title{font-size:34px;line-height:1.08;margin:15px 0 8px;font-weight:950;letter-spacing:-.04em;position:relative;z-index:1;}
+    .phase73-sub{max-width:920px;margin:0;color:#5f6676;line-height:1.65;font-size:15px;position:relative;z-index:1;}
+    .phase73-hero-actions{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1;}
+    .phase73-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:15px;padding:12px 16px;background:#8B0000;color:#fff;font-weight:900;text-decoration:none;box-shadow:0 15px 32px rgba(139,0,0,.18);transition:.16s ease;cursor:pointer;}
+    .phase73-btn:hover{color:#fff;transform:translateY(-1px);}
+    .phase73-btn.secondary{background:#fff;color:#172033;border:1px solid rgba(23,32,51,.12);box-shadow:none;}
+    .phase73-btn.ghost{background:rgba(255,255,255,.68);color:#172033;border:1px solid rgba(23,32,51,.10);box-shadow:none;}
+    .phase73-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
+    .phase73-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:18px;align-items:start;}
+    .phase73-card{background:rgba(255,255,255,.90);border:1px solid rgba(23,32,51,.10);border-radius:26px;box-shadow:0 18px 46px rgba(23,32,51,.07);overflow:hidden;}
+    .phase73-card + .phase73-card{margin-top:16px;}
+    .phase73-card-h{padding:18px 20px;border-bottom:1px solid rgba(23,32,51,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+    .phase73-card-title{margin:0;font-size:18px;font-weight:950;color:#172033;letter-spacing:-.01em;}
+    .phase73-card-desc{margin:5px 0 0;color:#5f6676;font-size:13px;line-height:1.55;}
+    .phase73-card-b{padding:20px;}
+    .phase73-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .phase73-full{grid-column:1/-1;}
+    .phase73-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:900;margin-bottom:7px;color:#172033;}
+    .phase73-required{font-size:11px;color:#8B0000;font-weight:900;}
+    .phase73-input,.phase73-select,.phase73-textarea{width:100%;border:1px solid rgba(23,32,51,.14);border-radius:15px;padding:12px 13px;background:#fff;color:#172033;outline:none;transition:border-color .15s ease, box-shadow .15s ease;}
+    .phase73-input:focus,.phase73-select:focus,.phase73-textarea:focus{border-color:rgba(139,0,0,.38);box-shadow:0 0 0 4px rgba(139,0,0,.075);}
+    .phase73-textarea{min-height:106px;resize:vertical;line-height:1.55;}
+    .phase73-help{margin:7px 0 0;color:#6b7280;font-size:12px;line-height:1.45;}
+    .phase73-section{border:1px solid rgba(23,32,51,.09);border-radius:22px;background:rgba(248,249,252,.74);padding:16px;margin-bottom:14px;}
+    .phase73-section:last-child{margin-bottom:0;}
+    .phase73-section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;font-weight:950;color:#172033;}
+    .phase73-num{width:28px;height:28px;border-radius:10px;background:#8B0000;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:950;box-shadow:0 10px 18px rgba(139,0,0,.14);}
+    .phase73-inline-note{border:1px solid rgba(139,0,0,.15);background:rgba(139,0,0,.055);border-radius:18px;padding:13px 14px;font-size:13px;color:#172033;line-height:1.55;margin-bottom:14px;}
+    .phase73-empty{border:1px dashed rgba(23,32,51,.18);border-radius:20px;padding:24px;text-align:center;color:#5f6676;background:rgba(255,255,255,.65);line-height:1.55;}
+    .phase73-side{position:sticky;top:16px;}
+    .phase73-steps{display:grid;gap:10px;}
+    .phase73-step{display:flex;gap:11px;border:1px solid rgba(23,32,51,.10);border-radius:18px;padding:13px;background:rgba(255,255,255,.76);}
+    .phase73-step-dot{flex:0 0 28px;width:28px;height:28px;border-radius:10px;background:rgba(139,0,0,.09);color:#8B0000;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:12px;}
+    .phase73-step strong{display:block;font-size:13px;color:#172033;margin-bottom:3px;}
+    .phase73-step span{display:block;font-size:12px;color:#5f6676;line-height:1.45;}
+    .phase73-preview{display:grid;gap:10px;}
+    .phase73-preview-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(23,32,51,.08);padding-bottom:9px;}
+    .phase73-preview-row:last-child{border-bottom:0;padding-bottom:0;}
+    .phase73-preview-row span{font-size:12px;color:#6b7280;}
+    .phase73-preview-row strong{font-size:13px;text-align:right;color:#172033;}
+    .phase73-checks{display:grid;gap:9px;}
+    .phase73-check{display:flex;align-items:center;gap:9px;font-size:13px;color:#5f6676;}
+    .phase73-check i{width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:rgba(23,32,51,.08);color:#6b7280;font-size:11px;}
+    .phase73-check.ok{color:#172033;font-weight:800;}
+    .phase73-check.ok i{background:rgba(31,122,76,.12);color:#1f7a4c;}
+    .phase73-chipbar{display:flex;flex-wrap:wrap;gap:8px;}
+    .phase73-chip{border:1px solid rgba(23,32,51,.11);background:#fff;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:800;color:#172033;cursor:pointer;}
+    .phase73-chip:hover{border-color:rgba(139,0,0,.30);color:#8B0000;}
+    .phase73-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;position:relative;z-index:1;}
+    .phase73-flow-item{border:1px solid rgba(23,32,51,.09);background:rgba(255,255,255,.72);border-radius:18px;padding:13px;}
+    .phase73-flow-item strong{display:block;font-size:13px;margin-bottom:4px;color:#172033;}
+    .phase73-flow-item span{display:block;font-size:12px;color:#5f6676;line-height:1.4;}
+    .phase73-submitbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid rgba(23,32,51,.08);padding-top:16px;margin-top:16px;}
+    .phase73-small{font-size:12px;color:#6b7280;line-height:1.45;}
+    @media(max-width:1040px){.phase73-layout{grid-template-columns:1fr}.phase73-side{position:static}.phase73-flow{grid-template-columns:1fr 1fr}.phase73-title{font-size:29px}}
+    @media(max-width:720px){.phase73-page{padding:10px}.phase73-form-grid,.phase73-flow{grid-template-columns:1fr}.phase73-card-h{display:block}.phase73-hero{padding:20px;border-radius:24px}.phase73-title{font-size:25px}.phase73-btn{width:100%}}
+</style>
+
+<div class="phase73-page">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    <section class="phase73-hero">
+        <div class="phase73-topline">
+            <div class="phase73-badge"><i class="fa-solid fa-comments"></i> Görüşme Sonrası Notlar</div>
+            <div class="phase73-hero-actions">
+                <a class="phase73-btn secondary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-list"></i> Görüşme Kayıtları</a>
+                <a class="phase73-btn ghost" href="{{ safe_url_for('main.performance_feedback_meeting_guide') }}"><i class="fa-solid fa-book-open"></i> Rehberi Aç</a>
+            </div>
+        </div>
+        <h1 class="phase73-title">Yeni Görüşme Kaydı Oluştur</h1>
+        <p class="phase73-sub">Bu ekran, personel ve performans dönemini seçerek ana görüşme dosyasını açar. Kayıt oluşturulduktan sonra görüşme notu, güçlü yönler, gelişim alanları, personelin son sözü ve eylem planı aynı dosyanın detayında yönetilir.</p>
+        <div class="phase73-flow" aria-label="Kullanım akışı">
+            <div class="phase73-flow-item"><strong>1. Personel</strong><span>Görüşmenin yapılacağı personel seçilir.</span></div>
+            <div class="phase73-flow-item"><strong>2. Dönem</strong><span>Görüşmenin bağlı olduğu performans dönemi belirlenir.</span></div>
+            <div class="phase73-flow-item"><strong>3. Plan</strong><span>Tarih, tür, yer ve görüşme amacı yazılır.</span></div>
+            <div class="phase73-flow-item"><strong>4. Detay</strong><span>Kayıt açılır; not ve eylem planı detayda tamamlanır.</span></div>
+        </div>
+    </section>
+
+    <div class="phase73-layout">
+        <main class="phase73-card">
+            <div class="phase73-card-h">
+                <div>
+                    <h2 class="phase73-card-title">Personel ve Dönem Görüşmesi</h2>
+                    <p class="phase73-card-desc">Açık geri bildirim talebi olmasa bile buradan doğrudan görüşme dosyası oluşturabilirsiniz.</p>
+                </div>
+            </div>
+            <div class="phase73-card-b">
+                {% if not schema_ready %}
+                <div class="phase73-empty">Görüşme kaydı oluşturmak için gerekli ana tablolar hazır görünmüyor. Önce görüşme sonrası notlar altyapısı ve feedback_meetings tablosu kontrol edilmelidir.</div>
+                {% elif not can_create_person_period_meeting %}
+                <div class="phase73-empty">Bu alandan yeni görüşme kaydı oluşturma yetkiniz bulunmamaktadır.</div>
+                {% elif not person_options %}
+                <div class="phase73-empty">Personel listesi alınamadı. Personel kayıtları veya kullanıcı tablosu kontrol edilmelidir.</div>
+                {% elif not period_options %}
+                <div class="phase73-empty">Performans dönemi bulunamadı. Önce Performans Yönetimi > Dönemler ekranından dönem oluşturulmalıdır.</div>
+                {% else %}
+                <div class="phase73-inline-note"><strong>Not nereye yazılacak?</strong> Bu sayfada görüşme dosyası açılır. Kayıt oluşturulduktan sonra sistem sizi detay sayfasına götürür; görüşme özeti, personelin değerlendirmesi, amir gözlemi ve eylem planı o detay sayfasında tamamlanır. Bu sayfadaki hazırlık alanları ise detaydaki “Görüşme Hazırlığı” bölümüne taslak olarak düşer.</div>
+
+                <form id="phase73Form" method="post" action="{{ safe_url_for('main.performance_feedback_aftercare_create_person_period') }}">
+                    {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+
+                    <section class="phase73-section">
+                        <h3 class="phase73-section-title"><span class="phase73-num">1</span> Personel ve performans dönemi</h3>
+                        <div class="phase73-form-grid">
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="personSearch">Personel arama <span class="phase73-required">seçimi kolaylaştırır</span></label>
+                                <input class="phase73-input" id="personSearch" type="search" autocomplete="off" placeholder="Ad, soyad veya sicil numarası ile süz...">
+                                <p class="phase73-help">Arama kutusu yalnızca listeyi süzer; kayıt için aşağıdaki personel seçimi zorunludur.</p>
+                            </div>
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="employee_id">Personel <span class="phase73-required">zorunlu</span></label>
+                                <select class="phase73-select" id="employee_id" name="employee_id" required data-preview-person>
+                                    <option value="">Personel seçiniz</option>
+                                    {% for person in person_options %}
+                                    <option value="{{ person.id }}" data-search="{{ (person.label ~ ' ' ~ (person.sicil_no or ''))|lower }}">{{ person.label }}{% if person.sicil_no %} · Sicil: {{ person.sicil_no }}{% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="periodSearch">Dönem arama</label>
+                                <input class="phase73-input" id="periodSearch" type="search" autocomplete="off" placeholder="Dönem adı, yıl veya durum ile süz...">
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="period_id">Performans dönemi <span class="phase73-required">zorunlu</span></label>
+                                <select class="phase73-select" id="period_id" name="period_id" required data-preview-period>
+                                    <option value="">Dönem seçiniz</option>
+                                    {% for period in period_options %}
+                                    <option value="{{ period.id }}" data-search="{{ (period.label ~ ' ' ~ (period.status_label or '') ~ ' ' ~ (period.date_range or ''))|lower }}">{{ period.label }}{% if period.status_label %} · {{ period.status_label }}{% endif %}{% if period.date_range %} · {{ period.date_range }}{% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="phase73-section">
+                        <h3 class="phase73-section-title"><span class="phase73-num">2</span> Görüşme planı</h3>
+                        <div class="phase73-form-grid">
+                            <div>
+                                <label class="phase73-label" for="meeting_date">Görüşme tarihi</label>
+                                <input class="phase73-input" id="meeting_date" type="date" name="meeting_date" data-preview-date>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="meeting_type">Görüşme türü</label>
+                                <select class="phase73-select" id="meeting_type" name="meeting_type" data-preview-type>
+                                    {% for opt in meeting_type_options %}<option value="{{ opt.value }}">{{ opt.label }}</option>{% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="meeting_start">Başlangıç</label>
+                                <input class="phase73-input" id="meeting_start" type="time" name="meeting_start" value="09:00">
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="meeting_end">Bitiş</label>
+                                <input class="phase73-input" id="meeting_end" type="time" name="meeting_end" value="10:00">
+                            </div>
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="location">Yer / yöntem</label>
+                                <input class="phase73-input" id="location" name="location" placeholder="Yüz yüze, Teams, toplantı odası..." data-preview-location>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="phase73-section">
+                        <h3 class="phase73-section-title"><span class="phase73-num">3</span> Görüşme amacı ve ilk not</h3>
+                        <div class="phase73-form-grid">
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="purpose">Görüşmenin amacı</label>
+                                <textarea class="phase73-textarea" id="purpose" name="purpose" placeholder="Bu görüşmenin temel amacı nedir? Örn. dönem sonucunu konuşmak, gelişim alanlarını netleştirmek, düşük performans için yol haritası oluşturmak..."></textarea>
+                            </div>
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="employee_summary">Personel hakkında kısa hazırlık notu</label>
+                                <textarea class="phase73-textarea" id="employee_summary" name="employee_summary" placeholder="Personelin dönem içindeki genel durumu, dikkat edilmesi gereken hassas noktalar veya görüşmeye hazırlık notu..."></textarea>
+                            </div>
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="note">Kayıt açıklaması</label>
+                                <textarea class="phase73-textarea" id="note" name="note" placeholder="Bu kayıt hangi kapsamda açılıyor? Bu alan görüşme dosyasının kısa açıklamasıdır."></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="phase73-section">
+                        <h3 class="phase73-section-title"><span class="phase73-num">4</span> Hazırlık taslağı</h3>
+                        <div class="phase73-form-grid">
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="opening_sentence">Açılış cümlesi taslağı</label>
+                                <textarea class="phase73-textarea" id="opening_sentence" name="opening_sentence" placeholder="Görüşmeye nasıl başlayacaksınız? Kısa, net ve güven veren bir cümle yazın."></textarea>
+                                <div class="phase73-chipbar" style="margin-top:10px;">
+                                    <button type="button" class="phase73-chip" data-template-target="opening_sentence" data-template="Bugün geçen dönemi birlikte konuşacağız. Önce senin gözünden dinlemek, sonra kendi gözlemlerimi paylaşmak ve sonunda birkaç somut adım üzerinde anlaşmak istiyorum.">Dengeli açılış</button>
+                                    <button type="button" class="phase73-chip" data-template-target="opening_sentence" data-template="Bu görüşmenin amacı seni yargılamak değil; neyin iyi gittiğini, nerede desteğe ihtiyaç olduğunu ve bir sonraki adımı birlikte netleştirmek.">Gelişim odaklı</button>
+                                    <button type="button" class="phase73-chip" data-template-target="opening_sentence" data-template="Bu dönem beklediğimiz noktaya tam ulaşamadığımız alanlar var. Önce bunu senin nasıl yaşadığını duymak, sonra birlikte çıkış yolunu netleştirmek istiyorum.">Düşük performans</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="strong_points">Güçlü yönler</label>
+                                <textarea class="phase73-textarea" id="strong_points" name="strong_points" placeholder="Somut davranışlarla güçlü yönler..."></textarea>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="development_areas">Gelişim alanları</label>
+                                <textarea class="phase73-textarea" id="development_areas" name="development_areas" placeholder="Geliştirilmesi gereken alanlar; yargı değil gözlem diliyle..."></textarea>
+                            </div>
+                            <div class="phase73-full">
+                                <label class="phase73-label" for="sbi_examples">SBI örnekleri</label>
+                                <textarea class="phase73-textarea" id="sbi_examples" name="sbi_examples" placeholder="Durum: Ne zaman / nerede? Davranış: Ne yaptı? Etki: Sonuca, ekibe veya işe nasıl yansıdı?"></textarea>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="sensitive_topics">Hassas konu / dikkat noktası</label>
+                                <textarea class="phase73-textarea" id="sensitive_topics" name="sensitive_topics" placeholder="Görüşmede dikkat edilmesi gereken konu, itiraz ihtimali veya hassas başlık..."></textarea>
+                            </div>
+                            <div>
+                                <label class="phase73-label" for="draft_actions">Eylem planı taslağı</label>
+                                <textarea class="phase73-textarea" id="draft_actions" name="draft_actions" placeholder="Görüşme sonunda netleştirilecek 1-3 taslak aksiyon..."></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="phase73-submitbar">
+                        <div class="phase73-small"><strong>Sonraki adım:</strong> Kayıt oluşturulduktan sonra detay sayfasında görüşme notu, personelin son sözü ve eylem planı tamamlanır.</div>
+                        <button id="phase73Submit" class="phase73-btn" type="submit"><i class="fa-solid fa-plus"></i> Yeni Görüşme Kaydı Oluştur</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </main>
+
+        <aside class="phase73-side">
+            <section class="phase73-card">
+                <div class="phase73-card-h">
+                    <div>
+                        <h2 class="phase73-card-title">Kayıt Önizlemesi</h2>
+                        <p class="phase73-card-desc">Seçimlerinizi kaydetmeden önce burada kontrol edin.</p>
+                    </div>
+                </div>
+                <div class="phase73-card-b">
+                    <div class="phase73-preview">
+                        <div class="phase73-preview-row"><span>Personel</span><strong id="pvPerson">Seçilmedi</strong></div>
+                        <div class="phase73-preview-row"><span>Dönem</span><strong id="pvPeriod">Seçilmedi</strong></div>
+                        <div class="phase73-preview-row"><span>Görüşme türü</span><strong id="pvType">Dönem Sonu Görüşmesi</strong></div>
+                        <div class="phase73-preview-row"><span>Tarih</span><strong id="pvDate">Bugün</strong></div>
+                        <div class="phase73-preview-row"><span>Yer / yöntem</span><strong id="pvLocation">Belirtilmedi</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="phase73-card">
+                <div class="phase73-card-h">
+                    <div>
+                        <h2 class="phase73-card-title">Hazırlık Kontrolü</h2>
+                        <p class="phase73-card-desc">Zorunlu alanlar ve önerilen hazırlık adımları.</p>
+                    </div>
+                </div>
+                <div class="phase73-card-b">
+                    <div class="phase73-checks">
+                        <div class="phase73-check" id="ckPerson"><i class="fa-solid fa-check"></i> Personel seçildi</div>
+                        <div class="phase73-check" id="ckPeriod"><i class="fa-solid fa-check"></i> Performans dönemi seçildi</div>
+                        <div class="phase73-check" id="ckPurpose"><i class="fa-solid fa-check"></i> Görüşme amacı yazıldı</div>
+                        <div class="phase73-check" id="ckOpening"><i class="fa-solid fa-check"></i> Açılış cümlesi hazırlandı</div>
+                        <div class="phase73-check" id="ckSbi"><i class="fa-solid fa-check"></i> SBI örneği eklendi</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="phase73-card">
+                <div class="phase73-card-h">
+                    <div>
+                        <h2 class="phase73-card-title">60 Dakikalık Akış</h2>
+                        <p class="phase73-card-desc">Görüşme sırasında amirin takip edebileceği sade akış.</p>
+                    </div>
+                </div>
+                <div class="phase73-card-b">
+                    <div class="phase73-steps">
+                        <div class="phase73-step"><span class="phase73-step-dot">5</span><div><strong>Açılış</strong><span>Atmosferi kur, amacı ve akışı netleştir.</span></div></div>
+                        <div class="phase73-step"><span class="phase73-step-dot">10</span><div><strong>Öz değerlendirme</strong><span>Önce personelin kendi değerlendirmesini dinle.</span></div></div>
+                        <div class="phase73-step"><span class="phase73-step-dot">10</span><div><strong>Yönetici değerlendirmesi</strong><span>Puanı ve gözlemi somut örneklerle paylaş.</span></div></div>
+                        <div class="phase73-step"><span class="phase73-step-dot">25</span><div><strong>Güçlü yön + gelişim</strong><span>Güçlü yönleri ve gelişim alanlarını birlikte netleştir.</span></div></div>
+                        <div class="phase73-step"><span class="phase73-step-dot">10</span><div><strong>Eylem planı</strong><span>Somut aksiyon ve takip tarihini belirle.</span></div></div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+
+<script>
+(function(){
+    const $ = (id) => document.getElementById(id);
+    const employee = $('employee_id');
+    const period = $('period_id');
+    const type = $('meeting_type');
+    const date = $('meeting_date');
+    const location = $('location');
+    const purpose = $('purpose');
+    const opening = $('opening_sentence');
+    const sbi = $('sbi_examples');
+    const submit = $('phase73Submit');
+
+    function setDefaultDate(){
+        if(date && !date.value){
+            const now = new Date();
+            const iso = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+            date.value = iso;
+        }
+    }
+    function selectedText(select){
+        if(!select || !select.value) return '';
+        const opt = select.options[select.selectedIndex];
+        return opt ? opt.text.replace(/\s+/g,' ').trim() : '';
+    }
+    function setText(id, value, empty){ const el=$(id); if(el) el.textContent = value || empty; }
+    function check(el, ok){ if(el){ el.classList.toggle('ok', !!ok); } }
+    function update(){
+        setText('pvPerson', selectedText(employee), 'Seçilmedi');
+        setText('pvPeriod', selectedText(period), 'Seçilmedi');
+        setText('pvType', selectedText(type), 'Belirtilmedi');
+        setText('pvDate', date && date.value ? date.value : 'Bugün', 'Bugün');
+        setText('pvLocation', location && location.value ? location.value : 'Belirtilmedi', 'Belirtilmedi');
+        check($('ckPerson'), employee && employee.value);
+        check($('ckPeriod'), period && period.value);
+        check($('ckPurpose'), purpose && purpose.value.trim().length > 5);
+        check($('ckOpening'), opening && opening.value.trim().length > 5);
+        check($('ckSbi'), sbi && sbi.value.trim().length > 5);
+        if(submit){ submit.disabled = !(employee && employee.value && period && period.value); }
+    }
+    function attachFilter(inputId, selectId){
+        const input = $(inputId), select = $(selectId);
+        if(!input || !select) return;
+        const all = Array.from(select.options).map(opt => ({value:opt.value, text:opt.text, search:(opt.dataset.search || opt.text).toLocaleLowerCase('tr-TR')}));
+        input.addEventListener('input', function(){
+            const q = this.value.trim().toLocaleLowerCase('tr-TR');
+            const current = select.value;
+            select.innerHTML = '';
+            all.forEach(item => {
+                if(!item.value || !q || item.search.includes(q)){
+                    const opt = document.createElement('option');
+                    opt.value = item.value; opt.text = item.text; opt.dataset.search = item.search;
+                    select.appendChild(opt);
+                }
+            });
+            if(Array.from(select.options).some(o => o.value === current)) select.value = current;
+            update();
+        });
+    }
+    document.querySelectorAll('[data-template-target]').forEach(btn => {
+        btn.addEventListener('click', function(){
+            const target = $(this.dataset.templateTarget);
+            if(target){ target.value = this.dataset.template || ''; target.focus(); update(); }
+        });
+    });
+    ['change','input'].forEach(evt => {
+        [employee, period, type, date, location, purpose, opening, sbi].forEach(el => { if(el) el.addEventListener(evt, update); });
+    });
+    attachFilter('personSearch','employee_id');
+    attachFilter('periodSearch','period_id');
+    setDefaultDate();
+    update();
+})();
+</script>
+{% endblock %}

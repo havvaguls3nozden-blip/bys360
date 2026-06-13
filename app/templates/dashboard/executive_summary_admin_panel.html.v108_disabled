@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Yönetici Özeti | BYS360{% endblock %}
+{% block content %}
+<style>
+  .exec-page{--exec-red:#8B0000;--exec-red-2:#b42318;--exec-ink:#101828;--exec-muted:#667085;--exec-line:rgba(16,24,40,.09);--exec-soft:#fff7f7;--exec-bg:#f8fafc;}
+  .exec-hero{border:0;border-radius:30px;background:radial-gradient(circle at 88% 8%,rgba(139,0,0,.14),transparent 32%),linear-gradient(135deg,#fff 0%,#fff7f7 52%,#fff 100%);box-shadow:0 24px 70px rgba(16,24,40,.10);overflow:hidden;position:relative}
+  .exec-hero:before{content:"";position:absolute;inset:0 auto 0 0;width:8px;background:linear-gradient(180deg,var(--exec-red),#5f0000)}
+  .exec-hero:after{content:"";position:absolute;right:-120px;bottom:-150px;width:340px;height:340px;border-radius:50%;background:rgba(139,0,0,.055)}
+  .exec-hero .card-body{position:relative;z-index:1}
+  .exec-pill{display:inline-flex;align-items:center;gap:9px;min-height:36px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid rgba(139,0,0,.14);color:var(--exec-red);font-weight:800;font-size:.82rem;box-shadow:0 8px 20px rgba(139,0,0,.06)}
+  .exec-title{font-weight:950;letter-spacing:-.04em;color:var(--exec-ink)}
+  .exec-lead{color:var(--exec-muted);font-size:1rem;line-height:1.72;max-width:980px}
+  .exec-card{border:1px solid var(--exec-line);border-radius:24px;box-shadow:0 16px 46px rgba(16,24,40,.07);background:rgba(255,255,255,.96);overflow:hidden}
+  .exec-card .card-header{background:linear-gradient(180deg,#fff,#fffafa);border-bottom:1px solid var(--exec-line);padding:18px 22px}
+  .exec-card h5{letter-spacing:-.02em}.exec-section-sub{color:var(--exec-muted);font-size:.9rem;line-height:1.55}
+  .exec-stat{border:1px solid var(--exec-line);border-radius:22px;background:#fff;box-shadow:0 12px 36px rgba(16,24,40,.06);height:100%;padding:18px}
+  .exec-stat-icon{width:44px;height:44px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;background:var(--exec-soft);color:var(--exec-red)}
+  .exec-stat-label{font-size:.76rem;color:var(--exec-muted);font-weight:750;text-transform:uppercase;letter-spacing:.04em}.exec-stat-value{font-size:1.75rem;font-weight:950;color:var(--exec-ink);letter-spacing:-.05em;line-height:1.05}
+  .exec-anchor-nav{display:flex;gap:10px;flex-wrap:wrap}.exec-anchor-nav a{border-radius:999px;border:1px solid rgba(139,0,0,.13);background:#fff;color:#8B0000;font-weight:800;text-decoration:none;padding:9px 13px;font-size:.84rem}.exec-anchor-nav a:hover{background:#fff7f7}
+  .exec-gradient-panel{background:linear-gradient(135deg,#8B0000,#b42318);color:#fff;border-radius:26px;box-shadow:0 22px 60px rgba(139,0,0,.22);overflow:hidden;position:relative}.exec-gradient-panel:after{content:"";position:absolute;right:-90px;top:-100px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.10)}.exec-gradient-panel .inner{position:relative;z-index:1;padding:24px}
+  .exec-recipient-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;max-height:260px;overflow:auto;padding-right:3px}.exec-chip{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:17px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px)}.exec-avatar{flex:0 0 auto;width:34px;height:34px;border-radius:12px;background:#fff;color:#8B0000;font-weight:900;display:inline-flex;align-items:center;justify-content:center;font-size:.82rem}.exec-chip-name{font-weight:850;line-height:1.25}.exec-chip-meta{font-size:.76rem;opacity:.84;line-height:1.35;margin-top:3px}.exec-empty{border:1px dashed rgba(255,255,255,.38);border-radius:18px;padding:18px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.90)}
+  .exec-recipient-list{max-height:460px;overflow:auto;border:1px solid var(--exec-line);border-radius:20px;background:#fff}.exec-recipient-row{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:start;padding:14px 16px;border-bottom:1px solid rgba(16,24,40,.06);transition:.15s ease;background:#fff}.exec-recipient-row:hover{background:#fffafa}.exec-recipient-row:last-child{border-bottom:0}.exec-recipient-row.is-selected{background:#fff7f7}.exec-recipient-name{font-weight:850;color:var(--exec-ink);line-height:1.25}.exec-recipient-meta{font-size:.82rem;color:var(--exec-muted);line-height:1.55;margin-top:4px}.exec-email-badge{font-size:.72rem;font-weight:750;color:#8B0000;background:#fff7f7;border:1px solid rgba(139,0,0,.14);border-radius:999px;padding:5px 9px;white-space:nowrap}.exec-search{border-radius:16px;padding:12px 14px;border:1px solid var(--exec-line)}
+  .exec-timeline{position:relative;margin:0;padding:0;list-style:none}.exec-timeline li{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(16,24,40,.07)}.exec-timeline li:last-child{border-bottom:0}.exec-dot{width:32px;height:32px;border-radius:12px;background:#fff7f7;color:#8B0000;display:flex;align-items:center;justify-content:center;flex:0 0 auto}.exec-table th{font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:#667085}.exec-action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.exec-action-row .btn{border-radius:14px;font-weight:800}.exec-callout{border:1px solid rgba(139,0,0,.12);background:#fff7f7;border-radius:20px;padding:16px 18px;color:#344054;line-height:1.6}.exec-form-label{font-size:.82rem;font-weight:800;color:#344054;margin-bottom:7px}
+  @media (max-width:768px){.exec-recipient-row{grid-template-columns:34px 1fr}.exec-email-badge{grid-column:2}.exec-recipient-grid{grid-template-columns:1fr}.exec-stat-value{font-size:1.35rem}.exec-title{font-size:1.55rem}}
+</style>
+
+<div class="container-fluid py-4 exec-page">
+  <div class="card exec-hero mb-4">
+    <div class="card-body p-4 p-lg-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-4">
+        <div>
+          <div class="exec-pill mb-3"><i class="fa-solid fa-chart-pie"></i> Yönetici Özeti Modülü · Sistem yöneticisi kontrol paneli</div>
+          <h2 class="exec-title mb-2">Yönetici Özeti</h2>
+          <p class="exec-lead mb-0">Sabah/akşam yönetici özeti, otomatik e-postalar, mail logları, zamanlanmış işler, test gönderimi ve özet alıcıları bu panelden yönetilir. Bu ekran yalnızca sistem yöneticisi tarafından görülür; diğer personel ve yöneticiler menüde görmez.</p>
+        </div>
+        <div class="exec-anchor-nav">
+          <a href="#otomatik-epostalar"><i class="fa-solid fa-envelope-open-text me-1"></i> Otomatik E-postalar</a>
+          <a href="#mail-loglari"><i class="fa-solid fa-list-check me-1"></i> Mail Logları</a>
+          <a href="#zamanlanmis-isler"><i class="fa-regular fa-clock me-1"></i> Zamanlanmış İşler</a>
+          <a href="#test-gonderimi"><i class="fa-solid fa-vial me-1"></i> Test Gönderimi</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="exec-stat"><div class="d-flex justify-content-between gap-3"><div><div class="exec-stat-label">Özet Alıcısı</div><div class="exec-stat-value" id="selectedCountTop">{{ selected_recipients|length }}</div><div class="small text-muted">Kayıtlı yönetici</div></div><div class="exec-stat-icon"><i class="fa-solid fa-user-tie"></i></div></div></div></div>
+    <div class="col-md-3"><div class="exec-stat"><div class="d-flex justify-content-between gap-3"><div><div class="exec-stat-label">Otomatik Akış</div><div class="exec-stat-value">{{ 'Aktif' if config.enabled else 'Pasif' }}</div><div class="small text-muted">Sabah / akşam özet</div></div><div class="exec-stat-icon"><i class="fa-solid fa-rotate"></i></div></div></div></div>
+    <div class="col-md-3"><div class="exec-stat"><div class="d-flex justify-content-between gap-3"><div><div class="exec-stat-label">Sabah</div><div class="exec-stat-value">{{ config.morning_time or '08:15' }}</div><div class="small text-muted">Planlanan gönderim</div></div><div class="exec-stat-icon"><i class="fa-solid fa-sun"></i></div></div></div></div>
+    <div class="col-md-3"><div class="exec-stat"><div class="d-flex justify-content-between gap-3"><div><div class="exec-stat-label">Akşam</div><div class="exec-stat-value">{{ config.evening_time or '20:30' }}</div><div class="small text-muted">Planlanan gönderim</div></div><div class="exec-stat-icon"><i class="fa-solid fa-moon"></i></div></div></div></div>
+  </div>
+
+  <div class="exec-gradient-panel mb-4" id="ozet-alicilari">
+    <div class="inner">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+        <div>
+          <div class="h5 fw-bold mb-1"><i class="fa-solid fa-envelope-circle-check me-2"></i>Yönetici özeti gönderilecek kişiler</div>
+          <div class="small" style="opacity:.84">Mustafa Başkan dışında özet almak isteyen diğer yöneticileri de buradan ekleyebilirsin.</div>
+        </div>
+        <div class="text-end"><div class="small" style="opacity:.84">Toplam</div><div class="display-6 fw-black" id="selectedCountHero" style="font-weight:950;line-height:1">{{ selected_recipients|length }}</div></div>
+      </div>
+      {% if selected_recipients %}
+      <div class="exec-recipient-grid">
+        {% for user in selected_recipients %}
+          {% set full_name = user.full_name or 'Yönetici' %}
+          <div class="exec-chip">
+            <div class="exec-avatar">{{ full_name[:1] }}</div>
+            <div><div class="exec-chip-name">{{ full_name }}</div><div class="exec-chip-meta">{{ user.email or '-' }}<br>{{ user.unit or '-' }}{% if user.title %} · {{ user.title }}{% endif %}</div></div>
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="exec-empty">Henüz yönetici özeti alıcısı seçilmemiş. Aşağıdaki listeden özet alacak yöneticileri seçip kaydet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post" action="/dashboard/yonetici-ozeti/alici-kaydet" class="mb-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-4">
+      <div class="col-xl-4">
+        <div class="card exec-card h-100">
+          <div class="card-header"><h5 class="mb-1 fw-bold">Özet Ayarları</h5><div class="exec-section-sub">Sabah/akşam özet akışı ve içerik kapsamı.</div></div>
+          <div class="card-body p-4">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="enabled" name="enabled" value="1" {% if config.enabled %}checked{% endif %}>
+              <label class="form-check-label fw-semibold" for="enabled">Yönetici özeti otomatik gönderimi aktif</label>
+            </div>
+            <div class="row g-3">
+              <div class="col-6"><label class="exec-form-label">Sabah saati</label><input class="form-control" name="morning_time" value="{{ config.morning_time or '08:15' }}" placeholder="08:15"></div>
+              <div class="col-6"><label class="exec-form-label">Akşam saati</label><input class="form-control" name="evening_time" value="{{ config.evening_time or '20:30' }}" placeholder="20:30"></div>
+            </div>
+            <hr>
+            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="include_performance" name="include_performance" value="1" {% if config.include_performance %}checked{% endif %}><label class="form-check-label" for="include_performance">Performans ve geciken işler özeti</label></div>
+            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="include_feedback" name="include_feedback" value="1" {% if config.include_feedback %}checked{% endif %}><label class="form-check-label" for="include_feedback">Geri bildirim / destek yoğunluğu</label></div>
+            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="include_weather" name="include_weather" value="1" {% if config.include_weather %}checked{% endif %}><label class="form-check-label" for="include_weather">Günlük personel bilgilendirme durumu</label></div>
+            <div class="exec-callout mt-3"><strong>Not:</strong> Bu panel özet alıcılarını yönetir. Günlük hava durumu/personel bilgilendirme alıcıları ayrı ekranda seçilmeye devam eder.</div>
+            <div class="exec-action-row mt-3"><a class="btn btn-outline-danger" href="/executive-summary/daily-weather-mail"><i class="fa-solid fa-cloud-sun-rain me-1"></i> Günlük Personel Bilgilendirme</a></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-8">
+        <div class="card exec-card h-100">
+          <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div><h5 class="mb-1 fw-bold">Özet Alıcısı Seçimi</h5><div class="exec-section-sub">Başkan, başkan yardımcısı, grup başkanı, koordinatör veya özet alması istenen yöneticileri seç.</div></div>
+            <div class="d-flex gap-2 flex-wrap"><button type="button" class="btn btn-sm btn-outline-secondary" id="selectVisible">Görünenleri Seç</button><button type="button" class="btn btn-sm btn-outline-secondary" id="clearVisible">Görünenleri Kaldır</button></div>
+          </div>
+          <div class="card-body p-4">
+            <input class="form-control exec-search mb-3" id="recipientSearch" placeholder="Yönetici adı, rol, birim veya e-posta ile ara...">
+            <div class="exec-recipient-list" id="recipientList">
+              {% for user in users %}
+                {% set search_text = (user.full_name ~ ' ' ~ user.email ~ ' ' ~ user.role ~ ' ' ~ user.unit ~ ' ' ~ user.title)|lower %}
+                <label class="exec-recipient-row {% if user.id in selected_ids %}is-selected{% endif %}" data-search="{{ search_text }}">
+                  <input class="form-check-input mt-1 exec-recipient-check" type="checkbox" name="summary_recipient_user_ids" value="{{ user.id }}" {% if user.id in selected_ids %}checked{% endif %}>
+                  <div><div class="exec-recipient-name">{{ user.full_name or 'Kullanıcı' }}</div><div class="exec-recipient-meta">Rol: {{ user.role or '-' }} · {{ user.unit or '-' }}{% if user.title %} · {{ user.title }}{% endif %}</div></div>
+                  <div class="exec-email-badge">{{ user.email or 'E-posta yok' }}</div>
+                </label>
+              {% else %}
+                <div class="p-4 text-muted">E-posta adresi bulunan yönetici/kullanıcı kaydı bulunamadı.</div>
+              {% endfor %}
+            </div>
+            <div class="mt-3 d-flex flex-wrap justify-content-between align-items-center gap-2"><div class="text-muted small"><span id="selectedLiveCount">{{ selected_recipients|length }}</span> kişi işaretli. Kaydetmeden alıcı listesi değişmez.</div><button class="btn btn-danger px-4"><i class="fa-solid fa-floppy-disk me-1"></i> Özet Alıcılarını Kaydet</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="row g-4">
+    <div class="col-xl-6" id="otomatik-epostalar">
+      <div class="card exec-card h-100">
+        <div class="card-header"><h5 class="mb-1 fw-bold">Otomatik E-postalar</h5><div class="exec-section-sub">Yönetici özeti ve personel bilgilendirme akışlarının kontrol alanı.</div></div>
+        <div class="card-body p-4">
+          <ul class="exec-timeline">
+            <li><div class="exec-dot"><i class="fa-solid fa-sun"></i></div><div><strong>Sabah Yönetici Özeti</strong><div class="text-muted small">Saat {{ config.morning_time or '08:15' }} · seçili yöneticilere günlük durum özeti.</div></div></li>
+            <li><div class="exec-dot"><i class="fa-solid fa-moon"></i></div><div><strong>Akşam Yönetici Özeti</strong><div class="text-muted small">Saat {{ config.evening_time or '20:30' }} · gün sonu toparlama ve ertesi gün dikkat notu.</div></div></li>
+            <li><div class="exec-dot"><i class="fa-solid fa-cloud-sun-rain"></i></div><div><strong>Günlük Personel Bilgilendirme</strong><div class="text-muted small">Hava durumu, kıyafet önerisi ve iyi dilek mesajı. <a href="/executive-summary/daily-weather-mail">Ayar ekranını aç</a></div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6" id="zamanlanmis-isler">
+      <div class="card exec-card h-100">
+        <div class="card-header"><h5 class="mb-1 fw-bold">Zamanlanmış İşler</h5><div class="exec-section-sub">Sunucuda beklenen otomatik görevler ve çalışma saatleri.</div></div>
+        <div class="card-body p-0"><div class="table-responsive"><table class="table align-middle mb-0 exec-table"><thead><tr><th>Görev</th><th>Saat</th><th>Durum</th></tr></thead><tbody>
+          <tr><td>Sabah Yönetici Özeti</td><td>{{ config.morning_time or '08:15' }}</td><td><span class="badge text-bg-success">Planlandı</span></td></tr>
+          <tr><td>Akşam Yönetici Özeti</td><td>{{ config.evening_time or '20:30' }}</td><td><span class="badge text-bg-secondary">Hazır</span></td></tr>
+          <tr><td>Günlük Personel Bilgilendirme</td><td>08:15</td><td><span class="badge text-bg-success">Ayrı görev</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card exec-card mt-4" id="mail-loglari">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2"><div><h5 class="mb-1 fw-bold">Mail Logları</h5><div class="exec-section-sub">Yönetici özeti ve ilgili bilgilendirme maillerinin son kayıtları.</div></div><a class="btn btn-sm btn-outline-danger" href="/dashboard/yonetici-ozeti#mail-loglari"><i class="fa-solid fa-rotate me-1"></i> Yenile</a></div>
+    <div class="card-body p-0"><div class="table-responsive"><table class="table align-middle mb-0 exec-table"><thead><tr><th>Tarih</th><th>Alıcı</th><th>Konu</th><th>Durum</th><th>Not</th></tr></thead><tbody>
+      {% for log in mail_logs %}<tr><td class="small text-muted">{{ log.created_at or log.sent_at or '-' }}</td><td>{{ log.recipient_email or '-' }}</td><td>{{ log.subject or '-' }}</td><td>{% if log.status in ['sent','success','ok'] %}<span class="badge text-bg-success">Gönderildi</span>{% elif log.status %}<span class="badge text-bg-warning">{{ log.status }}</span>{% else %}<span class="badge text-bg-secondary">-</span>{% endif %}</td><td class="small text-muted">{{ log.error_message or log.note or '' }}</td></tr>{% else %}<tr><td colspan="5" class="text-muted p-4">Henüz yönetici özeti mail logu bulunmuyor.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+  </div>
+
+  <div class="card exec-card mt-4" id="test-gonderimi">
+    <div class="card-header"><h5 class="mb-1 fw-bold">Test Gönderimi</h5><div class="exec-section-sub">Canlı alıcı listesine geçmeden önce özet akışını kontrollü test et.</div></div>
+    <div class="card-body p-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-lg-8"><div class="exec-callout"><strong>Güvenli test:</strong> Bu işlem, kayıtlı alıcı listesini değiştirmez. Test için önce alıcıları kaydet, sonra kuru çalışma ile mail içeriğini ve görev akışını kontrol et.</div></div>
+        <div class="col-lg-4"><form method="post" action="/dashboard/yonetici-ozeti/test-gonderimi"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-danger w-100"><i class="fa-solid fa-vial-circle-check me-1"></i> Test Kontrolünü Çalıştır</button></form></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const search=document.getElementById('recipientSearch');
+  const rows=Array.from(document.querySelectorAll('.exec-recipient-row'));
+  const checks=Array.from(document.querySelectorAll('.exec-recipient-check'));
+  const countEls=[document.getElementById('selectedCountTop'),document.getElementById('selectedCountHero'),document.getElementById('selectedLiveCount')].filter(Boolean);
+  function normalize(v){return (v||'').toLocaleLowerCase('tr-TR');}
+  function refresh(){let checked=0;rows.forEach(row=>{const cb=row.querySelector('.exec-recipient-check');const selected=cb&&cb.checked;if(selected)checked+=1;row.classList.toggle('is-selected',!!selected);});countEls.forEach(el=>el.textContent=checked);}
+  if(search){search.addEventListener('input',function(){const q=normalize(search.value);rows.forEach(row=>{row.style.display=normalize(row.dataset.search).includes(q)?'':'none';});});}
+  document.getElementById('selectVisible')?.addEventListener('click',function(){rows.forEach(row=>{if(row.style.display!=='none'){const cb=row.querySelector('.exec-recipient-check');if(cb)cb.checked=true;}});refresh();});
+  document.getElementById('clearVisible')?.addEventListener('click',function(){rows.forEach(row=>{if(row.style.display!=='none'){const cb=row.querySelector('.exec-recipient-check');if(cb)cb.checked=false;}});refresh();});
+  checks.forEach(cb=>cb.addEventListener('change',refresh));refresh();
+})();
+</script>
+{% endblock %}

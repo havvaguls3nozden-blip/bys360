@@ -1,0 +1,11 @@
+/* BYS360_PERFORMANCE_COMPLETION_PHASE10_REMINDER_CSS */
+.bys360-phase10-reminder-panel{margin:18px 0;padding:18px;border:1px solid rgba(139,0,0,.16);border-radius:18px;background:rgba(255,255,255,.82);box-shadow:0 14px 34px rgba(20,20,20,.08);backdrop-filter:blur(8px)}
+.bys360-phase10-reminder-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(139,0,0,.10);padding-bottom:12px;margin-bottom:14px}
+.bys360-phase10-reminder-head h3{margin:0;color:#8B0000;font-size:1.08rem;font-weight:800;letter-spacing:.01em}
+.bys360-phase10-reminder-head p{margin:6px 0 0;color:#555;line-height:1.45}
+.bys360-phase10-badge{display:inline-flex;align-items:center;white-space:nowrap;border-radius:999px;background:#8B0000;color:#fff;padding:7px 12px;font-weight:700;font-size:.82rem}
+.bys360-phase10-reminder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.bys360-phase10-card{border:1px solid rgba(139,0,0,.12);border-radius:14px;padding:13px;background:rgba(255,255,255,.74)}
+.bys360-phase10-card strong{display:block;color:#2a2a2a;margin-bottom:6px}
+.bys360-phase10-card span{display:block;color:#626262;font-size:.92rem;line-height:1.4}
+@media(max-width:860px){.bys360-phase10-reminder-grid{grid-template-columns:1fr}.bys360-phase10-reminder-head{flex-direction:column}.bys360-phase10-badge{align-self:flex-start}}

@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+
+{% block title %}Yükleme Kontrol Raporu - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Yükleme Kontrol Raporu{% endblock %}
+{% block page_subtitle %}Excel yükleme sonrası hiyerarşi ve veri tutarlılığını kontrol edin{% endblock %}
+
+{% block content %}
+<style>
+    .report-grid{
+        display:grid;
+        grid-template-columns:repeat(5, minmax(0,1fr));
+        gap:14px;
+        margin-bottom:18px;
+    }
+
+    .report-card,
+    .report-section{
+        background:rgba(255,255,255,.72);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+    }
+
+    .report-card{
+        padding:18px;
+    }
+
+    .report-label{
+        color:#6b7280;
+        font-size:.9rem;
+        margin-bottom:8px;
+    }
+
+    .report-value{
+        font-size:1.7rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .report-section{
+        padding:18px;
+        margin-bottom:18px;
+        overflow:auto;
+    }
+
+    .section-title{
+        margin:0 0 14px;
+        color:#8B0000;
+        font-size:1.05rem;
+        font-weight:800;
+    }
+
+    .report-table{
+        width:100%;
+        min-width:980px;
+        border-collapse:separate;
+        border-spacing:0 10px;
+    }
+
+    .report-table thead th{
+        text-align:left;
+        font-size:.85rem;
+        color:#6b7280;
+        padding:0 12px 6px;
+        font-weight:800;
+    }
+
+    .report-table tbody tr{
+        background:rgba(255,255,255,.88);
+        box-shadow:0 10px 24px rgba(15,23,42,.05);
+    }
+
+    .report-table tbody td{
+        padding:13px 12px;
+        border-top:1px solid rgba(15,23,42,.05);
+        border-bottom:1px solid rgba(15,23,42,.05);
+        vertical-align:top;
+    }
+
+    .report-table tbody td:first-child{
+        border-left:1px solid rgba(15,23,42,.05);
+        border-top-left-radius:16px;
+        border-bottom-left-radius:16px;
+    }
+
+    .report-table tbody td:last-child{
+        border-right:1px solid rgba(15,23,42,.05);
+        border-top-right-radius:16px;
+        border-bottom-right-radius:16px;
+    }
+
+    .ok-box{
+        padding:18px;
+        border-radius:18px;
+        background:#ecfdf5;
+        color:#065f46;
+        font-weight:700;
+    }
+
+    .ai-panel{padding:18px;border-radius:24px;border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));margin-bottom:18px}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+    .priority-list{display:grid;gap:10px;margin-top:14px}
+    .priority-item{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .priority-title{font-weight:900;color:#111827;font-size:.9rem;margin-bottom:4px}
+    .priority-sub{color:#6b7280;font-size:.82rem;line-height:1.6}
+
+    @media (max-width: 1100px){
+        .report-grid{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="report-grid">
+    <div class="report-card">
+        <div class="report-label">Mükerrer Birim</div>
+        <div class="report-value">{{ summary.duplicate_units }}</div>
+    </div>
+    <div class="report-card">
+        <div class="report-label">Boş Çalışma Grubu</div>
+        <div class="report-value">{{ summary.empty_workgroups }}</div>
+    </div>
+    <div class="report-card">
+        <div class="report-label">Bağsız Personel</div>
+        <div class="report-value">{{ summary.unbound_users }}</div>
+    </div>
+    <div class="report-card">
+        <div class="report-label">Yanlış Bağlı Personel</div>
+        <div class="report-value">{{ summary.mismatched_users }}</div>
+    </div>
+    <div class="report-card">
+        <div class="report-label">Eksik Amir Zinciri</div>
+        <div class="report-value">{{ summary.incomplete_manager_chain }}</div>
+    </div>
+</div>
+
+{% if ai_import_health_panel %}
+<div class="ai-panel">
+    <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_import_health_panel.badge or 'AI sağlık özeti' }}</div>
+    <h4 class="ai-headline">{{ ai_import_health_panel.headline }}</h4>
+    <p class="ai-summary">{{ ai_import_health_panel.summary }}</p>
+    <ul class="ai-bullets">
+        {% for item in ai_import_health_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    <div class="ai-actions">
+        {% for row in ai_import_health_panel.actions or [] %}
+            <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+        {% endfor %}
+    </div>
+    {% if ai_import_health_panel.priorities %}
+    <div class="priority-list">
+        {% for row in ai_import_health_panel.priorities %}
+        <div class="priority-item">
+            <div class="priority-title">{{ loop.index }}. {{ row.label }} · {{ row.value }}</div>
+            <div class="priority-sub">{{ row.reason }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if ai_import_simulation_panel %}
+<div class="ai-panel">
+    <div class="ai-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> {{ ai_import_simulation_panel.badge or 'AI düzeltme simülasyonu' }}</div>
+    <h4 class="ai-headline">{{ ai_import_simulation_panel.headline }}</h4>
+    <p class="ai-summary">{{ ai_import_simulation_panel.summary }}</p>
+    <ul class="ai-bullets">
+        {% for item in ai_import_simulation_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    <div class="ai-actions">
+        {% for row in ai_import_simulation_panel.actions or [] %}
+            <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+        {% endfor %}
+    </div>
+    <form method="POST" action="{{ url_for('main.admin_import_health_report') }}" style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-bolt me-2"></i>AI düzeltme simülasyonunu çalıştır</button>
+        <span style="font-size:.85rem;color:#6b7280;">Bu adım veritabanına yazmaz; yalnızca uygulanabilir düzeltme adaylarını önceliklendirir.</span>
+    </form>
+    {% if ai_import_simulation and ai_import_simulation.triggered %}
+    <div class="priority-list" style="margin-top:16px;">
+        {% for row in ai_import_simulation_panel.preview_rows or [] %}
+        <div class="priority-item">
+            <div class="priority-title">{{ row.label }} · {{ row.value }}</div>
+            <div class="priority-sub">{{ row.note }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="report-section">
+    <h3 class="section-title">Mükerrer Birimler</h3>
+    {% if duplicate_units %}
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Birim</th>
+                <th>Tür</th>
+                <th>Üst Birim</th>
+                <th>Adet</th>
+                <th>ID'ler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in duplicate_units %}
+            <tr>
+                <td>{{ row.unit_name }}</td>
+                <td>{{ row.unit_type }}</td>
+                <td>{{ row.parent_name }}</td>
+                <td>{{ row.duplicate_count }}</td>
+                <td>{{ row.unit_ids }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="ok-box">Mükerrer birim bulunmadı.</div>
+    {% endif %}
+</div>
+
+<div class="report-section">
+    <h3 class="section-title">Personeli Olmayan Çalışma Grupları</h3>
+    {% if empty_workgroups %}
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Çalışma Grubu</th>
+                <th>Üst Birim</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in empty_workgroups %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.unit_name }}</td>
+                <td>{{ row.parent_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="ok-box">Boş çalışma grubu bulunmadı.</div>
+    {% endif %}
+</div>
+
+<div class="report-section">
+    <h3 class="section-title">Birim Ağacına Bağlanmamış Personeller</h3>
+    {% if unbound_users %}
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Kişi</th>
+                <th>Sicil</th>
+                <th>Rol</th>
+                <th>Birim</th>
+                <th>Üst Birim</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in unbound_users %}
+            <tr>
+                <td>{{ row.ad }} {{ row.soyad }}</td>
+                <td>{{ row.sicil_no }}</td>
+                <td>{{ row.role }}</td>
+                <td>{{ row.birim }}</td>
+                <td>{{ row.ust_birim }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="ok-box">Bağsız personel bulunmadı.</div>
+    {% endif %}
+</div>
+
+<div class="report-section">
+    <h3 class="section-title">Yanlış Birime Bağlı Personeller</h3>
+    {% if mismatched_users %}
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Kişi</th>
+                <th>Sicil</th>
+                <th>Excel Birim</th>
+                <th>Excel Üst Birim</th>
+                <th>Bağlı Birim</th>
+                <th>Bağlı Üst Birim</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in mismatched_users %}
+            <tr>
+                <td>{{ row.ad }} {{ row.soyad }}</td>
+                <td>{{ row.sicil_no }}</td>
+                <td>{{ row.birim }}</td>
+                <td>{{ row.ust_birim }}</td>
+                <td>{{ row.linked_unit }}</td>
+                <td>{{ row.linked_parent }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="ok-box">Yanlış bağlı personel bulunmadı.</div>
+    {% endif %}
+</div>
+
+<div class="report-section">
+    <h3 class="section-title">Eksik Amir Zinciri</h3>
+    {% if incomplete_manager_chain %}
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Kişi</th>
+                <th>Sicil</th>
+                <th>Rol</th>
+                <th>Birim</th>
+                <th>1. Amir</th>
+                <th>2. Amir</th>
+                <th>3. Amir</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in incomplete_manager_chain %}
+            <tr>
+                <td>{{ row.ad }} {{ row.soyad }}</td>
+                <td>{{ row.sicil_no }}</td>
+                <td>{{ row.role }}</td>
+                <td>{{ row.birim }}</td>
+                <td>{{ row.yonetici_sicil or '-' }}</td>
+                <td>{{ row.ikinci_yonetici_sicil or '-' }}</td>
+                <td>{{ row.ucuncu_yonetici_sicil or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="ok-box">Eksik amir zinciri bulunmadı.</div>
+    {% endif %}
+</div>
+{% endblock %}

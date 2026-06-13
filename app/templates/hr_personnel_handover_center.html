@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Devir Teslim Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Devir Teslim Merkezi{% endblock %}
+{% block page_subtitle %}Ayrılış, işe başlatma ve birim değişikliği süreçlerinde zimmet, erişim ve evrak kapanışını tek panelden yönetin.{% endblock %}
+{% block content %}
+<style>
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}
+.stack{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+.label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.value{font-size:1.6rem;font-weight:900;color:#111827}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.subgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field{display:grid;gap:6px}
+.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:96px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.btn-row{display:flex;flex-wrap:wrap;gap:10px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}
+.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:740px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.soft{background:#f3f4f6;color:#374151}.empty{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:980px){.grid,.subgrid,.stats,.form-grid{grid-template-columns:1fr}}
+</style>
+<div class="stack">
+  <div class="stats">
+    <div class="stat"><div class="label">Açık devir teslim</div><div class="value">{{ handover_summary.open }}</div></div>
+    <div class="stat"><div class="label">Tamamlanan</div><div class="value">{{ handover_summary.completed }}</div></div>
+    <div class="stat"><div class="label">Kritik termin</div><div class="value">{{ handover_summary.critical }}</div></div>
+    <div class="stat"><div class="label">İşlem satırı</div><div class="value">{{ handover_summary.get('items', 0) if handover_summary is mapping else 0 }}</div></div>
+  </div>
+  {% if not handover_ready %}
+    <div class="panel empty">Devir teslim tabloları veri geçişi sonrası aktifleşecek.</div>
+  {% else %}
+  <div class="grid">
+    <div class="panel stack">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h3 style="margin:0">Devir teslim kayıtları</h3><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_clearance_board', scope=selected_scope_mode) }}">İlişik kesme panosu</a></div>
+      {% if handover_rows %}
+      <div class="table-wrap"><table class="table-clean"><thead><tr><th>Başlık</th><th>Tür</th><th>Durum</th><th>İlerleme</th><th>Termin</th><th></th></tr></thead><tbody>
+      {% for row in handover_rows %}<tr><td><strong>{{ row.title }}</strong><div class="label">{{ row.user_name }}</div></td><td>{{ row.operation_type_label }}</td><td><span class="tag {% if row.status == 'completed' %}good{% elif row.status == 'waiting' %}warn{% else %}soft{% endif %}">{{ row.status_label }}</span></td><td>%{{ row.progress }}</td><td>{{ row.due_date or '-' }}</td><td><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_handover_center', scope=selected_scope_mode, user_id=selected_user_id, handover_id=row.id) }}">Aç</a></td></tr>{% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty">Seçili personel için devir teslim kaydı bulunmuyor.</div>{% endif %}
+    </div>
+    <div class="panel stack">
+      <h3 style="margin:0">Devir teslim kartı</h3>
+      <form method="post" action="{{ url_for('main.hr_personnel_handover_save') }}" class="stack">
+        <input type="hidden" name="form_token" value="{{ handover_form_token }}"><input type="hidden" name="handover_id" value="{{ selected_handover.id if selected_handover else '' }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+        <div class="form-grid">
+          <div class="field"><label>Personel</label><select name="user_id">{% for row in scope_user_options %}<option value="{{ row.id }}" {% if selected_user_id == row.id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>{% endfor %}</select></div>
+          <div class="field"><label>Yaşam döngüsü vakası</label><select name="lifecycle_case_id"><option value="">Seçiniz</option>{% for row in available_cases %}<option value="{{ row.id }}" {% if selected_handover and selected_handover.lifecycle_case_id == row.id %}selected{% endif %}>{{ row.title }}</option>{% endfor %}</select></div>
+          <div class="field"><label>Operasyon türü</label><select name="operation_type"><option value="offboarding" {% if selected_handover and selected_handover.operation_type == 'offboarding' %}selected{% endif %}>Ayrılış Devir Teslimi</option><option value="onboarding" {% if selected_handover and selected_handover.operation_type == 'onboarding' %}selected{% endif %}>İşe Başlatma Teslimi</option><option value="unit_change" {% if selected_handover and selected_handover.operation_type == 'unit_change' %}selected{% endif %}>Birim Devir / Teslim</option><option value="return_to_work" {% if selected_handover and selected_handover.operation_type == 'return_to_work' %}selected{% endif %}>İşe Dönüş Hazırlığı</option></select></div>
+          <div class="field"><label>Durum</label><select name="status"><option value="draft">Taslak</option><option value="in_progress">İşlemde</option><option value="waiting">Beklemede</option><option value="completed">Tamamlandı</option><option value="cancelled">İptal</option></select></div>
+          <div class="field"><label>Başlık</label><input type="text" name="title" value="{{ selected_handover.title if selected_handover else '' }}" required></div>
+          <div class="field"><label>Devir teslim no</label><input type="text" name="handover_no" value="{{ selected_handover.handover_no if selected_handover else '' }}"></div>
+          <div class="field"><label>Plan tarihi</label><input type="date" name="planned_date" value="{{ selected_handover.planned_date.isoformat() if selected_handover and selected_handover.planned_date else '' }}"></div>
+          <div class="field"><label>Termin</label><input type="date" name="due_date" value="{{ selected_handover.due_date.isoformat() if selected_handover and selected_handover.due_date else '' }}"></div>
+          <div class="field" style="grid-column:1/-1"><label>Not</label><textarea name="note">{{ selected_handover.note if selected_handover else '' }}</textarea></div>
+        </div>
+        <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Kaydı güncelle' if selected_handover else 'Devir teslim oluştur' }}</button><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_lifecycle_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Yaşam döngüsü merkezine dön</a></div>
+      </form>
+    </div>
+  </div>
+  <div class="subgrid">
+    <div class="panel stack">
+      <h3 style="margin:0">İşlem satırı ekle</h3>
+      {% if selected_handover %}
+      <form method="post" action="{{ url_for('main.hr_personnel_handover_item_save') }}" class="stack">
+        <input type="hidden" name="form_token" value="{{ handover_item_form_token }}"><input type="hidden" name="handover_id" value="{{ selected_handover.id }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+        <div class="form-grid">
+          <div class="field"><label>Başlık</label><input type="text" name="title" required></div>
+          <div class="field"><label>Kategori</label><select name="category"><option value="zimmet">Zimmet</option><option value="erisim">Erişim / Hesap</option><option value="evrak">Evrak</option><option value="idari">İdari Kapanış</option><option value="diger">Diğer</option></select></div>
+          <div class="field"><label>Sorumlu</label><select name="responsible_user_id"><option value="">Seçiniz</option>{% for row in scope_user_options %}<option value="{{ row.id }}">{{ row.full_name }}</option>{% endfor %}</select></div>
+          <div class="field"><label>Termin</label><input type="date" name="due_date"></div>
+          <div class="field"><label>Durum</label><select name="status"><option value="pending">Bekliyor</option><option value="in_progress">İşlemde</option><option value="completed">Tamamlandı</option><option value="waived">Muaf</option></select></div>
+          <div class="field"><label>Zorunlu</label><select name="is_required"><option value="1">Evet</option><option value="0">Hayır</option></select></div>
+          <div class="field" style="grid-column:1/-1"><label>İşlem notu</label><textarea name="note"></textarea></div>
+          <div class="field" style="grid-column:1/-1"><label>Kanıt / teslim notu</label><textarea name="evidence_note"></textarea></div>
+        </div>
+        <div class="btn-row"><button class="btn-soft primary" type="submit">Satırı ekle</button></div>
+      </form>
+      {% else %}<div class="empty">İşlem satırı eklemek için önce bir devir teslim kaydı seçin.</div>{% endif %}
+    </div>
+    <div class="panel stack">
+      <h3 style="margin:0">İşlem listesi</h3>
+      {% if handover_item_rows %}
+      <div class="table-wrap"><table class="table-clean"><thead><tr><th>İşlem</th><th>Sorumlu</th><th>Durum</th><th>Termin</th><th></th></tr></thead><tbody>
+      {% for row in handover_item_rows %}<tr><td><strong>{{ row.title }}</strong><div class="label">{{ row.category }} · {% if row.is_required %}Zorunlu{% else %}İsteğe bağlı{% endif %}</div><div class="label">{{ row.evidence_note }}</div></td><td>{{ row.responsible_name }}</td><td>{{ row.status_label }}</td><td>{{ row.due_date or '-' }}</td><td><form method="post" action="{{ url_for('main.hr_personnel_handover_item_status') }}"><input type="hidden" name="form_token" value="{{ handover_item_status_token }}"><input type="hidden" name="item_id" value="{{ row.id }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><select name="status"><option value="pending">Bekliyor</option><option value="in_progress">İşlemde</option><option value="completed">Tamamlandı</option><option value="waived">Muaf</option></select><input type="text" name="evidence_note" placeholder="Kısa teslim notu" value="{{ row.evidence_note }}" style="margin:8px 0"><button class="btn-soft secondary" type="submit">Güncelle</button></form></td></tr>{% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty">Seçili kayıt için işlem satırı bulunmuyor.</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

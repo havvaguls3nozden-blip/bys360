@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}AI İnceleme Kuyruğu - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI İnceleme Kuyruğu{% endblock %}
+{% block page_subtitle %}Açık AI önerilerini kabul, ret veya toplu uygulama kararlarıyla yönetir.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-3" method="get">
+    <div class="col-md-3"><label class="form-label">Modül</label><select name="module_type" class="form-select"><option value="">Tümü</option>{% for item in module_options %}<option value="{{ item }}" {% if selected_module_type == item|lower %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label">Hedef tablo</label><select name="target_table" class="form-select"><option value="">Tümü</option>{% for item in target_table_options %}<option value="{{ item }}" {% if selected_target_table == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Durum</label><select name="status" class="form-select"><option value="">Tümü</option>{% for item in status_options %}<option value="{{ item }}" {% if selected_status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Şiddet</label><select name="severity" class="form-select"><option value="">Tümü</option>{% for item in severity_options %}<option value="{{ item }}" {% if selected_severity == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-2 d-flex align-items-end gap-2"><button class="btn btn-catab w-100">Filtrele</button><a class="btn btn-outline-secondary w-100" href="{{ url_for('main.admin_ai_review_queue_export', module_type=selected_module_type, target_table=selected_target_table, status=selected_status, severity=selected_severity) }}">CSV</a></div>
+  </form>
+</div>
+
+<form method="post" action="{{ url_for('main.admin_ai_review_queue_bulk') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="module_type" value="{{ selected_module_type }}">
+  <input type="hidden" name="target_table" value="{{ selected_target_table }}">
+  <input type="hidden" name="status" value="{{ selected_status }}">
+  <input type="hidden" name="severity" value="{{ selected_severity }}">
+  <input type="hidden" name="page" value="{{ pagination.page }}">
+  <div class="glass-card p-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <div class="d-flex gap-2 flex-wrap">
+        <span class="badge text-bg-light">Filtreli {{ summary.filtered_total }}</span>
+        <span class="badge text-bg-light">Global açık {{ summary.global_open_total }}</span>
+        <span class="badge text-bg-light">Sayfa destekli {{ summary.page_supported_total }}</span>
+      </div>
+      <div class="d-flex gap-2">
+        <select class="form-select" name="bulk_action" style="min-width:220px;">
+          <option value="">Toplu işlem seçin</option>
+          <option value="accepted">Kabul et</option>
+          <option value="rejected">Reddet</option>
+          <option value="dismissed">Kapat</option>
+          <option value="apply">Uygula</option>
+        </select>
+        <button class="btn btn-catab">Uygula</button>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th><input type="checkbox" onclick="document.querySelectorAll('.rec-check').forEach(x => x.checked = this.checked)"></th><th>Kayıt</th><th>Öneri</th><th>Şiddet</th><th>Durum</th><th>İşlem</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td><input class="form-check-input rec-check" type="checkbox" name="recommendation_ids" value="{{ row.id }}"></td>
+            <td>
+              <div class="fw-bold">{{ row.module_type }} / {{ row.target_table }}</div>
+              <div class="small text-muted">#{{ row.target_id }} · {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+            </td>
+            <td>
+              <div class="fw-semibold">{{ row.title }}</div>
+              <div class="small text-muted">{{ row.body }}</div>
+              {% if row.is_supported %}<span class="badge text-bg-success mt-1">destekli</span>{% else %}<span class="badge text-bg-secondary mt-1">manuel</span>{% endif %}
+            </td>
+            <td><span class="badge text-bg-{% if row.severity == 'critical' %}danger{% elif row.severity == 'warning' %}warning{% else %}secondary{% endif %}">{{ row.severity }}</span></td>
+            <td><span class="badge text-bg-light">{{ row.status }}</span></td>
+            <td class="small text-muted">{% if row.reviewed_at %}{{ row.reviewed_at.strftime('%d.%m.%Y %H:%M') }}{% else %}-{% endif %}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6"><div class="text-muted py-3">Bu filtrede AI önerisi bulunmadı.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div class="small text-muted">Sayfa {{ pagination.page }} / {{ pagination.pages }}</div>
+      <div class="btn-group">
+        {% if pagination.has_prev %}<a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_review_queue', module_type=selected_module_type, target_table=selected_target_table, status=selected_status, severity=selected_severity, page=pagination.prev_num) }}">Önceki</a>{% endif %}
+        {% if pagination.has_next %}<a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_review_queue', module_type=selected_module_type, target_table=selected_target_table, status=selected_status, severity=selected_severity, page=pagination.next_num) }}">Sonraki</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

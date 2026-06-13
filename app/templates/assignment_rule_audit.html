@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Performans Zincir Ön Kontrol{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h1 class="h4 mb-1">Performans Zincir Ön Kontrol</h1>
+      <div class="text-muted small">Görev üretimi öncesinde mevcut görevler anayasa kural motoruyla karşılaştırılır.</div>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('main.performance_generate_assignments') }}"><i class="fa-solid fa-arrow-left me-1"></i> Görev Üretimine Dön</a>
+  </div>
+
+  <form method="get" class="card border-0 shadow-sm mb-3">
+    <div class="card-body row g-2 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label small text-muted">Dönem</label>
+        <select name="period_id" class="form-select">
+          {% for period in periods or [] %}
+            <option value="{{ period.id }}" {% if selected_period_id == period.id %}selected{% endif %}>{{ period.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-auto"><button class="btn btn-catab" type="submit"><i class="fa-solid fa-magnifying-glass-chart me-1"></i> Kontrol Et</button></div>
+    </div>
+  </form>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Personel</div><div class="h4 mb-0">{{ audit.employee_count|default(0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Fark / Uyarı</div><div class="h4 mb-0">{{ audit.issue_count|default(0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Bloklayan</div><div class="h4 mb-0">{{ audit.blocking_issue_count|default(0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Tamamlanmış Çakışma</div><div class="h4 mb-0">{{ audit.completed_conflict_count|default(0) }}</div></div></div></div>
+  </div>
+
+  <div class="alert {% if audit.can_auto_repair %}alert-success{% else %}alert-danger{% endif %} border-0 shadow-sm">
+    <strong>{% if audit.can_auto_repair %}Görev üretimi güvenli.{% else %}Görev üretimi otomatik durdurulmalı.{% endif %}</strong>
+    {{ audit.message }}
+    <div class="small mt-1">Başkan lookup içinde: {{ 'Evet' if audit.president_lookup_available else 'Hayır' }} · Başkan görev öznesi dışında: {{ 'Evet' if audit.president_excluded_from_subjects else 'Hayır' }}</div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-semibold">Tespitler</div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light"><tr><th>Personel</th><th>Seviye</th><th>Tür</th><th>Durum</th><th>Açıklama</th></tr></thead>
+        <tbody>
+          {% for item in audit.issues or [] %}
+            <tr>
+              <td>{{ item.employee_name }}</td>
+              <td>{{ item.level or '-' }}</td>
+              <td><span class="badge text-bg-light">{{ item.issue_type }}</span></td>
+              <td>{% if item.severity == 'error' %}<span class="badge text-bg-danger">Kritik</span>{% else %}<span class="badge text-bg-warning">Uyarı</span>{% endif %}{% if item.completed %}<span class="badge text-bg-dark ms-1">Tamamlanmış</span>{% endif %}</td>
+              <td class="small">{{ item.message }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted py-4">Bu dönem için zincir farkı bulunmadı.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

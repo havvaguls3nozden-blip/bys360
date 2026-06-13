@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Performans Menü Görünürlüğü{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 rounded-4 p-4">
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+      <div>
+        <h1 class="h4 mb-2">Performans Menü Görünürlüğü</h1>
+        <p class="text-muted mb-0">Performans ve KPI sekmelerinin personel rolünde görünürlüğünü ayarlardan yönetin.</p>
+      </div>
+      <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rol matrisi senkron</span>
+    </div>
+    <hr>
+    <form method="post">
+      {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Personel görünürlük modu</label>
+        <select name="personnel_visibility_mode" class="form-select">
+          <option value="safe_default" {% if mode == 'safe_default' %}selected{% endif %}>Güvenli varsayılan</option>
+          <option value="custom" {% if mode == 'custom' %}selected{% endif %}>Seçili sekmeleri aç</option>
+          <option value="full_access" {% if mode == 'full_access' %}selected{% endif %}>Tüm performans sekmelerini aç</option>
+        </select>
+      </div>
+      <div class="alert alert-info border-0 rounded-3">
+        KPI Dashboardu, KPI ve Hedef Yönetimi, Yetkinlik Kütüphanesi ve KPI Analiz Merkezi personelde varsayılan kapalıdır. Öz Değerlendirme personel için açık kalır.
+      </div>
+      <div class="row g-3">
+        {% for item in registry %}
+        <div class="col-md-6 col-xl-4">
+          <label class="border rounded-3 p-3 d-block h-100 bg-white">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="allowed_items" value="{{ item.key }}" {% if item.key in allowed_items %}checked{% endif %}>
+              <span class="form-check-label fw-semibold">{{ item.label }}</span>
+            </div>
+            <div class="small text-muted mt-2">{{ item.description }}</div>
+            {% if item.key in ['performance.kpi_dashboard','performance.kpi_management','performance.competency_library','performance.kpi_analysis'] %}
+              <div class="small text-danger mt-2">KPI yönetim/analiz sekmesidir; personelde varsayılan kapalıdır.</div>
+            {% elif item.admin_only %}
+              <div class="small text-danger mt-2">Yönetim/yetkili ekranıdır.</div>
+            {% endif %}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="alert alert-warning mt-4 mb-3">Menü görünürlüğü tek başına yeterli değildir; sayfa ve sistem yetki kontrolleri de aynı anahtarlarla çalışmalıdır.</div>
+      <button class="btn btn-danger px-4" type="submit">Ayarları Kaydet</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

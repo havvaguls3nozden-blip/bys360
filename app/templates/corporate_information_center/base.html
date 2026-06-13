@@ -1,0 +1,127 @@
+
+    <!-- BYS360_CIC_V4_1B_FORCE_PRO_UI -->
+{% extends "base.html" %}
+{% block title %}Kurumsal Bilgilendirme Merkezi | BYS360{% endblock %}
+{% block page_title %}Kurumsal Bilgilendirme Merkezi{% endblock %}
+{% block page_subtitle %}Personel ve yönetici bilgilendirmeleri, şablonlar, alıcılar, test gönderimleri, loglar ve canlı geçiş kontrolleri tek merkezden yönetilir.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_v4_6b_celebrations_final.css') }}?v=4_6b">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_v3_0_phase4_1.css') }}?v=2_15_30">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_v3_0_phase7.css') }}?v=2_15_30">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_v3_0_phase7_8_base_header_pro.css') }}?v=2_15_30">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_v4_4_performance_style.css') }}?v=4_4">
+{% endblock %}
+
+
+{# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_12_ALL_TEMPLATE_MACRO_FIX: shared template helpers #}
+{% macro cic_csrf() -%}
+ {%- if csrf_token is defined -%}
+ <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+ {%- endif -%}
+{%- endmacro %}
+
+{% macro status_pill(status, label=None) -%}
+ {%- set _status = (status|default('neutral', true)|string)|lower -%}
+ {%- set _label = label|default(status|default('Durum', true), true) -%}
+ {%- if _status in ['ok', 'ready', 'active', 'success', 'enabled', 'completed', 'passed', 'healthy'] -%}
+ <span class="cic-badge ok"><i class="fa-solid fa-circle-check"></i> {{ _label }}</span>
+ {%- elif _status in ['warning', 'warn', 'pending', 'draft', 'attention', 'waiting'] -%}
+ <span class="cic-badge warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ _label }}</span>
+ {%- elif _status in ['error', 'danger', 'failed', 'missing', 'blocked', 'critical'] -%}
+ <span class="cic-badge danger"><i class="fa-solid fa-circle-exclamation"></i> {{ _label }}</span>
+ {%- elif _status in ['info', 'neutral', 'passive'] -%}
+ <span class="cic-badge neutral"><i class="fa-solid fa-circle-info"></i> {{ _label }}</span>
+ {%- else -%}
+ <span class="cic-badge neutral"><i class="fa-solid fa-circle-info"></i> {{ _label }}</span>
+ {%- endif -%}
+{%- endmacro %}
+
+{% macro task_status(task) -%}
+ {%- set _status = task.status|default(task.state|default(task.health|default('ready', true), true), true) -%}
+ {%- set _label = task.status_label|default(task.label_status|default(task.status_text|default('Hazır', true), true), true) -%}
+ {{ status_pill(_status, _label) }}
+{%- endmacro %}
+
+{% macro user_full_name(user) -%}
+ {%- set _ad = user.ad|default('', true) -%}
+ {%- set _soyad = user.soyad|default('', true) -%}
+ {%- set _name = (_ad ~ ' ' ~ _soyad)|trim -%}
+ {{ _name or user.full_name_cache|default('', true) or user.name|default('', true) or user.email|default('', true) or ('Kullanıcı #' ~ user.id) }}
+{%- endmacro %}
+
+{% macro user_initial(user) -%}
+ {%- set _name = user_full_name(user)|striptags|trim -%}
+ {{ (_name[:1] or 'K')|upper }}
+{%- endmacro %}
+
+
+{% macro tabs(active) -%}
+<nav class="cic-tabs" aria-label="Kurumsal Bilgilendirme Merkezi menüsü">
+  <a class="{{ 'active' if active=='overview' else '' }}" href="/dashboard/kurumsal-bilgilendirme"><i class="fa-solid fa-gauge-high"></i><span>Genel Bakış</span></a>
+  <a class="{{ 'active' if active=='celebrations' else '' }}" href="/dashboard/kurumsal-bilgilendirme/kutlamalar"><i class="fa-solid fa-cake-candles"></i><span>Kutlamalar</span></a>
+  <a class="{{ 'active' if active=='tasks' else '' }}" href="/dashboard/kurumsal-bilgilendirme/gorevler"><i class="fa-solid fa-list-check"></i><span>Görevler</span></a>
+  <a class="{{ 'active' if active=='recipients' else '' }}" href="/dashboard/kurumsal-bilgilendirme/alicilar"><i class="fa-solid fa-users"></i><span>Alıcılar</span></a>
+  <a class="{{ 'active' if active=='templates' else '' }}" href="/dashboard/kurumsal-bilgilendirme/sablonlar"><i class="fa-solid fa-envelope-open-text"></i><span>Şablonlar</span></a>
+  <a class="{{ 'active' if active=='test' else '' }}" href="/dashboard/kurumsal-bilgilendirme/test"><i class="fa-solid fa-eye"></i><span>Önizleme / Test</span></a>
+  <a class="{{ 'active' if active=='logs' else '' }}" href="/dashboard/kurumsal-bilgilendirme/loglar"><i class="fa-solid fa-clock-rotate-left"></i><span>Gönderim Geçmişi</span></a>
+  <a class="{{ 'active' if active=='system' else '' }}" href="/dashboard/kurumsal-bilgilendirme/sistem"><i class="fa-solid fa-server"></i><span>Sistem</span></a>
+</nav>
+{%- endmacro %}
+
+
+{% block content %}
+{% set _path = request.path|default('', true) if request is defined else '' %}
+{% set _active_tab = active_tab|default('celebrations' if _path.startswith('/dashboard/kurumsal-bilgilendirme/kutlamalar') else 'tasks' if _path.startswith('/dashboard/kurumsal-bilgilendirme/gorevler') else 'recipients' if _path.startswith('/dashboard/kurumsal-bilgilendirme/alicilar') else 'templates' if _path.startswith('/dashboard/kurumsal-bilgilendirme/sablonlar') else 'test' if _path.startswith('/dashboard/kurumsal-bilgilendirme/test') else 'logs' if _path.startswith('/dashboard/kurumsal-bilgilendirme/loglar') else 'system' if _path.startswith('/dashboard/kurumsal-bilgilendirme/sistem') else 'overview', true) %}
+{% set _ready_score = readiness_score|default(uat_score|default(100, true), true) %}
+{% set _success_rate = success_rate|default(100, true) %}
+{% set _failed_count = failed_count|default(0, true) %}
+{% set _release_label = release_status|default('Hazır', true) %}
+<div class="cic-shell cicp-shell">
+  <section class="cicp-command-header" aria-label="Kurumsal Bilgilendirme Merkezi özet alanı">
+    <div class="cicp-command-main">
+      <span class="cicp-eyebrow"><i class="fa-solid fa-bullhorn"></i> Kurumsal Bilgilendirme Merkezi</span>
+      <h1>Duyuru, alıcı yönetimi ve kutlama akışları tek çalışma alanında</h1>
+      <p>Kurumsal duyurular, otomatik kutlamalar, alıcı grupları, şablonlar, ön kontrol kayıtları ve gönderim geçmişi sade, izlenebilir ve yetki kontrollü bir yapıda yönetilir.</p>
+      <div class="cicp-command-actions">
+        <a class="cic-btn" href="/dashboard/kurumsal-bilgilendirme/test"><i class="fa-solid fa-eye"></i> Önizleme / test gönderimi</a>
+        <a class="cic-btn secondary" href="/dashboard/kurumsal-bilgilendirme/kutlamalar"><i class="fa-solid fa-cake-candles"></i> Kutlamalar</a>
+        <a class="cic-btn ghost" href="/dashboard/kurumsal-bilgilendirme/loglar"><i class="fa-solid fa-clock-rotate-left"></i> Gönderim geçmişi</a>
+      </div>
+    </div>
+    <aside class="cicp-readiness-card" aria-label="Gönderim hazırlık özeti">
+      <div class="cicp-score-ring"><strong>{{ _ready_score }}</strong><span>/100</span></div>
+      <div>
+        <div class="cicp-score-title">Gönderim hazırlığı</div>
+        <div class="cicp-score-sub">Alıcı, şablon, ön kontrol ve log kayıtları birlikte izlenir.</div>
+        <span class="cic-badge ok"><i class="fa-solid fa-circle-check"></i> {{ _release_label }}</span>
+      </div>
+    </aside>
+  </section>
+
+  <section class="cicp-metrics" aria-label="Kısa durum özeti">
+    <div class="cicp-metric"><span>Başarı oranı</span><strong>%{{ _success_rate }}</strong></div>
+    <div class="cicp-metric"><span>Hatalı kayıt</span><strong>{{ _failed_count }}</strong></div>
+    <div class="cicp-metric"><span>Gönderim durumu</span><strong>{{ _release_label }}</strong></div>
+    <div class="cicp-metric"><span>Durum yönetimi</span><strong>Aktif / Pasif</strong></div>
+  </section>
+
+  {{ tabs(_active_tab) }}
+  <main class="cicp-content">
+    {% block cic_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/corporate_information_center_v4_6b_celebrations_final.js') }}?v=4_6b"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/corporate_information_center_v4_6_celebrations_studio.js') }}?v=4_6"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/corporate_information_center_v4_5_excel_import.js') }}?v=4_5"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/corporate_information_center_v4_4b_system_page_final.js') }}?v=4_4b"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/corporate_information_center_v4_4a_system_link_polish.js') }}?v=4_4a"></script>
+{% endblock %}

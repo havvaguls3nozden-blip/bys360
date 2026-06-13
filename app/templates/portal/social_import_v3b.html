@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Sosyal Medya Gönderisi - Kaldırıldı{% endblock %}
+{% block content %}
+<div class="portal-shell">
+  <div class="portal-card">
+    <h2>Sosyal medya gönderisi ekranı kaldırıldı.</h2>
+    <p>Bu alan sadeleştirildi. Basında Tarihi Alan sayfasından haber adaylarını takip edebilirsiniz.</p>
+    <a class="btn btn-primary" href="{{ safe_url_for('main.portal_press_news', fallback='/portal/press-news') }}">Basında Tarihi Alan</a>
+  </div>
+</div>
+{% endblock %}

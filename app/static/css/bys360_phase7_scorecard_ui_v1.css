@@ -1,0 +1,448 @@
+/* BYS360_PHASE7_SCORECARD_UI_REDESIGN_V1 */
+/* BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT */
+.bys-scorecard-shell {
+    display: grid;
+    gap: 1.05rem;
+}
+
+.bys-scorecard-hero,
+.bys-scorecard-filter-card,
+.bys-scorecard-info-card,
+.bys-scorecard-panel,
+.bys-scorecard-personal,
+.bys-scorecard-ai {
+    background: rgba(255,255,255,.93);
+    border: 1px solid rgba(139,0,0,.12);
+    border-radius: 22px;
+    box-shadow: 0 16px 36px rgba(15,23,42,.08);
+}
+
+.bys-scorecard-hero {
+    display: grid;
+    grid-template-columns: minmax(0,1.55fr) minmax(220px,.55fr);
+    gap: 1rem;
+    padding: 1.35rem;
+}
+
+.bys-scorecard-kicker,
+.bys-scorecard-section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    color: #8B0000;
+    background: rgba(139,0,0,.07);
+    border-radius: 999px;
+    padding: .38rem .78rem;
+    font-weight: 800;
+    font-size: .84rem;
+}
+
+.bys-scorecard-hero h2,
+.bys-scorecard-panel h3,
+.bys-scorecard-personal h3,
+.bys-scorecard-info-card h3,
+.bys-scorecard-ai h3 {
+    color: #2f2020;
+    margin: .65rem 0 .4rem;
+    line-height: 1.3;
+}
+
+.bys-scorecard-hero h2 {
+    font-size: 1.65rem;
+}
+
+.bys-scorecard-hero p,
+.bys-scorecard-panel p,
+.bys-scorecard-personal p,
+.bys-scorecard-info-card p,
+.bys-scorecard-ai p {
+    color: #636b78;
+    margin: 0;
+    line-height: 1.65;
+}
+
+.bys-scorecard-chipline,
+.bys-scorecard-actions,
+.bys-scorecard-personal-actions,
+.bys-scorecard-row-actions {
+    display: flex;
+    gap: .65rem;
+    flex-wrap: wrap;
+}
+
+.bys-scorecard-chipline { margin-top: 1rem; }
+
+.bys-scorecard-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .45rem .78rem;
+    border-radius: 999px;
+    background: rgba(139,0,0,.065);
+    color: #6a1d1d;
+    font-weight: 700;
+}
+
+.bys-scorecard-hero-score {
+    border-radius: 20px;
+    border: 1px solid rgba(139,0,0,.11);
+    background: linear-gradient(180deg, rgba(139,0,0,.07), rgba(255,255,255,.9));
+    padding: 1.1rem;
+    display: grid;
+    align-content: center;
+    text-align: center;
+}
+
+.bys-scorecard-hero-score span,
+.bys-scorecard-main-score span,
+.bys-scorecard-stat span,
+.bys-scorecard-personal-grid span,
+.bys-scorecard-visibility-grid span {
+    color: #69717e;
+    font-weight: 800;
+    font-size: .84rem;
+}
+
+.bys-scorecard-hero-score strong,
+.bys-scorecard-main-score strong {
+    display: block;
+    color: #8B0000;
+    font-size: 2.4rem;
+    line-height: 1.1;
+    font-weight: 900;
+    margin: .25rem 0;
+}
+
+.bys-scorecard-hero-score small,
+.bys-scorecard-table small,
+.bys-scorecard-info-card small {
+    color: #69717e;
+    line-height: 1.45;
+}
+
+.bys-scorecard-filter-card,
+.bys-scorecard-info-card,
+.bys-scorecard-panel,
+.bys-scorecard-personal,
+.bys-scorecard-ai {
+    padding: 1.1rem;
+}
+
+.bys-scorecard-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(210px, .85fr) minmax(210px, .85fr) auto;
+    gap: .9rem;
+    align-items: end;
+}
+
+.bys-scorecard-field {
+    display: grid;
+    gap: .38rem;
+}
+
+.bys-scorecard-field label {
+    color: #5f6672;
+    font-weight: 800;
+    font-size: .9rem;
+}
+
+.bys-scorecard-field select {
+    min-height: 46px;
+    border-radius: 13px;
+    border: 1px solid rgba(139,0,0,.16);
+    background: #fff;
+    color: #2f3540;
+    padding: .7rem .9rem;
+    outline: none;
+}
+
+.bys-scorecard-field select:focus {
+    border-color: rgba(139,0,0,.45);
+    box-shadow: 0 0 0 4px rgba(139,0,0,.08);
+}
+
+.bys-scorecard-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 44px;
+    padding: .68rem 1rem;
+    border-radius: 13px;
+    border: 1px solid rgba(139,0,0,.13);
+    background: #fff;
+    color: #5a2424;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.bys-scorecard-btn.primary {
+    background: #8B0000;
+    color: #fff;
+    border-color: #8B0000;
+}
+
+.bys-scorecard-btn.ghost {
+    background: rgba(95,102,114,.07);
+    color: #4f5966;
+    border-color: rgba(95,102,114,.12);
+}
+
+.bys-scorecard-btn.soft {
+    background: rgba(139,0,0,.06);
+}
+
+.bys-scorecard-btn.mini {
+    min-height: 38px;
+    padding: .52rem .78rem;
+    font-size: .9rem;
+}
+
+.bys-scorecard-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.bys-scorecard-stat,
+.bys-scorecard-personal-grid article,
+.bys-scorecard-visibility-grid article {
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(139,0,0,.10);
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+.bys-scorecard-stat.success { border-color: rgba(0,128,96,.20); }
+.bys-scorecard-stat.danger { border-color: rgba(194,56,56,.24); }
+
+.bys-scorecard-stat strong,
+.bys-scorecard-visibility-grid strong {
+    display: block;
+    color: #302323;
+    font-size: 1.7rem;
+    line-height: 1.1;
+    margin: .4rem 0 .25rem;
+    font-weight: 900;
+}
+
+.bys-scorecard-stat small {
+    color: #68707d;
+}
+
+.bys-scorecard-personal {
+    background: linear-gradient(135deg, rgba(139,0,0,.06), rgba(255,255,255,.95));
+}
+
+.bys-scorecard-personal-head,
+.bys-scorecard-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.bys-scorecard-main-score {
+    min-width: 210px;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid rgba(139,0,0,.12);
+}
+
+.bys-scorecard-personal-grid,
+.bys-scorecard-visibility-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .8rem;
+}
+
+.bys-scorecard-personal-grid strong {
+    display: block;
+    color: #29313c;
+    margin-top: .4rem;
+    line-height: 1.5;
+}
+
+.bys-scorecard-personal-actions { margin-top: 1rem; }
+
+.bys-scorecard-reason-list,
+.bys-scorecard-ai-list,
+.bys-scorecard-ai-side {
+    display: grid;
+    gap: .7rem;
+}
+
+.bys-scorecard-reason-list {
+    margin-top: .9rem;
+}
+
+.bys-scorecard-reason-list div,
+.bys-scorecard-note,
+.bys-scorecard-ai-list div,
+.bys-scorecard-ai-side div {
+    padding: .8rem .9rem;
+    border-radius: 14px;
+    background: rgba(248,249,251,.95);
+    border: 1px solid rgba(139,0,0,.06);
+    color: #58616e;
+}
+
+.bys-scorecard-reason-list span,
+.bys-scorecard-ai-side span {
+    display: block;
+    color: #69717e;
+    margin-top: .18rem;
+}
+
+.bys-scorecard-ai.critical { border-color: rgba(194,56,56,.25); }
+.bys-scorecard-ai.watch { border-color: rgba(191,130,24,.25); }
+
+.bys-scorecard-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: .5rem .8rem;
+    border-radius: 999px;
+    background: rgba(95,102,114,.08);
+    color: #4f5966;
+    font-weight: 800;
+}
+
+.bys-scorecard-ai-badge.critical { background: rgba(194,56,56,.12); color: #9c2c2c; }
+.bys-scorecard-ai-badge.watch { background: rgba(191,130,24,.12); color: #8a5b13; }
+.bys-scorecard-ai-badge.calm { background: rgba(0,128,96,.12); color: #0a6b53; }
+
+.bys-scorecard-ai-grid {
+    display: grid;
+    grid-template-columns: 1.15fr .9fr;
+    gap: .85rem;
+}
+
+.bys-scorecard-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+    border: 1px solid rgba(139,0,0,.08);
+    background: #fff;
+}
+
+.bys-scorecard-table {
+    width: 100%;
+    min-width: 1040px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.bys-scorecard-table th {
+    background: #faf7f7;
+    color: #5d6470;
+    padding: .9rem .85rem;
+    font-size: .83rem;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+    border-bottom: 1px solid rgba(139,0,0,.08);
+    text-align: left;
+}
+
+.bys-scorecard-table td {
+    padding: .95rem .85rem;
+    border-bottom: 1px solid rgba(139,0,0,.055);
+    vertical-align: top;
+    color: #303743;
+}
+
+.bys-scorecard-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.bys-scorecard-name {
+    display: grid;
+    gap: .25rem;
+}
+
+.bys-scorecard-name strong {
+    color: #252b34;
+}
+
+.bys-scorecard-name span,
+.bys-scorecard-score-stack small {
+    color: #69717e;
+}
+
+.bys-scorecard-score-stack {
+    display: grid;
+    gap: .45rem;
+    justify-items: start;
+}
+
+.bys-scorecard-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    border-radius: 999px;
+    padding: .42rem .7rem;
+    font-weight: 800;
+    background: rgba(95,102,114,.10);
+    color: #46505c;
+}
+
+.bys-scorecard-pill.score { background: rgba(139,0,0,.08); color: #8B0000; }
+.bys-scorecard-pill.success,
+.bys-scorecard-pill.published { background: rgba(0,128,96,.12); color: #0a6b53; }
+.bys-scorecard-pill.risk { background: rgba(194,56,56,.12); color: #9c2c2c; }
+.bys-scorecard-pill.internal { background: rgba(33,95,160,.12); color: #22598f; }
+.bys-scorecard-pill.locked { background: rgba(95,102,114,.12); color: #48515e; }
+.bys-scorecard-pill.neutral { background: rgba(95,102,114,.09); color: #4c5663; }
+
+.bys-scorecard-status-text {
+    font-weight: 800;
+    color: #2f3540;
+}
+
+.bys-scorecard-empty {
+    padding: 1rem;
+    border-radius: 14px;
+    background: rgba(248,249,251,.95);
+    color: #68707d;
+    text-align: center;
+}
+
+.bys-scorecard-guidance {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (max-width: 1400px) {
+    .bys-scorecard-stat-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+
+@media (max-width: 1100px) {
+    .bys-scorecard-hero,
+    .bys-scorecard-ai-grid,
+    .bys-scorecard-personal-grid,
+    .bys-scorecard-visibility-grid { grid-template-columns: 1fr; }
+    .bys-scorecard-filter-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+    .bys-scorecard-hero,
+    .bys-scorecard-filter-card,
+    .bys-scorecard-info-card,
+    .bys-scorecard-panel,
+    .bys-scorecard-personal,
+    .bys-scorecard-ai { padding: 1rem; border-radius: 18px; }
+    .bys-scorecard-filter-grid,
+    .bys-scorecard-stat-grid { grid-template-columns: 1fr; }
+    .bys-scorecard-actions,
+    .bys-scorecard-personal-actions,
+    .bys-scorecard-panel-head,
+    .bys-scorecard-personal-head { display: grid; }
+    .bys-scorecard-btn { width: 100%; }
+    .bys-scorecard-hero h2 { font-size: 1.35rem; }
+    .bys-scorecard-hero-score strong,
+    .bys-scorecard-main-score strong { font-size: 2rem; }
+    .bys-scorecard-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .bys-scorecard-table { min-width: 920px; }
+}

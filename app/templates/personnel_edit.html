@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Personel Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Düzenle{% endblock %}
+{% block page_subtitle %}
+Mevcut personel kaydını güncelleyin. Yapılan değişiklikler ilgili modüllere yansıyacaktır.
+{% endblock %}
+
+{% block content %}
+<style>
+
+    .ai-summary-card{margin-bottom:16px;border:1px solid rgba(139,0,0,.10);border-radius:22px;background:rgba(255,255,255,.94);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:18px;display:grid;gap:12px}.ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.ai-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:900;color:#8B0000;text-transform:uppercase;letter-spacing:.04em}.ai-title{font-size:1.05rem;font-weight:900;color:#111827}.ai-text{color:#475569;line-height:1.7}.ai-bullets{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#475569}.ai-bullets i{font-size:.5rem;color:#8B0000;margin-top:.55rem}.ai-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ai-action{border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:12px;background:#fff}.ai-action-label{font-size:.75rem;color:#64748b;text-transform:uppercase;font-weight:800}.ai-action-value{margin-top:6px;font-size:1.05rem;font-weight:900;color:#111827}.ai-action.tone-critical .ai-action-value{color:#b91c1c}.ai-action.tone-watch .ai-action-value{color:#b45309}.ai-spotlight{display:grid;gap:8px}.ai-spotlight-row{display:flex;gap:8px;flex-wrap:wrap;color:#475569}.ai-spotlight-row strong{color:#111827}@media(max-width:900px){.ai-action-grid{grid-template-columns:1fr 1fr}}
+    .personnel-form-shell{display:grid;gap:18px}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .hero-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+    .hero-left{display:flex;align-items:center;gap:14px}
+    .avatar-wrap{width:72px;height:72px;border-radius:20px;overflow:hidden;background:#f8fafc;border:1px solid rgba(15,23,42,.08);flex:0 0 72px}
+    .avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+    .hero-title{font-size:1.08rem;font-weight:900;color:#111827;line-height:1.35;margin:0}
+    .hero-sub{color:#6b7280;font-size:.92rem;line-height:1.8;margin:4px 0 0}
+    .status-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;font-weight:800;font-size:.84rem}
+    .status-pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .status-pill.passive{background:rgba(107,114,128,.12);color:#374151}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .form-section{display:grid;gap:14px}
+    .section-title{font-size:1rem;font-weight:900;color:#111827;margin:0 0 4px}
+    .section-sub{color:#6b7280;font-size:.86rem;line-height:1.7;margin:0 0 10px}
+    .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field{display:flex;flex-direction:column;gap:8px}
+    .field.full{grid-column:1 / -1}
+    .field label{font-size:.9rem;font-weight:800;color:#374151}
+    .field-help{color:#6b7280;font-size:.8rem;line-height:1.6;margin-top:-2px}
+    .form-input,.form-select,.form-textarea{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%}
+    .form-textarea{min-height:110px;resize:vertical}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+    .upload-box{border:1px dashed rgba(15,23,42,.18);border-radius:18px;background:#f8fafc;padding:16px;display:grid;gap:10px}
+    .upload-note{color:#6b7280;font-size:.84rem;line-height:1.7}
+    .picker-box{display:grid;gap:10px;padding:14px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.08)}
+    .picker-meta{display:flex;flex-wrap:wrap;gap:10px}
+    .picker-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#4b5563;font-size:.8rem;font-weight:800}
+    .checkbox-row{display:flex;gap:22px;flex-wrap:wrap;align-items:center;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+    .checkbox-row label{display:inline-flex;align-items:center;gap:10px;font-size:.9rem;font-weight:700;color:#374151}
+    .checkbox-row input[type="checkbox"]{width:18px;height:18px;accent-color:#8B0000}
+    .action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+    .btn-soft:hover{transform:translateY(-1px)}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .btn-soft.warning{background:linear-gradient(180deg,#b45309,#92400e);color:#fff}
+    @media (max-width:1100px){.form-grid,.field-grid{grid-template-columns:1fr}}
+</style>
+
+{% set selected_org_unit_value = request.form.get('organization_unit_id', current_org_unit_id|string if current_org_unit_id else '') %}
+{% set display_name = user.full_name if user and user.full_name else (((user.ad or '') ~ ' ' ~ (user.soyad or ''))|trim if user else 'Personel') %}
+
+{% if ai_personnel_form_panel %}<article class="ai-summary-card tone-{{ ai_personnel_form_panel.tone }}"><div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_form_panel.badge }}</div><div class="ai-title">{{ ai_personnel_form_panel.headline }}</div><div class="ai-text">{{ ai_personnel_form_panel.summary }}</div>{% if ai_personnel_form_panel.bullets %}<ul class="ai-bullets">{% for bullet in ai_personnel_form_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>{% endif %}<div class="ai-action-grid">{% for item in ai_personnel_form_panel.actions %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>{% if ai_personnel_form_panel.spotlight %}<div class="ai-spotlight">{% for row in ai_personnel_form_panel.spotlight %}<div class="ai-spotlight-row"><strong>{{ row.label }}:</strong><span>{{ row.value }}</span></div>{% endfor %}</div>{% endif %}</article>
+{% endif %}
+
+<div class="personnel-form-shell">
+    <div class="glass-card panel-card">
+        <div class="hero-row">
+            <div class="hero-left">
+                <div class="avatar-wrap">
+                    <img src="{{ avatar_url or url_for('static', filename='img/default-avatar.svg') }}" alt="{{ display_name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                </div>
+                <div>
+                    <h3 class="hero-title">{{ display_name }}</h3>
+                    <p class="hero-sub">Sicil No: {{ user.sicil_no or '-' }}<br>{{ user.email or '-' }}</p>
+                </div>
+            </div>
+            {% if user and user.is_active %}
+                <span class="status-pill active"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+            {% else %}
+                <span class="status-pill passive"><i class="fa-solid fa-circle"></i> Pasif</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="glass-card panel-card">
+            <div class="form-grid">
+                <div class="form-section">
+                    <div>
+                        <h4 class="section-title">Kimlik ve İletişim</h4>
+                        <p class="section-sub">Personelin temel kimlik alanlarını güncelleyin.</p>
+                    </div>
+
+                    <div class="field-grid">
+                        <div class="field">
+                            <label>Ad</label>
+                            <input type="text" name="ad" class="form-input" value="{{ request.form.get('ad', user.ad if user else '') }}" required>
+                        </div>
+
+                        <div class="field">
+                            <label>Soyad</label>
+                            <input type="text" name="soyad" class="form-input" value="{{ request.form.get('soyad', user.soyad if user else '') }}" required>
+                        </div>
+
+                        <div class="field">
+                            <label>Sicil No</label>
+                            <input type="text" name="sicil_no" class="form-input" value="{{ request.form.get('sicil_no', user.sicil_no if user else '') }}" required>
+                        </div>
+
+                        <div class="field">
+                            <label>E-Posta</label>
+                            <input type="email" name="email" class="form-input" value="{{ request.form.get('email', user.email if user else '') }}" required>
+                        </div>
+
+                        <div class="field full">
+                            <label>Yönetici Şifre Sıfırlama</label>
+                            <div class="upload-box">
+                                <div class="field-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));">
+                                    <div class="field">
+                                        <label style="font-size:.84rem;">Yeni Geçici Şifre</label>
+                                        <input type="password" name="new_password" class="form-input" autocomplete="new-password" minlength="8" placeholder="Boş bırakırsanız mevcut şifre korunur">
+                                    </div>
+                                    <div class="field">
+                                        <label style="font-size:.84rem;">Yeni Geçici Şifre (Tekrar)</label>
+                                        <input type="password" name="new_password_repeat" class="form-input" autocomplete="new-password" minlength="8" placeholder="Yeni şifreyi tekrar giriniz">
+                                    </div>
+                                </div>
+                                <div class="upload-note">Personel şifresini ve gizli soru cevabını unutmuşsa yönetici buradan yeni geçici şifre tanımlayabilir. Bu alan doldurulursa kullanıcıdan ilk girişte şifre değiştirip gizli sorusunu yeniden tanımlaması istenir.</div>
+                            </div>
+                        </div>
+
+                        <div class="field full">
+                            <label>Profil Fotoğrafı</label>
+                            <div class="upload-box">
+                                <input type="file" name="profile_photo" class="form-input" accept=".png,.jpg,.jpeg,.webp">
+                                <div class="upload-note">Yeni fotoğraf yüklenirse mevcut görsel güncellenir. Yükleme yapılmazsa mevcut fotoğraf korunur.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div>
+                        <h4 class="section-title">Kurumsal Bilgiler</h4>
+                        <p class="section-sub">Unvan, rol, birim, üst birim ve amir zincirini güncelleyin.</p>
+                    </div>
+
+                    <div class="field-grid">
+                        <div class="field">
+                            <label>Unvan</label>
+                            <input type="text" name="unvan" class="form-input" value="{{ request.form.get('unvan', user.unvan if user else '') }}" required>
+                        </div>
+
+                        <div class="field">
+                            <label>Rol</label>
+                            <select name="role" class="form-select">
+                                <option value="">Rol seçiniz</option>
+                                {% for item in role_values or [] %}
+                                    <option value="{{ item }}" {% if request.form.get('role', current_role if current_role is defined else '') == item %}selected{% endif %}>{{ item }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="field">
+                            <label>Personel Kategorisi</label>
+                            <select name="personnel_category" class="form-select" data-bys360-marker="BYS360_PERSONNEL_CATEGORY_EDIT_FIELD">
+                                {% set selected_personnel_category = request.form.get('personnel_category', current_personnel_category if current_personnel_category is defined else 'Diğer') %}
+                                {% for category in personnel_category_options or [] %}
+                                    <option value="{{ category }}" {% if selected_personnel_category == category %}selected{% endif %}>{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="field-help">Performans dönem kapsamı, kategori ortalaması ve rapor filtreleri için kullanılır.</div>
+                        </div>
+
+                        <div class="field full">
+                            <label>Sistemden Birim Seç</label>
+                            <div class="picker-box">
+                                <select name="organization_unit_id" id="organization_unit_id" class="form-select">
+                                    <option value="">Seçiniz / Manuel düzenleyeceğim</option>
+                                    {% for unit in unit_catalog or [] %}
+                                        <option value="{{ unit.id }}" data-birim="{{ unit.name }}" data-ust-birim="{{ unit.parent_name or unit.name }}" {% if selected_org_unit_value == unit.id|string %}selected{% endif %}>{{ unit.label }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="picker-meta">
+                                    <span class="picker-chip"><i class="fa-solid fa-building"></i> Tüm aktif birimler listelenir</span>
+                                    <span class="picker-chip"><i class="fa-solid fa-pen"></i> Gerekirse manuel düzenleme yapılabilir</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Birim</label>
+                            <input type="text" id="birim_field" name="birim" class="form-input" list="birim_options" value="{{ request.form.get('birim', user.birim if user else '') }}" required>
+                            <datalist id="birim_options">
+                                {% for item in unit_name_options or [] %}
+                                    <option value="{{ item }}"></option>
+                                {% endfor %}
+                            </datalist>
+                            <div class="field-help">Sistemden seçebilir veya manuel düzenleyebilirsiniz.</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Üst Birim</label>
+                            <input type="text" id="ust_birim_field" name="ust_birim" class="form-input" list="ust_birim_options" value="{{ request.form.get('ust_birim', user.ust_birim if user else '') }}" required>
+                            <datalist id="ust_birim_options">
+                                {% for item in upper_unit_options or [] %}
+                                    <option value="{{ item }}"></option>
+                                {% endfor %}
+                            </datalist>
+                            <div class="field-help">Seçilen birime göre otomatik dolabilir.</div>
+                        </div>
+
+                        <div class="field">
+                            <label>1. Amir</label>
+                            <select name="manager_1_id" class="form-select">
+                                <option value="">Seçiniz</option>
+                                {% for mgr in managers or [] %}
+                                    <option value="{{ mgr.id }}" {% if request.form.get('manager_1_id', manager_1_id|string if manager_1_id is defined and manager_1_id else '') == mgr.id|string %}selected{% endif %}>{{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>2. Amir</label>
+                            <select name="manager_2_id" class="form-select">
+                                <option value="">Seçiniz</option>
+                                {% for mgr in managers or [] %}
+                                    <option value="{{ mgr.id }}" {% if request.form.get('manager_2_id', manager_2_id|string if manager_2_id is defined and manager_2_id else '') == mgr.id|string %}selected{% endif %}>{{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="field full">
+                            <label>3. Amir</label>
+                            <select name="manager_3_id" class="form-select">
+                                <option value="">Opsiyonel</option>
+                                {% for mgr in managers or [] %}
+                                    <option value="{{ mgr.id }}" {% if request.form.get('manager_3_id', manager_3_id|string if manager_3_id is defined and manager_3_id else '') == mgr.id|string %}selected{% endif %}>{{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:18px;" class="checkbox-row">
+                <label><input type="checkbox" name="is_active" value="1" {% if request.form.get('is_active', '1' if user and user.is_active else '') %}checked{% endif %}> Aktif kullanıcı</label>
+                <label><input type="checkbox" name="must_change_password" value="1" {% if request.form.get('must_change_password', '1' if user and user.must_change_password else '') %}checked{% endif %}> İlk girişte şifre değiştir</label>
+                <label><input type="checkbox" name="must_set_security_question" value="1" {% if request.form.get('must_set_security_question', '1' if user and user.must_set_security_question else '') %}checked{% endif %}> Gizli soru zorunlu</label>
+            </div>
+
+            <div class="action-bar">
+                <a href="{{ url_for('main.personnel_list') }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i> Listeye Dön</a>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <a href="{{ url_for('main.personnel_profile', user_id=user.id) }}" class="btn-soft warning"><i class="fa-solid fa-id-card"></i> Profili Gör</a>
+                    <button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const unitSelect = document.getElementById("organization_unit_id");
+    const birimInput = document.getElementById("birim_field");
+    const ustBirimInput = document.getElementById("ust_birim_field");
+
+    function applySelectedUnit() {
+        if (!unitSelect) return;
+        const selected = unitSelect.options[unitSelect.selectedIndex];
+        if (!selected || !selected.value) return;
+        const birim = selected.getAttribute("data-birim") || "";
+        const ustBirim = selected.getAttribute("data-ust-birim") || "";
+        if (birimInput && birim) birimInput.value = birim;
+        if (ustBirimInput && ustBirim) ustBirimInput.value = ustBirim;
+    }
+
+    if (unitSelect) {
+        unitSelect.addEventListener("change", applySelectedUnit);
+        applySelectedUnit();
+    }
+});
+</script>
+
+
+{% include 'performance/_v2_1_3_personnel_category_panel.html' ignore missing %}
+<!-- BYS360_PERFORMANCE_V2_1_3_PERSONNEL_CATEGORY_PANEL -->
+{% endblock %}

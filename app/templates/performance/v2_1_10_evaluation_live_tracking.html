@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Canlı Değerlendirme Takibi{% endblock %}
+{% block content %}
+<style>
+  .elt-page{
+    --primary:#8B0000;
+    --primary-dark:#6f0000;
+    --ink:#111827;
+    --muted:#667085;
+    --soft:#f8fafc;
+    --line:rgba(17,24,39,.10);
+    --card:rgba(255,255,255,.94);
+    max-width:1560px;
+    margin:0 auto;
+    padding:18px 18px 48px;
+  }
+  .elt-hero{
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:32px;
+    background:
+      radial-gradient(circle at 9% 8%,rgba(139,0,0,.18),transparent 32%),
+      radial-gradient(circle at 92% 0,rgba(139,0,0,.10),transparent 28%),
+      linear-gradient(135deg,rgba(255,255,255,.98),rgba(255,255,255,.86));
+    box-shadow:0 28px 85px rgba(17,24,39,.12);
+    padding:30px;
+    margin-bottom:18px;
+  }
+  .elt-hero:after{
+    content:"";
+    position:absolute;
+    width:360px;height:360px;
+    right:-150px;top:-170px;
+    border-radius:50%;
+    border:44px solid rgba(139,0,0,.045);
+  }
+  .elt-hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:22px;align-items:end}
+  .elt-eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--primary);font-weight:900;font-size:12px;margin-bottom:14px;letter-spacing:.02em}
+  .elt-title{font-size:clamp(28px,3vw,46px);line-height:1.04;font-weight:950;color:var(--ink);margin:0;letter-spacing:-.045em}
+  .elt-sub{max-width:1040px;margin:14px 0 0;color:var(--muted);font-size:15px;line-height:1.75}
+  .elt-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .elt-btn{border:0;border-radius:16px;min-height:44px;padding:0 16px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:.18s ease;line-height:1}
+  .elt-btn:hover{transform:translateY(-1px);text-decoration:none}
+  .elt-btn.primary{background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 16px 32px rgba(139,0,0,.24)}
+  .elt-btn.soft{background:rgba(139,0,0,.08);color:var(--primary)}
+  .elt-btn.gray{background:rgba(107,114,128,.11);color:#374151}
+  .elt-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900;white-space:nowrap}
+  .elt-badge.ok{background:rgba(22,163,74,.11);color:#15803d}.elt-badge.warn{background:rgba(245,158,11,.14);color:#92400e}.elt-badge.info{background:rgba(139,0,0,.08);color:var(--primary)}.elt-badge.danger{background:rgba(220,38,38,.12);color:#b91c1c}.elt-badge.muted{background:rgba(107,114,128,.10);color:#374151}
+  .elt-panel{border:1px solid var(--line);border-radius:26px;background:var(--card);padding:22px;margin-top:16px;box-shadow:0 18px 48px rgba(17,24,39,.075)}
+  .elt-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+  .elt-panel h2{margin:0;color:var(--ink);font-size:20px;font-weight:950;letter-spacing:-.02em}.elt-panel p{margin:6px 0 0;color:var(--muted);line-height:1.65;font-size:13px}
+  .elt-filter{display:grid;grid-template-columns:1.35fr .8fr .75fr 1fr auto;gap:12px;align-items:end}
+  .elt-label{display:flex;flex-direction:column;gap:7px;font-weight:850;color:#374151;font-size:.9rem}.elt-input,.elt-select{width:100%;border:1px solid var(--line);border-radius:15px;background:#fff;padding:11px 12px;color:var(--ink);font:inherit;min-height:46px;outline:none}.elt-input:focus,.elt-select:focus{border-color:rgba(139,0,0,.34);box-shadow:0 0 0 4px rgba(139,0,0,.08)}
+  .elt-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:18px 0}.elt-kpi{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.96);padding:18px;box-shadow:0 18px 48px rgba(17,24,39,.07)}.elt-kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#8B0000,#b91c1c)}.elt-kpi strong{display:block;font-size:13px;color:#374151;margin-bottom:8px}.elt-kpi b{display:block;font-size:34px;color:var(--primary);letter-spacing:-.045em;line-height:1}.elt-kpi span{display:block;color:var(--muted);font-size:13px;line-height:1.55;margin-top:8px}
+  .elt-dashboard{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch}.elt-progress-wrap{border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#fff,#fbfbfc);padding:18px}.elt-progress-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.elt-progress{height:16px;border-radius:999px;background:rgba(107,114,128,.14);overflow:hidden;border:1px solid rgba(17,24,39,.08)}.elt-progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#8B0000,#b91c1c)}
+  .elt-note-grid{display:grid;gap:10px}.elt-note{border:1px solid rgba(17,24,39,.08);border-radius:18px;background:rgba(139,0,0,.06);color:#5f0000;padding:14px 16px;line-height:1.65;font-size:13px;font-weight:750}.elt-note.ok{background:rgba(22,163,74,.10);color:#166534}.elt-note.warn{background:rgba(245,158,11,.13);color:#78350f}.elt-note.danger{background:rgba(220,38,38,.10);color:#991b1b}.elt-note strong{display:block;margin-bottom:4px;color:inherit}
+  .elt-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.elt-chipbox{border:1px solid var(--line);border-radius:22px;background:#fff;padding:17px}.elt-chipbox strong{display:block;color:#111827;font-size:14px;margin-bottom:10px}.elt-chiprow{display:flex;gap:9px;flex-wrap:wrap}
+  .elt-mini-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.elt-mini{border:1px solid var(--line);border-radius:20px;background:#fff;padding:15px;box-shadow:0 12px 32px rgba(17,24,39,.045)}.elt-mini-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.elt-mini h3{margin:0;color:var(--ink);font-size:15px;font-weight:950}.elt-small{color:#6b7280;font-size:.83rem;line-height:1.6}.elt-table-wrap{overflow:auto}.elt-table{width:100%;border-collapse:separate;border-spacing:0 10px;min-width:900px}.elt-table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;text-align:left;padding:0 12px}.elt-table td{background:#f8fafc;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 12px;vertical-align:middle}.elt-table td:first-child{border-left:1px solid var(--line);border-radius:16px 0 0 16px}.elt-table td:last-child{border-right:1px solid var(--line);border-radius:0 16px 16px 0}.elt-empty{border:1px dashed rgba(139,0,0,.22);border-radius:20px;background:rgba(139,0,0,.045);padding:18px;color:#6b0000;font-weight:850;line-height:1.6}
+  @media(max-width:1240px){.elt-hero-inner,.elt-dashboard,.elt-two,.elt-filter{grid-template-columns:1fr}.elt-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.elt-mini-list{grid-template-columns:1fr}}
+  @media(max-width:760px){.elt-page{padding:12px}.elt-hero{padding:22px;border-radius:24px}.elt-kpis{grid-template-columns:1fr}.elt-actions{margin-top:10px}.elt-panel-head{display:block}.elt-btn{width:100%}.elt-actions .elt-badge{width:auto}}
+</style>
+
+<div class="elt-page">
+  <section class="elt-hero">
+    <div class="elt-hero-inner">
+      <div>
+        <div class="elt-eyebrow"><i class="fa-solid fa-chart-line"></i> Performans Yönetimi</div>
+        <h1 class="elt-title">Canlı Değerlendirme Takibi</h1>
+        <p class="elt-sub">Seçili performans döneminde değerlendirme ilerlemesini, bekleyen görevleri, geciken işlemleri ve amir bazlı yoğunluğu tek ekranda izleyin.</p>
+      </div>
+      <div class="elt-actions">
+        <span class="elt-badge {{ state.stage_class }}"><i class="fa-solid fa-circle-info"></i> {{ state.stage }}</span>
+        {% if state.selected_period %}<span class="elt-badge info"><i class="fa-solid fa-calendar-days"></i> {{ state.selected_period.display_title }}</span>{% endif %}
+        <a class="elt-btn soft" href="/performans/donem-yonetim-merkezi"><i class="fa-solid fa-arrow-left"></i> Dönem Yönetim Merkezi</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="elt-panel">
+    <div class="elt-panel-head">
+      <div>
+        <h2>Dönem Seçimi</h2>
+        <p>Takip etmek istediğiniz dönemi, görev durumunu ve amir seviyesini seçerek görünümü güncelleyin.</p>
+      </div>
+      <span class="elt-badge muted"><i class="fa-solid fa-sliders"></i> İzleme kriterleri</span>
+    </div>
+    <form method="get" class="elt-filter">
+      <label class="elt-label">Performans Dönemi
+        <select class="elt-select" name="period_id">
+          {% for period in state.periods %}
+          <option value="{{ period.id }}" {% if period.id == state.selected_period_id %}selected{% endif %}>{{ period.display_title }}{% if period.is_active is defined and period.is_active %} — Aktif{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="elt-label">Görev Durumu
+        <select class="elt-select" name="status">
+          <option value="">Tüm durumlar</option>
+          {% for sc in state.status_counts %}
+          <option value="{{ sc.status }}" {% if state.filters.status == sc.status %}selected{% endif %}>{{ sc.label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="elt-label">Amir Seviyesi
+        <select class="elt-select" name="manager_level">
+          <option value="">Tüm seviyeler</option>
+          <option value="1" {% if state.filters.manager_level == '1' %}selected{% endif %}>1. Amir</option>
+          <option value="2" {% if state.filters.manager_level == '2' %}selected{% endif %}>2. Amir</option>
+          <option value="3" {% if state.filters.manager_level == '3' %}selected{% endif %}>3. Amir</option>
+        </select>
+      </label>
+      <label class="elt-label">Arama
+        <input class="elt-input" name="q" value="{{ state.filters.q }}" placeholder="Personel, amir veya sicil ara">
+      </label>
+      <button class="elt-btn primary" type="submit"><i class="fa-solid fa-magnifying-glass-chart"></i> Uygula</button>
+    </form>
+  </section>
+
+  <div class="elt-kpis">
+    <div class="elt-kpi"><strong>Toplam Görev</strong><b>{{ state.counts.total }}</b><span>Seçili dönemde oluşturulan değerlendirme görevi.</span></div>
+    <div class="elt-kpi"><strong>Tamamlanan</strong><b>{{ state.counts.completed }}</b><span>Süreci tamamlanan değerlendirme görevleri.</span></div>
+    <div class="elt-kpi"><strong>Bekleyen</strong><b>{{ state.counts.pending }}</b><span>İşlem bekleyen açık değerlendirmeler.</span></div>
+    <div class="elt-kpi"><strong>Geciken</strong><b>{{ state.counts.overdue }}</b><span>Takip gerektiren gecikmiş görevler.</span></div>
+    <div class="elt-kpi"><strong>Yaklaşan</strong><b>{{ state.counts.due_soon }}</b><span>Son tarihi yaklaşan açık görevler.</span></div>
+  </div>
+
+  <section class="elt-panel">
+    <div class="elt-panel-head">
+      <div>
+        <h2>Süreç İlerlemesi</h2>
+        <p>Seçili dönem için genel tamamlanma oranı ve yönetici notları.</p>
+      </div>
+      <span class="elt-badge {{ state.stage_class }}">%{{ state.counts.progress }}</span>
+    </div>
+    <div class="elt-dashboard">
+      <div class="elt-progress-wrap">
+        <div class="elt-progress-top"><strong>Genel tamamlanma oranı</strong><span class="elt-badge {{ state.stage_class }}">{{ state.stage }}</span></div>
+        <div class="elt-progress"><div class="elt-progress-bar" style="width:{{ state.counts.progress }}%"></div></div>
+        <p>%{{ state.counts.progress }} tamamlandı. Süreç durumu seçili dönem verilerine göre güncellenir.</p>
+      </div>
+      <div class="elt-note-grid">
+        {% for note in state.risk_notes %}
+        <div class="elt-note {{ note.class }}"><strong>{{ note.title }}</strong>{{ note.message }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="elt-panel">
+    <div class="elt-panel-head">
+      <div>
+        <h2>Görev Dağılımı</h2>
+        <p>Değerlendirme görevlerinin durum ve amir seviyesine göre dağılımı.</p>
+      </div>
+    </div>
+    <div class="elt-two">
+      <div class="elt-chipbox">
+        <strong>Görev durumları</strong>
+        <div class="elt-chiprow">
+          {% for item in state.status_counts %}<span class="elt-badge {{ item.class }}">{{ item.label }}: {{ item.total }}</span>{% else %}<span class="elt-badge muted">Kayıt bulunamadı</span>{% endfor %}
+        </div>
+      </div>
+      <div class="elt-chipbox">
+        <strong>Amir seviyeleri</strong>
+        <div class="elt-chiprow">
+          {% for item in state.level_counts %}<span class="elt-badge info">{{ item.label }}: {{ item.total }}</span>{% else %}<span class="elt-badge muted">Kayıt bulunamadı</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="elt-panel">
+    <div class="elt-panel-head">
+      <div>
+        <h2>Amir Bazlı İzleme</h2>
+        <p>Bekleyen veya geciken görevi bulunan amirler öncelikli olarak izlenir.</p>
+      </div>
+    </div>
+    <div class="elt-mini-list">
+      {% for item in state.evaluators %}
+      <div class="elt-mini">
+        <div class="elt-mini-head">
+          <div>
+            <h3>{{ item.evaluator_name or 'Amir' }}</h3>
+            <div class="elt-small">Toplam {{ item.total }} görev • Bekleyen {{ item.pending }} • Geciken {{ item.overdue }}</div>
+          </div>
+          <span class="elt-badge {{ item.status_class }}">%{{ item.progress }}</span>
+        </div>
+        <div class="elt-progress" style="margin-top:12px"><div class="elt-progress-bar" style="width:{{ item.progress }}%"></div></div>
+      </div>
+      {% else %}
+      <div class="elt-empty">Seçili dönem için amir bazlı takip kaydı bulunamadı.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="elt-panel">
+    <div class="elt-panel-head">
+      <div>
+        <h2>Değerlendirme Detayları</h2>
+        <p>Seçili filtrelere göre personel ve amir bazlı görev görünümü.</p>
+      </div>
+      <span class="elt-badge muted">{{ state.rows|length }} kayıt</span>
+    </div>
+    <div class="elt-table-wrap">
+      <table class="elt-table">
+        <thead><tr><th>Personel</th><th>Amir</th><th>Amir Seviyesi</th><th>Durum</th><th>Son Tarih</th><th>Tamamlanma</th></tr></thead>
+        <tbody>
+        {% for row in state.rows %}
+          <tr>
+            <td><strong>{{ row.employee_name or '-' }}</strong><div class="elt-small">{{ row.employee_sicil or '-' }} • {{ row.employee_unit or '-' }}</div></td>
+            <td><strong>{{ row.evaluator_name or '-' }}</strong><div class="elt-small">{{ row.evaluator_title or '-' }}</div></td>
+            <td>{{ row.manager_level or '-' }}. Amir</td>
+            <td><span class="elt-badge {{ row.status_class }}">{{ row.status_label }}</span>{% if row.overdue %}<div class="elt-small" style="color:#b91c1c;font-weight:850">Geciken görev</div>{% endif %}</td>
+            <td>{{ row.due_date or '-' }}</td>
+            <td>{{ row.completed_at or '-' }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6"><div class="elt-empty">Seçili filtrelere uygun değerlendirme görevi bulunamadı.</div></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

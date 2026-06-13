@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Performans V2 Kontrol Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}V2 Kontrol Merkezi{% endblock %}
+{% block page_subtitle %}Performans ana akışı artık V2 omurgasında çalışır. Bu ekrandan görevler, sonuçlar, yayınlama ve export süreçlerine tek yerden geçebilirsiniz.{% endblock %}
+
+{% block content %}
+<style>
+    .v2-shell{display:grid;gap:18px}
+    .v2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .v2-card,.v2-summary{background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}
+    .v2-card{padding:22px}
+    .v2-card h3{margin:0 0 10px;font-size:1.02rem;font-weight:900;color:#111827}
+    .v2-card p{margin:0 0 16px;color:#6b7280;line-height:1.8}
+    .v2-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .v2-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:14px;text-decoration:none;font-weight:800}
+    .v2-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+    .v2-btn.secondary{background:#f3f4f6;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .v2-summary{padding:22px}
+    .v2-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+    .v2-stat{padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .v2-label{font-size:.82rem;font-weight:800;color:#6b7280;margin-bottom:8px}
+    .v2-value{font-size:1.8rem;font-weight:900;color:#111827;line-height:1}
+    .v2-sub{margin-top:10px;font-size:.82rem;color:#6b7280;line-height:1.7}
+</style>
+
+<div class="v2-shell">
+    <div class="v2-summary">
+        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+                <h3 class="mb-2" style="font-weight:900;color:#111827;">Ana V2 görünümü</h3>
+                <p class="mb-0" style="color:#6b7280;line-height:1.8;">
+                    {% if period %}
+                    Seçili dönem: <strong>{{ period.title or ('Dönem #' ~ period.id) }}</strong>
+                    {% else %}
+                    Aktif dönem bulunamadı.
+                    {% endif %}
+                </p>
+            </div>
+            <form method="get" class="d-flex gap-2 flex-wrap">
+                <select name="period_id" class="form-select" style="min-width:260px;">
+                    {% for row in periods %}
+                    <option value="{{ row.id }}" {% if period and row.id == period.id %}selected{% endif %}>{{ row.title or ('Dönem #' ~ row.id) }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="v2-btn secondary">Dönemi Aç</button>
+            </form>
+        </div>
+
+        {% if dashboard %}
+        <div class="v2-stats mt-4">
+            <div class="v2-stat">
+                <div class="v2-label">Toplam Görev</div>
+                <div class="v2-value">{{ dashboard.assignment_total or 0 }}</div>
+            </div>
+            <div class="v2-stat">
+                <div class="v2-label">Tamamlanan</div>
+                <div class="v2-value">{{ dashboard.assignment_completed or 0 }}</div>
+            </div>
+            <div class="v2-stat">
+                <div class="v2-label">Geciken</div>
+                <div class="v2-value">{{ dashboard.assignment_overdue or 0 }}</div>
+            </div>
+            <div class="v2-stat">
+                <div class="v2-label">Yayımlanan Karne</div>
+                <div class="v2-value">{{ dashboard.published_total or 0 }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="v2-grid">
+        <div class="v2-card">
+            <h3>Görevler ve form akışı</h3>
+            <p>Görevlerim, değerlendirme formu ve önceki amir görüşleri akışı V2 ana çalışma alanına bağlandı.</p>
+            <div class="v2-actions">
+                <a href="{{ url_for('main.performance_tasks', period_id=period.id if period else None) }}" class="v2-btn primary">Görevlerim</a>
+                <a href="{{ url_for('main.performance_v2_phase3_dashboard', period_id=period.id if period else None) }}" class="v2-btn secondary">Çalışma Alanı</a>
+            </div>
+        </div>
+
+        <div class="v2-card">
+            <h3>Not Karnesi ve yayınlama</h3>
+            <p>Karne görünümü, sonuç yayınlama ve geri alma ekranları V2 omurgasında kullanılabilir durumda.</p>
+            <div class="v2-actions">
+                <a href="{{ url_for('main.performance_v2_phase5_scorecard', period_id=period.id if period else None) }}" class="v2-btn primary">Not Karnesi</a>
+                <a href="{{ url_for('main.performance_v2_phase5_publish', period_id=period.id if period else None) }}" class="v2-btn secondary">Yayın Yönetimi</a>
+            </div>
+        </div>
+
+        <div class="v2-card">
+            <h3>Raporlar ve exportlar</h3>
+            <p>Yönetici dashboard’u, Excel ve CSV exportları Kontrol 6 üzerinden açılır.</p>
+            <div class="v2-actions">
+                <a href="{{ url_for('main.performance_v2_phase6_dashboard', period_id=period.id if period else None) }}" class="v2-btn primary">Raporlar</a>
+                <a href="{{ url_for('main.performance_v2_phase6_export_xlsx', period_id=period.id if period else None) }}" class="v2-btn secondary">Excel Export</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

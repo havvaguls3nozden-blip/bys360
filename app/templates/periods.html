@@ -1,0 +1,731 @@
+{% extends "base.html" %}
+
+{% block title %}Dönemler - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Dönemler{% endblock %}
+{% block page_subtitle %}
+Performans dönemlerini yönetin, aktiflik ve yayın durumlarını takip edin, süreç yapılandırmasını tek ekrandan kontrol edin.
+{% endblock %}
+
+{% block content %}
+<style>
+    .period-shell{display:grid;gap:18px}
+
+    .glass-card{
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{padding:22px;}
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.95rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .toolbar-grid{
+        display:grid;
+        grid-template-columns:1fr 220px auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .search-wrap{
+        position:relative;
+    }
+
+    .search-wrap i{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#8B0000;
+        font-size:.9rem;
+    }
+
+    .search-wrap .form-input{
+        padding-left:40px;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:44px;
+        padding:0 15px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.88rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px);}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.success{
+        background:linear-gradient(180deg,#166534,#14532d);
+        color:#fff;
+    }
+
+    .btn-soft.warning{
+        background:linear-gradient(180deg,#b45309,#92400e);
+        color:#fff;
+    }
+
+    .btn-soft.danger{
+        background:linear-gradient(180deg,#b91c1c,#991b1b);
+        color:#fff;
+    }
+
+    .period-list{
+        display:grid;
+        gap:16px;
+    }
+
+    .period-card{
+        position:relative;
+        overflow:hidden;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:24px;
+        background:#fff;
+        transition:all .18s ease;
+    }
+
+    .period-card.active{
+        border-color:rgba(139,0,0,.20);
+        box-shadow:0 18px 30px rgba(139,0,0,.08);
+    }
+
+    .period-card:hover{
+        transform:translateY(-1px);
+        box-shadow:0 18px 30px rgba(15,23,42,.06);
+    }
+
+    .period-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:14px;
+        flex-wrap:wrap;
+        padding:20px 20px 14px 20px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.015));
+    }
+
+    .period-title{
+        color:#111827;
+        font-size:1.05rem;
+        font-weight:900;
+        line-height:1.45;
+        margin-bottom:4px;
+    }
+
+    .period-sub{
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.7;
+    }
+
+    .badge-stack{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534;}
+    .pill.inactive{background:rgba(107,114,128,.12);color:#374151;}
+    .pill.locked{background:rgba(180,83,9,.10);color:#92400e;}
+    .pill.unlocked{background:rgba(29,78,216,.10);color:#1d4ed8;}
+    .pill.published{background:rgba(139,0,0,.10);color:#8B0000;}
+    .pill.unpublished{background:rgba(107,114,128,.12);color:#374151;}
+
+    .period-grid{
+        display:grid;
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:12px;
+        padding:18px 20px;
+    }
+
+    .mini-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .mini-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .mini-value{
+        color:#111827;
+        font-size:.95rem;
+        font-weight:900;
+        line-height:1.55;
+    }
+
+    .period-foot{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:14px;
+        flex-wrap:wrap;
+        padding:0 20px 20px 20px;
+    }
+
+    .weight-box{
+        flex:1;
+        min-width:260px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .weight-title{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .weight-value{
+        color:#111827;
+        font-size:.9rem;
+        font-weight:800;
+        line-height:1.7;
+    }
+
+    .action-wrap{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        align-items:center;
+    }
+
+    .inline-form{
+        display:inline;
+        margin:0;
+        padding:0;
+    }
+
+    .empty-box{
+        padding:26px 20px;
+        border-radius:18px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        color:#6b7280;
+        text-align:center;
+        line-height:1.9;
+    }
+
+    .ai-period-panel{display:grid;grid-template-columns:1.15fr .95fr;gap:16px;}
+    .ai-period-card{padding:20px;border-radius:24px;border:1px solid rgba(139,0,0,.10);background:rgba(255,255,255,.92);box-shadow:0 18px 36px rgba(15,23,42,.06);}
+    .ai-period-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96));}
+    .ai-period-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96));}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800;margin-bottom:12px;}
+    .ai-title{font-size:1.04rem;font-weight:900;color:#111827;margin-bottom:6px;}
+    .ai-text{color:#6b7280;line-height:1.8;font-size:.9rem;}
+    .ai-bullets{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none;}
+    .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem;}
+    .ai-bullets i{color:#8B0000;margin-top:4px;}
+    .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    .ai-action{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;}
+    .ai-action-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+    .ai-action-value{font-size:1.35rem;font-weight:900;color:#111827;}
+    .ai-action.tone-critical .ai-action-value{color:#b91c1c;}
+    .ai-action.tone-watch .ai-action-value{color:#b45309;}
+    .ai-spotlight{display:grid;gap:10px;margin-top:16px;}
+    .ai-spotlight-row{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-size:.88rem;}
+    .ai-spotlight-row strong{color:#111827;}
+
+    @media (max-width:1200px){
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .toolbar-grid{grid-template-columns:1fr 1fr;}
+        .period-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+        .ai-period-panel{grid-template-columns:1fr;}
+    }
+
+    @media (max-width:700px){
+        .stats-grid,
+        .toolbar-grid,
+        .period-grid,
+        .ai-action-grid{grid-template-columns:1fr;}
+    }
+
+    /* BYS360_PHASE8_3_SPECIAL_SCENARIO_LIST_STYLE_START */
+    .bys360-period-scenario-label{font-weight:850;color:#6b7280;}
+    .bys360-period-scenario-value{display:inline-flex;align-items:center;margin-top:4px;padding:3px 9px;border-radius:999px;background:rgba(139,0,0,.075);color:#8B0000;font-weight:850;font-size:.78rem;}
+    /* BYS360_PHASE8_3_SPECIAL_SCENARIO_LIST_STYLE_END */
+
+    /* BYS360_PHASE8_5_PERIOD_LIST_SCOPE_LABELS_STYLE_START */
+    .bys360-phase8-5-scope-card{background:linear-gradient(180deg,rgba(139,0,0,.055),#fff);border-color:rgba(139,0,0,.12);}    
+    .bys360-phase8-5-scope-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;line-height:1.65;}
+    .bys360-phase8-5-scope-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 9px;background:rgba(139,0,0,.085);color:#8B0000;font-weight:900;font-size:.78rem;}
+    .bys360-phase8-5-scope-chip.neutral{background:rgba(15,23,42,.065);color:#374151;}
+    .bys360-phase8-5-scope-chip.info{background:rgba(29,78,216,.085);color:#1d4ed8;}
+    .bys360-phase8-5-scope-target{color:#374151;font-size:.82rem;font-weight:800;}
+    /* BYS360_PHASE8_5_PERIOD_LIST_SCOPE_LABELS_STYLE_END */
+</style>
+
+<div class="period-shell">
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Toplam Dönem</div>
+            <div class="stat-value">{{ total_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Aktif Dönem</div>
+            <div class="stat-value">{{ active_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Yayında Olan</div>
+            <div class="stat-value">{{ published_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Kilitli Dönem</div>
+            <div class="stat-value">{{ locked_count or 0 }}</div>
+        </div>
+    </div>
+
+
+    {% if ai_periods_panel %}
+    <div class="ai-period-panel">
+        <div class="ai-period-card tone-{{ ai_periods_panel.tone }}">
+            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_periods_panel.badge }}</div>
+            <div class="ai-title">{{ ai_periods_panel.headline }}</div>
+            <div class="ai-text">{{ ai_periods_panel.summary }}</div>
+            <ul class="ai-bullets">
+                {% for bullet in ai_periods_panel.bullets %}
+                <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="ai-period-card">
+            <div class="ai-kicker"><i class="fa-solid fa-chart-line"></i> AI dönem kontrolü</div>
+            <div class="ai-action-grid">
+                {% for item in ai_periods_panel.actions %}
+                <div class="ai-action tone-{{ item.tone }}">
+                    <div class="ai-action-label">{{ item.label }}</div>
+                    <div class="ai-action-value">{{ item.value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if ai_periods_panel.spotlight %}
+            <div class="ai-spotlight">
+                {% for row in ai_periods_panel.spotlight %}
+                <div class="ai-spotlight-row"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        <form method="GET" action="{{ url_for('main.performance_periods') }}">
+            <div class="toolbar-grid">
+                <div class="form-group">
+                    <label>Dönem Ara</label>
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="q" value="{{ q or '' }}" class="form-input" placeholder="Dönem adı, tür veya açıklama">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Durum</label>
+                    <select name="status" class="form-select">
+                        <option value="" {% if not selected_status %}selected{% endif %}>Tümü</option>
+                        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Aktif</option>
+                        <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Pasif</option>
+                        <option value="published" {% if selected_status == 'published' %}selected{% endif %}>Yayında</option>
+                        <option value="unpublished" {% if selected_status == 'unpublished' %}selected{% endif %}>Yayında Değil</option>
+                        <option value="locked" {% if selected_status == 'locked' %}selected{% endif %}>Kilitli</option>
+                        <option value="unlocked" {% if selected_status == 'unlocked' %}selected{% endif %}>Kilitsiz</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrele
+                </button>
+
+                <a href="{{ url_for('main.performance_period_create') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-plus"></i>
+                    Yeni Dönem
+                </a>
+<!-- BYS360_SP2E_PERFORMANCE_TABS_START -->
+<a class="btn-soft secondary" href="/performance/kpi/dashboard">KPI Dashboardu</a>
+<a class="btn-soft secondary" href="/performance/kpi/targets">KPI ve Hedef Yönetimi</a>
+<a class="btn-soft secondary" href="/performance/competencies">Yetkinlik Kütüphanesi</a>
+<a class="btn-soft secondary" href="/performance/self-review">Öz Değerlendirme</a>
+<a class="btn-soft secondary" href="/performance/kpi/ai-analysis">KPI Analiz Merkezi</a>
+<!-- BYS360_SP2E_PERFORMANCE_TABS_END -->
+
+            </div>
+        </form>
+    </div>
+
+    {% if period_rows %}
+        <div class="period-list">
+            {% for row in period_rows %}
+                {% set period = row.period %}
+                <div class="period-card {% if period.is_active %}active{% endif %}">
+                    <div class="period-head">
+                        <div>
+                            <div class="period-title">{{ period.title }}</div>
+                            <div class="period-sub">
+                                
+{# BYS360_PHASE8_3_SPECIAL_SCENARIO_LIST_START #}
+                                {% if period.special_scenario_type %}
+                                    <br>
+                                    <span class="bys360-period-scenario-label">Senaryo:</span>
+                                    <span class="bys360-period-scenario-value">
+                                        {% if period.special_scenario_type == 'security_personnel' %}Güvenlik personeli özel dönemi
+                                        {% elif period.special_scenario_type == 'cleaning_personnel' %}Temizlik personeli özel dönemi
+                                        {% elif period.special_scenario_type == 'probation_personnel' %}Deneme süreli personel dönemi
+                                        {% elif period.special_scenario_type == 'leaving_personnel' %}Ayrılacak personel değerlendirmesi
+                                        {% elif period.special_scenario_type == 'unit_special' %}Birime özel dönem
+                                        {% elif period.special_scenario_type == 'selected_personnel_special' %}Seçili personele özel dönem
+                                        {% else %}{{ period.special_scenario_type }}{% endif %}
+                                    </span>
+                                {% endif %}
+                                {# BYS360_PHASE8_3_SPECIAL_SCENARIO_LIST_END #}
+Tür: {{ 'Özel Dönem' if period.period_type == 'Özel' else (period.period_type or '-') }}<br>
+                                {% if period.description %}
+                                    {{ period.description }}
+                                {% else %}
+                                    Açıklama girilmedi.
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="badge-stack">
+                            {% if period.is_active %}
+                                <span class="pill active"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                            {% else %}
+                                <span class="pill inactive"><i class="fa-solid fa-circle"></i> Pasif</span>
+                            {% endif %}
+
+                            {% if period.results_published %}
+                                <span class="pill published"><i class="fa-solid fa-bullhorn"></i> Yayında</span>
+                            {% else %}
+                                <span class="pill unpublished"><i class="fa-solid fa-eye-slash"></i> Yayında Değil</span>
+                            {% endif %}
+
+                            {% if period.is_locked %}
+                                <span class="pill locked"><i class="fa-solid fa-lock"></i> Kilitli</span>
+                            {% else %}
+                                <span class="pill unlocked"><i class="fa-solid fa-lock-open"></i> Kilitsiz</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="period-grid">
+                        <div class="mini-box">
+                            <div class="mini-label">Başlangıç</div>
+                            <div class="mini-value">
+                                {% if period.start_date %}
+                                    {{ period.start_date.strftime('%d.%m.%Y') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Bitiş</div>
+                            <div class="mini-value">
+                                {% if period.end_date %}
+                                    {{ period.end_date.strftime('%d.%m.%Y') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Puanlama Penceresi</div>
+                            <div class="mini-value">{% if period.evaluation_window_start and period.evaluation_window_end %}{{ period.evaluation_window_start.strftime('%d.%m.%Y') }} - {{ period.evaluation_window_end.strftime('%d.%m.%Y') }}{% else %}-{% endif %}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Görev Sayısı / Süre</div>
+                            <div class="mini-value">{{ row.assignment_count or 0 }} görev{% if period.evaluation_due_days_effective %} · {{ period.evaluation_due_days_effective }} gün{% endif %}</div>
+
+                        <div class="mini-box bys360-phase8-scope-badge">
+                            <div class="mini-label">Kapsam</div>
+                            <div class="mini-value">
+                                {% if period.scope_type == 'unit' %}
+                                    Birim{% if period.scope_unit_label %} · {{ period.scope_unit_label }}{% endif %}
+                                {% elif period.scope_type == 'upper_unit' %}
+                                    Üst Birim{% if period.scope_unit_label %} · {{ period.scope_unit_label }}{% endif %}
+                                {% elif period.scope_type == 'category' %}
+                                    Kategori{% if period.scope_category_label %} · {{ period.scope_category_label }}{% endif %}
+                                {% elif period.scope_type == 'selected_personnel' %}
+                                    Seçili Personel
+                                {% else %}
+                                    Tüm Kurum
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+                        {# BYS360_PHASE8_5_PERIOD_LIST_SCOPE_LABELS_START #}
+                        <div class="mini-box bys360-phase8-5-scope-card">
+                            {% set phase8_scope_type = period.scope_type|default('all', true) %}
+                            {% set phase8_scope_unit_label = period.scope_unit_label|default('', true) %}
+                            {% set phase8_scope_category_label = period.scope_category_label|default('', true) %}
+                            {% set phase8_scope_personnel_filter = period.scope_personnel_filter|default('', true) %}
+                            {% set phase8_special_scenario_type = period.special_scenario_type|default('', true) %}
+                            <div class="mini-label">Kapsam Etiketi</div>
+                            <div class="mini-value">
+                                <div class="bys360-phase8-5-scope-line">
+                                    {% if phase8_scope_type == 'unit' %}
+                                        <span class="bys360-phase8-5-scope-chip"><i class="fa-solid fa-building"></i> Birim</span>
+                                        {% if phase8_scope_unit_label %}<span class="bys360-phase8-5-scope-target">{{ phase8_scope_unit_label }}</span>{% endif %}
+                                    {% elif phase8_scope_type == 'upper_unit' %}
+                                        <span class="bys360-phase8-5-scope-chip"><i class="fa-solid fa-sitemap"></i> Üst Birim</span>
+                                        {% if phase8_scope_unit_label %}<span class="bys360-phase8-5-scope-target">{{ phase8_scope_unit_label }}</span>{% endif %}
+                                    {% elif phase8_scope_type == 'category' %}
+                                        <span class="bys360-phase8-5-scope-chip"><i class="fa-solid fa-layer-group"></i> Kategori</span>
+                                        {% if phase8_scope_category_label %}<span class="bys360-phase8-5-scope-target">{{ phase8_scope_category_label }}</span>{% endif %}
+                                    {% elif phase8_scope_type == 'selected_personnel' %}
+                                        <span class="bys360-phase8-5-scope-chip"><i class="fa-solid fa-user-check"></i> Seçili Personel</span>
+                                        {% if phase8_scope_personnel_filter %}<span class="bys360-phase8-5-scope-target">Sicil/personel listesi tanımlı</span>{% endif %}
+                                    {% else %}
+                                        <span class="bys360-phase8-5-scope-chip neutral"><i class="fa-solid fa-globe"></i> Tüm Kurum</span>
+                                    {% endif %}
+                                </div>
+                                {% if phase8_special_scenario_type %}
+                                    <div class="bys360-phase8-5-scope-line" style="margin-top:7px;">
+                                        <span class="bys360-phase8-5-scope-chip info"><i class="fa-solid fa-calendar-check"></i>
+                                            {% if phase8_special_scenario_type == 'security_personnel' %}Güvenlik personeli özel dönemi
+                                            {% elif phase8_special_scenario_type == 'cleaning_personnel' %}Temizlik personeli özel dönemi
+                                            {% elif phase8_special_scenario_type == 'probation_personnel' %}Deneme süreli personel dönemi
+                                            {% elif phase8_special_scenario_type == 'leaving_personnel' %}Ayrılacak personel değerlendirmesi
+                                            {% elif phase8_special_scenario_type == 'unit_special' %}Birime özel dönem
+                                            {% elif phase8_special_scenario_type == 'selected_personnel_special' %}Seçili personele özel dönem
+                                            {% else %}{{ phase8_special_scenario_type }}{% endif %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {# BYS360_PHASE8_5_PERIOD_LIST_SCOPE_LABELS_END #}
+                    </div>
+
+                    <div class="period-foot">
+                        <div class="weight-box">
+                            <div class="weight-title">Tamamlanan / Toplam</div>
+                            <div class="weight-value">{{ row.completed_count or 0 }} / {{ row.evaluation_count or 0 }}</div>
+                        </div>
+
+                        <div class="weight-box">
+                            <div class="weight-title">Ağırlık ve Takvim Özeti</div>
+                            <div class="weight-value">{{ row.weight_summary }}<br>{{ row.availability_summary }}</div>
+                        </div>
+
+                        <div class="weight-box">
+                            <div class="weight-title">Canlı kapsama özeti</div>
+                            <div class="weight-value">
+                                Muaf {{ row.coverage_summary.exempted or 0 }} · Açıkta {{ row.coverage_summary.uncovered or 0 }} · Zincir {{ row.coverage_summary.chain_issue or 0 }} · Vekâlet {{ row.coverage_summary.delegated or 0 }}
+                                {% if row.coverage_latest_created_at %}<br>Son koşu: {{ row.coverage_latest_created_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="weight-box">
+                            <div class="weight-title">Öne çıkan birim etkileri</div>
+                            <div class="weight-value">
+                                {% if row.coverage_unit_rows %}
+                                    {% for unit_row in row.coverage_unit_rows %}
+                                        {{ unit_row.unit_name }} — risk {{ unit_row.risk_score or 0 }}, açıkta {{ unit_row.uncovered or 0 }}, muaf {{ unit_row.exempted or 0 }}{% if not loop.last %}<br>{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    Bu dönem için henüz kapsama logu oluşmadı.
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="action-wrap">
+                            <a href="{{ url_for('main.performance_period_edit', period_id=period.id) }}" class="btn-soft secondary">
+                                <i class="fa-solid fa-pen"></i>
+                                Düzenle
+                            </a>
+
+                            <form method="POST" action="{{ url_for('main.performance_period_toggle_active', period_id=period.id) }}" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if period.is_active %}
+                                    <button type="submit" class="btn-soft warning">
+                                        <i class="fa-solid fa-pause"></i>
+                                        Pasife Al
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn-soft success">
+                                        <i class="fa-solid fa-play"></i>
+                                        Aktifleştir
+                                    </button>
+                                {% endif %}
+                            </form>
+
+                            <form method="POST" action="{{ url_for('main.performance_period_toggle_publish', period_id=period.id) }}" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if period.results_published %}
+                                    <button type="submit" class="btn-soft warning">
+                                        <i class="fa-solid fa-eye-slash"></i>
+                                        Yayından Kaldır
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn-soft primary">
+                                        <i class="fa-solid fa-bullhorn"></i>
+                                        Yayınla
+                                    </button>
+                                {% endif %}
+                            </form>
+
+                            <form method="POST" action="{{ url_for('main.performance_period_toggle_lock', period_id=period.id) }}" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% if period.is_locked %}
+                                    <button type="submit" class="btn-soft secondary">
+                                        <i class="fa-solid fa-lock-open"></i>
+                                        Kilidi Aç
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn-soft warning">
+                                        <i class="fa-solid fa-lock"></i>
+                                        Kilitle
+                                    </button>
+                                {% endif %}
+                            </form>
+
+                            <a href="{{ url_for('main.performance_task_management', period_id=period.id) }}" class="btn-soft secondary">
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+                                Görev Yönetimi
+                            </a>
+
+                            <form method="POST" action="{{ url_for('main.performance_period_delete', period_id=period.id) }}" class="inline-form" onsubmit="return confirm('Bu dönem; görevleri, puanları, karne/snapshot kayıtları, Başkan onayı ve diğer dönem bağlantılarıyla birlikte silinecek. Devam edilsin mi?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-soft danger" title="Dönemi ilişkili kayıtlarıyla birlikte sil">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    Dönemi Sil
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass-card panel-card">
+            <div class="empty-box">
+                Filtreye uygun dönem bulunamadı.
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}{# BYS360_MEETING_P1_PERIOD_SCOPE_SUMMARY: Dönem kapsamı özeti periods ekranında gösterilecektir. #}
+
+{# BYS360_P2_ARCHIVE_PERIOD_HISTORY_BADGE: Geçmiş karne/puan arşivi dönem ve yıl bazlı izlenebilir. #}

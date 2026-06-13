@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Sonuç Yayınlama - BYS360{% endblock %}
+
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/performance_phase3.css') }}">{% endblock %}
+
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+
+{% block page_title %}Sonuç Yayınlama{% endblock %}
+
+{% block page_subtitle %}Yayımla ve geri al işlemleri, idari onay mantığı korunarak daha güvenli ve daha okunur bir kontrol yüzeyinden yürütülür.{% endblock %}
+
+
+
+{% block content %}
+
+{{ styles() }}
+
+{% set publish_is_open = period and (period.results_published or scorecard.published_count > 0) %}
+
+<div class="pw-shell">
+
+  {{ hero(title='Sonuç Yayın Merkezi', text='Seçili dönemin yayınlanabilir sonuçlarını, blokajlarını ve personel görünürlüğünü tek ekranda yönetin.', icon='fa-solid fa-bullhorn') }}
+
+  {{ nav(active='publish') }}
+
+  {{ note('Yayın işlemi kritik olduğu için üst bölümde daha net yönlendirme ve ortak gezinme dili kuruldu.') }}
+
+{% set phase5_guide_title = "Bu ekran personel görünürlüğünü kontrollü biçimde yönetir" %}
+
+{% set phase5_guide_text = "Yayınlama, yalnızca tamamlanmış ve kurala uygun kayıtların personele açılması için kullanılmalıdır. Geri alma ise görünürlüğü kapatır; değerlendirme geçmişini silmez." %}
+
+{% set phase5_guide_points = [
+
+  {'title': 'Ön kontrolü gör', 'text': 'Blokaj listesi ve neden özeti temizlenmeden toplu yayın kararı vermeyin.'},
+
+  {'title': 'Kademeli ilerle', 'text': 'Önce sorunlu kayıtları kapatın, sonra toplu yayın veya kontrollü zorlamalı yayın seçin.'},
+
+  {'title': 'Görünürlüğü hatırla', 'text': 'Yayımla personele açar, geri alma görünürlüğü kapatır; bu nedenle her iki işlem de yönetimsel karardır.'}
+
+] %}
+
+{% set phase5_guide_note = "Sonuçlar, Personel veya yetkili idari onay tamamlanmadan personele açılmamalıdır. Bu yüzey yayın güvenliği için son kapıdır." %}
+
+{% include "performance/_phase5_microguide.html" %}
+
+
+
+<style>
+
+.ai-summary-grid{display:grid;grid-template-columns:1.25fr .95fr;gap:16px;margin:16px 0 0;}
+
+.ai-summary-card{border:1px solid rgba(139,0,0,.10);border-radius:22px;background:rgba(255,255,255,.92);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:18px;}
+
+.ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96));}
+
+.ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96));}
+
+.ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800;margin-bottom:12px;}
+
+.ai-title{font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:6px;}
+
+.ai-text{color:#6b7280;line-height:1.8;font-size:.9rem;}
+
+.ai-bullets{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none;}
+
+.ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem;}
+
+.ai-bullets i{color:#8B0000;margin-top:4px;}
+
+.ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+
+.ai-action{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;}
+
+.ai-action-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+
+.ai-action-value{font-size:1.35rem;font-weight:900;color:#111827;}
+
+.ai-action.tone-critical .ai-action-value{color:#b91c1c;}
+
+.ai-action.tone-watch .ai-action-value{color:#b45309;}
+
+.ai-reason-list{display:grid;gap:10px;margin-top:16px;}
+
+.ai-reason-row{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-size:.88rem;}
+
+.ai-reason-row strong{color:#111827;}
+
+.preflight-banner{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:16px}.preflight-box{border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff;padding:16px}.preflight-box.critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.preflight-box.watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.preflight-title{font-size:.96rem;font-weight:900;color:#111827;margin-bottom:6px}.preflight-text{color:#6b7280;font-size:.88rem;line-height:1.7}.preflight-list{display:grid;gap:10px;margin-top:12px}.preflight-item{padding:10px 12px;border-radius:14px;background:rgba(15,23,42,.04);color:#374151;font-size:.84rem;line-height:1.65}.preflight-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}@media (max-width:900px){.ai-summary-grid,.ai-action-grid,.preflight-banner{grid-template-columns:1fr;}}
+
+.single-publish-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:.78rem;font-weight:900;border:1px solid rgba(15,23,42,.08);background:rgba(15,23,42,.04);color:#374151}.single-publish-status.success{background:rgba(220,252,231,.92);border-color:rgba(22,163,74,.18);color:#166534}.single-publish-status.ready{background:rgba(239,246,255,.94);border-color:rgba(37,99,235,.16);color:#1d4ed8}.single-publish-status.blocked{background:rgba(254,242,242,.94);border-color:rgba(185,28,28,.16);color:#991b1b}.single-publish-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.single-publish-actions form{margin:0}.single-publish-note{display:flex;align-items:flex-start;gap:10px;border:1px solid rgba(139,0,0,.10);background:rgba(139,0,0,.04);border-radius:18px;padding:12px 14px;color:#6b7280;font-size:.86rem;line-height:1.65}.single-publish-note i{color:#8B0000;margin-top:3px}@media (max-width:900px){.single-publish-actions{justify-content:flex-start}}
+</style>
+
+<div class="performance-ui">
+
+  <section class="performance-surface performance-hero">
+
+    <div class="performance-hero-main">
+
+      <span class="performance-kicker"><i class="fa-solid fa-share-nodes"></i> Yayın yönetimi</span>
+
+      <h2 class="performance-title">Sonuç yayını kontrollü şekilde yönetin</h2>
+
+      <p class="performance-text">Dönem seçimi, yayın istatistiği ve işlem butonları sadeleştirildi. Personel görünürlüğünü açıp kapatırken yanlış tıklama riskini azaltan net bir düzen kullanıldı.</p>
+
+      <div class="performance-badges">
+
+        <span class="performance-badge"><i class="fa-regular fa-calendar"></i> {{ period.title if period else 'Dönem seçiniz' }}</span>
+
+        <span class="performance-badge"><i class="fa-solid fa-address-card"></i> {{ scorecard.count }} toplam sonuç</span>
+
+        <span class="performance-badge"><i class="fa-solid fa-eye"></i> {{ scorecard.published_count }} görünür sonuç</span>
+
+        <span class="performance-badge"><i class="fa-solid fa-list-check"></i> {{ publish_summary.ready_count if publish_summary else 0 }} yayın için hazır</span>
+
+        <span class="performance-badge"><i class="fa-solid fa-shield-check"></i> {{ publish_preflight.readiness_label if publish_preflight else 'Ön kontrol' }}</span>
+
+      </div>
+
+    </div>
+
+    <div class="performance-hero-side">
+
+      <div class="performance-side-label">Kontrol notu</div>
+
+      <div class="performance-side-value">Yayımlama personel görünürlüğünü açar, geri alma görünürlüğü kapatır.</div>
+
+      <div class="performance-side-text">Aşağıdaki butonlar sadece seçili dönem için çalışır; işlem öncesi dönem alanını mutlaka kontrol edin.</div>
+
+    </div>
+
+  </section>
+
+
+
+  <section class="performance-surface">
+
+    <form method="get" class="performance-toolbar">
+
+      <div class="performance-field" style="min-width:280px;">
+
+        <label class="performance-field-label">Dönem</label>
+
+        <select class="performance-select" name="period_id">
+
+          {% for item in periods %}<option value="{{ item.id }}" {% if period and item.id == period.id %}selected{% endif %}>{{ item.title }}</option>{% endfor %}
+
+        </select>
+
+      </div>
+
+      <div class="performance-toolbar-actions">
+
+        <button class="performance-btn primary" type="submit"><i class="fa-solid fa-eye"></i> Görüntüle</button>
+
+        {% if period %}
+
+        <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase5_publish_preflight', period_id=period.id) }}"><i class="fa-solid fa-shield-check"></i> Ön kontrol</a>
+
+        <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase6_export_csv', period_id=period.id, type='publish_summary') }}"><i class="fa-solid fa-file-csv"></i> Yayın özeti CSV</a>
+
+        {% endif %}
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+
+  {% if publish_preflight %}
+
+  <section class="preflight-banner">
+
+    <article class="preflight-box {{ publish_preflight.readiness_tone }}">
+
+      <div class="preflight-title">Yayın ön kontrolü · {{ publish_preflight.readiness_label }}</div>
+
+      <div class="preflight-text">Toplu yayına geçmeden önce dönem, tamamlanma ve yayınlanabilir kayıt dengesi tek bakışta kontrol edilir.</div>
+
+      <div class="preflight-list">
+
+        {% for row in (publish_preflight.blockers or publish_preflight.warnings or publish_preflight.infos)[:3] %}
+
+        <div class="preflight-item"><strong>{{ row.title }}</strong><br>{{ row.detail }}</div>
+
+        {% endfor %}
+
+      </div>
+
+    </article>
+
+    <article class="preflight-box">
+
+      <div class="preflight-title">Hazır metrikler</div>
+
+      <div class="preflight-list">
+
+        {% for item in publish_preflight.actions %}
+
+        <div class="preflight-item"><strong>{{ item.label }}</strong><br>{{ item.value }}</div>
+
+        {% endfor %}
+
+      </div>
+
+      {% if period %}<div class="preflight-actions"><a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase5_publish_preflight', period_id=period.id) }}"><i class="fa-solid fa-clipboard-check"></i> Ayrıntılı ekran</a></div>{% endif %}
+
+    </article>
+
+  </section>
+
+  {% endif %}
+
+
+
+  <section class="ai-summary-grid">
+
+    <article class="ai-summary-card tone-{{ ai_publish_panel.tone if ai_publish_panel else 'calm' }}">
+
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_publish_panel.badge if ai_publish_panel else 'AI özeti' }}</div>
+
+      <div class="ai-title">{{ ai_publish_panel.headline if ai_publish_panel else 'Yayın özeti hazır' }}</div>
+
+      <div class="ai-text">{{ ai_publish_panel.summary if ai_publish_panel else '' }}</div>
+
+      {% if ai_publish_panel and ai_publish_panel.bullets %}
+
+      <ul class="ai-bullets">
+
+        {% for bullet in ai_publish_panel.bullets %}
+
+        <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+
+        {% endfor %}
+
+      </ul>
+
+      {% endif %}
+
+    </article>
+
+    <article class="ai-summary-card">
+
+      <div class="ai-kicker"><i class="fa-solid fa-wave-square"></i> AI aksiyon sıcaklığı</div>
+
+      <div class="ai-action-grid">
+
+        {% for item in (ai_publish_panel.actions if ai_publish_panel else []) %}
+
+        <div class="ai-action tone-{{ item.tone }}">
+
+          <div class="ai-action-label">{{ item.label }}</div>
+
+          <div class="ai-action-value">{{ item.value }}</div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+      {% if ai_publish_panel and ai_publish_panel.reason_rows %}
+
+      <div class="ai-reason-list">
+
+        {% for row in ai_publish_panel.reason_rows %}
+
+        <div class="ai-reason-row"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+
+        {% endfor %}
+
+      </div>
+
+      {% endif %}
+
+    </article>
+
+  </section>
+
+
+
+  <section class="performance-metrics">
+
+    <article class="performance-metric">
+
+      <div class="performance-metric-label">Toplam sonuç</div>
+
+      <div class="performance-metric-value">{{ scorecard.count }}</div>
+
+      <div class="performance-metric-sub">Seçili dönem için hesaplanmış sonuç sayısı.</div>
+
+    </article>
+
+    <article class="performance-metric">
+
+      <div class="performance-metric-label">Yayımlanan</div>
+
+      <div class="performance-metric-value">{{ scorecard.published_count }}</div>
+
+      <div class="performance-metric-sub">Personelin görebildiği sonuçlar.</div>
+
+    </article>
+
+    <article class="performance-metric">
+
+      <div class="performance-metric-label">Yayın için hazır</div>
+
+      <div class="performance-metric-value">{{ publish_summary.ready_count if publish_summary else 0 }}</div>
+
+      <div class="performance-metric-sub">Tamamlanmış ve hemen yayımlanabilir kayıtlar.</div>
+
+    </article>
+
+    <article class="performance-metric">
+
+      <div class="performance-metric-label">Bloke kayıt</div>
+
+      <div class="performance-metric-value">{{ publish_summary.blocked_count if publish_summary else 0 }}</div>
+
+      <div class="performance-metric-sub">Eksik akış veya tamamlanma sorunu nedeniyle açılamayan kayıtlar.</div>
+
+    </article>
+
+  </section>
+
+
+
+  <section class="performance-grid-2">
+
+    <article class="performance-surface">
+
+      <h3 class="performance-section-title">Yayın işlemi</h3>
+
+      <p class="performance-section-text">Bu dönem için yayımlanan sonuç sayısı {{ scorecard.published_count }} / {{ scorecard.count }} olarak izlenmektedir.</p>
+
+
+
+      <div class="performance-legend" style="margin-top:14px;">
+
+        <div class="performance-legend-item">
+
+          <div class="performance-stack-title">Yayımla</div>
+
+          <div class="performance-subtext">Seçili dönemde tamamlanan sonuçları personel görünümüne açar.</div>
+
+        </div>
+
+        <div class="performance-legend-item">
+
+          <div class="performance-stack-title">Yayını geri al</div>
+
+          <div class="performance-subtext">Dönemin sonuçlarını tekrar kurum içi yönetim görünümüne çeker.</div>
+
+        </div>
+
+        <div class="performance-legend-item">
+
+          <div class="performance-stack-title">Dönem kontrolü</div>
+
+          <div class="performance-subtext">İşlem sadece üstte seçili olan dönem için uygulanır.</div>
+
+        </div>
+
+      </div>
+
+
+
+      <form method="post" class="performance-toolbar" style="margin-top:18px;">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <input type="hidden" name="period_id" value="{{ period.id if period else '' }}">
+
+        <div class="performance-note">
+
+          <i class="fa-solid fa-circle-info"></i>
+
+          <span>Yanlış dönemde yayın açmamak için önce dönem alanını kontrol edin.</span>
+
+        </div>
+
+        {% if publish_preflight and publish_preflight.blockers %}
+
+        <label class="performance-note" style="background:rgba(255,251,235,.96);cursor:pointer;">
+
+          <input type="checkbox" name="force_publish" value="1" style="margin-right:8px;">
+
+          <span>Blokaja rağmen sadece uygun kayıtları yayımla</span>
+
+        </label>
+
+        {% endif %}
+
+        <div class="performance-toolbar-actions">
+
+          {% if publish_is_open %}
+
+          <button class="performance-btn primary" type="submit" name="publish_action" value="publish" disabled aria-disabled="true"><i class="fa-solid fa-circle-check"></i> Sonuçlar yayımlandı</button>
+
+          {% else %}
+
+          <button class="performance-btn success" type="submit" name="publish_action" value="publish"><i class="fa-solid fa-check"></i> Sonuçları yayımla</button>
+
+          {% endif %}
+
+          <button class="performance-btn warning" type="submit" name="publish_action" value="unpublish"><i class="fa-solid fa-rotate-left"></i> Yayını geri al</button>
+
+        </div>
+
+      </form>
+
+    </article>
+
+
+
+    <article class="performance-surface">
+
+      <h3 class="performance-section-title">Bloke neden özeti</h3>
+
+      <p class="performance-section-text">Yayın öncesi hangi engellerin baskın olduğunu bu panelden görebilirsiniz.</p>
+
+      <div class="performance-table-wrap" style="margin-top:16px;">
+
+        <table class="performance-table">
+
+          <thead><tr><th>Neden</th><th>Adet</th></tr></thead>
+
+          <tbody>
+
+            {% for reason, count in (publish_summary.blocked_reasons_summary if publish_summary else [])[:8] %}
+
+            <tr>
+
+              <td>{{ reason }}</td>
+
+              <td>{{ count }}</td>
+
+            </tr>
+
+            {% else %}
+
+            <tr><td colspan="2"><div class="performance-empty">Bloke nedeni görünmüyor. Kayıtların büyük kısmı yayımlanabilir durumda.</div></td></tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+
+  
+
+  <section class="performance-surface">
+    <div class="performance-toolbar">
+      <div>
+        <h3 class="performance-section-title">Tek tek yayınlanabilir puanlar</h3>
+        <p class="performance-section-text">Puanı tamamlanan personeli toplu yayın beklemeden tek tek personele açabilirsiniz. 70 altı Başkan onayı ve yayın kilidi kontrolleri yine korunur.</p>
+      </div>
+      <div class="single-publish-note">
+        <i class="fa-solid fa-user-check"></i>
+        <span>Bu alan sadece seçili dönem içindir. Yayınla butonu tek personel sonucunu açar; yayını geri al butonu yalnızca o personelin görünürlüğünü kapatır.</span>
+      </div>
+    </div>
+    <div class="performance-table-wrap" style="margin-top:16px;">
+      <table class="performance-table">
+        <thead><tr><th>Personel</th><th>Birim</th><th>Nihai puan</th><th>Durum</th><th>Yayın durumu</th><th style="text-align:right;">İşlem</th></tr></thead>
+        <tbody>
+          {% for row in scorecard.rows if scorecard %}
+          <tr>
+            <td>{{ row.display_name }}<div class="performance-subtext">{{ row.sicil_no }}</div></td>
+            <td>{{ row.unit_name }}</td>
+            <td><strong>{{ row.final_total }}</strong><div class="performance-subtext">{{ row.score_band_label }}</div></td>
+            <td>{{ row.status }}<div class="performance-subtext">{{ row.workflow_status }}</div></td>
+            <td>
+              <span class="single-publish-status {{ row.publish_action_class }}">
+                {% if row.published %}<i class="fa-solid fa-eye"></i>{% elif row.publish_allowed %}<i class="fa-solid fa-circle-check"></i>{% else %}<i class="fa-solid fa-lock"></i>{% endif %}
+                {{ row.publish_action_label }}
+              </span>
+            </td>
+            <td>
+              <div class="single-publish-actions">
+                {% if row.published %}
+                <form method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="period_id" value="{{ period.id if period else '' }}">
+                  <input type="hidden" name="evaluation_id" value="{{ row.evaluation.id }}">
+                  <button class="performance-btn warning" type="submit" name="publish_action" value="unpublish_single"><i class="fa-solid fa-eye-slash"></i> Bu kişinin yayınını geri al</button>
+                </form>
+                {% elif row.publish_allowed %}
+                <form method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="period_id" value="{{ period.id if period else '' }}">
+                  <input type="hidden" name="evaluation_id" value="{{ row.evaluation.id }}">
+                  <button class="performance-btn success" type="submit" name="publish_action" value="publish_single"><i class="fa-solid fa-user-check"></i> Bu kişiyi yayınla</button>
+                </form>
+                {% else %}
+                <span class="performance-subtext">Yayın için önce blokaj çözülmeli.</span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6"><div class="performance-empty">Bu dönemde tek tek yayınlanabilecek değerlendirme kaydı bulunmuyor.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+<section class="performance-surface">
+
+    <div class="performance-toolbar">
+
+      <div>
+
+        <h3 class="performance-section-title">Yayın öncesi dikkat gerektiren kayıtlar</h3>
+
+        <p class="performance-section-text">Öne çıkan kayıtlar üzerinden hangi eksiklerin yayın akışını durdurduğu doğrudan görülebilir.</p>
+
+      </div>
+
+    </div>
+
+    <div class="performance-table-wrap" style="margin-top:16px;">
+
+      <table class="performance-table">
+
+        <thead><tr><th>Personel</th><th>Birim</th><th>Nihai puan</th><th>Durum</th><th>Bloke nedeni</th></tr></thead>
+
+        <tbody>
+
+          {% for row in publish_summary.blocked_rows if publish_summary %}
+
+          <tr>
+
+            <td>{{ row.display_name }}<div class="performance-subtext">{{ row.sicil_no }}</div></td>
+
+            <td>{{ row.unit_name }}</td>
+
+            <td>{{ row.final_total }}</td>
+
+            <td>{{ row.status }}</td>
+
+            <td>{{ row.reason }}</td>
+
+          </tr>
+
+          {% else %}
+
+          <tr><td colspan="5"><div class="performance-empty">Bloke kayıt bulunmuyor.</div></td></tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</div>
+
+</div>
+
+{% endblock %}
+

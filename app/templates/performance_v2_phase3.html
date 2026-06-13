@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Değerlendirme Görevleri - BYS360{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/performance_phase3.css') }}">{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Değerlendirme Görevleri{% endblock %}
+{% block page_subtitle %}Görevler, son tarihler ve işlem akışı tek bir çalışma yüzeyinde izlenir.{% endblock %}
+
+{% block content %}
+{% set completed_count = assignments|selectattr('status','equalto','tamamlandi')|list|length %}
+{% set pending_count = assignments|rejectattr('status','equalto','tamamlandi')|list|length %}
+<div class="performance-ui">
+    <section class="performance-surface performance-hero">
+        <div class="performance-hero-main">
+            <span class="performance-kicker"><i class="fa-solid fa-list-check"></i> Görev çalışma alanı</span>
+            <h2 class="performance-title">Değerlendirme görevleri tek bakışta yönetilsin</h2>
+            <p class="performance-text">
+                Görev listesi, seviye sırası ve işlem durumu aynı görünümde toplandı.
+                Böylece değerlendirici hangi personele, hangi seviyede ve hangi tarihe kadar işlem yapacağını daha net izler.
+            </p>
+            <div class="performance-badges">
+                <span class="performance-badge"><i class="fa-regular fa-calendar"></i> {{ period.title if period else 'Aktif dönem bulunamadı' }}</span>
+                <span class="performance-badge"><i class="fa-solid fa-bars-progress"></i> {{ assignments|length }} görev</span>
+                <span class="performance-badge"><i class="fa-solid fa-route"></i> 3 → 2 → 1 akışı görünür</span>
+            </div>
+        </div>
+        <div class="performance-hero-side">
+            <div class="performance-side-label">Özet</div>
+            <div class="performance-side-value">Bekleyen ve tamamlanan görevler aynı tabloda ayrışır.</div>
+            <div class="performance-side-text">Filtre alanı istemci tarafında çalışır; sayfayı yenilemeden görev bulma ve daraltma yapılabilir.</div>
+        </div>
+    </section>
+
+    <section class="performance-metrics">
+        <article class="performance-metric">
+            <div class="performance-metric-label">Toplam görev</div>
+            <div class="performance-metric-value">{{ assignments|length }}</div>
+            <div class="performance-metric-sub">Değerlendirici görünümünde listelenen tüm görevler.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Bekleyen</div>
+            <div class="performance-metric-value">{{ pending_count }}</div>
+            <div class="performance-metric-sub">Henüz tamamlanmamış ya da taslakta kalan kayıtlar.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Tamamlanan</div>
+            <div class="performance-metric-value">{{ completed_count }}</div>
+            <div class="performance-metric-sub">Gönderimi tamamlanmış görevler.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Dönem</div>
+            <div class="performance-metric-value" style="font-size:1.08rem;line-height:1.45;">{{ period.title if period else 'Seçili dönem yok' }}</div>
+            <div class="performance-metric-sub">Görüntülenen görevlerin ait olduğu dönem.</div>
+        </article>
+    </section>
+
+    <section class="performance-surface">
+        <div class="performance-toolbar">
+            <div>
+                <h3 class="performance-section-title">Görev listesi</h3>
+                <p class="performance-section-text">Personel, sicil, seviye ve durum alanlarında hızlı filtreleme yapabilirsiniz.</p>
+            </div>
+            <div class="performance-toolbar-actions">
+                <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase2_dashboard', period_id=period.id if period else None) }}"><i class="fa-solid fa-rotate"></i> Görev senkronu</a>
+                <a class="performance-btn secondary" href="{{ url_for('main.performance_v2_phase5_dashboard', period_id=period.id if period else None) }}"><i class="fa-solid fa-chart-column"></i> Rapor özeti</a>
+            </div>
+        </div>
+
+        <div class="performance-filter-grid" style="margin-top:16px;">
+            <div class="performance-field">
+                <label class="performance-field-label">Arama</label>
+                <div class="performance-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="taskSearch" class="performance-input" type="search" placeholder="Personel adı veya sicil no ile filtrele">
+                </div>
+            </div>
+            <div class="performance-field">
+                <label class="performance-field-label">Durum</label>
+                <select id="taskStatus" class="performance-select">
+                    <option value="">Tüm durumlar</option>
+                    <option value="bekliyor">Bekliyor</option>
+                    <option value="taslak">Taslak</option>
+                    <option value="tamamlandi">Tamamlandı</option>
+                    <option value="kismen_tamamlandi">Kısmen tamamlandı</option>
+                </select>
+            </div>
+            <div class="performance-field">
+                <label class="performance-field-label">Hızlı filtre</label>
+                <div class="performance-chip-row">
+                    <button type="button" class="performance-chip active js-level-filter" data-level="">Tümü</button>
+                    <button type="button" class="performance-chip js-level-filter" data-level="1">1. amir</button>
+                    <button type="button" class="performance-chip js-level-filter" data-level="2">2. amir</button>
+                    <button type="button" class="performance-chip js-level-filter" data-level="3">3. amir</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-table-wrap" style="margin-top:18px;">
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Personel</th>
+                        <th>Seviye</th>
+                        <th>Durum</th>
+                        <th>Son tarih</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTableBody">
+                    {% for item in assignments %}
+                    <tr class="js-task-row"
+                        data-search="{{ (item.employee.full_name ~ ' ' ~ (item.employee.sicil_no or ''))|lower }}"
+                        data-status="{{ (item.status or '')|lower }}"
+                        data-level="{{ item.manager_level }}">
+                        <td>
+                            <strong>{{ item.employee.full_name }}</strong>
+                            <div class="performance-subtext">{{ item.employee.sicil_no or '-' }}</div>
+                        </td>
+                        <td><span class="performance-pill level{{ item.manager_level }}">{{ item.manager_level }}. Amir</span></td>
+                        <td>
+                            {% set s = (item.status or '')|lower %}
+                            <span class="performance-pill {% if s == 'tamamlandi' %}success{% elif s in ['bekliyor', 'taslak', 'kismen_tamamlandi'] %}warning{% else %}info{% endif %}">
+                                {{ item.status or '-' }}
+                            </span>
+                        </td>
+                        <td>{{ item.due_date.strftime('%d.%m.%Y %H:%M') if item.due_date else '-' }}</td>
+                        <td><a class="performance-btn primary" href="{{ url_for('main.performance_v2_phase3_assignment', assignment_id=item.id) }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Formu aç</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5"><div class="performance-empty">Bu görünümde görev bulunamadı.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="taskEmptyState" class="performance-empty" style="display:none; margin-top:14px;">Filtreyle eşleşen görev bulunamadı.</div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const rows = Array.from(document.querySelectorAll('.js-task-row'));
+    const searchInput = document.getElementById('taskSearch');
+    const statusSelect = document.getElementById('taskStatus');
+    const levelButtons = Array.from(document.querySelectorAll('.js-level-filter'));
+    const emptyState = document.getElementById('taskEmptyState');
+    let currentLevel = '';
+
+    function applyFilters() {
+        const q = (searchInput?.value || '').trim().toLowerCase();
+        const status = (statusSelect?.value || '').trim().toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach((row) => {
+            const matchesSearch = !q || (row.dataset.search || '').includes(q);
+            const matchesStatus = !status || (row.dataset.status || '') === status;
+            const matchesLevel = !currentLevel || (row.dataset.level || '') === currentLevel;
+            const visible = matchesSearch && matchesStatus && matchesLevel;
+            row.dataset.hidden = visible ? 'false' : 'true';
+            row.style.display = visible ? '' : 'none';
+            if (visible) visibleCount += 1;
+        });
+
+        if (emptyState) emptyState.style.display = visibleCount ? 'none' : 'block';
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    statusSelect?.addEventListener('change', applyFilters);
+    levelButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+            currentLevel = this.dataset.level || '';
+            levelButtons.forEach((item) => item.classList.toggle('active', item === this));
+            applyFilters();
+        });
+    });
+
+    applyFilters();
+})();
+</script>
+{% endblock %}

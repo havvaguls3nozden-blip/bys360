@@ -1,0 +1,26 @@
+FAZ 27 – SOL PROFİL KARTI KAPAK ALANI HOTFIX
+
+Sorun:
+Portal feed ekranında sol taraftaki kullanıcı kartının kırmızı kapak alanı
+gereksiz yüksek görünüyor ve avatar çok aşağıda kalıyor.
+
+Uygulama:
+1) project/app/static/css/faz27_profile_kapak_hotfix.css dosyasındaki içeriği aç.
+2) Bu içeriği mevcut ana stil dosyanın SONUNA ekle.
+   En muhtemel dosya:
+   - project/app/static/css/main.css
+   veya
+   - project/app/static/css/app.css
+   veya
+   - project/app/static/css/portal.css
+3) Sunucuyu yeniden başlat.
+4) Ctrl+F5 ile sayfayı sert yenile.
+
+Beklenen sonuç:
+- Sol profil kartındaki kırmızı kapak alanı kısalır.
+- Avatar daha dengeli konuma gelir.
+- Kart daha kurumsal ve sade görünür.
+
+Not:
+Bu hotfix, exact class adı farklı olsa bile yaygın profil/cover selector'larını
+aynı anda hedefleyecek şekilde hazırlanmıştır.

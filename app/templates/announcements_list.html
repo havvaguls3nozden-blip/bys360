@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% from "_premium_workspace_macros.html" import premium_action_shell, premium_helper_note %}
+{% from "_communication_suite_macros.html" import communication_workspace_header %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+{% block title %}Duyurular - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Duyurular{% endblock %}
+{% block page_subtitle %}Kurumsal duyuruları ve okunma performansını kart görünümünde takip edin.{% endblock %}
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+.ann-shell{display:grid;gap:18px}.glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}.panel-card{padding:22px;position:relative;z-index:1}.hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.06), transparent 28%),linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));pointer-events:none}.hero-row{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) 280px;gap:18px;align-items:start}.hero-title{margin:0;font-size:1.14rem;font-weight:900;color:#111827;line-height:1.4}.hero-text{margin:8px 0 0;color:#6b7280;font-size:.92rem;line-height:1.85}.hero-side{display:grid;gap:12px}.side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:rgba(248,250,252,.85)}.side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.55}.side-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.75}.btn-soft,.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all .18s ease}.btn-soft{min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;font-weight:800;font-size:.9rem;white-space:nowrap}.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}.mini-btn{min-height:38px;padding:0 12px;border-radius:12px;border:1px solid rgba(15,23,42,.08);background:#eef2f7;color:#374151;font-size:.82rem;font-weight:800}.btn-soft:hover,.mini-btn:hover,.ann-item:hover,.chip-link:hover{transform:translateY(-1px)}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.stat-card{padding:20px;position:relative;overflow:hidden}.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}.stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}.stat-value{color:#111827;font-size:1.6rem;font-weight:900;line-height:1;position:relative;z-index:1}.stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;font-weight:700;line-height:1.6;position:relative;z-index:1}.toolbar-card{position:sticky;top:10px;z-index:6}.toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}.chip-row{display:flex;gap:8px;flex-wrap:wrap}.chip-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#4b5563;font-size:.78rem;font-weight:900;text-decoration:none}.chip-link.active{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.16);color:#8B0000}.toolbar input{min-height:42px;border-radius:12px;border:1px solid rgba(15,23,42,.08);padding:0 14px;background:#fff;min-width:260px}.toolbar-foot{margin-top:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800}.ann-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.section-title{margin:0;font-size:1rem;font-weight:900;color:#111827}.section-sub{margin:4px 0 0;color:#6b7280;font-size:.86rem;line-height:1.7}.ann-list{display:grid;gap:12px}.ann-item{display:grid;grid-template-columns:minmax(0,1fr) 150px;align-items:flex-start;gap:14px;border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:20px;padding:16px;transition:all .18s ease}.ann-item.clickable{cursor:pointer}.ann-inline-empty{display:none;padding:18px 20px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.88rem;line-height:1.8}.ann-main{min-width:0}.ann-top{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:6px}.ann-title{margin:0;font-size:.96rem;font-weight:900;color:#111827;line-height:1.45}.pill{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 9px;border-radius:999px;font-size:.73rem;font-weight:900}.pill.red{background:rgba(139,0,0,.08);color:#8B0000}.pill.gray{background:#eef2f7;color:#4b5563}.pill.gold{background:rgba(202,138,4,.15);color:#a16207}.ann-body{margin:0;color:#6b7280;font-size:.88rem;line-height:1.8;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ann-meta{margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;color:#6b7280;font-size:.76rem;font-weight:700}.ann-note{margin-top:10px;padding:12px 14px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.83rem;line-height:1.72}.ann-actions{display:grid;gap:10px;align-content:start}.action-card{border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#faf7f7;padding:14px}.action-label{color:#6b7280;font-size:.74rem;font-weight:800;margin-bottom:6px}.action-value{color:#111827;font-size:.88rem;font-weight:900;line-height:1.55}.progress-track{width:100%;height:10px;border-radius:999px;background:#eef2f7;overflow:hidden;margin-top:10px}.progress-fill{height:100%;background:linear-gradient(90deg,#8B0000,#b91c1c);border-radius:999px}.empty-box{padding:32px 20px;border-radius:20px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;text-align:center;color:#6b7280;display:grid;gap:10px}.empty-box i{font-size:2rem;color:#8B0000}.empty-title{margin:0;font-size:1rem;font-weight:900;color:#111827}.empty-text{margin:0;font-size:.9rem;line-height:1.8}.mobile-toggle,.mobile-state{display:none}.ann-shell.filters-collapsed .toolbar,.ann-shell.filters-collapsed .toolbar-foot{display:none}@media (max-width:1120px){.hero-row{grid-template-columns:1fr}.ann-grid,.stats-grid{grid-template-columns:1fr}.ann-item{grid-template-columns:1fr}}@media (max-width:768px){.toolbar input{min-width:0;width:100%}.mobile-toggle,.mobile-state{display:flex;align-items:center;justify-content:center;gap:8px}.mobile-toggle{min-height:42px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-weight:900;cursor:pointer}.btn-soft,.mini-btn{width:100%}}
+
+.ann-ai-card{display:grid;grid-template-columns:minmax(0,1.2fr) 320px;gap:18px;margin-top:18px}.ann-ai-box{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.92));padding:18px}.ann-ai-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.76rem;font-weight:900;color:#8B0000;margin-bottom:10px}.ann-ai-title{margin:0;font-size:1.02rem;font-weight:900;color:#111827}.ann-ai-text{margin:10px 0 0;font-size:.88rem;line-height:1.8;color:#6b7280}.ann-ai-list{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:10px}.ann-ai-list li{display:flex;gap:10px;color:#374151;font-size:.84rem;line-height:1.7}.ann-ai-list i{margin-top:4px;color:#8B0000}.ann-ai-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ann-ai-chip{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px}.ann-ai-chip-label{font-size:.76rem;font-weight:800;color:#6b7280}.ann-ai-chip-value{margin-top:6px;font-size:1.15rem;font-weight:900;color:#111827}.ann-ai-chip-tone-watch .ann-ai-chip-value{color:#a16207}.ann-ai-chip-tone-critical .ann-ai-chip-value{color:#991b1b}@media (max-width: 991px){.ann-ai-card{grid-template-columns:1fr}}
+</style>
+<div class="ann-shell bys-premium-page">
+    {{ communication_workspace_header(
+        active='announcements',
+        title='Duyurular',
+        text='Gelen ve giden duyuruları iki ayrı akışta tutuyoruz; yine de sayaçlar, kart yapısı ve üst bağlam aynı kaldığı için ekran dağılmıyor.',
+        icon='fa-solid fa-bullhorn',
+        badges=[
+            {'icon': 'fa-solid fa-inbox', 'text': 'Gelen: ' ~ incoming_rows|length},
+            {'icon': 'fa-solid fa-paper-plane', 'text': 'Giden: ' ~ outgoing_rows|length},
+            {'icon': 'fa-solid fa-envelope-open-text', 'text': 'Okunmamış: ' ~ unread_rows|length}
+        ],
+        side_title='Teslim ve okuma görünümü',
+        side_text=total_outgoing_reads ~ ' toplam okuma kaydı var. Sağ taraftaki aksiyon alanı teslim ve okunma hızını boğmadan özetler.',
+        metric_cards=[
+            {'label': 'Bana Gelen', 'value': incoming_rows|length, 'icon': 'fa-solid fa-inbox', 'sub': 'Alıcı olduğunuz duyurular.'},
+            {'label': 'Gönderdiklerim', 'value': outgoing_rows|length, 'icon': 'fa-solid fa-paper-plane', 'sub': 'Sizin başlattığınız duyuru akışları.', 'tone': 'info'},
+            {'label': 'Okunmamış', 'value': unread_rows|length, 'icon': 'fa-solid fa-envelope-open-text', 'sub': 'Henüz açmadığınız gelen duyurular.', 'tone': 'warning'},
+            {'label': 'Toplam Okuma', 'value': total_outgoing_reads, 'icon': 'fa-solid fa-chart-line', 'sub': 'Giden duyurularda toplanan okuma sayısı.', 'tone': 'success'}
+        ],
+        hub_note='Duyurular, içerik ve teslim bilgisini aynı anda taşıdığı için çift akış halinde daha sakin okunur. Hızlı geçişler ise sizi tekrar menüye döndürmeden diğer iletişim katmanlarına alır.',
+        hub_metric=(incoming_rows|length + outgoing_rows|length) ~ ' görünür duyuru',
+        hub_secondary='%' ~ overall_read_rate|string ~ ' genel okuma oranı'
+    ) }}
+
+    {% if ai_announcements_panel %}
+    <div class="ann-ai-card">
+        <div class="glass-card panel-card ann-ai-box">
+            <div class="ann-ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_announcements_panel.badge if ai_announcements_panel else 'AI özeti' }}</div>
+            <h3 class="ann-ai-title">{{ ai_announcements_panel.headline }}</h3>
+            <p class="ann-ai-text">{{ ai_announcements_panel.summary }}</p>
+            <ul class="ann-ai-list">
+                {% for bullet in ai_announcements_panel.bullets or [] %}
+                <li><i class="fa-solid fa-check"></i><span>{{ bullet }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="glass-card panel-card ann-ai-box">
+            <div class="ann-ai-kicker"><i class="fa-solid fa-wave-square"></i> AI teslim sıcaklığı</div>
+            <div class="ann-ai-actions">
+                {% for action in ai_announcements_panel.actions or [] %}
+                <div class="ann-ai-chip ann-ai-chip-tone-{{ action.tone or 'calm' }}">
+                    <div class="ann-ai-chip-label">{{ action.label }}</div>
+                    <div class="ann-ai-chip-value">{{ action.value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="glass-card panel-card toolbar-card">
+        {% call premium_action_shell(title='Duyuru akışını daralt', text='Gelen ve giden duyurular ayrı kalsa da arama ve görünüm filtreleri aynı merkezde dursun; böylece teslim takibi dağılmasın.', icon='fa-solid fa-sliders', compact=True) %}
+        <button type="button" class="mobile-toggle" id="announcementToolbarToggle"><i class="fa-solid fa-sliders"></i> Filtreleri Aç / Kapat</button>
+        <div class="mobile-state" id="announcementToolbarState">Görünüm filtreleri burada.</div>
+        <div class="toolbar">
+            <div class="chip-row">
+                {% for key, label in [('all','Tümü'), ('incoming','Bana Gelen'), ('outgoing','Gönderdiklerim'), ('unread','Okunmamış')] %}
+                    <a href="{{ url_for('main.announcements_list', view=key, q=search_query) }}" class="chip-link {% if current_view == key %}active{% endif %}">{{ label }}</a>
+                {% endfor %}
+            </div>
+            <form method="GET" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;"><input type="hidden" name="view" value="{{ current_view }}"><input type="text" id="announcementSearchInput" name="q" value="{{ search_query }}" placeholder="Duyuru ara..."><button type="submit" class="mini-btn"><i class="fa-solid fa-filter"></i> Filtrele</button>{% if search_query %}<a href="{{ url_for('main.announcements_list', view=current_view) }}" class="mini-btn"><i class="fa-solid fa-rotate-left"></i> Temizle</a>{% endif %}</form>
+        </div>
+        <div class="toolbar-foot"><div class="bys-premium-toolbar-hint"><i class="fa-solid fa-circle-info"></i><strong>İpucu:</strong> Sol alan içeriği, sağ alan ise teslim ve okunma durumunu hızlı özetler.</div><span id="announcementVisibleCounter">{{ incoming_rows|length + outgoing_rows|length }} duyuru kartı görünür.</span></div>
+        {{ premium_helper_note('Gelen ve giden duyuruları aynı tabloda boğmuyoruz; yine de sayaçlar ve kart düzeni aynı kaldığı için göz yormayan bir okuma ritmi korunuyor.', icon='fa-solid fa-bullhorn') }}
+        {% endcall %}
+    </div>
+    <div class="ann-grid">
+        <div class="glass-card panel-card">
+            {% call list_workspace_panel(title='Bana gelen duyurular', text='Alıcı olduğunuz duyurular ve yeni içerikler burada görünür. Sol alan içerik, sağ alan ise okuma durumunu hızlı özetler.', badge=incoming_rows|length ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-inbox', note='Gelen ve giden duyurularda aynı kart omurgasını kullandım; böylece okuma ve teslim takibi farklı görünüm öğretmez.', note_icon='fa-solid fa-inbox') %}
+            {% if incoming_rows %}
+            <div class="ann-list">
+                {% for row in incoming_rows %}
+                <div class="ann-item clickable" tabindex="0" data-search="{{ ((row.thread.subject or '') ~ ' ' ~ (row.message.body if row.message else ''))|lower }}">
+                    <div class="ann-main"><div class="ann-top"><h5 class="ann-title">{{ row.thread.subject or 'Duyuru' }}</h5>{% if row.unread_count > 0 %}<span class="pill red">{{ row.unread_count }} yeni</span>{% endif %}<span class="pill gray">{{ row.recipient_count }} alıcı</span></div><p class="ann-body">{{ row.message.body if row.message else 'İçerik bulunamadı.' }}</p><div class="ann-meta"><span>{{ row.message.sent_at.strftime('%d.%m.%Y %H:%M') if row.message and row.message.sent_at else '-' }}</span><span>{{ row.sender.full_name if row.sender and row.sender.full_name else (((row.sender.ad or '') ~ ' ' ~ (row.sender.soyad or ''))|trim if row.sender else 'Gönderen bilinmiyor') }}</span></div><div class="ann-note">{% if row.unread_count > 0 %}Bu duyuruda henüz okumadığınız içerik var.{% else %}Bu duyuruya daha önce bakılmış görünüyor.{% endif %}</div></div>
+                    <div class="ann-actions"><div class="action-card"><div class="action-label">Duyuru Durumu</div><div class="action-value">{{ row.personal_state_label }}</div><div class="action-sub">{{ row.unread_count }} okunmamış içerik</div></div><a href="{{ row.open_url }}" class="mini-btn ann-open-link"><i class="fa-solid fa-eye"></i> Aç</a></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box"><i class="fa-solid fa-inbox"></i><h5 class="empty-title">Gelen duyuru yok</h5><p class="empty-text">Size ulaşan duyurular burada listelenecek.</p></div>
+            {% endif %}
+            {% endcall %}
+        </div>
+        <div class="glass-card panel-card">
+            {% call list_workspace_panel(title='Gönderdiğim duyurular', text='Okunma durumunu ve alıcı performansını buradan izleyin. Kart içindeki ilerleme alanı tek tek kişileri sormadan genel resmi verir.', badge='%' ~ overall_read_rate|string ~ ' genel oran', badge_tone='gold', icon='fa-solid fa-paper-plane', note='Okunma oranı, bekleyen kişi sayısı ve ilerleme çubuğu aynı katmanda duruyor; bu yüzden duyuru takibi ayrı rapor aratmaz.', note_icon='fa-solid fa-chart-line') %}
+            {% if outgoing_rows %}
+            <div class="ann-list">
+                {% for row in outgoing_rows %}
+                <div class="ann-item clickable" tabindex="0" data-search="{{ ((row.thread.subject or '') ~ ' ' ~ (row.message.body if row.message else ''))|lower }}">
+                    <div class="ann-main"><div class="ann-top"><h5 class="ann-title">{{ row.thread.subject or 'Duyuru' }}</h5><span class="pill gold">%{{ row.read_rate }} okundu</span>{% if row.pending_count > 0 %}<span class="pill gray">{{ row.pending_count }} bekliyor</span>{% endif %}</div><p class="ann-body">{{ row.message.body if row.message else 'İçerik bulunamadı.' }}</p><div class="ann-meta"><span>{{ row.message.sent_at.strftime('%d.%m.%Y %H:%M') if row.message and row.message.sent_at else '-' }}</span><span>{{ row.recipient_count }} alıcı</span><span>{{ row.read_count }} okudu</span></div><div class="progress-track"><div class="progress-fill" style="width: {{ row.read_rate }}%"></div></div><div class="ann-note">Bu duyurunun okunma ilerleyişi burada görünür kalır; kimseye tek tek sormaya gerek kalmaz.</div></div>
+                    <div class="ann-actions"><div class="action-card"><div class="action-label">Teslim Durumu</div><div class="action-value">{{ row.delivery_state_label }}</div><div class="action-sub">{{ row.delivery_detail }}</div></div><a href="{{ row.open_url }}" class="mini-btn ann-open-link"><i class="fa-solid fa-chart-line"></i> Aç</a></div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box"><i class="fa-solid fa-bullhorn"></i><h5 class="empty-title">Gönderdiğiniz duyuru yok</h5><p class="empty-text">Yeni duyurular yayınladığınızda okunma istatistikleri burada görünecek.</p></div>
+            {% endif %}
+            {% endcall %}
+        </div>
+    </div>
+    <div class="ann-inline-empty" id="announcementInlineEmpty"><i class="fa-solid fa-magnifying-glass"></i> Bu arama ile eşleşen duyuru görünmüyor.</div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+    const input = document.getElementById('announcementSearchInput');
+    const cards = Array.from(document.querySelectorAll('.ann-item.clickable'));
+    const inlineEmpty = document.getElementById('announcementInlineEmpty');
+    const counter = document.getElementById('announcementVisibleCounter');
+    const shell = document.querySelector('.ann-shell');
+    const toolbarToggle = document.getElementById('announcementToolbarToggle');
+    const toolbarState = document.getElementById('announcementToolbarState');
+    const toolbarKey = 'bys360-ann-toolbar-collapsed';
+    function sync(){
+        const visible = cards.filter(card => card.style.display !== 'none').length;
+        if (inlineEmpty) inlineEmpty.style.display = cards.length && visible === 0 ? 'block' : 'none';
+        if (counter) counter.textContent = `${visible} duyuru kartı görünür.`;
+        if (toolbarState && !(shell && shell.classList.contains('filters-collapsed'))) toolbarState.textContent = `${visible} duyuru görünür.`;
+    }
+    function applySearch(){
+        const q = (input && input.value || '').trim().toLowerCase();
+        cards.forEach(card => { card.style.display = !q || (card.dataset.search || '').includes(q) ? '' : 'none'; });
+        sync();
+    }
+    function syncToolbarState(){
+        if (!shell || !toolbarState || window.innerWidth > 768) return;
+        const collapsed = shell.classList.contains('filters-collapsed');
+        toolbarState.textContent = collapsed ? 'Görünüm filtreleri kapalı.' : 'Görünüm filtreleri açık.';
+    }
+    if (shell && window.innerWidth <= 768 && localStorage.getItem(toolbarKey) === '1') shell.classList.add('filters-collapsed');
+    syncToolbarState();
+    if (toolbarToggle && shell) toolbarToggle.addEventListener('click', function(){ shell.classList.toggle('filters-collapsed'); localStorage.setItem(toolbarKey, shell.classList.contains('filters-collapsed') ? '1' : '0'); syncToolbarState(); });
+    if (input) { input.addEventListener('input', applySearch); document.addEventListener('keydown', function(event){ if (event.key === '/' && document.activeElement !== input && !event.target.matches('input, textarea, select')) { event.preventDefault(); input.focus(); }}); }
+    document.querySelectorAll('.ann-open-link').forEach(function(link){ link.addEventListener('click', function(){ link.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Açılıyor'; }); });
+    cards.forEach(function(card){ const link = card.querySelector('.ann-open-link'); if (!link) return; card.addEventListener('click', function(event){ if (event.target.closest('a, button, input, textarea, select, label, form')) return; link.click(); }); card.addEventListener('keydown', function(event){ if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, input, textarea, select, label, form')) { event.preventDefault(); link.click(); } }); });
+    sync();
+})();
+</script>
+{% endblock %}

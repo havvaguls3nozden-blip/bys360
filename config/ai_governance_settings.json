@@ -1,0 +1,14 @@
+{
+  "module_quality_floor": 65,
+  "prompt_quality_floor": 60,
+  "backlog_limit": 8,
+  "negative_feedback_limit": 3,
+  "default_lookback_days": 30,
+  "weekly_summary": {
+    "lookback_days": 7,
+    "top_limit": 5,
+    "show_prompt_breakdown": true,
+    "show_module_breakdown": true,
+    "include_actions": true
+  }
+}

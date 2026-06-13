@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}AI Bildirim Önceliklendirme - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Bildirim Önceliklendirme{% endblock %}
+{% block page_subtitle %}Bildirim kutusunu öncelik, okunmamış yük ve tür bazlı kırılım ile birlikte özetler.{% endblock %}
+{% block content %}
+{% set priority_label_map = {
+  'urgent': 'Acil',
+  'critical': 'Kritik',
+  'high': 'Yüksek',
+  'warning': 'Uyarı',
+  'medium': 'Orta',
+  'normal': 'Normal',
+  'low': 'Düşük',
+  'info': 'Bilgilendirme'
+} %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-3" method="get">
+    <div class="col-md-2">
+      <label class="form-label">Pencere</label>
+      <input class="form-control" type="number" name="lookback_days" min="1" max="90" value="{{ selected_lookback_days }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Öncelik</label>
+      <select class="form-select" name="priority">
+        <option value="">Tümü</option>
+        {% for item in priority_options %}
+          {% set priority_key = (item or '')|lower %}
+          <option value="{{ item }}" {% if selected_priority == item %}selected{% endif %}>{{ priority_label_map.get(priority_key, item) }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Tür</label>
+      <select class="form-select" name="notification_type">
+        <option value="">Tümü</option>
+        {% for item in notification_type_options %}<option value="{{ item }}" {% if selected_notification_type == item %}selected{% endif %}>{{ item }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Limit</label>
+      <input class="form-control" type="number" name="limit" min="5" max="200" value="{{ summary.visible_count or 40 }}">
+    </div>
+    <div class="col-md-2 d-flex align-items-end gap-2">
+      <button class="btn btn-catab w-100">Güncelle</button>
+      <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.admin_ai_notification_priority_export', lookback_days=selected_lookback_days, priority=selected_priority, notification_type=selected_notification_type, unread_only='1' if selected_unread_only else '', limit=summary.visible_count or 40) }}">CSV</a>
+    </div>
+    <div class="col-12">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="unread_only" id="unread_only" value="1" {% if selected_unread_only %}checked{% endif %}>
+        <label class="form-check-label" for="unread_only">Sadece okunmamışları göster</label>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="row g-3 mb-4">
+  {% for item in actions %}
+  <div class="col-md-3"><div class="glass-card p-3"><div class="small text-muted">{{ item.label }}</div><div class="fs-4 fw-bold">{{ item.value }}</div></div></div>
+  {% endfor %}
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="glass-card p-4">
+      <h4 class="mb-3">Öncelikli satırlar</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Bildirim</th><th>Öncelik</th><th>Durum</th><th>Gerekçe</th></tr></thead>
+          <tbody>
+            {% for row in priority_rows %}
+              {% set priority_key = (row.priority or '')|lower %}
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ row.title }}</div>
+                  <div class="small text-muted">{{ row.notification_type }} · {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+                  {% if row.link_url %}<div><a class="small" href="{{ row.link_url }}">Kayda git</a></div>{% endif %}
+                </td>
+                <td><span class="badge text-bg-{% if priority_key in ['critical','urgent'] %}danger{% elif priority_key == 'high' %}warning{% else %}secondary{% endif %}">{{ priority_label_map.get(priority_key, row.priority or 'Normal') }}</span></td>
+                <td>{{ 'Okundu' if row.is_read else 'Okunmadı' }}</td>
+                <td class="small text-muted">{{ row.reason }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="text-muted">Bu filtrede bildirim bulunmadı.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4" style="display:grid;gap:16px;">
+    <div class="glass-card p-4"><h4 class="mb-3">AI özeti</h4>{% for item in highlights %}<div class="border rounded-4 p-3 mb-2"><div class="fw-semibold">{{ item.title }}</div><div class="small text-muted mt-1">{{ item.body }}</div></div>{% endfor %}</div>
+    <div class="glass-card p-4">
+      <h4 class="mb-3">Tür kırılımı</h4>
+      {% set type_rows = type_breakdown.items() if type_breakdown is mapping else (type_breakdown or []) %}
+      {% for row in type_rows %}
+        {% if row is mapping %}
+          {% set row_key = row.label if row.label is defined else (row.key if row.key is defined else (row.name if row.name is defined else '-')) %}
+          {% set row_value = row.count if row.count is defined else (row.value if row.value is defined else 0) %}
+        {% else %}
+          {% set row_key = row[0] if row is sequence and row is not string and row|length > 0 else row %}
+          {% set row_value = row[1] if row is sequence and row is not string and row|length > 1 else 0 %}
+        {% endif %}
+        <div class="d-flex justify-content-between border-bottom py-2"><span>{{ row_key }}</span><strong>{{ row_value }}</strong></div>
+      {% else %}
+        <div class="text-muted">Kayıt yok.</div>
+      {% endfor %}
+    </div>
+    <div class="glass-card p-4">
+      <h4 class="mb-3">Öncelik kırılımı</h4>
+      {% set priority_rows = priority_breakdown.items() if priority_breakdown is mapping else (priority_breakdown or []) %}
+      {% for row in priority_rows %}
+        {% if row is mapping %}
+          {% set row_key = row.label if row.label is defined else (row.key if row.key is defined else (row.name if row.name is defined else '-')) %}
+          {% set row_value = row.count if row.count is defined else (row.value if row.value is defined else 0) %}
+        {% else %}
+          {% set row_key = row[0] if row is sequence and row is not string and row|length > 0 else row %}
+          {% set row_value = row[1] if row is sequence and row is not string and row|length > 1 else 0 %}
+        {% endif %}
+        {% set priority_key = (row_key or '')|lower %}
+        <div class="d-flex justify-content-between border-bottom py-2"><span>{{ priority_label_map.get(priority_key, row_key) }}</span><strong>{{ row_value }}</strong></div>
+      {% else %}
+        <div class="text-muted">Kayıt yok.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

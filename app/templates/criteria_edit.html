@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Kriter Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Kriter Düzenle{% endblock %}
+{% block page_subtitle %}Mevcut kriter kaydını güncelleyin{% endblock %}
+
+{% block content %}
+<style>
+    .criteria-form-shell{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+    }
+
+    .form-card,
+    .info-card{
+        background:rgba(255,255,255,.68);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:22px;
+        box-shadow:0 16px 34px rgba(15,23,42,.08);
+        padding:22px;
+    }
+
+    .form-card h4,
+    .info-card h4{
+        margin:0 0 12px;
+        font-size:1.08rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .info-card p{
+        margin:0 0 12px;
+        color:#6b7280;
+        line-height:1.7;
+    }
+
+    .info-list{
+        display:grid;
+        gap:10px;
+    }
+
+    .info-item{
+        padding:12px 14px;
+        border-radius:14px;
+        background:rgba(255,255,255,.72);
+        border:1px solid rgba(15,23,42,.06);
+        color:#4b5563;
+        line-height:1.6;
+    }
+
+    @media (max-width: 1100px){
+        .criteria-form-shell{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="criteria-form-shell">
+    <div class="form-card">
+        <h4>Kriter Güncelleme Formu</h4>
+
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Temel Kriter</label>
+                    <input type="text" name="name" value="{{ criteria_obj.name }}" required>
+                </div>
+
+                <div class="form-group full">
+                    <label>Yardımcı Kriterler / Açıklama</label>
+                    <textarea name="description">{{ criteria_obj.description or '' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Ağırlık</label>
+                    <input type="number" name="weight" step="0.01" min="0" max="100" value="{{ criteria_obj.weight }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Sıralama</label>
+                    <input type="number" name="sort_order" value="{{ criteria_obj.sort_order }}" required>
+                </div>
+
+                <div class="form-group full">
+                    <label class="checkbox-row">
+                        <input type="checkbox" name="is_active" {% if criteria_obj.is_active %}checked{% endif %}>
+                        Kriter aktif olsun
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-row" style="margin-top:16px;">
+                <button type="submit" class="btn">
+                    <i class="fa-solid fa-floppy-disk"></i> Güncelle
+                </button>
+                <a class="btn btn-secondary" href="{{ url_for('main.performance_criteria') }}">
+                    <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-card">
+        <h4>Kayıt Özeti</h4>
+        <p>
+            Bu ekranda mevcut kriterin başlığını, açıklamasını, ağırlığını ve aktiflik durumunu
+            güncelleyebilirsiniz.
+        </p>
+
+        <div class="info-list">
+            <div class="info-item">
+                <strong>Mevcut Ağırlık:</strong> {{ criteria_obj.weight }}
+            </div>
+            <div class="info-item">
+                <strong>Mevcut Sıra:</strong> {{ criteria_obj.sort_order }}
+            </div>
+            <div class="info-item">
+                <strong>Durum:</strong> {{ 'Aktif' if criteria_obj.is_active else 'Pasif' }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

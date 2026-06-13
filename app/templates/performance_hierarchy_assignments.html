@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}Hiyerarşi Atamaları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Hiyerarşi Atamaları{% endblock %}
+{% block page_subtitle %}Personellerin 1. amir, 2. amir ve 3. amir zincirlerini yönetin{% endblock %}
+
+{% block content %}
+{% set rows = rows|default([]) %}
+{% set manager_options = manager_options|default([]) %}
+{% set unit_options = unit_options|default([]) %}
+{% set total_count = total_count|default(rows|length) %}
+{% set complete_count = complete_count|default(0) %}
+{% set incomplete_count = incomplete_count|default(0) %}
+{% set q = q|default('') %}
+{% set selected_unit_id = selected_unit_id|default('') %}
+
+<style>
+    .assign-top{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+        margin-bottom:18px;
+    }
+
+    .assign-summary,
+    .assign-stat,
+    .assign-filter,
+    .assign-rules,
+    .assign-table-wrap{
+        background:rgba(255,255,255,.68);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:22px;
+        box-shadow:0 16px 34px rgba(15,23,42,.08);
+    }
+
+    .assign-summary{
+        padding:24px;
+    }
+
+    .assign-summary h3{
+        margin:0 0 10px;
+        font-size:1.12rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .assign-summary p{
+        margin:0;
+        color:#6b7280;
+        line-height:1.75;
+    }
+
+    .assign-actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:18px;
+    }
+
+    .assign-stat-grid{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:14px;
+    }
+
+    .assign-stat{
+        padding:18px;
+    }
+
+    .assign-stat .label{
+        font-size:.88rem;
+        color:#6b7280;
+        margin-bottom:8px;
+    }
+
+    .assign-stat .value{
+        font-size:1.9rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .assign-filter,
+    .assign-rules{
+        padding:18px;
+        margin-bottom:18px;
+    }
+
+    .assign-rules h4,
+    .assign-filter h4{
+        margin:0 0 12px;
+        font-size:1.05rem;
+        font-weight:800;
+        color:#8B0000;
+    }
+
+    .assign-rules p{
+        margin:0;
+        color:#6b7280;
+        line-height:1.8;
+    }
+
+    .assign-filter-form{
+        display:grid;
+        grid-template-columns:1.2fr .8fr auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .assign-table-wrap{
+        padding:18px;
+        overflow:auto;
+    }
+
+    .chain-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:92px;
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:.84rem;
+        font-weight:800;
+    }
+
+    .chain-ok{
+        background:#ecfdf5;
+        color:#065f46;
+    }
+
+    .chain-missing{
+        background:#fef2f2;
+        color:#991b1b;
+    }
+
+    .employee-main{
+        font-weight:800;
+        color:#1f2937;
+        margin-bottom:4px;
+    }
+
+    .employee-sub{
+        font-size:.88rem;
+        color:#6b7280;
+        line-height:1.6;
+    }
+
+    .manager-stack{
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+    }
+
+    .manager-name{
+        font-weight:700;
+        color:#1f2937;
+        font-size:.92rem;
+    }
+
+    .manager-sub{
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.5;
+    }
+
+    .inline-form{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        gap:10px;
+        margin-top:12px;
+    }
+
+    .inline-form .form-group{
+        margin:0;
+    }
+
+    .inline-actions{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        margin-top:12px;
+    }
+
+    .select-sm{
+        min-height:42px;
+        font-size:.9rem;
+    }
+
+    .helper-note{
+        display:block;
+        margin-top:8px;
+        color:#9a3412;
+        font-size:.83rem;
+        line-height:1.6;
+        font-weight:700;
+    }
+
+    .empty-box{
+        padding:22px;
+        border-radius:18px;
+        background:#f8fafc;
+        border:1px dashed rgba(15,23,42,.12);
+        color:#6b7280;
+        text-align:center;
+        line-height:1.8;
+    }
+
+    @media (max-width: 1200px){
+        .assign-top{
+            grid-template-columns:1fr;
+        }
+
+        .assign-filter-form{
+            grid-template-columns:1fr;
+        }
+
+        .inline-form{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="assign-top">
+    <div class="assign-summary">
+        <h3>Hiyerarşi atamaları</h3>
+        <p>
+            Personelin 1. amir, 2. amir ve varsa 3. amir zincirini bu ekrandan düzenleyebilirsiniz.
+        </p>
+
+        <div class="assign-actions">
+            <a class="btn" href="{{ url_for('main.performance_hierarchy_tree') }}">
+                <i class="fa-solid fa-diagram-project"></i>
+                Hiyerarşi Ağacına Dön
+            </a>
+        </div>
+    </div>
+
+    <div class="assign-stat-grid">
+        <div class="assign-stat">
+            <div class="label">Toplam Kayıt</div>
+            <div class="value">{{ total_count }}</div>
+        </div>
+
+        <div class="assign-stat">
+            <div class="label">Zinciri Tam Olan</div>
+            <div class="value">{{ complete_count }}</div>
+        </div>
+
+        <div class="assign-stat">
+            <div class="label">Kontrol Gereken</div>
+            <div class="value">{{ incomplete_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="assign-rules">
+    <h4>Değerlendirme Kuralı</h4>
+    <p>
+        Çalışma grubundaki personel için 1. amir grup başkanı, 2. amir koordinatördür.
+        3. amir Başkan Yardımcısı değildir; varsa koordinatöre bağlı birim amiridir. Varsayılan olarak yorumcudur; dönem ayarı açılırsa puan katkısı da verebilir.
+        Koordinatör için 1. amir başkan yardımcısı, 2. amir grup başkanıdır.
+    </p>
+</div>
+
+<div class="assign-filter">
+    <h4>Filtrele</h4>
+
+    <form method="get" class="assign-filter-form">
+        <div class="form-group">
+            <label>Personel Ara</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="Ad, soyad, sicil no, birim">
+<div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+    <form method="post" action="{{ url_for('main.performance_hierarchy_assignments') }}"
+          onsubmit="return confirm('Filtrelenen kayıtlar için otomatik amir ataması yapılsın mı?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="auto_assign_filtered">
+        <input type="hidden" name="q" value="{{ q }}">
+        <input type="hidden" name="unit_id" value="{{ selected_unit_id }}">
+        <button type="submit" class="btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Filtreleneni Otomatik Ata
+        </button>
+    </form>
+</div>
+        </div>
+
+        <div class="form-group">
+            <label>Birim</label>
+            <select name="unit_id">
+                <option value="">Tüm Birimler</option>
+                {% for unit in unit_options %}
+                    <option value="{{ unit.id }}" {% if selected_unit_id|string == unit.id|string %}selected{% endif %}>
+                        {{ unit.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Filtrele
+            </button>
+        </div>
+
+        <div class="form-group">
+            <a href="{{ url_for('main.performance_hierarchy_assignments') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-rotate-left"></i>
+                Temizle
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="assign-table-wrap">
+    {# BYS360_PHASE4_4_PERFORMANCE_HIERARCHY_COLUMN #}
+    {% set phase4_4_show_third_col = phase4_4_should_show_third_supervisor_column(rows) %}
+    {% if rows %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Personel</th>
+                    <th>1. Amir</th>
+                    <th>2. Amir</th>
+                    {% if phase4_4_show_third_col %}<th>3. Amir</th>{% endif %}
+                    <th>Durum</th>
+                    <th style="min-width:360px;">Düzenle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>
+                        <div class="employee-main">{{ row.employee_name }}</div>
+                        <div class="employee-sub">
+                            Sicil: {{ row.employee_sicil }}<br>
+                            Rol: {{ row.employee_role }}<br>
+                            Birim: {{ row.employee_unit }}<br>
+                            Üst Birim: {{ row.employee_parent_unit or '-' }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="manager-stack">
+                            <span class="manager-name">{{ row.level_1_name or '-' }}</span>
+                            <span class="manager-sub">{{ row.level_1_sicil or '' }}</span>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="manager-stack">
+                            <span class="manager-name">{{ row.level_2_name or '-' }}</span>
+                            <span class="manager-sub">{{ row.level_2_sicil or '' }}</span>
+                        </div>
+                    </td>
+
+                    {% if phase4_4_show_third_col %}
+                    <td>
+                        <div class="manager-stack">
+                            <span class="manager-name">{{ row.level_3_name or '-' }}</span>
+                            <span class="manager-sub">{{ row.level_3_sicil or '' }}</span>
+                            <small class="helper-note">Sadece yorum</small>
+                        </div>
+                    </td>
+                    {% endif %}
+
+                    <td>
+                        {% if row.is_complete %}
+                            <span class="chain-badge chain-ok">Tam</span>
+                        {% else %}
+                            <span class="chain-badge chain-missing">Eksik</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <form method="post" action="{{ url_for('main.performance_hierarchy_assignments') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="employee_id" value="{{ row.employee_id }}">
+                            <input type="hidden" name="action" value="save_single">
+
+                            <div class="inline-form">
+                                <div class="form-group">
+                                    <label>1. Amir</label>
+                                    <select class="select-sm" name="level_1_manager_sicil">
+                                        <option value="">Seçiniz</option>
+                                        {% for manager in manager_options %}
+                                            <option value="{{ manager.sicil_no }}"
+                                                {% if row.level_1_sicil == manager.sicil_no %}selected{% endif %}>
+                                                {{ manager.full_name }} - {{ manager.sicil_no }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>2. Amir</label>
+                                    <select class="select-sm" name="level_2_manager_sicil">
+                                        <option value="">Seçiniz</option>
+                                        {% for manager in manager_options %}
+                                            <option value="{{ manager.sicil_no }}"
+                                                {% if row.level_2_sicil == manager.sicil_no %}selected{% endif %}>
+                                                {{ manager.full_name }} - {{ manager.sicil_no }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                {% if phase4_4_show_third_col %}
+                                <div class="form-group">
+                                    <label>3. Amir</label>
+                                    <select class="select-sm" name="level_3_manager_sicil">
+                                        <option value="">Seçiniz</option>
+                                        {% for manager in manager_options %}
+                                            <option value="{{ manager.sicil_no }}"
+                                                {% if row.level_3_sicil == manager.sicil_no %}selected{% endif %}>
+                                                {{ manager.full_name }} - {{ manager.sicil_no }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% else %}
+                                    <input type="hidden" name="level_3_manager_sicil" value="{{ row.level_3_sicil or '' }}">
+                                {% endif %}
+                            </div>
+
+                            <div class="inline-actions">
+                                <button type="submit" class="btn">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    Kaydet
+                                </button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-box">
+            Gösterilecek hiyerarşi atama kaydı bulunamadı.
+            Filtreyi temizleyip tekrar deneyin veya personel verisini kontrol edin.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

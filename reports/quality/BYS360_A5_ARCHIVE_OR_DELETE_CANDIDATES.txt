@@ -1,0 +1,675 @@
+P1	archive_or_delete_obsolete_contract	mobile_pwa	tests.architecture.test_android_responsive_baseline_p5a::test_android_responsive_baseline_gate_p5a
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5A_ANDROID_RESPONSIVE_BASELINE_GATE",     "android_responsive_baseline_gate_ok": false,     "handover_baseline_ok": false,     "mobile_release_evidence_report_ok": false,     "android_device_matrix_ok": true,     "android
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_android_responsive_final_evidence_p5f::test_android_responsive_final_evidence_gate_p5f
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P1	archive_or_delete_obsolete_contract	mobile_pwa	tests.architecture.test_android_responsive_inventory_precision_p6c::test_android_responsive_inventory_precision_p6c_report_ok
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: P6C inventory precision report missing assert False  +  where False = exists()  +    where exists = WindowsPath('reports/architecture/BYS360_ANDROID_RESPONSIVE_INVENTORY_PRECISION_GATE_P6C_REPORT.json').exists
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_android_responsive_release_suite_p5d_v2::test_android_responsive_release_suite_gate_p5d_v2
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_android_responsive_visual_regression_p6a::test_android_responsive_visual_regression_p6a_gate
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P1	archive_or_delete_obsolete_contract	mobile_pwa	tests.architecture.test_android_responsive_visual_uat_evidence_p5e::test_android_responsive_visual_uat_evidence_gate_p5e
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert False is True
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz10_contract::test_faz10_files_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: eksik Faz 10 dosyasi: C:\bys360\project\scripts\check_core_refactor_faz10_gate.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_core_refactor_faz10_gate.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz10_contract::test_quality_chain_knows_faz10
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz10_contract::test_faz10_gate_is_read_only_contract
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_core_refactor_faz10_gate.py'
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_core_refactor_faz10_contract::test_faz10_finalizer_writes_closure_reports
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\finalize_core_refactor_faz10.py'
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_core_refactor_faz10_contract::test_core_refactor_series_is_explicitly_closed
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\CORE_REFACTOR_FAZ10.md'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.architecture.test_core_refactor_faz2_contract::test_route_bootstrap_is_centralized_after_faz5
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'app.register_blueprint(' not in '\n"""BYS360...return app\n'      'app.register_blueprint(' is contained here:     :             app.register_blueprint(pwa_bp)               def _register_csrf_refresh_handler(app: Flask) -> None:...      ...Full output truncated (108 lines hidden), use '-vv'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.architecture.test_core_refactor_faz5_contract::test_app_init_is_public_factory_only
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 193 <= 55  +  where 193 = len(['', '"""BYS360 application factory.', '', 'Bu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve... uyumluluk sabitlerini tutar. Uygulama kurulum pipeline'ı", '``app.bootstrap.application_bootstrap`` altındadır.', ...])  +    where ['', '"""
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz5_contract::test_quality_chain_exists_and_cleans_runtime_artifacts
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.architecture.test_core_refactor_faz6_contract::test_model_manifest_documents_live_and_compatibility_modules
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'education_models' in '"""BYS360 model namespace sözleşmesi.\n\nBu dosya runtime davranışını değiştirmez; model paketinin hangi modüllerden\...MUNICATION_PHASE_MODEL_MODULES),\n        "forbidden_artifacts": sorted(FORBIDDEN_MODEL_NAMESPACE_ARTIFACTS),\n    }\n'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz6_contract::test_faz6_quality_tools_are_wired
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project') / 'scripts/check_core_refactor_faz6_gate.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz7_contract::test_phase_alias_report_scripts_are_registered_in_quality_chain
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz8_contract::test_phase8_quality_chain_registration
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz9_contract::test_faz9_files_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: eksik Faz 9 dosyasi: C:\bys360\project\scripts\check_core_refactor_faz9_gate.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_core_refactor_faz9_gate.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_core_refactor_faz9_contract::test_quality_chain_knows_faz9
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+P1	archive_or_delete_obsolete_contract	mobile_pwa	tests.architecture.test_home_phase1_contract::test_base_menu_points_to_home
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert '<span>Anasayfa</span>' in '\ufeff\n\n{# BYS360_BASE_CLEAN_V13: temiz, sabit ve rol bazlı ana iskelet #}\n<!doctype html>\n<html lang="tr">\n<hea...pletion_v2.js\') }}?v=2" defer></script>\n<!-- /BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_JS -->\n</body>\n</html>\n\n\n'
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_message_faz1_smoke_contract::test_message_send_submit_contract_order_is_stable
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'not thread or not thread.is_active' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destination(thread_id=thread_id)\n\n\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_message_faz1_smoke_contract::test_message_send_commit_rollback_and_cleanup_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: messages_send_impl güvenli yazma sözleşmesi eksik: db.session.commit() assert 'db.session.commit()' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    retur
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_message_faz1_smoke_contract::test_message_new_direct_thread_contract_is_stable
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: messages_new_impl sözleşmesi eksik: _find_or_create_direct_thread assert '_find_or_create_direct_thread' in 'def messages_new_impl():\n    users = _svc_load_all_active_compose_users()\n    recent_users = _svc_build_recent_mess...int)\n    return _render_message_new(users=users, recen
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_message_faz2_service_contract::test_message_routes_not_coupled_to_new_service_in_faz2
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert ['app.services.messages'] == []      Left contains one more item: 'app.services.messages'   Use -v to get more diff
+P1	archive_or_delete_obsolete_contract	mobile_pwa	tests.architecture.test_mobile_api_release_evidence_p4e::test_mobile_release_evidence_gate_p4e
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P4E_MOBILE_RELEASE_EVIDENCE_GATE",     "mobile_release_evidence_gate_ok": false,     "response_suite_report_ok": false,     "security_evidence_report_ok": false,     "p3_gate_count": 0,     "p3_gates_passed": 0,     "secur
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_mobile_api_request_smoke_p2c::test_mobile_api_request_level_smoke_p2c_contract
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_mobile_api_role_boundary_matrix_p4b::test_mobile_api_role_boundary_matrix_p4b
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_mobile_api_role_boundary_matrix_p4b_v2::test_mobile_api_role_boundary_matrix_p4b_v2
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: assert False is True
+P2	archive_or_split_mobile_evidence	mobile_pwa	tests.architecture.test_mobile_api_security_evidence_p4d::test_mobile_security_evidence_gate_p4d
+    reason: mobile evidence/gate test should be separated from web CI unless it checks current mobile runtime
+    detail: AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'ci_commands': ['python -m pip install -r requirements-dev...urity_evidence_gate_p4d.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], 'compile_ok': True, ...} assert False
+P1	archive_or_delete_obsolete_contract	portal	tests.architecture.test_portal_service_faz6_contract::test_portal_facade_is_small_and_compiles
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 563 <= 140  +  where 563 = _line_count(WindowsPath('C:/bys360/project/app/services/portal_service.py'))
+P1	archive_or_delete_obsolete_contract	portal	tests.architecture.test_portal_service_faz6_contract::test_editorial_parts_exist_and_compile
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik portal parçası: ['recognition.py', 'editorial_banners.py', 'editorial_announcements.py', 'feed.py', 'editorial_common.py', 'groups.py', 'moderation.py', 'editorial_publishing.py', 'editorial_headlines.py', 'posts.py', 'editorial.py'] assert not ['recognition.py', 'editorial_ban
+P1	archive_or_delete_obsolete_contract	portal	tests.architecture.test_portal_service_faz6_contract::test_editorial_public_contract_is_preserved
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\app\\services\\portal_parts\\editorial_common.py'
+P1	archive_or_delete_obsolete_contract	portal	tests.architecture.test_portal_service_faz6_contract::test_editorial_facade_stays_thin
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/app/services/portal_parts/editorial.py').exists
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_settings_faz0_live_contract::test_settings_change_log_and_transaction_contract_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 'db.session.commit' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom collections import OrderedDict\nimport json\nfrom typi...hardening_contract(\n        foundation_context=foundation_context,\n        profile_context=profile_context,\n    )\n'
+P1	archive_or_delete_obsolete_contract	live_external	tests.architecture.test_settings_faz0_live_contract::test_settings_page_post_action_contract_exists
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'save_system_foundation' in 'from __future__ import annotations\n\n\n\nfrom app.main_handlers.account_communication_helpers import *  # noqa: F401...login_security_flow",\n    "account_change_photo",\n    "account_security_setup",\n    "account_change_password",\n]\n'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.architecture.test_settings_faz2_service_bridge::test_settings_phase2_helpers_delegate_to_service_package
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert '_settings_dumps_json' in ''  +  where '' = _function_source('_serialize_state')
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_settings_faz3_snapshot_contract::test_settings_snapshot_module_has_no_db_side_effects
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'SystemSetting' not in '"""Ayarlar ....values())\n'      'SystemSetting' is contained here:     ]:         """SystemSetting satırlarından log/snapshot için eski formatta sözlük üretir."""   ?        +++++++++++++         snapshot: dict[str, Any] = {}         for definition in definitions or [
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_settings_faz3_snapshot_contract::test_settings_service_uses_snapshot_bridge_without_removing_save_contracts
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 'app.services.settings.snapshots' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom collections import OrderedDict\nimport json\nfrom typi...hardening_contract(\n        foundation_context=foundation_context,\n        profile_context=profile_context,\n    )\n'
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_survey_faz1_smoke_contract::test_survey_faz1_core_model_keywords_are_kept
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Anket çekirdek model anahtarları kaybolmuş: ['SurveyAnswer'] assert not ['SurveyAnswer']
+P1	archive_or_delete_obsolete_contract	live_external	tests.architecture.test_survey_faz2_service_contract::test_survey_faz2_does_not_modify_live_route_imports
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'app.services.surveys' not in 'from __futu...sults",\n]\n'      'app.services.surveys' is contained here:     ment     from app.services.surveys import (         build_survey_state_row as _service_build_survey_state_row,         get_assigned_surveys_for_user as _service_get_assigned_surveys_f
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_survey_faz3_route_service_bridge::test_survey_faz3_does_not_touch_submit_safety_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'SurveyResponse(' in 'def survey_submit(survey_id):\n    survey = db.session.get(Survey, survey_id)\n    survey_ok, survey_reason = _survey...return redirect(url_for("main.survey_take", survey_id=survey.id))\n\n    return redirect(url_for("main.surveys_list"))'
+P1	archive_or_delete_obsolete_contract	live_external	tests.architecture.test_survey_faz4_read_service_contract::test_survey_faz4_live_write_guards_stay_in_route
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'ensure_state_change' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_survey_faz6_target_access_contract::test_survey_faz6_does_not_move_mutating_submit_flow
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'db.session.add(response)' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_keeps_live_write_flow_in_route_for_faz7
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'db.session.add(response)' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_token_and_duplicate_guards_stay_before_response_write
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: ValueError: substring not found
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_validates_required_and_invalid_values
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'if question.is_required and not selected_option_id:' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n
+P1	archive_or_delete_obsolete_contract	other	tests.architecture.test_survey_faz7_submit_contract::test_survey_faz7_contract_module_is_passive_and_importable
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'SurveyResponse(' not in '"""Canlı an...hecks",\n]\n'      'SurveyResponse(' is contained here:     esponse = SurveyResponse(",                 "Token doğrulanmadan SurveyResponse oluşturulmamalı.",             ),             SubmissionContractCheck(                 "single_choice_required",.
+P1	archive_or_delete_obsolete_contract	communication_mail	tests.communication.test_communication_template_presence::test_expected_templates_present[communication/phase4_export_center.html]
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Beklenen template bulunamadı: communication/phase4_export_center.html assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/app/templates/communication/phase4_export_center.html').exists
+P1	archive_or_delete_obsolete_contract	communication_mail	tests.communication.test_phase9a_route_contracts::test_phase9a_files_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik dosyalar: ['app\\templates\\communication\\phase9a_backup_center.html'] assert not ['app\\templates\\communication\\phase9a_backup_center.html']
+P1	archive_or_delete_obsolete_contract	other	tests.docs.test_docs_expert_review_contract::test_architecture_doc_declares_layered_model
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\TEKNIK_MIMARI.md'
+P1	archive_or_delete_obsolete_contract	other	tests.docs.test_docs_expert_review_contract::test_security_doc_declares_kvkk_and_audit
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\GUVENLIK_KVKK_UYUM.md'
+P1	archive_or_delete_obsolete_contract	other	tests.docs.test_docs_expert_review_contract::test_ai_limits_are_explicit
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\AI_KULLANIM_SINIRLARI.md'
+P1	archive_or_delete_obsolete_contract	other	tests.docs.test_docs_expert_review_contract::test_runbook_and_rollback_are_present
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\CANLI_KURULUM_RUNBOOK.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase10_expert_final_gate::test_final_report_has_product_language
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_FINAL_RAPORU.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase10_expert_final_gate::test_ai_boundaries_are_unambiguous
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_FINAL_RAPORU.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase10_expert_final_gate::test_expert_questions_cover_core_risks
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_EKIP_SORU_CEVAP_DOSYASI.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase10_expert_final_gate::test_final_checklist_mentions_release_forbidden_files
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\FINAL_KALITE_KONTROL_LISTESI.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase10_expert_final_gate::test_manager_summary_is_present
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\YONETICI_OZETI_FINAL.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.expert_review.test_phase13_final_expert_review_package::test_phase13_gate_exists
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_phase13_final_expert_review_package.py').exists
+P1	archive_or_delete_obsolete_contract	other	tests.expert_review.test_phase13_final_expert_review_package::test_phase13_docs_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project/docs/uzman_inceleme') / 'UZMAN_INCELEME_YONETICI_OZETI.md').exists
+P1	archive_or_delete_obsolete_contract	other	tests.expert_review.test_phase13_final_expert_review_package::test_phase13_mentions_core_product_positioning
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_YONETICI_OZETI.md'
+P1	archive_or_delete_obsolete_contract	other	tests.expert_review.test_phase13_final_expert_review_package::test_phase13_question_answer_has_risk_response
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_SORU_CEVAP.md'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_final_quality_live_backbone_release_contract::test_releaseignore_excludes_runtime_and_generated_artifacts
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik dosya: .releaseignore assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.releaseignore').exists
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_final_quality_live_backbone_release_contract::test_final_quality_faz3_chain_is_registered_with_previous_quality_evidence
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik dosya: scripts/run_final_quality_faz3_chain.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/run_final_quality_faz3_chain.py').exists
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_final_quality_live_backbone_release_contract::test_final_quality_faz3_report_paths_are_documented
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik dosya: scripts/generate_final_quality_faz3_report.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/generate_final_quality_faz3_report.py').exists
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_auth_login_smoke_v5::test_sprint2_v5_files_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik Sprint 2 V5 dosyaları: ['scripts\\smoke_auth_login_critical_pages_v5.py', 'scripts\\check_sprint2_auth_login_smoke_gate_v5.py', 'scripts\\repair_sprint2_auth_login_smoke_v5.py', 'docs\\ops\\sprint2_auth_login_smoke_v5.md'] assert not ['scripts\\smoke_auth_login_critical_pages_v
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_auth_login_smoke_v5::test_sprint2_v5_markers_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'scripts\\smoke_auth_login_critical_pages_v5.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_auth_login_smoke_v5::test_smoke_script_has_safe_login_candidates
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'scripts\\smoke_auth_login_critical_pages_v5.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_closure_freeze_v19::test_v19_chain_contains_v1_to_v18_labels
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_closure_freeze_v19::test_v19_freeze_rules_block_live_until_ministry_server
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint2_closure_freeze_v19::test_v19_next_stage_mentions_sprint3
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_closure_freeze_v19::test_v19_infer_gate_passed_fail_zero
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_closure_freeze_v19::test_v19_markdown_renderer_contains_freeze_and_no_live
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_helper_exists_and_returns_bool
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_v17_chain_row_has_waiting_override_field
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_waiting_reason_mentions_v17_check_env
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_markdown_can_render_waiting_mode_override
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_freeze_rules_still_block_live_until_server
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_critical_page_list_contains_live_routes
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_detects_5xx_and_traceback
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_detects_white_screen
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_allows_login_redirect_page_when_not_blank
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_redacts_sensitive_payload_values
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_deployment_steps_include_backup_and_smoke
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_rollback_steps_include_restore_and_reason
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_post_checks_include_login_and_logs
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_markdown_renderer_contains_sections
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_collect_runbook_returns_marker
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_chain_contains_all_sprint2_gates
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_required_markers_include_scope_contract
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_addopts_contract_excludes_unsafe_scopes
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_finds_first_existing_candidate
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_marker_files_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: Eksik entegrasyon smoke dosyaları: .coveragerc, scripts\smoke_critical_pages.py, scripts\check_sprint2_coverage_baseline_gate_v3.py, scripts\check_sprint2_integration_smoke_gate_v4.py, docs\ops\sprint2_integration_smoke_v4.md assert not ['.coveragerc', 'scripts\\smoke_critical_pages.
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_pytest_config_keeps_safe_scope
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: pytest.ini test kapsamını göstermeli. assert 'tests' in '[pytest]\nmarkers =\n    ci_safe: CI icin guvenli, deterministik testler.\n    source_smoke: Kaynak kod ve template v...   slow: Uzun suren testler.\n    legacy_integration: Eski/agir entegrasyon testleri.\nfilterwarnings =\n  
+P1	archive_or_delete_obsolete_contract	communication_mail	tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_previous_sprint_markers_are_visible
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: Eksik Sprint markerları: BYS360_SPRINT1_CICD_QUALITY_GATE_V1, BYS360_SPRINT2_TEST_DISCIPLINE_V1, BYS360_SPRINT2_CRITICAL_GUARD_TESTS_V2, BYS360_SPRINT2_COVERAGE_BASELINE_V3 assert not ['BYS360_SPRINT1_CICD_QUALITY_GATE_V1', 'BYS360_SPRINT2_TEST_DISCIPLINE_V1', 'BYS360_SPRINT2_CRITICA
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_marker_lines_have_expected_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_http_as_live
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_db_as_realdb
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_subprocess_as_slow
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_skips_sprint2_files
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	other	tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_inserts_pytest_import
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_live_server_preflight_v17::test_v17_required_env_contains_security_flags
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_live_server_preflight_v17::test_v17_env_snapshot_masks_secrets
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_live_server_preflight_v17::test_v17_runtime_files_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_live_server_preflight_v17::test_v17_markdown_renderer_contains_commands_and_urls
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+P1	archive_or_delete_obsolete_contract	live_external	tests.integration.test_sprint2_live_server_preflight_v17::test_v17_collect_preflight_returns_marker
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_real_login_smoke_v6::test_v6_smoke_script_uses_environment_credentials_and_markers
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_real_login_smoke_v6::test_v6_redaction_never_returns_plain_password
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_real_login_smoke_v6::test_v6_hidden_input_parser_supports_csrf_token
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+P1	archive_or_delete_obsolete_contract	auth_session	tests.integration.test_sprint2_real_login_smoke_v6::test_v6_gate_has_real_login_flag_and_targeted_pytest_scope
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_real_login_smoke_gate_v6.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_forbidden_entry_detection
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_suspicious_entry_detection
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_required_entries_contract
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_matches_directory_pattern
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_find_latest_candidate_returns_none_without_dist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_sources_include_release_chain
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_artifacts_include_package_manifest
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_infer_status_missing_is_failed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_infer_status_fail_zero_passes
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_markdown_renderer_contains_gate_summary
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_matches_root_file_patterns
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_matches_directory_patterns
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_ignored_uses_releaseignore_patterns
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_forbidden_patterns_cover_release_leaks
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_core_candidates_include_app_and_wsgi
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_package_builder_v12::test_v12_matches_pattern_for_root_and_dir
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_package_builder_v12::test_v12_forced_exclude_contains_release_leaks
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_package_builder_v12::test_v12_forbidden_package_patterns_cover_sensitive_outputs
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_package_builder_v12::test_v12_required_package_contains_app_wsgi
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_package_builder_v12::test_v12_sha256_function_exists
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_readiness_v10::test_v10_releaseignore_contract_contains_sensitive_outputs
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_readiness_v10::test_v10_required_files_include_gate_doc_runner
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_readiness_v10::test_v10_root_risk_patterns_cover_common_release_leaks
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_readiness_v10::test_v10_secret_patterns_detect_literal_password_assignment
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.integration.test_sprint2_release_readiness_v10::test_v10_secret_patterns_ignore_masked_payload
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_next_stage_contains_lowercase_canli_oncesi
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_next_stage_still_mentions_ministry_server
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_source_marker_present
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_chain_contains_v1_to_v5
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_freeze_rules_block_live_until_server
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_next_stage_mentions_server_delivery
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_gate_passed_handles_fail_zero
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_collect_freeze_live_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_summary_markdown_contains_not_live_note
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_decision_classes_cover_core_options
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_rules_do_not_allow_live_deployment
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_classify_decision_blocks_open_critical
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_classify_decision_honors_conditional_signoff
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_collect_consolidation_live_deployment_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_summary_markdown_contains_not_live_note
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_minutes_contains_not_live_deployment_note
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_minutes_still_contains_secret_rule
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_source_marker_present
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_participants_include_core_roles
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_agenda_covers_core_topics
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_rules_do_not_allow_live_deployment
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_decision_options_include_conditional_and_retest
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_collect_pack_live_deployment_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_minutes_template_contains_signature_table
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_statuses_cover_execution_lifecycle
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_defect_taxonomy_has_core_items
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_execution_rules_do_not_allow_live_deployment
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_collect_matrix_live_deployment_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_markdown_contains_matrix_and_files
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_triage_statuses_cover_lifecycle
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_action_owners_cover_core_groups
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_rules_do_not_allow_live_deployment
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_severity_rank_orders_critical_high
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_summary_blocks_open_critical
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_collect_board_live_deployment_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_roles_cover_core_users
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_scenarios_cover_low_score_publish_scope
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_live_deployment_stays_closed
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_markdown_contains_not_live_note
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+P1	archive_or_delete_obsolete_contract	sprint3_integration	tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_result_statuses_include_repeat_test
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.ops.test_live_ops_contract::test_backup_script_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\backup_db.ps1'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.ops.test_live_ops_contract::test_restore_script_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\restore_db.ps1'
+P1	archive_or_delete_obsolete_contract	live_external	tests.ops.test_live_ops_contract::test_health_check_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\live_health_check.ps1'
+P1	archive_or_delete_obsolete_contract	live_external	tests.ops.test_live_ops_contract::test_clean_live_package_exclusions
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\clean_live_package.ps1'
+P1	archive_or_delete_obsolete_contract	live_external	tests.ops.test_live_ops_contract::test_live_ops_document_contract
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\CANLI_OPERASYON_ROLLBACK_PLANI.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_includes_all_final_evidence_steps
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_references_prior_final_quality_markers
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_has_cleanup_after_pytest_steps
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_report_contract::test_release_evidence_report_script_writes_expected_outputs
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/generate_final_quality_faz5_release_evidence.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_report_contract::test_final_quality_faz5_gate_and_doc_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_final_quality_faz5_gate.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_report_contract::test_final_quality_faz5_doc_mentions_release_package_boundaries
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\FINAL_QUALITY_FAZ5.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_final_quality_release_report_contract::test_windows_gate_wrapper_points_to_faz5_gate
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/windows/final_quality_faz5_gate.ps1').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_phase11_release_clean_gate::test_phase11_gate_script_exists
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_phase11_release_clean_gate.py').exists
+P1	archive_or_delete_obsolete_contract	live_external	tests.release.test_phase11_release_clean_gate::test_clean_release_builder_exists
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/build_clean_live_release.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.release.test_phase11_release_clean_gate::test_phase11_doc_exists_and_mentions_release_policy
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/docs/release/FAZ11_CANLI_PAKET_TEMIZLEME.md').exists
+P1	archive_or_delete_obsolete_contract	live_external	tests.security.test_final_quality_security_release_contract::test_security_release_evidence_paths_exist_or_are_current_phase_paths
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: ['clean_live_release:scripts/check_clean_live_release_gate.py', 'clean_live_release:.releaseignore', 'claude_quality_g...kbone:scripts/run_final_quality_faz3_chain.py', 'final_quality_faz4_security:scripts/check_final_quality_faz4_gate.py'] assert not ['clean_live_release:scripts/che
+P1	archive_or_delete_obsolete_contract	quality_release	tests.security.test_final_quality_security_release_contract::test_quality_chain_includes_security_and_prior_final_quality_chains
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/run_final_quality_faz4_chain.py').exists
+P1	archive_or_delete_obsolete_contract	live_external	tests.security.test_final_quality_security_release_contract::test_release_hygiene_mentions_generated_artifacts_are_not_live_payload
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\FINAL_QUALITY_FAZ4.md'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.security.test_final_quality_security_release_contract::test_security_report_output_locations_are_under_reports_and_generated_docs
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\generate_final_quality_faz4_report.py'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.services.test_final_quality_home_weather_contract::test_weather_service_has_cache_fallback_and_no_key_requirement
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: assert 'DEFAULT_CACHE_MINUTES = 60' in '\n"""BYS360 Anasayfa hava durumu ve saha öneri servisi.\n\nBu servis canlı arayüzün açılışını asla dış API\'ye bağıml...herSettings",\n    "build_weather_recommendations",\n    "get_home_weather_context",\n    "get_weather_settings",\n]\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.services.test_final_quality_live_source_contract::test_service_sources_do_not_contain_schema_mutation_shortcuts
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert not ['app\\services\\corporate_information_center.py::ALTER TABLE', 'app\\services\\performance\\feedback_followup_phase4....\meeting_p1_scope.py::ALTER TABLE', 'app\\services\\performance\\meeting_p4_development_guidance.py::ALTER TABLE', ...]
+P1	archive_or_delete_obsolete_contract	quality_release	tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_coverage_gate_files_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_sprint2_coverage_baseline_gate_v3.py').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_coverage_marker_present
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_coverage_baseline_gate_v3.py'
+P1	archive_or_delete_obsolete_contract	other	tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_pytest_config_has_coverage_intent
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.coveragerc').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.sprint2.test_sprint2_critical_guard_tests_v2::test_sprint2_critical_guard_files_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: Eksik kritik guard/test dosyası: ['scripts/check_template_dict_method_guard.py', 'scripts/check_jinja_dict_method_collision_guard.py', 'scripts/check_silent_exception_guard.py', 'scripts/check_sprint2_test_discipline_gate_v1.py', 'scripts/check_sprint2_critical_guard_tests_gate_v2.py
+P1	archive_or_delete_obsolete_contract	quality_release	tests.sprint2.test_sprint2_critical_guard_tests_v2::test_sprint2_v2_gate_ci_light_runs
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: C:\Users\Havva Gülsen ÖZDEN\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe: can't open file 'C:\\bys360\\project\\scripts\\check_sprint2_critical_guard_tests_gate_v2.py': [Errno 2] No such file or directory    assert 2 == 0  +  where
+P1	archive_or_delete_obsolete_contract	other	tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_pytest_configuration_exists
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 'BYS360_SPRINT2_TEST_DISCIPLINE_V1' in '[pytest]\nmarkers =\n    ci_safe: CI icin guvenli, deterministik testler.\n    source_smoke: Kaynak kod ve template v...   slow: Uzun suren testler.\n    legacy_integration: Eski/agir entegrasyon testleri.\nfilterwarnings =\n    default\
+P1	archive_or_delete_obsolete_contract	other	tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_coverage_configuration_exists
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: .coveragerc bulunamadı assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.coveragerc').exists
+P1	archive_or_delete_obsolete_contract	quality_release	tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_gate_scripts_exist
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: AssertionError: Eksik Sprint 2 dosyaları: scripts\repair_sprint2_test_discipline_v1.py, scripts\check_sprint2_test_discipline_gate_v1.py, scripts\run_sprint2_test_baseline_v1.ps1, docs\ops\sprint2_test_discipline_v1.md assert not ['scripts\\repair_sprint2_test_discipline_v1.py', 'scripts\\check_spri
+P1	archive_or_delete_obsolete_contract	live_external	tests.test_10_10_core_static_gate::test_removed_modules_stay_out_of_live_scope_and_menus
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert '"portal": True' in '\n"""Canlı öncesi kapsam dışı modül kararları.\n\nBu dosya Faz 1/2 overlay ile birlikte tek merkezli bir karar noktas... return is_module_removed(name)\n\n\ndef get_removed_modules() -> dict[str, bool]:\n    return dict(REMOVED_MODULES)\n'
+P1	archive_or_delete_obsolete_contract	quality_release	tests.test_10_10_core_static_gate::test_releaseignore_excludes_non_release_artifacts
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\.releaseignore'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.test_ai_analysis_visual_reports_static::test_faz8_routes_and_template_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'Faz 8' in '{% extends "admin_ai_base.html" %}\n{% block title %}AI Görselleştirme ve Rapor Kartları - BYS360{% endblock %}\n{% b...n class="ai-badge muted">Karar destek</span></li>\n      </ul>\n    </article>\n  </section>\n</div>\n{% endblock %}\n'
+P1	archive_or_delete_obsolete_contract	live_external	tests.test_ai_final_live_hardening_static::test_faz12_warning_fix_is_explicit
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'weak_secret_key' in '"""Geriye dönük uyumluluk shim.\n\nBu dosya taşınmadan önce app.security_audit olarak import ediliyordu.\nYeni konumu..._security_findings,\n    findings_to_dicts,\n    build_security_audit_summary,\n    log_runtime_security_posture,\n)\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.test_ai_visibility_gate_static::test_faz10_template_has_kvkk_and_role_matrix
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'Faz 10' in '{% extends "admin_ai_base.html" %}\n{% block title %}AI Yetki, KVKK Maskeleme ve Güvenli Görünürlük Kapısı - BYS360{%...erçek ham AI istem/yanıt alanları bu panelde okunmaz ve dışa aktarılmaz.</div>\n  </section>\n</div>\n{% endblock %}\n'
+P1	archive_or_delete_obsolete_contract	other	tests.test_async_task_infrastructure_static::test_async_worker_and_smoke_scripts_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_async_worker.py'
+P1	archive_or_delete_obsolete_contract	other	tests.test_claude_phase5_smoke_routes::test_get_routes_do_not_return_500
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: 500/exception üreten route bulundu: [('/health/deep', 503), ('/setup-admin', 500)] assert not [('/health/deep', 503), ('/setup-admin', 500)]
+P1	archive_or_delete_obsolete_contract	database_contract	tests.test_feedback_pulse_menu_visibility_static::test_feedback_pulse_menu_item_still_exists_in_base_and_registry
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert '"key": "feedback_pulse"' in '# BYS360_PHASE3_2_MENU_REGISTRY_NOTE: Performans menü görünürlüğünün son kararı app/services/settings/effective_menu.... loglandi: app/menu_registry.py:1512")\n    pass\n# BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_MENU_END\n\n'
+P1	archive_or_delete_obsolete_contract	other	tests.test_hr_leave_attendance_real_post_static::test_leave_and_attendance_post_are_real_handlers_not_placeholder_flash
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'return _handle_leave_post()' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+P1	archive_or_delete_obsolete_contract	other	tests.test_hr_leave_attendance_real_post_static::test_leave_attendance_balance_and_delegation_handlers_exist
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'def _handle_leave_post' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+P1	archive_or_delete_obsolete_contract	other	tests.test_hr_leave_attendance_real_post_static::test_duplicate_and_conflict_controls_are_present
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'def _leave_overlaps' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+P1	archive_or_delete_obsolete_contract	other	tests.test_hr_leave_attendance_real_post_static::test_form_tokens_are_consumed_for_mutating_hr_forms
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'consume_form_token("hr_management", request.form.get("_form_token"), scope="leave_create")' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in
+P1	archive_or_delete_obsolete_contract	other	tests.test_institutional_dashboard_route_static::test_hr_dashboard_endpoints_are_real_routes
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'def hr_leave_management' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+P1	archive_or_delete_obsolete_contract	performance	tests.test_performance_assignment_rule_gate_static::test_president_stays_in_lookup_but_not_subjects
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 'employees = [employee for employee in query.all() if not is_president(employee)]' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom app.core.datetime_utils import utc_now\nfrom datetime ...PHASE9_REMINDER_BOUND\n# Otomatik hatırlatma ve aksatan amir bildirimi
+P1	archive_or_delete_obsolete_contract	performance	tests.test_performance_core_health_dalga8_static::test_visibility_and_publish_locks_are_kept
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'LOW_SCORE_THRESHOLD = 70.0' in 'from __future__ import annotations\n\n\nimport logging\n\n"""BYS360 performans yayın ön kontrol anayasası.\n\nBu serv...SCORE_APPROVAL_BOUND\n# 70 altı düşük performans üst onay/yayın kilidi phase6_low_score_approval_policy ile izlenir.\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.test_performance_phase5_ui_copy::test_team_compare_uses_ekip_kiyas_wording
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'Ekip Kıyas' in '{% extends "base.html" %}\n{% block title %}Personel Analizi - BYS360{% endblock %}\n{% block page_kicker %}Performan...n</div>\n<script src="{{ url_for(\'static\', filename=\'js/bys360_reports_ai_pro.js\') }}"></script>\n{% endblock %}\n'
+P1	archive_or_delete_obsolete_contract	database_contract	tests.test_performance_phase5_ui_copy::test_microguide_partial_exists_and_is_used
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert '{% include "performance/_phase5_microguide.html" %}' in '{% extends "base.html" %}\n{% block title %}Personel Analizi - BYS360{% endblock %}\n{% block page_kicker %}Performan...n</div>\n<script src="{{ url_for(\'static\', filename=\'js/bys360_reports_ai_pro.js\') }}"></script>\n{% endblock %
+P1	archive_or_delete_obsolete_contract	performance	tests.test_performance_publish_preflight_static::test_publish_preflight_rules_hold_constitution
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: assert 'LOW_SCORE_THRESHOLD = 70.0' in 'from __future__ import annotations\n\n\nimport logging\n\n"""BYS360 performans yayın ön kontrol anayasası.\n\nBu serv...SCORE_APPROVAL_BOUND\n# 70 altı düşük performans üst onay/yayın kilidi phase6_low_score_approval_policy ile izlenir.\n'
+P1	archive_or_delete_obsolete_contract	performance	tests.test_performance_visibility_constitution_static::test_scorecard_visibility_is_centralized
+    reason: historical phase/evidence artifact contract; remove or move to tests/archive with explicit rationale
+    detail: AssertionError: assert 'from app.services.performance.visibility_guard import' in 'from __future__ import annotations\n\n# Faz 2 V5: publish.policy uygulama açılışında visibility_guard import etmez.\n...d.query\n        .filter_by(is_active=True)\n        .order_by(PerformancePeriod.id.desc())\n    
+P1	archive_or_delete_obsolete_contract	quality_release	tests.test_redis_ready_static::test_ci_quality_gate_exists
+    reason: phase/evidence/release contract test appears to validate historical artifacts rather than current runtime behavior
+    detail: FileNotFoundError: [Errno 2] No such file or directory: '.github\\workflows\\bys360-quality.yml'

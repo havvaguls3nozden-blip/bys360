@@ -1,0 +1,14 @@
+{# BYS360_AI_DECISION_FAZ10_PAGE_OK #}
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz10.css') }}">
+<main class="ai-decision-faz10-page">
+  <section class="ai-decision-faz10-hero">
+    <p>Karar Destek Merkezi</p>
+    <h1>Performans İçi Ara Not / Geri Bildirim</h1>
+    <span>Bu ekran dönem içi notları puana çevirmeden, değerlendirme öncesi güvenli hatırlatma özetine dönüştürür.</span>
+  </section>
+  {% set faz10_interim_feedback_context = context %}
+  {% include 'ai_decision/_interim_feedback_panel.html' %}
+</main>
+{% endblock %}

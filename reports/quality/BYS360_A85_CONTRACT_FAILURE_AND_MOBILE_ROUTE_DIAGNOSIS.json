@@ -1,0 +1,1246 @@
+{
+  "generated_at": "2026-06-12T17:48:27",
+  "phase": "A85_CONTRACT_FAILURE_AND_MOBILE_ROUTE_DIAGNOSIS",
+  "diagnosis_only": true,
+  "mobile_routes": [
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/communication_read_routes.py",
+      "line": 10,
+      "rule": "/notifications",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/notifications",
+      "full_rule": "/api/mobile/notifications"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/communication_read_routes.py",
+      "line": 10,
+      "rule": "/communication/messages/threads",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/communication/messages/threads",
+      "full_rule": "/api/mobile/communication/messages/threads"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/communication_read_routes.py",
+      "line": 10,
+      "rule": "/communication/messages/users",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/communication/messages/users",
+      "full_rule": "/api/mobile/communication/messages/users"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/communication_v2_read_routes.py",
+      "line": 10,
+      "rule": "/communication/v2/threads",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/communication/v2/threads",
+      "full_rule": "/api/mobile/communication/v2/threads"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/detail_read_routes.py",
+      "line": 10,
+      "rule": "/support/tickets/<int:ticket_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/support/tickets/<int:ticket_id>",
+      "full_rule": "/api/mobile/support/tickets/<int:ticket_id>"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/detail_read_routes.py",
+      "line": 10,
+      "rule": "/surveys/<int:survey_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/surveys/<int:survey_id>",
+      "full_rule": "/api/mobile/surveys/<int:survey_id>"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/detail_read_routes.py",
+      "line": 10,
+      "rule": "/communication/threads",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/communication/threads",
+      "full_rule": "/api/mobile/communication/threads"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/assistant_chat.py",
+      "line": 81,
+      "rule": "/assistant/v2/ask",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_b49_assistant_v2_ask",
+      "error": "",
+      "normalized_rule": "/assistant/v2/ask",
+      "full_rule": "/api/mobile/assistant/v2/ask"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/auth.py",
+      "line": 11,
+      "rule": "/auth/login",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_login",
+      "error": "",
+      "normalized_rule": "/auth/login",
+      "full_rule": "/api/mobile/auth/login"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/auth.py",
+      "line": 20,
+      "rule": "/auth/refresh",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_refresh",
+      "error": "",
+      "normalized_rule": "/auth/refresh",
+      "full_rule": "/api/mobile/auth/refresh"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/auth.py",
+      "line": 31,
+      "rule": "/me",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_me",
+      "error": "",
+      "normalized_rule": "/me",
+      "full_rule": "/api/mobile/me"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v1_write.py",
+      "line": 137,
+      "rule": "/communication/messages/threads/<int:thread_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_b46_communication_thread_detail",
+      "error": "",
+      "normalized_rule": "/communication/messages/threads/<int:thread_id>",
+      "full_rule": "/api/mobile/communication/messages/threads/<int:thread_id>"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v1_write.py",
+      "line": 159,
+      "rule": "/communication/messages/threads/<int:thread_id>/send",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_b46_communication_send_message",
+      "error": "",
+      "normalized_rule": "/communication/messages/threads/<int:thread_id>/send",
+      "full_rule": "/api/mobile/communication/messages/threads/<int:thread_id>/send"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v1_write.py",
+      "line": 193,
+      "rule": "/communication/messages/create-thread",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_b46_communication_create_thread",
+      "error": "",
+      "normalized_rule": "/communication/messages/create-thread",
+      "full_rule": "/api/mobile/communication/messages/create-thread"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v2_write.py",
+      "line": 161,
+      "rule": "/communication/v2/threads/<int:thread_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_b48_communication_v2_thread_detail",
+      "error": "",
+      "normalized_rule": "/communication/v2/threads/<int:thread_id>",
+      "full_rule": "/api/mobile/communication/v2/threads/<int:thread_id>"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v2_write.py",
+      "line": 185,
+      "rule": "/communication/v2/threads/<int:thread_id>/send",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_b48_communication_v2_send",
+      "error": "",
+      "normalized_rule": "/communication/v2/threads/<int:thread_id>/send",
+      "full_rule": "/api/mobile/communication/v2/threads/<int:thread_id>/send"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v2_write.py",
+      "line": 225,
+      "rule": "/communication/v2/users",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_b48_communication_v2_users",
+      "error": "",
+      "normalized_rule": "/communication/v2/users",
+      "full_rule": "/api/mobile/communication/v2/users"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/communication_v2_write.py",
+      "line": 265,
+      "rule": "/communication/v2/create-thread",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_b48_communication_v2_create_thread",
+      "error": "",
+      "normalized_rule": "/communication/v2/create-thread",
+      "full_rule": "/api/mobile/communication/v2/create-thread"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/dashboard.py",
+      "line": 11,
+      "rule": "/dashboard/summary",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_dashboard_summary",
+      "error": "",
+      "normalized_rule": "/dashboard/summary",
+      "full_rule": "/api/mobile/dashboard/summary"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/kpi_target_management.py",
+      "line": 68,
+      "rule": "/kpi/target-management",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_kpi_target_management_v2853",
+      "error": "",
+      "normalized_rule": "/kpi/target-management",
+      "full_rule": "/api/mobile/kpi/target-management"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/kpi_target_management.py",
+      "line": 135,
+      "rule": "/kpi/target-management",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_kpi_target_create_v2853",
+      "error": "",
+      "normalized_rule": "/kpi/target-management",
+      "full_rule": "/api/mobile/kpi/target-management"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/kpi_target_management.py",
+      "line": 194,
+      "rule": "/kpi/target-management/<int:target_id>/progress",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_kpi_target_progress_v2853",
+      "error": "",
+      "normalized_rule": "/kpi/target-management/<int:target_id>/progress",
+      "full_rule": "/api/mobile/kpi/target-management/<int:target_id>/progress"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/notifications.py",
+      "line": 12,
+      "rule": "/notifications/<int:notification_id>/read",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_notification_mark_read_v2864",
+      "error": "",
+      "normalized_rule": "/notifications/<int:notification_id>/read",
+      "full_rule": "/api/mobile/notifications/<int:notification_id>/read"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/notifications.py",
+      "line": 28,
+      "rule": "/notifications/read-all",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_notifications_mark_all_read_v2864",
+      "error": "",
+      "normalized_rule": "/notifications/read-all",
+      "full_rule": "/api/mobile/notifications/read-all"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/personnel_read.py",
+      "line": 11,
+      "rule": "/personnel/list",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_personnel_list",
+      "error": "",
+      "normalized_rule": "/personnel/list",
+      "full_rule": "/api/mobile/personnel/list"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/personnel_write_all.py",
+      "line": 11,
+      "rule": "/personnel/all",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_personnel_all",
+      "error": "",
+      "normalized_rule": "/personnel/all",
+      "full_rule": "/api/mobile/personnel/all"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/personnel_write_all.py",
+      "line": 198,
+      "rule": "/personnel/create",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_personnel_create",
+      "error": "",
+      "normalized_rule": "/personnel/create",
+      "full_rule": "/api/mobile/personnel/create"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/personnel_write_all.py",
+      "line": 205,
+      "rule": "/personnel/add",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_personnel_add_alias",
+      "error": "",
+      "normalized_rule": "/personnel/add",
+      "full_rule": "/api/mobile/personnel/add"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/support_survey_write.py",
+      "line": 37,
+      "rule": "/support/tickets",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_support_ticket_create",
+      "error": "",
+      "normalized_rule": "/support/tickets",
+      "full_rule": "/api/mobile/support/tickets"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/support_survey_write.py",
+      "line": 87,
+      "rule": "/support/tickets/<int:ticket_id>/reply",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_support_ticket_reply",
+      "error": "",
+      "normalized_rule": "/support/tickets/<int:ticket_id>/reply",
+      "full_rule": "/api/mobile/support/tickets/<int:ticket_id>/reply"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/domains/support_survey_write.py",
+      "line": 123,
+      "rule": "/surveys/<int:survey_id>/submit",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_survey_submit",
+      "error": "",
+      "normalized_rule": "/surveys/<int:survey_id>/submit",
+      "full_rule": "/api/mobile/surveys/<int:survey_id>/submit"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/light_read_routes.py",
+      "line": 10,
+      "rule": "/ai/insights",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/ai/insights",
+      "full_rule": "/api/mobile/ai/insights"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/light_read_routes.py",
+      "line": 10,
+      "rule": "/assistant/suggestions",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/assistant/suggestions",
+      "full_rule": "/api/mobile/assistant/suggestions"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/light_read_routes.py",
+      "line": 10,
+      "rule": "/settings/summary",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/settings/summary",
+      "full_rule": "/api/mobile/settings/summary"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/performance_read_routes.py",
+      "line": 10,
+      "rule": "/performance/periods",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/performance/periods",
+      "full_rule": "/api/mobile/performance/periods"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/performance_read_routes.py",
+      "line": 10,
+      "rule": "/performance/weights",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/performance/weights",
+      "full_rule": "/api/mobile/performance/weights"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 270,
+      "rule": "/performance/summary",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_summary",
+      "error": "",
+      "normalized_rule": "/performance/summary",
+      "full_rule": "/api/mobile/performance/summary"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 314,
+      "rule": "/performance/periods/<int:period_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_period_detail",
+      "error": "",
+      "normalized_rule": "/performance/periods/<int:period_id>",
+      "full_rule": "/api/mobile/performance/periods/<int:period_id>"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 366,
+      "rule": "/performance/approvals",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_approvals",
+      "error": "",
+      "normalized_rule": "/performance/approvals",
+      "full_rule": "/api/mobile/performance/approvals"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 381,
+      "rule": "/performance/scorecards",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_scorecards",
+      "error": "",
+      "normalized_rule": "/performance/scorecards",
+      "full_rule": "/api/mobile/performance/scorecards"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 389,
+      "rule": "/performance/rules-summary",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_rules_summary",
+      "error": "",
+      "normalized_rule": "/performance/rules-summary",
+      "full_rule": "/api/mobile/performance/rules-summary"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 473,
+      "rule": "/performance/criteria",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_criteria",
+      "error": "",
+      "normalized_rule": "/performance/criteria",
+      "full_rule": "/api/mobile/performance/criteria"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 497,
+      "rule": "/performance/third-manager",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_third_manager",
+      "error": "",
+      "normalized_rule": "/performance/third-manager",
+      "full_rule": "/api/mobile/performance/third-manager"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 637,
+      "rule": "/performance/tasks/<int:assignment_id>",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_task_detail",
+      "error": "",
+      "normalized_rule": "/performance/tasks/<int:assignment_id>",
+      "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 937,
+      "rule": "/performance/tasks/<int:assignment_id>/score-form",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_task_score_form",
+      "error": "",
+      "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+      "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 946,
+      "rule": "/performance/tasks/<int:assignment_id>/score-form",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_performance_task_score_submit",
+      "error": "",
+      "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+      "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1056,
+      "rule": "/performance/tasks/<int:assignment_id>/score-action",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_performance_task_score_action",
+      "error": "",
+      "normalized_rule": "/performance/tasks/<int:assignment_id>/score-action",
+      "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-action"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1218,
+      "rule": "/performance/full-feature-summary",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_legacy_mobile_performance_full_feature_summary",
+      "error": "",
+      "normalized_rule": "/performance/full-feature-summary",
+      "full_rule": "/api/mobile/performance/full-feature-summary"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1260,
+      "rule": "/performance/president-approvals",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_prev_mobile_performance_president_approvals_alias_v21748",
+      "error": "",
+      "normalized_rule": "/performance/president-approvals",
+      "full_rule": "/api/mobile/performance/president-approvals"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1272,
+      "rule": "/performance/publish-preapproval",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_publish_preapproval",
+      "error": "",
+      "normalized_rule": "/performance/publish-preapproval",
+      "full_rule": "/api/mobile/performance/publish-preapproval"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1303,
+      "rule": "/performance/history-archive",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_prev_mobile_performance_history_archive_v21748",
+      "error": "",
+      "normalized_rule": "/performance/history-archive",
+      "full_rule": "/api/mobile/performance/history-archive"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1315,
+      "rule": "/performance/in-period-notes",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_legacy_mobile_performance_in_period_notes",
+      "error": "",
+      "normalized_rule": "/performance/in-period-notes",
+      "full_rule": "/api/mobile/performance/in-period-notes"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1355,
+      "rule": "/performance/development-suggestions",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_development_suggestions",
+      "error": "",
+      "normalized_rule": "/performance/development-suggestions",
+      "full_rule": "/api/mobile/performance/development-suggestions"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1390,
+      "rule": "/performance/reports",
+      "methods": [
+        "GET"
+      ],
+      "function": "mobile_performance_reports",
+      "error": "",
+      "normalized_rule": "/performance/reports",
+      "full_rule": "/api/mobile/performance/reports"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1406,
+      "rule": "/performance/risk-analysis",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_legacy_mobile_performance_risk_analysis_v2852",
+      "error": "",
+      "normalized_rule": "/performance/risk-analysis",
+      "full_rule": "/api/mobile/performance/risk-analysis"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1508,
+      "rule": "/performance/in-period-notes/v2",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_legacy_mobile_performance_in_period_notes_v2853",
+      "error": "",
+      "normalized_rule": "/performance/in-period-notes/v2",
+      "full_rule": "/api/mobile/performance/in-period-notes/v2"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1573,
+      "rule": "/performance/in-period-notes/v2",
+      "methods": [
+        "POST"
+      ],
+      "function": "mobile_performance_create_in_period_note_v2853",
+      "error": "",
+      "normalized_rule": "/performance/in-period-notes/v2",
+      "full_rule": "/api/mobile/performance/in-period-notes/v2"
+    },
+    {
+      "source": "ast_decorator",
+      "file": "app/api/mobile/performance_routes.py",
+      "line": 1628,
+      "rule": "/performance/note-scorecard",
+      "methods": [
+        "GET"
+      ],
+      "function": "_bys360_legacy_mobile_performance_note_scorecard_v2863a",
+      "error": "",
+      "normalized_rule": "/performance/note-scorecard",
+      "full_rule": "/api/mobile/performance/note-scorecard"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/support_survey_read_routes.py",
+      "line": 10,
+      "rule": "/support/tickets",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/support/tickets",
+      "full_rule": "/api/mobile/support/tickets"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/support_survey_read_routes.py",
+      "line": 10,
+      "rule": "/surveys",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/surveys",
+      "full_rule": "/api/mobile/surveys"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/utility_routes.py",
+      "line": 10,
+      "rule": "/health",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/health",
+      "full_rule": "/api/mobile/health"
+    },
+    {
+      "source": "string_or_bridge_decorator",
+      "file": "app/api/mobile/utility_routes.py",
+      "line": 10,
+      "rule": "/kpi/goals",
+      "methods": [
+        "GET"
+      ],
+      "function": "",
+      "error": "",
+      "normalized_rule": "/kpi/goals",
+      "full_rule": "/api/mobile/kpi/goals"
+    }
+  ],
+  "mobile_duplicate_diagnosis": {
+    "total_mobile_routes_found": 62,
+    "exact_duplicate_count": 0,
+    "path_only_duplicate_count": 4,
+    "method_aware_ok_but_path_duplicate_count": 4,
+    "exact_duplicates": {},
+    "path_only_duplicates": {
+      "/api/mobile/kpi/target-management": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/kpi_target_management.py",
+          "line": 68,
+          "rule": "/kpi/target-management",
+          "methods": [
+            "GET"
+          ],
+          "function": "mobile_kpi_target_management_v2853",
+          "error": "",
+          "normalized_rule": "/kpi/target-management",
+          "full_rule": "/api/mobile/kpi/target-management"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/kpi_target_management.py",
+          "line": 135,
+          "rule": "/kpi/target-management",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_kpi_target_create_v2853",
+          "error": "",
+          "normalized_rule": "/kpi/target-management",
+          "full_rule": "/api/mobile/kpi/target-management"
+        }
+      ],
+      "/api/mobile/support/tickets": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/support_survey_write.py",
+          "line": 37,
+          "rule": "/support/tickets",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_support_ticket_create",
+          "error": "",
+          "normalized_rule": "/support/tickets",
+          "full_rule": "/api/mobile/support/tickets"
+        },
+        {
+          "source": "string_or_bridge_decorator",
+          "file": "app/api/mobile/support_survey_read_routes.py",
+          "line": 10,
+          "rule": "/support/tickets",
+          "methods": [
+            "GET"
+          ],
+          "function": "",
+          "error": "",
+          "normalized_rule": "/support/tickets",
+          "full_rule": "/api/mobile/support/tickets"
+        }
+      ],
+      "/api/mobile/performance/tasks/<int:assignment_id>/score-form": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 937,
+          "rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "methods": [
+            "GET"
+          ],
+          "function": "mobile_performance_task_score_form",
+          "error": "",
+          "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 946,
+          "rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_performance_task_score_submit",
+          "error": "",
+          "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+        }
+      ],
+      "/api/mobile/performance/in-period-notes/v2": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 1508,
+          "rule": "/performance/in-period-notes/v2",
+          "methods": [
+            "GET"
+          ],
+          "function": "_bys360_legacy_mobile_performance_in_period_notes_v2853",
+          "error": "",
+          "normalized_rule": "/performance/in-period-notes/v2",
+          "full_rule": "/api/mobile/performance/in-period-notes/v2"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 1573,
+          "rule": "/performance/in-period-notes/v2",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_performance_create_in_period_note_v2853",
+          "error": "",
+          "normalized_rule": "/performance/in-period-notes/v2",
+          "full_rule": "/api/mobile/performance/in-period-notes/v2"
+        }
+      ]
+    },
+    "method_aware_ok_but_path_duplicate": {
+      "/api/mobile/kpi/target-management": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/kpi_target_management.py",
+          "line": 68,
+          "rule": "/kpi/target-management",
+          "methods": [
+            "GET"
+          ],
+          "function": "mobile_kpi_target_management_v2853",
+          "error": "",
+          "normalized_rule": "/kpi/target-management",
+          "full_rule": "/api/mobile/kpi/target-management"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/kpi_target_management.py",
+          "line": 135,
+          "rule": "/kpi/target-management",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_kpi_target_create_v2853",
+          "error": "",
+          "normalized_rule": "/kpi/target-management",
+          "full_rule": "/api/mobile/kpi/target-management"
+        }
+      ],
+      "/api/mobile/support/tickets": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/domains/support_survey_write.py",
+          "line": 37,
+          "rule": "/support/tickets",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_support_ticket_create",
+          "error": "",
+          "normalized_rule": "/support/tickets",
+          "full_rule": "/api/mobile/support/tickets"
+        },
+        {
+          "source": "string_or_bridge_decorator",
+          "file": "app/api/mobile/support_survey_read_routes.py",
+          "line": 10,
+          "rule": "/support/tickets",
+          "methods": [
+            "GET"
+          ],
+          "function": "",
+          "error": "",
+          "normalized_rule": "/support/tickets",
+          "full_rule": "/api/mobile/support/tickets"
+        }
+      ],
+      "/api/mobile/performance/tasks/<int:assignment_id>/score-form": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 937,
+          "rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "methods": [
+            "GET"
+          ],
+          "function": "mobile_performance_task_score_form",
+          "error": "",
+          "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 946,
+          "rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_performance_task_score_submit",
+          "error": "",
+          "normalized_rule": "/performance/tasks/<int:assignment_id>/score-form",
+          "full_rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form"
+        }
+      ],
+      "/api/mobile/performance/in-period-notes/v2": [
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 1508,
+          "rule": "/performance/in-period-notes/v2",
+          "methods": [
+            "GET"
+          ],
+          "function": "_bys360_legacy_mobile_performance_in_period_notes_v2853",
+          "error": "",
+          "normalized_rule": "/performance/in-period-notes/v2",
+          "full_rule": "/api/mobile/performance/in-period-notes/v2"
+        },
+        {
+          "source": "ast_decorator",
+          "file": "app/api/mobile/performance_routes.py",
+          "line": 1573,
+          "rule": "/performance/in-period-notes/v2",
+          "methods": [
+            "POST"
+          ],
+          "function": "mobile_performance_create_in_period_note_v2853",
+          "error": "",
+          "normalized_rule": "/performance/in-period-notes/v2",
+          "full_rule": "/api/mobile/performance/in-period-notes/v2"
+        }
+      ]
+    }
+  },
+  "pytest_contract_run": {
+    "ok": true,
+    "returncode": 0,
+    "cmd": [
+      "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests",
+      "--ignore=tests/_archive_a5_obsolete",
+      "-m",
+      "not live and not realdb and not slow",
+      "-q"
+    ],
+    "failures": [],
+    "errors": [],
+    "failure_count": 0,
+    "error_count": 0,
+    "summary": {
+      "passed": 12,
+      "skipped": 734,
+      "deselected": 34,
+      "warnings": 10
+    }
+  },
+  "pytest_tail": "ssssssss..ssssssssssssssssssssssssssssssssssssssssssssss.....ss.s..sssss [  9%]\nss..ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 19%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 28%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 38%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 48%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 57%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 67%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 77%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 86%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 96%]\nssssssssssssssssssssssssss                                               [100%]\n============================== warnings summary ===============================\ntests\\architecture\\test_android_responsive_core_styles_p5b.py:38\n  C:\\bys360\\project\\tests\\architecture\\test_android_responsive_core_styles_p5b.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests\\architecture\\test_mobile_api_personnel_kpi_communication_response_p3c.py:29\n  C:\\bys360\\project\\tests\\architecture\\test_mobile_api_personnel_kpi_communication_response_p3c.py:29: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests\\architecture\\test_mobile_api_security_suite_p4c.py:43\n  C:\\bys360\\project\\tests\\architecture\\test_mobile_api_security_suite_p4c.py:43: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests\\architecture\\test_mobile_api_security_suite_p4c_v2.py:43\n  C:\\bys360\\project\\tests\\architecture\\test_mobile_api_security_suite_p4c_v2.py:43: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests\\architecture\\test_mobile_auth_dashboard_assistant_response_p3b.py:22\n  C:\\bys360\\project\\tests\\architecture\\test_mobile_auth_dashboard_assistant_response_p3b.py:22: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests\\mobile\\test_mobile_domain_contract_p2a.py:81\n  C:\\bys360\\project\\tests\\mobile\\test_mobile_domain_contract_p2a.py:81: PytestUnknownMarkWarning: Unknown pytest.mark.mobile - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html\n    pytestmark = pytest.mark.mobile\n\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py::test_mobile_personnel_kpi_communication_response_gate_p3c_v2\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py::test_mobile_api_request_level_smoke_contract_gate_v3\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py::test_mobile_personnel_kpi_communication_response_gate_p3c_v2\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py::test_mobile_api_request_level_smoke_contract_gate_v3\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n12 passed, 734 skipped, 34 deselected, 10 warnings in 48.43s\n",
+  "classified_failures": [],
+  "classified_failure_count": 0,
+  "ps1_files": {
+    "count": 776,
+    "sample": [
+      "scripts/check_bys360_ios_pwa_v2_advanced_mobile_app.ps1",
+      "scripts/check_bys360_ios_pwa_v2_topbar_notification_fix.ps1",
+      "scripts/check_bys360_ios_pwa_v3_1_performance_mobile_screens.ps1",
+      "scripts/check_bys360_ios_pwa_v3_2_install_prompt_single_tr_fix.ps1",
+      "scripts/check_bys360_ios_pwa_v3_5_prompt_disable_stable.ps1",
+      "scripts/check_bys360_ios_pwa_v3_premium_mobile_web.ps1",
+      "scripts/check_bys360_ios_safari_pwa_v1.ps1",
+      "scripts/check_bys360_mobile_v2_8_72_security_ios_10_10.ps1",
+      "scripts/check_bys360_mobile_v2_8_73_quality_router_fcm_tests.ps1",
+      "scripts/check_bys360_mobile_v2_8_74_android_v2_embedding_fix.ps1",
+      "scripts/check_bys360_mobile_v2_8_75_android_v2_embedding_scriptfix.ps1",
+      "scripts/check_bys360_mobile_v2_8_76_android_v2_embedding_parsefix.ps1",
+      "scripts/check_bys360_mobile_v2_8_77_android_v2_embedding_ps51_fix.ps1",
+      "scripts/check_bys360_mobile_v2_8_78_android_v2_embedding_finalfix.ps1",
+      "scripts/check_bys360_mobile_v2_8_80_android_v2_embedding_autofind.ps1",
+      "scripts/repair_bys360_ios_pwa_v2_advanced_mobile_app.ps1",
+      "scripts/repair_bys360_ios_pwa_v2_topbar_notification_fix.ps1",
+      "scripts/repair_bys360_ios_pwa_v3_1_performance_mobile_screens.ps1",
+      "scripts/repair_bys360_ios_pwa_v3_2_install_prompt_single_tr_fix.ps1",
+      "scripts/repair_bys360_ios_pwa_v3_5_prompt_disable_stable.ps1",
+      "scripts/repair_bys360_ios_pwa_v3_premium_mobile_web.ps1",
+      "scripts/repair_bys360_ios_safari_pwa_v1.ps1",
+      "scripts/repair_bys360_mobile_v2_8_72_security_ios_10_10.ps1",
+      "scripts/repair_bys360_mobile_v2_8_73_quality_router_fcm_tests.ps1",
+      "scripts/repair_bys360_mobile_v2_8_74_android_v2_embedding_fix.ps1",
+      "scripts/repair_bys360_mobile_v2_8_75_android_v2_embedding_scriptfix.ps1",
+      "scripts/repair_bys360_mobile_v2_8_76_android_v2_embedding_parsefix.ps1",
+      "scripts/repair_bys360_mobile_v2_8_77_android_v2_embedding_ps51_fix.ps1",
+      "scripts/repair_bys360_mobile_v2_8_78_android_v2_embedding_finalfix.ps1",
+      "scripts/repair_bys360_mobile_v2_8_79_android_v2_embedding_ps51_final.ps1",
+      "scripts/repair_bys360_mobile_v2_8_80_android_v2_embedding_autofind.ps1",
+      "scripts/split_clean_bys360_source_for_upload.ps1",
+      "app/scripts/windows/analyze_bys360_quality_10_10_p11_b1a_mobile_routes_split_candidates.ps1",
+      "project/scripts/windows/repair_bys360_portal_press_news_admin_route_authority_hotfix_v3.ps1",
+      "project/scripts/windows/repair_bys360_portal_press_news_admin_unlock_role_matrix_hotfix_v2.ps1",
+      "scripts/communication/run_daily_weather_personnel_mail.ps1",
+      "scripts/security/build_secure_release_zip_v1.ps1",
+      "scripts/security/build_secure_release_zip_v2.ps1",
+      "scripts/security/check_bys360_p0_security_observability_v1.ps1",
+      "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.ps1",
+      "scripts/security/check_bys360_p1_risk_hardening_v1.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1_1.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1_2.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1_3.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1_4.ps1",
+      "scripts/security/check_bys360_secure_release_secret_clean_v1_5.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1_1.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1_2.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1_3.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1_4.ps1",
+      "scripts/security/repair_bys360_secure_release_secret_clean_v1_5.ps1",
+      "scripts/windows/a8_live_cutover_guard.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p10_2_final_p1_decision.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p10_remaining_p1_triage.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_b1a_mobile_routes_split_candidates.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_b1_mobile_routes_split_candidates.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_b8_mobile_routes_remaining_refresh.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_b_mobile_routes_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_c2_mobile_performance_routes_remaining_refresh.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_c_mobile_performance_routes_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_d1_menu_registry_data_candidates.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_d_menu_registry_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_e1_effective_menu_dependency_candidates.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_e_effective_menu_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_f_settings_template_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_g1_evaluation_safe_split_candidates.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_g_evaluation_template_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_h_css_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p11_refactor_plan.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p12_a1_technical_ui_term_inventory_fix.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p12_a_technical_ui_term_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p12_b_technical_ui_term_decision.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p13_a2_effective_p1_closure_map_corrected.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p13_a3_effective_p1_closure_from_p7.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p13_a_effective_p1_closure_map.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p13_b_repair_script_inventory.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p13_c_repair_script_archive_dryrun.ps1",
+      "scripts/windows/analyze_bys360_quality_10_10_p14_a_assistant_js_inventory.ps1"
+    ]
+  },
+  "archive_status": {
+    "exists": true,
+    "file_count": 83,
+    "sample": [
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_ai_analysis_visual_reports_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_ai_final_live_hardening_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_ai_visibility_gate_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_async_task_infrastructure_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_claude_phase5_smoke_routes.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_hr_leave_attendance_real_post_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_institutional_dashboard_route_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_performance_assignment_rule_gate_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_performance_core_health_dalga8_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_performance_phase5_ui_copy.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/test_performance_visibility_constitution_static.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_baseline_p5a.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_final_evidence_p5f.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_inventory_precision_p6c.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_release_suite_p5d_v2.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_visual_regression_p6a.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_android_responsive_visual_uat_evidence_p5e.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz10_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz2_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz5_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz6_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz7_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz8_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_core_refactor_faz9_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_home_phase1_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_message_faz1_smoke_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_message_faz2_service_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_mobile_api_release_evidence_p4e.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_mobile_api_request_smoke_p2c.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_mobile_api_role_boundary_matrix_p4b.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_mobile_api_role_boundary_matrix_p4b_v2.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_mobile_api_security_evidence_p4d.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_portal_service_faz6_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_settings_faz0_live_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_settings_faz2_service_bridge.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_settings_faz3_snapshot_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz1_smoke_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz2_service_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz3_route_service_bridge.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz4_read_service_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz6_target_access_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/architecture/test_survey_faz7_submit_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/communication/test_communication_template_presence.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/communication/test_phase9a_route_contracts.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/expert_review/test_phase10_expert_final_gate.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/expert_review/test_phase13_final_expert_review_package.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_final_quality_live_backbone_release_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_auth_login_smoke_v5.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_closure_freeze_v19.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_critical_pages_smoke_v7.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_deployment_runbook_rollback_v16.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_final_regression_matrix_v9.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_integration_smoke_v4.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_legacy_integration_scope_v8.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_live_server_preflight_v17.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_real_login_smoke_v6.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_release_candidate_verify_v13.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_release_evidence_bundle_v14.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_release_manifest_dry_run_v11.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_release_package_builder_v12.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint2_release_readiness_v10.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_closure_pilot_acceptance_freeze_v6.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_corporate_approval_decision_consolidation_v5.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_corporate_approval_pack_v4.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_pilot_execution_matrix_v2.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_pilot_triage_board_v3.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/integration/test_sprint3_uat_pilot_plan_v1.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/ops/test_live_ops_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/release/test_final_quality_release_chain_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/release/test_final_quality_release_report_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/release/test_phase11_release_clean_gate.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/security/test_final_quality_security_release_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/services/test_final_quality_home_weather_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/services/test_final_quality_live_source_contract.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/sprint2/test_sprint2_coverage_baseline_v3.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/sprint2/test_sprint2_critical_guard_tests_v2.py.disabled",
+      "tests/_archive_a5_obsolete/20260612_090923/tests/sprint2/test_sprint2_test_infra_v1.py.disabled"
+    ]
+  }
+}

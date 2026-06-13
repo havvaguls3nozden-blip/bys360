@@ -1,0 +1,30 @@
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_dashboard_view') }}">
+    <i class="fa-solid fa-chart-line me-2"></i> İletişim Faz 4 Paneli
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_reports_view') }}">
+    <i class="fa-solid fa-file-lines me-2"></i> Yönetici Raporları
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_survey_analytics') }}">
+    <i class="fa-solid fa-square-poll-vertical me-2"></i> Anket Analitiği
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_support_analytics') }}">
+    <i class="fa-solid fa-headset me-2"></i> Destek Analitiği
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_export_center') }}">
+    <i class="fa-solid fa-file-export me-2"></i> Dışa Aktarma Merkezi
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('main.communication_phase4_governance') }}">
+    <i class="fa-solid fa-shield-halved me-2"></i> Yönetişim Merkezi
+  </a>
+</li>

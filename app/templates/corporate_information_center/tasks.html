@@ -1,0 +1,62 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='tasks' %}
+{% block cic_content %}
+<form method="post" class="cic-grid">
+ {{ cic_csrf() }}
+ <div class="cic-card span-12">
+ <div class="cic-card-head">
+ <div>
+ <span class="cic-eyebrow"><i class="fa-solid fa-clock"></i> BYS360 sistem kontrollü otomatik gönderim</span>
+ <h2>Görev Yönetimi</h2>
+ <p>Sabah, öğlen, akşam ve yönetici özetleri bu ekrandan aktif/pasif yapılır. Windows görevi yalnızca sistemi yoklar; asıl karar burada verdiğiniz saat ve aktiflik ayarına göre alınır.</p>
+ </div>
+ <button class="cic-btn"><i class="fa-solid fa-floppy-disk"></i> Tüm Görevleri Kaydet</button>
+ </div>
+ </div>
+
+
+ <div class="cic-card span-12 cic-weekday-policy"><i class="fa-solid fa-calendar-days"></i><strong>Hafta sonu gönderim yapılmaz.</strong> Aktif/pasif ve saat ayarları bu ekrandan yönetilir; otomatik gönderim yalnızca hafta içi çalışır.</div>
+
+ {% for task in tasks %}
+ <section class="cic-card span-6">
+ <div class="cic-card-head">
+ <div>
+ <h2><i class="fa-solid {{ task.icon }}"></i> {{ task.label }}</h2>
+ <p>{{ task.description }}</p>
+ </div>
+ {{ task_status(task) }}
+ </div>
+
+ <div class="cic-auto-task-row">
+ <label class="cic-switch-card">
+ <input type="checkbox" name="enabled_{{ task.key }}" {% if task.enabled %}checked{% endif %}>
+ <span>
+ <strong>{% if task.enabled %}Aktif{% else %}Pasif{% endif %}</strong>
+ <small>Bu görev otomatik zamanlayıcı tarafından dikkate alınır.</small>
+ </span>
+ </label>
+ <label>Saat
+ <input class="cic-input" type="number" min="0" max="23" name="hour_{{ task.key }}" value="{{ task.hour }}">
+ </label>
+ <label>Dakika
+ <input class="cic-input" type="number" min="0" max="59" name="minute_{{ task.key }}" value="{{ task.minute }}">
+ </label>
+ </div>
+
+ <div class="cic-check">
+ <span>Alıcı grubu</span>
+ <strong>{% if task.recipient_group == 'managers' %}Yöneticiler{% else %}Personel{% endif %}</strong>
+ </div>
+ <div class="cic-check">
+ <span>Son çalışma</span>
+ <small>{{ task.last_run_at or 'Henüz çalışmadı' }} — {{ task.last_status or 'Durum oluşmadı' }}</small>
+ </div>
+
+ <div class="cic-actions">
+ <button class="cic-btn secondary" formaction="/dashboard/kurumsal-bilgilendirme/gorevler/{{ task.key }}/calistir" formmethod="post" name="dry_run" value="1">Ön kontrol</button>
+ <button class="cic-btn ghost" formaction="/dashboard/kurumsal-bilgilendirme/gorevler/{{ task.key }}/calistir" formmethod="post">Şimdi çalıştır</button>
+ </div>
+ </section>
+ {% endfor %}
+</form>
+{% endblock %}

@@ -1,0 +1,214 @@
+{
+  "generated_at": "2026-06-12T13:52:51",
+  "phase": "A7D_LOCAL_SMOKE_TEST_CONTRACT",
+  "base_url": "",
+  "http_mode": false,
+  "ok": true,
+  "passed": 9,
+  "warnings": 0,
+  "failed": 0,
+  "findings": [
+    {
+      "name": "Ana sayfa / giriş yönlendirme",
+      "path": "/",
+      "severity": "high",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/__init__.py",
+        "app/main_handlers",
+        "app/routes.py"
+      ],
+      "term_hits": [
+        "@main",
+        "route(\"/\"",
+        "index"
+      ],
+      "expected_statuses": [
+        200,
+        302,
+        401,
+        403
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Login",
+      "path": "/login",
+      "severity": "high",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/auth",
+        "app/templates"
+      ],
+      "term_hits": [
+        "login",
+        "auth"
+      ],
+      "expected_statuses": [
+        200,
+        302
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Dashboard",
+      "path": "/dashboard",
+      "severity": "high",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/dashboard",
+        "app/templates/dashboard"
+      ],
+      "term_hits": [
+        "dashboard"
+      ],
+      "expected_statuses": [
+        200,
+        302,
+        401,
+        403
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Portal",
+      "path": "/portal",
+      "severity": "medium",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/portal",
+        "app/templates/portal"
+      ],
+      "term_hits": [
+        "portal"
+      ],
+      "expected_statuses": [
+        200,
+        302,
+        401,
+        403
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Geri Bildirim",
+      "path": "/feedback/gonder",
+      "severity": "medium",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app",
+        "app/communication",
+        "app/support",
+        "app/templates/feedback"
+      ],
+      "term_hits": [
+        "feedback",
+        "gonder",
+        "geri"
+      ],
+      "expected_statuses": [
+        200,
+        302,
+        401,
+        403
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "404 hata şablonu",
+      "path": "/__bys360_missing_smoke_page__",
+      "severity": "medium",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/templates/errors/404.html"
+      ],
+      "term_hits": [],
+      "expected_statuses": [
+        404
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "500 hata şablonu",
+      "path": "/__bys360_500_template_check__",
+      "severity": "medium",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/templates/errors/500.html"
+      ],
+      "term_hits": [],
+      "expected_statuses": [],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Static CSS",
+      "path": "/static/css",
+      "severity": "low",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/static/css"
+      ],
+      "term_hits": [
+        ".css"
+      ],
+      "expected_statuses": [
+        200,
+        301,
+        302,
+        403,
+        404
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    },
+    {
+      "name": "Mobil API kökü",
+      "path": "/api/mobile",
+      "severity": "medium",
+      "contract_ok": true,
+      "evidence_paths_found": true,
+      "existing_paths": [
+        "app/api/mobile"
+      ],
+      "term_hits": [
+        "mobile_api_bp",
+        "api/mobile",
+        "mobile"
+      ],
+      "expected_statuses": [
+        200,
+        302,
+        401,
+        403,
+        404,
+        405
+      ],
+      "http_result": null,
+      "http_ok": null,
+      "ok": true
+    }
+  ]
+}

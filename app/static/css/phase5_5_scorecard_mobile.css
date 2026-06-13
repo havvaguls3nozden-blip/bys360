@@ -1,0 +1,240 @@
+/* BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT
+   Karne ve puanlama ekranları mobil düzen kuralları.
+   Bu dosya yalnızca görünüm davranışını düzenler; iş kurallarına dokunmaz.
+*/
+
+.phase5-5-mobile-layout-note {
+  display: none;
+}
+
+.phase5-5-table-scroll,
+.phase5_5_mobile_table,
+.table-responsive {
+  max-width: 100%;
+}
+
+.phase5-5-scorecard-shell,
+.phase5-5-scoring-shell {
+  max-width: 100%;
+}
+
+@media (max-width: 992px) {
+  .phase5-5-scorecard-shell,
+  .phase5-5-scoring-shell,
+  .performance-scorecard-page,
+  .performance-scoring-page,
+  .president-scorecard-page,
+  .employee-scorecard-page {
+    overflow-x: hidden;
+  }
+
+  .phase5-5-table-scroll,
+  .phase5_5_mobile_table,
+  .table-responsive,
+  .scorecard-table-wrap,
+  .performance-table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .phase5-5-table-scroll table,
+  .phase5_5_mobile_table table,
+  .table-responsive table,
+  .scorecard-table-wrap table,
+  .performance-table-wrap table,
+  table.phase5-5-mobile-table,
+  table.performance-table,
+  table.scorecard-table {
+    min-width: 680px;
+  }
+
+  .phase5-5-mobile-stack,
+  .phase5-5-mobile-actions,
+  .scorecard-actions,
+  .performance-actions,
+  .approval-actions {
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+    align-items: stretch;
+  }
+
+  .phase5-5-mobile-actions .btn,
+  .scorecard-actions .btn,
+  .performance-actions .btn,
+  .approval-actions .btn,
+  .phase5-5-mobile-stack .btn {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .phase5-5-scorecard-shell .row,
+  .phase5-5-scoring-shell .row,
+  .performance-scorecard-page .row,
+  .performance-scoring-page .row,
+  .employee-scorecard-page .row,
+  .president-scorecard-page .row {
+    row-gap: .85rem;
+  }
+
+  .phase5-5-scorecard-shell [class*="col-"],
+  .phase5-5-scoring-shell [class*="col-"],
+  .performance-scorecard-page [class*="col-"],
+  .performance-scoring-page [class*="col-"],
+  .employee-scorecard-page [class*="col-"],
+  .president-scorecard-page [class*="col-"] {
+    min-width: 0;
+  }
+
+  .phase5-5-scorecard-shell .card,
+  .phase5-5-scorecard-shell .glass-card,
+  .phase5-5-scorecard-shell .score-card,
+  .phase5-5-scoring-shell .card,
+  .phase5-5-scoring-shell .glass-card,
+  .phase5-5-scoring-shell .score-card,
+  .performance-scorecard-page .card,
+  .performance-scoring-page .card,
+  .employee-scorecard-page .card,
+  .president-scorecard-page .card {
+    padding-left: .85rem;
+    padding-right: .85rem;
+  }
+
+  .phase5-5-scorecard-shell .form-control,
+  .phase5-5-scorecard-shell .form-select,
+  .phase5-5-scorecard-shell select,
+  .phase5-5-scorecard-shell textarea,
+  .phase5-5-scorecard-shell input,
+  .phase5-5-scoring-shell .form-control,
+  .phase5-5-scoring-shell .form-select,
+  .phase5-5-scoring-shell select,
+  .phase5-5-scoring-shell textarea,
+  .phase5-5-scoring-shell input,
+  .performance-scoring-page .form-control,
+  .performance-scoring-page .form-select,
+  .performance-scoring-page select,
+  .performance-scoring-page textarea,
+  .performance-scoring-page input {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .phase5-5-scorecard-shell,
+  .phase5-5-scoring-shell,
+  .performance-scorecard-page,
+  .performance-scoring-page,
+  .employee-scorecard-page,
+  .president-scorecard-page {
+    font-size: .95rem;
+  }
+
+  .phase5-5-scorecard-shell h1,
+  .phase5-5-scorecard-shell h2,
+  .phase5-5-scorecard-shell h3,
+  .phase5-5-scoring-shell h1,
+  .phase5-5-scoring-shell h2,
+  .phase5-5-scoring-shell h3,
+  .performance-scorecard-page h1,
+  .performance-scorecard-page h2,
+  .performance-scorecard-page h3,
+  .performance-scoring-page h1,
+  .performance-scoring-page h2,
+  .performance-scoring-page h3,
+  .employee-scorecard-page h1,
+  .employee-scorecard-page h2,
+  .employee-scorecard-page h3,
+  .president-scorecard-page h1,
+  .president-scorecard-page h2,
+  .president-scorecard-page h3 {
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  .phase5-5-scorecard-shell .score-value,
+  .phase5-5-scorecard-shell .final-score,
+  .employee-scorecard-page .score-value,
+  .employee-scorecard-page .final-score,
+  .president-scorecard-page .score-value,
+  .president-scorecard-page .final-score {
+    font-size: clamp(2rem, 10vw, 3.4rem);
+  }
+
+  .phase5-5-mobile-grid,
+  .scorecard-summary-grid,
+  .performance-summary-grid,
+  .approval-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: .85rem;
+  }
+
+  .phase5-5-table-scroll::after,
+  .phase5_5_mobile_table::after,
+  .table-responsive::after {
+    content: "Tabloyu görmek için yana kaydırabilirsiniz.";
+    display: block;
+    margin-top: .35rem;
+    font-size: .78rem;
+    color: #6b7280;
+  }
+
+  .phase5-5-scorecard-shell .badge,
+  .phase5-5-scoring-shell .badge,
+  .performance-scorecard-page .badge,
+  .performance-scoring-page .badge,
+  .employee-scorecard-page .badge,
+  .president-scorecard-page .badge {
+    white-space: normal;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: 576px) {
+  .phase5-5-scorecard-shell,
+  .phase5-5-scoring-shell,
+  .performance-scorecard-page,
+  .performance-scoring-page,
+  .employee-scorecard-page,
+  .president-scorecard-page {
+    padding-left: .25rem;
+    padding-right: .25rem;
+  }
+
+  .phase5-5-scorecard-shell .card-body,
+  .phase5-5-scoring-shell .card-body,
+  .performance-scorecard-page .card-body,
+  .performance-scoring-page .card-body,
+  .employee-scorecard-page .card-body,
+  .president-scorecard-page .card-body {
+    padding: .85rem;
+  }
+
+  .phase5-5-scorecard-shell .btn,
+  .phase5-5-scoring-shell .btn,
+  .performance-scorecard-page .btn,
+  .performance-scoring-page .btn,
+  .employee-scorecard-page .btn,
+  .president-scorecard-page .btn {
+    min-height: 42px;
+  }
+}
+
+/* BYS360_PHASE5_5_WARNING_CLEANUP_INLINE_WIDTH */
+.phase5_5_score_col {
+  width: clamp(5.5rem, 16vw, 8.75rem);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .phase5_5_score_col {
+    width: auto;
+    min-width: 5rem;
+    white-space: normal;
+  }
+}
+

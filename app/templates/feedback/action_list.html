@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}İyileştirme Aksiyonları - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}İyileştirme Aksiyonları{% endblock %}
+{% block page_subtitle %}Geri bildirimden doğan iyileştirme adımlarını planlayın ve izleyin.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+  .action-card,.action-form{border:none;border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);background:#fff}
+  .action-form input,.action-form select,.action-form textarea,.action-card input,.action-card select{border-radius:14px;border:1px solid rgba(15,23,42,.10);min-height:44px;box-shadow:none}
+  .action-form textarea{min-height:120px;padding-top:12px}
+  .status-pill,.priority-pill{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border-radius:999px;font-size:.76rem;font-weight:900}
+  .priority-pill{background:rgba(139,0,0,.08);color:#8B0000}
+  .status-pill.open{background:#fff4d8;color:#8a5b00}.status-pill.in_progress{background:#dff1ff;color:#005a9c}.status-pill.resolved{background:#e9f9ef;color:#166534}.status-pill.cancelled{background:#f3f4f6;color:#374151}
+</style>
+<div class="cw-shell">
+  {{ workspace.hero(
+      title='İyileştirme aksiyon alanı',
+      text='Geri bildirim sonucundan doğan operasyonel adımları tanımlayın, sorumlu atayın ve durumu tek alandan güncelleyin.',
+      icon='fa-solid fa-list-check',
+      kicker='Kurumsal geri bildirim',
+      secondary_url=url_for('main.feedback_results'),
+      secondary_label='Sonuçlara Dön'
+  ) }}
+  {{ workspace.feedback_nav('actions') }}
+
+  <div class="row g-4">
+    <div class="col-xl-5">
+      <div class="action-form">
+        <div class="cw-panel-body">
+          <h3 style="margin:0 0 14px;font-size:1.02rem;font-weight:900;color:#111827;">Yeni aksiyon</h3>
+          <p style="margin:0 0 18px;color:#6b7280;font-size:.88rem;line-height:1.8;">İyileştirme adımını, önceliğini ve sorumlusunu aynı formdan tanımlayın.</p>
+          <form method="post" action="{{ url_for('main.feedback_action_new') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3"><label class="form-label fw-semibold">Başlık</label><input class="form-control" name="title" required></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Açıklama</label><textarea class="form-control" name="description" rows="4"></textarea></div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6"><label class="form-label fw-semibold">Öncelik</label><select class="form-select" name="priority"><option value="low">Düşük</option><option value="medium" selected>Orta</option><option value="high">Yüksek</option></select></div>
+              <div class="col-md-6"><label class="form-label fw-semibold">Termin</label><input type="date" class="form-control" name="due_date"></div>
+            </div>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6"><label class="form-label fw-semibold">İlgili Kampanya</label><select class="form-select" name="campaign_id"><option value="">-</option>{% for campaign in campaigns %}<option value="{{ campaign.id }}">{{ campaign.title }}</option>{% endfor %}</select></div>
+              <div class="col-md-6"><label class="form-label fw-semibold">Sorumlu</label><select class="form-select" name="assigned_manager_id">{% for manager in managers %}<option value="{{ manager.id }}" {% if manager.id == current_user.id %}selected{% endif %}>{{ manager.full_name or ((manager.ad ~ ' ' ~ manager.soyad)|trim) }}</option>{% endfor %}</select></div>
+            </div>
+            <button class="cw-btn cw-btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Aksiyon Oluştur</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-7">
+      <div class="action-form">
+        <div class="cw-panel-body">
+          <h3 style="margin:0 0 14px;font-size:1.02rem;font-weight:900;color:#111827;">Açık ve geçmiş aksiyonlar</h3>
+          <p style="margin:0 0 18px;color:#6b7280;font-size:.88rem;line-height:1.8;">Durumu güncellenebilen işlem kartları.</p>
+          {% for action in actions %}
+          <div class="action-card" style="padding:18px;border:1px solid rgba(15,23,42,.06);margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px;">
+              <div>
+                <div style="font-size:1rem;font-weight:900;color:#111827;">{{ action.title }}</div>
+                <div style="margin-top:6px;font-size:.86rem;color:#6b7280;line-height:1.8;">{{ action.description or 'Açıklama yok.' }}</div>
+              </div>
+              <span class="status-pill {{ action.status }}">{% if action.status == 'open' %}<i class="fa-regular fa-clock"></i>Açık{% elif action.status == 'in_progress' %}<i class="fa-solid fa-spinner"></i>Devam Ediyor{% elif action.status == 'resolved' %}<i class="fa-solid fa-circle-check"></i>Çözüldü{% else %}<i class="fa-solid fa-ban"></i>İptal{% endif %}</span>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+              <span class="priority-pill"><i class="fa-solid fa-flag"></i>{{ action.priority }}</span>
+              <span style="font-size:.82rem;color:#6b7280;font-weight:700;"><i class="fa-solid fa-user-tie me-1"></i>{{ action.assigned_manager.full_name if action.assigned_manager else '-' }}</span>
+            </div>
+            <form method="post" class="row g-2 align-items-center">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action_id" value="{{ action.id }}">
+              <div class="col-lg-4"><select class="form-select form-select-sm" name="status">{% for value in ['open','in_progress','resolved','cancelled'] %}<option value="{{ value }}" {% if action.status == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></div>
+              <div class="col-lg-5"><input class="form-control form-control-sm" name="resolution_note" placeholder="Durum notu"></div>
+              <div class="col-lg-3 d-grid"><button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-rotate"></i>Güncelle</button></div>
+            </form>
+          </div>
+          {% else %}
+          <div class="cw-empty"><i class="fa-solid fa-list-check"></i><strong>Kayıtlı aksiyon bulunmuyor</strong><span>İlk aksiyonu soldaki formdan oluşturabilirsiniz.</span></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

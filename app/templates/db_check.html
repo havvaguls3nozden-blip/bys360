@@ -1,0 +1,801 @@
+﻿{% extends "base.html" %}
+
+{% block title %}DB Kontrol - BYS360{% endblock %}
+{% block page_kicker %}Sistem / Teknik İzleme{% endblock %}
+{% block page_title %}Veritabanı Kontrol Merkezi{% endblock %}
+{% block page_subtitle %}
+Veritabanı bağlantısını, temel tablo sağlık durumunu ve sistem şema uyarılarını kurumsal kontrol paneli üzerinden izleyin.
+{% endblock %}
+
+{% block content %}
+{% set table_counts = table_counts if table_counts is defined and table_counts else {
+    'users': 0,
+    'organization_units': 0,
+    'performance_periods': 0,
+    'performance_criteria': 0,
+    'evaluation_assignments': 0,
+    'performance_evaluations': 0,
+    'performance_evaluation_items': 0
+} %}
+{% set schema_errors = schema_errors if schema_errors is defined and schema_errors else [] %}
+{% set db_result = db_result if db_result is defined else 'Bağlantı bilgisi alınamadı' %}
+{% set total_records = total_records if total_records is defined else (
+    (table_counts.users or 0) +
+    (table_counts.organization_units or 0) +
+    (table_counts.performance_periods or 0) +
+    (table_counts.performance_criteria or 0) +
+    (table_counts.evaluation_assignments or 0) +
+    (table_counts.performance_evaluations or 0) +
+    (table_counts.performance_evaluation_items or 0)
+) %}
+{% set populated_table_count = populated_table_count if populated_table_count is defined else [
+    table_counts.users or 0,
+    table_counts.organization_units or 0,
+    table_counts.performance_periods or 0,
+    table_counts.performance_criteria or 0,
+    table_counts.evaluation_assignments or 0,
+    table_counts.performance_evaluations or 0,
+    table_counts.performance_evaluation_items or 0
+] | select('gt', 0) | list | length %}
+{% set empty_table_count = empty_table_count if empty_table_count is defined else (7 - populated_table_count) %}
+{% set table_rows = table_rows if table_rows is defined and table_rows else [
+    {'label':'Kullanıcılar','count':table_counts.users or 0,'is_populated':(table_counts.users or 0) > 0,'status_label':'Dolu' if (table_counts.users or 0) > 0 else 'Boş'},
+    {'label':'Organizasyon Birimleri','count':table_counts.organization_units or 0,'is_populated':(table_counts.organization_units or 0) > 0,'status_label':'Dolu' if (table_counts.organization_units or 0) > 0 else 'Boş'},
+    {'label':'Performans Dönemleri','count':table_counts.performance_periods or 0,'is_populated':(table_counts.performance_periods or 0) > 0,'status_label':'Dolu' if (table_counts.performance_periods or 0) > 0 else 'Boş'},
+    {'label':'Performans Kriterleri','count':table_counts.performance_criteria or 0,'is_populated':(table_counts.performance_criteria or 0) > 0,'status_label':'Dolu' if (table_counts.performance_criteria or 0) > 0 else 'Boş'},
+    {'label':'Değerlendirme Görevleri','count':table_counts.evaluation_assignments or 0,'is_populated':(table_counts.evaluation_assignments or 0) > 0,'status_label':'Dolu' if (table_counts.evaluation_assignments or 0) > 0 else 'Boş'},
+    {'label':'Performans Değerlendirmeleri','count':table_counts.performance_evaluations or 0,'is_populated':(table_counts.performance_evaluations or 0) > 0,'status_label':'Dolu' if (table_counts.performance_evaluations or 0) > 0 else 'Boş'},
+    {'label':'Değerlendirme Kalemleri','count':table_counts.performance_evaluation_items or 0,'is_populated':(table_counts.performance_evaluation_items or 0) > 0,'status_label':'Dolu' if (table_counts.performance_evaluation_items or 0) > 0 else 'Boş'}
+] %}
+{% set table_health_ratio = table_health_ratio if table_health_ratio is defined else ((populated_table_count / 7) * 100 if 7 else 0) %}
+<style>
+    .db-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-grid{
+        display:grid;
+        grid-template-columns:1.25fr .95fr;
+        gap:18px;
+    }
+
+    .hero-card{
+        display:grid;
+        gap:14px;
+    }
+
+    .hero-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        width:max-content;
+        padding:8px 12px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.82rem;
+        font-weight:900;
+        letter-spacing:.02em;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.35rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.35;
+    }
+
+    .hero-text{
+        margin:0;
+        color:#6b7280;
+        font-size:.94rem;
+        line-height:1.8;
+    }
+
+    .hero-actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:2px;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .status-panel{
+        display:grid;
+        gap:14px;
+        height:100%;
+        align-content:start;
+    }
+
+    .status-box{
+        border-radius:22px;
+        padding:20px;
+        border:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,250,252,.92));
+        display:grid;
+        gap:14px;
+    }
+
+    .status-head{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:14px;
+    }
+
+    .status-title{
+        margin:0;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .status-sub{
+        margin:4px 0 0;
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.7;
+    }
+
+    .status-icon{
+        width:50px;
+        height:50px;
+        border-radius:16px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.1rem;
+        flex:0 0 50px;
+    }
+
+    .status-ok .status-icon{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .status-fail .status-icon{
+        background:rgba(185,28,28,.10);
+        color:#b91c1c;
+    }
+
+    .status-pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        width:max-content;
+        padding:10px 14px;
+        border-radius:999px;
+        font-size:.84rem;
+        font-weight:900;
+    }
+
+    .status-ok .status-pill{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .status-fail .status-pill{
+        background:rgba(185,28,28,.10);
+        color:#b91c1c;
+    }
+
+    .mini-meta{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .mini-meta-card{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:18px;
+        background:#fff;
+        padding:14px 16px;
+    }
+
+    .mini-meta-label{
+        font-size:.78rem;
+        color:#6b7280;
+        font-weight:800;
+        margin-bottom:8px;
+        text-transform:uppercase;
+        letter-spacing:.03em;
+    }
+
+    .mini-meta-value{
+        font-size:1.15rem;
+        color:#111827;
+        font-weight:900;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        bottom:-18px;
+        width:82px;
+        height:82px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-top{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:10px;
+        margin-bottom:12px;
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        line-height:1.5;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-icon{
+        width:42px;
+        height:42px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(139,0,0,.10);
+        color:#8B0000;
+        font-size:1rem;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.75rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .section-grid{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+    }
+
+    .section-title{
+        margin:0 0 12px;
+        font-size:1.02rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .section-sub{
+        margin:0 0 16px;
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.75;
+    }
+
+    .db-table-wrap{
+        overflow:auto;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:20px;
+        background:#fff;
+    }
+
+    .db-table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:560px;
+    }
+
+    .db-table th,
+    .db-table td{
+        padding:15px 16px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        text-align:left;
+        vertical-align:middle;
+    }
+
+    .db-table th{
+        font-size:.8rem;
+        color:#6b7280;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+        font-weight:900;
+        background:rgba(248,250,252,.88);
+    }
+
+    .db-table td{
+        font-size:.92rem;
+        color:#111827;
+    }
+
+    .count-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:56px;
+        padding:7px 12px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.82rem;
+        font-weight:900;
+    }
+
+    .health-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:7px 12px;
+        border-radius:999px;
+        font-size:.82rem;
+        font-weight:900;
+    }
+
+    .health-good{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .health-empty{
+        background:rgba(180,83,9,.10);
+        color:#92400e;
+    }
+
+    .health-bad{
+        background:rgba(185,28,28,.10);
+        color:#b91c1c;
+    }
+
+    .alert-card{
+        border-radius:22px;
+        padding:20px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        display:grid;
+        gap:14px;
+    }
+
+    .alert-head{
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .alert-icon{
+        width:46px;
+        height:46px;
+        border-radius:16px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex:0 0 46px;
+        font-size:1rem;
+    }
+
+    .alert-danger .alert-icon{
+        background:rgba(185,28,28,.10);
+        color:#b91c1c;
+    }
+
+    .alert-success .alert-icon{
+        background:rgba(22,101,52,.10);
+        color:#166534;
+    }
+
+    .alert-title{
+        margin:0;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .alert-text{
+        margin:4px 0 0;
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.75;
+    }
+
+    .issue-list{
+        display:grid;
+        gap:10px;
+    }
+
+    .issue-item{
+        border:1px solid rgba(185,28,28,.14);
+        background:#fff7f7;
+        color:#7f1d1d;
+        border-radius:16px;
+        padding:12px 14px;
+        line-height:1.7;
+        font-size:.86rem;
+    }
+
+    .clean-state{
+        border:1px solid rgba(22,101,52,.14);
+        background:#f0fdf4;
+        color:#166534;
+        border-radius:16px;
+        padding:12px 14px;
+        line-height:1.7;
+        font-size:.88rem;
+        font-weight:700;
+    }
+
+    .quick-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:14px;
+    }
+
+    .quick-card{
+        display:grid;
+        gap:10px;
+        padding:18px;
+        border-radius:20px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        transition:all .18s ease;
+    }
+
+    .quick-card:hover{
+        transform:translateY(-1px);
+        box-shadow:0 18px 30px rgba(15,23,42,.06);
+    }
+
+    .quick-icon{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(139,0,0,.10);
+        color:#8B0000;
+        font-size:1rem;
+    }
+
+    .quick-title{
+        margin:0;
+        font-size:.95rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .quick-text{
+        margin:0;
+        color:#6b7280;
+        font-size:.85rem;
+        line-height:1.7;
+    }
+
+    @media (max-width:1200px){
+        .hero-grid,
+        .section-grid,
+        .quick-grid{
+            grid-template-columns:1fr;
+        }
+
+        .stats-grid{
+            grid-template-columns:repeat(2,minmax(0,1fr));
+        }
+    }
+
+    @media (max-width:720px){
+        .stats-grid,
+        .mini-meta{
+            grid-template-columns:1fr;
+        }
+
+        .hero-actions{
+            flex-direction:column;
+            align-items:stretch;
+        }
+
+        .btn-soft{
+            width:100%;
+        }
+    }
+</style>
+
+{% set total_records =
+    (table_counts.users or 0) +
+    (table_counts.organization_units or 0) +
+    (table_counts.performance_periods or 0) +
+    (table_counts.performance_criteria or 0) +
+    (table_counts.evaluation_assignments or 0) +
+    (table_counts.performance_evaluations or 0) +
+    (table_counts.performance_evaluation_items or 0)
+%}
+
+<div class="db-shell">
+    <div class="hero-grid">
+        <div class="glass-card panel-card hero-card">
+            <span class="hero-badge">
+                <i class="fa-solid fa-shield-heart"></i>
+                Teknik Sağlık Merkezi
+            </span>
+
+            <h3 class="hero-title">Veritabanı erişimi ve temel tablo durumu bu ekranda izlenir.</h3>
+
+            <p class="hero-text">
+                Bu ekran, BYS360 altyapısının temel veri katmanını yönetsel seviyede kontrol etmek için
+                kurumsal biçimde düzenlendi. Bağlantı durumu, tablo yoğunluğu ve olası şema uyarıları
+                aynı tasarım dili içinde sunulur.
+            </p>
+
+            <div class="hero-actions">
+                <a href="{{ url_for('main.personnel_list') }}" class="btn-soft primary">
+                    <i class="fa-solid fa-users"></i>
+                    Personel Yönetimi
+                </a>
+                <a href="{{ safe_url_for('main.admin_org_units') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-sitemap"></i>
+                    Birimler
+                </a>
+                <a href="{{ url_for('main.performance_hierarchy_tree') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    Hiyerarşi
+                </a>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card status-panel">
+            <div class="status-box {% if db_result is not none %}status-ok{% else %}status-fail{% endif %}">
+                <div class="status-head">
+                    <div>
+                        <h4 class="status-title">Bağlantı Durumu</h4>
+                        <p class="status-sub">
+                            Veritabanına temel erişim testi ve sistemden dönen anlık durum bilgisi.
+                        </p>
+                    </div>
+                    <div class="status-icon">
+                        <i class="fa-solid {% if db_result is not none %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i>
+                    </div>
+                </div>
+
+                <span class="status-pill">
+                    <i class="fa-solid fa-database"></i>
+                    {% if db_result is not none %}
+                        Bağlantı başarılı · Test sonucu: {{ db_result }}
+                    {% else %}
+                        Bağlantı testi başarısız
+                    {% endif %}
+                </span>
+
+                <div class="mini-meta">
+                    <div class="mini-meta-card">
+                        <div class="mini-meta-label">Toplam Kayıt Yükü</div>
+                        <div class="mini-meta-value">{{ total_records }}</div>
+                    </div>
+                    <div class="mini-meta-card">
+                        <div class="mini-meta-label">Şema Uyarısı</div>
+                        <div class="mini-meta-value">{{ schema_errors|length }}</div>
+                    </div>
+                    <div class="mini-meta-card">
+                        <div class="mini-meta-label">Dolu Tablo</div>
+                        <div class="mini-meta-value">{{ populated_table_count }}</div>
+                    </div>
+                    <div class="mini-meta-card">
+                        <div class="mini-meta-label">Tablo Sağlık Oranı</div>
+                        <div class="mini-meta-value">%{{ '%.1f'|format(table_health_ratio) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-top">
+                <div class="stat-label">Toplam Kullanıcı</div>
+                <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+            </div>
+            <div class="stat-value">{{ table_counts.users or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-top">
+                <div class="stat-label">Organizasyon Birimi</div>
+                <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+            </div>
+            <div class="stat-value">{{ table_counts.organization_units or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-top">
+                <div class="stat-label">Performans Dönemi</div>
+                <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            </div>
+            <div class="stat-value">{{ table_counts.performance_periods or 0 }}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-top">
+                <div class="stat-label">Değerlendirme Kriteri</div>
+                <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
+            </div>
+            <div class="stat-value">{{ table_counts.performance_criteria or 0 }}</div>
+        </div>
+    </div>
+
+    <div class="section-grid">
+        <div class="glass-card panel-card">
+            <h3 class="section-title">Tablo Bazlı Kayıt Görünümü</h3>
+            <p class="section-sub">
+                Kritik tabloların anlık kayıt yoğunluğu burada listelenir. Sıfır kayıt görülen alanlar
+                ayrıca dikkat edilmesi gereken yapılandırma veya veri eksikliği sinyali olabilir.
+            </p>
+
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Tablo</th>
+                            <th>Kayıt Sayısı</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in table_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td><span class="count-badge">{{ row.count }}</span></td>
+                            <td>
+                                <span class="health-badge {% if row.is_populated %}health-good{% else %}health-empty{% endif %}">
+                                    <i class="fa-solid {% if row.is_populated %}fa-circle-check{% else %}fa-hourglass-half{% endif %}"></i>
+                                    {{ row.status_label }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            {% if schema_errors %}
+                <div class="alert-card alert-danger">
+                    <div class="alert-head">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h3 class="alert-title">Şema Uyarıları Tespit Edildi</h3>
+                            <p class="alert-text">
+                                Uygulama açılışında algılanan veritabanı şema sorunları aşağıda listelenmiştir.
+                                Bu kayıtlar mimari uyumsuzluk veya migration eksikliği gösterebilir.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="issue-list">
+                        {% for err in schema_errors %}
+                            <div class="issue-item">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert-card alert-success">
+                    <div class="alert-head">
+                        <div class="alert-icon">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="alert-title">Şema Kontrolü Temiz</h3>
+                            <p class="alert-text">
+                                Sistem bu oturumda ek şema uyumsuzluğu raporlamadı. Temel tablo erişimleri sağlıklı görünüyor.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="clean-state">
+                        Uygulama tarafında raporlanan aktif şema hatası bulunmuyor.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <h3 class="section-title">Hızlı Teknik Erişim</h3>
+        <p class="section-sub">
+            Veri katmanıyla ilişkili ana yönetim ekranlarına buradan hızlı geçiş yapabilirsiniz.
+        </p>
+
+        <div class="quick-grid">
+            <a href="{{ url_for('main.personnel_list') }}" class="quick-card">
+                <div class="quick-icon"><i class="fa-solid fa-users"></i></div>
+                <h4 class="quick-title">Personel Havuzu</h4>
+                <p class="quick-text">Kullanıcı kayıtlarını ve aktif personel durumunu kontrol edin.</p>
+            </a>
+
+            <a href="{{ safe_url_for('main.admin_org_units') }}" class="quick-card">
+                <div class="quick-icon"><i class="fa-solid fa-building"></i></div>
+                <h4 class="quick-title">Birim Yapısı</h4>
+                <p class="quick-text">Organizasyon ağacını ve birim kayıtlarını gözden geçirin.</p>
+            </a>
+
+            <a href="{{ url_for('main.performance_hierarchy_settings') }}" class="quick-card">
+                <div class="quick-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                <h4 class="quick-title">Hiyerarşi Atamaları</h4>
+                <p class="quick-text">Amir zinciri ve değerlendirme ilişkilerini doğrulayın.</p>
+            </a>
+
+            <a href="{{ url_for('main.performance_periods') }}" class="quick-card">
+                <div class="quick-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <h4 class="quick-title">Dönem Yönetimi</h4>
+                <p class="quick-text">Aktif performans dönemlerini ve yayın akışını yönetin.</p>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

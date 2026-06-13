@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Birim Ekle - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Yapı{% endblock %}
+{% block page_title %}Yeni Birim Ekle{% endblock %}
+{% block page_subtitle %}Kurumsal hiyerarşiye yeni bir birim ekleyin{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Birim Adı</label>
+                <input type="text" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Birim Türü</label>
+                <select name="unit_type" required>
+                    <option value="">Seçiniz</option>
+                    {% for value, label in unit_type_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Üst Birim</label>
+                <select name="parent_id">
+                    <option value="">Üst Birim Yok</option>
+                    {% for item in parent_units %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group full">
+                <label class="checkbox-row">
+                    <input type="checkbox" name="is_active" checked>
+                    Aktif olsun
+                </label>
+            </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:16px;">
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-floppy-disk"></i> Kaydet
+            </button>
+            <a href="{{ url_for('main.admin_org_units') }}" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

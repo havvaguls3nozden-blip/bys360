@@ -1,0 +1,144 @@
+/* BYS360 iOS PWA V3.5 stable mobile shell - install prompt disabled */
+:root {
+  --bys-ios-red: #8B0000;
+  --bys-ios-red-dark: #650000;
+  --bys-ios-bg: #f7f4f2;
+  --bys-ios-card: rgba(255,255,255,.88);
+  --bys-ios-border: rgba(139,0,0,.16);
+  --bys-ios-shadow: 0 18px 45px rgba(35, 20, 20, .14);
+  --bys-ios-radius: 22px;
+  --bys-safe-top: env(safe-area-inset-top, 0px);
+  --bys-safe-right: env(safe-area-inset-right, 0px);
+  --bys-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bys-safe-left: env(safe-area-inset-left, 0px);
+}
+
+html.bys-ios-pwa,
+html.bys-ios-browser {
+  min-height: 100%;
+  background: radial-gradient(circle at top left, rgba(139,0,0,.08), transparent 34%), var(--bys-ios-bg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.bys-ios-pwa body,
+html.bys-ios-browser body {
+  min-height: calc(var(--bys-vh, 1vh) * 100);
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  padding-left: var(--bys-safe-left);
+  padding-right: var(--bys-safe-right);
+}
+
+html.bys-ios-pwa .navbar,
+html.bys-ios-pwa .topbar,
+html.bys-ios-pwa header,
+html.bys-ios-browser .navbar,
+html.bys-ios-browser .topbar,
+html.bys-ios-browser header {
+  padding-top: max(8px, var(--bys-safe-top));
+  backdrop-filter: saturate(145%) blur(18px);
+  -webkit-backdrop-filter: saturate(145%) blur(18px);
+}
+
+html.bys-ios-pwa .sidebar,
+html.bys-ios-browser .sidebar {
+  padding-top: max(12px, var(--bys-safe-top));
+  background: linear-gradient(180deg, var(--bys-ios-red) 0%, var(--bys-ios-red-dark) 100%);
+}
+
+html.bys-ios-pwa .main-content,
+html.bys-ios-pwa main,
+html.bys-ios-browser .main-content,
+html.bys-ios-browser main {
+  padding-bottom: max(24px, calc(var(--bys-safe-bottom) + 18px));
+}
+
+html.bys-ios-pwa .card,
+html.bys-ios-pwa .panel,
+html.bys-ios-pwa .glass-card,
+html.bys-ios-browser .card,
+html.bys-ios-browser .panel,
+html.bys-ios-browser .glass-card {
+  border-radius: var(--bys-ios-radius);
+  box-shadow: var(--bys-ios-shadow);
+  border-color: var(--bys-ios-border);
+}
+
+html.bys-ios-pwa button,
+html.bys-ios-pwa .btn,
+html.bys-ios-pwa a.btn,
+html.bys-ios-browser button,
+html.bys-ios-browser .btn,
+html.bys-ios-browser a.btn {
+  min-height: 44px;
+  border-radius: 14px;
+  touch-action: manipulation;
+}
+
+html.bys-ios-pwa input,
+html.bys-ios-pwa select,
+html.bys-ios-pwa textarea,
+html.bys-ios-browser input,
+html.bys-ios-browser select,
+html.bys-ios-browser textarea {
+  min-height: 44px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* Install prompt is disabled in V3.5 to prevent duplicate banners and iOS white-screen risk. */
+.bys-ios-install-card,
+#bys360-ios-install-final-v34,
+#bys360-ios-pwa-install,
+#bys360-ios-install,
+.ios-install-prompt,
+.pwa-install-prompt,
+.install-prompt,
+.a2hs-prompt,
+.add-to-home-screen,
+.add-to-homescreen,
+.home-screen-prompt,
+.homescreen-prompt,
+[data-bys360-ios-install-card],
+[data-bys360-ios-install-old],
+[data-ios-install],
+[data-pwa-install] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+  html.bys-ios-pwa .container,
+  html.bys-ios-pwa .page-container,
+  html.bys-ios-browser .container,
+  html.bys-ios-browser .page-container {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  html.bys-ios-pwa table,
+  html.bys-ios-browser table {
+    font-size: 13px;
+  }
+
+  html.bys-ios-pwa .table-responsive,
+  html.bys-ios-browser .table-responsive {
+    border-radius: 18px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html.bys-ios-pwa .modal-dialog,
+  html.bys-ios-browser .modal-dialog {
+    margin: max(12px, var(--bys-safe-top)) 12px max(12px, var(--bys-safe-bottom));
+  }
+}

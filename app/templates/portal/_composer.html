@@ -1,0 +1,169 @@
+{# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_BEGIN #}
+<section class="portal-card portal-composer-card portal-composer-accordion portal-v2c-composer" aria-label="Yeni portal paylaşımı" data-portal-composer-accordion>
+  <details class="portal-composer-details" data-portal-composer-details>
+    <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat">
+      <div class="portal-composer-summary-left">
+        <div class="portal-avatar portal-avatar-ring">
+          {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+        </div>
+        <div class="portal-composer-title compact-title">
+          <span class="portal-kicker"><i class="fa-solid fa-pen-nib"></i> Paylaşım</span>
+          <h2>Ne paylaşmak istersiniz?</h2>
+          <p>Duyuru, bilgilendirme, teşekkür, iyi uygulama veya etkinlik notu paylaşabilirsiniz.</p>
+        </div>
+      </div>
+      <span class="portal-composer-summary-action"><i class="fa-solid fa-plus"></i> Paylaş</span>
+    </summary>
+
+    <div class="portal-composer-expanded-note">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Paylaşımınız seçtiğiniz görünürlük kapsamına göre ilgili kullanıcıların akışında görünür.</span>
+    </div>
+
+
+
+    {# BYS360_PORTAL_EXPERIENCE_V2C_COMPOSER_CHIPS #}
+    <div class="portal-v2c-share-chips" aria-label="Paylaşım türleri">
+      <span><i class="fa-solid fa-bullhorn"></i> Duyuru</span>
+      <span><i class="fa-regular fa-newspaper"></i> Bilgilendirme</span>
+      <span><i class="fa-regular fa-heart"></i> Teşekkür</span>
+      <span><i class="fa-solid fa-award"></i> İyi Uygulama</span>
+      <span><i class="fa-regular fa-calendar-check"></i> Etkinlik</span>
+    </div>
+
+    {# BYS360_PORTAL_PROFILE_WALL_V2_8_COMPOSER_NOTE #}
+    {% if portal_wall_owner_user is defined and portal_wall_owner_user %}
+      <div class="portal-wall-target-note">
+        <i class="fa-regular fa-id-badge"></i>
+        {% if portal_wall_owner_user.id == current_user.id %}
+          <span>Bu paylaşım kendi profil duvarınızda yayınlanacaktır.</span>
+        {% else %}
+          <span>Bu paylaşım <strong>{{ portal_wall_owner_user.full_name or (portal_wall_owner_user.ad ~ ' ' ~ portal_wall_owner_user.soyad) or portal_wall_owner_user.email }}</strong> profil duvarında yayınlanacaktır.</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  
+    {# BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_NOTE #}
+    {% if portal_wall_owner_user is defined and portal_wall_owner_user %}
+      <div class="portal-wall-target-note v29">
+        <i class="fa-regular fa-id-card"></i>
+        {% if portal_wall_owner_user.id == current_user.id %}
+          <span>Kendi profil duvarınıza yazıyorsunuz.</span>
+        {% else %}
+          <span><strong>{{ portal_wall_owner_user.full_name or ((portal_wall_owner_user.ad or '') ~ ' ' ~ (portal_wall_owner_user.soyad or '')) or portal_wall_owner_user.email }}</strong> profil duvarına yazıyorsunuz.</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  <form id="portal-wall-composer" method="post" action="{{ safe_url_for('main.portal_post_create', fallback='/portal/posts') }}" class="portal-composer-form" data-portal-form enctype="multipart/form-data">
+      {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+      {# BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_HIDDEN #}
+      {% if portal_wall_owner_user is defined and portal_wall_owner_user %}
+        <input type="hidden" name="target_wall_user_id" value="{{ portal_wall_owner_user.id }}">
+      {% endif %}
+      {% if portal_group is defined and portal_group %}<input type="hidden" name="target_group_id" value="{{ portal_group.id }}">{% endif %}
+      {# BYS360_PORTAL_PROFILE_WALL_V2_8_COMPOSER_HIDDEN #}
+      {% if portal_wall_owner_user is defined and portal_wall_owner_user %}
+        <input type="hidden" name="target_wall_user_id" value="{{ portal_wall_owner_user.id }}">
+      {% endif %}
+
+      <div class="portal-form-stack">
+        <label class="portal-field-label" for="portal-title">Başlık <small>isteğe bağlı</small></label>
+        <input id="portal-title" class="portal-input" type="text" name="title" maxlength="220" placeholder="Örn. Eğitim duyurusu, etkinlik notu, teşekkür paylaşımı">
+      </div>
+
+      <div class="portal-form-stack">
+        <label class="portal-field-label" for="portal-body">Paylaşım metni</label>
+        <textarea id="portal-body" class="portal-textarea" name="body" maxlength="4000" required data-portal-counter="portal-body-counter" placeholder="Kurum içi duyuru, bilgilendirme, teşekkür veya iyi uygulama notunuzu yazın..."></textarea>
+        <div class="portal-field-help"><span><i class="fa-solid fa-circle-info"></i> Kişisel, hassas veya performans puanı içeren bilgi paylaşmayın.</span><small id="portal-body-counter">0 / 4000</small></div>
+      </div>
+
+      <div class="portal-form-grid refined">
+        <label>Paylaşım Türü
+          <select name="post_type" class="portal-select">
+            {% for key, label in portal_post_type_options %}
+              <option value="{{ key }}" {% if key == 'corporate_announcement' and not portal_can_announce %}disabled{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Görünürlük
+          <select name="visibility_scope" class="portal-select" data-portal-visibility>
+            {% for key, label in portal_visibility_options %}
+              <option value="{{ key }}" {% if portal_group is defined and portal_group and key == 'group' %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+
+      <div class="portal-visibility-help" data-portal-visibility-help>
+        <i class="fa-solid fa-eye"></i>
+        <span>Herkese açık paylaşım, kurum içindeki tüm yetkili kullanıcıların yayın akışında görünür.</span>
+      </div>
+
+      <div class="portal-target-panel" data-portal-target="selected_users">
+        <label class="portal-field-label">Görecek kişiler</label>
+        <select name="target_user_ids" class="portal-select" multiple size="6">
+          {% for u in portal_target_users %}
+            <option value="{{ u.id }}">{{ u.full_name or (u.ad ~ ' ' ~ u.soyad) or u.email }}</option>
+          {% endfor %}
+        </select>
+        <small>Ctrl tuşu ile birden fazla kişi seçebilirsiniz. Seçim yapılmazsa paylaşım kaydedilmez.</small>
+      </div>
+
+      <div class="portal-target-panel" data-portal-target="group">
+        <label class="portal-field-label">Görecek grup</label>
+        <select name="target_group_id" class="portal-select">
+          <option value="">Grup seçin</option>
+          {% for g in portal_groups %}
+            <option value="{{ g.id }}" {% if portal_group is defined and portal_group and g.id == portal_group.id %}selected{% endif %}>{{ g.name }}</option>
+          {% endfor %}
+        </select>
+        <small>Grup paylaşımı yalnızca ilgili grup kapsamındaki kullanıcılara gösterilir.</small>
+      </div>
+
+      <div class="portal-target-panel" data-portal-target="role">
+        <label class="portal-field-label">Görecek rol</label>
+        <select name="target_role_name" class="portal-select">
+          <option value="">Rol seçin</option>
+          {% for role_name in portal_all_roles %}<option value="{{ role_name }}">{{ role_name }}</option>{% endfor %}
+        </select>
+        <small>Rol bazlı paylaşım, ilgili yetki kapsamındaki kullanıcılara gösterilir.</small>
+      </div>
+
+      <div class="portal-media-tools bys360-v2121-media-tools" data-portal-media-tools>
+        <div class="portal-media-field">
+          <label class="portal-field-label" for="portal-images"><i class="fa-regular fa-images"></i> Fotoğraf ekle <small>en fazla 6</small></label>
+          <input id="portal-images" class="portal-file-input" type="file" name="portal_images" accept="image/jpeg,image/png,image/webp,image/gif" multiple data-portal-images>
+          <span class="portal-media-count" data-portal-image-count></span>
+          <small class="portal-media-note">JPG, PNG, WEBP veya GIF yükleyebilirsiniz. Paylaşım dosya sınırı 50 MB olarak uygulanır.</small>
+        </div>
+        <div class="portal-media-field">
+          <label class="portal-field-label" for="portal-video-file"><i class="fa-solid fa-video"></i> Video dosyası <small>MP4 destekli</small></label>
+          <input id="portal-video-file" class="portal-file-input" type="file" name="portal_video_file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v" data-portal-video-file>
+          <span class="portal-media-count" data-portal-video-count></span>
+          <small class="portal-media-note">MP4, WEBM, MOV veya M4V video yükleyebilirsiniz. En fazla 50 MB.</small>
+        </div>
+        <div class="portal-media-field portal-media-field-wide">
+          <label class="portal-field-label" for="portal-video-url"><i class="fa-brands fa-youtube"></i> Video bağlantısı <small>isteğe bağlı</small></label>
+          <input id="portal-video-url" class="portal-input" type="url" name="video_url" maxlength="700" placeholder="YouTube veya Vimeo bağlantısı yapıştırın">
+          <div class="portal-video-link-help"><i class="fa-solid fa-shield-halved"></i><span>Dosya yüklemeden güvenli YouTube/Vimeo bağlantısı da ekleyebilirsiniz.</span></div>
+        </div>
+      </div>
+      {# BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_COMPOSER #}
+
+      <div class="portal-composer-options">
+        <label class="portal-check"><input type="checkbox" name="comments_enabled" checked> Yorumlara izin ver</label>
+        <span><i class="fa-solid fa-shield-halved"></i> Görünürlük ve işlem geçmişi denetlenebilir şekilde saklanır.</span>
+      </div>
+
+      <div class="portal-composer-actions">
+        <div class="portal-submit-note"><i class="fa-regular fa-lightbulb"></i> Kurumsal, kısa ve anlaşılır bir dil tercih edin.</div>
+        <button class="portal-btn primary portal-submit" type="submit" data-portal-submit><i class="fa-solid fa-paper-plane"></i> Yayınla</button>
+      </div>
+    </form>
+  </details>
+</section>
+{# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_END #}
+
+{# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

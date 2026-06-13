@@ -1,0 +1,43 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='test' %}
+{# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_10_STATUS_PILL_FIX #}
+{% macro status_pill(status, label=None) -%}
+ {% set _status = (status|string|lower) if status is not none else 'ok' %}
+ {% set _label = label if label is not none else (status if status is not none else 'Hazır') %}
+ {% if _status in ['ok', 'success', 'successful', 'ready', 'healthy', 'active', 'passed', 'complete', 'completed', 'sent', 'hazır', 'tamam', 'basarili', 'başarılı'] %}
+ <span class="cic-badge ok"><i class="fa-solid fa-circle-check"></i> {{ _label }}</span>
+ {% elif _status in ['warning', 'warn', 'pending', 'waiting', 'risk', 'attention', 'review', 'uyari', 'uyarı', 'bekliyor', 'kontrol'] %}
+ <span class="cic-badge warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ _label }}</span>
+ {% elif _status in ['danger', 'error', 'failed', 'fail', 'missing', 'critical', 'blocked', 'inactive', 'hata', 'hatali', 'hatalı', 'eksik', 'kritik'] %}
+ <span class="cic-badge danger"><i class="fa-solid fa-circle-xmark"></i> {{ _label }}</span>
+ {% else %}
+ <span class="cic-badge neutral"><i class="fa-solid fa-circle-info"></i> {{ _label }}</span>
+ {% endif %}
+{%- endmacro %}
+
+{% block cic_content %}
+<!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL -->
+<form method="post" class="cic-grid-v4" id="phase5TestForm">
+
+ <!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY -->
+ 
+ <!-- BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE7_LIVE_RELEASE_USAGE -->
+ <section class="cic-card-v4 span-12 cic-phase7-release">
+ <div class="cic-card-header"><div><h2>Canlı Gönderim Release Kilidi</h2><p class="cic-muted-v4">Ön kontrol başarılı olmadan, alıcı kontrolü yapılmadan ve log ekranı izlenmeden toplu gerçek gönderim başlatılmamalıdır.</p></div><span class="cic-status-pill warn"><i class="fa-solid fa-triangle-exclamation"></i> önce gelir</span></div>
+ <div class="cic-phase7-warning"><strong>Uygulama standardı:</strong> İlk canlı denemede yalnızca grup kullanılmalı; kurum geneline gönderim logları temiz görüldükten sonra yapılmalıdır.</div>
+ </section>
+
+<section class="cic-card-v4 span-12 cic-phase6-live-gate">
+ <div class="cic-card-header"><div><h2>Gerçek Gönderim Son Kontrol Kapısı</h2><p class="cic-muted-v4">Gerçek mail göndermeden önce görev, konu, alıcı sayısı, ön kontrol sonucu ve mail altyapısı doğrulanmalıdır.</p></div>{{ status_pill(phase6.live.status, phase6.live.label) }}</div>
+ <div class="cic-phase6-final-grid">
+ {% for item in phase6.final_send_checks %}<div class="cic-phase6-final-item {{ item.status }}"><i class="fa-solid {{ item.icon }}"></i><strong>{{ item.title }}</strong><span>{{ item.detail }}</span></div>{% endfor %}
+ </div>
+ </section>
+
+ {{ cic_csrf() }}
+ <div class="cic-card-v4 span-5"><div class="cic-card-header"><div><h2>Test ve Gönderim Merkezi</h2><p class="cic-muted-v4">Önce ön kontrol ile alıcı, şablon ve log akışını doğrulayın. Gerçek gönderim bilinçli onay gerektirir.</p></div></div><div class="cic-field"><label>Görev</label><select class="cic-select-v4" name="task_key" id="taskSelect">{% for task in tasks %}<option value="{{ task.key }}" data-label="{{ task.label }}">{{ task.label }}</option>{% endfor %}</select></div><div class="cic-field"><label>Hedef</label><select class="cic-select-v4" name="target" id="targetSelect"><option value="self">Sadece bana gönder</option><option value="selected">Aşağıda seçtiğim kişilere gönder</option></select></div><label class="cic-task-card" style="display:block"><span class="cic-switch-line"><input type="checkbox" name="dry_run" value="1" checked id="dryRunCheck"> Ön kontrol yap; gerçek mail gönderme</span><p class="cic-muted-v4" style="margin:8px 0 0">Bu seçenek açıkken sistem alıcı ve içerik akışını kontrol eder, mail çıkışı yapmaz.</p></label><div id="realSendWarning" class="cic-danger-box" style="display:none"><strong>Gerçek gönderim uyarısı:</strong> Ön kontrol kapalı. Bu işlem seçilen hedefe göre e-posta gönderebilir.</div><button class="cic-btn-v4" style="width:100%;margin-top:14px"><i class="fa-solid fa-paper-plane"></i> İşlemi Başlat</button></div>
+ <div class="cic-card-v4 span-7"><div class="cic-card-header"><div><h2>Son İşlem Özeti</h2><p class="cic-muted-v4">Ön kontrol veya gerçek gönderimden gelen son kayıt.</p></div>{% if phase3_last_result %}<span class="cic-status-pill {{ 'ok' if phase3_last_result.ok else 'warn' }}">{{ 'Başarılı' if phase3_last_result.ok else 'Kontrol gerekli' }}</span>{% endif %}</div>{% if phase3_last_result %}<div class="cic-phase5-result-grid"><div><span>Alıcı</span><b>{{ phase3_last_result.recipient_count }}</b></div><div><span>Başarılı</span><b>{{ phase3_last_result.success_count }}</b></div><div><span>Hatalı</span><b>{{ phase3_last_result.fail_count }}</b></div><div><span>Ön kontrol</span><b>{{ 'Evet' if phase3_last_result.dry_run else 'Hayır' }}</b></div></div><div class="cic-help-v4"><strong>{{ phase3_last_result.message }}</strong><br>Görev: {{ phase3_last_result.task_label }} · {{ phase3_last_result.ran_at }} · {{ phase3_last_result.actor or '-' }}</div><div style="max-height:360px;overflow:auto"><table class="cic-table-v4"><thead><tr><th>Alıcı</th><th>E-posta</th><th>Durum</th></tr></thead><tbody>{% for item in phase3_last_result.details or [] %}<tr><td>{{ item.name or '-' }}</td><td>{{ item.email or '-' }}</td><td>{% if item.ok %}<span class="cic-status-pill ok">{{ item.status }}</span>{% else %}<span class="cic-status-pill danger">{{ item.status }}</span>{% endif %}</td></tr>{% else %}<tr><td colspan="3">Kişi detayı bulunmuyor.</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="cic-help-v4">Henüz işlem sonucu yok. İlk adım olarak ön kontrol yapın.</div>{% endif %}</div>
+ <div class="cic-card-v4 span-12"><div class="cic-card-header"><div><h2>İsteğe Bağlı Test Alıcıları</h2><p class="cic-muted-v4">Hedef “seçtiğim kişiler” olduğunda bu listedeki işaretli kişiler kullanılır.</p></div><span class="cic-status-pill info"><span id="testSelectedCount">0</span> seçili</span></div><input id="testSearch" class="cic-input-v4" placeholder="Test alıcısı ara..." style="margin-bottom:14px"><div id="testUsers" class="cic-grid-v4" style="gap:10px;max-height:540px;overflow:auto;padding-right:4px">{% for user in users %}<label class="cic-person-card-v4 span-4" data-test-card data-search="{{ user_full_name(user) }} {{ user.email|default('', true) }} {{ user.birim|default('', true) }} {{ user.unvan|default('', true) }}"><div class="cic-person-v4"><span class="cic-avatar-v4">{{ user_initial(user) }}</span><span style="flex:1"><span class="cic-switch-line"><input type="checkbox" name="user_ids" value="{{ user.id }}" data-test-check> <strong>{{ user_full_name(user) }}</strong></span><small class="cic-muted-v4">{{ user.email or 'E-posta yok' }}<br>{{ user.birim or '-' }} · {{ user.unvan or '-' }}</small></span></div></label>{% endfor %}</div></div>
+</form>
+<script>(function(){const dry=document.getElementById('dryRunCheck'), warn=document.getElementById('realSendWarning'), form=document.getElementById('phase5TestForm'), checks=[...document.querySelectorAll('[data-test-check]')], cnt=document.getElementById('testSelectedCount'), cards=[...document.querySelectorAll('[data-test-card]')], search=document.getElementById('testSearch'); function sync(){let n=0; checks.forEach(x=>{if(x.checked)n++; const c=x.closest('[data-test-card]'); if(c)c.classList.toggle('is-checked',x.checked);}); cnt.textContent=n; warn.style.display=dry.checked?'none':'block';} checks.forEach(x=>x.addEventListener('change',sync)); dry.addEventListener('change',sync); form.addEventListener('submit',function(e){if(!dry.checked&&!confirm('Ön kontrol kapalı. Gerçek e-posta gönderimi başlatılacak. Devam edilsin mi?'))e.preventDefault();}); search.addEventListener('input',()=>{const q=search.value.toLocaleLowerCase('tr-TR').trim(); cards.forEach(c=>c.style.display=(!q||c.dataset.search.toLocaleLowerCase('tr-TR').includes(q))?'block':'none');}); sync();})();</script>
+{% endblock %}

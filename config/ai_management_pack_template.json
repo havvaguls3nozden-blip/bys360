@@ -1,0 +1,9 @@
+{
+  "report_title": "BYS360 AI Yönetici Rapor Paketi",
+  "report_subtitle": "Karar geçmişi, istem sürüm karşılaştırması ve canlıya hazırlık görünümü",
+  "distribution_plan": {
+    "default_recipients": ["Üst Yönetim", "İK", "BT", "Sistem Yöneticisi"],
+    "default_formats": ["markdown", "json", "csv"],
+    "default_note": "Rapor yalnızca yönetici gözden geçirmesi ve insan onayı ile paylaşılmalıdır. AI çıktıları bağlayıcı karar metni değildir."
+  }
+}

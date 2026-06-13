@@ -1,0 +1,124 @@
+{# BYS360_SCORECARD_LIVE_HERO_INCLUDE_V3_BEGIN #}
+<style>
+    .bys-scorecard-hero-v3 {
+        --bys-red: #8B0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .10);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 34%),
+            linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.74));
+        box-shadow: 0 24px 70px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin: 0 0 18px;
+    }
+
+    .bys-scorecard-hero-v3::after {
+        content: "";
+        position: absolute;
+        right: -90px;
+        top: -100px;
+        width: 270px;
+        height: 270px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .08);
+        pointer-events: none;
+    }
+
+    .bys-scorecard-hero-v3-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 800;
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    .bys-scorecard-hero-v3-title {
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.05;
+        font-weight: 850;
+        color: var(--bys-ink);
+        margin: 0;
+        letter-spacing: -.04em;
+    }
+
+    .bys-scorecard-hero-v3-subtitle {
+        max-width: 980px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .bys-scorecard-hero-v3-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .bys-scorecard-hero-v3-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 11px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.76);
+        border: 1px solid var(--bys-line);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    @media (max-width: 720px) {
+        .bys-scorecard-hero-v3 {
+            padding: 22px;
+            border-radius: 22px;
+        }
+
+        .bys-scorecard-hero-v3-badges {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="bys-scorecard-hero-v3" data-page="not-karnesi">
+    <div class="bys-scorecard-hero-v3-eyebrow">
+        <i class="fa-solid fa-id-card-clip"></i>
+        Performans Yönetimi
+    </div>
+
+    <h1 class="bys-scorecard-hero-v3-title">Not Karnesi</h1>
+
+    <p class="bys-scorecard-hero-v3-subtitle">
+        Performans değerlendirme sonuçları, kriter bazlı puanlar, amir görüşleri ve yayın durumu bu ekranda
+        yetki kapsamına göre görüntülenir.
+    </p>
+
+    <div class="bys-scorecard-hero-v3-badges">
+        <span class="bys-scorecard-hero-v3-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+            Yetki kontrollü görünüm
+        </span>
+        <span class="bys-scorecard-hero-v3-badge">
+            <i class="fa-solid fa-lock"></i>
+            Yayın durumuna bağlı erişim
+        </span>
+        <span class="bys-scorecard-hero-v3-badge">
+            <i class="fa-solid fa-list-check"></i>
+            Kriter bazlı değerlendirme
+        </span>
+    </div>
+</section>
+{# BYS360_SCORECARD_LIVE_HERO_INCLUDE_V3_END #}

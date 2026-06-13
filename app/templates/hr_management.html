@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Personel Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Modüller{% endblock %}
+{% block page_title %}Personel Yönetimi{% endblock %}
+{% block page_subtitle %}
+Personel ana başlıklarını tek panelde toplayan, riskleri ve aksiyon önceliklerini görünür kılan yönetim ekranı.
+{% endblock %}
+
+{% block content %}
+{% set _scope_options = hr_scope.scope_options if hr_scope is defined and hr_scope and hr_scope.scope_options is defined else ([{'value': (selected_scope_mode if selected_scope_mode is defined and selected_scope_mode else 'personal'), 'label': 'Kişisel görünüm'}]) %}
+<style>
+    .workspace-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}
+    .hero{background:#fff}
+    .hero h3{margin:0 0 10px;font-size:1.42rem;font-weight:900;color:#111827}
+    .hero p{margin:0;color:#6b7280;line-height:1.8}
+    .hero-badges,.chip-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-weight:800;font-size:.86rem;color:#374151}
+    .chip.critical{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+    .chip.warn{background:#fff7ed;color:#9a3412;border-color:#fdba74}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .stat{padding:18px;border-radius:20px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+    .stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}
+    .stat .value{font-size:1.78rem;font-weight:900;color:#111827;line-height:1}
+    .muted{font-size:.9rem;color:#6b7280;line-height:1.7}
+    .scope-strip{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);box-shadow:0 14px 28px rgba(15,23,42,.06);margin-top:18px}
+    .scope-meta{display:grid;gap:4px}.scope-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.scope-title{font-size:1.05rem;font-weight:900;color:#111827}.scope-sub{font-size:.9rem;color:#6b7280;line-height:1.65}.scope-options{display:flex;flex-wrap:wrap;gap:8px}.scope-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(15,23,42,.1);background:#fff;color:#374151;font-weight:800;font-size:.86rem}.scope-pill.active{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}
+    .stack{display:grid;gap:18px;margin-top:18px}
+    .section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}
+    .module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .module-card{padding:18px;border-radius:20px;border:1px solid rgba(15,23,42,.08);text-decoration:none;color:#111827;background:#fff;box-shadow:0 12px 24px rgba(15,23,42,.05)}
+    .module-card .icon{font-size:1.15rem;color:#8B0000;margin-bottom:10px}
+    .module-card .title{font-weight:900;margin-bottom:6px}
+    .module-card .text{font-size:.9rem;color:#6b7280;line-height:1.65}
+    .action-list{display:grid;gap:12px}
+    .action-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}
+    .action-row.critical{border-color:#fecaca;background:#fff7f7}.action-row.watch{border-color:#fed7aa;background:#fffaf3}
+    .action-title{font-weight:900;color:#111827;margin-bottom:4px}.action-text{color:#6b7280;font-size:.88rem;line-height:1.65}
+    .action-count{min-width:54px;height:54px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:900;background:#f8fafc;color:#111827}
+    .action-row.critical .action-count{background:#fef2f2;color:#991b1b}.action-row.watch .action-count{background:#fff7ed;color:#9a3412}
+    .subtle-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;color:#8B0000;margin-top:10px}
+    .table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}
+    table{width:100%;border-collapse:collapse;min-width:680px}.compact{min-width:560px}
+    th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}
+    th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}
+    .status{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.ok{background:#ecfdf5;color:#065f46}.warn-pill{background:#fff7ed;color:#9a3412}.bad{background:#fef2f2;color:#991b1b}
+    @media (max-width:1100px){.workspace-grid,.module-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.scope-strip{flex-direction:column;align-items:flex-start}}
+</style>
+
+<div class="workspace-grid">
+    <div class="panel hero">
+        <h3>Kontrol paneli</h3>
+        <p>İzin, devamsızlık, vekâlet, özlük tamlığı ve gelişim görünümünü aynı ekranda okuyarak modüller arasında hızlı geçiş yapabilirsiniz.</p>
+        <div class="hero-badges">
+            <span class="chip"><i class="fa-solid fa-calendar-check"></i> Bugün izinli: {{ leave_today_count }}</span>
+            <span class="chip"><i class="fa-solid fa-user-clock"></i> Devamsızlık: {{ attendance_today_count }}</span>
+            <span class="chip"><i class="fa-solid fa-people-arrows-left-right"></i> Aktif vekâlet: {{ active_delegation_count }}</span>
+            <span class="chip {% if uncovered_count %}critical{% endif %}"><i class="fa-solid fa-triangle-exclamation"></i> Açıkta görev: {{ uncovered_count }}</span>
+        </div>
+        <div class="chip-row">
+            <span class="chip {% if pending_leave_count %}warn{% endif %}"><i class="fa-solid fa-hourglass-half"></i> Bekleyen izin: {{ pending_leave_count }}</span>
+            <span class="chip {% if pending_attendance_count %}warn{% endif %}"><i class="fa-solid fa-list-check"></i> Bekleyen devamsızlık: {{ pending_attendance_count }}</span>
+            <span class="chip"><i class="fa-solid fa-user-pen"></i> Eksik özlük: {{ incomplete_profile_count }}</span>
+            <span class="chip"><i class="fa-solid fa-wallet"></i> Kritik bakiye: {{ balance_risk_count }}</span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h4 class="section-title">Yönetim özeti</h4>
+        <div class="stats">
+            <div class="stat"><div class="label">Profil tamlığı ortalaması</div><div class="value">{{ completion_avg }}%</div></div>
+            <div class="stat"><div class="label">Yüksek potansiyel</div><div class="value">{{ high_potential_count }}</div></div>
+            <div class="stat"><div class="label">Gelişim izlemi</div><div class="value">{{ development_watch_count }}</div></div>
+            <div class="stat"><div class="label">Yaklaşan vekâlet sonu</div><div class="value">{{ expiring_delegation_count }}</div></div>
+        </div>
+        <p class="muted" style="margin:14px 0 0;">
+            {% if active_period %}
+                Aktif dönem: <strong>{{ active_period.title }}</strong>.
+            {% else %}
+                Şu anda aktif performans dönemi bulunamadı.
+            {% endif %}
+            Kontrol paneli ana başlıkları tek ekranda toplayacak şekilde genişletildi.
+        </p>
+    </div>
+</div>
+
+<div class="scope-strip">
+    <div class="scope-meta">
+        <div class="scope-kicker">{{ hr_scope.role_title if hr_scope else 'Kapsam' }}</div>
+        <div class="scope-title">{{ hr_scope.scope_heading if hr_scope else 'Kapsam' }} · {{ hr_scope.scope_label if hr_scope else '' }}</div>
+        <div class="scope-sub">Bu panel {{ hr_scope.scope_user_count if hr_scope else 0 }} personel ve {{ hr_scope.scope_unit_count if hr_scope else 0 }} birim üzerinden süzülüyor.</div>
+    </div>
+    <div class="scope-options">
+        {% for option in _scope_options %}
+            <a class="scope-pill {% if selected_scope_mode == option.value %}active{% endif %}" href="{{ url_for('main.hr_management', scope=option.value) }}">{{ option.label }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="stack">
+    <div class="panel">
+        <h4 class="section-title">Personel ana başlıkları</h4>
+        <div class="module-grid">
+            {% for card in module_cards %}
+            <a class="module-card" href="{{ card.href }}">
+                <div class="icon"><i class="fa-solid {{ card.icon }}"></i></div>
+                <div class="title">{{ card.title }}</div>
+                <div class="text">{{ card.text }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="workspace-grid">
+        <div class="panel">
+            <h4 class="section-title">Öncelikli aksiyonlar</h4>
+            <div class="action-list">
+                {% for row in action_rows %}
+                <div class="action-row {% if row.tone == 'critical' %}critical{% elif row.tone == 'watch' %}watch{% endif %}">
+                    <div>
+                        <div class="action-title">{{ row.title }}</div>
+                        <div class="action-text">{{ row.detail }}</div>
+                        {% if row.href %}<a class="subtle-link" href="{{ row.href }}"><i class="fa-solid fa-arrow-right"></i> İlgili ekrana git</a>{% endif %}
+                    </div>
+                    <div class="action-count">{{ row.count }}</div>
+                </div>
+                {% else %}
+                <div class="action-row"><div><div class="action-title">Açık kritik aksiyon yok</div><div class="action-text">Bu görünümde öne çekilecek risk veya bekleyen kayıt bulunamadı.</div></div><div class="action-count">0</div></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Birim nabzı</h4>
+            <div class="table-wrap">
+                <table class="compact">
+                    <thead><tr><th>Birim</th><th>Personel</th><th>İzin</th><th>Devamsızlık</th><th>Eksik özlük</th><th>Risk</th></tr></thead>
+                    <tbody>
+                        {% for row in unit_pulse_rows %}
+                        <tr>
+                            <td>{{ row.unit_name }}</td>
+                            <td>{{ row.employee_count }}</td>
+                            <td>{{ row.leave_today }}</td>
+                            <td>{{ row.attendance_today }}</td>
+                            <td>{{ row.incomplete_profiles }}</td>
+                            <td><span class="status {% if row.risk_score >= 5 %}bad{% elif row.risk_score >= 2 %}warn-pill{% else %}ok{% endif %}">{{ row.risk_score }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6">Birim görünümü oluşturulamadı.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace-grid">
+        <div class="panel">
+            <h4 class="section-title">Yaklaşan vekâlet bitişleri</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Asıl amir</th><th>Vekil</th><th>Kapsam</th><th>Bitiş</th><th>Durum</th></tr></thead>
+                    <tbody>
+                        {% for row in expiring_delegations %}
+                        <tr>
+                            <td>{{ row.delegator.full_name if row.delegator else '-' }}</td>
+                            <td>{{ row.delegate.full_name if row.delegate else '-' }}</td>
+                            <td>{{ scope_label(row.scope_type) }}</td>
+                            <td>{{ row.end_date }}</td>
+                            <td><span class="status {% if row.status == 'aktif' %}ok{% else %}warn-pill{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5">Önümüzdeki 7 gün içinde bitecek vekâlet bulunmuyor.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Son vekâlet kayıtları</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Asıl amir</th><th>Vekil</th><th>Kapsam</th><th>Tarih</th><th>Durum</th></tr></thead>
+                    <tbody>
+                        {% for row in recent_delegations %}
+                        <tr>
+                            <td>{{ row.delegator.full_name if row.delegator else '-' }}</td>
+                            <td>{{ row.delegate.full_name if row.delegate else '-' }}</td>
+                            <td>{{ scope_label(row.scope_type) }}</td>
+                            <td>{{ row.start_date }} → {{ row.end_date }}</td>
+                            <td><span class="status {% if row.status == 'aktif' %}ok{% elif row.status == 'bekliyor' %}warn-pill{% else %}bad{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5">Henüz vekâlet kaydı yok.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

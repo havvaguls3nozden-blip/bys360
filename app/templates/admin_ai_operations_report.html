@@ -1,0 +1,85 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Operasyon Raporu - BYS360{% endblock %}
+{% block page_kicker %}Yönetim & Denetim{% endblock %}
+{% block page_title %}Karar Destek Operasyon Raporu{% endblock %}
+{% block page_subtitle %}Modüllerin AI rapor, öneri, geri bildirim ve operasyon yükünü aynı karar masasında izleyin{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">Ortak karar masası</div>
+    <h3 class="ai-title">Hangi modül gerçekten operasyon üretmeye başladı?</h3>
+    <p class="ai-sub">Bu ekran; AI isteklerini yalnız teknik log olarak değil, yönetici raporu üretimi, açık öneri birikimi, son aktivite ve görünür kullanım yoğunluğu ile birlikte okur. Böylece yalnız canlıda kalan performans, izin–vekâlet ve dashboard AI yüzeyleri aynı yönetim ritminde kıyaslanabilir.</p>
+    <div class="ai-actions" style="margin-top:16px">
+      <a class="ai-link" href="{{ url_for('main.admin_ai_quality_hub') }}"><i class="fa-solid fa-medal"></i> Kalite panosunu aç</a>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-six">
+    <article class="ai-card"><div class="ai-label">Görünür modül</div><div class="ai-value">{{ summary.module_count }}</div></article>
+    <article class="ai-card"><div class="ai-label">Toplam AI isteği</div><div class="ai-value">{{ summary.request_total }}</div></article>
+    <article class="ai-card"><div class="ai-label">Rapor/özet üretimi</div><div class="ai-value">{{ summary.report_request_total }}</div></article>
+    <article class="ai-card"><div class="ai-label">Açık öneri</div><div class="ai-value">{{ summary.open_recommendations }}</div></article>
+    <article class="ai-card"><div class="ai-label">Negatif geri bildirim</div><div class="ai-value">{{ summary.negative_feedback }}</div></article>
+    <article class="ai-card"><div class="ai-label">Açık iş yükü</div><div class="ai-value">{{ summary.backlog_total }}</div><div class="ai-mini">Kritik {{ summary.critical_count }} · Uyarı {{ summary.warning_count }}</div></article>
+  </section>
+
+  <form class="ai-form-wrap" method="get">
+    <div class="ai-filters" style="grid-template-columns:repeat(3,minmax(0,1fr)) auto auto">
+      <div class="ai-group">
+        <label>Modül</label>
+        <select class="ai-select" name="module_type">
+          <option value="">Tümü</option>
+          {% for value in module_options %}
+          <option value="{{ value }}" {{ 'selected' if selected_module_type == value else '' }}>{{ value|ai_module_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ai-group"><label>Kapsam</label><div class="ai-note">İstek + rapor + öneri + cache + geri bildirim</div></div>
+      <div class="ai-group"><label>Satır</label><div class="ai-note">{{ rows|length }} modül</div></div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Filtrele</button>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_operations_report_export', module_type=selected_module_type) }}"><i class="fa-solid fa-file-arrow-down"></i> CSV dışa aktar</a>
+    </div>
+  </form>
+
+  <section class="ai-table-wrap">
+    <table class="ai-table">
+      <thead>
+        <tr>
+          <th>Modül</th>
+          <th>Risk</th>
+          <th>İstek</th>
+          <th>Görünür</th>
+          <th>Rapor/Özet</th>
+          <th>Açık öneri</th>
+          <th>Negatif</th>
+          <th>Cache</th>
+          <th>Operasyon odağı</th>
+          <th>Son istem</th>
+          <th>Son aktivite</th>
+          <th>Sonraki adım</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><strong>{{ row.module_type|ai_module_label }}</strong><div class="ai-mini">Toplam öneri {{ row.recommendation_total }} · açık yük {{ row.backlog_total }}</div></td>
+          <td><span class="ai-badge {{ 'warning' if row.tone in ['warning','critical'] else 'success' }}">{{ row.risk_score }}</span><div class="ai-mini">{{ row.tone|ai_tone_label }}</div></td>
+          <td>{{ row.request_total }}</td>
+          <td>{{ row.visible_request_total }}</td>
+          <td>{{ row.report_request_total }}</td>
+          <td>{{ row.open_recommendations }}</td>
+          <td>{{ row.negative_feedback }}</td>
+          <td>{{ row.cache_total }}</td>
+          <td>{{ row.operational_focus }}</td>
+          <td>{{ row.latest_prompt_version }}</td>
+          <td>{{ row.latest_activity_at }}</td>
+          <td>{{ row.next_step }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="12"><div class="ai-note">Seçili filtrede operasyon verisi oluşmadı.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

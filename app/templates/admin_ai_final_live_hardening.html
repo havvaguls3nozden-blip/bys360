@@ -1,0 +1,162 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}{{ page_title }} - BYS360{% endblock %}
+{% block page_kicker %}{{ page_kicker }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle }}{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell ai-final-hardening-shell">
+  <section class="ai-panel ai-hero">
+    <div class="ai-hero-grid">
+      <div>
+        <div class="ai-kicker">Kontrol 12 · Final canlı sertleştirme</div>
+        <h3 class="ai-title">AI Final Canlı Sertleştirme · Kalite kapısı ve kapanış raporu</h3>
+        <p class="ai-sub">Bu ekran AI Karar Destek / Analiz Merkezi fazlarını canlıya hazırlayan son denetim yüzeyidir. DB yazımı, gerçek içe aktarım, ham AI metni gösterimi ve otomatik karar uygulaması yapmaz.</p>
+        <div class="ai-actions" style="margin-top:16px">
+          <span class="ai-badge {{ 'success' if readiness_score >= 90 else 'warning' }}"><i class="fa-solid fa-shield-check"></i> Hazır oluş {{ readiness_score }}/100</span>
+          <span class="ai-badge {{ 'success' if security.warning_count == 0 and security.critical_count == 0 else 'warning' }}"><i class="fa-solid fa-lock"></i> critical={{ security.critical_count }} warning={{ security.warning_count }}</span>
+          <span class="ai-badge {{ 'success' if summary.unmasked_requests == 0 else 'warning' }}"><i class="fa-solid fa-user-shield"></i> Maskeleme %{{ summary.masked_rate }}</span>
+          <span class="ai-badge muted"><i class="fa-solid fa-clock"></i> Son {{ lookback_days }} gün</span>
+        </div>
+      </div>
+      <div class="ai-table-wrap" style="box-shadow:none">
+        <div class="ai-kicker">Dönem filtresi</div>
+        <form class="ai-filters" method="get" style="grid-template-columns:1fr auto">
+          <div class="ai-group">
+            <label for="lookback_days">Rapor dönemi</label>
+            <select class="ai-select" id="lookback_days" name="lookback_days">
+              {% for day in [7,14,30,60,90,180] %}
+              <option value="{{ day }}" {% if lookback_days == day %}selected{% endif %}>Son {{ day }} gün</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Uygula</button>
+        </form>
+        <div class="ai-note" style="margin-top:14px">{{ warning_fix_note }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-four">
+    <article class="ai-card"><div class="ai-label">AI işlem</div><div class="ai-value">{{ summary.request_total }}</div><div class="ai-mini">Tamamlanan {{ summary.completed_total }} · hata/uyarı {{ summary.failed_total }}</div></article>
+    <article class="ai-card"><div class="ai-label">KVKK maskeleme</div><div class="ai-value">%{{ summary.masked_rate }}</div><div class="ai-mini">Maskesiz kayıt {{ summary.unmasked_requests }} · aktif kural {{ summary.active_rules }}</div></article>
+    <article class="ai-card"><div class="ai-label">Açık öneri</div><div class="ai-value">{{ summary.open_recommendations }}</div><div class="ai-mini">Kritik {{ summary.critical_recommendations }} · negatif geri bildirim {{ summary.feedback_negative }}</div></article>
+    <article class="ai-card"><div class="ai-label">Performans sinyali</div><div class="ai-value">{{ summary.avg_latency_ms }} ms</div><div class="ai-mini">Yavaş işlem {{ summary.slow_total }} · prompt sürümü {{ summary.prompt_versions }}</div></article>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Final kalite kapıları</div>
+      <table class="ai-table">
+        <thead>
+          <tr><th>Kapı</th><th>Durum</th><th>Bulgu</th><th>Aksiyon</th></tr>
+        </thead>
+        <tbody>
+          {% for gate in readiness_gates %}
+          <tr>
+            <td><strong>{{ gate.label }}</strong><div class="ai-mini">{{ gate.key }}</div></td>
+            <td><span class="ai-badge {{ 'success' if gate.ok else 'warning' }}">{{ gate.status }}</span></td>
+            <td>{{ gate.finding }}</td>
+            <td>{{ gate.action }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </article>
+
+    <article class="ai-panel">
+      <div class="ai-kicker">Güvenli kapanış export</div>
+      <h3 class="ai-title">Kapanış raporu çıktıları</h3>
+      <p class="ai-sub">CSV, JSON ve Markdown çıktıları yalnız kalite kapısı, güvenlik özeti, risk metrikleri ve aksiyon notu içerir. Ham AI istem/yanıt metni, kişisel veri ve gerçek içe aktarım satırı export edilmez.</p>
+      <div class="ai-actions" style="margin-top:16px">
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_final_live_hardening_export_csv', fallback='#', lookback_days=lookback_days) }}"><i class="fa-solid fa-file-csv"></i> CSV dışa aktar</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_final_live_hardening_export_json', fallback='#', lookback_days=lookback_days) }}"><i class="fa-solid fa-code"></i> JSON dışa aktar</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_final_live_hardening_export_md', fallback='#', lookback_days=lookback_days) }}"><i class="fa-solid fa-file-lines"></i> MD dışa aktar</a>
+      </div>
+      <ul class="ai-list" style="margin-top:16px">
+        <li class="ai-list-item"><div><strong>DB yazımı</strong><div class="ai-mini">Final ekranı kayıt oluşturmaz ve güncellemez.</div></div><span class="ai-badge success">Kapalı</span></li>
+        <li class="ai-list-item"><div><strong>Gerçek içe aktarım</strong><div class="ai-mini">Excel/CSV verisi içeri alınmaz; Kontrol 7 önizleme çizgisi korunur.</div></div><span class="ai-badge success">Yok</span></li>
+        <li class="ai-list-item"><div><strong>Ham AI metni</strong><div class="ai-mini">İstem/yanıt panelde ve export dosyasında açılmaz.</div></div><span class="ai-badge success">Kapalı</span></li>
+        <li class="ai-list-item"><div><strong>İnsan onayı</strong><div class="ai-mini">AI nihai karar vermez; öneri otomatik uygulanmaz.</div></div><span class="ai-badge muted">Zorunlu</span></li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Startup warning tanısı</div>
+      <ul class="ai-list">
+        {% for finding in security.findings %}
+        <li class="ai-list-item">
+          <div>
+            <strong>{{ finding.code }}</strong>
+            <div class="ai-mini">{{ finding.message }}</div>
+            <div class="ai-mini">Aksiyon: {{ finding.action }}</div>
+          </div>
+          <span class="ai-badge {{ 'warning' if finding.level == 'warning' or finding.level == 'critical' else 'muted' }}">{{ finding.level }}</span>
+        </li>
+        {% else %}
+        <li class="ai-list-item"><div><strong>Güvenlik uyarısı yok</strong><div class="ai-mini">Runtime güvenlik özeti temiz görünüyor.</div></div><span class="ai-badge success">Temiz</span></li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Yönetici aksiyon kuyruğu</div>
+      <ul class="ai-list">
+        {% for action in action_queue %}
+        <li class="ai-list-item">
+          <div>
+            <strong>{{ action.title }}</strong>
+            <div class="ai-mini">{{ action.body }}</div>
+          </div>
+          <span class="ai-badge {{ 'warning' if action.tone == 'warning' else 'success' if action.tone == 'success' else 'muted' }}">{{ action.priority }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Kontrol listesi izleme listesi</div>
+    <table class="ai-table">
+      <thead>
+        <tr><th>Kontrol</th><th>Başlık</th><th>Komut</th><th>Durum</th><th>Not</th></tr>
+      </thead>
+      <tbody>
+        {% for row in phase_gate_rows %}
+        <tr>
+          <td><strong>Kontrol {{ row.phase }}</strong></td>
+          <td>{{ row.title }}</td>
+          <td><code>{{ row.command }}</code></td>
+          <td><span class="ai-badge {{ 'success' if row.tone == 'success' else 'warning' }}">{{ row.status }}</span></td>
+          <td>{{ row.note }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Modül bazlı kapanış görünümü</div>
+    <table class="ai-table">
+      <thead>
+        <tr><th>Modül</th><th>İşlem</th><th>Risk</th><th>Maskeleme</th><th>Öneri/geri bildirim</th><th>Aksiyon</th></tr>
+      </thead>
+      <tbody>
+        {% for row in module_rows %}
+        <tr>
+          <td><strong>{{ row.module_label }}</strong><div class="ai-mini">{{ row.module_type }}</div></td>
+          <td>{{ row.request_total }}<div class="ai-mini">Hata/uyarı {{ row.failed_total }} · yavaş {{ row.slow_total }}</div></td>
+          <td><span class="ai-badge {{ 'success' if row.tone == 'success' else 'warning' if row.tone in ['warning','danger'] else 'muted' }}">{{ row.status_label }}</span><div class="ai-mini">Risk {{ row.risk_score }}/100 · kalite {{ row.quality_score }}/100</div></td>
+          <td>Maskesiz {{ row.unmasked_total }}</td>
+          <td>Açık {{ row.open_recommendations }}<div class="ai-mini">Kritik {{ row.critical_recommendations }} · negatif {{ row.negative_feedback }}</div></td>
+          <td>{{ row.action }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="ai-note">Bu dönemde raporlanacak AI sinyali bulunamadı. Kalite kapıları yine sözleşme üzerinden izlenir.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

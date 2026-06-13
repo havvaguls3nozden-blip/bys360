@@ -1,0 +1,15 @@
+{
+  "rule_version": "faz3_3_final",
+  "notes": [
+    "Hukuk personeline yalnızca Hukuk Müşaviri puan verir.",
+    "Hukuk Müşavirinin kendisi için 1. amir Başkan, 2. amir Başkan Yardımcısıdır.",
+    "3. amir sabit unvan değildir; seçilen aktif personeldir.",
+    "3. amir zorunlu değildir.",
+    "Varsayılan ağırlık 50/50/0 mantığı korunmalıdır."
+  ],
+  "overrides": {
+    "baskan_sicil": "",
+    "baskan_yardimcisi_sicil": "",
+    "hukuk_musaviri_sicil": ""
+  }
+}

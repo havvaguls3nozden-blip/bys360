@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Anket Şablonları - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Şablon Kütüphanesi{% endblock %}
+{% block page_subtitle %}Sık kullanılan kurumsal anketleri yeniden kullanılabilir şablonlara dönüştür.{% endblock %}
+{% block content %}
+<div class="card shadow-sm border-0 rounded-4 mb-3"><div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div class="text-muted">Bu kütüphane, tekrar eden kurum içi değerlendirme ve memnuniyet anketlerini hızlandırır.</div>
+  <a href="{{ url_for('main.communication_phase2_survey_template_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Yeni Şablon</a>
+</div></div>
+<div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Başlık</th><th>Tür</th><th>Soru sayısı</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>
+{% for row in rows %}
+<tr><td><div class="fw-bold">{{ row.title }}</div><div class="small text-muted">{{ row.description or '-' }}</div></td><td>{{ row.survey_type }}</td><td>{{ row.questions.count() }}</td><td>{{ 'Aktif' if row.is_active else 'Pasif' }}</td><td><a href="{{ url_for('main.communication_phase2_survey_template_edit', template_id=row.id) }}" class="btn btn-sm btn-outline-dark">Düzenle</a></td></tr>
+{% else %}
+<tr><td colspan="5" class="text-center text-muted py-4">Henüz şablon yok.</td></tr>
+{% endfor %}
+</tbody></table></div></div></div>
+{% endblock %}

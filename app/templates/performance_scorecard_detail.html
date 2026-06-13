@@ -1,0 +1,425 @@
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+
+<style>
+.phase10-detail-summary{
+    cursor:pointer;
+    color:#8B0000;
+    font-weight:700;
+}
+.phase10-detail-summary:hover{
+    text-decoration:underline;
+}
+.phase10-note-detail-card{
+    margin-top:.55rem;
+    padding:.85rem .95rem;
+    border:1px solid rgba(139,0,0,.14);
+    border-radius:14px;
+    background:rgba(255,255,255,.72);
+    color:#334155;
+    line-height:1.55;
+}
+.phase10-status-badge{
+    display:inline-flex;
+    padding:.25rem .55rem;
+    border-radius:999px;
+    background:rgba(15,23,42,.06);
+    border:1px solid rgba(15,23,42,.10);
+    color:#334155;
+    font-weight:700;
+    font-size:.78rem;
+}
+
+
+/* BYS360_PHASE5_2_EMPLOYEE_SCORECARD_SIMPLE_STYLE */
+.phase5-employee-scorecard{display:grid;gap:18px}
+.phase5-employee-hero{display:grid;grid-template-columns:minmax(0,1.15fr) 260px;gap:18px;align-items:stretch;border:1px solid rgba(139,0,0,.14);border-radius:28px;background:linear-gradient(135deg,rgba(139,0,0,.075),rgba(255,255,255,.96));box-shadow:0 22px 46px rgba(15,23,42,.075);padding:22px}
+.phase5-employee-kicker{font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}
+.phase5-employee-title{margin:7px 0 8px;color:#111827;font-size:1.55rem;font-weight:950;line-height:1.25}
+.phase5-employee-text{margin:0;color:#64748b;line-height:1.7;font-size:.94rem}
+.phase5-score-main{border:1px solid rgba(139,0,0,.13);border-radius:24px;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:18px;min-height:160px}
+.phase5-score-main span{font-size:.78rem;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.phase5-score-main strong{margin-top:8px;color:#8B0000;font-size:3rem;line-height:1;font-weight:950}
+.phase5-score-main small{margin-top:8px;color:#64748b;font-weight:850}
+.phase5-employee-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.phase5-employee-card{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:rgba(255,255,255,.96);box-shadow:0 16px 32px rgba(15,23,42,.055);padding:17px}
+.phase5-employee-label{font-size:.74rem;font-weight:950;text-transform:uppercase;letter-spacing:.05em;color:#64748b}
+.phase5-employee-value{font-size:1.02rem;font-weight:950;color:#111827;margin-top:7px;line-height:1.5;word-break:break-word}
+.phase5-employee-section{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:rgba(255,255,255,.96);box-shadow:0 18px 34px rgba(15,23,42,.055);overflow:hidden}
+.phase5-employee-section-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:18px 20px;border-bottom:1px solid rgba(15,23,42,.07);background:linear-gradient(180deg,#fff,#f8fafc)}
+.phase5-employee-section-title{font-weight:950;color:#111827;font-size:1.08rem}
+.phase5-employee-section-sub{color:#64748b;font-size:.88rem;margin-top:4px;line-height:1.55}
+.phase5-employee-section-body{padding:18px 20px}
+.phase5-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 11px;background:rgba(139,0,0,.08);color:#8B0000;font-weight:950;font-size:.82rem}
+.phase5-pill.ok{background:rgba(22,101,52,.09);color:#166534}.phase5-pill.warn{background:rgba(185,28,28,.09);color:#991b1b}.phase5-pill.neutral{background:rgba(15,23,42,.08);color:#334155}
+.phase5-criteria-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.phase5-criteria-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;display:grid;gap:8px}
+.phase5-criteria-title{font-weight:950;color:#111827}.phase5-criteria-meta{color:#64748b;font-size:.86rem;line-height:1.55}.phase5-criteria-score{font-size:1.2rem;font-weight:950;color:#8B0000}
+.phase5-explanation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.phase5-explanation-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;padding:14px;color:#334155;line-height:1.65}
+.phase5-development-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.phase5-development-card{border:1px solid rgba(139,0,0,.12);border-radius:18px;background:#fff;padding:14px;box-shadow:0 12px 24px rgba(15,23,42,.045)}
+.phase5-development-title{font-weight:950;color:#111827;margin-bottom:7px}.phase5-development-text{color:#374151;line-height:1.65;white-space:pre-line}
+.phase5-employee-actions{display:flex;gap:10px;flex-wrap:wrap}.phase5-employee-actions .btn-soft{justify-content:center}
+.phase5-employee-empty{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;padding:16px;color:#64748b;font-weight:850;line-height:1.6}
+.phase5-mobile-label{display:none;font-size:.74rem;font-weight:950;text-transform:uppercase;color:#64748b;margin-bottom:3px}
+@media(max-width:900px){.phase5-employee-hero{grid-template-columns:1fr}.phase5-employee-grid{grid-template-columns:1fr}.phase5-score-main{align-items:flex-start;text-align:left}.phase5-employee-section-head{flex-direction:column}.phase5-employee-actions{flex-direction:column}.phase5-employee-actions .btn-soft{width:100%}.phase5-mobile-label{display:block}}
+
+</style>
+
+
+{# BYS360 gelişim rehberi Türkçe görünüm etiketleri #}
+{% macro phase10_label_source(value) -%}
+    {%- set labels = {
+        'system': 'Sistem',
+        'manual': 'Manuel',
+        'ai': 'AI Dikkat Notu',
+        'assistant': 'Sanal Asistan Rehberi'
+    } -%}
+    {{ labels.get(value|string, value or '-') }}
+{%- endmacro %}
+
+{% macro phase10_label_type(value) -%}
+    {%- set labels = {
+        'guidance_note': 'Rehber Notu',
+        'development_recommendation': 'Gelişim Önerisi',
+        'development_need': 'Gelişim İhtiyacı',
+        'strength_note': 'Güçlü Yön Notu',
+        'ai_attention_note': 'AI Dikkat Notu'
+    } -%}
+    {{ labels.get(value|string, value or '-') }}
+{%- endmacro %}
+
+{% macro phase10_label_visibility(value) -%}
+    {{ value or 'Görünürlük bilgisi yok' }}
+{%- endmacro %}
+
+{% macro phase10_label_status(value) -%}
+    {{ value or 'Kontrol Bekliyor' }}
+{%- endmacro %}
+
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{% block title %}Not Karnesi Detayı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Not Karnesi Detayı{% endblock %}
+{% block page_subtitle %}Kriter bazlı puanlar, amir yorumları ve çalışan onayı aynı ekranda izlenir{% endblock %}
+{% block body_class %}
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+page-performance-scorecard-detail{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz2_performance_mobile.css') }}">
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}
+
+{% block content %}
+{# BYS360_AI_DECISION_FAZ7_HISTORICAL_ARCHIVE_PANEL_INCLUDE #}
+{% include "ai_decision/_faz7_historical_archive_panel.html" ignore missing %}
+
+{# BYS360_AI_DECISION_FAZ5_SCORECARD_PANEL_INCLUDE #}
+{% include "ai_decision/_faz5_scorecard_decision_panel.html" ignore missing %}
+
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+<style>
+.scorecard-detail-shell{display:grid;gap:18px}.glass-card{background:rgba(255,255,255,.88);border:1px solid rgba(15,23,42,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.hero-grid,.summary-grid,.manager-grid{display:grid;gap:16px}.hero-grid{grid-template-columns:1.2fr .8fr}.summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.manager-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}.section-title{margin:0 0 10px 0;color:#8B0000;font-size:1.08rem;font-weight:900}.section-sub{margin:0;color:#6b7280;line-height:1.7}.hero-title{margin:0;color:#111827;font-size:1.35rem;font-weight:900}.hero-meta{margin-top:8px;color:#6b7280;line-height:1.8}.pill{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.82rem;font-weight:800}.pill.published{background:rgba(22,163,74,.12);color:#166534}.pill.internal{background:rgba(59,130,246,.12);color:#1d4ed8}.pill.locked{background:rgba(107,114,128,.12);color:#374151}.pill.success{background:rgba(22,163,74,.12);color:#166534}.pill.warning{background:rgba(245,158,11,.14);color:#92400e}.meta-box,.stat-box,.panel-box,.note-box{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff}.meta-box,.stat-box,.panel-box{padding:16px}.meta-label,.stat-label{font-size:.76rem;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;font-weight:800}.meta-value,.stat-value{margin-top:8px;color:#111827;font-weight:800;line-height:1.6}.stat-value{font-size:1.3rem}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:16px}table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}th{background:#f8fafc;color:#6b7280;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}tr:last-child td{border-bottom:none}.comment-box{margin-top:14px;padding:14px;border-radius:16px;background:rgba(15,23,42,.04);color:#374151;line-height:1.7}.action-row{display:flex;gap:10px;flex-wrap:wrap}.btn-soft{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#111827;text-decoration:none;font-weight:800}.btn-soft.primary{background:#8B0000;color:#fff;border-color:#8B0000}.btn-soft.secondary{background:rgba(15,23,42,.04)}textarea,input[type=text]{width:100%;border-radius:14px;border:1px solid rgba(15,23,42,.1);padding:11px 12px;background:#fff;font:inherit}textarea{min-height:92px;resize:vertical}.note-box{padding:14px 16px;background:rgba(15,23,42,.04);color:#374151;line-height:1.7}@media (max-width:900px){.hero-grid,.summary-grid{grid-template-columns:1fr}}
+
+/* BYS360_SCORECARD_INTERIM_NOTES_STYLE */
+.scorecard-interim-notes{border-color:rgba(139,0,0,.14);background:rgba(255,255,255,.9)}
+.scorecard-interim-notes-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:1px solid rgba(139,0,0,.10);padding-bottom:12px;margin-bottom:14px}
+.scorecard-interim-notes-kicker{display:inline-flex;align-items:center;gap:7px;color:#8B0000;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.scorecard-interim-notes-count{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(139,0,0,.07);border:1px solid rgba(139,0,0,.12);color:#7f1d1d;font-weight:900;white-space:nowrap}
+.scorecard-interim-notes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.scorecard-interim-note-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;box-shadow:0 12px 24px rgba(15,23,42,.05)}
+.scorecard-interim-note-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;color:#6b7280;font-size:.78rem}
+.scorecard-interim-note-type{font-weight:900;color:#8B0000}
+.scorecard-interim-note-title{margin:0 0 8px;color:#111827;font-size:1rem;font-weight:900}
+.scorecard-interim-note-body{color:#374151;line-height:1.7;white-space:pre-line;font-size:.92rem}
+.scorecard-interim-note-foot{margin-top:10px;display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.16);color:#166534;font-size:.78rem;font-weight:900}
+@media (max-width:900px){.scorecard-interim-notes-head{flex-direction:column}.scorecard-interim-notes-count{white-space:normal}}
+
+
+/* BYS360_PHASE10_SCORECARD_DEVELOPMENT_STYLE */
+.scorecard-development{border-color:rgba(139,0,0,.16);background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,248,248,.88))}
+.scorecard-development-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:1px solid rgba(139,0,0,.10);padding-bottom:12px;margin-bottom:14px}
+.scorecard-development-kicker{display:inline-flex;align-items:center;gap:7px;color:#8B0000;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.scorecard-development-status{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(139,0,0,.07);border:1px solid rgba(139,0,0,.12);color:#7f1d1d;font-weight:900;white-space:nowrap}
+.scorecard-development-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.scorecard-development-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;box-shadow:0 12px 24px rgba(15,23,42,.05)}
+.scorecard-development-card-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;color:#6b7280;font-size:.78rem}.scorecard-development-type{font-weight:900;color:#8B0000}.scorecard-development-title{margin:0 0 8px;color:#111827;font-size:1rem;font-weight:900}.scorecard-development-body{color:#374151;line-height:1.7;white-space:pre-line;font-size:.92rem}.scorecard-development-foot{margin-top:10px;display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.16);color:#166534;font-size:.78rem;font-weight:900}.scorecard-development-alert{border-radius:16px;border:1px solid rgba(245,158,11,.22);background:rgba(245,158,11,.08);color:#92400e;padding:12px 14px;line-height:1.65;margin-bottom:12px}.scorecard-development-form{margin-top:14px;display:grid;gap:10px;border-top:1px solid rgba(139,0,0,.10);padding-top:14px}.scorecard-development-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.scorecard-development-form select{width:100%;border-radius:14px;border:1px solid rgba(15,23,42,.1);padding:11px 12px;background:#fff;font:inherit}.scorecard-development-check{display:flex;align-items:center;gap:8px;color:#374151;font-weight:800}.scorecard-development-guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px}.scorecard-development-guide-item{border:1px solid rgba(139,0,0,.10);border-radius:16px;background:rgba(255,255,255,.72);padding:12px}.scorecard-development-guide-item strong{display:block;color:#8B0000;margin-bottom:5px}.scorecard-development-guide-item span{color:#4b5563;font-size:.9rem;line-height:1.55}@media (max-width:900px){.scorecard-development-head{flex-direction:column}.scorecard-development-status{white-space:normal}.scorecard-development-form-row{grid-template-columns:1fr}}
+    </style>
+<div class="scorecard-detail-shell">
+{% set phase5_2_is_employee_scorecard = evaluation is defined and current_user is defined and evaluation.employee_id == current_user.id %}
+{% if phase5_2_is_employee_scorecard %}
+<!-- BYS360_PHASE5_2_EMPLOYEE_SCORECARD_SIMPLE -->
+{# BYS360_PHASE5_2_HISTORY_ROUTE_BIND | Geçmiş Karnelerime Git | performance_scorecard | route bağı erken gate markerı #}
+
+{% set phase5_2_final_score = evaluation.final_total_100 if evaluation.final_total_100 is not none else 0 %}
+{% set phase5_2_score_label = 'Çok Başarılı' if phase5_2_final_score > 90 else ('Gelişim Gerektiren Sonuç' if phase5_2_final_score < 70 else 'Beklenen Düzey / Dengeli Sonuç') %}
+{% set phase5_2_category_average = detail_row.category_average if detail_row is defined and detail_row.category_average is defined else {} %}
+{% set development_ctx = development_guidance_context if development_guidance_context is defined and development_guidance_context else {} %}
+{% set development_rows = development_ctx.recommendations if development_ctx.recommendations is defined else [] %}
+{% set phase5_2_criteria_items = row.level_1_items if row.level_1_items else (row.level_2_items if row.level_2_items else (row.level_3_items if row.level_3_items else [])) %}
+<div class="phase5-employee-scorecard" data-bys360-marker="BYS360_PHASE5_2_PERSONEL_KARNE_EKRANI">
+    <section class="phase5-employee-hero" aria-label="Ana puan kartı">
+        <div>
+            <div class="phase5-employee-kicker">Not Karnesi</div>
+            <h2 class="phase5-employee-title">{{ employee.full_name if employee and employee.full_name else (employee.ad ~ ' ' ~ employee.soyad if employee else 'Personel') }}</h2>
+            <p class="phase5-employee-text">Bu ekran yayınlanan not karnenizi sade ve anlaşılır biçimde gösterir. Başka personel detayı veya taslak süreç bilgisi gösterilmez.</p>
+            <div class="phase5-employee-actions" style="margin-top:14px;">
+                <span class="phase5-pill neutral">Yayınlanan Karne</span>
+                {% if evaluation.employee_score_acknowledged_at %}<span class="phase5-pill ok">Not karnesi görüldü</span>{% elif evaluation.employee_score_viewed_at %}<span class="phase5-pill neutral">Karne görüntülendi</span>{% else %}<span class="phase5-pill warn">Görüntüleme bekleniyor</span>{% endif %}
+            </div>
+        </div>
+        <div class="phase5-score-main">
+            <span>Ana Puan Kartı</span>
+            <strong>{{ '%.2f'|format(phase5_2_final_score) }}</strong>
+            <small>{{ phase5_2_score_label }}</small>
+        </div>
+    </section>
+
+    <section class="phase5-employee-grid" aria-label="Dönem bilgisi">
+        <article class="phase5-employee-card"><div class="phase5-employee-label">Dönem Bilgisi</div><div class="phase5-employee-value">{{ period.title if period else '-' }}</div></article>
+        <article class="phase5-employee-card"><div class="phase5-employee-label">Birim</div><div class="phase5-employee-value">{{ employee.birim if employee and employee.birim else '-' }}</div></article>
+        <article class="phase5-employee-card"><div class="phase5-employee-label">Kategori Ortalaması</div><div class="phase5-employee-value">{{ '%.2f'|format(phase5_2_category_average.average_score|default(0, true)) }}</div><div class="phase5-employee-text">Kişi detayı gösterilmez.</div></article>
+    </section>
+
+    <section class="phase5-employee-section" aria-label="Kriter sonuçları">
+        <div class="phase5-employee-section-head"><div><div class="phase5-employee-section-title">Kriter Sonuçları</div><div class="phase5-employee-section-sub">Değerlendirme kriterleri sade puan özetiyle gösterilir.</div></div></div>
+        <div class="phase5-employee-section-body">
+            {% if phase5_2_criteria_items %}
+            <div class="phase5-criteria-grid">
+                {% for item in phase5_2_criteria_items %}
+                <article class="phase5-criteria-card">
+                    <div class="phase5-criteria-title">{{ item.criteria.name if item.criteria else 'Değerlendirme Kriteri' }}</div>
+                    <div class="phase5-criteria-score">{{ item.score if item.score is not none else '-' }} / 5</div>
+                    <div class="phase5-criteria-meta">100'lük karşılık: {{ '%.2f'|format(item.score_100 or 0) }}{% if item.criteria and item.criteria.weight is not none %} · Ağırlık: %{{ item.criteria.weight }}{% endif %}</div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="phase5-employee-empty">Bu karne için kriter sonucu bulunamadı.</div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="phase5-employee-section" aria-label="Yayınlanan açıklama">
+        <div class="phase5-employee-section-head"><div><div class="phase5-employee-section-title">Yayınlanan Açıklama</div><div class="phase5-employee-section-sub">Yayınlanan genel değerlendirme ve açıklama bilgileri.</div></div></div>
+        <div class="phase5-employee-section-body">
+            <div class="phase5-explanation-grid">
+                <div class="phase5-explanation-card"><strong>1. Amir Görüşü</strong><br>{{ row.level_1_comment or 'Yayınlanmış açıklama bulunmuyor.' }}</div>
+                {% if row.level_2_comment %}<div class="phase5-explanation-card"><strong>2. Amir Görüşü</strong><br>{{ row.level_2_comment }}</div>{% endif %}
+                {% if row.level_3_comment %}<div class="phase5-explanation-card"><strong>3. Amir Görüşü</strong><br>{{ row.level_3_comment }}</div>{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="phase5-employee-section" aria-label="Gelişim önerisi">
+        <div class="phase5-employee-section-head"><div><div class="phase5-employee-section-title">Gelişim Önerisi</div><div class="phase5-employee-section-sub">Karne sonucuna bağlı rehberlik ve gelişim notları.</div></div></div>
+        <div class="phase5-employee-section-body">
+            {% if development_rows %}
+            <div class="phase5-development-grid">
+                {% for item in development_rows %}
+                <article class="phase5-development-card"><div class="phase5-development-title">{{ item.title or item.type_label or 'Gelişim Önerisi' }}</div><div class="phase5-development-text">{{ item.recommendation_text or 'Açıklama girilmemiş.' }}</div></article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="phase5-employee-empty">Bu karne için yayınlanmış gelişim önerisi bulunmuyor.</div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="phase5-employee-section" aria-label="Geçmiş karne bağlantısı">
+        <div class="phase5-employee-section-head"><div><div class="phase5-employee-section-title">Geçmiş Karne Bağlantısı</div><div class="phase5-employee-section-sub">Önceki dönem not karnelerinize kendi ekranınızdan ulaşabilirsiniz.</div></div></div>
+        <div class="phase5-employee-section-body">
+            <div class="phase5-employee-actions">
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_scorecard', scope='mine') }}"><i class="fa-solid fa-clock-rotate-left"></i> Geçmiş Karnelerime Git</a>
+                <a class="btn-soft" href="{{ url_for('main.performance_scorecard_pdf', evaluation_id=evaluation.id, period_id=period.id if period else '', scope=selected_scope) }}"><i class="fa-regular fa-file-pdf"></i> PDF</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% else %}
+
+    <div class="glass-card">
+        <div class="hero-grid">
+            <div>
+                <h2 class="hero-title">{{ employee.full_name if employee and employee.full_name else (employee.ad ~ ' ' ~ employee.soyad if employee else 'Personel') }}</h2>
+                <div class="hero-meta">{% if employee and employee.sicil_no %}<strong>Sicil No:</strong> {{ employee.sicil_no }} · {% endif %}<strong>Birim:</strong> {{ employee.birim or '-' }}<br><strong>Dönem:</strong> {{ period.title if period else '-' }}<br><strong>Kapsam:</strong> {{ scope_label or 'Varsayılan görünüm' }}</div>
+                <div class="action-row" style="margin-top:14px;"><span class="pill {{ visibility_state.publish_badge_class }}">{{ visibility_state.publish_label }}</span>{% if evaluation.employee_score_acknowledged_at %}<span class="pill success">Çalışan onayı alındı</span>{% elif evaluation.employee_score_viewed_at %}<span class="pill warning">Çalışan görüntüledi</span>{% else %}<span class="pill locked">Çalışan onayı bekleniyor</span>{% endif %}</div>
+            </div>
+            <div class="meta-box"><div class="meta-label">Onay Takibi</div><div class="meta-value">Görüntülenme: {{ evaluation.employee_score_viewed_at.strftime('%d.%m.%Y %H:%M') if evaluation.employee_score_viewed_at else 'Henüz görüntülenmedi' }}<br>Onay: {{ evaluation.employee_score_acknowledged_at.strftime('%d.%m.%Y %H:%M') if evaluation.employee_score_acknowledged_at else 'Henüz onaylanmadı' }}</div>{% if evaluation.employee_score_acknowledged_note %}<div class="comment-box" style="margin-top:12px;"><strong>Çalışan notu:</strong><br>{{ evaluation.employee_score_acknowledged_note }}</div>{% endif %}</div>
+        </div>
+    </div>
+    <div class="summary-grid">
+        <div class="glass-card stat-box"><div class="stat-label">1. Amir Toplamı</div><div class="stat-value">{{ '%.2f'|format(evaluation.level_1_total_100 or 0) }}</div></div>
+        <div class="glass-card stat-box"><div class="stat-label">2. Amir Toplamı</div><div class="stat-value">{{ '%.2f'|format(evaluation.level_2_total_100 or 0) }}</div></div>
+        <div class="glass-card stat-box"><div class="stat-label">3. Amir Toplamı</div><div class="stat-value">{{ '%.2f'|format(evaluation.level_3_total_100 or 0) }}</div></div>
+        <div class="glass-card stat-box"><div class="stat-label">Nihai Puan</div><div class="stat-value">{{ '%.2f'|format(evaluation.final_total_100 or 0) }}</div></div>
+
+        {# BYS360_PHASE2_5_SCORECARD_CATEGORY_AVERAGE_CONTEXT #}
+        {% set category_average = category_average if category_average is defined and category_average else (detail_row.category_average if detail_row is defined and detail_row.category_average is defined else (bys360_category_average_for_evaluation(evaluation) if bys360_category_average_for_evaluation is defined and evaluation is defined else {})) %}
+        <div class="glass-card stat-box" data-bys360-marker="BYS360_PHASE2_5_SCORECARD_CATEGORY_AVERAGE_CARD"><div class="stat-label">Kategori Ortalaması</div><div class="stat-value">{{ '%.2f'|format(category_average.average_score|default(0, true)) }}</div><div class="section-sub" style="margin-top:8px;">{{ category_average.category_label|default('Diğer', true) }} · kişi detayı gösterilmez</div></div>
+    </div>
+
+
+    {% set scorecard_interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+    {% set scorecard_interim_notes = scorecard_interim_ctx.notes if scorecard_interim_ctx.notes is defined else [] %}
+    {% if scorecard_interim_notes %}
+    <!-- BYS360_SCORECARD_INTERIM_NOTES_BLOCK -->
+    <div class="glass-card scorecard-interim-notes" aria-label="Dönem içi notlar">
+        <div class="scorecard-interim-notes-head">
+            <div>
+                <span class="scorecard-interim-notes-kicker"><i class="fa-regular fa-note-sticky"></i> Süreç hafızası</span>
+                <h3 class="section-title" style="margin-top:8px;">Dönem İçi Notlar</h3>
+                <p class="section-sub">Bu alanda yalnızca <strong>Dönem İçi Notlar</strong> sayfasında <strong>Karne detayında gösterilsin</strong> olarak işaretlenen notlar görünür. Notlar karne puanını otomatik değiştirmez; değerlendirme sürecine açıklayıcı hafıza sağlar.</p>
+            </div>
+            <div class="scorecard-interim-notes-count">
+                <i class="fa-solid fa-id-card"></i>
+                <span>{{ scorecard_interim_ctx.count if scorecard_interim_ctx.count is defined else (scorecard_interim_notes|length) }} karne notu</span>
+            </div>
+        </div>
+        <div class="scorecard-interim-notes-grid">
+            {% for note in scorecard_interim_notes %}
+            <article class="scorecard-interim-note-card">
+                <div class="scorecard-interim-note-top">
+                    <span class="scorecard-interim-note-type"><i class="fa-regular fa-bookmark"></i> {{ note.note_type_label or 'Dönem İçi Not' }}</span>
+                    <span><i class="fa-regular fa-clock"></i> {{ note.created_display or '-' }}</span>
+                </div>
+                <h4 class="scorecard-interim-note-title">{{ note.title or note.note_type_label or 'Dönem İçi Not' }}</h4>
+                <div class="scorecard-interim-note-body">{{ note.body or note.note_body or 'Açıklama girilmemiş.' }}</div>
+                <div class="scorecard-interim-note-foot"><i class="fa-solid fa-check"></i> Karne detayında gösterilecek</div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    
+    {# BYS360_FEEDBACK_INTEGRATION_PHASE3_SCORECARD_LINK #}
+    <div class="glass-card" style="border-color:rgba(139,0,0,.14);background:linear-gradient(135deg,rgba(139,0,0,.055),rgba(255,255,255,.96));">
+        <h3 class="section-title"><i class="fa-solid fa-link"></i> Geri Bildirim Entegrasyonu</h3>
+        <p class="section-sub">Bu karneyi dönem içi notlar, görüşme sonrası notlar ve eylem planlarıyla birlikte süreç hafızasında inceleyebilirsiniz.</p>
+        <div class="action-row" style="margin-top:14px;">
+            <a class="btn-soft primary" href="{{ safe_url_for('main.performance_feedback_integration') }}?employee_id={{ evaluation.employee_id|default('') }}{% if period is defined and period %}&period_id={{ period.id }}{% endif %}"><i class="fa-solid fa-link"></i> Entegrasyon Ekranında Aç</a>
+            <a class="btn-soft secondary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlar</a>
+        </div>
+    </div>
+    {# /BYS360_FEEDBACK_INTEGRATION_PHASE3_SCORECARD_LINK #}
+
+{% set final_score = evaluation.final_total_100 or 0 %}
+    {% set score_band = 'high' if final_score > 90 else ('low' if final_score < 70 else 'mid') %}
+    {% set score_label = 'Çok Başarılı' if final_score > 90 else ('Başarısız / Yetersiz' if final_score < 70 else 'Denge Bandı') %}
+    <div class="glass-card">
+        <h3 class="section-title">Yönetici görünürlüğü özeti</h3>
+        <p class="section-sub">Bu panel, şeffaf değerlendirme ve kontrollü yayın mantığını not karnesi üzerinde netleştirir.</p>
+        <div class="summary-grid" style="margin-top:14px;">
+            <div class="glass-card stat-box"><div class="stat-label">Sonuç bandı</div><div class="stat-value">{{ '%.2f'|format(final_score) }}</div><div class="section-sub" style="margin-top:8px;">{{ score_label }}</div></div>
+            <div class="glass-card stat-box"><div class="stat-label">Yayın durumu</div><div class="stat-value">{{ visibility_state.publish_label }}</div><div class="section-sub" style="margin-top:8px;">Personele görünürlük ve idari onay birlikte değerlendirilir.</div></div>
+            <div class="glass-card stat-box"><div class="stat-label">Şeffaf amir akışı</div><div class="stat-value">Açık</div><div class="section-sub" style="margin-top:8px;">2. amir önceki amir toplamlarını ve yorumlarını bu ekranda birlikte görebilir.</div></div>
+            <div class="glass-card stat-box"><div class="stat-label">3. amir kullanımı</div><div class="stat-value">Yorum ağırlıklı</div><div class="section-sub" style="margin-top:8px;">Kurumsal kural gereği 3. amir alanı yorum desteği içindir; varsayılan etki %0 kabul edilir.</div></div>
+        </div>
+        {% if final_score < 70 or final_score > 90 %}
+        <div class="note-box" style="margin-top:16px;">
+            <strong>Dikkat:</strong> Bu sonuç eşik dışı banddadır. Kurumsal kural gereği ayrıntılı genel görüş ve gerekçe kontrolü yapılmalıdır.
+        </div>
+        {% endif %}
+    </div>
+
+
+    {% set development_ctx = development_guidance_context if development_guidance_context is defined and development_guidance_context else {} %}
+    {% set development_rows = development_ctx.recommendations if development_ctx.recommendations is defined else [] %}
+    {% if development_ctx.enabled is not defined or development_ctx.enabled %}
+    <!-- BYS360_PHASE10_SCORECARD_DEVELOPMENT_BLOCK -->
+    <div class="glass-card scorecard-development" aria-label="Gelişim önerisi ve rehberlik">
+        <div class="scorecard-development-head">
+            <div>
+                <span class="scorecard-development-kicker"><i class="fa-solid fa-seedling"></i> Gelişim Rehberi</span>
+                <h3 class="section-title" style="margin-top:8px;">Gelişim Önerisi ve Rehberlik</h3>
+                <p class="section-sub">Performans sonucu yalnızca puanla kapanmaz. 70 altı sonuçlarda gelişim önerisi, 90 üstü sonuçlarda güçlü yön notu desteklenir. Bu alan otomatik puan veya idari karar üretmez.</p>
+            </div>
+            <div class="scorecard-development-status">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>{{ development_ctx.status_label or 'Rehberlik alanı'|phase5_4_status_label }}</span>
+            </div>
+        </div>
+        {% if development_ctx.publish_block_reason %}
+        <div class="scorecard-development-alert"><strong>Yayın öncesi dikkat:</strong> {{ development_ctx.publish_block_reason }}</div>
+        {% else %}
+        <div class="scorecard-development-alert"><strong>Rehber notu:</strong> {{ development_ctx.status_detail or 'Gelişim önerileri ve güçlü yön notları karar destek niteliğindedir.' }}</div>
+        {% endif %}
+        {% if development_rows %}
+        <div class="scorecard-development-grid">
+            {% for item in development_rows %}
+            <article class="scorecard-development-card">
+                <div class="scorecard-development-card-top">
+                    <span class="scorecard-development-type"><i class="fa-regular fa-bookmark"></i> {{ item.type_label or item.recommendation_type or 'Gelişim Önerisi' }}</span>
+                    <span><i class="fa-regular fa-clock"></i> {{ item.created_display or '-' }}</span>
+                </div>
+                <h4 class="scorecard-development-title">{{ item.title or 'Gelişim Önerisi' }}</h4>
+                <div class="scorecard-development-body">{{ item.recommendation_text or 'Açıklama girilmemiş.' }}</div>
+                <div class="scorecard-development-foot"><i class="fa-solid fa-user-check"></i> {{ 'Zorunlu gelişim önerisi' if item.is_required else 'Rehber / güçlü yön notu' }}</div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="note-box">Henüz bu karneye bağlanmış gelişim önerisi veya güçlü yön notu bulunmuyor.</div>
+        {% endif %}
+        <div class="scorecard-development-guide">
+            {% for card in development_ctx.guidance_cards or [] %}
+            <div class="scorecard-development-guide-item"><strong>{{ card.title }}</strong><span>{{ card.text }}</span></div>
+            {% endfor %}
+        </div>
+        {% if development_ctx.can_add_note %}
+        <form class="scorecard-development-form" method="post" action="{{ url_for('main.performance_scorecard_development_note_save', evaluation_id=evaluation.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="scorecard-development-form-row">
+                <div><label class="meta-label">Not türü</label><select name="recommendation_type">{% for type_item in development_ctx.recommendation_types or [] %}<option value="{{ type_item.value }}" {% if type_item.value == development_ctx.default_type %}selected{% endif %}>{{ type_item.label }}</option>{% endfor %}</select></div>
+                <div><label class="meta-label">Kimler Görebilir</label><select name="visibility_scope">{% for visibility_option in development_ctx.visibility_options or [] %}<option value="{{ visibility_option.value }}">{{ visibility_option.label }}</option>{% endfor %}</select></div>
+            </div>
+            <div><label class="meta-label">Başlık</label><input type="text" name="title" value="{{ development_ctx.default_title or '' }}" placeholder="Kısa başlık"></div>
+            <div><label class="meta-label">Gelişim önerisi / güçlü yön notu</label><textarea name="recommendation_text" placeholder="Somut, sade ve yönlendirici not yazınız. Bu alan karar değil, gelişim rehberidir."></textarea></div>
+            <label class="scorecard-development-check"><input type="checkbox" name="is_required" {% if development_ctx.default_required %}checked{% endif %}> Bu kayıt yayın öncesi zorunlu gelişim önerisi olarak işaretlensin</label>
+            <div class="action-row"><button class="btn-soft primary" type="submit"><i class="fa-solid fa-seedling"></i> Gelişim Notunu Kaydet</button></div>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if evaluation.employee_id == current_user.id and visibility_state.employee_visible %}
+    <div class="glass-card">
+        <h3 class="section-title">Çalışan işlemleri</h3>
+        <p class="section-sub">Not karnenizi gördüğünüz bilgisini amirlerinize iletebilir ve gerekiyorsa geri bildirim toplantısı talep edebilirsiniz.</p>
+        <div class="action-row" style="margin-top:14px;">{% if open_feedback_request %}<a class="btn-soft secondary" href="{{ url_for('main.manager_feedback_request_detail', request_id=open_feedback_request.id, scope='mine') }}"><i class="fa-solid fa-comments"></i> Açık Talebi Gör</a>{% elif can_request_feedback %}<a class="btn-soft secondary" href="{{ url_for('main.performance_feedback_request', period_id=period.id) }}"><i class="fa-solid fa-calendar-check"></i> Geri Bildirim Toplantısı Talep Et</a>{% elif feedback_block_reason %}<div class="note-box">{{ feedback_block_reason }}</div>{% endif %}</div>
+        <form method="post" action="{{ url_for('main.performance_scorecard_acknowledge', evaluation_id=evaluation.id, period_id=period.id if period else '', scope=selected_scope) }}" style="margin-top:14px;display:grid;gap:12px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div><label class="meta-label" for="ack_note">İsteğe bağlı kısa not</label><textarea id="ack_note" name="ack_note" placeholder="Görüşme talebiniz veya kısa notunuz varsa yazabilirsiniz">{{ evaluation.employee_score_acknowledged_note or '' }}</textarea></div>
+            <div class="action-row"><button class="btn-soft primary" type="submit"><i class="fa-solid fa-circle-check"></i> Notumu Gördüm, Onaylıyorum</button><a class="btn-soft" href="{{ url_for('main.performance_scorecard_pdf', evaluation_id=evaluation.id, period_id=period.id if period else '', scope=selected_scope) }}"><i class="fa-regular fa-file-pdf"></i> PDF</a></div>
+        </form>
+    </div>
+    {% endif %}
+    <div class="manager-grid">
+        {% if row.level_1_items %}<div class="glass-card panel-box"><h3 class="section-title">1. Amir Değerlendirmesi</h3><div class="table-wrap"><table><thead><tr><th>Kriter</th><th>Ağırlık</th><th>Puan</th><th>100'lük</th><th>Yorum</th></tr></thead><tbody>{% for item in row.level_1_items %}<tr><td>{{ item.criteria.name if item.criteria else '-' }}</td><td>%{{ item.criteria.weight if item.criteria else 0 }}</td><td>{{ item.score if item.score is not none else '-' }}</td><td>{{ '%.2f'|format(item.score_100 or 0) }}</td><td>{{ item.comment or '-' }}</td></tr>{% endfor %}</tbody></table></div><div class="comment-box"><strong>Genel Yorum:</strong><br>{{ row.level_1_comment or 'Genel yorum girilmedi.' }}</div></div>{% endif %}
+        {% if row.level_2_items %}<div class="glass-card panel-box"><h3 class="section-title">2. Amir Değerlendirmesi</h3><div class="table-wrap"><table><thead><tr><th>Kriter</th><th>Ağırlık</th><th>Puan</th><th>100'lük</th><th>Yorum</th></tr></thead><tbody>{% for item in row.level_2_items %}<tr><td>{{ item.criteria.name if item.criteria else '-' }}</td><td>%{{ item.criteria.weight if item.criteria else 0 }}</td><td>{{ item.score if item.score is not none else '-' }}</td><td>{{ '%.2f'|format(item.score_100 or 0) }}</td><td>{{ item.comment or '-' }}</td></tr>{% endfor %}</tbody></table></div><div class="comment-box"><strong>Genel Yorum:</strong><br>{{ row.level_2_comment or 'Genel yorum girilmedi.' }}</div></div>{% endif %}
+        {% if row.level_3_items or row.level_3_comment %}<div class="glass-card panel-box"><h3 class="section-title">3. Amir Değerlendirmesi</h3>{% if row.level_3_items %}<div class="table-wrap"><table><thead><tr><th>Kriter</th><th>Ağırlık</th><th>Puan</th><th>100'lük</th><th>Yorum</th></tr></thead><tbody>{% for item in row.level_3_items %}<tr><td>{{ item.criteria.name if item.criteria else '-' }}</td><td>%{{ item.criteria.weight if item.criteria else 0 }}</td><td>{{ item.score if item.score is not none else '-' }}</td><td>{{ '%.2f'|format(item.score_100 or 0) }}</td><td>{{ item.comment or '-' }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}<div class="comment-box"><strong>Genel Yorum:</strong><br>{{ row.level_3_comment or 'Genel yorum girilmedi.' }}</div></div>{% endif %}
+    </div>
+{% endif %}
+</div>
+
+{% if current_user.id != evaluation.employee_id %}
+{% set ai_runtime_title = 'AI canlı değerlendirme özeti' %}
+{% set ai_runtime_description = 'Bu not karnesi için anlık AI özeti ve kural bazlı tutarlılık kontrolü alabilirsiniz.' %}
+{% set ai_runtime_summary_url = url_for('main.ai_performance_evaluation_summary', evaluation_id=evaluation.id) %}
+{% set ai_runtime_secondary_url = url_for('main.ai_performance_evaluation_consistency', evaluation_id=evaluation.id) %}
+{% set ai_runtime_secondary_label = 'Tutarlılık kontrolü' %}
+{% include 'partials/ai_runtime_summary_card.html' %}
+{% endif %}
+{# BYS360_AI_DECISION_FAZ10_PANEL_INCLUDED #}
+{% include 'ai_decision/_interim_feedback_panel.html' ignore missing %}
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND #}

@@ -1,0 +1,27 @@
+{
+  "name": "BYS360 Temiz Devir Teslim Kaynak Paketi",
+  "version_gate": "P3C",
+  "generated_at": "2026-06-08T13:01:47",
+  "project_root": "C:\\bys360\\releases\\BYS360_CLEAN_HANDOVER_SOURCE_P1",
+  "metrics": {
+    "file_count": 3492,
+    "size_bytes": 32450585,
+    "size_mb": 30.95,
+    "migration_version_files": 64,
+    "migration_heads": [
+      "bys360_portal_v2121"
+    ],
+    "migration_head_count": 1,
+    "compileall_ok": true,
+    "checked_targets": [
+      "app",
+      "config.py",
+      "scripts",
+      "migrations"
+    ],
+    "removed_pycache_dirs": 0,
+    "removed_pyc_files": 0
+  },
+  "security_note": "Gercek .env, parola, token, sertifika, DB dump ve sanal ortam dosyalari teslim paketine dahil edilmez.",
+  "required_runtime_note": "Canli kurulumda ortam degiskenleri kurum sistem yoneticisi tarafindan sunucu uzerinde tanimlanmalidir."
+}

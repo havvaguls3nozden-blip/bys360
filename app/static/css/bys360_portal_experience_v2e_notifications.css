@@ -1,0 +1,16 @@
+/* BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATIONS */
+.portal-v2e-notification-card{border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg,#fff 0%,#fffafa 100%)}
+.portal-v2e-notification-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.portal-v2e-notification-head h3{margin:0 0 5px;font-size:15px;color:#2b2b2b}.portal-v2e-notification-head h3 i{color:#8B0000}
+.portal-v2e-notification-head p{margin:0;font-size:12.5px;line-height:1.45;color:#6b6060}
+.portal-v2e-count{min-width:34px;height:34px;border-radius:999px;background:#8B0000;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 10px 24px rgba(139,0,0,.20)}
+.portal-v2e-mini-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.portal-v2e-mini-stats a{text-decoration:none;color:inherit;border:1px solid rgba(139,0,0,.10);background:rgba(255,255,255,.72);border-radius:14px;padding:9px 8px;text-align:center}
+.portal-v2e-mini-stats b{display:block;font-size:17px;color:#8B0000;line-height:1}.portal-v2e-mini-stats span{display:block;margin-top:4px;font-size:11px;color:#6c6262}
+.portal-v2e-notification-list{display:flex;flex-direction:column;gap:8px}.portal-v2e-notification-item{display:block;text-decoration:none;color:inherit;border:1px solid rgba(40,40,40,.08);background:#fff;border-radius:15px;padding:10px 11px;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.portal-v2e-notification-item:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(40,20,20,.08);border-color:rgba(139,0,0,.18)}
+.portal-v2e-notification-item span{display:inline-flex;margin-bottom:5px;padding:3px 8px;border-radius:999px;background:#f5eeee;color:#8B0000;font-size:10.5px;font-weight:800}.portal-v2e-notification-item b{display:block;font-size:13px;color:#292323;line-height:1.3}.portal-v2e-notification-item small{display:block;margin-top:4px;color:#756b6b;font-size:12px;line-height:1.35}
+.portal-v2e-notification-item.is-danger{border-left:4px solid #8B0000}.portal-v2e-notification-item.is-warning{border-left:4px solid #b7791f}.portal-v2e-notification-item.is-portal{border-left:4px solid rgba(139,0,0,.42)}
+.portal-v2e-empty{text-align:center;border:1px dashed rgba(139,0,0,.18);border-radius:16px;padding:15px 12px;color:#776c6c;background:rgba(255,255,255,.65)}.portal-v2e-empty i{color:#8B0000;font-size:20px;margin-bottom:6px}.portal-v2e-empty p{margin:0;font-size:12.5px}.portal-v2e-all-link{margin-top:12px}
+@media(max-width:980px){.portal-v2e-notification-card{order:-1}.portal-v2e-mini-stats{grid-template-columns:repeat(3,1fr)}}
+/* /BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATIONS */

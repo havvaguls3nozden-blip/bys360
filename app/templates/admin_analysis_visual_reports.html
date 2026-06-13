@@ -1,0 +1,159 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}AI Görselleştirme ve Rapor Kartları - BYS360{% endblock %}
+{% block page_kicker %}AI Karar Destek / Analiz Merkezi{% endblock %}
+{% block page_title %}Kontrol 8 — Görselleştirme, Grafik ve Rapor Kartları{% endblock %}
+{% block page_subtitle %}AI logları, önerileri, özet cache kayıtları ve KVKK maskeleme sinyallerini veri yazmadan okunabilir yönetici kartlarına dönüştürür.{% endblock %}
+{% block ai_inner %}
+<style>
+.viz-hero{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:stretch}.viz-filter-panel{padding:22px;border-radius:24px;background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);box-shadow:0 18px 36px rgba(15,23,42,.08)}.viz-safe-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.viz-safe-card{padding:15px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.07);color:#475569;line-height:1.55}.viz-safe-card strong{display:block;color:#111827;margin-bottom:6px}.viz-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.viz-report-card{position:relative;padding:18px;border-radius:24px;background:#fff;border:1px solid rgba(15,23,42,.07);box-shadow:0 16px 32px rgba(15,23,42,.06);overflow:hidden}.viz-report-card:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:#8B0000;opacity:.45}.viz-report-card.tone-success:before{background:#059669}.viz-report-card.tone-warning:before{background:#d97706}.viz-report-card.tone-danger:before{background:#dc2626}.viz-report-card.tone-muted:before{background:#94a3b8}.viz-card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.viz-score{display:grid;place-items:center;min-width:62px;height:62px;border-radius:50%;background:rgba(139,0,0,.08);color:#8B0000;font-weight:900}.viz-report-card.tone-success .viz-score{background:#ecfdf5;color:#065f46}.viz-report-card.tone-warning .viz-score{background:#fff7ed;color:#9a3412}.viz-report-card.tone-danger .viz-score{background:#fef2f2;color:#991b1b}.viz-metric-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}.viz-mini-metric{padding:10px;border-radius:14px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.viz-mini-metric .k{font-size:.72rem;color:#64748b;font-weight:800}.viz-mini-metric .v{font-weight:900;color:#111827;margin-top:4px}.viz-bar-list{display:grid;gap:12px}.viz-bar-row{display:grid;grid-template-columns:minmax(120px,220px) 1fr auto;gap:12px;align-items:center}.viz-bar-label{font-weight:800;color:#374151;font-size:.88rem}.viz-bar-track{height:14px;background:#f1f5f9;border-radius:999px;overflow:hidden;border:1px solid rgba(15,23,42,.06)}.viz-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(139,0,0,.75),rgba(139,0,0,.35))}.viz-bar-value{font-weight:900;color:#8B0000}.viz-risk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.viz-risk-card{padding:15px;border-radius:20px;background:#fff;border:1px solid rgba(15,23,42,.07)}.viz-risk-card.tone-success{background:#ecfdf5;border-color:#bbf7d0}.viz-risk-card.tone-warning{background:#fff7ed;border-color:#fed7aa}.viz-risk-card.tone-danger{background:#fef2f2;border-color:#fecaca}.viz-risk-card.tone-muted{background:#f8fafc;border-color:#e2e8f0}.viz-risk-value{font-size:1.55rem;font-weight:900;color:#8B0000}.viz-risk-body{margin-top:8px;color:#475569;line-height:1.55;font-size:.88rem}.viz-trend{display:flex;align-items:end;gap:7px;height:150px;padding:14px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);overflow-x:auto}.viz-trend-col{display:flex;flex-direction:column;justify-content:end;align-items:center;gap:7px;min-width:28px;height:120px}.viz-trend-bar{width:18px;min-height:2px;border-radius:999px 999px 4px 4px;background:linear-gradient(180deg,rgba(139,0,0,.72),rgba(139,0,0,.25))}.viz-trend-label{font-size:.68rem;color:#64748b;writing-mode:vertical-rl;transform:rotate(180deg)}.viz-note-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}.viz-note-list li{padding:13px 15px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.07);color:#374151;line-height:1.55}.viz-note-list li i{color:#8B0000;margin-right:8px}.viz-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid rgba(15,23,42,.08);background:#f8fafc;color:#475569}.viz-chip.safe{background:#ecfdf5;color:#065f46;border-color:#bbf7d0}.viz-chip.locked{background:rgba(139,0,0,.08);color:#8B0000;border-color:rgba(139,0,0,.14)}@media(max-width:1400px){.viz-card-grid,.viz-risk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.viz-safe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.viz-hero{grid-template-columns:1fr}}@media(max-width:768px){.viz-card-grid,.viz-risk-grid,.viz-safe-grid,.viz-metric-row{grid-template-columns:1fr}.viz-bar-row{grid-template-columns:1fr}.viz-filter-panel{padding:16px}}
+</style>
+<div class="ai-shell">
+  <section class="viz-hero">
+    <article class="ai-panel ai-hero">
+      <div class="ai-kicker">Kontrol 8 görsel raporlama</div>
+      <h3 class="ai-title">AI sinyallerini yönetici kartlarına dönüştürün</h3>
+      <p class="ai-sub">Bu ekran; AI işlem günlükleri, öneri kayıtları, geri bildirimler ve maskeleme durumunu grafikleştirir. Gerçek Excel içe aktarımı, canlı veri mutasyonu veya otomatik idari karar üretimi yapmaz.</p>
+      <div class="ai-actions" style="margin-top:16px">
+        <span class="viz-chip safe"><i class="fa-solid fa-eye"></i> Salt okunur</span>
+        <span class="viz-chip safe"><i class="fa-solid fa-database"></i> DB yazımı yok</span>
+        <span class="viz-chip locked"><i class="fa-solid fa-user-shield"></i> KVKK risk kartı aktif</span>
+        <span class="viz-chip"><i class="fa-solid fa-chart-simple"></i> Grafik / kart yüzeyi</span>
+      </div>
+    </article>
+
+    <form class="viz-filter-panel" method="get" autocomplete="off">
+      <div class="ai-kicker">Filtre</div>
+      <h3 class="ai-title">Rapor aralığını seç</h3>
+      <p class="ai-sub">Seçim yalnızca okuma sorgusunu değiştirir. Yeni kayıt üretmez.</p>
+      <div class="ai-filters" style="grid-template-columns:1fr 1fr auto;margin-top:16px">
+        <div class="ai-group">
+          <label for="lookback_days">Gün aralığı</label>
+          <input class="ai-input" id="lookback_days" name="lookback_days" type="number" min="1" max="180" value="{{ lookback_days }}">
+        </div>
+        <div class="ai-group">
+          <label for="module_type">Modül</label>
+          <select class="ai-select" id="module_type" name="module_type">
+            <option value="">Tüm canlı AI modülleri</option>
+            {% for option in module_options %}
+            <option value="{{ option.value }}" {% if selected_module_type == option.value %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Uygula</button>
+      </div>
+      <div class="ai-actions" style="margin-top:14px">
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_visual_reports_export', fallback='#', lookback_days=lookback_days, module_type=selected_module_type) }}"><i class="fa-solid fa-file-csv"></i> Kart CSV</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_center', fallback='#') }}"><i class="fa-solid fa-arrow-left"></i> AI merkeze dön</a>
+      </div>
+    </form>
+  </section>
+
+  <section class="ai-grid ai-grid-four">
+    <article class="ai-card"><div class="ai-label">AI işlem sayısı</div><div class="ai-value">{{ summary.request_total }}</div><div class="ai-mini">Son {{ lookback_days }} gün · seçili modül: {{ selected_module_type or 'tümü' }}</div></article>
+    <article class="ai-card"><div class="ai-label">Maskeleme oranı</div><div class="ai-value">%{{ summary.masked_rate }}</div><div class="ai-mini">Maskesiz kayıt {{ summary.unmasked_total }}</div></article>
+    <article class="ai-card"><div class="ai-label">Açık öneri</div><div class="ai-value">{{ summary.open_recommendations }}</div><div class="ai-mini">Kritik öneri {{ summary.critical_recommendations }}</div></article>
+    <article class="ai-card"><div class="ai-label">Ortalama gecikme</div><div class="ai-value">{{ summary.avg_latency_ms }}</div><div class="ai-mini">ms · hata/uyarı {{ summary.failed_or_warning_total }}</div></article>
+  </section>
+
+  <section class="viz-safe-grid">
+    {% for note in safety_notes %}
+    <article class="viz-safe-card"><strong><i class="fa-solid fa-shield-halved"></i> Güvenli görünürlük</strong>{{ note }}</article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Modül dağılımı</div>
+      <h3 class="ai-title">AI kullanım yoğunluğu</h3>
+      <div class="viz-bar-list" style="margin-top:16px">
+        {% for row in charts.module_distribution %}
+        <div class="viz-bar-row"><div class="viz-bar-label">{{ row.label }}</div><div class="viz-bar-track"><div class="viz-bar-fill" style="width:{{ row.width }}%"></div></div><div class="viz-bar-value">{{ row.value }}</div></div>
+        {% else %}<div class="ai-note">Seçilen aralıkta modül dağılımı oluşmadı.</div>{% endfor %}
+      </div>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Durum dağılımı</div>
+      <h3 class="ai-title">Tamamlandı / uyarı / hata görünümü</h3>
+      <div class="viz-bar-list" style="margin-top:16px">
+        {% for row in charts.status_distribution %}
+        <div class="viz-bar-row"><div class="viz-bar-label">{{ row.label }}</div><div class="viz-bar-track"><div class="viz-bar-fill" style="width:{{ row.width }}%"></div></div><div class="viz-bar-value">{{ row.value }}</div></div>
+        {% else %}<div class="ai-note">Seçilen aralıkta durum verisi bulunmadı.</div>{% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Günlük trend</div>
+      <h3 class="ai-title">Zaman çizgisi</h3>
+      <div class="viz-trend" aria-label="Günlük AI işlem trendi">
+        {% for day in charts.daily_trend %}
+        <div class="viz-trend-col" title="{{ day.date }} · {{ day.value }} işlem · {{ day.risk_value }} risk">
+          <div class="viz-trend-bar" style="height:{{ day.height }}%"></div>
+          <div class="viz-trend-label">{{ day.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="ai-mini">Çubuk yüksekliği işlem yoğunluğunu gösterir; hata/uyarı sayısı kolon başlığında tutulur.</div>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Gecikme ve özellik dağılımı</div>
+      <div class="viz-bar-list" style="margin-top:10px">
+        {% for row in charts.latency_distribution %}
+        <div class="viz-bar-row"><div class="viz-bar-label">{{ row.label }}</div><div class="viz-bar-track"><div class="viz-bar-fill" style="width:{{ row.width }}%"></div></div><div class="viz-bar-value">{{ row.value }}</div></div>
+        {% endfor %}
+      </div>
+      <div class="ai-note" style="margin-top:14px">Özellik tipleri: {% for row in charts.feature_distribution[:5] %}<strong>{{ row.label }}</strong> {{ row.value }}{% if not loop.last %} · {% endif %}{% else %}veri yok{% endfor %}</div>
+    </article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Risk ve öncelik kartları</div>
+    <h3 class="ai-title">KVKK, hata, öneri ve kullanıcı sinyali</h3>
+    <div class="viz-risk-grid" style="margin-top:16px">
+      {% for card in risk_cards %}
+      <article class="viz-risk-card tone-{{ card.tone }}"><div class="ai-label">{{ card.label }}</div><div class="viz-risk-value">{{ card.value }}</div><div class="viz-risk-body">{{ card.body }}</div></article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Rapor kartları</div>
+    <h3 class="ai-title">Modül bazlı karar destek kartları</h3>
+    <div class="viz-card-grid" style="margin-top:16px">
+      {% for card in report_cards %}
+      <article class="viz-report-card tone-{{ card.tone }}">
+        <div class="viz-card-top"><div><div class="ai-kicker">{{ card.module_type }}</div><h4 class="ai-spotlight-title">{{ card.label }}</h4></div><div class="viz-score">{{ card.signal_score }}</div></div>
+        <div class="viz-metric-row">
+          <div class="viz-mini-metric"><div class="k">İstek</div><div class="v">{{ card.request_total }}</div></div>
+          <div class="viz-mini-metric"><div class="k">Başarı</div><div class="v">%{{ card.success_rate }}</div></div>
+          <div class="viz-mini-metric"><div class="k">Maske</div><div class="v">%{{ card.masked_rate }}</div></div>
+          <div class="viz-mini-metric"><div class="k">Öneri</div><div class="v">{{ card.open_recommendations }}</div></div>
+        </div>
+        <div class="ai-mini">Kritik {{ card.critical_recommendations }} · Negatif geri bildirim {{ card.negative_feedback }} · Ortalama {{ card.avg_latency_ms }} ms</div>
+        <div class="ai-note" style="margin-top:12px">{{ card.note }}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Yönetici okuması</div>
+      <ul class="viz-note-list">
+        {% for note in executive_notes %}<li><i class="fa-solid fa-circle-check"></i>{{ note }}</li>{% endfor %}
+      </ul>
+    </article>
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Salt-okunur sözleşme</div>
+      <ul class="ai-list">
+        <li class="ai-list-item"><div><strong>Gerçek içe aktarım</strong><div class="ai-mini">Excel/CSV veya canlı veri aktarımı yapılmaz.</div></div><span class="ai-badge success">Kapalı</span></li>
+        <li class="ai-list-item"><div><strong>DB yazımı</strong><div class="ai-mini">Kontrol 8 servisinde yazma komutu bulunmaz.</div></div><span class="ai-badge success">{{ 'Kapalı' if not read_only_contract.DB_WRITE_ENABLED else 'Açık' }}</span></li>
+        <li class="ai-list-item"><div><strong>Görünürlük amacı</strong><div class="ai-mini">AI sinyallerini rapor kartı, grafik ve risk göstergesine çevirir.</div></div><span class="ai-badge muted">Karar destek</span></li>
+      </ul>
+    </article>
+  </section>
+</div>
+{% endblock %}

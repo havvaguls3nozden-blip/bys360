@@ -1,0 +1,66 @@
+# BYS360_OPS_HARDENING_V1
+# Local/pilot compose profile. For production, use real secrets through
+# server-side env/secrets management and an external PostgreSQL if required.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bys_db}
+      POSTGRES_USER: ${POSTGRES_USER:-bys_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_only_for_local}
+    volumes:
+      - bys360_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - bys360_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env.docker.local
+    environment:
+      BYS360_DEPLOYMENT_MODE: docker
+      PORT: ${PORT:-8000}
+    ports:
+      - "${BYS360_HOST_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - bys360_uploads:/app/uploads
+      - bys360_logs:/app/logs
+      - bys360_reports:/app/reports
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/health || curl -fsS http://127.0.0.1:8000/healthz"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+
+volumes:
+  bys360_postgres_data:
+  bys360_redis_data:
+  bys360_uploads:
+  bys360_logs:
+  bys360_reports:

@@ -1,0 +1,222 @@
+/* BYS360_IOS_ASISTAN_RESPONSIVE_FIX_V1
+   iPhone Safari/PWA için asistan balon metni, açılma ve panel taşma düzeltmesi.
+   Masaüstü görünümü etkilemez. */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    html, body { min-height: 100%; }
+
+    #bys360-assistant-module-root {
+      position: fixed !important;
+      right: max(12px, env(safe-area-inset-right)) !important;
+      bottom: max(14px, env(safe-area-inset-bottom)) !important;
+      left: auto !important;
+      top: auto !important;
+      z-index: 2147483400 !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: calc(100vw - 24px) !important;
+      pointer-events: auto !important;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher {
+      min-width: min(246px, calc(100vw - 28px)) !important;
+      width: auto !important;
+      min-height: 58px !important;
+      height: auto !important;
+      padding: 8px 13px 8px 8px !important;
+      border-radius: 22px !important;
+      gap: 9px !important;
+      cursor: pointer !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: transparent !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-icon {
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 16px !important;
+      flex: 0 0 42px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-text {
+      display: flex !important;
+      min-width: 0 !important;
+      max-width: 165px !important;
+      overflow: hidden !important;
+      color: #fff !important;
+      line-height: 1.08 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-text strong {
+      display: block !important;
+      font-size: 13.5px !important;
+      font-weight: 900 !important;
+      color: #fff !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-text span {
+      display: block !important;
+      margin-top: 4px !important;
+      font-size: 10.5px !important;
+      color: rgba(255,255,255,.92) !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-dot {
+      display: none !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-panel {
+      position: fixed !important;
+      left: max(8px, env(safe-area-inset-left)) !important;
+      right: max(8px, env(safe-area-inset-right)) !important;
+      bottom: calc(max(10px, env(safe-area-inset-bottom)) + 74px) !important;
+      top: auto !important;
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      max-height: calc(100dvh - 98px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      min-height: 0 !important;
+      border-radius: 22px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      -webkit-transform: translateZ(0) !important;
+      transform: translateZ(0) !important;
+    }
+
+    @supports not (height: 100dvh) {
+      #bys360-assistant-module-root .bys360-am-panel {
+        max-height: calc(100vh - 118px) !important;
+      }
+    }
+
+    #bys360-assistant-module-root .bys360-am-header {
+      flex: 0 0 auto !important;
+      padding: 14px 14px 11px !important;
+      cursor: default !important;
+      touch-action: manipulation !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-header-top {
+      gap: 10px !important;
+      min-width: 0 !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-mark {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 14px !important;
+      flex: 0 0 38px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-title {
+      min-width: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-title h2 {
+      display: block !important;
+      margin: 0 !important;
+      color: #fff !important;
+      font-size: 16px !important;
+      line-height: 1.12 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-title p {
+      display: block !important;
+      margin-top: 4px !important;
+      color: rgba(255,255,255,.92) !important;
+      font-size: 10.8px !important;
+      line-height: 1.25 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-note {
+      display: none !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-tabs {
+      flex: 0 0 auto !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 5px !important;
+      padding: 8px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-tab {
+      min-height: 34px !important;
+      padding: 6px 4px !important;
+      border-radius: 12px !important;
+      font-size: 10.6px !important;
+      white-space: nowrap !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-body {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-view {
+      min-height: 0 !important;
+      height: 100% !important;
+      padding: 10px !important;
+      overflow: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-view[data-panel="chat"],
+    #bys360-assistant-module-root .bys360-am-view.is-active[data-panel="chat"] {
+      overflow: hidden !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-log,
+    #bys360-assistant-module-root [data-chat-log="true"] {
+      min-height: 120px !important;
+      max-height: none !important;
+      flex: 1 1 auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      contain: none !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-form {
+      position: relative !important;
+      bottom: auto !important;
+      flex: 0 0 auto !important;
+      margin-top: 8px !important;
+      padding: 9px !important;
+      border-radius: 18px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-form textarea {
+      min-height: 54px !important;
+      max-height: 84px !important;
+      font-size: 13px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-form-row span {
+      display: none !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-form-row {
+      justify-content: flex-end !important;
+    }
+  }
+}

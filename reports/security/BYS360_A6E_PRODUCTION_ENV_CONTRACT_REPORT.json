@@ -1,0 +1,134 @@
+{
+  "generated_at": "2026-06-12T13:19:58",
+  "source": "reports\\security\\BYS360_A6F_STRICT_ENV_SAMPLE.env",
+  "strict": true,
+  "passed": 16,
+  "warnings": 0,
+  "failed": 0,
+  "ok": true,
+  "masked_values": {
+    "SECRET_KEY": "***MASKED***",
+    "DATABASE_URL": "postgresql+psycopg2://bys360_user:strong_password_only_for_gate@postgres.local:5432/bys360?sslmode=require",
+    "SENTRY_DSN": "***MASKED***",
+    "SESSION_COOKIE_SECURE": "true",
+    "REMEMBER_COOKIE_SECURE": "true",
+    "WTF_CSRF_ENABLED": "true",
+    "CSP_ENABLED": "true",
+    "DEBUG": "false",
+    "FLASK_DEBUG": "0"
+  },
+  "findings": [
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "SECRET_KEY",
+      "message": "SECRET_KEY tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "DATABASE_URL",
+      "message": "DATABASE_URL tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "SENTRY_DSN",
+      "message": "SENTRY_DSN tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "SESSION_COOKIE_SECURE",
+      "message": "SESSION_COOKIE_SECURE tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "REMEMBER_COOKIE_SECURE",
+      "message": "REMEMBER_COOKIE_SECURE tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "WTF_CSRF_ENABLED",
+      "message": "WTF_CSRF_ENABLED tan?ml?."
+    },
+    {
+      "rule": "REQUIRED_KEY_PRESENT",
+      "severity": "info",
+      "status": "pass",
+      "key": "CSP_ENABLED",
+      "message": "CSP_ENABLED tan?ml?."
+    },
+    {
+      "rule": "SECRET_KEY_STRONG",
+      "severity": "info",
+      "status": "pass",
+      "key": "SECRET_KEY",
+      "message": "SECRET_KEY uzunlu?u yeterli."
+    },
+    {
+      "rule": "DATABASE_IS_POSTGRESQL",
+      "severity": "info",
+      "status": "pass",
+      "key": "DATABASE_URL",
+      "message": "DATABASE_URL PostgreSQL g?r?n?yor."
+    },
+    {
+      "rule": "DATABASE_SSL_NOT_DISABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "DATABASE_URL",
+      "message": "DATABASE_URL SSL modu g?venli g?r?n?yor."
+    },
+    {
+      "rule": "SENTRY_DSN_VALID_SHAPE",
+      "severity": "info",
+      "status": "pass",
+      "key": "SENTRY_DSN",
+      "message": "SENTRY_DSN bi?imi uygun g?r?n?yor."
+    },
+    {
+      "rule": "DEBUG_DISABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "DEBUG",
+      "message": "DEBUG/FLASK_DEBUG a??k de?il."
+    },
+    {
+      "rule": "SECURE_COOKIE_ENABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "SESSION_COOKIE_SECURE",
+      "message": "SESSION_COOKIE_SECURE=true."
+    },
+    {
+      "rule": "SECURE_COOKIE_ENABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "REMEMBER_COOKIE_SECURE",
+      "message": "REMEMBER_COOKIE_SECURE=true."
+    },
+    {
+      "rule": "CSRF_ENABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "WTF_CSRF_ENABLED",
+      "message": "CSRF kapal? g?r?nm?yor."
+    },
+    {
+      "rule": "CSP_ENABLED",
+      "severity": "info",
+      "status": "pass",
+      "key": "CSP_ENABLED",
+      "message": "CSP kapal? g?r?nm?yor."
+    }
+  ]
+}

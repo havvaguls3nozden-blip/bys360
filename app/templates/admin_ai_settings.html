@@ -1,0 +1,235 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Ayarları - BYS360{% endblock %}
+{% block page_kicker %}Karar Destek Yapılandırması{% endblock %}
+{% block page_title %}Karar Destek Ayarları ve İstem Kataloğu{% endblock %}
+{% block page_subtitle %}Sağlayıcı, kayıt dosyası ve istem kayıtlarını tek ekranda izleyin; gerektiğinde aynı yerden oluşturun, düzenleyin veya silin{% endblock %}
+{% block ai_inner %}
+<style>
+.prompt-editor-grid{display:grid;grid-template-columns:minmax(360px,1.05fr) minmax(0,.95fr);gap:18px;align-items:start}
+.prompt-catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.prompt-card{display:flex;flex-direction:column;gap:12px}
+.prompt-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.prompt-pair{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.prompt-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-size:.78rem;font-weight:800;color:#374151}
+.prompt-version{font-size:.86rem;color:#4b5563;font-weight:700}
+.prompt-preview{padding:14px 16px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#334155;line-height:1.6;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;min-height:124px}
+.prompt-card-actions{display:flex;flex-wrap:wrap;gap:10px}
+.prompt-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.prompt-table td:nth-child(5){max-width:460px}
+.prompt-table .prompt-cell-preview{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.55}
+.prompt-action-stack{display:flex;flex-wrap:wrap;gap:8px}
+.ai-action-btn.danger{background:#991b1b}
+.ai-action-btn.ghost{background:#fff;color:#374151;border:1px solid rgba(15,23,42,.08)}
+.ai-help-list{display:grid;gap:10px;margin:0;padding-left:18px;color:#475569}
+.ai-note-compact{font-size:.86rem;color:#64748b;line-height:1.55}
+@media (max-width: 1400px){.prompt-editor-grid{grid-template-columns:1fr}.prompt-catalog-grid{grid-template-columns:1fr}.prompt-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 768px){.prompt-stat-grid{grid-template-columns:1fr}.prompt-table td:nth-child(5){max-width:280px}}
+</style>
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">Karar Destek Kontrol 2+</div>
+    <h3 class="ai-title">Sağlayıcı ve istem yönetimi</h3>
+    <p class="ai-sub">Bu ekran üzerinden karar destek istemlerini ve sağlayıcı ayarlarını sade, kurumsal ve Türkçe görünümle yönetebilirsiniz.</p>
+    <div class="ai-actions" style="margin-top:16px">
+      <span class="ai-badge {{ snapshot.status_tone }}">{{ snapshot.status_label }}</span>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_center') }}"><i class="fa-solid fa-arrow-left"></i> Karar destek merkezine dön</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_preflight') }}"><i class="fa-solid fa-shield-halved"></i> Ön kontrol</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_smoke') }}"><i class="fa-solid fa-list-check"></i> Hızlı doğrulama</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_settings') }}"><i class="fa-solid fa-plus"></i> Yeni istem oluştur</a>
+    </div>
+  </section>
+
+  <section class="prompt-stat-grid">
+    <article class="ai-card"><div class="ai-label">Toplam istem</div><div class="ai-value" style="font-size:1.3rem">{{ editor.total_count }}</div><div class="ai-mini">Katalogda görünen tüm istem tanımları</div></article>
+    <article class="ai-card"><div class="ai-label">Kayıt dosyası kaydı</div><div class="ai-value" style="font-size:1.3rem">{{ editor.registry_count }}</div><div class="ai-mini">Dosyadan yönetilen istem sayısı</div></article>
+    <article class="ai-card"><div class="ai-label">Yerleşik kayıt</div><div class="ai-value" style="font-size:1.3rem">{{ editor.built_in_count }}</div><div class="ai-mini">Kod içinden gelen varsayılan istemler</div></article>
+    <article class="ai-card"><div class="ai-label">Seçili kayıt</div><div class="ai-value" style="font-size:1.02rem;line-height:1.3">{{ selected_label }}</div><div class="ai-mini">{{ 'Kayıt dosyası üzerinden düzenlenebilir' if editor.registry_exists else 'İsterseniz kayıt dosyası ile üzerine yazabilirsiniz' }}</div></article>
+  </section>
+
+  <section class="prompt-editor-grid">
+    <section class="ai-form-wrap">
+      <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <h4 class="ai-title" style="font-size:1.05rem">İstem düzenleme alanı</h4>
+          <div class="ai-mini" style="margin-top:6px">Seçili istemi güncelleyin veya yeni bir kayıt ekleyin</div>
+        </div>
+        <div class="prompt-pair">
+          <span class="ai-badge {{ 'success' if editor.registry_exists else 'muted' }}">{{ 'Kayıt dosyası kaydı' if editor.registry_exists else 'Yerleşik kayıt' }}</span>
+          {% if editor.built_in_exists %}<span class="prompt-chip">Varsayılan mevcut</span>{% endif %}
+        </div>
+      </div>
+      <form method="post" action="{{ url_for('main.admin_ai_settings_prompt_upsert') }}" class="ai-shell">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="ai-grid ai-grid-two">
+          <div class="ai-group">
+            <label for="module_type">Modül</label>
+            <select class="ai-select" id="module_type" name="module_type" required>
+              <option value="">Modül seçin</option>
+              {% for option in module_options %}
+              <option value="{{ option.value }}" {{ 'selected' if editor.module_type == option.value else '' }}>{{ option.label }}</option>
+              {% endfor %}
+              {% if editor.module_type and not module_options|selectattr('value', 'equalto', editor.module_type)|list %}
+              <option value="{{ editor.module_type }}" selected>{{ editor.module_type|ai_module_label }}</option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="ai-group">
+            <label for="feature_type">Özellik</label>
+            <select class="ai-select" id="feature_type" name="feature_type" required>
+              <option value="">Özellik seçin</option>
+              {% for option in feature_options %}
+              <option value="{{ option.value }}" {{ 'selected' if editor.feature_type == option.value else '' }}>{{ option.label }}</option>
+              {% endfor %}
+              {% if editor.feature_type and not feature_options|selectattr('value', 'equalto', editor.feature_type)|list %}
+              <option value="{{ editor.feature_type }}" selected>{{ editor.feature_type|ai_feature_label }}</option>
+              {% endif %}
+            </select>
+          </div>
+        </div>
+        <div class="ai-grid ai-grid-two">
+          <div class="ai-group">
+            <label for="version">Sürüm etiketi</label>
+            <input class="ai-input" id="version" name="version" value="{{ editor.version }}" placeholder="ör. performans_ozeti_v6_bys360" required>
+          </div>
+          <div class="ai-group">
+            <label>Kayıt türü</label>
+            <div class="ai-note">{{ 'Şu an kayıt dosyası kaydı düzenleniyor.' if editor.registry_exists else 'Kaydet dediğinizde kayıt dosyası kaydı oluşturulur.' }}</div>
+          </div>
+        </div>
+        <div class="ai-group">
+          <label for="system">Sistem istem metni</label>
+          <textarea class="ai-textarea" id="system" name="system" style="min-height:240px" required>{{ editor.system }}</textarea>
+        </div>
+        <div class="ai-actions">
+          <button type="submit" class="ai-submit"><i class="fa-solid fa-floppy-disk"></i> {{ 'Güncelle' if editor.module_type and editor.feature_type else 'Kaydet' }}</button>
+          <a class="ai-action-btn ghost" href="{{ url_for('main.admin_ai_settings') }}"><i class="fa-solid fa-plus"></i> Temiz form aç</a>
+        </div>
+      </form>
+      {% if editor.registry_exists %}
+      <form method="post" action="{{ url_for('main.admin_ai_settings_prompt_delete') }}" style="margin-top:10px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="module_type" value="{{ editor.module_type }}">
+        <input type="hidden" name="feature_type" value="{{ editor.feature_type }}">
+        <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi? Yerleşik kayıt varsa ekran varsayılana döner.')"><i class="fa-solid fa-trash-can"></i> Kayıt dosyası kaydını sil</button>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="ai-form-wrap">
+      <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h4 class="ai-title" style="font-size:1.05rem">Kullanım notları</h4>
+        <span class="ai-badge muted">Dosya yolu: {{ prompt_meta.path }}</span>
+      </div>
+      <ol class="ai-help-list">
+        <li><strong>Yeni istem oluştur:</strong> Modül ve özellik seçin, sürüm verin, istem metnini kaydedin.</li>
+        <li><strong>Yerleşik istem düzenle:</strong> Kayıt seçip kaydedin; sistem aynı anahtar için kayıt dosyası ezme kaydı üretir.</li>
+        <li><strong>Kayıt dosyası istemini sil:</strong> Yalnızca kayıt dosyası kaynaklı kayıt silinir; yerleşik kayıt varsa ekranda varsayılan metin kalır.</li>
+        <li><strong>Türkçe görünüm:</strong> Modül, özellik ve kaynak etiketleri kullanıcıya Türkçe gösterilir.</li>
+      </ol>
+      <div class="ai-note" style="margin-top:14px">Gerçek değişiklikler <strong>{{ prompt_meta.path }}</strong> dosyasına yazılır. Uygulamayı yeniden başlatmadan da yeni kayıtlar katalogda görünür.</div>
+      <section class="ai-table-wrap" style="margin-top:14px;padding:14px">
+        <table class="ai-table prompt-table" style="min-width:0">
+          <thead><tr><th>Ayar</th><th>Etkin değer</th><th>Açıklama</th></tr></thead>
+          <tbody>
+            {% for row in env_rows[:4] %}
+            <tr>
+              <td><strong>{{ row.name }}</strong></td>
+              <td>{{ row.value }}</td>
+              <td>{{ row.note }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </section>
+  </section>
+
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">Öncelikli aksiyonlar</h4>
+    <div class="ai-grid ai-grid-two" style="margin-top:16px">
+      {% for item in actions %}
+      <article class="ai-card ai-action-card tone-{{ item.tone }}">
+        <div class="ai-label">{{ 'Öncelik' if item.tone == 'warning' else 'Durum' }}</div>
+        <div class="ai-title" style="font-size:1.02rem">{{ item.title }}</div>
+        <div class="ai-mini">{{ item.body }}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h4 class="ai-title" style="font-size:1.05rem">İstem kataloğu</h4>
+      <span class="ai-badge {{ 'success' if prompt_meta.exists else 'warning' }}">{{ 'Kayıt dosyası etkin' if prompt_meta.exists else 'Yerleşik istemler kullanılıyor' }}</span>
+    </div>
+    <div class="prompt-catalog-grid">
+      {% for row in prompt_rows %}
+      <article class="ai-card prompt-card">
+        <div class="prompt-card-head">
+          <div>
+            <div class="prompt-pair">
+              <span class="prompt-chip"><i class="fa-solid fa-cubes"></i> {{ row.module_type|ai_module_label }}</span>
+              <span class="prompt-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> {{ row.feature_type|ai_feature_label }}</span>
+            </div>
+            <div class="prompt-version" style="margin-top:8px">{{ row.version }}</div>
+          </div>
+          <span class="ai-badge {{ 'success' if row.source == 'registry' else 'muted' }}">{{ row.source|ai_source_label }}</span>
+        </div>
+        <div class="prompt-preview">{{ row.system }}</div>
+        <div class="prompt-card-actions">
+          <a class="ai-action-btn" href="{{ url_for('main.admin_ai_settings', module_type=row.module_type, feature_type=row.feature_type) }}"><i class="fa-solid fa-pen-to-square"></i> Düzenle</a>
+          {% if row.source == 'registry' %}
+          <form method="post" action="{{ url_for('main.admin_ai_settings_prompt_delete') }}" style="display:inline-flex">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="module_type" value="{{ row.module_type }}">
+            <input type="hidden" name="feature_type" value="{{ row.feature_type }}">
+            <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi?')"><i class="fa-solid fa-trash-can"></i> Sil</button>
+          </form>
+          {% else %}
+          <span class="ai-badge muted">Varsayılan kayıt</span>
+          {% endif %}
+        </div>
+      </article>
+      {% else %}
+      <div class="ai-note">İstem kaydı bulunamadı.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h4 class="ai-title" style="font-size:1.05rem">Etkin yapılandırma özeti</h4>
+      <span class="ai-badge muted">Tüm modül ve özellik adları kullanıcıya Türkçe gösterilir</span>
+    </div>
+    <table class="ai-table prompt-table">
+      <thead><tr><th>Modül</th><th>Özellik</th><th>Sürüm</th><th>Kaynak</th><th>Sistem istem önizleme</th><th>İşlem</th></tr></thead>
+      <tbody>
+        {% for row in prompt_rows %}
+        <tr>
+          <td><strong>{{ row.module_type|ai_module_label }}</strong></td>
+          <td>{{ row.feature_type|ai_feature_label }}</td>
+          <td>{{ row.version }}</td>
+          <td><span class="ai-badge {{ 'success' if row.source == 'registry' else 'muted' }}">{{ row.source|ai_source_label }}</span></td>
+          <td><div class="prompt-cell-preview">{{ row.system }}</div></td>
+          <td>
+            <div class="prompt-action-stack">
+              <a class="ai-link" href="{{ url_for('main.admin_ai_settings', module_type=row.module_type, feature_type=row.feature_type) }}"><i class="fa-solid fa-pen-to-square"></i> Düzenle</a>
+              {% if row.source == 'registry' %}
+              <form method="post" action="{{ url_for('main.admin_ai_settings_prompt_delete') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="module_type" value="{{ row.module_type }}">
+                <input type="hidden" name="feature_type" value="{{ row.feature_type }}">
+                <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi?')"><i class="fa-solid fa-trash-can"></i> Sil</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="ai-note">İstem kaydı bulunamadı.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

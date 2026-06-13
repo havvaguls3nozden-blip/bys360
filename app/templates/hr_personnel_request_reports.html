@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Talep Raporları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Talep Raporları{% endblock %}
+{% block page_subtitle %}Özlük taleplerini durum, görev sahipliği ve SLA görünümüyle raporlayın.{% endblock %}
+
+{% block content %}
+<style>
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}.stat{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827;line-height:1}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:1100px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.soft{background:#f3f4f6;color:#374151}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}@media (max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}}@media (max-width:680px){.stats{grid-template-columns:1fr}}
+</style>
+
+<div class="top-actions">
+  <a class="btn btn-outline-secondary" href="{{ url_for('main.hr_personnel_request_tasks', scope=selected_scope_mode) }}">Talep görev kutusu</a>
+  <a class="btn btn-outline-secondary" href="{{ url_for('main.hr_personnel_request_review_index', scope=selected_scope_mode) }}">Talep onay kutusu</a>
+  <a class="btn btn-danger" href="{{ url_for('main.hr_personnel_request_reports_export', scope=selected_scope_mode) }}">CSV dışa aktar</a>
+  <a class="btn btn-outline-secondary" href="{{ url_for('main.hr_personnel_request_analytics', scope=selected_scope_mode) }}">Analitik dashboard</a>
+  <a class="btn btn-outline-secondary" href="{{ url_for('main.hr_personnel_request_sla_policies', scope=selected_scope_mode) }}">SLA politikaları</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="label">Toplam talep</div><div class="value">{{ report_summary.total }}</div></div>
+  <div class="stat"><div class="label">Açık süreç</div><div class="value">{{ report_summary.open }}</div></div>
+  <div class="stat"><div class="label">Onaylandı</div><div class="value">{{ report_summary.approved }}</div></div>
+  <div class="stat"><div class="label">Reddedildi</div><div class="value">{{ report_summary.rejected }}</div></div>
+  <div class="stat"><div class="label">SLA geciken</div><div class="value">{{ report_summary.overdue }}</div></div>
+</div>
+
+<div class="panel">
+  <h3 class="section-title">Talep rapor tablosu</h3>
+  {% if report_rows %}
+  <div class="table-wrap"><table class="table-clean"><thead><tr><th>Tarih</th><th>Personel</th><th>Talep</th><th>Durum</th><th>Sorumlu</th><th>Görev</th><th>SLA</th><th>Karar Notu</th></tr></thead><tbody>
+    {% for row in report_rows %}
+    <tr>
+      <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+      <td>{{ row.user_name }}</td>
+      <td><strong>{{ row.title }}</strong><br><span class="muted">{{ row.request_type_label }} · {{ row.priority_label }}</span></td>
+      <td><span class="tag {% if row.status == 'approved' %}good{% elif row.status == 'rejected' %}bad{% elif row.status in ['submitted','in_review','returned'] %}warn{% else %}soft{% endif %}">{{ row.status_label }}</span></td>
+      <td>{{ row.primary_task_owner }}<br><span class="muted">{{ row.handler_name or '-' }}</span></td>
+      <td>{{ row.open_task_count }} açık / {{ row.task_count }} toplam<br><span class="muted">{{ row.primary_task_status_label }}</span></td>
+      <td>{% if row.sla %}<span class="tag {{ row.sla.tone }}">{{ row.sla.label }}</span>{% else %}<span class="tag soft">Takipsiz</span>{% endif %}</td>
+      <td class="muted">{{ row.decision_note or '-' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="muted">Bu kapsam altında raporlanacak talep bulunmuyor.</div>{% endif %}
+</div>
+{% endblock %}

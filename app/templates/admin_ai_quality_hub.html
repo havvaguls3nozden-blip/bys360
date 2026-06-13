@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}AI Kalite Panosu - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Kalite Panosu{% endblock %}
+{% block page_subtitle %}İstek, maskeleme, kabul oranı ve geri bildirim üzerinden kalite görünümünü toplar.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-3" method="get">
+    <div class="col-md-4"><label class="form-label">Modül</label><select class="form-select" name="module_type"><option value="">Tümü</option>{% for item in module_options %}<option value="{{ item }}" {% if selected_module_type == item|lower %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-4"><label class="form-label">İstem sürümü</label><select class="form-select" name="prompt_version"><option value="">Tümü</option>{% for item in prompt_options %}<option value="{{ item }}" {% if selected_prompt_version == item|lower %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+    <div class="col-md-2"><label class="form-label">Pencere</label><input class="form-control" type="number" min="1" max="180" name="lookback_days" value="{{ selected_lookback_days }}"></div>
+    <div class="col-md-2 d-flex align-items-end gap-2"><button class="btn btn-catab w-100">Güncelle</button><a class="btn btn-outline-secondary w-100" href="{{ url_for('main.admin_ai_quality_hub_export', module_type=selected_module_type, prompt_version=selected_prompt_version, lookback_days=selected_lookback_days) }}">CSV</a></div>
+  </form>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">İstek</div><div class="fs-4 fw-bold">{{ summary.request_total or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">Kalite</div><div class="fs-4 fw-bold">%{{ summary.quality_score or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">Başarı</div><div class="fs-4 fw-bold">%{{ summary.success_rate or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">Maskeleme</div><div class="fs-4 fw-bold">%{{ summary.masked_rate or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">Kabul</div><div class="fs-4 fw-bold">%{{ summary.acceptance_rate or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="glass-card p-3"><div class="small text-muted">Negatif geri bildirim</div><div class="fs-4 fw-bold">{{ summary.negative_feedback or 0 }}</div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-card p-4">
+      <h4 class="mb-3">Modül kırılımı</h4>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Modül</th><th>Kalite</th><th>Başarı</th><th>Backlog</th></tr></thead><tbody>{% for row in module_rows %}<tr><td>{{ row.module_type }}</td><td><span class="badge text-bg-{% if row.tone == 'warning' %}warning{% elif row.tone == 'success' %}success{% else %}secondary{% endif %}">%{{ row.quality_score }}</span></td><td>%{{ row.success_rate }}</td><td>{{ row.backlog_total }}</td></tr>{% else %}<tr><td colspan="4" class="text-muted">Kayıt yok.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4">
+      <h4 class="mb-3">İstem kırılımı</h4>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>İstem</th><th>Kalite</th><th>Kabul</th><th>Negatif</th></tr></thead><tbody>{% for row in prompt_rows %}<tr><td>{{ row.prompt_version }}</td><td><span class="badge text-bg-{% if row.tone == 'warning' %}warning{% elif row.tone == 'success' %}success{% else %}secondary{% endif %}">%{{ row.quality_score }}</span></td><td>%{{ row.acceptance_rate }}</td><td>{{ row.negative_feedback }}</td></tr>{% else %}<tr><td colspan="4" class="text-muted">Kayıt yok.</td></tr>{% endfor %}</tbody></table></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

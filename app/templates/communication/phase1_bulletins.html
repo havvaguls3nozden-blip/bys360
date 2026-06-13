@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Faz 1 Duyuru Merkezi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Faz 1 Duyuru Merkezi{% endblock %}
+{% block page_subtitle %}Hedeflenmiş duyuru omurgası, teslim mantığı ve merkezi takip ekranı bu fazda açılır.{% endblock %}
+{% block content %}
+<style>
+.shell{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.card,.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}.card{padding:20px}.label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:10px}.value{font-size:1.7rem;font-weight:900;color:#111827}.table-wrap{overflow:auto;background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:22px}.table{margin:0;min-width:980px}.table thead th{font-size:.79rem;text-transform:uppercase;letter-spacing:.03em;color:#6b7280;background:#fafafa}.table td,.table th{padding:14px 14px;border-bottom:1px solid rgba(15,23,42,.08);vertical-align:top}.panel{padding:22px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.btn-main,.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 15px;border-radius:14px;text-decoration:none;font-weight:800}.btn-main{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.btn-soft{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.16)}.badge-soft{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800}.meta{color:#6b7280;font-size:.84rem;line-height:1.7;margin-top:4px}@media (max-width:1100px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:720px){.stats{grid-template-columns:1fr}}
+</style>
+<div class="shell">
+    <div class="stats">
+        <div class="card"><div class="label">Toplam kayıt</div><div class="value">{{ counts.total }}</div></div>
+        <div class="card"><div class="label">Taslak</div><div class="value">{{ counts.draft }}</div></div>
+        <div class="card"><div class="label">Yayında</div><div class="value">{{ counts.published }}</div></div>
+        <div class="card"><div class="label">Arşiv</div><div class="value">{{ counts.archived }}</div></div>
+    </div>
+
+    <div class="panel">
+        <div class="toolbar">
+            <div>
+                <h3 style="margin:0;font-size:1.04rem;font-weight:900;color:#111827;">Hedefli duyuru listesi</h3>
+                <p style="margin:6px 0 0;color:#6b7280;line-height:1.8;">Bu fazda duyurular hedef kitlesiyle, önceliğiyle ve teslim mantığıyla kaydedilir.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a class="btn-soft" href="{{ url_for('main.communication_phase1_dashboard_view') }}"><i class="fa-solid fa-chart-line"></i> Kontrol 1 Paneli</a>
+                {% if can_manage %}
+                <a class="btn-main" href="{{ url_for('main.communication_phase1_bulletin_new') }}"><i class="fa-solid fa-plus"></i> Yeni Duyuru</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="table-wrap mt-3">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Başlık</th>
+                        <th>Tür</th>
+                        <th>Öncelik</th>
+                        <th>Durum</th>
+                        <th>Hedef</th>
+                        <th>Tarih</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:800;color:#111827;">{{ row.title }}</div>
+                            <div class="meta">{{ row.summary or 'Özet girilmemiş.' }}</div>
+                        </td>
+                        <td>{{ row.bulletin_type }}</td>
+                        <td><span class="badge-soft">{{ priority_labels.get(row.priority, row.priority) }}</span></td>
+                        <td>{{ status_labels.get(row.status, row.status) }}</td>
+                        <td>{{ row.audiences.count() if row.audiences is defined else 0 }} kayıt</td>
+                        <td>
+                            {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}
+                            {% if row.publish_at %}<div class="meta">Yayın: {{ row.publish_at.strftime('%d.%m.%Y %H:%M') }}</div>{% endif %}
+                        </td>
+                        <td><a class="btn-soft" href="{{ url_for('main.communication_phase1_bulletin_detail', bulletin_id=row.id) }}">Aç</a></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">Kontrol 1 duyuru kaydı bulunamadı.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+
+{% block title %}Yayın Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yayın Yönetimi{% endblock %}
+{% block page_subtitle %}
+Dönem bazlı sonuç yayınlarını yönetin, toplu veya tekil yayın işlemlerini kurumsal görünümle kontrol edin.
+{% endblock %}
+
+{% block content %}
+{% set ns = namespace(ready_count=0, blocked_count=0, published_count=0, unpublished_count=0) %}
+{% for row in rows or [] %}
+    {% if row.ready_to_publish %}{% set ns.ready_count = ns.ready_count + 1 %}{% endif %}
+    {% if row.blocked %}{% set ns.blocked_count = ns.blocked_count + 1 %}{% endif %}
+    {% if row.is_published %}{% set ns.published_count = ns.published_count + 1 %}{% else %}{% set ns.unpublished_count = ns.unpublished_count + 1 %}{% endif %}
+{% endfor %}
+<style>
+    .publish-shell{display:grid;gap:18px}
+    .glass-card{
+        position:relative;overflow:hidden;background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px);
+    }
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .intro-card{display:grid;gap:8px}
+    .intro-title{font-size:1.08rem;font-weight:900;color:#111827;line-height:1.35;margin:0}
+    .intro-sub{color:#6b7280;font-size:.92rem;line-height:1.8;margin:0}
+    .scope-strip{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding:16px 18px;border-radius:20px;background:linear-gradient(180deg, rgba(139,0,0,.055), rgba(139,0,0,.018));border:1px solid rgba(139,0,0,.08)}
+    .scope-title{color:#111827;font-size:.95rem;font-weight:900;line-height:1.5;margin-bottom:6px}
+    .scope-sub{color:#6b7280;font-size:.84rem;line-height:1.75;margin:0}
+    .field-help{color:#6b7280;font-size:.78rem;line-height:1.65;margin-top:2px}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+    .stat-card{padding:22px;position:relative;overflow:hidden}
+    .stat-card::after{
+        content:"";position:absolute;right:-20px;bottom:-20px;width:84px;height:84px;
+        border-radius:50%;background:rgba(139,0,0,.06);
+    }
+    .stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:10px;line-height:1.5;position:relative;z-index:1}
+    .stat-value{color:#111827;font-size:1.7rem;font-weight:900;line-height:1;position:relative;z-index:1}
+
+    .toolbar-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px 220px auto auto;gap:12px;align-items:end}
+    .form-group{display:flex;flex-direction:column;gap:8px}
+    .form-group label{font-size:.9rem;font-weight:800;color:#374151}
+    .form-input,.form-select{
+        min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);
+        background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%;
+    }
+    .form-input:focus,.form-select:focus{
+        border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+    .search-wrap{position:relative}
+    .search-wrap i{
+        position:absolute;left:14px;top:50%;transform:translateY(-50%);
+        color:#8B0000;font-size:.9rem;
+    }
+    .search-wrap .form-input{padding-left:40px}
+
+    .btn-soft{
+        display:inline-flex;align-items:center;justify-content:center;gap:8px;
+        min-height:48px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;
+        text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease;
+    }
+    .btn-soft:hover{transform:translateY(-1px)}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .btn-soft.success{background:linear-gradient(180deg,#166534,#14532d);color:#fff}
+    .btn-soft.warning{background:linear-gradient(180deg,#b45309,#92400e);color:#fff}
+
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .summary-box{border:1px solid rgba(15,23,42,.08);background:#f8fafc;border-radius:18px;padding:14px}
+    .summary-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px}
+    .summary-value{color:#111827;font-size:.96rem;font-weight:900;line-height:1.5}
+
+    .action-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .action-group{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .inline-form{display:inline;margin:0;padding:0}
+
+    .record-list{display:grid;gap:14px}
+    .record-card{
+        border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff;
+        overflow:hidden;transition:all .18s ease;
+    }
+    .record-card:hover{transform:translateY(-1px);box-shadow:0 18px 30px rgba(15,23,42,.06)}
+    .record-head{
+        display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;
+        padding:18px 18px 14px 18px;border-bottom:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.015));
+    }
+    .record-title{color:#111827;font-size:1rem;font-weight:900;line-height:1.45;margin-bottom:4px}
+    .record-sub{color:#6b7280;font-size:.86rem;line-height:1.7}
+    .badge-stack{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+    .pill{
+        display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 11px;
+        border-radius:999px;font-size:.8rem;font-weight:800;white-space:nowrap;
+    }
+    .pill.ready{background:rgba(22,101,52,.10);color:#166534}
+    .pill.blocked{background:rgba(180,83,9,.10);color:#92400e}
+    .pill.published{background:rgba(139,0,0,.10);color:#8B0000}
+    .pill.unpublished{background:rgba(107,114,128,.12);color:#374151}
+    .pill.log-publish{background:rgba(22,101,52,.10);color:#166534}
+    .pill.log-unpublish{background:rgba(180,83,9,.10);color:#92400e}
+    .pill.log-bulk-publish{background:rgba(139,0,0,.10);color:#8B0000}
+    .pill.log-bulk-unpublish{background:rgba(29,78,216,.10);color:#1d4ed8}
+
+    .record-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:16px 18px}
+    .mini-box{border:1px solid rgba(15,23,42,.08);background:#f8fafc;border-radius:18px;padding:14px}
+    .mini-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px}
+    .mini-value{color:#111827;font-size:.92rem;font-weight:900;line-height:1.55}
+
+    .record-foot{
+        display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+        padding:0 18px 18px 18px;
+    }
+    .record-note{color:#6b7280;font-size:.84rem;line-height:1.7}
+    .record-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn-soft.disabled,.btn-soft:disabled{
+        opacity:.55;cursor:not-allowed;transform:none !important;box-shadow:none !important;
+    }
+
+    .empty-box{
+        padding:26px 20px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;color:#6b7280;text-align:center;line-height:1.9;
+    }
+
+    .preview-modal .modal-content{
+        border:none;border-radius:26px;overflow:hidden;background:rgba(255,255,255,.98);
+        box-shadow:0 24px 50px rgba(15,23,42,.16);
+    }
+    .preview-modal .modal-header{
+        border:none;padding:18px 22px 12px 22px;
+        background:linear-gradient(180deg, rgba(139,0,0,.06), rgba(139,0,0,.02));
+    }
+    .preview-modal .modal-title{color:#111827;font-size:1.04rem;font-weight:900}
+    .preview-modal .modal-body{padding:18px 22px 22px 22px;display:grid;gap:14px}
+
+    .preview-top{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .preview-box{border:1px solid rgba(15,23,42,.08);background:#f8fafc;border-radius:18px;padding:14px}
+    .preview-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px}
+    .preview-value{color:#111827;font-size:.95rem;font-weight:900;line-height:1.55}
+    .preview-scores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+    .preview-table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff}
+    .preview-table{width:100%;min-width:640px;border-collapse:collapse}
+    .preview-table th,.preview-table td{padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+    .preview-table th{font-size:.78rem;color:#6b7280;text-transform:uppercase;letter-spacing:.25px;background:#f8fafc}
+    .preview-table td{font-size:.88rem;color:#111827;line-height:1.65}
+
+    .preview-note{
+        border:1px dashed rgba(15,23,42,.12);background:#f8fafc;border-radius:18px;
+        padding:14px;color:#6b7280;font-size:.86rem;line-height:1.8;
+    }
+    .preview-footer{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px}
+
+    .timeline-shell{position:relative;padding-left:18px;display:grid;gap:14px}
+    .timeline-shell::before{
+        content:"";position:absolute;left:8px;top:4px;bottom:4px;width:2px;
+        background:linear-gradient(180deg, rgba(139,0,0,.22), rgba(139,0,0,.06));
+    }
+    .timeline-item{
+        position:relative;border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff;
+        padding:16px 16px 14px 16px;margin-left:8px;
+    }
+    .timeline-item::before{
+        content:"";position:absolute;left:-20px;top:22px;width:12px;height:12px;border-radius:50%;
+        background:#8B0000;box-shadow:0 0 0 4px rgba(139,0,0,.10);
+    }
+    .timeline-head{
+        display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;
+        margin-bottom:12px;
+    }
+    .timeline-title{color:#111827;font-size:.96rem;font-weight:900;line-height:1.5;margin-bottom:4px}
+    .timeline-sub{color:#6b7280;font-size:.82rem;line-height:1.7}
+    .timeline-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+    @media (max-width:1350px){
+        .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .toolbar-grid{grid-template-columns:1fr 1fr 1fr}
+    }
+    @media (max-width:1100px){
+        .summary-grid,.record-grid,.preview-top,.preview-scores,.timeline-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:700px){
+        .stats-grid,.toolbar-grid,.summary-grid,.record-grid,.preview-top,.preview-scores,.timeline-grid{grid-template-columns:1fr}
+    }
+</style>
+
+<div class="publish-shell">
+    <div class="glass-card panel-card">
+        <div class="intro-card">
+            <h3 class="intro-title">Sonuç Yayınlama Merkezi</h3>
+            <p class="intro-sub">
+                Dönem bazlı sonuçları personel görünümüne açabilir, tek tek veya toplu olarak yayın yönetimini buradan gerçekleştirebilirsiniz. Yayın kapsamı alanı, işlemin hangi personel ve birimler için uygulanacağını belirler.
+            </p>
+            <div class="scope-strip">
+                <div>
+                    <div class="scope-title">Yayın Kapsamı · {{ scope_label or "Kurum geneli" }}</div>
+                    <div class="scope-sub">{{ scope_description or "Bu seçim, yayın işleminin hangi personel ve birimler için uygulanacağını belirler." }}<br>Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için yayın akışı izleniyor.</div>
+                </div>
+                <span class="pill unpublished">{{ stats.total or 0 }} kayıt</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Dönem Toplamı</div><div class="stat-value">{{ stats.total or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Tamamlanan</div><div class="stat-value">{{ stats.completed or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yayınlanan</div><div class="stat-value">{{ stats.published or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yayınlanmayan</div><div class="stat-value">{{ stats.unpublished or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Filtreye Göre Hazır</div><div class="stat-value">{{ filtered_stats.ready_to_publish or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Filtreye Göre Bloklu</div><div class="stat-value">{{ filtered_stats.blocked_count or 0 }}</div></div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <form method="GET" action="{{ url_for('main.performance_publish_dashboard', scope=selected_scope) }}">
+            <div class="toolbar-grid">
+                {% if scope_options and scope_options|length > 1 %}<div class="form-group"><label>Yayın Kapsamı</label><select name="scope" class="form-select">{% for value, label in scope_option_pairs or [] %}<option value="{{ value }}" {% if selected_scope == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><div class="field-help">Bu seçim, yayın işleminin hangi personel ve birimler için uygulanacağını belirler.</div></div>{% else %}<input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">{% endif %}
+                <div class="form-group">
+                    <label>Dönem</label>
+                    <select name="period_id" class="form-select">
+                        <option value="">Dönem seçiniz</option>
+                        {% for period in periods %}
+                            <option value="{{ period.id }}" {% if selected_period and selected_period.id == period.id %}selected{% endif %}>{{ period.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Personel / Birim Ara</label>
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="q" value="{{ q or '' }}" class="form-input" placeholder="Ad, sicil no, birim, unvan">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Durum</label>
+                    <select name="status" class="form-select">
+                        <option value="" {% if not selected_status %}selected{% endif %}>Tümü</option>
+                        <option value="published" {% if selected_status == 'published' %}selected{% endif %}>Yayınlanan</option>
+                        <option value="unpublished" {% if selected_status == 'unpublished' %}selected{% endif %}>Yayınlanmayan</option>
+                        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Tamamlanan</option>
+                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Tamamlanmayan</option>
+                        <option value="ready" {% if selected_status == 'ready' %}selected{% endif %}>Yayınlanmaya Hazır</option>
+                        <option value="blocked" {% if selected_status == 'blocked' %}selected{% endif %}>Bloklu</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrele
+                </button>
+
+                <a href="{{ url_for('main.performance_publish_dashboard', scope=selected_scope) }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Temizle
+                </a>
+            </div>
+        </form>
+        <div class="field-help" style="margin-top:12px;">Seçili kapsam: <strong>{{ scope_label or "Kurum geneli" }}</strong>. {{ scope_description or "Bu görünümde yalnızca yetkiniz dahilindeki kayıtlar listelenir." }}</div>
+    </div>
+
+    {% if selected_period %}
+        <div class="glass-card panel-card">
+            <div class="summary-grid" style="margin-bottom:16px;">
+                <div class="summary-box">
+                    <div class="summary-label">Seçili Dönem</div>
+                    <div class="summary-value">{{ selected_period.title }}</div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-label">Tarih Aralığı</div>
+                    <div class="summary-value">
+                        {% if selected_period.start_date %}{{ selected_period.start_date.strftime('%d.%m.%Y') }}{% else %}-{% endif %}
+                        -
+                        {% if selected_period.end_date %}{{ selected_period.end_date.strftime('%d.%m.%Y') }}{% else %}-{% endif %}
+                    </div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-label">Aktif / Kilit</div>
+                    <div class="summary-value">{{ 'Aktif' if selected_period.is_active else 'Pasif' }} / {{ 'Kilitli' if selected_period.is_locked else 'Kilitsiz' }}</div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-label">Dönem Yayın Durumu</div>
+                    <div class="summary-value">{{ 'Personel görünümüne açık' if selected_period.results_published else 'Personel görünümüne kapalı' }}</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="record-note">
+                    Toplu yayın yalnızca uygun kayıtları işler. Personel yayımlamadan personel not karnesinde görünmez; tamamlanmamış veya bloklu kayıtlar otomatik olarak atlanır ve seçili kapsam dışındaki personeller etkilenmez.
+                </div>
+
+                <div class="action-group">
+                    {% if not can_bulk_publish %}<div class="record-note">Bu görünüm izleme amaçlı açık tutulur. Toplu yayın butonları yalnızca en geniş yetki kapsamı seçildiğinde aktif olur.</div>{% endif %}
+                    {% if can_bulk_publish %}<form method="POST" action="{{ url_for('main.performance_publish_period', period_id=selected_period.id) }}" class="inline-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+                        <input type="hidden" name="q" value="{{ q or '' }}">
+                        <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                        <button type="submit" class="btn-soft success"><i class="fa-solid fa-bullhorn"></i>Seçili Kapsamı Yayınla</button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('main.performance_unpublish_period', period_id=selected_period.id) }}" class="inline-form" onsubmit="return confirm('Bu dönemin tüm yayınlarını geri çekmek istediğinize emin misiniz?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+                        <input type="hidden" name="q" value="{{ q or '' }}">
+                        <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                        <button type="submit" class="btn-soft warning"><i class="fa-solid fa-eye-slash"></i>Seçili Kapsamın Yayınını Geri Çek</button>
+                    </form>{% endif %}
+
+<form method="POST" action="{{ url_for('main.performance_snapshot_backfill') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+    <input type="hidden" name="q" value="{{ q or '' }}">
+    <input type="hidden" name="status" value="{{ selected_status or '' }}">
+    <button type="submit" class="btn-soft secondary">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Geçmiş Sonuçlardan Snapshot Oluştur
+    </button>
+</form>
+                </div>
+            </div>
+        </div>
+
+        {% if evaluation_rows %}
+            {% if blocked_reason_summary %}
+                <div class="glass-card panel-card" style="margin-bottom:16px;">
+                    <h3 class="section-title">Blok Nedenleri Özeti</h3>
+                    <div class="section-sub">Filtreye göre yayınlanamayan kayıtların ana sebepleri aşağıda gruplanır.</div>
+                    <div class="badge-stack" style="margin-top:14px;">
+                        {% for reason, count in blocked_reason_summary %}
+                            <span class="pill blocked"><i class="fa-solid fa-triangle-exclamation"></i> {{ count }} · {{ reason }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="record-list">
+                {% for row in evaluation_rows %}
+                    {% set evaluation = row.evaluation %}
+                    <div class="record-card">
+                        <div class="record-head">
+                            <div>
+                                <div class="record-title">{{ row.employee_name }}</div>
+                                <div class="record-sub">
+                                    Sicil: {{ row.sicil_no }}<br>
+                                    {{ row.unvan }} · {{ row.birim }}{% if row.ust_birim and row.ust_birim != '-' %} / {{ row.ust_birim }}{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="badge-stack">
+                                {% if row.ready_to_publish %}
+                                    <span class="pill ready"><i class="fa-solid fa-circle-check"></i> Yayına Hazır</span>
+                                {% elif row.blocked %}
+                                    <span class="pill blocked"><i class="fa-solid fa-triangle-exclamation"></i> Bloklu</span>
+                                {% endif %}
+
+                                {% if row.is_published %}
+                                    <span class="pill published"><i class="fa-solid fa-bullhorn"></i> Yayınlandı</span>
+                                {% else %}
+                                    <span class="pill unpublished"><i class="fa-solid fa-eye-slash"></i> Yayınlanmadı</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="record-grid">
+                            <div class="mini-box">
+                                <div class="mini-label">Nihai Puan</div>
+                                <div class="mini-value">{{ "%.2f"|format(row.final_score or 0) }}</div>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-label">Kayıt Durumu</div>
+                                <div class="mini-value">{{ evaluation.status or '-' }}</div>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-label">1. Amir / 2. Amir / 3. Amir</div>
+                                <div class="mini-value">
+                                    {{ "%.2f"|format(evaluation.level_1_total_100 or 0) }} /
+                                    {{ "%.2f"|format(evaluation.level_2_total_100 or 0) }} /
+                                    {{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}
+                                </div>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-label">Yayın Zamanı</div>
+                                <div class="mini-value">
+                                    {% if row.published_at %}{{ row.published_at.strftime('%d.%m.%Y %H:%M') }}{% else %}-{% endif %}
+                                </div>
+                            </div>
+                            <div class="mini-box">
+                                <div class="mini-label">Not</div>
+                                <div class="mini-value">
+                                    {% if row.ready_to_publish %}
+                                        Personel görünümüne açılabilir
+                                    {% elif row.blocked %}
+                                        {{ row.publish_reason or 'Yayın için ek işlem gerekiyor' }}
+                                    {% else %}
+                                        Yayın durumu güncel
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="record-foot">
+                            <div class="record-note">
+                                {% if row.is_published %}
+                                    Bu sonuç şu anda personel not karnesi ekranında görünür durumdadır.
+                                {% elif row.ready_to_publish %}
+                                    Bu kayıt tamamlandığı için tekil olarak yayınlanabilir.
+                                {% else %}
+                                    {{ row.publish_reason or 'Bu kayıt henüz yayımlanabilir durumda değil.' }}
+                                {% endif %}
+                            </div>
+
+                            <div class="record-actions">
+                                <button
+                                    type="button"
+                                    class="btn-soft secondary preview-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#previewModal"
+                                    data-employee="{{ row.employee_name }}"
+                                    data-period="{{ selected_period.title if selected_period else '-' }}"
+                                    data-sicil="{{ row.sicil_no }}"
+                                    data-birim="{{ row.birim }}"
+                                    data-unvan="{{ row.unvan }}"
+                                    data-score1="{{ '%.2f'|format(evaluation.level_1_total_100 or 0) }}"
+                                    data-score2="{{ '%.2f'|format(evaluation.level_2_total_100 or 0) }}"
+                                    data-score3="{{ '%.2f'|format(evaluation.level_3_total_100 or 0) }}"
+                                    data-final="{{ '%.2f'|format(row.final_score or 0) }}"
+                                    data-status="{{ evaluation.status or '-' }}"
+                                    data-published="{% if row.is_published %}Yayınlandı{% else %}Yayınlanmadı{% endif %}">
+                                    <i class="fa-solid fa-eye"></i>
+                                    Önizle
+                                </button>
+
+                                {% if row.is_published %}
+                                    <form method="POST" action="{{ url_for('main.performance_unpublish_evaluation', evaluation_id=evaluation.id) }}" class="inline-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+                                        <input type="hidden" name="q" value="{{ q or '' }}">
+                                        <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                                        <button type="submit" class="btn-soft warning"><i class="fa-solid fa-eye-slash"></i>Tekil Yayını Geri Çek</button>
+                                    </form>
+                                {% elif row.ready_to_publish %}
+                                    <form method="POST" action="{{ url_for('main.performance_publish_evaluation', evaluation_id=evaluation.id) }}" class="inline-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+                                        <input type="hidden" name="q" value="{{ q or '' }}">
+                                        <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                                        <button type="submit" class="btn-soft success"><i class="fa-solid fa-bullhorn"></i>Tekil Sonucu Yayınla</button>
+                                    </form>
+                                {% else %}
+                                    <button type="button" class="btn-soft secondary disabled" disabled><i class="fa-solid fa-ban"></i>Yayınlanamaz</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="glass-card panel-card">
+                <div class="empty-box">Filtreye uygun değerlendirme bulunamadı.</div>
+            </div>
+        {% endif %}
+
+        <div class="glass-card panel-card">
+            <div class="intro-card" style="margin-bottom:14px;">
+                <h3 class="intro-title">Yayın Geçmişi</h3>
+                <p class="intro-sub">Bu dönemde yapılan yayın ve yayından kaldırma işlemlerinin son kayıtları.</p>
+            </div>
+
+            <form method="GET" action="{{ url_for('main.performance_publish_dashboard', scope=selected_scope) }}" style="margin-bottom:16px;">
+                <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+                <input type="hidden" name="q" value="{{ q or '' }}">
+                <input type="hidden" name="status" value="{{ selected_status or '' }}">
+
+                <div class="toolbar-grid" style="grid-template-columns:220px 1fr 1fr auto auto;">
+                    <div class="form-group">
+                        <label>İşlem Türü</label>
+                        <select name="log_action" class="form-select">
+                            <option value="" {% if not log_action %}selected{% endif %}>Tümü</option>
+                            <option value="publish" {% if log_action == 'publish' %}selected{% endif %}>Tekil Yayın</option>
+                            <option value="unpublish" {% if log_action == 'unpublish' %}selected{% endif %}>Tekil Geri Çekme</option>
+                            <option value="bulk_publish" {% if log_action == 'bulk_publish' %}selected{% endif %}>Toplu Yayın</option>
+                            <option value="bulk_unpublish" {% if log_action == 'bulk_unpublish' %}selected{% endif %}>Toplu Geri Çekme</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>İşlemi Yapan</label>
+                        <div class="search-wrap">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" name="log_actor" value="{{ log_actor or '' }}" class="form-input" placeholder="Kullanıcı adı ara">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Personel</label>
+                        <div class="search-wrap">
+                            <i class="fa-solid fa-id-badge"></i>
+                            <input type="text" name="log_employee" value="{{ log_employee or '' }}" class="form-input" placeholder="Personel adı ara">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-soft primary">
+                        <i class="fa-solid fa-filter"></i>
+                        Log Filtrele
+                    </button>
+
+                    <a href="{{ url_for('main.performance_publish_logs_export_excel', period_id=selected_period.id if selected_period else '', log_action=log_action, log_actor=log_actor, log_employee=log_employee, scope=selected_scope) }}"
+                       class="btn-soft secondary">
+                        <i class="fa-solid fa-file-excel"></i>
+                        Excel
+                    </a>
+                </div>
+            </form>
+
+            {% if publish_logs %}
+                <div class="timeline-shell">
+                    {% for log in publish_logs %}
+                        {% set employee_name = '-' %}
+                        {% if log.employee %}
+                            {% set employee_name = log.employee.full_name or ((log.employee.ad or '') ~ ' ' ~ (log.employee.soyad or ''))|trim %}
+                        {% endif %}
+
+                        {% set actor_name = '-' %}
+                        {% if log.actor %}
+                            {% set actor_name = log.actor.full_name or ((log.actor.ad or '') ~ ' ' ~ (log.actor.soyad or ''))|trim %}
+                        {% endif %}
+
+                        <div class="timeline-item">
+                            <div class="timeline-head">
+                                <div>
+                                    <div class="timeline-title">
+                                        {% if log.employee %}
+                                            {{ employee_name }}
+                                        {% else %}
+                                            Toplu İşlem Kaydı
+                                        {% endif %}
+                                    </div>
+                                    <div class="timeline-sub">
+                                        İşlemi Yapan: {{ actor_name }}<br>
+                                        Tarih:
+                                        {% if log.created_at %}
+                                            {{ log.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="badge-stack">
+                                    {% if log.action_type == 'publish' %}
+                                        <span class="pill log-publish"><i class="fa-solid fa-bullhorn"></i> Tekil Yayın</span>
+                                    {% elif log.action_type == 'unpublish' %}
+                                        <span class="pill log-unpublish"><i class="fa-solid fa-eye-slash"></i> Tekil Geri Çekme</span>
+                                    {% elif log.action_type == 'bulk_publish' %}
+                                        <span class="pill log-bulk-publish"><i class="fa-solid fa-bullhorn"></i> Toplu Yayın</span>
+                                    {% elif log.action_type == 'bulk_unpublish' %}
+                                        <span class="pill log-bulk-unpublish"><i class="fa-solid fa-eye-slash"></i> Toplu Geri Çekme</span>
+                                    {% else %}
+                                        <span class="pill unpublished">{{ log.action_type }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="timeline-grid">
+                                <div class="mini-box">
+                                    <div class="mini-label">İşlem Türü</div>
+                                    <div class="mini-value">{{ log.action_type }}</div>
+                                </div>
+                                <div class="mini-box">
+                                    <div class="mini-label">Personel</div>
+                                    <div class="mini-value">
+                                        {% if log.employee %}{{ employee_name }}{% else %}Toplu işlem kaydı{% endif %}
+                                    </div>
+                                </div>
+                                <div class="mini-box">
+                                    <div class="mini-label">Değerlendirme ID</div>
+                                    <div class="mini-value">{{ log.evaluation_id or '-' }}</div>
+                                </div>
+                                <div class="mini-box">
+                                    <div class="mini-label">Not</div>
+                                    <div class="mini-value">{{ log.note or '-' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-box">Bu filtreye uygun yayın geçmişi kaydı bulunamadı.</div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="glass-card panel-card">
+            <div class="empty-box">Yayın yönetimini kullanmak için önce bir dönem seçiniz.</div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="modal fade preview-modal" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Personel Görünümü Önizlemesi</div>
+                    <div style="color:#6b7280; font-size:.86rem; line-height:1.7; margin-top:4px;">
+                        Yayından sonra personelin not karnesinde göreceği özet görünümün detaylı kontrolü.
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="preview-top">
+                    <div class="preview-box"><div class="preview-label">Personel</div><div class="preview-value" id="pvEmployee">-</div></div>
+                    <div class="preview-box"><div class="preview-label">Dönem</div><div class="preview-value" id="pvPeriod">-</div></div>
+                    <div class="preview-box"><div class="preview-label">Sicil No</div><div class="preview-value" id="pvSicil">-</div></div>
+                    <div class="preview-box"><div class="preview-label">Birim / Unvan</div><div class="preview-value" id="pvOrg">-</div></div>
+                </div>
+
+                <div class="preview-scores">
+                    <div class="preview-box"><div class="preview-label">1. Amir</div><div class="preview-value" id="pvScore1">0.00</div></div>
+                    <div class="preview-box"><div class="preview-label">2. Amir</div><div class="preview-value" id="pvScore2">0.00</div></div>
+                    <div class="preview-box"><div class="preview-label">3. Amir</div><div class="preview-value" id="pvScore3">0.00</div></div>
+                    <div class="preview-box"><div class="preview-label">Nihai Puan</div><div class="preview-value" id="pvFinal">0.00</div></div>
+                </div>
+
+                <div class="preview-table-wrap">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>Değerlendirme Katmanı</th>
+                                <th>Puan</th>
+                                <th>Personel Ekranındaki Görünüm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1. Amir</td><td id="pvTableScore1">0.00</td><td>1. amir değerlendirme özeti</td></tr>
+                            <tr><td>2. Amir</td><td id="pvTableScore2">0.00</td><td>2. amir değerlendirme özeti</td></tr>
+                            <tr><td>3. Amir</td><td id="pvTableScore3">0.00</td><td>Varsa 3. amir değerlendirme özeti</td></tr>
+                            <tr><td>Nihai Sonuç</td><td id="pvTableFinal">0.00</td><td>Personel not karnesinde görünen resmi sonuç</td></tr>
+                            <tr><td>Kayıt Durumu</td><td id="pvStatus">-</td><td>Değerlendirmenin tamamlanma durumu</td></tr>
+                            <tr><td>Yayın Durumu</td><td id="pvPublished">-</td><td>Personel görünümüne açılıp açılmadığı</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="preview-note">
+                    Bu önizleme, not karnesi ekranındaki temel yayın görünümünü temsil eder. Kriter bazlı detaylar ve amir yorumları, kayıt yayınlandıktan sonra personel ekranında ayrıca görüntülenebilir.
+                </div>
+
+                <div class="preview-footer">
+                    <button type="button" class="btn-soft secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i>
+                        Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const modal = document.getElementById("previewModal");
+    if (!modal) return;
+
+    modal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        if (!button) return;
+
+        const employee = button.getAttribute("data-employee") || "-";
+        const period = button.getAttribute("data-period") || "-";
+        const sicil = button.getAttribute("data-sicil") || "-";
+        const birim = button.getAttribute("data-birim") || "-";
+        const unvan = button.getAttribute("data-unvan") || "-";
+        const score1 = button.getAttribute("data-score1") || "0.00";
+        const score2 = button.getAttribute("data-score2") || "0.00";
+        const score3 = button.getAttribute("data-score3") || "0.00";
+        const finalScore = button.getAttribute("data-final") || "0.00";
+        const status = button.getAttribute("data-status") || "-";
+        const published = button.getAttribute("data-published") || "-";
+
+        document.getElementById("pvEmployee").textContent = employee;
+        document.getElementById("pvPeriod").textContent = period;
+        document.getElementById("pvSicil").textContent = sicil;
+        document.getElementById("pvOrg").textContent = `${birim} · ${unvan}`;
+
+        document.getElementById("pvScore1").textContent = score1;
+        document.getElementById("pvScore2").textContent = score2;
+        document.getElementById("pvScore3").textContent = score3;
+        document.getElementById("pvFinal").textContent = finalScore;
+
+        document.getElementById("pvTableScore1").textContent = score1;
+        document.getElementById("pvTableScore2").textContent = score2;
+        document.getElementById("pvTableScore3").textContent = score3;
+        document.getElementById("pvTableFinal").textContent = finalScore;
+
+        document.getElementById("pvStatus").textContent = status;
+        document.getElementById("pvPublished").textContent = published;
+    });
+})();
+</script>
+{% endblock %}

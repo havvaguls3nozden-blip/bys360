@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-12T17:21:25",
+  "phase": "A8A_LIVE_CUTOVER_CONTROL_CHECKLIST",
+  "local_ok": true,
+  "decision": "A8_READY_FOR_REAL_LIVE_VALIDATION",
+  "a6_latest_zip": "C:\\bys360\\releases\\BYS360_A6_SECURITY_EVIDENCE_20260612_133606.zip",
+  "a6_latest_sha256": "450E720885C790F99BA8A250991A8386392C2C0E9C79CF1E97B5E91C56CB51E2",
+  "a7_latest_zip": "C:\\bys360\\releases\\BYS360_A7_LIVE_READINESS_EVIDENCE_20260612_135815.zip",
+  "a7_latest_sha256": "4FB35400A0D9B31F4B48F065539B4A0CDA1679827CDDBD3746F273402D3447A2",
+  "missing_local_evidence": [],
+  "guard_script": "scripts\\windows\\a8_live_cutover_guard.ps1",
+  "live_cutover_checklist": [
+    {
+      "order": 1,
+      "name": "Ger?ek canl? env strict gate",
+      "status": "pending_live",
+      "required": true,
+      "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\windows\\a8_live_cutover_guard.ps1 -Mode ValidateEnv -EnvFile '<CANLI_ENV_YOLU>'",
+      "expected": "A6E_OK=True, A6E_FAILED=0, A8_VALIDATE_ENV_EXIT_CODE=0"
+    },
+    {
+      "order": 2,
+      "name": "Canl? DB yede?i",
+      "status": "pending_live",
+      "required": true,
+      "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\windows\\pre_live_backup_plan.ps1 -Mode Backup -IncludeDbBackup -DatabaseUrl '<CANLI_DATABASE_URL>'",
+      "expected": "pg_dump exit 0, backup summary olu?mal?"
+    },
+    {
+      "order": 3,
+      "name": "Servis ve zamanlanm?? g?rev yede?i",
+      "status": "pending_live",
+      "required": true,
+      "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\windows\\pre_live_backup_plan.ps1 -Mode Backup",
+      "expected": "service qc ve scheduled tasks kay?tlar? olu?mal?"
+    },
+    {
+      "order": 4,
+      "name": "Rollback dosyalar?n?n do?rulanmas?",
+      "status": "pending_live",
+      "required": true,
+      "command": "Backup klas?r?nde kod zip, servis kayd?, g?rev kayd?, varsa DB dump kontrol edilir.",
+      "expected": "Kod yede?i SHA256 var, DB dump var, servis/g?rev kay?tlar? var"
+    },
+    {
+      "order": 5,
+      "name": "Yay?n sonras? ger?ek URL smoke test",
+      "status": "pending_after_publish",
+      "required": true,
+      "command": ".\\.venv\\Scripts\\python.exe .\\scripts\\live_readiness\\a7d_local_smoke_contract.py --base-url 'https://bys360.canakkaletarihialan.gov.tr'",
+      "expected": "A7D_OK=True, A7D_FAILED=0"
+    },
+    {
+      "order": 6,
+      "name": "Manuel canl? ak?? kontrol?",
+      "status": "pending_after_publish",
+      "required": true,
+      "command": "Admin/login/dashboard/portal/feedback ekranlar? elle kontrol edilir.",
+      "expected": "Giri?, dashboard, portal, geri bildirim, hata sayfalar? ?al???r"
+    }
+  ],
+  "rollback_plan": [
+    "Canl? smoke test kritik hata verirse servis durdurulur.",
+    "Son al?nan kod yede?i geri a??l?r.",
+    "Veri bozulmas? varsa PostgreSQL dump geri y?klenir.",
+    "Servis/g?rev ayarlar? A8 yede?ine g?re do?rulan?r.",
+    "Tekrar ger?ek URL smoke test yap?l?r.",
+    "Sonu? raporlanmadan yay?n ba?ar?l? say?lmaz."
+  ]
+}

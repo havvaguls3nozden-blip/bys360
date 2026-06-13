@@ -1,0 +1,98 @@
+﻿@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .bys360-assistant-panel,
+    .bys360-ai-assistant-panel,
+    .assistant-panel,
+    #bys360AssistantPanel,
+    #bys360-assistant-panel {
+      position: fixed !important;
+      inset: 12px 10px calc(env(safe-area-inset-bottom) + 78px) 10px !important;
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      max-height: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      border-radius: 24px !important;
+      background: #fff !important;
+    }
+
+    .assistant-shortcuts,
+    .assistant-quick-actions,
+    .assistant-suggestions,
+    .assistant-summary,
+    .assistant-safe-info,
+    .assistant-guide,
+    .assistant-navigation,
+    .assistant-cards,
+    .assistant-card,
+    .assistant-help-grid,
+    .assistant-section,
+    .assistant-panel section:not(:first-child),
+    [data-assistant-section="shortcuts"],
+    [data-assistant-section="summary"],
+    [data-assistant-section="safe"],
+    [data-assistant-section="navigation"] {
+      display: none !important;
+    }
+
+    .bys360-assistant-body,
+    .bys360-ai-assistant-body,
+    .assistant-body,
+    .assistant-messages,
+    #assistantMessages,
+    #bys360AssistantMessages {
+      flex: 1 1 auto !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 18px !important;
+      background: #fff !important;
+    }
+
+    .bys360-assistant-body::before,
+    .bys360-ai-assistant-body::before,
+    .assistant-body::before {
+      content: "Merhaba, ben BYS360 Asistanı. Bulunduğunuz ekranı tanıyıp BYS360 içinde doğru sekmeye, doğru işlem sırasına ve güvenli kontrol adımına yönlendiririm. Performans, personel, izin, vekâlet, rol matrisi, raporlar, destek, anket, AI Karar Destek ve sayfa bazlı yardım konularında doğal dille soru sorabilirsiniz.";
+      display: block;
+      margin: 0 0 16px 0;
+      padding: 18px;
+      border-radius: 20px;
+      background: #fff;
+      color: #1f2937;
+      font-size: 16px;
+      line-height: 1.55;
+      box-shadow: 0 10px 28px rgba(0,0,0,.08);
+      border: 1px solid rgba(139,0,0,.08);
+    }
+
+    .bys360-assistant-input,
+    .bys360-ai-assistant-input,
+    .assistant-input,
+    .assistant-composer,
+    .chat-input-area,
+    form[class*="assistant"] {
+      flex: 0 0 auto !important;
+      position: sticky !important;
+      bottom: 0 !important;
+      display: flex !important;
+      gap: 10px !important;
+      padding: 12px !important;
+      background: rgba(255,255,255,.96) !important;
+      border-top: 1px solid rgba(0,0,0,.08) !important;
+      z-index: 999999 !important;
+    }
+
+    .bys360-assistant-input input,
+    .bys360-ai-assistant-input input,
+    .assistant-input input,
+    .assistant-composer input,
+    .chat-input-area input,
+    input[name*="assistant"],
+    textarea[name*="assistant"] {
+      min-height: 50px !important;
+      border-radius: 999px !important;
+      font-size: 16px !important;
+    }
+  }
+}

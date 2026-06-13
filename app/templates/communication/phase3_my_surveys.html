@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Anketlerim | BYS360{% endblock %}
+{% block page_title %}Anketlerim{% endblock %}
+{% block page_subtitle %}Size atanmış anketleri filtreleyin, kaydedin ve tamamlayın{% endblock %}
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Toplam</div><div class="h4 mb-0">{{ payload.summary.all or 0 }}</div></div></div>
+      <div class="col-md-3 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Bekleyen</div><div class="h4 mb-0">{{ payload.summary.pending or 0 }}</div></div></div>
+      <div class="col-md-3 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Açık</div><div class="h4 mb-0">{{ payload.summary.open or 0 }}</div></div></div>
+      <div class="col-md-3 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Tamamlanan</div><div class="h4 mb-0">{{ payload.summary.completed or 0 }}</div></div></div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <a href="{{ url_for('main.communication_phase3_my_surveys', filter='all') }}" class="btn {% if payload.filter_name == 'all' %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill">Tümü</a>
+      <a href="{{ url_for('main.communication_phase3_my_surveys', filter='open') }}" class="btn {% if payload.filter_name == 'open' %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill">Açık</a>
+      <a href="{{ url_for('main.communication_phase3_my_surveys', filter='pending') }}" class="btn {% if payload.filter_name == 'pending' %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill">Bekleyen</a>
+      <a href="{{ url_for('main.communication_phase3_my_surveys', filter='completed') }}" class="btn {% if payload.filter_name == 'completed' %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill">Tamamlanan</a>
+      <a href="{{ url_for('main.communication_phase3_my_surveys', filter='closed') }}" class="btn {% if payload.filter_name == 'closed' %}btn-danger{% else %}btn-outline-secondary{% endif %} btn-sm rounded-pill">Kapalı</a>
+    </div>
+
+    {% if payload.rows %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Anket</th>
+              <th>Tür</th>
+              <th>Soru</th>
+              <th>Durum</th>
+              <th>Zamanlama</th>
+              <th class="text-end">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in payload.rows %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ row.survey.title }}</div>
+                <div class="small text-muted">{{ row.survey.description or 'Açıklama girilmemiş.' }}</div>
+              </td>
+              <td>{{ row.survey.survey_type }}</td>
+              <td>{{ row.question_count }}</td>
+              <td>
+                {% if row.completed %}
+                  <span class="badge text-bg-success">Tamamlandı</span>
+                {% elif row.is_open %}
+                  <span class="badge text-bg-warning">Yanıt Bekliyor</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Kapalı</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="small">{{ row.survey.start_at.strftime('%d.%m.%Y %H:%M') if row.survey.start_at else '—' }}</div>
+                <div class="small text-muted">{{ row.survey.end_at.strftime('%d.%m.%Y %H:%M') if row.survey.end_at else 'Süresiz' }}</div>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-danger rounded-pill" href="{{ url_for('main.communication_phase3_survey_take', survey_id=row.survey.id) }}">Aç</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-light border rounded-4">Bu filtre için anket bulunmuyor.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

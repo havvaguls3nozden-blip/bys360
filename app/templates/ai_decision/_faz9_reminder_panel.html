@@ -1,0 +1,34 @@
+{# BYS360_AI_DECISION_FAZ9_REMINDER_PANEL #}
+<section class="ai-faz9-reminder-panel" data-ai-reminder-endpoint="/ai/decision-support/performance/reminders/summary">
+  <div class="ai-faz9-reminder-header">
+    <div>
+      <p class="ai-faz9-eyebrow">Karar Destek Merkezi</p>
+      <h3>Otomatik Hatırlatma ve Aksatan Amir Takibi</h3>
+      <p>Bekleyen değerlendirme görevleri, yaklaşan son tarihler ve gecikme yoğunluğu karar destek özetiyle izlenir.</p>
+    </div>
+    <span class="ai-faz9-badge">İnsan denetimli takip</span>
+  </div>
+
+  <div class="ai-faz9-grid">
+    <article>
+      <strong>Yaklaşan son tarih</strong>
+      <span>{{ ai_decision_faz9_summary.due_soon_count|default('—') }}</span>
+      <small>Hatırlatma önerilen görev sayısı</small>
+    </article>
+    <article>
+      <strong>Gecikmiş görev</strong>
+      <span>{{ ai_decision_faz9_summary.overdue_count|default('—') }}</span>
+      <small>Takip gerektiren değerlendirme</small>
+    </article>
+    <article>
+      <strong>Kritik gecikme</strong>
+      <span>{{ ai_decision_faz9_summary.critical_overdue_count|default('—') }}</span>
+      <small>Öncelikli kontrol alanı</small>
+    </article>
+  </div>
+
+  <div class="ai-faz9-note">
+    <strong>Kurumsal sınır:</strong>
+    Bu alan idari karar vermez; yalnızca yetkili kullanıcıya süreç takibi için özet ve öneri sunar.
+  </div>
+</section>

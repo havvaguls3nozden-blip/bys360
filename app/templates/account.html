@@ -1,0 +1,547 @@
+{% extends "base.html" %}
+
+{% block title %}Hesabım - BYS360{% endblock %}
+{% block page_kicker %}Kullanıcı Paneli{% endblock %}
+{% block page_title %}Hesabım{% endblock %}
+{% block page_subtitle %}
+Kişisel bilgilerinizi, profil fotoğrafınızı ve güvenlik ayarlarınızı bu ekrandan yönetebilirsiniz.
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+<style>
+    .account-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .glass-card{
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+    }
+
+    .hero-account{
+        display:grid;
+        grid-template-columns:140px minmax(0,1fr);
+        gap:22px;
+        align-items:center;
+    }
+
+    .hero-avatar-wrap{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .hero-avatar{
+        width:130px;
+        height:130px;
+        border-radius:30px;
+        object-fit:cover;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 14px 28px rgba(15,23,42,.08);
+        background:#fff;
+    }
+
+    .hero-kicker{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        min-height:34px;
+        padding:0 12px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.8rem;
+        font-weight:900;
+        margin-bottom:12px;
+    }
+
+    .hero-name{
+        font-size:1.65rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.2;
+        margin-bottom:6px;
+    }
+
+    .hero-sub{
+        color:#6b7280;
+        font-size:.95rem;
+        line-height:1.8;
+    }
+
+    .quick-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .quick-card{
+        position:relative;
+        overflow:hidden;
+        padding:20px;
+    }
+
+    .quick-card::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        bottom:-18px;
+        width:78px;
+        height:78px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .quick-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .quick-value{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+        line-height:1.5;
+        position:relative;
+        z-index:1;
+        word-break:break-word;
+    }
+
+    .section-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:16px;
+    }
+
+    .section-title{
+        margin:0;
+        color:#111827;
+        font-size:1.08rem;
+        font-weight:900;
+    }
+
+    .section-sub{
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.7;
+    }
+
+    .info-grid{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .info-item{
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        border-radius:18px;
+        padding:16px;
+    }
+
+    .info-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .info-value{
+        color:#111827;
+        font-size:.98rem;
+        font-weight:900;
+        line-height:1.6;
+        word-break:break-word;
+    }
+
+    .photo-grid{
+        display:grid;
+        grid-template-columns:140px minmax(0,1fr);
+        gap:20px;
+        align-items:center;
+    }
+
+    .photo-preview{
+        display:flex;
+        justify-content:center;
+    }
+
+    .photo-preview img{
+        width:120px;
+        height:120px;
+        object-fit:cover;
+        border-radius:28px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        box-shadow:0 14px 28px rgba(15,23,42,.06);
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .action-row{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-top:12px;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(135deg,#8B0000 0%, #a31111 100%);
+        color:#ffffff;
+        box-shadow:0 12px 24px rgba(139,0,0,.18);
+    }
+
+    .btn-soft.primary:hover,
+    .btn-soft.primary:focus{
+        background:linear-gradient(135deg,#7a0000 0%, #930f0f 100%);
+        color:#ffffff;
+        box-shadow:0 16px 30px rgba(139,0,0,.22);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.secondary:hover,
+    .btn-soft.secondary:focus{
+        background:#e5ebf3;
+        color:#1f2937;
+        border-color:rgba(15,23,42,.12);
+    }
+
+    .btn-soft.warning{
+        background:linear-gradient(135deg,#b45309 0%, #d97706 100%);
+        color:#ffffff;
+        box-shadow:0 12px 24px rgba(180,83,9,.18);
+    }
+
+    .btn-soft.warning:hover,
+    .btn-soft.warning:focus{
+        background:linear-gradient(135deg,#9a4708 0%, #c26a05 100%);
+        color:#ffffff;
+        box-shadow:0 16px 30px rgba(180,83,9,.22);
+    }
+
+    .security-grid{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .security-card{
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        border-radius:20px;
+        padding:18px;
+    }
+
+    .security-title{
+        color:#111827;
+        font-size:.98rem;
+        font-weight:900;
+        margin-bottom:8px;
+    }
+
+    .security-text{
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.75;
+        min-height:48px;
+    }
+
+    .badge-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:30px;
+        padding:0 10px;
+        border-radius:999px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        font-size:.76rem;
+        font-weight:900;
+    }
+
+    @media (max-width:1100px){
+        .quick-grid,
+        .security-grid{
+            grid-template-columns:repeat(2,minmax(0,1fr));
+        }
+    }
+
+    @media (max-width:800px){
+        .hero-account,
+        .photo-grid,
+        .quick-grid,
+        .info-grid,
+        .security-grid{
+            grid-template-columns:1fr;
+        }
+
+        .hero-avatar-wrap,
+        .photo-preview{
+            justify-content:flex-start;
+        }
+    }
+</style>
+
+<div class="account-shell">
+
+    <div class="glass-card panel-card">
+        <div class="hero-account">
+            <div class="hero-avatar-wrap">
+                <img src="{{ user.profile_photo_url }}" alt="Profil Fotoğrafı" class="hero-avatar">
+            </div>
+
+            <div>
+                <div class="hero-kicker">
+                    <i class="fa-solid fa-user"></i>
+                    Kullanıcı Profili
+                </div>
+
+                <div class="hero-name">{{ user.full_name }}</div>
+
+                <div class="hero-sub">
+                    {{ user.unvan or 'Unvan bilgisi yok' }}
+                    {% if user.birim %}
+                        · {{ user.birim }}
+                    {% endif %}
+                    {% if user.ust_birim %}
+                        / {{ user.ust_birim }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-grid">
+        <div class="glass-card quick-card">
+            <div class="quick-label">Sicil No</div>
+            <div class="quick-value">{{ user.sicil_no or '-' }}</div>
+        </div>
+
+        <div class="glass-card quick-card">
+            <div class="quick-label">E-Posta</div>
+            <div class="quick-value">{{ user.email or '-' }}</div>
+        </div>
+
+        <div class="glass-card quick-card">
+            <div class="quick-label">Rol</div>
+            <div class="quick-value">{{ user.role_label or user.role or '-' }}</div>
+        </div>
+
+        <div class="glass-card quick-card">
+            <div class="quick-label">Durum</div>
+            <div class="quick-value">
+                {% if user.is_active %}
+                    <span class="badge-soft">Aktif Kullanıcı</span>
+                {% else %}
+                    <span class="badge-soft" style="background:rgba(107,114,128,.12); color:#374151;">Pasif</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Kullanıcı Bilgileri</h3>
+                <div class="section-sub">Sistemde kayıtlı temel bilgileriniz aşağıda yer almaktadır.</div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Ad Soyad</div>
+                <div class="info-value">{{ user.full_name or '-' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Unvan</div>
+                <div class="info-value">{{ user.unvan or '-' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Birim</div>
+                <div class="info-value">{{ user.birim or '-' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Üst Birim</div>
+                <div class="info-value">{{ user.ust_birim or '-' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">E-Posta</div>
+                <div class="info-value">{{ user.email or '-' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Sicil No</div>
+                <div class="info-value">{{ user.sicil_no or '-' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Profil Fotoğrafı</h3>
+                <div class="section-sub">Profil fotoğrafınızı güncelleyebilir veya kaldırabilirsiniz. Fotoğraf olmasa da varsayılan avatar otomatik görünür.</div>
+            </div>
+        </div>
+
+        <div class="photo-grid">
+            <div class="photo-preview">
+                <img src="{{ user.profile_photo_url }}" alt="Profil Fotoğrafı">
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('main.account_change_photo') }}"
+                  enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label>Yeni Fotoğraf</label>
+                    <input type="file" name="profile_photo" class="form-input" accept=".png,.jpg,.jpeg,.webp">
+                </div>
+
+                <div class="action-row">
+                    <button type="submit" class="btn-soft primary">
+                        <i class="fa-solid fa-upload"></i>
+                        Fotoğrafı Güncelle
+                    </button>
+
+                    {% if user.profile_photo_path %}
+                    <button type="submit"
+                            name="remove_profile_photo"
+                            value="1"
+                            class="btn-soft secondary">
+                        <i class="fa-solid fa-trash"></i>
+                        Fotoğrafı Kaldır
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Güvenlik İşlemleri</h3>
+                <div class="section-sub">Hesap güvenliğinizi güçlendirmek için gerekli işlemler burada yer alır.</div>
+            </div>
+        </div>
+
+        <div class="security-grid">
+            <div class="security-card">
+                <div class="security-title">Şifre Değiştir</div>
+                <div class="security-text">
+                    Mevcut şifrenizi güvenli bir yeni şifre ile güncelleyebilirsiniz.
+                </div>
+                <div class="action-row">
+                    <a href="{{ url_for('main.account_change_password') }}" class="btn-soft primary">
+                        <i class="fa-solid fa-key"></i>
+                        Şifreyi Güncelle
+                    </a>
+                </div>
+            </div>
+
+            <div class="security-card">
+                <div class="security-title">Gizli Soru</div>
+                <div class="security-text">
+                    Hesap kurtarma işlemleri için gizli soru ve cevabınızı tanımlayabilirsiniz.
+                </div>
+                <div class="action-row">
+                    <a href="{{ url_for('main.account_security_setup') }}" class="btn-soft secondary">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        Gizli Soruyu Yönet
+                    </a>
+                </div>
+            </div>
+
+            <div class="security-card">
+                <div class="security-title">Hızlı Bilgi</div>
+                <div class="security-text">
+                    Fotoğrafınız silinse bile sistem otomatik olarak varsayılan kurumsal avatarı göstermeye devam eder.
+                </div>
+                <div class="action-row">
+                    <span class="badge-soft">
+                        <i class="fa-solid fa-circle-check"></i>&nbsp; Koruma Aktif
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+{% endblock %}

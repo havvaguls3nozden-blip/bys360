@@ -1,0 +1,68 @@
+/* BYS360 Mobile WebView Scroll Fix V12
+   Amaç: Android APK/WebView içinde sayfanın aşağı kaymama sorununu düzeltmek.
+   Sadece mobil genişlikte çalışır; masaüstü görünümü etkilemez. */
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: auto !important;
+    touch-action: pan-y !important;
+  }
+
+  body {
+    position: relative !important;
+  }
+
+  #app,
+  .app,
+  .app-shell,
+  .layout,
+  .layout-wrapper,
+  .page-wrapper,
+  .main-wrapper,
+  .main-content,
+  .content,
+  .content-wrapper,
+  .page-content,
+  .container,
+  .container-fluid,
+  main,
+  .app-main,
+  .layout-content,
+  .dashboard-content,
+  .bys360-content {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .sidebar-open,
+  .drawer-open,
+  .menu-open,
+  .mobile-menu-open {
+    overflow-y: auto !important;
+    position: relative !important;
+    height: auto !important;
+  }
+
+  .modal-open {
+    overflow: hidden !important;
+  }
+
+  table,
+  .table,
+  .table-responsive,
+  .card,
+  .glass-card,
+  .panel,
+  .section-card {
+    max-height: none !important;
+  }
+}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Geri Bildirim Alındı - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Geri Bildirim Alındı{% endblock %}
+{% block page_subtitle %}Katkınız kayıt altına alındı ve takip edilebilir hale getirildi.{% endblock %}
+
+{% block extra_head %}
+{{ workspace.styles() }}
+<style>
+  /* BYS360_FEEDBACK_SUCCESS_EXECUTIVE_UI_V2_17_72 */
+  .gbd-success-shell{max-width:1120px;margin:0 auto;display:grid;gap:20px;--gbd-red:#8B0000;--gbd-text:#101828;--gbd-muted:#667085;--gbd-border:#e7eaf2;}
+  .gbd-success-hero{position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(139,0,0,.10);background:radial-gradient(circle at top right,rgba(139,0,0,.13),transparent 34%),linear-gradient(135deg,#fff 0%,#fff7f7 52%,#f8fafc 100%);box-shadow:0 22px 48px rgba(15,23,42,.08);padding:30px;}
+  .gbd-success-hero::before{content:"";position:absolute;inset:0 auto 0 0;width:7px;background:linear-gradient(180deg,var(--gbd-red),#b91c1c);}
+  .gbd-success-main{position:relative;z-index:1;display:flex;gap:18px;align-items:flex-start;}
+  .gbd-success-icon{width:68px;height:68px;border-radius:22px;background:#fff;color:var(--gbd-red);display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:1px solid rgba(139,0,0,.12);box-shadow:0 14px 30px rgba(139,0,0,.12);flex:0 0 auto;}
+  .gbd-kicker{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 11px;border-radius:999px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.11);color:var(--gbd-red);font-size:.76rem;font-weight:950;margin-bottom:10px;}
+  .gbd-success-title{margin:0;color:var(--gbd-text);font-size:1.55rem;line-height:1.15;font-weight:950;letter-spacing:-.025em;}
+  .gbd-success-text{margin:11px 0 0;color:#475467;line-height:1.78;font-size:.98rem;max-width:820px;}
+  .gbd-card{background:#fff;border:1px solid var(--gbd-border);border-radius:26px;box-shadow:0 18px 42px rgba(15,23,42,.07);overflow:hidden;}
+  .gbd-card-body{padding:24px;}
+  .gbd-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.52fr);gap:20px;align-items:start;}
+  .gbd-section-title{font-size:1.12rem;font-weight:950;color:var(--gbd-text);margin:0;letter-spacing:-.015em;}
+  .gbd-section-text{font-size:.89rem;color:var(--gbd-muted);line-height:1.7;margin:8px 0 0;}
+  .gbd-row{display:grid;grid-template-columns:190px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid #edf0f5;}
+  .gbd-row:last-child{border-bottom:0;}
+  .gbd-label{font-weight:950;color:#667085;}
+  .gbd-value{font-weight:900;color:#111827;line-height:1.5;}
+  .gbd-next{display:grid;gap:12px;margin-top:16px;}
+  .gbd-next-row{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:flex-start;}
+  .gbd-next-icon{width:32px;height:32px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--gbd-red);display:flex;align-items:center;justify-content:center;border:1px solid rgba(139,0,0,.10);}
+  .gbd-next-title{font-weight:950;color:var(--gbd-text);font-size:.89rem;margin:0 0 4px;}
+  .gbd-next-text{color:var(--gbd-muted);font-size:.8rem;line-height:1.58;margin:0;}
+  .gbd-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+  .gbd-btn{border:1px solid transparent;min-height:46px;padding:0 18px;border-radius:15px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;transition:all .18s ease;}
+  .gbd-btn:hover{transform:translateY(-1px);}
+  .gbd-btn.primary{background:var(--gbd-red);color:#fff;box-shadow:0 12px 26px rgba(139,0,0,.18);}
+  .gbd-btn.secondary{background:#fff;color:#344054;border-color:#d0d5dd;}
+  @media(max-width:880px){.gbd-grid{grid-template-columns:1fr}.gbd-success-main{display:block}.gbd-success-icon{margin-bottom:14px}.gbd-row{grid-template-columns:1fr}.gbd-actions{display:grid}.gbd-btn{width:100%}.gbd-success-hero,.gbd-card-body{padding:22px}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gbd-success-shell">
+  <section class="gbd-success-hero">
+    <div class="gbd-success-main">
+      <div class="gbd-success-icon"><i class="fa-solid fa-check"></i></div>
+      <div>
+        <div class="gbd-kicker"><i class="fa-solid fa-circle-check"></i> Kayıt başarıyla oluşturuldu</div>
+        <h2 class="gbd-success-title">Geri bildiriminiz BYS360 içinde takip edilebilir kayda dönüştürüldü.</h2>
+        <p class="gbd-success-text">Paylaştığınız bilgi yetkili kullanıcılar tarafından incelenebilir, gerektiğinde atama ve çözüm süreci başlatılabilir. Katkınız, sistemin daha sade, erişilebilir ve kurumsal ihtiyaçlara uygun gelişmesine destek olur.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="gbd-grid">
+    <div class="gbd-card">
+      <div class="gbd-card-body">
+        <h3 class="gbd-section-title">Kayıt bilgileri</h3>
+        <p class="gbd-section-text">Bu numara ile kaydınızı daha sonra destek/talep ekranından takip edebilirsiniz.</p>
+        <div style="margin-top:12px;">
+          <div class="gbd-row"><div class="gbd-label">Kayıt No</div><div class="gbd-value">{{ ticket.ticket_no }}</div></div>
+          <div class="gbd-row"><div class="gbd-label">Konu</div><div class="gbd-value">{{ ticket.title }}</div></div>
+          <div class="gbd-row"><div class="gbd-label">Modül / Ekran</div><div class="gbd-value">{{ ticket.module_name }}</div></div>
+          <div class="gbd-row"><div class="gbd-label">Durum</div><div class="gbd-value">{{ ticket.status_label }}</div></div>
+          <div class="gbd-row"><div class="gbd-label">Öncelik</div><div class="gbd-value">{{ ticket.priority_label }}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="gbd-card">
+      <div class="gbd-card-body">
+        <h3 class="gbd-section-title">Sonraki adım</h3>
+        <p class="gbd-section-text">Kayıt destek sürecinde izlenebilir durumdadır.</p>
+        <div class="gbd-next">
+          <div class="gbd-next-row"><div class="gbd-next-icon"><i class="fa-solid fa-user-check"></i></div><div><p class="gbd-next-title">Yetkili inceleme</p><p class="gbd-next-text">Kayıt türüne göre ilgili kullanıcı veya birim değerlendirme yapabilir.</p></div></div>
+          <div class="gbd-next-row"><div class="gbd-next-icon"><i class="fa-solid fa-clock-rotate-left"></i></div><div><p class="gbd-next-title">Durum takibi</p><p class="gbd-next-text">Kayıt detayında durum geçmişi ve varsa yanıt süreci izlenebilir.</p></div></div>
+          <div class="gbd-next-row"><div class="gbd-next-icon"><i class="fa-solid fa-chart-line"></i></div><div><p class="gbd-next-title">Kurumsal iyileştirme</p><p class="gbd-next-text">Tekrar eden bildirimler geliştirme ve tasarım kararlarını besler.</p></div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="gbd-actions">
+    <a class="gbd-btn secondary" href="{{ url_for('main.bys360_feedback_new') }}"><i class="fa-solid fa-plus"></i> Yeni Geri Bildirim</a>
+    <a class="gbd-btn secondary" href="{{ url_for('main.support_detail', ticket_id=ticket.id) }}"><i class="fa-solid fa-folder-open"></i> Kayıt Detayını Aç</a>
+    <a class="gbd-btn primary" href="{{ url_for('main.feedback_dashboard') }}"><i class="fa-solid fa-chart-line"></i> Panele Dön</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+[tool.coverage.report]
+skip_empty = true
+show_missing = true
+omit = [
+  "app/static/*",
+  "app/templates/*",
+  "app/inspect_*",
+  "app/*snippet*",
+]
+fail_under = 80
+skip_covered = true
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "(migrations|node_modules|dist|build)"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_glob = ["migrations/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations", "dist", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["app", "tests", "scripts"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+exclude = "(^migrations/|^app/static/|^app/templates/)"

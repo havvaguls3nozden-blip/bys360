@@ -1,0 +1,702 @@
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+<style>
+
+/* BYS360_PHASE5_3_MANAGER_SCORING_STYLE */
+.phase5-3-manager-context{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 18px}.phase5-3-manager-card{border:1px solid rgba(139,0,0,.12);border-radius:20px;background:rgba(255,255,255,.94);box-shadow:0 14px 28px rgba(15,23,42,.055);padding:16px;min-height:130px}.phase5-3-manager-label{display:flex;align-items:center;gap:8px;color:#8B0000;font-size:.76rem;font-weight:950;text-transform:uppercase;letter-spacing:.05em}.phase5-3-manager-value{margin-top:9px;color:#111827;font-size:1.06rem;font-weight:950;line-height:1.45}.phase5-3-manager-text{margin-top:8px;color:#4b5563;font-size:.88rem;line-height:1.65;white-space:pre-line}.phase5-3-manager-pill{display:inline-flex;align-items:center;gap:7px;margin-top:9px;border-radius:999px;padding:7px 10px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.13);color:#7f1d1d;font-size:.78rem;font-weight:900}.phase5-3-rule-on{color:#166534;background:rgba(22,101,52,.08);border-color:rgba(22,101,52,.16)}.phase5-3-rule-off{color:#92400e;background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.20)}@media(max-width:1100px){.phase5-3-manager-context{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.phase5-3-manager-context{grid-template-columns:1fr}.phase5-3-manager-card{min-height:auto}}
+
+</style>
+{# BYS360_PHASE4_3_ASSIGNMENT_STATUS_LANGUAGE | Yorum/Görüş Bekliyor | Puanlama Bekliyor | assignment.manager_level == 3 #}
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{% block title %}Değerlendirme Çalışma Alanı - BYS360{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/performance_phase3.css') }}">{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Değerlendirme Çalışma Alanı{% endblock %}
+{% block page_subtitle %}Geniş kriter alanı ile 2. amir ve 3. amir sütunları aynı çalışma yüzeyinde yan yana gösterilir.{% endblock %}
+
+{% block content %}
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+{% set assignment_status_text = (assignment.status or '-') %}
+{% if assignment_status_text == 'tamamlandi' or assignment_status_text == 'tamamlandı' or assignment_status_text == 'completed' %}{% set assignment_status_text = 'Tamamlandı' %}{% endif %}
+{% if assignment_status_text == 'bekliyor' or assignment_status_text == 'pending' %}{% set assignment_status_text = 'Bekliyor' %}{% endif %}
+{% if assignment_status_text == 'kismen_tamamlandi' or assignment_status_text == 'kısmen_tamamlandı' or assignment_status_text == 'partial' %}{% set assignment_status_text = 'Kısmen Tamamlandı' %}{% endif %}
+{% set is_assignment_completed = assignment_status_text == 'Tamamlandı' or assignment.completed_at %}
+<div class="performance-ui">
+    <section class="performance-surface performance-hero">
+        <div class="performance-hero-main">
+            <span class="performance-kicker"><i class="fa-solid fa-file-signature"></i> Değerlendirme formu</span>
+            <h2 class="performance-title">{{ employee.full_name }}</h2>
+            <p class="performance-text">
+                Aynı ekranda görev seviyesi, zincir, ağırlık planı ve önceki amir görüşleri görülür.
+                Böylece değerlendirici başka ekrana geçmeden işlem yapabilir.
+            </p>
+            <div class="performance-badges">
+                <span class="performance-badge"><i class="fa-solid fa-id-badge"></i> {{ employee.sicil_no or '-' }}</span>
+                <span class="performance-badge"><i class="fa-solid fa-sitemap"></i> {{ assignment.manager_level }}. amir</span>
+                <span class="performance-badge"><i class="fa-regular fa-calendar"></i> {{ period.title if period else '-' }}</span>
+                <span class="performance-badge"><i class="fa-solid fa-weight-scale"></i> {{ weight_plan.level_weights[1] }} / {{ weight_plan.level_weights[2] }} / {{ weight_plan.level_weights[3] }}</span>
+            </div>
+        </div>
+        <div class="performance-hero-side">
+            <div class="performance-side-label">Görev durumu</div>
+            <div class="performance-side-value">{{ assignment_status_text }}</div>
+            <div class="performance-side-text">
+                {% if assignment.completed_at %}
+                    Tamamlanma: {{ assignment.completed_at.strftime('%d.%m.%Y %H:%M') }}
+                {% elif assignment.due_date %}
+                    Son tarih: {{ assignment.due_date.strftime('%d.%m.%Y %H:%M') }}
+                {% else %}
+                    Bu görev için tanımlı bir son tarih görünmüyor.
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="performance-preview-band">
+        <article class="performance-metric">
+            <div class="performance-metric-label">Anlık ön izleme</div>
+            <div class="performance-metric-value" id="liveLevelScore">{{ evaluation.final_total_100 if evaluation.final_total_100 is not none else '-' }}</div>
+            <div class="performance-metric-sub">Girilen puanlara göre 100’lük sisteme çevrilmiş ön izleme.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Kayıtlı nihai sonuç</div>
+            <div class="performance-metric-value">{{ evaluation.final_total_100 if evaluation.final_total_100 is not none else '-' }}</div>
+            <div class="performance-metric-sub">Henüz nihai toplam oluşmadıysa boş kalabilir.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Formdaki kriter</div>
+            <div class="performance-metric-value">{{ criteria_rows|length }}</div>
+            <div class="performance-metric-sub">Bu göreve ait değerlendirme kriteri sayısı.</div>
+        </article>
+        <article class="performance-metric">
+            <div class="performance-metric-label">Ağırlık planı</div>
+            <div class="performance-metric-value" style="font-size:1.05rem;line-height:1.5;">{{ weight_plan.level_weights[1] }} / {{ weight_plan.level_weights[2] }} / {{ weight_plan.level_weights[3] }}</div>
+            <div class="performance-metric-sub">1., 2. ve 3. amir katkı dağılımı.</div>
+        </article>
+    </section>
+
+    <section class="performance-workbench performance-workbench-single">
+        <article class="performance-surface performance-workbench-main">
+            <div class="performance-form-intro">
+                <div>
+                    <h3 class="performance-section-title">Kriter bazlı değerlendirme matrisi</h3>
+                    <p class="performance-section-text">
+                        Sol sütun geniş kriter çalışma alanıdır. Sağda 2. amir ve 3. amir sütunları aynı yatay eksende hizalanır;
+                        böylece her kriterin karşılığı aynı satırda okunur.
+                    </p>
+                </div>
+                <div class="performance-form-intro-meta">
+                    <span class="performance-chip active"><i class="fa-solid fa-route"></i> Sıra: {{ resolved_chain.order|join(' → ') }}</span>
+                    <span class="performance-chip"><i class="fa-solid fa-user"></i> {{ employee.unvan or employee.role }}{% if employee.birim %} · {{ employee.birim }}{% endif %}</span>
+                    <span class="performance-chip"><i class="fa-solid fa-calendar-days"></i> {{ period.title if period else '-' }}</span>
+                </div>
+            </div>
+
+            {% if not is_actionable %}<div class="performance-note" style="margin:14px 0 0;"><i class="fa-solid fa-lock"></i><span>Bu görev henüz işlem sırasına açılmadı. Önce önceki amir adımı tamamlanmalıdır.</span></div>{% endif %}
+
+{% set phase5_3_comment_rule_from_settings = phase5_3_comment_rule_from_settings if phase5_3_comment_rule_from_settings is defined else true %}
+{% set phase5_3_interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+{% set phase5_3_interim_notes = phase5_3_interim_ctx.notes if phase5_3_interim_ctx.notes is defined else [] %}
+{% set phase5_3_prev = namespace(score='-', comment='Henüz önceki amir görüşü görünmüyor.', label='Önceki Amir') %}
+{% if previous_comments %}
+    {% for snapshot in previous_comments %}
+        {% if phase5_3_prev.score == '-' and snapshot.score_100 is not none %}{% set phase5_3_prev.score = '%.2f'|format(snapshot.score_100) %}{% set phase5_3_prev.label = snapshot.level|string ~ '. Amir' %}{% endif %}
+        {% if phase5_3_prev.comment == 'Henüz önceki amir görüşü görünmüyor.' and snapshot.general_comment %}{% set phase5_3_prev.comment = snapshot.general_comment %}{% set phase5_3_prev.label = snapshot.level|string ~ '. Amir' %}{% endif %}
+    {% endfor %}
+{% endif %}
+<section class="phase5-3-manager-context" data-bys360-marker="BYS360_PHASE5_3_MANAGER_SCORING_SCREEN" aria-label="Amir puanlama karar özeti">
+    <article class="phase5-3-manager-card">
+        <div class="phase5-3-manager-label"><i class="fa-solid fa-eye"></i> Önceki Amir Puanı</div>
+        <div class="phase5-3-manager-value" data-bys360-marker="phase5_3_previous_manager_score">{{ phase5_3_prev.score }}</div>
+        <div class="phase5-3-manager-text">Şeffaf değerlendirme kuralı gereği tamamlanan önceki amir puanı karar öncesinde görünür.</div>
+    </article>
+    <article class="phase5-3-manager-card">
+        <div class="phase5-3-manager-label"><i class="fa-solid fa-comment-dots"></i> Önceki Amir Görüşü</div>
+        <div class="phase5-3-manager-text" data-bys360-marker="phase5_3_previous_manager_comment"><strong>{{ phase5_3_prev.label }}:</strong> {{ phase5_3_prev.comment }}</div>
+    </article>
+    <article class="phase5-3-manager-card">
+        <div class="phase5-3-manager-label"><i class="fa-regular fa-note-sticky"></i> Dönem İçi Notlar</div>
+        <div class="phase5-3-manager-value" data-bys360-marker="phase5_3_interim_notes_reminder">{{ phase5_3_interim_notes|length }} not</div>
+        <div class="phase5-3-manager-text">Dönem içi notlar otomatik puan üretmez; yalnızca değerlendirme sırasında hatırlatma sağlar.</div>
+    </article>
+    <article class="phase5-3-manager-card">
+        <div class="phase5-3-manager-label"><i class="fa-solid fa-asterisk"></i> Açıklama Zorunluluğu</div>
+        {% if phase5_3_comment_rule_from_settings %}
+            <span class="phase5-3-manager-pill phase5-3-rule-on" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar açık · 1 ve 5 puanlarda açıklama zorunludur</span>
+        {% else %}
+            <span class="phase5-3-manager-pill phase5-3-rule-off" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar kapalı · açıklama isteğe bağlı</span>
+        {% endif %}
+        <div class="phase5-3-manager-text">Genel görüş zorunluluğu 70 altı ve 90 üstü eşiklerde ayrıca korunur.</div>
+    </article>
+</section>
+
+
+            {% if previous_comments %}
+            <section class="performance-prior-comments" aria-label="Önceki amir görüşleri">
+                {% for snapshot in previous_comments %}
+                    {% set ns = namespace(panel=None) %}
+                    {% for candidate in manager_side_panels %}
+                        {% if candidate.level == snapshot.level %}
+                            {% set ns.panel = candidate %}
+                        {% endif %}
+                    {% endfor %}
+                    {% set comment_text = (snapshot.general_comment or '')|trim %}
+                    <article class="performance-prior-comment-card{% if snapshot.level == 3 %} is-critical{% endif %}">
+                        <div class="performance-prior-comment-head">
+                            <div class="performance-prior-comment-title">
+                                <i class="fa-solid fa-comments"></i>
+                                <span>{{ ns.panel.label if ns.panel else (snapshot.level|string ~ '. Amir') }} Görüşü</span>
+                            </div>
+                            <div class="performance-prior-comment-meta">
+                                <span class="performance-prior-chip"><i class="fa-solid fa-user"></i> {{ ns.panel.evaluator_name if ns.panel and ns.panel.evaluator_name else 'Tanımlı değil' }}</span>
+                                <span class="performance-prior-chip"><i class="fa-solid fa-circle-check"></i> {{ 'Tamamlandı' if snapshot.completed else 'Taslak / bekliyor' }}</span>
+                                {% if snapshot.score_100 is not none and ns.panel and not ns.panel.is_comment_only %}
+                                <span class="performance-prior-chip"><i class="fa-solid fa-hashtag"></i> {{ '%.2f'|format(snapshot.score_100) }}</span>
+                                {% endif %}
+                                {% if ns.panel and ns.panel.is_comment_only %}
+                                <span class="performance-prior-chip"><i class="fa-solid fa-comment-dots"></i> Yorumcu mod</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if comment_text %}
+                        <div class="performance-prior-comment-body">{{ comment_text }}</div>
+                        {% else %}
+                        <div class="performance-prior-comment-body performance-prior-comment-empty">Bu amir seviyesinde kaydedilmiş genel görüş henüz görünmüyor.</div>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            {% set interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+            {% set interim_notes = interim_ctx.notes if interim_ctx.notes is defined else [] %}
+            <section class="performance-interim-reminder performance-interim-reminder--manager-source" aria-label="Dönem içi notlar">
+                <div class="performance-interim-reminder-head">
+                    <div>
+                        <span class="performance-kicker"><i class="fa-regular fa-note-sticky"></i> Değerlendirme hatırlatmaları</span>
+                        <h3 class="performance-section-title">Dönem İçi Notlar</h3>
+                        <p class="performance-section-text performance-section-text--compact">Bu alan, <strong>Dönem İçi Notlar sayfasında</strong> bu personel için önceden kaydedilmiş notları gösterir. Buradan not eklenmez; notlar otomatik puan üretmez, yalnızca değerlendirme sırasında hatırlatma sağlar.</p>
+                    </div>
+                    <div class="performance-interim-actions">
+                        <div class="performance-interim-count">
+                            <strong>{{ interim_ctx.count if interim_ctx.count is defined else (interim_notes|length) }}</strong>
+                            <span>kayıtlı not</span>
+                        </div>
+                        <a class="performance-interim-manage-link" href="{{ url_for('main.performance_interim_notes', employee_id=employee.id, period_id=period.id if period else '') }}">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Dönem İçi Notlar sayfası
+                        </a>
+                    </div>
+                </div>
+
+                {% if interim_notes %}
+                <div class="performance-interim-list">
+                    {% for note in interim_notes %}
+                    <article class="performance-interim-card performance-interim-card--{{ note.note_type or 'genel_gozlem' }}">
+                        <div class="performance-interim-card-top">
+                            <span class="performance-interim-type"><i class="fa-regular fa-bookmark"></i> {{ note.note_type_label or 'Dönem İçi Not' }}</span>
+                            <span class="performance-interim-date"><i class="fa-regular fa-clock"></i> {{ note.created_display or '-' }}</span>
+                        </div>
+                        <h4 class="performance-interim-title">{{ note.title or note.note_type_label or 'Dönem İçi Not' }}</h4>
+                        <div class="performance-interim-body">{{ note.body or note.note_body or 'Açıklama girilmemiş.' }}</div>
+                        {% if note.include_in_scorecard %}
+                        <div class="performance-interim-card-foot"><i class="fa-solid fa-id-card"></i> Karne detayına işaretli</div>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="performance-interim-empty">
+                    <i class="fa-regular fa-note-sticky"></i>
+                    <span>Bu personel için bu döneme bağlı kayıtlı dönem içi not bulunmuyor.</span>
+                </div>
+                {% endif %}
+            </section>
+<form method="post" style="margin-top:16px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {% if not is_comment_only_level %}
+                <div class="performance-bulk-toolbar-premium">
+                    <div class="performance-bulk-toolbar-glow" aria-hidden="true"></div>
+                    <div class="performance-bulk-toolbar-top">
+                        <div class="performance-bulk-toolbar-copy">
+                            <span class="performance-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i> Toplu puanlama</span>
+                            <h4 class="performance-bulk-toolbar-title">Toplu puan seçimi</h4>
+                            <p class="performance-bulk-toolbar-text">Kriterlerin tamamını tek hamlede puanlayın. İsterseniz yalnızca boş kalan kriterleri doldurup çalışma alanını daha hızlı tamamlayın.</p>
+                        </div>
+                        <div class="performance-bulk-toolbar-toggle-wrap">
+                            <label class="performance-bulk-check">
+                                <input type="checkbox" id="bulkOnlyEmpty" checked {% if not is_actionable %}disabled{% endif %}>
+                                <span>Sadece boş kriterlere uygula</span>
+                            </label>
+                            <div class="performance-bulk-toolbar-mini">1 → 20 · 5 → 100 dönüşümü canlı ön izlemeye yansır.</div>
+                        </div>
+                    </div>
+
+                    <div class="performance-bulk-score-grid-premium">
+                        {% for point, label in [(1, 'Çok düşük'), (2, 'Düşük'), (3, 'Orta'), (4, 'İyi'), (5, 'Çok iyi')] %}
+                        <button type="button" class="performance-bulk-score-btn js-bulk-score-btn" data-score="{{ point }}" {% if not is_actionable %}disabled{% endif %}>
+                            <span class="performance-bulk-score-btn-top">
+                                <span class="performance-bulk-score-btn-number">{{ point }}</span>
+                                <span class="performance-bulk-score-btn-label">{{ label }}</span>
+                            </span>
+                            <span class="performance-bulk-score-btn-sub">Tüm kriterleri {{ point }} yap</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+
+                    <div class="performance-bulk-toolbar-footer">
+                        <div class="performance-bulk-toolbar-state" id="bulkActionState">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Hazır · Tek dokunuşla toplu puan verilebilir</span>
+                        </div>
+                        <button type="button" class="performance-btn soft-danger performance-bulk-clear-premium js-bulk-clear-btn" {% if not is_actionable %}disabled{% endif %}>
+                            <i class="fa-solid fa-eraser"></i> Seçimleri temizle
+                        </button>
+                    </div>
+
+                    {% if not is_actionable %}
+                    <div class="performance-note performance-bulk-toolbar-note"><i class="fa-solid fa-lock"></i><span>İşlem sırası açılmadığı için toplu seçim şu anda pasif durumda.</span></div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+
+                <div class="performance-matrix-shell{% if is_comment_only_level %} is-comment-only{% endif %}">
+                    <div class="performance-matrix-topline">
+                        <div class="performance-form-intro performance-form-intro--compact">
+                            <div>
+                                <h3 class="performance-section-title">Değerlendirme özeti</h3>
+                                <p class="performance-section-text performance-section-text--compact">Koordinatör, birim amiri ve işlem sırası tek satırda görünür. Kriter alanı doğrudan aşağıdan başlar.</p>
+                            </div>
+                            <div class="performance-form-intro-meta">
+                                <span class="performance-chip active"><i class="fa-solid fa-route"></i> Sıra: {{ resolved_chain.order|join(' → ') }}</span>
+                                <span class="performance-chip"><i class="fa-solid fa-user"></i> {{ employee.unvan or employee.role }}{% if employee.birim %} · {{ employee.birim }}{% endif %}</span>
+                                <span class="performance-chip"><i class="fa-solid fa-calendar-days"></i> {{ period.title if period else '-' }}</span>
+                            </div>
+                        </div>
+                        <div class="performance-manager-identity-strip">
+                            {% for panel in manager_side_panels %}
+                            <article class="performance-manager-identity-pill{% if panel.is_current %} is-current{% endif %}">
+                                <div class="performance-manager-identity-kicker">{{ panel.title }}</div>
+                                <div class="performance-manager-identity-role">{{ panel.label }}</div>
+                                <div class="performance-manager-identity-name">{{ panel.evaluator_name or 'Tanımlı değil' }}</div>
+                                <div class="performance-manager-identity-sub">{{ panel.evaluator_role or panel.empty_text }}</div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if is_comment_only_level %}
+                    <div class="performance-matrix-comment-only">
+                        <div class="performance-note" style="margin-top:4px;">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>Bu seviye yorumcu modunda çalışır. 3. amir kriter bazlı cevap vermez, puan girmez ve kriter yorumu yazmaz. Yalnızca aşağıdaki 3. Amir Üst Görüşü alanını doldurur; bu görüş 2. amir ve 1. amir tarafından görünür.</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="performance-matrix-body">
+                        {% for row in criteria_rows %}
+                        {% set current_score = row.item.score if row.item and row.item.score is not none else None %}
+                        <div class="performance-matrix-row" data-side-count="{{ row.side_cards|length }}">
+                            <article class="performance-criteria-card performance-criteria-row-card">
+                                <div class="performance-criteria-head">
+                                    <div>
+                                        <div class="performance-criteria-kicker">{{ loop.index }}. Kriter</div>
+                                        <h4 class="performance-criteria-title">{{ row.criterion.name }}</h4>
+                                        <div class="performance-criteria-desc">{{ row.criterion.description or 'Açıklama girilmemiş.' }}</div>
+                                    </div>
+                                    <span class="performance-badge"><i class="fa-solid fa-scale-balanced"></i> Ağırlık {{ row.criterion.weight }}</span>
+                                </div>
+                                <div class="performance-criteria-body">
+                                    <div class="performance-score-grid performance-score-grid-premium">
+                                        {% for point, label, subtitle in [
+                                            (1, 'Çok düşük', 'Kritik geliştirme alanı'),
+                                            (2, 'Düşük', 'Beklenenin altında'),
+                                            (3, 'Orta', 'Temel beklenti düzeyi'),
+                                            (4, 'İyi', 'Güçlü ve dengeli'),
+                                            (5, 'Çok iyi', 'Örnek gösterilebilecek düzey')
+                                        ] %}
+                                        <label class="performance-score-choice performance-score-choice-premium">
+                                            <input
+                                                type="radio"
+                                                name="score_{{ row.criterion.id }}"
+                                                value="{{ point }}"
+                                                class="js-score-input"
+                                                data-weight="{{ row.criterion.weight or 0 }}"
+                                                {% if current_score == point %}checked{% endif %}
+                                            >
+                                            <span class="performance-score-label performance-score-label-premium">
+                                                <span class="performance-score-label-top">
+                                                    <span class="performance-score-number">{{ point }}</span>
+                                                    <span class="performance-score-word">{{ label }}</span>
+                                                </span>
+                                                <span class="performance-score-subtitle">{{ subtitle }}</span>
+                                            </span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="performance-field" style="margin-top:16px;">
+                                        <label class="performance-field-label">Kriter yorumu</label>
+                                        <textarea class="performance-textarea" name="comment_{{ row.criterion.id }}" placeholder="Gerekli durumlarda açıklama girin">{{ row.item.comment if row.item else '' }}</textarea>
+                                        <div class="performance-field-help">{% if phase5_3_comment_rule_from_settings %}Açıklama 1 ve 5 puanlarda zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}</div>
+                                    </div>
+                                </div>
+                            </article>
+                            {% for side in row.side_cards %}
+                            <aside class="performance-side-criterion-card performance-side-criterion-card--{{ side.state }}{% if side.is_live %} is-live js-live-mini-card{% endif %}"{% if side.is_live %} data-criterion-id="{{ row.criterion.id }}"{% endif %}>
+                                <div class="performance-side-criterion-head">
+                                    <div class="performance-field-label" style="margin-bottom:0;">{{ side.label }}</div>
+                                    <span class="performance-mini-score performance-mini-score--{{ side.score_tone }}{% if side.is_live %} js-live-mini-score{% endif %}">{{ side.score_display }}</span>
+                                </div>
+                                <div class="performance-side-criterion-title">{{ side.label }}{% if side.title %}: {{ side.title }}{% endif %}</div>
+                                <div class="performance-side-criterion-text{% if side.is_live %} js-live-mini-comment{% endif %}">{{ side.text }}</div>
+                            </aside>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="performance-grid-2" style="margin-top:18px;">
+                    <div class="performance-field">
+                        <label class="performance-field-label">{{ general_comment_label }}</label>
+                        <textarea class="performance-textarea" name="general_comment" placeholder="{{ general_comment_placeholder }}">{{ general_comment_value or '' }}</textarea>
+                    </div>
+                    <div class="performance-field">
+                        <label class="performance-field-label">İade notu</label>
+                        <textarea class="performance-textarea" name="return_note" placeholder="İade gerekiyorsa gerekçeyi yazın">{{ return_note_value or '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="performance-footer-sticky">
+                    <div class="performance-footer-live performance-footer-live--compact">
+                        <div class="performance-live-inline-card is-primary" aria-label="Anlık seviye notu">
+                            <span class="performance-live-inline-label">Anlık not</span>
+                            <strong class="performance-live-inline-value" id="liveBottomLevelScore">{{ evaluation.final_total_100 if evaluation.final_total_100 is not none else '-' }}</strong>
+                        </div>
+                        <div class="performance-live-inline-card" aria-label="Başarı bandı">
+                            <span class="performance-live-inline-label">Band</span>
+                            <span class="performance-live-grade-pill performance-live-grade-pill--compact" id="liveBottomBand">Henüz oluşmadı</span>
+                        </div>
+                        <div class="performance-live-inline-card" aria-label="Tahmini nihai not">
+                            <span class="performance-live-inline-label">Nihai</span>
+                            <strong class="performance-live-inline-value" id="liveBottomFinalScore">{{ evaluation.final_total_100 if evaluation.final_total_100 is not none else '-' }}</strong>
+                        </div>
+                    </div>
+                    <div class="performance-actions-sticky">
+                        <button class="performance-btn secondary" type="submit" name="action" value="save"><i class="fa-regular fa-floppy-disk"></i> Taslak kaydet</button>
+                        <button
+                            class="performance-btn {% if is_assignment_completed %}info performance-btn-completed is-completed{% else %}success{% endif %}"
+                            type="submit"
+                            name="action"
+                            value="submit"
+                            id="completeAssignmentButton"
+                            data-default-label="Tamamla"
+                            data-completed-label="Tamamlandı"
+                            {% if not is_actionable or is_assignment_completed %}disabled{% endif %}>
+                            <i class="fa-solid {% if is_assignment_completed %}fa-circle-check{% else %}fa-check{% endif %}"></i>
+                            <span class="js-complete-btn-label">{% if is_assignment_completed %}Tamamlandı{% else %}Tamamla{% endif %}</span>
+                        </button>
+                        {% if assignment.manager_level == 1 %}
+                        <button class="performance-btn warning" type="submit" name="action" value="return"><i class="fa-solid fa-reply"></i> 2. amire iade et</button>
+                        {% endif %}
+                        <button class="performance-btn soft-danger" type="submit" name="action" value="withdraw"><i class="fa-solid fa-rotate-left"></i> Gönderimi geri çek</button>
+                    </div>
+                </div>
+            </form>
+
+
+        </article>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const scoreInputs = Array.from(document.querySelectorAll('.js-score-input'));
+    const liveScoreEl = document.getElementById('liveLevelScore');
+    const liveBottomLevelScoreEl = document.getElementById('liveBottomLevelScore');
+    const liveBottomBandEl = document.getElementById('liveBottomBand');
+    const liveBottomFinalScoreEl = document.getElementById('liveBottomFinalScore');
+    const currentLevel = Number('{{ assignment.manager_level }}');
+    const weightPlan = {
+        1: Number('{{ weight_plan.level_weights[1] }}' || 0),
+        2: Number('{{ weight_plan.level_weights[2] }}' || 0),
+        3: Number('{{ weight_plan.level_weights[3] }}' || 0),
+    };
+    const existingLevelScores = {
+        1: Number('{{ evaluation.level_1_total_100 or 0 }}' || 0),
+        2: Number('{{ evaluation.level_2_total_100 or 0 }}' || 0),
+        3: Number('{{ evaluation.level_3_total_100 or 0 }}' || 0),
+    };
+
+    const formEl = document.querySelector('.js-performance-assignment-form');
+    const completeButton = document.getElementById('completeAssignmentButton');
+
+    function setCompleteButtonDone(disableButton) {
+        if (!completeButton) return;
+        completeButton.classList.remove('success');
+        completeButton.classList.add('info', 'performance-btn-completed', 'is-completed');
+        const iconEl = completeButton.querySelector('i');
+        const labelEl = completeButton.querySelector('.js-complete-btn-label');
+        if (iconEl) iconEl.className = 'fa-solid fa-circle-check';
+        if (labelEl) labelEl.textContent = completeButton.dataset.completedLabel || 'Tamamlandı';
+        if (disableButton) completeButton.disabled = true;
+    }
+
+    if (completeButton && completeButton.classList.contains('is-completed')) {
+        setCompleteButtonDone(true);
+    }
+
+    function bandMeta(score) {
+        if (score === null || Number.isNaN(score)) {
+            return {label: 'Henüz oluşmadı', tone: 'empty'};
+        }
+        if (score < 70) return {label: '70 altı · Başarısız', tone: 'low'};
+        if (score > 90) return {label: '90 üstü · Çok başarılı', tone: 'high'};
+        return {label: '70-90 arası · Başarılı', tone: 'good'};
+    }
+
+    function applyBand(score) {
+        if (!liveBottomBandEl) return;
+        const meta = bandMeta(score);
+        liveBottomBandEl.textContent = meta.label;
+        liveBottomBandEl.className = `performance-live-grade-pill performance-live-grade-pill--${meta.tone}`;
+    }
+
+    function syncLiveMiniCards() {
+        const cards = Array.from(document.querySelectorAll('.js-live-mini-card'));
+        let filledCount = 0;
+        cards.forEach((card) => {
+            const criterionId = card.dataset.criterionId;
+            const checked = document.querySelector(`input[name="score_${criterionId}"]:checked`);
+            const commentField = document.querySelector(`textarea[name="comment_${criterionId}"]`);
+            const scoreEl = card.querySelector('.js-live-mini-score');
+            const commentEl = card.querySelector('.js-live-mini-comment');
+            const rawValue = checked ? Number(checked.value || 0) : null;
+            let tone = 'empty';
+            let display = '-';
+            if (rawValue !== null && !Number.isNaN(rawValue)) {
+                filledCount += 1;
+                display = Number.isInteger(rawValue) ? String(rawValue) : rawValue.toFixed(1);
+                if (rawValue <= 2) tone = 'low';
+                else if (rawValue < 4) tone = 'mid';
+                else if (rawValue < 5) tone = 'good';
+                else tone = 'high';
+            }
+            if (scoreEl) {
+                scoreEl.textContent = display;
+                scoreEl.className = `performance-mini-score performance-mini-score--${tone} js-live-mini-score`;
+            }
+            if (commentEl) {
+                const text = ((commentField && commentField.value) || '').trim();
+                commentEl.textContent = text || 'Henüz kriter yorumu yok.';
+            }
+        });
+        return filledCount;
+    }
+
+    function syncLiveProgress(filledCount) {
+        const progressCard = document.querySelector('.js-live-progress-card');
+        if (!progressCard) return;
+        const totalCriteria = Number(progressCard.dataset.totalCriteria || 0);
+        const isCommentOnly = String(progressCard.dataset.commentOnly || '0') === '1';
+        const statusEl = progressCard.querySelector('.js-live-progress-status');
+        const percentEl = progressCard.querySelector('.js-live-progress-percent');
+        const fillEl = progressCard.querySelector('.js-live-progress-fill');
+        const counterEl = progressCard.querySelector('.js-live-progress-counter');
+        const missingEl = progressCard.querySelector('.js-live-progress-missing');
+        let percent = 0;
+        let missing = 0;
+        let tone = 'pending';
+        let statusText = 'Henüz başlanmadı';
+        let counterText = 'Kriter bulunmuyor';
+
+        if (isCommentOnly) {
+            const generalField = document.querySelector('textarea[name="general_comment"]');
+            const hasOpinion = Boolean(generalField && generalField.value.trim());
+            percent = hasOpinion ? 100 : 0;
+            missing = hasOpinion ? 0 : 1;
+            tone = hasOpinion ? 'complete' : 'pending';
+            statusText = hasOpinion ? 'Üst görüş hazır' : 'Üst görüş bekleniyor';
+            counterText = 'Kriter yok · yalnız üst görüş';
+        } else if (totalCriteria > 0) {
+            percent = Math.round((filledCount / totalCriteria) * 100);
+            missing = Math.max(totalCriteria - filledCount, 0);
+            if (filledCount >= totalCriteria) {
+                tone = 'complete';
+                statusText = 'Kriterler tamamlandı';
+            } else if (filledCount > 0) {
+                tone = 'partial';
+                statusText = 'Kısmen tamamlandı';
+            } else {
+                tone = 'pending';
+                statusText = 'Henüz başlanmadı';
+            }
+            counterText = `${filledCount}/${totalCriteria} kriter dolu · ${missing} eksik`;
+        }
+
+        if (statusEl) {
+            statusEl.textContent = statusText;
+            statusEl.className = `performance-progress-status performance-progress-status--${tone} js-live-progress-status`;
+        }
+        if (percentEl) percentEl.textContent = `%${percent}`;
+        if (fillEl) {
+            fillEl.style.width = `${percent}%`;
+            fillEl.className = `performance-progress-bar-fill performance-progress-bar-fill--${tone} js-live-progress-fill`;
+        }
+        if (counterEl) counterEl.textContent = counterText;
+        if (missingEl) missingEl.textContent = isCommentOnly ? `${missing} bekleyen görüş` : `${missing} eksik`;
+    }
+
+    function computeLiveLevelScore() {
+        let totalWeight = 0;
+        let totalScore = 0;
+        const grouped = new Map();
+        scoreInputs.forEach((input) => {
+            if (!grouped.has(input.name)) grouped.set(input.name, []);
+            grouped.get(input.name).push(input);
+        });
+        grouped.forEach((inputs) => {
+            const checked = inputs.find((item) => item.checked);
+            const weight = Number((inputs[0] && inputs[0].dataset.weight) || 0);
+            if (!Number.isNaN(weight) && weight > 0) {
+                totalWeight += weight;
+                if (checked) {
+                    totalScore += Number(checked.value || 0) * 20 * weight;
+                }
+            }
+        });
+        if (!totalWeight) return null;
+        const result = totalScore / totalWeight;
+        return Number.isFinite(result) ? result : null;
+    }
+
+    function computeWeightedFinal(liveLevelScore) {
+        const scores = {...existingLevelScores};
+        if (liveLevelScore !== null && !Number.isNaN(liveLevelScore)) {
+            scores[currentLevel] = liveLevelScore;
+        }
+        let totalWeight = 0;
+        let total = 0;
+        Object.keys(weightPlan).forEach((key) => {
+            const level = Number(key);
+            const weight = Number(weightPlan[level] || 0);
+            if (weight > 0) {
+                totalWeight += weight;
+                total += Number(scores[level] || 0) * weight;
+            }
+        });
+        if (!totalWeight) return null;
+        return total / totalWeight;
+    }
+
+    function formatScore(score) {
+        if (score === null || Number.isNaN(score)) return '-';
+        return Number(score).toFixed(1);
+    }
+
+    function updatePreview() {
+        const liveLevelScore = computeLiveLevelScore();
+        if (liveScoreEl) liveScoreEl.textContent = formatScore(liveLevelScore);
+        if (liveBottomLevelScoreEl) liveBottomLevelScoreEl.textContent = formatScore(liveLevelScore);
+        const weightedFinal = computeWeightedFinal(liveLevelScore);
+        if (liveBottomFinalScoreEl) liveBottomFinalScoreEl.textContent = formatScore(weightedFinal);
+        applyBand(liveLevelScore);
+        const filledCount = syncLiveMiniCards();
+        syncLiveProgress(filledCount);
+    }
+
+
+    function groupedScoreInputs() {
+        const grouped = new Map();
+        scoreInputs.forEach((input) => {
+            if (!grouped.has(input.name)) grouped.set(input.name, []);
+            grouped.get(input.name).push(input);
+        });
+        return grouped;
+    }
+
+    const bulkStateEl = document.getElementById('bulkActionState');
+    const bulkButtons = Array.from(document.querySelectorAll('.js-bulk-score-btn'));
+
+    function setBulkState(message, tone = 'neutral') {
+        if (!bulkStateEl) return;
+        bulkStateEl.className = `performance-bulk-toolbar-state is-${tone}`;
+        const span = bulkStateEl.querySelector('span');
+        if (span) span.textContent = message;
+    }
+
+    function markBulkButtonActive(score) {
+        bulkButtons.forEach((button) => {
+            const isActive = Number(button.dataset.score || 0) === Number(score);
+            button.classList.toggle('is-selected', isActive);
+        });
+    }
+
+    function applyBulkScore(score) {
+        const onlyEmptyEl = document.getElementById('bulkOnlyEmpty');
+        const onlyEmpty = Boolean(onlyEmptyEl && onlyEmptyEl.checked);
+        groupedScoreInputs().forEach((inputs) => {
+            const currentChecked = inputs.find((item) => item.checked);
+            if (onlyEmpty && currentChecked) return;
+            const target = inputs.find((item) => Number(item.value) === Number(score));
+            if (target && !target.disabled) {
+                target.checked = true;
+                target.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        markBulkButtonActive(score);
+        setBulkState(`Toplu puan uygulandı · Kriterler ${score} üzerinden güncellendi`, 'active');
+        updatePreview();
+    }
+
+    bulkButtons.forEach((button) => {
+        button.addEventListener('click', () => applyBulkScore(Number(button.dataset.score || 0)));
+    });
+    const bulkClearButton = document.querySelector('.js-bulk-clear-btn');
+    if (bulkClearButton) {
+        bulkClearButton.addEventListener('click', clearBulkScores);
+    }
+
+    function clearBulkScores() {
+        groupedScoreInputs().forEach((inputs) => {
+            const currentChecked = inputs.find((item) => item.checked);
+            if (!currentChecked) return;
+            currentChecked.checked = false;
+            currentChecked.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        markBulkButtonActive(null);
+        setBulkState('Seçimler temizlendi · Alan tekrar manuel düzenlemeye hazır', 'muted');
+        updatePreview();
+    }
+
+    scoreInputs.forEach((input) => input.addEventListener('change', updatePreview));
+    Array.from(document.querySelectorAll('textarea[name^="comment_"]')).forEach((input) => {
+        input.addEventListener('input', syncLiveMiniCards);
+    });
+    const generalCommentField = document.querySelector('textarea[name="general_comment"]');
+    if (generalCommentField) {
+        generalCommentField.addEventListener('input', updatePreview);
+    }
+
+    if (formEl && completeButton) {
+        formEl.addEventListener('submit', (event) => {
+            const submitter = event.submitter || document.activeElement;
+            if (submitter === completeButton && !completeButton.disabled) {
+                setCompleteButtonDone(true);
+            }
+        });
+    }
+
+    updatePreview();
+    setBulkState('Hazır · Tek dokunuşla toplu puan verilebilir', 'neutral');
+})();
+</script>
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

@@ -1,0 +1,6 @@
+# BYS360 Android release signing sample. Copy this file to android/key.properties and fill it locally.
+# Never commit android/key.properties or the .jks/.keystore file.
+storeFile=../keystores/bys360-release.jks
+storePassword=makarna.17
+keyAlias=bys360
+keyPassword=makarna.17

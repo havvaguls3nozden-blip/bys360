@@ -1,0 +1,214 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}AI Yetki, KVKK Maskeleme ve Güvenli Görünürlük Kapısı - BYS360{% endblock %}
+{% block page_kicker %}AI Karar Destek / Analiz Merkezi{% endblock %}
+{% block page_title %}AI Yetki, KVKK Maskeleme ve Güvenli Görünürlük Kapısı{% endblock %}
+{% block page_subtitle %}AI ekranlarında rol, canlı kapsam, maskeleme ve güvenli export sınırını tek merkezde görünür kılar.{% endblock %}
+{% block ai_inner %}
+<style>
+  .vg-hero{background:linear-gradient(135deg, rgba(139,0,0,.10), rgba(255,255,255,.98) 54%, rgba(15,23,42,.035));}
+  .vg-contract{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px}
+  .vg-contract .item{padding:12px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+  .vg-contract .k{font-size:.72rem;color:#64748b;font-weight:900;text-transform:uppercase;letter-spacing:.03em}.vg-contract .v{margin-top:6px;font-weight:900;color:#111827}
+  .vg-chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.vg-chip{font-size:.76rem;font-weight:800;padding:5px 8px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#475569}
+  .vg-risk{width:46px;height:46px;border-radius:16px;background:#8B0000;color:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 12px 22px rgba(139,0,0,.18)}
+  .vg-meter{height:9px;border-radius:999px;background:#eef2f7;overflow:hidden;margin-top:8px}.vg-meter span{display:block;height:100%;border-radius:999px;background:#8B0000}
+  .vg-card-danger{background:linear-gradient(180deg, rgba(220,38,38,.12), rgba(255,255,255,.98))}.vg-card-warning{background:linear-gradient(180deg, rgba(245,158,11,.14), rgba(255,255,255,.98))}.vg-card-calm{background:linear-gradient(180deg, rgba(59,130,246,.10), rgba(255,255,255,.98))}.vg-card-success{background:linear-gradient(180deg, rgba(16,185,129,.12), rgba(255,255,255,.98))}.vg-card-muted{background:linear-gradient(180deg, rgba(100,116,139,.10), rgba(255,255,255,.98))}
+  .vg-mini-matrix{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.vg-mini-matrix .box{padding:12px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}.vg-mini-matrix .box strong{display:block;color:#111827}.vg-mini-matrix .box span{display:block;margin-top:4px;color:#64748b;font-size:.82rem;font-weight:700}
+  @media (max-width:1200px){.vg-contract{grid-template-columns:repeat(2,minmax(0,1fr))}.vg-mini-matrix{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:768px){.vg-contract,.vg-mini-matrix{grid-template-columns:1fr}.vg-risk{width:40px;height:40px}}
+</style>
+<div class="ai-shell">
+  <section class="ai-panel vg-hero">
+    <div class="ai-hero-grid">
+      <div>
+        <div class="ai-kicker">Kontrol 10 · Güvenli görünürlük kapısı</div>
+        <h3 class="ai-title">AI çıktısı karar değildir; görünürlük yetki ve KVKK filtresinden geçer</h3>
+        <p class="ai-sub">Bu ekran, AI yönetim yüzeylerinin hangi rolde ne kadar görüleceğini, hangi alanların maskeleneceğini ve güvenli CSV çıktısının sınırını gösterir. Ham istem/yanıt metni açmaz, veri değiştirmez, öneri uygulamaz.</p>
+        <div class="ai-actions" style="margin-top:16px">
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_center', fallback='/admin/ai-center') }}"><i class="fa-solid fa-arrow-left"></i> AI Karar Destek Merkezi</a>
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_recommendation_priority', fallback='/admin/ai-recommendation-priority') }}"><i class="fa-solid fa-triangle-exclamation"></i> Kontrol 9 risk paneli</a>
+          {% if current_policy.can_export_safe_csv %}
+          <a class="ai-link" href="{{ safe_url_for('main.admin_ai_visibility_gate_export', fallback='/admin/ai-visibility-gate/export', **filters) }}"><i class="fa-solid fa-file-csv"></i> Güvenli CSV</a>
+          {% else %}
+          <span class="ai-badge muted"><i class="fa-solid fa-lock"></i> Export yetkisi kapalı</span>
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        <div class="ai-note">
+          <strong>Geçerli kullanıcı politikası</strong>
+          <div class="vg-contract">
+            <div class="item"><div class="k">Rol</div><div class="v">{{ current_policy.role_label }}</div></div>
+            <div class="item"><div class="k">Kapsam</div><div class="v">{{ current_policy.scope }}</div></div>
+            <div class="item"><div class="k">AI merkezi</div><div class="v">{{ 'Açık' if current_policy.can_view_ai_center else 'Kapalı' }}</div></div>
+            <div class="item"><div class="k">Güvenli export</div><div class="v">{{ 'Açık' if current_policy.can_export_safe_csv else 'Kapalı' }}</div></div>
+            <div class="item"><div class="k">Ham AI metni</div><div class="v">{{ 'Açık' if current_policy.raw_payload_visible else 'Kapalı' }}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <form class="ai-form-wrap" method="get" action="{{ safe_url_for('main.admin_ai_visibility_gate', fallback='/admin/ai-visibility-gate') }}">
+    <div class="ai-filters-wide">
+      <div class="ai-group">
+        <label>Gün aralığı</label>
+        <input class="ai-input" type="number" min="1" max="180" name="lookback_days" value="{{ lookback_days }}">
+      </div>
+      <div class="ai-group">
+        <label>Modül</label>
+        <select class="ai-select" name="module_type">
+          <option value="">Tümü</option>
+          {% for option in module_options %}
+          <option value="{{ option.value }}" {% if filters.module_type == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="ai-group">
+        <label>Rol</label>
+        <select class="ai-select" name="role_name">
+          <option value="">Tümü</option>
+          {% for option in role_options %}
+          <option value="{{ option.value }}" {% if filters.role_name == option.value %}selected{% endif %}>{{ option.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-shield-halved"></i> Görünürlüğü denetle</button>
+    </div>
+  </form>
+
+  <section class="ai-grid ai-grid-five">
+    {% for card in summary_cards %}
+    <article class="ai-card vg-card-{{ card.tone }}">
+      <div class="ai-label">{{ card.label }}</div>
+      <div class="ai-value">{{ card.value }}</div>
+      <div class="ai-mini">{{ card.mini }}</div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-panel">
+    <div class="ai-kicker">Güvenli çalışma sözleşmesi</div>
+    <h3 class="ai-title">Kontrol 10 kapısı hangi sınırları sabitler?</h3>
+    <div class="vg-contract">
+      <div class="item"><div class="k">DB yazımı</div><div class="v">{{ 'Açık' if visibility_contract.DB_WRITE_ENABLED else 'Kapalı' }}</div></div>
+      <div class="item"><div class="k">AI nihai karar</div><div class="v">{{ 'Açık' if visibility_contract.AI_FINAL_DECISION_ENABLED else 'Kapalı' }}</div></div>
+      <div class="item"><div class="k">Otomatik uygulama</div><div class="v">{{ 'Açık' if visibility_contract.AI_AUTO_APPLY_ENABLED else 'Kapalı' }}</div></div>
+      <div class="item"><div class="k">Ham payload export</div><div class="v">{{ 'Açık' if visibility_contract.RAW_AI_EXPORT_ENABLED else 'Kapalı' }}</div></div>
+      <div class="item"><div class="k">KVKK maskeleme</div><div class="v">{{ 'Zorunlu' if visibility_contract.KVKK_MASKING_REQUIRED else 'Pasif' }}</div></div>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-five">
+    {% for item in guardrails %}
+    <article class="ai-card vg-card-{{ item.tone }}">
+      <div class="ai-label">{{ item.title }}</div>
+      <div class="ai-mini" style="margin-top:8px">{{ item.body }}</div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Rol bazlı görünürlük matrisi</div>
+    <h3 class="ai-title">Kim hangi AI kapsamını görebilir?</h3>
+    <p class="ai-sub">Ham AI request/response hiçbir rolde görünmez. Rol görünürlüğü canlı modüller, güvenli export ve KVKK maskeleme sözleşmesiyle birlikte okunur.</p>
+    <table class="ai-table">
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Kapsam</th>
+          <th>AI merkezi</th>
+          <th>Export</th>
+          <th>Modüller</th>
+          <th>Not</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in role_rows %}
+        <tr>
+          <td><strong>{{ row.role_label }}</strong><div class="ai-mini">Aktif kullanıcı: {{ role_counts.get(row.role, 0) }}</div></td>
+          <td><span class="ai-badge muted">{{ row.scope }}</span><div class="ai-mini">Satır limiti {{ row.row_limit }}</div></td>
+          <td><span class="ai-badge {{ 'success' if row.can_view_ai_center else 'muted' }}">{{ 'Açık' if row.can_view_ai_center else 'Kapalı' }}</span><div class="ai-mini">Ham metin: {{ 'açık' if row.raw_payload_visible else 'kapalı' }}</div></td>
+          <td><span class="ai-badge {{ 'success' if row.can_export_safe_csv else 'muted' }}">{{ 'Güvenli CSV' if row.can_export_safe_csv else 'Kapalı' }}</span></td>
+          <td>
+            <div class="vg-chip-list">
+              {% for label in row.visible_module_labels %}<span class="vg-chip">{{ label }}</span>{% endfor %}
+              {% if not row.visible_module_labels %}<span class="vg-chip">Yönetim modülü yok</span>{% endif %}
+            </div>
+          </td>
+          <td><div class="ai-mini">{{ row.note }}</div></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Modül bazlı KVKK sinyali</div>
+      <h3 class="ai-title">Maskeleme ve görünürlük riski</h3>
+      <table class="ai-table">
+        <thead><tr><th>Modül</th><th>Risk</th><th>Sinyaller</th><th>Aksiyon</th></tr></thead>
+        <tbody>
+          {% for row in module_rows %}
+          <tr>
+            <td><strong>{{ row.module_label }}</strong><div class="ai-mini">İstek {{ row.request_total }} · Maske kuralı {{ row.active_redaction_rules }}</div></td>
+            <td>
+              <div class="vg-risk">{{ row.risk_score }}</div>
+              <div class="vg-meter"><span style="width:{{ row.risk_score }}%"></span></div>
+              <div class="ai-mini">{{ row.risk_label }}</div>
+            </td>
+            <td>
+              <div class="vg-chip-list">
+                {% for reason in row.reasons %}<span class="vg-chip">{{ reason }}</span>{% endfor %}
+              </div>
+              <div class="ai-mini">Maskeli {{ row.masked_total }} · Maskesiz {{ row.unmasked_total }} · Kullanıcıya görünür {{ row.user_visible_total }}</div>
+            </td>
+            <td><div class="ai-note">{{ row.safe_action }}</div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Menü yetki uyumu</div>
+      <h3 class="ai-title">ai_center menü anahtarı kontrolü</h3>
+      <div class="vg-mini-matrix" style="margin:14px 0">
+        <div class="box"><strong>{{ menu_permissions.override_visible }}</strong><span>Kullanıcı bazlı açık override</span></div>
+        <div class="box"><strong>{{ menu_permissions.override_hidden }}</strong><span>Kullanıcı bazlı kapalı override</span></div>
+        <div class="box"><strong>{{ role_rows|length }}</strong><span>Politika matrisi rolü</span></div>
+        <div class="box"><strong>Kapalı</strong><span>Ham AI metin kuralı</span></div>
+      </div>
+      <table class="ai-table">
+        <thead><tr><th>Rol</th><th>Politika</th><th>Ayar</th><th>Durum</th></tr></thead>
+        <tbody>
+          {% for row in menu_permissions.rows %}
+          <tr>
+            <td><strong>{{ row.role_label }}</strong></td>
+            <td>{{ 'Açık' if row.policy_visible else 'Kapalı' }}</td>
+            <td>{{ 'Tanımsız' if row.configured_visible is none else 'Açık' if row.configured_visible else 'Kapalı' }}</td>
+            <td><span class="ai-badge {{ 'success' if row.tone == 'success' else 'warning' }}">{{ row.state_label }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="ai-note" style="margin-top:14px">Tanımsız ayar doğrudan hata değildir; Kontrol 10 matrisi güvenli varsayılanı gösterir. Farklılık varsa Ayarlar/Yönetim menü yetkileriyle birlikte kontrol edilmelidir.</div>
+    </article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">KVKK örnek maskeleme</div>
+    <h3 class="ai-title">Önizleme ve exportta ham kişisel veri açılmaz</h3>
+    <table class="ai-table">
+      <thead><tr><th>Alan</th><th>Örnek değer</th><th>Güvenli görünüm</th></tr></thead>
+      <tbody>
+        {% for item in masked_examples %}
+        <tr><td><strong>{{ item.field }}</strong></td><td>{{ item.raw }}</td><td><span class="ai-badge muted">{{ item.masked }}</span></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="ai-note" style="margin-top:14px">Bu örnekler gösterim amaçlıdır; gerçek ham AI istem/yanıt alanları bu panelde okunmaz ve dışa aktarılmaz.</div>
+  </section>
+</div>
+{% endblock %}

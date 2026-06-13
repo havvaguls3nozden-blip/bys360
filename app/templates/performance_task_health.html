@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Görev Sağlık Raporu - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Görev Sağlık Raporu{% endblock %}
+{% block page_subtitle %}
+Aktif dönem için mükerrer görev, amir eşleşme farkı, açıkta kalan kapsama ve zincir kırıkları tek ekranda toplanır.
+{% endblock %}
+
+{% block content %}
+{% set summary = health_report.summary if health_report else {} %}
+{% set coverage_summary = health_report.coverage_summary if health_report else {} %}
+{% set health_summary = health_report.health_summary if health_report else {} %}
+<style>
+.health-shell{display:grid;gap:18px}
+.glass-card{background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+.panel-card{padding:22px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat-card{padding:20px;position:relative;overflow:hidden}
+.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:78px;height:78px;border-radius:50%;background:rgba(139,0,0,.06)}
+.stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}
+.stat-value{color:#111827;font-size:1.95rem;font-weight:900;line-height:1;position:relative;z-index:1}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.section-title{margin:0;color:#111827;font-size:1.06rem;font-weight:900}
+.section-sub{color:#6b7280;font-size:.9rem;line-height:1.7}
+.action-bar{display:flex;gap:10px;flex-wrap:wrap}
+.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+.btn-soft:hover{transform:translateY(-1px)}
+.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+.btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+.mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mini-card{padding:18px;border-radius:18px;background:rgba(248,250,252,.92);border:1px solid rgba(15,23,42,.06)}
+.mini-card strong{display:block;font-size:1.45rem;color:#111827}
+.mini-card span{display:block;margin-top:6px;color:#6b7280;font-size:.88rem}
+.table-wrap{width:100%;overflow-x:auto;border-radius:18px}
+.table-wrap table{width:100%;min-width:1040px;border-collapse:collapse;background:#fff}
+.table-wrap th,.table-wrap td{padding:13px 12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+.table-wrap th{background:rgba(248,250,252,.96);color:#6b7280;font-size:.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.35px}
+.table-wrap td{color:#111827;font-size:.9rem}
+.table-wrap tbody tr:hover{background:rgba(139,0,0,.02)}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap}
+.badge-soft{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:800}
+.badge-soft.danger{background:rgba(220,38,38,.10);color:#b91c1c}
+.badge-soft.warning{background:rgba(245,158,11,.14);color:#b45309}
+.badge-soft.success{background:rgba(16,185,129,.12);color:#047857}
+.empty-state{padding:24px;border-radius:18px;background:rgba(248,250,252,.94);border:1px dashed rgba(15,23,42,.10);color:#6b7280}
+.list-stack{display:grid;gap:10px}
+.list-item{padding:14px 16px;border-radius:16px;background:rgba(248,250,252,.92);border:1px solid rgba(15,23,42,.06)}
+.list-item strong{color:#111827}
+.list-item small{display:block;margin-top:4px;color:#6b7280}
+@media (max-width: 1100px){.stats-grid,.mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 720px){.stats-grid,.mini-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="health-shell">
+    <section class="glass-card panel-card">
+        <div class="section-head" style="margin-bottom:0;">
+            <div>
+                <h3 class="section-title">Rapor özeti</h3>
+                <div class="section-sub">Seçili kapsam: {{ scope_label or 'Genel görünüm' }}{% if scope_user_count %} · {{ scope_user_count }} personel{% endif %}</div>
+            </div>
+            <div class="action-bar">
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-arrow-left"></i> Görev Yönetimi</a>
+                <a class="btn-soft primary" href="{{ url_for('main.performance_task_management_health_export', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-file-csv"></i> CSV Dışa Aktar</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Personel</div><div class="stat-value">{{ summary.employee_count or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Değerlendirme</div><div class="stat-value">{{ summary.evaluation_count or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Görev</div><div class="stat-value">{{ summary.assignment_count or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Geciken Görev</div><div class="stat-value">{{ summary.overdue_count or 0 }}</div></div>
+    </div>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Kritik sağlık sinyalleri</h3>
+                <div class="section-sub">Canlıda sürpriz oluşturan dört ana alan: mükerrer seviye, amir eşleşme farkı, görevsiz değerlendirme ve değerlendirmesiz görev.</div>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="mini-card"><strong>{{ summary.duplicate_level_count or 0 }}</strong><span>Mükerrer seviye satırı</span></div>
+            <div class="mini-card"><strong>{{ summary.mismatch_count or 0 }}</strong><span>Amir eşleşme farkı</span></div>
+            <div class="mini-card"><strong>{{ summary.orphan_evaluation_count or 0 }}</strong><span>Görevsiz değerlendirme</span></div>
+            <div class="mini-card"><strong>{{ summary.orphan_assignment_count or 0 }}</strong><span>Değerlendirmesiz görev</span></div>
+            <div class="mini-card"><strong>{{ summary.delegated_count or 0 }}</strong><span>Vekâletli görev</span></div>
+            <div class="mini-card"><strong>{{ summary.uncovered_count or 0 }}</strong><span>Açıkta kalan kapsama</span></div>
+        </div>
+    </section>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Zincir ve üretim görünümü</h3>
+                <div class="section-sub">Hiyerarşi sağlığı ile son görev üretim logu aynı yerde okunur.</div>
+            </div>
+            <div class="badge-row">
+                <span class="badge-soft danger"><i class="fa-solid fa-link-slash"></i> Zincir eksiği {{ health_summary.missing_chain_count or 0 }}</span>
+                <span class="badge-soft warning"><i class="fa-solid fa-shuffle"></i> Çakışma {{ health_summary.conflict_count or 0 }}</span>
+                <span class="badge-soft success"><i class="fa-solid fa-circle-check"></i> Dengeli {{ health_summary.balanced_count or 0 }}</span>
+                <span class="badge-soft warning"><i class="fa-solid fa-user-slash"></i> Açıkta {{ coverage_summary.uncovered or 0 }}</span>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div class="mini-card"><strong>{{ coverage_summary.delegated or 0 }}</strong><span>Log içindeki vekâletli kayıt</span></div>
+            <div class="mini-card"><strong>{{ coverage_summary.chain_issue or 0 }}</strong><span>Log içindeki zincir sorunu</span></div>
+            <div class="mini-card"><strong>{{ coverage_summary.exempted or 0 }}</strong><span>Log içindeki muaf kayıt</span></div>
+        </div>
+    </section>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Mükerrer seviye satırları</h3>
+                <div class="section-sub">Aynı personelin aynı amir seviyesinde birden fazla görev satırı oluştuysa burada görünür.</div>
+            </div>
+        </div>
+        {% if health_report.duplicate_rows %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Personel</th><th>Birim</th><th>Seviye</th><th>Satır</th><th>Amirler</th><th>Kaynaklar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in health_report.duplicate_rows %}
+                    <tr>
+                        <td>{{ row.employee_name }}</td>
+                        <td>{{ row.employee_unit }}</td>
+                        <td>{{ row.manager_level }}. amir</td>
+                        <td>{{ row.row_count }}</td>
+                        <td>{{ row.evaluators|join(', ') }}</td>
+                        <td>{{ row.source_labels|join(', ') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">Mükerrer seviye satırı görünmüyor.</div>
+        {% endif %}
+    </section>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Amir eşleşme farkları</h3>
+                <div class="section-sub">Evaluation içindeki beklenen amir ile görev satırındaki fiili/orijinal amir farklıysa burada listelenir.</div>
+            </div>
+        </div>
+        {% if health_report.mismatch_rows %}
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Personel</th><th>Birim</th><th>Seviye</th><th>Beklenen</th><th>Gerçek</th><th>Durum</th></tr></thead>
+                <tbody>
+                    {% for row in health_report.mismatch_rows %}
+                    <tr>
+                        <td>{{ row.employee_name }}</td>
+                        <td>{{ row.employee_unit }}</td>
+                        <td>{{ row.manager_level }}. amir</td>
+                        <td>{{ row.expected_manager_name or '-' }}</td>
+                        <td>{{ row.actual_manager_names|join(', ') if row.actual_manager_names else '-' }}</td>
+                        <td>{{ row.reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">Beklenen amir ile görev satırı arasında fark görünmüyor.</div>
+        {% endif %}
+    </section>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Görevsiz / değerlendirmesiz kayıtlar</h3>
+                <div class="section-sub">Görev üretimi sonrası yarım kalan veri kümeleri bu bölümde tutulur.</div>
+            </div>
+        </div>
+        <div class="mini-grid">
+            <div>
+                <h4 class="section-title" style="font-size:.98rem;margin-bottom:10px;">Görevsiz değerlendirmeler</h4>
+                {% if health_report.orphan_evaluations %}
+                <div class="list-stack">
+                    {% for row in health_report.orphan_evaluations[:8] %}
+                    <div class="list-item"><strong>{{ row.employee_name }}</strong><small>{{ row.employee_unit }} · {{ row.workflow_status }}{% if row.exempted %} · Muaf{% endif %}</small></div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">Görevsiz değerlendirme görünmüyor.</div>
+                {% endif %}
+            </div>
+            <div>
+                <h4 class="section-title" style="font-size:.98rem;margin-bottom:10px;">Değerlendirmesiz görevler</h4>
+                {% if health_report.orphan_assignments %}
+                <div class="list-stack">
+                    {% for row in health_report.orphan_assignments[:8] %}
+                    <div class="list-item"><strong>{{ row.employee_name }}</strong><small>{{ row.employee_unit }} · Seviye: {{ row.manager_levels|join(', ') }} · Kaynak: {{ row.sources|join(', ') }}</small></div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">Değerlendirmesiz görev görünmüyor.</div>
+                {% endif %}
+            </div>
+            <div>
+                <h4 class="section-title" style="font-size:.98rem;margin-bottom:10px;">Görev baskısı yüksek amirler</h4>
+                {% if health_report.manager_pressure_rows %}
+                <div class="list-stack">
+                    {% for row in health_report.manager_pressure_rows[:8] %}
+                    <div class="list-item"><strong>{{ row.manager_name }}</strong><small>{{ row.manager_unit }} · Açık: {{ row.open_count }} · Geciken: {{ row.overdue_count }} · Vekâlet: {{ row.delegated_count }}</small></div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">Görev baskısı görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-card panel-card">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Zincir odak listesi</h3>
+                <div class="section-sub">Öncelikli kontrol gerektiren personeller burada öne çıkarılır.</div>
+            </div>
+        </div>
+        {% if health_summary.focus_rows %}
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Personel</th><th>1. Amir</th><th>2. Amir</th><th>3. Amir</th><th>Sorunlar</th><th>Durum</th></tr></thead>
+                <tbody>
+                    {% for row in health_summary.focus_rows %}
+                    <tr>
+                        <td>{{ row.user.full_name if row.user else '-' }}</td>
+                        <td>{{ row.manager_1_name }}</td>
+                        <td>{{ row.manager_2_name }}</td>
+                        <td>{{ row.manager_3_name }}</td>
+                        <td>{{ row.issues|join(' · ') if row.issues else (row.warnings|join(' · ') if row.warnings else '-') }}</td>
+                        <td>{{ row.status_label }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">Öncelikli zincir sorunu görünmüyor.</div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

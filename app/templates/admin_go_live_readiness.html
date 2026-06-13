@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Canlıya Hazırlık Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Canlıya Hazırlık{% endblock %}
+{% block page_title %}Kurumsal Kapanış ve Yayın Hazırlığı{% endblock %}
+{% block page_subtitle %}Güvenlik, ortam ayarı, log ve yedek görünümünü tek yerde toplayan son kontrol yüzeyi{% endblock %}
+
+{% block content %}
+<style>
+.go-shell{display:grid;gap:18px}.glass-card{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(12px)}
+.hero{padding:24px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.hero h2{margin:10px 0 8px;font-size:1.5rem;font-weight:900;color:#111827}.hero p{color:#6b7280;line-height:1.8}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;border:none;border-radius:14px;text-decoration:none;font-weight:800;cursor:pointer}.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+.side-grid{display:grid;gap:12px}.side-card{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.side-label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:6px}.side-value{font-size:1.02rem;color:#111827;font-weight:900}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.stat-card{padding:20px}.stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px}.stat-value{font-size:1.9rem;font-weight:900;color:#111827}
+.grid-two{display:grid;grid-template-columns:1fr 1fr;gap:18px}.section-card{padding:22px}.section-title{margin:0 0 8px;color:#111827;font-size:1.08rem;font-weight:900}.section-sub{color:#6b7280;font-size:.9rem;line-height:1.7}.signal-list{display:grid;gap:12px;margin-top:16px}.signal{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.signal.fail{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.signal.warn{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.signal-title{font-size:.96rem;font-weight:900;color:#111827}.signal-meta{margin-top:6px;color:#8B0000;font-size:.82rem;font-weight:800}.signal-detail{margin-top:8px;color:#4b5563;font-size:.88rem;line-height:1.7}
+.table-wrap{width:100%;overflow-x:auto;border-radius:18px;margin-top:16px}table{width:100%;min-width:780px;border-collapse:collapse;background:#fff}th,td{padding:13px 12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}th{background:rgba(248,250,252,.96);color:#6b7280;font-size:.8rem;font-weight:900;text-transform:uppercase}td{color:#111827;font-size:.9rem}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.76rem;font-weight:800}.badge.pass{background:#ecfdf5;color:#166534}.badge.warn{background:#fffbeb;color:#b45309}.badge.fail{background:#fef2f2;color:#b91c1c}
+.empty-box{padding:16px;border-radius:18px;background:rgba(15,23,42,.03);border:1px dashed rgba(15,23,42,.10);color:#6b7280;line-height:1.7}.mini-list{display:grid;gap:10px;margin-top:16px}.mini-item{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}.mini-item strong{display:block;color:#111827}.mini-item span{display:block;color:#6b7280;font-size:.85rem;line-height:1.6;margin-top:4px}
+@media (max-width:1100px){.hero,.stats-grid,.grid-two{grid-template-columns:1fr}}
+</style>
+<div class="go-shell">
+    <section class="glass-card hero">
+        <div>
+            <span class="kicker"><i class="fa-solid fa-rocket"></i> {{ rollout_decision }}</span>
+            <h2>Canlıya geçiş öncesi teknik kapanışı tek yerden görün</h2>
+            <p>Bu ekran; ortam ayarlarını, güvenlik denetimini, log üretimini ve yedek görünümünü tek karar yüzeyinde toplar. Amaç, yeni özellik açmadan önce kurumda güvenle işletilecek omurgayı son kez doğrulamaktır.</p>
+            <div class="btn-row">
+                <a class="btn-soft secondary" href="{{ url_for('main.performance_operations_center') }}"><i class="fa-solid fa-chart-line"></i> Performans operasyon merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.admin_go_live_readiness_export_json') }}"><i class="fa-solid fa-code"></i> JSON indir</a>
+                <a class="btn-soft primary" href="{{ url_for('main.admin_go_live_readiness_export_md') }}"><i class="fa-solid fa-file-lines"></i> Markdown indir</a>
+            </div>
+        </div>
+        <div class="side-grid">
+            <div class="side-card"><div class="side-label">Hazırlık skoru</div><div class="side-value">{{ readiness_score }} / 100</div></div>
+            <div class="side-card"><div class="side-label">Üretim zamanı</div><div class="side-value">{{ generated_at.strftime('%d.%m.%Y %H:%M') if generated_at else '-' }}</div></div>
+            <div class="side-card"><div class="side-label">Proje kökü</div><div class="side-value">{{ project_root }}</div></div>
+            <div class="side-card"><div class="side-label">Ayar dosyası yolu</div><div class="side-value">{{ env_path }}</div></div>
+        </div>
+    </section>
+
+    <section class="stats-grid">
+        <article class="glass-card stat-card"><div class="stat-label">Geçen kapı</div><div class="stat-value">{{ counts.pass }}</div></article>
+        <article class="glass-card stat-card"><div class="stat-label">Uyarı</div><div class="stat-value">{{ counts.warn }}</div></article>
+        <article class="glass-card stat-card"><div class="stat-label">Blokaj</div><div class="stat-value">{{ counts.fail }}</div></article>
+        <article class="glass-card stat-card"><div class="stat-label">Güvenlik kritiği</div><div class="stat-value">{{ security_report.critical_count or 0 }}</div></article>
+    </section>
+
+    <section class="glass-card section-card">
+        <h3 class="section-title">Kapanış vurguları</h3>
+        <p class="section-sub">Yönetim ve BT için son turda en fazla değer taşıyan kısa okuma alanı.</p>
+        <div class="mini-list">
+            {% for item in highlights %}
+            <div class="mini-item"><strong>{{ item.title }}</strong><span>{{ item.body }}</span></div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="grid-two">
+        <section class="glass-card section-card">
+            <h3 class="section-title">Kritik blokajlar</h3>
+            <p class="section-sub">Kapanmadan canlıya çıkmaması gereken başlıklar.</p>
+            {% if blockers %}
+            <div class="signal-list">
+                {% for row in blockers %}
+                <div class="signal fail">
+                    <div class="signal-title">{{ row.label }}</div>
+                    <div class="signal-meta">{{ row.owner }}</div>
+                    <div class="signal-detail">{{ row.detail }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box">Kritik blokaj görünmüyor.</div>
+            {% endif %}
+        </section>
+        <section class="glass-card section-card">
+            <h3 class="section-title">Kontrollü uyarılar</h3>
+            <p class="section-sub">Canlıyı durdurmasa da ilk gün kalitesini etkileyen maddeler.</p>
+            {% if warnings %}
+            <div class="signal-list">
+                {% for row in warnings %}
+                <div class="signal warn">
+                    <div class="signal-title">{{ row.label }}</div>
+                    <div class="signal-meta">{{ row.owner }}</div>
+                    <div class="signal-detail">{{ row.detail }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box">Ek uyarı görünmüyor.</div>
+            {% endif %}
+        </section>
+    </div>
+
+    <section class="glass-card section-card">
+        <h3 class="section-title">Canlıya alma kapıları</h3>
+        <p class="section-sub">Ortam, yedek, log ve güvenlik kapılarının birleşik görünümü.</p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kontrol</th>
+                        <th>Durum</th>
+                        <th>Sorumlu</th>
+                        <th>Detay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gate in gates %}
+                    <tr>
+                        <td>{{ gate.label }}</td>
+                        <td><span class="badge {{ gate.status }}">{{ 'Geçti' if gate.status == 'pass' else 'Uyarı' if gate.status == 'warn' else 'Blokaj' }}</span></td>
+                        <td>{{ gate.owner }}</td>
+                        <td>{{ gate.detail }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="grid-two">
+        <section class="glass-card section-card">
+            <h3 class="section-title">Ortam önerileri</h3>
+            <p class="section-sub">Ortam ayarlarında gözden geçirilmesi gereken öneri alanları.</p>
+            {% if env_suggestions %}
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Anahtar</th><th>Öneri</th></tr></thead>
+                    <tbody>
+                        {% for key, value in env_suggestions.items() %}
+                        <tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-box">Ek ortam önerisi görünmüyor.</div>
+            {% endif %}
+        </section>
+        <section class="glass-card section-card">
+            <h3 class="section-title">Yedek ve log özeti</h3>
+            <p class="section-sub">Son hareketi olan dosyalar burada kısa görünür.</p>
+            <div class="mini-list">
+                <div class="mini-item"><strong>Yedek kökü</strong><span>{{ backup_summary.path }}</span></div>
+                <div class="mini-item"><strong>Log kökü</strong><span>{{ log_summary.path }}</span></div>
+                <div class="mini-item"><strong>Son 14 gün yedek</strong><span>{{ backup_summary.recent_files|length }}</span></div>
+                <div class="mini-item"><strong>Son 7 gün log</strong><span>{{ log_summary.recent_files|length }}</span></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="glass-card section-card">
+        <h3 class="section-title">Güvenlik denetimi bulguları</h3>
+        <p class="section-sub">Kritik ve uyarı kayıtlarının kısa görünümü.</p>
+        {% if security_report.findings %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kategori</th>
+                        <th>Şiddet</th>
+                        <th>Başlık</th>
+                        <th>Detay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in security_report.findings[:20] %}
+                    <tr>
+                        <td>{{ item.category }}</td>
+                        <td><span class="badge {{ 'fail' if item.severity == 'critical' else 'warn' if item.severity == 'warning' else 'pass' }}">{{ item.severity }}</span></td>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.detail }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-box">Güvenlik denetimi bulgusu görünmüyor.</div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}İletişim ve Anket Yönetimi Faz 2 - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Faz 2 Yönetici Editör Merkezi{% endblock %}
+{% block page_subtitle %}Duyuru revizyonları, anket şablonları ve yayın akışları bu ekranda merkezi olarak görünür hale gelir.{% endblock %}
+{% block content %}
+<style>
+.f2-shell{display:grid;gap:18px}.f2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.f2-card,.f2-panel{background:rgba(255,255,255,.94);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}
+.f2-card{padding:22px}.f2-panel{padding:22px}.f2-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px}.f2-value{font-size:1.74rem;font-weight:900;color:#111827}
+.f2-note{margin-top:10px;color:#6b7280;font-size:.9rem;line-height:1.75}.f2-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.f2-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 15px;border-radius:14px;text-decoration:none;font-weight:800}.f2-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.f2-btn.soft{background:#fff;border:1px solid rgba(139,0,0,.14);color:#8B0000}.f2-list{display:grid;gap:12px;margin-top:14px}.f2-item{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.f2-title{font-weight:800;color:#111827}.f2-meta{margin-top:6px;color:#6b7280;font-size:.86rem;line-height:1.7}
+@media (max-width:1200px){.f2-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:720px){.f2-grid{grid-template-columns:1fr}}
+</style>
+<div class="f2-shell">
+  <div class="f2-grid">
+    <div class="f2-card"><div class="f2-label">Anket şablonları</div><div class="f2-value">{{ payload.stats.templates }}</div><div class="f2-note">Yöneticiler tekrarlanan kurum içi anketleri aynı omurgada yeniden kullanabilir.</div></div>
+    <div class="f2-card"><div class="f2-label">Duyuru revizyon kayıtları</div><div class="f2-value">{{ payload.stats.bulletin_revisions }}</div><div class="f2-note">Duyuru üzerinde yapılan tüm kurumsal değişiklikler izlenebilir hale gelir.</div></div>
+    <div class="f2-card"><div class="f2-label">Yayımdaki anketler</div><div class="f2-value">{{ payload.stats.published_surveys }}</div><div class="f2-note">Şu anda kullanıcıya açık ve yanıt bekleyen anket sayısı.</div></div>
+    <div class="f2-card"><div class="f2-label">Taslak anketler</div><div class="f2-value">{{ payload.stats.draft_surveys }}</div><div class="f2-note">Henüz yayımlanmamış, düzenleme bekleyen anket sayısı.</div></div>
+  </div>
+
+  <div class="f2-panel">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <h3 class="m-0" style="font-size:1.05rem;font-weight:900;color:#111827;">Kontrol 2 çalışma alanları</h3>
+        <p class="m-0 mt-2" style="color:#6b7280;line-height:1.8;">Bu paket, Kontrol 1 üzerine editör mantığı getirir: duyuru güncelleme, revizyon geçmişi, anket şablonları ve yönetici sonuç ekranları.</p>
+      </div>
+      <div class="f2-actions">
+        <a class="f2-btn primary" href="{{ url_for('main.communication_phase2_surveys') }}"><i class="fa-solid fa-square-poll-vertical"></i> Anket Yöneticisi</a>
+        <a class="f2-btn soft" href="{{ url_for('main.communication_phase2_survey_templates') }}"><i class="fa-solid fa-layer-group"></i> Şablon Kütüphanesi</a>
+        <a class="f2-btn soft" href="{{ url_for('main.communication_phase1_bulletins') }}"><i class="fa-solid fa-bullhorn"></i> Duyuru Merkezi</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-6">
+      <div class="f2-panel h-100">
+        <h3 class="m-0" style="font-size:1rem;font-weight:900;color:#111827;">Son anketler</h3>
+        <div class="f2-list">
+          {% for row in payload.latest_surveys %}
+          <div class="f2-item">
+            <div class="f2-title">{{ row.title }}</div>
+            <div class="f2-meta">Durum: {{ row.status }} · Tür: {{ row.survey_type }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+          </div>
+          {% else %}
+          <div class="f2-item"><div class="f2-meta">Henüz anket kaydı bulunmuyor.</div></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6">
+      <div class="f2-panel h-100">
+        <h3 class="m-0" style="font-size:1rem;font-weight:900;color:#111827;">Son revizyonlar</h3>
+        <div class="f2-list">
+          {% for row in payload.latest_revisions %}
+          <div class="f2-item">
+            <div class="f2-title">V{{ row.version_no }} · {{ row.title }}</div>
+            <div class="f2-meta">Durum: {{ row.status }} · Öncelik: {{ row.priority }} · Değişiklik notu: {{ row.change_note or '-' }}</div>
+          </div>
+          {% else %}
+          <div class="f2-item"><div class="f2-meta">Henüz revizyon kaydı bulunmuyor.</div></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

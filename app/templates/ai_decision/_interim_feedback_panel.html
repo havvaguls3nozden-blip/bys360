@@ -1,0 +1,58 @@
+{# BYS360_AI_DECISION_FAZ10_PANEL_OK #}
+{% set faz10_context = faz10_interim_feedback_context if faz10_interim_feedback_context is defined else none %}
+{% if faz10_context %}
+<section class="ai-decision-faz10-panel" aria-label="Dönem içi not karar destek özeti">
+  <div class="ai-decision-faz10-head">
+    <div>
+      <p class="ai-decision-faz10-eyebrow">Karar Destek Merkezi</p>
+      <h3>Dönem İçi Not ve Geri Bildirim Özeti</h3>
+      <p>{{ faz10_context.principle }}</p>
+    </div>
+    <span class="ai-decision-faz10-badge">Puan üretmez</span>
+  </div>
+
+  <div class="ai-decision-faz10-grid">
+    <article class="ai-decision-faz10-metric">
+      <span>Toplam ara not</span>
+      <strong>{{ faz10_context.summary.total_notes }}</strong>
+    </article>
+    <article class="ai-decision-faz10-metric">
+      <span>Olumlu kayıt</span>
+      <strong>{{ faz10_context.summary.positive_total }}</strong>
+    </article>
+    <article class="ai-decision-faz10-metric">
+      <span>Gelişim / olumsuz kayıt</span>
+      <strong>{{ faz10_context.summary.negative_total }}</strong>
+    </article>
+  </div>
+
+  <div class="ai-decision-faz10-balance ai-decision-faz10-{{ faz10_context.summary.balance_level }}">
+    {{ faz10_context.summary.balance_label }}
+  </div>
+
+  {% if faz10_context.signals %}
+  <div class="ai-decision-faz10-signals">
+    {% for signal in faz10_context.signals %}
+      <article class="ai-decision-faz10-signal ai-decision-faz10-{{ signal.severity }}">
+        <strong>{{ signal.title }}</strong>
+        <p>{{ signal.message }}</p>
+      </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if faz10_context.summary.examples %}
+  <div class="ai-decision-faz10-examples">
+    <h4>Örnek notlar</h4>
+    {% for example in faz10_context.summary.examples %}
+      <div class="ai-decision-faz10-example">
+        <span>{{ example.type }}</span>
+        <p>{{ example.text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="ai-decision-faz10-note">{{ faz10_context.safe_visibility_note }}</p>
+</section>
+{% endif %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}AI Yönetişim Ayarları - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Yönetişim Ayarları{% endblock %}
+{% block page_subtitle %}Kalite ve haftalık özet eşiklerini uygulama içinden yönetir.{% endblock %}
+{% block content %}
+<form method="post" class="glass-card p-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-3">
+    <div class="col-md-3"><label class="form-label">Modül kalite eşiği</label><input class="form-control" type="number" name="module_quality_floor" min="20" max="95" value="{{ settings.module_quality_floor or 65 }}"></div>
+    <div class="col-md-3"><label class="form-label">İstem kalite eşiği</label><input class="form-control" type="number" name="prompt_quality_floor" min="20" max="95" value="{{ settings.prompt_quality_floor or 60 }}"></div>
+    <div class="col-md-3"><label class="form-label">Backlog limiti</label><input class="form-control" type="number" name="backlog_limit" min="1" max="200" value="{{ settings.backlog_limit or 8 }}"></div>
+    <div class="col-md-3"><label class="form-label">Negatif geri bildirim limiti</label><input class="form-control" type="number" name="negative_feedback_limit" min="1" max="50" value="{{ settings.negative_feedback_limit or 3 }}"></div>
+    <div class="col-md-3"><label class="form-label">Varsayılan pencere</label><input class="form-control" type="number" name="default_lookback_days" min="1" max="180" value="{{ settings.default_lookback_days or 30 }}"></div>
+    <div class="col-md-3"><label class="form-label">Haftalık pencere</label><input class="form-control" type="number" name="weekly_lookback_days" min="1" max="60" value="{{ settings.weekly_summary.lookback_days or 7 }}"></div>
+    <div class="col-md-3"><label class="form-label">Haftalık üst limit</label><input class="form-control" type="number" name="weekly_top_limit" min="1" max="20" value="{{ settings.weekly_summary.top_limit or 5 }}"></div>
+    <div class="col-md-3 d-flex align-items-end"><button class="btn btn-catab w-100">Kaydet</button></div>
+  </div>
+  <div class="row g-3 mt-1">
+    <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="show_prompt_breakdown" id="show_prompt_breakdown" {% if settings.weekly_summary.show_prompt_breakdown %}checked{% endif %}><label class="form-check-label" for="show_prompt_breakdown">Haftalık özette istem kırılımını göster</label></div></div>
+    <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="show_module_breakdown" id="show_module_breakdown" {% if settings.weekly_summary.show_module_breakdown %}checked{% endif %}><label class="form-check-label" for="show_module_breakdown">Haftalık özette modül kırılımını göster</label></div></div>
+    <div class="col-md-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="include_actions" id="include_actions" {% if settings.weekly_summary.include_actions %}checked{% endif %}><label class="form-check-label" for="include_actions">Haftalık özette aksiyon kutusunu göster</label></div></div>
+  </div>
+</form>
+{% endblock %}

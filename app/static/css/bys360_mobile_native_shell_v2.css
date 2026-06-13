@@ -1,0 +1,268 @@
+/* BYS360_MOBILE_NATIVE_SHELL_V2_CSS
+   Faz 3 sonrası gerçek cihaz/PWA/WebView mobil deneyim düzeltmesi.
+   Amaç: tek hamburger, çalışan sol çekmece, Android hissiyatı, taşma ve stray text temizliği. */
+:root{
+  --bys360-native-v2-red:#8B0000;
+  --bys360-native-v2-red-dark:#640000;
+  --bys360-native-v2-bg:#f4f6fb;
+  --bys360-native-v2-card:#ffffff;
+  --bys360-native-v2-text:#111827;
+  --bys360-native-v2-muted:#667085;
+  --bys360-native-v2-border:rgba(15,23,42,.08);
+  --bys360-native-v2-shadow:0 18px 44px rgba(15,23,42,.16);
+  --bys360-native-v2-safe-top:env(safe-area-inset-top,0px);
+  --bys360-native-v2-safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+html.bys360-mobile-native-shell-v2,
+body.bys360-mobile-native-shell-v2{
+  width:100%;
+  max-width:100%;
+  min-width:0!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  -webkit-tap-highlight-color:rgba(139,0,0,.12);
+  background:var(--bys360-native-v2-bg)!important;
+}
+
+body.bys360-mobile-native-shell-v2 *,
+body.bys360-mobile-native-shell-v2 *::before,
+body.bys360-mobile-native-shell-v2 *::after{box-sizing:border-box;}
+
+/* Native/PWA içinde kurulum kartları ve web fazından gelen fazlalıklar gizli kalsın. */
+body.bys360-mobile-native-shell-v2 .bys360-pwa-install-card,
+body.bys360-mobile-native-shell-v2 [data-bys360-pwa-install],
+body.bys360-mobile-native-shell-v2 .pwa-install-card{display:none!important;}
+
+@media (max-width:1100px){
+  body.bys360-mobile-native-shell-v2{
+    padding-bottom:var(--bys360-native-v2-safe-bottom)!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .app-shell,
+  body.bys360-mobile-native-shell-v2 .app-main,
+  body.bys360-mobile-native-shell-v2 main,
+  body.bys360-mobile-native-shell-v2 .content-wrap,
+  body.bys360-mobile-native-shell-v2 .app-content,
+  body.bys360-mobile-native-shell-v2 .page-content,
+  body.bys360-mobile-native-shell-v2 .container,
+  body.bys360-mobile-native-shell-v2 .container-fluid{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    overflow-x:hidden!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .app-main{
+    margin-left:0!important;
+    background:linear-gradient(180deg,#ffffff 0,#f6f7fb 120px,#f4f6fb 100%)!important;
+  }
+
+  /* Android hissiyatı: üst alan tek uygulama barı gibi davransın. */
+  body.bys360-mobile-native-shell-v2 .topbar{
+    position:sticky!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    min-height:64px!important;
+    height:auto!important;
+    padding:8px 12px!important;
+    padding-top:calc(8px + var(--bys360-native-v2-safe-top))!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    z-index:2500!important;
+    background:rgba(255,255,255,.96)!important;
+    backdrop-filter:blur(16px)!important;
+    -webkit-backdrop-filter:blur(16px)!important;
+    border-bottom:1px solid var(--bys360-native-v2-border)!important;
+    box-shadow:0 8px 22px rgba(15,23,42,.06)!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .topbar-left{
+    display:flex!important;
+    align-items:center!important;
+    min-width:0!important;
+    gap:8px!important;
+    flex:1 1 auto!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .topbar-right{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    min-width:0!important;
+    flex:0 0 auto!important;
+    gap:6px!important;
+  }
+
+  /* Tek menü düğmesi: eski #menuToggle kalsın, sonradan oluşturulan ikinci buton gizlensin. */
+  body.bys360-mobile-native-shell-v2 .topbar .bys360-mobile-menu-toggle:not(#menuToggle),
+  body.bys360-mobile-native-shell-v2 .bys360-mobile-menu-toggle[data-bys360-duplicate-hidden="true"]{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 #menuToggle,
+  body.bys360-mobile-native-shell-v2 .menu-toggle#menuToggle,
+  body.bys360-mobile-native-shell-v2 .menu-toggle[data-bys360-primary-menu-toggle="true"]{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    min-height:46px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:18px!important;
+    background:linear-gradient(135deg,var(--bys360-native-v2-red),var(--bys360-native-v2-red-dark))!important;
+    color:#fff!important;
+    box-shadow:0 12px 24px rgba(139,0,0,.24)!important;
+    appearance:none!important;
+    -webkit-appearance:none!important;
+    cursor:pointer!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 #menuToggle i,
+  body.bys360-mobile-native-shell-v2 #menuToggle span{font-size:1.08rem!important;line-height:1!important;color:#fff!important;}
+
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open #menuToggle,
+  body.bys360-mobile-native-shell-v2 #menuToggle.is-active{
+    background:linear-gradient(135deg,#510000,#8B0000)!important;
+    transform:scale(.98);
+  }
+
+  body.bys360-mobile-native-shell-v2 .topbar-brand{
+    max-width:112px!important;
+    min-width:0!important;
+    flex:0 1 auto!important;
+    overflow:hidden!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .topbar-brand-logo{
+    max-width:108px!important;
+    max-height:34px!important;
+    object-fit:contain!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .page-title,
+  body.bys360-mobile-native-shell-v2 .topbar-title{
+    font-size:.98rem!important;
+    line-height:1.2!important;
+    max-width:38vw!important;
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  /* Sol şerit gerçek mobil drawer gibi çalışsın. */
+  body.bys360-mobile-native-shell-v2 .app-sidebar{
+    position:fixed!important;
+    left:0!important;
+    top:0!important;
+    bottom:0!important;
+    width:min(86vw,336px)!important;
+    max-width:336px!important;
+    height:100vh!important;
+    max-height:100vh!important;
+    padding-top:calc(8px + var(--bys360-native-v2-safe-top))!important;
+    transform:translate3d(-108%,0,0)!important;
+    transition:transform .24s cubic-bezier(.2,.8,.2,1), box-shadow .24s ease!important;
+    z-index:3200!important;
+    will-change:transform!important;
+    border-top-right-radius:24px!important;
+    border-bottom-right-radius:24px!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .app-sidebar::before,
+  body.bys360-mobile-native-shell-v2 .app-sidebar::after{
+    top:0!important;
+    height:100vh!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .app-sidebar.mobile-open,
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open .app-sidebar,
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open #appSidebar{
+    transform:translate3d(0,0,0)!important;
+    box-shadow:28px 0 58px rgba(15,23,42,.32)!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 #mobileOverlay,
+  body.bys360-mobile-native-shell-v2 .mobile-overlay,
+  body.bys360-mobile-native-shell-v2 .bys360-mobile-menu-backdrop{
+    display:block!important;
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100vh!important;
+    z-index:3000!important;
+    background:rgba(15,23,42,.42)!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    transition:opacity .22s ease!important;
+    border:0!important;
+    padding:0!important;
+    margin:0!important;
+    backdrop-filter:blur(2px)!important;
+    -webkit-backdrop-filter:blur(2px)!important;
+  }
+
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open #mobileOverlay,
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open .mobile-overlay,
+  body.bys360-mobile-native-shell-v2.bys360-mobile-menu-open .bys360-mobile-menu-backdrop{
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .content-wrap,
+  body.bys360-mobile-native-shell-v2 .page-content,
+  body.bys360-mobile-native-shell-v2 .app-content,
+  body.bys360-mobile-native-shell-v2 main{
+    padding:14px 12px calc(22px + var(--bys360-native-v2-safe-bottom))!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .card,
+  body.bys360-mobile-native-shell-v2 .glass-card,
+  body.bys360-mobile-native-shell-v2 .content-card,
+  body.bys360-mobile-native-shell-v2 .dashboard-card,
+  body.bys360-mobile-native-shell-v2 .panel,
+  body.bys360-mobile-native-shell-v2 .ai-card,
+  body.bys360-mobile-native-shell-v2 .scorecard-card{
+    border-radius:20px!important;
+    background:rgba(255,255,255,.96)!important;
+    box-shadow:0 12px 30px rgba(15,23,42,.08)!important;
+    border:1px solid rgba(15,23,42,.07)!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 input,
+  body.bys360-mobile-native-shell-v2 select,
+  body.bys360-mobile-native-shell-v2 textarea,
+  body.bys360-mobile-native-shell-v2 .form-control,
+  body.bys360-mobile-native-shell-v2 .form-select{
+    font-size:16px!important;
+    min-height:48px!important;
+    border-radius:16px!important;
+  }
+
+  body.bys360-mobile-native-shell-v2 .btn,
+  body.bys360-mobile-native-shell-v2 button,
+  body.bys360-mobile-native-shell-v2 [role="button"]{
+    min-height:44px;
+    border-radius:15px;
+    touch-action:manipulation;
+  }
+
+  body.bys360-mobile-native-shell-v2 .quick-link{display:none!important;}
+  body.bys360-mobile-native-shell-v2 .user-meta{display:none!important;}
+
+  /* Sayfa altında görünen bozuk metin varsa görünmez kalsın; JS ayrıca metin düğümünü kaldırır. */
+  body.bys360-mobile-native-shell-v2 .bys360-stray-markup-artifact{display:none!important;}
+}

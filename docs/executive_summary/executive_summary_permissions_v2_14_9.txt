@@ -1,0 +1,12 @@
+BYS360 Yönetici Özeti Modülü Yetki Kodları V2.14.9
+
+executive_summary.view        Yönetici Özeti ana modülü görüntüleme
+executive_summary.dashboard   Yönetici Paneli
+executive_summary.emails      Otomatik E-Postalar
+executive_summary.logs        Mail Logları
+executive_summary.jobs        Zamanlanmış İşler
+executive_summary.test        Test Gönderimi
+executive_summary.admin       Tam yönetim
+
+Not:
+Bu dosya referans amaçlıdır. Canlı rol matrisi mevcut BYS360 Ayarlar / Yetki ekranından yönetilmelidir.

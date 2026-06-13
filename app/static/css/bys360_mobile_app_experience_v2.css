@@ -1,0 +1,185 @@
+/* BYS360_MOBILE_APP_EXPERIENCE_V2
+   Performans ekranları için mobil app görünümü: puanlama, karne, Başkan onayı, süreç/puan geçmişi.
+   V1 genel mobil omurganın üstüne çalışır.
+*/
+:root{
+  --bys360-v2-red:#8B0000;
+  --bys360-v2-red-soft:rgba(139,0,0,.08);
+  --bys360-v2-bg:#f5f6fa;
+  --bys360-v2-card:#fff;
+  --bys360-v2-text:#111827;
+  --bys360-v2-muted:#667085;
+  --bys360-v2-border:rgba(15,23,42,.10);
+  --bys360-v2-shadow:0 14px 34px rgba(15,23,42,.08);
+  --bys360-v2-radius:24px;
+}
+
+@media (max-width:900px){
+  body.bys360-performance-mobile-v2,
+  body.bys360-score-mobile-v2,
+  body.bys360-scorecard-mobile-v2,
+  body.bys360-approval-mobile-v2{ background:var(--bys360-v2-bg)!important; }
+
+  body.bys360-performance-mobile-v2 .content-wrap,
+  body.bys360-score-mobile-v2 .content-wrap,
+  body.bys360-scorecard-mobile-v2 .content-wrap,
+  body.bys360-approval-mobile-v2 .content-wrap{ padding:10px 10px 86px!important; }
+
+  /* Üst başlık alanı mobilde app ekran başlığı gibi sıkılaşır */
+  body.bys360-performance-mobile-v2 .page-header,
+  body.bys360-performance-mobile-v2 .page-hero,
+  body.bys360-performance-mobile-v2 .performance-hero,
+  body.bys360-score-mobile-v2 .page-header,
+  body.bys360-score-mobile-v2 .page-hero,
+  body.bys360-scorecard-mobile-v2 .scorecard-hero,
+  body.bys360-approval-mobile-v2 .approval-hero{
+    position:relative!important;
+    border-radius:28px!important;
+    padding:16px!important;
+    background:linear-gradient(145deg,#fff,rgba(139,0,0,.045))!important;
+    border:1px solid var(--bys360-v2-border)!important;
+    box-shadow:var(--bys360-v2-shadow)!important;
+    overflow:hidden!important;
+  }
+
+  body.bys360-performance-mobile-v2 .page-header::before,
+  body.bys360-performance-mobile-v2 .page-hero::before,
+  body.bys360-performance-mobile-v2 .performance-hero::before,
+  body.bys360-scorecard-mobile-v2 .scorecard-hero::before,
+  body.bys360-approval-mobile-v2 .approval-hero::before{
+    content:""; position:absolute; inset:auto -30px -42px auto; width:150px; height:150px;
+    background:radial-gradient(circle,rgba(139,0,0,.13),rgba(139,0,0,0) 68%); pointer-events:none;
+  }
+
+  /* Mobil bölüm menüsü */
+  .bys360-mobile-section-nav-v2{
+    display:flex; gap:8px; overflow-x:auto; padding:4px 0 12px; margin:0 0 4px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .bys360-mobile-section-nav-v2::-webkit-scrollbar{display:none;}
+  .bys360-mobile-section-nav-v2 a{
+    flex:0 0 auto; min-height:38px; display:inline-flex; align-items:center; justify-content:center;
+    padding:8px 12px; border-radius:999px; background:#fff; border:1px solid var(--bys360-v2-border);
+    color:#344054; font-weight:900; font-size:.80rem; text-decoration:none!important;
+    box-shadow:0 8px 18px rgba(15,23,42,.045);
+  }
+  .bys360-mobile-section-nav-v2 a.is-active{ background:var(--bys360-v2-red)!important; color:#fff!important; }
+
+  /* Puanlama kriterleri */
+  .bys360-mobile-score-item-v2,
+  .criterion-row,.criteria-row,.evaluation-item,.scoring-item,.score-item,
+  tr.bys360-mobile-score-row-v2{
+    border-radius:24px!important; background:#fff!important; border:1px solid var(--bys360-v2-border)!important;
+    box-shadow:var(--bys360-v2-shadow)!important; padding:14px!important; margin-bottom:12px!important;
+  }
+  .bys360-mobile-score-item-v2 .bys360-mobile-score-title-v2,
+  .criterion-title,.criteria-title,.evaluation-title,.score-item-title{
+    font-weight:950!important; color:var(--bys360-v2-text)!important; font-size:1rem!important; line-height:1.28!important;
+  }
+  .bys360-mobile-score-item-v2 .bys360-mobile-score-help-v2,
+  .criterion-desc,.criteria-desc,.evaluation-desc{ color:var(--bys360-v2-muted)!important; font-size:.86rem!important; line-height:1.45!important; }
+
+  .bys360-mobile-rating-strip-v2,
+  .score-inputs,.rating-group,.puanlama-grubu,.rating-options,
+  .bys360-mobile-score-item-v2 .btn-group{
+    display:grid!important; grid-template-columns:repeat(5,minmax(0,1fr))!important; gap:7px!important; width:100%!important; margin-top:10px!important;
+  }
+  .bys360-mobile-rating-strip-v2 label,
+  .bys360-mobile-rating-strip-v2 .btn,
+  .score-inputs label,.rating-group label,.puanlama-grubu label,.rating-options label,
+  .score-inputs .btn,.rating-group .btn,.puanlama-grubu .btn,.rating-options .btn{
+    min-height:48px!important; border-radius:16px!important; font-weight:950!important; font-size:.96rem!important;
+    display:flex!important; align-items:center!important; justify-content:center!important; padding:0!important;
+    border:1px solid rgba(139,0,0,.18)!important; background:#fff!important; color:#344054!important;
+  }
+  .bys360-mobile-rating-strip-v2 input:checked + label,
+  .score-inputs input:checked + label,.rating-group input:checked + label,.puanlama-grubu input:checked + label,.rating-options input:checked + label,
+  .btn-check:checked + .btn{
+    background:var(--bys360-v2-red)!important; color:#fff!important; border-color:var(--bys360-v2-red)!important;
+    box-shadow:0 10px 22px rgba(139,0,0,.20)!important;
+  }
+
+  /* Karne / Başkan onayı özet kartları */
+  .bys360-mobile-scorecard-stack-v2,
+  .scorecard-summary,.approval-summary,.score-summary,.performance-summary,
+  .scorecard-grid,.approval-grid,.metric-grid,.stats-grid{
+    display:grid!important; grid-template-columns:1fr!important; gap:10px!important;
+  }
+  .final-score,.score-value,.score-number,.metric-value,.stat-value,
+  [class*="score"] .display-1,[class*="puan"] .display-1{
+    font-size:clamp(2.15rem,15vw,4rem)!important; line-height:.95!important; letter-spacing:-.055em!important;
+  }
+  .bys360-mobile-kpi-v2,.metric-card,.stat-card,.summary-card,.score-card,.score-tile,.approval-card,.scorecard-card{
+    border-radius:24px!important; border:1px solid var(--bys360-v2-border)!important; background:#fff!important;
+    box-shadow:var(--bys360-v2-shadow)!important; padding:14px!important;
+  }
+  .bys360-mobile-kpi-v2 small,.metric-card small,.stat-card small,.summary-card small{ color:var(--bys360-v2-muted)!important; font-weight:800!important; }
+
+  /* Süreç geçmişi mobil zaman çizgisi */
+  .process-history,.score-history,.approval-history,.timeline,.audit-timeline{
+    position:relative!important; display:grid!important; gap:10px!important; padding-left:0!important;
+  }
+  .process-history .timeline-item,.score-history .timeline-item,.approval-history .timeline-item,
+  .process-item,.history-item,.approval-history-item,.audit-item{
+    position:relative!important; border-radius:22px!important; border:1px solid var(--bys360-v2-border)!important;
+    background:#fff!important; padding:13px 13px 13px 42px!important; box-shadow:0 10px 24px rgba(15,23,42,.055)!important;
+  }
+  .process-history .timeline-item::before,.score-history .timeline-item::before,.approval-history .timeline-item::before,
+  .process-item::before,.history-item::before,.approval-history-item::before,.audit-item::before{
+    content:""; position:absolute; left:15px; top:17px; width:12px; height:12px; border-radius:999px;
+    background:var(--bys360-v2-red); box-shadow:0 0 0 5px rgba(139,0,0,.10);
+  }
+
+  /* Başkan onayı / yayın / puanlama aksiyonları alt sabit bar */
+  .approval-actions,.score-submit-bar,.publish-actions,.sticky-actions,.form-actions,
+  .bys360-mobile-actionbar-v2{
+    position:sticky!important; bottom:0!important; z-index:60!important; margin:12px -10px -10px!important;
+    padding:10px 10px calc(10px + env(safe-area-inset-bottom))!important;
+    background:rgba(245,246,250,.94)!important; backdrop-filter:blur(16px)!important;
+    border-top:1px solid rgba(15,23,42,.09)!important;
+    display:grid!important; grid-template-columns:1fr!important; gap:8px!important;
+  }
+  .approval-actions .btn,.score-submit-bar .btn,.publish-actions .btn,.sticky-actions .btn,.form-actions .btn,
+  .bys360-mobile-actionbar-v2 .btn{ width:100%!important; min-height:48px!important; border-radius:16px!important; font-weight:900!important; }
+
+  /* Geniş tablolar: performans ekranlarında kart görünümüne zorla */
+  body.bys360-performance-mobile-v2 table.bys360-mobile-v2-card-table,
+  body.bys360-score-mobile-v2 table.bys360-mobile-v2-card-table,
+  body.bys360-scorecard-mobile-v2 table.bys360-mobile-v2-card-table,
+  body.bys360-approval-mobile-v2 table.bys360-mobile-v2-card-table{ min-width:0!important; width:100%!important; border-collapse:separate!important; border-spacing:0 10px!important; }
+  table.bys360-mobile-v2-card-table thead{ display:none!important; }
+  table.bys360-mobile-v2-card-table tbody, table.bys360-mobile-v2-card-table tr, table.bys360-mobile-v2-card-table td{ display:block!important; width:100%!important; }
+  table.bys360-mobile-v2-card-table tr{
+    border-radius:22px!important; background:#fff!important; border:1px solid var(--bys360-v2-border)!important;
+    box-shadow:0 10px 24px rgba(15,23,42,.055)!important; padding:12px!important; margin-bottom:10px!important;
+  }
+  table.bys360-mobile-v2-card-table td{
+    border:0!important; border-bottom:1px dashed rgba(15,23,42,.10)!important; padding:9px 0!important;
+    display:flex!important; justify-content:space-between!important; gap:14px!important; text-align:right!important;
+  }
+  table.bys360-mobile-v2-card-table td:last-child{ border-bottom:0!important; }
+  table.bys360-mobile-v2-card-table td::before{
+    content:attr(data-label); color:#475467; font-weight:950; text-align:left; min-width:42%; padding-right:8px;
+  }
+
+  /* Form okunabilirliği */
+  .bys360-mobile-performance-form-v2 textarea,
+  textarea[name*="comment"], textarea[name*="aciklama"], textarea[name*="gorus"], textarea[name*="reason"]{
+    min-height:132px!important; border-radius:20px!important; line-height:1.55!important;
+  }
+  .bys360-mobile-performance-form-v2 .form-label,
+  .bys360-mobile-performance-form-v2 label{ font-weight:850!important; color:#344054!important; }
+  .bys360-mobile-performance-form-v2 .form-text{ font-size:.82rem!important; color:var(--bys360-v2-muted)!important; }
+}
+
+@media (max-width:520px){
+  .bys360-mobile-rating-strip-v2,
+  .score-inputs,.rating-group,.puanlama-grubu,.rating-options,
+  .bys360-mobile-score-item-v2 .btn-group{ gap:5px!important; }
+  .bys360-mobile-rating-strip-v2 label,
+  .bys360-mobile-rating-strip-v2 .btn,
+  .score-inputs label,.rating-group label,.puanlama-grubu label,.rating-options label,
+  .score-inputs .btn,.rating-group .btn,.puanlama-grubu .btn,.rating-options .btn{ min-height:44px!important; font-size:.88rem!important; }
+  table.bys360-mobile-v2-card-table td{ flex-direction:column!important; align-items:flex-start!important; text-align:left!important; gap:4px!important; }
+  table.bys360-mobile-v2-card-table td::before{ min-width:0; }
+}

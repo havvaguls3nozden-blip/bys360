@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+
+{% block title %}Dönem Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Dönem Düzenle{% endblock %}
+{% block page_subtitle %}
+Seçili performans döneminin temel bilgilerini güncelleyin. Tarih, tür ve açıklama bilgilerini dikkatle düzenleyin.
+{% endblock %}
+
+{% block content %}
+<style>
+    .period-form-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .glass-card.watermark-card::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        background-image:url("{{ url_for('static', filename='img/ay_yildiz.svg') }}");
+        background-repeat:no-repeat;
+        background-position:right 24px bottom 22px;
+        background-size:170px auto;
+        pointer-events:none;
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-card{
+        display:grid;
+        grid-template-columns:120px 1fr;
+        gap:18px;
+        align-items:center;
+    }
+
+    .hero-logo-wrap{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .hero-logo{
+        width:96px;
+        height:96px;
+        object-fit:contain;
+        filter:drop-shadow(0 10px 18px rgba(0,0,0,.10));
+    }
+
+    .hero-title{
+        font-size:1.16rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.35;
+        margin-bottom:4px;
+    }
+
+    .hero-sub{
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+    }
+
+    .status-grid{
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0,1fr));
+        gap:14px;
+    }
+
+    .status-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .status-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .status-value{
+        color:#111827;
+        font-size:.96rem;
+        font-weight:900;
+        line-height:1.5;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534;}
+    .pill.inactive{background:rgba(107,114,128,.12);color:#374151;}
+    .pill.locked{background:rgba(180,83,9,.10);color:#92400e;}
+    .pill.unlocked{background:rgba(29,78,216,.10);color:#1d4ed8;}
+    .pill.published{background:rgba(139,0,0,.10);color:#8B0000;}
+    .pill.unpublished{background:rgba(107,114,128,.12);color:#374151;}
+
+    .form-grid{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:16px;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group.full{
+        grid-column:1 / -1;
+    }
+
+    .form-group label{
+        color:#374151;
+        font-size:.9rem;
+        font-weight:800;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea{
+        width:100%;
+        min-height:50px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:12px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        transition:all .18s ease;
+    }
+
+    .form-textarea{
+        min-height:140px;
+        resize:vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .helper-grid{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:14px;
+    }
+
+    .settings-shell{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:16px;
+        margin-top:18px;
+        padding-top:18px;
+        border-top:1px solid rgba(15,23,42,.08);
+    }
+
+    .settings-card{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:20px;
+        padding:16px;
+    }
+
+    .settings-card h4{
+        margin:0 0 12px;
+        color:#111827;
+        font-size:.96rem;
+        font-weight:900;
+    }
+
+    .settings-card p{
+        margin:0 0 14px;
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.75;
+    }
+
+    .toggle-stack{
+        display:grid;
+        gap:10px;
+    }
+
+    .toggle-row{
+        display:flex;
+        align-items:flex-start;
+        gap:10px;
+        padding:12px 14px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        color:#374151;
+        line-height:1.6;
+    }
+
+    .toggle-row input{
+        width:18px;
+        height:18px;
+        min-height:auto;
+        margin-top:2px;
+    }
+
+    .helper-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .ai-form-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:16px;}
+    .ai-form-card{position:relative;overflow:hidden;border:1px solid rgba(139,0,0,.10);border-radius:24px;background:rgba(255,255,255,.90);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:20px;}
+    .ai-form-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96));}
+    .ai-form-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96));}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800;margin-bottom:12px;}
+    .ai-title{font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:6px;}
+    .ai-text{color:#6b7280;line-height:1.8;font-size:.9rem;}
+    .ai-bullets{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none;}
+    .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem;}
+    .ai-bullets i{color:#8B0000;margin-top:4px;}
+    .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+    .ai-action{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;}
+    .ai-action-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+    .ai-action-value{font-size:1.35rem;font-weight:900;color:#111827;}
+    .ai-action.tone-critical .ai-action-value{color:#b91c1c;}
+    .ai-action.tone-watch .ai-action-value{color:#b45309;}
+
+    .helper-title{
+        color:#111827;
+        font-size:.88rem;
+        font-weight:900;
+        margin-bottom:8px;
+    }
+
+    .helper-text{
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.75;
+    }
+
+    .action-bar{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 18px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    @media (max-width:1100px){
+        .hero-card{
+            grid-template-columns:1fr;
+            text-align:center;
+        }
+
+        .hero-logo-wrap{
+            justify-content:center;
+        }
+
+        .status-grid,
+        .form-grid,
+        .helper-grid,
+        .settings-shell{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="period-form-shell">
+    <div class="glass-card watermark-card">
+        <div class="panel-card hero-card">
+            <div class="hero-logo-wrap">
+                <img src="{{ url_for('static', filename='img/catab_logo.png') }}"
+                     alt="ÇATAB Logo"
+                     class="hero-logo"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+            </div>
+            <div>
+                <div class="hero-title">Performans Dönemini Düzenle</div>
+                <div class="hero-sub">
+                    Seçili dönemin temel bilgilerini güncelliyorsunuz. Aktiflik, kilit ve yayın yönetimi dönem listesi ekranından kontrol edilir.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-grid">
+        <div class="glass-card panel-card">
+            <div class="status-box">
+                <div class="status-label">Aktiflik Durumu</div>
+                <div class="status-value">
+                    {% if period.is_active %}
+                        <span class="pill active"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                    {% else %}
+                        <span class="pill inactive"><i class="fa-solid fa-circle"></i> Pasif</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <div class="status-box">
+                <div class="status-label">Yayın Durumu</div>
+                <div class="status-value">
+                    {% if period.results_published %}
+                        <span class="pill published"><i class="fa-solid fa-bullhorn"></i> Yayında</span>
+                    {% else %}
+                        <span class="pill unpublished"><i class="fa-solid fa-eye-slash"></i> Yayında Değil</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <div class="status-box">
+                <div class="status-label">Kilit Durumu</div>
+                <div class="status-value">
+                    {% if period.is_locked %}
+                        <span class="pill locked"><i class="fa-solid fa-lock"></i> Kilitli</span>
+                    {% else %}
+                        <span class="pill unlocked"><i class="fa-solid fa-lock-open"></i> Kilitsiz</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <div class="status-box">
+                <div class="status-label">Dönem ID</div>
+                <div class="status-value">#{{ period.id }}</div>
+            </div>
+        </div>
+    </div>
+
+    {% if ai_period_form_panel %}
+    <div class="ai-form-grid">
+        <div class="ai-form-card tone-{{ ai_period_form_panel.tone }}">
+            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_period_form_panel.badge }}</div>
+            <div class="ai-title">{{ ai_period_form_panel.headline }}</div>
+            <div class="ai-text">{{ ai_period_form_panel.summary }}</div>
+            <ul class="ai-bullets">
+                {% for bullet in ai_period_form_panel.bullets %}
+                <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="ai-form-card">
+            <div class="ai-kicker"><i class="fa-solid fa-sliders"></i> AI yapılandırma sinyalleri</div>
+            <div class="ai-action-grid">
+                {% for item in ai_period_form_panel.actions %}
+                <div class="ai-action tone-{{ item.tone }}">
+                    <div class="ai-action-label">{{ item.label }}</div>
+                    <div class="ai-action-value">{{ item.value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        <form method="POST" action="{{ url_for('main.performance_period_edit', period_id=period.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Dönem Başlığı</label>
+                    <input type="text" name="title" class="form-input" value="{{ period.title or '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Dönem Türü</label>
+                    <select name="period_type" class="form-select" required>
+                        <option value="">Seçiniz</option>
+                        <option value="Aylık" {% if period.period_type == 'Aylık' %}selected{% endif %}>Aylık</option>
+                        <option value="3 Aylık" {% if period.period_type == '3 Aylık' %}selected{% endif %}>3 Aylık</option>
+                        <option value="6 Aylık" {% if period.period_type == '6 Aylık' %}selected{% endif %}>6 Aylık</option>
+                        <option value="Yıllık" {% if period.period_type == 'Yıllık' %}selected{% endif %}>Yıllık</option>
+                        <option value="Özel Dönem" {% if period.period_type in ['Özel Dönem', 'Özel'] %}selected{% endif %}>Özel Dönem</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Başlangıç Tarihi</label>
+                    <input type="date" name="start_date" class="form-input" value="{{ period.start_date.strftime('%Y-%m-%d') if period.start_date else '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Bitiş Tarihi</label>
+                    <input type="date" name="end_date" class="form-input" value="{{ period.end_date.strftime('%Y-%m-%d') if period.end_date else '' }}" required>
+                </div>
+
+                <div class="form-group full">
+                    <label>Açıklama</label>
+                    <textarea name="description" class="form-textarea" placeholder="Döneme ilişkin açıklama, kapsam veya not bilgisi yazabilirsiniz.">{{ period.description or '' }}</textarea>
+                </div>
+
+                {# BYS360_PHASE8_3_SPECIAL_SCENARIO_FIELDS_START #}
+                <div class="form-group full bys360-phase8-special-scenario-field">
+                    <label>Özel Dönem Senaryosu</label>
+                    <select name="special_scenario_type" class="form-select">
+                        <option value="" {% if not period.special_scenario_type %}selected{% endif %}>Senaryo seçmeyin</option>
+                        <option value="security_personnel" {% if period.special_scenario_type == 'security_personnel' %}selected{% endif %}>Güvenlik personeli özel dönemi</option>
+                        <option value="cleaning_personnel" {% if period.special_scenario_type == 'cleaning_personnel' %}selected{% endif %}>Temizlik personeli özel dönemi</option>
+                        <option value="probation_personnel" {% if period.special_scenario_type == 'probation_personnel' %}selected{% endif %}>Deneme süreli personel dönemi</option>
+                        <option value="leaving_personnel" {% if period.special_scenario_type == 'leaving_personnel' %}selected{% endif %}>Ayrılacak personel değerlendirmesi</option>
+                        <option value="unit_special" {% if period.special_scenario_type == 'unit_special' %}selected{% endif %}>Birime özel dönem</option>
+                        <option value="selected_personnel_special" {% if period.special_scenario_type == 'selected_personnel_special' %}selected{% endif %}>Seçili personele özel dönem</option>
+                    </select>
+                    <small class="form-help">Senaryo seçildiğinde dönem türü “Özel Dönem” mantığında değerlendirilir; görev üretiminde kapsam filtresi Kontrol 8.4 ile kesin bağlanacaktır.</small>
+                </div>
+                {# BYS360_PHASE8_3_SPECIAL_SCENARIO_FIELDS_END #}
+
+                {# BYS360_PHASE8_2_PERIOD_SCOPE_FIELDS_START #}
+                <div class="form-group">
+                    <label>Dönem Kapsamı</label>
+                    <select name="scope_type" class="form-select">
+                        <option value="all" {% if period.scope_type in [none, '', 'all'] %}selected{% endif %}>Tüm Kurum</option>
+                        <option value="unit" {% if period.scope_type == 'unit' %}selected{% endif %}>Birim</option>
+                        <option value="upper_unit" {% if period.scope_type == 'upper_unit' %}selected{% endif %}>Üst Birim</option>
+                        <option value="category" {% if period.scope_type == 'category' %}selected{% endif %}>Kategori</option>
+                        <option value="selected_personnel" {% if period.scope_type == 'selected_personnel' %}selected{% endif %}>Seçili Personel</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Birim / Üst Birim Adı</label>
+                    <input type="text" name="scope_unit_label" class="form-input" value="{{ period.scope_unit_label or '' }}" placeholder="Örn: Personel ve Destek Hizmetleri Grup Başkanlığı">
+                    <small class="form-help">Birim veya Üst Birim kapsamı seçildiğinde kullanılır.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Personel Kategorisi</label>
+                    <select name="scope_category_label" class="form-select">
+                        <option value="" {% if not period.scope_category_label %}selected{% endif %}>Kategori seçmeyin</option>
+                        <option value="Güvenlik" {% if period.scope_category_label == 'Güvenlik' %}selected{% endif %}>Güvenlik</option>
+                        <option value="Temizlik" {% if period.scope_category_label == 'Temizlik' %}selected{% endif %}>Temizlik</option>
+                        <option value="İdari Personel" {% if period.scope_category_label == 'İdari Personel' %}selected{% endif %}>İdari Personel</option>
+                        <option value="Teknik Personel" {% if period.scope_category_label == 'Teknik Personel' %}selected{% endif %}>Teknik Personel</option>
+                        <option value="Deneme Süreli Personel" {% if period.scope_category_label == 'Deneme Süreli Personel' %}selected{% endif %}>Deneme Süreli Personel</option>
+                        <option value="Ayrılacak Personel" {% if period.scope_category_label == 'Ayrılacak Personel' %}selected{% endif %}>Ayrılacak Personel</option>
+                        <option value="Diğer" {% if period.scope_category_label == 'Diğer' %}selected{% endif %}>Diğer</option>
+                    </select>
+                </div>
+
+                <div class="form-group full">
+                    <label>Seçili Personel / Sicil Listesi</label>
+                    <textarea name="scope_personnel_filter" class="form-textarea" placeholder="Seçili personel dönemi için sicil numaralarını virgül veya satır bazında yazabilirsiniz.">{{ period.scope_personnel_filter or '' }}</textarea>
+                    <small class="form-help">Seçili Personel kapsamında yalnızca bu listede yer alan personele görev üretimi Kontrol 8.4 ile bağlanacaktır.</small>
+                </div>
+                {# BYS360_PHASE8_2_PERIOD_SCOPE_FIELDS_END #}
+            </div>
+
+            <div class="settings-shell">
+                <div class="settings-card">
+                    <!-- BYS360_SCORING_AFTER_PERIOD_END_EDIT_TEMPLATE_V1_2 -->
+                    <h4>Puanlama takvimi</h4>
+                    <p>Puanlama penceresi dönem bittikten sonra başlar. Dönem içinde puanlama açılmaz; boş bırakılırsa bitiş tarihinden sonraki gün esas alınır.</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Puanlama Başlangıç Tarihi</label>
+                            <input type="date" name="evaluation_start_date" class="form-input" value="{{ period.evaluation_window_start.strftime('%Y-%m-%d') if period.evaluation_window_start else '' }}">
+                            <small class="form-help">Dönem içinde puanlama başlatılmaz. Tarih, dönem bitişinden sonra olmalıdır.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Puanlama Bitiş Tarihi</label>
+                            <input type="date" name="evaluation_end_date" class="form-input" value="{{ period.evaluation_window_end.strftime('%Y-%m-%d') if period.evaluation_window_end else '' }}">
+                            <small class="form-help">Boş bırakılırsa puanlama başlangıç günü esas alınır.</small>
+                        </div>
+                        <div class="form-group full">
+                            <label>Görev Başına Tamamlama Süresi (Gün)</label>
+                            <input type="number" min="1" step="1" name="evaluation_due_days" class="form-input" value="{{ period.evaluation_due_days if period.evaluation_due_days is not none else '' }}" placeholder="Boş bırakılırsa son tarih puanlama bitiş günü olur.">
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h4>Muafiyet ve fiili gün kuralları</h4>
+                    <p>Bu alanlar izin ve devamsızlık omurgasının performans görev üretimini nasıl etkileyeceğini belirler.</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Asgari fiili çalışma günü</label>
+                            <input type="number" step="0.5" min="0" name="minimum_presence_days_for_evaluation" class="form-input" value="{{ period.minimum_presence_days_for_evaluation or 0 }}" placeholder="0 = kapalı">
+                        </div>
+                        <div class="form-group">
+                            <label>İzin muafiyet eşiği</label>
+                            <input type="number" step="0.5" min="0" name="leave_skip_threshold_days" class="form-input" value="{{ period.leave_skip_threshold_days if period.leave_skip_threshold_days is not none else '' }}" placeholder="Boş = kapalı">
+                        </div>
+                        <div class="form-group full">
+                            <label>Devamsızlık muafiyet eşiği</label>
+                            <input type="number" step="0.5" min="0" name="absence_skip_threshold_days" class="form-input" value="{{ period.absence_skip_threshold_days if period.absence_skip_threshold_days is not none else '' }}" placeholder="Boş = kapalı">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h4>Canlı akış davranışı</h4>
+                    <p>Görev üretimi ve değerlendirme zinciri için otomatik muafiyet ve vekâlet zorunluluğu burada tanımlanır.</p>
+                    <div class="toggle-stack">
+                        <label class="toggle-row">
+                            <input type="checkbox" name="auto_skip_if_fully_absent" {% if period.auto_skip_if_fully_absent %}checked{% endif %}>
+                            <span>Dönemin tamamı izin/devamsızlık ise personeli otomatik muaf yap</span>
+                        </label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="manager_delegation_required" {% if period.manager_delegation_required %}checked{% endif %}>
+                            <span>Yönetici görevi bloke eden onaylı izinlerde aktif ya da aynı anda tanımlanmış vekâleti zorunlu kıl</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-top:18px;">
+                <a href="{{ url_for('main.performance_periods') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Dönemlere Dön
+                </a>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Değişiklikleri Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="helper-grid">
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Aktif Dönem Kuralı</div>
+                <div class="helper-text">
+                    Aynı anda tek aktif dönem olmalıdır. Aktiflik değişikliği dönem listesi ekranından yapılır.
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Kilit Etkisi</div>
+                <div class="helper-text">
+                    Kilitli dönemde değerlendirme değişikliği yapılamaz. Bu yüzden tarih ve açıklama güncellemelerini kontrollü yapın.
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Yayın Notu</div>
+                <div class="helper-text">
+                    Sonuçlar yayımlanmadan personel not karnesi ekranında görünmez. Yayın durumu yine dönem listesi ekranından yönetilir.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

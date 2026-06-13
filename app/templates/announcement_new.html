@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+
+{% block title %}Duyuru Gönder - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Duyuru Gönder{% endblock %}
+{% block page_subtitle %}
+Kurumsal duyuruları hedef kitleye düzenli ve güvenli şekilde iletin.
+{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+    .ann-shell{
+        display:grid;
+        gap:18px;
+    }
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.16rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .hero-text{
+        margin:8px 0 0;
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+    }
+
+    .form-grid{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .field.full{
+        grid-column:1 / -1;
+    }
+
+    .field label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-textarea{
+        min-height:220px;
+        resize:vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .help-box{
+        border:1px solid rgba(139,0,0,.10);
+        background:rgba(139,0,0,.04);
+        color:#6b7280;
+        border-radius:18px;
+        padding:14px 16px;
+        line-height:1.8;
+        font-size:.86rem;
+    }
+
+    .micro-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800;margin-top:8px}
+    .tone-pill{display:inline-flex;align-items:center;justify-content:center;min-height:26px;padding:0 10px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.74rem;font-weight:900}
+    .tone-pill.warn{background:rgba(202,138,4,.15);color:#a16207}
+    .tone-pill.risk{background:rgba(153,27,27,.12);color:#991b1b}
+    .target-search{min-height:44px;border-radius:12px;border:1px solid rgba(15,23,42,.08);padding:0 14px;background:#fff;width:100%}
+    .selection-summary{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .selection-pill{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.74rem;font-weight:900}
+    .mobile-action-bar{display:none}
+
+    .btn-line{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .target-tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.preview-box{
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:18px;
+        padding:18px;
+        min-height:160px;
+    }
+
+    .preview-title{
+        margin:0 0 8px;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .preview-body{
+        margin:0;
+        color:#6b7280;
+        line-height:1.8;
+        white-space:pre-wrap;
+    }
+
+    @media (max-width:900px){
+        .form-grid{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media (max-width:768px){
+        .btn-soft{
+            width:100%;
+        }
+
+        .btn-line{
+            flex-direction:column-reverse;
+            align-items:stretch;
+        }
+
+        .mobile-action-bar{display:flex;position:sticky;bottom:0;z-index:7;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-radius:18px;background:rgba(17,24,39,.92);color:#fff;backdrop-filter:blur(12px)}
+        .mobile-action-bar .btn-soft{width:auto;min-height:40px;padding:0 12px}
+    }
+
+    .ann-form-ai-card{display:grid;grid-template-columns:minmax(0,1.15fr) 300px;gap:18px}
+    .ann-form-ai-box{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,250,252,.94));padding:18px}
+    .ann-form-ai-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.76rem;font-weight:900;color:#8B0000;margin-bottom:10px}
+    .ann-form-ai-title{margin:0;font-size:1rem;font-weight:900;color:#111827}.ann-form-ai-text{margin:10px 0 0;font-size:.88rem;line-height:1.8;color:#6b7280}
+    .ann-form-ai-list{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:10px}.ann-form-ai-list li{display:flex;gap:10px;color:#374151;font-size:.84rem;line-height:1.7}.ann-form-ai-list i{margin-top:4px;color:#8B0000}
+    .ann-form-ai-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ann-form-ai-chip{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px}.ann-form-ai-chip-label{font-size:.76rem;font-weight:800;color:#6b7280}.ann-form-ai-chip-value{margin-top:6px;font-size:1.08rem;font-weight:900;color:#111827}.ann-form-ai-chip-tone-watch .ann-form-ai-chip-value{color:#a16207}.ann-form-ai-chip-tone-critical .ann-form-ai-chip-value{color:#991b1b}@media (max-width: 991px){.ann-form-ai-card{grid-template-columns:1fr}}
+</style>
+
+<div class="ann-shell">
+    {{ workspace.hero(
+        title='Kurumsal duyuru oluştur',
+        text='Hazırladığınız duyuru hedef kitleye bildirim ve duyuru kaydı olarak iletilir; hedefleme, ön izleme ve yayın dili aynı ekranda korunur.',
+        icon='fa-solid fa-bullhorn',
+        kicker='Kurumsal iletişim çalışma alanı',
+        secondary_url=url_for('main.announcements_list'),
+        secondary_label='Duyuru Akışı'
+    ) }}
+    {{ workspace.announcement_nav('new') }}
+
+    
+    {% if ai_announcement_form_panel %}
+    <div class="glass-card panel-card ann-form-ai-card">
+        <div class="ann-form-ai-box">
+            <div class="ann-form-ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_announcement_form_panel.badge if ai_announcement_form_panel else 'AI özeti' }}</div>
+            <h3 class="ann-form-ai-title">{{ ai_announcement_form_panel.headline }}</h3>
+            <p class="ann-form-ai-text">{{ ai_announcement_form_panel.summary }}</p>
+            <ul class="ann-form-ai-list">
+                {% for bullet in ai_announcement_form_panel.bullets or [] %}
+                <li><i class="fa-solid fa-check"></i><span>{{ bullet }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="ann-form-ai-box">
+            <div class="ann-form-ai-kicker"><i class="fa-solid fa-wave-square"></i> AI gönderim sinyalleri</div>
+            <div class="ann-form-ai-actions">
+                {% for action in ai_announcement_form_panel.actions or [] %}
+                <div class="ann-form-ai-chip ann-form-ai-chip-tone-{{ action.tone or 'calm' }}">
+                    <div class="ann-form-ai-chip-label">{{ action.label }}</div>
+                    <div class="ann-form-ai-chip-value">{{ action.value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+<form method="POST" class="glass-card panel-card" id="announcementForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_form_token" value="{{ submit_token }}">
+
+        <div class="form-grid">
+            <div class="field full">
+                <label for="subject">Duyuru Başlığı</label>
+                <input id="subject" name="subject" class="form-input" required value="{{ selected_subject if selected_subject is defined else request.form.get('subject', '') }}">
+            </div>
+
+            <div class="field">
+                <label for="target_type">Hedef Türü</label>
+                <select id="target_type" name="target_type" class="form-select">
+                    <option value="all" {% if (selected_target_type if selected_target_type is defined else request.form.get('target_type')) == 'all' %}selected{% endif %}>Tüm Personel</option>
+                    <option value="role" {% if (selected_target_type if selected_target_type is defined else request.form.get('target_type')) == 'role' %}selected{% endif %}>Role Göre</option>
+                    <option value="unit" {% if (selected_target_type if selected_target_type is defined else request.form.get('target_type')) == 'unit' %}selected{% endif %}>Birime Göre</option>
+                    <option value="user" {% if (selected_target_type if selected_target_type is defined else request.form.get('target_type')) == 'user' %}selected{% endif %}>Seçili Kişiler</option>
+                </select>
+            </div>
+
+            <div class="field" id="targetValuesWrapper">
+                <label for="target_values">Hedef Seçimi</label>
+                <input type="text" id="targetSearchInput" class="target-search" placeholder="Rol, birim veya kişi ara...">
+                <select id="target_values" name="target_values" class="form-select" multiple size="6">
+                    {% for role in roles %}
+                        <option value="{{ role }}" data-type="role" {% if role|string in (selected_target_values if selected_target_values is defined else request.form.getlist('target_values')) %}selected{% endif %}>{{ role }}</option>
+                    {% endfor %}
+                    {% for birim in birimler %}
+                        <option value="{{ birim }}" data-type="unit" {% if birim|string in (selected_target_values if selected_target_values is defined else request.form.getlist('target_values')) %}selected{% endif %}>{{ birim }}</option>
+                    {% endfor %}
+                    {% for user in users %}
+                        <option value="{{ user.id }}" data-type="user" {% if user.id|string in (selected_target_values if selected_target_values is defined else request.form.getlist('target_values')) %}selected{% endif %}>
+                            {{ user.full_name if user.full_name else ((user.ad or '') ~ ' ' ~ (user.soyad or ''))|trim }}
+                            {% if user.birim %} / {{ user.birim }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="target-tools"><button type="button" class="btn-soft secondary" id="selectVisibleTargetsBtn"><i class="fa-solid fa-check"></i> Görünenleri Seç</button><button type="button" class="btn-soft secondary" id="clearVisibleTargetsBtn"><i class="fa-solid fa-xmark"></i> Görünenleri Temizle</button></div><div class="selection-summary" id="targetSelectionSummary"></div>
+            </div>
+
+            <div class="field full">
+                <label for="body">Duyuru Metni</label>
+                <textarea id="body" name="body" class="form-textarea" required>{{ selected_body if selected_body is defined else request.form.get('body', '') }}</textarea>
+                <div class="micro-row"><span>Net, kısa ve hedefe uygun yazmanız okunma oranını artırır.</span><span id="announcementCharCount">0 karakter</span></div>
+            </div>
+
+            <div class="field full">
+                <div class="help-box">
+                    Rol, birim veya kişi bazlı seçimlerde çoklu seçim yapabilirsiniz. “Tüm Personel” seçildiğinde hedef seçim alanı gizlenir.
+                </div>
+            </div>
+
+            <div class="field full">
+                <div class="help-box" id="recipientPreviewBox">
+                    Bu duyuru şu an <strong id="recipientPreviewCount">{{ (total_user_count or 0) if (selected_target_type if selected_target_type is defined else request.form.get('target_type', 'all')) == 'all' else 0 }}</strong> kişiye gidecek gibi görünüyor.
+                    <div class="micro-row" style="margin-top:10px;">
+                        <span id="announcementDraftState">Formdaki seçimler bu tarayıcıda geçici taslak olarak saklanabilir.</span>
+                        <span class="tone-pill" id="audienceTone">Kitle büyüklüğü izleniyor</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label>Ön İzleme</label>
+                <div class="preview-box">
+                    <h4 class="preview-title" id="previewTitle">Duyuru başlığı burada görünecek</h4>
+                    <p class="preview-body" id="previewBody">Duyuru içeriği burada ön izlenecek.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-line" style="margin-top:18px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{{ url_for('main.messages_inbox') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Mesajlara Dön
+                </a>
+                <button type="button" class="btn-soft secondary" id="clearAnnouncementDraftBtn"><i class="fa-solid fa-eraser"></i> Taslağı Temizle</button>
+            </div>
+
+            <button type="submit" class="btn-soft primary" id="announcementSubmitBtn">
+                <i class="fa-solid fa-bullhorn"></i>
+                Duyuruyu Gönder
+            </button>
+                <div class="mobile-action-bar">
+            <div><strong id="mobileRecipientCount">0</strong> kişiye gidiyor</div>
+            <button type="submit" class="btn-soft primary" form="announcementForm" id="announcementSubmitBtnMobile"><i class="fa-solid fa-bullhorn"></i> Gönder</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const targetType = document.getElementById("target_type");
+    const targetValues = document.getElementById("target_values");
+    const wrapper = document.getElementById("targetValuesWrapper");
+    const previewCount = document.getElementById("recipientPreviewCount");
+    const totalUserCount = {{ total_user_count or 0 }};
+    const previewCounts = {{ preview_counts|tojson }};
+    const form = document.getElementById("announcementForm");
+    const submitBtn = document.getElementById("announcementSubmitBtn");
+    const draftKey = `bys360-announcement-draft-{{ current_user.id }}`;
+    const draftState = document.getElementById("announcementDraftState");
+    const tone = document.getElementById("audienceTone");
+    const charCount = document.getElementById("announcementCharCount");
+    const clearDraftBtn = document.getElementById("clearAnnouncementDraftBtn");
+    const selectVisibleTargetsBtn = document.getElementById("selectVisibleTargetsBtn");
+    const clearVisibleTargetsBtn = document.getElementById("clearVisibleTargetsBtn");
+    const targetSearchInput = document.getElementById("targetSearchInput");
+    const targetSelectionSummary = document.getElementById("targetSelectionSummary");
+    const mobileRecipientCount = document.getElementById("mobileRecipientCount");
+    const submitBtnMobile = document.getElementById("announcementSubmitBtnMobile");
+
+    function syncTone(recipientCount) {
+        if (!tone) return;
+        tone.className = 'tone-pill';
+        if (recipientCount >= 100) {
+            tone.textContent = 'Geniş kitle • dikkatli kontrol';
+            tone.classList.add('risk');
+        } else if (recipientCount >= 25) {
+            tone.textContent = 'Orta kitle • bir kez daha oku';
+            tone.classList.add('warn');
+        } else {
+            tone.textContent = 'Dar kitle • hedef net';
+        }
+    }
+
+    function syncCharCount() {
+        if (!charCount || !body) return;
+        charCount.textContent = `${(body.value || '').length} karakter`;
+    }
+
+    function saveDraft() {
+        try {
+            const payload = {
+                subject: subject ? subject.value || '' : '',
+                body: body ? body.value || '' : '',
+                target_type: targetType ? targetType.value || 'all' : 'all',
+                target_values: targetValues ? Array.from(targetValues.options).filter(opt => opt.selected).map(opt => opt.value) : [],
+            };
+            localStorage.setItem(draftKey, JSON.stringify(payload));
+            if (draftState) draftState.textContent = 'Duyuru taslağı bu tarayıcıda kaydedildi.';
+        } catch (err) {}
+    }
+
+    function restoreDraft() {
+        try {
+            const raw = localStorage.getItem(draftKey);
+            if (!raw) return;
+            const payload = JSON.parse(raw);
+            if (subject && !subject.value) subject.value = payload.subject || '';
+            if (body && !body.value) body.value = payload.body || '';
+            if (targetType && payload.target_type) targetType.value = payload.target_type;
+            if (targetValues && Array.isArray(payload.target_values)) {
+                Array.from(targetValues.options).forEach(opt => {
+                    opt.selected = payload.target_values.includes(opt.value);
+                });
+            }
+            if (draftState) draftState.textContent = 'Son yerel duyuru taslağı geri yüklendi.';
+        } catch (err) {}
+    }
+
+    function optionRecipientCount(option) {
+        if (!option) return 0;
+        const selectedType = option.getAttribute("data-type") || "";
+        const value = option.value || "";
+        const typedMap = (previewCounts && previewCounts[selectedType]) ? previewCounts[selectedType] : {};
+        return Number(typedMap[value] || 0);
+    }
+
+    function filterTargetOptions() {
+        if (!targetType || !targetValues || !wrapper) return;
+        const selectedType = targetType.value;
+        const search = (targetSearchInput && targetSearchInput.value || "").trim().toLowerCase();
+
+        Array.from(targetValues.options).forEach(opt => {
+            const optType = opt.getAttribute("data-type");
+            const matchesType = selectedType !== "all" && optType === selectedType;
+            const matchesSearch = !search || (opt.textContent || "").toLowerCase().includes(search);
+            const visible = matchesType && matchesSearch;
+            opt.hidden = !visible;
+            if (selectedType === "all" || !matchesType) opt.selected = false;
+        });
+
+        wrapper.style.display = selectedType === "all" ? "none" : "";
+        syncRecipientPreview();
+        syncSelectionSummary();
+    }
+
+    function syncRecipientPreview() {
+        if (!previewCount || !targetType || !targetValues) return 0;
+        if (targetType.value === "all") {
+            previewCount.textContent = String(totalUserCount);
+            if (mobileRecipientCount) mobileRecipientCount.textContent = String(totalUserCount);
+            syncTone(totalUserCount);
+            return totalUserCount;
+        }
+        const selectedValues = Array.from(targetValues.options).filter(opt => opt.selected);
+        const count = selectedValues.reduce((sum, opt) => sum + optionRecipientCount(opt), 0);
+        previewCount.textContent = String(count);
+        if (mobileRecipientCount) mobileRecipientCount.textContent = String(count);
+        syncTone(count);
+        return count;
+    }
+
+    function syncSelectionSummary(){
+        if (!targetSelectionSummary || !targetValues) return;
+        const allSelected = Array.from(targetValues.options).filter(opt => opt.selected);
+        const selected = allSelected.slice(0, 6);
+        targetSelectionSummary.innerHTML = '';
+        selected.forEach(opt => {
+            const span = document.createElement('span');
+            span.className = 'selection-pill';
+            span.textContent = opt.textContent.trim();
+            targetSelectionSummary.appendChild(span);
+        });
+        const extra = allSelected.length - selected.length;
+        if (extra > 0) {
+            const span = document.createElement('span');
+            span.className = 'selection-pill';
+            span.textContent = `+${extra} seçim daha`;
+            targetSelectionSummary.appendChild(span);
+        }
+    }
+
+    if (targetType) {
+        targetType.addEventListener("change", filterTargetOptions);
+        filterTargetOptions();
+    }
+    if (targetValues) {
+        targetValues.addEventListener("change", function(){ syncRecipientPreview(); syncSelectionSummary(); });
+    }
+    if (targetSearchInput) targetSearchInput.addEventListener("input", filterTargetOptions);
+
+    if (selectVisibleTargetsBtn && targetValues) {
+        selectVisibleTargetsBtn.addEventListener('click', function(){
+            Array.from(targetValues.options).forEach(opt => { if (!opt.hidden) opt.selected = true; });
+            syncRecipientPreview();
+            syncSelectionSummary();
+            saveDraft();
+        });
+    }
+    if (clearVisibleTargetsBtn && targetValues) {
+        clearVisibleTargetsBtn.addEventListener('click', function(){
+            Array.from(targetValues.options).forEach(opt => { if (!opt.hidden) opt.selected = false; });
+            syncRecipientPreview();
+            syncSelectionSummary();
+            saveDraft();
+        });
+    }
+
+    const subject = document.getElementById("subject");
+    const body = document.getElementById("body");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewBody = document.getElementById("previewBody");
+
+    function syncPreview() {
+        previewTitle.textContent = (subject.value || "").trim() || "Duyuru başlığı burada görünecek";
+        previewBody.textContent = (body.value || "").trim() || "Duyuru içeriği burada ön izlenecek.";
+        if (draftState && body && (body.value || '').length > 1200) {
+            draftState.textContent = 'Metin uzunlaştı; göndermeden önce bir kez daha gözden geçirmek iyi olur.';
+        }
+    }
+
+    restoreDraft();
+    if (subject) subject.addEventListener("input", function(){ syncPreview(); saveDraft(); });
+    if (body) body.addEventListener("input", function(){ syncPreview(); syncCharCount(); saveDraft(); });
+    if (targetType) targetType.addEventListener("change", saveDraft);
+    if (targetValues) targetValues.addEventListener("change", saveDraft);
+    if (clearDraftBtn) {
+        clearDraftBtn.addEventListener("click", function(){
+            localStorage.removeItem(draftKey);
+            if (subject) subject.value = '';
+            if (body) body.value = '';
+            if (targetType) targetType.value = 'all';
+            if (targetValues) Array.from(targetValues.options).forEach(opt => opt.selected = false);
+            filterTargetOptions();
+            syncPreview();
+            syncCharCount();
+            if (draftState) draftState.textContent = 'Yerel duyuru taslağı temizlendi.';
+        });
+    }
+    syncPreview();
+    syncCharCount();
+    syncRecipientPreview();
+    syncSelectionSummary();
+
+    if (form) {
+        form.addEventListener('submit', function(event){
+            const recipientCount = syncRecipientPreview();
+            if (!recipientCount) {
+                event.preventDefault();
+                return;
+            }
+            if (recipientCount >= 100 && !window.confirm(`Bu duyuru yaklaşık ${recipientCount} kişiye gidecek. Emin misiniz?`)) {
+                event.preventDefault();
+                return;
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Gönderiliyor';
+                submitBtn.style.opacity = '0.82';
+            }
+            if (submitBtnMobile) {
+                submitBtnMobile.disabled = true;
+                submitBtnMobile.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+                submitBtnMobile.style.opacity = '0.82';
+            }
+            localStorage.removeItem(draftKey);
+            if (draftState) draftState.textContent = 'Duyuru gönderiliyor...';
+        });
+    }
+})();
+</script>
+{% endblock %}

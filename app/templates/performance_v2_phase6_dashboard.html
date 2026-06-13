@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Yönetici Rapor Paneli - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yönetici Rapor Paneli{% endblock %}
+{% block page_subtitle %}Görev tamamlanma, yayın hazırlığı, not karneleri ve AI karar destek göstergeleri tek yönetici ekranında.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_reports_ai_pro.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+{% set d = dashboard if dashboard is defined and dashboard else {} %}
+{% set sc = d.scorecard if d.scorecard is defined else {} %}
+{% set ps = publish_summary if publish_summary is defined and publish_summary else d.publish_summary|default({}, true) %}
+{% set ai = ai_management_panel if ai_management_panel is defined and ai_management_panel else {} %}
+<div class="bys-pro-shell">
+  <section class="bys-pro-hero">
+    <div class="bys-pro-hero-grid">
+      <div>
+        <div class="bys-pro-kicker"><i class="fa-solid fa-file-signature"></i> Yönetici rapor paneli</div>
+        <h1 class="bys-pro-title">Yayın öncesi performans kontrol merkezi</h1>
+        <p class="bys-pro-sub">Seçili döneme ait görev akışı, tamamlanan değerlendirmeler, 70 altı / 90 üstü kayıtlar ve personele açılmadan önceki yayın hazırlığı burada izlenir.</p>
+        <div class="bys-pro-hero-actions">
+          <a class="bys-pro-btn light" href="{{ url_for('main.performance_v2_phase6_export_xlsx', period_id=period.id) if period else '#' }}"><i class="fa-solid fa-file-excel"></i> Excel</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.performance_v2_phase6_print', period_id=period.id) if period else '#' }}"><i class="fa-solid fa-print"></i> Yazdır</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.performance_team_compare', period_id=period.id) if period else url_for('main.performance_team_compare') }}"><i class="fa-solid fa-users-viewfinder"></i> Personel Analizi</a>
+          <a class="bys-pro-btn light" href="{{ url_for('main.workflow_executive_dashboard') }}"><i class="fa-solid fa-route"></i> İş Akış Paneli</a>
+        </div>
+      </div>
+      <aside class="bys-pro-hero-panel">
+        <div class="bys-pro-hero-panel-title">Seçili dönem</div>
+        <div class="bys-pro-hero-panel-main">{{ period.title if period else 'Dönem seçilmedi' }}</div>
+        <div class="bys-pro-hero-panel-note">AI destekli yönetici özeti, yayın öncesi kontrol ve görünürlük kurallarıyla birlikte çalışır.</div>
+      </aside>
+    </div>
+  </section>
+
+  <form method="get" class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-toolbar">
+      <div class="bys-pro-field"><label>Dönem seç</label><select name="period_id">{% for p in periods|default([]) %}<option value="{{ p.id }}" {% if period and p.id == period.id %}selected{% endif %}>{{ p.title }}</option>{% endfor %}</select></div>
+      <button class="bys-pro-action primary" type="submit"><i class="fa-solid fa-rotate"></i> Görünümü yenile</button>
+      <a class="bys-pro-action" href="{{ url_for('main.performance_reports') }}"><i class="fa-solid fa-chart-line"></i> Raporlar</a>
+    </div>
+  </form>
+
+  <section class="bys-pro-stat-grid">
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Görev toplamı</div><div class="bys-pro-stat-value" data-bys-count>{{ d.assignment_total|default(0, true) }}</div><div class="bys-pro-stat-note">Tamamlanan: {{ d.assignment_completed|default(0, true) }}</div></div>
+    <div class="bys-pro-stat warning"><div class="bys-pro-stat-label">Bekleyen görev</div><div class="bys-pro-stat-value" data-bys-count>{{ d.assignment_pending|default(0, true) }}</div><div class="bys-pro-stat-note">Geciken: {{ d.assignment_overdue|default(0, true) }}</div></div>
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Tamamlanma</div><div class="bys-pro-stat-value"><span data-bys-count>{{ d.completion_rate|default(0, true) }}</span>%</div><div class="bys-pro-stat-note"><div class="bys-pro-progress"><span data-bys-progress="{{ d.completion_rate|default(0, true) }}"></span></div></div></div>
+    <div class="bys-pro-stat success"><div class="bys-pro-stat-label">Yayın oranı</div><div class="bys-pro-stat-value"><span data-bys-count>{{ d.publish_rate|default(0, true) }}</span>%</div><div class="bys-pro-stat-note">Yayımlanan: {{ d.published_total|default(0, true) }}</div></div>
+  </section>
+
+  <section class="bys-pro-two">
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Dönem skor kartı</h2><p class="bys-pro-section-sub">Ortalama, düşük ve yüksek eşik kayıtları.</p></div><span class="bys-pro-chip">{{ sc.count|default(0, true) }} kayıt</span></div>
+      <div class="bys-pro-chart compact"><canvas data-bys-chart="bar" data-labels='{{ ["Ortalama", "70 altı", "90 üstü", "Yayımlanan"]|tojson }}' data-datasets='{{ [{"label":"Skor kartı","data":[sc.avg_score|default(0,true), sc.low_count|default(0,true), sc.high_count|default(0,true), sc.published_count|default(0,true)]}]|tojson }}'></canvas></div>
+    </div>
+    <div class="bys-pro-card bys-pro-card-pad bys-pro-ai">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">AI yönetici özeti</h2><p class="bys-pro-section-sub">Kontrollü karar destek notu.</p></div><span class="bys-pro-chip"><i class="fa-solid fa-brain"></i> AI</span></div>
+      <div class="bys-pro-ai-grid">
+        <div class="bys-pro-ai-box"><b>Yayın hazır</b><span>{{ ps.ready_count|default(0, true) }} kayıt yayına hazırlanabilir görünüyor.</span></div>
+        <div class="bys-pro-ai-box"><b>Blokaj</b><span>{{ ps.blocked_count|default(0, true) }} kayıt yayın öncesi kontrol bekliyor.</span></div>
+        <div class="bys-pro-ai-box"><b>Eşik</b><span>{{ sc.low_count|default(0, true) }} düşük, {{ sc.high_count|default(0, true) }} çok başarılı eşik kaydı var.</span></div>
+        <div class="bys-pro-ai-box"><b>Görünürlük</b><span>Personel sonuçları yalnız yayın/onay sonrası açılmalıdır.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Not karnesi listesi</h2><p class="bys-pro-section-sub">Personel bazlı sonuç, eşik ve yayın durumu.</p></div><span class="bys-pro-chip">{{ sc.rows|default([], true)|length }} satır</span></div>
+    <div class="bys-pro-table-wrap"><table class="bys-pro-table"><thead><tr><th>Personel</th><th>Birim</th><th>Sicil</th><th>Nihai puan</th><th>Durum</th><th>Yayın</th><th>Görülme</th></tr></thead><tbody>{% for row in sc.rows|default([]) %}<tr><td><div class="bys-pro-name">{{ row.display_name }}</div></td><td>{{ row.unit_name }}</td><td>{{ row.sicil_no }}</td><td><span class="bys-pro-badge {{ row.score_band_class }}">{{ row.final_total }}</span></td><td>{{ row.status }}</td><td><span class="bys-pro-badge {{ 'success' if row.published else 'locked' }}">{{ 'Yayında' if row.published else 'Kapalı' }}</span></td><td><span class="bys-pro-badge {{ row.acknowledgement_class }}">{{ row.acknowledgement_label }}</span></td></tr>{% else %}<tr><td colspan="7"><div class="bys-pro-empty">Seçili dönem için not karnesi kaydı bulunmadı.</div></td></tr>{% endfor %}</tbody></table></div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_reports_ai_pro.js') }}"></script>
+{% endblock %}

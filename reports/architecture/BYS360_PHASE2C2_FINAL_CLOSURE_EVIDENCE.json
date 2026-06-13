@@ -1,0 +1,174 @@
+{
+  "generated_at": "2026-06-13T11:20:19",
+  "phase": "PHASE2C2_FINAL_CLOSURE_EVIDENCE",
+  "ok": true,
+  "decision": "PHASE2C2_GREEN_CLOSED_9_OF_10_SAFE_IMPORTS_APPLIED",
+  "c2d_ok": true,
+  "c2d_kept_count": 9,
+  "c2d_rolled_back_count": 1,
+  "explicit_expected_count": 9,
+  "explicit_status": [
+    {
+      "file": "app/api/mobile/domains/assistant_chat.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/communication_v1_write.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/communication_v2_write.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/dashboard.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/kpi_target_management.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/notifications.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/personnel_read.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/personnel_write_all.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/domains/support_survey_write.py",
+      "has_mobile_shared_wildcard": false,
+      "has_mobile_shared_explicit": true,
+      "ok": true
+    }
+  ],
+  "explicit_ok": true,
+  "wildcard_expected_count": 2,
+  "wildcard_status": [
+    {
+      "file": "app/api/mobile/domains/auth.py",
+      "has_mobile_shared_wildcard": true,
+      "has_mobile_shared_explicit": false,
+      "ok": true
+    },
+    {
+      "file": "app/api/mobile/routes.py",
+      "has_mobile_shared_wildcard": true,
+      "has_mobile_shared_explicit": false,
+      "ok": true
+    }
+  ],
+  "wildcard_ok": true,
+  "app_ast_wildcard_count": 63,
+  "app_ast_wildcard_by_module_top_50": {
+    "app.services.ai.dashboard_panel_common": 6,
+    "app.institutional.hr_common": 5,
+    "app.services.mail_core": 4,
+    "app.institutional.hr_form_helpers": 3,
+    "app.institutional.hr_scope_helpers": 3,
+    "app.main_handlers.account_communication_helpers": 3,
+    "app.api.mobile.shared": 2,
+    "app.services.mail_performance_builder": 2,
+    "app.api.mobile.domains.auth": 1,
+    "app.api.mobile.domains.dashboard": 1,
+    "app.api.mobile.domains.personnel_read": 1,
+    "app.api.mobile.domains.notifications": 1,
+    "app.api.mobile.domains.support_survey_write": 1,
+    "app.api.mobile.domains.communication_v1_write": 1,
+    "app.api.mobile.domains.communication_v2_write": 1,
+    "app.api.mobile.domains.assistant_chat": 1,
+    "app.api.mobile.domains.personnel_write_all": 1,
+    "app.api.mobile.domains.kpi_target_management": 1,
+    "app.institutional.org_unit_routes": 1,
+    "app.institutional.hr_personnel_operations_routes": 1,
+    "app.institutional.hr_leave_attendance_routes": 1,
+    "app.institutional.hr_reports_routes": 1,
+    "app.main_handlers.account_visibility_helpers": 1,
+    "feedback_helpers": 1,
+    "mail_helpers": 1,
+    "publish_helpers": 1,
+    "maintenance_merge_registry": 1,
+    "schema_guard_core_maintenances": 1,
+    "dashboard_panels": 1,
+    "app.services.ai.dashboard_panel_performance": 1,
+    "app.services.ai.dashboard_panel_personnel": 1,
+    "app.services.ai.dashboard_panel_hr": 1,
+    "app.services.ai.dashboard_panel_communication": 1,
+    "app.services.ai.dashboard_panel_operations": 1,
+    "app.services.mail_performance_sender": 1,
+    "app.services.mail_feedback": 1,
+    "common_admin_scope_maintenance": 1,
+    "app.performance.services.performance_rule_engine": 1,
+    "app.services.performance.phase3_role_matrix": 1,
+    "constants": 1,
+    "state": 1,
+    "transitions": 1,
+    "visibility": 1
+  },
+  "mobile_shared_remaining": [
+    {
+      "file": "app/api/mobile/domains/auth.py",
+      "line_no": 8,
+      "module": "app.api.mobile.shared",
+      "level": 0
+    },
+    {
+      "file": "app/api/mobile/routes.py",
+      "line_no": 7,
+      "module": "app.api.mobile.shared",
+      "level": 0
+    }
+  ],
+  "compileall_returncode": 0,
+  "contract_pytest_returncode": 0,
+  "contract_pytest_summary": {
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "warnings": 0
+  },
+  "quality_smoke_returncode": 0,
+  "quality_smoke_summary": {
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "warnings": 0
+  },
+  "default_pytest_returncode": 0,
+  "default_pytest_summary": {
+    "passed": 746,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "phase2c1_rerun_returncode": 0,
+  "tests_green": true,
+  "next_action": "Faz 2C3: auth.py özel yardımcı importları manuel haritalanarak veya ikinci güvenli wildcard paketi seçilerek ilerlenebilir."
+}

@@ -1,0 +1,73 @@
+/* BYS360_AI_EVERYWHERE_V1
+   Tüm BYS360 ekranlarında güvenli, yetki kontrollü AI rehber kartı.
+   İdari karar üretmez; hassas veri göstermez; kullanıcıyı doğru ekrana yönlendirir.
+*/
+:root{
+  --bys360-ai-red:#8B0000;
+  --bys360-ai-red-dark:#690000;
+  --bys360-ai-soft:#fff7f7;
+  --bys360-ai-border:rgba(139,0,0,.14);
+  --bys360-ai-text:#101828;
+  --bys360-ai-muted:#667085;
+  --bys360-ai-shadow:0 18px 46px rgba(15,23,42,.10);
+}
+.bys360-ai-everywhere{
+  position:relative;
+  margin:0 0 18px 0;
+  border:1px solid var(--bys360-ai-border);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at right top,rgba(139,0,0,.09),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,250,250,.94));
+  box-shadow:var(--bys360-ai-shadow);
+  overflow:hidden;
+  isolation:isolate;
+}
+.bys360-ai-everywhere::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:7px;
+  background:linear-gradient(180deg,var(--bys360-ai-red),var(--bys360-ai-red-dark));
+  opacity:.96;
+}
+.bys360-ai-everywhere-inner{padding:20px 20px 18px 24px;display:grid;gap:16px;}
+.bys360-ai-everywhere-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.bys360-ai-everywhere-titlebox{display:grid;gap:7px;min-width:0;}
+.bys360-ai-everywhere-kicker{display:inline-flex;align-items:center;gap:8px;width:max-content;max-width:100%;padding:6px 11px;border-radius:999px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.12);color:var(--bys360-ai-red);font-size:.76rem;font-weight:900;letter-spacing:.02em;}
+.bys360-ai-everywhere h2{margin:0;color:var(--bys360-ai-text);font-size:1.03rem;line-height:1.35;font-weight:900;}
+.bys360-ai-everywhere p{margin:0;color:#475467;font-size:.91rem;line-height:1.65;}
+.bys360-ai-everywhere-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.bys360-ai-everywhere-btn{
+  appearance:none;border:0;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;
+  padding:0 12px;border-radius:12px;background:var(--bys360-ai-red);color:#fff;font-size:.8rem;font-weight:900;
+  box-shadow:0 10px 20px rgba(139,0,0,.18);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.bys360-ai-everywhere-btn:hover{transform:translateY(-1px);box-shadow:0 13px 24px rgba(139,0,0,.24);background:#760000;color:#fff;}
+.bys360-ai-everywhere-btn.secondary{background:#fff;color:var(--bys360-ai-red);border:1px solid rgba(139,0,0,.18);box-shadow:none;}
+.bys360-ai-everywhere-btn.ghost{background:rgba(139,0,0,.06);color:var(--bys360-ai-red);border:1px solid rgba(139,0,0,.10);box-shadow:none;}
+.bys360-ai-everywhere-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.bys360-ai-everywhere-card{padding:13px 14px;border-radius:18px;background:rgba(255,255,255,.86);border:1px solid rgba(15,23,42,.07);box-shadow:0 10px 22px rgba(15,23,42,.05);}
+.bys360-ai-everywhere-card strong{display:flex;align-items:center;gap:8px;margin-bottom:7px;color:var(--bys360-ai-text);font-size:.84rem;font-weight:900;}
+.bys360-ai-everywhere-card span{display:block;color:#566176;font-size:.8rem;line-height:1.55;}
+.bys360-ai-everywhere-questions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.bys360-ai-everywhere-question{appearance:none;border:1px solid rgba(139,0,0,.13);border-radius:999px;background:#fff;color:#7a0000;font-size:.78rem;font-weight:850;min-height:33px;padding:0 12px;cursor:pointer;}
+.bys360-ai-everywhere-question:hover{background:#fff1f1;border-color:rgba(139,0,0,.24);}
+.bys360-ai-everywhere-links{display:flex;flex-wrap:wrap;gap:8px;}
+.bys360-ai-everywhere-link{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 12px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#344054;font-size:.78rem;font-weight:850;text-decoration:none;}
+.bys360-ai-everywhere-link:hover{color:var(--bys360-ai-red);background:#fff;border-color:rgba(139,0,0,.15);}
+.bys360-ai-everywhere[data-collapsed="true"] .bys360-ai-everywhere-grid,
+.bys360-ai-everywhere[data-collapsed="true"] .bys360-ai-everywhere-questions,
+.bys360-ai-everywhere[data-collapsed="true"] .bys360-ai-everywhere-links,
+.bys360-ai-everywhere[data-collapsed="true"] p{display:none!important;}
+.bys360-ai-everywhere[data-collapsed="true"] .bys360-ai-everywhere-inner{padding:12px 16px 12px 23px;}
+.bys360-ai-everywhere[data-collapsed="true"] h2{font-size:.92rem;}
+.bys360-ai-screen-supported-badge{display:inline-flex;align-items:center;gap:6px;margin-left:8px;padding:4px 8px;border-radius:999px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.12);color:#8B0000;font-size:.7rem;font-weight:900;vertical-align:middle;}
+@media(max-width:900px){
+  .bys360-ai-everywhere-inner{padding:16px 15px 15px 20px;}
+  .bys360-ai-everywhere-head{flex-direction:column;align-items:stretch;}
+  .bys360-ai-everywhere-actions{justify-content:flex-start;}
+  .bys360-ai-everywhere-grid{grid-template-columns:1fr;}
+  .bys360-ai-everywhere-btn{width:auto;}
+}
+@media print{.bys360-ai-everywhere{display:none!important;}}

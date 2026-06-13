@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-06-13T10:25:51",
+  "phase": "S0Z_SECURITY_TEST_HYGIENE_FINAL_CLOSURE",
+  "mode": "final_evidence_report_no_code_change",
+  "ok": true,
+  "decision": "S0Z_GREEN_READY_FOR_PHASE2_ARCHITECTURE",
+  "phase_status": {
+    "S0C3": {
+      "path": "C:\\bys360\\project\\reports\\quality\\BYS360_S0C3_REMAINING_SECRETKEY_BLOCK_HOTFIX.json",
+      "exists": true,
+      "ok": true,
+      "decision": "S0C3_GREEN",
+      "generated_at": "2026-06-13T09:57:10"
+    },
+    "S0D": {
+      "path": "C:\\bys360\\project\\reports\\quality\\BYS360_S0D_PYTEST_CONFIG_BACKUP_COLLECTION_HOTFIX.json",
+      "exists": true,
+      "ok": true,
+      "decision": "S0D_GREEN",
+      "generated_at": "2026-06-13T10:02:06"
+    },
+    "S0E": {
+      "path": "C:\\bys360\\project\\reports\\quality\\BYS360_S0E_REPORTS_QUALITY_BACKUP_ARCHIVE_CLEANUP.json",
+      "exists": true,
+      "ok": true,
+      "decision": "S0E_GREEN",
+      "generated_at": "2026-06-13T10:06:14"
+    },
+    "S0F3": {
+      "path": "C:\\bys360\\project\\reports\\quality\\BYS360_S0F3_PYTEST_ISOLATED_UPDATE_VERIFY.json",
+      "exists": true,
+      "ok": true,
+      "decision": "S0F3_GREEN_ALL_PIP_AUDIT_FIXED",
+      "generated_at": "2026-06-13T10:18:32"
+    },
+    "S0G": {
+      "path": "C:\\bys360\\project\\reports\\quality\\BYS360_S0G_OLD_VENV_ARCHIVE_CLEANUP.json",
+      "exists": true,
+      "ok": true,
+      "decision": "S0G_GREEN",
+      "generated_at": "2026-06-13T10:22:09"
+    }
+  },
+  "s0a_rerun": {
+    "returncode": 0,
+    "ok": true,
+    "red_flag_count": 0,
+    "pip_audit_vulnerability_count": 0,
+    "old_venv_total_mb": 0
+  },
+  "pip_audit": {
+    "available": true,
+    "command": "C:\\bys360\\project\\.venv\\Scripts\\python.exe -m pip_audit -f json",
+    "returncode": 0,
+    "vulnerability_count": 0,
+    "by_package": {},
+    "findings": [],
+    "attempts": [
+      {
+        "cmd": "C:\\bys360\\project\\.venv\\Scripts\\python.exe -m pip_audit -f json",
+        "returncode": 0,
+        "tail": "\"version\": \"32.0.1\", \"vulns\": []}, {\"name\": \"pluggy\", \"version\": \"1.6.0\", \"vulns\": []}, {\"name\": \"prometheus-client\", \"version\": \"0.20.0\", \"vulns\": []}, {\"name\": \"psycopg2-binary\", \"version\": \"2.9.9\", \"vulns\": []}, {\"name\": \"py-serializable\", \"version\": \"1.1.2\", \"vulns\": []}, {\"name\": \"pycparser\", \"version\": \"3.0\", \"vulns\": []}, {\"name\": \"pygments\", \"version\": \"2.20.0\", \"vulns\": []}, {\"name\": \"pyparsing\", \"version\": \"3.3.2\", \"vulns\": []}, {\"name\": \"pytest\", \"version\": \"9.0.3\", \"vulns\": []}, {\"name\": \"python-dateutil\", \"version\": \"2.9.0.post0\", \"vulns\": []}, {\"name\": \"python-dotenv\", \"version\": \"1.2.2\", \"vulns\": []}, {\"name\": \"pytz\", \"version\": \"2026.2\", \"vulns\": []}, {\"name\": \"redis\", \"version\": \"5.0.8\", \"vulns\": []}, {\"name\": \"reportlab\", \"version\": \"4.4.10\", \"vulns\": []}, {\"name\": \"requests\", \"version\": \"2.34.2\", \"vulns\": []}, {\"name\": \"rich\", \"version\": \"13.9.4\", \"vulns\": []}, {\"name\": \"rq\", \"version\": \"2.3.3\", \"vulns\": []}, {\"name\": \"sentry-sdk\", \"version\": \"2.20.0\", \"vulns\": []}, {\"name\": \"setuptools\", \"version\": \"82.0.1\", \"vulns\": []}, {\"name\": \"six\", \"version\": \"1.17.0\", \"vulns\": []}, {\"name\": \"sortedcontainers\", \"version\": \"2.4.0\", \"vulns\": []}, {\"name\": \"sqlalchemy\", \"version\": \"2.0.36\", \"vulns\": []}, {\"name\": \"toml\", \"version\": \"0.10.2\", \"vulns\": []}, {\"name\": \"typing-extensions\", \"version\": \"4.15.0\", \"vulns\": []}, {\"name\": \"tzdata\", \"version\": \"2026.2\", \"vulns\": []}, {\"name\": \"urllib3\", \"version\": \"2.7.0\", \"vulns\": []}, {\"name\": \"waitress\", \"version\": \"3.0.2\", \"vulns\": []}, {\"name\": \"webencodings\", \"version\": \"0.5.1\", \"vulns\": []}, {\"name\": \"werkzeug\", \"version\": \"3.1.8\", \"vulns\": []}, {\"name\": \"wheel\", \"version\": \"0.47.0\", \"vulns\": []}, {\"name\": \"wrapt\", \"version\": \"2.2.1\", \"vulns\": []}, {\"name\": \"wtforms\", \"version\": \"3.1.2\", \"vulns\": []}, {\"name\": \"xlsxwriter\", \"version\": \"3.2.0\", \"vulns\": []}, {\"name\": \"zope-event\", \"version\": \"6.2\", \"vulns\": []}, {\"name\": \"zope-interface\", \"version\": \"8.5\", \"vulns\": []}], \"fixes\": []}\n\nNo known vulnerabilities found\n"
+      }
+    ]
+  },
+  "compileall_returncode": 0,
+  "collect_only_returncode": 0,
+  "pytest_quality_smoke_returncode": 0,
+  "pytest_quality_smoke_summary": {
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "warnings": 0
+  },
+  "pytest_full_returncode": 0,
+  "pytest_full_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "pytest_default_returncode": 0,
+  "pytest_default_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "all_phase_reports_green": true,
+  "tests_green": true,
+  "security_green": true,
+  "next_action": "Faz 2A mimari borç haritasına geçilebilir.",
+  "release_zip": "C:\\bys360\\releases\\BYS360_S0Z_SECURITY_TEST_HYGIENE_FINAL_CLOSURE_20260613_102427.zip",
+  "release_zip_sha256": "11d9ec51091d85d4911473c8c3a40acc22f9b966f938ed95c900d51be0e53771"
+}

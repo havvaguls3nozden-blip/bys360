@@ -1,0 +1,147 @@
+/* BYS360 iOS PWA V2 - Hamburger / Bildirim Üst Bar Çakışma Düzeltmesi */
+/* Amaç: iPad/iPhone ve dar ekranlarda Bildirimler kısayolunun hamburger menünün üstüne binmesini engellemek. */
+
+@media (max-width: 1100px){
+  html.bys360-ios-pwa .topbar,
+  html.bys360-ios-browser .topbar,
+  .bys360-pwa-standalone .topbar{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    column-gap:8px!important;
+    overflow:visible!important;
+    isolation:isolate!important;
+  }
+
+  html.bys360-ios-pwa .topbar-left,
+  html.bys360-ios-browser .topbar-left,
+  .bys360-pwa-standalone .topbar-left{
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  html.bys360-ios-pwa .menu-toggle,
+  html.bys360-ios-browser .menu-toggle,
+  .bys360-pwa-standalone .menu-toggle{
+    position:relative!important;
+    z-index:4!important;
+    flex:0 0 42px!important;
+    width:42px!important;
+    min-width:42px!important;
+  }
+
+  html.bys360-ios-pwa .topbar-right,
+  html.bys360-ios-browser .topbar-right,
+  .bys360-pwa-standalone .topbar-right{
+    position:relative!important;
+    z-index:3!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:6px!important;
+    margin-left:0!important;
+    min-width:0!important;
+    flex:0 0 auto!important;
+  }
+
+  html.bys360-ios-pwa .topbar-right > .quick-link:not(.notify-pill),
+  html.bys360-ios-browser .topbar-right > .quick-link:not(.notify-pill),
+  .bys360-pwa-standalone .topbar-right > .quick-link:not(.notify-pill){
+    display:none!important;
+  }
+
+  html.bys360-ios-pwa .notify-pill,
+  html.bys360-ios-browser .notify-pill,
+  .bys360-pwa-standalone .notify-pill{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:42px!important;
+    min-width:42px!important;
+    max-width:42px!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:0!important;
+    border-radius:14px!important;
+    overflow:visible!important;
+    white-space:nowrap!important;
+    font-size:0!important;
+    line-height:1!important;
+    flex:0 0 42px!important;
+  }
+
+  html.bys360-ios-pwa .notify-pill i,
+  html.bys360-ios-browser .notify-pill i,
+  .bys360-pwa-standalone .notify-pill i{
+    font-size:17px!important;
+    margin:0!important;
+  }
+
+  html.bys360-ios-pwa .notify-count,
+  html.bys360-ios-browser .notify-count,
+  .bys360-pwa-standalone .notify-count{
+    top:-6px!important;
+    right:-6px!important;
+    z-index:5!important;
+    min-width:20px!important;
+    height:20px!important;
+    padding:0 6px!important;
+    font-size:10px!important;
+    pointer-events:none!important;
+  }
+
+  html.bys360-ios-pwa .user-menu,
+  html.bys360-ios-browser .user-menu,
+  .bys360-pwa-standalone .user-menu{
+    flex:0 0 auto!important;
+    min-width:0!important;
+  }
+
+  html.bys360-ios-pwa .user-summary,
+  html.bys360-ios-browser .user-summary,
+  .bys360-pwa-standalone .user-summary{
+    min-width:40px!important;
+    flex:0 0 auto!important;
+  }
+}
+
+@media (max-width: 900px){
+  html.bys360-ios-pwa .page-meta,
+  html.bys360-ios-browser .page-meta,
+  .bys360-pwa-standalone .page-meta{
+    display:none!important;
+  }
+
+  html.bys360-ios-pwa .topbar-brand,
+  html.bys360-ios-browser .topbar-brand,
+  .bys360-pwa-standalone .topbar-brand{
+    max-width:112px!important;
+    flex:0 1 112px!important;
+  }
+}
+
+@media (max-width: 430px){
+  html.bys360-ios-pwa .topbar,
+  html.bys360-ios-browser .topbar,
+  .bys360-pwa-standalone .topbar{
+    padding-left:max(10px, env(safe-area-inset-left, 0px))!important;
+    padding-right:max(10px, env(safe-area-inset-right, 0px))!important;
+  }
+
+  html.bys360-ios-pwa .topbar-brand,
+  html.bys360-ios-browser .topbar-brand,
+  .bys360-pwa-standalone .topbar-brand{
+    max-width:96px!important;
+    flex-basis:96px!important;
+  }
+
+  html.bys360-ios-pwa .topbar-brand-logo,
+  html.bys360-ios-browser .topbar-brand-logo,
+  .bys360-pwa-standalone .topbar-brand-logo{
+    max-width:92px!important;
+  }
+}

@@ -1,0 +1,14 @@
+{% from "_premium_workspace_macros.html" import premium_context_banner, premium_metric_card %}
+
+{% macro management_workspace_header(title='', text='', icon='fa-solid fa-briefcase', kicker='Kurumsal yönetim çalışma alanı', badges=None, side_title='', side_text='', metric_cards=None) -%}
+<div class="bys-premium-page">
+    {{ premium_context_banner(title=title, text=text, icon=icon, kicker=kicker, badges=badges, side_title=side_title, side_text=side_text) }}
+    {% if metric_cards %}
+    <div class="bys-metric-grid">
+        {% for card in metric_cards %}
+            {{ premium_metric_card(label=card.label, value=card.value, icon=card.icon, sub=card.sub if card.sub is defined else '', tone=card.tone if card.tone is defined else '') }}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{%- endmacro %}

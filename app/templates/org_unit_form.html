@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+{% set unit = unit_obj if unit_obj is defined else unit %}
+{% set parent_options = parent_options if parent_options is defined else parent_units %}
+
+{% if unit %}
+    {% set page_title_text = "Birim / Pozisyon Düzenle" %}
+    {% set page_subtitle_text = "Mevcut organizasyon kaydını güncelleyin, hiyerarşik bağlarını ve durumunu düzenleyin." %}
+{% else %}
+    {% set page_title_text = "Yeni Birim / Pozisyon" %}
+    {% set page_subtitle_text = "Kurumsal yapıya yeni birim veya pozisyon kaydı ekleyin." %}
+{% endif %}
+
+{% block title %}{{ page_title_text }} - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}{{ page_title_text }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle_text }}{% endblock %}
+
+{% block content %}
+<style>
+    .org-form-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:26px;
+        box-shadow:0 20px 40px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:24px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-panel{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+        align-items:stretch;
+    }
+
+    .hero-main{
+        position:relative;
+        overflow:hidden;
+        border-radius:24px;
+        padding:24px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        min-height:auto;
+    }
+
+    .hero-main::after{display:none}
+
+    .hero-kicker{
+        display:inline-flex;
+        align-items:center;
+        min-height:28px;
+        padding:0 12px;
+        border-radius:999px;
+        font-size:.74rem;
+        font-weight:900;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        margin-bottom:12px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.16rem;
+        font-weight:900;
+        line-height:1.4;
+        max-width:760px;
+        color:#111827;
+    }
+
+    .hero-text{
+        margin:10px 0 0;
+        font-size:.92rem;
+        line-height:1.8;
+        color:#6b7280;
+        max-width:760px;
+    }
+
+    .hero-side{
+        display:grid;
+        gap:14px;
+    }
+
+    .mini-stat{
+        border-radius:22px;
+        padding:20px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 26px rgba(15,23,42,.05);
+        position:relative;
+        overflow:hidden;
+    }
+
+    .mini-stat::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        bottom:-18px;
+        width:72px;
+        height:72px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .mini-stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-value{
+        color:#111827;
+        font-size:1.14rem;
+        font-weight:900;
+        line-height:1.35;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-sub{
+        margin-top:8px;
+        color:#6b7280;
+        font-size:.82rem;
+        line-height:1.65;
+        position:relative;
+        z-index:1;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+        line-height:1.5;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.04rem;
+        font-weight:900;
+        line-height:1.45;
+        position:relative;
+        z-index:1;
+    }
+
+    .ai-panel{border:1px solid rgba(139,0,0,.10);background:rgba(139,0,0,.04);border-radius:22px;padding:18px 20px;display:grid;gap:12px}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;color:#8B0000;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    .ai-headline{margin:0;font-size:1rem;font-weight:900;color:#111827}
+    .ai-summary{margin:0;color:#6b7280;line-height:1.75;font-size:.9rem}
+    .ai-bullets{margin:0;padding-left:18px;color:#374151;display:grid;gap:8px;font-size:.88rem}
+    .ai-actions{display:flex;flex-wrap:wrap;gap:10px}
+    .ai-chip{display:inline-flex;align-items:center;gap:6px;padding:10px 12px;border-radius:999px;background:#fff;border:1px solid rgba(139,0,0,.08);font-size:.82rem;color:#374151}
+    .notice-box{
+        border:1px solid rgba(139,0,0,.10);
+        background:rgba(139,0,0,.04);
+        color:#6b7280;
+        border-radius:18px;
+        padding:14px 16px;
+        line-height:1.8;
+        font-size:.86rem;
+    }
+
+    .section-title{
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+        margin:0 0 14px;
+        line-height:1.3;
+    }
+
+    .form-grid{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .field.full{
+        grid-column:1 / -1;
+    }
+
+    .field label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-textarea{
+        min-height:130px;
+        resize:vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .hint{
+        color:#6b7280;
+        font-size:.78rem;
+        line-height:1.6;
+    }
+
+    .check-row{
+        display:flex;
+        gap:16px;
+        flex-wrap:wrap;
+    }
+
+    .check-item{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        color:#374151;
+        font-size:.9rem;
+        font-weight:700;
+    }
+
+    .btn-line{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    @media (max-width:1280px){
+        .hero-panel{grid-template-columns:1fr}
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:900px){
+        .form-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:700px){
+        .stats-grid{grid-template-columns:1fr}
+        .btn-soft{width:100%}
+        .btn-line{flex-direction:column-reverse;align-items:stretch}
+    }
+</style>
+
+{% set current_type = request.form.get('unit_type', unit.unit_type if unit and unit.unit_type else 'birim') %}
+{% set current_parent = request.form.get('parent_id', unit.parent_id|string if unit and unit.parent_id else '') %}
+{% set active_val = request.form.get('is_active', '1' if (unit.is_active if unit else true) else '0') %}
+
+<div class="org-form-shell">
+    <div class="hero-panel">
+        <div class="hero-main">
+            <div class="hero-kicker">Kurumsal Yapı Tanımlama</div>
+            <h3 class="hero-title">{{ page_title_text }}</h3>
+            <p class="hero-text">
+                Birim, çalışma grubu, koordinatörlük ve pozisyon kayıtlarını üst birim ilişkileriyle birlikte buradan düzenleyebilirsiniz.
+            </p>
+        </div>
+
+        <div class="hero-side">
+            <div class="mini-stat">
+                <div class="mini-stat-label">İşlem Türü</div>
+                <div class="mini-stat-value">{% if unit %}Kayıt Güncelleme{% else %}Yeni Kayıt Oluşturma{% endif %}</div>
+                <div class="mini-stat-sub">Yapılan değişiklik organizasyon ağacına yansır.</div>
+            </div>
+
+            <div class="mini-stat">
+                <div class="mini-stat-label">Kurumsal Etki</div>
+                <div class="mini-stat-value">Hiyerarşi ve Atama Yapısı</div>
+                <div class="mini-stat-sub">Personel ve hiyerarşi kayıtları bu yapıya bağlıdır.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Kayıt Türü</div>
+            <div class="stat-value">
+                {% if current_type == 'birim' %}Birim
+                {% elif current_type == 'pozisyon' %}Pozisyon
+                {% elif current_type == 'calisma_grubu' %}Çalışma Grubu
+                {% elif current_type == 'koordinatorluk' %}Koordinatörlük
+                {% else %}Tanımsız{% endif %}
+            </div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Durum</div>
+            <div class="stat-value">{% if active_val == '1' %}Aktif{% else %}Pasif{% endif %}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Üst Birim Bağı</div>
+            <div class="stat-value">{% if current_parent %}Tanımlı{% else %}Yok / Ana Kayıt{% endif %}</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Kullanım Alanı</div>
+            <div class="stat-value">Hiyerarşi, Atama, Raporlama</div>
+        </div>
+    </div>
+
+    {% if ai_org_unit_panel %}
+    <div class="glass-card panel-card ai-panel">
+        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_org_unit_panel.badge or 'AI birim özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_org_unit_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_org_unit_panel.summary }}</p>
+        <ul class="ai-bullets">{% for item in ai_org_unit_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}</ul>
+        {% if ai_org_unit_panel.actions %}<div class="ai-actions">{% for row in ai_org_unit_panel.actions %}<span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>{% endfor %}</div>{% endif %}
+        {% if ai_org_unit_panel.recommendations %}<ul class="ai-bullets">{% for item in ai_org_unit_panel.recommendations %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        <div class="notice-box">
+            Birim adı, kod ve üst birim bilgileri kurumsal organizasyon ağacında birlikte değerlendirilir.
+            Aynı isimli kayıtların ayrışması için kod ve üst birim alanlarının dikkatli tanımlanması önerilir.
+        </div>
+    </div>
+
+    <form method="POST" class="glass-card panel-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <h4 class="section-title">Temel Kayıt Bilgileri</h4>
+        <div class="form-grid">
+            <div class="field">
+                <label for="name">Birim / Pozisyon Adı</label>
+                <input id="name" name="name" class="form-input" value="{{ request.form.get('name', unit.name if unit else '') }}" required>
+            </div>
+
+            <div class="field">
+                <label for="unit_code">Kod</label>
+                <input id="unit_code" name="unit_code" class="form-input" value="{{ request.form.get('unit_code', unit.unit_code if unit and unit.unit_code else '') }}">
+                <div class="hint">Örn: EP-01, IK-02, STR-03</div>
+            </div>
+
+            <div class="field">
+                <label for="unit_type">Tür</label>
+                <select id="unit_type" name="unit_type" class="form-select">
+                    <option value="birim" {% if current_type == 'birim' %}selected{% endif %}>Birim</option>
+                    <option value="pozisyon" {% if current_type == 'pozisyon' %}selected{% endif %}>Pozisyon</option>
+                    <option value="calisma_grubu" {% if current_type == 'calisma_grubu' %}selected{% endif %}>Çalışma Grubu</option>
+                    <option value="koordinatorluk" {% if current_type == 'koordinatorluk' %}selected{% endif %}>Koordinatörlük</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="parent_id">Üst Birim</label>
+                <select id="parent_id" name="parent_id" class="form-select">
+                    <option value="">Seçiniz</option>
+                    {% if parent_options is defined %}
+                        {% for parent in parent_options %}
+                            <option value="{{ parent.id }}" {% if current_parent == (parent.id|string) %}selected{% endif %}>
+                                {{ parent.name }}
+                            </option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="field full">
+                <label for="description">Açıklama</label>
+                <textarea id="description" name="description" class="form-textarea">{{ request.form.get('description', unit.description if unit and unit.description else '') }}</textarea>
+            </div>
+
+            <div class="field full">
+                <label>Durum</label>
+                <div class="check-row">
+                    <label class="check-item">
+                        <input type="checkbox" name="is_active" value="1" {% if active_val == '1' %}checked{% endif %}>
+                        Aktif kayıt
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div style="height:20px"></div>
+
+        <div class="btn-line">
+            <a href="{{ url_for('main.admin_org_units') }}" class="btn-soft secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Listeye Dön
+            </a>
+
+            <button type="submit" class="btn-soft primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                {% if unit %}Değişiklikleri Kaydet{% else %}Kaydı Oluştur{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

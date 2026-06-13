@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}Güvenlik Sorusu Tanımla - BYS360{% endblock %}
+{% block page_kicker %}Kullanıcı Güvenliği{% endblock %}
+{% block page_title %}Güvenlik Sorusu Tanımla{% endblock %}
+{% block page_subtitle %}Şifre sıfırlama ve hesap doğrulama süreçlerinde kullanılacak güvenlik sorusu ve cevabınızı güvenli biçimde tanımlayın.{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+<style>
+    .security-setup-shell{
+        display:grid;
+        grid-template-columns:minmax(300px, 360px) minmax(0, 1fr);
+        gap:20px;
+        align-items:start;
+    }
+    .security-panel{
+        background:rgba(255,255,255,.92);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:26px;
+        box-shadow:0 18px 42px rgba(15,23,42,.08);
+        overflow:hidden;
+    }
+    .security-side{
+        position:sticky;
+        top:96px;
+    }
+    .security-side-top{
+        padding:24px 24px 18px;
+        background:linear-gradient(180deg, rgba(139,0,0,.08), rgba(139,0,0,.02));
+        border-bottom:1px solid rgba(139,0,0,.08);
+        position:relative;
+    }
+    .security-side-top::after{
+        content:"";
+        position:absolute;
+        right:-34px;
+        top:-24px;
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:rgba(139,0,0,.08);
+    }
+    .security-icon{
+        width:84px;
+        height:84px;
+        border-radius:24px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:2rem;
+        color:#8B0000;
+        background:rgba(255,255,255,.88);
+        box-shadow:0 16px 30px rgba(139,0,0,.10);
+        position:relative;
+        z-index:1;
+    }
+    .security-side-title{
+        margin:18px 0 8px;
+        font-size:1.16rem;
+        font-weight:900;
+        color:#111827;
+        position:relative;
+        z-index:1;
+    }
+    .security-side-text{
+        margin:0;
+        font-size:.95rem;
+        line-height:1.8;
+        color:#4b5563;
+        position:relative;
+        z-index:1;
+    }
+    .security-side-body{
+        padding:18px 24px 24px;
+        display:grid;
+        gap:14px;
+    }
+    .security-mini-card{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:18px;
+        background:#f8fafc;
+        padding:14px 16px;
+    }
+    .security-mini-card strong{
+        display:block;
+        margin-bottom:4px;
+        color:#111827;
+        font-size:.92rem;
+    }
+    .security-mini-card span{
+        display:block;
+        color:#6b7280;
+        line-height:1.7;
+        font-size:.88rem;
+    }
+    .security-main{
+        padding:24px;
+        display:grid;
+        gap:18px;
+    }
+    .security-alert{
+        display:flex;
+        gap:12px;
+        align-items:flex-start;
+        padding:16px 18px;
+        border-radius:18px;
+        background:linear-gradient(180deg, rgba(139,0,0,.06), rgba(139,0,0,.03));
+        border:1px solid rgba(139,0,0,.10);
+        color:#7f1d1d;
+    }
+    .security-alert i{
+        margin-top:2px;
+        font-size:1rem;
+    }
+    .security-steps{
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:12px;
+    }
+    .security-step{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:18px;
+        background:#fff;
+        padding:16px;
+        min-height:108px;
+    }
+    .security-step-no{
+        width:30px;
+        height:30px;
+        border-radius:50%;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        font-weight:800;
+        font-size:.86rem;
+        background:rgba(139,0,0,.09);
+        color:#8B0000;
+        margin-bottom:10px;
+    }
+    .security-step-title{
+        margin:0 0 6px;
+        font-size:.94rem;
+        font-weight:800;
+        color:#111827;
+    }
+    .security-step-text{
+        margin:0;
+        font-size:.88rem;
+        color:#6b7280;
+        line-height:1.7;
+    }
+    .security-form-card{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:22px;
+        background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.98));
+        padding:24px;
+        display:grid;
+        gap:18px;
+    }
+    .security-form-head{
+        display:flex;
+        justify-content:space-between;
+        gap:14px;
+        align-items:flex-start;
+        padding-bottom:14px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+    }
+    .security-form-title{
+        margin:0 0 6px;
+        font-size:1.08rem;
+        font-weight:900;
+        color:#8B0000;
+    }
+    .security-form-sub{
+        margin:0;
+        color:#6b7280;
+        line-height:1.75;
+        font-size:.92rem;
+    }
+    .security-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        min-height:40px;
+        padding:0 14px;
+        border-radius:999px;
+        background:#fff;
+        border:1px solid rgba(139,0,0,.10);
+        color:#8B0000;
+        font-weight:800;
+        font-size:.86rem;
+        white-space:nowrap;
+    }
+    .security-grid{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:16px;
+    }
+    .security-field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+    .security-field.full{
+        grid-column:1 / -1;
+    }
+    .security-label{
+        font-size:.92rem;
+        font-weight:800;
+        color:#374151;
+    }
+    .security-input-wrap{
+        position:relative;
+    }
+    .security-input-wrap i{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#9ca3af;
+        font-size:.95rem;
+        pointer-events:none;
+    }
+    .security-select,
+    .security-input{
+        width:100%;
+        min-height:54px;
+        border-radius:16px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        color:#111827;
+        font-size:.95rem;
+        outline:none;
+        transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .security-select{
+        padding:12px 14px 12px 44px;
+    }
+    .security-input{
+        padding:12px 14px 12px 44px;
+    }
+    .security-select:focus,
+    .security-input:focus{
+        border-color:rgba(139,0,0,.22);
+        box-shadow:0 0 0 4px rgba(139,0,0,.08);
+    }
+    .security-help-grid{
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:14px;
+    }
+    .security-help-box{
+        padding:16px 18px;
+        border-radius:18px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+    }
+    .security-help-box strong{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        margin-bottom:8px;
+        color:#111827;
+        font-size:.92rem;
+    }
+    .security-help-box p{
+        margin:0;
+        font-size:.88rem;
+        color:#6b7280;
+        line-height:1.75;
+    }
+    .security-actions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        padding-top:4px;
+    }
+    .security-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 18px;
+        border-radius:14px;
+        border:none;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.92rem;
+        transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .security-btn:hover{
+        transform:translateY(-1px);
+    }
+    .security-btn-primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 14px 28px rgba(139,0,0,.18);
+    }
+    .security-btn-secondary{
+        background:#fff;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.10);
+    }
+    @media (max-width:1100px){
+        .security-setup-shell{grid-template-columns:1fr}
+        .security-side{position:relative;top:auto}
+    }
+    @media (max-width:780px){
+        .security-steps,
+        .security-grid,
+        .security-help-grid{grid-template-columns:1fr}
+        .security-form-head{flex-direction:column}
+        .security-actions{justify-content:stretch}
+        .security-actions .security-btn{width:100%}
+    }
+</style>
+
+{% set selected_question = request.form.get('security_question', current_user.security_question or '') %}
+{% set answer_value = request.form.get('security_answer', '') %}
+
+<div class="security-setup-shell">
+    <aside class="security-panel security-side">
+        <div class="security-side-top">
+            <div class="security-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="security-side-title">Hesap Koruma Adımı</h3>
+            <p class="security-side-text">
+                Güvenlik sorusu, şifre sıfırlama ve kimlik doğrulama süreçlerinde hesabınızı koruyan ikinci kontrol katmanıdır.
+            </p>
+        </div>
+
+        <div class="security-side-body">
+            <div class="security-mini-card">
+                <strong>Kolay hatırlanır olmalı</strong>
+                <span>Sadece sizin bileceğiniz ama unutmayacağınız bir cevap tercih edin.</span>
+            </div>
+            <div class="security-mini-card">
+                <strong>Tahmin edilmesi zor olmalı</strong>
+                <span>Doğum tarihi, açık kullanıcı bilgileri veya kurumda bilinen cevaplardan kaçının.</span>
+            </div>
+            <div class="security-mini-card">
+                <strong>Gizli tutulmalı</strong>
+                <span>Bu cevap, hesabınıza erişim için kullanılabileceği için üçüncü kişilerle paylaşılmamalıdır.</span>
+            </div>
+        </div>
+    </aside>
+
+    <section class="security-panel security-main">
+        {% if current_user.must_set_security_question %}
+        <div class="security-alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+                <strong>Bu adım zorunludur.</strong><br>
+                Hesabınızı güvenli biçimde kullanmaya devam edebilmek için önce güvenlik sorunuzu tanımlamalısınız.
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="security-steps">
+            <div class="security-step">
+                <div class="security-step-no">1</div>
+                <h4 class="security-step-title">Soruyu seçin</h4>
+                <p class="security-step-text">Sizin için anlamlı ve uzun vadede hatırlanabilir bir soru belirleyin.</p>
+            </div>
+            <div class="security-step">
+                <div class="security-step-no">2</div>
+                <h4 class="security-step-title">Cevabı yazın</h4>
+                <p class="security-step-text">Kısa ama tahmin edilmesi zor bir cevap kullanın. Tutarlı yazım tercih edin.</p>
+            </div>
+            <div class="security-step">
+                <div class="security-step-no">3</div>
+                <h4 class="security-step-title">Kaydedin</h4>
+                <p class="security-step-text">Kaydetme sonrası hesabınız güvenlik doğrulama sürecine hazır hale gelir.</p>
+            </div>
+        </div>
+
+        <div class="security-form-card">
+            <div class="security-form-head">
+                <div>
+                    <h3 class="security-form-title">Güvenlik Sorusu Formu</h3>
+                    <p class="security-form-sub">
+                        Aşağıdan bir soru seçin ve cevabınızı girin. Cevabınız sistemde güvenli şekilde saklanır.
+                    </p>
+                </div>
+                <div class="security-badge">
+                    <i class="fa-solid fa-lock"></i>
+                    Hesap Güvenliği
+                </div>
+            </div>
+
+            <form method="post" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="security-grid">
+                    <div class="security-field full">
+                        <label for="security_question" class="security-label">Güvenlik Sorusu</label>
+                        <div class="security-input-wrap">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <select name="security_question" id="security_question" class="security-select" required>
+                                <option value="">Soru seçiniz</option>
+                                {% for question in security_questions %}
+                                    <option value="{{ question }}" {% if selected_question == question %}selected{% endif %}>{{ question }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="security-field full">
+                        <label for="security_answer" class="security-label">Cevap</label>
+                        <div class="security-input-wrap">
+                            <i class="fa-solid fa-key"></i>
+                            <input
+                                type="text"
+                                name="security_answer"
+                                id="security_answer"
+                                class="security-input"
+                                placeholder="Güvenlik cevabınızı yazın"
+                                value="{{ answer_value }}"
+                                autocomplete="off"
+                                spellcheck="false"
+                                required
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-help-grid">
+                    <div class="security-help-box">
+                        <strong><i class="fa-solid fa-lightbulb"></i> İyi cevap örneği</strong>
+                        <p>Yakın çevreniz tarafından bilinmeyen, size özel bir ifade ya da sadece sizin kurduğunuz bir hatırlatma düzeni kullanın.</p>
+                    </div>
+                    <div class="security-help-box">
+                        <strong><i class="fa-solid fa-triangle-exclamation"></i> Kaçınılması gerekenler</strong>
+                        <p>Açık sosyal medya bilgileri, sık kullanılan takma adlar, kurumda herkesin bildiği cevaplar ve doğrudan kişisel veriler önerilmez.</p>
+                    </div>
+                </div>
+
+                <div class="security-actions">
+                    {% if not current_user.must_set_security_question %}
+                    <a href="{{ url_for('main.account') }}" class="security-btn security-btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Hesabıma Dön
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="security-btn security-btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Güvenlik Sorusunu Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+{% endblock %}

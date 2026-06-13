@@ -1,0 +1,362 @@
+{
+  "generated_at": "2026-06-12T13:29:01",
+  "total_findings": 31,
+  "classification_counts": {
+    "accepted_with_followup": 5,
+    "noise": 1,
+    "control_runtime_guard": 7,
+    "runtime_action": 1,
+    "accepted_with_controls": 2,
+    "control_script": 15
+  },
+  "issue_counts": {
+    "CSP_UNSAFE_INLINE": 20,
+    "CSRF_EXEMPT": 4,
+    "CSRF_DISABLED": 7
+  },
+  "runtime_action_count": 1,
+  "accepted_count": 7,
+  "control_count": 22,
+  "review_count": 0,
+  "mobile_controls_evidence": {
+    "has_mobile_api_dir": true,
+    "auth_terms": [
+      "app/api/mobile/__init__.py",
+      "app/api/mobile/communication_read_routes.py",
+      "app/api/mobile/communication_v2_read_routes.py",
+      "app/api/mobile/detail_read_routes.py",
+      "app/api/mobile/domains/assistant_chat.py",
+      "app/api/mobile/domains/auth.py",
+      "app/api/mobile/domains/communication_v1_write.py",
+      "app/api/mobile/domains/communication_v2_write.py",
+      "app/api/mobile/domains/dashboard.py",
+      "app/api/mobile/domains/kpi_target_management.py",
+      "app/api/mobile/domains/notifications.py",
+      "app/api/mobile/domains/personnel_read.py",
+      "app/api/mobile/domains/personnel_write_all.py",
+      "app/api/mobile/domains/support_survey_write.py",
+      "app/api/mobile/light_read_routes.py",
+      "app/api/mobile/performance_read_routes.py",
+      "app/api/mobile/performance_routes.py",
+      "app/api/mobile/services/auth_service.py",
+      "app/api/mobile/shared.py",
+      "app/api/mobile/support_survey_read_routes.py",
+      "app/api/mobile/utility_routes.py"
+    ],
+    "token_terms": [
+      "app/api/mobile/__init__.py",
+      "app/api/mobile/domains/auth.py",
+      "app/api/mobile/domains/support_survey_write.py",
+      "app/api/mobile/services/auth_service.py",
+      "app/api/mobile/shared.py"
+    ],
+    "rate_limit_terms": []
+  },
+  "runtime_actions": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "runtime_action",
+      "severity": "high",
+      "decision": "script-src unsafe-inline",
+      "file": "app/security/headers.py",
+      "line": 9,
+      "excerpt": "- script-src tarafinda unsafe-inline varsayilan kullanilmaz.",
+      "recommendation": "Canl?da script-src unsafe-inline olmamal?."
+    }
+  ],
+  "accepted_or_followup": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Varsay?lan style-src uyumluluk istisnas?",
+      "file": "config.py",
+      "line": 334,
+      "excerpt": "CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', \"'self' 'unsafe-inline' https:\").strip() or \"'self' 'unsafe-inline' https:\"",
+      "recommendation": "Script-src de?il; style-src i?in takip karar? yaz?lmal?."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Duyuru popup CSRF muafiyeti",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 380,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Endpoint auth/rate-limit/gerek?e kontrol? ile takip edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Duyuru popup CSRF muafiyeti",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 395,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Endpoint auth/rate-limit/gerek?e kontrol? ile takip edilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "style-src uyumluluk istisnas?",
+      "file": "app/security/csp_nonce.py",
+      "line": 61,
+      "excerpt": "f\"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; \"",
+      "recommendation": "Ge?ici kabul edilebilir; orta vadede inline style azaltma/nonce/stylesheet plan? gerekli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "style-src uyumluluk istisnas?",
+      "file": "app/security/headers.py",
+      "line": 25,
+      "excerpt": "\"style-src\": \"'self' 'unsafe-inline' https:\",",
+      "recommendation": "Ge?ici kabul edilebilir; orta vadede inline style azaltma/nonce/stylesheet plan? gerekli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_controls",
+      "severity": "medium",
+      "decision": "Mobil API CSRF muafiyeti",
+      "file": "app/api/mobile/__init__.py",
+      "line": 18,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "Token/auth tabanl? mobil API i?in kabul edilebilir; auth/rate-limit kan?t? takip edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_controls",
+      "severity": "medium",
+      "decision": "Mobil API CSRF muafiyeti",
+      "file": "app/api/mobile/__init__.py",
+      "line": 31,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "Token/auth tabanl? mobil API i?in kabul edilebilir; auth/rate-limit kan?t? takip edilmeli."
+    }
+  ],
+  "reviews": [],
+  "controls_sample": [
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/audit.py",
+      "line": 92,
+      "excerpt": "code='csrf_disabled',",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/audit.py",
+      "line": 150,
+      "excerpt": "if observability_like and csp_enabled and \"'unsafe-inline'\" in script_src and not _is_truthy(config.get('CSP_ALLOW_UNSAFE_INLINE_SCRIPT', False)):",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/audit.py",
+      "line": 154,
+      "excerpt": "message='CSP script-src icinde unsafe-inline var.',",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/audit.py",
+      "line": 155,
+      "excerpt": "action='Nonce tabanli CSP kullan ve unsafe-inline script iznini kaldir.',",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "CSP temizleme yard?mc? fonksiyonu",
+      "file": "app/security/headers.py",
+      "line": 67,
+      "excerpt": "value = _remove_token(value, \"'unsafe-inline'\")",
+      "recommendation": "Risk de?il; unsafe-inline kald?rma kontrol?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/startup_audit.py",
+      "line": 101,
+      "excerpt": "if \"'unsafe-inline'\" in script_src and not bool(app.config.get(\"CSP_ALLOW_UNSAFE_INLINE_SCRIPT\", False)):",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_runtime_guard",
+      "severity": "info",
+      "decision": "Runtime g?venlik denetim kural?",
+      "file": "app/security/startup_audit.py",
+      "line": 102,
+      "excerpt": "security_errors.append(\"CSP_SCRIPT_SRC icinde unsafe-inline bulunamaz; nonce tabanli CSP kullanilmalidir.\")",
+      "recommendation": "Aksiyon de?il; bu sat?rlar risk yakalamak i?in var."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "line": 243,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_performance_response_gate_p3e.py",
+      "line": 152,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "line": 258,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v2.py",
+      "line": 293,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "line": 312,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "line": 143,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 107,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 112,
+      "excerpt": "if 'inject_csp_nonce_into_html' not in headers or \"'unsafe-inline'\" in script_default:",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 113,
+      "excerpt": "failures.append('CSP header/nonce uygulaması eksik veya DEFAULT_CSP script tarafında unsafe-inline içeriyor.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 98,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 113,
+      "excerpt": "if \"'unsafe-inline'\" in script_default:",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 114,
+      "excerpt": "failures.append('DEFAULT_CSP script-src hala unsafe-inline içeriyor.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 166,
+      "excerpt": "failures.append('.env içinde CSP_ALLOW_UNSAFE_INLINE_SCRIPT=true var; script unsafe-inline kapatılmalı.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 167,
+      "excerpt": "if \"'unsafe-inline'\" in csp_script:",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "control_script",
+      "severity": "info",
+      "decision": "G?venlik/kalite kontrol scripti",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 168,
+      "excerpt": "failures.append('.env CSP_SCRIPT_SRC içinde unsafe-inline var; nonce tabanlı CSP kullanılmalı.')",
+      "recommendation": "Canl? runtime riski de?il; kontrol mekanizmas?."
+    }
+  ]
+}

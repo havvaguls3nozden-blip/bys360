@@ -1,0 +1,373 @@
+/* BYS360 iOS PWA V3.1 Performance Mobile Screens
+   Performans ekranlarını iPhone/iPad ve dar ekranlarda kart, akordeon ve dokunmatik puanlama düzenine taşır. */
+:root {
+  --bys-perf-red: #8B0000;
+  --bys-perf-red-dark: #650000;
+  --bys-perf-ink: #2f2424;
+  --bys-perf-muted: #6f6363;
+  --bys-perf-bg: #f7f4f2;
+  --bys-perf-card: rgba(255,255,255,.94);
+  --bys-perf-border: rgba(139,0,0,.15);
+  --bys-perf-soft: rgba(139,0,0,.07);
+  --bys-perf-shadow: 0 18px 45px rgba(40, 18, 18, .13);
+  --bys-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bys-safe-top: env(safe-area-inset-top, 0px);
+}
+html.bys-perf-mobile-active,
+html.bys-perf-mobile-active body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+html.bys-perf-mobile-active body {
+  background: radial-gradient(circle at top left, rgba(139,0,0,.07), transparent 32%), var(--bys-perf-bg);
+}
+.bys-perf-mobile-page *,
+.bys-perf-mobile-page *::before,
+.bys-perf-mobile-page *::after { box-sizing: border-box; }
+.bys-perf-mobile-page input,
+.bys-perf-mobile-page select,
+.bys-perf-mobile-page textarea,
+.bys-perf-mobile-page button { font-size: 16px; }
+.bys-perf-mobile-page .table-responsive,
+.bys-perf-mobile-page .responsive-table-wrap,
+.bys-perf-mobile-page .table-wrapper,
+.bys-perf-mobile-page [class*="table"]:has(table) {
+  -webkit-overflow-scrolling: touch;
+}
+.bys-perf-mobile-page .btn,
+.bys-perf-mobile-page button,
+.bys-perf-mobile-page input[type="submit"],
+.bys-perf-mobile-page input[type="button"] {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.bys-perf-mobile-page textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+.bys-perf-mobile-page .bys-mobile-action-sticky {
+  display: none;
+}
+.bys-perf-mobile-page .bys-score-choice-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.bys-perf-mobile-page .bys-score-choice {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(139,0,0,.24);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--bys-perf-red);
+  font-weight: 800;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.bys-perf-mobile-page .bys-score-choice:active { transform: scale(.96); }
+.bys-perf-mobile-page .bys-score-choice.is-selected {
+  background: linear-gradient(135deg, var(--bys-perf-red), #b01818);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(139,0,0,.22);
+}
+.bys-perf-mobile-page .bys-mobile-section-toggle {
+  display: none;
+}
+.bys-perf-mobile-page .bys-mobile-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(139,0,0,.08);
+  color: var(--bys-perf-red);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (max-width: 992px) {
+  html.bys-perf-mobile-active .main-content,
+  html.bys-perf-mobile-active main,
+  html.bys-perf-mobile-active .content,
+  html.bys-perf-mobile-active .page-content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-bottom: max(96px, calc(var(--bys-safe-bottom) + 82px)) !important;
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+  .bys-perf-mobile-page .container,
+  .bys-perf-mobile-page .container-fluid,
+  .bys-perf-mobile-page .page-container,
+  .bys-perf-mobile-page .content-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  .bys-perf-mobile-page h1,
+  .bys-perf-mobile-page .page-title,
+  .bys-perf-mobile-page .content-title {
+    font-size: clamp(22px, 6vw, 30px) !important;
+    line-height: 1.16 !important;
+    letter-spacing: -.02em;
+    margin-bottom: 10px !important;
+  }
+  .bys-perf-mobile-page h2 { font-size: clamp(19px, 5vw, 24px) !important; }
+  .bys-perf-mobile-page h3 { font-size: clamp(17px, 4.5vw, 21px) !important; }
+  .bys-perf-mobile-page p,
+  .bys-perf-mobile-page li,
+  .bys-perf-mobile-page .text-muted,
+  .bys-perf-mobile-page .small {
+    line-height: 1.55;
+  }
+  .bys-perf-mobile-page .card,
+  .bys-perf-mobile-page .panel,
+  .bys-perf-mobile-page .glass-card,
+  .bys-perf-mobile-page .box,
+  .bys-perf-mobile-page .section,
+  .bys-perf-mobile-page .content-card,
+  .bys-perf-mobile-page [class*="card"] {
+    border-radius: 22px !important;
+    box-shadow: var(--bys-perf-shadow) !important;
+    border-color: var(--bys-perf-border) !important;
+    background: var(--bys-perf-card);
+  }
+  .bys-perf-mobile-page .row {
+    --bs-gutter-x: 12px;
+    --bs-gutter-y: 12px;
+  }
+  .bys-perf-mobile-page .row > [class*="col"],
+  .bys-perf-mobile-page .grid > *,
+  .bys-perf-mobile-page [class*="grid"] > * {
+    min-width: 0;
+  }
+  .bys-perf-mobile-page .btn-toolbar,
+  .bys-perf-mobile-page .button-row,
+  .bys-perf-mobile-page .action-row,
+  .bys-perf-mobile-page .page-actions,
+  .bys-perf-mobile-page .d-flex.gap-2,
+  .bys-perf-mobile-page .d-flex.gap-3 {
+    flex-wrap: wrap !important;
+  }
+  .bys-perf-mobile-page .btn,
+  .bys-perf-mobile-page button,
+  .bys-perf-mobile-page a.btn {
+    border-radius: 15px !important;
+    min-height: 46px;
+    padding: 10px 14px;
+    white-space: normal;
+  }
+  .bys-perf-mobile-page input:not([type="checkbox"]):not([type="radio"]),
+  .bys-perf-mobile-page select,
+  .bys-perf-mobile-page textarea,
+  .bys-perf-mobile-page .form-control,
+  .bys-perf-mobile-page .form-select {
+    width: 100% !important;
+    min-height: 46px;
+    border-radius: 15px !important;
+  }
+  .bys-perf-mobile-page label,
+  .bys-perf-mobile-page .form-label {
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--bys-perf-ink);
+    margin-bottom: 6px;
+  }
+  .bys-perf-mobile-page .form-row,
+  .bys-perf-mobile-page .form-grid,
+  .bys-perf-mobile-page form .row {
+    row-gap: 12px !important;
+  }
+  .bys-perf-mobile-page .modal-dialog {
+    margin: max(12px, var(--bys-safe-top)) 10px max(14px, var(--bys-safe-bottom)) !important;
+  }
+  .bys-perf-mobile-page .modal-content {
+    border-radius: 24px !important;
+  }
+
+  /* Performans tablolarını mobil kartlara dönüştürür. */
+  .bys-perf-mobile-page table.bys-mobile-card-table,
+  .bys-perf-mobile-page table.bys-mobile-card-table thead,
+  .bys-perf-mobile-page table.bys-mobile-card-table tbody,
+  .bys-perf-mobile-page table.bys-mobile-card-table th,
+  .bys-perf-mobile-page table.bys-mobile-card-table td,
+  .bys-perf-mobile-page table.bys-mobile-card-table tr {
+    display: block;
+    width: 100% !important;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table {
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important;
+    background: transparent !important;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table thead {
+    position: absolute;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table tr {
+    margin: 0 0 12px;
+    padding: 12px;
+    border: 1px solid var(--bys-perf-border);
+    border-radius: 22px;
+    background: rgba(255,255,255,.94);
+    box-shadow: var(--bys-perf-shadow);
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table td {
+    display: grid;
+    grid-template-columns: minmax(105px, 38%) 1fr;
+    align-items: start;
+    gap: 10px;
+    min-height: 34px;
+    padding: 8px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(139,0,0,.08) !important;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table td:last-child { border-bottom: 0 !important; }
+  .bys-perf-mobile-page table.bys-mobile-card-table td::before {
+    content: attr(data-bys-label);
+    color: var(--bys-perf-muted);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.35;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table td:empty { display: none; }
+  .bys-perf-mobile-page table.bys-mobile-card-table td .btn,
+  .bys-perf-mobile-page table.bys-mobile-card-table td button {
+    width: 100%;
+    margin: 3px 0;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table td input,
+  .bys-perf-mobile-page table.bys-mobile-card-table td select,
+  .bys-perf-mobile-page table.bys-mobile-card-table td textarea {
+    min-width: 0 !important;
+  }
+
+  /* Kriter puanlama ve karne ekranları */
+  .bys-perf-mobile-page .score,
+  .bys-perf-mobile-page .final-score,
+  .bys-perf-mobile-page .performance-score,
+  .bys-perf-mobile-page [class*="score-card"],
+  .bys-perf-mobile-page [class*="puan"] {
+    max-width: 100%;
+  }
+  .bys-perf-mobile-page .bys-score-choice-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(44px, 1fr));
+    gap: 8px;
+  }
+  .bys-perf-mobile-page .bys-score-choice {
+    width: 100%;
+    min-width: 44px;
+  }
+  .bys-perf-mobile-page input[type="radio"][name*="score"],
+  .bys-perf-mobile-page input[type="radio"][name*="puan"],
+  .bys-perf-mobile-page input[type="radio"][name*="rating"],
+  .bys-perf-mobile-page input[type="radio"][name*="rate"] {
+    min-height: auto;
+  }
+
+  /* Mobilde kritik aksiyonlar altta sabitlenir. */
+  .bys-perf-mobile-page .bys-mobile-action-sticky {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9998;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: stretch;
+    padding: 10px 12px max(12px, calc(var(--bys-safe-bottom) + 10px));
+    background: rgba(255,255,255,.94);
+    border-top: 1px solid var(--bys-perf-border);
+    box-shadow: 0 -14px 36px rgba(35,20,20,.14);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .bys-perf-mobile-page .bys-mobile-action-sticky .btn,
+  .bys-perf-mobile-page .bys-mobile-action-sticky button {
+    flex: 1 1 0;
+    margin: 0 !important;
+  }
+  .bys-perf-mobile-page .bys-mobile-hide-source-action {
+    display: none !important;
+  }
+
+  /* Akordeon etkisi: uzun değerlendirme blokları dar ekranda daha kontrollü açılır. */
+  .bys-perf-mobile-page .bys-mobile-collapsible {
+    overflow: hidden;
+  }
+  .bys-perf-mobile-page .bys-mobile-section-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--bys-perf-border);
+    border-radius: 18px;
+    background: rgba(139,0,0,.06);
+    color: var(--bys-perf-red);
+    font-weight: 800;
+  }
+  .bys-perf-mobile-page .bys-mobile-section-toggle::after {
+    content: 'âŒ„';
+    font-size: 18px;
+    transition: transform .18s ease;
+  }
+  .bys-perf-mobile-page .bys-mobile-collapsible.is-collapsed .bys-mobile-section-toggle::after {
+    transform: rotate(-90deg);
+  }
+  .bys-perf-mobile-page .bys-mobile-collapsible.is-collapsed .bys-mobile-section-body {
+    display: none;
+  }
+
+  /* Başkan onayı, karne inceleme, görev listesi gibi alanlarda taşmayı önler. */
+  .bys-perf-mobile-page .timeline,
+  .bys-perf-mobile-page .process-history,
+  .bys-perf-mobile-page .approval-history,
+  .bys-perf-mobile-page .score-history,
+  .bys-perf-mobile-page [class*="timeline"],
+  .bys-perf-mobile-page [class*="history"] {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .bys-perf-mobile-page .badge,
+  .bys-perf-mobile-page .status,
+  .bys-perf-mobile-page [class*="badge"],
+  .bys-perf-mobile-page [class*="status"] {
+    white-space: normal !important;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: 520px) {
+  .bys-perf-mobile-page table.bys-mobile-card-table td {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .bys-perf-mobile-page table.bys-mobile-card-table td::before {
+    font-size: 11.5px;
+  }
+  .bys-perf-mobile-page .bys-score-choice-group {
+    gap: 7px;
+  }
+  .bys-perf-mobile-page .bys-score-choice {
+    height: 42px;
+    border-radius: 13px;
+  }
+}

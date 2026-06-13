@@ -1,0 +1,350 @@
+:root {
+  --perf-card-radius: 22px;
+  --perf-soft-border: 1px solid rgba(15, 23, 42, .08);
+  --perf-soft-bg: rgba(255,255,255,.88);
+  --perf-soft-muted: #6b7280;
+  --perf-soft-title: #111827;
+  --perf-soft-accent: #8B0000;
+  --perf-safe-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+.page-performance-form .container-fluid,
+.page-performance-tasks .content-block,
+.page-performance-compare .content-block,
+.page-performance-personal-compare .content-block,
+.page-performance-scorecard .content-block,
+.page-performance-scorecard-detail .content-block {
+  min-width: 0;
+}
+
+.page-performance-form .content-wrap,
+.page-performance-compare .content-wrap,
+.page-performance-personal-compare .content-wrap,
+.page-performance-scorecard .content-wrap,
+.page-performance-scorecard-detail .content-wrap {
+  padding-bottom: calc(var(--perf-safe-bottom) + 18px);
+}
+
+.perf-form-shell,
+.compare-mobile-list,
+.criteria-mobile-list {
+  display: grid;
+  gap: 16px;
+}
+
+.perf-form-card,
+.perf-inline-card,
+.perf-criteria-card,
+.perf-mobile-card,
+.criteria-mobile-card {
+  background: var(--perf-soft-bg);
+  border: var(--perf-soft-border);
+  border-radius: var(--perf-card-radius);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, .08);
+}
+
+.perf-form-card { padding: 20px; }
+.perf-inline-card { padding: 16px; }
+.perf-criteria-card { padding: 18px; display: grid; gap: 14px; }
+.perf-mobile-card,
+.criteria-mobile-card { padding: 16px; }
+
+.perf-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.perf-form-title {
+  margin: 0;
+  color: var(--perf-soft-title);
+  font-size: 1.14rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.perf-form-subtitle,
+.perf-muted,
+.perf-mobile-note,
+.perf-meta-text,
+.perf-criteria-desc,
+.perf-inline-list,
+.perf-mobile-card p,
+.criteria-mobile-card p {
+  color: var(--perf-soft-muted);
+  line-height: 1.7;
+}
+
+.perf-badge,
+.perf-inline-badge,
+.perf-score-chip,
+.perf-mobile-pill,
+.compare-mobile-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.perf-badge.primary,
+.perf-score-chip.primary,
+.compare-mobile-pill.primary {
+  background: linear-gradient(180deg, #8B0000, #6f0000);
+  color: #fff;
+}
+
+.perf-badge.soft,
+.perf-inline-badge,
+.perf-mobile-pill,
+.compare-mobile-pill.soft {
+  background: rgba(139, 0, 0, .08);
+  color: var(--perf-soft-accent);
+  border: 1px solid rgba(139, 0, 0, .10);
+}
+
+.perf-summary-grid,
+.perf-stats-grid,
+.perf-mini-grid,
+.perf-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.perf-mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.perf-metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.perf-stat-box,
+.perf-meta-box,
+.perf-mini-box,
+.perf-metric-box {
+  border: var(--perf-soft-border);
+  border-radius: 18px;
+  background: #fff;
+  padding: 14px;
+  min-width: 0;
+}
+
+.perf-stat-label,
+.perf-meta-label,
+.perf-mini-label,
+.perf-metric-label {
+  color: var(--perf-soft-muted);
+  font-size: .78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  margin-bottom: 8px;
+}
+
+.perf-stat-value,
+.perf-meta-value,
+.perf-mini-value,
+.perf-metric-value {
+  color: var(--perf-soft-title);
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.perf-stat-value { font-size: 1.3rem; }
+
+.perf-criteria-head,
+.perf-prev-head,
+.perf-mobile-card-head,
+.criteria-mobile-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.perf-criteria-title {
+  margin: 0;
+  color: var(--perf-soft-title);
+  font-size: 1.02rem;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.perf-criteria-grid {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.perf-prev-cards,
+.compare-mobile-list,
+.criteria-mobile-list {
+  display: none;
+}
+
+.perf-prev-card {
+  border: var(--perf-soft-border);
+  border-radius: 18px;
+  background: #fff;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.perf-prev-card strong,
+.perf-mobile-card strong,
+.criteria-mobile-card strong,
+.compare-mobile-card strong { color: var(--perf-soft-title); }
+
+.perf-form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 8;
+  background: rgba(255, 255, 255, .96);
+  border: var(--perf-soft-border);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, .08);
+  padding: 12px;
+}
+
+.perf-form-actions__inner {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.perf-form-actions .btn,
+.perf-form-actions .btn-soft,
+.perf-form-actions button {
+  min-height: 48px;
+}
+
+.compare-mobile-card,
+.criteria-mobile-card {
+  display: grid;
+  gap: 12px;
+}
+
+.compare-mobile-meta,
+.criteria-mobile-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.compare-mobile-meta .box,
+.criteria-mobile-meta .box {
+  border: var(--perf-soft-border);
+  border-radius: 16px;
+  background: #fff;
+  padding: 12px;
+}
+
+.compare-mobile-meta .label,
+.criteria-mobile-meta .label {
+  display: block;
+  font-size: .76rem;
+  font-weight: 800;
+  color: var(--perf-soft-muted);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  margin-bottom: 6px;
+}
+
+.compare-mobile-meta .value,
+.criteria-mobile-meta .value {
+  display: block;
+  color: var(--perf-soft-title);
+  font-size: .92rem;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+@media (max-width: 1200px) {
+  .perf-summary-grid,
+  .perf-stats-grid,
+  .perf-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .perf-criteria-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .perf-form-card,
+  .perf-inline-card,
+  .perf-criteria-card,
+  .perf-mobile-card,
+  .criteria-mobile-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .perf-form-title {
+    font-size: 1.02rem;
+  }
+
+  .perf-summary-grid,
+  .perf-stats-grid,
+  .perf-mini-grid,
+  .perf-metric-grid,
+  .compare-mobile-meta,
+  .criteria-mobile-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .perf-form-actions__inner {
+    flex-direction: column;
+  }
+
+  .perf-form-actions__inner > * {
+    width: 100%;
+  }
+
+  .perf-prev-table-wrap,
+  .team-compare-table-wrap,
+  .personal-compare-table-wrap {
+    display: none;
+  }
+
+  .perf-prev-cards,
+  .compare-mobile-list,
+  .criteria-mobile-list {
+    display: grid;
+  }
+
+  .page-performance-tasks .toolbar-grid,
+  .page-performance-tasks .employee-grid,
+  .page-performance-tasks .unit-summary,
+  .page-performance-tasks .assignment-row,
+  .page-performance-scorecard .toolbar-grid,
+  .page-performance-scorecard .stats-grid,
+  .page-performance-scorecard .totals-grid,
+  .page-performance-scorecard .layout-horizontal .amir-layout,
+  .page-performance-scorecard-detail .hero-grid,
+  .page-performance-scorecard-detail .summary-grid,
+  .page-performance-scorecard-detail .manager-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-performance-tasks .assignment-actions {
+    justify-content: stretch;
+  }
+
+  .page-performance-tasks .assignment-actions > * {
+    width: 100%;
+  }
+
+  .page-performance-scorecard table,
+  .page-performance-scorecard-detail table {
+    min-width: 640px;
+  }
+}

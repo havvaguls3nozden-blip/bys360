@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Talep Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Talep Merkezi{% endblock %}
+{% block page_subtitle %}Şablon bazlı özlük taleplerinizi hazırlayın, ek yükleyin ve SLA durumunu tek ekrandan izleyin.{% endblock %}
+
+{% block content %}
+<style>
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827;line-height:1}.page-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.template-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}.template-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:14px;background:#fff;cursor:pointer}.template-card.active{border-color:#8B0000;box-shadow:0 0 0 2px rgba(139,0,0,.08)}.template-card h4{margin:0 0 8px;font-size:.98rem;font-weight:900}.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.soft{background:#f3f4f6;color:#374151}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:grid;gap:6px}.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:120px;resize:vertical}.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.btn-soft.danger{background:#fef2f2;color:#991b1b}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:780px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.stack{display:grid;gap:14px}.attachment-list,.timeline{display:grid;gap:12px}.attachment-item,.timeline-item{padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.empty-state{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:1100px){.stats,.page-grid,.form-grid,.template-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="stats">
+  <div class="stat"><div class="label">Toplam talep</div><div class="value">{{ request_rows|length }}</div></div>
+  <div class="stat"><div class="label">Gönderildi</div><div class="value">{{ queue_counts.submitted }}</div></div>
+  <div class="stat"><div class="label">İncelemede</div><div class="value">{{ queue_counts.in_review }}</div></div>
+  <div class="stat"><div class="label">SLA geciken</div><div class="value">{{ queue_counts.overdue }}</div></div>
+</div>
+
+<div class="page-grid">
+  <div class="panel">
+    <h3 class="section-title">Talep formu</h3>
+    {% if template_cards %}
+    <div class="template-grid" id="templateGrid">
+      {% for card in template_cards %}
+      <div class="template-card {% if selected_template_id == card.id %}active{% endif %}" data-template-card data-id="{{ card.id }}" data-title="{{ card.title|e }}" data-desc="{{ card.description_hint|e }}" data-type="{{ card.request_type }}" data-priority="{{ card.priority }}" data-sla="{{ card.sla_target_days if card.sla_target_days is not none else '' }}" data-req="{{ 1 if card.requires_attachment else 0 }}">
+        <h4>{{ card.title }}</h4>
+        <div class="muted">{{ card.description_hint or 'Bu şablon için yönlendirme metni tanımlanmadı.' }}</div>
+        <div class="badge-row">
+          <span class="tag soft">{{ card.request_type_label }}</span>
+          <span class="tag soft">{{ card.priority_label }}</span>
+          <span class="tag {% if card.requires_attachment %}warn{% else %}good{% endif %}">{{ 'Ek zorunlu' if card.requires_attachment else 'Ek opsiyonel' }}</span>
+          {% if card.sla_target_days is not none %}<span class="tag soft">{{ card.sla_target_days }} gün SLA</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('main.hr_self_service_request_save') }}" class="stack" enctype="multipart/form-data">
+      <input type="hidden" name="form_token" value="{{ request_form_token }}">
+      <input type="hidden" name="request_id" value="{{ selected_request.id if selected_request else '' }}">
+      <input type="hidden" name="template_id" id="template_id" value="{{ selected_request.template_id if selected_request and selected_request.template_id else '' }}">
+      <div class="form-grid">
+        <div class="field"><label>Talep türü</label><select name="request_type" id="request_type">{% for value,label in request_type_options %}<option value="{{ value }}" {% if (selected_request.request_type if selected_request else 'bilgi_guncelleme') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="field"><label>Öncelik</label><select name="priority" id="priority">{% for value,label in request_priority_options %}<option value="{{ value }}" {% if (selected_request.priority if selected_request else 'normal') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="field"><label>Talep edilen yürürlük tarihi</label><input type="date" name="requested_effective_date" value="{{ selected_request.requested_effective_date.isoformat() if selected_request and selected_request.requested_effective_date else '' }}"></div>
+        <div class="field"><label>Hedef tamamlanma tarihi</label><input type="date" name="desired_completion_date" value="{{ selected_request.desired_completion_date.isoformat() if selected_request and selected_request.desired_completion_date else '' }}"></div>
+      </div>
+      <div class="field"><label>Talep başlığı</label><input type="text" id="title" name="title" value="{{ selected_request.title if selected_request else '' }}" maxlength="255" required></div>
+      <div class="field"><label>Talep açıklaması</label><textarea id="description" name="description" maxlength="5000" required>{{ selected_request.description if selected_request else '' }}</textarea></div>
+      <div class="form-grid">
+        <div class="field"><label>Destekleyici belgeler</label><input type="file" name="request_files" multiple></div>
+        <div class="field"><label>Ek notu</label><input type="text" name="attachment_note" maxlength="255" placeholder="Yüklenen ekler için kısa not"></div>
+      </div>
+      <div class="muted" id="templateMeta">Şablon seçildiğinde talep türü, öncelik ve yönlendirme metni otomatik güncellenir.</div>
+      <div class="btn-row">
+        <button class="btn-soft secondary" type="submit" name="action_mode" value="draft">Taslak kaydet</button>
+        <button class="btn-soft primary" type="submit" name="action_mode" value="submit">İncelemeye gönder</button>
+      </div>
+    </form>
+
+    {% if selected_request and ((selected_request.status or 'draft') in ['draft','returned']) %}
+    <div class="btn-row" style="margin-top:12px">
+      <form method="post" action="{{ url_for('main.hr_self_service_request_delete', request_id=selected_request.id) }}">
+        <input type="hidden" name="form_token" value="{{ request_delete_token }}">
+        <button class="btn-soft danger" type="submit">Talebi sil</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="stack" style="margin-top:18px">
+      <h3 class="section-title">Talep ekleri</h3>
+      {% if selected_request_attachment_rows %}
+      <div class="attachment-list">
+        {% for item in selected_request_attachment_rows %}
+        <div class="attachment-item">
+          <strong>{{ item.name }}</strong>
+          <div class="muted">{{ item.uploaded_by_name }} · {{ item.uploaded_at.strftime('%d.%m.%Y %H:%M') if item.uploaded_at else '-' }}{% if item.note %} · {{ item.note }}{% endif %}</div>
+          <div class="btn-row">
+            <a class="btn-soft secondary" href="{{ url_for('main.hr_self_service_request_attachment_download', request_id=selected_request.id, attachment_id=item.id) }}">İndir</a>
+            {% if selected_request and ((selected_request.status or 'draft') in ['draft','returned']) %}
+            <form method="post" action="{{ url_for('main.hr_self_service_request_attachment_delete', request_id=selected_request.id, attachment_id=item.id) }}">
+              <input type="hidden" name="form_token" value="{{ request_attachment_delete_token }}">
+              <button class="btn-soft danger" type="submit">Sil</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}<div class="empty-state">Bu talep için henüz ek yüklenmedi.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="panel stack">
+    <div>
+      <h3 class="section-title">Talep listesi</h3>
+      {% if request_rows %}
+      <div class="table-wrap"><table class="table-clean"><thead><tr><th>Başlık</th><th>Durum</th><th>SLA</th><th>İşlem</th></tr></thead><tbody>
+      {% for row in request_rows %}
+      <tr>
+        <td><strong>{{ row.title }}</strong><br><span class="muted">{{ row.template_title }} · {{ row.request_type_label }} · {{ row.attachment_count }} ek</span></td>
+        <td><span class="tag {% if row.status == 'approved' %}good{% elif row.status == 'rejected' %}bad{% elif row.status in ['submitted','in_review','returned'] %}warn{% else %}soft{% endif %}">{{ row.status_label }}</span></td>
+        <td>{% if row.sla %}<span class="tag {{ row.sla.tone }}">{{ row.sla.label }}</span>{% else %}<span class="tag soft">Takipsiz</span>{% endif %}</td>
+        <td><a class="btn-soft secondary" href="{{ url_for('main.hr_self_service_requests', request_id=row.id) }}">Aç</a></td>
+      </tr>
+      {% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty-state">Henüz talep kaydı oluşturmadınız.</div>{% endif %}
+    </div>
+
+    <div>
+      <h3 class="section-title">Seçili talebin akışı</h3>
+      {% if selected_request %}
+      <div class="attachment-item">
+        <strong>{{ selected_request.title }}</strong>
+        <div class="badge-row" style="margin-top:10px">
+          <span class="tag soft">{{ selected_request.template.title if selected_request.template else 'Serbest form' }}</span>
+          <span class="tag soft">{{ (selected_request.priority or 'normal')|replace('_',' ')|title }}</span>
+          {% if selected_request_sla %}<span class="tag {{ selected_request_sla.tone }}">{{ selected_request_sla.label }}</span>{% endif %}
+        </div>
+        <div class="muted" style="margin-top:10px">{{ selected_request.description }}</div>
+      </div>
+      <div class="timeline">
+        {% for item in request_log_rows %}
+        <div class="timeline-item"><strong>{{ item.action }}</strong><br><span class="muted">{{ item.actor_name }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '-' }}</span><div class="muted" style="margin-top:8px">{{ item.from_status }} → {{ item.to_status }}{% if item.note %} · {{ item.note }}{% endif %}</div></div>
+        {% else %}<div class="empty-state">Henüz işlem geçmişi oluşmadı.</div>{% endfor %}
+      </div>
+      {% else %}<div class="empty-state">Sağ tarafta akışını izlemek için bir talep seçin.</div>{% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const cards = document.querySelectorAll('[data-template-card]');
+  const templateId = document.getElementById('template_id');
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const requestType = document.getElementById('request_type');
+  const priority = document.getElementById('priority');
+  const meta = document.getElementById('templateMeta');
+  const selectedRequestId = '{{ selected_request.id if selected_request else '' }}';
+  if (!cards.length || selectedRequestId) return;
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      cards.forEach((item) => item.classList.remove('active'));
+      card.classList.add('active');
+      templateId.value = card.dataset.id || '';
+      if (card.dataset.type) requestType.value = card.dataset.type;
+      if (card.dataset.priority) priority.value = card.dataset.priority;
+      if (!title.value.trim()) title.value = card.dataset.title || '';
+      if (!description.value.trim()) description.value = card.dataset.desc || '';
+      meta.textContent = `${card.dataset.sla ? card.dataset.sla + ' gün hedef' : 'Standart takip'} · ${card.dataset.req === '1' ? 'ek zorunlu' : 'ek opsiyonel'}`;
+    });
+  });
+})();
+</script>
+{% endblock %}

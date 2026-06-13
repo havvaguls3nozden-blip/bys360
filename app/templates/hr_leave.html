@@ -1,0 +1,742 @@
+{% extends "base.html" %}
+
+{% block title %}İzin Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}İzin Yönetimi{% endblock %}
+{% block page_subtitle %}
+İzin kayıtları, bakiyeler ve dönem etkilerini bu ekranda takip edebilirsiniz.
+{% endblock %}
+
+{% block content %}
+<style>@import url("{{ url_for('static', filename='css/faz3_communication_hr_mobile.css') }}");</style>
+{% set _scope_options = hr_scope.scope_options if hr_scope is defined and hr_scope and hr_scope.scope_options is defined else ([{'value': (selected_scope_mode if selected_scope_mode is defined and selected_scope_mode else 'personal'), 'label': 'Kişisel görünüm'}]) %}
+{% set _scope_role_title = hr_scope.role_title if hr_scope is defined and hr_scope else 'Kapsam görünümü' %}
+{% set _scope_heading = hr_scope.scope_heading if hr_scope is defined and hr_scope else 'Kapsam' %}
+{% set _scope_label = hr_scope.scope_label if hr_scope is defined and hr_scope else (scope_label if scope_label is defined else '') %}
+{% set _scope_description = hr_scope.scope_description if hr_scope is defined and hr_scope else '' %}
+{% set _scope_user_count = hr_scope.scope_user_count if hr_scope is defined and hr_scope else 0 %}
+{% set _active_delegations = active_delegations if active_delegations is defined else ((leave_overview.active_delegations if leave_overview is defined and leave_overview else []) or []) %}
+{% set _delegation_health = delegation_health if delegation_health is defined else {} %}
+{% set _delegation_coverage = _delegation_health.coverage_summary if _delegation_health and _delegation_health.coverage_summary is defined else {} %}
+{% set _delegated_open_assignments = _delegation_health.delegated_open_assignments if _delegation_health and _delegation_health.delegated_open_assignments is defined else 0 %}
+{% set _open_assignment_count = _delegation_health.open_assignment_count if _delegation_health and _delegation_health.open_assignment_count is defined else 0 %}
+{% set _uncovered_count = _delegation_coverage.uncovered if _delegation_coverage and _delegation_coverage.uncovered is defined else 0 %}
+<style>
+    .page-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
+    .hero-hata ayrıntısı{display:grid;gap:18px;align-items:start}
+    .hero-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .hero-mini-grid .ai-card{height:100%}
+    .hero-mini-grid .ai-card.full-span{grid-column:1/-1}
+    .panel{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}
+    .top-strip{background:#fff;color:#111827;align-self:start}
+    .top-strip h3{margin:0 0 10px;font-size:1.4rem;font-weight:900}
+    .top-strip p{margin:0;line-height:1.8;color:#6b7280}
+    .top-strip-badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .top-strip-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-weight:800;font-size:.86rem;color:#374151}
+    .section-title{margin:0 0 14px;font-size:1.02rem;font-weight:900;color:#111827}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .stat{padding:18px;border-radius:20px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+    .stat .label{font-size:.85rem;color:#6b7280;font-weight:700;margin-bottom:8px}
+    .stat .value{font-size:1.8rem;font-weight:900;color:#111827;line-height:1}
+    .hata ayrıntısı{display:grid;gap:18px;margin-top:18px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .full{grid-column:1/-1}
+    label{display:block;font-size:.84rem;font-weight:800;color:#374151;margin-bottom:6px}
+    input,select,textarea{width:100%;min-height:44px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;padding:10px 12px;font:inherit;color:#111827}
+    textarea{min-height:92px;resize:vertical}
+    .check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .check{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid rgba(15,23,42,.08);border-radius:16px;background:#f8fafc;font-size:.92rem}
+    .check input{width:18px;height:18px;min-height:auto;padding:0}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+    .subtle-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#111827;text-decoration:none;font-weight:800}
+    .submit-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border:none;border-radius:14px;color:#fff;background:linear-gradient(180deg,#8B0000,#690000);font-weight:800;cursor:pointer}
+    .secondary{background:linear-gradient(180deg,#4b5563,#374151)}
+    .table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}
+    table{width:100%;border-collapse:collapse;min-width:900px}
+    th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}
+    th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}
+    .status{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:800}
+    .ok{background:#ecfdf5;color:#065f46}.warn{background:#fff7ed;color:#9a3412}.bad{background:#fef2f2;color:#991b1b}
+    .mini-actions{display:flex;flex-wrap:wrap;gap:8px}
+    .mini-actions form{margin:0}
+    .pill-note{padding:12px 14px;border-radius:16px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.7}
+    .filter-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+    .small{font-size:.86rem;color:#6b7280;line-height:1.7}
+    .notice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+    .notice-card{padding:16px 18px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#f8fafc;line-height:1.75}
+    .notice-card strong{display:block;color:#111827;margin-bottom:6px}
+    .notice-card.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+    .notice-card.ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
+    .level-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .level-badge{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.82rem;font-weight:800;color:#374151}.field-hidden{display:none !important}.inline-help{padding:12px 14px;border-radius:16px;background:#f8fafc;border:1px dashed rgba(15,23,42,.12);color:#4b5563;line-height:1.7}
+    @media (max-width:1150px){.page-grid,.hero-mini-grid{grid-template-columns:1fr}.form-grid,.stats,.check-grid,.filter-form,.notice-grid{grid-template-columns:1fr}}
+    .scope-strip{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);box-shadow:0 14px 28px rgba(15,23,42,.06)}
+    .scope-meta{display:grid;gap:4px}.scope-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.scope-title{font-size:1.05rem;font-weight:900;color:#111827}.scope-sub{font-size:.9rem;color:#6b7280;line-height:1.65}.scope-options{display:flex;flex-wrap:wrap;gap:8px}.scope-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(15,23,42,.1);background:#fff;color:#374151;font-weight:800;font-size:.86rem}.scope-pill.active{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}
+    .ai-zone{display:grid;gap:18px;margin-top:18px}.ai-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.ai-card{border-radius:24px;padding:22px;background:rgba(255,255,255,.95);border:1px solid rgba(139,0,0,.08);box-shadow:0 16px 30px rgba(15,23,42,.06)}.ai-card.critical{background:#fff7ed;border-color:#fed7aa}.ai-card.watch{background:#fffdf5;border-color:#fde68a}.ai-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000;margin-bottom:8px}.ai-title{font-size:1.1rem;font-weight:900;color:#111827;margin-bottom:8px}.ai-text{color:#4b5563;line-height:1.7}.ai-bullets,.ai-actions{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}.ai-bullets li,.ai-actions li{display:flex;gap:10px;align-items:flex-start}.ai-actions li{justify-content:space-between;align-items:center;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.06)}.tone-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:900}.tone-pill.critical{background:#fee2e2;color:#991b1b}.tone-pill.watch{background:#fef3c7;color:#92400e}.tone-pill.calm{background:#ecfdf5;color:#166534}.report-actions{display:flex;flex-wrap:wrap;gap:10px}.report-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;text-decoration:none;font-weight:800;border:1px solid rgba(15,23,42,.12);background:#fff;color:#111827}.report-btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}.mini-table{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.mini-table table{min-width:720px}.mini-table th,.mini-table td{padding:10px 12px}.muted{color:#6b7280}.priority-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:999px;background:#111827;color:#fff;font-size:.78rem;font-weight:900}@media (max-width:1150px){.ai-grid{grid-template-columns:1fr}}
+    .command-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+    .command-card{padding:16px 18px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}
+    .command-card .label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:8px}
+    .command-card .value{font-size:1.55rem;font-weight:900;color:#111827;line-height:1}
+    .command-card.ok{background:#ecfdf5;border-color:#bbf7d0}.command-card.warn{background:#fff7ed;border-color:#fed7aa}.command-card.bad{background:#fef2f2;border-color:#fecaca}
+    .command-shell{display:grid;gap:18px;margin-top:18px}
+    .command-note-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+    .command-note-list li{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);color:#4b5563;line-height:1.7}
+    @media (max-width:1150px){.command-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:700px){.command-grid{grid-template-columns:1fr}}
+
+</style>
+
+<div class="page-grid">
+    <div class="hero-stack">
+        <div class="panel top-strip">
+            <h3>İzin kayıtları ve dönem etkisi</h3>
+            <p>
+                Onaylı izin günleri, bakiye ve dönem etkilerini bu ekranda birlikte izleyebilirsiniz.
+            </p>
+            <div class="top-strip-badges">
+                <span class="top-strip-badge"><i class="fa-solid fa-calendar-day"></i> Bugün izinde: {{ leave_today_count }}</span>
+                <span class="top-strip-badge"><i class="fa-solid fa-hourglass-half"></i> Bekleyen kayıt: {{ pending_leave_count }}</span>
+                <span class="top-strip-badge"><i class="fa-solid fa-wallet"></i> Bakiye satırı: {{ balance_count }}</span>
+                <span class="top-strip-badge"><i class="fa-solid fa-ban"></i> Muafiyet adayı: {{ exemption_candidates }}</span>
+            </div>
+        </div>
+
+        <div class="scope-strip">
+            <div class="scope-meta">
+                <div class="scope-kicker">{{ _scope_role_title }}</div>
+                <div class="scope-title">{{ _scope_heading }} · {{ _scope_label }}</div>
+                <div class="scope-sub">{{ _scope_description }} Filtre ve kayıt listesi {{ _scope_user_count }} personel üzerinden çalışıyor.</div>
+            </div>
+            <div class="scope-options">
+                {% for option in _scope_options %}
+                    <a class="scope-pill {% if selected_scope_mode == option.value %}active{% endif %}" href="{{ url_for('main.hr_leave_management', scope=option.value, period_id=selected_period_id, user_id=selected_user_id) }}">{{ option.label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="hero-mini-grid">
+            <article class="ai-card {{ leave_ai_panel.tone if leave_ai_panel else 'calm' }}">
+                <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ leave_ai_panel.badge if leave_ai_panel else 'AI yönetici özeti' }}</div>
+                <div class="ai-title">{{ leave_ai_panel.headline if leave_ai_panel else 'İzin AI özeti' }}</div>
+                <div class="ai-text">{{ leave_ai_panel.summary if leave_ai_panel else '' }}</div>
+                <ul class="ai-bullets">
+                    {% for bullet in (leave_ai_panel.bullets if leave_ai_panel else []) %}
+                    <li><i class="fa-solid fa-angle-right"></i><span>{{ bullet }}</span></li>
+                    {% endfor %}
+                </ul>
+                <ul class="ai-actions">
+                    {% for item in (leave_ai_panel.actions if leave_ai_panel else []) %}
+                    <li>
+                        <span>{{ item.label }}</span>
+                        <span class="tone-pill {{ item.tone }}">{{ item.value }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </article>
+            <article class="ai-card">
+                <div class="ai-kicker"><i class="fa-solid fa-file-waveform"></i> Yönetici raporu</div>
+                <div class="ai-title">İndirilebilir AI karar paketi</div>
+                <div class="ai-text">İzin görünümü, birim baskı haritası ve öncelikli aksiyon planı aynı raporda dışa aktarılır.</div>
+                <div class="report-actions" style="margin-top:16px;">
+                    <a class="report-btn primary" href="{{ url_for('main.hr_leave_ai_report_export', scope=selected_scope_mode, period_id=selected_period_id, user_id=selected_user_id, format='xlsx') }}"><i class="fa-solid fa-file-excel"></i> Excel raporu</a>
+                    <a class="report-btn" href="{{ url_for('main.hr_leave_ai_report_export', scope=selected_scope_mode, period_id=selected_period_id, user_id=selected_user_id, format='csv') }}"><i class="fa-solid fa-file-csv"></i> CSV raporu</a>
+                </div>
+                <div class="small" style="margin-top:14px;">
+                    Bu çıktı; toplantı öncesi paylaşım, birim bazlı önceliklendirme ve AI öneri listesi için hazırdır.
+                </div>
+            </article>
+            {% if can_view_ai_admin and leave_ai_governance_url %}
+            <article class="ai-card full-span">
+                <div class="ai-kicker"><i class="fa-solid fa-shield-halved"></i> AI yönetişim köprüsü</div>
+                <div class="ai-title">Bu modülün AI denetim izini aç</div>
+                <div class="ai-text">HR tarafında üretilen AI raporları, geçici kayıt kayıtları ve modül sağlığı admin AI merkezine bağlanır. Maskeleme, açık öneri ve prompt sürümü takibi aynı yerden okunur.</div>
+                <div class="report-actions" style="margin-top:16px;">
+                    <a class="report-btn" href="{{ leave_ai_governance_url }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> AI modül sağlığı</a>
+                </div>
+                <div class="small" style="margin-top:14px;">Bu köprü özellikle yönetim sunumu ve denetim izi için kullanılır.</div>
+            </article>
+            {% endif %}
+        </div>
+{% set ai_runtime_summary_url = url_for('main.ai_hr_leave_brief') %}
+{% set ai_runtime_title = 'İzin ve vekâlet için AI ikinci kontrolü' %}
+{% set ai_runtime_description = 'Statik yönetici paneline ek olarak, güncel izin ve vekâlet görünümü için istek üzerine kısa AI özeti üretebilirsiniz.' %}
+{% set ai_runtime_secondary_url = '' %}
+{% include 'partials/ai_runtime_summary_card.html' %}
+
+    </div>
+
+    <div class="panel">
+        <h4 class="section-title">Dönem görünümü</h4>
+        <div class="stats">
+            <div class="stat"><div class="label">Bugün izinli</div><div class="value">{{ leave_today_count }}</div></div>
+            <div class="stat"><div class="label">Bekleyen</div><div class="value">{{ pending_leave_count }}</div></div>
+            <div class="stat"><div class="label">Bakiye satırı</div><div class="value">{{ balance_count }}</div></div>
+            <div class="stat"><div class="label">Muafiyet adayı</div><div class="value">{{ exemption_candidates }}</div></div>
+        </div>
+        <div class="pill-note" style="margin-top:14px;">
+            {% if effective_period %}
+                Çalışan kural seti <strong>{{ effective_period.title }}</strong> dönemi üzerinden okunuyor. Asgari fiili gün, izin/devamsızlık eşiği ve vekâlet zorunluluğu bu dönemin ayarlarına göre çalışır.
+            {% else %}
+                Aktif performans dönemi bulunmadığı için yalnızca Personel kayıtları tutulur; muafiyet kontrolü dönem açıldığında devreye girer.
+            {% endif %}
+        </div>
+        <div class="notice-grid">
+            <div class="notice-card">
+                <strong>Dönem kuralı özeti</strong>
+                {% if effective_period %}
+                    Asgari fiili gün: <strong>{{ effective_period.minimum_presence_days_for_evaluation or 0 }}</strong><br>
+                    İzin eşiği: <strong>{{ effective_period.leave_skip_threshold_days if effective_period.leave_skip_threshold_days is not none else 'Kapalı' }}</strong><br>
+                    Devamsızlık eşiği: <strong>{{ effective_period.absence_skip_threshold_days if effective_period.absence_skip_threshold_days is not none else 'Kapalı' }}</strong><br>
+                    Tam yoklukta otomatik muafiyet: <strong>{{ 'Açık' if effective_period.auto_skip_if_fully_absent else 'Kapalı' }}</strong><br>
+                    Yönetici izninde vekâlet: <strong>{{ 'Zorunlu' if effective_period.manager_delegation_required else 'Opsiyonel' }}</strong>
+                {% else %}
+                    Dönem seçilmediği için yalnızca genel izin kaydı oluşturulur.
+                {% endif %}
+            </div>
+            <div class="notice-card {% if selected_user_guard and selected_user_guard.coverage.is_manager and effective_period and effective_period.manager_delegation_required %}warn{% else %}ok{% endif %}">
+                <strong>Seçili personel bilgilendirmesi</strong>
+                {% if selected_user_guard %}
+                    {{ selected_user_guard.message }}
+                    {% if selected_user_guard.coverage.is_manager %}
+                    <div class="level-badges">
+                        <span class="level-badge">1. Amir: {{ selected_user_guard.coverage.level_1 }}</span>
+                        <span class="level-badge">2. Amir: {{ selected_user_guard.coverage.level_2 }}</span>
+                        <span class="level-badge">3. Amir: {{ selected_user_guard.coverage.level_3 }}</span>
+                    </div>
+                    {% if selected_user_guard.requires_delegation %}
+                        <div style="margin-top:10px;">Bu personel için yönetici görevini bloklayan onaylı izin kaydedilirken aktif ya da aynı ekranda tanımlanmış bir vekâlet bulunmak zorundadır.</div>
+                    {% endif %}
+                    {% if selected_user_guard.has_covering_delegation and selected_user_guard.covering_delegation and selected_user_guard.covering_delegation.delegate_user %}
+                        <div style="margin-top:10px;">Mevcut kapsayan vekâlet: <strong>{{ selected_user_guard.covering_delegation.delegate_user.full_name }}</strong></div>
+                    {% endif %}
+                    {% else %}
+                        Personel seçip filtrelediğinizde amir kapsamı burada görünür.
+                    {% endif %}
+                {% else %}
+                    Personel seçip filtrelediğinizde izin kaydının yönetici zincirine etkisi burada görünür.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ai-zone">
+<div class="ai-grid">
+        <article class="ai-card">
+            <div class="ai-kicker"><i class="fa-solid fa-wave-square"></i> Birim bazlı izin baskı haritası</div>
+            <div class="mini-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Birim</th>
+                            <th>Risk</th>
+                            <th>Aktif izin</th>
+                            <th>Bekleyen</th>
+                            <th>Vekâletsiz yönetici</th>
+                            <th>Bakiye alarmı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in leave_pressure_rows %}
+                        <tr>
+                            <td><strong>{{ row.unit_name }}</strong></td>
+                            <td><span class="tone-pill {{ row.tone }}">{{ row.risk_score }}</span></td>
+                            <td>{{ row.active_count }}</td>
+                            <td>{{ row.pending_count }}</td>
+                            <td>{{ row.manager_gap_count }}</td>
+                            <td>{{ row.balance_watch_count }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="muted">Seçili filtrede AI baskı haritası oluşturacak kayıt bulunamadı.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+        <article class="ai-card">
+            <div class="ai-kicker"><i class="fa-solid fa-list-check"></i> Öncelikli aksiyon planı</div>
+            <div class="mini-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Öncelik</th>
+                            <th>Başlık</th>
+                            <th>Sahip</th>
+                            <th>Sonraki adım</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in leave_action_rows %}
+                        <tr>
+                            <td><span class="priority-badge">{{ row.priority }}</span></td>
+                            <td><strong>{{ row.title }}</strong><div class="muted">{{ row.count }}</div></td>
+                            <td>{{ row.owner }}</td>
+                            <td>{{ row.next_step }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="muted">Seçili filtrede öncelikli AI aksiyon satırı oluşmadı.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </div>
+</div>
+
+<div class="panel command-shell">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+        <div>
+            <h4 class="section-title" style="margin-bottom:6px;">İzin–Vekâlet Komuta Merkezi</h4>
+            <div class="small">İzinli amirlerde görev seviyesinin korunması, aktif vekâlet kapsamı ve açık görev baskısı aynı alanda izlenir.</div>
+        </div>
+        <span class="status {% if _uncovered_count %}bad{% else %}ok{% endif %}">{{ 'Vekâletsiz zincir uyarısı var' if _uncovered_count else 'Zincir görünümü dengeli' }}</span>
+    </div>
+
+    <div class="command-grid">
+        <div class="command-card ok">
+            <div class="label">Aktif vekâlet</div>
+            <div class="value">{{ _active_delegations|length }}</div>
+        </div>
+        <div class="command-card warn">
+            <div class="label">Vekile yönlenen açık görev</div>
+            <div class="value">{{ _delegated_open_assignments }}</div>
+        </div>
+        <div class="command-card {% if _uncovered_count %}bad{% else %}ok{% endif %}">
+            <div class="label">Vekâletsiz zincir uyarısı</div>
+            <div class="value">{{ _uncovered_count }}</div>
+        </div>
+        <div class="command-card warn">
+            <div class="label">Toplam açık görev</div>
+            <div class="value">{{ _open_assignment_count }}</div>
+        </div>
+    </div>
+
+    <div class="mini-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Asıl yönetici</th>
+                    <th>Vekil</th>
+                    <th>Kapsam</th>
+                    <th>Seviye</th>
+                    <th>Tarih</th>
+                    <th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in _active_delegations %}
+                <tr>
+                    <td><strong>{{ row.delegator.full_name if row.delegator is defined and row.delegator else (row.delegator_name if row.delegator_name is defined else '-') }}</strong></td>
+                    <td>{{ row.delegate.full_name if row.delegate is defined and row.delegate else (row.delegate_name if row.delegate_name is defined else '-') }}</td>
+                    <td>{{ row.scope_type if row.scope_type is defined else 'performance' }}</td>
+                    <td>
+                        {% if row.applies_level_1 is defined or row.applies_level_2 is defined or row.applies_level_3 is defined %}
+                            {% if row.applies_level_1 %}<span class="level-badge">1</span>{% endif %}
+                            {% if row.applies_level_2 %}<span class="level-badge">2</span>{% endif %}
+                            {% if row.applies_level_3 %}<span class="level-badge">3</span>{% endif %}
+                        {% elif row.applies is defined %}
+                            {% if row.applies.level_1 %}<span class="level-badge">1</span>{% endif %}
+                            {% if row.applies.level_2 %}<span class="level-badge">2</span>{% endif %}
+                            {% if row.applies.level_3 %}<span class="level-badge">3</span>{% endif %}
+                        {% else %}
+                            <span class="small">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ row.start_date if row.start_date is defined else '-' }} → {{ row.end_date if row.end_date is defined else '-' }}</td>
+                    <td><span class="status ok">{{ row.status|default('aktif')|replace('_',' ')|title }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="muted">Aktif vekâlet kaydı görünmüyor. Yönetici izninde görev boşa düşmemesi için aktif kapsayıcı vekâlet tanımlı olmalı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <ul class="command-note-list">
+        <li><i class="fa-solid fa-shield-halved"></i><span>İzinli amirde görev seviyesi korunmalı; 1. amir görevi 1. amir vekiline, 2. amir görevi 2. amir vekiline düşmelidir.</span></li>
+        <li><i class="fa-solid fa-route"></i><span>Muafiyet, kısmi değerlendirme ve bilgi amaçlı kayıt ayrımı açık görünmeli; izin kaydı ile performans sonucu birbirine karışmamalıdır.</span></li>
+        <li><i class="fa-solid fa-clipboard-check"></i><span>Vekâletsiz zincir uyarısı varsa görev üretimi veya yayın öncesi kontrol ekranında ayrıca izlenmelidir.</span></li>
+    </ul>
+</div>
+
+<div class="stack">
+    <div class="panel">
+        <div class="toolbar">
+            <a class="subtle-btn" href="{{ url_for('main.hr_management', scope=selected_scope_mode) }}"><i class="fa-solid fa-arrow-left"></i> Personel paneli</a>
+            <a class="subtle-btn" href="{{ url_for('main.hr_attendance_management', scope=selected_scope_mode) }}"><i class="fa-solid fa-user-clock"></i> Devamsızlık & Vekâlet</a>
+            <a class="subtle-btn" href="{{ url_for('main.hr_reports', scope=selected_scope_mode) }}"><i class="fa-solid fa-chart-column"></i> Personel Raporları</a>
+        </div>
+
+        <h4 class="section-title">Filtrele</h4>
+        <form method="get" class="filter-form">
+            <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+            <div>
+                <label>Personel</label>
+                <select name="user_id">
+                    <option value="">Tümü</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>{{ user.full_name }}{% if user.birim %} · {{ user.birim }}{% endif %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Dönem</label>
+                <select name="period_id">
+                    <option value="">Tümü</option>
+                    {% for period in periods %}
+                    <option value="{{ period.id }}" {% if selected_period_id == period.id %}selected{% endif %}>{{ period.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Görünüm</label>
+                <select name="scope">
+                    {% for option in _scope_options %}
+                    <option value="{{ option.value }}" {% if selected_scope_mode == option.value %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-filter"></i> Uygula</button>
+        </form>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Yeni izin kaydı</h4>
+            <form method="post" class="form-grid" id="hr-leave-create-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="create_leave">
+                <input type="hidden" name="_form_token" value="{{ leave_create_submit_token }}">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+                <input type="hidden" name="period_id" value="{{ selected_period_id or '' }}">
+                <div>
+                    <label>Personel</label>
+                    <select name="user_id" required>
+                        <option value="">Seçiniz</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>{{ user.full_name }}{% if user.birim %} · {{ user.birim }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Dönem</label>
+                    <select name="period_id">
+                        <option value="">Otomatik eşleştir</option>
+                        {% for period in periods %}
+                        <option value="{{ period.id }}" {% if selected_period_id == period.id %}selected{% endif %}>{{ period.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>İzin türü</label>
+                    <select name="leave_type" required data-role="leave-type">
+                        {% for value,label in leave_type_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Durum</label>
+                    <select name="status" required>
+                        {% for value,label in leave_status_choices %}
+                        <option value="{{ value }}" {% if value == 'onaylandi' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Performans modu</label>
+                    <select name="performance_mode" data-role="performance-mode">
+                        <option value="partial" selected>Kısmi değerlendirme</option>
+                        <option value="exclude">Muaf</option>
+                        <option value="informational">Bilgi amaçlı</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Başlangıç</label>
+                    <input type="date" name="start_date" required>
+                </div>
+                <div>
+                    <label>Bitiş</label>
+                    <input type="date" name="end_date" required>
+                </div>
+                <div>
+                    <label>Onaylanan gün</label>
+                    <input type="text" name="approved_day_count" data-role="approved-day-count" placeholder="Boş bırakılırsa iş günü hesabı otomatik yapılır">
+                </div>
+                <div class="small" style="display:flex;align-items:end;">
+                    Gün bazlı izinlerde sistem hafta içi günlerini baz alır. Saatlik izin için aşağıdaki saat alanlarını doldurabilirsiniz.
+                </div>
+                <div data-role="closed-day-wrap">
+                    <label>Kurum kapalı / resmi tatil düzeltmesi</label>
+                    <input type="text" name="closed_day_count" value="0" data-role="closed-day-count" placeholder="Örn. 1">
+                </div>
+                <div class="inline-help" data-role="leave-day-hint">Sistem hafta sonunu otomatik düşer. Resmi tatil veya kurum kapalı gün varsa burada ayrıca düzeltme girebilirsiniz.</div>
+                <div data-role="hourly-only" class="field-hidden">
+                    <label>Başlangıç saati <span class="small">(saatlik izin)</span></label>
+                    <input type="time" name="hourly_start_time">
+                </div>
+                <div data-role="hourly-only" class="field-hidden">
+                    <label>Bitiş saati <span class="small">(saatlik izin)</span></label>
+                    <input type="time" name="hourly_end_time">
+                </div>
+                <div data-role="hourly-only" class="field-hidden">
+                    <label>Toplam saat <span class="small">(opsiyonel)</span></label>
+                    <input type="text" name="approved_hour_count" placeholder="Boş bırakılırsa başlangıç ve bitiş saatinden hesaplanır">
+                </div>
+                <div class="small field-hidden" data-role="hourly-only" style="display:flex;align-items:end;">
+                    Saatlik izin aynı gün içinde tanımlanır ve sistem 8 saat = 1 gün mantığıyla performans etkisini otomatik çevirir.
+                </div>
+                <div class="full check-grid">
+                    <label class="check" data-role="day-based-only"><input type="checkbox" name="start_half_day"> Başlangıç yarım gün</label>
+                    <label class="check" data-role="day-based-only"><input type="checkbox" name="end_half_day"> Bitiş yarım gün</label>
+                    <label class="check"><input type="checkbox" name="blocks_performance_evaluation" checked data-role="performance-checkbox"> Performans değerlendirmesini etkilesin</label>
+                    <label class="check"><input type="checkbox" name="blocks_manager_duties" checked data-role="manager-block-checkbox"> Yönetici görevini bloklasın</label>
+                </div>
+                <div class="full pill-note">Performans modu seçimi, değerlendirmeyi tamamen muaf / kısmi / sadece bilgi amaçlı olarak netleştirir.</div>
+                <div class="full" data-role="delegation-zone">
+                    <div class="pill-note">
+                        Yönetici görevi bloke eden onaylı izinlerde, dönem ayarında vekâlet zorunluysa aşağıdaki alanlardan aynı anda vekâlet tanımlayabilirsiniz. Aktif kapsayan bir vekâlet yoksa kayıt engellenir.
+                    </div>
+                </div>
+                <div>
+                    <label>Vekil personel</label>
+                    <select name="delegate_user_id">
+                        <option value="">Mevcut aktif vekâleti kullan / boş bırak</option>
+                        {% for user in delegate_candidates %}
+                        <option value="{{ user.id }}">{{ user.full_name }}{% if user.birim %} · {{ user.birim }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Vekâlet kapsamı</label>
+                    <select name="delegation_scope_type">
+                        <option value="performance" selected>Performans</option>
+                        <option value="full">Genel Kapsam</option>
+                    </select>
+                </div>
+                <div class="full check-grid">
+                    <label class="check"><input type="checkbox" name="delegation_applies_level_1" checked> 1. amir görevlerini kapsasın</label>
+                    <label class="check"><input type="checkbox" name="delegation_applies_level_2" checked> 2. amir görevlerini kapsasın</label>
+                    <label class="check"><input type="checkbox" name="delegation_applies_level_3"> 3. amir görüş zincirini kapsasın</label>
+                </div>
+                <div class="full">
+                    <label>Vekâlet notu</label>
+                    <textarea name="delegation_note" placeholder="Vekâlet notu, kapsam detayı veya karar metni"></textarea>
+                </div>
+                <div class="full">
+                    <label>Açıklama</label>
+                    <textarea name="description" placeholder="Not, belge numarası veya açıklama"></textarea>
+                </div>
+                <div class="full btn-row">
+                    <button type="submit" class="submit-btn"><i class="fa-solid fa-floppy-disk"></i> İzin kaydet</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h4 class="section-title">İzin bakiyesi tanımı</h4>
+            <form method="post" class="form-grid">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="save_balance">
+                <input type="hidden" name="_form_token" value="{{ leave_balance_submit_token }}">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+                <input type="hidden" name="period_id" value="{{ selected_period_id or '' }}">
+                <div>
+                    <label>Personel</label>
+                    <select name="user_id" required>
+                        <option value="">Seçiniz</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>{{ user.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Yıl</label>
+                    <input type="number" name="year" value="{{ today.year }}" required>
+                </div>
+                <div>
+                    <label>İzin türü</label>
+                    <select name="leave_type" required>
+                        {% for value,label in leave_type_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Toplam gün</label>
+                    <input type="text" name="total_days" value="0" required>
+                </div>
+                <div>
+                    <label>Devreden gün</label>
+                    <input type="text" name="carried_over_days" value="0">
+                </div>
+                <div>
+                    <label>Kullanılmış gün</label>
+                    <input type="text" name="used_days" value="0">
+                </div>
+                <div class="full">
+                    <label>Açıklama</label>
+                    <textarea name="note" placeholder="Personel kararı, manuel düzeltme notu vb."></textarea>
+                </div>
+                <div class="full check-grid">
+                    <label class="check"><input type="checkbox" name="manual_override" checked> Manuel override olarak işaretle</label>
+                </div>
+                <div class="full btn-row">
+                    <button type="submit" class="submit-btn secondary"><i class="fa-solid fa-wallet"></i> Bakiye kaydet</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="panel">
+        <h4 class="section-title">İzin kayıtları</h4>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Personel</th>
+                        <th>Tür</th>
+                        <th>Dönem</th>
+                        <th>Tarih</th>
+                        <th>Süre</th>
+                        <th>Performans etkisi</th>
+                        <th>Yönetici görevi</th>
+                        <th>Durum</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in leaves %}
+                    <tr>
+                        <td>
+                            <strong>{{ row.user.full_name if row.user else '-' }}</strong><br>
+                            <span class="small">{{ row.user.birim if row.user and row.user.birim else '-' }}</span>
+                        </td>
+                        <td>{{ leave_type_label(row.leave_type) }}</td>
+                        <td>{{ row.period.title if row.period else 'Otomatik / yok' }}</td>
+                        <td>{{ leave_date_range_label(row) }}</td>
+                        <td>{{ leave_duration_label(row) }}</td>
+                        <td>{{ performance_mode_label(row.performance_mode) }}{% if row.blocks_performance_evaluation %} · Etkili{% else %} · Bilgi{% endif %}</td>
+                        <td>{{ 'Evet' if row.blocks_manager_duties else 'Hayır' }}</td>
+                        <td>
+                            <span class="status {% if row.status == 'onaylandi' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">
+                                {{ row.status|replace('_', ' ')|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="mini-actions">
+                                <form method="post" action="{{ url_for('main.hr_leave_update_status', leave_id=row.id) }}">
+                                    <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+                                    <input type="hidden" name="user_id" value="{{ selected_user_id or row.user_id or '' }}">
+                                    <input type="hidden" name="period_id" value="{{ selected_period_id or row.period_id or '' }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="status" value="onaylandi">
+                                    <button type="submit" class="subtle-btn">Onayla</button>
+                                </form>
+                                <form method="post" action="{{ url_for('main.hr_leave_update_status', leave_id=row.id) }}">
+                                    <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+                                    <input type="hidden" name="user_id" value="{{ selected_user_id or row.user_id or '' }}">
+                                    <input type="hidden" name="period_id" value="{{ selected_period_id or row.period_id or '' }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="status" value="bekliyor">
+                                    <button type="submit" class="subtle-btn">Beklet</button>
+                                </form>
+                                <form method="post" action="{{ url_for('main.hr_leave_delete', leave_id=row.id) }}" onsubmit="return confirm('İzin kaydı silinsin mi?');">
+                                    <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
+                                    <input type="hidden" name="user_id" value="{{ selected_user_id or row.user_id or '' }}">
+                                    <input type="hidden" name="period_id" value="{{ selected_period_id or row.period_id or '' }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="subtle-btn">Sil</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9">Filtreye uyan izin kaydı bulunamadı.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="panel">
+        <h4 class="section-title">İzin bakiyeleri</h4>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Personel</th>
+                        <th>Yıl</th>
+                        <th>Tür</th>
+                        <th>Toplam</th>
+                        <th>Devreden</th>
+                        <th>Kullanılan</th>
+                        <th>Kalan</th>
+                        <th>Not</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in balances %}
+                    <tr>
+                        <td>{{ row.user.full_name if row.user else '-' }}</td>
+                        <td>{{ row.year or '-' }}</td>
+                        <td>{{ leave_type_label(row.leave_type) }}</td>
+                        <td>{{ row.total_days }}</td>
+                        <td>{{ row.carried_over_days }}</td>
+                        <td>{{ row.used_days }}</td>
+                        <td><strong>{{ row.remaining_days }}</strong></td>
+                        <td>{{ row.note or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8">Henüz bakiye kaydı yok.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('hr-leave-create-form');
+  if(!form) return;
+  const leaveType = form.querySelector('[data-role="leave-type"]');
+  const perfMode = form.querySelector('[data-role="performance-mode"]');
+  const perfCheckbox = form.querySelector('[data-role="performance-checkbox"]');
+  const managerCheckbox = form.querySelector('[data-role="manager-block-checkbox"]');
+  const hourlyFields = form.querySelectorAll('[data-role="hourly-only"]');
+  const dayFields = form.querySelectorAll('[data-role="day-based-only"]');
+  const dayCount = form.querySelector('[data-role="approved-day-count"]');
+  const closedWrap = form.querySelector('[data-role="closed-day-wrap"]');
+  const closedCount = form.querySelector('[data-role="closed-day-count"]');
+  const startDate = form.querySelector('input[name="start_date"]');
+  const endDate = form.querySelector('input[name="end_date"]');
+  const delegationZone = form.querySelector('[data-role="delegation-zone"]');
+  function syncLeaveForm(){
+    const isHourly = leaveType && leaveType.value === 'saatlik_izin';
+    hourlyFields.forEach(el => el.classList.toggle('field-hidden', !isHourly));
+    dayFields.forEach(el => el.classList.toggle('field-hidden', isHourly));
+    if(closedWrap) closedWrap.classList.toggle('field-hidden', isHourly);
+    if(dayCount) dayCount.disabled = isHourly;
+    if(closedCount) closedCount.disabled = isHourly;
+    if(isHourly && startDate && endDate && startDate.value){ endDate.value = startDate.value; }
+    if(delegationZone && managerCheckbox){ delegationZone.classList.toggle('field-hidden', !managerCheckbox.checked); }
+  }
+  function syncPerformanceMode(){
+    if(!perfMode || !perfCheckbox) return;
+    perfCheckbox.checked = perfMode.value !== 'informational';
+  }
+  if(leaveType){ leaveType.addEventListener('change', syncLeaveForm); }
+  if(startDate){ startDate.addEventListener('change', syncLeaveForm); }
+  if(perfMode){ perfMode.addEventListener('change', syncPerformanceMode); }
+  if(managerCheckbox){ managerCheckbox.addEventListener('change', syncLeaveForm); }
+  syncLeaveForm();
+  syncPerformanceMode();
+})();
+</script>
+
+<script src="{{ url_for('static', filename='js/faz3_communication_hr_mobile.js') }}"></script>
+{% endblock %}

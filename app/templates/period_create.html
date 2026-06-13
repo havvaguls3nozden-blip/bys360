@@ -1,0 +1,591 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Dönem - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yeni Dönem Oluştur{% endblock %}
+{% block page_subtitle %}
+Dönem türünü, tarih aralığını ve değerlendirme kapsamını belirleyin. Özel dönemlerde birim, üst birim veya personeli listeden seçebilirsiniz.
+{% endblock %}
+
+{% block content %}
+<style>
+    .period-form-shell{display:grid;gap:18px;}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.86);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px);}
+    .glass-card.watermark-card::before{content:"";position:absolute;inset:0;background-image:url("{{ url_for('static', filename='img/ay_yildiz.svg') }}");background-repeat:no-repeat;background-position:right 24px bottom 22px;background-size:170px auto;pointer-events:none;opacity:.72;}
+    .panel-card{padding:22px;position:relative;z-index:1;}
+    .hero-card{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;}
+    .hero-title{font-size:1.22rem;font-weight:900;color:#111827;line-height:1.35;margin-bottom:7px;}
+    .hero-sub{color:#6b7280;font-size:.92rem;line-height:1.8;max-width:880px;}
+    .hero-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid rgba(139,0,0,.10);background:rgba(139,0,0,.06);color:#8B0000;font-size:.78rem;font-weight:900;padding:9px 12px;white-space:nowrap;}
+    .section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
+    .section-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.78rem;font-weight:900;margin-bottom:10px;}
+    .section-title{margin:0;color:#111827;font-size:1.04rem;font-weight:900;}
+    .section-note{margin:6px 0 0;color:#6b7280;font-size:.88rem;line-height:1.75;}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+    .form-grid.three{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .form-group{display:flex;flex-direction:column;gap:8px;}
+    .form-group.full{grid-column:1 / -1;}
+    .form-group label{color:#374151;font-size:.9rem;font-weight:900;}
+    .form-input,.form-select,.form-textarea{width:100%;min-height:50px;border-radius:16px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:12px 14px;font:inherit;color:#111827;outline:none;transition:all .18s ease;}
+    .form-textarea{min-height:116px;resize:vertical;}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06);}
+    .form-help{color:#6b7280;font-size:.78rem;line-height:1.65;}
+    .scope-shell{display:grid;gap:16px;}
+    .scope-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+    .scope-tab{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:18px;padding:13px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:all .18s ease;color:#374151;line-height:1.45;min-height:76px;}
+    .scope-tab i{color:#8B0000;margin-top:3px;}
+    .scope-tab strong{display:block;color:#111827;font-size:.84rem;margin-bottom:3px;}
+    .scope-tab span{font-size:.76rem;color:#6b7280;}
+    .scope-tab.is-active{border-color:rgba(139,0,0,.26);background:linear-gradient(180deg,rgba(139,0,0,.07),rgba(255,255,255,.95));box-shadow:0 12px 24px rgba(139,0,0,.08);}
+    .scope-panel{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#f8fafc;padding:18px;display:none;}
+    .scope-panel.is-visible{display:block;}
+    .picker-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:16px;align-items:start;}
+    .picker-tools{display:grid;gap:12px;}
+    .selected-box{border:1px dashed rgba(139,0,0,.20);border-radius:18px;background:rgba(255,255,255,.78);padding:14px;}
+    .selected-title{font-size:.86rem;font-weight:900;color:#111827;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .selected-list{display:flex;flex-wrap:wrap;gap:8px;min-height:34px;}
+    .selected-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;background:#fff;color:#111827;border:1px solid rgba(15,23,42,.08);font-size:.78rem;font-weight:800;}
+    .selected-empty{color:#6b7280;font-size:.82rem;line-height:1.6;}
+    .personnel-list{display:grid;gap:8px;max-height:360px;overflow:auto;padding-right:4px;}
+    .personnel-option{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:16px;padding:12px;cursor:pointer;transition:all .16s ease;}
+    .personnel-option:hover{border-color:rgba(139,0,0,.20);box-shadow:0 10px 18px rgba(15,23,42,.05);}
+    .personnel-option input{width:18px;height:18px;margin-top:3px;}
+    .person-name{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:#111827;font-weight:900;font-size:.88rem;}
+    .person-meta{margin-top:4px;color:#6b7280;font-size:.78rem;line-height:1.55;}
+    .person-tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:rgba(139,0,0,.07);color:#8B0000;font-size:.72rem;font-weight:900;}
+    .empty-state{border:1px dashed rgba(15,23,42,.18);border-radius:18px;background:#fff;padding:18px;color:#6b7280;line-height:1.7;font-size:.88rem;}
+    .settings-shell{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px;padding-top:18px;border-top:1px solid rgba(15,23,42,.08);}
+    .settings-card{border:1px solid rgba(15,23,42,.08);background:#f8fafc;border-radius:20px;padding:16px;}
+    .settings-card h4{margin:0 0 12px;color:#111827;font-size:.96rem;font-weight:900;}
+    .settings-card p{margin:0 0 14px;color:#6b7280;font-size:.84rem;line-height:1.75;}
+    .toggle-stack{display:grid;gap:10px;}
+    .toggle-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;line-height:1.6;}
+    .toggle-row input{width:18px;height:18px;min-height:auto;margin-top:2px;}
+    .ai-form-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:16px;}
+    .ai-form-card{position:relative;overflow:hidden;border:1px solid rgba(139,0,0,.10);border-radius:24px;background:rgba(255,255,255,.90);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:20px;}
+    .ai-form-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96));}
+    .ai-form-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96));}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800;margin-bottom:12px;}
+    .ai-title{font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:6px;}
+    .ai-text{color:#6b7280;line-height:1.8;font-size:.9rem;}
+    .ai-bullets{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none;}
+    .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem;}
+    .ai-bullets i{color:#8B0000;margin-top:4px;}
+    .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+    .ai-action{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;}
+    .ai-action-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+    .ai-action-value{font-size:1.35rem;font-weight:900;color:#111827;}
+    .ai-action.tone-critical .ai-action-value{color:#b91c1c;}
+    .ai-action.tone-watch .ai-action-value{color:#b45309;}
+    .helper-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+    .helper-box{border:1px solid rgba(15,23,42,.08);background:#f8fafc;border-radius:18px;padding:14px;height:100%;}
+    .helper-title{color:#111827;font-size:.88rem;font-weight:900;margin-bottom:8px;}
+    .helper-text{color:#6b7280;font-size:.84rem;line-height:1.75;}
+    .action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:900;font-size:.9rem;white-space:nowrap;transition:all .18s ease;}
+    .btn-soft:hover{transform:translateY(-1px);}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16);}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08);}
+    .btn-inline{min-height:40px;border-radius:12px;padding:0 12px;border:1px solid rgba(139,0,0,.12);background:#fff;color:#8B0000;font-weight:900;cursor:pointer;}
+    .is-hidden{display:none !important;}
+    @media (max-width:1100px){.hero-card,.picker-grid,.ai-form-grid,.settings-shell{grid-template-columns:1fr;}.hero-badges{justify-content:flex-start;}.scope-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}.form-grid.three{grid-template-columns:1fr;}}
+    @media (max-width:760px){.form-grid,.helper-grid{grid-template-columns:1fr;}.scope-tabs{grid-template-columns:1fr;}.panel-card{padding:18px;}}
+</style>
+
+{% set unit_scope_options = unit_scope_options|default([]) %}
+{% set upper_unit_scope_options = upper_unit_scope_options|default([]) %}
+{% set category_scope_options = category_scope_options|default([]) %}
+{% set personnel_scope_options = personnel_scope_options|default([]) %}
+
+<div class="period-form-shell">
+    <div class="glass-card watermark-card">
+        <div class="panel-card hero-card">
+            <div>
+                <div class="hero-title">Yeni Performans Dönemi Oluştur</div>
+                <div class="hero-sub">
+                    Bu ekran dönem açma işlemini tek yerde toplar. Kapsamı tüm kurum, birim, üst birim, kategori veya isim isim seçilmiş personel üzerinden belirleyebilirsiniz.
+                </div>
+            </div>
+            <div class="hero-badges" aria-label="Dönem oluşturma özellikleri">
+                <span class="hero-badge"><i class="fa-solid fa-layer-group"></i> Çoklu kapsam</span>
+                <span class="hero-badge"><i class="fa-solid fa-users-viewfinder"></i> İsimden personel seçimi</span>
+                <span class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Yayın kontrollü</span>
+            </div>
+        </div>
+    </div>
+
+    {% if ai_period_form_panel %}
+    <div class="ai-form-grid">
+        <div class="ai-form-card tone-{{ ai_period_form_panel.tone }}">
+            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_period_form_panel.badge }}</div>
+            <div class="ai-title">{{ ai_period_form_panel.headline }}</div>
+            <div class="ai-text">{{ ai_period_form_panel.summary }}</div>
+            <ul class="ai-bullets">
+                {% for bullet in ai_period_form_panel.bullets %}
+                <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="ai-form-card">
+            <div class="ai-kicker"><i class="fa-solid fa-sliders"></i> Karar destek özeti</div>
+            <div class="ai-action-grid">
+                {% for item in ai_period_form_panel.actions %}
+                <div class="ai-action tone-{{ item.tone }}">
+                    <div class="ai-action-label">{{ item.label }}</div>
+                    <div class="ai-action-value">{{ item.value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        <form method="POST" action="{{ url_for('main.performance_period_create') }}" id="periodCreateForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="section-heading">
+                <div>
+                    <div class="section-kicker"><i class="fa-solid fa-calendar-plus"></i> Dönem bilgileri</div>
+                    <h3 class="section-title">Başlık, tür ve tarih aralığı</h3>
+                    <p class="section-note">Puanlama dönem devam ederken açılmaz; boş bırakılırsa dönem bitiş tarihinden sonraki gün otomatik başlar.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="period-title">Dönem Başlığı</label>
+                    <input id="period-title" type="text" name="title" class="form-input" placeholder="Örn: 2026 1. Yarıyıl Performans Dönemi" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-type">Dönem Türü</label>
+                    <select id="period-type" name="period_type" class="form-select" required>
+                        <option value="">Seçiniz</option>
+                        <option value="Aylık">Aylık</option>
+                        <option value="3 Aylık">3 Aylık</option>
+                        <option value="6 Aylık">6 Aylık</option>
+                        <option value="Yıllık">Yıllık</option>
+                        <option value="Özel Dönem">Özel Dönem</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-start-date">Başlangıç Tarihi</label>
+                    <input id="period-start-date" type="date" name="start_date" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="period-end-date">Bitiş Tarihi</label>
+                    <input id="period-end-date" type="date" name="end_date" class="form-input" required>
+                
+                    <div class="alert alert-info small mt-2" data-bys360="scoring-after-period-end">
+                        <strong>Puanlama başlangıcı:</strong> Puanlama dönem devam ederken açılmaz. Dönem bitiş tarihinden sonraki gün otomatik başlar.
+                    </div>
+                    <!-- BYS360_SCORING_AFTER_PERIOD_END_TEMPLATE -->
+</div>
+
+                <div class="form-group full">
+                    <label for="period-description">Açıklama</label>
+                    <textarea id="period-description" name="description" class="form-textarea" placeholder="Döneme ilişkin açıklama, kapsam veya not bilgisi yazabilirsiniz."></textarea>
+                </div>
+            </div>
+
+            <div class="section-heading" style="margin-top:24px;">
+                <div>
+                    <div class="section-kicker"><i class="fa-solid fa-sitemap"></i> Kapsam seçimi</div>
+                    <h3 class="section-title">Dönemin kimleri kapsayacağını seçin</h3>
+                    <p class="section-note">Özel dönemlerde birim, üst birim, kategori veya personel isimlerini listeden seçebilirsiniz. Değerlendirici amirler yalnızca görev zincirinde yer alır; açıkça seçilmedikçe puanlanacak personel listesine eklenmez.</p>
+                    <!-- BYS360_SELECTED_SCOPE_ASSESSOR_FIX_TEMPLATE -->
+                </div>
+            </div>
+
+            <div class="scope-shell">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="special-scenario-type">Özel Dönem Senaryosu</label>
+                        <select id="special-scenario-type" name="special_scenario_type" class="form-select">
+                            <option value="">Senaryo seçmeyin</option>
+                            <option value="security_personnel">Güvenlik personeli özel dönemi</option>
+                            <option value="cleaning_personnel">Temizlik personeli özel dönemi</option>
+                            <option value="probation_personnel">Deneme süreli personel dönemi</option>
+                            <option value="leaving_personnel">Ayrılacak personel değerlendirmesi</option>
+                            <option value="unit_special">Birime özel dönem</option>
+                            <option value="selected_personnel_special">Seçili personele özel dönem</option>
+                        </select>
+                        <small class="form-help">Senaryo seçimi kapsam alanlarını otomatik önerir; ihtiyaç halinde aşağıdaki kapsamı elle değiştirebilirsiniz.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scope-type">Dönem Kapsamı</label>
+                        <select id="scope-type" name="scope_type" class="form-select">
+                            <option value="all">Tüm Kurum</option>
+                            <option value="unit">Birim</option>
+                            <option value="upper_unit">Üst Birim</option>
+                            <option value="category">Kategori</option>
+                            <option value="selected_personnel">Seçili Personel</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="scope-tabs" aria-hidden="true">
+                    <button type="button" class="scope-tab is-active" data-scope-tab="all"><i class="fa-solid fa-building-columns"></i><span><strong>Tüm Kurum</strong>Genel dönem</span></button>
+                    <button type="button" class="scope-tab" data-scope-tab="unit"><i class="fa-solid fa-building"></i><span><strong>Birim</strong>Birim adına göre</span></button>
+                    <button type="button" class="scope-tab" data-scope-tab="upper_unit"><i class="fa-solid fa-diagram-project"></i><span><strong>Üst Birim</strong>Üst birim adına göre</span></button>
+                    <button type="button" class="scope-tab" data-scope-tab="category"><i class="fa-solid fa-tags"></i><span><strong>Kategori</strong>Görev grubuna göre</span></button>
+                    <button type="button" class="scope-tab" data-scope-tab="selected_personnel"><i class="fa-solid fa-user-check"></i><span><strong>Seçili Personel</strong>İsim isim seçim</span></button>
+                </div>
+
+                <input type="hidden" name="scope_unit_label" id="scope-unit-label-hidden" value="">
+
+                <div class="scope-panel is-visible" data-scope-panel="all">
+                    <div class="empty-state">
+                        <strong>Tüm Kurum</strong> seçildiğinde dönem, görev üretimi sırasında aktif ve kapsama uygun tüm personele göre değerlendirilir.
+                    </div>
+                </div>
+
+                <div class="scope-panel" data-scope-panel="unit">
+                    <div class="form-group">
+                        <label for="scope-unit-select">Birim Adı</label>
+                        <select id="scope-unit-select" class="form-select" data-unit-selector="unit">
+                            <option value="">Birim seçiniz</option>
+                            {% for unit_name in unit_scope_options %}
+                            <option value="{{ unit_name }}">{{ unit_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-help">Birim listesi personel kayıtları ve organizasyon birimlerinden alınır.</small>
+                    </div>
+                </div>
+
+                <div class="scope-panel" data-scope-panel="upper_unit">
+                    <div class="form-group">
+                        <label for="scope-upper-unit-select">Üst Birim Adı</label>
+                        <select id="scope-upper-unit-select" class="form-select" data-unit-selector="upper_unit">
+                            <option value="">Üst birim seçiniz</option>
+                            {% for unit_name in upper_unit_scope_options %}
+                            <option value="{{ unit_name }}">{{ unit_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-help">Üst birim kapsamı seçildiğinde görev üretimi bu üst birim etiketiyle sınırlandırılır.</small>
+                    </div>
+                </div>
+
+                <div class="scope-panel" data-scope-panel="category">
+                    <div class="form-group">
+                        <label for="scope-category-label">Personel Kategorisi</label>
+                        <select id="scope-category-label" name="scope_category_label" class="form-select">
+                            <option value="">Kategori seçiniz</option>
+                            {% for category_name in category_scope_options %}
+                            <option value="{{ category_name }}">{{ category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="scope-panel" data-scope-panel="selected_personnel">
+                    <div class="picker-grid">
+                        <div class="picker-tools">
+                            <div class="form-group">
+                                <label for="personnel-search">Personel Ara</label>
+                                <input id="personnel-search" type="search" class="form-input" placeholder="Ad, soyad, sicil, birim veya kategori ile arayın">
+                            </div>
+                            <div class="selected-box">
+                                <div class="selected-title"><i class="fa-solid fa-user-check"></i> Puanlanacak Personel</div>
+                                <div id="selected-personnel-list" class="selected-list">
+                                    <span class="selected-empty">Henüz personel seçilmedi.</span>
+                                </div>
+                                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                                    <button type="button" class="btn-inline" id="clear-personnel-selection">Seçimi Temizle</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="scope-personnel-filter">Sicil Listesi</label>
+                                <textarea id="scope-personnel-filter" name="scope_personnel_filter" class="form-textarea" placeholder="Personel seçildiğinde sicil listesi otomatik oluşur. Gerekirse sicil numaralarını virgül veya satır bazında elle de yazabilirsiniz."></textarea>
+                                <small class="form-help">Kayıt sırasında yalnızca puanlanacak personelin sicil numaraları saklanır. Amirler değerlendirme zincirinde görev alır, bu alana otomatik eklenmez.</small>
+                            </div>
+                        </div>
+
+                        <div>
+                            {% if personnel_scope_options %}
+                            <div class="personnel-list" id="personnel-picker-list">
+                                {% for person in personnel_scope_options %}
+                                <label class="personnel-option" data-search="{{ (person.name ~ ' ' ~ person.sicil_no ~ ' ' ~ person.birim ~ ' ' ~ person.ust_birim ~ ' ' ~ person.category)|lower }}">
+                                    <input type="checkbox" value="{{ person.sicil_no }}" data-name="{{ person.name }}" data-meta="{{ person.sicil_no }}{% if person.birim %} · {{ person.birim }}{% endif %}">
+                                    <span>
+                                        <span class="person-name">{{ person.name }} <span class="person-tag">{{ person.sicil_no }}</span></span>
+                                        <span class="person-meta">
+                                            {% if person.birim %}{{ person.birim }}{% endif %}
+                                            {% if person.ust_birim %}{% if person.birim %} · {% endif %}{{ person.ust_birim }}{% endif %}
+                                            {% if person.category %}{% if person.birim or person.ust_birim %} · {% endif %}{{ person.category }}{% endif %}
+                                        </span>
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state">
+                                Personel listesi şu anda getirilemedi. Sicil numaralarını soldaki alana satır satır yazarak seçili personel kapsamı oluşturabilirsiniz.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-shell">
+                <div class="settings-card">
+                    <h4>Puanlama takvimi</h4>
+                    <p>Amirlerin puanlama yapacağı tarih aralığı dönem bittikten sonra başlar. Boş bırakılırsa dönem bitişinden sonraki gün otomatik oluşturulur.</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="evaluation-start-date">Puanlama Başlangıç Tarihi</label>
+                            <input id="evaluation-start-date" type="date" name="evaluation_start_date" class="form-input">
+                            <small class="form-help">Dönem içinde puanlama başlatılmaz. Boş bırakılırsa bitiş tarihinden sonraki gün seçilir.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="evaluation-end-date">Puanlama Bitiş Tarihi</label>
+                            <input id="evaluation-end-date" type="date" name="evaluation_end_date" class="form-input">
+                            <small class="form-help">Bitiş tarihi de dönem bitişinden sonra olmalıdır. Boş bırakılırsa başlangıç günü esas alınır.</small>
+                        </div>
+                        <div class="form-group full">
+                            <label for="evaluation-due-days">Görev Başına Tamamlama Süresi (Gün)</label>
+                            <input id="evaluation-due-days" type="number" min="1" step="1" name="evaluation_due_days" class="form-input" value="" placeholder="Boş bırakılırsa son tarih puanlama bitiş günü olur.">
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h4>Muafiyet ve fiili gün kuralları</h4>
+                    <p>İzin ve devamsızlık kayıtlarının performans görev üretimini nasıl etkileyeceğini belirleyin.</p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="minimum-presence-days">Asgari fiili çalışma günü</label>
+                            <input id="minimum-presence-days" type="number" step="0.5" min="0" name="minimum_presence_days_for_evaluation" class="form-input" value="0" placeholder="0 = kapalı">
+                        </div>
+                        <div class="form-group">
+                            <label for="leave-skip-threshold-days">İzin muafiyet eşiği</label>
+                            <input id="leave-skip-threshold-days" type="number" step="0.5" min="0" name="leave_skip_threshold_days" class="form-input" value="" placeholder="Boş = kapalı">
+                        </div>
+                        <div class="form-group full">
+                            <label for="absence-skip-threshold-days">Devamsızlık muafiyet eşiği</label>
+                            <input id="absence-skip-threshold-days" type="number" step="0.5" min="0" name="absence_skip_threshold_days" class="form-input" value="" placeholder="Boş = kapalı">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h4>Canlı akış davranışı</h4>
+                    <p>Görev üretimi, vekâlet zorunluluğu ve üçüncü amir görünürlüğü burada yönetilir.</p>
+                    <div class="toggle-stack">
+                        <label class="toggle-row">
+                            <input type="checkbox" name="auto_skip_if_fully_absent" checked>
+                            <span>Dönemin tamamı izin/devamsızlık ise personeli otomatik muaf yap</span>
+                        </label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="manager_delegation_required" checked>
+                            <span>Yönetici görevi bloke eden onaylı izinlerde aktif vekâleti zorunlu kıl</span>
+                        </label>
+                    </div>
+                    <div class="toggle-stack" style="margin-top:12px;">
+                        <label class="toggle-row">
+                            <input type="checkbox" name="enable_level_3">
+                            <span>Bu dönemde 3. amir görevi kullanılabilsin</span>
+                        </label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="level_3_column_visible">
+                            <span>3. amir sütunu yalnızca ihtiyaç varsa görünür olsun</span>
+                        </label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="enable_level_3_scoring">
+                            <span>3. amir puana katkı versin; kapalıysa yalnızca görüş alınır</span>
+                        </label>
+                        <label class="toggle-row">
+                            <input type="checkbox" name="require_level_3_completion_for_final">
+                            <span>3. amir tanımlı kayıtlar tamamlanmadan nihai karne kesinleşmesin</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar" style="margin-top:18px;">
+                <a href="{{ url_for('main.performance_periods') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Dönemlere Dön
+                </a>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Dönemi Oluştur
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="helper-grid">
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Kapsam disiplini</div>
+                <div class="helper-text">Birim, üst birim, kategori veya seçili personel kapsamı dönem kaydına işlenir. Puanlanacak kişiler ile değerlendirme amirleri görev üretiminde ayrı tutulur.</div>
+            </div>
+        </div>
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Yayın kontrolü</div>
+                <div class="helper-text">Sonuçlar süreç tamamlanmadan personele açılmaz. Yayın kararı dönem yönetimi ekranından kontrollü şekilde verilir.</div>
+            </div>
+        </div>
+        <div class="glass-card panel-card">
+            <div class="helper-box">
+                <div class="helper-title">Tarih kontrolü</div>
+                <div class="helper-text">Başlangıç tarihi bitişten büyük olamaz. Puanlama takvimi dönem bittikten sonra başlamalıdır; dönem içinde puanlama açılmaz.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const scopeSelect = document.getElementById('scope-type');
+    const periodType = document.getElementById('period-type');
+    const scenarioSelect = document.getElementById('special-scenario-type');
+    const tabs = Array.from(document.querySelectorAll('[data-scope-tab]'));
+    const panels = Array.from(document.querySelectorAll('[data-scope-panel]'));
+    const hiddenUnit = document.getElementById('scope-unit-label-hidden');
+    const unitSelect = document.getElementById('scope-unit-select');
+    const upperUnitSelect = document.getElementById('scope-upper-unit-select');
+    const categorySelect = document.getElementById('scope-category-label');
+    const personnelSearch = document.getElementById('personnel-search');
+    const personnelTextarea = document.getElementById('scope-personnel-filter');
+    const selectedList = document.getElementById('selected-personnel-list');
+    const clearPersonnel = document.getElementById('clear-personnel-selection');
+    const personnelChecks = Array.from(document.querySelectorAll('#personnel-picker-list input[type="checkbox"]'));
+    const personnelRows = Array.from(document.querySelectorAll('#personnel-picker-list .personnel-option'));
+
+    // BYS360_SCORING_AFTER_PERIOD_END_TEMPLATE_JS_V1_2
+    const periodEndDateInput = document.getElementById('period-end-date');
+    const evaluationStartDateInput = document.getElementById('evaluation-start-date');
+    const evaluationEndDateInput = document.getElementById('evaluation-end-date');
+    function nextDayIso(isoDate){
+        if(!isoDate) return '';
+        const parts = isoDate.split('-').map(Number);
+        if(parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return '';
+        const dt = new Date(parts[0], parts[1] - 1, parts[2]);
+        dt.setDate(dt.getDate() + 1);
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        const d = String(dt.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+    function syncScoringDateMin(){
+        const minDate = nextDayIso(periodEndDateInput ? periodEndDateInput.value : '');
+        if(!minDate) return;
+        if(evaluationStartDateInput){
+            evaluationStartDateInput.min = minDate;
+            if(!evaluationStartDateInput.value || evaluationStartDateInput.value < minDate){
+                evaluationStartDateInput.value = minDate;
+            }
+        }
+        if(evaluationEndDateInput){
+            evaluationEndDateInput.min = minDate;
+            if(!evaluationEndDateInput.value || evaluationEndDateInput.value < minDate){
+                evaluationEndDateInput.value = evaluationStartDateInput && evaluationStartDateInput.value ? evaluationStartDateInput.value : minDate;
+            }
+        }
+    }
+    if(periodEndDateInput){
+        periodEndDateInput.addEventListener('change', syncScoringDateMin);
+        syncScoringDateMin();
+    }
+
+    function setScope(scope){
+        if(!scopeSelect) return;
+        scopeSelect.value = scope || 'all';
+        const activeScope = scopeSelect.value || 'all';
+        tabs.forEach(tab => tab.classList.toggle('is-active', tab.dataset.scopeTab === activeScope));
+        panels.forEach(panel => panel.classList.toggle('is-visible', panel.dataset.scopePanel === activeScope));
+        updateUnitHidden();
+    }
+
+    function updateUnitHidden(){
+        const activeScope = scopeSelect ? scopeSelect.value : 'all';
+        if(!hiddenUnit) return;
+        if(activeScope === 'unit'){
+            hiddenUnit.value = unitSelect ? unitSelect.value : '';
+        }else if(activeScope === 'upper_unit'){
+            hiddenUnit.value = upperUnitSelect ? upperUnitSelect.value : '';
+        }else{
+            hiddenUnit.value = '';
+        }
+    }
+
+    function setCategory(value){
+        if(!categorySelect) return;
+        const option = Array.from(categorySelect.options).find(item => item.value === value);
+        if(option){ categorySelect.value = value; }
+    }
+
+    function applyScenario(){
+        if(!scenarioSelect) return;
+        const scenario = scenarioSelect.value;
+        if(scenario){ periodType.value = 'Özel Dönem'; }
+        if(scenario === 'security_personnel'){
+            setScope('category'); setCategory('Güvenlik');
+        }else if(scenario === 'cleaning_personnel'){
+            setScope('category'); setCategory('Temizlik');
+        }else if(scenario === 'probation_personnel'){
+            setScope('category'); setCategory('Deneme Süreli Personel');
+        }else if(scenario === 'leaving_personnel'){
+            setScope('category'); setCategory('Ayrılacak Personel');
+        }else if(scenario === 'unit_special'){
+            setScope('unit');
+        }else if(scenario === 'selected_personnel_special'){
+            setScope('selected_personnel');
+        }
+    }
+
+    function updatePersonnelTextarea(){
+        if(!personnelTextarea || !selectedList) return;
+        const selected = personnelChecks.filter(check => check.checked);
+        personnelTextarea.value = selected.map(check => check.value).join('\n');
+        selectedList.innerHTML = '';
+        if(!selected.length){
+            const empty = document.createElement('span');
+            empty.className = 'selected-empty';
+            empty.textContent = 'Henüz personel seçilmedi.';
+            selectedList.appendChild(empty);
+            return;
+        }
+        selected.forEach(check => {
+            const pill = document.createElement('span');
+            pill.className = 'selected-pill';
+            pill.textContent = (check.dataset.name || check.value) + ' · ' + check.value;
+            selectedList.appendChild(pill);
+        });
+    }
+
+    function filterPersonnel(){
+        const query = (personnelSearch ? personnelSearch.value : '').trim().toLowerCase();
+        personnelRows.forEach(row => {
+            row.classList.toggle('is-hidden', query && !(row.dataset.search || '').includes(query));
+        });
+    }
+
+    tabs.forEach(tab => tab.addEventListener('click', () => setScope(tab.dataset.scopeTab)));
+    if(scopeSelect){ scopeSelect.addEventListener('change', () => setScope(scopeSelect.value)); }
+    if(scenarioSelect){ scenarioSelect.addEventListener('change', applyScenario); }
+    if(unitSelect){ unitSelect.addEventListener('change', updateUnitHidden); }
+    if(upperUnitSelect){ upperUnitSelect.addEventListener('change', updateUnitHidden); }
+    if(personnelSearch){ personnelSearch.addEventListener('input', filterPersonnel); }
+    personnelChecks.forEach(check => check.addEventListener('change', updatePersonnelTextarea));
+    if(clearPersonnel){
+        clearPersonnel.addEventListener('click', function(){
+            personnelChecks.forEach(check => check.checked = false);
+            updatePersonnelTextarea();
+        });
+    }
+
+    setScope(scopeSelect ? scopeSelect.value : 'all');
+    updatePersonnelTextarea();
+});
+</script>
+{% endblock %}

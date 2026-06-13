@@ -1,0 +1,660 @@
+BYS360 A5 TEST FAILURE TRIAGE SUMMARY
+============================================================
+
+STATUS COUNTS
+error: 45
+failed: 246
+passed: 770
+skipped: 2
+
+STATUS x CATEGORY
+error      database_contract         45
+failed     ai_agent_repository       1
+failed     auth_session              17
+failed     communication_mail        4
+failed     database_contract         19
+failed     live_external             29
+failed     mobile_pwa                13
+failed     other                     45
+failed     performance               7
+failed     portal                    4
+failed     quality_release           66
+failed     sprint3_integration       41
+passed     ai_agent_repository       5
+passed     auth_session              10
+passed     communication_mail        98
+passed     database_contract         63
+passed     live_external             36
+passed     mobile_pwa                20
+passed     other                     325
+passed     performance               152
+passed     portal                    22
+passed     quality_release           36
+passed     sprint3_integration       3
+skipped    mobile_pwa                2
+
+TOP FAILED/ERROR FILES
+   12 tests.critical.test_v58_claude_roadmap_smoke
+    8 tests.critical.test_claude_phase5_critical_contracts
+    7 tests.integration.test_feedback_http_behavior
+    6 tests.integration.test_sprint2_legacy_integration_scope_v8
+    6 tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6
+    6 tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5
+    6 tests.integration.test_sprint3_corporate_approval_pack_v4
+    6 tests.integration.test_sprint3_pilot_triage_board_v3
+    5 tests.architecture.test_core_refactor_faz10_contract
+    5 tests.docs.test_docs_expert_review_contract
+    5 tests.expert_review.test_phase10_expert_final_gate
+    5 tests.integration.test_sprint2_closure_freeze_v19
+    5 tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1
+    5 tests.integration.test_sprint2_critical_pages_smoke_v7
+    5 tests.integration.test_sprint2_deployment_runbook_rollback_v16
+    5 tests.integration.test_sprint2_live_server_preflight_v17
+    5 tests.integration.test_sprint2_release_candidate_verify_v13
+    5 tests.integration.test_sprint2_release_evidence_bundle_v14
+    5 tests.integration.test_sprint2_release_manifest_dry_run_v11
+    5 tests.integration.test_sprint2_release_package_builder_v12
+    5 tests.integration.test_sprint2_release_readiness_v10
+    5 tests.integration.test_sprint3_pilot_execution_matrix_v2
+    5 tests.integration.test_sprint3_uat_pilot_plan_v1
+    5 tests.ops.test_live_ops_contract
+    5 tests.performance.test_critical_performance_routes_smoke
+    4 tests.architecture.test_portal_service_faz6_contract
+    4 tests.architecture.test_survey_faz7_submit_contract
+    4 tests.critical.test_claude_phase6_sql_performance_contracts
+    4 tests.expert_review.test_phase13_final_expert_review_package
+    4 tests.integration.test_sprint2_final_regression_matrix_v9
+    4 tests.integration.test_sprint2_real_login_smoke_v6
+    4 tests.release.test_final_quality_release_report_contract
+    4 tests.security.test_final_quality_security_release_contract
+    4 tests.test_hr_leave_attendance_real_post_static
+    3 tests.architecture.test_message_faz1_smoke_contract
+    3 tests.architecture.test_message_live_contract
+    3 tests.integration.test_final_quality_live_backbone_release_contract
+    3 tests.integration.test_sprint2_auth_login_smoke_v5
+    3 tests.integration.test_sprint2_integration_smoke_v4
+    3 tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1
+
+FAILED/ERROR TESTS
+failed   ai_agent_repository        tests.architecture.test_ai_dashboard_panels_split::test_dashboard_panels_public_exports_exist
+         assert 'build_repository_dashboard_ai_panel' in '\n"""AI panel public facade.\n\nBu modül eski import yolunu korur; gerçek üreticiler küçük dosyalara bölünmüştür.\nYe...ld_announcements_ai_panel",\n    "build_announcement_form_ai_panel",\n    "build_dashboard_ai_operations_bridge",\n]\n'
+failed   mobile_pwa                 tests.architecture.test_android_responsive_baseline_p5a::test_android_responsive_baseline_gate_p5a
+         AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5A_ANDROID_RESPONSIVE_BASELINE_GATE",     "android_responsive_baseline_gate_ok": false,     "handover_baseline_ok": false,     "mobile_release_evidence_report_ok": false,     "android_device_matrix_ok": true,     "android_device_matrix_count": 7,     "responsive_scan_ok": true,     "responsive_marker_total": 2528,     "routes_py_lines": 237,     "total_mobile_route_decorator_count": 24,     "direct_contract_ok": true,     "compile_ok": true,     "app_factory_ok": true,     "secret_gate_ok": true,     "secret_gate_finding_count": 0,     "pytest_ok": true,     "pytest_mode": "not_requested",     "report": "C:\\bys36
+failed   mobile_pwa                 tests.architecture.test_android_responsive_core_styles_p5b::test_android_responsive_core_styles_gate_p5b
+         AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE",     "android_responsive_core_styles_gate_ok": false,     "responsive_hardening_ok": false,     "p5a_baseline_report_ok": false,     "android_core_css_ok": true,     "base_template_link_ok": true,     "core_css_media_query_count": 5,     "routes_py_lines": 237,     "total_mobile_route_decorator_count": 24,     "direct_contract_ok": true,     "compile_ok": true,     "app_factory_ok": true,     "secret_gate_ok": true,     "secret_gate_finding_count": 0,     "pytest_ok": true,     "pytest_mode": "skipped",     "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_ANDROI
+failed   mobile_pwa                 tests.architecture.test_android_responsive_final_evidence_p5f::test_android_responsive_final_evidence_gate_p5f
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_android_responsive_inventory_precision_p6c::test_android_responsive_inventory_precision_p6c_report_ok
+         AssertionError: P6C inventory precision report missing assert False  +  where False = exists()  +    where exists = WindowsPath('reports/architecture/BYS360_ANDROID_RESPONSIVE_INVENTORY_PRECISION_GATE_P6C_REPORT.json').exists
+failed   mobile_pwa                 tests.architecture.test_android_responsive_release_suite_p5d_v2::test_android_responsive_release_suite_gate_p5d_v2
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_android_responsive_visual_regression_p6a::test_android_responsive_visual_regression_p6a_gate
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_android_responsive_visual_uat_evidence_p5e::test_android_responsive_visual_uat_evidence_gate_p5e
+         assert False is True
+failed   quality_release            tests.architecture.test_core_refactor_faz10_contract::test_faz10_files_exist
+         AssertionError: eksik Faz 10 dosyasi: C:\bys360\project\scripts\check_core_refactor_faz10_gate.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_core_refactor_faz10_gate.py').exists
+failed   quality_release            tests.architecture.test_core_refactor_faz10_contract::test_quality_chain_knows_faz10
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+failed   quality_release            tests.architecture.test_core_refactor_faz10_contract::test_faz10_gate_is_read_only_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_core_refactor_faz10_gate.py'
+failed   other                      tests.architecture.test_core_refactor_faz10_contract::test_faz10_finalizer_writes_closure_reports
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\finalize_core_refactor_faz10.py'
+failed   other                      tests.architecture.test_core_refactor_faz10_contract::test_core_refactor_series_is_explicitly_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\CORE_REFACTOR_FAZ10.md'
+failed   auth_session               tests.architecture.test_core_refactor_faz2_contract::test_route_bootstrap_is_centralized_after_faz5
+         assert 'app.register_blueprint(' not in '\n"""BYS360...return app\n'      'app.register_blueprint(' is contained here:     :             app.register_blueprint(pwa_bp)               def _register_csrf_refresh_handler(app: Flask) -> None:...      ...Full output truncated (108 lines hidden), use '-vv' to show
+failed   auth_session               tests.architecture.test_core_refactor_faz5_contract::test_app_init_is_public_factory_only
+         assert 193 <= 55  +  where 193 = len(['', '"""BYS360 application factory.', '', 'Bu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve... uyumluluk sabitlerini tutar. Uygulama kurulum pipeline'ı", '``app.bootstrap.application_bootstrap`` altındadır.', ...])  +    where ['', '"""BYS360 application factory.', '', 'Bu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve... uyumluluk sabitlerini tutar. Uygulama kurulum pipeline'ı", '``app.bootstrap.application_bootstrap`` altındadır.', ...] = <built-in method splitlines of str object at 0x00000210007DEE30>()  +      where <built-in method splitlines of str object at 0x00000210007DEE30> = '\n"""BYS360 appli
+failed   quality_release            tests.architecture.test_core_refactor_faz5_contract::test_quality_chain_exists_and_cleans_runtime_artifacts
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+failed   live_external              tests.architecture.test_core_refactor_faz6_contract::test_model_manifest_documents_live_and_compatibility_modules
+         assert 'education_models' in '"""BYS360 model namespace sözleşmesi.\n\nBu dosya runtime davranışını değiştirmez; model paketinin hangi modüllerden\...MUNICATION_PHASE_MODEL_MODULES),\n        "forbidden_artifacts": sorted(FORBIDDEN_MODEL_NAMESPACE_ARTIFACTS),\n    }\n'
+failed   quality_release            tests.architecture.test_core_refactor_faz6_contract::test_faz6_quality_tools_are_wired
+         AssertionError: assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project') / 'scripts/check_core_refactor_faz6_gate.py').exists
+failed   quality_release            tests.architecture.test_core_refactor_faz7_contract::test_phase_alias_report_scripts_are_registered_in_quality_chain
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+failed   quality_release            tests.architecture.test_core_refactor_faz8_contract::test_phase8_quality_chain_registration
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+failed   quality_release            tests.architecture.test_core_refactor_faz9_contract::test_faz9_files_exist
+         AssertionError: eksik Faz 9 dosyasi: C:\bys360\project\scripts\check_core_refactor_faz9_gate.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_core_refactor_faz9_gate.py').exists
+failed   quality_release            tests.architecture.test_core_refactor_faz9_contract::test_quality_chain_knows_faz9
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_core_refactor_quality_chain.py'
+failed   mobile_pwa                 tests.architecture.test_home_phase1_contract::test_base_menu_points_to_home
+         assert '<span>Anasayfa</span>' in '\ufeff\n\n{# BYS360_BASE_CLEAN_V13: temiz, sabit ve rol bazlı ana iskelet #}\n<!doctype html>\n<html lang="tr">\n<hea...pletion_v2.js\') }}?v=2" defer></script>\n<!-- /BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_JS -->\n</body>\n</html>\n\n\n'
+failed   other                      tests.architecture.test_message_faz1_smoke_contract::test_message_send_submit_contract_order_is_stable
+         assert 'not thread or not thread.is_active' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destination(thread_id=thread_id)\n\n\n'
+failed   database_contract          tests.architecture.test_message_faz1_smoke_contract::test_message_send_commit_rollback_and_cleanup_contract
+         AssertionError: messages_send_impl güvenli yazma sözleşmesi eksik: db.session.commit() assert 'db.session.commit()' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destination(thread_id=thread_id)\n\n\n'
+failed   other                      tests.architecture.test_message_faz1_smoke_contract::test_message_new_direct_thread_contract_is_stable
+         AssertionError: messages_new_impl sözleşmesi eksik: _find_or_create_direct_thread assert '_find_or_create_direct_thread' in 'def messages_new_impl():\n    users = _svc_load_all_active_compose_users()\n    recent_users = _svc_build_recent_mess...int)\n    return _render_message_new(users=users, recent_users=recent_users, recipient_user_id=selected_recipient)\n\n'
+failed   other                      tests.architecture.test_message_faz2_service_contract::test_message_routes_not_coupled_to_new_service_in_faz2
+         AssertionError: assert ['app.services.messages'] == []      Left contains one more item: 'app.services.messages'   Use -v to get more diff
+failed   database_contract          tests.architecture.test_message_live_contract::test_message_db_writes_do_not_skip_basic_safety_keywords
+         AssertionError: messages_send_impl commit sözleşmesi korunmalı assert 'db.session.commit' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destination(thread_id=thread_id)\n\n\n'
+failed   live_external              tests.architecture.test_message_live_contract::test_message_send_attachment_and_notification_contract
+         assert '_save_message_attachment' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destination(thread_id=thread_id)\n\n\n'
+failed   live_external              tests.architecture.test_message_live_contract::test_message_service_file_security_symbols_exist
+         AssertionError: message_service dosya güvenliği sözleşmesi eksik: resolve_message_attachment_download assert 'resolve_message_attachment_download' in 'from __future__ import annotations\n\n\n\nfrom app.core.datetime_utils import utc_now\nimport mimetypes\nimport uuid\...s:\n            continue\n        seen_survey_ids.add(survey_id)\n        visible.append(survey)\n    return visible\n'
+failed   communication_mail         tests.architecture.test_mobile_api_personnel_kpi_communication_response_p3c::test_mobile_personnel_kpi_communication_response_gate_p3c
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_mobile_api_release_evidence_p4e::test_mobile_release_evidence_gate_p4e
+         AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P4E_MOBILE_RELEASE_EVIDENCE_GATE",     "mobile_release_evidence_gate_ok": false,     "response_suite_report_ok": false,     "security_evidence_report_ok": false,     "p3_gate_count": 0,     "p3_gates_passed": 0,     "security_gate_count": 0,     "security_gates_passed": 0,     "total_probe_count": 0,     "feature_coverage_ok": false,     "direct_contract_ok": true,     "compile_ok": true,     "app_factory_ok": true,     "secret_gate_ok": true,     "secret_gate_finding_count": 0,     "pytest_ok": true,     "pytest_mode": "not_run",     "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_MOBILE_RELEASE_EVID
+failed   mobile_pwa                 tests.architecture.test_mobile_api_request_smoke_p2c::test_mobile_api_request_level_smoke_p2c_contract
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_mobile_api_role_boundary_matrix_p4b::test_mobile_api_role_boundary_matrix_p4b
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_mobile_api_role_boundary_matrix_p4b_v2::test_mobile_api_role_boundary_matrix_p4b_v2
+         assert False is True
+failed   mobile_pwa                 tests.architecture.test_mobile_api_security_evidence_p4d::test_mobile_security_evidence_gate_p4d
+         AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'ci_commands': ['python -m pip install -r requirements-dev...urity_evidence_gate_p4d.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], 'compile_ok': True, ...} assert False
+failed   auth_session               tests.architecture.test_mobile_api_security_suite_p4c::test_mobile_security_suite_gate_p4c
+         AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ality/bys360_mobile_security_suite_gate_p4c.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...} assert False
+failed   auth_session               tests.architecture.test_mobile_api_security_suite_p4c_v2::test_mobile_security_suite_gate_p4c_v2
+         AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ty/bys360_mobile_security_suite_gate_p4c_v2.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...} assert False
+failed   auth_session               tests.architecture.test_mobile_auth_dashboard_assistant_response_p3b::test_mobile_auth_dashboard_assistant_response_gate_p3b
+         assert False is True
+failed   portal                     tests.architecture.test_portal_service_faz6_contract::test_portal_facade_is_small_and_compiles
+         AssertionError: assert 563 <= 140  +  where 563 = _line_count(WindowsPath('C:/bys360/project/app/services/portal_service.py'))
+failed   portal                     tests.architecture.test_portal_service_faz6_contract::test_editorial_parts_exist_and_compile
+         AssertionError: Eksik portal parçası: ['recognition.py', 'editorial_banners.py', 'editorial_announcements.py', 'feed.py', 'editorial_common.py', 'groups.py', 'moderation.py', 'editorial_publishing.py', 'editorial_headlines.py', 'posts.py', 'editorial.py'] assert not ['recognition.py', 'editorial_banners.py', 'editorial_announcements.py', 'feed.py', 'editorial_common.py', 'groups.py', ...]
+failed   portal                     tests.architecture.test_portal_service_faz6_contract::test_editorial_public_contract_is_preserved
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\app\\services\\portal_parts\\editorial_common.py'
+failed   portal                     tests.architecture.test_portal_service_faz6_contract::test_editorial_facade_stays_thin
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/app/services/portal_parts/editorial.py').exists
+failed   database_contract          tests.architecture.test_settings_faz0_live_contract::test_settings_change_log_and_transaction_contract_exist
+         AssertionError: assert 'db.session.commit' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom collections import OrderedDict\nimport json\nfrom typi...hardening_contract(\n        foundation_context=foundation_context,\n        profile_context=profile_context,\n    )\n'
+failed   live_external              tests.architecture.test_settings_faz0_live_contract::test_settings_page_post_action_contract_exists
+         assert 'save_system_foundation' in 'from __future__ import annotations\n\n\n\nfrom app.main_handlers.account_communication_helpers import *  # noqa: F401...login_security_flow",\n    "account_change_photo",\n    "account_security_setup",\n    "account_change_password",\n]\n'
+failed   quality_release            tests.architecture.test_settings_faz2_service_bridge::test_settings_phase2_helpers_delegate_to_service_package
+         AssertionError: assert '_settings_dumps_json' in ''  +  where '' = _function_source('_serialize_state')
+failed   database_contract          tests.architecture.test_settings_faz3_snapshot_contract::test_settings_snapshot_module_has_no_db_side_effects
+         assert 'SystemSetting' not in '"""Ayarlar ....values())\n'      'SystemSetting' is contained here:     ]:         """SystemSetting satırlarından log/snapshot için eski formatta sözlük üretir."""   ?        +++++++++++++         snapshot: dict[str, Any] = {}         for definition in definitions or []:...      ...Full output truncated (125 lines hidden), use '-vv' to show
+failed   other                      tests.architecture.test_settings_faz3_snapshot_contract::test_settings_service_uses_snapshot_bridge_without_removing_save_contracts
+         AssertionError: assert 'app.services.settings.snapshots' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom collections import OrderedDict\nimport json\nfrom typi...hardening_contract(\n        foundation_context=foundation_context,\n        profile_context=profile_context,\n    )\n'
+failed   other                      tests.architecture.test_survey_faz1_smoke_contract::test_survey_faz1_core_model_keywords_are_kept
+         AssertionError: Anket çekirdek model anahtarları kaybolmuş: ['SurveyAnswer'] assert not ['SurveyAnswer']
+failed   live_external              tests.architecture.test_survey_faz2_service_contract::test_survey_faz2_does_not_modify_live_route_imports
+         assert 'app.services.surveys' not in 'from __futu...sults",\n]\n'      'app.services.surveys' is contained here:     ment     from app.services.surveys import (         build_survey_state_row as _service_build_survey_state_row,         get_assigned_surveys_for_user as _service_get_assigned_surveys_for_user,         latest_response_for_user as _service_latest_response_for_user,...      ...Full output truncated (1055 lines hidden), use '-vv' to show
+failed   database_contract          tests.architecture.test_survey_faz3_route_service_bridge::test_survey_faz3_does_not_touch_submit_safety_contract
+         assert 'SurveyResponse(' in 'def survey_submit(survey_id):\n    survey = db.session.get(Survey, survey_id)\n    survey_ok, survey_reason = _survey...return redirect(url_for("main.survey_take", survey_id=survey.id))\n\n    return redirect(url_for("main.surveys_list"))'
+failed   live_external              tests.architecture.test_survey_faz4_read_service_contract::test_survey_faz4_live_write_guards_stay_in_route
+         assert 'ensure_state_change' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+failed   database_contract          tests.architecture.test_survey_faz6_target_access_contract::test_survey_faz6_does_not_move_mutating_submit_flow
+         assert 'db.session.add(response)' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+failed   database_contract          tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_keeps_live_write_flow_in_route_for_faz7
+         assert 'db.session.add(response)' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+failed   other                      tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_token_and_duplicate_guards_stay_before_response_write
+         ValueError: substring not found
+failed   other                      tests.architecture.test_survey_faz7_submit_contract::test_survey_submit_validates_required_and_invalid_values
+         assert 'if question.is_required and not selected_option_id:' in 'from __future__ import annotations\n\n\n\nfrom flask import Response, current_app, flash, jsonify, redirect, request,... "survey_archive",\n    "survey_restore",\n    "survey_bulk_action",\n    "survey_delete",\n    "survey_results",\n]\n'
+failed   other                      tests.architecture.test_survey_faz7_submit_contract::test_survey_faz7_contract_module_is_passive_and_importable
+         assert 'SurveyResponse(' not in '"""Canlı an...hecks",\n]\n'      'SurveyResponse(' is contained here:     esponse = SurveyResponse(",                 "Token doğrulanmadan SurveyResponse oluşturulmamalı.",             ),             SubmissionContractCheck(                 "single_choice_required",...      ...Full output truncated (89 lines hidden), use '-vv' to show
+failed   live_external              tests.architecture.test_survey_live_contract::test_survey_live_contract_model_keywords_are_present
+         AssertionError: Canlı anket model/yardımcı anahtarları eksik: ['SurveyAnswer'] assert not ['SurveyAnswer']
+failed   performance                tests.communication.test_communication_route_contracts::test_no_direct_query_get_usage_in_communication_and_services
+         AssertionError: query.get() kullanılan dosyalar bulundu: ['app\\services\\assignment_sync_service.py', 'app\\services\\corporate_information_center.py', 'app\\services\\instagram_portal_sync.py', 'app\\services\\leave_delegation_service.py', 'app\\services\\ai\\query_adapters.py', 'app\\services\\ai_decision\\category_group_center.py', 'app\\services\\messages\\compose.py', 'app\\services\\performance\\v2_1_6_category_period_integration.py', 'app\\services\\performance_v2\\chain.py', 'app\\services\\performance_v2\\sync_service.py'] assert ['app\\servic...nter.py', ...] == []      Left contains 10 more items, first extra item: 'app\\services\\assignment_sync_service.py'   Use -v to get more 
+failed   communication_mail         tests.communication.test_communication_template_presence::test_expected_templates_present[communication/phase4_export_center.html]
+         AssertionError: Beklenen template bulunamadı: communication/phase4_export_center.html assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/app/templates/communication/phase4_export_center.html').exists
+failed   communication_mail         tests.communication.test_phase9a_route_contracts::test_phase9a_files_exist
+         AssertionError: Eksik dosyalar: ['app\\templates\\communication\\phase9a_backup_center.html'] assert not ['app\\templates\\communication\\phase9a_backup_center.html']
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_live_settings_contract_is_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 18   def test_live_settings_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixture
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_performance_manager_constitution_contract_is_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 40   def test_performance_manager_constitution_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       us
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_performance_visibility_and_chain_fields_remain_present
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 53   def test_performance_visibility_and_chain_fields_remain_present(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_feedback_pulse_campaign_contract_is_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 66   def test_feedback_pulse_campaign_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_message_and_survey_contract_is_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 82   def test_message_and_survey_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fi
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_ai_decision_support_contract_is_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 92   def test_ai_decision_support_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --f
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_security_and_mail_contracts_are_covered
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 102   def test_security_and_mail_contracts_are_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --
+error    database_contract          tests.critical.test_claude_phase5_critical_contracts::test_phase5_quality_gate_exists
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 115   def test_phase5_quality_gate_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [tes
+error    database_contract          tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_index_catalog_covers_live_core_tables
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 20   def test_phase6_index_catalog_covers_live_core_tables(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use
+error    database_contract          tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_sql_generation_is_create_index_only
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 43   def test_phase6_sql_generation_is_create_index_only(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use '
+error    database_contract          tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_query_guard_can_scan_without_db
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 51   def test_phase6_query_guard_can_scan_without_db(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pyte
+error    database_contract          tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_quality_gate_exists
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 58   def test_phase6_quality_gate_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixture
+error    database_contract          tests.critical.test_claude_phase7_final_gate_contracts::test_phase7_contract_module_is_complete
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase7_final_gate_contracts.py, line 4   def test_phase7_contract_module_is_complete(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtu
+error    database_contract          tests.critical.test_claude_phase7_final_gate_contracts::test_phase7_quality_script_exists
+         failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase7_final_gate_contracts.py, line 23   def test_phase7_quality_script_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_assistant_context_processors_are_registered
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 28   def test_v58_assistant_context_processors_are_registered(app): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory 
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/dashboard]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/dashboard/heavy-panels]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/settings]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-pipeline]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-corporate-cleanup]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/process-tracking]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/process-reports]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/president-approvals/1/card]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-aftercare]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-final-gate]
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, t
+error    database_contract          tests.critical.test_v58_claude_roadmap_smoke::test_v58_smoke_route_count_contract
+         failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 50   def test_v58_smoke_route_count_contract(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, _v58_disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest 
+error    database_contract          tests.critical.test_v59_4_assistant_shortcut_context::test_v59_4_assistant_shortcut_context_keys_are_always_available
+         failed on setup with "file C:\bys360\project\tests\critical\test_v59_4_assistant_shortcut_context.py, line 9   def test_v59_4_assistant_shortcut_context_keys_are_always_available(app): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory > 
+error    database_contract          tests.critical.test_v59_broad_route_smoke::test_static_route_list_is_broad_enough
+         failed on setup with "file C:\bys360\project\tests\critical\test_v59_broad_route_smoke.py, line 88   def test_static_route_list_is_broad_enough(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath
+error    database_contract          tests.critical.test_v59_broad_route_smoke::test_v59_broad_routes_do_not_return_500
+         failed on setup with "file C:\bys360\project\tests\critical\test_v59_broad_route_smoke.py, line 92   def test_v59_broad_routes_do_not_return_500(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture(app): E       fixture 'app' not found >       available fixtures: _bys360_v59_3_sqlite_smoke_schema_fixture, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpat
+failed   other                      tests.docs.test_docs_expert_review_contract::test_expert_review_docs_exist
+         AssertionError: TEKNIK_MIMARI.md assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project/docs/uzman_inceleme') / 'TEKNIK_MIMARI.md').exists
+failed   other                      tests.docs.test_docs_expert_review_contract::test_architecture_doc_declares_layered_model
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\TEKNIK_MIMARI.md'
+failed   other                      tests.docs.test_docs_expert_review_contract::test_security_doc_declares_kvkk_and_audit
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\GUVENLIK_KVKK_UYUM.md'
+failed   other                      tests.docs.test_docs_expert_review_contract::test_ai_limits_are_explicit
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\AI_KULLANIM_SINIRLARI.md'
+failed   other                      tests.docs.test_docs_expert_review_contract::test_runbook_and_rollback_are_present
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\CANLI_KURULUM_RUNBOOK.md'
+failed   quality_release            tests.expert_review.test_phase10_expert_final_gate::test_final_report_has_product_language
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_FINAL_RAPORU.md'
+failed   quality_release            tests.expert_review.test_phase10_expert_final_gate::test_ai_boundaries_are_unambiguous
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_FINAL_RAPORU.md'
+failed   quality_release            tests.expert_review.test_phase10_expert_final_gate::test_expert_questions_cover_core_risks
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_EKIP_SORU_CEVAP_DOSYASI.md'
+failed   quality_release            tests.expert_review.test_phase10_expert_final_gate::test_final_checklist_mentions_release_forbidden_files
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\FINAL_KALITE_KONTROL_LISTESI.md'
+failed   quality_release            tests.expert_review.test_phase10_expert_final_gate::test_manager_summary_is_present
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\YONETICI_OZETI_FINAL.md'
+failed   quality_release            tests.expert_review.test_phase13_final_expert_review_package::test_phase13_gate_exists
+         AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_phase13_final_expert_review_package.py').exists
+failed   other                      tests.expert_review.test_phase13_final_expert_review_package::test_phase13_docs_exist
+         AssertionError: assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project/docs/uzman_inceleme') / 'UZMAN_INCELEME_YONETICI_OZETI.md').exists
+failed   other                      tests.expert_review.test_phase13_final_expert_review_package::test_phase13_mentions_core_product_positioning
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_YONETICI_OZETI.md'
+failed   other                      tests.expert_review.test_phase13_final_expert_review_package::test_phase13_question_answer_has_risk_response
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\UZMAN_INCELEME_SORU_CEVAP.md'
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse/history]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse/analytics]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/admin/pulse-analytics]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/campaigns]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+error    database_contract          tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/results]
+         failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/feedback/campaigns",       "/feedback/results",   ])   def test_feedback_routes_exist_and_do_not_500(client, path): E       fixture 'client' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_fac
+failed   live_external              tests.integration.test_final_quality_live_backbone_release_contract::test_releaseignore_excludes_runtime_and_generated_artifacts
+         AssertionError: Eksik dosya: .releaseignore assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.releaseignore').exists
+failed   live_external              tests.integration.test_final_quality_live_backbone_release_contract::test_final_quality_faz3_chain_is_registered_with_previous_quality_evidence
+         AssertionError: Eksik dosya: scripts/run_final_quality_faz3_chain.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/run_final_quality_faz3_chain.py').exists
+failed   live_external              tests.integration.test_final_quality_live_backbone_release_contract::test_final_quality_faz3_report_paths_are_documented
+         AssertionError: Eksik dosya: scripts/generate_final_quality_faz3_report.py assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/generate_final_quality_faz3_report.py').exists
+failed   auth_session               tests.integration.test_sprint2_auth_login_smoke_v5::test_sprint2_v5_files_exist
+         AssertionError: Eksik Sprint 2 V5 dosyaları: ['scripts\\smoke_auth_login_critical_pages_v5.py', 'scripts\\check_sprint2_auth_login_smoke_gate_v5.py', 'scripts\\repair_sprint2_auth_login_smoke_v5.py', 'docs\\ops\\sprint2_auth_login_smoke_v5.md'] assert not ['scripts\\smoke_auth_login_critical_pages_v5.py', 'scripts\\check_sprint2_auth_login_smoke_gate_v5.py', 'scripts\\repair_sprint2_auth_login_smoke_v5.py', 'docs\\ops\\sprint2_auth_login_smoke_v5.md']
+failed   auth_session               tests.integration.test_sprint2_auth_login_smoke_v5::test_sprint2_v5_markers_exist
+         FileNotFoundError: [Errno 2] No such file or directory: 'scripts\\smoke_auth_login_critical_pages_v5.py'
+failed   auth_session               tests.integration.test_sprint2_auth_login_smoke_v5::test_smoke_script_has_safe_login_candidates
+         FileNotFoundError: [Errno 2] No such file or directory: 'scripts\\smoke_auth_login_critical_pages_v5.py'
+failed   other                      tests.integration.test_sprint2_closure_freeze_v19::test_v19_chain_contains_v1_to_v18_labels
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   live_external              tests.integration.test_sprint2_closure_freeze_v19::test_v19_freeze_rules_block_live_until_ministry_server
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   sprint3_integration        tests.integration.test_sprint2_closure_freeze_v19::test_v19_next_stage_mentions_sprint3
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   quality_release            tests.integration.test_sprint2_closure_freeze_v19::test_v19_infer_gate_passed_fail_zero
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   live_external              tests.integration.test_sprint2_closure_freeze_v19::test_v19_markdown_renderer_contains_freeze_and_no_live
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   other                      tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_helper_exists_and_returns_bool
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   other                      tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_v17_chain_row_has_waiting_override_field
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   other                      tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_waiting_reason_mentions_v17_check_env
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   other                      tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_markdown_can_render_waiting_mode_override
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   live_external              tests.integration.test_sprint2_closure_freeze_waiting_mode_hotfix_v19_1::test_v19_1_freeze_rules_still_block_live_until_server
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_closure_freeze_v19.py'
+failed   live_external              tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_critical_page_list_contains_live_routes
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+failed   other                      tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_detects_5xx_and_traceback
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+failed   other                      tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_detects_white_screen
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+failed   auth_session               tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_allows_login_redirect_page_when_not_blank
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+failed   other                      tests.integration.test_sprint2_critical_pages_smoke_v7::test_v7_redacts_sensitive_payload_values
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_critical_pages_v7.py'
+failed   other                      tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_deployment_steps_include_backup_and_smoke
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+failed   other                      tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_rollback_steps_include_restore_and_reason
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+failed   auth_session               tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_post_checks_include_login_and_logs
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+failed   other                      tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_markdown_renderer_contains_sections
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+failed   other                      tests.integration.test_sprint2_deployment_runbook_rollback_v16::test_v16_collect_runbook_returns_marker
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_deployment_runbook_rollback_v16.py'
+failed   quality_release            tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_chain_contains_all_sprint2_gates
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+failed   quality_release            tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_required_markers_include_scope_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+failed   quality_release            tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_addopts_contract_excludes_unsafe_scopes
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+failed   quality_release            tests.integration.test_sprint2_final_regression_matrix_v9::test_v9_finds_first_existing_candidate
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_final_regression_matrix_gate_v9.py'
+failed   quality_release            tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_marker_files_exist
+         AssertionError: Eksik entegrasyon smoke dosyaları: .coveragerc, scripts\smoke_critical_pages.py, scripts\check_sprint2_coverage_baseline_gate_v3.py, scripts\check_sprint2_integration_smoke_gate_v4.py, docs\ops\sprint2_integration_smoke_v4.md assert not ['.coveragerc', 'scripts\\smoke_critical_pages.py', 'scripts\\check_sprint2_coverage_baseline_gate_v3.py', 'scripts\\check_sprint2_integration_smoke_gate_v4.py', 'docs\\ops\\sprint2_integration_smoke_v4.md']
+failed   other                      tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_pytest_config_keeps_safe_scope
+         AssertionError: pytest.ini test kapsamını göstermeli. assert 'tests' in '[pytest]\nmarkers =\n    ci_safe: CI icin guvenli, deterministik testler.\n    source_smoke: Kaynak kod ve template v...   slow: Uzun suren testler.\n    legacy_integration: Eski/agir entegrasyon testleri.\nfilterwarnings =\n    default\n'
+failed   communication_mail         tests.integration.test_sprint2_integration_smoke_v4::test_sprint2_integration_smoke_previous_sprint_markers_are_visible
+         AssertionError: Eksik Sprint markerları: BYS360_SPRINT1_CICD_QUALITY_GATE_V1, BYS360_SPRINT2_TEST_DISCIPLINE_V1, BYS360_SPRINT2_CRITICAL_GUARD_TESTS_V2, BYS360_SPRINT2_COVERAGE_BASELINE_V3 assert not ['BYS360_SPRINT1_CICD_QUALITY_GATE_V1', 'BYS360_SPRINT2_TEST_DISCIPLINE_V1', 'BYS360_SPRINT2_CRITICAL_GUARD_TESTS_V2', 'BYS360_SPRINT2_COVERAGE_BASELINE_V3']
+failed   other                      tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_marker_lines_have_expected_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   live_external              tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_http_as_live
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   database_contract          tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_db_as_realdb
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   other                      tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_classifies_subprocess_as_slow
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   other                      tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_skips_sprint2_files
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   other                      tests.integration.test_sprint2_legacy_integration_scope_v8::test_v8_inserts_pytest_import
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\repair_sprint2_legacy_integration_scope_v8.py'
+failed   live_external              tests.integration.test_sprint2_live_server_preflight_v17::test_v17_required_env_contains_security_flags
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+failed   live_external              tests.integration.test_sprint2_live_server_preflight_v17::test_v17_env_snapshot_masks_secrets
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+failed   live_external              tests.integration.test_sprint2_live_server_preflight_v17::test_v17_runtime_files_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+failed   live_external              tests.integration.test_sprint2_live_server_preflight_v17::test_v17_markdown_renderer_contains_commands_and_urls
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+failed   live_external              tests.integration.test_sprint2_live_server_preflight_v17::test_v17_collect_preflight_returns_marker
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_live_server_preflight_v17.py'
+failed   auth_session               tests.integration.test_sprint2_real_login_smoke_v6::test_v6_smoke_script_uses_environment_credentials_and_markers
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+failed   auth_session               tests.integration.test_sprint2_real_login_smoke_v6::test_v6_redaction_never_returns_plain_password
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+failed   auth_session               tests.integration.test_sprint2_real_login_smoke_v6::test_v6_hidden_input_parser_supports_csrf_token
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\smoke_real_login_session_v6.py'
+failed   auth_session               tests.integration.test_sprint2_real_login_smoke_v6::test_v6_gate_has_real_login_flag_and_targeted_pytest_scope
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_real_login_smoke_gate_v6.py'
+failed   quality_release            tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_forbidden_entry_detection
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+failed   quality_release            tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_suspicious_entry_detection
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+failed   quality_release            tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_required_entries_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+failed   quality_release            tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_matches_directory_pattern
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+failed   quality_release            tests.integration.test_sprint2_release_candidate_verify_v13::test_v13_find_latest_candidate_returns_none_without_dist
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\verify_sprint2_release_candidate_v13.py'
+failed   quality_release            tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_sources_include_release_chain
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+failed   quality_release            tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_artifacts_include_package_manifest
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+failed   quality_release            tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_infer_status_missing_is_failed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+failed   quality_release            tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_infer_status_fail_zero_passes
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+failed   quality_release            tests.integration.test_sprint2_release_evidence_bundle_v14::test_v14_markdown_renderer_contains_gate_summary
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint2_release_evidence_v14.py'
+failed   quality_release            tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_matches_root_file_patterns
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+failed   quality_release            tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_matches_directory_patterns
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+failed   quality_release            tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_ignored_uses_releaseignore_patterns
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+failed   quality_release            tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_forbidden_patterns_cover_release_leaks
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+failed   quality_release            tests.integration.test_sprint2_release_manifest_dry_run_v11::test_v11_core_candidates_include_app_and_wsgi
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_manifest_dry_run_gate_v11.py'
+failed   quality_release            tests.integration.test_sprint2_release_package_builder_v12::test_v12_matches_pattern_for_root_and_dir
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+failed   quality_release            tests.integration.test_sprint2_release_package_builder_v12::test_v12_forced_exclude_contains_release_leaks
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+failed   quality_release            tests.integration.test_sprint2_release_package_builder_v12::test_v12_forbidden_package_patterns_cover_sensitive_outputs
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+failed   quality_release            tests.integration.test_sprint2_release_package_builder_v12::test_v12_required_package_contains_app_wsgi
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+failed   quality_release            tests.integration.test_sprint2_release_package_builder_v12::test_v12_sha256_function_exists
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\build_sprint2_release_package_v12.py'
+failed   quality_release            tests.integration.test_sprint2_release_readiness_v10::test_v10_releaseignore_contract_contains_sensitive_outputs
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+failed   quality_release            tests.integration.test_sprint2_release_readiness_v10::test_v10_required_files_include_gate_doc_runner
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+failed   quality_release            tests.integration.test_sprint2_release_readiness_v10::test_v10_root_risk_patterns_cover_common_release_leaks
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+failed   quality_release            tests.integration.test_sprint2_release_readiness_v10::test_v10_secret_patterns_detect_literal_password_assignment
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+failed   quality_release            tests.integration.test_sprint2_release_readiness_v10::test_v10_secret_patterns_ignore_masked_payload
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_release_readiness_gate_v10.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_next_stage_contains_lowercase_canli_oncesi
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_next_stage_still_mentions_ministry_server
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_freeze_next_stage_phrase_hotfix_v6_1::test_v6_1_source_marker_present
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_chain_contains_v1_to_v5
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_freeze_rules_block_live_until_server
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_next_stage_mentions_server_delivery
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_gate_passed_handles_fail_zero
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_collect_freeze_live_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_closure_pilot_acceptance_freeze_v6::test_sprint3_v6_summary_markdown_contains_not_live_note
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_closure_pilot_acceptance_freeze_v6.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_decision_classes_cover_core_options
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_rules_do_not_allow_live_deployment
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_classify_decision_blocks_open_critical
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_classify_decision_honors_conditional_signoff
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_collect_consolidation_live_deployment_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_decision_consolidation_v5::test_sprint3_v5_summary_markdown_contains_not_live_note
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_decision_consolidation_v5.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_minutes_contains_not_live_deployment_note
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_minutes_still_contains_secret_rule
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_minutes_live_note_hotfix_v4_1::test_v4_1_source_marker_present
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_participants_include_core_roles
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_agenda_covers_core_topics
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_rules_do_not_allow_live_deployment
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_decision_options_include_conditional_and_retest
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_collect_pack_live_deployment_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_corporate_approval_pack_v4::test_sprint3_v4_minutes_template_contains_signature_table
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_corporate_approval_pack_v4.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_statuses_cover_execution_lifecycle
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_defect_taxonomy_has_core_items
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_execution_rules_do_not_allow_live_deployment
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_collect_matrix_live_deployment_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_execution_matrix_v2::test_sprint3_v2_markdown_contains_matrix_and_files
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_execution_matrix_v2.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_triage_statuses_cover_lifecycle
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_action_owners_cover_core_groups
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_rules_do_not_allow_live_deployment
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_severity_rank_orders_critical_high
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_summary_blocks_open_critical
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_pilot_triage_board_v3::test_sprint3_v3_collect_board_live_deployment_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_pilot_triage_board_v3.py'
+failed   sprint3_integration        tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_roles_cover_core_users
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+failed   sprint3_integration        tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_scenarios_cover_low_score_publish_scope
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+failed   sprint3_integration        tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_live_deployment_stays_closed
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+failed   sprint3_integration        tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_markdown_contains_not_live_note
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+failed   sprint3_integration        tests.integration.test_sprint3_uat_pilot_plan_v1::test_sprint3_v1_result_statuses_include_repeat_test
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\collect_sprint3_uat_pilot_plan_v1.py'
+failed   auth_session               tests.mobile.test_mobile_domain_contract_p2a::test_mobile_route_contract_count
+         AssertionError: assert 24 == 23  +  where 24 = len(['/auth/login', '/auth/refresh', '/me', '/dashboard/summary', '/notifications/<int:notification_id>/read', '/notifications/read-all', ...])  +  and   23 = len({'/assistant/v2/ask', '/auth/login', '/auth/refresh', '/communication/messages/create-thread', '/communication/messages/threads/<int:thread_id>', '/communication/messages/threads/<int:thread_id>/send', ...})  +    where {'/assistant/v2/ask', '/auth/login', '/auth/refresh', '/communication/messages/create-thread', '/communication/messages/threads/<int:thread_id>', '/communication/messages/threads/<int:thread_id>/send', ...} = set(['/auth/login', '/auth/refresh', '/me', '/dashboard/summa
+failed   database_contract          tests.ops.test_live_ops_contract::test_backup_script_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\backup_db.ps1'
+failed   database_contract          tests.ops.test_live_ops_contract::test_restore_script_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\restore_db.ps1'
+failed   live_external              tests.ops.test_live_ops_contract::test_health_check_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\live_health_check.ps1'
+failed   live_external              tests.ops.test_live_ops_contract::test_clean_live_package_exclusions
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\windows\\clean_live_package.ps1'
+failed   live_external              tests.ops.test_live_ops_contract::test_live_ops_document_contract
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\uzman_inceleme\\CANLI_OPERASYON_ROLLBACK_PLANI.md'
+error    database_contract          tests.performance.test_critical_performance_routes_smoke::test_feedback_pipeline_loads_without_500
+         failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 24   def test_feedback_pipeline_loads_without_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def _disable_login(app): E       fixture 'app' not found >       available fixtures: _disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath
+error    database_contract          tests.performance.test_critical_performance_routes_smoke::test_feedback_corporate_cleanup_no_500
+         failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 43   def test_feedback_corporate_cleanup_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def _disable_login(app): E       fixture 'app' not found >       available fixtures: _disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]'
+error    database_contract          tests.performance.test_critical_performance_routes_smoke::test_process_tracking_no_500
+         failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 60   def test_process_tracking_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def _disable_login(app): E       fixture 'app' not found >       available fixtures: _disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help 
+error    database_contract          tests.performance.test_critical_performance_routes_smoke::test_process_reports_no_500
+         failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 78   def test_process_reports_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def _disable_login(app): E       fixture 'app' not found >       available fixtures: _disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help o
+error    database_contract          tests.performance.test_critical_performance_routes_smoke::test_president_approval_card_no_500
+         failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 97   def test_president_approval_card_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def _disable_login(app): E       fixture 'app' not found >       available fixtures: _disable_login, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' fo
+failed   quality_release            tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_includes_all_final_evidence_steps
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+failed   quality_release            tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_references_prior_final_quality_markers
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+failed   quality_release            tests.release.test_final_quality_release_chain_contract::test_final_quality_faz5_chain_has_cleanup_after_pytest_steps
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_final_quality_faz5_chain.py'
+failed   quality_release            tests.release.test_final_quality_release_report_contract::test_release_evidence_report_script_writes_expected_outputs
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/generate_final_quality_faz5_release_evidence.py').exists
+failed   quality_release            tests.release.test_final_quality_release_report_contract::test_final_quality_faz5_gate_and_doc_exist
+         AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_final_quality_faz5_gate.py').exists
+failed   quality_release            tests.release.test_final_quality_release_report_contract::test_final_quality_faz5_doc_mentions_release_package_boundaries
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\FINAL_QUALITY_FAZ5.md'
+failed   quality_release            tests.release.test_final_quality_release_report_contract::test_windows_gate_wrapper_points_to_faz5_gate
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/windows/final_quality_faz5_gate.ps1').exists
+failed   quality_release            tests.release.test_phase11_release_clean_gate::test_phase11_gate_script_exists
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/check_phase11_release_clean_gate.py').exists
+failed   live_external              tests.release.test_phase11_release_clean_gate::test_clean_release_builder_exists
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/build_clean_live_release.py').exists
+failed   quality_release            tests.release.test_phase11_release_clean_gate::test_phase11_doc_exists_and_mentions_release_policy
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/docs/release/FAZ11_CANLI_PAKET_TEMIZLEME.md').exists
+failed   live_external              tests.security.test_final_quality_security_release_contract::test_security_release_evidence_paths_exist_or_are_current_phase_paths
+         AssertionError: ['clean_live_release:scripts/check_clean_live_release_gate.py', 'clean_live_release:.releaseignore', 'claude_quality_g...kbone:scripts/run_final_quality_faz3_chain.py', 'final_quality_faz4_security:scripts/check_final_quality_faz4_gate.py'] assert not ['clean_live_release:scripts/check_clean_live_release_gate.py', 'clean_live_release:.releaseignore', 'claude_quality_g...kbone:scripts/run_final_quality_faz3_chain.py', 'final_quality_faz4_security:scripts/check_final_quality_faz4_gate.py']
+failed   quality_release            tests.security.test_final_quality_security_release_contract::test_quality_chain_includes_security_and_prior_final_quality_chains
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/scripts/run_final_quality_faz4_chain.py').exists
+failed   live_external              tests.security.test_final_quality_security_release_contract::test_release_hygiene_mentions_generated_artifacts_are_not_live_payload
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\docs\\refactor\\FINAL_QUALITY_FAZ4.md'
+failed   quality_release            tests.security.test_final_quality_security_release_contract::test_security_report_output_locations_are_under_reports_and_generated_docs
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\generate_final_quality_faz4_report.py'
+failed   quality_release            tests.services.test_final_quality_home_weather_contract::test_weather_service_has_cache_fallback_and_no_key_requirement
+         assert 'DEFAULT_CACHE_MINUTES = 60' in '\n"""BYS360 Anasayfa hava durumu ve saha öneri servisi.\n\nBu servis canlı arayüzün açılışını asla dış API\'ye bağıml...herSettings",\n    "build_weather_recommendations",\n    "get_home_weather_context",\n    "get_weather_settings",\n]\n'
+failed   database_contract          tests.services.test_final_quality_live_source_contract::test_service_sources_do_not_contain_schema_mutation_shortcuts
+         AssertionError: assert not ['app\\services\\corporate_information_center.py::ALTER TABLE', 'app\\services\\performance\\feedback_followup_phase4....\meeting_p1_scope.py::ALTER TABLE', 'app\\services\\performance\\meeting_p4_development_guidance.py::ALTER TABLE', ...]
+failed   quality_release            tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_coverage_gate_files_exist
+         AssertionError: assert False  +  where False = exists()  +    where exists = ((WindowsPath('C:/bys360/project') / 'scripts') / 'check_sprint2_coverage_baseline_gate_v3.py').exists
+failed   quality_release            tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_coverage_marker_present
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\check_sprint2_coverage_baseline_gate_v3.py'
+failed   other                      tests.sprint2.test_sprint2_coverage_baseline_v3::test_sprint2_pytest_config_has_coverage_intent
+         AssertionError: assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.coveragerc').exists
+failed   quality_release            tests.sprint2.test_sprint2_critical_guard_tests_v2::test_sprint2_critical_guard_files_exist
+         AssertionError: Eksik kritik guard/test dosyası: ['scripts/check_template_dict_method_guard.py', 'scripts/check_jinja_dict_method_collision_guard.py', 'scripts/check_silent_exception_guard.py', 'scripts/check_sprint2_test_discipline_gate_v1.py', 'scripts/check_sprint2_critical_guard_tests_gate_v2.py'] assert not ['scripts/check_template_dict_method_guard.py', 'scripts/check_jinja_dict_method_collision_guard.py', 'scripts/check_s...guard.py', 'scripts/check_sprint2_test_discipline_gate_v1.py', 'scripts/check_sprint2_critical_guard_tests_gate_v2.py']
+failed   quality_release            tests.sprint2.test_sprint2_critical_guard_tests_v2::test_sprint2_v2_gate_ci_light_runs
+         AssertionError: C:\Users\Havva Gülsen ÖZDEN\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe: can't open file 'C:\\bys360\\project\\scripts\\check_sprint2_critical_guard_tests_gate_v2.py': [Errno 2] No such file or directory    assert 2 == 0  +  where 2 = CompletedProcess(args=['C:\\bys360\\project\\.venv\\Scripts\\python.exe', 'C:\\bys360\\project\\scripts\\check_sprint2...bys360\\\\project\\\\scripts\\\\check_sprint2_critical_guard_tests_gate_v2.py': [Errno 2] No such file or directory\n").returncode
+failed   other                      tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_pytest_configuration_exists
+         AssertionError: assert 'BYS360_SPRINT2_TEST_DISCIPLINE_V1' in '[pytest]\nmarkers =\n    ci_safe: CI icin guvenli, deterministik testler.\n    source_smoke: Kaynak kod ve template v...   slow: Uzun suren testler.\n    legacy_integration: Eski/agir entegrasyon testleri.\nfilterwarnings =\n    default\n'
+failed   other                      tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_coverage_configuration_exists
+         AssertionError: .coveragerc bulunamadı assert False  +  where False = exists()  +    where exists = WindowsPath('C:/bys360/project/.coveragerc').exists
+failed   quality_release            tests.sprint2.test_sprint2_test_infra_v1::test_sprint2_gate_scripts_exist
+         AssertionError: Eksik Sprint 2 dosyaları: scripts\repair_sprint2_test_discipline_v1.py, scripts\check_sprint2_test_discipline_gate_v1.py, scripts\run_sprint2_test_baseline_v1.ps1, docs\ops\sprint2_test_discipline_v1.md assert not ['scripts\\repair_sprint2_test_discipline_v1.py', 'scripts\\check_sprint2_test_discipline_gate_v1.py', 'scripts\\run_sprint2_test_baseline_v1.ps1', 'docs\\ops\\sprint2_test_discipline_v1.md']
+failed   auth_session               tests.test_10_10_core_static_gate::test_schema_guard_is_check_first_not_auto_repair_default
+         assert 'auto_repair_schema and should_auto_repair_schema()' in '\n"""BYS360 application factory.\n\nBu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve\nmevcu...n_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))\n    return app\n'
+failed   live_external              tests.test_10_10_core_static_gate::test_removed_modules_stay_out_of_live_scope_and_menus
+         assert '"portal": True' in '\n"""Canlı öncesi kapsam dışı modül kararları.\n\nBu dosya Faz 1/2 overlay ile birlikte tek merkezli bir karar noktas... return is_module_removed(name)\n\n\ndef get_removed_modules() -> dict[str, bool]:\n    return dict(REMOVED_MODULES)\n'
+failed   quality_release            tests.test_10_10_core_static_gate::test_releaseignore_excludes_non_release_artifacts
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\.releaseignore'
+failed   database_contract          tests.test_ai_analysis_visual_reports_static::test_faz8_routes_and_template_exist
+         assert 'Faz 8' in '{% extends "admin_ai_base.html" %}\n{% block title %}AI Görselleştirme ve Rapor Kartları - BYS360{% endblock %}\n{% b...n class="ai-badge muted">Karar destek</span></li>\n      </ul>\n    </article>\n  </section>\n</div>\n{% endblock %}\n'
+failed   live_external              tests.test_ai_final_live_hardening_static::test_faz12_warning_fix_is_explicit
+         assert 'weak_secret_key' in '"""Geriye dönük uyumluluk shim.\n\nBu dosya taşınmadan önce app.security_audit olarak import ediliyordu.\nYeni konumu..._security_findings,\n    findings_to_dicts,\n    build_security_audit_summary,\n    log_runtime_security_posture,\n)\n'
+error    database_contract          tests.test_ai_routes::test_run_json_service_success
+         failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 9   def test_run_json_service_success(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help on them.  C:\bys360\project\tests\test_ai_routes.py:9"
+error    database_contract          tests.test_ai_routes::test_run_json_service_maps_403
+         failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 16   def test_run_json_service_maps_403(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help on them.  C:\bys360\project\tests\test_ai_routes.py:16"
+error    database_contract          tests.test_ai_routes::test_run_json_service_maps_503
+         failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 23   def test_run_json_service_maps_503(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help on them.  C:\bys360\project\tests\test_ai_routes.py:23"
+failed   database_contract          tests.test_ai_visibility_gate_static::test_faz10_template_has_kvkk_and_role_matrix
+         assert 'Faz 10' in '{% extends "admin_ai_base.html" %}\n{% block title %}AI Yetki, KVKK Maskeleme ve Güvenli Görünürlük Kapısı - BYS360{%...erçek ham AI istem/yanıt alanları bu panelde okunmaz ve dışa aktarılmaz.</div>\n  </section>\n</div>\n{% endblock %}\n'
+failed   other                      tests.test_async_task_infrastructure_static::test_async_worker_and_smoke_scripts_exist
+         FileNotFoundError: [Errno 2] No such file or directory: 'C:\\bys360\\project\\scripts\\run_async_worker.py'
+failed   other                      tests.test_claude_phase5_smoke_routes::test_get_routes_do_not_return_500
+         AssertionError: 500/exception üreten route bulundu: [('/health/deep', 503), ('/setup-admin', 500)] assert not [('/health/deep', 503), ('/setup-admin', 500)]
+error    database_contract          tests.test_compat_redirects::test_soft_redirect_targets_endpoint
+         failed on setup with "file C:\bys360\project\tests\test_compat_redirects.py, line 8   def test_soft_redirect_targets_endpoint(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory >       use 'pytest --fixtures [testpath]' for help on them.  C:\bys360\project\tests\test_compat_redirects.py:8"
+failed   database_contract          tests.test_feedback_pulse_admin_tab_static::test_base_has_separate_pulse_analysis_menu_item
+         assert "current_ep in ['main.feedback_pulse_analytics', 'main.feedback_admin_pulse_analytics']" in '\ufeff\n\n{# BYS360_BASE_CLEAN_V13: temiz, sabit ve rol bazlı ana iskelet #}\n<!doctype html>\n<html lang="tr">\n<hea...pletion_v2.js\') }}?v=2" defer></script>\n<!-- /BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_JS -->\n</body>\n</html>\n\n\n'
+failed   database_contract          tests.test_feedback_pulse_admin_tab_static::test_feedback_core_menu_policy_contains_pulse_keys
+         assert '"feedback_pulse"' in 'from __future__ import annotations\n\n\nimport logging\nlogger = logging.getLogger(__name__)\n\n"""Ortak route destek...not _bys360_v13_route_support_is_removed_menu_key(key)}\n# BYS360_CLAUDE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_END\n\n'
+failed   database_contract          tests.test_feedback_pulse_menu_visibility_static::test_feedback_pulse_is_core_visible_for_all_roles
+         assert '"feedback_pulse": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"}' in 'from __future__ import annotations\n\n\nimport logging\nlogger = logging.getLogger(__name__)\n\n"""Ortak route destek...not _bys360_v13_route_support_is_removed_menu_key(key)}\n# BYS360_CLAUDE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_END\n\n'
+failed   database_contract          tests.test_feedback_pulse_menu_visibility_static::test_feedback_pulse_menu_item_still_exists_in_base_and_registry
+         assert '"key": "feedback_pulse"' in '# BYS360_PHASE3_2_MENU_REGISTRY_NOTE: Performans menü görünürlüğünün son kararı app/services/settings/effective_menu.... loglandi: app/menu_registry.py:1512")\n    pass\n# BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_MENU_END\n\n'
+failed   other                      tests.test_hr_leave_attendance_real_post_static::test_leave_and_attendance_post_are_real_handlers_not_placeholder_flash
+         assert 'return _handle_leave_post()' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+failed   other                      tests.test_hr_leave_attendance_real_post_static::test_leave_attendance_balance_and_delegation_handlers_exist
+         assert 'def _handle_leave_post' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+failed   other                      tests.test_hr_leave_attendance_real_post_static::test_duplicate_and_conflict_controls_are_present
+         assert 'def _leave_overlaps' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+failed   other                      tests.test_hr_leave_attendance_real_post_static::test_form_tokens_are_consumed_for_mutating_hr_forms
+         assert 'consume_form_token("hr_management", request.form.get("_form_token"), scope="leave_create")' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+failed   other                      tests.test_institutional_dashboard_route_static::test_hr_dashboard_endpoints_are_real_routes
+         assert 'def hr_leave_management' in '\n"""BYS360 canlı çekirdek kurumsal/personel route ailesi.\n\nFaz A: Büyük dosya bölme refactoru. Bu dosya ana HR yön...rts_routes import *  # noqa: E402,F401,F403\n\n\n__all__ = [name for name in globals() if not name.startswith("__")]\n'
+failed   live_external              tests.test_live_scope_and_security_static::test_schema_guard_is_not_auto_repair_by_default
+         assert 'auto_repair_schema and should_auto_repair_schema()' in '\n"""BYS360 application factory.\n\nBu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve\nmevcu...n_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))\n    return app\n'
+failed   performance                tests.test_performance_assignment_rule_gate_static::test_president_stays_in_lookup_but_not_subjects
+         AssertionError: assert 'employees = [employee for employee in query.all() if not is_president(employee)]' in 'from __future__ import annotations\n\n\n\nimport logging\nfrom app.core.datetime_utils import utc_now\nfrom datetime ...PHASE9_REMINDER_BOUND\n# Otomatik hatırlatma ve aksatan amir bildirimi phase9_reminder_policy sözleşmesini kullanır.\n'
+failed   performance                tests.test_performance_core_health_dalga8_static::test_visibility_and_publish_locks_are_kept
+         assert 'LOW_SCORE_THRESHOLD = 70.0' in 'from __future__ import annotations\n\n\nimport logging\n\n"""BYS360 performans yayın ön kontrol anayasası.\n\nBu serv...SCORE_APPROVAL_BOUND\n# 70 altı düşük performans üst onay/yayın kilidi phase6_low_score_approval_policy ile izlenir.\n'
+failed   database_contract          tests.test_performance_phase5_ui_copy::test_team_compare_uses_ekip_kiyas_wording
+         assert 'Ekip Kıyas' in '{% extends "base.html" %}\n{% block title %}Personel Analizi - BYS360{% endblock %}\n{% block page_kicker %}Performan...n</div>\n<script src="{{ url_for(\'static\', filename=\'js/bys360_reports_ai_pro.js\') }}"></script>\n{% endblock %}\n'
+failed   database_contract          tests.test_performance_phase5_ui_copy::test_microguide_partial_exists_and_is_used
+         assert '{% include "performance/_phase5_microguide.html" %}' in '{% extends "base.html" %}\n{% block title %}Personel Analizi - BYS360{% endblock %}\n{% block page_kicker %}Performan...n</div>\n<script src="{{ url_for(\'static\', filename=\'js/bys360_reports_ai_pro.js\') }}"></script>\n{% endblock %}\n'
+failed   performance                tests.test_performance_preflight::test_validate_score_comment_rules_requires_comment_for_edge_scores
+         AssertionError: assert '1 ve 5 puanlarında açıklama zorunlu.' in ['Bu puan için sistem ayarında açıklama zorunluluğu aktiftir.', '70 altı ve 90 üstü sonuçlarda genel görüş zorunlu.']
+failed   performance                tests.test_performance_publish_preflight_static::test_publish_preflight_rules_hold_constitution
+         assert 'LOW_SCORE_THRESHOLD = 70.0' in 'from __future__ import annotations\n\n\nimport logging\n\n"""BYS360 performans yayın ön kontrol anayasası.\n\nBu serv...SCORE_APPROVAL_BOUND\n# 70 altı düşük performans üst onay/yayın kilidi phase6_low_score_approval_policy ile izlenir.\n'
+failed   performance                tests.test_performance_publish_preflight_static::test_publish_guard_shows_strict_blockers
+         assert '2026-04-18-publish-preflight-lock-v1' in 'from __future__ import annotations\n\n\nimport logging\n\nfrom typing import Any\n\nfrom app.models import Performanc...ocked,\n        "viewed": viewed,\n        "acknowledged": acknowledged,\n        "top_reasons": top_reasons,\n    }\n'
+failed   performance                tests.test_performance_visibility_constitution_static::test_scorecard_visibility_is_centralized
+         AssertionError: assert 'from app.services.performance.visibility_guard import' in 'from __future__ import annotations\n\n# Faz 2 V5: publish.policy uygulama açılışında visibility_guard import etmez.\n...d.query\n        .filter_by(is_active=True)\n        .order_by(PerformancePeriod.id.desc())\n        .first()\n    )\n'
+failed   auth_session               tests.test_redis_ready_static::test_redis_ready_cache_and_rate_limit_contracts
+         AssertionError: assert 'redis>=' in 'Flask==3.0.3\nFlask-Login==0.6.3\nFlask-SQLAlchemy==3.1.1\nFlask-WTF==1.2.1\nFlask-Migrate==4.0.7\nSQLAlchemy==2.0.36...entry-sdk[flask]==2.20.0\nredis==5.0.8\nrq==2.3.3\nprometheus-client==0.20.0\nFlask-Limiter==3.5.0\npip-audit==2.7.0\n'
+failed   quality_release            tests.test_redis_ready_static::test_ci_quality_gate_exists
+         FileNotFoundError: [Errno 2] No such file or directory: '.github\\workflows\\bys360-quality.yml'

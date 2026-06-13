@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}AI Yönetici Rapor Paketi - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Yönetici Rapor Paketi{% endblock %}
+{% block page_subtitle %}Karar geçmişi, istem sürüm görünümü ve yönetişim özetini tek pakette toplar.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <form class="d-flex gap-2" method="get">
+      <input class="form-control" type="number" name="lookback_days" min="1" max="365" value="{{ lookback_days or 30 }}">
+      <button class="btn btn-catab">Güncelle</button>
+    </form>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_management_pack_export_md', lookback_days=lookback_days) }}">Markdown</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_management_pack_export_json', lookback_days=lookback_days) }}">JSON</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_decision_history', lookback_days=lookback_days) }}">Karar geçmişi</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_prompt_compare', lookback_days=lookback_days) }}">İstem karşılaştırma</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  {% for row in summary_cards %}
+  <div class="col-xl-3 col-md-6">
+    <div class="glass-card p-4 h-100">
+      <div class="small text-muted">{{ row.label }}</div>
+      <div class="display-6 fw-bold">{{ row.value }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="glass-card p-4 mb-4">
+  <h4 class="mb-3">Yönetici notu</h4>
+  <div class="alert alert-warning border-0 rounded-4 mb-0">{{ manager_note }}</div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Öne çıkan başlıklar</h4>
+      {% for item in sections.executive_highlights %}
+      <div class="border rounded-4 p-3 mb-3">
+        <div class="fw-semibold">{{ item.title }}</div>
+        <div class="small text-muted mt-1">{{ item.body }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Başlık bulunmuyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Öncelikli riskler</h4>
+      {% for item in sections.risk_watch %}
+      <div class="border rounded-4 p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center gap-2">
+          <div class="fw-semibold">{{ item.title }}</div>
+          <span class="badge text-bg-secondary">{{ item.severity or 'bilgi' }}</span>
+        </div>
+        <div class="small text-muted mt-2">{{ item.body }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Risk görünmüyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Son karar geçmişi</h4>
+      {% for row in sections.recent_decisions %}
+      <div class="border rounded-4 p-3 mb-3 small">
+        <div class="fw-semibold">{{ row.module_label }} / {{ row.feature_label }}</div>
+        <div class="text-muted">{{ row.prompt_version }} · {{ row.status_label }} · {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+        <div class="mt-2">{{ row.response_preview }}</div>
+        <div class="text-muted mt-2">Geri bildirim: {{ row.feedback_total }} · Açık öneri: {{ row.open_recommendations }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">Kayıt görünmüyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">İstem sürüm izleme</h4>
+      {% for row in sections.prompt_watch %}
+      <div class="border rounded-4 p-3 mb-3 small">
+        <div class="d-flex justify-content-between gap-2 align-items-center">
+          <div class="fw-semibold">{{ row.module_label }} / {{ row.feature_label }}</div>
+          <span class="badge text-bg-secondary">{{ row.stability_label }}</span>
+        </div>
+        <div class="text-muted">{{ row.prompt_version }} · Başarı %{{ row.success_rate }} · Kalite %{{ row.quality_score }}</div>
+        <div class="mt-2">{{ row.comparison_note }}</div>
+      </div>
+      {% else %}
+      <div class="text-muted">İstem verisi görünmüyor.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-7">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Canlıya alma kapıları</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Kontrol</th><th>Durum</th><th>Detay</th></tr></thead>
+          <tbody>
+            {% for row in sections.go_live_gates %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td><span class="badge text-bg-secondary">{{ row.status }}</span></td>
+              <td class="small text-muted">{{ row.detail }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-muted">Kontrol bulunamadı.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Paylaşım planı</h4>
+      <div class="fw-semibold mb-2">Alıcı grupları</div>
+      <div class="small text-muted mb-3">{{ (distribution_plan.default_recipients or [])|join(', ') }}</div>
+      <div class="fw-semibold mb-2">Önerilen formatlar</div>
+      <div class="small text-muted mb-3">{{ (distribution_plan.default_formats or [])|join(', ') }}</div>
+      <div class="fw-semibold mb-2">Yönetici notu</div>
+      <div class="small text-muted">{{ distribution_plan.default_note }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

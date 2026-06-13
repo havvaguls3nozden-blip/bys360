@@ -1,0 +1,48 @@
+{# BYS360_CORPORATE_PORTAL_MATURITY_V1_6_GROUPS #}
+{% extends "base.html" %}
+{% block title %}Portal Grupları - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Portal{% endblock %}
+{% block page_title %}Portal Grupları{% endblock %}
+{% block page_subtitle %}Resmi çalışma grupları, proje ekipleri ve yetki kontrollü grup paylaşımları.{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=portal-iphone-responsive-v2-11">{% endblock %}
+{% block content %}
+<div class="portal-shell portal-maturity-shell">
+  {% include 'portal/_tabs.html' %}
+  <div class="portal-layout groups-layout">
+    <main class="portal-main">
+      <section class="portal-card portal-grid-card upgraded">
+        <div class="portal-section-head">
+          <div><span class="portal-kicker"><i class="fa-solid fa-user-group"></i> Gruplar</span><h2>Portal Grupları</h2><p>Resmi gruplar, proje ekipleri ve hedefli paylaşımlar burada yönetilir.</p></div>
+        </div>
+        <div class="portal-group-grid">
+          {% for group in portal_group_list %}
+          <a class="portal-group-card" href="{{ safe_url_for('main.portal_group_detail', group_id=group.id, fallback='#') }}">
+            <i class="fa-solid fa-user-group"></i><h3>{{ group.name }}</h3><p>{{ group.description or 'Kurumsal portal grubu' }}</p><span>{{ group.group_type }}</span>
+          </a>
+          {% else %}<div class="portal-empty embedded"><i class="fa-regular fa-folder-open"></i><h3>Henüz grup bulunmuyor</h3><p>Yetkili kullanıcılar yeni portal grubu oluşturabilir.</p></div>{% endfor %}
+        </div>
+      </section>
+    </main>
+    {% if portal_can_manage %}
+    <aside class="portal-side portal-right">
+      <section class="portal-card portal-create-group-card">
+        <span class="portal-kicker"><i class="fa-solid fa-plus"></i> Yeni Grup</span>
+        <h3>Grup Oluştur</h3>
+        <p>Kurumsal çalışma, proje veya ilgi gruplarını düzenli yayın akışıyla yönetin.</p>
+        <form method="post" action="{{ safe_url_for('main.portal_group_create', fallback='/portal/groups') }}" class="portal-mini-form" data-portal-inline-form>
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <label class="portal-field-label">Grup adı</label>
+          <input class="portal-input" name="name" required maxlength="180" placeholder="Örn. Eğitim ve Performans Çalışma Grubu">
+          <label class="portal-field-label">Açıklama</label>
+          <textarea class="portal-textarea compact" name="description" maxlength="1200" placeholder="Grubun amacı ve kapsamı"></textarea>
+          <label class="portal-field-label">Grup türü</label>
+          <select class="portal-select" name="group_type"><option value="official">Resmi kurumsal grup</option><option value="social">Sosyal / ilgi grubu</option><option value="project">Proje grubu</option></select>
+          <button class="portal-btn primary full" type="submit"><i class="fa-solid fa-plus"></i> Grup Oluştur</button>
+        </form>
+      </section>
+    </aside>
+    {% endif %}
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-iphone-responsive-v2-11"></script>
+{% endblock %}

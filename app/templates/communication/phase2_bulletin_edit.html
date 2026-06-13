@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Duyuru Düzenle - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Duyuru Düzenleme Merkezi{% endblock %}
+{% block page_subtitle %}Faz 2 ile duyuru kaydı artık revizyon geçmişi korunarak güncellenebilir hale gelir.{% endblock %}
+{% block content %}
+<div class="card shadow-sm border-0 rounded-4">
+  <div class="card-body p-4 p-xl-5">
+    <form method="post" class="row g-3">
+      <div class="col-xl-8">
+        <label class="form-label fw-bold">Başlık</label>
+        <input type="text" name="title" class="form-control form-control-lg" value="{{ request.form.get('title', bulletin.title) }}" required>
+      </div>
+      <div class="col-xl-4">
+        <label class="form-label fw-bold">Öncelik</label>
+        <select class="form-select form-select-lg" name="priority">
+          {% for value, label in priority_labels.items() %}
+          <option value="{{ value }}" {% if request.form.get('priority', bulletin.priority)==value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-bold">Kısa Özet</label>
+        <input type="text" name="summary" class="form-control" value="{{ request.form.get('summary', bulletin.summary or '') }}">
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-bold">İçerik</label>
+        <textarea name="content" class="form-control" rows="10" required>{{ request.form.get('content', bulletin.content) }}</textarea>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Hedefleme tipi</label>
+        <select class="form-select" name="target_type">
+          {% set selected_target = request.form.get('target_type', default_target_type) %}
+          <option value="all" {% if selected_target=='all' %}selected{% endif %}>Tüm kurum</option>
+          <option value="role" {% if selected_target=='role' %}selected{% endif %}>Role göre</option>
+          <option value="unit" {% if selected_target=='unit' %}selected{% endif %}>Birime göre</option>
+          <option value="user" {% if selected_target=='user' %}selected{% endif %}>Kişi bazlı</option>
+        </select>
+      </div>
+      <div class="col-md-8">
+        <label class="form-label fw-bold">Hedef değerler</label>
+        <input type="text" name="target_values" class="form-control" value="{{ request.form.get('target_values', default_target_values) }}" placeholder="Örnek: grup_baskani veya 12,34">
+        <div class="form-text">Çoklu seçimleri virgülle ayırabilirsin. Birim veya kullanıcı ID mantığıyla çalışır.</div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-check mt-4 pt-2"><input class="form-check-input" type="checkbox" name="is_pinned" id="is_pinned" {% if request.form.get('is_pinned') or bulletin.is_pinned %}checked{% endif %}><label class="form-check-label fw-semibold" for="is_pinned">Sabitlenmiş duyuru</label></div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-check mt-4 pt-2"><input class="form-check-input" type="checkbox" name="require_ack" id="require_ack" {% if request.form.get('require_ack') or bulletin.require_ack %}checked{% endif %}><label class="form-check-label fw-semibold" for="require_ack">Okundu teyidi zorunlu</label></div>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Durum</label>
+        <input type="text" class="form-control" value="{{ status_labels.get(bulletin.status, bulletin.status) }}" disabled>
+      </div>
+      <div class="col-12">
+        <label class="form-label fw-bold">Değişiklik Notu</label>
+        <input type="text" name="change_note" class="form-control" placeholder="Örnek: içerik sadeleştirildi, hedef kitle güncellendi">
+      </div>
+      <div class="col-12 d-flex flex-wrap gap-2 pt-2">
+        <button type="submit" class="btn btn-danger px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Kaydet</button>
+        <a href="{{ url_for('main.communication_phase2_bulletin_history', bulletin_id=bulletin.id) }}" class="btn btn-outline-secondary px-4"><i class="fa-solid fa-clock-rotate-left me-2"></i>Revizyon Geçmişi</a>
+        <a href="{{ url_for('main.communication_phase1_bulletin_detail', bulletin_id=bulletin.id) }}" class="btn btn-outline-dark px-4">Detaya Dön</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

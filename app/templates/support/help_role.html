@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ role.title }} - Yardım Merkezi{% endblock %}
+{% block page_kicker %}Yardım Merkezi{% endblock %}
+{% block page_title %}{{ role.title }} Rehberleri{% endblock %}
+{% block page_subtitle %}{{ role.description }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_support_learning.css') }}">
+<div class="support-learning-shell">
+  {% set current_view_key = 'support_index' %}
+  {% include 'support/_tabs.html' %}
+  <section class="support-hero" style="grid-template-columns:1fr 260px;">
+    <div>
+      <span class="support-kicker"><i class="{{ role.icon }}"></i> Rol Bazlı Rehber</span>
+      <h2 class="support-title">{{ role.title }}</h2>
+      <p class="support-text">{{ role.description }}</p>
+    </div>
+    <div class="support-note"><h4>Kapsam</h4><p>{{ role.article_count }} rehber · {{ role.coverage_level }} seviye</p></div>
+  </section>
+  <section class="support-panel">
+    <div class="support-article-list">
+      {% for article in role.articles %}
+      <a class="support-article-card" href="{{ url_for('main.support_help_article', article_slug=article.slug) }}">
+        <div><h4 class="support-article-title">{{ article.title }}</h4><p class="support-article-summary">{{ article.summary }}</p><div class="support-meta">{% for tag in article.tags[:4] %}<span class="support-badge">{{ tag }}</span>{% endfor %}</div></div>
+        <span class="support-badge">İncele</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_support_learning.js') }}"></script>
+{% endblock %}

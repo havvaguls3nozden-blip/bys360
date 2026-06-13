@@ -1,0 +1,257 @@
+{# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_2_POST_CARD #}
+{% set post = item.post %}
+{# BYS360_PORTAL_INSTAGRAM_FULL_HIDE_V2_11_8_POSTCARD_BEGIN #}
+{% if not (post and post.post_type in ['instagram', 'instagram_story']) %}
+{# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_6_POSTCARD_CONTEXT_BEGIN #}
+{% set bys360_v2116_is_instagram = post.post_type in ['instagram', 'instagram_story'] %}
+{% set bys360_v2116_attachments = post.attachments.all() if post.attachments is defined else [] %}
+{% set bys360_v2116_ig = namespace(permalink='', account='', media_url='', thumbnail_url='') %}
+{% if bys360_v2116_is_instagram %}
+  {% for attachment in bys360_v2116_attachments %}
+    {% if attachment.mime_type == 'text/x-instagram-permalink' %}{% set bys360_v2116_ig.permalink = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-account' %}{% set bys360_v2116_ig.account = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-media-url' %}{% set bys360_v2116_ig.media_url = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-thumbnail-url' %}{% set bys360_v2116_ig.thumbnail_url = attachment.stored_path %}{% endif %}
+  {% endfor %}
+{% endif %}
+{# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_6_POSTCARD_CONTEXT_END #}
+{% set is_instagram = post.post_type in ['instagram', 'instagram_story'] %}
+{% set portal_attachments = post.attachments.all() if post.attachments is defined else [] %}
+{% set ig = namespace(media_url='', thumbnail_url='', permalink='', account='', media_type='IMAGE', kind='media') %}
+
+{# BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_CONTEXT #}
+{% set bys360_social = namespace(url='', platform='', embed='') %}
+{% for attachment in portal_attachments %}
+  {% if attachment.mime_type == 'text/x-portal-social-url' %}{% set bys360_social.url = attachment.stored_path %}{% endif %}
+  {% if attachment.mime_type == 'text/x-portal-social-platform' %}{% set bys360_social.platform = attachment.stored_path %}{% endif %}
+  {% if attachment.mime_type == 'text/x-portal-social-embed' %}{% set bys360_social.embed = attachment.stored_path %}{% endif %}
+{% endfor %}
+
+{% if is_instagram %}
+  {% for attachment in portal_attachments %}
+    {% if attachment.mime_type == 'text/x-instagram-media-url' %}{% set ig.media_url = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-thumbnail-url' %}{% set ig.thumbnail_url = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-permalink' %}{% set ig.permalink = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-account' %}{% set ig.account = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-media-type' %}{% set ig.media_type = attachment.stored_path %}{% endif %}
+    {% if attachment.mime_type == 'text/x-instagram-kind' %}{% set ig.kind = attachment.stored_path %}{% endif %}
+  {% endfor %}
+{% endif %}
+<article id="post-{{ post.id }}" class="portal-card portal-post-card {{ 'has-social-embed-v3b' if bys360_social.url else '' }} portal-v2c-post-card {{ 'is-pinned' if post.is_pinned else '' }} {{ 'is-instagram' if is_instagram else '' }} {{ 'is-instagram-story' if post.post_type == 'instagram_story' else '' }}" aria-label="Portal paylaşımı">
+  <header class="portal-post-head">
+    {% if is_instagram %}
+      <a class="portal-avatar portal-avatar-ring portal-instagram-avatar" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram profilini aç"><i class="fa-brands fa-instagram"></i></a>
+    {% else %}
+      <a class="portal-avatar portal-avatar-ring" href="{{ safe_url_for('main.portal_profile', user_id=post.author_user_id, fallback='#') }}" aria-label="Profil">
+        {% if post.author and post.author.profile_photo_url %}<img src="{{ post.author.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+      </a>
+    {% endif %}
+    <div class="portal-post-meta">
+      <div class="portal-post-author-line">
+        {% if is_instagram %}
+          <a href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer">@{{ ig.account or 'instagram' }}</a>
+        {% else %}
+          <a href="{{ safe_url_for('main.portal_profile', user_id=post.author_user_id, fallback='#') }}">{{ post.author.full_name if post.author else 'BYS360 Kullanıcısı' }}</a>
+        {% endif %}
+        {% if post.is_pinned %}<span class="portal-mini-pin"><i class="fa-solid fa-thumbtack"></i> Sabit</span>{% endif %}
+      </div>
+      {% if is_instagram %}
+        <span>{{ 'Instagram Story' if post.post_type == 'instagram_story' else 'Instagram Paylaşımı' }}</span>
+      {% else %}
+        <span>{{ post.author.unvan if post.author and post.author.unvan else 'Kurumsal Kullanıcı' }}</span>
+      {% endif %}
+      <small><i class="fa-regular fa-clock"></i> {{ post.published_at.strftime('%d.%m.%Y %H:%M') if post.published_at else 'Yayın tarihi yok' }} · <i class="fa-solid fa-eye"></i> {{ item.visibility_label }}</small>
+      {% if not is_instagram %}
+        {% if item is defined and item.wall_owner_label %}
+          <small class="portal-wall-owner-line"><i class="fa-regular fa-id-card"></i> {{ item.wall_owner_label }} profil duvarında paylaşıldı.</small>
+        {% elif post is defined and post.wall_owner and post.wall_owner_user_id and post.author_user_id and post.wall_owner_user_id != post.author_user_id %}
+          <small class="portal-wall-owner-line"><i class="fa-regular fa-id-card"></i> {{ post.wall_owner.full_name or ((post.wall_owner.ad or '') ~ ' ' ~ (post.wall_owner.soyad or '')) or post.wall_owner.email }} profil duvarında paylaşıldı.</small>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div class="portal-post-badges">
+      {% if is_instagram %}
+        <span class="portal-badge soft portal-instagram-source"><i class="fa-brands fa-instagram"></i> {{ 'Story' if post.post_type == 'instagram_story' else 'Instagram' }}</span>
+      {% else %}
+        <span class="portal-badge soft"><i class="fa-regular fa-newspaper"></i> {{ item.post_type_label }}</span>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if post.title %}<h3 class="portal-post-title">{{ post.title }}</h3>{% endif %}
+  <div class="portal-post-body">{{ post.body|replace('\n','<br>')|safe }}</div>
+
+  {% if is_instagram %}
+    {% set ig_visual_url = ig.thumbnail_url or ig.media_url %}
+    {% if ig_visual_url %}
+      <section class="portal-instagram-media" aria-label="Instagram medya önizlemesi">
+        <a href="{{ ig.permalink or ig_visual_url }}" target="_blank" rel="noopener noreferrer" title="Instagram'da aç">
+          {% if ig.media_type == 'VIDEO' and not ig.thumbnail_url %}
+            <video controls preload="metadata"><source src="{{ ig.media_url }}"></video>
+          {% else %}
+            <img src="{{ ig_visual_url }}" alt="Instagram paylaşımı" loading="lazy">
+          {% endif %}
+        </a>
+      </section>
+    {% endif %}
+  {% elif portal_attachments %}
+    <section class="portal-post-media" aria-label="Paylaşım medyaları">
+      {% set image_count = namespace(value=0) %}
+      {% for attachment in portal_attachments %}
+        {% if attachment.mime_type and attachment.mime_type.startswith('image/') %}{% set image_count.value = image_count.value + 1 %}{% endif %}
+      {% endfor %}
+      {% if image_count.value %}
+        <div class="portal-media-gallery {{ 'compact' if image_count.value > 2 else '' }}">
+          {% for attachment in portal_attachments %}
+            {% if attachment.mime_type and attachment.mime_type.startswith('image/') %}
+              <a class="portal-media-image" href="{{ url_for('static', filename=attachment.stored_path) }}" target="_blank" rel="noopener" title="Görseli aç">
+                <img src="{{ url_for('static', filename=attachment.stored_path) }}" alt="Paylaşım görseli" loading="lazy">
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <span class="portal-media-label"><i class="fa-regular fa-images"></i> {{ image_count.value }} fotoğraf</span>
+      {% endif %}
+      {% for attachment in portal_attachments %}
+
+      {# BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_EMBED_RENDER #}
+      {% if attachment.mime_type == 'text/x-portal-social-embed' %}
+        <div class="portal-social-embed-v3b" aria-label="Sosyal medya paylaşımı">
+          {{ attachment.stored_path|safe }}
+        </div>
+      {% endif %}
+        {% if attachment.mime_type == 'text/x-portal-video' %}
+          <div class="portal-video-frame">
+            <iframe src="{{ attachment.stored_path }}" title="Portal video paylaşımı" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        {% elif attachment.mime_type and attachment.mime_type.startswith('video/') %}
+          <div class="portal-native-video-frame" aria-label="Yüklenen portal videosu">
+            <video controls preload="metadata">
+              <source src="{{ url_for('static', filename=attachment.stored_path) }}" type="{{ attachment.mime_type }}">
+              Tarayıcınız video oynatmayı desteklemiyor.
+            </video>
+            <span class="portal-media-label"><i class="fa-solid fa-video"></i> {{ attachment.filename }}</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+      {# BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_VIDEO_RENDER #}
+    </section>
+  {% endif %}
+
+      {# BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_OPEN_LINK #}
+      {% if bys360_social.url %}
+        <div class="portal-social-open-v3b"><a href="{{ bys360_social.url }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Kaynak paylaşımı aç</a></div>
+      {% endif %}
+
+  {# BYS360_CORPORATE_PORTAL_MEDIA_VIDEO_V2_3_POST_CARD #}
+
+  {% if is_instagram %}
+    <div class="portal-instagram-action-row">
+      <a class="portal-btn instagram" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> Instagram’da Aç</a>
+      <a class="portal-link-btn" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-heart"></i> Beğen / Yorum Yap</a>
+      {% if item is defined and item.can_delete %}
+        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" onsubmit="return confirm('Bu Instagram kaydı portal akışından kaldırılacak. Devam etmek istiyor musunuz?');">
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <button class="portal-link-btn danger portal-delete-post-v210" type="submit"><i class="fa-regular fa-trash-can"></i> Akıştan Kaldır</button>
+        </form>
+      {% endif %}
+    </div>
+    <div class="portal-comment-closed"><i class="fa-solid fa-arrow-up-right-from-square"></i> Beğeni ve yorum işlemleri Instagram üzerinde yapılır.</div>
+  {% else %}
+    {# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_6_POSTCARD_ACTION_BEGIN #}
+{% if bys360_v2116_is_instagram %}
+  {% set bys360_v2116_instagram_url = bys360_v2116_ig.permalink or ('https://www.instagram.com/' ~ bys360_v2116_ig.account ~ '/') %}
+  <div class="portal-instagram-action-row bys360-v2116-instagram-action" aria-label="Instagram işlemleri">
+    <a class="portal-btn instagram" href="{{ bys360_v2116_instagram_url }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> Instagram&#8217;da A&#231;</a>
+    <a class="portal-link-btn" href="{{ bys360_v2116_instagram_url }}" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-heart"></i> Be&#287;en / Yorum Yap</a>
+  </div>
+  <div class="portal-comment-closed bys360-v2116-instagram-note"><i class="fa-solid fa-arrow-up-right-from-square"></i> Be&#287;eni ve yorum i&#351;lemleri Instagram &#252;zerinde yap&#305;l&#305;r.</div>
+{% endif %}
+{# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_6_POSTCARD_ACTION_END #}
+<div class="portal-post-stats">
+      <span><i class="fa-regular fa-face-smile"></i> {{ item.total_reactions }} tepki</span>
+      <span><i class="fa-regular fa-comment"></i> {{ item.comments_count }} yorum</span>
+      {% if item.saved %}<span><i class="fa-solid fa-bookmark"></i> Kaydedildi</span>{% endif %}
+    </div>
+
+    <div class="portal-reaction-row" aria-label="Tepki seçenekleri">
+      {% for r in portal_reaction_options %}
+        <form method="post" action="{{ safe_url_for('main.portal_post_react', post_id=post.id, fallback='#') }}" data-portal-quick-action>
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <input type="hidden" name="reaction_type" value="{{ r.key }}">
+          <button class="portal-reaction {{ 'active' if item.user_reaction == r.key else '' }}" type="submit" title="{{ r.label }}">
+            <i class="{{ r.icon }}"></i><span>{{ r.label }}</span>{% if item.reaction_counts.get(r.key) %}<b>{{ item.reaction_counts.get(r.key) }}</b>{% endif %}
+          </button>
+        </form>
+      {% endfor %}
+    </div>
+
+    <div class="portal-post-actions">
+      {% if item is defined and item.can_delete %}
+        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" onsubmit="return confirm('Bu paylaşım yayından kaldırılacak. Devam etmek istiyor musunuz?');">
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <button class="portal-link-btn danger portal-delete-post-v210" type="submit" title="Paylaşımı yayından kaldır"><i class="fa-regular fa-trash-can"></i> Sil</button>
+        </form>
+      {% endif %}
+
+      <form method="post" action="{{ safe_url_for('main.portal_post_save', post_id=post.id, fallback='#') }}" data-portal-quick-action>
+        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+        <button class="portal-link-btn" type="submit"><i class="fa-regular fa-bookmark"></i> {{ 'Kaydı kaldır' if item.saved else 'Kaydet' }}</button>
+      </form>
+      <details class="portal-report-details"><summary><i class="fa-regular fa-flag"></i> Bildir</summary>
+        <form method="post" action="{{ safe_url_for('main.portal_post_report', post_id=post.id, fallback='#') }}" data-portal-inline-form>
+          {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+          <input class="portal-input compact" name="reason" maxlength="500" placeholder="İnceleme nedeni">
+          <button class="portal-btn ghost" type="submit">Gönder</button>
+        </form>
+      </details>
+    </div>
+
+    {% if post.comments_enabled %}
+    <section class="portal-comments bys360-v2121-comments" aria-label="Yorumlar">
+      {% for c in item.recent_comments %}
+        <div class="portal-comment bys360-v2121-comment" id="comment-{{ c.id }}">
+          <div class="portal-comment-main">
+            <b>{{ c.author.full_name if c.author else 'Kullanıcı' }}</b>
+            <p>{{ c.body }}</p>
+            <button class="portal-comment-reply-toggle" type="button" data-portal-reply-toggle="reply-form-{{ c.id }}"><i class="fa-regular fa-comment-dots"></i> Cevapla</button>
+          </div>
+          {% set replies = item.recent_replies.get(c.id, []) if item.recent_replies is defined else [] %}
+          {% if replies %}
+            <div class="portal-comment-replies">
+              {% for r in replies %}
+                <div class="portal-comment portal-comment-reply" id="comment-{{ r.id }}">
+                  <b>{{ r.author.full_name if r.author else 'Kullanıcı' }}</b>
+                  <p>{{ r.body }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <form id="reply-form-{{ c.id }}" method="post" action="{{ safe_url_for('main.portal_post_comment', post_id=post.id, fallback='#') }}" class="portal-comment-form portal-reply-form" data-portal-inline-form data-portal-reply-form hidden>
+            {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+            <input type="hidden" name="parent_comment_id" value="{{ c.id }}">
+            <span class="portal-reply-to"><i class="fa-solid fa-reply"></i> {{ c.author.full_name if c.author else 'yoruma' }} cevaben</span>
+            <div class="portal-mention-hidden" data-portal-mention-hidden></div>
+            <input class="portal-input" name="comment_body" maxlength="1200" placeholder="Cevabınızı yazın; kişi etiketlemek için @ kullanabilirsiniz..." autocomplete="off" data-portal-mention>
+            <button class="portal-btn ghost" type="submit" title="Cevabı gönder"><i class="fa-regular fa-paper-plane"></i></button>
+          </form>
+        </div>
+      {% endfor %}
+      <form method="post" action="{{ safe_url_for('main.portal_post_comment', post_id=post.id, fallback='#') }}" class="portal-comment-form" data-portal-inline-form>
+        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+        <div class="portal-mention-hidden" data-portal-mention-hidden></div>
+        <input class="portal-input" name="comment_body" maxlength="1200" placeholder="Yorum yazın; kişi etiketlemek için @ kullanabilirsiniz..." autocomplete="off" data-portal-mention>
+        <button class="portal-btn ghost" type="submit" title="Yorumu gönder"><i class="fa-regular fa-paper-plane"></i></button>
+      </form>
+      <small class="portal-comment-help"><i class="fa-solid fa-at"></i> Kişi etiketlemek için @ kullanabilirsiniz.</small>
+    </section>
+    {# BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_COMMENTS #}
+    {% else %}
+    <div class="portal-comment-closed"><i class="fa-solid fa-lock"></i> Bu paylaşımda yorum yapılmasına kapalıdır.</div>
+    {% endif %}
+  {% endif %}
+</article>
+{% endif %}
+{# BYS360_PORTAL_INSTAGRAM_FULL_HIDE_V2_11_8_POSTCARD_END #}
+
+{# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+
+{% block title %}Anket Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Yönetimi{% endblock %}
+{% block page_subtitle %}Anket kayıtlarını yönetin ve sonuçları izleyin.{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+{{ workspace.styles() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_formbricks_overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_jotform_phase1.css') }}">
+<style>
+    .survey-manage-shell{display:grid;gap:22px}
+    .soft-panel{position:relative;overflow:hidden;background:#fff;border:1px solid #e4e7ec;border-radius:22px;box-shadow:0 14px 34px rgba(15,23,42,.06)}
+    .soft-panel-body{padding:24px;position:relative;z-index:1}
+    .summary-grid{display:grid;grid-template-columns:1.8fr 1fr;gap:18px}
+    .summary-card{padding:0}
+    .summary-title{margin:0;font-size:1.08rem;font-weight:900;color:#101828;letter-spacing:-.01em}
+    .summary-text{margin:8px 0 0;color:#667085;font-size:.92rem;line-height:1.78}
+    .insight-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+    .insight-chip,.status-item,.metric-card{padding:16px;border-radius:18px;background:#fff;border:1px solid #eaecf3;box-shadow:0 4px 14px rgba(15,23,42,.03)}
+    .insight-chip .label,.metric-label{display:block;font-size:.75rem;font-weight:900;color:#667085;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+    .insight-chip .value,.metric-value{display:block;font-size:1.42rem;font-weight:900;color:#101828;line-height:1.1}
+    .insight-chip .sub,.metric-sub,.status-item span{display:block;margin-top:8px;font-size:.82rem;color:#667085;line-height:1.65}
+    .status-stack,.metric-grid{display:grid;gap:12px}
+    .metric-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+    .toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    .toolbar-main,.toolbar-secondary,.selection-actions,.action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .filter-pill,.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;text-decoration:none;font-size:.82rem;font-weight:800;background:#fff;border:1px solid #d0d5dd;color:#344054;cursor:pointer;transition:all .18s ease}
+    .filter-pill:hover,.mini-btn:hover{transform:translateY(-1px);border-color:#8B0000;color:#8B0000}
+    .filter-pill.active{background:#8B0000;color:#fff;border-color:#8B0000;box-shadow:0 10px 18px rgba(139,0,0,.12)}
+    .mini-btn.danger{border-color:#f3c7c7;color:#b42318}
+    .search-box{position:relative;min-width:300px}
+    .search-box i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#98a2b3}
+    .search-box input{width:100%;min-height:46px;padding:0 14px 0 42px;border-radius:14px;border:1px solid #d0d5dd;background:#fff;color:#101828}
+    .selection-bar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px;border-radius:18px;background:#fafbfc;border:1px solid #eaecf3}
+    .selection-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:#667085;font-size:.84rem;font-weight:800}
+    .selection-counter{color:#101828}
+    .table-wrap{overflow:auto;border:1px solid #eaecf3;border-radius:20px;background:#fff}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px}
+    thead th{position:sticky;top:0;background:#f8fafc;color:#475467;font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;padding:14px;border-bottom:1px solid #eaecf3;z-index:1}
+    tbody td{padding:14px;border-bottom:1px solid #f0f2f6;color:#344054;font-size:.88rem;vertical-align:top;background:#fff}
+    tbody tr:hover td{background:#fcfcfd}
+    .status-pill,.type-pill,.target-pill,.count-pill,.rate-pill{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid #eaecf3;background:#f8fafc;color:#475467}
+    .row-hidden{display:none}
+    .empty-box{padding:30px 20px;border-radius:18px;border:1px dashed #d0d5dd;background:#fafbfc;text-align:center;color:#667085}
+    .empty-box i{font-size:2rem;color:#8B0000;margin-bottom:10px}
+    .empty-box h5{margin:0 0 8px;color:#101828;font-weight:900}
+    .share-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.44);z-index:1600}
+    .share-modal[hidden]{display:none}
+    .share-dialog{width:min(560px,100%);background:#fff;border-radius:24px;border:1px solid #eaecf3;box-shadow:0 24px 64px rgba(15,23,42,.18);padding:24px;display:grid;gap:16px}
+    .share-dialog-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .share-dialog-title{margin:0;font-size:1.02rem;font-weight:900;color:#101828}
+    .share-dialog-sub{margin:6px 0 0;color:#667085;font-size:.88rem;line-height:1.7}
+    .share-link-row{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid #d0d5dd;border-radius:16px;background:#f8fafc}
+    .share-link-row input{flex:1;border:none;background:transparent;color:#101828;font-size:.86rem;outline:none;padding:0}
+    .share-actions-row{display:flex;gap:10px;flex-wrap:wrap}
+    @media (max-width:1200px){.summary-grid,.metric-grid{grid-template-columns:1fr 1fr}.insight-list{grid-template-columns:1fr}.search-box{min-width:220px}}
+    @media (max-width:768px){.summary-grid,.metric-grid{grid-template-columns:1fr}.toolbar,.selection-bar{align-items:stretch}.toolbar-main,.toolbar-secondary,.selection-meta,.selection-actions{width:100%}.filter-pill,.mini-btn,.search-box{width:100%}}
+</style>
+
+{% set status_counts = status_counts if status_counts is defined else {'all': rows|length, 'published': 0, 'draft': 0, 'closed': 0, 'archived': 0} %}
+{% set total_count = status_counts.get('all', rows|length) %}
+{% set current_status = current_status if current_status is defined else 'all' %}
+{% set published_count = status_counts.get('published', 0) %}
+{% set draft_count = status_counts.get('draft', 0) %}
+{% set closed_count = status_counts.get('closed', 0) %}
+{% set archived_count = status_counts.get('archived', 0) %}
+{% set ns = namespace(max_rate=0, low_coverage=0, zero_response=0) %}
+{% for row in rows %}
+    {% if row.response_rate > ns.max_rate %}{% set ns.max_rate = row.response_rate %}{% endif %}
+    {% if row.assignment_count > 0 and row.response_rate < 50 %}{% set ns.low_coverage = ns.low_coverage + 1 %}{% endif %}
+    {% if row.response_count == 0 %}{% set ns.zero_response = ns.zero_response + 1 %}{% endif %}
+{% endfor %}
+
+<div class="survey-manage-shell jotform-phase1-shell" data-survey-manage="1">
+    {{ workspace.hero(
+        title='Anket yönetim merkezi',
+        text='Anketlerin durumunu, katılımını ve işlem adımlarını bu ekrandan yönetin.',
+        icon='fa-solid fa-list-check',
+        kicker='Anket',
+        primary_url=url_for('main.survey_create'),
+        primary_label='Yeni Anket Oluştur',
+        secondary_url=url_for('main.survey_results'),
+        secondary_label='Sonuç Görünümü'
+    ) }}
+    {{ workspace.survey_nav('manage') }}
+
+    <div class="summary-grid">
+        <div class="soft-panel summary-card">
+            <div class="soft-panel-body">
+                <h3 class="summary-title">Yönetim özeti</h3>
+                <p class="summary-text">Yayımlanan, taslak ve arşivdeki anket kayıtları bu alanda izlenir.</p>
+                <div class="insight-list">
+                    <div class="insight-chip">
+                        <span class="label">En yüksek yanıt oranı</span>
+                        <span class="value">%{{ ns.max_rate }}</span>
+                        <span class="sub">Mevcut listede ulaşılan en yüksek tamamlanma seviyesi.</span>
+                    </div>
+                    <div class="insight-chip">
+                        <span class="label">İlgi isteyen anket</span>
+                        <span class="value">{{ ns.low_coverage }}</span>
+                        <span class="sub">Hedef kitlesine göre %50 altı katılımda kalan anket sayısı.</span>
+                    </div>
+                    <div class="insight-chip">
+                        <span class="label">Hiç yanıt almayan</span>
+                        <span class="value">{{ ns.zero_response }}</span>
+                        <span class="sub">Henüz tek bir yanıt oluşmamış anket sayısı.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="soft-panel summary-card">
+            <div class="soft-panel-body">
+                <h3 class="summary-title" style="font-size:1rem;">Mevcut görünüm</h3>
+                <div class="status-stack" style="margin-top:14px;">
+                    <div class="status-item">
+                        <strong>Filtre</strong>
+                        <span>{% if current_status == 'all' %}Tüm anketler gösteriliyor.{% elif current_status == 'published' %}Yalnızca yayımlanmış anketler gösteriliyor.{% elif current_status == 'draft' %}Taslak durumundaki anketler gösteriliyor.{% elif current_status == 'closed' %}Kapatılmış anketler gösteriliyor.{% else %}Arşivdeki anketler gösteriliyor.{% endif %}</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Yönetim yaklaşımı</strong>
+                        <span>Toplu ve tekil işlemler bu ekranda birlikte kullanılabilir.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="surveySmartFilterMount"></div>
+
+    <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">Toplam Anket</div><div class="metric-value">{{ total_count }}</div><div class="metric-sub">Sistemde kayıtlı tüm anketlerin toplamı.</div></div>
+        <div class="metric-card"><div class="metric-label">Yayımlanan</div><div class="metric-value">{{ published_count }}</div><div class="metric-sub">Kullanıcıya açık veya açık olmaya hazır anketler.</div></div>
+        <div class="metric-card"><div class="metric-label">Taslak</div><div class="metric-value">{{ draft_count }}</div><div class="metric-sub">Henüz yayıma alınmamış çalışma kayıtları.</div></div>
+        <div class="metric-card"><div class="metric-label">Kapalı</div><div class="metric-value">{{ closed_count }}</div><div class="metric-sub">Yanıt toplama süreci bitmiş anketler.</div></div>
+        <div class="metric-card"><div class="metric-label">Arşiv</div><div class="metric-value">{{ archived_count }}</div><div class="metric-sub">Saklanan ve aktif akıştan çıkarılan kayıtlar.</div></div>
+    </div>
+
+    <div class="soft-panel">
+        <div class="soft-panel-body">
+            <div class="toolbar">
+                <div class="toolbar-main">
+                    {% for key, label, icon in [('all','Tümü','fa-layer-group'), ('published','Yayımlanan','fa-bullhorn'), ('draft','Taslak','fa-file-lines'), ('closed','Kapalı','fa-lock'), ('archived','Arşiv','fa-box-archive')] %}
+                        <a href="{{ url_for('main.survey_manage', status=key) }}" class="filter-pill {% if current_status == key %}active{% endif %}"><i class="fa-solid {{ icon }}"></i>{{ label }}</a>
+                    {% endfor %}
+                </div>
+                <div class="toolbar-secondary">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="surveyTableSearch" placeholder="Başlık, açıklama, tür veya oluşturan kişide ara...">
+                    </div>
+                </div>
+            </div>
+
+            {% if rows %}
+                <div class="selection-bar" style="margin-top:18px;">
+                    <div class="selection-meta">
+                        <button type="button" class="mini-btn" id="surveySelectVisibleBtn"><i class="fa-solid fa-check-double"></i> Görünenleri Seç</button>
+                        <button type="button" class="mini-btn" id="surveyClearSelectionBtn"><i class="fa-solid fa-broom"></i> Seçimi Temizle</button>
+                        <span class="selection-counter" id="surveySelectionCounter">0 anket seçili</span>
+                        <span class="selection-hint" id="surveySelectionHint">Toplu işlem için seçim yapın.</span>
+                    </div>
+                    <div class="selection-actions">
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkArchiveForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="current_status" value="{{ current_status }}">
+                            <input type="hidden" name="bulk_action" value="archive">
+                            <div id="surveyBulkArchiveFields"></div>
+                            <button type="submit" class="mini-btn" id="surveyBulkArchiveBtn"><i class="fa-solid fa-box-archive"></i> Arşive Al</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkRestoreForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="current_status" value="{{ current_status }}">
+                            <input type="hidden" name="bulk_action" value="restore">
+                            <div id="surveyBulkRestoreFields"></div>
+                            <button type="submit" class="mini-btn" id="surveyBulkRestoreBtn"><i class="fa-solid fa-rotate-left"></i> Taslağa Al</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkDeleteForm" onsubmit="return confirm('Seçili anketler kalıcı olarak silinecek. Devam edilsin mi?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="current_status" value="{{ current_status }}">
+                            <input type="hidden" name="bulk_action" value="delete">
+                            <div id="surveyBulkDeleteFields"></div>
+                            <button type="submit" class="mini-btn danger" id="surveyBulkDeleteBtn"><i class="fa-solid fa-trash"></i> Sil</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkForceDeleteForm" onsubmit="return confirm('Seçili anketler ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="current_status" value="{{ current_status }}">
+                            <input type="hidden" name="bulk_action" value="delete">
+                            <input type="hidden" name="force_delete" value="1">
+                            <div id="surveyBulkForceDeleteFields"></div>
+                            <button type="submit" class="mini-btn danger" id="surveyBulkForceDeleteBtn"><i class="fa-solid fa-trash-can"></i> Yanıtlarıyla Birlikte Sil</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-wrap" style="margin-top:18px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:44px;"></th>
+                                <th>Başlık</th>
+                                <th>Tür / Dönem</th>
+                                <th>Durum</th>
+                                <th>Soru</th>
+                                <th>Hedef</th>
+                                <th>Tamamlanan</th>
+                                <th>Yanıt Oranı</th>
+                                <th>Oluşturan</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="surveyManageTableBody">
+                            {% for row in rows %}
+                                <tr class="survey-data-row" data-status="{{ row.survey.status }}" data-response-count="{{ row.response_count }}" data-rate="{{ row.response_rate }}" data-search="{{ (row.survey.title or '')|lower }} {{ (row.survey.description or '')|lower }} {{ (row.survey.survey_type or '')|lower }} {% if row.survey.created_by and row.survey.created_by.full_name %}{{ row.survey.created_by.full_name|lower }}{% elif row.survey.created_by %}{{ (((row.survey.created_by.ad or '') ~ ' ' ~ (row.survey.created_by.soyad or ''))|trim)|lower }}{% endif %}">
+                                    <td><input type="checkbox" class="survey-bulk-checkbox" value="{{ row.survey.id }}" data-status="{{ row.survey.status }}" aria-label="{{ row.survey.title }} seç"></td>
+                                    <td class="title-cell">
+                                        <strong>{{ row.survey.title }}</strong>
+                                        <span>{{ row.survey.description or 'Açıklama girilmemiş.' }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="muted-stack">
+                                            <strong>{{ row.survey.survey_type or '-' }}</strong>
+                                            <span>
+                                                {% if row.survey.start_at %}{{ row.survey.start_at.strftime('%d.%m.%Y %H:%M') }}{% else %}Başlangıç tanımlı değil{% endif %}
+                                                {% if row.survey.end_at %}<br>{{ row.survey.end_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td><span class="pill {{ row.survey.status }}">{{ row.state_label }}</span></td>
+                                    <td>{{ row.question_count }}</td>
+                                    <td>{{ row.assignment_count }}</td>
+                                    <td>{{ row.response_count }}</td>
+                                    <td>
+                                        <div class="response-rate">
+                                            <div class="rate-top"><span>%{{ row.response_rate }}</span><span>{{ row.response_count }}/{{ row.assignment_count if row.assignment_count else 0 }}</span></div>
+                                            <div class="rate-bar"><div class="rate-fill" style="width: {{ row.response_rate if row.response_rate <= 100 else 100 }}%;"></div></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if row.survey.created_by and row.survey.created_by.full_name %}
+                                            {{ row.survey.created_by.full_name }}
+                                        {% elif row.survey.created_by %}
+                                            {{ ((row.survey.created_by.ad or '') ~ ' ' ~ (row.survey.created_by.soyad or ''))|trim }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="action-row">
+                                            <a href="{{ url_for('main.survey_results', survey_id=row.survey.id) }}" class="mini-btn"><i class="fa-solid fa-chart-column"></i> Sonuçlar</a>
+                                            <a href="{{ url_for('main.survey_edit', survey_id=row.survey.id) }}" class="mini-btn"><i class="fa-solid fa-pen"></i> Düzenle</a>
+                                            {% if row.survey.status not in ['published', 'archived'] %}
+                                            <form method="POST" action="{{ url_for('main.survey_publish', survey_id=row.survey.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn"><i class="fa-solid fa-bullhorn"></i> Yayımla</button>
+                                            </form>
+                                            {% endif %}
+                                            {% if row.survey.status == 'published' %}
+                                            <button type="button" class="mini-btn" data-share-survey data-share-title="{{ row.survey.title|e }}" data-share-url="{{ url_for('main.survey_take', survey_id=row.survey.id, _external=True) }}"><i class="fa-solid fa-share-nodes"></i> Paylaş</button>
+                                            <form method="POST" action="{{ url_for('main.survey_unpublish', survey_id=row.survey.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn"><i class="fa-solid fa-file-pen"></i> Taslağa Al</button>
+                                            </form>
+                                            {% endif %}
+                                            {% if row.survey.status not in ['closed', 'archived'] %}
+                                            <form method="POST" action="{{ url_for('main.survey_close', survey_id=row.survey.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn"><i class="fa-solid fa-lock"></i> Kapat</button>
+                                            </form>
+                                            {% endif %}
+                                            {% if row.survey.status != 'archived' %}
+                                            <form method="POST" action="{{ url_for('main.survey_archive', survey_id=row.survey.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn"><i class="fa-solid fa-box-archive"></i> Arşive Al</button>
+                                            </form>
+                                            {% else %}
+                                            <form method="POST" action="{{ url_for('main.survey_restore', survey_id=row.survey.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn"><i class="fa-solid fa-rotate-left"></i> Taslağa Geri Al</button>
+                                            </form>
+                                            {% endif %}
+                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" onsubmit="return confirm('Bu anket kalıcı olarak silinecek. Devam edilsin mi?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="mini-btn danger"><i class="fa-solid fa-trash"></i> Sil</button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" onsubmit="return confirm('Bu anket ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="force_delete" value="1">
+                                                <button type="submit" class="mini-btn danger"><i class="fa-solid fa-trash-can"></i> Yanıtlarıyla Birlikte Sil</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-box row-hidden" id="surveyManageEmptySearch" style="margin-top:18px;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <h5>Eşleşen anket bulunamadı</h5>
+                    <p>Arama ifadesini değiştirerek tekrar deneyin.</p>
+                </div>
+            {% else %}
+                <div class="empty-box">
+                    <i class="fa-solid fa-square-poll-vertical"></i>
+                    <h5>Henüz anket bulunmuyor</h5>
+                    <p>İlk anket oluşturulduğunda yönetim görünümü burada listelenecektir.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="share-modal" id="surveyShareModal" hidden>
+    <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="surveyShareTitle">
+        <div class="share-dialog-head">
+            <div>
+                <h3 class="share-dialog-title" id="surveyShareTitle">Anket paylaşımı</h3>
+                <p class="share-dialog-sub">Bağlantıyı kopyalayabilir veya paylaşım uygulamalarıyla gönderebilirsiniz.</p>
+            </div>
+            <button type="button" class="mini-btn" data-share-close><i class="fa-solid fa-xmark"></i>Kapat</button>
+        </div>
+        <div class="share-link-row">
+            <input type="text" id="surveyShareUrl" readonly>
+            <button type="button" class="mini-btn" id="surveyShareCopyBtn"><i class="fa-solid fa-copy"></i>Kopyala</button>
+        </div>
+        <div class="share-actions-row">
+            <a class="mini-btn" id="surveyShareMailBtn" href="#"><i class="fa-solid fa-envelope"></i>E-posta</a>
+            <a class="mini-btn" id="surveyShareWhatsappBtn" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+            <button type="button" class="mini-btn" id="surveyShareNativeBtn" hidden><i class="fa-solid fa-arrow-up-from-bracket"></i>Paylaş</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+    const boxes = Array.from(document.querySelectorAll('.survey-bulk-checkbox'));
+    const selectBtn = document.getElementById('surveySelectVisibleBtn');
+    const clearBtn = document.getElementById('surveyClearSelectionBtn');
+    const selectionCounter = document.getElementById('surveySelectionCounter');
+    const selectionHint = document.getElementById('surveySelectionHint');
+    const archiveBtn = document.getElementById('surveyBulkArchiveBtn');
+    const restoreBtn = document.getElementById('surveyBulkRestoreBtn');
+    const deleteBtn = document.getElementById('surveyBulkDeleteBtn');
+    const forceDeleteBtn = document.getElementById('surveyBulkForceDeleteBtn');
+    const searchInput = document.getElementById('surveyTableSearch');
+    const tableRows = Array.from(document.querySelectorAll('.survey-data-row'));
+    const emptySearch = document.getElementById('surveyManageEmptySearch');
+    const containers = [
+        document.getElementById('surveyBulkArchiveFields'),
+        document.getElementById('surveyBulkRestoreFields'),
+        document.getElementById('surveyBulkDeleteFields'),
+        document.getElementById('surveyBulkForceDeleteFields'),
+    ];
+
+    function setDisabled(button, disabled){
+        if (!button) return;
+        button.disabled = !!disabled;
+        button.style.opacity = disabled ? '.55' : '';
+        button.style.cursor = disabled ? 'not-allowed' : '';
+    }
+
+    function visibleBoxes(){
+        return boxes.filter(box => {
+            const row = box.closest('tr');
+            return row && !row.classList.contains('row-hidden');
+        });
+    }
+
+    function syncSelection(){
+        const selected = boxes.filter(box => box.checked);
+        containers.forEach(container => {
+            if (!container) return;
+            container.innerHTML = '';
+            selected.forEach(box => {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'survey_ids';
+                hidden.value = box.value;
+                container.appendChild(hidden);
+            });
+        });
+        const count = selected.length;
+        const archivedCount = selected.filter(box => (box.dataset.status || '') === 'archived').length;
+        if (selectionCounter) selectionCounter.textContent = `${count} anket seçili`;
+        if (selectionHint){
+            if (!count) selectionHint.textContent = 'Toplu işlem için seçim yapın.';
+            else if (archivedCount === count) selectionHint.textContent = 'Seçilenlerin tamamı arşivde; taslağa geri alma uygundur.';
+            else if (archivedCount === 0) selectionHint.textContent = 'Seçilen anketler arşive alınabilir veya silinebilir.';
+            else selectionHint.textContent = 'Karışık seçim var; işlem öncesi durumları gözden geçirin.';
+        }
+        setDisabled(archiveBtn, count === 0 || archivedCount === count);
+        setDisabled(restoreBtn, count === 0 || archivedCount === 0);
+        setDisabled(deleteBtn, count === 0);
+        setDisabled(forceDeleteBtn, count === 0);
+    }
+
+    function syncSearch(){
+        const q = (searchInput?.value || '').trim().toLowerCase();
+        let visibleCount = 0;
+        tableRows.forEach(row => {
+            const haystack = (row.getAttribute('data-search') || '').toLowerCase();
+            const matched = !q || haystack.includes(q);
+            row.classList.toggle('row-hidden', !matched);
+            if (matched) visibleCount += 1;
+        });
+        if (emptySearch) emptySearch.classList.toggle('row-hidden', visibleCount !== 0);
+    }
+
+    boxes.forEach(box => box.addEventListener('change', syncSelection));
+    if (selectBtn){
+        selectBtn.addEventListener('click', function(){
+            visibleBoxes().forEach(box => { box.checked = true; });
+            syncSelection();
+        });
+    }
+    if (clearBtn){
+        clearBtn.addEventListener('click', function(){
+            boxes.forEach(box => { box.checked = false; });
+            syncSelection();
+        });
+    }
+    if (searchInput){
+        searchInput.addEventListener('input', function(){
+            syncSearch();
+        });
+    }
+    syncSearch();
+    syncSelection();
+})();
+</script>
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+<script src="{{ url_for('static', filename='js/survey_manage_phase1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/survey_share_tools.js', v='20260417_sharefix') }}"></script>
+{% endblock %}

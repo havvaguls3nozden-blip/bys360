@@ -1,0 +1,436 @@
+<!-- BYS360_AI_AGENT_AG8_CORPORATE_PANEL_V1 | BYS360_AI_AGENT_AG9_CORPORATE_VISUAL_FINAL_V1 | eski gate başlığı: Güvenli Sanal Asistan | eski gate panel adı: BYS360 Kurumsal AI Asistan Paneli | görünür ad: BYS360 Asistanı | Güvenli kullanım ilkesi -->
+{# BYS360_AI_AGENT_PANEL_ADVANCED_V1 | BYS360_AI_AGENT_PANEL_ADVANCED_V32 #}
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_ai_agent_panel.css') }}">
+
+<div class="ai-agent-advanced-page" data-panel="BYS360_AI_AGENT_PANEL_ADVANCED_V1">
+  <section class="ai-agent-advanced-hero">
+    <div class="ai-agent-hero-main">
+      <div class="ai-agent-eyebrow">
+        <span class="ai-agent-pulse"></span>
+        BYS360 Asistanı
+      </div>
+      <h1>BYS360 Asistanı</h1>
+      <p>
+        Kurumsal Rehberlik, Akıllı Yönlendirme ve Yetki Kontrollü Dijital Yardımcı olarak; performans, karne, bekleyen görevler, Başkan/Üst Onay, KPI/Hedefler, destek talepleri, anketler ve bildirimler için güvenli rehberlik ve doğru ekrana yönlendirme sağlar.
+      </p>
+      <div class="ai-agent-hero-buttons">
+        <button type="button" class="ai-agent-btn ai-agent-btn-primary" data-panel-focus-chat>Asistana soru sor</button>
+        <a class="ai-agent-btn ai-agent-btn-light" href="#briefing">Yönetici brifingi</a>
+        <a class="ai-agent-btn ai-agent-btn-light" href="#guvenli-yonlendirme">Hızlı yönlendirme</a>
+      </div>
+    </div>
+
+    <aside class="ai-agent-hero-side">
+      <div class="ai-agent-mini-title">Güvenli kullanım ilkesi</div>
+      <p>Asistan idari karar vermez, puan değiştirmez, karne yayınlamaz ve yetki dışı veri göstermez.</p>
+      <div class="ai-agent-safe-row">
+        <span>Rehberlik</span>
+        <strong>Aktif</strong>
+      </div>
+      <div class="ai-agent-safe-row">
+        <span>Yetki kontrolü</span>
+        <strong>Aktif</strong>
+      </div>
+      <div class="ai-agent-safe-row">
+        <span>Veri değiştirme</span>
+        <strong>Yok</strong>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ai-agent-command-center">
+    <article class="ai-agent-chat-card" id="asistan">
+      <div class="ai-agent-section-head">
+        <div>
+          <span class="ai-agent-section-kicker">Soru-Cevap</span>
+          <h2>Asistana sorun</h2>
+          <p>Normal konuşma diliyle yazabilirsiniz. Örneğin: “Karnem neden görünmüyor?” veya “70 altı olursa ne olur?”</p>
+        </div>
+        <span class="ai-agent-chip-soft">Sohbet edilebilir</span>
+      </div>
+
+      <div class="ai-agent-conversation" data-panel-messages>
+        <div class="ai-agent-bubble ai-agent-bubble-assistant">
+          <strong>Merhaba, ben BYS360 Asistanı.</strong>
+          <p>Size nasıl yardımcı olabilirim? Performans, karne, bekleyen görevler, KPI/Hedefler, destek talepleri ve ayarlar hakkında soru sorabilirsiniz.</p>
+        </div>
+      </div>
+
+      <div class="ai-agent-prompt-list">
+        <button type="button" data-panel-question="Merhaba">Merhaba</button>
+        <button type="button" data-panel-question="İyi misin?">İyi misin?</button>
+        <button type="button" data-panel-question="Seni kim geliştirdi?">Seni kim geliştirdi?</button>
+        <button type="button" data-panel-question="Karnem neden görünmüyor?">Karnem neden görünmüyor?</button>
+        <button type="button" data-panel-question="70 altı olursa ne olur?">70 altı olursa ne olur?</button>
+        <button type="button" data-panel-question="3. amir ne yapar?">3. amir ne yapar?</button>
+      </div>
+
+      <form class="ai-agent-ask-bar" data-panel-ask-form autocomplete="off">
+        <label class="sr-only" for="ai-agent-panel-question">Asistana soru yaz</label>
+        <textarea id="ai-agent-panel-question" data-panel-input rows="2" maxlength="900" placeholder="Sorunuzu yazın..."></textarea>
+        <button type="submit" data-panel-submit>Gönder</button>
+      </form>
+    </article>
+
+    <aside class="ai-agent-briefing-card" id="briefing">
+      <div class="ai-agent-section-head compact">
+        <div>
+          <span class="ai-agent-section-kicker">Canlı özet</span>
+          <h2>Yönetici brifingi</h2>
+        </div>
+        <button type="button" class="ai-agent-refresh" data-panel-refresh>Yenile</button>
+      </div>
+
+      <div class="ai-agent-briefing-list" data-panel-briefing>
+        <div class="ai-agent-loading">Brifing hazırlanıyor...</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="ai-agent-metrics-grid" aria-label="Asistan özet kartları">
+    <article class="ai-agent-metric-card">
+      <span>Başkan/Üst Onay</span>
+      <strong data-metric="president">—</strong>
+      <em>Düşük performans onay takibi</em>
+    </article>
+    <article class="ai-agent-metric-card">
+      <span>Yayın Kilidi</span>
+      <strong data-metric="locked">—</strong>
+      <em>Yayın öncesi kontrol</em>
+    </article>
+    <article class="ai-agent-metric-card">
+      <span>Bekleyen Görev</span>
+      <strong data-metric="pending">—</strong>
+      <em>Tamamlanacak değerlendirme</em>
+    </article>
+    <article class="ai-agent-metric-card">
+      <span>Riskli Hedef</span>
+      <strong data-metric="risky">—</strong>
+      <em>KPI/Hedef izleme</em>
+    </article>
+  </section>
+
+  <div class="ai-agent-content-grid">
+    <section class="ai-agent-panel-card">
+      <div class="ai-agent-section-head">
+        <div>
+          <span class="ai-agent-section-kicker">Performans</span>
+          <h2>Performans yönetimi özeti</h2>
+          <p>Başkan/Üst Onay, yayın kilidi, bekleyen görev ve süreç takibi başlıkları.</p>
+        </div>
+        <span class="ai-agent-chip-soft">Yetki kontrollü</span>
+      </div>
+      <div class="ai-agent-detail-grid" data-performance-details>
+        <div class="ai-agent-loading">Performans özeti hazırlanıyor...</div>
+      </div>
+    </section>
+
+    <section class="ai-agent-panel-card">
+      <div class="ai-agent-section-head">
+        <div>
+          <span class="ai-agent-section-kicker">KPI / Hedef</span>
+          <h2>KPI ve hedef görünümü</h2>
+          <p>Toplam hedef, riskli hedef ve gerçekleşme oranı gibi güvenli özetler.</p>
+        </div>
+        <span class="ai-agent-chip-soft">Özet düzeyi</span>
+      </div>
+      <div class="ai-agent-detail-grid" data-kpi-details>
+        <div class="ai-agent-loading">KPI/Hedef özeti hazırlanıyor...</div>
+      </div>
+    </section>
+  </div>
+
+  <section class="ai-agent-content-grid lower">
+    <article class="ai-agent-panel-card" id="oneriler">
+      <div class="ai-agent-section-head">
+        <div>
+          <span class="ai-agent-section-kicker">Aksiyon kuyruğu</span>
+          <h2>Onaylı aksiyon kuyruğu</h2>
+          <p>Asistan öneri oluşturabilir; veri değiştiren işlemler kullanıcı onayı ve güvenlik kontrolleri olmadan uygulanmaz.</p>
+        </div>
+      </div>
+      <div class="ai-agent-action-stack" data-action-queue>
+        <div class="ai-agent-loading">Aksiyon kuyruğu hazırlanıyor...</div>
+      </div>
+    </article>
+
+    <article class="ai-agent-panel-card" id="guvenli-yonlendirme">
+      <div class="ai-agent-section-head">
+        <div>
+          <span class="ai-agent-section-kicker">Yönlendirme</span>
+          <h2>Doğru ekrana hızlı geçiş</h2>
+          <p>En sık kullanılan işlemler için güvenli bağlantılar.</p>
+        </div>
+      </div>
+      <div class="ai-agent-route-grid">
+        <a href="/performance/scorecard"><strong>Karneme git</strong><span>Yayınlanmış karne ve geçmiş kayıtlar</span></a>
+        <a href="/performance/tasks"><strong>Bekleyen görevler</strong><span>Değerlendirme ve puanlama işlemleri</span></a>
+        <a href="/performance/president-approvals"><strong>Başkan/Üst Onayları</strong><span>70 altı ve onay bekleyen süreçler</span></a>
+        <a href="/performance/reports"><strong>Performans raporları</strong><span>Dönem, birim ve kapsam özetleri</span></a>
+        <a href="/performans/stratejik/kpi-dashboard"><strong>KPI/Hedef paneli</strong><span>Hedef ve gerçekleşme takibi</span></a>
+        <a href="/support"><strong>Destek talepleri</strong><span>Yardım ve destek süreci</span></a>
+      </div>
+    </article>
+  </section>
+
+  <section class="ai-agent-policy-panel">
+    <div>
+      <h2>Güvenlik ve sorumluluk sınırı</h2>
+      <p>
+        BYS360 Asistanı yalnızca rehberlik, sayı düzeyinde özet ve güvenli yönlendirme sağlar.
+        Hassas içerik, yetki dışı personel detayı, amir görüşü, anket cevabı veya özel mesaj içeriği göstermez.
+      </p>
+    </div>
+    <div class="ai-agent-policy-pills">
+      <span>İdari karar vermez</span>
+      <span>Puan değiştirmez</span>
+      <span>Yetki dışı veri göstermez</span>
+      <span>Onaysız işlem yapmaz</span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const ASK_URL = "/ai-agent/api/ask";
+  const PERF_URL = "/ai-agent/api/performance-summary";
+  const KPI_URL = "/ai-agent/api/dashboard-kpi-summary";
+  const ACTION_URL = "/ai-agent/api/action-queue-summary";
+
+  function text(value, fallback) {
+    if (value === null || value === undefined || value === "") return fallback || "0";
+    return String(value).replace(/[<>]/g, "");
+  }
+
+  function url(value) {
+    const raw = String(value || "#").trim();
+    if (raw.startsWith("/") || raw.startsWith("#")) return raw;
+    return "#";
+  }
+
+  function number(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function csrf() {
+    const meta = document.querySelector('meta[name="csrf-token"], meta[name="csrf_token"]');
+    if (meta && meta.content) return meta.content;
+    const input = document.querySelector('input[name="csrf_token"]');
+    if (input && input.value) return input.value;
+    return "";
+  }
+
+  function pageContext() {
+    const heading = document.querySelector("h1, .page-title, [data-page-title]");
+    const active = document.querySelector(".sidebar a.active, .nav-link.active, [aria-current='page']");
+    return {
+      path: window.location.pathname || "/ai-agent/panel",
+      title: document.title || "BYS360 Asistanı",
+      heading: heading ? heading.textContent.trim().slice(0, 120) : "",
+      activeMenu: active ? active.textContent.trim().slice(0, 120) : "",
+      source: "ai-agent-panel-v32"
+    };
+  }
+
+  async function jsonFetch(path, options) {
+    const response = await fetch(path, Object.assign({
+      credentials: "same-origin",
+      headers: { "Accept": "application/json" }
+    }, options || {}));
+    const contentType = response.headers.get("content-type") || "";
+    const body = await response.text();
+    if (!response.ok || contentType.indexOf("application/json") === -1) {
+      throw new Error("Bilgi alınamadı. Lütfen oturumunuzu ve yetkinizi kontrol edin.");
+    }
+    return JSON.parse(body || "{}");
+  }
+
+  function metric(name, value) {
+    const el = document.querySelector('[data-metric="' + name + '"]');
+    if (el) el.textContent = text(value, "0");
+  }
+
+  function detailItem(label, value, note) {
+    return [
+      '<div class="ai-agent-detail-item">',
+      '<span>' + text(label, "Özet") + '</span>',
+      '<strong>' + text(value, "0") + '</strong>',
+      '<em>' + text(note, "Yetki kapsamındaki bilgi") + '</em>',
+      '</div>'
+    ].join("");
+  }
+
+  function renderPerformance(data) {
+    const president = data.president_pending || data.president_approval_pending || data.president_approval_waiting || 0;
+    const locked = data.publish_locked || data.locked_scorecards || 0;
+    const pending = data.pending_tasks || data.pending_evaluations || data.pending_assignments || 0;
+    const delayed = data.delayed_tasks || data.overdue_tasks || 0;
+    metric("president", president);
+    metric("locked", locked);
+    metric("pending", pending);
+    const root = document.querySelector("[data-performance-details]");
+    if (root) {
+      root.innerHTML = [
+        detailItem("Başkan/Üst Onay", president, "Düşük performans ve üst onay bekleyen kayıtlar"),
+        detailItem("Yayın Kilidi", locked, "Yayın öncesi kontrol bekleyen karneler"),
+        detailItem("Bekleyen Görev", pending, "Tamamlanması gereken değerlendirme görevleri"),
+        detailItem("Geciken Görev", delayed, "Takip gerektiren gecikmiş işlemler")
+      ].join("");
+    }
+  }
+
+  function renderKpi(data) {
+    const total = data.total_targets || data.target_total || 0;
+    const risky = data.risky_targets || data.risk_count || 0;
+    const completion = data.average_completion || data.completion_rate || "%0";
+    const cards = data.briefing_count || data.summary_cards || 0;
+    metric("risky", risky);
+    const root = document.querySelector("[data-kpi-details]");
+    if (root) {
+      root.innerHTML = [
+        detailItem("Toplam Hedef", total, "Yetki kapsamındaki hedefler"),
+        detailItem("Riskli Hedef", risky, "Takip gerektiren hedefler"),
+        detailItem("Ortalama Gerçekleşme", completion, "Güncel oran"),
+        detailItem("Brifing Kartı", cards, "Yönetici özeti")
+      ].join("");
+    }
+  }
+
+  function renderActionQueue(data) {
+    const open = number(data.open_count || data.pending_count || data.total_open || 0);
+    const root = document.querySelector("[data-action-queue]");
+    if (!root) return;
+    root.innerHTML = [
+      '<div class="ai-agent-action-item"><span><strong>Açık öneri kuyruğu</strong><em>Kullanıcı onayı bekleyen güvenli öneri kayıtları</em></span><b>' + open + '</b></div>',
+      '<div class="ai-agent-action-item"><span><strong>İşlem güvenliği</strong><em>Asistan öneri üretir; işlemi kendisi uygulamaz</em></span><b>Aktif</b></div>',
+      '<div class="ai-agent-action-item"><span><strong>Takip notu</strong><em>Veri değiştiren adımlar sonraki güvenlik kontrollerine bağlıdır</em></span><b>Kontrollü</b></div>'
+    ].join("");
+  }
+
+  function renderBriefing(perf, kpi, queue) {
+    const root = document.querySelector("[data-panel-briefing]");
+    if (!root) return;
+    const president = number(perf.president_pending || perf.president_approval_pending || perf.president_approval_waiting || 0);
+    const pending = number(perf.pending_tasks || perf.pending_evaluations || perf.pending_assignments || 0);
+    const risky = number(kpi.risky_targets || kpi.risk_count || 0);
+    const open = number(queue.open_count || queue.pending_count || queue.total_open || 0);
+
+    root.innerHTML = [
+      '<div class="ai-agent-briefing-item"><strong>Bugünün önceliği</strong><p>' + (president || pending || risky ? 'Takip gerektiren başlıklar var. Onay, görev ve hedef kartlarını kontrol edin.' : 'Şu an öne çıkan kritik sayı düşük görünüyor. Yine de dönem ve görev takibini sürdürün.') + '</p></div>',
+      '<div class="ai-agent-briefing-item"><strong>Performans takibi</strong><p>' + president + ' üst onay, ' + pending + ' bekleyen görev görünüyor.</p></div>',
+      '<div class="ai-agent-briefing-item"><strong>KPI/Hedef takibi</strong><p>' + risky + ' riskli hedef özeti alındı.</p></div>',
+      '<div class="ai-agent-briefing-item"><strong>Aksiyon kuyruğu</strong><p>' + open + ' öneri/takip kaydı bekliyor.</p></div>'
+    ].join("");
+  }
+
+  function addMessage(role, message, actions) {
+    const root = document.querySelector("[data-panel-messages]");
+    if (!root) return;
+    const bubble = document.createElement("div");
+    bubble.className = "ai-agent-bubble ai-agent-bubble-" + role;
+    const paragraph = document.createElement("p");
+    paragraph.textContent = text(message, "");
+    paragraph.style.whiteSpace = "pre-wrap";
+    bubble.appendChild(paragraph);
+    const list = Array.isArray(actions) ? actions : [];
+    if (list.length) {
+      const actionWrap = document.createElement("div");
+      actionWrap.className = "ai-agent-answer-actions";
+      list.slice(0, 4).forEach(function(item){
+        const href = url(item.url || item.route || item.href);
+        if (href === "#") return;
+        const a = document.createElement("a");
+        a.href = href;
+        a.textContent = text(item.label || item.title || "İlgili ekrana git", "İlgili ekrana git");
+        actionWrap.appendChild(a);
+      });
+      if (actionWrap.children.length) bubble.appendChild(actionWrap);
+    }
+    root.appendChild(bubble);
+    root.scrollTop = root.scrollHeight;
+  }
+
+  async function ask(question) {
+    const input = document.querySelector("[data-panel-input]");
+    const submit = document.querySelector("[data-panel-submit]");
+    const value = String(question || (input ? input.value : "") || "").trim();
+    if (!value) return;
+
+    addMessage("user", value);
+    if (input) input.value = "";
+    if (input) input.disabled = true;
+    if (submit) { submit.disabled = true; submit.textContent = "Yanıtlanıyor"; }
+
+    try {
+      const token = csrf();
+      const headers = { "Accept": "application/json", "Content-Type": "application/json" };
+      if (token) {
+        headers["X-CSRFToken"] = token;
+        headers["X-CSRF-Token"] = token;
+      }
+      const data = await jsonFetch(ASK_URL, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({ question: value, context: pageContext() })
+      });
+      addMessage("assistant", data.answer || "Size nasıl yardımcı olabilirim?", data.actions || data.suggested_actions || []);
+    } catch (error) {
+      addMessage("assistant", error.message || "Yanıt alınamadı. Lütfen tekrar deneyin.");
+    } finally {
+      if (input) { input.disabled = false; input.focus(); }
+      if (submit) { submit.disabled = false; submit.textContent = "Gönder"; }
+    }
+  }
+
+  async function refreshPanel() {
+    const perfPromise = jsonFetch(PERF_URL).catch(function(){ return {}; });
+    const kpiPromise = jsonFetch(KPI_URL).catch(function(){ return {}; });
+    const queuePromise = jsonFetch(ACTION_URL).catch(function(){ return {}; });
+    const all = await Promise.all([perfPromise, kpiPromise, queuePromise]);
+    renderPerformance(all[0] || {});
+    renderKpi(all[1] || {});
+    renderActionQueue(all[2] || {});
+    renderBriefing(all[0] || {}, all[1] || {}, all[2] || {});
+  }
+
+  document.querySelectorAll("[data-panel-question]").forEach(function(button){
+    button.addEventListener("click", function(){ ask(button.getAttribute("data-panel-question") || button.textContent); });
+  });
+
+  const form = document.querySelector("[data-panel-ask-form]");
+  if (form) {
+    form.addEventListener("submit", function(event){
+      event.preventDefault();
+      ask();
+    });
+  }
+
+  const input = document.querySelector("[data-panel-input]");
+  if (input) {
+    input.addEventListener("keydown", function(event){
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        ask();
+      }
+    });
+  }
+
+  const focusButton = document.querySelector("[data-panel-focus-chat]");
+  if (focusButton && input) {
+    focusButton.addEventListener("click", function(){
+      document.getElementById("asistan")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(function(){ input.focus(); }, 300);
+    });
+  }
+
+  const refresh = document.querySelector("[data-panel-refresh]");
+  if (refresh) refresh.addEventListener("click", refreshPanel);
+
+  refreshPanel();
+})();
+</script>
+{% endblock %}

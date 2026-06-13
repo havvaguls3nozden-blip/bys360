@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}İlk 72 Saat{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+      <div>
+        <h3 class="mb-2">İlk 72 Saat Stabilizasyonu</h3>
+        <p class="text-muted mb-0">Canlı açılıştan sonraki yakın izleme, smoke test ve handoff takibi.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('main.communication_phase9_dashboard') }}" class="btn btn-outline-danger">Kontrol 9 Ana Ekran</a>
+        <a href="{{ url_for('main.communication_phase9_release_center') }}" class="btn btn-danger">Canlıya Geçiş Merkezi</a>
+        <a href="{{ url_for('main.communication_phase9d_stabilization_center') }}" class="btn btn-outline-danger">Kontrol 9D</a>
+      </div>
+    </div>
+  </div></div>
+  <div class="row g-3 mb-4">{% for item in payload.watch_items %}<div class="col-md-6 col-xl-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="fw-semibold mb-1">{{ item.title }}</div><div class="text-danger-emphasis small mb-2">{{ item.metric }}</div><div class="small text-muted">{{ item.detail }}</div></div></div></div>{% endfor %}</div>
+  <div class="row g-4"><div class="col-xl-8"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Smoke test listesi</h5><div class="d-flex gap-2"><span class="small text-muted">Temel uç noktalar</span><a href="{{ url_for('main.communication_phase9d_dashboard') }}" class="btn btn-sm btn-outline-danger">9D Özet</a></div></div><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Ekran</th><th>URL</th><th>Beklenen</th><th>Sahip</th></tr></thead><tbody>{% for row in payload.smoke_rows %}<tr><td>{{ row.label }}</td><td><code>{{ row.path }}</code></td><td>{{ row.expected }}</td><td>{{ row.owner }}</td></tr>{% endfor %}</tbody></table></div></div></div></div><div class="col-xl-4"><div class="card border-0 shadow-sm h-100"><div class="card-body"><h5 class="mb-3">Handoff notları</h5><ul class="list-group list-group-flush">{% for row in payload.handoff_rows %}<li class="list-group-item px-0"><div class="fw-semibold">{{ row.title }}</div><div class="small text-muted">{{ row.body }}</div></li>{% endfor %}</ul></div></div></div></div>
+  <div class="card border-0 shadow-sm mt-4"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Son audit görünümü</h5><a href="{{ url_for('main.communication_phase9d_stabilization_center') }}" class="btn btn-sm btn-outline-danger">9D Kayıt</a></div><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>İşlem</th><th>Durum</th><th>Zaman</th></tr></thead><tbody>{% for row in payload.recent_audit %}<tr><td>{{ row.summary }}</td><td>{{ row.status }}</td><td>{{ row.executed_at }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Audit kaydı görünmüyor.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+{% endblock %}

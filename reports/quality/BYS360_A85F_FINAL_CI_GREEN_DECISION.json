@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-12T18:37:46",
+  "phase": "A85F_FINAL_CI_GREEN_DECISION",
+  "ok": true,
+  "decision": "A85_CI_GREEN",
+  "pytest_returncode": 0,
+  "summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "passed": 744,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 2,
+  "deselected": 34,
+  "warnings": 32,
+  "cmd": [
+    "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests",
+    "--ignore=tests/_archive_a5_obsolete",
+    "-m",
+    "not live and not realdb and not slow",
+    "-q",
+    "-ra"
+  ],
+  "note": "A8.5 CI/s?zle?me kap?s? ye?il. Bu karar ger?ek canl? yay?n yap?ld??? anlam?na gelmez."
+}

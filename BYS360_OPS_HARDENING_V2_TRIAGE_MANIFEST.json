@@ -1,0 +1,18 @@
+{
+  "package": "BYS360_OPS_HARDENING_V2_TRIAGE",
+  "version": "V2",
+  "purpose": "BYS360 operasyon kalite borcunu canlı uygulama kodu, script/test/migration ve kök config kapsamlarına ayıran; print/except/secret risklerini değer göstermeden raporlayan güvenli triage paketi.",
+  "files": [
+    "scripts/quality/bys360_ops_triage_v2.py",
+    "scripts/windows/repair_bys360_ops_hardening_v2_triage.ps1",
+    "scripts/windows/run_bys360_ops_triage_v2.ps1",
+    "docs/BYS360_OPS_HARDENING_V2_TRIAGE_README.md",
+    "BYS360_OPS_HARDENING_V2_TRIAGE_MANIFEST.json"
+  ],
+  "safe_default": true,
+  "notes": [
+    "Mode all yalnızca audit + compileall yapar; üretim kodunu otomatik değiştirmez.",
+    "Secret taraması değerleri rapora yazmaz; sadece dosya ve satır numarası ile anahtar türünü raporlar.",
+    "print/except sayıları app, scripts, tests, migrations ve root_config olarak ayrılır."
+  ]
+}

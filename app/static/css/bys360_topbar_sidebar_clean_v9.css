@@ -1,0 +1,300 @@
+/* BYS360_TOPBAR_SIDEBAR_CLEAN_V9
+   Sadece üst boşluk, topbar yüksekliği ve tekrar görünen sidebar telif yazısı için güvenli düzeltme.
+   Menü sırası, Kullanıcı bölümü, Jinja/route yapısı değiştirilmez. */
+
+:root{
+    --topbar-h:58px !important;
+}
+
+html,
+body{
+    margin:0 !important;
+    padding:0 !important;
+    min-height:100% !important;
+}
+
+body,
+.app-shell,
+.app-main,
+main.app-main{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* Sidebar telif yazısı ana footer ile tekrar görünmesin. Ana alt footer korunur. */
+.app-sidebar .sidebar-footer{
+    display:none !important;
+}
+
+/* V8'in sidebar'ı aşağıdan başlatan kuralları geri alınır; scroll tekrar tam yükseklikte çalışır. */
+.app-sidebar{
+    top:0 !important;
+    bottom:0 !important;
+    height:100vh !important;
+    max-height:100vh !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+}
+
+.sidebar-inner{
+    min-height:auto !important;
+    padding-bottom:18px !important;
+}
+
+.mobile-overlay{
+    top:0 !important;
+    height:100vh !important;
+}
+
+/* Topbar: normal akışta, en üste yapışık, kompakt ve sabit ölçülü. */
+.app-main > .topbar,
+header.topbar,
+.topbar{
+    position:sticky !important;
+    top:0 !important;
+    z-index:1060 !important;
+    min-height:58px !important;
+    height:58px !important;
+    max-height:58px !important;
+    margin:0 !important;
+    padding:6px 18px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    flex-direction:row !important;
+    flex-wrap:nowrap !important;
+    gap:12px !important;
+    overflow:visible !important;
+}
+
+.topbar-left{
+    height:46px !important;
+    min-height:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:10px !important;
+    margin:0 !important;
+    padding:0 !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+}
+
+.topbar-brand{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 auto !important;
+    width:auto !important;
+    height:40px !important;
+    max-height:40px !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+.topbar-brand-logo{
+    display:block !important;
+    width:auto !important;
+    height:34px !important;
+    max-height:34px !important;
+    max-width:142px !important;
+    object-fit:contain !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+.page-meta{
+    display:block !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+.page-kicker,
+.page-subtitle{
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    line-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+}
+
+.page-title{
+    margin:0 !important;
+    padding:0 !important;
+    font-size:1.02rem !important;
+    line-height:1.1 !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+}
+
+.topbar-right{
+    height:46px !important;
+    min-height:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:8px !important;
+    flex-shrink:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+.quick-link{
+    min-height:34px !important;
+    height:34px !important;
+    padding:0 10px !important;
+    border-radius:12px !important;
+    font-size:.8rem !important;
+}
+
+.user-summary{
+    min-height:40px !important;
+    height:40px !important;
+    padding:4px 9px !important;
+    border-radius:14px !important;
+    gap:8px !important;
+}
+
+.user-avatar{
+    width:31px !important;
+    height:31px !important;
+    border-radius:10px !important;
+}
+
+.user-name{
+    font-size:.81rem !important;
+    line-height:1.15 !important;
+}
+
+.user-role{
+    font-size:.68rem !important;
+    line-height:1.15 !important;
+}
+
+.content-wrap{
+    margin-top:0 !important;
+    padding-top:12px !important;
+}
+
+.content-block > :first-child{
+    margin-top:0 !important;
+}
+
+/* Sayfa özel hero/panel üst boşluğu aşırı açıyorsa bastır. */
+.content-block > .hero:first-child,
+.content-block > .hero-card:first-child,
+.content-block > .page-hero:first-child,
+.content-block > .dashboard-hero:first-child,
+.content-block > .portalv2-hero:first-child,
+.content-block > .summary-hero:first-child,
+.content-block > .profile-card:first-child,
+.content-block > .info-card:first-child,
+.content-block > .hero-panel:first-child,
+.content-block > .hero-banner:first-child{
+    margin-top:0 !important;
+}
+
+@media (max-width:1100px){
+    .app-main{
+        margin-left:0 !important;
+    }
+
+    .app-sidebar{
+        top:0 !important;
+        height:100vh !important;
+        max-height:100vh !important;
+        overflow-y:auto !important;
+    }
+}
+
+@media (max-width:768px){
+    :root{
+        --topbar-h:54px !important;
+    }
+
+    .app-main > .topbar,
+    header.topbar,
+    .topbar{
+        min-height:54px !important;
+        height:54px !important;
+        max-height:54px !important;
+        padding:5px 10px !important;
+        flex-direction:row !important;
+        flex-wrap:nowrap !important;
+        align-items:center !important;
+        gap:8px !important;
+    }
+
+    .topbar-left{
+        height:42px !important;
+        gap:7px !important;
+    }
+
+    .menu-toggle{
+        width:36px !important;
+        height:36px !important;
+        border-radius:12px !important;
+        flex:0 0 auto !important;
+    }
+
+    .topbar-brand{
+        height:36px !important;
+        max-height:36px !important;
+    }
+
+    .topbar-brand-logo{
+        height:28px !important;
+        max-height:28px !important;
+        max-width:108px !important;
+    }
+
+    .page-title{
+        font-size:.9rem !important;
+        max-width:40vw !important;
+    }
+
+    .topbar-right{
+        width:auto !important;
+        height:42px !important;
+        margin-left:auto !important;
+        justify-content:flex-end !important;
+        gap:6px !important;
+    }
+
+    .quick-link{
+        display:none !important;
+    }
+
+    .user-summary{
+        width:38px !important;
+        min-width:38px !important;
+        height:38px !important;
+        min-height:38px !important;
+        padding:4px !important;
+        justify-content:center !important;
+    }
+
+    .user-summary > i,
+    .user-meta{
+        display:none !important;
+    }
+
+    .user-avatar{
+        width:29px !important;
+        height:29px !important;
+        border-radius:10px !important;
+    }
+
+    .content-wrap{
+        padding-top:10px !important;
+    }
+}

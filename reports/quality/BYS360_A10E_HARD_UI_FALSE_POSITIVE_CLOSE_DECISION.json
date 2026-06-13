@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-06-12T19:09:47",
+  "phase": "A10E_HARD_UI_FALSE_POSITIVE_CLOSE_DECISION",
+  "ok": true,
+  "decision": "A10E_HARD_UI_CLOSED",
+  "source_a10d": "reports\\quality\\BYS360_A10D_HARD_UI_PRECISION_DECISION.json",
+  "real_user_facing_hit_count": 0,
+  "manual_review_hit_count": 1,
+  "allowed_manual_review_count": 1,
+  "unallowed_manual_review_count": 0,
+  "allowed_manual_reviews": [
+    {
+      "path": "mobile_flutter/bys360_mobile_native/lib/core/diagnostics/bys_mobile_crash_service.dart",
+      "line": 28,
+      "term": "exception",
+      "sample": "unawaited(_store(details.exceptionAsString(), details.stack));",
+      "suggested_message": "Beklenmeyen bir hata oluştu.",
+      "decision": "manual_review"
+    }
+  ],
+  "unallowed_manual_reviews": [],
+  "false_positive_hit_count": 56,
+  "compileall_returncode": 0,
+  "compileall": {
+    "cmd": "C:\\bys360\\project\\.venv\\Scripts\\python.exe -m compileall -q app scripts",
+    "returncode": 0,
+    "stdout_tail": "",
+    "stderr_tail": ""
+  },
+  "quality_scripts_exist": true,
+  "note": "A10C hard UI bulgularında gerçek kullanıcıya görünen teknik metin bulunmadı; kod içi/sanitizer/diagnostic false-positive olarak kapatıldı."
+}

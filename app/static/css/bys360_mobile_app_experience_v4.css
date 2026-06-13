@@ -1,0 +1,224 @@
+/* BYS360_MOBILE_APP_EXPERIENCE_V4_FINAL_GATE
+   Final mobile lock layer: live-safe, app-like, no horizontal overflow. */
+:root{
+  --bys360-mobile-radius:18px;
+  --bys360-mobile-gap:12px;
+  --bys360-mobile-shadow:0 10px 28px rgba(20,20,20,.10);
+  --bys360-mobile-border:1px solid rgba(139,0,0,.12);
+  --bys360-mobile-red:#8B0000;
+  --bys360-mobile-bg:rgba(255,255,255,.88);
+}
+html.bys360-mobile-v4-html,
+body.bys360-mobile-v4-final{
+  max-width:100%;
+  overflow-x:hidden !important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+.bys360-mobile-v4-final *,
+.bys360-mobile-v4-final *::before,
+.bys360-mobile-v4-final *::after{box-sizing:border-box;}
+.bys360-mobile-v4-final img,
+.bys360-mobile-v4-final svg,
+.bys360-mobile-v4-final canvas,
+.bys360-mobile-v4-final video{max-width:100%;height:auto;}
+.bys360-mobile-v4-final table{max-width:100%;}
+.bys360-mobile-v4-final input,
+.bys360-mobile-v4-final select,
+.bys360-mobile-v4-final textarea,
+.bys360-mobile-v4-final button{font-size:16px;}
+
+@media (max-width: 820px){
+  body.bys360-mobile-v4-final{
+    min-width:0 !important;
+    background-attachment:fixed;
+  }
+  .bys360-mobile-v4-final .container,
+  .bys360-mobile-v4-final .container-fluid,
+  .bys360-mobile-v4-final main,
+  .bys360-mobile-v4-final .main,
+  .bys360-mobile-v4-final .content,
+  .bys360-mobile-v4-final .page-content,
+  .bys360-mobile-v4-final .app-content,
+  .bys360-mobile-v4-final .layout-content{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    padding-left:12px !important;
+    padding-right:12px !important;
+    overflow-x:hidden !important;
+  }
+
+  .bys360-mobile-v4-final .card,
+  .bys360-mobile-v4-final .panel,
+  .bys360-mobile-v4-final .box,
+  .bys360-mobile-v4-final .glass-card,
+  .bys360-mobile-v4-final .content-card,
+  .bys360-mobile-v4-final .performance-card,
+  .bys360-mobile-v4-final .scorecard-card,
+  .bys360-mobile-v4-final .settings-card{
+    border-radius:var(--bys360-mobile-radius) !important;
+    box-shadow:var(--bys360-mobile-shadow) !important;
+    border:var(--bys360-mobile-border) !important;
+    background:var(--bys360-mobile-bg) !important;
+    overflow:hidden !important;
+  }
+
+  .bys360-mobile-v4-final .row,
+  .bys360-mobile-v4-final .grid,
+  .bys360-mobile-v4-final .dashboard-grid,
+  .bys360-mobile-v4-final .stats-grid,
+  .bys360-mobile-v4-final .kpi-grid,
+  .bys360-mobile-v4-final .summary-grid,
+  .bys360-mobile-v4-final .form-row{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:var(--bys360-mobile-gap) !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+  .bys360-mobile-v4-final [class*="col-"]{
+    width:100% !important;
+    max-width:100% !important;
+    flex:0 0 100% !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+
+  .bys360-mobile-v4-final .table-responsive,
+  .bys360-mobile-v4-final .table-wrapper,
+  .bys360-mobile-v4-final .responsive-table,
+  .bys360-mobile-v4-final .data-table-wrap{
+    width:100% !important;
+    overflow-x:visible !important;
+  }
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table,
+  .bys360-mobile-v4-final .bys360-mobile-v4-card-table table{
+    width:100% !important;
+    border-collapse:separate !important;
+    border-spacing:0 12px !important;
+    display:block !important;
+  }
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table thead{display:none !important;}
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table tbody,
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table tr,
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table td{
+    display:block !important;
+    width:100% !important;
+  }
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table tr{
+    background:rgba(255,255,255,.92) !important;
+    border:var(--bys360-mobile-border) !important;
+    border-left:4px solid var(--bys360-mobile-red) !important;
+    border-radius:18px !important;
+    padding:10px 12px !important;
+    box-shadow:0 8px 22px rgba(0,0,0,.08) !important;
+    margin-bottom:12px !important;
+    overflow:hidden !important;
+  }
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table td{
+    border:0 !important;
+    padding:8px 0 !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+  }
+  .bys360-mobile-v4-final table.bys360-mobile-v4-card-table td::before{
+    content:attr(data-label);
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:rgba(139,0,0,.88);
+    margin-bottom:3px;
+    letter-spacing:.01em;
+  }
+
+  .bys360-mobile-v4-final .btn,
+  .bys360-mobile-v4-final button,
+  .bys360-mobile-v4-final input[type="submit"],
+  .bys360-mobile-v4-final .action-btn,
+  .bys360-mobile-v4-final .mobile-action{
+    min-height:44px !important;
+    border-radius:14px !important;
+    touch-action:manipulation;
+  }
+  .bys360-mobile-v4-final .btn-group,
+  .bys360-mobile-v4-final .actions,
+  .bys360-mobile-v4-final .action-buttons,
+  .bys360-mobile-v4-final .form-actions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    width:100% !important;
+  }
+  .bys360-mobile-v4-final .btn-group > *,
+  .bys360-mobile-v4-final .actions > *,
+  .bys360-mobile-v4-final .action-buttons > *,
+  .bys360-mobile-v4-final .form-actions > *{width:100% !important;}
+
+  .bys360-mobile-v4-final.bys360-performance-mobile-v4 .score-input,
+  .bys360-mobile-v4-final.bys360-performance-mobile-v4 .score-control,
+  .bys360-mobile-v4-final.bys360-performance-mobile-v4 input[type="number"],
+  .bys360-mobile-v4-final.bys360-performance-mobile-v4 select,
+  .bys360-mobile-v4-final.bys360-performance-mobile-v4 textarea{
+    width:100% !important;
+    min-height:48px !important;
+    border-radius:14px !important;
+  }
+  .bys360-mobile-v4-final .bys360-mobile-v4-score-shell{
+    border-radius:22px !important;
+    padding:14px !important;
+    background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
+    box-shadow:var(--bys360-mobile-shadow);
+    border:var(--bys360-mobile-border);
+  }
+  .bys360-mobile-v4-final .bys360-mobile-v4-sticky-actions{
+    position:sticky !important;
+    bottom:0 !important;
+    z-index:50 !important;
+    padding:10px 12px !important;
+    margin:12px -12px -12px !important;
+    background:rgba(255,255,255,.94) !important;
+    backdrop-filter:blur(12px);
+    border-top:1px solid rgba(139,0,0,.12) !important;
+    box-shadow:0 -10px 24px rgba(0,0,0,.08) !important;
+  }
+
+  .bys360-mobile-v4-final .nav-tabs,
+  .bys360-mobile-v4-final .tabs,
+  .bys360-mobile-v4-final .submenu,
+  .bys360-mobile-v4-final .module-tabs{
+    display:flex !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    gap:8px !important;
+    padding:8px 2px 10px !important;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .bys360-mobile-v4-final .nav-tabs::-webkit-scrollbar,
+  .bys360-mobile-v4-final .tabs::-webkit-scrollbar,
+  .bys360-mobile-v4-final .submenu::-webkit-scrollbar{display:none;}
+  .bys360-mobile-v4-final .nav-tabs > *,
+  .bys360-mobile-v4-final .tabs > *,
+  .bys360-mobile-v4-final .submenu > *,
+  .bys360-mobile-v4-final .module-tabs > *{
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+    border-radius:999px !important;
+  }
+
+  .bys360-mobile-v4-final .modal-dialog{max-width:calc(100vw - 24px) !important;margin:12px auto !important;}
+  .bys360-mobile-v4-final .dropdown-menu{max-width:calc(100vw - 24px) !important;white-space:normal !important;}
+  .bys360-mobile-v4-final pre,
+  .bys360-mobile-v4-final code{white-space:pre-wrap !important;word-break:break-word !important;}
+}
+
+@media (max-width: 480px){
+  .bys360-mobile-v4-final h1{font-size:1.45rem !important;line-height:1.2 !important;}
+  .bys360-mobile-v4-final h2{font-size:1.25rem !important;line-height:1.25 !important;}
+  .bys360-mobile-v4-final .page-title,
+  .bys360-mobile-v4-final .hero-title{font-size:1.35rem !important;}
+  .bys360-mobile-v4-final .stat-value,
+  .bys360-mobile-v4-final .score-value,
+  .bys360-mobile-v4-final .final-score{font-size:2rem !important;}
+}

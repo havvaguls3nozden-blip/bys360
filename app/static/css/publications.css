@@ -1,0 +1,27 @@
+
+.pub-spread-frame.is-clickable,
+.pub-single-frame.is-clickable {
+  cursor: pointer;
+}
+
+.pub-page-sheet {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff;
+  width: 100%;
+  border: 1px solid rgba(139,0,0,.10);
+  padding: 0;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.pub-page-sheet:focus-visible {
+  outline: 3px solid rgba(139, 0, 0, .35);
+  outline-offset: 3px;
+}
+
+.pub-page-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}

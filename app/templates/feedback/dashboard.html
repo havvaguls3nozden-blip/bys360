@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Kurumsal Geri Bildirim - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Kurumsal Geri Bildirim{% endblock %}
+{% block page_subtitle %}Ekran hataları, eksikler, öneriler, tebrik ve teşekkür kayıtlarını kurumsal çizgide toplayın.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+  .fb-campaign,.fb-side-card{border:1px solid rgba(15,23,42,.06);border-radius:20px;padding:18px;background:linear-gradient(180deg,#fff,#fcfcfd);height:100%}
+  .fb-badge{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.76rem;font-weight:900}
+  .fb-badge.dark{background:#111827;color:#fff}
+  .fb-link{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:12px;background:#fff;border:1px solid rgba(15,23,42,.08);text-decoration:none;color:#374151;font-weight:800;font-size:.84rem}
+  .fb-link:hover{color:#8B0000;border-color:rgba(139,0,0,.16)}
+  .fb-muted{color:#6b7280}
+  .history-mini{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.06);background:#fff}
+</style>
+
+<div class="cw-shell">
+  {{ workspace.hero(
+      title='Kurumsal geri bildirim merkezi',
+      text='Çalışan deneyimini görünür kılan, yöneticilere erken sinyal veren ve iyileştirme adımlarını aynı ritimde toplayan alan.',
+      icon='fa-solid fa-comments',
+      kicker='Kurumsal iletişim çalışma alanı',
+      primary_url=url_for('main.bys360_feedback_new'),
+      primary_label='Geri Bildirim Gönder',
+      secondary_url=url_for('main.feedback_campaigns'),
+      secondary_label='Açık Kampanyalar'
+  ) }}
+  {{ workspace.feedback_nav('dashboard') }}
+
+  <div class="cw-metric-grid">
+    <div class="cw-metric"><div class="cw-metric-label">Açık Kampanya</div><div class="cw-metric-value">{{ visible_campaign_count }}</div><div class="cw-metric-sub">Yanıt bekleyen görünür kampanya sayısı.</div></div>
+    <div class="cw-metric"><div class="cw-metric-label">Bugünkü Nabız</div><div class="cw-metric-value">{% if today_pulse %}{% if today_pulse.mood_value == 5 %}😄{% elif today_pulse.mood_value == 4 %}🙂{% elif today_pulse.mood_value == 3 %}😐{% elif today_pulse.mood_value == 2 %}😟{% else %}🆘{% endif %}{% else %}—{% endif %}</div><div class="cw-metric-sub">{{ today_pulse.mood_label if today_pulse else 'Henüz nabız kaydı bırakılmadı.' }}</div></div>
+    <div class="cw-metric"><div class="cw-metric-label">30 Gün Ortalaması</div><div class="cw-metric-value">{{ pulse_avg if pulse_avg is not none else '—' }}</div><div class="cw-metric-sub">Birim bazlı son 30 gün duygu ortalaması.</div></div>
+    <div class="cw-metric"><div class="cw-metric-label">Açık Aksiyon</div><div class="cw-metric-value">{{ open_actions_count }}</div><div class="cw-metric-sub">Takibi süren iyileştirme adımı sayısı.</div></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-xl-8">
+      <div class="cw-panel">
+        <div class="cw-panel-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div>
+              <h3 style="margin:0;font-size:1.05rem;font-weight:900;color:#111827;">Yakın kampanyalar</h3>
+              <p style="margin:8px 0 0;color:#6b7280;font-size:.88rem;line-height:1.8;">Görünür ve işlem yapılabilir son kampanyalar kurumsal kart düzeninde listelenir.</p>
+            </div>
+            <span class="fb-badge"><i class="fa-solid fa-layer-group"></i>{{ recent_campaigns|length }} kayıt</span>
+          </div>
+
+          {% if recent_campaigns %}
+          <div class="row g-3">
+            {% for campaign in recent_campaigns %}
+            <div class="col-xl-6">
+              <div class="fb-campaign">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <span class="fb-badge"><i class="fa-solid fa-tag"></i>{{ campaign.campaign_type|replace('_',' ')|title }}</span>
+                    {% if campaign.is_anonymous %}<span class="fb-badge dark"><i class="fa-solid fa-user-secret"></i>Anonim</span>{% endif %}
+                  </div>
+                  <span class="fb-muted" style="font-size:.8rem;font-weight:800;">{{ campaign.status }}</span>
+                </div>
+                <div style="font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:8px;">{{ campaign.title }}</div>
+                <div class="fb-muted" style="font-size:.88rem;line-height:1.8;min-height:50px;">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div>
+                <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px;">
+                  <div class="fb-muted" style="font-size:.82rem;font-weight:700;"><i class="fa-regular fa-circle-question me-1"></i>{{ campaign.questions.count() }} soru</div>
+                  <a class="fb-link" href="{{ url_for('main.feedback_campaign_detail', campaign_id=campaign.id) }}"><i class="fa-solid fa-arrow-up-right-from-square"></i>Kampanyayı Aç</a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="cw-empty"><i class="fa-solid fa-folder-open"></i><strong>Görünür kampanya bulunmuyor</strong><span>Yeni kampanyalar yayımlandığında bu alanda listelenecek.</span></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="cw-panel">
+        <div class="cw-panel-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+              <h3 style="margin:0;font-size:1.02rem;font-weight:900;color:#111827;">Nabız özeti</h3>
+              <p style="margin:8px 0 0;color:#6b7280;font-size:.86rem;line-height:1.7;">Son işaretlerin ve yönetici görünümü için kısa sinyaller.</p>
+            </div>
+            <a class="fb-link" href="{{ url_for('main.feedback_pulse_history') }}"><i class="fa-solid fa-clock-rotate-left"></i>Geçmiş</a>
+          </div>
+          <div style="display:grid;gap:10px;">
+            {% for row in pulse_history_preview %}
+            <div class="history-mini">
+              <div>
+                <div style="font-weight:900;color:#111827;">{% if row.mood_value == 5 %}😄{% elif row.mood_value == 4 %}🙂{% elif row.mood_value == 3 %}😐{% elif row.mood_value == 2 %}😟{% else %}🆘{% endif %} {{ row.mood_label }}</div>
+                <div class="fb-muted" style="font-size:.8rem;">{{ row.entry_date.strftime('%d.%m.%Y') }}</div>
+              </div>
+              <div class="fb-muted" style="font-size:.8rem;">{{ row.mood_value }}/5</div>
+            </div>
+            {% else %}
+            <div class="cw-empty"><i class="fa-solid fa-wave-square"></i><strong>Kayıt yok</strong><span>İlk nabız kaydın burada görünecek.</span></div>
+            {% endfor %}
+          </div>
+          {% if manager_pulse_analytics and manager_pulse_analytics.eligible %}
+          <div class="fb-side-card" style="margin-top:16px;">
+            <div style="font-size:.84rem;font-weight:900;color:#6b7280;margin-bottom:8px;">Yönetici sinyali</div>
+            <div style="font-size:1.2rem;font-weight:900;color:#111827;">{{ manager_pulse_analytics.average if manager_pulse_analytics.average is not none else '—' }}</div>
+            <div class="fb-muted" style="font-size:.82rem;line-height:1.7;margin-top:8px;">Risk kullanıcı: {{ manager_pulse_analytics.risk_user_count }} · Kapsama: {{ manager_pulse_analytics.coverage_rate if manager_pulse_analytics.coverage_rate is not none else '—' }}{% if manager_pulse_analytics.coverage_rate is not none %}%{% endif %}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

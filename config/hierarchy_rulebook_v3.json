@@ -1,0 +1,152 @@
+{
+  "version": "v3",
+  "effective_date": "2026-04-08",
+  "notes": [
+    "Bu dosya kullanıcı tarafından 08.04.2026 tarihinde netleştirilen nihai amir zinciri kurallarını içerir.",
+    "Önceki genelleyici hukuk/başkanlık eşleştirmeleri geçersiz sayılmalıdır.",
+    "3. amir alanı unvan-temelli zorunlu bir kadro değildir; seçilen aktif personel olabilir.",
+    "Eski çelişkili örnek zincirler referans alınmamalıdır."
+  ],
+  "global_rules": {
+    "blind_review": false,
+    "default_weights": {
+      "level_1": 50,
+      "level_2": 50,
+      "level_3": 0
+    },
+    "third_manager": {
+      "required": false,
+      "default_mode": "comment_only",
+      "selection_rule": "selected_active_person",
+      "fixed_title_required": false
+    },
+    "status_rules": {
+      "president_is_not_evaluated": true,
+      "info_not_warning_for_optional_third_manager": true
+    }
+  },
+  "chains": {
+    "president": {
+      "evaluated": false,
+      "levels": []
+    },
+    "president_assistant": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "baskan"
+        }
+      ],
+      "order": [
+        1
+      ]
+    },
+    "group_president": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "baskan"
+        },
+        {
+          "manager_level": 2,
+          "role": "baskan_yardimcisi"
+        }
+      ],
+      "order": [
+        2,
+        1
+      ]
+    },
+    "law_counsel": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "baskan"
+        },
+        {
+          "manager_level": 2,
+          "role": "baskan_yardimcisi"
+        }
+      ],
+      "order": [
+        2,
+        1
+      ]
+    },
+    "law_staff": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "hukuk_musaviri"
+        }
+      ],
+      "order": [
+        1
+      ]
+    },
+    "special_direct_to_president": {
+      "units": [
+        "DANISMANLIK",
+        "OZEL KALEM",
+        "IC DENETIM"
+      ],
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "baskan"
+        }
+      ],
+      "order": [
+        1
+      ]
+    },
+    "coordinator": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "baskan_yardimcisi"
+        },
+        {
+          "manager_level": 2,
+          "role": "grup_baskani"
+        }
+      ],
+      "order": [
+        2,
+        1
+      ]
+    },
+    "general_staff": {
+      "levels": [
+        {
+          "manager_level": 1,
+          "role": "grup_baskani"
+        },
+        {
+          "manager_level": 2,
+          "role": "koordinator"
+        },
+        {
+          "manager_level": 3,
+          "role": "selected_person_optional"
+        }
+      ],
+      "order": [
+        2,
+        1
+      ],
+      "order_with_third": [
+        3,
+        2,
+        1
+      ]
+    }
+  },
+  "repair_rules": {
+    "rollback_wrong_law_assignments": true,
+    "do_not_auto_promote_law_staff_to_president_chain": true,
+    "do_not_require_fixed_title_for_third_manager": true,
+    "do_not_generate_tasks_for_president": true,
+    "respect_existing_valid_assignments": true
+  }
+}

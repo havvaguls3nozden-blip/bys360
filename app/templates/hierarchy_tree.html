@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Hiyerarşi Ağacı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Hiyerarşi Ağacı{% endblock %}
+{% block page_subtitle %}
+Kurumsal yapıyı üst birim, birim ve personel düzeyinde izleyin.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Hiyerarşi Ağacı', text='Üst birim, birim ve personel ilişkilerini tek bakışta izleyin.', icon='fa-solid fa-diagram-project') }}
+  {{ nav(active='tree') }}
+  
+<style>
+  .ai-summary-card{margin-bottom:16px;border:1px solid rgba(139,0,0,.10);border-radius:22px;background:rgba(255,255,255,.94);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:18px;display:grid;gap:12px}.ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.ai-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:900;color:#8B0000;text-transform:uppercase;letter-spacing:.04em}.ai-title{font-size:1.05rem;font-weight:900;color:#111827}.ai-text{color:#475569;line-height:1.7}.ai-bullets{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#475569}.ai-bullets i{font-size:.5rem;color:#8B0000;margin-top:.55rem}.ai-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ai-action{border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:12px;background:#fff}.ai-action-label{font-size:.75rem;color:#64748b;text-transform:uppercase;font-weight:800}.ai-action-value{margin-top:6px;font-size:1.05rem;font-weight:900;color:#111827}.ai-action.tone-critical .ai-action-value{color:#b91c1c}.ai-action.tone-watch .ai-action-value{color:#b45309}.ai-spotlight{display:grid;gap:8px}.ai-spotlight-row{display:flex;gap:8px;flex-wrap:wrap;color:#475569}.ai-spotlight-row strong{color:#111827}@media(max-width:900px){.ai-action-grid{grid-template-columns:1fr 1fr}}
+
+  .tree-shell{display:grid;gap:18px}
+
+  .glass-card{
+    background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    backdrop-filter:blur(14px);
+  }
+
+  .panel-card{padding:22px}
+  .intro-title{font-size:1.08rem;font-weight:900;color:#111827;margin:0 0 8px}
+  .intro-sub{color:#6b7280;font-size:.92rem;line-height:1.8;margin:0}
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px;
+  }
+
+  .stat-card{
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .stat-card::after{
+    content:"";
+    position:absolute;
+    right:-20px;
+    bottom:-20px;
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    background:rgba(139,0,0,.06);
+  }
+
+  .stat-label{
+    color:#6b7280;
+    font-size:.82rem;
+    font-weight:800;
+    margin-bottom:10px;
+    position:relative;
+    z-index:1;
+  }
+
+  .stat-value{
+    color:#111827;
+    font-size:1.7rem;
+    font-weight:900;
+    line-height:1;
+    position:relative;
+    z-index:1;
+  }
+
+  .scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;margin-top:16px}
+  .scope-title{color:#111827;font-size:.92rem;font-weight:900}
+  .scope-sub{color:#6b7280;font-size:.82rem;line-height:1.7}
+  .toolbar-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr auto;gap:12px;margin-top:16px}
+  .form-group{display:flex;flex-direction:column;gap:8px}
+  .form-group label{color:#6b7280;font-size:.8rem;font-weight:800}
+  .form-input,.form-select{width:100%;min-height:46px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:10px 14px;background:#fff;font:inherit;outline:none}
+  .form-input:focus,.form-select:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+  .action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;transition:all .18s ease}
+  .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+  .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+  .legend{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .pill.ok{background:rgba(22,101,52,.10);color:#166534}
+  .pill.passive{background:rgba(107,114,128,.12);color:#374151}
+  .pill.unit{background:rgba(29,78,216,.10);color:#1d4ed8}
+  .pill.parent{background:rgba(139,0,0,.10);color:#8B0000}
+
+  .parent-list{
+    display:grid;
+    gap:18px;
+  }
+
+  .parent-card{
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:24px;
+    background:#fff;
+    overflow:hidden;
+  }
+
+  .parent-head{
+    padding:18px 20px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.015));
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .parent-title{
+    color:#111827;
+    font-size:1rem;
+    font-weight:900;
+    line-height:1.45;
+  }
+
+  .parent-sub{
+    color:#6b7280;
+    font-size:.86rem;
+    line-height:1.7;
+    margin-top:4px;
+  }
+
+  .child-list{
+    display:grid;
+    gap:14px;
+    padding:18px;
+  }
+
+  .child-card{
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:20px;
+    background:#f8fafc;
+    overflow:hidden;
+  }
+
+  .child-head{
+    padding:14px 16px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .child-title{
+    color:#111827;
+    font-size:.95rem;
+    font-weight:900;
+  }
+
+  .child-sub{
+    color:#6b7280;
+    font-size:.82rem;
+    line-height:1.7;
+    margin-top:4px;
+  }
+
+  .person-list{
+    display:grid;
+    gap:10px;
+    padding:14px 16px 16px;
+  }
+
+  .person-card{
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    background:#fff;
+    padding:14px;
+    display:grid;
+    gap:10px;
+  }
+
+  .person-name{
+    color:#111827;
+    font-size:.92rem;
+    font-weight:900;
+    line-height:1.5;
+  }
+
+  .person-sub{
+    color:#6b7280;
+    font-size:.82rem;
+    line-height:1.7;
+  }
+
+  .chain-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .chain-box{
+    border:1px solid rgba(15,23,42,.08);
+    background:#f8fafc;
+    border-radius:14px;
+    padding:10px 12px;
+  }
+
+  .chain-label{
+    color:#6b7280;
+    font-size:.75rem;
+    font-weight:800;
+    margin-bottom:6px;
+  }
+
+  .chain-value{
+    color:#111827;
+    font-size:.84rem;
+    font-weight:900;
+    line-height:1.55;
+    word-break:break-word;
+  }
+
+  .empty-box{
+    padding:26px 20px;
+    border-radius:18px;
+    border:1px dashed rgba(15,23,42,.12);
+    background:#f8fafc;
+    color:#6b7280;
+    text-align:center;
+    line-height:1.9;
+  }
+
+  @media (max-width:1100px){
+    .stats-grid,.chain-grid,.toolbar-grid{grid-template-columns:1fr 1fr}
+  }
+
+  @media (max-width:700px){
+    .stats-grid,.chain-grid,.toolbar-grid{grid-template-columns:1fr}
+  }
+</style>
+
+{% if ai_hierarchy_tree_panel %}<article class="ai-summary-card tone-{{ ai_hierarchy_tree_panel.tone }}"><div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_hierarchy_tree_panel.badge }}</div><div class="ai-title">{{ ai_hierarchy_tree_panel.headline }}</div><div class="ai-text">{{ ai_hierarchy_tree_panel.summary }}</div>{% if ai_hierarchy_tree_panel.bullets %}<ul class="ai-bullets">{% for bullet in ai_hierarchy_tree_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>{% endif %}<div class="ai-action-grid">{% for item in ai_hierarchy_tree_panel.actions %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>{% if ai_hierarchy_tree_panel.spotlight %}<div class="ai-spotlight">{% for row in ai_hierarchy_tree_panel.spotlight %}<div class="ai-spotlight-row"><strong>{{ row.label }}:</strong><span>{{ row.value }}</span></div>{% endfor %}</div>{% endif %}</article>{% endif %}
+
+<div class="tree-shell">
+  <div class="glass-card panel-card">
+    <h3 class="intro-title">Kurumsal Hiyerarşi Görünümü</h3>
+    <p class="intro-sub">
+      Üst birim, birim ve personel düzeyinde kurumsal hiyerarşiyi tek ekranda görüntüleyin.
+    </p>
+
+
+    <div class="scope-strip">
+      <div>
+        <div class="scope-title">{{ scope_role_title or 'Kapsam görünümü' }} · {{ scope_label or 'Kurum geneli' }}</div>
+        <div class="scope-sub">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim üzerinden hiyerarşi izleniyor.</div>
+      </div>
+      <span class="pill parent"><i class="fa-solid fa-sitemap"></i> {{ total_user_count or 0 }} kayıt</span>
+    </div>
+
+    <form method="GET" action="{{ url_for('main.performance_hierarchy_tree') }}">
+      <div class="toolbar-grid">
+        <div class="form-group">
+          <label>Arama</label>
+          <input type="text" name="q" value="{{ q or '' }}" class="form-input" placeholder="Ad, sicil, birim, unvan">
+        </div>
+        <div class="form-group">
+          <label>Kapsam</label>
+          <select name="scope" class="form-select">
+            {% for value, label in scope_option_pairs or [] %}
+              <option value="{{ value }}" {% if selected_scope == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Birim</label>
+          <select name="birim" class="form-select">
+            <option value="">Tüm birimler</option>
+            {% for item in birimler %}
+              <option value="{{ item }}" {% if selected_birim == item %}selected{% endif %}>{{ item }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="action-row">
+          <button type="submit" class="btn-soft primary"><i class="fa-solid fa-filter"></i> Filtrele</button>
+          <a href="{{ url_for('main.performance_hierarchy_tree', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-rotate-left"></i> Temizle</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="legend">
+      <span class="pill parent"><i class="fa-solid fa-sitemap"></i> Üst Birim</span>
+      <span class="pill unit"><i class="fa-solid fa-building"></i> Birim</span>
+      <span class="pill ok"><i class="fa-solid fa-circle-check"></i> Aktif Personel</span>
+      <span class="pill passive"><i class="fa-solid fa-circle"></i> Pasif Personel</span>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="glass-card stat-card">
+      <div class="stat-label">Toplam Personel</div>
+      <div class="stat-value">{{ total_user_count or 0 }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Üst Birim Sayısı</div>
+      <div class="stat-value">{{ parent_count or 0 }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Aktif Personel</div>
+      <div class="stat-value">{{ active_count or 0 }}</div>
+    </div>
+    <div class="glass-card stat-card">
+      <div class="stat-label">Pasif Personel</div>
+      <div class="stat-value">{{ passive_count or 0 }}</div>
+    </div>
+  </div>
+
+  {% if grouped_tree %}
+    <div class="parent-list">
+      {% for parent_name, child_map in grouped_tree.items() %}
+        <div class="glass-card parent-card">
+          <div class="parent-head">
+            <div>
+              <div class="parent-title">{{ parent_name }}</div>
+              <div class="parent-sub">
+                Bu üst birime bağlı {{ child_map|length }} birim görüntüleniyor.
+              </div>
+            </div>
+            <span class="pill parent"><i class="fa-solid fa-sitemap"></i> Üst Birim</span>
+          </div>
+
+          <div class="child-list">
+            {% for child_name, person_list in child_map.items() %}
+              <div class="child-card">
+                <div class="child-head">
+                  <div>
+                    <div class="child-title">{{ child_name }}</div>
+                    <div class="child-sub">{{ person_list|length }} personel</div>
+                  </div>
+                  <span class="pill unit"><i class="fa-solid fa-building"></i> Birim</span>
+                </div>
+
+                <div class="person-list">
+                  {% for person in person_list %}
+                    <div class="person-card">
+                      <div class="person-name">
+                        {{ person.full_name or ((person.ad or '') ~ ' ' ~ (person.soyad or ''))|trim }}
+                      </div>
+
+                      <div class="person-sub">
+                        {{ person.unvan or '-' }}<br>
+                        Sicil No: {{ person.sicil_no or '-' }}
+                      </div>
+
+                      <div class="chain-grid">
+                        <div class="chain-box">
+                          <div class="chain-label">1. Amir</div>
+                          <div class="chain-value">{{ person.yonetici_sicil or '-' }}</div>
+                        </div>
+
+                        <div class="chain-box">
+                          <div class="chain-label">2. Amir</div>
+                          <div class="chain-value">{{ person.ikinci_yonetici_sicil or '-' }}</div>
+                        </div>
+
+                        <div class="chain-box">
+                          <div class="chain-label">3. Amir</div>
+                          <div class="chain-value">{{ person.ucuncu_yonetici_sicil or '-' }}</div>
+                        </div>
+                      </div>
+
+                      {% if person.is_active %}
+                        <span class="pill ok"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                      {% else %}
+                        <span class="pill passive"><i class="fa-solid fa-circle"></i> Pasif</span>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="glass-card panel-card">
+      <div class="empty-box">Görüntülenecek hiyerarşi verisi bulunamadı.</div>
+    </div>
+  {% endif %}
+</div>
+</div>
+{% endblock %}

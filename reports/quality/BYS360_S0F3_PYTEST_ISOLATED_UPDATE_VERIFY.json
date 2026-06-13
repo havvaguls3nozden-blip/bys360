@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-06-13T10:18:32",
+  "phase": "S0F3_PYTEST_ISOLATED_UPDATE_VERIFY",
+  "mode": "isolated_test_tool_update_with_auto_rollback_on_test_failure",
+  "ok": true,
+  "decision": "S0F3_GREEN_ALL_PIP_AUDIT_FIXED",
+  "target_spec": "pytest>=9.0.3",
+  "rollback_script": "C:\\bys360\\project\\reports\\quality\\BYS360_S0F3_ROLLBACK_PYTEST.ps1",
+  "pre_pytest_version": "8.4.2",
+  "post_pytest_version": "9.0.3",
+  "final_pytest_version": "9.0.3",
+  "install_returncode": 0,
+  "rollback_performed": false,
+  "rollback_returncode": null,
+  "validation_after_update": {
+    "compileall_returncode": 0,
+    "pytest_quality_smoke_returncode": 0,
+    "pytest_quality_smoke_summary": {
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "warnings": 0
+    },
+    "pytest_full_returncode": 0,
+    "pytest_full_summary": {
+      "passed": 744,
+      "skipped": 2,
+      "deselected": 34,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    "pytest_default_returncode": 0,
+    "pytest_default_summary": {
+      "passed": 744,
+      "skipped": 2,
+      "deselected": 34,
+      "failed": 0,
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "rollback_validation": null,
+  "pip_audit_available": true,
+  "pip_audit_returncode": 0,
+  "pip_audit_vulnerability_count_after": 0,
+  "pip_audit_by_package_after": {},
+  "remaining_findings": [],
+  "s0a_rerun": {
+    "returncode": 0,
+    "ok": true,
+    "red_flag_count": 1,
+    "pip_audit_available": true,
+    "pip_audit_vulnerability_count": 0,
+    "old_venv_total_mb": 197.11
+  },
+  "next_action": "S0G eski .venv_old_* temizliğine geçilebilir."
+}

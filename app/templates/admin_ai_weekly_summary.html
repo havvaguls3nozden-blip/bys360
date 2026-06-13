@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}AI Haftalık Yönetici Özeti - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Haftalık Yönetici Özeti{% endblock %}
+{% block page_subtitle %}Kalite, yönetişim ve aksiyon görünümünü tek sayfada toplar.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <form class="d-flex gap-2" method="get"><input class="form-control" type="number" name="lookback_days" min="1" max="60" value="{{ lookback_days or 7 }}"><button class="btn btn-catab">Güncelle</button></form>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_weekly_summary_export', lookback_days=lookback_days) }}">CSV</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_governance_hub') }}">Yönetişim merkezi</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_notification_priority') }}">Bildirim önceliği</a>
+    </div>
+  </div>
+</div>
+<div class="row g-3 mb-4">
+  {% for item in highlights %}
+  <div class="col-lg-4"><div class="glass-card p-4 h-100"><div class="fw-bold mb-2">{{ item.title }}</div><div class="text-muted small">{{ item.body }}</div></div></div>
+  {% endfor %}
+</div>
+<div class="row g-4">
+  <div class="col-lg-6"><div class="glass-card p-4 h-100"><h4 class="mb-3">Alarmlar</h4>{% for row in alerts %}<div class="border rounded-4 p-3 mb-2"><div class="fw-semibold">{{ row.title }}</div><div class="small text-muted mt-1">{{ row.body }}</div></div>{% else %}<div class="text-muted">Alarm görünmüyor.</div>{% endfor %}</div></div>
+  <div class="col-lg-6"><div class="glass-card p-4 h-100"><h4 class="mb-3">Bu hafta için aksiyon</h4>{% for row in actions %}<div class="border rounded-4 p-3 mb-2"><div class="fw-semibold">{{ row.title }}</div><div class="small text-muted mt-1">{{ row.body }}</div></div>{% else %}<div class="text-muted">Aksiyon gerektiren başlık görünmüyor.</div>{% endfor %}</div></div>
+</div>
+<div class="row g-4 mt-1">
+  <div class="col-lg-6"><div class="glass-card p-4"><h4 class="mb-3">Modül görünümü</h4><div class="table-responsive"><table class="table"><thead><tr><th>Modül</th><th>Kalite</th><th>Backlog</th></tr></thead><tbody>{% for row in module_rows %}<tr><td>{{ row.module_type }}</td><td>%{{ row.quality_score }}</td><td>{{ row.backlog_total }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Kayıt yok.</td></tr>{% endfor %}</tbody></table></div></div></div>
+  <div class="col-lg-6"><div class="glass-card p-4"><h4 class="mb-3">İstem görünümü</h4><div class="table-responsive"><table class="table"><thead><tr><th>İstem</th><th>Kalite</th><th>Negatif</th></tr></thead><tbody>{% for row in prompt_rows %}<tr><td>{{ row.prompt_version }}</td><td>%{{ row.quality_score }}</td><td>{{ row.negative_feedback }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Kayıt yok.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+{% endblock %}

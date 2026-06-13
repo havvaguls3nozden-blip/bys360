@@ -1,0 +1,103 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Ön Kontrol - BYS360{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">Canlı öncesi toplu tarama</div>
+    <h3 class="ai-title">AI entegrasyonu için gerileme ve ön kontrol görünümü</h3>
+    <p class="ai-sub">Bu ekran; AI kontrol yapısı, aktarım zinciri, kritik bağlantılar ve temel şablon dosyalarını tek yerde kontrol eder. Amaç dağıtımdan önce "buton var ama sayfa yok" veya "aktarım sorunu yüzünden uygulama açılmıyor" riskini azaltmaktır.</p>
+    <div class="ai-actions" style="margin-top:16px">
+      <a class="ai-link" href="{{ url_for('main.admin_ai_center') }}"><i class="fa-solid fa-arrow-left"></i> AI kontrol merkezine dön</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_preflight_export') }}"><i class="fa-solid fa-file-arrow-down"></i> Ön kontrol CSV indir</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_operations_report') }}"><i class="fa-solid fa-chart-line"></i> Operasyon raporunu aç</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_smoke') }}"><i class="fa-solid fa-list-check"></i> Hızlı doğrulama ve kabul ekranı</a>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-preflight-metrics">
+    <article class="ai-card"><div class="ai-label">Hazırlık skoru</div><div class="ai-value">%{{ summary.readiness_score or 0 }}</div><div class="ai-mini">Toplam {{ summary.check_total or 0 }} kontrol içinde hazır görünen {{ summary.ok_count or 0 }}</div></article>
+    <article class="ai-card"><div class="ai-label">Uyarı</div><div class="ai-value">{{ summary.warning_count or 0 }}</div><div class="ai-mini">Dağıtım öncesi ele alınması gereken kontrol sayısı</div></article>
+    <article class="ai-card"><div class="ai-label">Şema hazırlığı</div><div class="ai-value">{{ 'Hazır' if schema_status.ready else 'Korumalı' }}</div><div class="ai-mini">{{ schema_status.message }}</div></article>
+    <article class="ai-card"><div class="ai-label">Eksik tablo</div><div class="ai-value">{{ (schema_status.missing_tables or [])|length }}</div><div class="ai-mini">Eksik kolon: {{ (schema_status.missing_columns or [])|length }}</div></article>
+    <article class="ai-card"><div class="ai-label">Doğrulama yolu</div><div class="ai-value">{{ (smoke_paths or [])|length }}</div><div class="ai-mini">Canlı öncesi elle dolaşılacak kritik yol</div></article>
+    <article class="ai-card"><div class="ai-label">Zaman</div><div class="ai-value" style="font-size:1.05rem">{{ snapshot.generated_at.strftime('%d.%m.%Y %H:%M') if snapshot.generated_at else '-' }}</div><div class="ai-mini">Bu rapor sayfa açılışında üretildi</div></article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">Öncelikli aksiyonlar</h4>
+    <div class="ai-grid ai-grid-preflight-actions" style="margin-top:16px">
+      {% for item in top_actions %}
+      <article class="ai-card ai-action-card tone-{{ item.tone }}">
+        <div class="ai-label">{{ 'Öncelik' if item.tone == 'warning' else 'Durum' }}</div>
+        <div class="ai-title" style="font-size:1.02rem">{{ item.title }}</div>
+        <div class="ai-mini">{{ item.body }}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if not schema_status.ready %}
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">AI şema eksikleri</h4>
+    <div class="ai-grid" style="margin-top:16px">
+      <article class="ai-card">
+        <div class="ai-label">Eksik tablolar</div>
+        <ul class="ai-list">
+          {% for item in schema_status.missing_tables or [] %}<li class="ai-list-item"><span>{{ item }}</span><strong>Eksik</strong></li>{% else %}<li class="ai-note">Eksik tablo görünmüyor.</li>{% endfor %}
+        </ul>
+      </article>
+      <article class="ai-card">
+        <div class="ai-label">Eksik kolonlar</div>
+        <ul class="ai-list">
+          {% for item in schema_status.missing_columns or [] %}<li class="ai-list-item"><span>{{ item }}</span><strong>Eksik</strong></li>{% else %}<li class="ai-note">Eksik kolon görünmüyor.</li>{% endfor %}
+        </ul>
+      </article>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="ai-grid ai-grid-preflight-groups">
+    {% for category, rows in grouped_checks.items() %}
+    <article class="ai-table-wrap">
+      <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h4 class="ai-title" style="font-size:1.05rem">{{ category|replace('_', ' ')|title }} kontrolleri</h4>
+        <span class="ai-badge {{ 'warning' if rows|selectattr('status', 'ne', 'ok')|list|length else 'success' }}">{{ rows|length }} kayıt</span>
+      </div>
+      <table class="ai-table">
+        <thead><tr><th>Kontrol</th><th>Durum</th><th>Detay</th><th>Öneri</th></tr></thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td><strong>{{ row.label }}</strong></td>
+            <td><span class="ai-badge {{ 'success' if row.status == 'ok' else 'warning' }}">{{ 'Hazır' if row.status == 'ok' else 'Kontrol et' }}</span></td>
+            <td>{{ row.detail }}</td>
+            <td>{{ row.advice or '-' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4"><div class="ai-note">Bu kategori için kontrol kaydı bulunamadı.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">Önerilen doğrulama yolları</h4>
+    <table class="ai-table" style="margin-top:14px">
+      <thead><tr><th>Ekran</th><th>Bağlantı</th><th>Yol</th></tr></thead>
+      <tbody>
+        {% for item in smoke_paths %}
+        <tr>
+          <td>{{ item.label }}</td>
+          <td><span class="ai-badge muted">{{ item['end' ~ 'point'] }}</span></td>
+          <td><code>{{ item.path }}</code></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3"><div class="ai-note">Doğrulama yolu listesi henüz üretilmedi.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

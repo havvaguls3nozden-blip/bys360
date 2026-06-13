@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% from "_premium_ui_macros.html" import premium_hub_strip %}
+{% from "_premium_workspace_macros.html" import premium_context_banner, premium_metric_card, premium_action_shell, premium_helper_note %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Randevu Sistemi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Randevu Sistemi{% endblock %}
+{% block page_subtitle %}
+Geri bildirim görüşmelerini, yaklaşan randevuları ve geçmiş oturumları tek bir kurumsal akışta takip edin.
+{% endblock %}
+
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .meeting-shell{display:grid;gap:18px}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.07), transparent 30%),linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0));pointer-events:none}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.2fr) 340px;gap:18px;align-items:start}
+    .hero-title{margin:0;font-size:1.14rem;font-weight:900;color:#111827;line-height:1.4}
+    .hero-text{margin:10px 0 0;color:#6b7280;font-size:.92rem;line-height:1.85;max-width:880px}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .soft-pill,.status-pill,.scope-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.76rem;font-weight:900;white-space:nowrap}
+    .scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;margin:0 0 16px}
+    .soft-pill{background:#eef2f7;color:#4b5563}
+    .scope-pill{background:rgba(139,0,0,.08);color:#8B0000}
+    .status-pill.planlandi{background:rgba(22,101,52,.10);color:#166534}
+    .status-pill.tamamlandi{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .status-pill.ertelendi{background:rgba(146,64,14,.12);color:#92400e}
+    .status-pill.iptal_edildi{background:rgba(153,27,27,.10);color:#991b1b}
+    .hero-side{display:grid;gap:12px}
+    .side-metric{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:rgba(248,250,252,.85)}
+    .side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}
+    .side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.5}
+    .side-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.75}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .stat-card{padding:22px;position:relative;overflow:hidden}
+    .stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:80px;height:80px;border-radius:50%;background:rgba(139,0,0,.06)}
+    .stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:9px;position:relative;z-index:1}
+    .stat-value{color:#111827;font-size:1.55rem;font-weight:900;line-height:1;position:relative;z-index:1}
+    .stat-sub{margin-top:9px;color:#6b7280;font-size:.78rem;font-weight:700;position:relative;z-index:1;line-height:1.6}
+    .toolbar-card{position:sticky;top:10px;z-index:7}
+    .toolbar-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+    .chip-row{display:flex;gap:8px;flex-wrap:wrap}
+    .chip-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#4b5563;font-size:.78rem;font-weight:900;text-decoration:none;transition:all .18s ease}
+    .chip-link:hover,.btn-soft:hover,.mini-btn:hover,.meeting-card:hover{transform:translateY(-1px)}
+    .chip-link.active{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.18);color:#8B0000}
+    .chip-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;padding:0 8px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.72rem;font-weight:900}
+    .chip-link.active .chip-count{background:rgba(139,0,0,.14);color:#8B0000}
+    .toolbar-form{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .toolbar-form input{min-height:44px;border-radius:14px;border:1px solid rgba(15,23,42,.08);padding:0 14px;background:#fff;min-width:300px;color:#111827}
+    .toolbar-foot{margin-top:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800}
+    .btn-soft,.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all .18s ease}
+    .btn-soft{min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;font-weight:800;font-size:.9rem;white-space:nowrap}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary,.mini-btn{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .next-meeting{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;border:1px solid rgba(139,0,0,.08);background:linear-gradient(135deg,rgba(139,0,0,.06),rgba(255,255,255,.65));border-radius:22px;padding:18px}
+    .next-title{margin:0;font-size:1rem;font-weight:900;color:#111827}
+    .next-text{margin:6px 0 0;color:#6b7280;font-size:.9rem;line-height:1.8}
+    .section-card{padding:22px}
+    .section-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}
+    .section-title{margin:0;color:#111827;font-size:1.06rem;font-weight:900}
+    .section-sub{margin:6px 0 0;color:#6b7280;font-size:.9rem;line-height:1.75}
+    .count-pill{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border-radius:999px;background:#eef2f7;color:#4b5563;font-size:.78rem;font-weight:900}
+    .meeting-list{display:grid;gap:14px}
+    .meeting-card{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:22px;padding:18px;transition:all .18s ease}
+    .meeting-main{min-width:0}
+    .meeting-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+    .meeting-name{margin:0;color:#111827;font-size:1rem;font-weight:900;line-height:1.45}
+    .meeting-sub{color:#6b7280;font-size:.86rem;line-height:1.8}
+    .meeting-meta{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .meta-box{border:1px solid rgba(15,23,42,.06);border-radius:16px;background:#f8fafc;padding:12px}
+    .meta-label{color:#6b7280;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+    .meta-value{color:#111827;font-size:.88rem;font-weight:800;line-height:1.6}
+    .meeting-note{margin-top:12px;padding:12px 14px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.84rem;line-height:1.75}
+    .meeting-side{display:grid;gap:10px;align-content:start}
+    .meeting-side-card{border-radius:18px;border:1px solid rgba(15,23,42,.08);background:linear-gradient(180deg,#fff,#faf7f7);padding:14px}
+    .meeting-side-label{color:#6b7280;font-size:.74rem;font-weight:800;margin-bottom:6px}
+    .meeting-side-value{color:#111827;font-size:.9rem;font-weight:900;line-height:1.6}
+    .meeting-actions{display:flex;flex-direction:column;gap:10px}
+    .empty-box{padding:32px 20px;border-radius:20px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;text-align:center;color:#6b7280;display:grid;gap:10px}
+    .empty-box i{font-size:2rem;color:#8B0000}
+    .empty-title{margin:0;font-size:1rem;font-weight:900;color:#111827}
+    .empty-text{margin:0;font-size:.9rem;line-height:1.8}
+    .mobile-toggle,.mobile-state{display:none}
+    .meeting-shell.filters-collapsed .toolbar-row,.meeting-shell.filters-collapsed .toolbar-foot{display:none}
+    @media (max-width:1180px){.hero-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.meeting-card{grid-template-columns:1fr}}
+    @media (max-width:768px){
+        .stats-grid{grid-template-columns:1fr}
+        .meeting-meta{grid-template-columns:1fr}
+        .toolbar-form input{min-width:0;width:100%}
+        .mobile-toggle,.mobile-state{display:flex;align-items:center;justify-content:center;gap:8px}
+        .mobile-toggle{min-height:42px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-weight:900;cursor:pointer}
+        .btn-soft,.mini-btn{width:100%}
+        .next-meeting{grid-template-columns:1fr}
+    }
+
+    .ai-summary-grid{display:grid;grid-template-columns:1.2fr .95fr;gap:16px;margin:16px 0 0}
+    .ai-summary-card{background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:22px;box-shadow:0 14px 30px rgba(15,23,42,.06);padding:18px}
+    .ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.92),rgba(255,255,255,.94))}
+    .ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,247,237,.92),rgba(255,255,255,.94))}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(139,0,0,.08);color:#7a1111;font-size:.77rem;font-weight:900}
+    .ai-title{margin-top:12px;font-size:1.02rem;font-weight:900;color:#111827;line-height:1.5}
+    .ai-text{margin-top:10px;color:#6b7280;font-size:.9rem;line-height:1.78}
+    .ai-bullets{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+    .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#4b5563;font-size:.86rem;line-height:1.7}
+    .ai-bullets i{font-size:.5rem;margin-top:.5rem;color:#8B0000}
+    .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+    .ai-action{border-radius:16px;padding:12px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+    .ai-action.tone-critical{background:rgba(254,242,242,.92);border-color:rgba(185,28,28,.14)}
+    .ai-action.tone-watch{background:rgba(255,247,237,.94);border-color:rgba(180,83,9,.14)}
+    .ai-action-label{color:#6b7280;font-size:.75rem;font-weight:800;margin-bottom:6px}
+    .ai-action-value{color:#111827;font-size:1.2rem;font-weight:900;line-height:1}
+    @media (max-width:1180px){.ai-summary-grid{grid-template-columns:1fr}}
+
+</style>
+
+<div class="meeting-shell bys-premium-page">
+    {{ premium_context_banner(
+        title='Geri bildirim görüşmeleri',
+        text='Yaklaşan, tamamlanan ve sizinle ilişkili görüşmeleri bu ekrandan takip edebilirsiniz.',
+        kicker='Performans görüşmeleri ve planlama',
+        icon='fa-solid fa-calendar-check',
+        badges=[
+            {'icon':'fa-solid fa-calendar-days','text':'Görünür kayıt: ' ~ visible_count, 'tone':'soft-red'},
+            {'icon':'fa-solid fa-clock','text':'Bugün: ' ~ (today.strftime('%d.%m.%Y') if today else '-'), 'tone':'soft-blue'},
+            {'icon':'fa-solid fa-filter','text':'Görünüm: ' ~ current_view, 'tone':'soft-green'}
+        ],
+        side_title='Sıradaki randevu',
+        side_text=((next_meeting.employee.ad ~ ' ' ~ next_meeting.employee.soyad ~ ' · ' ~ (next_meeting.meeting_date.strftime('%d.%m.%Y') if next_meeting.meeting_date else '-') ~ ' · ' ~ (next_meeting.location or 'Konum girilmedi')) if next_meeting else 'Yaklaşan yeni bir kayıt eklendiğinde burada gösterilir.')
+    ) }}
+
+    <div class="scope-strip"><div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için randevu akışı izleniyor.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;"><a href="{{ url_for('main.feedback_operations_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-wave-square"></i> Operasyon Paneli</a><span class="scope-pill"><i class="fa-solid fa-sitemap"></i> {{ visible_count or 0 }} görünür kayıt</span></div></div>
+
+    {{ premium_hub_strip(
+        active='meetings',
+        note='Randevu sistemi, performans modülünden kopuk bir ek sayfa gibi değil; mesajlaşma ve geri bildirim akışıyla aynı kurumsal hissi taşıyor.',
+        metric=visible_count ~ " görünür randevu",
+        secondary=upcoming_meetings|length ~ " yaklaşan kayıt"
+    ) }}
+    <div class="bys-metric-grid">
+        {{ premium_metric_card('Toplam Randevu', filter_counts.get('all', 0), 'fa-solid fa-calendar-week', 'Sistemde sizin görünümünüze düşen toplam kayıt.') }}
+        {{ premium_metric_card('Yaklaşan', filter_counts.get('upcoming', 0), 'fa-solid fa-hourglass-start', 'Bugün ve sonrası için planlı oturumlar.', tone='info') }}
+        {{ premium_metric_card('Tamamlanan', filter_counts.get('tamamlandi', 0), 'fa-solid fa-circle-check', 'Sonuçlandırılmış görüşmeler.', tone='success') }}
+        {{ premium_metric_card('Benim Akışım', filter_counts.get('my_managed', 0) + filter_counts.get('my_employee', 0), 'fa-solid fa-user-clock', 'Yönettiğiniz ve katıldığınız toplam randevu görünümü.') }}
+    </div>
+
+    {% call premium_action_shell('Filtreler ve görünüm kontrolü', 'Durum çipleri, arama alanı ve görünür kayıt sayacı aynı blokta toplandı. Personel yönetimi ekranındaki filtre ritmi burada da korundu.', 'fa-solid fa-filter') %}
+<div class="toolbar-card">
+        <button type="button" class="mobile-toggle" id="meetingToolbarToggle"><i class="fa-solid fa-sliders"></i> Filtreleri Aç / Kapat</button>
+        <div class="mobile-state" id="meetingToolbarState">Randevu filtreleri açık.</div>
+        <div class="toolbar-row">
+            <div class="chip-row">
+                {% for key, label in [('all','Tümü'), ('upcoming','Yaklaşan'), ('past','Geçmiş'), ('planlandi','Planlandı'), ('tamamlandi','Tamamlandı'), ('ertelendi','Ertelendi'), ('iptal_edildi','İptal'), ('my_managed','Yönettiğim'), ('my_employee','Katıldığım')] %}
+                    <a href="{{ url_for('main.feedback_meetings_list', view=key, q=search_query, scope=selected_scope) }}" class="chip-link {% if current_view == key %}active{% endif %}">{{ label }} <span class="chip-count">{{ filter_counts.get(key, 0) }}</span></a>
+                {% endfor %}
+            </div>
+            <form method="GET" class="toolbar-form">
+                <input type="hidden" name="scope" value="{{ selected_scope }}">
+                <input type="hidden" name="view" value="{{ current_view }}">
+                <input type="text" name="q" id="meetingSearchInput" value="{{ search_query }}" placeholder="Personel, yönetici, sicil, dönem veya not ara...">
+                <button type="submit" class="mini-btn"><i class="fa-solid fa-filter"></i> Filtrele</button>
+                {% if search_query or current_view != 'all' %}<a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="mini-btn"><i class="fa-solid fa-rotate-left"></i> Temizle</a>{% endif %}
+            </form>
+        </div>
+        <div class="toolbar-foot">
+            <div class="bys-premium-toolbar-hint"><i class="fa-solid fa-circle-info"></i><strong>İpucu:</strong> Kartın herhangi bir yerine tıklayarak detaya geçebilirsiniz.</div>
+            <span id="meetingVisibleCounter">{{ visible_count }} / {{ filter_counts.get(current_view, filter_counts.get('all', 0)) }} kayıt gösteriliyor.</span>
+            <span>Kartların dili personel yönetimi görünümüne yakın tutuldu; kim, ne zaman, nerede bilgisi tek bakışta görülsün diye.</span>
+        </div>
+        </div>
+        {{ premium_helper_note('Toplantı dilini sade tuttum: kim, ne zaman, hangi döneme bağlı ve sonraki adım hep aynı yerde duruyor. Böylece görüşme ekranı daha az yorar.', 'fa-solid fa-calendar-day') }}
+    {% endcall %}
+    {% if next_meeting %}
+    <div class="glass-card panel-card">
+        <div class="next-meeting">
+            <div>
+                <h4 class="next-title">Sıradaki planlı görüşme</h4>
+                <p class="next-text">{{ next_meeting.employee.ad }} {{ next_meeting.employee.soyad }} için {{ next_meeting.meeting_date.strftime('%d.%m.%Y') if next_meeting.meeting_date else '-' }} tarihinde {{ next_meeting.meeting_start.strftime('%H:%M') if next_meeting.meeting_start else '--:--' }}{% if next_meeting.meeting_end %} - {{ next_meeting.meeting_end.strftime('%H:%M') }}{% endif %} aralığında {{ next_meeting.meeting_type or 'görüşme' }} planı bulunuyor. Konum: {{ next_meeting.location or 'henüz girilmedi' }}.</p>
+            </div>
+            <a href="{{ url_for('main.feedback_meeting_detail', meeting_id=next_meeting.id, scope=selected_scope) }}" class="btn-soft primary"><i class="fa-solid fa-arrow-right"></i> Detaya Git</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="glass-card panel-card">
+        {% call list_workspace_panel(title='Yaklaşan randevular', text='Henüz zamanı gelmemiş veya bugün gerçekleşecek görüşmeler burada listelenir.', badge=upcoming_meetings|length ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-hourglass-start', note='Kartlarda kişi, zaman ve aksiyon bilgileri birlikte gösterilir.', note_icon='fa-solid fa-route') %}
+        {% if upcoming_meetings %}
+        <div class="meeting-list">
+            {% for meeting in upcoming_meetings %}
+            <div class="meeting-card" tabindex="0">
+                <div class="meeting-main">
+                    <div class="meeting-top">
+                        <div>
+                            <h5 class="meeting-name">{{ meeting.employee.ad }} {{ meeting.employee.soyad }}</h5>
+                            <div class="meeting-sub">Yönetici: {{ meeting.manager.ad }} {{ meeting.manager.soyad }}{% if meeting.employee.sicil_no %} · Sicil: {{ meeting.employee.sicil_no }}{% endif %}</div>
+                        </div>
+                        <div class="pill-row" style="margin-top:0;">
+                            <span class="status-pill {{ meeting.status }}">{{ meeting.status }}</span>
+                            <span class="soft-pill">{{ meeting.meeting_type or 'Tür girilmedi' }}</span>
+                        </div>
+                    </div>
+                    <div class="meeting-meta">
+                        <div class="meta-box"><div class="meta-label">Tarih / Saat</div><div class="meta-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }} · {{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div></div>
+                        <div class="meta-box"><div class="meta-label">Konum / Bağlantı</div><div class="meta-value">{{ meeting.location or 'Henüz girilmedi' }}</div></div>
+                        <div class="meta-box"><div class="meta-label">Dönem</div><div class="meta-value">{{ meeting.feedback_request.period.title if meeting.feedback_request and meeting.feedback_request.period else 'Dönem bilgisi yok' }}</div></div>
+                        <div class="meta-box"><div class="meta-label">Talep Durumu</div><div class="meta-value">{{ meeting.feedback_request.status if meeting.feedback_request else 'Talep bağlantısı yok' }}</div></div>
+                    </div>
+                    <div class="meeting-note">{{ meeting.note or 'Toplantı notu girilmemiş. Bu alan kısa bir hazırlık notu bırakmak için iyi çalışıyor.' }}</div>
+                </div>
+                <div class="meeting-side">
+                    <div class="meeting-side-card"><div class="meeting-side-label">Görünüm</div><div class="meeting-side-value">{% if meeting.manager_id == current_user.id %}Yönettiğiniz görüşme{% elif meeting.employee_id == current_user.id %}Katıldığınız görüşme{% else %}Kurumsal görünüm{% endif %}</div></div>
+                    <div class="meeting-actions">
+                        <a href="{{ url_for('main.feedback_meeting_detail', meeting_id=meeting.id, scope=selected_scope) }}" class="btn-soft primary"><i class="fa-solid fa-eye"></i> Detayı Aç</a>
+                        {% if meeting.feedback_request %}<a href="{{ url_for('main.manager_feedback_request_detail', request_id=meeting.feedback_request.id, scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-box"><i class="fa-solid fa-calendar-check"></i><h5 class="empty-title">Yaklaşan randevu görünmüyor</h5><p class="empty-text">Seçili filtre altında bugüne veya sonrasına düşen bir kayıt yok. Görünümü değiştirerek geçmiş ya da ertelenen kayıtları inceleyebilirsiniz.</p></div>
+        {% endif %}
+        {% endcall %}
+    </div>
+
+    <div class="glass-card panel-card">
+        {% call list_workspace_panel(title='Geçmiş ve kapanan oturumlar', text='Tamamlanan, ertelenen veya geçmiş tarihte kalmış görüşmeler bu bölümde durur. Kapanış dili de yaklaşan listeyle aynı omurgayı korur.', badge=past_meetings|length ~ ' kayıt', badge_tone='gold', icon='fa-solid fa-clock-rotate-left', note='Bu bölümde statü rozetleri daha belirgin tutuldu; böylece tamamlandı, ertelendi ve iptal edildi satırları tek bakışta ayrışır.', note_icon='fa-solid fa-layer-group') %}
+        {% if past_meetings %}
+        <div class="meeting-list">
+            {% for meeting in past_meetings %}
+            <div class="meeting-card" tabindex="0">
+                <div class="meeting-main">
+                    <div class="meeting-top">
+                        <div>
+                            <h5 class="meeting-name">{{ meeting.employee.ad }} {{ meeting.employee.soyad }}</h5>
+                            <div class="meeting-sub">Yönetici: {{ meeting.manager.ad }} {{ meeting.manager.soyad }} · {{ meeting.employee.birim or 'Birim bilgisi yok' }}</div>
+                        </div>
+                        <div class="pill-row" style="margin-top:0;">
+                            <span class="status-pill {{ meeting.status }}">{{ meeting.status }}</span>
+                            {% if meeting.feedback_request and meeting.feedback_request.period %}<span class="soft-pill">{{ meeting.feedback_request.period.title }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="meeting-meta">
+                        <div class="meta-box"><div class="meta-label">Tarih / Saat</div><div class="meta-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }} · {{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}</div></div>
+                        <div class="meta-box"><div class="meta-label">Konum</div><div class="meta-value">{{ meeting.location or 'Konum girilmedi' }}</div></div>
+                    </div>
+                    <div class="meeting-note">{{ meeting.note or 'Durum notu bulunmuyor.' }}</div>
+                </div>
+                <div class="meeting-side">
+                    <div class="meeting-side-card"><div class="meeting-side-label">Kapanış Duruşu</div><div class="meeting-side-value">{% if meeting.status == 'tamamlandi' %}Görüşme tamamlanmış durumda.{% elif meeting.status == 'ertelendi' %}Oturum ertelenmiş görünüyor.{% elif meeting.status == 'iptal_edildi' %}Randevu iptal edilmiş durumda.{% else %}Kayıt geçmiş görünüme düştü.{% endif %}</div></div>
+                    <div class="meeting-actions"><a href="{{ url_for('main.feedback_meeting_detail', meeting_id=meeting.id, scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-eye"></i> Detayı Aç</a></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-box"><i class="fa-solid fa-clock-rotate-left"></i><h5 class="empty-title">Geçmiş oturum görünmüyor</h5><p class="empty-text">Bu görünümde henüz kapanmış bir randevu yok.</p></div>
+        {% endif %}
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+    const shell = document.querySelector('.meeting-shell');
+    const toolbarToggle = document.getElementById('meetingToolbarToggle');
+    const toolbarState = document.getElementById('meetingToolbarState');
+    const searchInput = document.getElementById('meetingSearchInput');
+    const storageKey = 'bys360-meeting-toolbar-collapsed';
+
+    function syncToolbarState(){
+        if (!shell || !toolbarState || window.innerWidth > 768) return;
+        const collapsed = shell.classList.contains('filters-collapsed');
+        toolbarState.textContent = collapsed ? 'Filtreler kapalı.' : 'Filtreler açık.';
+    }
+
+    if (shell && window.innerWidth <= 768 && localStorage.getItem(storageKey) === '1') {
+        shell.classList.add('filters-collapsed');
+    }
+    syncToolbarState();
+
+    if (toolbarToggle && shell) {
+        toolbarToggle.addEventListener('click', function(){
+            shell.classList.toggle('filters-collapsed');
+            localStorage.setItem(storageKey, shell.classList.contains('filters-collapsed') ? '1' : '0');
+            syncToolbarState();
+        });
+    }
+
+    if (searchInput) {
+        document.addEventListener('keydown', function(event){
+            if (event.key === '/' && document.activeElement !== searchInput && !event.target.matches('input, textarea, select')) {
+                event.preventDefault();
+                searchInput.focus();
+            }
+        });
+    }
+
+    document.querySelectorAll('.meeting-card').forEach(function(card){
+        const primary = card.querySelector('.meeting-actions a');
+        if (!primary) return;
+        card.addEventListener('click', function(event){
+            if (event.target.closest('a, button, input, textarea, select, label, form')) return;
+            window.location.href = primary.getAttribute('href');
+        });
+        card.addEventListener('keydown', function(event){
+            if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, input, textarea, select, label, form')) {
+                event.preventDefault();
+                window.location.href = primary.getAttribute('href');
+            }
+        });
+    });
+})();
+</script>
+{% endblock %}

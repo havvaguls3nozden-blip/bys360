@@ -1,0 +1,26 @@
+[
+  {
+    "path": "OKU_BENI_BYS360_MOBILE_V2_8_80_PORTAL_HOME_APK.md",
+    "bytes": 1920
+  },
+  {
+    "path": "docs/BYS360_MOBILE_V2_8_80_PORTAL_HOME_APK_NOTLARI.md",
+    "bytes": 569
+  },
+  {
+    "path": "scripts/windows/repair_bys360_mobile_v2_8_80_portal_home_apk.ps1",
+    "bytes": 1439
+  },
+  {
+    "path": "scripts/windows/check_bys360_mobile_v2_8_80_portal_home_apk.ps1",
+    "bytes": 2450
+  },
+  {
+    "path": "scripts/windows/build_bys360_mobile_v2_8_80_portal_home_apk.ps1",
+    "bytes": 2267
+  },
+  {
+    "path": "scripts/windows/tools/mobile_portal_patch_v2_8_80.py",
+    "bytes": 21089
+  }
+]

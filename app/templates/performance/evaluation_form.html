@@ -1,0 +1,264 @@
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+<style>
+
+/* BYS360_PHASE5_3_MANAGER_SCORING_STYLE */
+.phase5-3-manager-context{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 18px}.phase5-3-manager-card{border:1px solid rgba(139,0,0,.12);border-radius:20px;background:rgba(255,255,255,.94);box-shadow:0 14px 28px rgba(15,23,42,.055);padding:16px;min-height:130px}.phase5-3-manager-label{display:flex;align-items:center;gap:8px;color:#8B0000;font-size:.76rem;font-weight:950;text-transform:uppercase;letter-spacing:.05em}.phase5-3-manager-value{margin-top:9px;color:#111827;font-size:1.06rem;font-weight:950;line-height:1.45}.phase5-3-manager-text{margin-top:8px;color:#4b5563;font-size:.88rem;line-height:1.65;white-space:pre-line}.phase5-3-manager-pill{display:inline-flex;align-items:center;gap:7px;margin-top:9px;border-radius:999px;padding:7px 10px;background:rgba(139,0,0,.08);border:1px solid rgba(139,0,0,.13);color:#7f1d1d;font-size:.78rem;font-weight:900}.phase5-3-rule-on{color:#166534;background:rgba(22,101,52,.08);border-color:rgba(22,101,52,.16)}.phase5-3-rule-off{color:#92400e;background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.20)}@media(max-width:1100px){.phase5-3-manager-context{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.phase5-3-manager-context{grid-template-columns:1fr}.phase5-3-manager-card{min-height:auto}}
+
+</style>
+{% extends "base.html" %}
+
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{% block title %}Performans Değerlendirme Formu - BYS360{% endblock %}
+{% block body_class %}
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+page-performance-form{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Performans Değerlendirme Formu{% endblock %}
+{% block page_subtitle %}
+Şeffaf değerlendirme kuralına uygun şekilde puan, yorum ve genel görüş alanlarını mobilde de rahat kullanın.
+{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz2_performance_mobile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3 py-lg-4 perf-form-shell">
+    <div class="perf-form-card">
+        <div class="perf-form-header">
+            <div>
+                <h3 class="perf-form-title">Görev özeti</h3>
+                <p class="perf-form-subtitle mb-0">
+                    {% if manager_level == 3 and not score_enabled %}
+                        3. amir bu dönemde sadece yorumcudur. Puan alanı kapalıdır.
+                    {% elif manager_level == 3 and score_enabled %}
+                        3. amir bu dönemde puan verebilir. Verilen puanlar ağırlıklı sonuca dahil edilir.
+                    {% else %}
+                        Lütfen tüm kriterleri eksiksiz değerlendiriniz. {% if phase5_3_comment_rule_from_settings %}1 ve 5 puanlarda açıklama zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="perf-badge soft">
+                    <i class="fa-solid fa-layer-group"></i>
+                    {% if manager_level == 1 %}1. Amir{% elif manager_level == 2 %}2. Amir{% elif manager_level == 3 and score_enabled %}3. Amir · Puanlayıcı{% elif manager_level == 3 %}3. Amir · Yorumcu{% else %}Tanımsız{% endif %}
+                </span>
+                <a href="{{ request.referrer or '/performans' }}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Geri Dön
+                </a>
+            </div>
+        </div>
+
+        {% if assignment %}
+        <div class="perf-summary-grid mt-3">
+            <div class="perf-stat-box">
+                <div class="perf-stat-label">Personel</div>
+                <div class="perf-stat-value">{{ employee.display_name }}</div>
+            </div>
+            <div class="perf-stat-box">
+                <div class="perf-stat-label">Birim</div>
+                <div class="perf-stat-value">{{ employee.birim or '-' }}</div>
+            </div>
+            <div class="perf-stat-box">
+                <div class="perf-stat-label">Dönem</div>
+                <div class="perf-stat-value">{{ period.title }}</div>
+            </div>
+            <div class="perf-stat-box">
+                <div class="perf-stat-label">Kriter sayısı</div>
+                <div class="perf-stat-value">{{ criteria_list|length if criteria_list else 0 }}</div>
+            </div>
+        </div>
+        <div class="perf-mini-grid mt-3">
+            <div class="perf-mini-box">
+                <div class="perf-mini-label">Puanlama kuralı</div>
+                <div class="perf-mini-value">{% if phase5_3_comment_rule_from_settings %}1 ve 5 puanlarda açıklama zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}</div>
+            </div>
+            <div class="perf-mini-box">
+                <div class="perf-mini-label">Genel görüş</div>
+                <div class="perf-mini-value">70 altı / 90 üstü için ayrıntılı not</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not assignment %}
+
+{% set phase5_3_comment_rule_from_settings = phase5_3_comment_rule_from_settings if phase5_3_comment_rule_from_settings is defined else true %}
+{% set phase5_3_interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+{% set phase5_3_interim_notes = phase5_3_interim_ctx.notes if phase5_3_interim_ctx.notes is defined else [] %}
+<section class="phase5-3-manager-context" data-bys360-marker="BYS360_PHASE5_3_MANAGER_SCORING_SCREEN" aria-label="Amir puanlama karar özeti">
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-eye"></i> Önceki Amir Puanı</div><div class="phase5-3-manager-value" data-bys360-marker="phase5_3_previous_manager_score">{% if previous_level_data %}{% for row in previous_level_data %}{% if row.score is not none %}{{ row.score }} / 5{% endif %}{% endfor %}{% else %}-{% endif %}</div><div class="phase5-3-manager-text">Önceki amir puanı, şeffaf değerlendirme gereği görünür.</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-comment-dots"></i> Önceki Amir Görüşü</div><div class="phase5-3-manager-text" data-bys360-marker="phase5_3_previous_manager_comment">{% if previous_level_data %}{% for row in previous_level_data %}{% if row.comment %}{{ row.comment }}{% endif %}{% endfor %}{% else %}Henüz önceki amir görüşü görünmüyor.{% endif %}</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-regular fa-note-sticky"></i> Dönem İçi Notlar</div><div class="phase5-3-manager-value" data-bys360-marker="phase5_3_interim_notes_reminder">{{ phase5_3_interim_notes|length }} not</div><div class="phase5-3-manager-text">Dönem içi notlar otomatik puan üretmez; yalnızca hatırlatma sağlar.</div></article>
+    <article class="phase5-3-manager-card"><div class="phase5-3-manager-label"><i class="fa-solid fa-asterisk"></i> Açıklama Zorunluluğu</div>{% if phase5_3_comment_rule_from_settings %}<span class="phase5-3-manager-pill phase5-3-rule-on" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar açık · 1 ve 5 puanlarda açıklama zorunludur</span>{% else %}<span class="phase5-3-manager-pill phase5-3-rule-off" data-bys360-marker="phase5_3_comment_rule_from_settings">Ayar kapalı · açıklama isteğe bağlı</span>{% endif %}<div class="phase5-3-manager-text">70 altı / 90 üstü genel görüş kuralı ayrıca korunur.</div></article>
+</section>
+
+        <div class="alert alert-warning shadow-sm mb-0">
+            <strong>Form oluşturulamadı.</strong><br>
+            Bu görev mevcut değil, size atanmadı ya da hiyerarşi eksik olduğu için değerlendirme formu üretilemedi.
+        </div>
+    {% else %}
+
+        {% if previous_level_data %}
+            <div class="perf-inline-card">
+                <div class="perf-prev-head">
+                    <div>
+                        <h4 class="perf-form-title mb-1">Önceki amir değerlendirmesi</h4>
+                        <div class="perf-muted">Sonraki amir, önceki amirin puanını ve kanaatini burada birlikte görür.</div>
+                    </div>
+                    <span class="perf-inline-badge">
+                        <i class="fa-solid fa-eye"></i>
+                        Şeffaf görünüm
+                    </span>
+                </div>
+
+                <div class="team-compare-table-wrap perf-prev-table-wrap mt-3">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kriter</th>
+                                    <th class="phase5_5_score_col">Puan</th>
+                                    <th>Yorum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in previous_level_data %}
+                                    <tr>
+                                        <td>{{ row.criteria_name }}</td>
+                                        <td>
+                                            {% if row.score is not none %}
+                                                {{ row.score }} / 5
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ row.comment or '-' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="perf-prev-cards mt-3">
+                    {% for row in previous_level_data %}
+                    <div class="perf-prev-card">
+                        <strong>{{ row.criteria_name }}</strong>
+                        <div class="perf-mobile-note">Puan: {% if row.score is not none %}{{ row.score }} / 5{% else %}-{% endif %}</div>
+                        <div class="perf-mobile-note">Yorum: {{ row.comment or '-' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not criteria_list %}
+            <div class="alert alert-warning mb-0">
+                Aktif kriter bulunamadı. Form kaydı yapılamaz.
+            </div>
+        {% else %}
+            <form method="post" action="{{ url_for('main.performance_v2_phase4_assignment', assignment_id=assignment.id) }}" class="perf-form-shell">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+
+                <div class="perf-inline-card mb-3" data-final-gate="degerlendirme-kriterleri">
+                    <div class="perf-prev-head">
+                        <div>
+                            <h4 class="perf-form-title mb-1">Değerlendirme Kriterleri</h4>
+                            <div class="perf-muted">Kriter bazlı puan, açıklama ve genel görüş alanları bu bölümde doldurulur.</div>
+                        </div>
+                        <span class="perf-inline-badge">
+                            <i class="fa-solid fa-list-check"></i>
+                            1–5 puan ölçeği
+                        </span>
+                    </div>
+                </div>
+
+                {% for criteria in criteria_list %}
+                    {% set existing_item = existing_items.get(criteria.id) %}
+                    {% set ns = namespace(prev=None) %}
+                    {% if previous_level_data %}
+                        {% for prev in previous_level_data %}
+                            {% if prev.criteria_name == criteria.name %}
+                                {% set ns.prev = prev %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <article class="perf-criteria-card">
+                        <div class="perf-criteria-head">
+                            <div>
+                                <h5 class="perf-criteria-title">{{ criteria.name }}</h5>
+                                <div class="perf-criteria-desc">{{ criteria.description or 'Açıklama girilmemiş.' }}</div>
+                            </div>
+                            <span class="perf-score-chip primary">Ağırlık %{{ criteria.weight }}</span>
+                        </div>
+
+                        {% if ns.prev %}
+                        <div class="perf-inline-card">
+                            <div class="perf-inline-list">
+                                <strong>Önceki amir kaydı:</strong>
+                                Puan {% if ns.prev.score is not none %}{{ ns.prev.score }} / 5{% else %}-{% endif %}
+                                · Yorum {{ ns.prev.comment or '-' }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="perf-criteria-grid">
+                            <div class="perf-meta-box">
+                                <div class="perf-meta-label">Puan</div>
+                                {% if score_enabled %}
+                                    <select name="score_{{ criteria.id }}" class="form-select" required>
+                                        <option value="">Seçiniz</option>
+                                        {% for point in [1, 2, 3, 4, 5] %}
+                                            <option value="{{ point }}" {% if existing_item and existing_item.score == point %}selected{% endif %}>{{ point }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <input type="text" class="form-control" value="Bu seviyede puan girişi kapalı" disabled>
+                                {% endif %}
+                                <div class="perf-meta-text mt-2">{% if phase5_3_comment_rule_from_settings %}1 ve 5 puanlarda açıklama zorunludur.{% else %}1 ve 5 puan açıklaması ayardan kapalıdır; gerekçe isteğe bağlıdır.{% endif %}</div>
+                            </div>
+
+                            <div class="perf-meta-box">
+                                <div class="perf-meta-label">Kriter Yorumu</div>
+                                <textarea name="comment_{{ criteria.id }}" class="form-control" rows="4" placeholder="Yorum giriniz...">{{ existing_item.comment if existing_item else '' }}</textarea>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+
+                <div class="perf-inline-card">
+                    <div class="perf-meta-label">Genel Görüş</div>
+                    <textarea
+                        name="general_comment"
+                        class="form-control"
+                        rows="5"
+                        placeholder="Genel değerlendirmenizi yazınız..."
+                    >{% if evaluation and manager_level == 1 %}{{ evaluation.level_1_general_comment or '' }}{% elif evaluation and manager_level == 2 %}{{ evaluation.level_2_general_comment or '' }}{% elif evaluation and manager_level == 3 %}{{ evaluation.level_3_general_comment or '' }}{% endif %}</textarea>
+                </div>
+
+                <div class="perf-form-actions">
+                    <div class="perf-form-actions__inner">
+                        <button type="submit" name="submit_mode" value="taslak" class="btn btn-outline-primary">
+                            <i class="fa-regular fa-floppy-disk"></i>
+                            Taslak Kaydet
+                        </button>
+                        <button type="submit" name="submit_mode" value="tamamla" class="btn btn-primary">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Değerlendirmeyi Tamamla
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/faz2_performance_mobile.js') }}"></script>
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

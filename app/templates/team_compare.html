@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Personel Analizi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Personel Analizi{% endblock %}
+{% block page_subtitle %}Personel bazlı puan, eşik, amir, durum ve yayın görünürlüğünü tek profesyonel analiz ekranında izleyin.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_reports_ai_pro.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+{% set st = stats if stats is defined and stats else {} %}
+<div class="bys-pro-shell">
+  <section class="bys-pro-hero">
+    <div class="bys-pro-hero-grid">
+      <div>
+        <div class="bys-pro-kicker"><i class="fa-solid fa-users-viewfinder"></i> Personel analizi</div>
+        <h1 class="bys-pro-title">Personel Analizi</h1>
+        <div class="bys-pro-hero-actions">
+          <a class="bys-pro-btn light" href="{{ url_for('main.performance_team_compare', period_id=selected_period_id, export='xlsx', scope=selected_scope, birim=selected_birim, durum=selected_status, quick=selected_quick, q=q) }}"><i class="fa-solid fa-file-excel"></i> Excel</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.team_performance_comparison_history') }}"><i class="fa-solid fa-timeline"></i> Personel Dönem Analizi</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.performance_reports') }}"><i class="fa-solid fa-chart-line"></i> Raporlar</a>
+        </div>
+      </div>
+      <aside class="bys-pro-hero-panel">
+        <div class="bys-pro-hero-panel-title">Analiz özeti</div>
+        <div class="bys-pro-hero-panel-main">{{ st.low_count|default(0, true) }} düşük eşik, {{ st.high_count|default(0, true) }} çok başarılı eşik kaydı var.</div>
+      </aside>
+    </div>
+  </section>
+
+  <form method="get" class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-toolbar">
+      <div class="bys-pro-field"><label>Arama</label><input type="text" name="q" value="{{ q|default('', true) }}" placeholder="Ad, sicil, birim, amir ara"></div>
+      <div class="bys-pro-field"><label>Dönem</label><select name="period_id"><option value="">Aktif / son dönem</option>{% for p in periods|default([]) %}<option value="{{ p.id }}" {% if selected_period_id == p.id %}selected{% endif %}>{{ p.title }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Kapsam</label><select name="scope">{% for opt in scope_options|default([]) %}<option value="{{ opt.value }}" {% if selected_scope == opt.value %}selected{% endif %}>{{ opt.label }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Birim</label><select name="birim"><option value="">Tümü</option>{% for b in birimler|default([]) %}<option value="{{ b }}" {% if selected_birim == b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Durum</label><select name="durum"><option value="">Tümü</option>{% for val,label in status_options|default([]) %}<option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+      <button class="bys-pro-action primary" type="submit"><i class="fa-solid fa-filter"></i> Uygula</button>
+    </div>
+    <div class="bys-pro-quick" style="margin-top:14px">
+      {% set quicks = [('','Tümü','fa-layer-group'),('low','70 altı','fa-triangle-exclamation'),('high','90 üstü','fa-star'),('in_progress','Devam eden','fa-hourglass-half'),('completed','Tamamlanan','fa-circle-check'),('employee_visible','Personele açık','fa-eye'),('locked','Kapalı','fa-lock')] %}
+      {% for key,label,icon in quicks %}<a class="{{ 'active' if selected_quick == key else '' }}" href="{{ url_for('main.performance_team_compare', period_id=selected_period_id, scope=selected_scope, birim=selected_birim, durum=selected_status, quick=key, q=q) }}"><i class="fa-solid {{ icon }}"></i>{{ label }}</a>{% endfor %}
+    </div>
+  </form>
+
+  <section class="bys-pro-stat-grid">
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Kayıt</div><div class="bys-pro-stat-value" data-bys-count>{{ st.row_count|default(0, true) }}</div><div class="bys-pro-stat-note">{{ scope_label|default('Yetkili kapsam', true) }}</div></div>
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Ortalama puan</div><div class="bys-pro-stat-value" data-bys-count>{{ st.avg_score|default(0, true) }}</div><div class="bys-pro-stat-note">En yüksek: {{ st.top_score|default(0, true) }}</div></div>
+    <div class="bys-pro-stat danger"><div class="bys-pro-stat-label">70 altı</div><div class="bys-pro-stat-value" data-bys-count>{{ st.low_count|default(0, true) }}</div><div class="bys-pro-stat-note">Yakın takip</div></div>
+    <div class="bys-pro-stat success"><div class="bys-pro-stat-label">90 üstü</div><div class="bys-pro-stat-value" data-bys-count>{{ st.high_count|default(0, true) }}</div><div class="bys-pro-stat-note">Çok başarılı</div></div>
+  </section>
+
+  <section class="bys-pro-two">
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Puan dağılımı</h2><p class="bys-pro-section-sub">Eşik bandına göre personel dağılımı.</p></div></div>
+      <div class="bys-pro-chart compact"><canvas data-bys-chart="doughnut" data-labels='{{ ["70 altı", "70-90", "90 üstü"]|tojson }}' data-datasets='{{ [{"label":"Dağılım","data":[st.low_count|default(0,true), st.mid_count|default(0,true), st.high_count|default(0,true)]}]|tojson }}'></canvas></div>
+    </div>
+    <div class="bys-pro-card bys-pro-card-pad bys-pro-ai">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Birim içgörüsü</h2><p class="bys-pro-section-sub">Birim ortalamaları ve risk işaretleri.</p></div><span class="bys-pro-chip">{{ birim_rankings|default([], true)|length }} birim</span></div>
+      <div class="bys-pro-list">
+        {% if top_avg_unit %}<div class="bys-pro-list-row"><div><strong>En yüksek ortalama</strong><span>{{ top_avg_unit.birim }} · {{ top_avg_unit.count }} kayıt</span></div><span class="bys-pro-badge high">{{ top_avg_unit.avg_score }}</span></div>{% endif %}
+        {% if risk_unit %}<div class="bys-pro-list-row"><div><strong>Yakın takip birimi</strong><span>{{ risk_unit.birim }} · 70 altı oranı {{ risk_unit.low_rate }}%</span></div><span class="bys-pro-badge low">{{ risk_unit.low_count }}</span></div>{% endif %}
+        {% if largest_unit %}<div class="bys-pro-list-row"><div><strong>En geniş kapsam</strong><span>{{ largest_unit.birim }}</span></div><span class="bys-pro-badge">{{ largest_unit.count }} kişi</span></div>{% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Personel analiz tablosu</h2><p class="bys-pro-section-sub">Amir puanları, görünür puan, yayın durumu ve dikkat sinyali.</p></div><span class="bys-pro-chip">{{ rows|default([], true)|length }} satır</span></div>
+    <div class="bys-pro-table-wrap"><table class="bys-pro-table"><thead><tr><th>Personel</th><th>Birim</th><th>1. Amir</th><th>2. Amir</th><th>1. Puan</th><th>2. Puan</th><th>Görünür puan</th><th>Durum</th><th>Yayın</th><th>Dikkat</th></tr></thead><tbody>{% for row in rows|default([]) %}<tr><td><div class="bys-pro-name">{{ row.employee_name }}</div><span class="bys-pro-muted">{{ row.sicil_no }}</span></td><td>{{ row.birim }}<span class="bys-pro-muted">{{ row.ust_birim }}</span></td><td>{{ row.level_1_name }}</td><td>{{ row.level_2_name }}</td><td>{{ row.level_1_total }}</td><td>{{ row.level_2_total }}</td><td><span class="bys-pro-badge {{ row.score_band }}">{{ row.final_total }}</span></td><td><span class="bys-pro-badge {{ row.status }}">{{ row.status_label }}</span></td><td><span class="bys-pro-badge {{ row.publish_badge_class }}">{{ row.publish_label }}</span></td><td><span class="bys-pro-badge {{ row.attention_class }}">{{ row.attention }}</span></td></tr>{% else %}<tr><td colspan="10"><div class="bys-pro-empty">Seçilen filtrelere uygun personel analizi kaydı bulunamadı.</div></td></tr>{% endfor %}</tbody></table></div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_reports_ai_pro.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}Performans Raporları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Raporlar{% endblock %}
+{% block page_subtitle %}Performans sonuçlarını, kapsam görünürlüğünü ve dönem eğilimlerini sade, okunur ve kurumsal bir raporlama yüzeyinde izleyin.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_performance_surfaces_elite_v2.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+{% set s = stats if stats is defined and stats else {} %}
+{% set cd = chart_data if chart_data is defined and chart_data else {} %}
+{% set scope = report_scope if report_scope is defined and report_scope else {} %}
+{% set surface = report_surface if report_surface is defined and report_surface else {} %}
+{% set cat = category_average_summary if category_average_summary is defined and category_average_summary else {} %}
+{% set cat_avg = cat.average if cat.average is defined and cat.average is not none else (cat.category_average if cat.category_average is defined and cat.category_average is not none else 0) %}
+<div class="bys-elite-shell" data-bys360-marker="BYS360_PHASE7_PREMIUM_REPORTS_SURFACE_V2">
+    <section class="bys-elite-hero">
+        <div class="bys-elite-hero-main">
+            <span class="bys-elite-kicker"><i class="fa-solid fa-chart-column"></i> Kurumsal raporlama yüzeyi</span>
+            <h2 class="bys-elite-hero-title">Performans raporları daha sade, daha güvenli ve daha okunur bir yapıda</h2>
+            <p class="bys-elite-hero-text">{{ surface.description|default('Dönem, kapsam, kategori, yayın hazırlığı ve temel performans eğilimleri tek ekranda izlenir. Görünürlük ve yetki kuralları korunurken yönetici kullanımını kolaylaştıran sade bir yüzey sunulur.', true) }}</p>
+            <div class="bys-elite-action-row">
+                <a class="bys-elite-btn soft" href="{{ url_for('main.performance_reports_export_excel', period_id=selected_period_id, q=q, category=selected_category) }}"><i class="fa-solid fa-file-excel"></i> Excel</a>
+                <a class="bys-elite-btn soft" href="{{ url_for('main.performance_reports_export_pdf', period_id=selected_period_id, q=q, category=selected_category) }}"><i class="fa-solid fa-file-pdf"></i> PDF</a>
+                <a class="bys-elite-btn soft" href="{{ url_for('main.performance_reports_print', period_id=selected_period_id, q=q, category=selected_category) }}"><i class="fa-solid fa-print"></i> Yazdır</a>
+                <a class="bys-elite-btn soft" href="{{ url_for('main.performance_team_compare', period_id=selected_period_id) }}"><i class="fa-solid fa-users-viewfinder"></i> Personel Analizi</a>
+            </div>
+        </div>
+        <aside class="bys-elite-highlight">
+            <div class="bys-elite-highlight-label">Aktif özet</div>
+            <div class="bys-elite-highlight-value">{{ s.low_score_count|default(0, true) }}</div>
+            <div class="bys-elite-highlight-title">70 altı kayıt</div>
+            <p class="bys-elite-highlight-note">{{ s.high_score_count|default(0, true) }} adet 90 üstü kayıt ve %{{ s.completion_rate|default(0, true) }} tamamlanma oranı ile birlikte izleniyor.</p>
+        </aside>
+    </section>
+
+    <section class="bys-elite-card bys-elite-pad">
+        <form method="get" class="bys-elite-filters">
+            {% if selected_scope_mode %}
+            <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+            {% endif %}
+            <div class="bys-elite-field bys-elite-field-wide">
+                <label for="report_q">Arama</label>
+                <input id="report_q" type="text" name="q" value="{{ q|default('', true) }}" placeholder="Personel, sicil veya birim ara">
+            </div>
+            <div class="bys-elite-field">
+                <label for="report_period">Dönem</label>
+                <select id="report_period" name="period_id">
+                    <option value="">Tüm dönemler</option>
+                    {% for p in periods|default([]) %}
+                    <option value="{{ p.id }}" {% if selected_period_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="bys-elite-field" data-bys360-marker="BYS360_PHASE2_REPORT_CATEGORY_FILTER">
+                <label for="report_category">Kategori</label>
+                <select id="report_category" name="category">
+                    <option value="">Tüm kategoriler</option>
+                    {% for category in category_options|default([]) %}
+                    <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="bys-elite-filter-actions">
+                <button type="submit" class="bys-elite-btn primary"><i class="fa-solid fa-filter"></i> Filtreyi Uygula</button>
+                <a href="{{ url_for('main.performance_reports') }}" class="bys-elite-btn ghost"><i class="fa-solid fa-rotate-left"></i> Sıfırla</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="bys-elite-stat-grid bys-elite-stat-grid-6">
+        <article class="bys-elite-stat-card">
+            <span class="bys-elite-stat-label">Kapsamdaki personel</span>
+            <strong class="bys-elite-stat-value">{{ s.total_people|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">{{ scope.scope_label|default('Yetkili kapsam', true) }}</span>
+        </article>
+        <article class="bys-elite-stat-card">
+            <span class="bys-elite-stat-label">Ortalama puan</span>
+            <strong class="bys-elite-stat-value">{{ s.overall_avg_score|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">Görünür sonuç ortalaması</span>
+        </article>
+        <article class="bys-elite-stat-card success">
+            <span class="bys-elite-stat-label">90 üstü</span>
+            <strong class="bys-elite-stat-value">{{ s.high_score_count|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">Yüksek başarı eşiği</span>
+        </article>
+        <article class="bys-elite-stat-card danger">
+            <span class="bys-elite-stat-label">70 altı</span>
+            <strong class="bys-elite-stat-value">{{ s.low_score_count|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">Yakın takip gerektiren kayıt</span>
+        </article>
+        <article class="bys-elite-stat-card">
+            <span class="bys-elite-stat-label">Tamamlanma oranı</span>
+            <strong class="bys-elite-stat-value">%{{ s.completion_rate|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">Görünür dönem toplamı</span>
+        </article>
+        <article class="bys-elite-stat-card">
+            <span class="bys-elite-stat-label">Yayınlanan dönem</span>
+            <strong class="bys-elite-stat-value">{{ s.published_period_count|default(0, true) }}</strong>
+            <span class="bys-elite-stat-note">Toplam {{ s.total_periods|default(0, true) }} dönem</span>
+        </article>
+    </section>
+
+    {% if selected_category %}
+    <section class="bys-elite-card bys-elite-pad" data-bys360-marker="BYS360_PHASE2_4_CATEGORY_AVERAGE_CARD">
+        <div class="bys-elite-section-head">
+            <div>
+                <span class="bys-elite-section-kicker">Kategori görünümü</span>
+                <h3>{{ selected_category }}</h3>
+                <p>Kategori ortalaması kişi detayı göstermeden, yalnızca toplu özet mantığıyla sunulur.</p>
+            </div>
+            <span class="bys-elite-badge neutral"><i class="fa-solid fa-user-shield"></i> Mahremiyet korunur</span>
+        </div>
+        <div class="bys-elite-stat-grid bys-elite-stat-grid-3">
+            <article class="bys-elite-stat-card emphasis">
+                <span class="bys-elite-stat-label">Kategori ortalaması</span>
+                <strong class="bys-elite-stat-value">{{ cat_avg }}</strong>
+                <span class="bys-elite-stat-note">Seçili filtrede toplulaştırılmış değer</span>
+            </article>
+            <article class="bys-elite-stat-card">
+                <span class="bys-elite-stat-label">Örnek sayısı</span>
+                <strong class="bys-elite-stat-value">{{ cat.sample_count|default(0, true) }}</strong>
+                <span class="bys-elite-stat-note">Kişi bazlı detay paylaşılmaz</span>
+            </article>
+            <article class="bys-elite-stat-card">
+                <span class="bys-elite-stat-label">Gizlilik notu</span>
+                <div class="bys-elite-text-block">{{ cat.privacy_note|default('Kategori ortalaması kişi detayı göstermeden hesaplanır; kişi detayı gösterilmez.', true) }}</div>
+            </article>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="bys-elite-grid bys-elite-grid-2">
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact">
+                <div>
+                    <span class="bys-elite-section-kicker">Eğilim</span>
+                    <h3>Dönemsel puan ve tamamlanma</h3>
+                    <p>Ortalama puan ile tamamlanma oranı birlikte izlenir.</p>
+                </div>
+            </div>
+            <div class="bys-elite-chart-wrap"><canvas id="bysReportsTrendChart"></canvas></div>
+        </article>
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact">
+                <div>
+                    <span class="bys-elite-section-kicker">Dağılım</span>
+                    <h3>Tamamlanma durumu</h3>
+                    <p>Görünür kayıtların tamamlanan, kısmi ve bekleyen dağılımı.</p>
+                </div>
+            </div>
+            <div class="bys-elite-chart-wrap donut"><canvas id="bysReportsStatusChart"></canvas></div>
+        </article>
+    </section>
+
+    <section class="bys-elite-grid bys-elite-grid-2">
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Öne çıkanlar</span><h3>Yüksek performans kayıtları</h3></div></div>
+            {% if top_people %}
+            <div class="bys-elite-list">
+                {% for row in top_people %}
+                <div class="bys-elite-list-row">
+                    <div>
+                        <strong>{{ row.name|default('-', true) }}</strong>
+                        <span>{{ row.birim|default('-', true) }} · {{ row.period_title|default('-', true) }}</span>
+                    </div>
+                    <span class="bys-elite-score-pill high">{{ row.score|default(0, true) }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bys-elite-empty">Bu filtrede öne çıkan kayıt bulunamadı.</div>
+            {% endif %}
+        </article>
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Yakın takip</span><h3>Düşük eşik tarafı</h3></div></div>
+            {% if low_people %}
+            <div class="bys-elite-list">
+                {% for row in low_people %}
+                <div class="bys-elite-list-row">
+                    <div>
+                        <strong>{{ row.name|default('-', true) }}</strong>
+                        <span>{{ row.birim|default('-', true) }} · {{ row.period_title|default('-', true) }}</span>
+                    </div>
+                    <span class="bys-elite-score-pill low">{{ row.score|default(0, true) }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bys-elite-empty">Yakın takip gerektiren kayıt bulunamadı.</div>
+            {% endif %}
+        </article>
+    </section>
+
+    <section class="bys-elite-grid bys-elite-grid-2">
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Kapsam sağlığı</span><h3>Görev ve zincir özeti</h3></div></div>
+            <div class="bys-elite-stat-grid bys-elite-stat-grid-4">
+                <div class="bys-elite-mini-box"><span>Muaf</span><strong>{{ coverage_stats.exempted|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box danger"><span>Kapsam dışı</span><strong>{{ coverage_stats.uncovered|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box warning"><span>Zincir uyarısı</span><strong>{{ coverage_stats.chain_issue|default(0, true) }}</strong></div>
+                <div class="bys-elite-mini-box success"><span>Vekâletli</span><strong>{{ coverage_stats.delegated|default(0, true) }}</strong></div>
+            </div>
+        </article>
+        <article class="bys-elite-card bys-elite-pad">
+            <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Kısa yorum</span><h3>Yönetici notları</h3></div></div>
+            <div class="bys-elite-note-list">
+                <div class="bys-elite-note-item"><strong>Yayın disiplini</strong><span>Yayın öncesi görünürlük ve onay süreçleri rapor ekranından kontrol edilmelidir.</span></div>
+                <div class="bys-elite-note-item"><strong>Eşik yönetimi</strong><span>70 altı ve 90 üstü sonuçlar açıklama ve süreç kontrolü açısından düzenli izlenmelidir.</span></div>
+                <div class="bys-elite-note-item"><strong>Kategori filtresi</strong><span>Kategori ortalaması yalnızca toplu özet verir; kişi detayı göstermez.</span></div>
+            </div>
+        </article>
+    </section>
+
+    {% if coverage_unit_rows %}
+    <section class="bys-elite-card bys-elite-pad">
+        <div class="bys-elite-section-head compact"><div><span class="bys-elite-section-kicker">Birim görünümü</span><h3>Birim bazlı kapsama özeti</h3></div></div>
+        <div class="bys-elite-table-wrap compact">
+            <table class="bys-elite-table compact">
+                <thead><tr><th>Birim</th><th>Toplam</th><th>Muaf</th><th>Kapsam dışı</th><th>Zincir uyarısı</th><th>Vekâletli</th></tr></thead>
+                <tbody>
+                    {% for row in coverage_unit_rows %}
+                    <tr>
+                        <td>{{ row.unit_name|default(row.name|default('-', true), true) }}</td>
+                        <td>{{ row.total|default(0, true) }}</td>
+                        <td>{{ row.exempted|default(0, true) }}</td>
+                        <td>{{ row.uncovered|default(0, true) }}</td>
+                        <td>{{ row.chain_issue|default(0, true) }}</td>
+                        <td>{{ row.delegated|default(0, true) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="bys-elite-card bys-elite-pad">
+        <div class="bys-elite-section-head">
+            <div>
+                <span class="bys-elite-section-kicker">Dönem tablosu</span>
+                <h3>Dönem bazlı performans görünümü</h3>
+                <p>Tamamlanma, ortalama puan ve eşik dağılımı birlikte gösterilir.</p>
+            </div>
+            <span class="bys-elite-badge neutral">{{ period_rows|length }} dönem</span>
+        </div>
+        <div class="bys-elite-table-wrap">
+            <table class="bys-elite-table">
+                <thead>
+                    <tr>
+                        <th>Dönem</th><th>Toplam</th><th>Tamamlanan</th><th>Kısmi</th><th>Bekleyen</th><th>Tamamlanma</th><th>Ortalama</th><th>70 altı</th><th>90 üstü</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in period_rows %}
+                    <tr>
+                        <td><div class="bys-elite-table-title">{{ row.title|default('-', true) }}</div></td>
+                        <td>{{ row.total_eval|default(0, true) }}</td>
+                        <td>{{ row.completed_eval|default(0, true) }}</td>
+                        <td>{{ row.partial_eval|default(0, true) }}</td>
+                        <td>{{ row.pending_eval|default(0, true) }}</td>
+                        <td>
+                            <div class="bys-elite-progress"><span style="width: {{ row.completion_rate|default(0, true) }}%"></span></div>
+                            <div class="bys-elite-progress-text">%{{ row.completion_rate|default(0, true) }}</div>
+                        </td>
+                        <td><span class="bys-elite-score-pill {% if row.avg_score|default(0, true) > 90 %}high{% elif row.avg_score|default(0, true) < 70 %}low{% else %}mid{% endif %}">{{ row.avg_score|default(0, true) }}</span></td>
+                        <td>{{ row.low_score_count|default(0, true) }}</td>
+                        <td>{{ row.high_score_count|default(0, true) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="9"><div class="bys-elite-empty">Seçili filtrelerde dönem raporu bulunamadı.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+<script>
+window.bys360PerformanceReportsData = {{ {
+    "labels": cd.labels|default([], true),
+    "avg_scores": cd.avg_scores|default([], true),
+    "completion_rates": cd.completion_rates|default([], true),
+    "status_distribution": cd.status_distribution|default([], true)
+}|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/bys360_performance_surfaces_elite_v2.js') }}"></script>
+{% endblock %}

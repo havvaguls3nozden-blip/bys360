@@ -1,0 +1,200 @@
+/* BYS360_MOBILE_APP_EXPERIENCE_V3
+   Ayarlar / Rol Matrisi / Personel ekranları için mobil app görünümü.
+   V1 genel omurga ve V2 performans katmanının üstüne çalışır.
+*/
+:root{
+  --bys360-v3-red:#8B0000;
+  --bys360-v3-red-soft:rgba(139,0,0,.08);
+  --bys360-v3-bg:#f5f6fa;
+  --bys360-v3-card:#fff;
+  --bys360-v3-text:#101828;
+  --bys360-v3-muted:#667085;
+  --bys360-v3-border:rgba(15,23,42,.11);
+  --bys360-v3-shadow:0 14px 34px rgba(15,23,42,.08);
+  --bys360-v3-radius:24px;
+}
+
+@media (max-width:900px){
+  body.bys360-mobile-v3{ background:var(--bys360-v3-bg)!important; overflow-x:hidden!important; }
+  body.bys360-mobile-v3 .content-wrap,
+  body.bys360-settings-mobile-v3 .content-wrap,
+  body.bys360-personnel-mobile-v3 .content-wrap{ padding:10px 10px 88px!important; max-width:100%!important; overflow-x:hidden!important; }
+
+  body.bys360-mobile-v3 .page-header,
+  body.bys360-mobile-v3 .page-hero,
+  body.bys360-mobile-v3 .settings-hero,
+  body.bys360-mobile-v3 .personnel-hero,
+  body.bys360-mobile-v3 .admin-hero{
+    border-radius:28px!important; padding:16px!important; margin-bottom:10px!important;
+    background:linear-gradient(145deg,#fff,rgba(139,0,0,.045))!important;
+    border:1px solid var(--bys360-v3-border)!important; box-shadow:var(--bys360-v3-shadow)!important;
+    overflow:hidden!important;
+  }
+  body.bys360-mobile-v3 h1{ font-size:1.35rem!important; line-height:1.18!important; letter-spacing:-.02em!important; }
+  body.bys360-mobile-v3 h2{ font-size:1.12rem!important; line-height:1.22!important; }
+  body.bys360-mobile-v3 h3{ font-size:1rem!important; line-height:1.25!important; }
+
+  .bys360-mobile-quicktabs-v3{
+    display:flex!important; gap:8px!important; overflow-x:auto!important; padding:4px 0 12px!important; margin:0 0 4px!important;
+    -webkit-overflow-scrolling:touch!important; scrollbar-width:none!important;
+  }
+  .bys360-mobile-quicktabs-v3::-webkit-scrollbar{ display:none!important; }
+  .bys360-mobile-quicktabs-v3 a{
+    flex:0 0 auto!important; min-height:38px!important; display:inline-flex!important; align-items:center!important; justify-content:center!important;
+    padding:8px 12px!important; border-radius:999px!important; background:#fff!important; border:1px solid var(--bys360-v3-border)!important;
+    color:#344054!important; font-weight:900!important; font-size:.80rem!important; text-decoration:none!important;
+    box-shadow:0 8px 18px rgba(15,23,42,.045)!important;
+  }
+  .bys360-mobile-quicktabs-v3 a.is-active{ background:var(--bys360-v3-red)!important; color:#fff!important; border-color:var(--bys360-v3-red)!important; }
+
+  /* Mobilde Bootstrap/tab yapıları satır taşırmasın */
+  body.bys360-mobile-v3 .nav-tabs,
+  body.bys360-mobile-v3 .nav-pills,
+  body.bys360-mobile-v3 .settings-tabs,
+  body.bys360-mobile-v3 .personnel-tabs{
+    display:flex!important; flex-wrap:nowrap!important; overflow-x:auto!important; gap:8px!important;
+    border:0!important; padding-bottom:8px!important; scrollbar-width:none!important;
+  }
+  body.bys360-mobile-v3 .nav-tabs::-webkit-scrollbar,
+  body.bys360-mobile-v3 .nav-pills::-webkit-scrollbar{ display:none!important; }
+  body.bys360-mobile-v3 .nav-tabs .nav-link,
+  body.bys360-mobile-v3 .nav-pills .nav-link{
+    white-space:nowrap!important; border-radius:999px!important; border:1px solid var(--bys360-v3-border)!important;
+    background:#fff!important; color:#344054!important; font-weight:900!important; padding:8px 12px!important;
+  }
+  body.bys360-mobile-v3 .nav-tabs .nav-link.active,
+  body.bys360-mobile-v3 .nav-pills .nav-link.active{ background:var(--bys360-v3-red)!important; color:#fff!important; }
+
+  .bys360-mobile-v3-hint{
+    border-radius:18px!important; background:rgba(139,0,0,.06)!important; border:1px solid rgba(139,0,0,.12)!important;
+    color:#7a1111!important; padding:10px 12px!important; margin:8px 0 10px!important; font-size:.84rem!important; font-weight:800!important;
+  }
+
+  /* Ayarlar / Personel kartları */
+  .bys360-mobile-v3-card,
+  body.bys360-mobile-v3 .card,
+  body.bys360-mobile-v3 .panel,
+  body.bys360-mobile-v3 .box,
+  body.bys360-mobile-v3 .summary-card,
+  body.bys360-mobile-v3 .metric-card,
+  body.bys360-mobile-v3 .user-card,
+  body.bys360-mobile-v3 .personnel-card,
+  body.bys360-mobile-v3 .profile-card{
+    border-radius:24px!important; border:1px solid var(--bys360-v3-border)!important; background:#fff!important;
+    box-shadow:var(--bys360-v3-shadow)!important; padding:14px!important; margin-bottom:10px!important;
+  }
+  body.bys360-mobile-v3 .card-body{ padding:0!important; }
+  body.bys360-mobile-v3 .card-header,
+  body.bys360-mobile-v3 .card-footer{ background:transparent!important; border-color:rgba(15,23,42,.08)!important; padding:10px 0!important; }
+
+  /* Filtre ve form alanları app hissi */
+  .bys360-mobile-v3-form,
+  .bys360-mobile-v3-filter-form,
+  body.bys360-mobile-v3 .filter-bar,
+  body.bys360-mobile-v3 .search-bar,
+  body.bys360-mobile-v3 .toolbar,
+  body.bys360-mobile-v3 .settings-filter,
+  body.bys360-mobile-v3 .personnel-filter{
+    border-radius:24px!important; border:1px solid var(--bys360-v3-border)!important; background:#fff!important;
+    box-shadow:0 10px 24px rgba(15,23,42,.055)!important; padding:12px!important; margin-bottom:10px!important;
+  }
+  body.bys360-mobile-v3 .row{ --bs-gutter-x:.65rem!important; --bs-gutter-y:.65rem!important; }
+  body.bys360-mobile-v3 input,
+  body.bys360-mobile-v3 select,
+  body.bys360-mobile-v3 textarea,
+  body.bys360-mobile-v3 .form-control,
+  body.bys360-mobile-v3 .form-select{
+    min-height:46px!important; border-radius:16px!important; font-size:16px!important; border-color:rgba(15,23,42,.14)!important;
+  }
+  body.bys360-mobile-v3 textarea{ min-height:112px!important; }
+  body.bys360-mobile-v3 label,
+  body.bys360-mobile-v3 .form-label{ font-weight:850!important; color:#344054!important; }
+
+  /* Geniş tablolar mobil kart olur */
+  body.bys360-mobile-v3 table.bys360-mobile-v3-card-table,
+  body.bys360-settings-mobile-v3 table.bys360-mobile-v3-card-table,
+  body.bys360-personnel-mobile-v3 table.bys360-mobile-v3-card-table{
+    min-width:0!important; width:100%!important; border-collapse:separate!important; border-spacing:0 10px!important;
+  }
+  table.bys360-mobile-v3-card-table thead{ display:none!important; }
+  table.bys360-mobile-v3-card-table tbody,
+  table.bys360-mobile-v3-card-table tr,
+  table.bys360-mobile-v3-card-table td{ display:block!important; width:100%!important; }
+  table.bys360-mobile-v3-card-table tr{
+    border-radius:22px!important; background:#fff!important; border:1px solid var(--bys360-v3-border)!important;
+    box-shadow:0 10px 24px rgba(15,23,42,.055)!important; padding:12px!important; margin-bottom:10px!important;
+  }
+  table.bys360-mobile-v3-card-table td{
+    border:0!important; border-bottom:1px dashed rgba(15,23,42,.10)!important; padding:9px 0!important;
+    display:flex!important; justify-content:space-between!important; align-items:flex-start!important; gap:14px!important; text-align:right!important;
+    word-break:break-word!important;
+  }
+  table.bys360-mobile-v3-card-table td:last-child{ border-bottom:0!important; }
+  table.bys360-mobile-v3-card-table td::before{
+    content:attr(data-label); color:#475467!important; font-weight:950!important; text-align:left!important; min-width:42%!important; padding-right:8px!important;
+  }
+  table.bys360-mobile-v3-card-table td .btn,
+  table.bys360-mobile-v3-card-table td button{ margin:2px!important; }
+
+  /* Rol matrisi: checkboxlar dokunmatik toggle hissi verir */
+  table.bys360-role-matrix-mobile-v3 td,
+  .bys360-mobile-toggle-cell-v3{ align-items:center!important; }
+  .bys360-mobile-toggle-v3,
+  table.bys360-role-matrix-mobile-v3 input[type="checkbox"],
+  table.bys360-role-matrix-mobile-v3 input[type="radio"]{
+    width:24px!important; height:24px!important; min-width:24px!important; accent-color:var(--bys360-v3-red)!important;
+  }
+  table.bys360-role-matrix-mobile-v3 td:has(input[type="checkbox"]),
+  table.bys360-role-matrix-mobile-v3 td:has(input[type="radio"]){
+    min-height:46px!important; align-items:center!important; background:rgba(139,0,0,.025)!important; border-radius:14px!important; padding:9px 10px!important;
+  }
+
+  /* Personel listeleri ve işlem butonları */
+  body.bys360-personnel-mobile-v3 .avatar,
+  body.bys360-personnel-mobile-v3 .profile-photo,
+  body.bys360-personnel-mobile-v3 img.rounded-circle{ width:44px!important; height:44px!important; object-fit:cover!important; }
+  body.bys360-mobile-v3 .badge,
+  body.bys360-mobile-v3 .status-badge{
+    border-radius:999px!important; padding:6px 9px!important; font-weight:850!important; white-space:normal!important;
+  }
+  body.bys360-mobile-v3 .btn,
+  body.bys360-mobile-v3 button,
+  body.bys360-mobile-v3 .button{
+    min-height:42px!important; border-radius:14px!important; font-weight:850!important;
+  }
+  body.bys360-mobile-v3 .btn-group{ display:flex!important; flex-wrap:wrap!important; gap:6px!important; }
+  body.bys360-mobile-v3 .btn-group>.btn{ flex:1 1 auto!important; }
+
+  /* Alt aksiyon alanı */
+  .bys360-mobile-v3-actionbar,
+  body.bys360-mobile-v3 .form-actions,
+  body.bys360-mobile-v3 .save-actions,
+  body.bys360-mobile-v3 .button-row{
+    position:sticky!important; bottom:0!important; z-index:62!important; margin:12px -10px -10px!important;
+    padding:10px 10px calc(10px + env(safe-area-inset-bottom))!important;
+    background:rgba(245,246,250,.94)!important; backdrop-filter:blur(16px)!important;
+    border-top:1px solid rgba(15,23,42,.09)!important; display:grid!important; grid-template-columns:1fr!important; gap:8px!important;
+  }
+  .bys360-mobile-v3-actionbar .btn,
+  body.bys360-mobile-v3 .form-actions .btn,
+  body.bys360-mobile-v3 .save-actions .btn,
+  body.bys360-mobile-v3 .button-row .btn{ width:100%!important; min-height:48px!important; }
+
+  /* Yatay taşma engeli */
+  body.bys360-mobile-v3 .table-responsive,
+  body.bys360-mobile-v3 .responsive-table,
+  body.bys360-mobile-v3 .dataTables_wrapper,
+  body.bys360-mobile-v3 .tab-content,
+  body.bys360-mobile-v3 main,
+  body.bys360-mobile-v3 .container,
+  body.bys360-mobile-v3 .container-fluid{ max-width:100%!important; overflow-x:hidden!important; }
+  body.bys360-mobile-v3 pre,
+  body.bys360-mobile-v3 code{ white-space:pre-wrap!important; word-break:break-word!important; }
+}
+
+@media (max-width:520px){
+  table.bys360-mobile-v3-card-table td{ flex-direction:column!important; align-items:stretch!important; text-align:left!important; gap:4px!important; }
+  table.bys360-mobile-v3-card-table td::before{ min-width:0!important; width:100%!important; }
+  body.bys360-mobile-v3 .btn-group>.btn,
+  body.bys360-mobile-v3 .btn{ width:100%!important; }
+}

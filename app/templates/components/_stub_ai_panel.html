@@ -1,0 +1,45 @@
+{% set panel = ai_stub_panel if ai_stub_panel is defined else none %}
+{% if panel and panel.enabled and not (access_denied is defined and access_denied) %}
+<style>
+.bys-ai-panel{--ai-red:#8B0000;--ai-line:rgba(15,23,42,.10);--ai-muted:#64748b;--ai-ink:#111827;--ai-card:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.14);border-radius:24px;background:linear-gradient(135deg,rgba(139,0,0,.055),rgba(255,255,255,.96));box-shadow:0 18px 42px rgba(15,23,42,.08);padding:20px;margin:16px 0;overflow:hidden;position:relative}.bys-ai-panel:after{content:"";position:absolute;right:-48px;top:-62px;width:180px;height:180px;border-radius:999px;background:rgba(139,0,0,.055);pointer-events:none}.bys-ai-panel-top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}.bys-ai-panel-main{display:flex;gap:13px;align-items:flex-start}.bys-ai-icon{width:42px;height:42px;border-radius:16px;background:rgba(139,0,0,.10);color:var(--ai-red);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}.bys-ai-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--ai-red);font-size:.76rem;font-weight:900;padding:6px 10px;margin-bottom:7px}.bys-ai-title{margin:0;color:var(--ai-ink);font-size:1.03rem;font-weight:950;letter-spacing:-.02em}.bys-ai-headline{margin:5px 0 0;color:#374151;line-height:1.55;font-weight:800}.bys-ai-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:14px;margin-top:15px;position:relative;z-index:1}.bys-ai-card{background:var(--ai-card);border:1px solid var(--ai-line);border-radius:18px;padding:14px}.bys-ai-card h4{margin:0 0 9px;color:var(--ai-ink);font-size:.9rem;font-weight:950}.bys-ai-list{margin:0;padding-left:18px;color:#374151;line-height:1.62;font-size:.9rem}.bys-ai-list li+li{margin-top:5px}.bys-ai-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.bys-ai-chip{border:1px solid var(--ai-line);background:#fff;border-radius:999px;padding:6px 9px;color:var(--ai-muted);font-size:.74rem;font-weight:850}.bys-ai-note{margin-top:10px;color:var(--ai-muted);font-size:.82rem;line-height:1.5}@media(max-width:900px){.bys-ai-panel-top{display:block}.bys-ai-grid{grid-template-columns:1fr}.bys-ai-panel{padding:16px}.bys-ai-panel-main{align-items:flex-start}}
+</style>
+<section class="bys-ai-panel" aria-label="AI karar destek paneli">
+  <div class="bys-ai-panel-top">
+    <div class="bys-ai-panel-main">
+      <div class="bys-ai-icon"><i class="{{ panel.icon or 'fa-solid fa-wand-magic-sparkles' }}"></i></div>
+      <div>
+        <div class="bys-ai-badge"><i class="fa-solid fa-shield-halved"></i> {{ panel.badge or 'Kurallı AI · Gerçek veri' }}</div>
+        <h3 class="bys-ai-title">{{ panel.title or 'AI Karar Destek' }}</h3>
+        <p class="bys-ai-headline">{{ panel.headline or 'Sayfadaki gerçek veriler üzerinden kurumsal karar destek notu üretildi.' }}</p>
+      </div>
+    </div>
+    <div class="bys-ai-meta">
+      <span class="bys-ai-chip">Dış bağlantı yok</span>
+      <span class="bys-ai-chip">İnsan onayı esastır</span>
+    </div>
+  </div>
+  <div class="bys-ai-grid">
+    <div class="bys-ai-card">
+      <h4>Öne Çıkan Değerlendirme</h4>
+      {% if panel.bullets %}
+      <ul class="bys-ai-list">
+        {% for item in panel.bullets %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <p class="bys-ai-note">Bu görünüm için ek değerlendirme satırı üretilmedi. Veri oluştukça panel daha ayrıntılı öneri sunar.</p>
+      {% endif %}
+    </div>
+    <div class="bys-ai-card">
+      <h4>Önerilen Sonraki Adım</h4>
+      {% if panel.actions %}
+      <ul class="bys-ai-list">
+        {% for item in panel.actions %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <p class="bys-ai-note">Sayfadaki kayıtları kontrol ederek süreci mevcut kurumsal akışa göre ilerletin.</p>
+      {% endif %}
+      <div class="bys-ai-note">{{ panel.meta.decision_boundary if panel.meta is defined and panel.meta.decision_boundary is defined else 'AI karar vermez; yetkili kullanıcıya destek sunar.' }}</div>
+    </div>
+  </div>
+</section>
+{% endif %}

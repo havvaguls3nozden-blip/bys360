@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}Başkan Onayları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Başkan Onayları{% endblock %}
+{% block page_subtitle %}70 altı nihai performans sonuçları yetkili onay tamamlanmadan kesinleşmez ve personele yayınlanmaz.{% endblock %}
+{% block content %}
+{# BYS360_PRESIDENT_APPROVALS_CORPORATE_UI_V3 #}
+{# BYS360_PRESIDENT_APPROVALS_TECHNICAL_LANGUAGE_CLEAN_V3 #}
+<style>
+.president-approval-page{display:flex;flex-direction:column;gap:18px}.pa-hero{position:relative;overflow:hidden;border:1px solid rgba(139,0,0,.13);border-radius:30px;background:linear-gradient(135deg,rgba(139,0,0,.10),rgba(255,255,255,.97) 58%,rgba(248,250,252,.95));box-shadow:0 24px 60px rgba(15,23,42,.08);padding:26px}.pa-hero:after{content:"";position:absolute;right:-90px;top:-110px;width:260px;height:260px;border-radius:999px;background:radial-gradient(circle,rgba(139,0,0,.12),rgba(139,0,0,0) 68%)}.pa-hero-inner{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}.pa-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.pa-title{font-size:clamp(1.7rem,2.8vw,2.45rem);font-weight:950;color:#111827;margin:8px 0 10px;line-height:1.08}.pa-lead{margin:0;color:#475569;line-height:1.7;max-width:880px}.pa-hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.pa-btn{border:0;border-radius:999px;padding:10px 14px;font-weight:950;display:inline-flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;white-space:nowrap}.pa-btn-primary{background:#8B0000;color:#fff}.pa-btn-soft{background:#fff;color:#334155;border:1px solid rgba(15,23,42,.10)}.pa-btn-green{background:#166534;color:#fff}.pa-btn-red{background:#8B0000;color:#fff}.pa-btn-danger{background:#991b1b;color:#fff}.pa-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.pa-summary-card{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:rgba(255,255,255,.96);box-shadow:0 18px 38px rgba(15,23,42,.055);padding:18px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.pa-summary-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:#64748b;font-weight:950}.pa-summary-value{font-size:2.1rem;font-weight:950;color:#111827;margin-top:8px}.pa-summary-icon{width:42px;height:42px;border-radius:16px;display:grid;place-items:center;background:rgba(139,0,0,.08);color:#8B0000}.pa-summary-card.ok .pa-summary-icon{background:rgba(22,101,52,.10);color:#166534}.pa-summary-card.warn .pa-summary-icon{background:rgba(180,83,9,.10);color:#92400e}.pa-board{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px}.pa-side{display:flex;flex-direction:column;gap:14px}.pa-panel{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:rgba(255,255,255,.96);box-shadow:0 16px 34px rgba(15,23,42,.05);padding:18px}.pa-panel-title{font-weight:950;color:#111827;margin:0 0 8px}.pa-panel-text{margin:0;color:#64748b;line-height:1.62;font-size:.92rem}.pa-steps{display:flex;flex-direction:column;gap:10px;margin-top:14px}.pa-step{display:flex;gap:10px;align-items:flex-start}.pa-step-dot{width:28px;height:28px;border-radius:999px;background:rgba(139,0,0,.09);color:#8B0000;display:grid;place-items:center;font-weight:950;flex:0 0 auto}.pa-step-title{font-weight:900;color:#111827;font-size:.9rem}.pa-step-note{color:#64748b;font-size:.8rem;line-height:1.45;margin-top:2px}.pa-toolbar{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:#fff;box-shadow:0 16px 34px rgba(15,23,42,.045);padding:14px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}.pa-tabs{display:flex;gap:8px;flex-wrap:wrap}.pa-tab{border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:9px 13px;text-decoration:none;color:#334155;font-weight:900;background:#fff}.pa-tab.active{background:#8B0000;color:#fff;border-color:#8B0000}.pa-search{display:flex;align-items:center;gap:8px;border:1px solid rgba(15,23,42,.10);border-radius:999px;padding:8px 12px;background:#f8fafc;min-width:min(100%,300px)}.pa-search input{border:0;outline:0;background:transparent;width:100%;font-weight:750;color:#334155}.pa-list{display:flex;flex-direction:column;gap:14px}.pa-record{border:1px solid rgba(15,23,42,.08);border-radius:26px;background:rgba(255,255,255,.98);box-shadow:0 18px 40px rgba(15,23,42,.055);overflow:hidden}.pa-record-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:18px;border-bottom:1px solid rgba(15,23,42,.06);background:linear-gradient(135deg,#fff,#f8fafc)}.pa-person{display:flex;gap:12px;align-items:flex-start}.pa-avatar{width:46px;height:46px;border-radius:18px;background:rgba(139,0,0,.09);display:grid;place-items:center;color:#8B0000;font-weight:950}.pa-name{font-weight:950;color:#111827;font-size:1.05rem}.pa-meta{color:#64748b;font-size:.84rem;line-height:1.55;margin-top:4px}.pa-status-stack{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}.pa-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 11px;font-weight:950;font-size:.82rem}.pa-pill.pending{background:rgba(139,0,0,.08);color:#8B0000}.pa-pill.ok{background:rgba(22,101,52,.09);color:#166534}.pa-pill.returned{background:rgba(180,83,9,.10);color:#92400e}.pa-pill.score-low{background:rgba(185,28,28,.08);color:#991b1b}.pa-pill.score-critical{background:rgba(127,29,29,.10);color:#7f1d1d}.pa-pill.score-muted{background:#f1f5f9;color:#475569}.pa-record-body{display:grid;grid-template-columns:1.1fr 1fr 250px;gap:16px;padding:18px}.pa-info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.pa-info{border:1px solid rgba(15,23,42,.07);border-radius:18px;background:#f8fafc;padding:11px}.pa-info-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:950}.pa-info-value{font-weight:900;color:#111827;margin-top:4px;font-size:.92rem}.pa-detail{border:1px solid rgba(15,23,42,.07);border-radius:18px;background:#fff;overflow:hidden}.pa-detail summary{list-style:none;cursor:pointer;padding:12px 14px;font-weight:950;color:#111827;background:#f8fafc;display:flex;justify-content:space-between;gap:12px}.pa-detail summary::-webkit-details-marker{display:none}.pa-detail-content{padding:12px 14px;display:flex;flex-direction:column;gap:9px}.pa-mini-card{border:1px solid rgba(15,23,42,.07);border-radius:14px;background:#fff;padding:10px}.pa-mini-title{font-weight:900;color:#111827;font-size:.88rem}.pa-mini-meta{color:#64748b;font-size:.78rem;line-height:1.45;margin-top:4px}.pa-flow-text{color:#475569;line-height:1.65;margin:0}.pa-actions{display:flex;flex-direction:column;gap:10px}.pa-actions textarea{width:100%;min-height:86px;border:1px solid rgba(15,23,42,.12);border-radius:16px;padding:10px 12px;resize:vertical;color:#334155}.pa-action-row{display:flex;gap:8px;flex-wrap:wrap}.pa-done{border:1px solid rgba(22,101,52,.12);border-radius:18px;background:rgba(22,101,52,.06);padding:12px;color:#166534;font-weight:900}.pa-delete-note{font-size:.75rem;color:#64748b;line-height:1.45}.pa-empty{border:1px dashed rgba(139,0,0,.24);border-radius:26px;background:rgba(255,255,255,.9);padding:34px;text-align:center}.pa-empty-title{font-size:1.15rem;font-weight:950;color:#111827;margin-bottom:8px}.pa-empty-text{color:#64748b;line-height:1.6;margin:0}.pa-hidden{display:none!important}@media(max-width:1180px){.pa-board{grid-template-columns:1fr}.pa-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.pa-record-body{grid-template-columns:1fr}}@media(max-width:760px){.pa-hero-inner,.pa-record-head{grid-template-columns:1fr}.pa-hero-actions,.pa-status-stack{justify-content:flex-start}.pa-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.pa-side{grid-template-columns:1fr}.pa-info-grid{grid-template-columns:1fr}.pa-toolbar{align-items:stretch}.pa-search{width:100%}}@media(max-width:520px){.pa-summary{grid-template-columns:1fr}.pa-hero{padding:20px}.pa-record-body{padding:14px}.pa-record-head{padding:14px}}
+</style>
+
+<div class="president-approval-page" data-president-approvals-page="1">
+  <section class="pa-hero">
+    <div class="pa-hero-inner">
+      <div>
+        <div class="pa-eyebrow"><i class="fa-solid fa-shield-halved"></i> Düşük Performans Onay Merkezi</div>
+        <h2 class="pa-title">Başkan Onayları</h2>
+        <p class="pa-lead">Nihai puanı 70’in altında kalan değerlendirmeler burada incelenir. Onay tamamlanmadan karne kesinleşmez, personele açılmaz ve yayın süreci ilerletilmez.</p>
+      </div>
+      <div class="pa-hero-actions">
+        <a class="pa-btn pa-btn-primary" href="{{ url_for('main.performance_president_approvals', status=status_filter, refresh=1) }}"><i class="fa-solid fa-rotate"></i> Listeyi Yenile</a>
+        <a class="pa-btn pa-btn-soft" href="/performans/surec-takibi"><i class="fa-solid fa-diagram-project"></i> Süreç Takibi</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pa-summary" aria-label="Başkan onayı özeti">
+    <article class="pa-summary-card"><div><div class="pa-summary-label">Toplam Düşük Performans</div><div class="pa-summary-value">{{ summary.total or 0 }}</div></div><div class="pa-summary-icon"><i class="fa-solid fa-layer-group"></i></div></article>
+    <article class="pa-summary-card warn"><div><div class="pa-summary-label">Onay Bekleyen</div><div class="pa-summary-value">{{ summary.pending or 0 }}</div></div><div class="pa-summary-icon"><i class="fa-solid fa-hourglass-half"></i></div></article>
+    <article class="pa-summary-card ok"><div><div class="pa-summary-label">Onaylanan</div><div class="pa-summary-value">{{ summary.approved or 0 }}</div></div><div class="pa-summary-icon"><i class="fa-solid fa-circle-check"></i></div></article>
+    <article class="pa-summary-card"><div><div class="pa-summary-label">İade Edilen</div><div class="pa-summary-value">{{ summary.returned or 0 }}</div></div><div class="pa-summary-icon"><i class="fa-solid fa-rotate-left"></i></div></article>
+  </section>
+
+  <section class="pa-board">
+    <aside class="pa-side">
+      <div class="pa-panel">
+        <h3 class="pa-panel-title">Onay akışı</h3>
+        <p class="pa-panel-text">Bu liste yalnızca gerçek düşük performans kayıtlarını gösterir. İnceleme, onay veya iade kararı kayıt altına alınır.</p>
+        <div class="pa-steps">
+          <div class="pa-step"><div class="pa-step-dot">1</div><div><div class="pa-step-title">Karne incelenir</div><div class="pa-step-note">Personel, dönem, puan ve amir görüşleri kontrol edilir.</div></div></div>
+          <div class="pa-step"><div class="pa-step-dot">2</div><div><div class="pa-step-title">Başkan kararı verilir</div><div class="pa-step-note">Uygunsa onaylanır; eksik varsa iade edilir.</div></div></div>
+          <div class="pa-step"><div class="pa-step-dot">3</div><div><div class="pa-step-title">Yayın sürecine geçer</div><div class="pa-step-note">Onay tamamlanmadan personel sonucu göremez.</div></div></div>
+        </div>
+      </div>
+      <div class="pa-panel">
+        <h3 class="pa-panel-title">Güvenli görünürlük</h3>
+        <p class="pa-panel-text">Ekranda yalnızca yetki kapsamındaki kayıtlar gösterilir. Teknik durum kodları yerine anlaşılır kurumsal ifadeler kullanılır.</p>
+      </div>
+    </aside>
+
+    <main class="pa-list-wrap">
+      <section class="pa-toolbar">
+        <div class="pa-tabs">
+          <a class="pa-tab {% if status_filter == 'pending' %}active{% endif %}" href="{{ url_for('main.performance_president_approvals', status='pending') }}">Bekleyenler</a>
+          <a class="pa-tab {% if status_filter == 'approved' %}active{% endif %}" href="{{ url_for('main.performance_president_approvals', status='approved') }}">Onaylananlar</a>
+          <a class="pa-tab {% if status_filter == 'returned' %}active{% endif %}" href="{{ url_for('main.performance_president_approvals', status='returned') }}">İade Edilenler</a>
+          <a class="pa-tab {% if status_filter == 'all' %}active{% endif %}" href="{{ url_for('main.performance_president_approvals', status='all') }}">Tümü</a>
+        </div>
+        <label class="pa-search" for="paRecordSearch"><i class="fa-solid fa-magnifying-glass"></i><input id="paRecordSearch" type="search" placeholder="Personel, sicil veya birim ara"></label>
+      </section>
+
+      {% if rows %}
+      <section class="pa-list" id="paRecordList" aria-label="Canlı düşük performans onay listesi">
+        {% for row in rows %}
+        <article class="pa-record" data-search="{{ (row.employee_name ~ ' ' ~ row.sicil_no ~ ' ' ~ row.birim ~ ' ' ~ row.period_title)|lower }}">
+          <div class="pa-record-head">
+            <div class="pa-person">
+              <div class="pa-avatar"><i class="fa-solid fa-user"></i></div>
+              <div>
+                <div class="pa-name">{{ row.employee_name }}</div>
+                <div class="pa-meta">Sicil: {{ row.sicil_no }} · {{ row.birim }}<br>{{ row.period_title }}</div>
+              </div>
+            </div>
+            <div class="pa-status-stack">
+              <span class="pa-pill {{ row.score_class }}"><i class="fa-solid fa-arrow-trend-down"></i> {{ row.final_score }} puan</span>
+              <span class="pa-pill {{ row.status_badge_class }}"><i class="fa-solid fa-stamp"></i> {{ row.visible_status }}</span>
+            </div>
+          </div>
+
+          <div class="pa-record-body">
+            <div>
+              <div class="pa-info-grid">
+                <div class="pa-info"><div class="pa-info-label">Onay Nedeni</div><div class="pa-info-value">{{ row.score_label }}</div></div>
+                <div class="pa-info"><div class="pa-info-label">Bekleme Durumu</div><div class="pa-info-value">{{ row.waiting_label }}</div></div>
+                <div class="pa-info"><div class="pa-info-label">Talep Tarihi</div><div class="pa-info-value">{{ row.requested_at }}</div></div>
+                <div class="pa-info"><div class="pa-info-label">Son İşlem</div><div class="pa-info-value">{{ row.last_action_at }}</div></div>
+              </div>
+              <div style="height:12px"></div>
+              <p class="pa-flow-text">{{ row.flow_summary }}</p>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <details class="pa-detail" open>
+                <summary>Süreç adımları <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="pa-detail-content">
+                  {% if row.flow_steps %}
+                    {% for step in row.flow_steps %}
+                    <div class="pa-mini-card"><div class="pa-mini-title">{{ step.title }}</div><div class="pa-mini-meta">{{ step.status }} · {{ step.date }}{% if step.actor != '-' %} · {{ step.actor }}{% endif %}</div>{% if step.summary %}<div class="pa-mini-meta">{{ step.summary }}</div>{% endif %}</div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="pa-mini-card"><div class="pa-mini-title">{{ row.current_stage }}</div><div class="pa-mini-meta">{{ row.current_owner_name }} · {{ row.last_action_title }}</div></div>
+                  {% endif %}
+                </div>
+              </details>
+
+              <details class="pa-detail">
+                <summary>Puanlama özeti <i class="fa-solid fa-chevron-down"></i></summary>
+                <div class="pa-detail-content">
+                  {% if row.scoring_history %}
+                    {% for item in row.scoring_history %}
+                    <div class="pa-mini-card"><div class="pa-mini-title">{{ item.scorer_name }} · {{ item.score }} puan</div><div class="pa-mini-meta">{{ item.manager_level }}. amir · {{ item.action_at }}</div><div class="pa-mini-meta">{{ item.status }}</div></div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="pa-mini-card"><div class="pa-mini-title">Puanlama özeti hazırlanıyor</div><div class="pa-mini-meta">Karne inceleme ekranında mevcut değerlendirme bilgileri ayrıca gösterilir.</div></div>
+                  {% endif %}
+                </div>
+              </details>
+            </div>
+
+            <div class="pa-actions">
+              <a data-bys360-scorecard-button="1" class="pa-btn pa-btn-soft" href="{{ url_for('main.performance_president_card_review', approval_id=row.approval_id) }}"><i class="fa-solid fa-id-card-clip"></i> Karneye Bak</a>
+              {% if row.approval_status_key in ['approved','returned'] %}
+                <div class="pa-done"><i class="fa-solid fa-circle-check"></i> İşlem tamamlandı</div>
+                {% if row.decision_note %}<div class="pa-meta">Karar notu: {{ row.decision_note }}</div>{% endif %}
+                {% if row.decided_at != '-' %}<div class="pa-meta">Karar tarihi: {{ row.decided_at }}</div>{% endif %}
+              {% else %}
+                <form method="post" class="pa-decision-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <textarea name="note" placeholder="Karar notu veya iade gerekçesi yazın"></textarea>
+                  <div class="pa-action-row">
+                    <button class="pa-btn pa-btn-green" type="submit" formaction="{{ url_for('main.performance_president_approval_approve', approval_id=row.approval_id) }}"><i class="fa-solid fa-check"></i> Onayla</button>
+                    <button class="pa-btn pa-btn-red" type="submit" formaction="{{ url_for('main.performance_president_approval_return', approval_id=row.approval_id) }}"><i class="fa-solid fa-rotate-left"></i> İade Et</button>
+                  </div>
+                </form>
+              {% endif %}
+
+              {% if can_delete_president_records %}
+                <form method="post" action="{{ url_for('main.performance_president_approval_delete', approval_id=row.approval_id) }}" onsubmit="return confirm('Bu kayıt Başkan Onayları listesinden kaldırılacak. Personel, karne ve puan verisi silinmez. Devam edilsin mi?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="status_filter" value="{{ status_filter }}">
+                  <button class="pa-btn pa-btn-danger" type="submit"><i class="fa-solid fa-trash-can"></i> Listeden Kaldır</button>
+                </form>
+                <div class="pa-delete-note">Bu işlem yalnızca eski veya yetim onay kayıtlarını listeden kaldırmak içindir.</div>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+      {% else %}
+      <section class="pa-empty">
+        <div class="pa-empty-title">{{ filter_label }} için kayıt bulunmuyor</div>
+        <p class="pa-empty-text">Bu bölümde yalnızca 70 altı gerçek düşük performans kayıtları gösterilir. Onay gerektiren yeni kayıt oluştuğunda listeye düşer.</p>
+      </section>
+      {% endif %}
+    </main>
+  </section>
+</div>
+
+<script>
+(function(){
+  const input = document.getElementById('paRecordSearch');
+  const list = document.getElementById('paRecordList');
+  if(!input || !list){ return; }
+  input.addEventListener('input', function(){
+    const q = (input.value || '').trim().toLowerCase();
+    list.querySelectorAll('.pa-record').forEach(function(card){
+      const text = card.getAttribute('data-search') || '';
+      card.classList.toggle('pa-hidden', q && !text.includes(q));
+    });
+  });
+})();
+</script>
+{% endblock %}
+
+<!-- BYS360_PRESIDENT_APPROVALS_CORPORATE_UI_V3 -->
+<!-- BYS360_PRESIDENT_APPROVALS_TECHNICAL_LANGUAGE_CLEAN_V3 -->

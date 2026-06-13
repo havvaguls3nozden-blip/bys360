@@ -1,0 +1,61 @@
+{% if ai_runtime_summary_url %}
+<section class="ai-runtime-card"
+         data-summary-url="{{ ai_runtime_summary_url }}"
+         data-secondary-url="{{ ai_runtime_secondary_url|default('', true) }}"
+         data-feedback-url-template="{{ url_for('main.ai_feedback', ai_request_log_id=0) }}"
+         data-csrf-token="{{ csrf_token() }}"
+         data-title="{{ ai_runtime_title|default('AI anlık özeti', true) }}"
+         data-description="{{ ai_runtime_description|default('Bu kayıt için istek üzerine AI özeti oluşturabilirsiniz.', true) }}">
+  <style>
+    .ai-runtime-card{display:grid;gap:14px;padding:18px 20px;border:1px solid rgba(139,0,0,.10);border-radius:22px;background:linear-gradient(180deg,rgba(139,0,0,.04),rgba(255,255,255,.98));box-shadow:0 16px 34px rgba(15,23,42,.06);margin-top:18px}
+    .ai-runtime-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .ai-runtime-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#7c0e0e;font-size:.8rem;font-weight:900}
+    .ai-runtime-title{margin-top:10px;font-size:1.04rem;font-weight:900;color:#111827}
+    .ai-runtime-desc{margin-top:6px;color:#64748b;line-height:1.7;font-size:.9rem}
+    .ai-runtime-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .ai-runtime-btn{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border:none;border-radius:14px;text-decoration:none;font-weight:800;cursor:pointer;background:#fff;color:#334155;border:1px solid rgba(15,23,42,.08)}
+    .ai-runtime-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;border:none}
+    .ai-runtime-btn:disabled{opacity:.55;cursor:wait}
+    .ai-runtime-body{display:grid;gap:12px}
+    .ai-runtime-state{padding:14px 16px;border-radius:16px;background:#fff;border:1px dashed rgba(139,0,0,.14);color:#64748b;line-height:1.7}
+    .ai-runtime-state.is-error{border-style:solid;border-color:rgba(185,28,28,.16);background:rgba(254,242,242,.92);color:#991b1b}
+    .ai-runtime-summary{padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#334155;line-height:1.8;white-space:pre-wrap}
+    .ai-runtime-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+    .ai-runtime-metric{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .ai-runtime-metric-label{font-size:.76rem;font-weight:800;color:#6b7280;text-transform:uppercase}
+    .ai-runtime-metric-value{margin-top:6px;font-size:1.08rem;font-weight:900;color:#111827}
+    .ai-runtime-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+    .ai-runtime-list li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.92);border:1px solid rgba(15,23,42,.06);color:#475569;line-height:1.65}
+    .ai-runtime-list li i{font-size:.5rem;margin-top:.5rem;color:#8B0000}
+    .ai-runtime-feedback{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+    .ai-runtime-feedback.visible{display:flex}
+    .ai-runtime-feedback-note{color:#64748b;font-size:.84rem}
+  </style>
+  <div class="ai-runtime-head">
+    <div>
+      <span class="ai-runtime-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_runtime_title|default('AI anlık özeti', true) }}</span>
+      <div class="ai-runtime-title">{{ ai_runtime_title|default('AI anlık özeti', true) }}</div>
+      <div class="ai-runtime-desc">{{ ai_runtime_description|default('Bu kayıt için istek üzerine AI özeti oluşturabilirsiniz.', true) }}</div>
+    </div>
+    <div class="ai-runtime-actions">
+      <button class="ai-runtime-btn primary" type="button" data-ai-run="summary"><i class="fa-solid fa-wand-magic-sparkles"></i>AI özeti üret</button>
+      {% if ai_runtime_secondary_url %}
+      <button class="ai-runtime-btn" type="button" data-ai-run="secondary"><i class="fa-solid fa-shield-check"></i>{{ ai_runtime_secondary_label|default('İkinci kontrol', true) }}</button>
+      {% endif %}
+    </div>
+  </div>
+  <div class="ai-runtime-body">
+    <div class="ai-runtime-state" data-ai-state>Henüz anlık AI çağrısı yapılmadı. İsterseniz yukarıdaki butonlardan biriyle bu kayıt için güncel özet oluşturabilirsiniz.</div>
+    <div class="ai-runtime-summary" data-ai-summary hidden></div>
+    <div class="ai-runtime-grid" data-ai-metrics hidden></div>
+    <ul class="ai-runtime-list" data-ai-list hidden></ul>
+    <div class="ai-runtime-feedback" data-ai-feedback>
+      <span class="ai-runtime-feedback-note">Bu çıktı faydalı oldu mu?</span>
+      <button class="ai-runtime-btn" type="button" data-ai-feedback-type="helpful"><i class="fa-solid fa-thumbs-up"></i>Faydalı</button>
+      <button class="ai-runtime-btn" type="button" data-ai-feedback-type="not_helpful"><i class="fa-solid fa-thumbs-down"></i>Geliştirilmeli</button>
+      <span class="ai-runtime-feedback-note" data-ai-feedback-result></span>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/ai_runtime_summary.js') }}"></script>
+</section>
+{% endif %}

@@ -1,0 +1,21 @@
+BYS360 Teknik Borç Final Kapanış V2.17.46
+
+Bu overlay uygulama dosyalarını değiştirmez.
+V2.17.45 raporunda URL rule / mobile rule / performance rule 0 göründüğü için overall_ok False oluşabiliyordu.
+Bu durum proje bozukluğu değil, kapanış raporu scriptinin URLMap çıktısını büyük JSON olarak okuyup kırpması nedeniyle oluşan ölçüm hatasıdır.
+
+V2.17.46 düzeltmesi:
+- URLMap büyük JSON yerine kompakt sayım olarak ölçülür.
+- Mobil rule, performans rule ve yazma rule sayıları yeniden doğrulanır.
+- OPTIONS dry-run sonuçları tekrar alınır.
+- compileall ve app_factory sağlık kontrolü korunur.
+- Uygulama kodu değiştirilmez.
+
+Kapanış kararı:
+- P0 tamamlandı.
+- P1 tamamlandı.
+- P2 tamamlandı.
+- P3 tamamlandı.
+- P4 ertelendi.
+- Yeni P fazı açılmayacak.
+- Hassas POST/yazma endpointlerine yetkili mobil token smoke testi olmadan dokunulmayacak.

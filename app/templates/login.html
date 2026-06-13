@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Giriş - BYS360</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/faz1_mobile_foundation.css') }}">
+
+    <style>
+        :root{
+            --bys-red:#8B0000;
+            --bys-red-dark:#650000;
+            --bys-text:#111827;
+            --bys-muted:#6b7280;
+            --bys-border:rgba(15,23,42,.10);
+        }
+
+        *{box-sizing:border-box}
+        html,body{height:100%}
+
+        body{
+            margin:0;
+            font-family:"Inter","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:28px 16px;
+            background:
+                radial-gradient(circle at top left, rgba(139,0,0,.10), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(139,0,0,.08), transparent 24%),
+                linear-gradient(180deg, #f7f8fb 0%, #eef1f6 100%);
+        }
+
+        .page-loader{
+            position:fixed;
+            inset:0;
+            z-index:99999;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(255,255,255,.94);
+            backdrop-filter:blur(8px);
+            transition:opacity .45s ease, visibility .45s ease;
+        }
+
+        .page-loader.hidden{
+            opacity:0;
+            visibility:hidden;
+            pointer-events:none;
+        }
+
+        .page-loader-inner{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:14px;
+            position:relative;
+        }
+
+        .page-loader-ring{
+            position:absolute;
+            width:208px;
+            height:208px;
+            border-radius:50%;
+            background:radial-gradient(circle, rgba(139,0,0,.10) 0%, rgba(139,0,0,.04) 42%, rgba(139,0,0,0) 72%);
+            animation:ringPulse 1.8s ease-in-out infinite;
+        }
+
+        .page-loader-logo{
+            position:relative;
+            z-index:2;
+            width:178px;
+            height:178px;
+            object-fit:contain;
+            animation:logoPulse 1.45s ease-in-out infinite;
+            filter:drop-shadow(0 10px 24px rgba(0,0,0,.14));
+        }
+
+        .page-loader-text{
+            position:relative;
+            z-index:2;
+            font-family:"Manrope","Inter","Segoe UI",sans-serif;
+            font-size:.96rem;
+            font-weight:700;
+            color:#8B0000;
+            letter-spacing:.01em;
+        }
+
+        .page-loader-bar{
+            position:relative;
+            z-index:2;
+            width:220px;
+            height:6px;
+            border-radius:999px;
+            overflow:hidden;
+            background:rgba(139,0,0,.10);
+        }
+
+        .page-loader-bar::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            width:40%;
+            border-radius:999px;
+            background:linear-gradient(90deg, rgba(139,0,0,.35), rgba(139,0,0,.9), rgba(139,0,0,.35));
+            animation:barFlow 1.2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse{
+            0%{transform:scale(.90); opacity:.86;}
+            50%{transform:scale(1.03); opacity:1;}
+            100%{transform:scale(.90); opacity:.86;}
+        }
+
+        @keyframes ringPulse{
+            0%{transform:scale(.92); opacity:.65;}
+            50%{transform:scale(1.06); opacity:1;}
+            100%{transform:scale(.92); opacity:.65;}
+        }
+
+        @keyframes barFlow{
+            0%{transform:translateX(-110%);}
+            100%{transform:translateX(290%);}
+        }
+
+        .login-shell{
+            width:min(1180px, 100%);
+            display:grid;
+            grid-template-columns:1.02fr .98fr;
+            gap:22px;
+            align-items:stretch;
+        }
+
+        .brand-panel,
+        .form-panel{
+            border-radius:30px;
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,.24);
+            box-shadow:0 24px 56px rgba(15,23,42,.12);
+        }
+
+        .brand-panel{
+            position:relative;
+            background:linear-gradient(145deg, rgba(139,0,0,.97) 0%, rgba(112,0,0,.96) 44%, rgba(64,64,64,.94) 100%);
+            color:#fff;
+            padding:38px 34px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:680px;
+        }
+
+        .brand-panel::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background-image:url("{{ url_for('static', filename='img/ay_yildiz.png') }}");
+            background-repeat:no-repeat;
+            background-position:center;
+            background-size:290px auto;
+            opacity:.10;
+            pointer-events:none;
+        }
+
+        .brand-inner{
+            position:relative;
+            z-index:2;
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            text-align:center;
+            background:#ffffff;
+            border-radius:28px;
+            padding:18px 12px;
+            box-shadow:0 18px 34px rgba(15,23,42,.16);
+        }
+
+        .brand-logo{
+            width:min(360px, 100%);
+            height:auto;
+            max-width:100%;
+            object-fit:contain;
+            margin-bottom:0;
+            filter:none;
+        }
+
+        .brand-inst-line{
+            font-family:"Manrope","Inter","Segoe UI",sans-serif;
+            font-size:1.18rem;
+            font-weight:800;
+            line-height:1.14;
+            color:#fff;
+            white-space:nowrap;
+            letter-spacing:.01em;
+        }
+
+        .brand-system{
+            margin-top:8px;
+            font-family:"Manrope","Inter","Segoe UI",sans-serif;
+            font-size:1rem;
+            font-weight:700;
+            line-height:1.12;
+            color:rgba(255,255,255,.92);
+            white-space:nowrap;
+            letter-spacing:.01em;
+        }
+
+        .brand-footer{
+            position:absolute;
+            left:34px;
+            right:34px;
+            bottom:28px;
+            text-align:center;
+            color:rgba(255,255,255,.80);
+            font-size:.82rem;
+            z-index:2;
+        }
+
+        .form-panel{
+            background:rgba(255,255,255,.90);
+            backdrop-filter:blur(18px);
+            padding:34px 30px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+        }
+
+        .panel-title{
+            font-size:1.72rem;
+            font-weight:900;
+            color:var(--bys-text);
+            line-height:1.2;
+            margin:0 0 20px 0;
+            text-align:center;
+        }
+
+        .flash-stack{
+            display:grid;
+            gap:10px;
+            margin-bottom:18px;
+        }
+
+        .flash-alert{
+            border:none;
+            border-radius:18px;
+            padding:14px 16px;
+            box-shadow:0 12px 26px rgba(15,23,42,.06);
+            font-size:.92rem;
+            font-weight:700;
+        }
+
+        .login-form{
+            display:grid;
+            gap:16px;
+        }
+
+        .form-group{
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+        }
+
+        .form-group label{
+            color:#374151;
+            font-size:.9rem;
+            font-weight:800;
+        }
+
+        .input-wrap{
+            position:relative;
+        }
+
+        .input-wrap i.left-icon{
+            position:absolute;
+            left:14px;
+            top:50%;
+            transform:translateY(-50%);
+            color:var(--bys-red);
+            font-size:.9rem;
+        }
+
+        .form-input{
+            width:100%;
+            min-height:52px;
+            border-radius:16px;
+            border:1px solid var(--bys-border);
+            background:#fff;
+            padding:12px 14px 12px 42px;
+            font:inherit;
+            color:#111827;
+            outline:none;
+            transition:all .18s ease;
+        }
+
+        .form-input.password-field{
+            padding-right:52px;
+        }
+
+        .form-input:focus{
+            border-color:rgba(139,0,0,.30);
+            box-shadow:0 0 0 4px rgba(139,0,0,.06);
+        }
+
+        .password-toggle{
+            position:absolute;
+            right:10px;
+            top:50%;
+            transform:translateY(-50%);
+            width:34px;
+            height:34px;
+            border:none;
+            border-radius:10px;
+            background:#f8fafc;
+            color:#6b7280;
+        }
+
+        .captcha-box{
+            border-radius:20px;
+            background:#f8fafc;
+            border:1px dashed rgba(15,23,42,.12);
+            padding:16px;
+        }
+
+        .captcha-title{
+            color:#111827;
+            font-size:.9rem;
+            font-weight:900;
+            margin-bottom:6px;
+        }
+
+        .captcha-question{
+            color:var(--bys-red);
+            font-size:1rem;
+            font-weight:900;
+            margin-bottom:10px;
+        }
+
+        .action-row{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            align-items:center;
+            margin-top:4px;
+        }
+
+        .btn-login{
+            min-height:52px;
+            border:none;
+            border-radius:16px;
+            padding:0 18px;
+            font-size:.94rem;
+            font-weight:900;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            transition:all .18s ease;
+        }
+
+        .btn-login.primary{
+            background:linear-gradient(180deg, var(--bys-red), var(--bys-red-dark));
+            color:#fff;
+            box-shadow:0 14px 28px rgba(139,0,0,.18);
+            flex:1 1 220px;
+        }
+
+        .btn-login.primary:hover{
+            transform:translateY(-1px);
+        }
+
+        .btn-login.secondary{
+            background:#eef2f7;
+            color:#374151;
+            border:1px solid rgba(15,23,42,.08);
+            flex:1 1 180px;
+        }
+
+        .login-footer{
+            margin-top:22px;
+            color:#6b7280;
+            font-size:.82rem;
+            line-height:1.7;
+            text-align:center;
+        }
+
+        @media (max-width: 980px){
+            .login-shell{
+                grid-template-columns:1fr;
+            }
+
+            .brand-panel{
+                min-height:360px;
+            }
+
+            .brand-logo{
+                width:min(300px, 100%);
+                height:auto;
+            }
+
+            .brand-inst-line{
+                font-size:1rem;
+            }
+
+            .brand-system{
+                font-size:.9rem;
+            }
+        }
+
+        @media (max-width: 640px){
+            body{
+                padding:16px 12px;
+            }
+
+            .brand-panel,
+            .form-panel{
+                border-radius:24px;
+            }
+
+            .brand-panel{
+                padding:26px 22px;
+            }
+
+            .form-panel{
+                padding:26px 20px;
+            }
+
+            .panel-title{
+                font-size:1.45rem;
+            }
+
+            .brand-inst-line{
+                font-size:.86rem;
+            }
+
+            .brand-system{
+                font-size:.76rem;
+            }
+
+            .page-loader-logo{
+                width:150px;
+                height:150px;
+            }
+
+            .page-loader-ring{
+                width:182px;
+                height:182px;
+            }
+
+            .page-loader-bar{
+                width:196px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_global_hardening.css') }}">
+</head>
+<body>
+<div id="pageLoader" class="page-loader">
+    <div class="page-loader-inner">
+        <div class="page-loader-ring"></div>
+        <img src="{{ url_for('static', filename='img/bys360.svg') }}"
+             alt="Yükleniyor"
+             class="page-loader-logo"
+             onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+        <div class="page-loader-text">Lütfen bekleyiniz...</div>
+        <div class="page-loader-bar"></div>
+    </div>
+</div>
+
+<div class="login-shell">
+    <section class="brand-panel">
+        <div class="brand-inner">
+            <img src="{{ url_for('static', filename='img/bys360.svg') }}"
+                 alt="BYS360 Logo"
+                 class="brand-logo"
+                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+        </div>
+
+        <div class="brand-footer">
+            © 2026 Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı
+        </div>
+    </section>
+
+    <section class="form-panel">
+        <h1 class="panel-title">Sisteme Giriş</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-stack">
+                    {% for category, message in messages %}
+                        <div class="alert flash-alert
+                            {% if category == 'success' %}alert-success
+                            {% elif category == 'warning' %}alert-warning
+                            {% elif category == 'danger' or category == 'error' %}alert-danger
+                            {% else %}alert-info{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="login-form" autocomplete="off">
+            {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
+
+            <div class="form-group">
+                <label>Sicil No veya E-Posta</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-user left-icon"></i>
+                    <input
+                        type="text"
+                        name="sicil_or_email"
+                        class="form-input"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Şifre</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock left-icon"></i>
+                    <input
+                        type="password"
+                        name="password"
+                        id="passwordField"
+                        class="form-input password-field"
+                        required>
+                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Şifreyi Göster/Gizle">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            {% if captcha_required %}
+            <div class="captcha-box">
+                <div class="captcha-title">Doğrulama</div>
+                <div class="captcha-question">{{ captcha_question }}</div>
+
+                <div class="form-group mb-0">
+                    <label>Sonuç</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-shield-halved left-icon"></i>
+                        <input
+                            type="text"
+                            name="captcha_answer"
+                            class="form-input"
+                            required>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="action-row">
+                <button type="submit" class="btn-login primary">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Giriş Yap
+                </button>
+
+                <a href="{{ url_for('main.forgot_password') }}" class="btn-login secondary">
+                    <i class="fa-solid fa-key"></i>
+                    Şifremi Unuttum
+                </a>
+            </div>
+        </form>
+
+        <div class="login-footer">BYS360</div>
+    </section>
+</div>
+
+<script>
+    (function(){
+        const passwordField = document.getElementById('passwordField');
+        const toggleButton = document.getElementById('togglePassword');
+
+        if(toggleButton && passwordField){
+            toggleButton.addEventListener('click', function(){
+                const isPassword = passwordField.getAttribute('type') === 'password';
+                passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+                toggleButton.innerHTML = isPassword
+                    ? '<i class="fa-solid fa-eye-slash"></i>'
+                    : '<i class="fa-solid fa-eye"></i>';
+            });
+        }
+    })();
+
+    (function () {
+        let hidden = false;
+        const hideLoader = () => {
+            if (hidden) return;
+            hidden = true;
+            const loader = document.getElementById("pageLoader");
+            if (!loader) return;
+            loader.classList.add("hidden");
+            setTimeout(() => {
+                if (loader && loader.parentNode) {
+                    loader.parentNode.removeChild(loader);
+                }
+            }, 180);
+        };
+
+        const scheduleHide = () => {
+            window.requestAnimationFrame(() => {
+                setTimeout(hideLoader, 120);
+            });
+        };
+
+        if (document.readyState === "interactive" || document.readyState === "complete") {
+            scheduleHide();
+        } else {
+            document.addEventListener("DOMContentLoaded", scheduleHide, { once: true });
+        }
+
+        window.addEventListener("load", hideLoader, { once: true });
+        setTimeout(hideLoader, 1800);
+    })();
+</script>
+    <script src="{{ url_for('static', filename='js/mobile_global_hardening.js') }}"></script>
+</body>
+</html>

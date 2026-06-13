@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}AI Yönetişim Merkezi - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Yönetişim Merkezi{% endblock %}
+{% block page_subtitle %}Kalite eşiği, backlog ve geri bildirim yükünü yönetsel alarm mantığıyla yorumlar.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-3" method="get">
+    <div class="col-md-2"><label class="form-label">Pencere</label><input class="form-control" type="number" name="lookback_days" min="1" max="180" value="{{ selected_lookback_days }}"></div>
+    <div class="col-md-2"><label class="form-label">Modül eşiği</label><input class="form-control" type="number" name="module_quality_floor" min="20" max="95" value="{{ selected_module_quality_floor }}"></div>
+    <div class="col-md-2"><label class="form-label">İstem eşiği</label><input class="form-control" type="number" name="prompt_quality_floor" min="20" max="95" value="{{ selected_prompt_quality_floor }}"></div>
+    <div class="col-md-2"><label class="form-label">Backlog limiti</label><input class="form-control" type="number" name="backlog_limit" min="1" max="200" value="{{ selected_backlog_limit }}"></div>
+    <div class="col-md-2"><label class="form-label">Negatif limit</label><input class="form-control" type="number" name="negative_feedback_limit" min="1" max="50" value="{{ selected_negative_feedback_limit }}"></div>
+    <div class="col-md-2 d-flex align-items-end gap-2"><button class="btn btn-catab w-100">Uygula</button><a class="btn btn-outline-secondary w-100" href="{{ url_for('main.admin_ai_governance_hub_export', lookback_days=selected_lookback_days, module_quality_floor=selected_module_quality_floor, prompt_quality_floor=selected_prompt_quality_floor, backlog_limit=selected_backlog_limit, negative_feedback_limit=selected_negative_feedback_limit) }}">CSV</a></div>
+  </form>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="glass-card p-3"><div class="small text-muted">Yönetişim skoru</div><div class="fs-3 fw-bold">{{ summary.governance_score or 0 }}</div></div></div>
+  <div class="col-md-3"><div class="glass-card p-3"><div class="small text-muted">Kritik alarm</div><div class="fs-3 fw-bold">{{ summary.critical_alert_total or 0 }}</div></div></div>
+  <div class="col-md-3"><div class="glass-card p-3"><div class="small text-muted">Uyarı</div><div class="fs-3 fw-bold">{{ summary.warning_alert_total or 0 }}</div></div></div>
+  <div class="col-md-3"><div class="glass-card p-3"><div class="small text-muted">Açık öneri</div><div class="fs-3 fw-bold">{{ summary.open_recommendations or 0 }}</div></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7"><div class="glass-card p-4"><h4 class="mb-3">Alarm listesi</h4><div class="list-group">{% for row in all_alerts %}<div class="list-group-item border rounded-4 mb-2"><div class="d-flex justify-content-between align-items-start gap-2"><div><div class="fw-bold">{{ row.title }}</div><div class="small text-muted mt-1">{{ row.body }}</div></div><span class="badge text-bg-{% if row.severity == 'critical' %}danger{% elif row.severity == 'warning' %}warning{% else %}secondary{% endif %}">{{ row.severity }}</span></div></div>{% else %}<div class="text-muted">Alarm oluşmadı.</div>{% endfor %}</div></div></div>
+  <div class="col-lg-5"><div class="glass-card p-4"><h4 class="mb-3">Öncelikli aksiyonlar</h4><div class="list-group">{% for row in actions %}<div class="list-group-item border rounded-4 mb-2"><div class="fw-bold">{{ row.title }}</div><div class="small text-muted mt-1">{{ row.body }}</div>{% if row.href %}<a class="btn btn-sm btn-outline-secondary mt-2" href="{{ row.href }}">{{ row.label or 'Aç' }}</a>{% endif %}</div>{% else %}<div class="text-muted">Aksiyon önerisi yok.</div>{% endfor %}</div></div></div>
+</div>
+{% endblock %}

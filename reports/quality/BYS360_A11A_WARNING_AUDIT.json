@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-06-12T20:30:26",
+  "phase": "A11A_WARNING_AUDIT",
+  "mode": "audit_only",
+  "ok": true,
+  "decision": "A11A_WARNING_AUDIT_GREEN",
+  "pytest_returncode": 0,
+  "pytest_summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "raw_pytest_output": "reports\\quality\\BYS360_A11A_WARNING_AUDIT_RAW_PYTEST.txt",
+  "extracted_warning_line_count": 2,
+  "warning_item_count": 2,
+  "by_family": {
+    "resource_warning": 2
+  },
+  "by_category": {
+    "ResourceWarning": 2
+  },
+  "by_path_top_30": {
+    "C:\\bys360\\project\\app\\bootstrap\\startup.py": 2
+  },
+  "grouped": {
+    "resource_warning": [
+      {
+        "path": "C:\\bys360\\project\\app\\bootstrap\\startup.py",
+        "line_no": 22,
+        "category": "ResourceWarning",
+        "message": "unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>",
+        "family": "resource_warning",
+        "fix_strategy": "Açık dosya/socket/session kapatma akışı netleştirilmeli.",
+        "raw": "C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>",
+        "context": "tests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated."
+      },
+      {
+        "path": "C:\\bys360\\project\\app\\bootstrap\\startup.py",
+        "line_no": 22,
+        "category": "ResourceWarning",
+        "message": "unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>",
+        "family": "resource_warning",
+        "fix_strategy": "Açık dosya/socket/session kapatma akışı netleştirilmeli.",
+        "raw": "C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>",
+        "context": "tests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated."
+      }
+    ]
+  },
+  "next_action": "A11B: En büyük warning ailesi seçilip güvenli düzeltme uygulanacak. Kod değiştirmeden önce uyarı ailesi netleşti."
+}

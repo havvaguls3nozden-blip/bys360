@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}İletişim ve Anket Yönetimi | Raporlar{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Yönetici Rapor Merkezi</h2>
+      <div class="text-muted">Özet üretimi, geçmiş raporlar ve karar destek görünümü</div>
+    </div>
+    <form method="post" action="{{ url_for('main.communication_phase4_report_create') }}" class="d-flex flex-wrap gap-2">
+      <select name="report_type" class="form-select">
+        <option value="weekly_summary">Haftalık Özet</option>
+        <option value="executive_brief">Yönetici Brifi</option>
+        <option value="scorecard">Skor Kartı</option>
+      </select>
+      <select name="days" class="form-select">
+        {% for day in [14, 30, 60, 90] %}
+          <option value="{{ day }}" {% if payload.days == day %}selected{% endif %}>Son {{ day }} gün</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-danger">Özet üret</button>
+    </form>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Anket Sayısı</div><div class="display-6">{{ payload.headline.survey_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">İlk Yanıt SLA Riski</div><div class="display-6">{{ payload.headline.overdue_first_response }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Çözüm SLA Riski</div><div class="display-6">{{ payload.headline.overdue_resolution }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Öneri Sayısı</div><div class="display-6">{{ payload.recommendations|length }}</div></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Anket görünümü</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Anket</th><th>Atama</th><th>Tamamlanan</th><th>Oran</th><th>Durum</th></tr></thead>
+            <tbody>
+              {% for row in payload.survey_metrics %}
+              <tr>
+                <td>{{ row.title }}</td>
+                <td>{{ row.assignments }}</td>
+                <td>{{ row.completed }}</td>
+                <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td>
+                <td>{{ row.status }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" class="text-muted">Kayıt bulunamadı.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Son üretilen raporlar</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Durum</th><th>Oluşturan</th><th>Tarih</th><th></th></tr></thead>
+            <tbody>
+              {% for row in history.rows %}
+              <tr>
+                <td>{{ row.title }}</td>
+                <td>{{ row.status }}</td>
+                <td>{{ row.created_by }}</td>
+                <td>{{ row.created_at }}</td>
+                <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.communication_phase4_report_detail', report_id=row.id) }}">Aç</a></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="5" class="text-muted">Henüz rapor oluşturulmadı.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header"><strong>Yönetici önerileri</strong></div>
+    <div class="card-body">
+      {% if payload.recommendations %}
+        <div class="row g-3">
+          {% for item in payload.recommendations %}
+            <div class="col-lg-6"><div class="border rounded p-3 h-100">{{ item }}</div></div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted">Öneri oluşturulmadı.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

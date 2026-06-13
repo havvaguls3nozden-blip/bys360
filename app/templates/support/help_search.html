@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Yardım Merkezi Arama{% endblock %}
+{% block page_kicker %}Yardım Merkezi{% endblock %}
+{% block page_title %}Arama Sonuçları{% endblock %}
+{% block page_subtitle %}İşlem, modül veya hata mesajına göre rehber arayın.{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_support_learning.css') }}">
+<div class="support-learning-shell">
+  {% set current_view_key = 'support_index' %}
+  {% include 'support/_tabs.html' %}
+  <section class="support-panel">
+    <form class="support-search" method="get" action="{{ url_for('main.support_help_search') }}">
+      <input class="support-input" type="text" name="q" value="{{ search_query or '' }}" placeholder="personel raporları, destek talebi, AI karar destek, menü, CSRF...">
+      <button class="support-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Ara</button>
+    </form>
+    <div class="support-chip-row">
+      {% for query in ['destek talebi','personel raporları','performans dönemi','nabız analitiği','AI özet','menü yetkisi','CSRF'] %}
+      <a class="support-chip" href="{{ url_for('main.support_help_search', q=query) }}"><i class="fa-solid fa-hashtag"></i>{{ query }}</a>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="support-panel">
+    {% if search_query %}<p class="support-section-text"><strong>“{{ search_query }}”</strong> için {{ articles|length }} sonuç bulundu.</p>{% endif %}
+    {% if articles %}
+    <div class="support-article-list" style="margin-top:16px;">
+      {% for article in articles %}
+      <a class="support-article-card" href="{{ url_for('main.support_help_article', article_slug=article.slug) }}">
+        <div><h4 class="support-article-title">{{ article.title }}</h4><p class="support-article-summary">{{ article.summary }}</p><div class="support-meta">{% for tag in article.tags[:4] %}<span class="support-badge">{{ tag }}</span>{% endfor %}</div></div>
+        <span class="support-badge">İncele</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% elif search_query %}
+    <div class="support-empty" style="margin-top:16px;">Sonuç bulunamadı. Benzer kelimeler deneyin: destek, personel, performans, nabız, rapor, yetki, CSRF.</div>
+    {% else %}
+    <div class="support-empty" style="margin-top:16px;">Arama yapmak için bir anahtar kelime yazın.</div>
+    {% endif %}
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_support_learning.js') }}"></script>
+{% endblock %}

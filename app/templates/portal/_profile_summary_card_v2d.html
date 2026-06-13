@@ -1,0 +1,61 @@
+{# BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_CARD #}
+{% set profile_user = portal_card_user if portal_card_user is defined and portal_card_user else current_user %}
+{% set profile_context = portal_card_context if portal_card_context is defined else 'feed' %}
+{% set profile_post_count = portal_card_post_count if portal_card_post_count is defined else 0 %}
+{% set display_name = profile_user.full_name or ((profile_user.ad or '') ~ ' ' ~ (profile_user.soyad or ''))|trim or profile_user.email or 'BYS360 Kullanıcısı' %}
+{% set ns = namespace(done=0) %}
+{% if profile_user.profile_photo_url %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% if profile_user.unvan %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% if profile_user.birim %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% if profile_user.email %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% if profile_user.sicil_no %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% if profile_user.role_label or profile_user.role %}{% set ns.done = ns.done + 1 %}{% endif %}
+{% set completion_percent = (ns.done * 100 // 6) %}
+
+<section class="portal-card portal-v2d-profile-card {% if profile_context == 'profile' %}portal-v2d-profile-hero{% else %}portal-v2d-profile-compact{% endif %}" aria-label="Kurumsal profil özeti">
+  <div class="portal-v2d-profile-cover" aria-hidden="true"></div>
+  <div class="portal-v2d-profile-main">
+    <div class="portal-v2d-avatar-wrap">
+      <div class="portal-avatar xl portal-avatar-ring portal-v2d-avatar">
+        {% if profile_user.profile_photo_url %}
+          <img src="{{ profile_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">
+        {% else %}
+          <i class="fa-regular fa-user"></i>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="portal-v2d-profile-info">
+      <span class="portal-v2d-kicker"><i class="fa-regular fa-id-card"></i> Kurumsal Profil</span>
+      <h2>{{ display_name }}</h2>
+      <p>{{ profile_user.unvan or 'Görev bilgisi eklenmedi' }}</p>
+      <div class="portal-v2d-profile-tags" aria-label="Profil bilgisi">
+        <span><i class="fa-solid fa-building"></i> {{ profile_user.birim or 'Birim bilgisi yok' }}</span>
+        {% if profile_user.ust_birim %}<span><i class="fa-solid fa-sitemap"></i> {{ profile_user.ust_birim }}</span>{% endif %}
+        <span><i class="fa-solid fa-user-shield"></i> {{ profile_user.role_label or profile_user.role or 'Kullanıcı' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="portal-v2d-profile-stats" aria-label="Profil özetleri">
+    <div><b>{{ profile_post_count|default(0, true) }}</b><span>Görünür Paylaşım</span></div>
+    <div><b>{{ completion_percent }}%</b><span>Tamamlanma</span></div>
+    <div><b>{{ profile_user.sicil_no or '-' }}</b><span>Sicil</span></div>
+  </div>
+
+  <div class="portal-v2d-profile-completion" aria-label="Profil tamamlanma durumu">
+    <div class="portal-v2d-completion-line">
+      <span>Profil bilgisi</span>
+      <b>{{ completion_percent }}%</b>
+    </div>
+    <div class="portal-v2d-progress" style="--portal-v2d-progress: {{ completion_percent }}%;"><span></span></div>
+    <small>Profil bilgileriniz tamamlandıkça kurum içi görünürlük ve iletişim daha düzenli hale gelir.</small>
+  </div>
+
+  <div class="portal-v2d-profile-actions">
+    <a class="portal-btn ghost full" href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-id-card"></i> Profilimi Gör</a>
+    {% if profile_context == 'feed' %}
+      <a class="portal-btn ghost full" href="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}"><i class="fa-solid fa-address-book"></i> Personel Profilleri</a>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-06-12T13:44:51",
+  "phase": "A7C_PRELIVE_BACKUP_SCRIPT_REGISTER",
+  "script_exists": true,
+  "script_path": "scripts\\windows\\pre_live_backup_plan.ps1",
+  "missing_terms": [],
+  "ok": true
+}

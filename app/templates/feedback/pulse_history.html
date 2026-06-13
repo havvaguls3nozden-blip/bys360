@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Nabız Geçmişi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Nabız Geçmişi{% endblock %}
+{% block page_subtitle %}Kişisel nabız kayıtlarını tarih sırasıyla inceleyin.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+  .history-card{border:none;border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);background:#fff}
+  .history-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:16px;border-radius:18px;border:1px solid rgba(15,23,42,.06);background:linear-gradient(180deg,#fff,#fcfcfd)}
+  .history-note{font-size:.86rem;color:#6b7280;line-height:1.7;margin-top:8px}
+</style>
+<div class="cw-shell">
+  {{ workspace.hero(
+      title='Nabız geçmişin',
+      text='Seçimlerin ve kısa notların zaman içinde nasıl değiştiğini aynı çizgide inceleyebilirsin.',
+      icon='fa-solid fa-clock-rotate-left',
+      kicker='Kurumsal geri bildirim',
+      primary_url=url_for('main.feedback_pulse'),
+      primary_label='Yeni Kayıt',
+      secondary_url=url_for('main.feedback_dashboard'),
+      secondary_label='Panele Dön'
+  ) }}
+  {{ workspace.feedback_nav('pulse') }}
+
+  <div class="cw-panel">
+    <div class="cw-panel-body">
+      <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+        <div>
+          <label style="display:block;font-size:.84rem;font-weight:900;color:#374151;margin-bottom:8px;">Dönem</label>
+          <select name="days" style="min-width:220px;min-height:46px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:0 14px;">
+            {% for option in [7,14,30,60,90] %}<option value="{{ option }}" {% if days == option %}selected{% endif %}>Son {{ option }} gün</option>{% endfor %}
+          </select>
+        </div>
+        <button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-filter"></i>Göster</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="history-card">
+    <div class="cw-panel-body">
+      <div style="display:grid;gap:12px;">
+        {% for row in entries %}
+        <div class="history-row">
+          <div>
+            <div style="font-weight:900;color:#111827;">{% if row.mood_value == 5 %}😄{% elif row.mood_value == 4 %}🙂{% elif row.mood_value == 3 %}😐{% elif row.mood_value == 2 %}😟{% else %}🆘{% endif %} {{ row.mood_label }}</div>
+            <div style="font-size:.82rem;color:#6b7280;margin-top:4px;">{{ row.entry_date.strftime('%d.%m.%Y') }} · {{ 'Anonim' if row.is_anonymous else 'Standart' }}</div>
+            {% if row.short_note %}<div class="history-note">{{ row.short_note }}</div>{% endif %}
+          </div>
+          <div style="font-size:1.1rem;font-weight:900;color:#8B0000;">{{ row.mood_value }}/5</div>
+        </div>
+        {% else %}
+        <div class="cw-empty"><i class="fa-solid fa-wave-square"></i><strong>Kayıt bulunamadı</strong><span>Seçilen dönem için görünür nabız kaydı yok.</span></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

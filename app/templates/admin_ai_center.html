@@ -1,0 +1,165 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}AI Karar Destek Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Yönetim & Denetim{% endblock %}
+{% block page_title %}AI Karar Destek Merkezi{% endblock %}
+{% block page_subtitle %}Güncel canlı omurgadaki AI izlerini, yönetişim çizgisini ve operasyon sinyallerini tek merkezde birleştirir.{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel ai-hero">
+    <div class="ai-hero-grid">
+      <div>
+        <div class="ai-kicker">Kurumsal AI vitrini</div>
+        <h3 class="ai-title">BYS360 karar destek omurgasını tek ekranda yönetin</h3>
+        <p class="ai-sub">Bu merkez, serbest sohbet mantığında çalışan bir alan değildir. AI; yönetilebilir istemler, kayıt altına alınan çıktılar, rol bazlı görünürlük ve insan onayı ile çalışan kontrollü karar destek katmanı olarak konumlanır.</p>
+        <div class="ai-actions" style="margin-top:16px">
+          <span class="ai-badge {{ 'success' if center_snapshot.using_stub_mode else 'warning' }}">
+            <i class="fa-solid {{ 'fa-brain' if center_snapshot.using_stub_mode else 'fa-plug-circle-check' }}"></i>
+            {{ center_snapshot.provider_label }}
+          </span>
+          <span class="ai-badge muted"><i class="fa-solid fa-cubes"></i> {{ active_module_count }} aktif modül</span>
+          <span class="ai-badge muted"><i class="fa-solid fa-eye-slash"></i> {{ hidden_module_count }} pasif modül izi gizli</span>
+          <span class="ai-badge {{ 'success' if center_snapshot.ready_for_live_provider or center_snapshot.using_stub_mode else 'warning' }}"><i class="fa-solid fa-shield-halved"></i> {{ center_snapshot.live_policy }}</span>
+        </div>
+
+        <div class="ai-metric-strip">
+          <div class="ai-metric-box">
+            <div class="label">Motor etiketi</div>
+            <div class="value">{{ center_snapshot.provider_name }}</div>
+            <div class="mini">{{ center_snapshot.model_name }}</div>
+          </div>
+          <div class="ai-metric-box">
+            <div class="label">Yerel motor seviyesi</div>
+            <div class="value">{{ center_snapshot.stub_intelligence_level }}</div>
+            <div class="mini">{{ center_snapshot.stub_scenario_count }} canlı senaryo davranışı</div>
+          </div>
+          <div class="ai-metric-box">
+            <div class="label">Sağlıklı modül</div>
+            <div class="value">{{ center_snapshot.healthy_count }} / {{ center_snapshot.total_modules }}</div>
+            <div class="mini">Kritik {{ summary.critical_module_count }} · Uyarı {{ summary.warning_module_count }}</div>
+          </div>
+          <div class="ai-metric-box">
+            <div class="label">Operasyon sinyali</div>
+            <div class="value">{{ summary.request_total }}</div>
+            <div class="mini">İstek · {{ summary.open_recommendations }} açık öneri · {{ summary.feedback_negative }} negatif geri bildirim</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <ul class="ai-soft-list">
+          {% for item in center_highlights %}
+          <li class="ai-soft-item">
+            <div class="title">{{ item.title }}</div>
+            <div class="body">{{ item.body }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-four">
+    <article class="ai-card"><div class="ai-label">Toplam karar destek isteği</div><div class="ai-value">{{ summary.request_total }}</div><div class="ai-mini">Son çağrılar, özet üretimleri ve analiz istekleri birlikte okunur.</div></article>
+    <article class="ai-card"><div class="ai-label">Maskeleme oranı</div><div class="ai-value">%{{ summary.masked_rate }}</div><div class="ai-mini">Maskeli {{ summary.masked_requests }} · maskesiz {{ summary.unmasked_requests }}</div></article>
+    <article class="ai-card"><div class="ai-label">Açık öneriler</div><div class="ai-value">{{ summary.open_recommendations }}</div><div class="ai-mini">Toplam öneri {{ summary.recommendation_total }} · aktif kural {{ summary.active_rules }}</div></article>
+    <article class="ai-card"><div class="ai-label">Ortalama gecikme</div><div class="ai-value">{{ summary.avg_latency_ms }}</div><div class="ai-mini">Prompt sürümü {{ summary.prompt_version_total }} · geri bildirim {{ summary.feedback_total }}</div></article>
+  </section>
+
+  <section class="ai-panel">
+    <div class="ai-kicker">Aktif modül sahnesi</div>
+    <h3 class="ai-title">Karar destek katmanı şu anda hangi modüllerde ne yapıyor?</h3>
+    <p class="ai-sub">Kaldırılan eski modül akışları ana AI vitrinden çıkarıldı. Bu görünüm yalnız canlı kapsamda kalan performans, personel/izin, iletişim, anket, geri bildirim, destek, dashboard ve AI yönetişim katmanını odak alır.</p>
+  </section>
+
+  <section class="ai-spotlight-grid">
+    {% for card in module_spotlights %}
+    <article class="ai-spotlight tone-{{ 'success' if card.tone == 'success' else 'warning' if card.tone == 'warning' else 'calm' }}">
+      <div class="ai-spotlight-top">
+        <div>
+          <div class="ai-kicker">{{ card.label }}</div>
+          <h4 class="ai-spotlight-title">{{ card.title }}</h4>
+        </div>
+        <span class="ai-badge {{ 'success' if card.tone == 'success' else 'warning' if card.tone == 'warning' else 'muted' }}">{{ card.tone|ai_tone_label if card.tone else 'İzleniyor' }}</span>
+      </div>
+      <div class="ai-spotlight-sub">{{ card.body }}</div>
+      <div class="ai-spotlight-focus">Odak: {{ card.focus }}</div>
+      <div class="ai-spotlight-metrics">
+        <div class="ai-spotlight-metric"><div class="k">İstek</div><div class="v">{{ card.request_total }}</div></div>
+        <div class="ai-spotlight-metric"><div class="k">Açık öneri</div><div class="v">{{ card.open_recommendations }}</div></div>
+        <div class="ai-spotlight-metric"><div class="k">Maske oranı</div><div class="v">%{{ card.masked_rate }}</div></div>
+        <div class="ai-spotlight-metric"><div class="k">Negatif geri bildirim</div><div class="v">{{ card.negative_feedback }}</div></div>
+      </div>
+      <div class="ai-mini" style="margin-top:14px">Hata {{ card.failed_total }} · Ortalama {{ card.avg_latency_ms }} ms</div>
+      <div class="ai-note" style="margin-top:14px">{{ card.next_step }}</div>
+      <div class="ai-actions" style="margin-top:14px">
+        <a class="ai-link" href="{{ card.href }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> {{ card.href_label }}</a>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-panel">
+      <div class="ai-kicker">Hızlı operasyon</div>
+      <h3 class="ai-title">Yönetim masasında en sık açılan alanlar</h3>
+      <div class="ai-actions" style="margin-top:16px">
+        <a class="ai-link" href="{{ url_for('main.admin_ai_requests') }}"><i class="fa-solid fa-timeline"></i> İşlem günlükleri</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_recommendations') }}"><i class="fa-solid fa-list-check"></i> Öneri merkezi</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_module_health') }}"><i class="fa-solid fa-heart-pulse"></i> Modül sağlığı</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_operations_report') }}"><i class="fa-solid fa-chart-line"></i> Operasyon raporu</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_review_queue') }}"><i class="fa-solid fa-inbox"></i> İnceleme kuyruğu</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_quality_hub') }}"><i class="fa-solid fa-gauge-high"></i> Kalite panosu</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_visual_reports', fallback='#') }}"><i class="fa-solid fa-chart-pie"></i> Görsel rapor kartları</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_recommendation_priority', fallback='#') }}"><i class="fa-solid fa-triangle-exclamation"></i> Risk öncelik paneli</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_analysis_center_excel_preview', fallback='#') }}"><i class="fa-solid fa-file-excel"></i> Excel önizleme</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_executive_report', fallback='#') }}"><i class="fa-solid fa-file-export"></i> Yönetici rapor/export</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_final_live_hardening', fallback='#') }}"><i class="fa-solid fa-shield-check"></i> Final kalite kapısı</a>
+      </div>
+    </article>
+
+    <article class="ai-panel">
+      <div class="ai-kicker">Yönetişim ve yayın</div>
+      <h3 class="ai-title">Canlı güvenlik ve görünürlük kapıları</h3>
+      <div class="ai-actions" style="margin-top:16px">
+        <a class="ai-link" href="{{ url_for('main.admin_ai_preflight') }}"><i class="fa-solid fa-shield-halved"></i> Ön kontrol</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_smoke') }}"><i class="fa-solid fa-vial-circle-check"></i> Hızlı doğrulama</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_governance_hub') }}"><i class="fa-solid fa-shield-heart"></i> Yönetişim merkezi</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_redaction_rules') }}"><i class="fa-solid fa-user-shield"></i> Maskeleme kuralları</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_visibility_gate', fallback='#') }}"><i class="fa-solid fa-lock"></i> Görünürlük kapısı</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_go_live_readiness') }}"><i class="fa-solid fa-shield-check"></i> Canlıya alma hazır oluşu</a>
+        <a class="ai-link" href="{{ url_for('main.admin_ai_acceptance_pack') }}"><i class="fa-solid fa-clipboard-check"></i> Kabul ve teslim paketi</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_final_live_hardening', fallback='#') }}"><i class="fa-solid fa-flag-checkered"></i> Canlı sertleştirme raporu</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Sonraki adımlar</div>
+      <ul class="ai-list">
+        {% for action in health_actions[:6] %}
+        <li class="ai-list-item">
+          <div>
+            <strong>{{ action.title }}</strong>
+            <div class="ai-mini">{{ action.body }}</div>
+          </div>
+          <a class="ai-link" href="{{ action.href }}">{{ action.label }}</a>
+        </li>
+        {% else %}
+        <li class="ai-list-item"><div class="ai-mini">Açık kritik adım görünmüyor. Yönetim ekranları düzenli izlenmeli.</div></li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Kapsam görünürlüğü</div>
+      <ul class="ai-list">
+        <li class="ai-list-item"><div><strong>Aktif AI modülleri</strong><div class="ai-mini">{{ active_module_labels|join(', ') }}</div></div><span class="ai-badge success">{{ active_module_count }}</span></li>
+        <li class="ai-list-item"><div><strong>Pasif bırakılan modül izleri</strong><div class="ai-mini">Canlı kapsam dışı eski modül akışları ana AI vitrine alınmaz.</div></div><span class="ai-badge muted">{{ hidden_module_count }}</span></li>
+        <li class="ai-list-item"><div><strong>İstem katalog yaklaşımı</strong><div class="ai-mini">Modül bazlı senaryo, kayıt altına alma ve insan onayı korunur.</div></div><span class="ai-badge muted">Kontrollü</span></li>
+        <li class="ai-list-item"><div><strong>Kurum kuralı</strong><div class="ai-mini">AI nihai idari karar vermez; özet, öncelik ve destek notu üretir.</div></div><span class="ai-badge muted">İnsan gözetimi</span></li>
+      </ul>
+    </article>
+  </section>
+</div>
+{% endblock %}

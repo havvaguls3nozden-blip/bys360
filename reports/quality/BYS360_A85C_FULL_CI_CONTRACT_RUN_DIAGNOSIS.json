@@ -1,0 +1,94 @@
+{
+  "generated_at": "2026-06-12T17:55:11",
+  "phase": "A85C_FULL_CI_CONTRACT_RUN_DIAGNOSIS",
+  "diagnosis_only": true,
+  "env": {
+    "BYS360_RUN_LEGACY_ARCHITECTURE_TESTS": "1",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "cmd": [
+    "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests",
+    "--ignore=tests/_archive_a5_obsolete",
+    "-m",
+    "not live and not realdb and not slow",
+    "-q",
+    "-ra"
+  ],
+  "returncode": 1,
+  "summary": {
+    "warnings": 28,
+    "failed": 6,
+    "passed": 738,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "passed": 738,
+  "failed": 6,
+  "errors": 0,
+  "skipped": 2,
+  "passed_700_ok": true,
+  "clean_ok": false,
+  "failed_lines": [
+    "FAILED tests/architecture/test_android_responsive_core_styles_p5b.py::test_android_responsive_core_styles_gate_p5b",
+    "FAILED tests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py::test_mobile_personnel_kpi_communication_response_gate_p3c",
+    "FAILED tests/architecture/test_mobile_api_security_suite_p4c.py::test_mobile_security_suite_gate_p4c",
+    "FAILED tests/architecture/test_mobile_api_security_suite_p4c_v2.py::test_mobile_security_suite_gate_p4c_v2",
+    "FAILED tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py::test_mobile_auth_dashboard_assistant_response_gate_p3b",
+    "FAILED tests/mobile/test_mobile_domain_contract_p2a.py::test_mobile_route_contract_count"
+  ],
+  "error_lines": [],
+  "classified_failures": [
+    {
+      "raw": "FAILED tests/architecture/test_android_responsive_core_styles_p5b.py::test_android_responsive_core_styles_gate_p5b",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Genel test/s?zle?me hatas?.",
+      "suggested_fix": "?lgili test dosyas? ve assertion ayr?nt?s? incelenmeli."
+    },
+    {
+      "raw": "FAILED tests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py::test_mobile_personnel_kpi_communication_response_gate_p3c",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Genel test/s?zle?me hatas?.",
+      "suggested_fix": "?lgili test dosyas? ve assertion ayr?nt?s? incelenmeli."
+    },
+    {
+      "raw": "FAILED tests/architecture/test_mobile_api_security_suite_p4c.py::test_mobile_security_suite_gate_p4c",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Genel test/s?zle?me hatas?.",
+      "suggested_fix": "?lgili test dosyas? ve assertion ayr?nt?s? incelenmeli."
+    },
+    {
+      "raw": "FAILED tests/architecture/test_mobile_api_security_suite_p4c_v2.py::test_mobile_security_suite_gate_p4c_v2",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Genel test/s?zle?me hatas?.",
+      "suggested_fix": "?lgili test dosyas? ve assertion ayr?nt?s? incelenmeli."
+    },
+    {
+      "raw": "FAILED tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py::test_mobile_auth_dashboard_assistant_response_gate_p3b",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Genel test/s?zle?me hatas?.",
+      "suggested_fix": "?lgili test dosyas? ve assertion ayr?nt?s? incelenmeli."
+    },
+    {
+      "raw": "FAILED tests/mobile/test_mobile_domain_contract_p2a.py::test_mobile_route_contract_count",
+      "file": "",
+      "test": "",
+      "reason": "",
+      "diagnosis": "Mobil route s?zle?mesi g?ncel kodla uyu?muyor.",
+      "suggested_fix": "Beklenen route listesi g?ncellenmeli veya ger?ek endpoint eksikli?i giderilmeli."
+    }
+  ],
+  "tail": "...F..ss......................................................F......FF. [  9%]\nF....................................................................... [ 19%]\n.................F...................................................... [ 28%]\n........................................................................ [ 38%]\n........................................................................ [ 48%]\n........................................................................ [ 57%]\n........................................................................ [ 67%]\n........................................................................ [ 77%]\n........................................................................ [ 86%]\n........................................................................ [ 96%]\n..........................                                               [100%]\n================================== FAILURES ===================================\n________________ test_android_responsive_core_styles_gate_p5b _________________\n\n    def test_android_responsive_core_styles_gate_p5b() -> None:\n        root = Path(__file__).resolve().parents[2]\n        script = root / \"scripts\" / \"quality\" / \"bys360_android_responsive_core_styles_gate_p5b.py\"\n        result = subprocess.run(\n            [sys.executable, str(script), \"--root\", str(root)],\n            cwd=str(root),\n            capture_output=True,\n            text=True,\n            encoding=\"utf-8\",\n            errors=\"replace\",\n        )\n>       assert result.returncode == 0, result.stdout + \"\\n\" + result.stderr\nE       AssertionError: {\nE           \"ok\": false,\nE           \"package\": \"BYS360_CLAUDE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE\",\nE           \"android_responsive_core_styles_gate_ok\": false,\nE           \"responsive_hardening_ok\": false,\nE           \"p5a_baseline_report_ok\": false,\nE           \"android_core_css_ok\": true,\nE           \"base_template_link_ok\": true,\nE           \"core_css_media_query_count\": 5,\nE           \"routes_py_lines\": 237,\nE           \"total_mobile_route_decorator_count\": 24,\nE           \"direct_contract_ok\": true,\nE           \"compile_ok\": true,\nE           \"app_factory_ok\": true,\nE           \"secret_gate_ok\": true,\nE           \"secret_gate_finding_count\": 0,\nE           \"pytest_ok\": true,\nE           \"pytest_mode\": \"skipped\",\nE           \"report\": \"C:\\\\bys360\\\\project\\\\reports\\\\architecture\\\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json\"\nE         }\nE         \nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['C:\\\\bys360\\\\project\\\\.venv\\\\Scripts\\\\python.exe', 'C:\\\\bys360\\\\project\\\\scripts\\\\quality\\\\bys3...\\\\\\\\project\\\\\\\\reports\\\\\\\\architecture\\\\\\\\BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json\"\\n}\\n', stderr='').returncode\n\ntests\\architecture\\test_android_responsive_core_styles_p5b.py:24: AssertionError\n__________ test_mobile_personnel_kpi_communication_response_gate_p3c __________\n\n    def test_mobile_personnel_kpi_communication_response_gate_p3c() -> None:\n        root = Path(__file__).resolve().parents[2]\n        result = run_checks(\n            root,\n            compile_all=False,\n            app_factory=False,\n            secret_gate=False,\n            pytest_gate=False,\n            write_report=False,\n        )\n        assert result[\"direct_contract_ok\"] is True\n>       assert result[\"runtime_route_map_ok\"] is True\nE       assert False is True\n\ntests\\architecture\\test_mobile_api_personnel_kpi_communication_response_p3c.py:21: AssertionError\n------------------------------ Captured log call ------------------------------\nWARNING  app:monitoring.py:44 Sentry DSN tanimli degil; hata izleme kapali.\nINFO     app:startup.py:46 Startup ozeti | env=testing | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\nINFO     app.services.performance.feedback_followup_scheduler:feedback_followup_scheduler.py:51 BYS360 eylem planı takip zamanlayıcısı kapalı. Harici script/Görev Zamanlayıcı kullanılabilir.\nINFO     app:audit.py:196 Guvenlik ozeti | critical=0 warning=0 info=1\nINFO     app:startup_checks.py:62 Schema validation SQLite duman/test ortamında pas geçildi.\nWARNING  app:monitoring.py:44 Sentry DSN tanimli degil; hata izleme kapali.\nINFO     app:startup.py:46 Startup ozeti | env=testing | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\nINFO     app.services.performance.feedback_followup_scheduler:feedback_followup_scheduler.py:51 BYS360 eylem planı takip zamanlayıcısı kapalı. Harici script/Görev Zamanlayıcı kullanılabilir.\nINFO     app:audit.py:196 Guvenlik ozeti | critical=0 warning=0 info=1\nINFO     app:startup_checks.py:62 Schema validation SQLite duman/test ortamında pas geçildi.\n_____________________ test_mobile_security_suite_gate_p4c _____________________\n\n    def test_mobile_security_suite_gate_p4c():\n        root = Path(__file__).resolve().parents[2]\n        module = _load_gate(root)\n    \n        class Args:\n            compile_all = False\n            app_factory = False\n            secret_gate = False\n            pytest_gate = False\n    \n        report = module.build_report(root, Args())\n>       assert report[\"ok\"], report\nE       AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ality/bys360_mobile_security_suite_gate_p4c.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...}\nE       assert False\n\ntests\\architecture\\test_mobile_api_security_suite_p4c.py:31: AssertionError\n___________________ test_mobile_security_suite_gate_p4c_v2 ____________________\n\n    def test_mobile_security_suite_gate_p4c_v2():\n        root = Path(__file__).resolve().parents[2]\n        module = _load_gate(root)\n    \n        class Args:\n            compile_all = False\n            app_factory = False\n            secret_gate = False\n            pytest_gate = False\n    \n        report = module.build_report(root, Args())\n>       assert report[\"ok\"], report\nE       AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ty/bys360_mobile_security_suite_gate_p4c_v2.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...}\nE       assert False\n\ntests\\architecture\\test_mobile_api_security_suite_p4c_v2.py:31: AssertionError\n___________ test_mobile_auth_dashboard_assistant_response_gate_p3b ____________\n\n    def test_mobile_auth_dashboard_assistant_response_gate_p3b() -> None:\n        root = Path(__file__).resolve().parents[2]\n        result = run_checks(root, compile_all=True, app_factory=True, secret_gate=False, pytest_gate=False, write_report=False)\n        assert result[\"direct_contract_ok\"] is True\n>       assert result[\"runtime_route_map_ok\"] is True\nE       assert False is True\n\ntests\\architecture\\test_mobile_auth_dashboard_assistant_response_p3b.py:14: AssertionError\n______________________ test_mobile_route_contract_count _______________________\n\n    def test_mobile_route_contract_count():\n        route_rules: list[str] = []\n        for path in _all_mobile_route_files():\n            assert path.exists(), str(path)\n            route_rules.extend(_extract_routes(path))\n        assert len(route_rules) == EXPECTED_ROUTE_COUNT\n>       assert len(route_rules) == len(set(route_rules))\nE       AssertionError: assert 24 == 23\nE        +  where 24 = len(['/auth/login', '/auth/refresh', '/me', '/dashboard/summary', '/notifications/<int:notification_id>/read', '/notifications/read-all', ...])\nE        +  and   23 = len({'/assistant/v2/ask', '/auth/login', '/auth/refresh', '/communication/messages/create-thread', '/communication/messages/threads/<int:thread_id>', '/communication/messages/threads/<int:thread_id>/send', ...})\nE        +    where {'/assistant/v2/ask', '/auth/login', '/auth/refresh', '/communication/messages/create-thread', '/communication/messages/threads/<int:thread_id>', '/communication/messages/threads/<int:thread_id>/send', ...} = set(['/auth/login', '/auth/refresh', '/me', '/dashboard/summary', '/notifications/<int:notification_id>/read', '/notifications/read-all', ...])\n\ntests\\mobile\\test_mobile_domain_contract_p2a.py:68: AssertionError\n============================== warnings summary ===============================\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b.py:14: P6B report is generated by the repair/quality gate before targeted pytest.\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b_v2.py:14: P6B V2 report is generated by the repair/quality gate before targeted pytest.\nFAILED tests/architecture/test_android_responsive_core_styles_p5b.py::test_android_responsive_core_styles_gate_p5b\nFAILED tests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py::test_mobile_personnel_kpi_communication_response_gate_p3c\nFAILED tests/architecture/test_mobile_api_security_suite_p4c.py::test_mobile_security_suite_gate_p4c\nFAILED tests/architecture/test_mobile_api_security_suite_p4c_v2.py::test_mobile_security_suite_gate_p4c_v2\nFAILED tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py::test_mobile_auth_dashboard_assistant_response_gate_p3b\nFAILED tests/mobile/test_mobile_domain_contract_p2a.py::test_mobile_route_contract_count\n6 failed, 738 passed, 2 skipped, 34 deselected, 28 warnings in 41.25s\n"
+}

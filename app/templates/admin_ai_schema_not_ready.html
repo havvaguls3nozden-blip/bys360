@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title or 'AI Şema Durumu' }} - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}{{ page_title or 'AI Şema Durumu' }}{% endblock %}
+{% block page_subtitle %}AI tabloları veya ilgili omurga bu ortamda henüz hazır görünmüyor.{% endblock %}
+{% block content %}
+<div class="glass-card p-4">
+  <h3 class="mb-3">Şema hazır değil</h3>
+  <p class="text-muted mb-3">Bu ekran, AI log ve öneri tabloları hazır olduğunda çalışır. Aşağıdaki durum özeti savunmacı biçimde gösterilir.</p>
+  <div class="row g-3">
+    <div class="col-md-4"><div class="border rounded-4 p-3 bg-white"><div class="small text-muted">Hazır</div><div class="fw-bold">{{ 'Evet' if ai_schema_status.ready else 'Hayır' }}</div></div></div>
+    <div class="col-md-4"><div class="border rounded-4 p-3 bg-white"><div class="small text-muted">Eksik tablo</div><div class="fw-bold">{{ (ai_schema_status.missing_tables or [])|length }}</div></div></div>
+    <div class="col-md-4"><div class="border rounded-4 p-3 bg-white"><div class="small text-muted">Eksik kolon</div><div class="fw-bold">{{ (ai_schema_status.missing_columns or [])|length }}</div></div></div>
+  </div>
+  {% if ai_schema_status.missing_tables %}
+  <div class="mt-4">
+    <h5>Eksik tablolar</h5>
+    <ul class="mb-0">
+      {% for item in ai_schema_status.missing_tables %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

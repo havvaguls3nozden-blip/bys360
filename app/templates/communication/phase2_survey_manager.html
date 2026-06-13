@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Anket Yöneticisi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Yöneticisi{% endblock %}
+{% block page_subtitle %}Taslak, yayında, kapanmış ve arşivlenmiş anketleri tek listede izleyin; yaşam döngüsünü tek ekrandan yönetin.{% endblock %}
+{% block content %}
+<div class="card shadow-sm border-0 rounded-4 mb-3"><div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+  <div class="d-flex flex-wrap gap-2">
+    <span class="badge rounded-pill text-bg-light px-3 py-2">Taslak: {{ payload.counts.get('draft', 0) }}</span>
+    <span class="badge rounded-pill text-bg-light px-3 py-2">Yayında: {{ payload.counts.get('published', 0) }}</span>
+    <span class="badge rounded-pill text-bg-light px-3 py-2">Kapalı: {{ payload.counts.get('closed', 0) }}</span>
+    <span class="badge rounded-pill text-bg-light px-3 py-2">Arşiv: {{ payload.counts.get('archived', 0) }}</span>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('main.communication_phase2_survey_new') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-2"></i>Yeni Anket</a>
+    <a href="{{ url_for('main.communication_phase2_survey_templates') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-layer-group me-2"></i>Şablonlar</a>
+  </div>
+</div></div>
+
+<div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Başlık</th><th>Durum</th><th>Kapsam</th><th>Tamamlanma</th><th>Zamanlama</th><th>İşlem</th></tr></thead>
+      <tbody>
+        {% for row in payload.rows %}
+        <tr>
+          <td>
+            <div class="fw-bold">{{ row.survey.title }}</div>
+            <div class="small text-muted">{{ row.survey.description or '-' }}</div>
+          </td>
+          <td>{{ status_labels.get(row.survey.status, row.survey.status) }}</td>
+          <td>
+            <div class="small">Soru: {{ row.question_count }} · Hedef: {{ row.summary.target_total }}</div>
+            <div class="small text-muted">Yanıt: {{ row.response_count }} · Bekleyen: {{ row.summary.pending_total }}</div>
+          </td>
+          <td>
+            <div class="fw-semibold">%{{ row.summary.completion_rate }}</div>
+            <div class="progress" style="height: 6px;"><div class="progress-bar" role="progressbar" style="width: {{ row.summary.completion_rate }}%;"></div></div>
+          </td>
+          <td>
+            <div class="small">{{ row.survey.start_at.strftime('%d.%m.%Y %H:%M') if row.survey.start_at else '—' }}</div>
+            <div class="small text-muted">{{ row.survey.end_at.strftime('%d.%m.%Y %H:%M') if row.survey.end_at else 'Süresiz' }}</div>
+          </td>
+          <td>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{{ url_for('main.communication_phase2_survey_detail', survey_id=row.survey.id) }}" class="btn btn-sm btn-outline-dark">Detay</a>
+              <a href="{{ url_for('main.communication_phase2_survey_results', survey_id=row.survey.id) }}" class="btn btn-sm btn-outline-secondary">Sonuç</a>
+              {% if row.response_count == 0 and row.survey.status != 'archived' %}
+              <a href="{{ url_for('main.communication_phase2_survey_edit', survey_id=row.survey.id) }}" class="btn btn-sm btn-outline-primary">Düzenle</a>
+              {% endif %}
+              <form method="post" action="{{ url_for('main.communication_phase2_survey_duplicate', survey_id=row.survey.id) }}"><button type="submit" class="btn btn-sm btn-outline-secondary">Kopyala</button></form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Henüz anket kaydı bulunmuyor.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div></div>
+{% endblock %}

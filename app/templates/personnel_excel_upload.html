@@ -1,0 +1,662 @@
+{% extends "base.html" %}
+
+{% block title %}Personel Excel Yükleme - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Excel Yükleme{% endblock %}
+{% block page_subtitle %}
+Toplu personel aktarımı için şablon dosyayı kullanın, verileri kontrol edin ve sisteme güvenli şekilde yükleyin.
+{% endblock %}
+
+{% block content %}
+<style>
+
+    .ai-summary-card{margin-bottom:16px;border:1px solid rgba(139,0,0,.10);border-radius:22px;background:rgba(255,255,255,.94);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:18px;display:grid;gap:12px}.ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.ai-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:900;color:#8B0000;text-transform:uppercase;letter-spacing:.04em}.ai-title{font-size:1.05rem;font-weight:900;color:#111827}.ai-text{color:#475569;line-height:1.7}.ai-bullets{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#475569}.ai-bullets i{font-size:.5rem;color:#8B0000;margin-top:.55rem}.ai-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ai-action{border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:12px;background:#fff}.ai-action-label{font-size:.75rem;color:#64748b;text-transform:uppercase;font-weight:800}.ai-action-value{margin-top:6px;font-size:1.05rem;font-weight:900;color:#111827}.ai-action.tone-critical .ai-action-value{color:#b91c1c}.ai-action.tone-watch .ai-action-value{color:#b45309}.ai-spotlight{display:grid;gap:8px}.ai-spotlight-row{display:flex;gap:8px;flex-wrap:wrap;color:#475569}.ai-spotlight-row strong{color:#111827}@media(max-width:900px){.ai-action-grid{grid-template-columns:1fr 1fr}}
+    .upload-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:26px;
+        box-shadow:0 20px 40px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:24px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-panel{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+        align-items:stretch;
+    }
+
+    .hero-main{
+        position:relative;
+        overflow:hidden;
+        border-radius:24px;
+        padding:24px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        min-height:auto;
+    }
+
+    .hero-main::after{display:none}
+
+    .hero-kicker{
+        display:inline-flex;
+        align-items:center;
+        min-height:28px;
+        padding:0 12px;
+        border-radius:999px;
+        font-size:.74rem;
+        font-weight:900;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        margin-bottom:12px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.16rem;
+        font-weight:900;
+        line-height:1.4;
+        max-width:760px;
+        color:#111827;
+    }
+
+    .hero-text{
+        margin:10px 0 0;
+        font-size:.92rem;
+        line-height:1.8;
+        color:#6b7280;
+        max-width:760px;
+    }
+
+    .hero-actions{
+        margin-top:18px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    .hero-side{
+        display:grid;
+        gap:14px;
+    }
+
+    .mini-stat{
+        border-radius:22px;
+        padding:20px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 26px rgba(15,23,42,.05);
+        position:relative;
+        overflow:hidden;
+    }
+
+    .mini-stat::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        bottom:-18px;
+        width:72px;
+        height:72px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .mini-stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-value{
+        color:#111827;
+        font-size:1.1rem;
+        font-weight:900;
+        line-height:1.35;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-sub{
+        margin-top:8px;
+        color:#6b7280;
+        font-size:.82rem;
+        line-height:1.65;
+        position:relative;
+        z-index:1;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+        line-height:1.5;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.02rem;
+        font-weight:900;
+        line-height:1.45;
+        position:relative;
+        z-index:1;
+    }
+
+    .content-grid{
+        display:grid;
+        grid-template-columns:1.1fr .9fr;
+        gap:18px;
+    }
+
+    .section-title{
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+        margin:0 0 14px;
+        line-height:1.3;
+    }
+
+    .notice-box{
+        border:1px solid rgba(139,0,0,.10);
+        background:rgba(139,0,0,.04);
+        color:#6b7280;
+        border-radius:18px;
+        padding:14px 16px;
+        line-height:1.8;
+        font-size:.86rem;
+    }
+
+    .step-list{
+        display:grid;
+        gap:12px;
+    }
+
+    .step-item{
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+        padding:15px;
+        border-radius:18px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+    }
+
+    .step-no{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+        flex-shrink:0;
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:.86rem;
+        font-weight:900;
+        box-shadow:0 10px 20px rgba(139,0,0,.16);
+    }
+
+    .step-title{
+        margin:0 0 4px;
+        font-size:.92rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .step-text{
+        margin:0;
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.75;
+    }
+
+    .tips-list{
+        display:grid;
+        gap:10px;
+    }
+
+    .tip-item{
+        display:flex;
+        gap:10px;
+        align-items:flex-start;
+        color:#374151;
+        font-size:.86rem;
+        line-height:1.75;
+        padding:12px 14px;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:16px;
+        background:#fff;
+    }
+
+    .tip-item i{
+        color:#8B0000;
+        margin-top:2px;
+    }
+
+    .upload-area{
+        position:relative;
+        border:2px dashed rgba(139,0,0,.16);
+        border-radius:24px;
+        background:linear-gradient(180deg, rgba(139,0,0,.03), rgba(139,0,0,.015));
+        min-height:320px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        padding:28px;
+    }
+
+    .upload-inner{
+        max-width:620px;
+        width:100%;
+    }
+
+    .upload-icon{
+        width:88px;
+        height:88px;
+        margin:0 auto 16px;
+        border-radius:24px;
+        background:rgba(139,0,0,.08);
+        color:#8B0000;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:2rem;
+    }
+
+    .upload-title{
+        margin:0;
+        font-size:1.06rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .upload-text{
+        margin:10px 0 16px;
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.8;
+    }
+
+    .upload-actions{
+        display:flex;
+        justify-content:center;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .upload-meta{
+        display:flex;
+        justify-content:center;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-top:14px;
+    }
+
+    .meta-pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:28px;
+        padding:0 12px;
+        border-radius:999px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        color:#4b5563;
+        font-size:.78rem;
+        font-weight:800;
+    }
+
+    .file-name{
+        margin-top:14px;
+        color:#8B0000;
+        font-size:.86rem;
+        font-weight:800;
+        line-height:1.6;
+        word-break:break-word;
+    }
+
+    .option-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px;
+        margin-top:18px;
+        text-align:left;
+    }
+
+    .option-card{
+        padding:16px;
+        border-radius:18px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .option-card label{
+        display:flex;
+        gap:10px;
+        align-items:flex-start;
+        color:#111827;
+        font-size:.9rem;
+        font-weight:800;
+        line-height:1.6;
+        cursor:pointer;
+    }
+
+    .option-card small{
+        display:block;
+        margin-top:6px;
+        color:#6b7280;
+        font-size:.78rem;
+        font-weight:600;
+        line-height:1.7;
+    }
+
+    @media (max-width:1280px){
+        .hero-panel{grid-template-columns:1fr}
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:1000px){
+        .content-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:800px){
+        .option-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:700px){
+        .stats-grid{grid-template-columns:1fr}
+        .btn-soft{width:100%}
+    }
+</style>
+
+{% if ai_personnel_excel_panel %}<article class="ai-summary-card tone-{{ ai_personnel_excel_panel.tone }}"><div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_excel_panel.badge }}</div><div class="ai-title">{{ ai_personnel_excel_panel.headline }}</div><div class="ai-text">{{ ai_personnel_excel_panel.summary }}</div>{% if ai_personnel_excel_panel.bullets %}<ul class="ai-bullets">{% for bullet in ai_personnel_excel_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>{% endif %}<div class="ai-action-grid">{% for item in ai_personnel_excel_panel.actions %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>{% if ai_personnel_excel_panel.spotlight %}<div class="ai-spotlight">{% for row in ai_personnel_excel_panel.spotlight %}<div class="ai-spotlight-row"><strong>{{ row.label }}:</strong><span>{{ row.value }}</span></div>{% endfor %}</div>{% endif %}</article>
+{% endif %}
+
+<div class="upload-shell">
+    <div class="hero-panel">
+        <div class="hero-main">
+            <div class="hero-kicker">Toplu Veri Aktarımı</div>
+            <h3 class="hero-title">Personel Excel Yükleme Merkezi</h3>
+            <p class="hero-text">
+                Personel kayıtlarını standart Excel şablonuyla toplu olarak sisteme aktarabilirsiniz.
+            </p>
+
+            <div class="hero-actions">
+                {% if sample_file_url is defined and sample_file_url %}
+                <a href="{{ sample_file_url }}" class="btn-soft primary">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    Şablonu İndir
+                </a>
+                {% endif %}
+
+                <a href="{{ url_for('main.admin_users') }}" class="btn-soft primary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Personel Listesine Dön
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-side">
+            <div class="mini-stat">
+                <div class="mini-stat-label">Beklenen Başlıklar</div>
+                <div class="mini-stat-value">sicil no, ad, soyad, e-posta</div>
+                <div class="mini-stat-sub">Zorunlu kolon başlıkları tutarlı olmalıdır.</div>
+            </div>
+
+            <div class="mini-stat">
+                <div class="mini-stat-label">Kurumsal Etki</div>
+                <div class="mini-stat-value">Hiyerarşi ve Personel Modülü</div>
+                <div class="mini-stat-sub">İçe aktarılan kayıtlar personel ve hiyerarşi ekranlarında kullanılır.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Zorunlu Kolonlar</div>
+            <div class="stat-value">sicil no, ad, soyad, e-posta, unvan, rol, kategori, birim, üst birim</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Opsiyonel Kolonlar</div>
+            <div class="stat-value">yönetici sicil, ikinci yönetici sicil, üçüncü yönetici sicil, is_active</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Şifre Politikası</div>
+            <div class="stat-value">Yeni kullanıcıya varsayılan şifre sistem tarafından atanır</div>
+        </div>
+
+        <div class="glass-card stat-card">
+            <div class="stat-label">Dosya Türleri</div>
+            <div class="stat-value">XLSX, XLS, CSV</div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="glass-card panel-card">
+            <h4 class="section-title">Yükleme Akışı</h4>
+
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-no">1</div>
+                    <div>
+                        <p class="step-title">Şablon dosyayı kullanın</p>
+                        <p class="step-text">Başlık satırlarını değiştirmeden doldurun. Özellikle <strong>sicil no</strong>, <strong>e-posta</strong> ve <strong>üst birim</strong> kolonları doğru yazılmalıdır.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-no">2</div>
+                    <div>
+                        <p class="step-title">Verileri kontrol edin</p>
+                        <p class="step-text">Eksik ad, soyad, sicil no, e-posta, unvan, birim veya üst birim bilgisi olan satırlar atlanabilir. Rol ve kategori alanları şablonda otomatik gelir; kategori boşsa Diğer kabul edilir.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-no">3</div>
+                    <div>
+                        <p class="step-title">İçe aktarma seçeneklerini belirleyin</p>
+                        <p class="step-text">Mevcut kayıtlar güncellensin mi ve yeni kullanıcılar aktif açılsın mı seçeneklerini işaretleyin.</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-no">4</div>
+                    <div>
+                        <p class="step-title">Yüklemeyi başlatın</p>
+                        <p class="step-text">Sistem satırları kontrol ederek yeni kayıtları ekler, istenirse mevcut olanları günceller.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height:16px"></div>
+
+            <div class="notice-box">
+                Aynı isimli yapıların karışmaması için birim ve üst birim alanlarının kurumsal teşkilat yapısına göre doldurulması önerilir.
+                Amir alanları sicil numarası üzerinden değerlendirilir.
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <h4 class="section-title">Dikkat Edilecek Noktalar</h4>
+
+            <div class="tips-list">
+                <div class="tip-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Başlık satırındaki kolon isimlerini değiştirmeyin; Unvan, Rol ve Kategori alanları indirilen şablonda otomatik oluşturulur.</span>
+                </div>
+
+                <div class="tip-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span><strong>sicil no</strong> ve <strong>e-posta</strong> alanları mümkünse benzersiz olmalıdır.</span>
+                </div>
+
+                <div class="tip-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Yeni kullanıcılar için sistem otomatik olarak başlangıç şifresi üretir.</span>
+                </div>
+
+                <div class="tip-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Rol kolonu gönderilmezse sistem unvan/birim bilgisinden rol çıkarabilir; çıkaramazsa yeni kullanıcı <strong>personel</strong> rolünde açılır. <strong>Kategori</strong> boşsa <strong>Diğer</strong> kabul edilir.</span>
+                </div>
+            
+                <div class="tip-item" data-bys360-marker="BYS360_PHASE2_3_EXCEL_TEMPLATE_AUTO_NOTE">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Şablonu indir düğmesi artık Excel dosyasını otomatik üretir; <strong>Unvan</strong>, <strong>Rol</strong> ve <strong>Kategori</strong> kolonları hazır gelir.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="glass-card panel-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="upload-area">
+            <div class="upload-inner">
+                <div class="upload-icon">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+
+                <h4 class="upload-title">Excel dosyasını seçin</h4>
+                <p class="upload-text">
+                    Şablona uygun personel Excel dosyanızı seçin. Sistem dosya başlıklarını ve satır verilerini kontrol ederek içe aktarma işlemini başlatacaktır.
+                </p>
+
+                <div class="upload-actions">
+                    <label for="excel_file" class="btn-soft primary" style="cursor:pointer;">
+                        <i class="fa-solid fa-upload"></i>
+                        Dosya Seç
+                    </label>
+
+                    <button type="submit" class="btn-soft secondary">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        Yüklemeyi Başlat
+                    </button>
+                </div>
+
+                <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" style="display:none;" required>
+
+                <div class="file-name" id="selectedFileName"></div>
+
+                <div class="upload-meta">
+                    <span class="meta-pill">XLSX</span>
+                    <span class="meta-pill">XLS</span>
+                    <span class="meta-pill">CSV</span>
+                </div>
+
+                <div class="option-grid">
+                    <div class="option-card">
+                        <label>
+                            <input type="checkbox" name="update_existing" value="1" {% if request.form.get('update_existing') %}checked{% endif %}>
+                            <span>Mevcut kayıtları güncelle</span>
+                        </label>
+                        <small>Aynı sicil no veya e-posta ile eşleşen kullanıcılar güncellenir.</small>
+                    </div>
+
+                    <div class="option-card">
+                        <label>
+                            <input type="checkbox" name="activate_new_users" value="1" {% if request.form.get('activate_new_users', '1') %}checked{% endif %}>
+                            <span>Yeni kullanıcıları aktif oluştur</span>
+                        </label>
+                        <small>İşaretlenirse yeni kayıtlar aktif olarak açılır.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const input = document.getElementById("excel_file");
+    const output = document.getElementById("selectedFileName");
+
+    if (input && output) {
+        input.addEventListener("change", function () {
+            if (this.files && this.files.length > 0) {
+                output.textContent = "Seçilen dosya: " + this.files[0].name;
+            } else {
+                output.textContent = "";
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

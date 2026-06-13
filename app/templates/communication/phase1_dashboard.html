@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}İletişim ve Anket Yönetimi Faz 1 - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Faz 1 Gelişim Merkezi{% endblock %}
+{% block page_subtitle %}Duyuru, anket, destek ve bildirim akışlarını tek bakışta izleyin. Bu ekran, ileri seviye modül geliştirmesinin ilk omurgasını görünür hale getirir.{% endblock %}
+{% block content %}
+<style>
+.phase-shell{display:grid;gap:18px}
+.phase-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.phase-card,.phase-panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}
+.phase-card{padding:22px}
+.phase-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px}
+.phase-value{color:#111827;font-size:1.72rem;font-weight:900;line-height:1.1}
+.phase-note{margin-top:10px;color:#6b7280;font-size:.88rem;line-height:1.75}
+.phase-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.phase-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 15px;border-radius:14px;border:none;text-decoration:none;font-weight:800}
+.phase-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+.phase-btn.soft{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.14)}
+.phase-panel{padding:22px}
+.phase-section-title{margin:0 0 6px;font-size:1.02rem;font-weight:900;color:#111827}
+.phase-section-text{margin:0;color:#6b7280;line-height:1.8;font-size:.9rem}
+.phase-list{display:grid;gap:12px;margin-top:14px}
+.phase-item{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+.phase-item-title{font-weight:800;color:#111827}
+.phase-meta{margin-top:6px;color:#6b7280;font-size:.84rem;line-height:1.7}
+@media (max-width:1200px){.phase-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.phase-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="phase-shell">
+    <div class="phase-grid">
+        <div class="phase-card">
+            <div class="phase-label">Okunmamış bildirimlerim</div>
+            <div class="phase-value">{{ dashboard.stats.my_unread_notifications }}</div>
+            <div class="phase-note">İletişim akışında kullanıcıya gerçekten temas eden yükü görünür hale getirir.</div>
+        </div>
+        <div class="phase-card">
+            <div class="phase-label">Aktif anketler</div>
+            <div class="phase-value">{{ dashboard.stats.active_surveys }}</div>
+            <div class="phase-note">Yayımdaki ve aksiyon bekleyen anketler tek sayaçta izlenir.</div>
+        </div>
+        <div class="phase-card">
+            <div class="phase-label">Açık destek kayıtları</div>
+            <div class="phase-value">{{ dashboard.stats.open_support }}</div>
+            <div class="phase-note">Çözüm bekleyen destek yükü bu fazda yönetsel görünürlük kazanır.</div>
+        </div>
+        <div class="phase-card">
+            <div class="phase-label">Yardım makaleleri</div>
+            <div class="phase-value">{{ dashboard.stats.help_articles }}</div>
+            <div class="phase-note">Talep azaltma ve kurumsal hafıza için bilgi bankası görünürlüğü sağlanır.</div>
+        </div>
+    </div>
+
+    <div class="phase-panel">
+        <h3 class="phase-section-title">Kontrol 1 çalışma alanları</h3>
+        <p class="phase-section-text">Bu paketle duyuru hedefleme, anket merkezi ve destek merkezi aynı başlık altında ilk kez birlikte görünür hale gelir.</p>
+        <div class="phase-actions">
+            <a class="phase-btn primary" href="{{ url_for('main.communication_phase1_bulletins') }}"><i class="fa-solid fa-bullhorn"></i> Duyuru Merkezi</a>
+            <a class="phase-btn soft" href="{{ url_for('main.communication_phase1_survey_center') }}"><i class="fa-solid fa-square-poll-vertical"></i> Anket Merkezi</a>
+            <a class="phase-btn soft" href="{{ url_for('main.communication_phase1_support_center') }}"><i class="fa-solid fa-life-ring"></i> Destek Merkezi</a>
+        </div>
+    </div>
+
+    <div class="phase-grid" style="grid-template-columns:1.15fr .85fr .95fr;">
+        <div class="phase-panel">
+            <h3 class="phase-section-title">Son duyuru kayıtları</h3>
+            <p class="phase-section-text">Hedeflenmiş duyurular, durum ve öncelik bilgisiyle izlenir.</p>
+            <div class="phase-list">
+                {% for row in dashboard.bulletins.rows %}
+                <div class="phase-item">
+                    <div class="phase-item-title">{{ row.title }}</div>
+                    <div class="phase-meta">Durum: {{ row.status }} · Öncelik: {{ row.priority }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+                </div>
+                {% else %}
+                <div class="phase-item"><div class="phase-meta">Henüz Kontrol 1 duyuru kaydı oluşturulmadı.</div></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="phase-panel">
+            <h3 class="phase-section-title">Son anketler</h3>
+            <p class="phase-section-text">Mevcut anket omurgası bu fazda merkezi görünüm kazanır.</p>
+            <div class="phase-list">
+                {% for row in dashboard.recent_surveys %}
+                <div class="phase-item">
+                    <div class="phase-item-title">{{ row.title }}</div>
+                    <div class="phase-meta">Durum: {{ row.status }} · Tür: {{ row.survey_type }} · Başlangıç: {{ row.start_at.strftime('%d.%m.%Y') if row.start_at else '-' }}</div>
+                </div>
+                {% else %}
+                <div class="phase-item"><div class="phase-meta">Kayıtlı anket bulunamadı.</div></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="phase-panel">
+            <h3 class="phase-section-title">Son destek kayıtları</h3>
+            <p class="phase-section-text">Destek talebi yükü iletişim modülünden ayrı değil, birleşik şekilde izlenir.</p>
+            <div class="phase-list">
+                {% for row in dashboard.recent_support %}
+                <div class="phase-item">
+                    <div class="phase-item-title">{{ row.ticket_no }} · {{ row.title }}</div>
+                    <div class="phase-meta">Durum: {{ row.status_label if row.status_label is defined else row.status }} · Öncelik: {{ row.priority_label if row.priority_label is defined else row.priority }}</div>
+                </div>
+                {% else %}
+                <div class="phase-item"><div class="phase-meta">Kayıtlı destek talebi bulunamadı.</div></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

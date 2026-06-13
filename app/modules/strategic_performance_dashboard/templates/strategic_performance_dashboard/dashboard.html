@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Stratejik Performans Dashboardu{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('strategic_performance_dashboard.static', filename='css/sp1b_dashboard.css') }}">
+<section class="sp1b-page">
+  <div class="sp1b-hero">
+    <div>
+      <p class="sp1b-eyebrow">BYS360 Stratejik Performans</p>
+      <h1>KPI ve Hedef Dashboardu</h1>
+      <p>Hedef gerçekleşmeleri, riskli KPI alanları ve karar destek özetleri tek ekranda izlenir.</p>
+    </div>
+    <div class="sp1b-scope">{{ scope_label | default('Yetki Kapsamım') }}</div>
+  </div>
+  <div class="sp1b-grid sp1b-grid-4">
+    <div class="sp1b-card"><span>Toplam Hedef</span><strong>{{ summary.total_targets | default(0) }}</strong><small>Yetki kapsamındaki hedefler</small></div>
+    <div class="sp1b-card"><span>Tamamlanan</span><strong>{{ summary.completed_targets | default(0) }}</strong><small>Başarıyla kapanan hedefler</small></div>
+    <div class="sp1b-card"><span>Riskli KPI</span><strong>{{ summary.risky_targets | default(0) }}</strong><small>Yakından izlenmesi gereken kayıtlar</small></div>
+    <div class="sp1b-card"><span>Kritik Hedef</span><strong>{{ summary.critical_targets | default(0) }}</strong><small>Öncelikli müdahale alanı</small></div>
+  </div>
+  <div class="sp1b-layout">
+    <div class="sp1b-panel">
+      <h2>Hedef Gerçekleşme Özeti</h2>
+      <div class="sp1b-progress"><div style="width: {{ summary.average_completion | default(0) }}%"></div></div>
+      <p class="sp1b-muted">Ortalama gerçekleşme: %{{ summary.average_completion | default(0) }}</p>
+      <div class="sp1b-empty">Henüz görüntülenecek canlı KPI kaydı bulunmuyorsa bu alan güvenli boş durum ekranı olarak çalışır.</div>
+    </div>
+    <div class="sp1b-panel">
+      <h2>AI Karar Destek Notları</h2>
+      <ul class="sp1b-ai-list">
+        {% for note in ai_notes %}<li>{{ note }}</li>{% endfor %}
+      </ul>
+      <p class="sp1b-muted">AI karar vermez; yalnızca yetki kontrollü özet ve dikkat notu üretir.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

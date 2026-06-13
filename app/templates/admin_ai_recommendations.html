@@ -1,0 +1,54 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}AI Öneri Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Yönetim & Denetim{% endblock %}
+{% block page_title %}AI Öneri Merkezi{% endblock %}
+{% block page_subtitle %}Açık AI önerilerini takip edin, duruma alın ve denetim izini koruyun{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">AI öneriler</div>
+    <h3 class="ai-title">Önerileri kabul et, reddet veya kapat</h3>
+    <p class="ai-sub">Bu merkez, ekranlarda üretilen AI önerilerini tek akışta toplar. Karar yine kullanıcıdadır; AI yalnızca öneri üretir.</p>
+    <div class="ai-actions" style="margin-top:16px">
+      <a class="ai-link" href="{{ url_for('main.admin_ai_review_queue') }}"><i class="fa-solid fa-layer-group"></i> Toplu inceleme kuyruğu</a>
+    </div>
+  </section>
+  <form class="ai-form-wrap" method="get">
+    <div class="ai-filters">
+      <div class="ai-group"><label>Modül</label><select class="ai-select" name="module_type"><option value="">Tümü</option>{% for value in module_options %}<option value="{{ value }}" {{ 'selected' if selected_module_type == value|lower else '' }}>{{ value|ai_module_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Önem</label><select class="ai-select" name="severity"><option value="">Tümü</option>{% for value in severity_options %}<option value="{{ value }}" {{ 'selected' if selected_severity == value|lower else '' }}>{{ value|ai_severity_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Durum</label><select class="ai-select" name="status"><option value="">Tümü</option>{% for value in status_options %}<option value="{{ value }}" {{ 'selected' if selected_status == value|lower else '' }}>{{ value|ai_status_label }}</option>{% endfor %}</select></div>
+      <div class="ai-group"><label>Toplam kayıt</label><div class="ai-note">{{ pagination.total }} öneri</div></div>
+      <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Filtrele</button>
+    </div>
+  </form>
+  <section class="ai-table-wrap">
+    <table class="ai-table">
+      <thead><tr><th>Oluştu</th><th>Modül</th><th>Tip</th><th>Öneri</th><th>Önem</th><th>Durum</th><th>Hedef</th><th>İşlem</th></tr></thead>
+      <tbody>
+        {% for row in rows %}<tr>
+          <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+          <td>{{ row.module_type|ai_module_label }}</td>
+          <td>{{ row.recommendation_type|ai_recommendation_label }}</td>
+          <td><strong>{{ row.title }}</strong><div class="ai-mini">{{ row.body or '' }}</div></td>
+          <td><span class="ai-badge {{ 'warning' if row.severity in ['warning','critical'] else 'muted' }}">{{ (row.severity or 'info')|ai_severity_label }}</span></td>
+          <td><span class="ai-badge {{ 'success' if row.status == 'accepted' else 'warning' if row.status in ['open','rejected'] else 'muted' }}">{{ row.status|ai_status_label }}</span></td>
+          <td>{{ row.target_table|ai_target_label }} #{{ row.target_id }}</td>
+          <td>
+            <div class="ai-actions">
+              {% for target in ['accepted','rejected','dismissed'] %}
+              <form method="post" action="{{ url_for('main.admin_ai_recommendation_status', recommendation_id=row.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="status" value="{{ target }}">
+                <button class="ai-action-btn {{ 'secondary' if target != 'accepted' else '' }}" type="submit">{{ 'Kabul Et' if target == 'accepted' else 'Reddet' if target == 'rejected' else 'Kapat' }}</button>
+              </form>
+              {% endfor %}
+            </div>
+          </td>
+        </tr>{% else %}<tr><td colspan="8"><div class="ai-note">Filtrelere uyan AI önerisi bulunamadı.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+    <div class="pagination-shell">{% if pagination.pages > 1 %}<div class="ai-actions">{% if pagination.has_prev %}<a class="ai-link" href="{{ url_for('main.admin_ai_recommendations', page=pagination.prev_num, module_type=selected_module_type, severity=selected_severity, status=selected_status) }}">Önceki</a>{% endif %}<span class="ai-link">Sayfa {{ pagination.page }} / {{ pagination.pages }}</span>{% if pagination.has_next %}<a class="ai-link" href="{{ url_for('main.admin_ai_recommendations', page=pagination.next_num, module_type=selected_module_type, severity=selected_severity, status=selected_status) }}">Sonraki</a>{% endif %}</div>{% endif %}</div>
+  </section>
+</div>
+{% endblock %}

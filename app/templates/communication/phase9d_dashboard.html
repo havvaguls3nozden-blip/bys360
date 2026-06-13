@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}İletişim Faz 9D{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="d-flex flex-column flex-xl-row justify-content-between gap-3 align-items-xl-center">
+        <div>
+          <h3 class="mb-2">İletişim ve Anket Yönetimi | Kontrol 9D</h3>
+          <p class="text-muted mb-0">İlk 72 saat stabilizasyonu, sıcak izleme sinyalleri, acil düzeltme ihtiyacı ve kapanış kararları için merkezi görünüm.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('main.communication_phase9_dashboard') }}" class="btn btn-outline-danger">Kontrol 9 Ana Ekran</a>
+          <a href="{{ url_for('main.communication_phase9_first72') }}" class="btn btn-outline-danger">İlk 72 Saat</a>
+          <a href="{{ url_for('main.communication_phase9d_stabilization_center') }}" class="btn btn-danger">Stabilizasyon Merkezi</a>
+          <a href="{{ url_for('main.communication_phase9d_export_md') }}" class="btn btn-outline-secondary">Markdown</a>
+          <a href="{{ url_for('main.communication_phase9d_export_json') }}" class="btn btn-outline-secondary">JSON</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    {% for card in payload.summary_cards %}
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">{{ card.label }}</div>
+        <div class="fs-3 fw-semibold">{{ card.value }}{{ card.suffix }}</div>
+      </div></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-xl-7">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Stabilizasyon kapıları</h5>
+          <span class="badge text-bg-{{ 'success' if payload.tone == 'success' else 'warning' if payload.tone == 'warning' else 'danger' }}">{{ payload.decision }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Durum</th><th>Sahip</th><th>Detay</th></tr></thead>
+            <tbody>
+              {% for row in payload.gates %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td>{{ row.owner }}</td>
+                <td>
+                  <div>{{ row.detail }}</div>
+                  {% if row.action %}<div class="small text-muted">{{ row.action }}</div>{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-xl-5">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">72 saat pencereleri</h5>
+        <div class="list-group list-group-flush">
+          {% for row in payload.window_rows %}
+          <div class="list-group-item px-0">
+            <div class="d-flex justify-content-between gap-2">
+              <div class="fw-semibold">{{ row.title }}</div>
+              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'secondary' if row.status == 'pending' else 'danger' }}">{{ row.status }}</span>
+            </div>
+            <div class="small text-muted mt-1">{{ row.focus }}</div>
+            <div class="small text-muted">Sahip: {{ row.owner }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Sıcak izleme başlıkları</h5>
+        <ul class="list-group list-group-flush">
+          {% for row in payload.watch_items %}
+          <li class="list-group-item px-0">
+            <div class="fw-semibold">{{ row.title }}</div>
+            <div class="small text-danger-emphasis">{{ row.metric }}</div>
+            <div class="small text-muted">{{ row.detail }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Son acil düzeltme kayıtları</h5>
+          <a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.communication_phase9d_stabilization_center') }}">Kayıt bırak</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Seviye</th><th>Zaman</th></tr></thead>
+            <tbody>
+              {% for row in payload.hotfix_rows %}
+              <tr>
+                <td>
+                  <div>{{ row.title }}</div>
+                  {% if row.note %}<div class="small text-muted">{{ row.note }}</div>{% endif %}
+                </td>
+                <td>{{ row.severity }}</td>
+                <td>{{ row.executed_at }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="3" class="text-muted">Henüz acil düzeltme kaydı bulunmuyor.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Son izleme sinyalleri</h5>
+          <a class="btn btn-sm btn-outline-danger" href="{{ url_for('main.communication_phase9d_stabilization_center') }}">Sinyal kaydet</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Durum</th><th>Zaman</th></tr></thead>
+            <tbody>
+              {% for row in payload.signal_rows %}
+              <tr>
+                <td>
+                  <div>{{ row.title }}</div>
+                  {% if row.note %}<div class="small text-muted">{{ row.note }}</div>{% endif %}
+                </td>
+                <td>{{ row.status }}</td>
+                <td>{{ row.executed_at }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="3" class="text-muted">Henüz izleme sinyali yok.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

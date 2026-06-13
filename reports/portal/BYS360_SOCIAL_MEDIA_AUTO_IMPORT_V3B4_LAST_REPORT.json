@@ -1,0 +1,46 @@
+{
+  "ok": true,
+  "manual": false,
+  "auto_discover": true,
+  "checked": 0,
+  "created": 0,
+  "duplicate": 0,
+  "invalid": 0,
+  "failed": 0,
+  "items": [],
+  "discovery": {
+    "ok": true,
+    "sources": [
+      {
+        "platform": "x",
+        "account": "tarihialan",
+        "profile_url": "https://x.com/tarihialan",
+        "ok": true,
+        "found": 0,
+        "message": "Kontrol tamamlandı"
+      },
+      {
+        "platform": "instagram",
+        "account": "casamer_tarihialan",
+        "profile_url": "https://www.instagram.com/casamer_tarihialan/",
+        "ok": true,
+        "found": 0,
+        "message": "Kontrol tamamlandı"
+      },
+      {
+        "platform": "instagram",
+        "account": "tarihialanbaskanligi",
+        "profile_url": "https://www.instagram.com/tarihialanbaskanligi/",
+        "ok": true,
+        "found": 0,
+        "message": "Kontrol tamamlandı"
+      }
+    ],
+    "discovered": [],
+    "discovered_count": 0,
+    "state_path": "C:\\bys360\\project\\instance\\portal\\social_media_watch_state_v3b2.json",
+    "generated_at": "2026-06-13T06:00:06+00:00",
+    "message": "Kurumsal hesap kontrolü tamamlandı"
+  },
+  "generated_at": "2026-06-13T06:00:06+00:00"
+}

@@ -1,0 +1,45 @@
+{# BYS360_AI_DECISION_FAZ12_PANEL_OK #}
+{% set ai_final_gate_url = safe_url_for('main.ai_decision_faz1_health', fallback='/ai/decision-support/faz12/final-gate') %}
+{% set ai_live_control_url = safe_url_for('main.admin_ai_final_live_hardening', fallback='/admin/analysis-center/final-live-hardening') %}
+<section class="ai-faz12-final-panel home-ai-decision-card" aria-label="Karar Destek Merkezi canlı hazırlık kartı">
+  <div class="home-ai-decision-glow one" aria-hidden="true"></div>
+  <div class="home-ai-decision-glow two" aria-hidden="true"></div>
+
+  <div class="ai-faz12-panel-head home-ai-decision-head">
+    <div class="home-ai-decision-title">
+      <p class="ai-faz12-kicker home-ai-kicker"><i class="fa-solid fa-brain"></i> Karar Destek Merkezi</p>
+      <h2>Canlı Hazırlık ve Kontrol Özeti</h2>
+      <p>Görünürlük, kurumsal dil, güvenlik ve yayın öncesi kontrol sinyalleri tek kartta izlenir.</p>
+    </div>
+    <span class="ai-faz12-status home-ai-status"><i class="fa-solid fa-user-shield"></i> İnsan denetimli kontrol</span>
+  </div>
+
+  <div class="ai-faz12-grid home-ai-decision-grid">
+    <article>
+      <i class="fa-solid fa-clipboard-check"></i>
+      <strong>Kontrol bütünlüğü</strong>
+      <span>Kontrol sonuçları, rapor izleri ve canlı hazırlık adımları birlikte doğrulanır.</span>
+    </article>
+    <article>
+      <i class="fa-solid fa-shield-halved"></i>
+      <strong>Canlı güvenliği</strong>
+      <span>Route, panel, yetki ve paket hijyeni canlı öncesi düzenli şekilde kontrol edilir.</span>
+    </article>
+    <article>
+      <i class="fa-solid fa-comments"></i>
+      <strong>Kurumsal dil</strong>
+      <span>Kullanıcı ekranlarında teknik ifade kalmaması ve sade Türkçe görünüm hedeflenir.</span>
+    </article>
+  </div>
+
+  <div class="home-ai-decision-footer">
+    <div>
+      <strong>Karar yerine destek üretir.</strong>
+      <span>Son değerlendirme ve idari karar yetkili kullanıcıdadır.</span>
+    </div>
+    <div class="home-ai-decision-actions">
+      <a href="{{ ai_final_gate_url }}" class="home-ai-decision-btn primary"><i class="fa-solid fa-arrow-right"></i> Kontrol Kartını Aç</a>
+      <a href="{{ ai_live_control_url }}" class="home-ai-decision-btn"><i class="fa-solid fa-chart-simple"></i> Canlı Kontroller</a>
+    </div>
+  </div>
+</section>

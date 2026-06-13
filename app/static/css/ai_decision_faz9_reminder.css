@@ -1,0 +1,77 @@
+/* BYS360_AI_DECISION_FAZ9_REMINDER_CSS */
+.ai-faz9-reminder-panel {
+  margin: 18px 0;
+  padding: 20px;
+  border: 1px solid rgba(139, 0, 0, 0.16);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 48px rgba(24, 24, 27, 0.08);
+  backdrop-filter: blur(14px);
+}
+.ai-faz9-reminder-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.ai-faz9-reminder-header h3 {
+  margin: 3px 0 6px;
+  font-size: 1.18rem;
+  color: #2b1b1b;
+}
+.ai-faz9-reminder-header p {
+  margin: 0;
+  color: #5f5f66;
+  line-height: 1.5;
+}
+.ai-faz9-eyebrow {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #8B0000 !important;
+}
+.ai-faz9-badge {
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(139, 0, 0, 0.08);
+  color: #8B0000;
+  font-weight: 700;
+  font-size: .82rem;
+}
+.ai-faz9-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.ai-faz9-grid article {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(139, 0, 0, 0.12);
+}
+.ai-faz9-grid strong,
+.ai-faz9-grid small {
+  display: block;
+  color: #5f5f66;
+}
+.ai-faz9-grid span {
+  display: block;
+  margin: 6px 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #8B0000;
+}
+.ai-faz9-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(139, 0, 0, 0.06);
+  color: #4b4242;
+}
+@media (max-width: 768px) {
+  .ai-faz9-reminder-header { flex-direction: column; }
+  .ai-faz9-grid { grid-template-columns: 1fr; }
+}

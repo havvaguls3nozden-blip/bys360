@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Görev Senkronu - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Görev Senkronu{% endblock %}
+{% block page_subtitle %}Değerlendirme görevleri seçilen dönem ve personel için aynı kurumsal yönetim arayüzünden güncellenir{% endblock %}
+{% block content %}
+<style>
+    .criteria-shell{display:grid;gap:18px}.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.premium-card,.stat-card{background:rgba(255,255,255,.78);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.stat-card{padding:20px}.toolbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:14px;align-items:end}.form-group{display:flex;flex-direction:column;gap:8px}.form-group label{font-weight:800;color:#374151;font-size:.92rem}.form-select{min-height:48px;border-radius:16px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:12px 14px;font-size:.95rem;color:#111827}.muted,.section-text{color:#6b7280;line-height:1.7;font-size:.94rem}.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.92rem}.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}.section-title{margin:0 0 8px;color:#8B0000;font-size:1.08rem;font-weight:900}.stat-label{color:#6b7280;font-size:.88rem;font-weight:700;margin-bottom:10px}.stat-value{font-size:2rem;font-weight:900;color:#111827;line-height:1}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px;background:#fff}table{width:100%;border-collapse:collapse}th,td{padding:14px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}th{font-size:.82rem;color:#6b7280;text-transform:uppercase;letter-spacing:.03em;background:rgba(248,250,252,.92)}tr:last-child td{border-bottom:none}@media(max-width:1100px){.toolbar,.stats-grid{grid-template-columns:1fr}}
+</style>
+<div class="criteria-shell">
+    <div class="premium-card">
+        <form method="post" class="toolbar">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group"><label>Dönem</label><select name="period_id" class="form-select">{% for item in periods %}<option value="{{ item.id }}" {% if period and item.id==period.id %}selected{% endif %}>{{ item.title }}</option>{% endfor %}</select></div>
+            <div class="form-group"><label>Personel</label><select name="employee_id" class="form-select"><option value="">Tüm aktif personel</option>{% for item in employee_options %}<option value="{{ item.id }}">{{ item.full_name }} — {{ item.sicil_no }}</option>{% endfor %}</select></div>
+            <div class="form-group"><label>İşlem Açıklaması</label><div class="muted">Seçilen dönem için görev satırları güncellenir ve eksik kayıtlar tamamlanır.</div></div>
+            <button class="btn-soft primary" type="submit">Senkronu Başlat</button>
+        </form>
+    </div>
+    {% if result %}
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">İşlenen Personel</div><div class="stat-value">{{ result.employee_count }}</div></div>
+        <div class="stat-card"><div class="stat-label">Yeni Kayıt</div><div class="stat-value">{{ result.created_count }}</div></div>
+        <div class="stat-card"><div class="stat-label">Güncellenen Kayıt</div><div class="stat-value">{{ result.updated_count }}</div></div>
+    </div>
+    <div class="premium-card">
+        <h3 class="section-title">İşlem Özeti</h3>
+        <div class="table-wrap"><table><thead><tr><th>Personel</th><th>Oluşturulan</th><th>Güncellenen</th><th>İlk Not</th></tr></thead><tbody>
+            {% for row in result.rows[:50] %}
+            <tr><td>{{ row.employee_name }}</td><td>{{ row.created_count }}</td><td>{{ row.updated_count }}</td><td>{% if row.resolved_chain.issues %}{{ row.resolved_chain.issues[0].message }}{% else %}Kayıt güncel{% endif %}</td></tr>
+            {% endfor %}
+        </tbody></table></div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE8_PERIOD_SCOPE_BOUND #}

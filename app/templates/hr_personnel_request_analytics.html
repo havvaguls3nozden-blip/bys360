@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Talep Analitik Dashboard - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Talep Analitik Dashboard{% endblock %}
+{% block page_subtitle %}Özlük taleplerini hacim, SLA, yaşlanma ve eskalasyon görünümüyle yönetin.{% endblock %}
+
+{% block content %}
+<style>
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}.stat{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827;line-height:1}.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.pill.good{background:#ecfdf5;color:#065f46}.pill.warn{background:#fff7ed;color:#9a3412}.pill.bad{background:#fef2f2;color:#991b1b}.pill.soft{background:#f3f4f6;color:#374151}.bars{display:grid;gap:12px}.bar-row{display:grid;gap:8px}.bar-track{height:12px;border-radius:999px;background:#f3f4f6;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,#8b0000,#b91c1c)}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:980px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.stack{display:grid;gap:16px}.field{display:grid;gap:6px}.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:90px;resize:vertical}.btn-row{display:flex;flex-wrap:wrap;gap:10px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.empty{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:1280px){.stats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}@media (max-width:780px){.stats{grid-template-columns:1fr}}
+</style>
+
+<div class="top-actions">
+  <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_request_tasks', scope=selected_scope_mode) }}">Talep görev kutusu</a>
+  <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_request_reports', scope=selected_scope_mode) }}">Talep raporları</a>
+  <a class="btn-soft primary" href="{{ url_for('main.hr_personnel_request_sla_policies', scope=selected_scope_mode) }}">SLA politikaları</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="label">Toplam talep</div><div class="value">{{ analytics_summary.total }}</div></div>
+  <div class="stat"><div class="label">Açık süreç</div><div class="value">{{ analytics_summary.open }}</div></div>
+  <div class="stat"><div class="label">SLA geciken</div><div class="value">{{ analytics_summary.overdue }}</div></div>
+  <div class="stat"><div class="label">Eskalasyonlu talep</div><div class="value">{{ analytics_summary.escalated }}</div></div>
+  <div class="stat"><div class="label">Ort. kapanış (saat)</div><div class="value">{{ analytics_summary.avg_close_hours }}</div></div>
+  <div class="stat"><div class="label">Aktif SLA politikası</div><div class="value">{{ analytics_summary.policy_count }}</div></div>
+</div>
+
+<div class="grid">
+  <div class="stack">
+    <div class="panel">
+      <h3 class="section-title">Acil müdahale listesi</h3>
+      {% if urgent_rows %}
+      <div class="table-wrap"><table class="table-clean"><thead><tr><th>Talep</th><th>Durum</th><th>SLA</th><th>Eskalasyon</th><th>İşlem</th></tr></thead><tbody>
+      {% for row in urgent_rows %}
+      <tr>
+        <td><strong>{{ row.title }}</strong><br><span class="muted">{{ row.user_name }} · {{ row.request_type_label }} · {{ row.priority_label }}</span></td>
+        <td><span class="pill soft">{{ row.status_label }}</span><br><span class="muted">{{ row.handler_name or '-' }}</span></td>
+        <td>{% if row.sla %}<span class="pill {{ row.sla.tone }}">{{ row.sla.label }}</span>{% else %}<span class="pill soft">Takipsiz</span>{% endif %}</td>
+        <td><span class="pill {% if row.escalation_count %}warn{% else %}soft{% endif %}">{{ row.escalation_count }} seviye</span></td>
+        <td>
+          <form method="post" action="{{ url_for('main.hr_personnel_request_escalate', request_id=row.id) }}" class="stack" style="min-width:240px">
+            <input type="hidden" name="form_token" value="{{ escalation_token }}">
+            <div class="field"><label>Hedef yönetici</label><select name="escalated_to_id" required>{% for manager in manager_rows %}<option value="{{ manager.id }}">{{ manager.full_name if manager.full_name else (manager.ad ~ ' ' ~ manager.soyad) }}{% if manager.unvan %} · {{ manager.unvan }}{% endif %}</option>{% endfor %}</select></div>
+            <div class="field"><label>Gerekçe</label><input type="text" name="reason" value="SLA riski ve yönetici eskalasyonu"></div>
+            <div class="field"><label>Not</label><textarea name="note" placeholder="Kısa eskalasyon notu"></textarea></div>
+            <button class="btn-soft primary" type="submit">Eskale et</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody></table></div>
+      {% else %}<div class="empty">Bu kapsam altında acil eskalasyon gerektiren talep görünmüyor.</div>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h3 class="section-title">Talep tipi dağılımı</h3>
+      <div class="bars">
+        {% set max_count = (type_rows|map(attribute='count')|max) if type_rows else 1 %}
+        {% for row in type_rows %}
+        <div class="bar-row">
+          <div style="display:flex;justify-content:space-between;gap:12px"><strong>{{ row.label }}</strong><span class="muted">{{ row.count }}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: {{ (row.count / max_count * 100) if max_count else 0 }}%"></div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="section-title">Durum görünümü</h3>
+      <div class="bars">
+        {% set max_status = (status_rows|map(attribute='count')|max) if status_rows else 1 %}
+        {% for row in status_rows %}
+        <div class="bar-row">
+          <div style="display:flex;justify-content:space-between;gap:12px"><strong>{{ row.label }}</strong><span class="muted">{{ row.count }}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width: {{ (row.count / max_status * 100) if max_status else 0 }}%"></div></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="panel">
+      <h3 class="section-title">Yaşlanma matrisi</h3>
+      <div class="bars">
+        {% set aging_max = [aging['0_2'], aging['3_7'], aging['8_plus']]|max if analytics_summary.open else 1 %}
+        <div class="bar-row"><div style="display:flex;justify-content:space-between"><strong>0–2 gün</strong><span class="muted">{{ aging['0_2'] }}</span></div><div class="bar-track"><div class="bar-fill" style="width: {{ (aging['0_2'] / aging_max * 100) if aging_max else 0 }}%"></div></div></div>
+        <div class="bar-row"><div style="display:flex;justify-content:space-between"><strong>3–7 gün</strong><span class="muted">{{ aging['3_7'] }}</span></div><div class="bar-track"><div class="bar-fill" style="width: {{ (aging['3_7'] / aging_max * 100) if aging_max else 0 }}%"></div></div></div>
+        <div class="bar-row"><div style="display:flex;justify-content:space-between"><strong>8 gün ve üzeri</strong><span class="muted">{{ aging['8_plus'] }}</span></div><div class="bar-track"><div class="bar-fill" style="width: {{ (aging['8_plus'] / aging_max * 100) if aging_max else 0 }}%"></div></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 class="section-title">Görev yükü odağı</h3>
+      {% if top_assignees %}
+      <div class="bars">
+        {% set assignee_max = (top_assignees|map(attribute='count')|max) if top_assignees else 1 %}
+        {% for row in top_assignees %}
+        <div class="bar-row"><div style="display:flex;justify-content:space-between"><strong>{{ row.name }}</strong><span class="muted">{{ row.count }}</span></div><div class="bar-track"><div class="bar-fill" style="width: {{ (row.count / assignee_max * 100) if assignee_max else 0 }}%"></div></div></div>
+        {% endfor %}
+      </div>
+      {% else %}<div class="empty">Atanmış görev yükü verisi henüz oluşmadı.</div>{% endif %}
+    </div>
+
+    <div class="panel">
+      <h3 class="section-title">Son eskalasyon hareketleri</h3>
+      {% if recent_escalations %}
+      <div class="stack">
+        {% for row in recent_escalations %}
+        <div class="empty" style="background:#fff">
+          <strong>{{ row.request_title }}</strong><br>
+          <span class="muted">{{ row.from_name or '-' }} → {{ row.to_name or '-' }} · Seviye {{ row.level }}</span>
+          <div class="muted" style="margin-top:8px">{{ row.reason }}{% if row.note %} · {{ row.note }}{% endif %}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}<div class="empty">Bu kapsam altında kayıtlı eskalasyon görünmüyor.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

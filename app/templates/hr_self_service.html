@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Self Servis - BYS360
+        <div class="stack">
+            <div class="panel">
+                <h3 class="section-title">Talep merkezim</h3>
+                <div class="info">Özlük güncelleme, belge talebi ve diğer personel istekleri için yeni talep merkezi açıldı.</div>
+                <div style="margin-top:14px">
+                    <a class="status warn" style="text-decoration:none" href="{{ url_for('main.hr_self_service_requests') }}">
+                        <i class="fa-solid fa-folder-open"></i>&nbsp; Talep Merkezine Git
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+{% block page_kicker %}Personel Yönetimi
+        <div class="stack">
+            <div class="panel">
+                <h3 class="section-title">Talep merkezim</h3>
+                <div class="info">Özlük güncelleme, belge talebi ve diğer personel istekleri için yeni talep merkezi açıldı.</div>
+                <div style="margin-top:14px">
+                    <a class="status warn" style="text-decoration:none" href="{{ url_for('main.hr_self_service_requests') }}">
+                        <i class="fa-solid fa-folder-open"></i>&nbsp; Talep Merkezine Git
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+{% block page_title %}Self Servis
+        <div class="stack">
+            <div class="panel">
+                <h3 class="section-title">Talep merkezim</h3>
+                <div class="info">Özlük güncelleme, belge talebi ve diğer personel istekleri için yeni talep merkezi açıldı.</div>
+                <div style="margin-top:14px">
+                    <a class="status warn" style="text-decoration:none" href="{{ url_for('main.hr_self_service_requests') }}">
+                        <i class="fa-solid fa-folder-open"></i>&nbsp; Talep Merkezine Git
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+{% block page_subtitle %}
+Kendi kayıtlarınız, özlük tamlığınız, amir zinciriniz ve üzerinize devredilmiş görevler tek ekranda görünür.
+
+        <div class="stack">
+            <div class="panel">
+                <h3 class="section-title">Talep merkezim</h3>
+                <div class="info">Özlük güncelleme, belge talebi ve diğer personel istekleri için yeni talep merkezi açıldı.</div>
+                <div style="margin-top:14px">
+                    <a class="status warn" style="text-decoration:none" href="{{ url_for('main.hr_self_service_requests') }}">
+                        <i class="fa-solid fa-folder-open"></i>&nbsp; Talep Merkezine Git
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+{% block content %}
+<style>
+    .page-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+    .panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}
+    .top-strip h3{margin:0 0 10px;font-size:1.38rem;font-weight:900;color:#111827}.top-strip p{margin:0;color:#6b7280;line-height:1.8}
+    .badge-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.badge{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-weight:800;font-size:.86rem;color:#374151}
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.stat{padding:18px;border-radius:20px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.72rem;font-weight:900;color:#111827;line-height:1}
+    .stack{display:grid;gap:18px;margin-top:18px}.section-title{margin:0 0 14px;font-size:1.02rem;font-weight:900;color:#111827}.info{padding:14px 16px;border-radius:18px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.7}.muted{color:#6b7280;font-size:.88rem;line-height:1.7}
+    .table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}
+    .status{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.ok{background:#ecfdf5;color:#065f46}.warn{background:#fff7ed;color:#9a3412}.bad{background:#fef2f2;color:#991b1b}
+    .action-list{display:grid;gap:12px}.action-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.action-row.watch{border-color:#fed7aa;background:#fffaf3}.action-row .count{min-width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#f8fafc;font-weight:900}.chain-list{display:grid;gap:10px}.chain-row{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+    @media (max-width:1100px){.page-grid,.stats{grid-template-columns:1fr}}
+</style>
+
+<div class="page-grid">
+    <div class="panel top-strip">
+        <h3>Kendi Personel görünümünüz</h3>
+        <p>Kayıt geçmişiniz, amir zinciriniz ve üzerinize devredilen vekâletler tek ekranda toplandı. Bu görünüm self servis tarafını daha olgun hale getirmek için genişletildi.</p>
+        <div class="badge-row">
+            <span class="badge"><i class="fa-solid fa-id-card"></i> Profil tamlığı: {{ profile_payload.score }}%</span>
+            <span class="badge"><i class="fa-solid fa-calendar-check"></i> İzin kaydı: {{ own_leaves|length }}</span>
+            <span class="badge"><i class="fa-solid fa-user-clock"></i> Devamsızlık: {{ own_attendance|length }}</span>
+            <span class="badge"><i class="fa-solid fa-people-arrows-left-right"></i> Aktif vekâlet: {{ active_received_delegations|length }}</span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h4 class="section-title">Bakiye ve dönem özeti</h4>
+        <div class="stats">
+            <div class="stat"><div class="label">Toplam hak</div><div class="value">{{ balance_summary.allocated }}</div></div>
+            <div class="stat"><div class="label">Kullanılan</div><div class="value">{{ balance_summary.used }}</div></div>
+            <div class="stat"><div class="label">Kalan</div><div class="value">{{ balance_summary.remaining }}</div></div>
+            <div class="stat"><div class="label">Kritik satır</div><div class="value">{{ balance_summary.risk_count }}</div></div>
+        </div>
+        <div class="info" style="margin-top:14px;">
+            {% if active_period and impact %}
+                <strong>{{ active_period.title }}</strong> döneminde fiili gün {{ impact.available_days }}, izin {{ impact.leave_days }}, devamsızlık {{ impact.absence_days }}.
+                {% if impact.exempted %} Şu an değerlendirme dışı görünüyorsunuz: {{ impact.reason or 'Sistem muafiyet kuralı' }}{% endif %}
+            {% else %}
+                Aktif dönem bulunamadı. Kayıt geçmişiniz ve özlük görünümünüz yine de kullanılabilir.
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="stack">
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Amir zincirim</h4>
+            <div class="chain-list">
+                {% for row in manager_chain %}
+                <div class="chain-row">
+                    <div>
+                        <strong>{{ row.label }}</strong><br>
+                        <span class="muted">{{ row.user.full_name if row.user else 'Tanımlı değil' }}</span>
+                    </div>
+                    <div class="muted" style="text-align:right;">
+                        {{ row.user.unvan if row.user and row.user.unvan else row.sicil_no or '-' }}<br>
+                        {{ row.unit_name }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="chain-row"><div><strong>Amir zinciri bulunamadı</strong><br><span class="muted">Profilde amir kaydı görünmüyor.</span></div></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Kişisel aksiyon alanı</h4>
+            <div class="action-list">
+                {% for row in personal_action_rows %}
+                <div class="action-row {% if row.tone == 'watch' %}watch{% endif %}">
+                    <div>
+                        <strong>{{ row.title }}</strong>
+                        <div class="muted">{{ row.detail }}</div>
+                    </div>
+                    <div class="count">{{ row.count }}</div>
+                </div>
+                {% else %}
+                <div class="action-row"><div><strong>Açık kişisel aksiyon görünmüyor</strong><div class="muted">Profil, bakiye ve vekâlet görünümünüzde öne çıkan bir uyarı yok.</div></div><div class="count">0</div></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">İzin geçmişim</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Tür</th><th>Tarih</th><th>Süre</th><th>Durum</th><th>Açıklama</th></tr></thead>
+                    <tbody>
+                    {% for row in own_leaves %}
+                        <tr>
+                            <td>{{ leave_type_label(row.leave_type) }}</td>
+                            <td>{{ leave_date_range_label(row) }}</td>
+                            <td>{{ leave_duration_label(row) }}</td>
+                            <td><span class="status {% if row.status == 'onaylandi' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                            <td>{{ leave_description_label(row) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Henüz izin kaydı yok.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Bana devredilen vekâletler</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Asıl amir</th><th>Kapsam</th><th>Tarih</th><th>Durum</th><th>Not</th></tr></thead>
+                    <tbody>
+                    {% for row in received_delegations %}
+                        <tr>
+                            <td>{{ row.delegator.full_name if row.delegator else '-' }}</td>
+                            <td>{{ scope_label(row.scope_type) }}</td>
+                            <td>{{ row.start_date }} → {{ row.end_date }}</td>
+                            <td><span class="status {% if row.status == 'aktif' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                            <td>{{ row.note or '-' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Üzerinize devredilmiş vekâlet bulunmuyor.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="stack">
+            <div class="panel">
+                <h3 class="section-title">Talep merkezim</h3>
+                <div class="info">Özlük güncelleme, belge talebi ve diğer personel istekleri için yeni talep merkezi açıldı.</div>
+                <div style="margin-top:14px">
+                    <a class="status warn" style="text-decoration:none" href="{{ url_for('main.hr_self_service_requests') }}">
+                        <i class="fa-solid fa-folder-open"></i>&nbsp; Talep Merkezine Git
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

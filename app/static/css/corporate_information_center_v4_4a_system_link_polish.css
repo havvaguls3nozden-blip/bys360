@@ -1,0 +1,58 @@
+/* BYS360_CIC_V4_4A_SYSTEM_LINK_POLISH
+   Sistem sayfasındaki Kutlamalar bağlantısının Bootstrap mavi link görünümünü temizler. */
+body.bys360-cic-v44a .cic-shell a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-shell a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-content a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-content a.text-primary[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-content a.link-primary[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-content .text-primary[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-v44a .cicp-content .link-primary[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"]{
+  color:#5f2525!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+}
+body.bys360-cic-system-page .cicp-content a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-system-page .cicp-content .cic-v44a-link-polished{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:.42rem!important;
+  min-height:34px!important;
+  padding:.38rem .66rem!important;
+  border-radius:12px!important;
+  border:1px solid rgba(139,0,0,.12)!important;
+  background:rgba(139,0,0,.045)!important;
+  color:#5f2525!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+}
+body.bys360-cic-system-page .cicp-content a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"]:hover,
+body.bys360-cic-system-page .cicp-content .cic-v44a-link-polished:hover{
+  background:rgba(139,0,0,.075)!important;
+  color:#8B0000!important;
+  border-color:rgba(139,0,0,.20)!important;
+}
+body.bys360-cic-v44a .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"]:not(.active){
+  color:#5f2525!important;
+  background:#fff!important;
+  border-color:rgba(139,0,0,.14)!important;
+}
+body.bys360-cic-v44a .cic-tabs a.active[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"]{
+  color:#fff!important;
+  background:#8B0000!important;
+  border-color:#8B0000!important;
+}
+body.bys360-cic-system-page .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"],
+body.bys360-cic-system-page .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"].active,
+body.bys360-cic-system-page .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"].is-active,
+body.bys360-cic-system-page .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/kutlamalar"].selected{
+  color:#5f2525!important;
+  background:#fff!important;
+  border-color:rgba(139,0,0,.14)!important;
+  box-shadow:none!important;
+}
+body.bys360-cic-system-page .cic-tabs a[href*="/dashboard/kurumsal-bilgilendirme/sistem"]{
+  background:#8B0000!important;
+  color:#fff!important;
+  border-color:#8B0000!important;
+  box-shadow:0 10px 22px rgba(139,0,0,.17)!important;
+}

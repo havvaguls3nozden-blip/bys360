@@ -1,0 +1,771 @@
+{% extends "base.html" %}
+{% block title %}Performans Yönetimi — Geri Bildirim Hattı{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Süreç Hattı{% endblock %}
+{% block page_subtitle %}Görüşme sonrası notlar, rehber, karne bağlantısı, eylem takibi ve canlı kontrol — tek kurumsal yüzey.{% endblock %}
+
+{% block content %}
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+
+{# ── Güvenli defaults ── #}
+{% set steps        = steps        if steps        is defined else [] %}
+{% set summary      = summary      if summary      is defined else {} %}
+{% set warnings     = warnings     if warnings     is defined else [] %}
+{% set state_machine= state_machine if state_machine is defined else {} %}
+{% set access_denied= access_denied if access_denied is defined else false %}
+{% set pipeline_note= pipeline_note if pipeline_note is defined else '' %}
+
+<style>
+/* ── Kök değişkenler ── */
+:root {
+  --cr: #8B0000;
+  --cr2: #a31313;
+  --cr3: rgba(139,0,0,.08);
+  --cr4: rgba(139,0,0,.14);
+  --ink: #0f172a;
+  --ink2: #1e293b;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --surf: rgba(255,255,255,.97);
+  --surf2: rgba(248,250,252,.9);
+  --edge: rgba(15,23,42,.08);
+  --edge2: rgba(15,23,42,.14);
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
+}
+
+/* ── Sayfa kabuğu ── */
+.pm-shell {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 4px 0 52px;
+  display: grid;
+  gap: 16px;
+}
+
+/* ── Genel kart ── */
+.pm-card {
+  background: var(--surf);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 44px rgba(15,23,42,.07);
+}
+
+/* ── Hero kartı ── */
+.pm-hero {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: minmax(0,1.3fr) 340px;
+  gap: 20px;
+  align-items: stretch;
+  background: linear-gradient(135deg,
+    rgba(139,0,0,.07) 0%,
+    var(--surf) 55%,
+    rgba(139,0,0,.03) 100%
+  );
+}
+.pm-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--cr3);
+  color: var(--cr);
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.pm-hero-title {
+  margin: 0 0 10px;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 950;
+  color: var(--ink);
+  line-height: 1.18;
+  letter-spacing: -.04em;
+}
+.pm-hero-text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+  font-size: .92rem;
+  max-width: 680px;
+}
+.pm-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+.pm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: .82rem;
+  font-weight: 900;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.pm-btn:hover { transform: translateY(-1px); }
+.pm-btn.primary {
+  background: var(--cr);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(139,0,0,.22);
+}
+.pm-btn.primary:hover { box-shadow: 0 14px 34px rgba(139,0,0,.3); }
+.pm-btn.soft {
+  background: var(--cr3);
+  color: var(--cr);
+  border-color: var(--cr4);
+}
+.pm-btn.ghost {
+  background: var(--surf2);
+  color: var(--ink2);
+  border-color: var(--edge2);
+}
+
+/* ── Hazırlık ölçer ── */
+.pm-meter-box {
+  background: #fff;
+  border: 1px solid var(--cr4);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 10px;
+}
+.pm-meter-pct {
+  font-size: 3.4rem;
+  font-weight: 950;
+  line-height: 1;
+  color: var(--cr);
+  letter-spacing: -.06em;
+}
+.pm-meter-label {
+  font-size: .8rem;
+  color: var(--muted);
+  font-weight: 850;
+}
+.pm-meter-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(15,23,42,.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.pm-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cr), var(--cr2));
+  border-radius: 999px;
+  min-width: 4%;
+  transition: width .6s ease;
+}
+.pm-meter-pills {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── İstatistik sırası ── */
+.pm-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+}
+.pm-stat {
+  background: #fff;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-height: 84px;
+}
+.pm-stat strong {
+  display: block;
+  font-size: 1.65rem;
+  font-weight: 950;
+  color: var(--cr);
+  letter-spacing: -.04em;
+}
+.pm-stat span {
+  display: block;
+  font-size: .78rem;
+  font-weight: 850;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+/* ── Hap / rozet ── */
+.pm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .74rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.pm-pill.ok    { background: rgba(22,101,52,.09);  color: #166534; }
+.pm-pill.warn  { background: rgba(180,83,9,.10);   color: #92400e; }
+.pm-pill.fail  { background: rgba(185,28,28,.10);  color: #991b1b; }
+.pm-pill.muted { background: rgba(100,116,139,.09);color: #475569; }
+.pm-pill.info  { background: rgba(29,78,216,.08);  color: #1d4ed8; }
+.pm-pill.phase { background: var(--cr3); color: var(--cr); }
+
+/* ── Adım listesi ── */
+.pm-steps-head {
+  padding: 20px 24px 14px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--edge);
+}
+.pm-steps-head h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 950;
+  color: var(--ink);
+}
+.pm-steps-head p {
+  margin: 0;
+  font-size: .8rem;
+  color: var(--muted);
+}
+.pm-steps-body {
+  padding: 16px 20px 20px;
+  display: grid;
+  gap: 10px;
+}
+
+/* ── Tek adım ── */
+.pm-step {
+  display: grid;
+  grid-template-columns: 54px minmax(0,1fr) 180px;
+  gap: 14px;
+  align-items: start;
+  border: 1px solid var(--edge);
+  border-radius: 22px;
+  background: #fff;
+  padding: 16px 18px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.pm-step:hover {
+  border-color: var(--edge2);
+  box-shadow: 0 8px 20px rgba(15,23,42,.06);
+}
+.pm-step.ready  { border-color: rgba(22,101,52,.18);  background: linear-gradient(135deg,rgba(240,253,244,.7),#fff); }
+.pm-step.attention { border-color: rgba(180,83,9,.18); background: linear-gradient(135deg,rgba(255,251,235,.7),#fff); }
+.pm-step.missing { border-color: rgba(185,28,28,.18); background: linear-gradient(135deg,rgba(254,242,242,.7),#fff); }
+
+.pm-step-no {
+  width: 50px;
+  height: 50px;
+  border-radius: 17px;
+  background: var(--cr3);
+  color: var(--cr);
+  display: grid;
+  place-items: center;
+  font-size: .95rem;
+  font-weight: 950;
+  flex-shrink: 0;
+}
+.pm-step-name {
+  font-size: 1rem;
+  font-weight: 950;
+  color: var(--ink);
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+.pm-step-desc {
+  font-size: .82rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+.pm-step-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.pm-step-path {
+  font-family: monospace;
+  font-size: .7rem;
+  color: var(--muted2);
+  margin-top: 6px;
+  display: block;
+}
+.pm-step-bar {
+  height: 5px;
+  background: rgba(15,23,42,.07);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.pm-step-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cr);
+}
+.pm-step-actions {
+  display: grid;
+  gap: 7px;
+}
+.pm-step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-decoration: none;
+  border-radius: 13px;
+  padding: 9px 12px;
+  font-size: .78rem;
+  font-weight: 900;
+  background: var(--cr3);
+  color: var(--cr);
+  border: 1px solid var(--cr4);
+  transition: transform .1s;
+}
+.pm-step-btn:hover { transform: translateY(-1px); text-decoration: none; }
+.pm-step-btn.ghost {
+  background: var(--surf2);
+  color: var(--muted);
+  border-color: var(--edge);
+}
+
+/* ── Durum makinesi bölümü ── */
+.pm-state-section {
+  padding: 20px 24px;
+}
+.pm-state-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-top: 14px;
+  scrollbar-width: thin;
+}
+.pm-state-node {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  background: #fff;
+  min-width: 110px;
+  text-align: center;
+}
+.pm-state-node.ready    { border-color: rgba(22,101,52,.22); background: rgba(240,253,244,.8); }
+.pm-state-node.blocked  { border-color: rgba(185,28,28,.2);  background: rgba(254,242,242,.8); }
+.pm-state-node.pending  { border-color: rgba(180,83,9,.18);  background: rgba(255,251,235,.8); }
+.pm-state-arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  color: var(--muted2);
+  font-size: .9rem;
+}
+.pm-state-phase {
+  font-size: .68rem;
+  font-weight: 950;
+  color: var(--cr);
+  background: var(--cr3);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.pm-state-name {
+  font-size: .75rem;
+  font-weight: 900;
+  color: var(--ink2);
+  line-height: 1.3;
+}
+.pm-state-note {
+  font-size: .72rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.pm-info-box {
+  background: var(--cr3);
+  border: 1px solid var(--cr4);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: .82rem;
+  color: var(--ink2);
+  line-height: 1.65;
+  margin-top: 14px;
+}
+.pm-info-box strong { color: var(--cr); }
+
+/* ── Uyarı sırası ── */
+.pm-warnings {
+  padding: 18px 22px;
+}
+.pm-warning-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+.pm-warning-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(254,252,232,.85);
+  border: 1px solid rgba(161,98,7,.15);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: .8rem;
+  color: #713f12;
+  line-height: 1.55;
+}
+
+/* ── Erişim engellendi ── */
+.pm-denied {
+  border-color: rgba(185,28,28,.2);
+  background: rgba(254,242,242,.96);
+  padding: 36px 28px;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media(max-width:1100px) {
+  .pm-hero { grid-template-columns: 1fr; }
+  .pm-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .pm-step { grid-template-columns: 50px minmax(0,1fr); }
+  .pm-step-actions { grid-column: 1/-1; display: flex; flex-wrap: wrap; gap: 7px; }
+  .pm-state-flow { flex-wrap: wrap; }
+}
+@media(max-width:680px) {
+  .pm-card { border-radius: 22px; }
+  .pm-stats { grid-template-columns: 1fr 1fr; }
+  .pm-step { grid-template-columns: 1fr; padding: 14px 16px; }
+  .pm-step-no { width: 44px; height: 44px; }
+  .pm-hero-title { font-size: 1.4rem; }
+  .pm-hero-actions { flex-direction: column; }
+  .pm-btn { width: 100%; justify-content: center; }
+}
+</style>
+
+<div class="pm-shell">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+
+  {% if access_denied %}
+  {# ── ERİŞİM ENGELLENDİ ── #}
+  <section class="pm-card pm-denied">
+    <div class="pm-kicker" style="justify-content:center;margin-bottom:16px;">
+      <i class="fa-solid fa-shield-halved"></i> Yetki Kontrolü
+    </div>
+    <h1 class="pm-hero-title" style="text-align:center;">Bu sayfaya erişim yetkiniz bulunmamaktadır.</h1>
+    <p class="pm-hero-text" style="text-align:center;margin:10px auto 0;max-width:520px;">
+      Geri bildirim süreç hattı yalnızca yetkili yönetici, performans yetkilisi
+      ve sistem yöneticisi kapsamında açılır.
+    </p>
+  </section>
+
+  {% else %}
+  {# ── HERO ── #}
+  <section class="pm-card pm-hero">
+    <div>
+      <div class="pm-kicker">
+        <i class="fa-solid fa-route"></i> Süreç Hattı
+      </div>
+      <h1 class="pm-hero-title">
+        Geri bildirim görüşmesi<br>baştan sona izlenebilir.
+      </h1>
+      <p class="pm-hero-text">{{ pipeline_note }}</p>
+      <div class="pm-hero-actions">
+        <a class="pm-btn primary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}">
+          <i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlar
+        </a>
+        <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_followup') }}">
+          <i class="fa-solid fa-calendar-check"></i> Eylem Planı Takibi
+        </a>
+        <a class="pm-btn ghost" href="{{ safe_url_for('main.performance_feedback_corporate_cleanup') }}">
+          <i class="fa-solid fa-shield-heart"></i> Canlı Kontrol
+        </a>
+      </div>
+    </div>
+
+    <div class="pm-meter-box">
+      <div class="pm-meter-pct">%{{ summary.overall_percent|default(0) }}</div>
+      <div class="pm-meter-label">Genel hazırlık oranı</div>
+      <div class="pm-meter-bar">
+        <div class="pm-meter-fill" style="width:{{ [summary.overall_percent|default(0)|int, 100]|min }}%;"></div>
+      </div>
+      <div class="pm-meter-pills">
+        {% if summary.ready|default(0) > 0 %}
+        <span class="pm-pill ok"><i class="fa-solid fa-check"></i> {{ summary.ready }} hazır</span>
+        {% endif %}
+        {% if summary.attention|default(0) > 0 %}
+        <span class="pm-pill warn"><i class="fa-solid fa-triangle-exclamation"></i> {{ summary.attention }} dikkat</span>
+        {% endif %}
+        {% if summary.missing|default(0) > 0 %}
+        <span class="pm-pill fail"><i class="fa-solid fa-xmark"></i> {{ summary.missing }} eksik</span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# ── İSTATİSTİK SATIRLARI ── #}
+  <div class="pm-stats">
+    <div class="pm-stat">
+      <strong>{{ summary.total|default(0) }}</strong>
+      <span>Toplam süreç adımı</span>
+    </div>
+    <div class="pm-stat">
+      <strong>{{ summary.ready|default(0) }}</strong>
+      <span>Hazır adım</span>
+    </div>
+    <div class="pm-stat">
+      <strong>{{ summary.attention|default(0) }}</strong>
+      <span>Gözden geçirilecek</span>
+    </div>
+    <div class="pm-stat">
+      <strong>{{ summary.warning_count|default(0) }}</strong>
+      <span>Dikkat notu</span>
+    </div>
+  </div>
+
+  {# ── ADIMLAR ── #}
+  <section class="pm-card">
+    <div class="pm-steps-head">
+      <div>
+        <h2>Süreç adımları</h2>
+        <p>Her adım bağlantı, şablon ve veritabanı tablosu varlığına göre değerlendirilir.</p>
+      </div>
+    </div>
+
+    <div class="pm-steps-body">
+      {% for step in steps %}
+      <div class="pm-step {{ step.status|default('muted') }}">
+
+        {# ── Sol: Numara ── #}
+        <div class="pm-step-no">
+          {% if step.status == 'ready' %}
+            <i class="fa-solid fa-check"></i>
+          {% elif step.status == 'missing' %}
+            <i class="fa-solid fa-xmark"></i>
+          {% else %}
+            {{ step.order|default(loop.index) }}
+          {% endif %}
+        </div>
+
+        {# ── Orta: İçerik ── #}
+        <div>
+          <p class="pm-step-name">
+            {% if step.phase_label %}
+            <span class="pm-pill phase" style="font-size:.68rem;padding:3px 8px;margin-right:6px;">{{ step.phase_label }}</span>
+            {% endif %}
+            {{ step.title }}
+          </p>
+          <p class="pm-step-desc">{{ step.description }}</p>
+
+          <div class="pm-step-meta">
+            {# bağlantı #}
+            {% if step.endpoint_ok %}
+            <span class="pm-pill ok"><i class="fa-solid fa-plug"></i> Bağlantı aktif</span>
+            {% else %}
+            <span class="pm-pill fail"><i class="fa-solid fa-plug-circle-xmark"></i> Bağlantı eksik</span>
+            {% endif %}
+
+            {# şablon #}
+            {% if step.template_ok %}
+            <span class="pm-pill ok"><i class="fa-solid fa-file-code"></i> Şablon mevcut</span>
+            {% else %}
+            <span class="pm-pill fail"><i class="fa-solid fa-file-circle-xmark"></i> Şablon yok</span>
+            {% endif %}
+
+            {# tablolar #}
+            {% if step.missing_tables %}
+            <span class="pm-pill warn"><i class="fa-solid fa-database"></i> {{ step.missing_tables|length }} tablo eksik</span>
+            {% else %}
+            <span class="pm-pill ok"><i class="fa-solid fa-database"></i> Tablolar tamam</span>
+            {% endif %}
+
+            {# flow durumu #}
+            {% if step.flow_status %}
+            <span class="pm-pill {{ step.flow_status_class|default('muted') }}">
+              <i class="fa-solid fa-diagram-project"></i> {{ step.flow_status_label|default(step.flow_status) }}
+            </span>
+            {% endif %}
+          </div>
+
+          {% if step.blocked_by_labels %}
+          <div style="margin-top:7px;">
+            {% for bl in step.blocked_by_labels %}
+            <span class="pm-pill fail" style="font-size:.69rem;">
+              <i class="fa-solid fa-lock"></i> {{ bl }} tamamlanmadı
+            </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="pm-step-bar">
+            <span style="width:{{ [step.percent|default(0)|int, 100]|min }}%;"></span>
+          </div>
+          <span class="pm-step-path">{{ step.path }}</span>
+        </div>
+
+        {# ── Sağ: Eylemler ── #}
+        <div class="pm-step-actions">
+          {% if step.endpoint_ok %}
+          <a class="pm-step-btn"
+             href="{{ safe_url_for(step.endpoint) }}"
+             title="{{ step.title }} sayfasını aç">
+            <i class="{{ step.icon }}"></i>
+            Sayfayı Aç
+          </a>
+          {% else %}
+          <span class="pm-step-btn ghost" style="cursor:not-allowed;opacity:.6;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            Ulaşılamıyor
+          </span>
+          {% endif %}
+
+          {% if step.tables %}
+          <details style="width:100%;">
+            <summary style="cursor:pointer;font-size:.73rem;color:var(--muted);font-weight:850;padding:5px 0;list-style:none;display:flex;align-items:center;gap:6px;">
+              <i class="fa-solid fa-table-list" style="font-size:.7rem;"></i>
+              Tablo detayı ({{ step.tables|length }})
+            </summary>
+            <div style="margin-top:7px;display:grid;gap:4px;">
+              {% for tbl in step.tables %}
+              <div style="display:flex;align-items:center;gap:7px;font-size:.73rem;color:{{ '#166534' if tbl.ok else '#991b1b' }};">
+                <i class="fa-solid {{ 'fa-check' if tbl.ok else 'fa-xmark' }}" style="font-size:.65rem;"></i>
+                {{ tbl.name }}
+              </div>
+              {% endfor %}
+            </div>
+          </details>
+          {% endif %}
+        </div>
+
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:24px;color:var(--muted);font-size:.85rem;">
+        <i class="fa-solid fa-circle-info" style="margin-bottom:8px;display:block;font-size:1.2rem;opacity:.5;"></i>
+        Süreç adımı bulunamadı.
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ── DURUM MAKİNESİ ── #}
+  <section class="pm-card">
+    <div class="pm-state-section">
+      <div class="pm-kicker" style="margin-bottom:14px;">
+        <i class="fa-solid fa-diagram-project"></i> Süreç Sırası Kontrolü
+      </div>
+      <h2 style="margin:0 0 6px;font-size:1.08rem;font-weight:950;color:var(--ink);">
+        P0'dan Final adımına kadar atlama kontrolü aktif.
+      </h2>
+      <p style="margin:0;font-size:.82rem;color:var(--muted);">
+        Bir adım tamamlanmadan sonraki adıma geçiş kilitlidir.
+      </p>
+
+      <div class="pm-state-flow">
+        {% for sm_step in state_machine.steps|default([]) %}
+        <div class="pm-state-node {{ sm_step.status|default('pending') }}">
+          <span class="pm-state-phase">{{ sm_step.phase_label|default('P?') }}</span>
+          <span class="pm-state-name">{{ sm_step.title }}</span>
+          {% if sm_step.status == 'ready' %}
+          <span class="pm-pill ok" style="font-size:.65rem;padding:3px 7px;">Tamamlandı</span>
+          {% elif sm_step.status == 'blocked' %}
+          <span class="pm-pill fail" style="font-size:.65rem;padding:3px 7px;">Kilitli</span>
+          {% else %}
+          <span class="pm-pill muted" style="font-size:.65rem;padding:3px 7px;">Bekliyor</span>
+          {% endif %}
+        </div>
+        {% if not loop.last %}
+        <div class="pm-state-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="pm-info-box">
+        {{ state_machine.note|default('Durum makinesi P0 → P1 → P2 → P3 → P4 → Final sıralamasını uygular.') }}
+        {% if not state_machine.storage_ready|default(true) %}
+        <br><strong>Not:</strong> Süreç tablosu henüz oluşturulmamış; ekran sözleşme modunda çalışıyor.
+        Şema scripti çalıştırıldığında adım durumları veritabanına da yazılır.
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  {# ── HIZLI ERİŞİM ── #}
+  <section class="pm-card">
+    <div class="pm-steps-head">
+      <div>
+        <h2>Hızlı erişim</h2>
+        <p>Görüşme hattının tüm bileşenlerine doğrudan bağlantı.</p>
+      </div>
+    </div>
+    <div style="padding:16px 20px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_aftercare') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlar
+      </a>
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_meeting_guide') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-comments"></i> Görüşme Rehberi
+      </a>
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_integration') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-link"></i> Karne Bağlantısı
+      </a>
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_followup') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-calendar-check"></i> Eylem Planı Takibi
+      </a>
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_final_gate') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-circle-check"></i> Yayına Hazırlık Kontrolü
+      </a>
+      <a class="pm-btn soft" href="{{ safe_url_for('main.performance_feedback_corporate_cleanup') }}" style="justify-content:flex-start;">
+        <i class="fa-solid fa-shield-heart"></i> Canlı Kullanım Kontrolü
+      </a>
+    </div>
+  </section>
+
+  {# ── UYARILAR ── #}
+  {% if warnings %}
+  <section class="pm-card">
+    <div class="pm-warnings">
+      <div class="pm-kicker" style="margin-bottom:12px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Dikkat Notları
+      </div>
+      <div class="pm-warning-list">
+        {% for w in warnings %}
+        <div class="pm-warning-item">
+          <i class="fa-solid fa-circle-exclamation" style="flex-shrink:0;margin-top:1px;opacity:.75;"></i>
+          <span>{{ w }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% endif %}{# /access_denied #}
+</div>{# /pm-shell #}
+
+{% endblock %}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE11_REPORTING_RISK_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_READINESS_BOUND #}

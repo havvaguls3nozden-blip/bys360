@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Amir Zinciri Ayarları{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">Amir Zinciri Ayar Paneli</h1>
+      <p class="text-muted mb-0">Şablon bazlı zincir kuralı, 3. amir modu ve Excel önizleme alanı</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{{ url_for('hierarchy_governance.download_last_json') }}">Son JSON raporu indir</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 border-0">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">Temel Ayarlar</h2>
+          <form method="post" action="{{ url_for('hierarchy_governance.save_settings') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">1. amir ağırlığı</label>
+                <input class="form-control" type="number" name="manager_1" value="{{ config.default_weights.manager_1 }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">2. amir ağırlığı</label>
+                <input class="form-control" type="number" name="manager_2" value="{{ config.default_weights.manager_2 }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">3. amir ağırlığı</label>
+                <input class="form-control" type="number" name="manager_3" value="{{ config.default_weights.manager_3 }}">
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" id="third_enabled" name="third_enabled" {% if config.third_manager_defaults.enabled %}checked{% endif %}>
+                  <label class="form-check-label" for="third_enabled">3. amir varsayılanı aktif</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">3. amir modu</label>
+                <select class="form-select" name="third_mode">
+                  {% for mode in ['disabled','comment_only','comment_and_score'] %}
+                  <option value="{{ mode }}" {% if config.third_manager_defaults.mode == mode %}selected{% endif %}>{{ mode }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end">
+              <button class="btn btn-danger">Ayarları Kaydet</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow-sm rounded-4 border-0">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">Excel Önizleme</h2>
+          <form method="post" action="{{ url_for('hierarchy_governance.preview_excel') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label">Excel dosyası</label>
+              <input class="form-control" type="file" name="excel_file" accept=".xlsx,.xlsm,.xltx,.xltm">
+            </div>
+            <button class="btn btn-danger">Önizleme Üret</button>
+          </form>
+
+          {% if preview_summary %}
+          <hr>
+          <h3 class="h6">Son önizleme</h3>
+          <ul class="small text-muted ps-3 mb-0">
+            <li>Girdi satırı: {{ preview_summary.input_count }}</li>
+            <li>Çözümlenen satır: {{ preview_summary.resolved_count }}</li>
+            <li>Warning: {{ preview_summary.warning_count }}</li>
+            <li>Info: {{ preview_summary.info_count }}</li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm rounded-4 border-0 mt-4">
+    <div class="card-body p-4">
+      <h2 class="h5 mb-3">Etkin Şablon Kuralları</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Kural</th>
+              <th>Tip</th>
+              <th>Sıra</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rule in config.rules %}
+            <tr>
+              <td>{{ rule.label }}</td>
+              <td>{{ rule.chain_type }}</td>
+              <td>{{ rule.order|join(' → ') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

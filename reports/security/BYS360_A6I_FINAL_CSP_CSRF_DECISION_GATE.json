@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-06-12T13:32:49",
+  "source": "reports\\security\\BYS360_A6H_RUNTIME_CSP_CSRF_DECISION_REGISTER.json",
+  "a6h_total_findings": 31,
+  "a6h_runtime_action_count": 1,
+  "final_runtime_blocker_count": 0,
+  "false_positive_count": 1,
+  "accepted_followup_count": 7,
+  "manual_review_count": 0,
+  "control_count": 22,
+  "real_runtime_actions": [],
+  "false_positive_runtime_actions": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "runtime_action",
+      "severity": "high",
+      "decision": "script-src unsafe-inline",
+      "file": "app/security/headers.py",
+      "line": 9,
+      "excerpt": "- script-src tarafinda unsafe-inline varsayilan kullanilmaz.",
+      "recommendation": "Canl?da script-src unsafe-inline olmamal?.",
+      "final_decision": "false_positive_documentation_line",
+      "final_note": "Bu sat?r canl? a??k de?il; CSP kural?n? a??klayan dok?mantasyon/metin sat?r?d?r."
+    }
+  ],
+  "accepted_or_followup": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Varsay?lan style-src uyumluluk istisnas?",
+      "file": "config.py",
+      "line": 334,
+      "excerpt": "CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', \"'self' 'unsafe-inline' https:\").strip() or \"'self' 'unsafe-inline' https:\"",
+      "recommendation": "Script-src de?il; style-src i?in takip karar? yaz?lmal?."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Duyuru popup CSRF muafiyeti",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 380,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Endpoint auth/rate-limit/gerek?e kontrol? ile takip edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "Duyuru popup CSRF muafiyeti",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 395,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Endpoint auth/rate-limit/gerek?e kontrol? ile takip edilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "style-src uyumluluk istisnas?",
+      "file": "app/security/csp_nonce.py",
+      "line": 61,
+      "excerpt": "f\"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; \"",
+      "recommendation": "Ge?ici kabul edilebilir; orta vadede inline style azaltma/nonce/stylesheet plan? gerekli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_with_followup",
+      "severity": "medium",
+      "decision": "style-src uyumluluk istisnas?",
+      "file": "app/security/headers.py",
+      "line": 25,
+      "excerpt": "\"style-src\": \"'self' 'unsafe-inline' https:\",",
+      "recommendation": "Ge?ici kabul edilebilir; orta vadede inline style azaltma/nonce/stylesheet plan? gerekli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_controls",
+      "severity": "medium",
+      "decision": "Mobil API CSRF muafiyeti",
+      "file": "app/api/mobile/__init__.py",
+      "line": 18,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "Token/auth tabanl? mobil API i?in kabul edilebilir; auth/rate-limit kan?t? takip edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_with_controls",
+      "severity": "medium",
+      "decision": "Mobil API CSRF muafiyeti",
+      "file": "app/api/mobile/__init__.py",
+      "line": 31,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "Token/auth tabanl? mobil API i?in kabul edilebilir; auth/rate-limit kan?t? takip edilmeli."
+    }
+  ],
+  "reviews": [],
+  "mobile_controls_evidence": {
+    "has_mobile_api_dir": true,
+    "auth_terms": [
+      "app/api/mobile/__init__.py",
+      "app/api/mobile/communication_read_routes.py",
+      "app/api/mobile/communication_v2_read_routes.py",
+      "app/api/mobile/detail_read_routes.py",
+      "app/api/mobile/domains/assistant_chat.py",
+      "app/api/mobile/domains/auth.py",
+      "app/api/mobile/domains/communication_v1_write.py",
+      "app/api/mobile/domains/communication_v2_write.py",
+      "app/api/mobile/domains/dashboard.py",
+      "app/api/mobile/domains/kpi_target_management.py",
+      "app/api/mobile/domains/notifications.py",
+      "app/api/mobile/domains/personnel_read.py",
+      "app/api/mobile/domains/personnel_write_all.py",
+      "app/api/mobile/domains/support_survey_write.py",
+      "app/api/mobile/light_read_routes.py",
+      "app/api/mobile/performance_read_routes.py",
+      "app/api/mobile/performance_routes.py",
+      "app/api/mobile/services/auth_service.py",
+      "app/api/mobile/shared.py",
+      "app/api/mobile/support_survey_read_routes.py",
+      "app/api/mobile/utility_routes.py"
+    ],
+    "token_terms": [
+      "app/api/mobile/__init__.py",
+      "app/api/mobile/domains/auth.py",
+      "app/api/mobile/domains/support_survey_write.py",
+      "app/api/mobile/services/auth_service.py",
+      "app/api/mobile/shared.py"
+    ],
+    "rate_limit_terms": []
+  }
+}

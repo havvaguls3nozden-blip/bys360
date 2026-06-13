@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Rol Matrisi V4 - BYS360{% endblock %}
+{% block page_kicker %}Ayarlar ve Yetkilendirme{% endblock %}
+{% block page_title %}Rol Matrisi Merkezi{% endblock %}
+{% block page_subtitle %}Genel, Personel Yönetimi, Performans Yönetimi, İletişim-Anket, AI ve Ayarlar-Güvenlik sekmeleri için görsel rol matrisi.{% endblock %}
+
+{% block content %}
+
+{# BYS360_SETTINGS_ROLE_MATRIX_ALL_FEATURES_FINAL_FIX_V1 #}
+{# BYS360 Ayarlar Rol Matrisi Merkezi | Genel Kategorisi | Personel Yönetimi Sekmeleri | Performans Yönetimi Sekmeleri | role-subtabs #}
+<style>
+    .rm-shell{max-width:1720px;margin:0 auto;display:grid;gap:18px;}
+    .rm-hero{border:1px solid rgba(139,0,0,.12);border-radius:26px;background:linear-gradient(135deg,rgba(139,0,0,.08),rgba(255,255,255,.98) 48%,rgba(248,250,252,.96));box-shadow:0 18px 38px rgba(15,23,42,.07);padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;}
+    .rm-title{margin:0 0 6px;color:#8B0000;font-weight:950;font-size:1.34rem;letter-spacing:-.01em;display:flex;gap:10px;align-items:center;}
+    .rm-text{margin:0;color:#64748b;line-height:1.75;max-width:1040px;}
+    .rm-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+    .rm-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:14px;text-decoration:none;font-weight:900;font-size:.88rem;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;transition:.18s ease;}
+    .rm-btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(15,23,42,.07);color:#8B0000;}
+    .rm-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;border-color:transparent;box-shadow:0 12px 24px rgba(139,0,0,.16);}
+    .rm-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
+    .rm-stat{border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff;padding:16px;box-shadow:0 12px 26px rgba(15,23,42,.05);}
+    .rm-stat-label{color:#64748b;font-size:.75rem;font-weight:950;text-transform:uppercase;letter-spacing:.035em;margin-bottom:7px;}
+    .rm-stat-value{color:#111827;font-size:1.45rem;font-weight:950;line-height:1;}
+    .rm-nav{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:rgba(255,255,255,.94);box-shadow:0 16px 34px rgba(15,23,42,.06);padding:16px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;position:sticky;top:74px;z-index:5;backdrop-filter:blur(10px);}
+    .rm-nav-title{font-weight:950;color:#111827;display:flex;gap:9px;align-items:center;}
+    .rm-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+    .rm-tab{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 12px;border-radius:999px;text-decoration:none;background:#eef2f7;color:#374151;font-weight:900;font-size:.82rem;border:1px solid rgba(15,23,42,.07);transition:.18s ease;}
+    .rm-tab:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(15,23,42,.06);}
+    .rm-tab.active{background:rgba(139,0,0,.09);color:#8B0000;border-color:rgba(139,0,0,.18);}
+    .rm-principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+    .rm-principle{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:15px;line-height:1.7;color:#475569;box-shadow:0 12px 26px rgba(15,23,42,.04);}
+    .rm-principle strong{display:block;color:#111827;margin-bottom:4px;}
+    .rm-card{border:1px solid rgba(15,23,42,.08);border-radius:26px;background:rgba(255,255,255,.96);box-shadow:0 18px 38px rgba(15,23,42,.065);padding:18px;scroll-margin-top:130px;}
+    .rm-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:15px;}
+    .rm-card-title{margin:0;color:#8B0000;font-size:1.08rem;font-weight:950;display:flex;align-items:center;gap:10px;}
+    .rm-card-title i{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(139,0,0,.08);color:#8B0000;}
+    .rm-card-text{margin:8px 0 0;color:#64748b;line-height:1.75;max-width:900px;font-size:.92rem;}
+    .rm-badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:560px;}
+    .rm-badge{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 10px;border-radius:999px;background:#eef2f7;color:#374151;font-size:.76rem;font-weight:900;}
+    .rm-table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;}
+    .rm-table{width:100%;border-collapse:collapse;min-width:1180px;}
+    .rm-table th,.rm-table td{padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.08);vertical-align:middle;text-align:center;}
+    .rm-table tr:last-child td{border-bottom:0;}
+    .rm-table th{background:#fff;color:#7f1d1d;font-weight:950;text-transform:uppercase;letter-spacing:.035em;font-size:.72rem;line-height:1.3;white-space:pre-line;}
+    .rm-table th:first-child,.rm-table td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:2;min-width:235px;box-shadow:8px 0 16px rgba(15,23,42,.025);}
+    .rm-row-title{font-weight:950;color:#374151;display:flex;gap:10px;align-items:flex-start;line-height:1.45;}
+    .rm-row-title i{color:#8B0000;min-width:16px;margin-top:2px;}
+    .rm-row-sub{display:block;color:#8b8f98;font-size:.78rem;font-weight:700;margin-top:2px;padding-left:26px;}
+    .rm-check{appearance:none;-webkit-appearance:none;width:15px;height:15px;border-radius:4px;border:1px solid rgba(15,23,42,.28);background:#fff;display:inline-grid;place-content:center;vertical-align:middle;}
+    .rm-check:checked{border-color:#0b84df;background:#0b84df;}
+    .rm-check:checked::after{content:"✓";font-size:11px;font-weight:950;line-height:1;color:#fff;}
+    .rm-check[disabled]{opacity:1;cursor:default;}
+    .rm-empty{display:inline-flex;width:15px;height:15px;border-radius:4px;border:1px solid rgba(15,23,42,.24);background:#fff;vertical-align:middle;}
+    .rm-policy{margin-top:10px;color:#64748b;line-height:1.7;font-size:.86rem;}
+    .rm-legend{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:#fff;padding:18px;box-shadow:0 14px 30px rgba(15,23,42,.05);}
+    .rm-legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:10px;}
+
+    .rm-version{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 8px;border-radius:999px;background:#8B0000;color:#fff;font-size:.72rem;letter-spacing:.02em;}
+    .rm-tools{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:#fff;padding:16px;box-shadow:0 16px 34px rgba(15,23,42,.055);display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:12px;align-items:center;}
+    .rm-search{width:100%;min-height:42px;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:0 14px;font-weight:800;color:#374151;outline:none;background:#f8fafc;}
+    .rm-search:focus{border-color:rgba(139,0,0,.32);box-shadow:0 0 0 4px rgba(139,0,0,.08);background:#fff;}
+    .rm-tool-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+    .rm-small-btn{border:1px solid rgba(15,23,42,.1);border-radius:13px;background:#f8fafc;min-height:40px;padding:0 12px;font-weight:950;color:#374151;cursor:pointer;}
+    .rm-small-btn:hover{background:#fff;color:#8B0000;box-shadow:0 8px 16px rgba(15,23,42,.05);}
+    .rm-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+    .rm-role-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff;padding:15px;box-shadow:0 14px 28px rgba(15,23,42,.045);}
+    .rm-role-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+    .rm-role-name{font-weight:950;color:#111827;}
+    .rm-role-tag{font-size:.72rem;font-weight:950;color:#8B0000;background:rgba(139,0,0,.08);border-radius:999px;padding:5px 8px;}
+    .rm-role-metrics{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0;}
+    .rm-role-metric{font-size:.74rem;font-weight:950;border-radius:999px;padding:5px 8px;background:#eef2f7;color:#374151;}
+    .rm-role-card p{margin:0;color:#64748b;line-height:1.65;font-size:.84rem;}
+    .rm-hidden{display:none!important;}
+    .rm-no-results{display:none;border:1px dashed rgba(139,0,0,.28);border-radius:18px;padding:18px;background:rgba(139,0,0,.04);color:#7f1d1d;font-weight:900;text-align:center;}
+    .rm-no-results.show{display:block;}
+    .rm-row-highlight td{background:rgba(139,0,0,.035)!important;}
+    @media(max-width:980px){.rm-hero,.rm-tools{grid-template-columns:1fr}.rm-actions,.rm-tabs,.rm-badges,.rm-tool-buttons{justify-content:flex-start}.rm-nav{position:relative;top:auto}.rm-table{min-width:1080px}}
+</style>
+
+<div class="rm-shell">
+    <section class="rm-hero">
+        <div>
+            <h2 class="rm-title"><i class="fa-solid fa-table-list"></i> BYS360 Rol Matrisi Merkezi <span class="rm-version">{{ matrix_version }}</span></h2>
+            <p class="rm-text">Bu ekran, Ayarlar modülü içinde Genel, Personel Yönetimi, Performans Yönetimi, İletişim-Anket, AI Karar Destek ve Ayarlar-Güvenlik sekmelerinin rol bazlı görünürlüğünü görsel matris olarak gösterir. Tik işareti ilgili rol için sekmenin açık olduğunu; boş kutu varsayılan kapalı olduğunu ifade eder.</p>
+        </div>
+        <div class="rm-actions">
+            <a class="rm-btn" href="{{ safe_url_for('main.settings_page') }}"><i class="fa-solid fa-sliders"></i> Ayarlara Dön</a>
+            <a class="rm-btn" href="#role-summary"><i class="fa-solid fa-users-gear"></i> Rol Özeti</a>
+            <a class="rm-btn primary" href="#matrix-list"><i class="fa-solid fa-shield-halved"></i> Matrisi İncele</a>
+        </div>
+    </section>
+
+    <section class="rm-stats">
+        <div class="rm-stat"><div class="rm-stat-label">Matris Grubu</div><div class="rm-stat-value">{{ stats.group_count }}</div></div>
+        <div class="rm-stat"><div class="rm-stat-label">Rol Sütunu</div><div class="rm-stat-value">{{ stats.role_count }}</div></div>
+        <div class="rm-stat"><div class="rm-stat-label">Sekme Satırı</div><div class="rm-stat-value">{{ stats.row_count }}</div></div>
+        <div class="rm-stat"><div class="rm-stat-label">Aktif Tik</div><div class="rm-stat-value">{{ stats.checked_count }}</div></div>
+        <div class="rm-stat"><div class="rm-stat-label">Personelde Kapalı</div><div class="rm-stat-value">{{ stats.restricted_row_count }}</div></div>
+    </section>
+
+    <section class="rm-nav">
+        <div class="rm-nav-title"><i class="fa-solid fa-filter"></i> Matris Grupları</div>
+        <div class="rm-tabs">
+            <a class="rm-tab {% if selected_module == 'tum' %}active{% endif %}" href="{{ safe_url_for('main.admin_role_matrix_center') }}"><i class="fa-solid fa-layer-group"></i> Tümü</a>
+            {% for group in matrix_groups %}
+            <a class="rm-tab {% if selected_module == group.key %}active{% endif %}" href="{{ safe_url_for('main.admin_role_matrix_center') }}?module={{ group.key }}"><i class="{{ group.icon }}"></i> {{ group.title }}</a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="rm-tools" aria-label="Rol matrisi araçları">
+        <input id="rmSearch" class="rm-search" type="search" placeholder="Sekme, modül, rol veya anahtar kelime ara..." autocomplete="off">
+        <div class="rm-tool-buttons">
+            <button class="rm-small-btn" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Yazdır</button>
+            <button class="rm-small-btn" type="button" id="rmClearSearch"><i class="fa-solid fa-eraser"></i> Aramayı Temizle</button>
+            <button class="rm-small-btn" type="button" id="rmCopySummary"><i class="fa-solid fa-copy"></i> Özeti Kopyala</button>
+        </div>
+    </section>
+
+    <section id="role-summary" class="rm-summary">
+        {% for item in role_summary %}
+        <article class="rm-role-card" data-role-card="{{ item.key }} {{ item.label }} {{ item.note }}">
+            <div class="rm-role-head">
+                <span class="rm-role-name">{{ item.label }}</span>
+                <span class="rm-role-tag">{{ item.short_label }}</span>
+            </div>
+            <div class="rm-role-metrics">
+                <span class="rm-role-metric">Açık: {{ item.allowed_count }}</span>
+                <span class="rm-role-metric">Kapalı: {{ item.denied_count }}</span>
+                <span class="rm-role-metric">Grup: {{ item.group_count }}</span>
+            </div>
+            <p>{{ item.note }}</p>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section class="rm-principles">
+        {% for principle in principles %}
+        <div class="rm-principle"><strong><i class="fa-solid fa-check"></i> İlke</strong>{{ principle }}</div>
+        {% endfor %}
+    </section>
+
+    <section id="matrix-list" class="rm-shell">
+        {% for group in visible_groups %}
+        <article class="rm-card" id="{{ group.key }}" data-rm-group="{{ group.title }} {{ group.subtitle }} {{ group.key }}">
+            <div class="rm-card-head">
+                <div>
+                    <h3 class="rm-card-title"><i class="{{ group.icon }}"></i> {{ group.title }}</h3>
+                    <p class="rm-card-text">{{ group.subtitle }}</p>
+                </div>
+                <div class="rm-badges">
+                    {% for badge in group.badges %}
+                    <span class="rm-badge"><i class="fa-solid fa-circle-check"></i> {{ badge }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rm-table-wrap">
+                <table class="rm-table">
+                    <thead>
+                        <tr>
+                            <th>SEKME</th>
+                            {% for role in roles %}
+                            <th title="{{ role.description }}">{{ role.short_label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in group.rows %}
+                        <tr data-rm-row="{{ group.title }} {{ row.title }} {{ row.subtitle }} {{ row.policy }} {{ row.allowed_roles|join(' ') }}">
+                            <td>
+                                <span class="rm-row-title"><i class="{{ row.icon }}"></i> {{ row.title }}</span>
+                                <span class="rm-row-sub">{{ row.subtitle }}</span>
+                            </td>
+                            {% for role in roles %}
+                            <td title="{{ role.label }} - {{ row.title }}">
+                                {% if role.key in row.allowed_roles %}
+                                <input class="rm-check" type="checkbox" checked disabled aria-label="{{ role.label }} için {{ row.title }} açık">
+                                {% else %}
+                                <span class="rm-empty" aria-label="{{ role.label }} için {{ row.title }} kapalı"></span>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="rm-policy"><strong>audit log:</strong> Bu gruptaki kritik rol, menü, görünürlük, yayın, AI ve yönetim işlemleri denetim iziyle takip edilmelidir.</p>
+        </article>
+        {% endfor %}
+    </section>
+
+    <div id="rmNoResults" class="rm-no-results"><i class="fa-solid fa-magnifying-glass"></i> Arama kriterine uygun rol matrisi satırı bulunamadı.</div>
+
+    <section class="rm-legend">
+        <h3 class="rm-card-title"><i class="fa-solid fa-circle-info"></i> Matris Okuma Notları</h3>
+        <div class="rm-legend-grid">
+            {% for item in role_legend %}
+            <div class="rm-principle"><strong>{{ item.label }}</strong>{{ item.text }}</div>
+            {% endfor %}
+            {% for item in role_priority_notes %}
+            <div class="rm-principle"><strong>{{ item.title }}</strong>{{ item.text }}</div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script>
+(function(){
+    const searchInput = document.getElementById('rmSearch');
+    const clearButton = document.getElementById('rmClearSearch');
+    const copyButton = document.getElementById('rmCopySummary');
+    const noResults = document.getElementById('rmNoResults');
+    const rows = Array.from(document.querySelectorAll('[data-rm-row]'));
+    const cards = Array.from(document.querySelectorAll('[data-rm-group]'));
+    const roleCards = Array.from(document.querySelectorAll('[data-role-card]'));
+
+    function normalize(value){
+        return (value || '').toString().toLocaleLowerCase('tr-TR');
+    }
+
+    function applySearch(){
+        const q = normalize(searchInput ? searchInput.value : '');
+        let visibleRowCount = 0;
+        rows.forEach(function(row){
+            const match = !q || normalize(row.getAttribute('data-rm-row')).includes(q);
+            row.classList.toggle('rm-hidden', !match);
+            row.classList.toggle('rm-row-highlight', !!q && match);
+            if(match){ visibleRowCount += 1; }
+        });
+        roleCards.forEach(function(card){
+            const match = !q || normalize(card.getAttribute('data-role-card')).includes(q);
+            card.classList.toggle('rm-hidden', !match && q.length > 0);
+        });
+        cards.forEach(function(card){
+            const visibleRows = card.querySelectorAll('tbody tr:not(.rm-hidden)').length;
+            const groupMatch = q && normalize(card.getAttribute('data-rm-group')).includes(q);
+            card.classList.toggle('rm-hidden', q && !groupMatch && visibleRows === 0);
+        });
+        if(noResults){ noResults.classList.toggle('show', q.length > 0 && visibleRowCount === 0); }
+    }
+
+    if(searchInput){ searchInput.addEventListener('input', applySearch); }
+    if(clearButton){ clearButton.addEventListener('click', function(){ if(searchInput){ searchInput.value=''; applySearch(); searchInput.focus(); } }); }
+    if(copyButton){ copyButton.addEventListener('click', function(){
+        const text = 'BYS360 Rol Matrisi V4: {{ stats.group_count }} grup, {{ stats.role_count }} rol, {{ stats.row_count }} sekme satırı, {{ stats.checked_count }} aktif tik.';
+        if(navigator.clipboard){ navigator.clipboard.writeText(text); }
+        copyButton.innerHTML = '<i class="fa-solid fa-check"></i> Kopyalandı';
+        setTimeout(function(){ copyButton.innerHTML = '<i class="fa-solid fa-copy"></i> Özeti Kopyala'; }, 1400);
+    }); }
+})();
+</script>
+{% endblock %}

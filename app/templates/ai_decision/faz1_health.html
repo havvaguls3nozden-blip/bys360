@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Karar Destek Merkezi{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz1_executive.css') }}">
+{% set policy = payload.policy if payload and payload.policy else {} %}
+{% set is_ready = payload.ok if payload else false %}
+
+<main class="decision-status-page" aria-labelledby="decision-status-title">
+  <section class="decision-hero-card">
+    <div class="decision-hero-glow" aria-hidden="true"></div>
+    <div class="decision-hero-content">
+      <p class="decision-eyebrow">BYS360 Karar Destek Merkezi</p>
+      <h1 id="decision-status-title">Yönetim kararlarını güçlendiren güvenli analiz alanı</h1>
+      <p class="decision-hero-text">
+        Performans verileri, açıklama gereklilikleri ve üst onay ihtiyacı tek bakışta anlaşılır hale getirilir.
+        Bu alan karar vermez; yetkili kullanıcıya değerlendirme öncesi güvenli destek sunar.
+      </p>
+      <div class="decision-hero-actions" aria-label="Hızlı geçişler">
+        <a class="decision-primary-action" href="/performance/dashboard">Yönetici görünümüne geç</a>
+        <a class="decision-secondary-action" href="/performance/reports">Performans raporlarını aç</a>
+      </div>
+    </div>
+    <aside class="decision-status-card" aria-label="Merkez durumu">
+      <span class="decision-status-dot {{ 'is-ready' if is_ready else 'needs-review' }}"></span>
+      <strong>{{ 'Merkez hazır' if is_ready else 'İnceleme gerekli' }}</strong>
+      <small>Kontroller güvenli kullanım ilkeleriyle çalışıyor.</small>
+    </aside>
+  </section>
+
+  <section class="decision-overview-grid" aria-label="Karar destek ilkeleri">
+    <article class="decision-info-card is-strong">
+      <span class="decision-card-icon">✓</span>
+      <h2>İnsan onayı esastır</h2>
+      <p>Üretilen notlar yöneticinin değerlendirmesine yardımcı olur; nihai idari karar yetkili kişidedir.</p>
+    </article>
+    <article class="decision-info-card">
+      <span class="decision-card-icon">↗</span>
+      <h2>Düşük performans görünürlüğü</h2>
+      <p>{{ policy.low_score_threshold|default(70) }} puanın altındaki sonuçlarda üst onay ihtiyacı öne çıkarılır.</p>
+    </article>
+    <article class="decision-info-card">
+      <span class="decision-card-icon">★</span>
+      <h2>Yüksek başarı gerekçesi</h2>
+      <p>{{ policy.high_score_threshold|default(90) }} puanın üzerindeki sonuçlarda ayrıntılı genel görüş kontrol edilir.</p>
+    </article>
+    <article class="decision-info-card">
+      <span class="decision-card-icon">⌁</span>
+      <h2>Yayın koruması</h2>
+      <p>Düşük performans süreci tamamlanmadan sonucun personele açılması engellenir.</p>
+    </article>
+  </section>
+
+  <section class="decision-section-card">
+    <div class="decision-section-heading">
+      <p class="decision-eyebrow">Canlı kullanım özeti</p>
+      <h2>Kurumsal kontrol başlıkları</h2>
+      <span>Bu başlıklar, karar destek alanının hangi kurumsal güvenceyle çalıştığını sade şekilde gösterir.</span>
+    </div>
+
+    <div class="decision-control-list">
+      <article class="decision-control-row">
+        <div>
+          <strong>Düşük performansta üst onay</strong>
+          <p>Başkan veya yetkili üst onay süreci gerektiğinde sonuç doğrudan yayınlanmaz.</p>
+        </div>
+        <span class="decision-pill {{ 'active' if policy.low_score_requires_upper_approval else 'passive' }}">
+          {{ 'Aktif' if policy.low_score_requires_upper_approval else 'Kapalı' }}
+        </span>
+      </article>
+
+      <article class="decision-control-row">
+        <div>
+          <strong>Yayın öncesi koruma</strong>
+          <p>Düşük performans sonucu onay süreci tamamlanmadan personele gösterilmez.</p>
+        </div>
+        <span class="decision-pill {{ 'active' if policy.publish_lock_for_low_score else 'passive' }}">
+          {{ 'Aktif' if policy.publish_lock_for_low_score else 'Kapalı' }}
+        </span>
+      </article>
+
+      <article class="decision-control-row">
+        <div>
+          <strong>Gerekçeli değerlendirme</strong>
+          <p>1 ve 5 puanlarda açıklama istenmesi sistem ayarına göre yönetilir.</p>
+        </div>
+        <span class="decision-pill {{ 'active' if policy.require_comment_for_score_1 or policy.require_comment_for_score_5 else 'passive' }}">
+          {{ 'Aktif' if policy.require_comment_for_score_1 or policy.require_comment_for_score_5 else 'Kapalı' }}
+        </span>
+      </article>
+
+      <article class="decision-control-row">
+        <div>
+          <strong>Eşik dışı sonuçlarda genel görüş</strong>
+          <p>Düşük veya çok yüksek performans sonucunda ayrıntılı kanaat kontrolü yapılır.</p>
+        </div>
+        <span class="decision-pill {{ 'active' if policy.require_general_comment_below_low or policy.require_general_comment_above_high else 'passive' }}">
+          {{ 'Aktif' if policy.require_general_comment_below_low or policy.require_general_comment_above_high else 'Kapalı' }}
+        </span>
+      </article>
+    </div>
+  </section>
+
+  <section class="decision-bottom-grid">
+    <article class="decision-guidance-card">
+      <p class="decision-eyebrow">Yönetici notu</p>
+      <h2>Bu ekranın anlamı</h2>
+      <p>
+        Karar Destek Merkezi; performans sürecinde dikkat edilmesi gereken eşikleri, onay ihtiyaçlarını ve yayın
+        korumasını sade bir dille gösterir. Kişisel karar vermez, otomatik idari işlem oluşturmaz.
+      </p>
+    </article>
+    <article class="decision-guidance-card is-muted">
+      <p class="decision-eyebrow">Güvenli kullanım</p>
+      <h2>Veri sınırı korunur</h2>
+      <p>
+        Kullanıcı yalnızca yetkisi kapsamındaki özetleri görür. Hassas içerik, kişisel veri ve mahrem değerlendirme
+        ayrıntıları bu alanda açık biçimde sunulmaz.
+      </p>
+    </article>
+  </section>
+</main>
+{% endblock %}

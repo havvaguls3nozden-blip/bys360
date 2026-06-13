@@ -1,0 +1,167 @@
+/* BYS360_AI_TEACHING_CENTER_V1 */
+.ai-teaching-page{--teach-red:#8B0000;--teach-red-dark:#650000;--teach-ink:#172033;--teach-muted:#667085;--teach-border:rgba(139,0,0,.12);--teach-soft:rgba(139,0,0,.055);color:var(--teach-ink);padding-bottom:28px}.ai-teaching-page *{box-sizing:border-box}.ai-teaching-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:20px;align-items:stretch;border-radius:30px;padding:28px;color:#fff;background:radial-gradient(circle at 90% 10%,rgba(214,179,106,.38),transparent 28%),linear-gradient(135deg,var(--teach-red),var(--teach-red-dark));box-shadow:0 24px 58px rgba(139,0,0,.20)}.ai-teaching-kicker{display:inline-flex;margin-bottom:12px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.86);font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.ai-teaching-hero h1{margin:0;font-size:clamp(28px,4vw,44px);line-height:1.05;font-weight:950;letter-spacing:-.035em}.ai-teaching-hero p{margin:14px 0 0;max-width:850px;color:rgba(255,255,255,.84);line-height:1.65}.ai-teaching-hero aside{border-radius:24px;padding:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px)}.ai-teaching-hero aside strong,.ai-teaching-hero aside span{display:block}.ai-teaching-hero aside strong{font-size:17px;margin-bottom:8px}.ai-teaching-hero aside span{color:rgba(255,255,255,.82);line-height:1.55}.ai-teaching-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:18px;margin-top:20px}.ai-teaching-form-card,.ai-teaching-help-card,.ai-teaching-list-card{border:1px solid var(--teach-border);background:rgba(255,255,255,.94);box-shadow:0 18px 44px rgba(31,41,55,.08);border-radius:26px;overflow:hidden}.ai-teaching-section-head{padding:20px;border-bottom:1px solid rgba(139,0,0,.08);background:linear-gradient(180deg,rgba(139,0,0,.045),transparent)}.ai-teaching-section-head span{display:block;margin-bottom:6px;color:var(--teach-red);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.ai-teaching-section-head h2{margin:0;font-size:20px;line-height:1.2;font-weight:900}.ai-teaching-section-head p{margin:8px 0 0;color:var(--teach-muted);line-height:1.55;font-size:13px}.ai-teaching-form{display:grid;gap:14px;padding:20px}.ai-teaching-form label{display:grid;gap:7px}.ai-teaching-form label span{color:var(--teach-ink);font-size:13px;font-weight:850}.ai-teaching-form input,.ai-teaching-form textarea,.ai-teaching-form select{width:100%;border:1px solid rgba(139,0,0,.15);border-radius:15px;background:rgba(139,0,0,.025);padding:12px 13px;font:inherit;font-size:13px;outline:none}.ai-teaching-form textarea{resize:vertical}.ai-teaching-form input:focus,.ai-teaching-form textarea:focus,.ai-teaching-form select:focus{border-color:rgba(139,0,0,.46);box-shadow:0 0 0 3px rgba(139,0,0,.08);background:#fff}.ai-teaching-form-row{display:grid;grid-template-columns:1fr 220px;gap:12px}.ai-teaching-form button,.ai-teaching-actions button{border:0;border-radius:15px;background:var(--teach-red);color:#fff;min-height:42px;padding:0 15px;font-weight:900;cursor:pointer}.ai-teaching-help-card{padding:20px}.ai-teaching-help-card h2{margin:0;color:var(--teach-red);font-size:20px}.ai-teaching-help-card ol{margin:14px 0 0;padding-left:20px;color:var(--teach-muted);line-height:1.65;font-size:13px}.ai-teaching-example{margin-top:18px;border-radius:18px;padding:14px;border:1px solid rgba(139,0,0,.10);background:var(--teach-soft)}.ai-teaching-example strong{display:block;color:var(--teach-red);margin-bottom:8px}.ai-teaching-example p{margin:0;color:var(--teach-muted);line-height:1.55;font-size:13px}.ai-teaching-list-card{margin-top:20px}.ai-teaching-table-wrap{overflow:auto}.ai-teaching-table{width:100%;border-collapse:collapse;min-width:980px}.ai-teaching-table th,.ai-teaching-table td{padding:14px 16px;border-bottom:1px solid rgba(139,0,0,.08);text-align:left;vertical-align:top;font-size:13px}.ai-teaching-table th{color:var(--teach-red);background:rgba(139,0,0,.035);font-weight:900}.ai-teaching-table td strong{display:block;font-weight:900}.ai-teaching-table td small{display:block;margin-top:4px;color:var(--teach-muted)}.ai-teaching-table pre{white-space:pre-wrap;margin:0;font:inherit;color:var(--teach-muted);line-height:1.45}.ai-teaching-status{display:inline-flex;border-radius:999px;padding:7px 10px;font-weight:900;font-size:12px}.ai-teaching-status.active{color:#075e3d;background:rgba(7,94,61,.10)}.ai-teaching-status.passive{color:#7a4b00;background:rgba(122,75,0,.10)}.ai-teaching-actions{display:flex;flex-wrap:wrap;gap:8px}.ai-teaching-actions form{margin:0}.ai-teaching-actions button{min-height:34px;font-size:12px;border-radius:12px}.ai-teaching-actions button.danger{background:#7f1d1d}.ai-teaching-empty{margin:20px;border-radius:18px;padding:18px;background:var(--teach-soft);color:var(--teach-muted);border:1px solid rgba(139,0,0,.10)}@media(max-width:1080px){.ai-teaching-hero,.ai-teaching-grid,.ai-teaching-form-row{grid-template-columns:1fr}}
+
+/* BYS360_AI_KNOWLEDGE_BANK_SEED_DISPLAY_V1 */
+.ai-knowledge-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.ai-knowledge-summary-grid article {
+  border: 1px solid rgba(139,0,0,.12);
+  background: linear-gradient(180deg, #fff, rgba(139,0,0,.025));
+  box-shadow: 0 18px 44px rgba(31,41,55,.07);
+  border-radius: 24px;
+  padding: 17px;
+}
+
+.ai-knowledge-summary-grid span {
+  display: block;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ai-knowledge-summary-grid strong {
+  display: block;
+  margin-top: 10px;
+  color: #8B0000;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.ai-knowledge-summary-grid em {
+  display: block;
+  margin-top: 9px;
+  color: #667085;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.ai-knowledge-bank-list {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+
+.ai-knowledge-entry-card {
+  border: 1px solid rgba(139,0,0,.10);
+  background: #fff;
+  border-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 10px 26px rgba(31,41,55,.05);
+}
+
+.ai-knowledge-entry-card header,
+.ai-knowledge-entry-card footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.ai-knowledge-entry-card h3 {
+  margin: 8px 0 0;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.ai-knowledge-entry-card header p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+.ai-knowledge-entry-card header strong {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: #8B0000;
+  background: rgba(139,0,0,.055);
+  font-size: 12px;
+}
+
+.ai-knowledge-entry-body {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.ai-knowledge-entry-body > div {
+  border: 1px solid rgba(139,0,0,.08);
+  border-radius: 18px;
+  background: rgba(139,0,0,.025);
+  padding: 13px;
+}
+
+.ai-knowledge-entry-body span {
+  display: block;
+  color: #8B0000;
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.ai-knowledge-entry-body pre,
+.ai-knowledge-entry-body p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: #4b5563;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ai-knowledge-entry-card footer {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(139,0,0,.08);
+  align-items: center;
+}
+
+.ai-knowledge-entry-card footer small {
+  color: #667085;
+}
+
+.ai-teaching-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.ai-teaching-breadcrumb a {
+  color: #8B0000 !important;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.ai-teaching-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.ai-teaching-breadcrumb span::before {
+  content: "›";
+  margin-right: 8px;
+  color: rgba(139,0,0,.45);
+}
+
+@media (max-width: 980px) {
+  .ai-knowledge-summary-grid,
+  .ai-knowledge-entry-body {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-knowledge-entry-card header,
+  .ai-knowledge-entry-card footer {
+    display: grid;
+  }
+}

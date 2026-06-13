@@ -1,0 +1,25 @@
+BYS360 LIVE LOGOUT FORCE CLEAR V2.13.3
+
+Amaç:
+- Canlıda “Çıkış yapıldı” mesajı görünmesine rağmen kullanıcının içeride kalması sorununu düzeltir.
+- Logout route GET/POST uyumlu hale gelir.
+- Bozuk/yarım oturumda da logout çağrısı session ve remember cookie temizliği yapabilir.
+- Logout cevabına no-store header eklenir.
+- Kimlikli HTML sayfalarında tarayıcı önbelleği kaynaklı geri dönüş etkisi azaltılır.
+- PWA service worker sürümü yenilenir ve logout/login hassas istekleri cache dışında kalır.
+
+Uygulama:
+1) Zip içeriğini C:\bys360\project içine açın.
+2) PowerShell:
+   cd C:\bys360\project
+   powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_live_logout_force_clear_v2_13_3.ps1 -ProjectRoot "C:\bys360\project"
+3) Canlı görevini durdurup başlatın:
+   Stop-ScheduledTask -TaskName "BYS360 Live Waitress 80"
+   Start-ScheduledTask -TaskName "BYS360 Live Waitress 80"
+
+Test:
+- Canlıda giriş yapın.
+- Sağ üst/sol menü Güvenli Çıkış'a basın.
+- Login sayfasına düşmelisiniz.
+- Geri tuşuna basınca içerik ekranı açılmamalı; login veya yetkisiz/yenileme davranışı gelmelidir.
+- /dashboard veya iç ekran URL'si elle yazıldığında login'e yönlenmelidir.

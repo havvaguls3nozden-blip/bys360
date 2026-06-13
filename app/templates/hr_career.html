@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Kariyer ve Gelişim Planlama - BYS360{% endblock %}
+{% block page_kicker %}Eğitim ve Performans Çalışma Grubu{% endblock %}
+{% block page_title %}Kariyer ve Gelişim Planlama{% endblock %}
+{% block page_subtitle %}
+Kariyer, gelişim, yedekleme ve hazırlık havuzunu Eğitim ve Performans çalışma grubu odağında yöneten ekran.
+{% endblock %}
+
+{% block content %}
+{% set _scope_options = hr_scope.scope_options if hr_scope is defined and hr_scope and hr_scope.scope_options is defined else ([{'value': (selected_scope_mode if selected_scope_mode is defined and selected_scope_mode else 'personal'), 'label': 'Kişisel görünüm'}]) %}
+<style>
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}
+.page-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:18px}.stack{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.65rem;font-weight:900;color:#111827;line-height:1}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}
+.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:720px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.soft{background:#f3f4f6;color:#374151}
+.scope-strip{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);box-shadow:0 14px 28px rgba(15,23,42,.06);margin-top:18px}.scope-meta{display:grid;gap:4px}.scope-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.scope-title{font-size:1.05rem;font-weight:900;color:#111827}.scope-sub{font-size:.9rem;color:#6b7280;line-height:1.65}.scope-options{display:flex;flex-wrap:wrap;gap:8px}.scope-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(15,23,42,.1);background:#fff;color:#374151;font-weight:800;font-size:.86rem}.scope-pill.active{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}
+.action-list{display:grid;gap:12px}.action-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.action-row.critical{border-color:#fecaca;background:#fff7f7}.action-row.watch{border-color:#fed7aa;background:#fffaf3}.count{min-width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#f8fafc;font-weight:900}
+@media (max-width:1100px){.page-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media (max-width:720px){.stats{grid-template-columns:1fr}}
+</style>
+
+<div class="panel">
+    <div class="stats">
+        <div class="stat"><div class="label">Kapsamdaki personel</div><div class="value">{{ scope_user_count }}</div></div>
+        <div class="stat"><div class="label">Yüksek potansiyel</div><div class="value">{{ high_potential_count }}</div></div>
+        <div class="stat"><div class="label">Yedekleme havuzu</div><div class="value">{{ bench_ready_count }}</div></div>
+        <div class="stat"><div class="label">Profil ortalaması</div><div class="value">{{ completion_avg }}%</div></div>
+    </div>
+    <div class="muted" style="margin-top:14px;">{% if effective_period %}Referans dönem: <strong>{{ effective_period.title }}</strong>.{% else %}Aktif dönem bulunmadı.{% endif %} Bu ekran Personel altında konumlanmaz; eğitim, gelişim ve potansiyel görünürlüğü için çalışır.</div>
+</div>
+
+<div class="scope-strip">
+    <div class="scope-meta">
+        <div class="scope-kicker">{{ hr_scope.role_title if hr_scope else 'Kapsam' }}</div>
+        <div class="scope-title">{{ hr_scope.scope_heading if hr_scope else 'Kapsam' }} · {{ hr_scope.scope_label if hr_scope else '' }}</div>
+        <div class="scope-sub">Performans, profil tamlığı ve gelişim hazırlığı verisi birlikte okunur.</div>
+    </div>
+    <div class="scope-options">
+        {% for option in _scope_options %}
+            <a class="scope-pill {% if selected_scope_mode == option.value %}active{% endif %}" href="{{ url_for('main.hr_career_planning', scope=option.value) }}">{{ option.label }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="stack">
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Kariyer aksiyon görünümü</h4>
+            <div class="action-list">
+                {% for row in action_rows %}
+                <div class="action-row {% if row.tone == 'critical' %}critical{% elif row.tone == 'watch' %}watch{% endif %}">
+                    <div><strong>{{ row.title }}</strong><div class="muted">{{ row.detail }}</div></div>
+                    <div class="count">{{ row.count }}</div>
+                </div>
+                {% else %}
+                <div class="action-row"><div><strong>Açık kariyer aksiyonu görünmüyor</strong><div class="muted">Bu kapsam için öne çıkan yapısal risk bulunmadı.</div></div><div class="count">0</div></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Birim hazırlık görünümü</h4>
+            <div class="table-wrap">
+                <table class="table-clean">
+                    <thead><tr><th>Birim</th><th>Hazırlık</th><th>Potansiyel</th><th>Yedek</th><th>Amir gap</th></tr></thead>
+                    <tbody>
+                    {% for row in readiness_rows %}
+                        <tr>
+                            <td>{{ row.unit_name }}</td>
+                            <td><span class="tag {% if row.readiness_score >= 2 %}good{% elif row.readiness_score >= 0 %}warn{% else %}bad{% endif %}">{{ row.readiness_score }}</span></td>
+                            <td>{{ row.high_potential_count }}</td>
+                            <td>{{ row.succession_count }}</td>
+                            <td>{{ row.manager_gap_count }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5">Gösterilecek veri yok.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Yüksek potansiyel listesi</h4>
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Personel</th><th>Birim</th><th>Son puan</th><th>Profil</th><th>Öneri</th></tr></thead><tbody>
+            {% for row in talent_rows %}
+                <tr><td>{{ row.user.full_name }}<br><span class="muted">{{ row.user.unvan or '-' }}</span></td><td>{{ row.unit_name }}</td><td><span class="tag good">{{ '%.1f'|format(row.performance_score) }}</span></td><td><span class="tag {% if row.profile.score >= 90 %}good{% elif row.profile.score >= 70 %}warn{% else %}bad{% endif %}">{{ row.profile.score }}%</span></td><td>Yedekleme ve görev zenginleştirme için uygun.</td></tr>
+            {% else %}
+                <tr><td colspan="5">Gösterilecek kayıt bulunmadı.</td></tr>
+            {% endfor %}
+            </tbody></table></div>
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Gelişim önceliği listesi</h4>
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Personel</th><th>Birim</th><th>Son puan</th><th>Profil</th><th>Gerekçe</th></tr></thead><tbody>
+            {% for row in development_rows %}
+                <tr><td>{{ row.user.full_name }}</td><td>{{ row.unit_name }}</td><td><span class="tag {% if row.performance_score and row.performance_score < 70 %}bad{% else %}soft{% endif %}">{{ '%.1f'|format(row.performance_score) if row.performance_score else '-' }}</span></td><td><span class="tag {% if row.profile.score >= 90 %}good{% elif row.profile.score >= 70 %}warn{% else %}bad{% endif %}">{{ row.profile.score }}%</span></td><td>{% if row.missing_manager %}1. amir kaydı eksik.{% elif row.profile.critical_missing %}Özlük alanları eksik.{% elif row.performance_score and row.performance_score < 70 %}Performans gelişim ihtiyacı.{% else %}İzleme önerilir.{% endif %}</td></tr>
+            {% else %}
+                <tr><td colspan="5">Gösterilecek kayıt bulunmadı.</td></tr>
+            {% endfor %}
+            </tbody></table></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

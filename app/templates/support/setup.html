@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Destek Modülü Kurulumu - BYS360{% endblock %}
+{% block page_kicker %}Destek ve Talep Yönetimi{% endblock %}
+{% block page_title %}Kurulum Ekranı{% endblock %}
+{% block page_subtitle %}Bu ekran yalnızca modül tablolarını oluşturmak ve temel kategorileri hazırlamak için kullanılır.{% endblock %}
+{% block content %}
+<style>.setup-shell{display:grid;gap:18px}.setup-card{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;padding:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}.setup-list{display:grid;gap:8px;margin-top:12px}.setup-item{padding:12px 14px;border-radius:14px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.support-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;border-radius:14px;text-decoration:none;font-weight:800;border:none}.support-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}.support-btn.soft{background:#eef2f7;color:#334155}</style>
+<div class="setup-shell">
+    <div class="setup-card">
+        <h3 style="margin:0 0 8px;font-size:1.08rem;font-weight:900;color:#111827;">Destek & Talepler modülünü aktifleştir</h3>
+        <p style="margin:0;color:#6b7280;line-height:1.85;">Bu işlem yalnızca destek modülüne ait tabloları oluşturur. Mevcut diğer modüllerin tablolarına dokunmaz.</p>
+        <div class="setup-list">
+            {% for row in required_tables %}<div class="setup-item">{{ row }}</div>{% endfor %}
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;">
+            {% if not is_support_ready %}
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="support-btn primary"><i class="fa-solid fa-play"></i> Kurulumu Başlat</button>
+            </form>
+            {% else %}
+            <div class="support-btn soft"><i class="fa-solid fa-circle-check"></i> Kurulum tamamlandı</div>
+            {% endif %}
+            <a href="{{ url_for('main.support_index') }}" class="support-btn soft"><i class="fa-solid fa-arrow-left"></i> Modüle dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

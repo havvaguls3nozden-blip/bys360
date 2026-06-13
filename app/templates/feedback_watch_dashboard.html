@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Takip ve Uyarı Paneli - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Takip ve Uyarı Paneli{% endblock %}
+{% block page_subtitle %}
+Açık geri bildirim taleplerini, SLA riskini ve yaklaşan veya geciken görüşmeleri tek panelde izleyin.
+{% endblock %}
+
+{% block content %}
+<style>
+.watch-shell{display:grid;gap:18px}
+.glass-card{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}
+.scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+.scope-pill,.soft-pill,.tone-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:900;white-space:nowrap}
+.scope-pill{background:rgba(139,0,0,.08);color:#8B0000}
+.soft-pill{background:#eef2f7;color:#4b5563}.tone-pill.watch{background:rgba(180,83,9,.12);color:#92400e}.tone-pill.critical{background:rgba(185,28,28,.1);color:#991b1b}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) 340px;gap:18px}
+.hero-title{margin:0;color:#111827;font-size:1.15rem;font-weight:900;line-height:1.45}
+.hero-text{margin-top:10px;color:#6b7280;font-size:.93rem;line-height:1.85}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;text-decoration:none;cursor:pointer;font-weight:800;font-size:.9rem;transition:all .18s ease}
+.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+.btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+.btn-soft:hover{transform:translateY(-1px)}
+.side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:#f8fafc;display:grid;gap:8px}
+.side-label{color:#6b7280;font-size:.78rem;font-weight:800}.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.6}.side-sub{color:#6b7280;font-size:.84rem;line-height:1.75}
+.stats-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}.stat-card{position:relative;overflow:hidden}.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}
+.stat-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}.stat-value{color:#111827;font-size:1.35rem;font-weight:900;line-height:1;position:relative;z-index:1}.stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;line-height:1.65;position:relative;z-index:1}
+.layout-grid{display:grid;grid-template-columns:minmax(0,1.08fr) 360px;gap:18px}
+.section-title{margin:0 0 12px;color:#111827;font-size:1.06rem;font-weight:900}.section-sub{margin:0 0 14px;color:#6b7280;font-size:.9rem;line-height:1.75}
+.list-grid{display:grid;gap:12px}.item-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:16px;display:grid;gap:10px}.item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.item-title{margin:0;color:#111827;font-size:.98rem;font-weight:900;line-height:1.5}.item-meta{color:#6b7280;font-size:.84rem;line-height:1.75}.item-text{color:#4b5563;font-size:.86rem;line-height:1.8}.item-actions{display:flex;gap:10px;flex-wrap:wrap}
+.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:12px;text-decoration:none;background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08);font-size:.82rem;font-weight:800}
+.manager-list{display:grid;gap:10px}.manager-row{display:grid;gap:10px;padding:14px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff}.manager-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.manager-name{font-weight:900;color:#111827}.manager-meta{color:#6b7280;font-size:.82rem;line-height:1.7}.manager-badges{display:flex;gap:8px;flex-wrap:wrap}.empty-box{padding:22px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;text-align:center;line-height:1.8}
+.form-note{color:#6b7280;font-size:.82rem;line-height:1.7}.checkline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#374151;font-size:.86rem;font-weight:700}
+@media (max-width:1280px){.hero-grid,.layout-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:768px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.btn-soft,.mini-btn{width:100%}}
+</style>
+
+<div class="watch-shell">
+    <div class="scope-strip">
+        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için takip sinyali üretiliyor.</span></div>
+        <span class="scope-pill"><i class="fa-solid fa-bell"></i> Takip ve Uyarı Merkezi</span>
+    </div>
+
+    <div class="glass-card">
+        <div class="hero-grid">
+            <div>
+                <h3 class="hero-title">Sistem hangi kayda hatırlatma ve hangi kayda SLA uyarısı gitmesi gerektiğini burada söyler</h3>
+                <p class="hero-text">Bu panel, açık talep yaşını ve görüşme takvimini okuyarak operasyon ekibine öncelik çıkarır. Tek tıkla uygulama içi uyarılar üretilebilir; isterseniz aynı anda e-posta denemesi de yapılır.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+                    <span class="soft-pill"><i class="fa-solid fa-inbox"></i> {{ alert_counts.open_requests or 0 }} açık talep</span>
+                    <span class="tone-pill watch"><i class="fa-solid fa-bell"></i> {{ alert_counts.request_reminder_candidates or 0 }} hatırlatma eşiğinde</span>
+                    <span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ alert_counts.request_sla_risks or 0 }} SLA riski</span>
+                </div>
+                <div class="hero-actions">
+                    <a href="{{ url_for('main.feedback_operations_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-chart-line"></i> Operasyon Paneli</a>
+                    <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-halved"></i> Audit Paneli</a>
+                    <a href="{{ url_for('main.feedback_executive_summary_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-chart-pie"></i> Yönetici Özeti</a>
+                    <form method="post" action="{{ url_for('main.feedback_watch_run_alerts', scope=selected_scope) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="scope" value="{{ selected_scope }}">
+                        <label class="checkline"><input type="checkbox" name="send_email" value="1"> E-posta da dene</label>
+                        <button type="submit" class="btn-soft primary"><i class="fa-solid fa-bolt"></i> Hatırlatmaları Çalıştır</button>
+                    </form>
+                </div>
+                <div class="form-note">Aynı açık kayıt için okunmamış uyarı varsa sistem yinelenen uygulama içi bildirimi tekrar üretmez.</div>
+            </div>
+            <div class="side-card">
+                <div class="side-label">Çalışan kurallar</div>
+                <div class="side-value">Talep {{ runner_rules.request_reminder_days }}. günde hatırlatma, {{ runner_rules.request_sla_days }}. günde SLA uyarısına düşer.</div>
+                <div class="side-sub">Görüşmeler için {{ runner_rules.meeting_window_hours }} saat içi yaklaşan hatırlatması ve planlı bitişten {{ runner_rules.meeting_overdue_hours }} saat sonra gecikme uyarısı üretilir.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Açık Talep</div><div class="stat-value">{{ alert_counts.open_requests or 0 }}</div><div class="stat-sub">Henüz kapanmamış bekleyen talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Hatırlatma</div><div class="stat-value">{{ alert_counts.request_reminder_candidates or 0 }}</div><div class="stat-sub">İlk hatırlatma eşiğini geçen talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">SLA Riski</div><div class="stat-value">{{ alert_counts.request_sla_risks or 0 }}</div><div class="stat-sub">Yönetici aksiyonu geciken kritik talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">24 Saat İçinde</div><div class="stat-value">{{ alert_counts.meetings_next_24h or 0 }}</div><div class="stat-sub">Yaklaşan görüşme kayıtları.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Geciken Görüşme</div><div class="stat-value">{{ alert_counts.meeting_overdue or 0 }}</div><div class="stat-sub">Planlı zamanı aşmış, durumu güncellenmemiş kayıtlar.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yoğun Amir</div><div class="stat-value">{{ alert_counts.manager_hotspots or 0 }}</div><div class="stat-sub">Açık yük veya gecikme biriktiren yönetici sayısı.</div></div>
+    </div>
+
+    <div class="layout-grid">
+        <div style="display:grid;gap:18px;">
+            <div class="glass-card">
+                <h3 class="section-title">Talep uyarı kuyruğu</h3>
+                <p class="section-sub">Önce SLA riski, sonra hatırlatma eşiği gelen talepler listelenir.</p>
+                {% if request_alerts %}
+                <div class="list-grid">
+                    {% for item in request_alerts %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <div class="tone-pill {{ item.tone }}">{{ item.kind }}</div>
+                                <h4 class="item-title" style="margin-top:10px;">{{ item.employee_name }}</h4>
+                                <div class="item-meta">{{ item.period_title }} · {{ item.status }} · {{ item.age_days }} gündür açık</div>
+                            </div>
+                            <span class="soft-pill"><i class="fa-solid fa-user-check"></i> {{ item.manager_text }}</span>
+                        </div>
+                        <div class="item-text">{{ item.detail }}</div>
+                        <div class="item-actions">
+                            <a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=item.request_id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Şu an hatırlatma veya SLA eşiğini geçen açık talep görünmüyor.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Görüşme uyarı kuyruğu</h3>
+                <p class="section-sub">Yaklaşan ve geciken görüşmeler aynı akışta görünür.</p>
+                {% if meeting_alerts %}
+                <div class="list-grid">
+                    {% for item in meeting_alerts %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <div class="tone-pill {{ item.tone }}">{{ item.kind }}</div>
+                                <h4 class="item-title" style="margin-top:10px;">{{ item.employee_name }}</h4>
+                                <div class="item-meta">{{ item.manager_name }} · {{ item.when_text }} · {{ item.status }}</div>
+                            </div>
+                        </div>
+                        <div class="item-text">{{ item.location }}{% if item.hours_late is defined %} · {{ item.hours_late }} saat gecikme{% endif %}</div>
+                        <div class="item-actions">
+                            <a class="mini-btn" href="{{ url_for('main.feedback_meeting_detail', meeting_id=item.meeting_id, scope=selected_scope) }}"><i class="fa-solid fa-calendar-check"></i> Randevuyu Aç</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Şu an yaklaşan veya geciken görüşme uyarısı görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display:grid;gap:18px;align-content:start;">
+            <div class="glass-card">
+                <h3 class="section-title">Yönetici özet kutuları</h3>
+                <p class="section-sub">Açık yük, SLA riski ve yaklaşan veya geciken randevu yoğunluğu en yüksek yöneticileri üstte tuttum.</p>
+                {% if manager_rows %}
+                <div class="manager-list">
+                    {% for row in manager_rows %}
+                    <div class="manager-row">
+                        <div class="manager-top">
+                            <div class="manager-name">{{ row.manager_name }}</div>
+                            <div class="manager-badges">
+                                <span class="soft-pill"><i class="fa-solid fa-inbox"></i> {{ row.open_requests }}</span>
+                                {% if row.sla_risk_requests %}<span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ row.sla_risk_requests }}</span>{% endif %}
+                            </div>
+                        </div>
+                        <div class="manager-meta">En yaşlı açık talep: {{ row.max_request_age_days }} gün · Yaklaşan görüşme: {{ row.upcoming_meetings }} · Geciken görüşme: {{ row.overdue_meetings }}</div>
+                        <div class="manager-meta">En yakın görüşme: {{ row.next_meeting_text or '-' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Henüz özetlenecek açık yük görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

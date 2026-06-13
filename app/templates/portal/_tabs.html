@@ -1,0 +1,14 @@
+<nav class="portal-tabs bys360-portal-tabs-v3b8c" aria-label="Kurumsal Portal menüsü">
+  {% set _portal_can_manage = portal_can_manage|default(false) %}
+  {% set _portal_press_news_visible = portal_press_news_visible|default(false) %}
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'feed' else '' }}" href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}"><i class="fa-solid fa-stream"></i> Yayın Akışı</a>
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'profile' else '' }}" href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-user"></i> Profilim</a>
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'people' else '' }}" href="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}"><i class="fa-solid fa-address-book"></i> Personel Duvarları</a>
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'groups' else '' }}" href="{{ safe_url_for('main.portal_groups', fallback='/portal/groups') }}"><i class="fa-solid fa-user-group"></i> Gruplar</a>
+  {% if _portal_press_news_visible %}
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'press_news' else '' }}" href="{{ safe_url_for('main.portal_press_news_review', fallback='/portal/press-news') }}"><i class="fa-regular fa-newspaper"></i> Basında Tarihi Alan</a>
+  {% endif %}
+  {% if _portal_can_manage %}
+  <a class="portal-tab {{ 'active' if active_portal_tab == 'moderation' else '' }}" href="{{ safe_url_for('main.portal_moderation', fallback='/portal/moderation') }}"><i class="fa-solid fa-shield-halved"></i> Portal Yönetimi</a>
+  {% endif %}
+</nav>

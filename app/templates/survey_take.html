@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% from "_communication_suite_macros.html" import communication_workspace_header %}
+
+{% block title %}Anket Doldur - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Doldur{% endblock %}
+{% block page_subtitle %}
+Anket sorularını dikkatlice yanıtlayın ve formu tamamlayarak gönderin.
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+{% include "_premium_ui_kit.html" %}
+<style>
+    .take-shell{display:grid;gap:18px}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .hero-title{margin:0;font-size:1.16rem;font-weight:900;color:#111827}
+    .hero-text{margin:8px 0 0;color:#6b7280;font-size:.92rem;line-height:1.8}
+    .meta-row{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:0 10px;border-radius:999px;font-size:.74rem;font-weight:900;background:#eef2f7;color:#4b5563}
+    .survey-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.survey-summary-card{background:rgba(255,255,255,.92)}.summary-box{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:16px}.summary-label{color:#6b7280;font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.35px;margin-bottom:8px}.summary-value{color:#111827;font-size:.95rem;font-weight:900;line-height:1.55}.summary-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.7}.form-shell{display:grid;gap:18px}.survey-intro-note{padding:14px 16px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;font-size:.84rem;line-height:1.75}
+    .question-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.question-nav-wrap{position:sticky;top:10px;z-index:6}.question-jump{display:inline-flex;align-items:center;justify-content:center;min-width:38px;min-height:38px;padding:0 10px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.78rem;font-weight:900;color:#4b5563;text-decoration:none}.question-jump.required{border-color:rgba(139,0,0,.14)}.question-jump.done{background:rgba(22,101,52,.10);border-color:rgba(22,101,52,.16);color:#166534}.question-jump.current{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.18);color:#8B0000}.question-list{display:grid;gap:16px}
+    .question-card{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:20px;padding:18px;scroll-margin-top:110px}.question-card.required-unanswered{border-color:rgba(153,27,27,.18);box-shadow:0 0 0 3px rgba(153,27,27,.05)}.question-card.answered{border-color:rgba(22,101,52,.14)}
+    .question-title{margin:0;font-size:.98rem;font-weight:900;color:#111827;line-height:1.6}
+    .required-mark{color:#8B0000;font-weight:900}
+    .question-sub{margin:6px 0 0;color:#6b7280;font-size:.82rem}
+    .question-body{margin-top:14px;display:grid;gap:10px}
+    .choice-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid rgba(15,23,42,.08);border-radius:14px;background:#f8fafc}
+    .choice-item input{margin-top:2px}
+    .choice-item label{margin:0;color:#374151;font-size:.9rem;line-height:1.7;cursor:pointer}
+    .form-textarea,.form-input,.form-select{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%}
+    .form-textarea{min-height:130px;resize:vertical}
+    .form-textarea:focus,.form-input:focus,.form-select:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+    .rating-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .rating-grid.ten{grid-template-columns:repeat(10,minmax(0,1fr))}
+    .rating-item label{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;font-weight:900;color:#374151;cursor:pointer}
+    .rating-item input{display:none}
+    .rating-item input:checked + label{background:rgba(139,0,0,.08);border-color:rgba(139,0,0,.18);color:#8B0000}
+    .progress-wrap{display:grid;gap:10px;margin-top:16px;position:sticky;bottom:10px;z-index:5;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid rgba(15,23,42,.08);backdrop-filter:blur(10px)}.progress-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800}.progress-track{width:100%;height:10px;border-radius:999px;background:#eef2f7;overflow:hidden}.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#8B0000,#b91c1c);width:0;transition:width .2s ease}.draft-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:#6b7280;font-size:.82rem;font-weight:800}.action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.mobile-dock{display:none}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+    .btn-soft:hover{transform:translateY(-1px)}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    @media (max-width:900px){.rating-grid.ten{grid-template-columns:repeat(5,minmax(0,1fr))}.survey-summary-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:768px){.rating-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.survey-summary-grid{grid-template-columns:1fr}.btn-soft{width:100%}.action-bar{flex-direction:column-reverse;align-items:stretch}.question-nav-wrap{overflow:auto;padding-bottom:4px}.question-nav{flex-wrap:nowrap;width:max-content}.progress-wrap{bottom:84px}.mobile-dock{display:flex;position:sticky;bottom:0;z-index:7;margin-top:16px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-radius:18px;background:rgba(17,24,39,.92);color:#fff;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(10px)}.mobile-dock-actions{display:flex;gap:8px;flex:1;justify-content:flex-end}.mobile-dock .btn-soft{width:auto;min-height:40px;padding:0 12px}.mobile-dock-progress{font-size:.82rem;font-weight:900;line-height:1.5}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/survey_mobile_hardening.css') }}">
+
+<div class="take-shell bys-premium-page" data-survey-take="1">
+    {{ communication_workspace_header(
+        active='surveys',
+        title=survey.title,
+        text=(survey.description or 'Bu anket için açıklama bulunmuyor.'),
+        icon='fa-solid fa-square-poll-vertical',
+        badges=[
+            {'icon': 'fa-solid fa-layer-group', 'text': (survey.survey_type or 'kurum_ici')|replace('_', ' ')|title},
+            {'icon': 'fa-solid fa-list-ol', 'text': 'Soru: ' ~ (questions|length)},
+            {'icon': 'fa-solid fa-user-shield', 'text': 'Anonim' if survey.is_anonymous else 'Ad bazlı'}
+        ],
+        side_title='Yanıt akışı',
+        side_text='Zorunlu sorular anlık takip edilir. Taslak yalnızca bu tarayıcıda geçici olarak tutulur ve gönderim tamamlanınca temizlenir.',
+        metric_cards=[
+            {'label': 'Toplam soru', 'value': questions|length, 'icon': 'fa-solid fa-list-check', 'sub': 'Bu formdaki toplam soru sayısı.'},
+            {'label': 'Zorunlu', 'value': questions|selectattr('is_required')|list|length, 'icon': 'fa-solid fa-asterisk', 'sub': 'Boş bırakılamayan soru sayısı.', 'tone': 'warning'},
+            {'label': 'Durum', 'value': 'Açık', 'icon': 'fa-solid fa-bolt', 'sub': 'Anket şu an yanıtlanabilir durumda.', 'tone': 'success'},
+            {'label': 'Hedef', 'value': matched_assignment.target_type|title if matched_assignment else 'Atama', 'icon': 'fa-solid fa-bullseye', 'sub': 'Bu anketin size geliş biçimi.', 'tone': 'info'}
+        ],
+        hub_note='Zorunlu sorular ve ilerleme durumu bu alanda izlenir.',
+        hub_metric=(questions|length) ~ ' soru',
+        hub_secondary=(questions|selectattr('is_required')|list|length) ~ ' zorunlu alan'
+    ) }}
+
+    <div class="glass-card panel-card survey-summary-card">
+        <div class="survey-summary-grid">
+            <div class="summary-box">
+                <div class="summary-label">Başlangıç</div>
+                <div class="summary-value">{{ survey.start_at.strftime('%d.%m.%Y %H:%M') if survey.start_at else 'Hemen açık' }}</div>
+                <div class="summary-sub">Başlangıç zamanı tanımlanmamışsa anket yayınlandığı anda erişilebilir kabul edilir.</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-label">Bitiş</div>
+                <div class="summary-value">{{ survey.end_at.strftime('%d.%m.%Y %H:%M') if survey.end_at else 'Süre sınırı yok' }}</div>
+                <div class="summary-sub">Bitiş zamanı varsa bu saatten sonra yanıt kabul edilmez.</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-label">Yanıt tipi</div>
+                <div class="summary-value">{% if survey.is_anonymous %}Anonim{% else %}Kullanıcı bazlı{% endif %}</div>
+                <div class="summary-sub">Kurumsal analiz ihtiyacına göre anonim veya ad bazlı toplanır.</div>
+            </div>
+            <div class="summary-box">
+                <div class="summary-label">Atama</div>
+                <div class="summary-value">{{ matched_assignment.target_type|replace('_', ' ')|title if matched_assignment else 'Genel atama' }}</div>
+                <div class="summary-sub">Sorular arasında hızlı gezinti için aşağıdaki numara çubuğunu kullanabilirsiniz.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card question-nav-wrap">
+        <div class="question-nav" id="questionJumpNav">
+            {% for question in questions %}
+                <a href="#questionCard{{ question.id }}" class="question-jump {% if question.is_required %}required{% endif %}" data-question-id="{{ question.id }}">{{ loop.index }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('main.survey_submit', survey_id=survey.id) }}" class="glass-card panel-card" id="surveyTakeForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_form_token" value="{{ submit_token }}">
+
+        <div class="survey-intro-note"><i class="fa-solid fa-circle-info"></i> Zorunlu alanlar ve koşullu sorular anlık olarak yönetilir. Yazdıklarınız tarayıcı taslağında korunur; ekran kapanırsa aynı cihazda kaldığınız yerden devam edebilirsiniz.</div>
+
+        <div class="question-list">
+            {% for question in questions %}
+                {% set qtype = (question.question_type or '').lower() %}
+                {% set draft_payload = draft_answer_map.get(question.id, {}) if draft_answer_map else {} %}
+                <div class="question-card" id="questionCard{{ question.id }}" data-question-id="{{ question.id }}" data-required="{{ 1 if question.is_required else 0 }}" data-logic-mode="{{ question.logic_mode or 'always' }}" data-logic-source="{{ question.logic_source_question_id or '' }}" data-logic-operator="{{ question.logic_operator or 'answered' }}" data-logic-value="{{ question.logic_value or '' }}" {% if visible_question_ids and question.id not in visible_question_ids %}hidden{% endif %}>
+                    <h4 class="question-title">
+                        {{ loop.index }}. {{ question.question_text }}
+                        {% if question.is_required %}<span class="required-mark">*</span>{% endif %}
+                    </h4>
+                    <p class="question-sub">
+                        Tür: {{ question.question_type }}
+                        {% if question.helper_text %}<br><span>{{ question.helper_text }}</span>{% endif %}
+                    </p>
+
+                    <div class="question-body">
+                        {% if qtype in ['single_choice', 'yes_no'] %}
+                            {% for option in question.options.order_by(question.options.column_descriptions[0]['entity'].sort_order.asc(), question.options.column_descriptions[0]['entity'].id.asc()).all() %}
+                                <div class="choice-item">
+                                    <input type="radio" id="q{{ question.id }}_{{ option.id }}" name="question_{{ question.id }}" value="{{ option.id }}" {% if question.is_required %}required{% endif %} {% if option.id in (draft_payload.get('option_ids', []) if draft_payload else []) %}checked{% endif %}>
+                                    <label for="q{{ question.id }}_{{ option.id }}">{{ option.option_text }}</label>
+                                </div>
+                            {% endfor %}
+
+                        {% elif qtype == 'multiple_choice' %}
+                            {% for option in question.options.order_by(question.options.column_descriptions[0]['entity'].sort_order.asc(), question.options.column_descriptions[0]['entity'].id.asc()).all() %}
+                                <div class="choice-item">
+                                    <input type="checkbox" id="q{{ question.id }}_{{ option.id }}" name="question_{{ question.id }}" value="{{ option.id }}" {% if option.id in (draft_payload.get('option_ids', []) if draft_payload else []) %}checked{% endif %}>
+                                    <label for="q{{ question.id }}_{{ option.id }}">{{ option.option_text }}</label>
+                                </div>
+                            {% endfor %}
+
+                        {% elif qtype == 'rating_5' %}
+                            <div class="rating-grid">
+                                {% for n in range(1, 6) %}
+                                    <div class="rating-item">
+                                        <input type="radio" id="q{{ question.id }}_{{ n }}" name="question_{{ question.id }}" value="{{ n }}" {% if question.is_required %}required{% endif %} {% if draft_payload and draft_payload.get('number') == n %}checked{% endif %}>
+                                        <label for="q{{ question.id }}_{{ n }}">{{ n }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                        {% elif qtype == 'rating_10' %}
+                            <div class="rating-grid ten">
+                                {% for n in range(1, 11) %}
+                                    <div class="rating-item">
+                                        <input type="radio" id="q{{ question.id }}_{{ n }}" name="question_{{ question.id }}" value="{{ n }}" {% if question.is_required %}required{% endif %} {% if draft_payload and draft_payload.get('number') == n %}checked{% endif %}>
+                                        <label for="q{{ question.id }}_{{ n }}">{{ n }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                        {% else %}
+                            <textarea class="form-textarea" name="question_{{ question.id }}" placeholder="Yanıtınızı yazınız..." {% if question.is_required %}required{% endif %}>{{ draft_payload.get('text', '') if draft_payload else '' }}</textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="progress-wrap">
+            <div class="progress-top">
+                <span id="surveyAnsweredState">0 / {{ questions|length }} soru yanıtlandı</span>
+                <span id="surveyRequiredState">Zorunlu alanlar takip ediliyor</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="surveyProgressFill"></div></div>
+        </div>
+
+        <div class="draft-row" style="margin-top:18px;">
+            <span id="surveyDraftState">Tarayıcı taslağı açık. Aynı cihazda form alanları geçici olarak korunur.</span>
+            <button type="button" class="btn-soft secondary" id="clearSurveyDraftBtn"><i class="fa-solid fa-eraser"></i> Taslağı Temizle</button>
+        </div>
+
+        <div class="survey-intro-note" style="margin-top:18px;">Koşullu sorular yanıtlarınıza göre otomatik açılır.</div>
+
+        <div class="action-bar" style="margin-top:18px;">
+            <a href="{{ url_for('main.surveys_list') }}" class="btn-soft secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Anketlere Dön
+            </a>
+
+            <button type="submit" class="btn-soft primary" id="surveySubmitBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+                Yanıtı Gönder
+            </button>
+        </div>
+
+        <div class="mobile-dock">
+            <div class="mobile-dock-progress" id="surveyMobileProgress">0 / {{ questions|length }} tamamlandı</div>
+            <div class="mobile-dock-actions">
+                <button type="button" class="btn-soft secondary" id="jumpFirstMissingBtn"><i class="fa-solid fa-location-arrow"></i> İlk Eksik</button>
+                <button type="submit" class="btn-soft primary" form="surveyTakeForm" id="surveySubmitBtnMobile"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script>
+window.BYS360SurveyTakeConfig = {
+    surveyId: {{ survey.id }},
+    draftKey: 'bys360-survey-draft-{{ survey.id }}',
+    serverDraftProgress: {{ server_draft_progress|default(0)|tojson }},
+};
+</script>
+<script src="{{ url_for('static', filename='js/survey_formbricks_overlay.js') }}"></script>
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+{% endblock %}

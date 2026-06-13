@@ -1,0 +1,639 @@
+{% extends "base.html" %}
+
+{% block title %}Gelişim Rehberi{% endblock %}lock %}
+
+{% block content %}
+{% set page_summary = page_summary if page_summary is defined and page_summary else {} %}
+{% set guidance_items = guidance_items if guidance_items is defined and guidance_items else [] %}
+{% set development_items = development_items if development_items is defined and development_items else [] %}
+{% set recommendation_rows = recommendation_rows if recommendation_rows is defined and recommendation_rows else [] %}
+{% set scorecard_items = scorecard_items if scorecard_items is defined and scorecard_items else [] %}
+
+<style>
+    .bys-dev-shell {
+        --bys-red: #8B0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .10);
+        --bys-card: rgba(255, 255, 255, .88);
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 18px 18px 44px;
+    }
+
+    .bys-dev-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 34%),
+            linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.74));
+        box-shadow: 0 24px 70px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin-bottom: 18px;
+    }
+
+    .bys-dev-hero::after {
+        content: "";
+        position: absolute;
+        right: -90px;
+        top: -100px;
+        width: 270px;
+        height: 270px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .08);
+        pointer-events: none;
+    }
+
+    .bys-dev-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 800;
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    .bys-dev-title {
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.05;
+        font-weight: 850;
+        color: var(--bys-ink);
+        margin: 0;
+        letter-spacing: -.04em;
+    }
+
+    .bys-dev-subtitle {
+        max-width: 960px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .bys-dev-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .bys-dev-stat {
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: var(--bys-card);
+        padding: 18px;
+        box-shadow: 0 16px 42px rgba(31, 41, 55, .08);
+        min-height: 132px;
+    }
+
+    .bys-dev-stat-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 14px;
+    }
+
+    .bys-dev-stat-number {
+        font-size: 30px;
+        font-weight: 850;
+        color: var(--bys-ink);
+        letter-spacing: -.03em;
+        margin-bottom: 2px;
+    }
+
+    .bys-dev-stat-label {
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .bys-dev-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
+        margin: 18px 0;
+        align-items: center;
+    }
+
+    .bys-dev-input,
+    .bys-dev-select {
+        width: 100%;
+        border: 1px solid var(--bys-line);
+        background: rgba(255,255,255,.94);
+        border-radius: 16px;
+        padding: 12px 14px;
+        color: var(--bys-ink);
+        outline: none;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, .05);
+    }
+
+    .bys-dev-card {
+        border: 1px solid var(--bys-line);
+        border-radius: 24px;
+        background: var(--bys-card);
+        box-shadow: 0 18px 52px rgba(31, 41, 55, .08);
+        overflow: hidden;
+        margin-top: 16px;
+    }
+
+    .bys-dev-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--bys-line);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .bys-dev-card-title {
+        margin: 0;
+        font-size: 18px;
+        color: var(--bys-ink);
+        font-weight: 820;
+        letter-spacing: -.02em;
+    }
+
+    .bys-dev-card-desc {
+        margin: 6px 0 0;
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .bys-dev-card-body {
+        padding: 18px 22px 22px;
+    }
+
+    .bys-dev-two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .bys-dev-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .bys-dev-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid var(--bys-line);
+        border-radius: 18px;
+        background: rgba(255,255,255,.66);
+    }
+
+    .bys-dev-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background: var(--bys-red);
+        box-shadow: 0 0 0 5px rgba(139, 0, 0, .08);
+    }
+
+    .bys-dev-item-title {
+        margin: 0;
+        font-weight: 780;
+        color: var(--bys-ink);
+        font-size: 14px;
+    }
+
+    .bys-dev-item-meta {
+        margin-top: 5px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .bys-dev-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, .06);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .bys-dev-badge-success {
+        background: rgba(22, 101, 52, .10);
+        color: #166534;
+    }
+
+    .bys-dev-badge-warning {
+        background: rgba(146, 64, 14, .10);
+        color: #92400e;
+    }
+
+    .bys-dev-badge-danger {
+        background: rgba(139, 0, 0, .10);
+        color: var(--bys-red);
+    }
+
+    .bys-dev-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--bys-line);
+        border-radius: 20px;
+        background: rgba(255,255,255,.66);
+    }
+
+    .bys-dev-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 880px;
+    }
+
+    .bys-dev-table th {
+        text-align: left;
+        padding: 14px 16px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        font-weight: 850;
+        border-bottom: 1px solid var(--bys-line);
+        background: rgba(31, 41, 55, .035);
+    }
+
+    .bys-dev-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid rgba(31, 41, 55, .08);
+        color: var(--bys-ink);
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .bys-dev-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .bys-dev-empty {
+        text-align: center;
+        padding: 34px 18px;
+        border: 1px dashed rgba(31, 41, 55, .18);
+        border-radius: 20px;
+        background: rgba(255,255,255,.52);
+        color: var(--bys-muted);
+    }
+
+    .bys-dev-empty i {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        border-radius: 18px;
+        align-items: center;
+        justify-content: center;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 12px;
+    }
+
+    .bys-dev-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .bys-dev-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid var(--bys-line);
+        color: var(--bys-ink);
+        background: rgba(255,255,255,.72);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 750;
+    }
+
+    .bys-dev-action:hover {
+        color: var(--bys-red);
+        border-color: rgba(139, 0, 0, .28);
+    }
+
+    .bys-dev-note {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--bys-red-soft);
+        color: #5f0b0b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1180px) {
+        .bys-dev-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .bys-dev-two {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .bys-dev-shell {
+            padding: 12px 10px 30px;
+        }
+        .bys-dev-hero {
+            padding: 22px;
+            border-radius: 22px;
+        }
+        .bys-dev-toolbar {
+            grid-template-columns: 1fr;
+        }
+        .bys-dev-grid {
+            grid-template-columns: 1fr;
+        }
+        .bys-dev-card-header {
+            display: block;
+        }
+        .bys-dev-item {
+            grid-template-columns: auto 1fr;
+        }
+        .bys-dev-item .bys-dev-badge {
+            grid-column: 2;
+            width: max-content;
+        }
+    }
+</style>
+
+<div class="bys-dev-shell" data-page="gelisim-rehberi">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    <section class="bys-dev-hero">
+        <div class="bys-dev-eyebrow">
+            <i class="fa-solid fa-seedling"></i>
+            Performans Yönetimi
+        </div>
+
+        <h1 class="bys-dev-title">Gelişim Rehberi</h1>
+
+        <p class="bys-dev-subtitle">
+            Performans değerlendirme sonuçlarının gelişim sürecine bağlanması, yönetici önerilerinin izlenmesi,
+            karne altında gösterilecek gelişim notlarının düzenlenmesi ve personel gelişim alanlarının kurumsal
+            biçimde takip edilmesi için hazırlanmıştır.
+        </p>
+
+        <div class="bys-dev-grid">
+            <div class="bys-dev-stat">
+                <div class="bys-dev-stat-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div class="bys-dev-stat-number">{{ page_summary.open_guidance_count|default(page_summary.open_count|default(0)) }}</div>
+                <div class="bys-dev-stat-label">Açık gelişim önerisi</div>
+            </div>
+
+            <div class="bys-dev-stat">
+                <div class="bys-dev-stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                <div class="bys-dev-stat-number">{{ page_summary.manager_recommendation_count|default(0) }}</div>
+                <div class="bys-dev-stat-label">Yönetici önerisi</div>
+            </div>
+
+            <div class="bys-dev-stat">
+                <div class="bys-dev-stat-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                <div class="bys-dev-stat-number">{{ page_summary.scorecard_visible_count|default(0) }}</div>
+                <div class="bys-dev-stat-label">Karneye yansıtılan öneri</div>
+            </div>
+
+            <div class="bys-dev-stat">
+                <div class="bys-dev-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="bys-dev-stat-number">{{ page_summary.completed_count|default(0) }}</div>
+                <div class="bys-dev-stat-label">Tamamlanan gelişim takibi</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bys-dev-toolbar">
+        <input id="bysDevSearch" class="bys-dev-input" type="search" placeholder="Personel, birim, öneri başlığı veya gelişim alanı ara...">
+        <select id="bysDevStatus" class="bys-dev-select">
+            <option value="">Tüm durumlar</option>
+            <option value="acik">Açık</option>
+            <option value="karne">Karneye yansıtılan</option>
+            <option value="tamamlandi">Tamamlandı</option>
+        </select>
+        <a class="btn btn-sm btn-outline-secondary" href="/performance/process-tracking">
+            <i class="fa-solid fa-route me-1"></i> Süreç Takibi
+        </a>
+    </div>
+
+    <section class="bys-dev-two">
+        <div class="bys-dev-card">
+            <div class="bys-dev-card-header">
+                <div>
+                    <h2 class="bys-dev-card-title">Gelişim Önerileri</h2>
+                    <p class="bys-dev-card-desc">
+                        Personelin performans sonucuyla ilişkilendirilen gelişim alanları ve yönetici önerileri.
+                    </p>
+                </div>
+                <span class="bys-dev-badge bys-dev-badge-success">
+                    <i class="fa-solid fa-seedling"></i>
+                    Gelişim odaklı takip
+                </span>
+            </div>
+
+            <div class="bys-dev-card-body">
+                {% set all_items = development_items if development_items else guidance_items %}
+                {% if all_items %}
+                <div class="bys-dev-list">
+                    {% for item in all_items %}
+                    {% set title = item.get('title') or item.get('guidance_title') or item.get('recommendation_title') or 'Gelişim önerisi' %}
+                    {% set person = item.get('personnel_name') or item.get('employee_name') or item.get('full_name') or 'Personel' %}
+                    {% set unit = item.get('unit_name') or item.get('department_name') or '' %}
+                    {% set note = item.get('note') or item.get('description') or item.get('guidance_note') or '' %}
+                    {% set status_key = item.get('status_key') or item.get('status') or 'acik' %}
+                    {% set status_label = item.get('status_label') or ('Tamamlandı' if status_key == 'tamamlandi' else 'Açık') %}
+                    <article class="bys-dev-item" data-search="{{ (title ~ ' ' ~ person ~ ' ' ~ unit ~ ' ' ~ note)|lower }}" data-status="{{ status_key }}">
+                        <span class="bys-dev-dot"></span>
+                        <div>
+                            <h3 class="bys-dev-item-title">{{ title }}</h3>
+                            <div class="bys-dev-item-meta">
+                                {{ person }}
+                                {% if unit %} · {{ unit }}{% endif %}
+                                {% if note %}<br>{{ note }}{% endif %}
+                            </div>
+                        </div>
+                        <span class="bys-dev-badge {% if status_key == 'tamamlandi' %}bys-dev-badge-success{% else %}bys-dev-badge-warning{% endif %}">
+                            {{ status_label }}
+                        </span>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bys-dev-empty">
+                    <i class="fa-solid fa-seedling"></i>
+                    <div><strong>Henüz kayıtlı gelişim önerisi bulunmuyor.</strong></div>
+                    <div>Performans sonucu sonrası öneri oluşturulduğunda bu alanda görüntülenir.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bys-dev-card">
+            <div class="bys-dev-card-header">
+                <div>
+                    <h2 class="bys-dev-card-title">Rehber Alanları</h2>
+                    <p class="bys-dev-card-desc">
+                        Gelişim notlarının hangi amaçla kullanılacağını gösteren sade rehber alanı.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bys-dev-card-body">
+                <div class="bys-dev-list">
+                    <article class="bys-dev-item" data-search="karne gelişim önerisi" data-status="karne">
+                        <span class="bys-dev-dot"></span>
+                        <div>
+                            <h3 class="bys-dev-item-title">Karne Altı Gelişim Önerisi</h3>
+                            <div class="bys-dev-item-meta">
+                                Yayınlanan karne altında personele gösterilecek gelişim notları bu başlık altında yönetilir.
+                            </div>
+                        </div>
+                        <span class="bys-dev-badge bys-dev-badge-success">Karne</span>
+                    </article>
+
+                    <article class="bys-dev-item" data-search="yönetici önerisi takip" data-status="acik">
+                        <span class="bys-dev-dot"></span>
+                        <div>
+                            <h3 class="bys-dev-item-title">Yönetici Önerisi</h3>
+                            <div class="bys-dev-item-meta">
+                                Amir veya yetkili yönetici tarafından yazılan öneriler gelişim sürecine bağlanır.
+                            </div>
+                        </div>
+                        <span class="bys-dev-badge bys-dev-badge-warning">Takip</span>
+                    </article>
+
+                    <article class="bys-dev-item" data-search="kişisel gelişim planı" data-status="acik">
+                        <span class="bys-dev-dot"></span>
+                        <div>
+                            <h3 class="bys-dev-item-title">Gelişim Planı</h3>
+                            <div class="bys-dev-item-meta">
+                                Düşük performans, güçlü yönler veya geliştirilmesi gereken alanlar planlı şekilde izlenir.
+                            </div>
+                        </div>
+                        <span class="bys-dev-badge">Planlama</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-dev-card">
+        <div class="bys-dev-card-header">
+            <div>
+                <h2 class="bys-dev-card-title">Karneye Yansıtılacak Gelişim Notları</h2>
+                <p class="bys-dev-card-desc">
+                    Personel karnesinde gösterilmesi uygun görülen gelişim önerileri burada takip edilir.
+                </p>
+            </div>
+            <span class="bys-dev-badge bys-dev-badge-warning">
+                <i class="fa-solid fa-id-card-clip"></i>
+                Karne görünürlüğü
+            </span>
+        </div>
+
+        <div class="bys-dev-card-body">
+            {% set table_items = scorecard_items if scorecard_items else recommendation_rows %}
+            {% if table_items %}
+            <div class="bys-dev-table-wrap">
+                <table class="bys-dev-table">
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Gelişim Alanı</th>
+                            <th>Öneri</th>
+                            <th>Karne Görünürlüğü</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in table_items %}
+                        {% set person = item.get('personnel_name') or item.get('employee_name') or 'Personel' %}
+                        {% set area = item.get('area') or item.get('development_area') or item.get('title') or 'Gelişim alanı' %}
+                        {% set rec = item.get('recommendation') or item.get('note') or item.get('description') or '-' %}
+                        {% set visible = item.get('scorecard_visible') %}
+                        {% set status_label = item.get('status_label') or 'Takipte' %}
+                        <tr data-search="{{ (person ~ ' ' ~ area ~ ' ' ~ rec ~ ' ' ~ status_label)|lower }}" data-status="{{ 'karne' if visible else 'acik' }}">
+                            <td><strong>{{ person }}</strong></td>
+                            <td>{{ area }}</td>
+                            <td>{{ rec }}</td>
+                            <td>
+                                {% if visible %}
+                                <span class="bys-dev-badge bys-dev-badge-success">Karneye yansır</span>
+                                {% else %}
+                                <span class="bys-dev-badge">İç takip</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ status_label }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="bys-dev-empty">
+                <i class="fa-solid fa-id-card-clip"></i>
+                <div><strong>Karneye yansıtılacak gelişim notu bulunmuyor.</strong></div>
+                <div>Gelişim önerisi karne görünürlüğüne açıldığında bu alanda listelenir.</div>
+            </div>
+            {% endif %}
+
+            <div class="bys-dev-note">
+                <strong>Bilgi:</strong> Bu ekran performans puanı üretmez ve idari karar vermez. Gelişim notları,
+                yetki ve yayın kuralları doğrultusunda karneye veya iç takibe bağlanır.
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("bysDevSearch");
+    const status = document.getElementById("bysDevStatus");
+
+    function normalize(value) {
+        return (value || "").toLocaleLowerCase("tr-TR").trim();
+    }
+
+    function applyFilters() {
+        const q = normalize(search ? search.value : "");
+        const selected = normalize(status ? status.value : "");
+        const rows = document.querySelectorAll("[data-search][data-status]");
+
+        rows.forEach(function (row) {
+            const haystack = normalize(row.getAttribute("data-search"));
+            const state = normalize(row.getAttribute("data-status"));
+            const matchesSearch = !q || haystack.indexOf(q) !== -1;
+            const matchesStatus = !selected || state === selected;
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+        });
+    }
+
+    if (search) search.addEventListener("input", applyFilters);
+    if (status) status.addEventListener("change", applyFilters);
+})();
+</script>
+{
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+% endblock %}
+
+{% endblock %}

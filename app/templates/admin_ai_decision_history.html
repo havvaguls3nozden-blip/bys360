@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}AI Karar Geçmişi - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Karar Geçmişi{% endblock %}
+{% block page_subtitle %}İstek, çıktı, geri bildirim ve öneri ilişkisini denetim izi olarak gösterir.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-xl-2 col-md-3">
+      <label class="form-label small text-muted">Geriye dönük gün</label>
+      <input class="form-control" type="number" name="lookback_days" min="1" max="365" value="{{ lookback_days or 30 }}">
+    </div>
+    <div class="col-xl-3 col-md-3">
+      <label class="form-label small text-muted">Modül</label>
+      <select class="form-select" name="module_type">
+        <option value="">Tümü</option>
+        {% for opt in module_options %}
+        <option value="{{ opt }}" {% if selected_module_type == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-xl-3 col-md-3">
+      <label class="form-label small text-muted">Özellik</label>
+      <select class="form-select" name="feature_type">
+        <option value="">Tümü</option>
+        {% for opt in feature_options %}
+        <option value="{{ opt }}" {% if selected_feature_type == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-xl-2 col-md-3">
+      <label class="form-label small text-muted">Durum</label>
+      <select class="form-select" name="status">
+        <option value="">Tümü</option>
+        {% for opt in status_options %}
+        <option value="{{ opt }}" {% if selected_status == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-xl-2 d-flex gap-2">
+      <button class="btn btn-catab flex-grow-1">Uygula</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_decision_history_export_csv', lookback_days=lookback_days, module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status) }}">CSV</a>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Toplam çağrı</div><div class="display-6 fw-bold">{{ summary.request_total or 0 }}</div></div></div>
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Tamamlanan</div><div class="display-6 fw-bold">{{ summary.completed_total or 0 }}</div></div></div>
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Uyarı</div><div class="display-6 fw-bold">{{ summary.warning_total or 0 }}</div></div></div>
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Başarısız</div><div class="display-6 fw-bold">{{ summary.failed_total or 0 }}</div></div></div>
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Geri bildirim</div><div class="display-6 fw-bold">{{ summary.feedback_total or 0 }}</div></div></div>
+  <div class="col-xl-2 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Açık öneri</div><div class="display-6 fw-bold">{{ summary.open_recommendations or 0 }}</div></div></div>
+</div>
+
+<div class="glass-card p-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h4 class="mb-0">Karar geçmişi kayıtları</h4>
+    <div class="small text-muted">Sayfa {{ pagination.page }} / {{ pagination.pages }}</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Tarih</th>
+          <th>Bağlam</th>
+          <th>İstem</th>
+          <th>Durum</th>
+          <th>Geri Bildirim</th>
+          <th>Öneri</th>
+          <th>İstek / Çıktı</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="small">
+            <div>{{ row.created_at.strftime('%d.%m.%Y') if row.created_at else '-' }}</div>
+            <div class="text-muted">{{ row.created_at.strftime('%H:%M') if row.created_at else '' }}</div>
+          </td>
+          <td class="small">
+            <div class="fw-semibold">{{ row.module_label }}</div>
+            <div class="text-muted">{{ row.feature_label }}</div>
+            <div class="text-muted">{{ row.target_label }}{% if row.target_id %} #{{ row.target_id }}{% endif %}</div>
+          </td>
+          <td class="small">
+            <div class="fw-semibold">{{ row.prompt_version }}</div>
+            <div class="text-muted">{{ row.provider_name }} / {{ row.model_name }}</div>
+            <div class="text-muted">{{ row.latency_ms }} ms</div>
+          </td>
+          <td class="small">
+            <span class="badge text-bg-secondary">{{ row.status_label }}</span>
+            {% if row.error_message and row.error_message != '-' %}
+            <div class="text-danger mt-2">{{ row.error_message }}</div>
+            {% endif %}
+          </td>
+          <td class="small">
+            <div>Toplam: {{ row.feedback_total }}</div>
+            <div class="text-muted">Pozitif: {{ row.feedback_positive }} · Negatif: {{ row.feedback_negative }}</div>
+            <div class="text-muted">Son etiket: {{ row.feedback_latest_label }}</div>
+          </td>
+          <td class="small">
+            <div>Toplam: {{ row.recommendation_total }}</div>
+            <div class="text-muted">Açık: {{ row.open_recommendations }} · Kabul: {{ row.accepted_recommendations }}</div>
+            <div class="text-muted">Tip: {{ row.recommendation_top_label }}</div>
+          </td>
+          <td class="small" style="min-width: 320px;">
+            <div class="fw-semibold mb-1">İstek</div>
+            <div class="text-muted mb-2">{{ row.request_preview }}</div>
+            <div class="fw-semibold mb-1">Çıktı</div>
+            <div class="text-muted">{{ row.response_preview }}</div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted">Kayıt bulunamadı.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pagination.pages > 1 %}
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="small text-muted">Toplam {{ pagination.total }} kayıt</div>
+    <div class="d-flex gap-2">
+      {% if pagination.has_prev %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('main.admin_ai_decision_history', lookback_days=lookback_days, module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status, page=pagination.prev_num) }}">Önceki</a>
+      {% endif %}
+      {% if pagination.has_next %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('main.admin_ai_decision_history', lookback_days=lookback_days, module_type=selected_module_type, feature_type=selected_feature_type, status=selected_status, page=pagination.next_num) }}">Sonraki</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

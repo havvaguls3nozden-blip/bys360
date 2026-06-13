@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Geri Bildirim Entegrasyonu{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Entegrasyonu{% endblock %}
+{% block page_subtitle %}Not karnesi, dönem içi notlar ve görüşme sonrası eylem planı aynı süreç hafızasında izlenir.{% endblock %}
+
+{% block content %}
+<style>
+.bys-fb3{--red:#8B0000;--ink:#111827;--muted:#64748b;--line:rgba(15,23,42,.09);display:grid;gap:18px;max-width:1500px;margin:0 auto;padding:4px 0 34px}.bys-fb3-card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.07);padding:20px}.bys-fb3-hero{display:grid;grid-template-columns:minmax(0,1.25fr) 360px;gap:18px;align-items:stretch;background:linear-gradient(135deg,rgba(139,0,0,.075),rgba(255,255,255,.96));border-color:rgba(139,0,0,.13)}.bys-fb3-eyebrow{display:inline-flex;gap:8px;align-items:center;color:var(--red);font-weight:950;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}.bys-fb3-title{margin:8px 0 8px;color:var(--ink);font-size:1.55rem;font-weight:950;line-height:1.24}.bys-fb3-sub{margin:0;color:var(--muted);line-height:1.75}.bys-fb3-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.bys-fb3-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:10px 13px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font-weight:900}.bys-fb3-btn.primary{background:var(--red);border-color:var(--red);color:#fff}.bys-fb3-btn.soft{background:rgba(139,0,0,.07);border-color:rgba(139,0,0,.14);color:var(--red)}.bys-fb3-filter{display:grid;gap:12px}.bys-fb3-label{font-size:.75rem;font-weight:950;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.bys-fb3-select{width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;padding:11px 12px;color:var(--ink);font-weight:800}.bys-fb3-stat-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.bys-fb3-stat{border:1px solid var(--line);border-radius:18px;background:#fff;padding:15px}.bys-fb3-stat strong{display:block;color:var(--red);font-size:1.55rem;font-weight:950}.bys-fb3-stat span{display:block;color:var(--muted);font-size:.82rem;font-weight:850;margin-top:5px;line-height:1.45}.bys-fb3-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.bys-fb3-section-title{margin:0;color:var(--ink);font-size:1.08rem;font-weight:950}.bys-fb3-section-sub{margin:5px 0 0;color:var(--muted);line-height:1.6}.bys-fb3-list{display:grid;gap:10px;margin-top:14px}.bys-fb3-item{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px}.bys-fb3-item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;color:var(--muted);font-size:.82rem;font-weight:850}.bys-fb3-item h4{margin:8px 0 6px;color:var(--ink);font-weight:950}.bys-fb3-item p{margin:0;color:#374151;line-height:1.65;white-space:pre-line}.bys-fb3-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;background:rgba(15,23,42,.06);color:#334155;font-size:.76rem;font-weight:900}.bys-fb3-pill.low{background:rgba(185,28,28,.09);color:#991b1b}.bys-fb3-pill.high{background:rgba(22,101,52,.09);color:#166534}.bys-fb3-pill.mid{background:rgba(139,0,0,.07);color:var(--red)}.bys-fb3-timeline{position:relative;display:grid;gap:12px;margin-top:14px}.bys-fb3-timeline-item{display:grid;grid-template-columns:42px minmax(0,1fr);gap:12px;align-items:start}.bys-fb3-timeline-icon{width:42px;height:42px;border-radius:16px;display:grid;place-items:center;background:rgba(139,0,0,.08);color:var(--red);border:1px solid rgba(139,0,0,.12)}.bys-fb3-empty{border:1px dashed rgba(139,0,0,.22);background:rgba(139,0,0,.035);border-radius:18px;padding:16px;color:#7f1d1d;font-weight:850;line-height:1.65}.bys-fb3-denied{border-color:rgba(185,28,28,.20);background:rgba(254,242,242,.96)}@media(max-width:1100px){.bys-fb3-hero,.bys-fb3-grid{grid-template-columns:1fr}.bys-fb3-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.bys-fb3-stat-grid{grid-template-columns:1fr}.bys-fb3-card{padding:16px}.bys-fb3-title{font-size:1.28rem}.bys-fb3-actions{flex-direction:column}.bys-fb3-btn{width:100%}}
+</style>
+
+<div class="bys-fb3" data-bys="feedback-integration-phase3">
+    {% if access_denied %}
+    <section class="bys-fb3-card bys-fb3-denied">
+        <div class="bys-fb3-eyebrow"><i class="fa-solid fa-shield-halved"></i> Yetki Kontrolü</div>
+        <h2 class="bys-fb3-title">Bu kayda erişim yetkiniz bulunmamaktadır.</h2>
+        <p class="bys-fb3-sub">Geri bildirim entegrasyonu yalnızca kişinin kendi verisi veya yetkili olduğu personel kapsamı için görüntülenir.</p>
+    </section>
+    {% endif %}
+
+    <section class="bys-fb3-card bys-fb3-hero">
+        <div>
+            <div class="bys-fb3-eyebrow"><i class="fa-solid fa-link"></i> Süreç Hafızası</div>
+            <h1 class="bys-fb3-title">Karne, dönem içi not ve görüşme sonrası takip tek ekranda</h1>
+            <p class="bys-fb3-sub">Bu ekran performans sonucunu, dönem boyunca alınan gözlem notlarını, geri bildirim görüşmesi özetini ve eylem planlarını birlikte gösterir. Amaç puanı tek başına bırakmamak; gelişim, takip ve kurumsal hafızayı aynı zeminde izlemektir.</p>
+            <div class="bys-fb3-actions">
+                <a class="bys-fb3-btn primary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-clipboard-check"></i> Görüşme Sonrası Notlar</a>
+
+                {# BYS360_FEEDBACK_FOLLOWUP_PHASE4_INTEGRATION_LINK #}
+                <a class="bys-fb3-btn soft" href="{{ safe_url_for('main.performance_feedback_followup') }}"><i class="fa-solid fa-calendar-check"></i> Eylem Planı Takibi</a>
+                {# /BYS360_FEEDBACK_FOLLOWUP_PHASE4_INTEGRATION_LINK #}
+
+                <a class="bys-fb3-btn soft" href="{{ safe_url_for('main.performance_interim_notes') }}"><i class="fa-regular fa-note-sticky"></i> Dönem İçi Notlar</a>
+                <a class="bys-fb3-btn" href="{{ safe_url_for('main.performance_feedback_meeting_guide') }}"><i class="fa-solid fa-comments"></i> Geri Bildirim Rehberi</a>
+
+                {# BYS360_FEEDBACK_FINAL_GATE_PHASE5_INTEGRATION_LINK #}
+                <a class="bys-fb3-btn" href="{{ safe_url_for('main.performance_feedback_final_gate') }}"><i class="fa-solid fa-circle-check"></i> Final Kontrol</a>
+                {# /BYS360_FEEDBACK_FINAL_GATE_PHASE5_INTEGRATION_LINK #}
+
+            </div>
+        </div>
+        <form class="bys-fb3-card bys-fb3-filter" method="get" action="{{ safe_url_for('main.performance_feedback_integration') }}">
+            <div>
+                <label class="bys-fb3-label" for="employee_id">Personel</label>
+                <select class="bys-fb3-select" id="employee_id" name="employee_id">
+                    <option value="">Yetkili kapsamımdaki tüm personel</option>
+                    {% for person in people %}
+                    <option value="{{ person.id }}" {% if selected_employee_id and person.id == selected_employee_id %}selected{% endif %}>{{ person.full_name }}{% if person.sicil_no %} · {{ person.sicil_no }}{% endif %}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="bys-fb3-label" for="period_id">Dönem</label>
+                <select class="bys-fb3-select" id="period_id" name="period_id">
+                    <option value="">Tüm dönemler</option>
+                    {% for period in periods %}
+                    <option value="{{ period.id }}" {% if selected_period_id and period.id == selected_period_id %}selected{% endif %}>{{ period.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="bys-fb3-btn primary" type="submit"><i class="fa-solid fa-filter"></i> Entegrasyonu Göster</button>
+        </form>
+    </section>
+
+    <section class="bys-fb3-stat-grid">
+        <div class="bys-fb3-stat"><strong>{{ summary.scorecard_count }}</strong><span>Karne kaydı</span></div>
+        <div class="bys-fb3-stat"><strong>{{ summary.note_count }}</strong><span>Dönem içi not</span></div>
+        <div class="bys-fb3-stat"><strong>{{ summary.meeting_count }}</strong><span>Görüşme kaydı</span></div>
+        <div class="bys-fb3-stat"><strong>{{ summary.action_count }}</strong><span>Eylem planı</span></div>
+        <div class="bys-fb3-stat"><strong>{{ summary.open_action_count }}</strong><span>Açık/takipte aksiyon</span></div>
+        <div class="bys-fb3-stat"><strong>%{{ summary.integration_readiness }}</strong><span>Süreç doluluk göstergesi</span></div>
+    </section>
+
+    <section class="bys-fb3-grid">
+        <div class="bys-fb3-card">
+            <h3 class="bys-fb3-section-title">Not Karnesi Bağlantısı</h3>
+            <p class="bys-fb3-section-sub">Karne sonucu tek başına değil, ilgili not ve görüşme kayıtlarıyla birlikte okunur.</p>
+            <div class="bys-fb3-list">
+                {% for row in scorecards %}
+                <article class="bys-fb3-item">
+                    <div class="bys-fb3-item-top"><span>{{ row.period_title or 'Dönem bilgisi yok' }}</span><span class="bys-fb3-pill {{ row.score_band }}">{{ row.score_label }}</span></div>
+                    <h4>{{ row.employee_name or 'Personel' }}</h4>
+                    <p>Nihai puan: <strong>{{ row.final_score if row.final_score is not none else '-' }}</strong>{% if row.status %} · Durum: {{ row.status }}{% endif %}</p>
+                </article>
+                {% else %}
+                <div class="bys-fb3-empty">Seçili kapsamda karne kaydı bulunamadı.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bys-fb3-card">
+            <h3 class="bys-fb3-section-title">Görüşme Sonrası Takip</h3>
+            <p class="bys-fb3-section-sub">Hazırlık, görüşme özeti ve eylem planı performans sonucunun takip tarafını oluşturur.</p>
+            <div class="bys-fb3-list">
+                {% for meeting in aftercare_meetings %}
+                <article class="bys-fb3-item">
+                    <div class="bys-fb3-item-top"><span>{{ meeting.meeting_date or '-' }}</span><span class="bys-fb3-pill mid">{{ meeting.status_label }}</span></div>
+                    <h4>{{ meeting.employee_name or 'Personel' }} · {{ meeting.manager_name or 'Amir bilgisi yok' }}</h4>
+                    <p>{{ meeting.meeting_summary or meeting.meeting_note or 'Görüşme sonrası özet bekleniyor.' }}</p>
+                    <div class="bys-fb3-actions"><a class="bys-fb3-btn soft" href="/performance/feedback-aftercare/{{ meeting.meeting_id }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Kaydı Aç</a></div>
+                </article>
+                {% else %}
+                <div class="bys-fb3-empty">Seçili kapsamda görüşme sonrası not kaydı bulunamadı.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-fb3-grid">
+        <div class="bys-fb3-card">
+            <h3 class="bys-fb3-section-title">Karneye Bağlanan Dönem İçi Notlar</h3>
+            <p class="bys-fb3-section-sub">Dönem içi notlar puanı otomatik değiştirmez; amire ve personele süreç hafızası sağlar.</p>
+            <div class="bys-fb3-list">
+                {% for note in interim_notes[:8] %}
+                <article class="bys-fb3-item">
+                    <div class="bys-fb3-item-top"><span>{{ note.created_at or '-' }}</span><span class="bys-fb3-pill">{{ note.note_type_label }}</span></div>
+                    <h4>{{ note.title or note.note_type_label }}</h4>
+                    <p>{{ note.body or 'Açıklama girilmemiş.' }}</p>
+                </article>
+                {% else %}
+                <div class="bys-fb3-empty">Seçili kapsamda dönem içi not bulunamadı.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="bys-fb3-card">
+            <h3 class="bys-fb3-section-title">Eylem Planları</h3>
+            <p class="bys-fb3-section-sub">Görüşme sonrası belirlenen aksiyonların hedef tarihi ve takip durumu burada görünür.</p>
+            <div class="bys-fb3-list">
+                {% for action in action_plans[:8] %}
+                <article class="bys-fb3-item">
+                    <div class="bys-fb3-item-top"><span>Hedef: {{ action.target_date or '-' }}</span><span class="bys-fb3-pill {% if action.status == 'gecikti' %}low{% elif action.status == 'tamamlandi' %}high{% else %}mid{% endif %}">{{ action.status_label }}</span></div>
+                    <h4>{{ action.title or 'Eylem planı' }}</h4>
+                    <p>{{ action.smart_description or action.follow_up_note or action.result_summary or 'Detay bekleniyor.' }}</p>
+                </article>
+                {% else %}
+                <div class="bys-fb3-empty">Seçili kapsamda eylem planı bulunamadı.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-fb3-card">
+        <h3 class="bys-fb3-section-title">Süreç Zaman Çizelgesi</h3>
+        <p class="bys-fb3-section-sub">Karne, dönem içi not, görüşme sonrası not ve eylem planı kayıtları tek sırada izlenir.</p>
+        <div class="bys-fb3-timeline">
+            {% for item in timeline %}
+            <div class="bys-fb3-timeline-item">
+                <div class="bys-fb3-timeline-icon"><i class="{{ item.icon }}"></i></div>
+                <article class="bys-fb3-item">
+                    <div class="bys-fb3-item-top"><span>{{ item.date or '-' }}</span><span class="bys-fb3-pill">{{ item.kind_label }}</span></div>
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.body }}</p>
+                    {% if item.url %}<div class="bys-fb3-actions"><a class="bys-fb3-btn" href="{{ item.url }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> İlgili Kayda Git</a></div>{% endif %}
+                </article>
+            </div>
+            {% else %}
+            <div class="bys-fb3-empty">Seçili kapsam için henüz süreç zaman çizelgesi oluşmadı.</div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

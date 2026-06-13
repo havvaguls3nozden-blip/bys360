@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}AI Öneri Merkezi - BYS360{% endblock %}
+{% block page_kicker %}AI Kontrol Merkezi{% endblock %}
+{% block page_title %}AI Öneri Merkezi{% endblock %}
+{% block page_subtitle %}Atama denetim kayıtlarından türetilen öncelikli aksiyonlar ve birim baskıları burada sade bir sırayla gösterilir.{% endblock %}
+{% block content %}
+<style>
+.ai-rec-shell{display:grid;gap:18px}.glass{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}.field{display:flex;flex-direction:column;gap:8px}.field label{font-size:.88rem;font-weight:800;color:#374151}.field input,.field select{min-height:46px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:10px 12px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;font-weight:800;text-decoration:none;cursor:pointer}.btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff}.btn.soft{background:#f8fafc;color:#111827;border:1px solid rgba(15,23,42,.08)}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.ai-card{padding:22px;border-radius:22px;border:1px solid rgba(15,23,42,.08);background:#fff}.ai-card.critical{background:linear-gradient(180deg,rgba(254,242,242,.96),#fff)}.ai-card.watch{background:linear-gradient(180deg,rgba(255,247,237,.96),#fff)}.ai-kicker{font-size:.8rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.ai-title{font-size:1.1rem;font-weight:900;color:#111827;margin-top:8px}.ai-text{font-size:.95rem;color:#4b5563;line-height:1.75;margin-top:8px}.ai-bullets{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}.ai-bullets li{display:flex;gap:10px;color:#374151;line-height:1.7}.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}.metric{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.metric .l{font-size:.8rem;color:#6b7280;font-weight:800}.metric .v{font-size:1.35rem;font-weight:900;color:#111827}.rec-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.list-card{display:grid;gap:12px}.rec-item{padding:16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.rec-item.critical{background:linear-gradient(180deg,rgba(254,242,242,.9),#fff)}.rec-item.watch{background:linear-gradient(180deg,rgba(255,247,237,.9),#fff)}.rec-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.rec-title{font-weight:900;color:#111827}.rec-count{font-weight:900;color:#8B0000}.rec-detail{margin-top:8px;color:#4b5563;line-height:1.7}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.pill.critical{background:#fef2f2;color:#b91c1c}.pill.watch{background:#fff7ed;color:#9a3412}.pill.calm{background:#ecfdf5;color:#166534}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}table{width:100%;min-width:720px;border-collapse:collapse}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}th{background:#f8fafc;font-size:.8rem;color:#6b7280;text-transform:uppercase}@media (max-width:1100px){.toolbar,.hero-grid,.rec-grid,.metric-grid{grid-template-columns:1fr}}
+</style>
+<div class="ai-rec-shell">
+  <form method="get" class="glass toolbar">
+    <div class="field">
+      <label>Dönem</label>
+      <select name="period_id">
+        <option value="">Aktif dönem</option>
+        {% for period in periods %}
+        <option value="{{ period.id }}" {% if selected_period and selected_period.id == period.id %}selected{% endif %}>{{ period.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Önem düzeyi</label>
+      <input type="text" name="severity" value="{{ severity or '' }}" placeholder="critical, warning">
+    </div>
+    <div class="field">
+      <label>Olay tipi</label>
+      <input type="text" name="event_type" value="{{ event_type or '' }}" placeholder="delegated, uncovered">
+    </div>
+    <div class="field">
+      <button type="submit" class="btn primary"><i class="fa-solid fa-filter"></i> Filtrele</button>
+    </div>
+  </form>
+
+  <div class="hero-grid">
+    <article class="ai-card {{ ai_recommendation_panel.tone if ai_recommendation_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_recommendation_panel.badge if ai_recommendation_panel else 'AI öneri özeti' }}</div>
+      <div class="ai-title">{{ ai_recommendation_panel.headline if ai_recommendation_panel else 'Özet hazır' }}</div>
+      <div class="ai-text">{{ ai_recommendation_panel.summary if ai_recommendation_panel else '' }}</div>
+      <ul class="ai-bullets">
+        {% for bullet in (ai_recommendation_panel.bullets if ai_recommendation_panel else []) %}
+        <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+        {% endfor %}
+      </ul>
+      <div class="metric-grid">
+        {% for item in (ai_recommendation_panel.actions if ai_recommendation_panel else []) %}
+        <div class="metric">
+          <div class="l">{{ item.label }}</div>
+          <div class="v">{{ item.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="ai-card {{ ai_pressure_panel.tone if ai_pressure_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-wave-square"></i> {{ ai_pressure_panel.badge if ai_pressure_panel else 'Birim baskısı' }}</div>
+      <div class="ai-title">{{ ai_pressure_panel.headline if ai_pressure_panel else 'Baskı görünümü' }}</div>
+      <div class="ai-text">{{ ai_pressure_panel.summary if ai_pressure_panel else '' }}</div>
+      <ul class="ai-bullets">
+        {% for bullet in (ai_pressure_panel.bullets if ai_pressure_panel else []) %}
+        <li><i class="fa-solid fa-angle-right"></i><span>{{ bullet }}</span></li>
+        {% endfor %}
+      </ul>
+      <div class="metric-grid">
+        {% for item in (ai_pressure_panel.actions if ai_pressure_panel else []) %}
+        <div class="metric">
+          <div class="l">{{ item.label }}</div>
+          <div class="v">{{ item.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+
+  <div class="rec-grid">
+    <section class="glass list-card">
+      <div class="ai-kicker"><i class="fa-solid fa-list-check"></i> Önerilen aksiyonlar</div>
+      {% for row in recommendation_rows %}
+      <article class="rec-item {{ row.tone }}">
+        <div class="rec-top">
+          <div class="rec-title">{{ row.title }}</div>
+          <div class="rec-count">{{ row.count }}</div>
+        </div>
+        <div class="rec-detail">{{ row.detail }}</div>
+      </article>
+      {% else %}
+      <div class="rec-item">
+        <div class="rec-title">Öneri bulunamadı</div>
+        <div class="rec-detail">Seçili filtrelerde aksiyon üretecek baskı görünmüyor.</div>
+      </div>
+      {% endfor %}
+    </section>
+
+    <section class="glass">
+      <div class="ai-kicker"><i class="fa-solid fa-building-shield"></i> Birim bazlı kalıcı baskı</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Birim</th><th>Skor</th><th>Detay</th><th>Toplam kayıt</th></tr>
+          </thead>
+          <tbody>
+            {% for row in pressure_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td><span class="pill {{ row.tone }}">{{ row.score }}</span></td>
+              <td>{{ row.detail }}</td>
+              <td>{{ row.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">Birim bazlı baskı kaydı bulunamadı.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <ul class="ai-bullets">
+        {% for reason,count in reason_rows[:5] %}
+        <li><i class="fa-solid fa-angle-right"></i><span>{{ reason }} · {{ count }}</span></li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

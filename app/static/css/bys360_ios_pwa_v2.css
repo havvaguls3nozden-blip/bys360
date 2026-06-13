@@ -1,0 +1,60 @@
+/* BYS360 iOS PWA V2 Advanced Mobile App */
+:root{
+  --bys-ios-safe-top: env(safe-area-inset-top, 0px);
+  --bys-ios-safe-right: env(safe-area-inset-right, 0px);
+  --bys-ios-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bys-ios-safe-left: env(safe-area-inset-left, 0px);
+  --bys-mobile-red:#8B0000;
+}
+html.bys360-ios-pwa, html.bys360-ios-browser{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+html.bys360-ios-pwa body{
+  min-height:100dvh;
+  padding-top: var(--bys-ios-safe-top);
+  padding-bottom: var(--bys-ios-safe-bottom);
+  overscroll-behavior-y:none;
+  -webkit-tap-highlight-color: rgba(139,0,0,.10);
+}
+html.bys360-ios-pwa .app-topbar,
+html.bys360-ios-pwa .topbar,
+html.bys360-ios-pwa header.navbar{
+  padding-top: max(0px, var(--bys-ios-safe-top));
+}
+html.bys360-ios-pwa .app-main,
+html.bys360-ios-pwa main,
+html.bys360-ios-pwa .content-wrapper{
+  padding-left: max(0px, var(--bys-ios-safe-left));
+  padding-right: max(0px, var(--bys-ios-safe-right));
+}
+html.bys360-ios-pwa input,
+html.bys360-ios-pwa select,
+html.bys360-ios-pwa textarea{
+  font-size:16px!important; /* iOS otomatik zoom engeli */
+}
+html.bys360-ios-pwa .modal,
+html.bys360-ios-pwa .offcanvas{
+  padding-top: var(--bys-ios-safe-top);
+  padding-bottom: var(--bys-ios-safe-bottom);
+}
+.bys360-pwa-install-hint{
+  position:fixed;left:16px;right:16px;bottom:calc(16px + var(--bys-ios-safe-bottom));z-index:2147483000;
+  display:none;background:rgba(255,255,255,.97);border:1px solid rgba(139,0,0,.14);border-radius:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.18);padding:14px 14px 13px 14px;color:#111827;backdrop-filter:blur(14px);
+}
+.bys360-pwa-install-hint.is-visible{display:block;animation:bys360PwaSlideUp .24s ease-out both;}
+.bys360-pwa-install-title{font-weight:900;color:var(--bys-mobile-red);font-size:15px;margin:0 30px 4px 0;}
+.bys360-pwa-install-text{font-size:13px;line-height:1.45;color:#667085;margin:0;}
+.bys360-pwa-install-close{position:absolute;right:10px;top:8px;width:32px;height:32px;border:0;border-radius:999px;background:#f2f4f7;color:#344054;font-weight:900;}
+@keyframes bys360PwaSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width: 768px){
+  html.bys360-ios-pwa .card,
+  html.bys360-ios-browser .card{border-radius:18px;}
+  html.bys360-ios-pwa .btn,
+  html.bys360-ios-pwa button,
+  html.bys360-ios-pwa a.btn{min-height:44px;}
+}
+@media (display-mode: standalone){
+  .bys360-browser-only{display:none!important;}
+}

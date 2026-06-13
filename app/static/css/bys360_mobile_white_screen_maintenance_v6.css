@@ -1,0 +1,40 @@
+/* BYS360 Mobile White Screen Repair V6
+   Amaç: V5 asistan kopya katmanını devreden çıkarınca mobil sayfanın görünür ve kaydırılabilir kalmasını sağlamak. */
+@media (max-width: 768px) {
+  html,
+  body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  body,
+  .app-shell,
+  .main-wrapper,
+  .content-wrapper,
+  .page-content,
+  main,
+  .main-content,
+  #content,
+  #mainContent {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .bys360-mobile-tabbar,
+  .bys360-mobile-bottom-nav,
+  .bys360-mobile-native-tabbar,
+  [data-bys360-mobile-tabbar="true"] {
+    display: none !important;
+  }
+
+  /* Eski V5 sınıfı tarayıcı önbelleğinden kalırsa etkisizleştir. */
+  .bys360-mobile-assistant-v5-hidden {
+    display: initial !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}

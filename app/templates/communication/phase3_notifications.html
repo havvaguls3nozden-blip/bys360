@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Bildirim Merkezi | BYS360{% endblock %}
+{% block page_title %}Bildirim Merkezi{% endblock %}
+{% block page_subtitle %}Duyuru, anket, destek ve sistem bildirimlerini tek listede yönetin{% endblock %}
+{% block content %}
+{% set priority_label_map = {'urgent': 'Acil', 'critical': 'Kritik', 'high': 'Yüksek', 'warning': 'Uyarı', 'medium': 'Orta', 'normal': 'Normal', 'low': 'Düşük', 'info': 'Bilgilendirme'} %}
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap justify-content-between gap-3 align-items-center mb-4">
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-sm {% if payload.filter_name=='all' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='all') }}">Tümü</a>
+        <a class="btn btn-sm {% if payload.filter_name=='unread' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='unread') }}">Okunmamış</a>
+        <a class="btn btn-sm {% if payload.filter_name=='survey' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='survey') }}">Anket</a>
+        <a class="btn btn-sm {% if payload.filter_name=='support' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='support') }}">Destek</a>
+        <a class="btn btn-sm {% if payload.filter_name=='announcement' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='announcement') }}">Duyuru</a>
+        <a class="btn btn-sm {% if payload.filter_name=='portal' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded-pill" href="{{ url_for('main.communication_phase3_notifications', filter='portal') }}">Portal</a>
+      </div>
+      <form method="post" action="{{ url_for('main.communication_phase3_notifications_read_all') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger rounded-pill">Tümünü Okundu Yap</button>
+      </form>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Toplam</div><div class="h4 mb-0">{{ payload.summary.all or 0 }}</div></div></div>
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Okunmamış</div><div class="h4 mb-0">{{ payload.summary.unread or 0 }}</div></div></div>
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Anket</div><div class="h4 mb-0">{{ payload.summary.survey or 0 }}</div></div></div>
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Destek</div><div class="h4 mb-0">{{ payload.summary.support or 0 }}</div></div></div>
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Duyuru</div><div class="h4 mb-0">{{ payload.summary.announcement or 0 }}</div></div></div>
+      <div class="col-md-2 col-6"><div class="border rounded-4 p-3"><div class="small text-muted">Portal</div><div class="h4 mb-0">{{ payload.summary.portal or 0 }}</div></div></div>
+    </div>
+
+    {% if payload.rows %}
+      {% for row in payload.rows %}
+      <div class="border rounded-4 p-3 mb-3 {% if not row.is_read %}border-danger-subtle{% endif %}">
+        <div class="d-flex flex-wrap justify-content-between gap-3">
+          <div>
+            <div class="fw-bold">{{ row.title }}</div>
+            <div class="small text-muted">{{ row.notification_type_label }} · Öncelik: {{ priority_label_map.get((row.priority or '')|lower, row.priority or 'Normal') }}</div>
+            {% if row.body %}<div class="mt-2">{{ row.body }}</div>{% endif %}
+            {% if row.link_url %}<a class="btn btn-sm btn-outline-danger rounded-pill mt-2" href="{{ row.link_url }}">İlgili Kayda Git</a>{% endif %}
+          </div>
+          <div class="text-end small text-muted">
+            {% if row.created_at %}{{ row.created_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}<br>
+            {% if row.is_read %}<span class="badge text-bg-light mt-2">Okundu</span>{% else %}<span class="badge text-bg-danger mt-2">Yeni</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-light border rounded-4">Seçili filtre için bildirim bulunamadı.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

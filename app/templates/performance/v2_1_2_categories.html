@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}V2.1.2 Personel Grup/Kategori Altyapısı{% endblock %}
+
+{% block content %}
+<style>
+  .bys-v212-shell{--bys-red:#8B0000;--bys-ink:#1f2937;--bys-muted:#6b7280;--bys-line:rgba(31,41,55,.10);max-width:1480px;margin:0 auto;padding:18px 18px 42px;}
+  .bys-v212-hero{border:1px solid var(--bys-line);border-radius:28px;background:radial-gradient(circle at top left,rgba(139,0,0,.13),transparent 32%),linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,255,255,.74));box-shadow:0 24px 70px rgba(31,41,55,.10);padding:28px;margin-bottom:18px;overflow:hidden;position:relative;}
+  .bys-v212-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--bys-red);font-weight:800;font-size:12px;margin-bottom:14px;}
+  .bys-v212-title{font-size:clamp(26px,3vw,42px);line-height:1.05;font-weight:850;color:var(--bys-ink);margin:0;letter-spacing:-.04em;}
+  .bys-v212-subtitle{max-width:960px;margin:14px 0 0;color:var(--bys-muted);font-size:15px;line-height:1.7;}
+  .bys-v212-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0;}
+  .bys-v212-card{border:1px solid var(--bys-line);border-radius:22px;background:rgba(255,255,255,.88);padding:18px;box-shadow:0 16px 42px rgba(31,41,55,.08);}
+  .bys-v212-card strong{display:block;color:var(--bys-ink);font-size:13px;margin-bottom:8px;}.bys-v212-card span{color:var(--bys-muted);font-size:13px;line-height:1.55;}
+  .bys-v212-section{border:1px solid var(--bys-line);border-radius:24px;background:rgba(255,255,255,.90);padding:22px;margin-top:16px;box-shadow:0 16px 42px rgba(31,41,55,.07);}
+  .bys-v212-section h2{margin:0 0 14px;color:var(--bys-ink);font-size:20px;font-weight:850;}
+  .bys-v212-table{width:100%;border-collapse:separate;border-spacing:0 10px;}.bys-v212-table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;text-align:left;padding:0 12px;}
+  .bys-v212-table td{background:rgba(248,250,252,.92);border-top:1px solid var(--bys-line);border-bottom:1px solid var(--bys-line);padding:14px 12px;vertical-align:middle;}
+  .bys-v212-table td:first-child{border-left:1px solid var(--bys-line);border-radius:16px 0 0 16px;}.bys-v212-table td:last-child{border-right:1px solid var(--bys-line);border-radius:0 16px 16px 0;}
+  .bys-v212-input{width:100%;border:1px solid var(--bys-line);border-radius:14px;background:#fff;padding:10px 12px;color:var(--bys-ink);}
+  .bys-v212-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}.bys-v212-btn{border:0;border-radius:16px;padding:12px 16px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+  .bys-v212-btn.primary{background:var(--bys-red);color:#fff;box-shadow:0 14px 30px rgba(139,0,0,.22);}.bys-v212-btn.soft{background:rgba(139,0,0,.08);color:var(--bys-red);}
+  .bys-v212-badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;}.bys-v212-badge.ok{background:rgba(22,163,74,.10);color:#15803d;}.bys-v212-badge.no{background:rgba(220,38,38,.10);color:#b91c1c;}.bys-v212-badge.info{background:rgba(139,0,0,.08);color:var(--bys-red);}
+  @media(max-width:980px){.bys-v212-grid{grid-template-columns:1fr 1fr}.bys-v212-shell{padding:12px}.bys-v212-table{font-size:13px;}}
+  @media(max-width:680px){.bys-v212-grid{grid-template-columns:1fr}.bys-v212-table th:nth-child(3),.bys-v212-table td:nth-child(3){display:none}}
+</style>
+
+<div class="bys-v212-shell">
+  <section class="bys-v212-hero">
+    <div class="bys-v212-eyebrow">Performans Yönetimi · V2.1.2</div>
+    <h1 class="bys-v212-title">Personel Grup/Kategori Altyapısı</h1>
+    <p class="bys-v212-subtitle">Bu merkez, Güvenlik, Temizlik, İdari Personel, Teknik Personel, Deneme Süreli Personel ve Diğer kategorilerini performans yönetimi için hazırlar. Mevcut personel kaydını bozmaz; kategori bağlantısını ayrı ve güvenli eşleme tablosunda tutar.</p>
+  </section>
+
+  <div class="bys-v212-grid">
+    <div class="bys-v212-card"><strong>Kural Sürümü</strong><span>{{ summary.rule_version }}</span></div>
+    <div class="bys-v212-card"><strong>Kategori Sayısı</strong><span>{{ summary.category_count }}</span></div>
+    <div class="bys-v212-card"><strong>Atama Sayısı</strong><span>{{ summary.assignment_total }}</span></div>
+    <div class="bys-v212-card"><strong>Veri Yaklaşımı</strong><span>Ayrı eşleme tablosu; personel çekirdeğine dokunmaz.</span></div>
+  </div>
+
+  <section class="bys-v212-section">
+    <h2>Varsayılan Kategoriler</h2>
+    <table class="bys-v212-table">
+      <thead><tr><th>Kategori</th><th>Anahtar</th><th>Açıklama</th><th>Atama</th><th>Durum</th></tr></thead>
+      <tbody>
+      {% for item in categories %}
+        <tr>
+          <td><strong>{{ item.display_name }}</strong></td>
+          <td><span class="bys-v212-badge info">{{ item.category_key }}</span></td>
+          <td>{{ item.description }}</td>
+          <td>{{ item.assignment_count }}</td>
+          <td>{% if item.is_active %}<span class="bys-v212-badge ok">Aktif</span>{% else %}<span class="bys-v212-badge no">Pasif</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <form method="post" class="bys-v212-actions"><input type="hidden" name="action" value="seed"><button class="bys-v212-btn soft" type="submit">Varsayılan Kategorileri İşle</button></form>
+  </section>
+
+  <section class="bys-v212-section">
+    <h2>Test Amaçlı Kategori Ataması</h2>
+    <p class="bys-v212-subtitle" style="margin-top:0">Bu alan personel kartı entegrasyonu gelmeden önce altyapının çalıştığını doğrulamak için kullanılır. Kullanıcı ID ile atama yapar; personel ana kaydını değiştirmez.</p>
+    <form method="post">
+      <input type="hidden" name="action" value="assign_user_category">
+      <div class="bys-v212-grid" style="grid-template-columns:1fr 1fr auto;align-items:end;">
+        <label><strong>Kullanıcı ID</strong><input class="bys-v212-input" type="number" name="user_id" placeholder="Örn. 1"></label>
+        <label><strong>Kategori</strong><select class="bys-v212-input" name="category_key">{% for item in categories %}<option value="{{ item.category_key }}">{{ item.display_name }}</option>{% endfor %}</select></label>
+        <button class="bys-v212-btn primary" type="submit">Ata</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="bys-v212-section">
+    <h2>Kalite Kapısı</h2>
+    <table class="bys-v212-table">
+      <thead><tr><th>Kontrol</th><th>Durum</th><th>Sonuç</th></tr></thead>
+      <tbody>
+      {% for item in gate.checks %}
+        <tr><td>{{ item.name }}</td><td>{% if item.ok %}<span class="bys-v212-badge ok">Geçti</span>{% else %}<span class="bys-v212-badge no">Kontrol Gerekli</span>{% endif %}</td><td>{{ item.message }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

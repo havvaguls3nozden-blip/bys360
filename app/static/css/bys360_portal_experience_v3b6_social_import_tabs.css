@@ -1,0 +1,76 @@
+/* BYS360 Portal V3B6 - Sosyal medya ekranı sekme ve canlı görünüm temizliği */
+.social-v3b6-tabs{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 18px;
+  padding:12px;
+  border:1px solid rgba(139,0,0,.12);
+  background:linear-gradient(135deg,#fff,#fff7f7);
+  border-radius:22px;
+  box-shadow:0 14px 34px rgba(70,0,0,.065);
+}
+.social-v3b6-tab{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  min-height:42px;
+  padding:10px 14px;
+  border:1px solid rgba(139,0,0,.14);
+  border-radius:999px;
+  background:#fff;
+  color:#4a1b1b !important;
+  text-decoration:none !important;
+  font-size:.92rem;
+  font-weight:800;
+  line-height:1;
+  box-shadow:0 10px 20px rgba(80,0,0,.045);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.social-v3b6-tab:hover{
+  transform:translateY(-1px);
+  border-color:rgba(139,0,0,.32);
+  box-shadow:0 14px 26px rgba(80,0,0,.085);
+  background:#fffafa;
+}
+.social-v3b6-tab i{color:#8b0000;font-size:.95rem;}
+.social-v3b6-tab.is-active{
+  color:#fff !important;
+  border-color:#8b0000;
+  background:linear-gradient(135deg,#8b0000,#b42323);
+  box-shadow:0 16px 32px rgba(139,0,0,.24);
+}
+.social-v3b6-tab.is-active i{color:#fff;}
+.social-v3b4-shell .portal-tabs,
+.social-v3b4-shell .portal-tabbar,
+.social-v3b4-shell .portal-nav-tabs{
+  display:none !important;
+}
+.social-v3b4-shell a:not(.social-v3b6-tab):not(.social-v3b4-btn){
+  text-decoration:none;
+}
+.social-v3b4-btn,
+.social-v3b4-input-action button,
+.social-v3b5-task-actions button{
+  text-decoration:none !important;
+}
+.social-v3b4-form input,
+.social-v3b4-form textarea{
+  border:1px solid rgba(139,0,0,.18) !important;
+  border-radius:16px !important;
+  box-shadow:0 10px 22px rgba(80,0,0,.045) !important;
+}
+.social-v3b4-form input:focus,
+.social-v3b4-form textarea:focus{
+  outline:none !important;
+  border-color:rgba(139,0,0,.44) !important;
+  box-shadow:0 0 0 4px rgba(139,0,0,.08) !important;
+}
+@media(max-width:760px){
+  .social-v3b6-tabs{gap:8px;padding:10px;border-radius:18px;}
+  .social-v3b6-tab{flex:1 1 calc(50% - 8px);justify-content:center;font-size:.86rem;padding:10px 9px;}
+}
+@media(max-width:480px){
+  .social-v3b6-tab{flex-basis:100%;}
+}

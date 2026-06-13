@@ -1,0 +1,110 @@
+{# BYS360_CORPORATE_PORTAL_MATURITY_V1_6_FEED #}
+{% extends "base.html" %}
+{% block title %}Kurumsal Portal - BYS360{% endblock %}
+{% block page_kicker %}BYS360{% endblock %}
+{% block page_title %}Kurumsal Portal{% endblock %}
+{% block page_subtitle %}Kurum içi paylaşımlar, duyurular ve güncel bilgilendirmeler.{% endblock %}
+{% block extra_head %}
+<!-- BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v3b_social_posts.css') }}?v=3b">
+<!-- /BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V3A_PRESS_NEWS_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v3a_press_news.css') }}?v=3a">
+<!-- /BYS360_PORTAL_EXPERIENCE_V3A_PRESS_NEWS_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2F_NEWS_LEFT_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2f_news_left.css') }}?v=2f">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2F_NEWS_LEFT_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATIONS_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2e_notifications.css') }}?v=2e">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATIONS_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2D1_PROFILE_VISUAL_FIX_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2d1_profile_visual_fix.css') }}?v=2d1">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2D1_PROFILE_VISUAL_FIX_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_AREA_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2d_profile_area.css') }}?v=2d">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_AREA_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2C_POST_CARDS_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2c_post_cards.css') }}?v=2c">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2C_POST_CARDS_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2B_FEED_FIRST_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2b_feed_first.css') }}?v=2b">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2B_FEED_FIRST_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2_FEED_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2.css') }}?v=2">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2_FEED_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=mobile-portal-light-home-v2-8-81"><!-- BYS360_PORTAL_EXPERIENCE_V1_FEED_CSS --><link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v1.css') }}?v=1"><!-- /BYS360_PORTAL_EXPERIENCE_V1_FEED_CSS -->{% endblock %}
+{% block content %}
+<div class="portal-shell portal-v2d1-profile-visual-fix portal-v2d-feed portal-maturity-shell portal-v2c-feed">
+  {% include 'portal/_tabs.html' %}
+  <div class="portal-layout portal-layout-feed-first portal-layout-news-left-v2f">
+    <aside class="portal-side portal-left">
+    {# BYS360_PORTAL_EXPERIENCE_V2D_LEFT_PROFILE_CARD #}
+    {% set portal_card_user = current_user %}
+    {% set portal_card_context = 'feed' %}
+    {% set portal_card_post_count = portal_feed_posts|length if portal_feed_posts is defined and portal_feed_posts else 0 %}
+    {% include 'portal/_profile_summary_card_v2d.html' ignore missing %}
+    {# BYS360_PORTAL_EXPERIENCE_V2F_LEFT_NEWS_SHOWCASE #}
+    {% include 'portal/_left_news_showcase_v2f.html' ignore missing %}
+    {# BYS360_PORTAL_EXPERIENCE_V3A_LEFT_PRESS_NEWS_CARD #}
+    {% include 'portal/_press_news_left_card_v3a.html' ignore missing %}
+      <section class="portal-card portal-profile-mini portal-profile-upgraded">
+        <div class="portal-cover"></div>
+        <div class="portal-avatar big portal-avatar-ring">{% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}</div>
+        <h2>{{ current_user.full_name or (current_user.ad ~ ' ' ~ current_user.soyad) or current_user.email }}</h2>
+        <p>{{ current_user.unvan or 'BYS360 Kullanıcısı' }}</p>
+        <span><i class="fa-solid fa-building"></i> {{ current_user.birim or 'Birim bilgisi yok' }}</span>
+        <a class="portal-btn ghost full" href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-id-card"></i> Profilime Git</a>
+      </section>
+      <section class="portal-card portal-info-card portal-principle-card">
+        <h3><i class="fa-solid fa-shield-halved"></i> Portal İlkesi</h3>
+        <p>Paylaşımlar görünürlük kapsamına göre gösterilir. Hassas personel, performans ve özel süreç bilgileri portal duvarında paylaşılmamalıdır.</p>
+      </section>
+    </aside>
+
+    <main class="portal-main">
+      <div id="portal-body"></div>
+      {% include 'portal/_composer.html' %}
+
+      {# BYS360_PORTAL_LIGHT_HOME_V2_8_81_INSTAGRAM_STORY_STRIP_HIDDEN #}
+{% if portal_feed_posts %}
+        {% for item in portal_feed_posts %}{% include 'portal/_post_card.html' %}{% endfor %}
+      {% else %}
+        <section class="portal-card portal-empty"><i class="fa-regular fa-newspaper"></i><h3>Henüz paylaşım yok</h3><p>İlk kurumsal paylaşımı oluşturarak yayın akışını başlatabilirsiniz.</p><a class="portal-btn ghost" href="#portal-body"><i class="fa-solid fa-pen"></i> Paylaşım yaz</a></section>
+      {% endif %}
+    </main>
+
+    <aside class="portal-side portal-right">
+      {# BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATION_CARD #}
+      {% include 'portal/_notification_habit_card_v2e.html' ignore missing %}
+      {# BYS360_PORTAL_EXPERIENCE_V2B_SIDEBAR_INCLUDE #}
+      {% include 'portal/_feed_sidebar_v2b.html' ignore missing %}
+      <section class="portal-card portal-side-block">
+        <h3><i class="fa-solid fa-user-group"></i> Gruplar</h3>
+        {% for group in portal_groups[:6] %}<a class="portal-group-link" href="{{ safe_url_for('main.portal_group_detail', group_id=group.id, fallback='#') }}">{{ group.name }}</a>{% else %}<p>Henüz grup görünmüyor.</p>{% endfor %}
+        <a class="portal-btn ghost full" href="{{ safe_url_for('main.portal_groups', fallback='/portal/groups') }}"><i class="fa-solid fa-arrow-right"></i> Tüm Gruplar</a>
+      </section>
+      {# BYS360_PORTAL_LIGHT_HOME_V2_8_81_INSTAGRAM_SYNC_CARD_HIDDEN #}
+<section class="portal-card portal-side-block">
+        <h3><i class="fa-solid fa-bullhorn"></i> Kurumsal Kullanım</h3>
+        <ul class="portal-clean-list"><li>Duyurular yetkili kullanıcılarca paylaşılır.</li><li>Yorumlar kurumsal nezaket içinde tutulur.</li><li>Görünürlük sonradan denetlenebilir.</li></ul>
+      </section>
+    </aside>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=mobile-portal-light-home-v2-8-81"></script>
+
+{# BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_WIDGETS #}
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script async src="https://www.instagram.com/embed.js"></script>
+<script>window.addEventListener('load',function(){try{if(window.twttr&&twttr.widgets){twttr.widgets.load();} if(window.instgrm&&instgrm.Embeds){instgrm.Embeds.process();}}catch(e){}});</script>
+{% endblock %}
+
+{# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

@@ -1,0 +1,63 @@
+/* BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_GATE_CSS */
+.bys360-phase12-final-gate-panel{
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(139,0,0,.18);
+  border-radius: 18px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 14px 32px rgba(30,30,30,.08);
+}
+.phase12-final-gate-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  border-bottom:1px solid rgba(139,0,0,.12);
+  padding-bottom:12px;
+  margin-bottom:14px;
+}
+.phase12-final-gate-header h3{
+  margin:0 0 6px;
+  font-size:1.08rem;
+  color:#8B0000;
+  font-weight:700;
+}
+.phase12-final-gate-header p{
+  margin:0;
+  color:#555;
+  line-height:1.45;
+}
+.phase12-final-gate-badge{
+  white-space:nowrap;
+  border-radius:999px;
+  padding:6px 12px;
+  background:#8B0000;
+  color:#fff;
+  font-weight:700;
+  font-size:.82rem;
+}
+.phase12-final-gate-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.phase12-final-gate-card{
+  border-radius:14px;
+  background:rgba(139,0,0,.045);
+  padding:13px;
+  min-height:94px;
+}
+.phase12-final-gate-card strong{
+  display:block;
+  color:#8B0000;
+  margin-bottom:7px;
+}
+.phase12-final-gate-card span{
+  display:block;
+  color:#444;
+  line-height:1.45;
+}
+@media (max-width: 860px){
+  .phase12-final-gate-grid{grid-template-columns:1fr;}
+  .phase12-final-gate-header{flex-direction:column;}
+}

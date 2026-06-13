@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Anket Detayı - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Detayı{% endblock %}
+{% block page_subtitle %}Soru yapısını, hedeflemeyi, hatırlatma geçmişini ve yanıt özetini tek ekranda izleyin.{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Hedef kullanıcı</div><div class="fs-2 fw-bold">{{ payload.summary.target_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Tamamlanan</div><div class="fs-2 fw-bold">{{ payload.summary.completed_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Bekleyen</div><div class="fs-2 fw-bold">{{ payload.summary.pending_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Tamamlanma</div><div class="fs-2 fw-bold">%{{ payload.summary.completion_rate }}</div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-xl-4">
+    <div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-start gap-2"><div><h5 class="fw-bold mb-1">{{ payload.survey.title }}</h5><div class="text-muted small">{{ payload.survey.description or '-' }}</div></div><span class="badge text-bg-dark">{{ status_labels.get(payload.survey.status, payload.survey.status) }}</span></div>
+      <div class="small text-muted mt-3">Tür: {{ payload.survey.survey_type }} · Anonim: {{ 'Evet' if payload.survey.is_anonymous else 'Hayır' }}</div>
+      <div class="small text-muted mt-2">Başlangıç: {{ payload.survey.start_at.strftime('%d.%m.%Y %H:%M') if payload.survey.start_at else '—' }}</div>
+      <div class="small text-muted mt-1">Bitiş: {{ payload.survey.end_at.strftime('%d.%m.%Y %H:%M') if payload.survey.end_at else 'Süresiz' }}</div>
+      <div class="d-grid gap-2 mt-4">
+        {% if payload.can_edit %}
+        <a href="{{ url_for('main.communication_phase2_survey_edit', survey_id=payload.survey.id) }}" class="btn btn-outline-primary w-100">Düzenle</a>
+        {% endif %}
+        <form method="post" action="{{ url_for('main.communication_phase2_survey_duplicate', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-outline-dark w-100">Kopyasını Oluştur</button></form>
+        {% if payload.survey.status != 'published' and payload.survey.status != 'archived' %}
+        <form method="post" action="{{ url_for('main.communication_phase2_survey_publish', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-danger w-100">Yayımla</button></form>
+        {% endif %}
+        {% if payload.survey.status not in ['closed', 'archived'] %}
+        <form method="post" action="{{ url_for('main.communication_phase2_survey_close', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-outline-secondary w-100">Kapat</button></form>
+        {% endif %}
+        {% if payload.survey.status != 'archived' %}
+        <form method="post" action="{{ url_for('main.communication_phase2_survey_archive', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-outline-secondary w-100">Arşive Al</button></form>
+        {% else %}
+        <form method="post" action="{{ url_for('main.communication_phase2_survey_reopen', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-outline-secondary w-100">Taslağa Geri Al</button></form>
+        {% endif %}
+        {% if payload.summary.pending_total > 0 and payload.survey.status == 'published' %}
+        <form method="post" action="{{ url_for('main.communication_phase3_survey_remind', survey_id=payload.survey.id) }}"><button type="submit" class="btn btn-outline-secondary w-100">Bekleyenlere Hatırlat</button></form>
+        {% endif %}
+        <a href="{{ url_for('main.communication_phase2_survey_results', survey_id=payload.survey.id) }}" class="btn btn-outline-dark">Sonuç Ekranı</a>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-xl-8">
+    <div class="card shadow-sm border-0 rounded-4 mb-3"><div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Sorular</h5>
+      <div class="list-group list-group-flush">
+        {% for question in payload.questions %}
+        <div class="list-group-item px-0 py-3">
+          <div class="fw-bold">{{ loop.index }}. {{ question.question_text }}</div>
+          <div class="small text-muted mt-1">Tür: {{ question_type_labels.get(question.question_type, question.question_type) }} · {{ 'Zorunlu' if question.is_required else 'Opsiyonel' }}</div>
+          {% if question.options.count() %}
+          <div class="small text-muted mt-2">Seçenekler: {% for option in question.options.order_by('sort_order').all() %}{{ option.option_text }}{% if not loop.last %}, {% endif %}{% endfor %}</div>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="text-muted">Soru kaydı bulunmuyor.</div>
+        {% endfor %}
+      </div>
+    </div></div>
+
+    <div class="card shadow-sm border-0 rounded-4 mb-3"><div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Hedefleme ve son yanıtlar</h5>
+      <div class="small text-muted mb-3">Hedef kayıtları: {% for assignment in payload.assignments %}<span class="badge text-bg-light me-1">{{ assignment.target_type }}{% if assignment.target_value %}: {{ assignment.target_value }}{% endif %}</span>{% else %}yok{% endfor %}</div>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Yanıt</th><th>Kullanıcı</th><th>Durum</th><th>Tarih</th></tr></thead><tbody>
+        {% for response in payload.responses %}
+        <tr><td>#{{ response.id }}</td><td>{{ response.user.full_name if response.user and response.user.full_name else (response.user.ad ~ ' ' ~ response.user.soyad if response.user else 'Anonim / Silinmiş') }}</td><td>{{ 'Tamamlandı' if response.is_completed else 'Taslak' }}</td><td>{{ response.submitted_at.strftime('%d.%m.%Y %H:%M') if response.submitted_at else '-' }}</td></tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted py-4">Henüz yanıt kaydı yok.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div>
+
+    <div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Hatırlatma geçmişi</h5>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kullanıcı</th><th>Tip</th><th>Not</th><th>Tarih</th></tr></thead><tbody>
+        {% for row in payload.reminders %}
+        <tr><td>{{ row.user.full_name if row.user and row.user.full_name else (row.user.ad ~ ' ' ~ row.user.soyad if row.user else '-') }}</td><td>{{ row.reminder_type }}</td><td>{{ row.note or '-' }}</td><td>{{ row.sent_at.strftime('%d.%m.%Y %H:%M') if row.sent_at else '-' }}</td></tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted py-4">Henüz hatırlatma kaydı yok.</td></tr>
+        {% endfor %}
+      </tbody></table></div>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

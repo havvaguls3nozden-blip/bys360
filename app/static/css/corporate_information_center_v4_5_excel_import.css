@@ -1,0 +1,29 @@
+/* BYS360_CIC_V4_5_CELEBRATION_EXCEL_IMPORT */
+body.bys360-cic-v45 .cic-v45-excel-upload{border:1px solid rgba(139,0,0,.12)!important;background:#fff!important;border-radius:22px!important;box-shadow:0 14px 36px rgba(17,24,39,.06)!important;overflow:hidden!important;}
+body.bys360-cic-v45 .cic-v45-excel-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:1rem!important;padding:1.15rem 1.25rem!important;border-bottom:1px solid rgba(139,0,0,.09)!important;background:linear-gradient(135deg,rgba(139,0,0,.045),rgba(255,255,255,.96))!important;}
+body.bys360-cic-v45 .cic-v45-excel-head h2{margin:0 0 .35rem!important;font-size:1.22rem!important;line-height:1.25!important;font-weight:850!important;color:#2f2020!important;letter-spacing:-.01em!important;}
+body.bys360-cic-v45 .cic-v45-excel-head p{margin:0!important;color:#5f6672!important;font-size:.94rem!important;line-height:1.55!important;max-width:860px!important;}
+body.bys360-cic-v45 .cic-v45-excel-body{display:grid!important;grid-template-columns:minmax(0,1fr) 330px!important;gap:1rem!important;padding:1.2rem!important;align-items:start!important;}
+body.bys360-cic-v45 .cic-v45-upload-box{border:1px dashed rgba(139,0,0,.24)!important;background:rgba(139,0,0,.025)!important;border-radius:18px!important;padding:1rem!important;}
+body.bys360-cic-v45 .cic-v45-upload-box label{display:block!important;color:#2f2020!important;font-weight:850!important;margin-bottom:.55rem!important;}
+body.bys360-cic-v45 .cic-v45-file-input{width:100%!important;min-height:46px!important;border:1px solid rgba(139,0,0,.13)!important;border-radius:13px!important;background:#fff!important;color:#2f2020!important;padding:.55rem!important;font-weight:700!important;}
+body.bys360-cic-v45 .cic-v45-upload-actions{display:flex!important;flex-wrap:wrap!important;gap:.65rem!important;margin-top:.85rem!important;align-items:center!important;}
+body.bys360-cic-v45 .cic-v45-upload-actions .cic-btn{min-height:42px!important;}
+body.bys360-cic-v45 .cic-v45-help-card{border:1px solid rgba(139,0,0,.10)!important;background:#fff!important;border-radius:18px!important;padding:1rem!important;}
+body.bys360-cic-v45 .cic-v45-help-card h3{margin:0 0 .65rem!important;color:#2f2020!important;font-size:1rem!important;font-weight:850!important;}
+body.bys360-cic-v45 .cic-v45-help-card ul{margin:.2rem 0 0 1.05rem!important;padding:0!important;color:#5f6672!important;line-height:1.65!important;font-size:.92rem!important;}
+body.bys360-cic-v45 .cic-v45-help-card li::marker{color:#8B0000!important;}
+body.bys360-cic-v45 .cic-v45-template-link,body.bys360-cic-v45 a.cic-v45-template-link{display:inline-flex!important;align-items:center!important;gap:.45rem!important;white-space:nowrap!important;text-decoration:none!important;border:1px solid rgba(139,0,0,.14)!important;background:#fff!important;color:#5f2525!important;font-weight:850!important;border-radius:13px!important;padding:.64rem .9rem!important;box-shadow:none!important;}
+body.bys360-cic-v45 .cic-v45-template-link:hover{background:rgba(139,0,0,.055)!important;color:#8B0000!important;border-color:rgba(139,0,0,.28)!important;}
+body.bys360-cic-v45 .cic-v45-import-result{margin:0 1.2rem 1.2rem!important;border:1px solid rgba(139,0,0,.10)!important;border-radius:18px!important;background:#fff!important;overflow:hidden!important;}
+body.bys360-cic-v45 .cic-v45-import-result-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:1rem!important;background:rgba(139,0,0,.045)!important;border-bottom:1px solid rgba(139,0,0,.08)!important;padding:.85rem 1rem!important;}
+body.bys360-cic-v45 .cic-v45-import-result-head strong{color:#2f2020!important;font-weight:900!important;}
+body.bys360-cic-v45 .cic-v45-import-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:.7rem!important;padding:1rem!important;}
+body.bys360-cic-v45 .cic-v45-import-summary div{border:1px solid rgba(139,0,0,.08)!important;background:#fbfbfc!important;border-radius:14px!important;padding:.8rem!important;}
+body.bys360-cic-v45 .cic-v45-import-summary span{display:block!important;font-size:.72rem!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:#687386!important;font-weight:850!important;}
+body.bys360-cic-v45 .cic-v45-import-summary b{display:block!important;margin-top:.22rem!important;font-size:1.18rem!important;color:#111827!important;font-weight:900!important;}
+body.bys360-cic-v45 .cic-v45-result-list{padding:0 1rem 1rem!important;color:#5f6672!important;font-size:.9rem!important;line-height:1.55!important;}
+body.bys360-cic-v45 .cic-v45-result-list code{background:rgba(139,0,0,.06)!important;color:#5f2525!important;border:1px solid rgba(139,0,0,.08)!important;border-radius:8px!important;padding:.12rem .35rem!important;}
+body.bys360-cic-v45 .cic-actions a[href*="excel-yukleme"],body.bys360-cic-v45 a[href$="#excel-yukleme"]{display:inline-flex!important;align-items:center!important;gap:.45rem!important;text-decoration:none!important;border-radius:13px!important;border:1px solid rgba(139,0,0,.14)!important;background:#fff!important;color:#5f2525!important;font-weight:850!important;padding:.66rem .92rem!important;}
+@media(max-width:980px){body.bys360-cic-v45 .cic-v45-excel-head,body.bys360-cic-v45 .cic-v45-excel-body{grid-template-columns:1fr!important;flex-direction:column!important;}body.bys360-cic-v45 .cic-v45-import-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+@media(max-width:560px){body.bys360-cic-v45 .cic-v45-import-summary{grid-template-columns:1fr!important;}}

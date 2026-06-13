@@ -1,0 +1,24 @@
+{# BYS360 V2.1.3 personel kartı kategori paneli. Güvenli ek panel; çekirdek form alanlarını değiştirmez. #}
+{% set _v213_person = profile if profile is defined else (personnel if personnel is defined else (user if user is defined else none)) %}
+{% if _v213_person is not none and _v213_person.id is defined %}
+    {% set _v213_category = v213_get_user_category(_v213_person.id) if v213_get_user_category is defined else {'display_name':'Kategori Atanmamış'} %}
+    <div class="glass-card panel-card bys-v213-personnel-category-panel" style="border:1px solid rgba(139,0,0,.10);background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.78));">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;">
+            <div>
+                <h4 class="section-title" style="margin-bottom:6px;">Performans Kategorisi</h4>
+                <p class="section-sub" style="margin-bottom:0;">Bu alan performans dönemlerinde kategori/grup bazlı kapsam, ortalama ve raporlama için kullanılır.</p>
+            </div>
+            <span style="display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 13px;background:rgba(139,0,0,.08);color:#8B0000;font-weight:900;font-size:.86rem;">
+                <i class="fa-solid fa-layer-group"></i>
+                {{ _v213_category.display_name or 'Kategori Atanmamış' }}
+            </span>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <a href="{{ url_for('main.performance_v2_1_3_personnel_category_card', q=_v213_person.id) }}" class="btn-soft warning" style="text-decoration:none;">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Kategoriyi Yönet
+            </a>
+            <span style="color:#6b7280;font-size:.84rem;line-height:1.6;">Kategori değişiklikleri ayrı audit kaydına düşer; personel ana kaydı bozulmaz.</span>
+        </div>
+    </div>
+{% endif %}

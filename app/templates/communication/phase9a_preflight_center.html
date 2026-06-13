@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Faz 9A Preflight{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4"><div class="card-body">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+      <div>
+        <h3 class="mb-2">Kontrol 9A | Yayın Öncesi Teknik Kilit</h3>
+        <p class="text-muted mb-0">Production ortam ayarı, klasör varlığı, temel smoke listesi ve teknik karar kayıtları tek ekranda.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('main.communication_phase9a_dashboard') }}" class="btn btn-outline-danger">Kontrol 9A Ana Ekran</a>
+        <a href="{{ url_for('main.communication_phase9a_backup_center') }}" class="btn btn-outline-danger">Yedek & Geri dönüş</a>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Env kontrol listesi</h5>
+          <span class="small text-muted">Zorunlu alanlar</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Değişken</th><th>Durum</th><th>Değer</th><th>Detay</th></tr></thead>
+            <tbody>
+              {% for row in payload.env_rows %}
+              <tr>
+                <td>{{ row.key }}</td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td><code>{{ row.value }}</code></td>
+                <td>{{ row.detail }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5 class="mb-3">Teknik kilit kaydı</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9a_freeze_create') }}" class="vstack gap-3">
+          <input type="hidden" name="freeze_token" value="{{ freeze_token }}">
+          <div>
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="status">
+              <option value="pass">pass</option>
+              <option value="warn">warn</option>
+              <option value="fail">fail</option>
+              <option value="pending" selected>pending</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="4" placeholder="Kod freeze, ortam ayarı veya erişim sınırı notu"></textarea>
+          </div>
+          <button class="btn btn-danger" type="submit">Teknik kilit kaydet</button>
+        </form>
+      </div></div>
+      <div class="card border-0 shadow-sm"><div class="card-body">
+        <h5 class="mb-3">Smoke kayıt notu</h5>
+        <form method="post" action="{{ url_for('main.communication_phase9a_smoke_create') }}" class="vstack gap-3">
+          <input type="hidden" name="smoke_token" value="{{ smoke_token }}">
+          <div>
+            <label class="form-label">Hedef ekran</label>
+            <input class="form-control" name="target" placeholder="örn. /portal/notifications">
+          </div>
+          <div>
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="status">
+              <option value="pass">pass</option>
+              <option value="warn">warn</option>
+              <option value="fail">fail</option>
+              <option value="pending" selected>pending</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Not</label>
+            <textarea class="form-control" name="note" rows="4" placeholder="Kısa gözlem"></textarea>
+          </div>
+          <button class="btn btn-outline-danger" type="submit">Smoke kaydı bırak</button>
+        </form>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <h5 class="mb-3">Klasör doğrulaması</h5>
+        <ul class="list-group list-group-flush">
+          {% for row in payload.path_rows %}
+          <li class="list-group-item px-0">
+            <div class="d-flex justify-content-between gap-3 align-items-start">
+              <div>
+                <div class="fw-semibold">{{ row.label }}</div>
+                <div class="small"><code>{{ row.path }}</code></div>
+                <div class="small text-muted">{{ row.detail }}</div>
+              </div>
+              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'danger' }}">{{ row.status }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div></div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Temel smoke matrisi</h5>
+          <span class="small text-muted">Açılış öncesi zorunlu ekranlar</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead><tr><th>Ekran</th><th>URL</th><th>Beklenen</th><th>Sahip</th></tr></thead>
+            <tbody>
+              {% for row in payload.first72.smoke_rows %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td><code>{{ row.path }}</code></td>
+                <td>{{ row.expected }}</td>
+                <td>{{ row.owner }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

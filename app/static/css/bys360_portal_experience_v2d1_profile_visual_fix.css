@@ -1,0 +1,175 @@
+/* BYS360 Portal — profil kartı görsel hizalama düzeltmesi */
+:root{
+  --portal-v2d1-red:#8B0000;
+  --portal-v2d1-ink:#111827;
+  --portal-v2d1-muted:#64748b;
+  --portal-v2d1-line:rgba(15,23,42,.08);
+  --portal-v2d1-soft:#f8fafc;
+}
+
+/* Yayın akışındaki sol profil kartında avatar ve metin dengesi */
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact{
+  border-radius:22px!important;
+  overflow:hidden!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-cover{
+  height:64px!important;
+  background:
+    radial-gradient(circle at 22% 0%,rgba(255,255,255,.34),transparent 34%),
+    linear-gradient(135deg,#8B0000,#5c0000)!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-main{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  justify-items:center!important;
+  gap:0!important;
+  padding:0 16px 14px!important;
+  margin-top:-38px!important;
+  text-align:center!important;
+  align-items:start!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-avatar-wrap{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  margin:0 0 9px!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-avatar{
+  width:82px!important;
+  height:82px!important;
+  border:4px solid #fff!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  box-shadow:0 14px 26px rgba(15,23,42,.18)!important;
+  overflow:hidden!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-avatar img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  display:block!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-info{
+  width:100%!important;
+  min-width:0!important;
+  padding-top:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+
+/* Küçük sol kartta 'Kurumsal Profil' etiketi fazla kalabalık yapıyordu. */
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-kicker{
+  display:none!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-info h2{
+  margin:0!important;
+  max-width:100%!important;
+  color:var(--portal-v2d1-ink)!important;
+  font-size:1.02rem!important;
+  line-height:1.18!important;
+  font-weight:950!important;
+  letter-spacing:-.015em!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-info p{
+  margin:5px 0 0!important;
+  max-width:100%!important;
+  color:var(--portal-v2d1-muted)!important;
+  font-size:.84rem!important;
+  line-height:1.35!important;
+  font-weight:820!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-tags{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:7px!important;
+  margin-top:12px!important;
+  justify-content:stretch!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-tags span{
+  justify-content:center!important;
+  min-width:0!important;
+  width:100%!important;
+  padding:8px 10px!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  border:1px solid var(--portal-v2d1-line)!important;
+  color:#334155!important;
+  font-size:.76rem!important;
+  line-height:1.25!important;
+  font-weight:850!important;
+  text-align:center!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-tags i{
+  color:var(--portal-v2d1-red)!important;
+  flex:0 0 auto!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-stats{
+  padding:0 16px 13px!important;
+  gap:7px!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-stats div{
+  border-radius:14px!important;
+  background:var(--portal-v2d1-soft)!important;
+  padding:10px 7px!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-completion{
+  margin:0 16px 14px!important;
+  border-radius:16px!important;
+}
+
+.portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-completion small{
+  font-size:.76rem!important;
+}
+
+@media(max-width:920px){
+  .portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-main{
+    margin-top:-40px!important;
+  }
+}
+
+@media(max-width:640px){
+  .portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-cover{
+    height:58px!important;
+  }
+  .portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-avatar{
+    width:78px!important;
+    height:78px!important;
+  }
+  .portal-v2d1-profile-visual-fix .portal-v2d-profile-compact .portal-v2d-profile-tags span{
+    white-space:normal!important;
+  }
+}

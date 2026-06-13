@@ -1,0 +1,72 @@
+{# BYS360_CORPORATE_PORTAL_MATURITY_V1_6_PROFILE #}
+{% extends "base.html" %}
+{% block title %}Portal Profili - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Portal{% endblock %}
+{% block page_title %}Portal Profili{% endblock %}
+{% block page_subtitle %}Kurum içi profil bilgileri ve görünür paylaşımlar.{% endblock %}
+{% block extra_head %}
+<!-- BYS360_PORTAL_EXPERIENCE_V2D1_PROFILE_VISUAL_FIX_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2d1_profile_visual_fix.css') }}?v=2d1">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2D1_PROFILE_VISUAL_FIX_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_AREA_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2d_profile_area.css') }}?v=2d">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_AREA_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=portal-iphone-responsive-v2-11">{% endblock %}
+{% block content %}
+<div class="portal-shell portal-maturity-shell portal-v2d-profile-page">
+  {% include 'portal/_tabs.html' %}
+
+  {# BYS360_PORTAL_EXPERIENCE_V2D_PROFILE_HERO #}
+  {% set portal_card_user = portal_profile_user if portal_profile_user is defined else current_user %}
+  {% set portal_card_context = 'profile' %}
+  {% set portal_card_post_count = portal_feed_posts|length if portal_feed_posts is defined and portal_feed_posts else 0 %}
+  {% include 'portal/_profile_summary_card_v2d.html' ignore missing %}
+
+  {# BYS360_PORTAL_PROFILE_WALL_V2_9_PROFILE_SEARCH #}
+  <section class="portal-card portal-people-search-card compact">
+    <div>
+      <h3><i class="fa-solid fa-address-book"></i> Personel profillerinde ara</h3>
+      <p>Personel profillerini görüntüleyebilir ve yetkiniz dahilinde ilgili paylaşımları takip edebilirsiniz.</p>
+    </div>
+    <form method="get" action="{{ safe_url_for('main.portal_people', fallback='/portal/people') }}" class="portal-people-search-form">
+      <input class="portal-input" type="search" name="q" placeholder="Ad, soyad, birim veya unvan ara">
+      <button class="portal-btn ghost" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Ara</button>
+    </form>
+  </section>
+
+  <section class="portal-card portal-profile-hero upgraded">
+    <div class="portal-cover"></div>
+    <div class="portal-profile-hero-grid">
+      <div class="portal-avatar xl portal-avatar-ring">{% if portal_profile_user.profile_photo_url %}<img src="{{ portal_profile_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}</div>
+      <div class="portal-profile-body">
+        <span class="portal-kicker"><i class="fa-regular fa-id-card"></i> Kurumsal Profil</span>
+        <h1>{{ portal_profile_user.full_name or (portal_profile_user.ad ~ ' ' ~ portal_profile_user.soyad) or portal_profile_user.email }}</h1>
+        <p>{{ portal_profile_user.unvan or 'BYS360 Kullanıcısı' }}</p>
+        <div class="portal-profile-chips">
+          <span><i class="fa-solid fa-building"></i> {{ portal_profile_user.birim or 'Birim bilgisi yok' }}</span>
+          <span><i class="fa-regular fa-newspaper"></i> {{ portal_feed_posts|length if portal_feed_posts else 0 }} görünür paylaşım</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="portal-layout single-side">
+    <main class="portal-main wide-feed">
+      {# BYS360_PORTAL_PROFILE_WALL_V2_8_PROFILE_COMPOSER #}
+      {% if portal_can_post_to_wall %}
+        {% include 'portal/_composer.html' %}
+      {% elif portal_profile_user.id == current_user.id %}
+        <section class="portal-card portal-wall-closed"><h3>Profil duvarı kapalı</h3><p>Profil duvarınıza paylaşım yapılması şu anda kapalı görünüyor.</p></section>
+      {% endif %}
+      {% if portal_feed_posts %}
+        {% for item in portal_feed_posts %}{% include 'portal/_post_card.html' %}{% endfor %}
+      {% else %}
+        <section class="portal-card portal-empty"><i class="fa-regular fa-user"></i><h3>Bu profilde görünür paylaşım yok</h3><p>Paylaşımlar görünürlük kapsamına göre burada listelenir.</p></section>
+      {% endif %}
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-iphone-responsive-v2-11"></script>
+{% endblock %}
+
+{# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

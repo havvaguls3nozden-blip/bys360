@@ -1,0 +1,126 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Analiz Merkezi Excel Önizleme - BYS360{% endblock %}
+{% block page_kicker %}AI Karar Destek / Analiz Merkezi{% endblock %}
+{% block page_title %}Kontrol 7 — Excel Yükleme ve Veri Ön İzleme{% endblock %}
+{% block page_subtitle %}Gerçek içe aktarım yapmadan güvenli dosya doğrulama, sütun analizi, örnek satır önizleme ve KVKK uyarıları üretir.{% endblock %}
+{% block ai_inner %}
+<style>
+.analysis-preview-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch}.analysis-drop{padding:22px;border-radius:24px;background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);box-shadow:0 18px 36px rgba(15,23,42,.08)}.analysis-upload-box{border:1px dashed rgba(139,0,0,.32);border-radius:22px;padding:22px;background:linear-gradient(180deg,rgba(139,0,0,.05),rgba(255,255,255,.96))}.analysis-upload-box input[type=file]{width:100%;padding:14px;border:1px solid rgba(15,23,42,.10);border-radius:16px;background:#fff}.analysis-safe-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.analysis-safe-card{padding:16px;border-radius:20px;background:#fff;border:1px solid rgba(15,23,42,.07)}.analysis-safe-card strong{display:block;color:#111827;margin-bottom:6px}.analysis-safe-card span{color:#64748b;font-size:.88rem;line-height:1.5}.analysis-kvkk{padding:16px 18px;border-radius:20px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}.analysis-kvkk strong{display:block;margin-bottom:8px;color:#9a3412}.analysis-preview-table{width:100%;border-collapse:separate;border-spacing:0 8px;min-width:860px}.analysis-preview-table th{font-size:.78rem;color:#64748b;text-align:left;padding:0 10px 6px}.analysis-preview-table td{background:#fff;padding:12px 10px;border-top:1px solid rgba(15,23,42,.06);border-bottom:1px solid rgba(15,23,42,.06);vertical-align:top}.analysis-preview-table td:first-child{border-left:1px solid rgba(15,23,42,.06);border-radius:14px 0 0 14px}.analysis-preview-table td:last-child{border-right:1px solid rgba(15,23,42,.06);border-radius:0 14px 14px 0}.analysis-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.76rem;font-weight:800}.analysis-pill.low{background:#f8fafc;color:#475569;border:1px solid #e2e8f0}.analysis-pill.medium{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}.analysis-pill.high{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}.analysis-pill.safe{background:#ecfdf5;color:#065f46;border:1px solid #bbf7d0}.analysis-pill.locked{background:rgba(139,0,0,.08);color:#8B0000;border:1px solid rgba(139,0,0,.13)}.analysis-table-scroll{overflow-x:auto}.analysis-cell-list{display:flex;flex-wrap:wrap;gap:8px}.analysis-cell{padding:8px 10px;border-radius:12px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);font-size:.86rem}.analysis-muted{color:#64748b}.analysis-alert-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}.analysis-alert-list li{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.07);color:#475569}.analysis-alert-list li.warning{background:#fff7ed;border-color:#fed7aa;color:#7c2d12}.analysis-alert-list li.security{background:#fef2f2;border-color:#fecaca;color:#991b1b}@media(max-width:1200px){.analysis-preview-hero{grid-template-columns:1fr}.analysis-safe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:768px){.analysis-safe-grid{grid-template-columns:1fr}.analysis-drop{padding:16px}.analysis-upload-box{padding:16px}}
+</style>
+<div class="ai-shell">
+  <section class="analysis-preview-hero">
+    <div class="ai-panel ai-hero">
+      <div class="ai-kicker">Kontrol 7 güvenli önizleme</div>
+      <h3 class="ai-title">Excel/CSV dosyasını içe aktarmadan önce analiz edin</h3>
+      <p class="ai-sub">Bu ekran dosyayı yalnızca geçici olarak okur. Sütun başlıklarını, veri tiplerini, örnek satırları ve KVKK açısından hassas alanları gösterir; sistem kayıtlarına personel, performans, anket veya destek verisi yazmaz.</p>
+      <div class="ai-actions" style="margin-top:16px">
+        <span class="analysis-pill safe"><i class="fa-solid fa-circle-check"></i> Gerçek içe aktarım kapalı</span>
+        <span class="analysis-pill safe"><i class="fa-solid fa-database"></i> DB yazımı yok</span>
+        <span class="analysis-pill locked"><i class="fa-solid fa-user-shield"></i> KVKK maskeleme aktif</span>
+        <span class="analysis-pill low"><i class="fa-solid fa-file-excel"></i> .xlsx / .csv</span>
+      </div>
+    </div>
+
+    <form class="analysis-drop" method="post" enctype="multipart/form-data" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="ai-kicker">Dosya kontrolü</div>
+      <h3 class="ai-title">Güvenli dosya doğrulama</h3>
+      <p class="ai-sub">En fazla {{ max_file_size_mb }} MB dosya analiz edilir. Dosya diske kaydedilmez; sonuç yalnızca bu sayfada gösterilir.</p>
+      <div class="analysis-upload-box" style="margin-top:16px">
+        <div class="ai-group">
+          <label for="analysis_file">Excel veya CSV dosyası</label>
+          <input id="analysis_file" name="analysis_file" type="file" accept=".xlsx,.csv" required>
+        </div>
+        <div class="ai-filters" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px">
+          <div class="ai-group"><label for="sample_limit">Örnek satır</label><input class="ai-input" id="sample_limit" name="sample_limit" type="number" min="3" max="25" value="{{ default_sample_limit }}"></div>
+          <div class="ai-group"><label for="scan_limit">Analiz satır sınırı</label><input class="ai-input" id="scan_limit" name="scan_limit" type="number" min="50" max="1000" value="{{ default_scan_limit }}"></div>
+          <div class="ai-group"><label for="sheet_name">Sayfa adı opsiyonel</label><input class="ai-input" id="sheet_name" name="sheet_name" type="text" placeholder="Boşsa ilk sayfa okunur"></div>
+        </div>
+        <div class="ai-actions" style="margin-top:16px"><button class="ai-submit" type="submit"><i class="fa-solid fa-magnifying-glass-chart"></i> Güvenli önizleme üret</button></div>
+      </div>
+    </form>
+  </section>
+
+  <section class="analysis-safe-grid">
+    {% for note in safety_notes %}
+    <article class="analysis-safe-card"><strong><i class="fa-solid fa-shield-halved"></i> Güvenlik notu</strong><span>{{ note }}</span></article>
+    {% endfor %}
+  </section>
+
+  {% if preview %}
+  <section class="ai-grid ai-grid-four">
+    <article class="ai-card"><div class="ai-label">Görünen satır</div><div class="ai-value">{{ preview.metrics.row_count_visible }}</div><div class="ai-mini">Tahmini toplam {{ preview.metrics.row_count_estimated }}</div></article>
+    <article class="ai-card"><div class="ai-label">Sütun</div><div class="ai-value">{{ preview.metrics.column_count }}</div><div class="ai-mini">Hassas sütun {{ preview.metrics.sensitive_column_count }}</div></article>
+    <article class="ai-card"><div class="ai-label">Formül hücresi</div><div class="ai-value">{{ preview.metrics.formula_cells }}</div><div class="ai-mini">Formüller çalıştırılmaz ve gizlenir.</div></article>
+    <article class="ai-card"><div class="ai-label">Aktarım durumu</div><div class="ai-value">Kapalı</div><div class="ai-mini">DB yazımı: {{ 'Açık' if preview.db_write_enabled else 'Kapalı' }}</div></article>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Dosya özeti</div>
+      <ul class="ai-list">
+        <li class="ai-list-item"><div><strong>Dosya</strong><div class="ai-mini">{{ preview.original_filename }} · {{ preview.extension }} · {{ preview.file_size }} byte</div></div><span class="analysis-pill low">{{ preview.detected_mime }}</span></li>
+        <li class="ai-list-item"><div><strong>Okunan sayfa</strong><div class="ai-mini">{{ preview.sheet_name }}{% if preview.sheet_names|length > 1 %} · Sayfalar: {{ preview.sheet_names|join(', ') }}{% endif %}</div></div><span class="analysis-pill safe">Önizleme</span></li>
+        <li class="ai-list-item"><div><strong>Başlık satırı</strong><div class="ai-mini">İlk dolu satır başlık kabul edilir. Boş/tekrarlı başlıklar ayrıca işaretlenir.</div></div><span class="analysis-pill low">Satır {{ preview.header_row_index }}</span></li>
+      </ul>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">KVKK ve güvenlik uyarıları</div>
+      <ul class="analysis-alert-list">
+        {% for item in preview.kvkk_warnings %}<li class="warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ item }}</li>{% endfor %}
+        {% for item in preview.security_findings %}<li class="security"><i class="fa-solid fa-shield-virus"></i> {{ item }}</li>{% endfor %}
+        {% for item in preview.warnings %}<li><i class="fa-solid fa-circle-info"></i> {{ item }}</li>{% endfor %}
+      </ul>
+    </article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Sütun analizi</div>
+    <h3 class="ai-title">Başlık, veri tipi ve hassasiyet profili</h3>
+    <div class="analysis-table-scroll" style="margin-top:14px">
+      <table class="analysis-preview-table">
+        <thead><tr><th>#</th><th>Sütun</th><th>Tip</th><th>Hassasiyet</th><th>Dolu / Boş</th><th>Örnek değerler</th><th>KVKK notu</th></tr></thead>
+        <tbody>
+          {% for column in preview.columns %}
+          <tr>
+            <td>{{ column.index }}</td>
+            <td><strong>{{ column.header }}</strong><div class="analysis-muted">{{ column.normalized_header }}</div></td>
+            <td>{{ column.inferred_type }}</td>
+            <td><span class="analysis-pill {{ 'high' if column.sensitivity == 'yüksek' else 'medium' if column.sensitivity == 'orta' else 'low' }}">{{ column.sensitivity }}</span></td>
+            <td>{{ column.non_empty_count }} / {{ column.empty_count }}</td>
+            <td><div class="analysis-cell-list">{% for value in column.sample_values %}<span class="analysis-cell">{{ value }}</span>{% else %}<span class="analysis-muted">Örnek yok</span>{% endfor %}</div></td>
+            <td>{{ column.kvkk_reason }}{% if column.formula_count %}<div class="analysis-muted">{{ column.formula_count }} formül hücresi</div>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Örnek satır önizleme</div>
+    <h3 class="ai-title">Maskelenmiş örnek satırlar</h3>
+    <p class="ai-sub">Bu tabloda ham veri gösterilmez. TC, e-posta, telefon, sicil, ad-soyad ve benzeri alanlar otomatik maskelenir.</p>
+    <div class="analysis-table-scroll" style="margin-top:14px">
+      <table class="analysis-preview-table">
+        <thead><tr><th>Satır</th><th>Maskelenmiş hücreler</th></tr></thead>
+        <tbody>
+          {% for row in preview.preview_rows %}
+          <tr>
+            <td><strong>{{ row.row_number }}</strong></td>
+            <td><div class="analysis-cell-list">{% for cell in row.cells %}<span class="analysis-cell" title="{{ cell.header }}">{{ cell.header }}: {{ cell.value if cell.value else '—' }}</span>{% endfor %}</div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% else %}
+  <section class="analysis-kvkk">
+    <strong><i class="fa-solid fa-lock"></i> KVKK güvenli varsayılan</strong>
+    Dosya yüklenene kadar hiçbir veri okunmaz. Yükleme sonrası yalnız güvenli analiz ve maskeli önizleme gösterilir; gerçek içe aktarım butonu bu fazda yoktur.
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

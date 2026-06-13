@@ -1,0 +1,190 @@
+:root{
+    --mobile-hardening-gap: 10px;
+}
+
+.mobile-hardening-active{
+    overflow-x: hidden;
+}
+
+.mobile-media-fluid{
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.mobile-fullwidth{
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.mobile-trim-minwidth{
+    min-width: 0 !important;
+}
+
+.mobile-wrap-text{
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+.mobile-overflow-x{
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-flex-wrap{
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+    gap: var(--mobile-hardening-gap) !important;
+}
+
+.mobile-force-stack{
+    grid-template-columns: minmax(0, 1fr) !important;
+}
+
+@media (max-width: 992px){
+    html,
+    body{
+        overflow-x: hidden;
+    }
+
+    body.mobile-hardening-active{
+        overflow-x: hidden;
+    }
+
+    main,
+    .app-main,
+    .content-wrap,
+    .content-block,
+    .container,
+    .container-fluid,
+    .row,
+    [class*="col-"],
+    .card,
+    .panel,
+    .glass-card,
+    .dashboard-card,
+    .metric-card,
+    .summary-card,
+    .table-card,
+    .widget,
+    .hero,
+    .hero-card,
+    .status-card,
+    .shell,
+    .workspace-shell,
+    .report-shell,
+    .list-card,
+    .page-meta,
+    .page-header,
+    .page-actions,
+    .header-actions,
+    .toolbar,
+    .filters,
+    .actions{
+        min-width: 0 !important;
+        max-width: 100%;
+    }
+
+    .mobile-force-stack,
+    .mobile-auto-grid{
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: var(--mobile-hardening-gap) !important;
+    }
+
+    .mobile-flex-wrap{
+        display: flex !important;
+    }
+
+    .mobile-table-wrap,
+    .table-responsive{
+        width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 18px;
+    }
+
+    .mobile-table-wrap > table,
+    .table-responsive > table{
+        min-width: 640px;
+        margin-bottom: 0;
+    }
+
+    .content-block .btn-toolbar,
+    .content-block .action-row,
+    .content-block .filter-row,
+    .content-block .page-actions,
+    .content-block .header-actions,
+    .content-block .card-actions,
+    .content-block .toolbar,
+    .content-block .actions,
+    .content-block .filters,
+    .content-block .button-row,
+    .content-block .form-actions,
+    .content-block .quick-actions,
+    .content-block .top-actions,
+    .content-block .list-actions{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        align-items: stretch !important;
+    }
+
+    .content-block .btn-group,
+    .content-block .input-group{
+        flex-wrap: wrap !important;
+    }
+
+    .content-block .btn,
+    .content-block button,
+    .content-block .form-control,
+    .content-block .form-select,
+    .content-block input,
+    .content-block select,
+    .content-block textarea,
+    .content-block .input-group-text{
+        max-width: 100%;
+    }
+
+    .content-block .pagination,
+    .pagination-shell{
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-start !important;
+    }
+
+    img,
+    svg,
+    canvas,
+    video,
+    iframe{
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .mobile-fullwidth > *,
+    .mobile-trim-minwidth > *{
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px){
+    .mobile-table-wrap > table,
+    .table-responsive > table{
+        min-width: 560px;
+    }
+
+    .content-block .page-actions > .btn,
+    .content-block .header-actions > .btn,
+    .content-block .actions > .btn,
+    .content-block .filters > .btn,
+    .content-block .form-actions > .btn,
+    .content-block .quick-actions > .btn,
+    .content-block .btn-toolbar > .btn,
+    .content-block .btn-group > .btn,
+    .content-block .btn-group > a,
+    .content-block .action-row > .btn,
+    .content-block .action-row > a{
+        width: 100%;
+    }
+}

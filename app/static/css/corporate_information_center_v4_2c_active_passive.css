@@ -1,0 +1,10 @@
+/* BYS360 CIC V4.2C - Kurumsal Bilgilendirme dil ve görünürlük düzeltmesi */
+.cic-active-passive-pill,
+.cicp-command-actions .cic-active-passive-pill{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;
+  border:1px solid rgba(139,0,0,.18);background:rgba(255,255,255,.78);
+  box-shadow:0 12px 28px rgba(15,23,42,.08);color:#6f0000;font-weight:800;letter-spacing:.01em;
+}
+.cic-active-passive-pill i{color:#8B0000;}
+.cic-sidebar-celebrations-link{display:flex!important;align-items:center;gap:10px;margin:4px 10px 4px 24px;padding:10px 12px!important;border-radius:14px;background:rgba(255,255,255,.08);color:inherit!important;text-decoration:none!important;font-size:13px;font-weight:700;}
+.cic-sidebar-celebrations-link:hover,.cic-sidebar-celebrations-link.is-active{background:rgba(255,255,255,.18);}

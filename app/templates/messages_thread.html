@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Konuşma - BYS360{% endblock %}
+{% block page_kicker %}İletişim{% endblock %}
+{% block page_title %}Konuşma{% endblock %}
+{% block page_subtitle %}Messenger benzeri sade konuşma ekranı{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages_messenger_mobile.css') }}">
+
+<div class="msg-thread-shell single-thread-view">
+  <section class="messenger-panel standalone-thread-panel">
+    <div class="messenger-panel-head">
+      <div class="messenger-panel-user">
+        <a class="msg-mini-btn" href="{{ back_url }}"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="messenger-avatar big" style="background:linear-gradient(180deg, {{ thread.accent_color or '#8B0000' }}, {{ thread.accent_color or '#8B0000' }}CC);">
+          <i class="{{ thread.icon_name or 'fa-solid fa-comments' }}"></i>
+        </div>
+        <div class="messenger-panel-meta">
+          <h2 class="messenger-panel-title">{{ thread.title or 'Konuşma' }}</h2>
+          <p class="messenger-panel-sub">{{ participants|length }} katılımcı {% if thread.thread_type == 'self' %} • Kendime not{% else %} • Kurumsal konuşma{% endif %}</p>
+        </div>
+      </div>
+      <div class="msg-thread-actions">
+        <a href="{{ url_for('main.messages_new') }}" class="msg-mini-btn"><i class="fa-solid fa-pen-to-square"></i> Yeni</a>
+      </div>
+    </div>
+
+    {% if participants %}
+    <div class="msg-participants messenger-participants">
+      {% for p in participants %}
+        {% set person_name = p.user.full_name if p.user and p.user.full_name else (((p.user.ad or '') ~ ' ' ~ (p.user.soyad or ''))|trim if p.user else '-') %}
+        <span class="msg-participant-chip">
+          <i class="fa-solid fa-user"></i>
+          {{ person_name }}
+        </span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="messenger-panel-body">
+      <div class="msg-messages messenger-messages" id="msgMessages">
+        {% if messages %}
+          {% for message in messages %}
+            {% set sender_name = message.sender.full_name if message.sender and message.sender.full_name else (((message.sender.ad or '') ~ ' ' ~ (message.sender.soyad or ''))|trim if message.sender else 'Kullanıcı') %}
+            {% set message_attachments = message.attachments.all() if (not message.is_deleted and message.attachments is defined) else [] %}
+            {% set has_attachments = message_attachments|length > 0 %}
+            {% set message_body_text = (message.body or '')|trim %}
+            <div class="msg-row {% if message.sender_user_id == current_user.id %}mine{% endif %}">
+              <div class="msg-bubble">
+                <div class="msg-author">{{ sender_name }}</div>
+                {% if message_body_text and not (has_attachments and message_body_text in ['[Ek]', '[Dosya Eki]']) %}
+                  <div class="msg-text">{{ message.body }}</div>
+                {% endif %}
+
+                {% if has_attachments %}
+                <div class="msg-attachments">
+                  {% for attachment in message_attachments %}
+                    {% set ext = (attachment.file_ext or '')|lower %}
+                    {% set is_image = ext in ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.heic', '.heif'] %}
+                    {% set is_video = ext in ['.mp4', '.webm', '.mov', '.m4v'] %}
+                    {% if is_image %}
+                      <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank" class="msg-attachment is-image">
+                        <img src="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" alt="{{ attachment.original_filename }}">
+                      </a>
+                    {% elif is_video %}
+                      <div class="msg-attachment is-video">
+                        <video controls preload="metadata" src="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}"></video>
+                        <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank">
+                          <i class="fa-regular fa-file-video"></i>
+                          <span>{{ attachment.original_filename }}</span>
+                        </a>
+                      </div>
+                    {% else %}
+                      <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank" class="msg-attachment">
+                        <i class="fa-solid fa-paperclip"></i>
+                        <span>{{ attachment.original_filename }}</span>
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="msg-meta">
+                  <span>{{ message.sent_at.strftime('%d.%m.%Y %H:%M') if message.sent_at else '-' }}</span>
+                  {% if message.edited_at %}<span>düzenlendi</span>{% endif %}
+                </div>
+
+                {% if message.sender_user_id == current_user.id and not message.is_deleted %}
+                <div class="msg-thread-actions msg-inline-actions">
+                  <button type="button" class="msg-mini-btn" onclick="openEditModal('{{ message.id }}', {{ message.body|tojson }})">
+                    <i class="fa-solid fa-pen"></i> Düzenle
+                  </button>
+                  <form method="POST" action="{{ url_for('main.messages_delete', message_id=message.id) }}" onsubmit="return confirm('Bu mesaj silinsin mi?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="msg-mini-btn danger"><i class="fa-solid fa-trash"></i> Sil</button>
+                  </form>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="msg-empty">Henüz mesaj yok. İlk mesajı siz gönderin.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="msg-compose-wrap messenger-compose-wrap">
+      <form method="POST" action="{{ url_for('main.messages_send', thread_id=thread.id) }}" enctype="multipart/form-data" class="msg-compose-form js-message-attachment-compose">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_form_token" value="{{ compose_submit_token }}">
+        <input type="hidden" name="_return_view" value="thread">
+
+        <div class="msg-compose-main">
+          <div class="msg-attachment-preview js-message-attachment-preview" hidden></div>
+          <div class="msg-compose-input-row">
+            <label class="msg-attach-btn" title="Dosya ekle">
+              <i class="fa-solid fa-paperclip"></i>
+              <span class="visually-hidden">Dosya ekle</span>
+              <input type="file" name="attachments" class="js-message-attachment-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.webp,.gif,.bmp,.heic,.heif,.mp4,.webm,.mov,.m4v,.zip,.rar,.7z">
+            </label>
+            <textarea name="body" id="threadMessageBody" class="msg-textarea js-msg-autogrow" placeholder="Mesajınızı yazın veya dosya ekleyin..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="msg-send" title="Gönder"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </section>
+</div>
+
+<div class="modal fade" id="editMessageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px; border:none;">
+      <form method="POST" id="editMessageForm" data-action-template="{{ url_for('main.messages_edit', message_id=0) }}">
+        <div class="modal-header" style="border-bottom:1px solid rgba(15,23,42,.06);">
+          <h5 class="modal-title" style="font-weight:900;">Mesajı Düzenle</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <textarea name="body" id="editMessageBody" class="msg-textarea js-msg-autogrow" required></textarea>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid rgba(15,23,42,.06);">
+          <button type="button" class="msg-btn soft" data-bs-dismiss="modal">Vazgeç</button>
+          <button type="submit" class="msg-btn primary">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function openEditModal(messageId, bodyText) {
+  const form = document.getElementById('editMessageForm');
+  const textarea = document.getElementById('editMessageBody');
+  const tpl = form.getAttribute('data-action-template') || '';
+  form.action = tpl ? tpl.replace(/0$/, String(messageId)) : '{{ url_for('main.messages_edit', message_id=0) }}'.replace(/0$/, String(messageId));
+  textarea.value = bodyText || '';
+  if (window.bootstrap && bootstrap.Modal) {
+    const modal = new bootstrap.Modal(document.getElementById('editMessageModal'));
+    modal.show();
+  }
+}
+</script>
+<script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}"></script>
+{% endblock %}

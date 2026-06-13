@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}İletişim ve Anket Yönetimi Faz 3 | BYS360{% endblock %}
+{% block page_title %}İletişim ve Anket Yönetimi · Faz 3{% endblock %}
+{% block page_subtitle %}Kullanıcı akışı, bildirim merkezi, destek kuyruğu ve bilgi bankası{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body p-4">
+        <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
+          <div>
+            <div class="small text-muted">Kontrol 3 genel görünüm</div>
+            <h4 class="mb-1">Gerçek kullanım akışı hazır</h4>
+            <div class="text-muted">Bildirim, anket, destek ve bilgi bankası aynı ekranda izlenebilir.</div>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-danger rounded-pill" href="{{ url_for('main.communication_phase3_notifications') }}">Bildirimler</a>
+            <a class="btn btn-outline-danger rounded-pill" href="{{ url_for('main.communication_phase3_my_surveys') }}">Anketlerim</a>
+            <a class="btn btn-outline-danger rounded-pill" href="{{ url_for('main.communication_phase3_support_queue') }}">Destek Kuyruğu</a>
+            <a class="btn btn-danger rounded-pill" href="{{ url_for('main.communication_phase3_help_center') }}">Bilgi Bankası</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4"><div class="text-muted small">Okunmamış Bildirim</div><div class="display-6 fw-bold text-danger">{{ payload.notifications.summary.unread or 0 }}</div><div class="text-muted">Toplam {{ payload.notifications.summary.all or 0 }} bildirim</div></div></div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4"><div class="text-muted small">Bekleyen Anket</div><div class="display-6 fw-bold text-danger">{{ payload.surveys.summary.pending or 0 }}</div><div class="text-muted">Açık {{ payload.surveys.summary.open or 0 }} anket</div></div></div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4"><div class="text-muted small">Destek Kaydı</div><div class="display-6 fw-bold text-danger">{{ payload.support.counts.all or 0 }}</div><div class="text-muted">Açık ve kapalı talepler birlikte</div></div></div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100"><div class="card-body p-4"><div class="text-muted small">Bilgi Bankası</div><div class="display-6 fw-bold text-danger">{{ payload.help.rows|length }}</div><div class="text-muted">Yayınlanmış makale sayısı</div></div></div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-white border-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+        <div><h5 class="mb-1">Son Bildirimler</h5><div class="text-muted small">Birleşik bildirim merkezi ön izlemesi</div></div>
+        <a href="{{ url_for('main.communication_phase3_notifications') }}" class="btn btn-sm btn-outline-danger rounded-pill">Tamamını Aç</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if payload.notifications.rows %}
+          <div class="list-group list-group-flush">
+            {% for row in payload.notifications.rows %}
+            <div class="list-group-item px-0 py-3 border-bottom">
+              <div class="d-flex justify-content-between gap-3">
+                <div>
+                  <div class="fw-bold">{{ row.title }}</div>
+                  <div class="text-muted small">{{ row.notification_type_label }} · {{ row.priority|upper }}</div>
+                  {% if row.body %}<div class="small mt-1">{{ row.body }}</div>{% endif %}
+                </div>
+                <div class="small text-muted text-end">{% if row.created_at %}{{ row.created_at.strftime('%d.%m.%Y %H:%M') }}{% endif %}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-muted">Gösterilecek bildirim bulunmuyor.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-white border-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+        <div><h5 class="mb-1">Anketlerim</h5><div class="text-muted small">Yanıt akışı tamamlandı</div></div>
+        <a href="{{ url_for('main.communication_phase3_my_surveys') }}" class="btn btn-sm btn-outline-danger rounded-pill">Anket Merkezine Git</a>
+      </div>
+      <div class="card-body px-4 pb-4">
+        {% if payload.surveys.rows %}
+          {% for row in payload.surveys.rows[:5] %}
+          <div class="border rounded-4 p-3 mb-3">
+            <div class="d-flex justify-content-between gap-3">
+              <div>
+                <div class="fw-bold">{{ row.survey.title }}</div>
+                <div class="small text-muted">{{ row.question_count }} soru · {{ row.survey.status }}</div>
+              </div>
+              <div>
+                {% if row.completed %}
+                  <span class="badge text-bg-success">Tamamlandı</span>
+                {% elif row.is_open %}
+                  <span class="badge text-bg-warning">Bekliyor</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Kapalı</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-muted">Size atanmış anket görünmüyor.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

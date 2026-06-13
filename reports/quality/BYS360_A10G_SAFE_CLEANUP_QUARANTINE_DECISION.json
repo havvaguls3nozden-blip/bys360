@@ -1,0 +1,1034 @@
+{
+  "generated_at": "2026-06-12T19:14:58",
+  "phase": "A10G_SAFE_CLEANUP_QUARANTINE",
+  "ok": false,
+  "decision": "A10G_SAFE_CLEANUP_QUARANTINE_NOT_GREEN",
+  "quarantine_root": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407",
+  "source_a10f": "reports\\quality\\BYS360_A10F_CLEANUP_CANDIDATE_PRECISION_PLAN.json",
+  "safe_candidate_count_before": 200,
+  "moved_count": 200,
+  "missing_before_move_count": 0,
+  "moved": [
+    {
+      "path": "scripts/check_bys360_feedback_csrf_hotfix_v2_13_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\check_bys360_feedback_csrf_hotfix_v2_13_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_compileall_legacy_script_syntax_v2_13_3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_compileall_legacy_script_syntax_v2_13_3.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_group_compat_v1_9.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_group_compat_v1_9.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_group_full_compat_v2_0.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_group_full_compat_v2_0.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_group_full_compat_v2_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_group_full_compat_v2_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_group_full_compat_v2_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_group_full_compat_v2_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_home_v1_5.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_home_v1_5.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_insert_compat_v1_8.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_insert_compat_v1_8.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_legacy_author_v1_6.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_legacy_author_v1_6.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_legacy_columns_v1_7.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_legacy_columns_v1_7.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_maturity_v1_6.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_maturity_v1_6.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_media_video_v2_3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_media_video_v2_3.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_menu_v1_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_menu_v1_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_routes_v1_4.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_routes_v1_4.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_schema_v1_3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_schema_v1_3.py"
+    },
+    {
+      "path": "scripts/repair_bys360_corporate_portal_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_corporate_portal_v1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_feedback_campaign_form_v2_13_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_feedback_campaign_form_v2_13_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_feedback_center_v2_13_0.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_feedback_center_v2_13_0.py"
+    },
+    {
+      "path": "scripts/repair_bys360_feedback_center_v2_13_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_feedback_center_v2_13_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_feedback_csrf_hotfix_v2_13_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_feedback_csrf_hotfix_v2_13_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_home_festival_portal_v2_5_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_home_festival_portal_v2_5_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_home_menu_always_visible_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_home_menu_always_visible_v1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_home_portal_safe_links_v2_7.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_home_portal_safe_links_v2_7.py"
+    },
+    {
+      "path": "scripts/repair_bys360_logout_post_v2_4.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_logout_post_v2_4.py"
+    },
+    {
+      "path": "scripts/repair_bys360_mobile_v2_8_74_android_release_ready_p0.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_mobile_v2_8_74_android_release_ready_p0.py"
+    },
+    {
+      "path": "scripts/repair_bys360_mobile_v2_8_75_app_maturity_p1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_mobile_v2_8_75_app_maturity_p1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_composer_accordion_v2_6.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_composer_accordion_v2_6.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_delete_route_dedupe_v2_10_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_delete_route_dedupe_v2_10_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_instagram_feed_v2_11_0.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_instagram_feed_v2_11_0.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_instagram_feed_v2_11_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_instagram_feed_v2_11_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_instagram_feed_v2_11_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_instagram_feed_v2_11_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_instagram_full_hide_v2_11_8.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_instagram_full_hide_v2_11_8.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_instagram_hide_v2_11_7.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_instagram_hide_v2_11_7.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_iphone_responsive_v2_11.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_iphone_responsive_v2_11.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_media_comments_mentions_v2_12_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_media_comments_mentions_v2_12_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_people_premium_v2_10.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_people_premium_v2_10.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_me_link_v2_10_3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_me_link_v2_10_3.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_me_link_v2_10_5.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_me_link_v2_10_5.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_me_link_v2_10_6.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_me_link_v2_10_6.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_me_link_v2_10_7.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_me_link_v2_10_7.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_8.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_8.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_8_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_8_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9_1.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9_2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9_2.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9_3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9_3.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9_4.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9_4.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_profile_wall_v2_9_5.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_profile_wall_v2_9_5.py"
+    },
+    {
+      "path": "scripts/repair_bys360_portal_settings_role_matrix_v2_12.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\repair_bys360_portal_settings_role_matrix_v2_12.py"
+    },
+    {
+      "path": "scripts/admin/repair_system_admin_email_v2_16_0.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\admin\\repair_system_admin_email_v2_16_0.py"
+    },
+    {
+      "path": "scripts/admin/repair_system_admin_email_v2_16_1_checkfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\admin\\repair_system_admin_email_v2_16_1_checkfix.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_auto_mail_weekday_only_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_auto_mail_weekday_only_v1.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_mail_engine_system_sender_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_mail_engine_system_sender_v1.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_mail_engine_system_sender_v1_1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_mail_engine_system_sender_v1_1.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_recipients_pro_usability_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_recipients_pro_usability_v1.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_recipients_save_persistence_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_recipients_save_persistence_v2.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_recipients_save_persistence_v2_1_gate_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_recipients_save_persistence_v2_1_gate_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_cic_v3_0_system_auto_mail_scheduler_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_cic_v3_0_system_auto_mail_scheduler_v1.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_feedback_submit_executive_ui_v2_17_70.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_feedback_submit_executive_ui_v2_17_70.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_feedback_submit_executive_ui_v2_17_71.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_feedback_submit_executive_ui_v2_17_71.py"
+    },
+    {
+      "path": "scripts/communication/repair_bys360_feedback_submit_executive_ui_v2_17_72.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_bys360_feedback_submit_executive_ui_v2_17_72.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_0a_celebrations_menu_tab.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_0a_celebrations_menu_tab.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_2b_active_passive_sidebar_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_2b_active_passive_sidebar_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_2d_active_passive_syntax_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_2d_active_passive_syntax_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_2_global_sidebar_cache_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_2_global_sidebar_cache_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_3_full_pro_ui_sidebar_active.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_3_full_pro_ui_sidebar_active.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_4a_system_link_polish.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_4a_system_link_polish.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_4b_system_page_final_polish.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_4b_system_page_final_polish.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_4_performance_style_reset.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_4_performance_style_reset.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_5a_celebration_excel_import_lock_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_5a_celebration_excel_import_lock_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_5_celebration_excel_import.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_5_celebration_excel_import.py"
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_6a_jinja_slice_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_cic_v4_6a_jinja_slice_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase4_advanced_ui.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v3_0_phase4_advanced_ui.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase5_1_gate_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v3_0_phase5_1_gate_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_10_status_pill_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v3_0_phase7_10_status_pill_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_4_release_pro_ui.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v3_0_phase7_4_release_pro_ui.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_5_quality_gate_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v3_0_phase7_5_quality_gate_fix.py"
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v4_0_smart_celebrations.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_corporate_information_center_v4_0_smart_celebrations.py"
+    },
+    {
+      "path": "scripts/communication/repair_daily_weather_mail_v1_0_4_move_to_executive_summary.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_daily_weather_mail_v1_0_4_move_to_executive_summary.py"
+    },
+    {
+      "path": "scripts/communication/repair_daily_weather_mail_v1_0_6_merge_exec_menu.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_daily_weather_mail_v1_0_6_merge_exec_menu.py"
+    },
+    {
+      "path": "scripts/communication/repair_daily_weather_mail_v1_0_7_system_admin_only.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\communication\\repair_daily_weather_mail_v1_0_7_system_admin_only.py"
+    },
+    {
+      "path": "scripts/corporate_information/repair_corporate_information_center_v3_0_phase1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\corporate_information\\repair_corporate_information_center_v3_0_phase1.py"
+    },
+    {
+      "path": "scripts/dashboard/repair_executive_summary_v1_0_8_admin_professional.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\dashboard\\repair_executive_summary_v1_0_8_admin_professional.py"
+    },
+    {
+      "path": "scripts/db/repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py"
+    },
+    {
+      "path": "scripts/executive/repair_daily_mail_tasks_v1_4_stable_automation_ui.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_daily_mail_tasks_v1_4_stable_automation_ui.py"
+    },
+    {
+      "path": "scripts/executive/repair_executive_summary_advanced_v2_14_20.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_executive_summary_advanced_v2_14_20.py"
+    },
+    {
+      "path": "scripts/executive/repair_executive_summary_advanced_v2_14_21.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_executive_summary_advanced_v2_14_21.py"
+    },
+    {
+      "path": "scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3_1_route_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_executive_summary_daily_mail_tasks_v1_3_1_route_fix.py"
+    },
+    {
+      "path": "scripts/executive/repair_executive_summary_v3_local_pro_ui.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_executive_summary_v3_local_pro_ui.py"
+    },
+    {
+      "path": "scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_4_route_priority_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_exec_summary_daily_mail_tasks_v1_3_4_route_priority_fix.py"
+    },
+    {
+      "path": "scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_5_premium_people.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_exec_summary_daily_mail_tasks_v1_3_5_premium_people.py"
+    },
+    {
+      "path": "scripts/executive/repair_mail_center_v1_5.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_mail_center_v1_5.py"
+    },
+    {
+      "path": "scripts/executive/repair_mail_center_v1_6_full_pages.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\executive\\repair_mail_center_v1_6_full_pages.py"
+    },
+    {
+      "path": "scripts/maintenance/bys360_cic_logging_import_hotfix_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\bys360_cic_logging_import_hotfix_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_a5_p1_archive_marker_safe_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_a5_p1_archive_marker_safe_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v2.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_assistant_shortcut_sqlalchemy_smoke_hotfix_v3.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_ci_hardening_safe_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_ci_hardening_safe_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_claude_score_uplift_p0c_source_secret_sanitizer_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_claude_score_uplift_p0c_source_secret_sanitizer_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_claude_score_uplift_p0d_gate_precision_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_claude_score_uplift_p0d_gate_precision_v2.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_claude_score_uplift_p1c_config_env_strip_hotfix_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_claude_score_uplift_p1c_config_env_strip_hotfix_v2.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_encoding_quality_fix_v2_17_63.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_encoding_quality_fix_v2_17_63.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_f821_cleanup_safe_v3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_f821_cleanup_safe_v3.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_final_gate_review_cleanup_v2_17_71.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_final_gate_review_cleanup_v2_17_71.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_final_gate_scanner_finalize_v2_17_73.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_final_gate_scanner_finalize_v2_17_73.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_final_text_quality_tail_v2_17_72.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_final_text_quality_tail_v2_17_72.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_local_sqlite_bootstrap_db_hotfix_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_local_sqlite_bootstrap_db_hotfix_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_mobile_analyze_fix_v2_17_65.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_mobile_analyze_fix_v2_17_65.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_mobile_consistency_v2_17_64.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_mobile_consistency_v2_17_64.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_mobile_lint_cleanup_v2_17_66.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_mobile_lint_cleanup_v2_17_66.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p3a_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p3a_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p4c_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p4c_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p4c_v2_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p4c_v2_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p4d_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p4d_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p4e_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p4e_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p5a_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p5a_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p5b_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p5b_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p6b_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p6b_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p6b_v2_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p6b_v2_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_p6c_active_architecture_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_p6c_active_architecture_scope.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_phase1_bleeding_stop_safe_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_phase1_bleeding_stop_safe_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v1.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v13.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v13.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v14.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v14.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v15.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v15.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v16.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v16.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v18.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v18.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v3.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v3.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v4.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v4.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_technical_debt_cleanup_safe_v5.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v5.py"
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_v2_17_61_syntax_warning_cleanup_v2_17_68.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\maintenance\\repair_bys360_v2_17_61_syntax_warning_cleanup_v2_17_68.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_admin_only_v1_0_10.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_admin_only_v1_0_10.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_menu_safe_v2_14_11.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_menu_safe_v2_14_11.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_menu_solid_v2_14_13.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_menu_solid_v2_14_13.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_menu_solid_v2_14_14.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_menu_solid_v2_14_14.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_menu_v2_14_9.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_menu_v2_14_9.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_module_before_footer_v2_14_17.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_module_before_footer_v2_14_17.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_module_bottom_v2_14_16.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_module_bottom_v2_14_16.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_module_static_v2_14_15.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_module_static_v2_14_15.py"
+    },
+    {
+      "path": "scripts/menu/repair_executive_summary_native_menu_v2_14_19.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\menu\\repair_executive_summary_native_menu_v2_14_19.py"
+    },
+    {
+      "path": "scripts/notifications/repair_bys360_notifications_v2_1_24_cross_module_bridge.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\notifications\\repair_bys360_notifications_v2_1_24_cross_module_bridge.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase10_reminder_notification_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase10_reminder_notification_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase10_reminder_notification_center_v1a_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase10_reminder_notification_center_v1a_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase11_period_scope_assignment_final.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase11_period_scope_assignment_final.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase12_final_gate.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase12_final_gate.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase1_rule_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase1_rule_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase4_third_manager_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase4_third_manager_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase4_third_manager_center_v1a_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase4_third_manager_center_v1a_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase5_scorecard_ui_center_v1b_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase5_scorecard_ui_center_v1b_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase6_low_score_process_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase6_low_score_process_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase7_scorecard_archive_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase7_scorecard_archive_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_completion_phase8_midterm_feedback_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_completion_phase8_midterm_feedback_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_10_evaluation_live_tracking.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_10_evaluation_live_tracking.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_11_evaluator_reminder_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_11_evaluator_reminder_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_12b_period_center_executive_ui.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_12b_period_center_executive_ui.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_12c_period_center_language_gate_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_12c_period_center_language_gate_fix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_12_period_center_visible_upgrade.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_12_period_center_visible_upgrade.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_13_period_center_embedded_dashboard.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_13_period_center_embedded_dashboard.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_14_period_center_real_summary.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_14_period_center_real_summary.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_15_period_selection_status_flow.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_15_period_selection_status_flow.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_16_scope_chain_control_panel.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_16_scope_chain_control_panel.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_17_reminder_approval_prep.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_17_reminder_approval_prep.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_18_executive_view.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_18_executive_view.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_19_admin_workflow.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_19_admin_workflow.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_1_rule_engine_settings.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_1_rule_engine_settings.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_20_final_gate_language_cleanup.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_20_final_gate_language_cleanup.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_21_period_center_role_matrix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_21_period_center_role_matrix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_22a_period_center_admin_access_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_22a_period_center_admin_access_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_22b_live_tracking_route_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_22b_live_tracking_route_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_22c_live_tracking_executive_design.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_22c_live_tracking_executive_design.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_22_period_center_executive_design.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_22_period_center_executive_design.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_23a_settings_role_matrix_decorator_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_23a_settings_role_matrix_decorator_fix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_23b_settings_performance_policy_visible.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_23b_settings_performance_policy_visible.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_2_personnel_category.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_2_personnel_category.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_3a_personnel_category_sidebar.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_3a_personnel_category_sidebar.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_3b_personnel_category_sidebar_visibility.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_3b_personnel_category_sidebar_visibility.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_3c_base_sidebar_render.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_3c_base_sidebar_render.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_3_personnel_category_card.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_3_personnel_category_card.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_4_category_scope_visibility.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_4_category_scope_visibility.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_5_category_period_scope.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_5_category_period_scope.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_6a_corporate_ui_category_delete.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_6a_corporate_ui_category_delete.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_6_category_period_integration.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_6_category_period_integration.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_7_period_management_center.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_7_period_management_center.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_8a_period_center_fast_open_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_8a_period_center_fast_open_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_8_period_center_assignment_launch.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_8_period_center_assignment_launch.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_9a_period_center_safe_open_hotfix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_9a_period_center_safe_open_hotfix.py"
+    },
+    {
+      "path": "scripts/performance/repair_bys360_performance_v2_1_9_period_center_process_notifications.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\performance\\repair_bys360_performance_v2_1_9_period_center_process_notifications.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_home_prestige_safe_v1a.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_home_prestige_safe_v1a.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v1.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v1.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v1b.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v1b.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2a_live_text_cleanup.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2a_live_text_cleanup.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2b_feed_first.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2b_feed_first.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2c_post_cards.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2c_post_cards.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2d1_profile_visual_fix.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2d1_profile_visual_fix.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2d_profile_area.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2d_profile_area.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2e_notifications.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2e_notifications.py"
+    },
+    {
+      "path": "scripts/portal/repair_bys360_portal_experience_v2f_news_left.py",
+      "status": "moved",
+      "to": "C:\\bys360\\releases\\A10G_SAFE_CLEANUP_QUARANTINE_20260612_191407\\scripts\\portal\\repair_bys360_portal_experience_v2f_news_left.py"
+    }
+  ],
+  "compileall_returncode": 0,
+  "a10a_returncode": 0,
+  "a10b_returncode": 0,
+  "a10f_returncode": 0,
+  "safe_quarantine_candidate_count_after": 87,
+  "cleanup_candidate_count_after": 136,
+  "keep_or_review_count_after": 49,
+  "a10f_by_decision_after": {
+    "runtime_keep_rename_later": 12,
+    "safe_quarantine_candidate": 87,
+    "referenced_keep_review": 37
+  },
+  "pytest_returncode": 0,
+  "pytest_summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "pytest_tail": "......ss................................................................ [  9%]\n........................................................................ [ 19%]\n........................................................................ [ 28%]\n........................................................................ [ 38%]\n........................................................................ [ 48%]\n........................................................................ [ 57%]\n........................................................................ [ 67%]\n........................................................................ [ 77%]\n........................................................................ [ 86%]\n........................................................................ [ 96%]\n..........................                                               [100%]\n============================== warnings summary ===============================\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b.py:14: P6B report is generated by the repair/quality gate before targeted pytest.\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b_v2.py:14: P6B V2 report is generated by the repair/quality gate before targeted pytest.\n744 passed, 2 skipped, 34 deselected, 32 warnings in 36.34s\n\n",
+  "note": "Yalnızca A10F safe_quarantine_candidate sınıfı taşındı. Runtime, template, mobile, migration ve referans alan dosyalara dokunulmadı."
+}

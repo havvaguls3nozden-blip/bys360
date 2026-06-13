@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}AI İstem Sürüm Karşılaştırması - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI İstem Sürüm Karşılaştırması{% endblock %}
+{% block page_subtitle %}İstem sürümlerini kalite, başarı, geri bildirim ve backlog eğilimiyle karşılaştırır.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-xl-2 col-md-3">
+      <label class="form-label small text-muted">Geriye dönük gün</label>
+      <input class="form-control" type="number" name="lookback_days" min="1" max="365" value="{{ lookback_days or 30 }}">
+    </div>
+    <div class="col-xl-4 col-md-4">
+      <label class="form-label small text-muted">Modül</label>
+      <select class="form-select" name="module_type">
+        <option value="">Tümü</option>
+        {% for opt in module_options %}
+        <option value="{{ opt }}" {% if selected_module_type == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-xl-4 col-md-4">
+      <label class="form-label small text-muted">Özellik</label>
+      <select class="form-select" name="feature_type">
+        <option value="">Tümü</option>
+        {% for opt in feature_options %}
+        <option value="{{ opt }}" {% if selected_feature_type == opt %}selected{% endif %}>{{ opt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-xl-2 d-flex gap-2">
+      <button class="btn btn-catab flex-grow-1">Uygula</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_prompt_compare_export_csv', lookback_days=lookback_days, module_type=selected_module_type, feature_type=selected_feature_type) }}">CSV</a>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-xl-3 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Sürüm satırı</div><div class="display-6 fw-bold">{{ summary.version_total or 0 }}</div></div></div>
+  <div class="col-xl-3 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Dengeli</div><div class="display-6 fw-bold">{{ summary.stable_total or 0 }}</div></div></div>
+  <div class="col-xl-3 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Uyarı</div><div class="display-6 fw-bold">{{ summary.warning_total or 0 }}</div></div></div>
+  <div class="col-xl-3 col-md-4"><div class="glass-card p-3 h-100"><div class="small text-muted">Kritik</div><div class="display-6 fw-bold">{{ summary.critical_total or 0 }}</div></div></div>
+</div>
+
+<div class="glass-card p-4">
+  <h4 class="mb-3">İstem sürümleri</h4>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Bağlam</th>
+          <th>Sürüm</th>
+          <th>Kalite</th>
+          <th>Başarı</th>
+          <th>Geri Bildirim</th>
+          <th>Backlog</th>
+          <th>Karşılaştırma</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="small">
+            <div class="fw-semibold">{{ row.module_label }}</div>
+            <div class="text-muted">{{ row.feature_label }}</div>
+          </td>
+          <td class="small">
+            <div class="fw-semibold">{{ row.prompt_version }}</div>
+            <div class="text-muted">Önceki: {{ row.previous_version }}</div>
+            <div class="text-muted">Son kullanım: {{ row.last_seen_at.strftime('%d.%m.%Y %H:%M') if row.last_seen_at else '-' }}</div>
+          </td>
+          <td class="small">
+            <div class="fw-semibold">%{{ row.quality_score }}</div>
+            <span class="badge text-bg-secondary">{{ row.stability_label }}</span>
+          </td>
+          <td class="small">
+            <div>%{{ row.success_rate }}</div>
+            <div class="text-muted">İstek: {{ row.request_total }}</div>
+            <div class="text-muted">Ortalama: {{ row.avg_latency_ms }} ms</div>
+          </td>
+          <td class="small">
+            <div>Toplam: {{ row.feedback_total }}</div>
+            <div class="text-muted">Denge: {{ row.feedback_balance }}</div>
+            <div class="text-muted">Negatif: {{ row.feedback_negative }}</div>
+          </td>
+          <td class="small">
+            <div>Açık: {{ row.open_recommendations }}</div>
+            <div class="text-muted">Kabul: {{ row.accepted_recommendations }}</div>
+          </td>
+          <td class="small" style="min-width: 260px;">
+            <div>{{ row.comparison_note }}</div>
+            {% if row.delta_quality is not none %}
+            <div class="text-muted mt-1">Delta kalite: {{ row.delta_quality }}</div>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted">Kayıt bulunamadı.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

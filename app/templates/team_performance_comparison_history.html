@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Personel Dönem Analizi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Personel Dönem Analizi{% endblock %}
+{% block page_subtitle %}Personelin iki dönem arasındaki gelişimini ve kapsam genelindeki dönemsel değişimi izleyin.{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_reports_ai_pro.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+{% set cs = comparison_summary if comparison_summary is defined and comparison_summary else {} %}
+<div class="bys-pro-shell">
+  <section class="bys-pro-hero">
+    <div class="bys-pro-hero-grid">
+      <div>
+        <div class="bys-pro-kicker"><i class="fa-solid fa-timeline"></i> Personel Dönem Analizi</div>
+        <h1 class="bys-pro-title">Personel Dönem Analizi</h1>
+        <div class="bys-pro-hero-actions">
+          <a class="bys-pro-btn light" href="{{ url_for('main.performance_team_compare') }}"><i class="fa-solid fa-users-viewfinder"></i> Personel Analizi</a>
+          <a class="bys-pro-btn" href="{{ url_for('main.performance_reports') }}"><i class="fa-solid fa-chart-line"></i> Raporlar</a>
+        </div>
+      </div>
+      <aside class="bys-pro-hero-panel">
+        <div class="bys-pro-hero-panel-title">Dönem özeti</div>
+        <div class="bys-pro-hero-panel-main">{% if selected_employee %}{{ selected_employee.full_name or (selected_employee.ad ~ ' ' ~ selected_employee.soyad) }} için dönem farkı: {{ cs.diff|default(0, true) }}{% else %}Personel seçildiğinde değişim yorumu oluşur.{% endif %}</div>
+      </aside>
+    </div>
+  </section>
+
+  <form method="get" class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-toolbar">
+      <div class="bys-pro-field"><label>Personel</label><select name="employee_id"><option value="">Personel seç</option>{% for e in employees|default([]) %}<option value="{{ e.id }}" {% if selected_employee_id == e.id %}selected{% endif %}>{{ e.full_name or (e.ad ~ ' ' ~ e.soyad) }} · {{ e.birim or '-' }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Güncel dönem</label><select name="period_a_id"><option value="">Seç</option>{% for p in period_options|default([]) %}<option value="{{ p.id }}" {% if period_a_id == p.id %}selected{% endif %}>{{ p.title }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Karşılaştırılan dönem</label><select name="period_b_id"><option value="">Seç</option>{% for p in period_options|default([]) %}<option value="{{ p.id }}" {% if period_b_id == p.id %}selected{% endif %}>{{ p.title }}</option>{% endfor %}</select></div>
+      <div class="bys-pro-field"><label>Birim</label><select name="birim"><option value="">Tümü</option>{% for b in birimler|default([]) %}<option value="{{ b }}" {% if selected_birim == b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select></div>
+      <button class="bys-pro-action primary" type="submit"><i class="fa-solid fa-chart-simple"></i> Analiz et</button>
+    </div>
+  </form>
+
+  <section class="bys-pro-stat-grid">
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Güncel puan</div><div class="bys-pro-stat-value" data-bys-count>{{ cs.current_score|default(0, true) }}</div><div class="bys-pro-stat-note">Seçili personel</div></div>
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Önceki puan</div><div class="bys-pro-stat-value" data-bys-count>{{ cs.previous_score|default(0, true) }}</div><div class="bys-pro-stat-note">Karşılaştırılan dönem</div></div>
+    <div class="bys-pro-stat {{ 'success' if cs.diff|default(0, true) > 0 else 'danger' if cs.diff|default(0, true) < 0 else '' }}"><div class="bys-pro-stat-label">Değişim</div><div class="bys-pro-stat-value" data-bys-count>{{ cs.diff|default(0, true) }}</div><div class="bys-pro-stat-note">Puan farkı</div></div>
+    <div class="bys-pro-stat"><div class="bys-pro-stat-label">Kapsam satırı</div><div class="bys-pro-stat-value" data-bys-count>{{ roster_rows|default([], true)|length }}</div><div class="bys-pro-stat-note">Dönem karşılaştırması</div></div>
+  </section>
+
+  <section class="bys-pro-two">
+    <div class="bys-pro-card bys-pro-card-pad">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Kriter değişim kırılımı</h2><p class="bys-pro-section-sub">Güçlenen ve gerileyen kriterleri birlikte okuyun.</p></div></div>
+      <div class="bys-pro-table-wrap"><table class="bys-pro-table"><thead><tr><th>Kriter</th><th>Önceki</th><th>Güncel</th><th>Fark</th></tr></thead><tbody>{% for row in criteria_rows|default([]) %}<tr><td><div class="bys-pro-name">{{ row.name|default(row.criteria_name|default('-', true), true) }}</div></td><td>{{ row.previous|default(row.previous_score|default(0, true), true) }}</td><td>{{ row.current|default(row.current_score|default(0, true), true) }}</td><td><span class="bys-pro-badge {{ 'high' if row.diff|default(0, true) > 0 else 'low' if row.diff|default(0, true) < 0 else 'mid' }}">{{ row.diff|default(0, true) }}</span></td></tr>{% else %}<tr><td colspan="4"><div class="bys-pro-empty">Kriter karşılaştırması için personel ve iki dönem seçin.</div></td></tr>{% endfor %}</tbody></table></div>
+    </div>
+    <div class="bys-pro-card bys-pro-card-pad bys-pro-ai">
+      <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">AI gelişim yorumu</h2><p class="bys-pro-section-sub">Karar destek notları.</p></div><span class="bys-pro-chip"><i class="fa-solid fa-brain"></i> Özet</span></div>
+      <div class="bys-pro-list">
+        <div class="bys-pro-list-row"><div><strong>En iyi gelişim</strong><span>{{ cs.best.name if cs.best is defined and cs.best else 'Kriter verisi oluşmadı.' }}</span></div></div>
+        <div class="bys-pro-list-row"><div><strong>Yakın takip</strong><span>{{ cs.worst.name if cs.worst is defined and cs.worst else 'Gerileme kırılımı oluşmadı.' }}</span></div></div>
+        <div class="bys-pro-list-row"><div><strong>Yorum ilkesi</strong><span>Bu analiz personel gelişimini izler; idari karar öncesi dönem, görev ve açıklama kayıtları birlikte incelenir.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bys-pro-card bys-pro-card-pad">
+    <div class="bys-pro-section-head"><div><h2 class="bys-pro-section-title">Kapsam dönem değişim tablosu</h2><p class="bys-pro-section-sub">Seçilen iki dönem için personel bazlı artış ve düşüşler.</p></div><span class="bys-pro-chip">{{ roster_rows|default([], true)|length }} kayıt</span></div>
+    <div class="bys-pro-table-wrap"><table class="bys-pro-table"><thead><tr><th>Personel</th><th>Sicil</th><th>Birim</th><th>Güncel</th><th>Önceki</th><th>Fark</th><th>Bant</th></tr></thead><tbody>{% for row in roster_rows|default([]) %}<tr><td><div class="bys-pro-name">{{ row.employee_name }}</div></td><td>{{ row.sicil_no }}</td><td>{{ row.birim }}</td><td>{{ row.current_score }}</td><td>{{ row.previous_score }}</td><td><span class="bys-pro-badge {{ 'high' if row.diff > 0 else 'low' if row.diff < 0 else 'mid' }}">{{ row.diff }}</span></td><td><span class="bys-pro-badge {{ row.band }}">{{ row.band }}</span></td></tr>{% else %}<tr><td colspan="7"><div class="bys-pro-empty">Dönem karşılaştırması için iki dönem seçin.</div></td></tr>{% endfor %}</tbody></table></div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_reports_ai_pro.js') }}"></script>
+{% endblock %}

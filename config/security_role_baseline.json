@@ -1,0 +1,42 @@
+{
+  "roles": {
+    "admin": [
+      "dashboard",
+      "personel",
+      "gorevlerim",
+      "kriterler",
+      "donemler",
+      "not_karnesi",
+      "raporlar",
+      "ayarlar"
+    ],
+    "grup_baskani": [
+      "dashboard",
+      "gorevlerim",
+      "kriterler",
+      "donemler",
+      "not_karnesi",
+      "raporlar"
+    ],
+    "mali_musavir": [
+      "dashboard",
+      "gorevlerim",
+      "kriterler",
+      "donemler",
+      "not_karnesi",
+      "raporlar"
+    ],
+    "birim_sorumlusu": [
+      "dashboard",
+      "gorevlerim",
+      "not_karnesi",
+      "raporlar"
+    ],
+    "personel": [
+      "dashboard",
+      "gorevlerim",
+      "not_karnesi",
+      "hesabim"
+    ]
+  }
+}

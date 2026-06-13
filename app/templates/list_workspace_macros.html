@@ -1,0 +1,10 @@
+{% from "_premium_workspace_macros.html" import premium_helper_note %}
+{% from "_communication_suite_macros.html" import communication_panel_header %}
+
+{% macro list_workspace_panel(title='', text='', badge='', badge_tone='gray', icon='fa-solid fa-table-list', note='', note_icon='fa-solid fa-circle-info', tone='') -%}
+<div class="bys-list-workspace {{ tone }}">
+    {{ communication_panel_header(title=title, text=text, badge=badge, badge_tone=badge_tone, icon=icon) }}
+    {% if note %}{{ premium_helper_note(note, note_icon) }}{% endif %}
+    <div class="bys-list-workspace-body">{{ caller() }}</div>
+</div>
+{%- endmacro %}

@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}İletişim ve Anket Yönetimi | Faz 4{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">İletişim ve Anket Yönetimi · Kontrol 4</h2>
+      <div class="text-muted">Yönetici özeti, trend görünümü ve risk odaklı analitik</div>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="get" class="d-flex gap-2">
+        <select name="days" class="form-select">
+          {% for day in [14, 30, 60, 90] %}
+            <option value="{{ day }}" {% if payload.days == day %}selected{% endif %}>Son {{ day }} gün</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline-secondary">Uygula</button>
+      </form>
+      <form method="post" action="{{ url_for('main.communication_phase4_metrics_refresh') }}">
+        <button class="btn btn-danger">Günlük metrikleri yenile</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Yayımlanmış Duyuru</div><div class="display-6">{{ payload.headline.published_bulletins }}</div><div class="small text-muted mt-2">Okunma oranı %{{ '%.1f'|format(payload.headline.bulletin_read_rate or 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Anket Sayısı</div><div class="display-6">{{ payload.headline.survey_count }}</div><div class="small text-muted mt-2">Aktif / kapanan tüm görünüm</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Açık Destek Talebi</div><div class="display-6">{{ payload.headline.open_tickets }}</div><div class="small text-muted mt-2">İlk yanıt riski {{ payload.headline.overdue_first_response }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Okunmamış Kritik Bildirim</div><div class="display-6">{{ payload.headline.critical_unread }}</div><div class="small text-muted mt-2">Toplam okunmamış {{ payload.headline.unread_notifications }}</div></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>30 günlük trend</strong>
+          <span class="text-muted small">Kayıtlar günlük metrik tablosundan okunur</span>
+        </div>
+        <div class="card-body">
+          <canvas id="phase4DashboardTrend" height="110"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Yönetici önerileri</strong></div>
+        <div class="card-body">
+          {% if payload.recommendations %}
+            <ul class="mb-0 ps-3">
+              {% for item in payload.recommendations %}
+                <li class="mb-2">{{ item }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-muted">Bu görünüm için ek öneri üretilmedi.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Düşük katılımlı anketler</strong>
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.communication_phase4_survey_analytics', days=payload.days) }}">Anket analitiği</a>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Anket</th><th>Atama</th><th>Oran</th><th>Durum</th></tr></thead>
+            <tbody>
+            {% for row in payload.risk_surveys %}
+              <tr>
+                <td>{{ row.title }}</td>
+                <td>{{ row.assignments }}</td>
+                <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td>
+                <td>{{ row.status }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4" class="text-muted">Kritik eşik altında anket bulunmadı.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>SLA riski taşıyan destek kayıtları</strong>
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.communication_phase4_support_analytics', days=payload.days) }}">Destek analitiği</a>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>#</th><th>Başlık</th><th>Yaş</th><th>İlk Yanıt</th><th>Çözüm</th></tr></thead>
+            <tbody>
+            {% for row in payload.risk_support_rows %}
+              <tr>
+                <td>#{{ row.id }}</td>
+                <td>{{ row.title }}</td>
+                <td>{{ row.age_days }} gün</td>
+                <td>{% if row.first_response_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
+                <td>{% if row.resolution_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5" class="text-muted">Riskli destek kaydı bulunmadı.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>En çok görüntülenen yardım içerikleri</strong></div>
+        <div class="card-body">
+          {% if payload.top_help_articles %}
+            <div class="list-group list-group-flush">
+              {% for row in payload.top_help_articles %}
+                <div class="list-group-item px-0">
+                  <div class="fw-semibold">{{ row.title }}</div>
+                  <div class="small text-muted">{{ row.category }} · {{ row.view_count }} görüntülenme</div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-muted">Yardım merkezi görüntüleme verisi bulunamadı.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Hızlı geçişler</strong>
+          <span class="text-muted small">Rapor, dışa aktarma ve yönetişim</span>
+        </div>
+        <div class="card-body d-flex flex-wrap gap-2">
+          <a class="btn btn-outline-danger" href="{{ url_for('main.communication_phase4_reports_view', days=payload.days) }}">Rapor merkezi</a>
+          <a class="btn btn-outline-danger" href="{{ url_for('main.communication_phase4_export_center', days=payload.days) }}">Dışa aktarma</a>
+          <a class="btn btn-outline-danger" href="{{ url_for('main.communication_phase4_governance') }}">Yönetişim</a>
+          <a class="btn btn-outline-danger" href="{{ url_for('main.communication_phase4_survey_analytics', days=payload.days) }}">Anket analitiği</a>
+          <a class="btn btn-outline-danger" href="{{ url_for('main.communication_phase4_support_analytics', days=payload.days) }}">Destek analitiği</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  if (!window.Chart) return;
+  const el = document.getElementById('phase4DashboardTrend');
+  if (!el) return;
+  const labels = {{ payload.trends.surveys.labels | tojson }};
+  new Chart(el, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Anket Sayısı', data: {{ (payload.trends.surveys.get('values', []) if payload.trends.surveys is mapping else []) | tojson }}, tension: 0.3, borderWidth: 2 },
+        { label: 'Açık Destek', data: {{ (payload.trends.open_tickets.get('values', []) if payload.trends.open_tickets is mapping else []) | tojson }}, tension: 0.3, borderWidth: 2 },
+        { label: 'Okunmamış Bildirim', data: {{ (payload.trends.unread_notifications.get('values', []) if payload.trends.unread_notifications is mapping else []) | tojson }}, tension: 0.3, borderWidth: 2 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+})();
+</script>
+{% endblock %}

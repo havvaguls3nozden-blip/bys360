@@ -1,0 +1,71 @@
+name: BYS360 CI Quality Gate
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install -r requirements.txt
+          python -m pip install ruff pytest pytest-cov pip-audit
+
+      - name: BYS360 secret/repo gate
+        run: python scripts/quality/bys360_secret_repo_gate.py --root .
+
+      - name: Build safe release audit
+        run: python scripts/release/build_bys360_safe_release.py --root . --output /tmp/bys360-ci-safe-release.zip --audit-only
+
+      - name: Ruff F821 hard gate
+        run: python -m ruff check app --select F821
+
+      - name: Compile Python source
+        run: python -m compileall -q app config.py wsgi.py run.py scripts
+
+      - name: BYS360 safe release audit
+        run: |
+          mkdir -p reports/quality
+          python scripts/release/build_bys360_safe_release.py --root . --output reports/quality/BYS360_SAFE_RELEASE_CI_AUDIT.zip --audit-only
+
+      - name: Run tests
+        run: python -m pytest tests/quality -m "ci_safe" --tb=short -q
+
+      - name: BYS360 operations audit
+        run: |
+          mkdir -p reports/quality
+          python scripts/quality/bys360_ops_audit.py --mode ci --source-paths app config.py wsgi.py run.py --report reports/quality/BYS360_OPS_AUDIT_CI.md --max-print 0 --max-broad-except 2300
+
+      - name: BYS360 Quality 9 CI contract gate
+        run: python scripts/quality/bys360_quality9_ci_gate.py --root .
+
+      - name: Ruff syntax/import sanity
+        run: python -m ruff check app config.py wsgi.py run.py scripts --select E9,F63,F7,F82
+
+      - name: Dependency vulnerability audit
+        run: python -m pip_audit -r requirements.txt --progress-spinner off
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bys360-quality-reports
+          path: reports/quality
+          if-no-files-found: ignore

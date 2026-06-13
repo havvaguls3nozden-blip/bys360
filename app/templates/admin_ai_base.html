@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.ai-shell{display:grid;gap:18px}
+.ai-panel,.ai-card,.ai-table-wrap,.ai-form-wrap{min-width:0;overflow-wrap:anywhere;word-break:break-word;background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}
+.ai-panel{padding:22px;background:linear-gradient(180deg, rgba(139,0,0,.06), rgba(139,0,0,.02));}
+.ai-kicker{color:#8B0000;font-size:.84rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+.ai-title{margin:0;color:#111827;font-size:1.35rem;font-weight:900}
+.ai-sub{margin:10px 0 0;color:#6b7280;line-height:1.7}
+.ai-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:stretch}
+.ai-grid-six{grid-template-columns:repeat(6,minmax(0,1fr))}
+.ai-grid-four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ai-grid-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ai-grid-preflight-metrics{grid-template-columns:repeat(3,minmax(240px,1fr))}
+.ai-grid-preflight-actions{grid-template-columns:repeat(3,minmax(260px,1fr))}
+.ai-grid-preflight-groups{grid-template-columns:repeat(2,minmax(360px,1fr))}
+.ai-card{padding:18px;height:100%}
+.ai-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px}
+.ai-value{font-size:1.65rem;font-weight:900;color:#8B0000;line-height:1}
+.ai-mini{margin-top:10px;color:#374151;font-size:.88rem;line-height:1.6}
+.ai-table-wrap,.ai-form-wrap{padding:20px}
+.ai-table-wrap{overflow-x:auto}
+.ai-table{width:100%;min-width:720px;border-collapse:separate;border-spacing:0 10px}
+.ai-table thead th{text-align:left;padding:0 12px 8px;color:#6b7280;font-size:.82rem;font-weight:800}
+.ai-table tbody tr{background:rgba(255,255,255,.92);box-shadow:0 10px 24px rgba(15,23,42,.05)}
+.ai-table tbody td{padding:14px 12px;border-top:1px solid rgba(15,23,42,.05);border-bottom:1px solid rgba(15,23,42,.05);vertical-align:top}
+.ai-table tbody td:first-child{border-left:1px solid rgba(15,23,42,.05);border-top-left-radius:16px;border-bottom-left-radius:16px}
+.ai-table tbody td:last-child{border-right:1px solid rgba(15,23,42,.05);border-top-right-radius:16px;border-bottom-right-radius:16px}
+.ai-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:800;background:rgba(139,0,0,.08);color:#8B0000;border:1px solid rgba(139,0,0,.10)}
+.ai-badge.success{background:#ecfdf5;color:#065f46;border-color:#bbf7d0}
+.ai-badge.warning{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+.ai-badge.muted{background:#f3f4f6;color:#4b5563;border-color:#e5e7eb}
+.ai-actions{display:flex;flex-wrap:wrap;gap:10px}
+.ai-link{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;background:#fff;border:1px solid rgba(15,23,42,.08);font-weight:800;color:#374151}
+.ai-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:12px;align-items:end}
+.ai-filters-wide{grid-template-columns:repeat(6,minmax(0,1fr)) auto auto}
+.ai-group{display:flex;flex-direction:column;gap:8px}
+.ai-group label{font-size:.84rem;font-weight:800;color:#374151}
+.ai-input,.ai-select,.ai-textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;color:#111827}
+.ai-textarea{min-height:88px;resize:vertical}
+.ai-submit,.ai-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border:none;border-radius:14px;background:#8B0000;color:#fff;font-weight:800}
+.ai-action-btn.secondary{background:#374151}
+.ai-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.ai-list-item{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.07)}
+.ai-note{padding:14px 16px;border-radius:16px;background:#f8fafc;color:#475569;border:1px dashed rgba(15,23,42,.12)}
+.ai-hero{padding:26px;background:linear-gradient(135deg, rgba(139,0,0,.10), rgba(139,0,0,.03) 45%, rgba(255,255,255,.96));position:relative;overflow:hidden}
+.ai-hero::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle, rgba(139,0,0,.16), rgba(139,0,0,0));pointer-events:none}
+.ai-hero-grid{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;align-items:stretch}
+.ai-metric-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+.ai-metric-box{padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.88);border:1px solid rgba(15,23,42,.06);box-shadow:0 10px 24px rgba(15,23,42,.05)}
+.ai-metric-box .label{font-size:.78rem;font-weight:800;color:#6b7280;margin-bottom:6px}
+.ai-metric-box .value{font-size:1.15rem;font-weight:900;color:#111827}
+.ai-metric-box .mini{margin-top:6px;color:#4b5563;font-size:.82rem;line-height:1.5}
+.ai-soft-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.ai-soft-item{padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.88);border:1px solid rgba(15,23,42,.06)}
+.ai-soft-item .title{font-weight:900;color:#111827}
+.ai-soft-item .body{margin-top:6px;font-size:.88rem;color:#4b5563;line-height:1.6}
+.ai-spotlight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ai-spotlight{padding:20px;border-radius:24px;background:rgba(255,255,255,.92);border:1px solid rgba(15,23,42,.07);box-shadow:0 16px 34px rgba(15,23,42,.06)}
+.ai-spotlight.tone-warning{background:linear-gradient(180deg, rgba(245,158,11,.11), rgba(255,255,255,.98))}
+.ai-spotlight.tone-success{background:linear-gradient(180deg, rgba(16,185,129,.10), rgba(255,255,255,.98))}
+.ai-spotlight.tone-calm{background:linear-gradient(180deg, rgba(59,130,246,.08), rgba(255,255,255,.98))}
+.ai-spotlight-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.ai-spotlight-title{font-size:1.02rem;font-weight:900;color:#111827;margin:0}
+.ai-spotlight-sub{margin-top:8px;color:#4b5563;line-height:1.65;font-size:.92rem}
+.ai-spotlight-focus{margin-top:10px;font-size:.84rem;color:#6b7280;font-weight:700}
+.ai-spotlight-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+.ai-spotlight-metric{padding:12px;border-radius:16px;background:rgba(248,250,252,.96);border:1px solid rgba(15,23,42,.06)}
+.ai-spotlight-metric .k{font-size:.73rem;color:#6b7280;font-weight:800;margin-bottom:5px}
+.ai-spotlight-metric .v{font-size:1rem;font-weight:900;color:#8B0000}
+.ai-action-card.tone-warning{background:linear-gradient(180deg, rgba(245,158,11,.12), rgba(255,255,255,.96))}
+.ai-action-card.tone-calm{background:linear-gradient(180deg, rgba(59,130,246,.10), rgba(255,255,255,.96))}
+.ai-action-card.tone-success{background:linear-gradient(180deg, rgba(16,185,129,.12), rgba(255,255,255,.96))}
+.pagination-shell{display:flex;justify-content:flex-end;margin-top:14px}
+@media (max-width: 1400px){.ai-grid-six{grid-template-columns:repeat(3,minmax(0,1fr))}.ai-grid-four{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-grid-two{grid-template-columns:1fr 1fr}.ai-grid-preflight-metrics{grid-template-columns:repeat(3,minmax(220px,1fr))}.ai-grid-preflight-actions{grid-template-columns:repeat(2,minmax(240px,1fr))}.ai-grid-preflight-groups{grid-template-columns:1fr}.ai-filters-wide{grid-template-columns:repeat(3,minmax(0,1fr)) auto auto}.ai-hero-grid{grid-template-columns:1fr}.ai-metric-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-spotlight-grid{grid-template-columns:1fr}.ai-spotlight-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 1200px){.ai-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-grid-preflight-metrics,.ai-grid-preflight-actions{grid-template-columns:repeat(2,minmax(220px,1fr))}.ai-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-filters-wide{grid-template-columns:repeat(2,minmax(0,1fr)) auto auto}}
+@media (max-width: 768px){.ai-grid,.ai-grid-six,.ai-grid-four,.ai-grid-two,.ai-grid-preflight-metrics,.ai-grid-preflight-actions,.ai-grid-preflight-groups,.ai-metric-strip,.ai-spotlight-grid,.ai-spotlight-metrics{grid-template-columns:1fr}.ai-table{min-width:640px}.ai-filters,.ai-filters-wide{grid-template-columns:1fr}.ai-actions{flex-direction:column}.ai-link,.ai-submit,.ai-action-btn{width:100%}}
+</style>
+{% block ai_inner %}{% endblock %}
+{% endblock %}
+<!-- BYS360_LOGOUT_FORCE_CLEAR_V2_15_12_BEGIN -->
+<form id="bys360LogoutForceClearForm" action="/logout" method="post" style="display:none;" aria-hidden="true">
+    {% if csrf_token is defined %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+</form>
+<script>
+(function () {
+    "use strict";
+    var formId = "bys360LogoutForceClearForm";
+    function isLogoutUrl(value) {
+        if (!value) return false;
+        try {
+            var url = new URL(value, window.location.origin);
+            return url.pathname.replace(/\/+$/, "") === "/logout";
+        } catch (error) {
+            return value === "/logout" || /\/logout\/?$/.test(String(value));
+        }
+    }
+    function clearLightClientState() {
+        try { window.sessionStorage && window.sessionStorage.clear(); } catch (error) {}
+        try {
+            if (window.caches && window.caches.keys) {
+                window.caches.keys().then(function (keys) {
+                    keys.forEach(function (key) {
+                        if (/bys360/i.test(key)) window.caches.delete(key);
+                    });
+                }).catch(function () {});
+            }
+        } catch (error) {}
+    }
+    function postLogout(event) {
+        if (event && typeof event.preventDefault === "function") event.preventDefault();
+        clearLightClientState();
+        var form = document.getElementById(formId) || document.getElementById("logoutForm") || document.getElementById("bys360LogoutPostForm");
+        if (form) {
+            try { form.submit(); return false; } catch (error) {}
+        }
+        window.location.assign("/logout");
+        return false;
+    }
+    window.bys360ForceLogout = postLogout;
+    window.submitLogoutForm = postLogout;
+    document.addEventListener("click", function (event) {
+        var target = event.target && event.target.closest ? event.target.closest("a[href],button[data-logout]") : null;
+        if (!target) return;
+        var href = target.getAttribute("href") || target.getAttribute("data-logout") || "";
+        if (!isLogoutUrl(href)) return;
+        postLogout(event);
+    }, true);
+    window.addEventListener("pageshow", function (event) {
+        if (event && event.persisted && /\/logout\/?$/.test(window.location.pathname)) {
+            window.location.replace("/login");
+        }
+    });
+})();
+</script>
+<!-- BYS360_LOGOUT_FORCE_CLEAR_V2_15_12_END -->

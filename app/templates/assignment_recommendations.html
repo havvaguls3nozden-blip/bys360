@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}AI Öneri Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}AI Öneri Merkezi{% endblock %}
+{% block page_subtitle %}Atama denetim kayıtlarından türetilen öncelikli aksiyonlar, filtre kısayolları ve indirilebilir aksiyon planı burada görünür olur.{% endblock %}
+{% block content %}
+<style>
+.rec-shell{display:grid;gap:18px}.glass{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.toolbar{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 16px;border:none;border-radius:14px;font-weight:800;text-decoration:none;cursor:pointer}.btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff}.btn.soft{background:#f8fafc;color:#111827;border:1px solid rgba(15,23,42,.08)}.ai-card{padding:22px;border-radius:22px;border:1px solid rgba(15,23,42,.08);background:#fff}.ai-card.critical{background:linear-gradient(180deg,rgba(254,242,242,.96),#fff)}.ai-card.watch{background:linear-gradient(180deg,rgba(255,247,237,.96),#fff)}.ai-kicker{font-size:.8rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.ai-title{font-size:1.1rem;font-weight:900;color:#111827;margin-top:8px}.ai-text{font-size:.95rem;color:#4b5563;line-height:1.75;margin-top:8px}.ai-bullets{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.metric{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.metric .l{font-size:.8rem;color:#6b7280;font-weight:800}.metric .v{font-size:1.35rem;font-weight:900;color:#111827}.shortcut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.shortcut{display:flex;align-items:center;gap:10px;padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08);text-decoration:none;color:#111827;font-weight:800}.shortcut.critical{background:linear-gradient(180deg,rgba(254,242,242,.9),#fff)}.shortcut.watch{background:linear-gradient(180deg,rgba(255,247,237,.9),#fff)}.list-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.rec-item{padding:16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.rec-item.critical{background:linear-gradient(180deg,rgba(254,242,242,.9),#fff)}.rec-item.watch{background:linear-gradient(180deg,rgba(255,247,237,.9),#fff)}.rec-title{font-weight:900;color:#111827}.rec-detail{margin-top:8px;color:#4b5563;line-height:1.7}.pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.pill.critical{background:#fef2f2;color:#b91c1c}.pill.watch{background:#fff7ed;color:#9a3412}.pill.calm{background:#ecfdf5;color:#166534}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}table{width:100%;min-width:860px;border-collapse:collapse}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}th{background:#f8fafc;font-size:.8rem;color:#6b7280;text-transform:uppercase}@media (max-width:1100px){.hero-grid,.metric-grid,.shortcut-grid,.list-grid{grid-template-columns:1fr}}
+</style>
+<div class="rec-shell">
+  <div class="toolbar">
+    <a class="btn soft" href="{{ url_for('main.performance_task_management_audit_detail', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type) }}"><i class="fa-solid fa-clipboard-check"></i> Denetim Detayı</a>
+    <a class="btn soft" href="{{ url_for('main.admin_ai_operations_report', module_type='performance') }}"><i class="fa-solid fa-chart-line"></i> AI Operasyon Raporu</a>
+    <a class="btn primary" href="{{ url_for('main.performance_task_management_recommendations_export', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type) }}"><i class="fa-solid fa-file-csv"></i> CSV İndir</a>
+    <a class="btn soft" href="{{ url_for('main.performance_task_management_recommendations_export', period_id=selected_period.id if selected_period else None, scope=selected_scope, severity=severity, event_type=event_type, format='xlsx') }}"><i class="fa-solid fa-file-excel"></i> Excel İndir</a>
+  </div>
+
+  <div class="hero-grid">
+    <article class="ai-card {{ ai_recommendation_panel.tone if ai_recommendation_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_recommendation_panel.badge if ai_recommendation_panel else 'AI öneri özeti' }}</div>
+      <div class="ai-title">{{ ai_recommendation_panel.headline if ai_recommendation_panel else 'Öneri özeti hazır' }}</div>
+      <div class="ai-text">{{ ai_recommendation_panel.summary if ai_recommendation_panel else '' }}</div>
+      <ul class="ai-bullets">{% for bullet in (ai_recommendation_panel.bullets if ai_recommendation_panel else []) %}<li><i class="fa-solid fa-angle-right"></i> <span>{{ bullet }}</span></li>{% endfor %}</ul>
+      <div class="metric-grid">{% for item in (ai_recommendation_panel.actions if ai_recommendation_panel else []) %}<div class="metric"><div class="l">{{ item.label }}</div><div class="v">{{ item.value }}</div></div>{% endfor %}</div>
+    </article>
+    <article class="ai-card {{ ai_pressure_panel.tone if ai_pressure_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-wave-square"></i> {{ ai_pressure_panel.badge if ai_pressure_panel else 'Baskı özeti' }}</div>
+      <div class="ai-title">{{ ai_pressure_panel.headline if ai_pressure_panel else 'Görev devri baskısı' }}</div>
+      <div class="ai-text">{{ ai_pressure_panel.summary if ai_pressure_panel else '' }}</div>
+      <ul class="ai-bullets">{% for bullet in (ai_pressure_panel.bullets if ai_pressure_panel else []) %}<li><i class="fa-solid fa-angle-right"></i> <span>{{ bullet }}</span></li>{% endfor %}</ul>
+    </article>
+  </div>
+
+  <section class="glass">
+    <div class="ai-kicker"><i class="fa-solid fa-bolt"></i> Tek tık filtre kısayolları</div>
+    <div class="shortcut-grid" style="margin-top:14px">
+      {% for row in shortcut_rows %}
+      <a href="{{ row.url }}" class="shortcut {{ row.tone }}"><i class="fa-solid {{ row.icon }}"></i> <span>{{ row.label }}</span>{% if row.count is defined %}<span class="pill {{ row.tone }}" style="margin-left:auto;">{{ row.count }}</span>{% endif %}</a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="list-grid">
+    <section class="glass">
+      <div class="ai-kicker"><i class="fa-solid fa-list-check"></i> Önerilen aksiyonlar</div>
+      <div style="display:grid;gap:12px;margin-top:14px">
+        {% for row in recommendation_rows %}
+        <article class="rec-item {{ row.tone }}">
+          <div class="rec-title">{{ row.title }} <span class="pill {{ row.tone }}" style="margin-left:8px">{{ row.count }}</span></div>
+          <div class="rec-detail">{{ row.detail }}</div>
+          <div style="margin-top:12px"><a class="btn soft" href="{{ row.url }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> İlgili ekrana git</a></div>
+        </article>
+        {% else %}
+        <article class="rec-item"><div class="rec-title">Öneri bulunamadı</div><div class="rec-detail">Seçili filtrelerde aksiyon üretecek baskı görünmüyor.</div></article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="glass">
+      <div class="ai-kicker"><i class="fa-solid fa-building-shield"></i> Kalıcı görev devri baskısı</div>
+      <div class="table-wrap" style="margin-top:14px">
+        <table>
+          <thead><tr><th>Birim</th><th>Risk</th><th>Detay</th><th>Kayıt</th></tr></thead>
+          <tbody>
+            {% for row in pressure_rows %}
+            <tr><td>{{ row.unit_name }}</td><td><span class="pill {{ row.tone }}">{{ row.risk_score }}</span></td><td>{{ row.detail }}</td><td>{{ row.log_count }}</td></tr>
+            {% else %}
+            <tr><td colspan="4">Birim bazlı baskı kaydı bulunamadı.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="glass">
+    <div class="ai-kicker"><i class="fa-solid fa-table-list"></i> Öncelikli aksiyon planı</div>
+    <div class="table-wrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Öncelik</th><th>Başlık</th><th>Adet/Skor</th><th>Sahip</th><th>Sonraki adım</th><th>İşlem</th></tr></thead>
+        <tbody>
+          {% for row in action_plan_rows %}
+          <tr><td>{{ row.priority }}</td><td>{{ row.title }}</td><td><span class="pill {{ row.tone }}">{{ row.count }}</span></td><td>{{ row.owner }}</td><td>{{ row.next_step }}</td><td><a class="btn soft" href="{{ row.url }}"><i class="fa-solid fa-filter"></i> Filtrele</a></td></tr>
+          {% else %}
+          <tr><td colspan="6">Aksiyon planı oluşmadı.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

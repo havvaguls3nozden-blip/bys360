@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-06-13T08:57:21",
+  "phase": "A11C_WARNING_ZERO_FINAL_EVIDENCE",
+  "ok": true,
+  "decision": "accepted_warning_zero",
+  "source_a11b2_ok": true,
+  "source_a11b2_json": "C:\\bys360\\project\\reports\\quality\\BYS360_A11B2_RESOURCE_WARNING_FIX.json",
+  "compileall_returncode": 0,
+  "pytest_returncode": 0,
+  "strict_unraisable_returncode": 0,
+  "strict_resource_returncode": 0,
+  "pytest_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_unraisable_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "strict_resource_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "warnings_after": 0,
+  "pytest_has_warning_text": false,
+  "strict_unraisable_has_warning_text": false,
+  "strict_resource_has_warning_text": false,
+  "warning_lines": [],
+  "strict_unraisable_warning_lines": [],
+  "strict_resource_warning_lines": [],
+  "raw_files": {
+    "pytest": "C:\\bys360\\project\\reports\\quality\\BYS360_A11C_PYTEST_RAW.txt",
+    "strict_unraisable": "C:\\bys360\\project\\reports\\quality\\BYS360_A11C_STRICT_UNRAISABLE_RAW.txt",
+    "strict_resource": "C:\\bys360\\project\\reports\\quality\\BYS360_A11C_STRICT_RESOURCE_RAW.txt"
+  },
+  "evidence_zip": "C:\\bys360\\releases\\BYS360_A11C_WARNING_ZERO_EVIDENCE_20260613_085521.zip",
+  "evidence_zip_sha256": "87fd71bebe48e39506c15241e708d373f176d11461f0cee5c9150db70dc398ca",
+  "evidence_file_count": 19,
+  "zip_entry_count": 19,
+  "duplicate_zip_entry_count": 0,
+  "duplicate_zip_entries": [],
+  "next_phase": "A12_UI_TECHNICAL_LANGUAGE_CLEANUP",
+  "live_note": "Bu A11 kapanışı local/repo kalite kanıtıdır. Canlı ortam için ayrıca canlı smoke ve servis log kontrolü yapılmalıdır."
+}

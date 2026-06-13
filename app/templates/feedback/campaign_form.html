@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Yeni Geri Bildirim Kampanyası - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Yeni Geri Bildirim Kampanyası{% endblock %}
+{% block page_subtitle %}BYS360 ekranları, yeni özellikler, mobil deneyim ve kurum içi süreçler için planlı görüş toplama kampanyası oluşturun.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+  :root{--bys-red:#8B0000;--bys-ink:#101828;--bys-muted:#667085;--bys-line:#e7eaf2;--bys-soft:#f8fafc;}
+  .campaign-shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start;}
+  .campaign-surface{border:1px solid var(--bys-line);border-radius:26px;box-shadow:0 18px 38px rgba(15,23,42,.07);background:rgba(255,255,255,.96);overflow:hidden;}
+  .campaign-body{padding:24px;}
+  .campaign-section{border:1px solid #edf0f5;border-radius:22px;background:linear-gradient(180deg,#fff,#fcfcfd);padding:20px;margin-bottom:18px;}
+  .campaign-section:last-child{margin-bottom:0;}
+  .section-title{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+  .section-index{width:40px;height:40px;border-radius:15px;background:rgba(139,0,0,.08);display:flex;align-items:center;justify-content:center;color:var(--bys-red);font-weight:900;flex:0 0 auto;}
+  .section-title h3{margin:0;font-size:1.02rem;font-weight:900;color:var(--bys-ink);letter-spacing:-.01em;}
+  .section-title p{margin:5px 0 0;font-size:.85rem;color:var(--bys-muted);line-height:1.6;}
+  .campaign-surface .form-label{font-size:.84rem;color:#344054;margin-bottom:8px;}
+  .campaign-surface .form-control,.campaign-surface .form-select{border-radius:15px;border:1px solid rgba(15,23,42,.12);min-height:48px;box-shadow:none;background:#fff;}
+  .campaign-surface .form-control:focus,.campaign-surface .form-select:focus{border-color:rgba(139,0,0,.45);box-shadow:0 0 0 .2rem rgba(139,0,0,.08);}
+  .campaign-surface textarea.form-control{min-height:126px;padding-top:12px;line-height:1.65;}
+  .hint-box{border:1px solid rgba(139,0,0,.12);background:linear-gradient(135deg,rgba(139,0,0,.06),rgba(255,255,255,.92));border-radius:18px;padding:14px 16px;color:#475467;line-height:1.65;font-size:.86rem;}
+  .hint-box strong{color:#7f1d1d;}
+  .quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .preset-card{width:100%;text-align:left;border:1px solid #e6e8ef;border-radius:18px;background:#fff;padding:15px 15px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:all .18s ease;color:inherit;}
+  .preset-card:hover{transform:translateY(-1px);border-color:rgba(139,0,0,.35);box-shadow:0 12px 24px rgba(15,23,42,.07);}
+  .preset-icon{width:38px;height:38px;border-radius:14px;background:#f6f7fb;color:var(--bys-red);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .preset-card strong{display:block;color:var(--bys-ink);font-size:.9rem;margin-bottom:4px;}
+  .preset-card span{display:block;color:var(--bys-muted);font-size:.78rem;line-height:1.55;}
+  .soft-check{border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:16px;background:#fff;height:100%;}
+  .soft-check .form-check-label{color:#1f2937;}
+  .soft-check .small{line-height:1.6;}
+  .question-helper{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px;}
+  .helper-chip{border:1px solid #e6e8ef;background:#fff;border-radius:999px;min-height:36px;padding:0 12px;font-size:.78rem;font-weight:800;color:#475467;display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;}
+  .helper-chip:hover{border-color:rgba(139,0,0,.35);color:var(--bys-red);}
+  .side-panel{display:grid;gap:16px;position:sticky;top:18px;}
+  .side-card{border:1px solid var(--bys-line);border-radius:24px;background:#fff;box-shadow:0 14px 30px rgba(15,23,42,.055);padding:18px;}
+  .side-card h4{margin:0 0 10px;font-size:.96rem;font-weight:900;color:var(--bys-ink);}
+  .side-card p,.side-card li{color:var(--bys-muted);font-size:.84rem;line-height:1.72;}
+  .side-card ul{padding-left:18px;margin:0;}
+  .mini-flow{display:grid;gap:10px;margin-top:12px;}
+  .flow-step{display:flex;gap:10px;align-items:flex-start;border:1px solid #edf0f5;border-radius:16px;padding:12px;background:#fcfcfd;}
+  .flow-step i{color:var(--bys-red);margin-top:2px;}
+  .flow-step strong{display:block;font-size:.82rem;color:#1f2937;margin-bottom:3px;}
+  .flow-step span{display:block;font-size:.76rem;color:var(--bys-muted);line-height:1.5;}
+  .action-row{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:20px;}
+  .required-note{display:inline-flex;align-items:center;gap:8px;border:1px solid #edf0f5;border-radius:999px;padding:7px 11px;background:#fff;color:#667085;font-size:.78rem;font-weight:800;}
+  .target-help{font-size:.78rem;color:#667085;line-height:1.6;margin-top:7px;}
+  @media (max-width:1120px){.campaign-shell{grid-template-columns:1fr}.side-panel{position:static}.quick-grid{grid-template-columns:1fr}.question-helper{grid-template-columns:1fr}}
+</style>
+
+<div class="cw-shell">
+  {{ workspace.hero(
+      title='Yeni geri bildirim kampanyası',
+      text='Kampanyalar; BYS360 ekran hataları, eksikler, kullanım kolaylığı, yeni özellikler, mobil deneyim, tebrik ve teşekkürleri planlı şekilde toplamak için kullanılır.',
+      icon='fa-solid fa-bullseye',
+      kicker='Kurumsal geri bildirim merkezi',
+      secondary_url=url_for('main.feedback_campaign_manage'),
+      secondary_label='Kampanya Yönetimine Dön'
+  ) }}
+  {{ workspace.feedback_nav('admin') }}
+
+  <div class="campaign-shell">
+    <div class="campaign-surface">
+      <div class="campaign-body">
+        <form method="post" id="feedbackCampaignForm" autocomplete="off">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="campaign-section">
+            <div class="section-title">
+              <div class="section-index">1</div>
+              <div>
+                <h3>Kampanya amacını seçin</h3>
+                <p>Hazır şablonlar formu doldurur; metinleri kurum ihtiyacına göre değiştirebilirsiniz.</p>
+              </div>
+            </div>
+            <div class="quick-grid">
+              <button class="preset-card" type="button" data-preset="screen">
+                <span class="preset-icon"><i class="fa-solid fa-bug"></i></span>
+                <span><strong>Ekran hataları ve eksikler</strong><span>Bozuk sayfa, eksik buton, görünmeyen alan, yazım ve kullanım sorunlarını toplar.</span></span>
+              </button>
+              <button class="preset-card" type="button" data-preset="feature">
+                <span class="preset-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                <span><strong>Yeni özellik değerlendirmesi</strong><span>Eklenen modül veya sayfanın anlaşılır, kullanışlı ve yeterli olup olmadığını ölçer.</span></span>
+              </button>
+              <button class="preset-card" type="button" data-preset="mobile">
+                <span class="preset-icon"><i class="fa-solid fa-mobile-screen-button"></i></span>
+                <span><strong>Mobil / APK deneyimi</strong><span>Mobil görünüm, açılmayan sekme, taşma, hız ve menü deneyimini toplar.</span></span>
+              </button>
+              <button class="preset-card" type="button" data-preset="thanks">
+                <span class="preset-icon"><i class="fa-solid fa-heart"></i></span>
+                <span><strong>Tebrik ve teşekkür</strong><span>Olumlu geri bildirimleri, iyi çalışan ekranları ve memnuniyet notlarını toplar.</span></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="campaign-section">
+            <div class="section-title">
+              <div class="section-index">2</div>
+              <div>
+                <h3>Temel bilgiler</h3>
+                <p>Kullanıcıların göreceği başlık, açıklama ve kampanya türünü belirleyin.</p>
+              </div>
+            </div>
+            <div class="row g-3">
+              <div class="col-lg-8">
+                <label class="form-label fw-semibold">Kampanya başlığı <span class="text-danger">*</span></label>
+                <input class="form-control" name="title" id="campaignTitle" required maxlength="255" placeholder="Örn. BYS360 ekran hataları ve eksikler geri bildirim kampanyası">
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Kampanya türü</label>
+                <select class="form-select" name="campaign_type" id="campaignType">
+                  <option value="survey">Geri Bildirim Anketi</option>
+                  <option value="survey_with_pulse">Anket + Nabız Yoklaması</option>
+                  <option value="pulse">Sadece Nabız Yoklaması</option>
+                  <option value="training_feedback">Eğitim Geri Bildirimi</option>
+                  <option value="training_feedback_with_pulse">Eğitim + Nabız Yoklaması</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Açıklama</label>
+                <textarea class="form-control" name="description" id="campaignDescription" rows="3" placeholder="Bu kampanyanın amacı, BYS360 kullanıcılarından ekran hataları, eksikler ve geliştirme önerileri hakkında düzenli geri bildirim toplamaktır."></textarea>
+                <div class="target-help">Açıklama, kullanıcının neden yanıt verdiğini anlamasını sağlar. Kısa, net ve kurumsal dil tercih edin.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="campaign-section">
+            <div class="section-title">
+              <div class="section-index">3</div>
+              <div>
+                <h3>Soru yapısı</h3>
+                <p>Soru türünü seçin ve her satıra bir soru gelecek şekilde kampanya sorularını yazın.</p>
+              </div>
+            </div>
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Soru türü</label>
+                <select class="form-select" name="question_type" id="questionType">
+                  <option value="scale_1_5">1-5 Ölçek</option>
+                  <option value="single_choice">Tek Seçim</option>
+                  <option value="text">Serbest Metin</option>
+                </select>
+              </div>
+              <div class="col-lg-8">
+                <label class="form-label fw-semibold">Seçmeli soru seçenekleri</label>
+                <input class="form-control" name="option_values" id="optionValues" placeholder="Çok iyi, İyi, Kararsızım, Zorlanıyorum, Desteğe ihtiyacım var">
+                <div class="target-help">Yalnızca “Tek Seçim” soru türünde kullanılır. Seçenekleri virgülle ayırın.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Sorular <span class="text-danger">*</span></label>
+                <textarea class="form-control" name="question_texts" id="questionTexts" rows="8" required placeholder="Her satıra bir soru yazın."></textarea>
+                <div class="question-helper">
+                  <button class="helper-chip" type="button" data-add-question="Hangi ekranda veya işlem adımında sorun yaşadınız?"><i class="fa-solid fa-plus"></i>Ekran sorusu ekle</button>
+                  <button class="helper-chip" type="button" data-add-question="Bu ekranda eksik gördüğünüz alan veya geliştirme öneriniz nedir?"><i class="fa-solid fa-plus"></i>Eksik/öneri ekle</button>
+                  <button class="helper-chip" type="button" data-add-question="Bu ekranın kullanımını 1-5 arasında nasıl değerlendirirsiniz?"><i class="fa-solid fa-plus"></i>Kullanım puanı ekle</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="campaign-section">
+            <div class="section-title">
+              <div class="section-index">4</div>
+              <div>
+                <h3>Hedef kapsam ve tarih</h3>
+                <p>Kampanyanın kimlere açılacağını ve hangi tarihler arasında yanıtlanacağını belirleyin.</p>
+              </div>
+            </div>
+            <div class="row g-3">
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Hedef kapsam</label>
+                <select class="form-select" name="target_scope" id="targetScope">
+                  <option value="all">Tüm kullanıcılar</option>
+                  <option value="role">Belirli rol</option>
+                  <option value="unit">Belirli birim</option>
+                  <option value="user">Belirli kullanıcı</option>
+                </select>
+                <div class="target-help">Tüm kullanıcılar dışında bir kapsam seçerseniz hedef değer alanını doldurun.</div>
+              </div>
+              <div class="col-lg-4">
+                <label class="form-label fw-semibold">Hedef değer</label>
+                <input class="form-control" name="target_value" id="targetValue" placeholder="Rol / birim / kullanıcı bilgisi">
+                <div class="target-help">Örnek: koordinator, Bilgi Teknolojileri, 12345 sicil no veya kurum maili.</div>
+              </div>
+              <div class="col-lg-2">
+                <label class="form-label fw-semibold">Başlangıç</label>
+                <input type="datetime-local" class="form-control" name="start_at" id="startAt">
+              </div>
+              <div class="col-lg-2">
+                <label class="form-label fw-semibold">Bitiş</label>
+                <input type="datetime-local" class="form-control" name="end_at" id="endAt">
+              </div>
+            </div>
+          </div>
+
+          <div class="campaign-section">
+            <div class="section-title">
+              <div class="section-index">5</div>
+              <div>
+                <h3>Görünürlük ve yanıt davranışı</h3>
+                <p>Anonimlik, çoklu yanıt ve yorum alanı ayarlarını kampanya amacına göre düzenleyin.</p>
+              </div>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="soft-check">
+                  <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" name="is_anonymous" id="is_anonymous">
+                    <label class="form-check-label fw-semibold" for="is_anonymous">Anonim yanıt</label>
+                    <div class="small text-muted mt-2">Yanıtlar kişi adı öne çıkarılmadan analiz edilir. Hassas görüşlerde kullanışlıdır.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="soft-check">
+                  <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" name="allow_multiple_submissions" id="allow_multiple_submissions">
+                    <label class="form-check-label fw-semibold" for="allow_multiple_submissions">Çoklu yanıt</label>
+                    <div class="small text-muted mt-2">Aynı kullanıcı farklı zamanlarda birden fazla geri bildirim gönderebilir.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="soft-check">
+                  <div class="form-check m-0">
+                    <input class="form-check-input" type="checkbox" name="allow_comment" id="allow_comment" checked>
+                    <label class="form-check-label fw-semibold" for="allow_comment">Yorum alanı açık</label>
+                    <div class="small text-muted mt-2">Kullanıcı puan/seçim dışında serbest açıklama yazabilir.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hint-box mt-3">
+              <strong>Öneri:</strong> BYS360 ekran hataları ve eksikler için “Çoklu yanıt” açık olabilir. Kurumsal memnuniyet veya hassas görüş toplama kampanyalarında “Anonim yanıt” tercih edilebilir.
+            </div>
+          </div>
+
+          <div class="action-row">
+            <span class="required-note"><i class="fa-solid fa-circle-info"></i>Zorunlu alanlar: başlık ve en az bir soru</span>
+            <a href="{{ url_for('main.feedback_campaign_manage') }}" class="cw-btn cw-btn-secondary"><i class="fa-solid fa-arrow-left"></i>Yönetime Dön</a>
+            <button class="cw-btn cw-btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i>Kampanya Taslağını Oluştur</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <aside class="side-panel" aria-label="Kampanya yardım paneli">
+      <div class="side-card">
+        <h4><i class="fa-solid fa-circle-question" style="color:#8B0000"></i> Bu ekran ne için?</h4>
+        <p>Kampanya; tek tek gelen geri bildirimlerden farklı olarak belirli bir konu için planlı, hedefli ve raporlanabilir görüş toplama alanıdır.</p>
+        <div class="mini-flow">
+          <div class="flow-step"><i class="fa-solid fa-pen-to-square"></i><span><strong>1. Taslak oluştur</strong><span>Başlık, soru ve kapsamı belirleyin.</span></span></div>
+          <div class="flow-step"><i class="fa-solid fa-eye"></i><span><strong>2. Kontrol et</strong><span>Soru metinleri ve hedef kapsamı son kez gözden geçirin.</span></span></div>
+          <div class="flow-step"><i class="fa-solid fa-paper-plane"></i><span><strong>3. Yayınla</strong><span>Kampanya yönetiminden yayına alın.</span></span></div>
+          <div class="flow-step"><i class="fa-solid fa-chart-line"></i><span><strong>4. Sonuçları izle</strong><span>Yanıtlar sonuçlar ve eğilimler ekranında raporlanır.</span></span></div>
+        </div>
+      </div>
+      <div class="side-card">
+        <h4><i class="fa-solid fa-shield-halved" style="color:#8B0000"></i> Güvenli kullanım notu</h4>
+        <ul>
+          <li>Kampanya yönetimi yalnızca yetkili rollerde görünmelidir.</li>
+          <li>Personel sadece kendisine atanmış kampanyayı yanıtlamalıdır.</li>
+          <li>Hassas veri istenecekse anonimlik ve hedef kapsam dikkatle seçilmelidir.</li>
+          <li>Sonuçlar kişisel değerlendirme kararı değil, kurumsal iyileştirme verisi olarak kullanılmalıdır.</li>
+        </ul>
+      </div>
+      <div class="side-card">
+        <h4><i class="fa-solid fa-lightbulb" style="color:#8B0000"></i> BYS360 için örnek kullanım</h4>
+        <p><strong>“Yeni Geri Bildirim Gönder sayfası kullanışlı mı?”</strong> başlıklı kampanya açılıp tüm personele yöneltilebilir. Böylece ekran hataları, eksikler, tebrikler ve teşekkürler tek raporda toplanır.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const presets = {
+    screen: {
+      title: 'BYS360 ekran hataları ve eksikler geri bildirim kampanyası',
+      type: 'survey',
+      questionType: 'text',
+      description: 'Bu kampanyanın amacı, BYS360 kullanıcılarından ekran hataları, eksik alanlar, anlaşılmayan işlem adımları ve geliştirme önerileri hakkında düzenli geri bildirim toplamaktır.',
+      options: '',
+      questions: [
+        'Hangi ekranda veya işlem adımında sorun yaşadınız?',
+        'Ekranda eksik, hatalı veya anlaşılması zor bulduğunuz alan nedir?',
+        'Bu sorunun çözülmesi için öneriniz nedir?',
+        'Varsa tebrik, teşekkür veya olumlu görüşünüzü yazınız.'
+      ].join('\n'),
+      multi: true,
+      anonymous: false
+    },
+    feature: {
+      title: 'BYS360 yeni özellik kullanım deneyimi değerlendirmesi',
+      type: 'survey_with_pulse',
+      questionType: 'scale_1_5',
+      description: 'Bu kampanya, BYS360’a eklenen yeni ekran veya özelliğin kullanıcı açısından anlaşılır, kolay ve yeterli olup olmadığını ölçmek için oluşturulmuştur.',
+      options: '',
+      questions: [
+        'Yeni eklenen ekran veya özellik kullanım açısından anlaşılır mı?',
+        'İşlem adımları yeterince kolay mı?',
+        'Eksik gördüğünüz alan veya geliştirme öneriniz var mı?',
+        'Bu özelliğin günlük iş akışınıza katkısını nasıl değerlendirirsiniz?'
+      ].join('\n'),
+      multi: false,
+      anonymous: false
+    },
+    mobile: {
+      title: 'BYS360 mobil / APK kullanım deneyimi geri bildirimi',
+      type: 'survey',
+      questionType: 'text',
+      description: 'Bu kampanya, BYS360 mobil görünüm, APK, menü yapısı, açılmayan sekmeler, ekran taşmaları ve kullanım kolaylığı hakkında geri bildirim toplamak için hazırlanmıştır.',
+      options: '',
+      questions: [
+        'Mobilde hangi ekranda veya menüde sorun yaşadınız?',
+        'Açılmayan, taşan, karışık görünen veya gereksiz bulduğunuz alan var mı?',
+        'Mobil kullanımın daha kolay olması için öneriniz nedir?',
+        'Mobil uygulamada iyi çalıştığını düşündüğünüz alanları yazınız.'
+      ].join('\n'),
+      multi: true,
+      anonymous: false
+    },
+    thanks: {
+      title: 'BYS360 tebrik ve teşekkür geri bildirim kampanyası',
+      type: 'survey',
+      questionType: 'text',
+      description: 'Bu kampanya, BYS360 içinde beğenilen ekranlar, kolaylaştıran özellikler, teşekkür ve tebrik notlarını kurumsal hafızaya almak için oluşturulmuştur.',
+      options: '',
+      questions: [
+        'BYS360 içinde beğendiğiniz ekran veya özellik hangisidir?',
+        'Hangi işlem işinizi kolaylaştırdı?',
+        'Tebrik veya teşekkür etmek istediğiniz konu nedir?',
+        'Benzer şekilde geliştirilmesini istediğiniz başka bir alan var mı?'
+      ].join('\n'),
+      multi: true,
+      anonymous: false
+    }
+  };
+  function byId(id){return document.getElementById(id)}
+  function setChecked(id, value){const el=byId(id); if(el){el.checked=!!value}}
+  document.querySelectorAll('[data-preset]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const data = presets[btn.getAttribute('data-preset')];
+      if(!data){return;}
+      byId('campaignTitle').value = data.title;
+      byId('campaignType').value = data.type;
+      byId('questionType').value = data.questionType;
+      byId('campaignDescription').value = data.description;
+      byId('questionTexts').value = data.questions;
+      byId('optionValues').value = data.options;
+      setChecked('allow_multiple_submissions', data.multi);
+      setChecked('is_anonymous', data.anonymous);
+      setChecked('allow_comment', true);
+      byId('campaignTitle').focus();
+    });
+  });
+  document.querySelectorAll('[data-add-question]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const textarea = byId('questionTexts');
+      const line = btn.getAttribute('data-add-question') || '';
+      textarea.value = (textarea.value.trim() ? textarea.value.trim() + '\n' : '') + line;
+      textarea.focus();
+    });
+  });
+})();
+</script>
+{% endblock %}

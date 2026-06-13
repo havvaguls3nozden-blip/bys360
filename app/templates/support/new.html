@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Yeni Talep Aç - BYS360{% endblock %}
+{% block page_kicker %}Destek ve Talep Yönetimi{% endblock %}
+{% block page_title %}Yeni Talep Aç{% endblock %}
+{% block page_subtitle %}Sorunları, geliştirme ihtiyaçlarını, kullanım desteğini ve yetki taleplerini kayıtlı sürece dönüştürün.{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_support_learning.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+<style>.support-request-layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.request-card{background:rgba(255,255,255,.94);border:1px solid rgba(139,0,0,.08);border-radius:24px;padding:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:grid;gap:8px}.field label{font-size:.84rem;font-weight:850;color:#374151}.field small{color:#6b7280;line-height:1.55}.field input,.field select,.field textarea{min-height:46px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:0 14px;background:#fff;color:#111827}.field textarea{min-height:190px;padding:14px;resize:vertical}.field.span-2{grid-column:span 2}.request-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.request-side{position:sticky;top:86px;display:grid;gap:14px}.request-help-card{background:rgba(255,255,255,.94);border:1px solid rgba(139,0,0,.08);border-radius:22px;padding:18px;box-shadow:0 14px 30px rgba(15,23,42,.06)}.request-help-card h4{margin:0 0 10px;font-size:1rem;font-weight:950;color:#111827}.request-help-card p{margin:0;color:#6b7280;line-height:1.72}.request-help-card ul{margin:10px 0 0;padding-left:18px;color:#4b5563;line-height:1.7}.request-help-card li{padding:3px 0}.warn-box{padding:18px;border-radius:18px;border:1px solid rgba(202,138,4,.2);background:#fffbeb;color:#92400e}.privacy-box{margin-top:14px;padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.07)}@media (max-width:1060px){.support-request-layout{grid-template-columns:1fr}.request-side{position:static}}@media (max-width:760px){.form-grid{grid-template-columns:1fr}.field.span-2{grid-column:span 1}}</style>
+<div class="support-learning-shell help-center-v2">
+    {% set current_view_key = 'support_new' %}
+    {% include 'support/_tabs.html' %}
+
+    {% if not is_support_ready %}
+    <div class="warn-box">Destek modülü tabloları kurulmadan kayıt açılamaz. Yetkili kullanıcı kurulum ekranından modülü aktifleştirebilir.</div>
+    {% endif %}
+
+    <section class="support-hero support-hero-compact">
+        <div>
+            <span class="support-kicker"><i class="fa-solid fa-ticket"></i> Kayıtlı destek süreci</span>
+            <h2 class="support-title">Talebi net yazarsanız çözüm daha hızlı ilerler.</h2>
+            <p class="support-text">Ekran adresi, işlem adımı, beklenen sonuç, görülen hata ve varsa ekran görüntüsü talebin doğru kişiye yönlenmesini kolaylaştırır.</p>
+        </div>
+        <aside class="support-hero-side">
+            <div class="support-note"><h4>Önce rehbere bakın</h4><p>Benzer konu için hazırlanmış bir yardım makalesi varsa talep açmadan işlem adımlarını kontrol edin.</p></div>
+        </aside>
+    </section>
+
+    <div class="support-request-layout">
+        <div class="request-card">
+            <form method="post" enctype="multipart/form-data">
+
+                <div class="privacy-box" style="margin-bottom:16px;">
+                    <strong>Nasıl doldurulur?</strong>
+                    <div style="margin-top:6px;color:#6b7280;line-height:1.65;font-size:.9rem;">Talep Türü = işlem nedeni. Talep Konusu / İlgili Alan = hangi ekran veya süreçle ilgili olduğu. Kategori ayrıca seçilmez; sistem bunu talep türüne göre otomatik işler.</div>
+                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Talep Türü</label>
+                        <select name="ticket_type">{% for value,label in ticket_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+                        <small>Hata, kullanım desteği, yetki veya geliştirme ihtiyacını doğru ayırır.</small>
+                    </div>
+                    <div class="field">
+                        <label>Talep Konusu / İlgili Alan</label>
+                        <select name="module_name">{% for item in modules %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select>
+                        <small>Talebin hangi ekran veya süreçle ilgili olduğunu seçin.</small>
+                    </div>
+                    <div class="field">
+                        <label>Öncelik</label>
+                        <select name="priority">{% for value,label in priorities %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+                        <small>Kritik öncelik yalnızca işlem yapılamaması, güvenlik veya veri riski durumunda seçilmelidir.</small>
+                    </div>
+                    <div class="field span-2">
+                        <label>Konu</label>
+                        <input type="text" name="title" maxlength="255" placeholder="Örn. Performans karne ekranında yayın durumu görünmüyor" required>
+                    </div>
+                    <div class="field span-2">
+                        <label>Açıklama</label>
+                        <textarea name="description" placeholder="Hangi sayfada, hangi işlemden sonra, ne beklerken ne gördüğünüzü yazın. Varsa hata mesajını aynen ekleyin." required></textarea>
+                    </div>
+                    <div class="field">
+                        <label>İlgili Sayfa URL</label>
+                        <input type="text" name="page_url" maxlength="255" placeholder="/performance/dashboard veya /support/help/search">
+                    </div>
+                    <div class="field">
+                        <label>Ek Dosya / Ekran Görüntüsü</label>
+                        <input type="file" name="attachment">
+                        <small>Gereksiz kişisel veri içeren görüntüleri paylaşmadan önce kırpın.</small>
+                    </div>
+                </div>
+                <div class="privacy-box">
+                    <label style="display:inline-flex;align-items:center;gap:8px;font-weight:850;color:#374151;"><input type="checkbox" name="is_private" value="1"> Sadece yetkili kullanıcılar görsün</label>
+                    <div style="margin-top:6px;color:#6b7280;line-height:1.65;font-size:.9rem;">Performans, personel, güvenlik veya hassas kurum içi bilgi içeren kayıtlar için bu seçenek kullanılmalıdır.</div>
+                </div>
+                <div class="request-actions">
+                    <button type="submit" class="support-btn"><i class="fa-solid fa-paper-plane"></i> Talebi Kaydet</button>
+                    <a href="{{ url_for('main.support_my_tickets') }}" class="support-btn-soft"><i class="fa-solid fa-folder-open"></i> Taleplerime Git</a>
+                    <a href="{{ url_for('main.support_help_article', article_slug='destek-talebi-nasil-acilir') }}" class="support-btn-soft"><i class="fa-solid fa-book-open"></i> Talep Açma Rehberi</a>
+                </div>
+            </form>
+        </div>
+        <aside class="request-side">
+            <div class="request-help-card">
+                <h4>İyi talep örneği</h4>
+                <p>“/performance/dashboard sayfasında dönem filtresini seçince grafik boş geliyor. Aynı dönem rapor ekranında veri var. Ekran görüntüsü ektedir.”</p>
+            </div>
+            <div class="request-help-card">
+                <h4>Eksik talep örneği</h4>
+                <p>“Sistem çalışmıyor.” Bu ifade tek başına yeterli değildir; sayfa, işlem adımı ve beklenen sonuç yazılmalıdır.</p>
+            </div>
+            <div class="request-help-card">
+                <h4>Kontrol listesi</h4>
+                <ul>
+                    <li>Sayfa adresini ekledim.</li>
+                    <li>Hangi adımda kaldığımı yazdım.</li>
+                    <li>Hata mesajını aynen belirttim.</li>
+                    <li>Önceliği iş etkisine göre seçtim.</li>
+                    <li>Gerekliyse ekran görüntüsü ekledim.</li>
+                </ul>
+            </div>
+            <div class="request-help-card">
+                <h4>Güvenli veri notu</h4>
+                <p>Kişisel veri, performans görüşü, puan, anket cevabı veya özel personel bilgisi içeren dosyaları yalnızca gerçekten gerekliyse ve yetkili kapsamda paylaşın.</p>
+            </div>
+        </aside>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+{% endblock %}
+
+{# BYS360_SUPPORT_NEW_REQUEST_TAXONOMY_V1: kategori alanı yeni talep formunda kaldırıldı; talep konusu modül alanı sadeleştirildi. #}

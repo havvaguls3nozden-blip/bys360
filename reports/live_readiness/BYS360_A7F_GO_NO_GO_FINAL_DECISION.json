@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-06-12T13:59:38",
+  "phase": "A7F_GO_NO_GO_FINAL_DECISION",
+  "local_pre_live_ok": true,
+  "decision": "LOCAL_GO_READY_WITH_LIVE_CONDITIONS",
+  "a6_latest_zip": "C:\\bys360\\releases\\BYS360_A6_SECURITY_EVIDENCE_20260612_133606.zip",
+  "a6_latest_sha256": "450E720885C790F99BA8A250991A8386392C2C0E9C79CF1E97B5E91C56CB51E2",
+  "a7_latest_zip": "C:\\bys360\\releases\\BYS360_A7_LIVE_READINESS_EVIDENCE_20260612_135815.zip",
+  "a7_latest_sha256": "4FB35400A0D9B31F4B48F065539B4A0CDA1679827CDDBD3746F273402D3447A2",
+  "missing": [],
+  "go_checks": [
+    {
+      "name": "A6 g?venlik evidence paketi mevcut",
+      "ok": true,
+      "detail": "C:\\bys360\\releases\\BYS360_A6_SECURITY_EVIDENCE_20260612_133606.zip"
+    },
+    {
+      "name": "A7 canl? haz?rl?k evidence paketi mevcut",
+      "ok": true,
+      "detail": "C:\\bys360\\releases\\BYS360_A7_LIVE_READINESS_EVIDENCE_20260612_135815.zip"
+    },
+    {
+      "name": "Zorunlu A7/A6 raporlar? mevcut",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "Local smoke s?zle?mesi ye?il",
+      "ok": true,
+      "detail": "A7D V3 raporu mevcut; A7D_OK=True olarak ?retildi."
+    },
+    {
+      "name": "Rollback/yedek plan? haz?r",
+      "ok": true,
+      "detail": "A7B raporu mevcut."
+    },
+    {
+      "name": "Pre-live backup scripti haz?r",
+      "ok": true,
+      "detail": "Varsay?lan modu Plan; yanl??l?kla DB/kod yede?i ?al??t?rmaz."
+    }
+  ],
+  "live_required_before_publish": [
+    "Ger?ek canl? .env de?erleri strict env gate ile do?rulanmal?.",
+    "Canl? DATABASE_URL PostgreSQL + sslmode=require/verify olacak ?ekilde do?rulanmal?.",
+    "Ger?ek SENTRY_DSN canl? sunucuda tan?mlanmal?.",
+    "Canl? DB yede?i al?nmadan yay?n yap?lmamal?.",
+    "Servis/g?rev yede?i al?nmadan yay?n yap?lmamal?.",
+    "Yay?n sonras? HTTP smoke test ger?ek URL ?zerinden ?al??t?r?lmal?.",
+    "Canl? admin/login/dashboard/portal/feedback ak??? manuel olarak kontrol edilmeli."
+  ]
+}

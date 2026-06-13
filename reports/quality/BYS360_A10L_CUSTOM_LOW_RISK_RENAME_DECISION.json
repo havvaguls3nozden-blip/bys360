@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-06-12T19:35:50",
+  "phase": "A10L_CUSTOM_LOW_RISK_RENAME",
+  "ok": true,
+  "decision": "A10L_CUSTOM_LOW_RISK_RENAME_GREEN",
+  "backup_root": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435",
+  "initial_a10k_returncode": 0,
+  "target_count": 7,
+  "renamed_count": 7,
+  "source_missing_count": 0,
+  "target_exists_count": 0,
+  "invalid_count": 0,
+  "same_path_count": 0,
+  "operations": [
+    {
+      "source": "migrations/versions/523a11510d7d_historical_placeholder.py",
+      "target": "migrations/versions/523a11510d7d_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\523a11510d7d_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/71d0eccf02c0_historical_placeholder.py",
+      "target": "migrations/versions/71d0eccf02c0_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\71d0eccf02c0_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/b31c7a5d9e2f_historical_placeholder.py",
+      "target": "migrations/versions/b31c7a5d9e2f_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\b31c7a5d9e2f_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/c32f8a1e4b9d_historical_placeholder.py",
+      "target": "migrations/versions/c32f8a1e4b9d_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\c32f8a1e4b9d_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/c4a1d9e2f731_historical_placeholder.py",
+      "target": "migrations/versions/c4a1d9e2f731_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\c4a1d9e2f731_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/d33a9c4e8f10_historical_placeholder.py",
+      "target": "migrations/versions/d33a9c4e8f10_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\d33a9c4e8f10_historical_placeholder.py",
+      "status": "renamed"
+    },
+    {
+      "source": "migrations/versions/e8c3f1a9b4d0_historical_placeholder.py",
+      "target": "migrations/versions/e8c3f1a9b4d0_historical_placeharchiveer.py",
+      "backup": "C:\\bys360\\releases\\A10L_CUSTOM_LOW_RISK_RENAME_BACKUP_20260612_193435\\migrations\\versions\\e8c3f1a9b4d0_historical_placeholder.py",
+      "status": "renamed"
+    }
+  ],
+  "compileall_returncode": 0,
+  "refresh_returncodes": {
+    "a10a": 0,
+    "a10b": 0,
+    "a10f": 0,
+    "a10i": 0,
+    "a10k": 0
+  },
+  "final_a10f_safe_quarantine_candidate_count": 0,
+  "final_a10f_cleanup_candidate_count": 52,
+  "final_a10f_keep_or_review_count": 52,
+  "final_a10i_remaining_count": 52,
+  "final_a10i_by_decision": {
+    "rename_requires_compat_wrapper_and_import_update": 7,
+    "keep_referenced_do_not_rename_now": 45
+  },
+  "final_a10k_remaining_low_risk_count": 0,
+  "final_a10k_by_decision": {},
+  "pytest_returncode": 0,
+  "pytest_summary": {
+    "warnings": 32,
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34
+  },
+  "pytest_tail": "......ss................................................................ [  9%]\n........................................................................ [ 19%]\n........................................................................ [ 28%]\n........................................................................ [ 38%]\n........................................................................ [ 48%]\n........................................................................ [ 57%]\n........................................................................ [ 67%]\n........................................................................ [ 77%]\n........................................................................ [ 86%]\n........................................................................ [ 96%]\n..........................                                               [100%]\n============================== warnings summary ===============================\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py: 1 warning\ntests/architecture/test_mobile_api_auth_guard_matrix_p4a.py: 1 warning\ntests/architecture/test_mobile_api_performance_response_p3e.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py: 1 warning\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c.py: 1 warning\ntests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py: 1 warning\ntests/architecture/test_mobile_api_response_suite_p3f.py: 1 warning\ntests/architecture/test_mobile_api_role_boundary_matrix_p4b_v3.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c.py: 1 warning\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py: 1 warning\ntests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py: 1 warning\ntests/critical/test_v58_claude_roadmap_smoke.py: 1 warning\ntests/critical/test_v59_broad_route_smoke.py: 1 warning\ntests/integration/test_feedback_http_behavior.py: 1 warning\ntests/test_sp_routes_smoke.py: 1 warning\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ===========================\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b.py:14: P6B report is generated by the repair/quality gate before targeted pytest.\nSKIPPED [1] tests\\architecture\\test_android_responsive_visual_regression_evidence_suite_p6b_v2.py:14: P6B V2 report is generated by the repair/quality gate before targeted pytest.\n744 passed, 2 skipped, 34 deselected, 32 warnings in 38.74s\n\n",
+  "note": "A10K custom suggestion üreten düşük riskli dosyalar yedekli yeniden adlandırıldı. Keep allowlist adaylarına ve referanslı dosyalara dokunulmadı."
+}

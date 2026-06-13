@@ -1,0 +1,27 @@
+Flask==3.0.3
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.7
+SQLAlchemy==2.0.36
+psycopg2-binary==2.9.9
+python-dotenv==1.0.1
+WTForms==3.1.2
+email-validator==2.2.0
+openpyxl==3.1.5
+pandas==2.2.3
+waitress==3.0.0
+XlsxWriter==3.2.0
+Pillow==10.4.0
+cryptography==46.0.4
+# Aşağıdakiler daha önce >= ile belirtilmişti.
+# Kararlı sürümlere sabitlendi — 2026-04-27
+reportlab==4.4.10
+gunicorn==25.3.0
+gevent==24.11.1
+sentry-sdk[flask]==2.20.0
+redis==5.0.8
+rq==2.3.3
+prometheus-client==0.20.0
+Flask-Limiter==3.5.0
+pip-audit==2.7.0

@@ -1,0 +1,15 @@
+{
+  "package": "BYS360_TECH_DEBT_CLEANUP_SAFE_V1_OVERLAY",
+  "version": "SAFE_V1",
+  "purpose": "BYS360 technical debt, repository hygiene, CSS inventory, broad-except ratchet and clean source copy tooling",
+  "live_safe": true,
+  "modifies_application_code": false,
+  "database_changes": false,
+  "files": [
+    "scripts/windows/repair_bys360_tech_debt_cleanup_safe_v1.ps1",
+    "scripts/maintenance/bys360_tech_debt_cleanup_safe_v1.py",
+    "scripts/quality/check_bys360_broad_except_ratchet_safe_v1.py",
+    "docs/technical_debt/BYS360_TECH_DEBT_CLEANUP_SAFE_V1_PLAN.md",
+    "README.md"
+  ]
+}

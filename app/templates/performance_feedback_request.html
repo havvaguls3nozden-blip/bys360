@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, note %}
+
+{% block title %}Geri Bildirim Talebi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Talebi{% endblock %}
+{% block page_subtitle %}
+Performans değerlendirmenizle ilgili görüşme talebinizi daha anlaşılır, güven veren ve kurumsal tasarım diliyle iletin.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(
+      title='Geri Bildirim Talebi',
+      text='Bu ekran, personelin değerlendirme sonrasındaki geri bildirim talebini açık, düzenli ve kurumsal bir yüzeyde iletmesi için yeniden tasarlandı. Talebiniz amir zincirine iletilir; süreç boyunca açıklamanız net, saygılı ve somut olduğunda dönüş kalitesi yükselir.',
+      icon='fa-solid fa-comments',
+      kicker='Performans Yönetimi',
+      side_label='Talep akışı',
+      side_title='Açıklama → İletim → İnceleme → Görüşme',
+      side_text='Form yalnızca gerekli alanları gösterir. Amaç, gereksiz kalabalık oluşturmadan güçlü bir kullanıcı deneyimi sunmaktır.'
+  ) }}
+
+  {{ note('Bu ekran, performans modülündeki yeni kurumsal yüzeylerle aynı görsel aileye alınmıştır. Sicil bazlı görünüm, sade veri kartları ve tek odaklı form yapısı özellikle canlı kullanım rahatlığı için tercih edildi.') }}
+
+  <style>
+    .feedback-shell{display:grid;gap:18px}
+    .feedback-top-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .feedback-btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;
+      border:none;border-radius:14px;text-decoration:none;cursor:pointer;font-weight:800;font-size:.88rem;
+      transition:all .18s ease;
+    }
+    .feedback-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .feedback-btn.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .feedback-btn:hover{transform:translateY(-1px)}
+
+    .glass-card{
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(139,0,0,.08);
+      border-radius:24px;
+      box-shadow:0 18px 36px rgba(15,23,42,.08);
+      backdrop-filter:blur(14px);
+    }
+
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .summary-card{padding:20px;position:relative;overflow:hidden}
+    .summary-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:86px;height:86px;border-radius:50%;background:rgba(139,0,0,.05)}
+    .summary-label{position:relative;z-index:1;color:#6b7280;font-size:.8rem;font-weight:800;letter-spacing:.02em;margin-bottom:10px}
+    .summary-value{position:relative;z-index:1;color:#111827;font-size:1.15rem;font-weight:900;line-height:1.35}
+    .summary-sub{position:relative;z-index:1;margin-top:8px;color:#6b7280;font-size:.84rem;line-height:1.7}
+
+    .content-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.9fr);gap:18px}
+    .panel-card{padding:24px}
+    .section-title{margin:0;color:#111827;font-size:1.08rem;font-weight:900}
+    .section-sub{margin:8px 0 0;color:#6b7280;font-size:.9rem;line-height:1.8}
+
+    .emphasis-box{
+      margin-top:16px;padding:16px 18px;border-radius:18px;
+      background:linear-gradient(180deg,rgba(139,0,0,.05),rgba(255,255,255,.96));
+      border:1px solid rgba(139,0,0,.10);color:#4b5563;font-size:.9rem;line-height:1.8;
+    }
+    .emphasis-box strong{color:#111827}
+
+    .form-grid{display:grid;gap:16px;margin-top:18px}
+    .form-group{display:flex;flex-direction:column;gap:8px}
+    .form-label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.9rem;font-weight:800;color:#374151}
+    .form-hint{font-size:.78rem;font-weight:700;color:#8B0000}
+    .form-control-custom{
+      width:100%;min-height:54px;border-radius:16px;border:1px solid rgba(15,23,42,.10);background:#fff;
+      padding:14px 16px;font:inherit;color:#111827;outline:none;transition:border-color .18s ease, box-shadow .18s ease;
+    }
+    textarea.form-control-custom{min-height:240px;resize:vertical;line-height:1.8}
+    .form-control-custom:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+
+    .helper-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .helper-card{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.08)}
+    .helper-card-title{display:flex;align-items:center;gap:8px;color:#111827;font-size:.86rem;font-weight:900;margin-bottom:8px}
+    .helper-card-text{color:#6b7280;font-size:.84rem;line-height:1.7}
+
+    .form-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:4px}
+    .character-box{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(15,23,42,.05);color:#4b5563;font-size:.8rem;font-weight:800}
+
+    .aside-stack{display:grid;gap:18px}
+    .info-list{display:grid;gap:12px;margin-top:16px}
+    .info-row{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .info-row-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}
+    .info-row-value{color:#111827;font-size:.94rem;font-weight:800;line-height:1.65}
+    .muted-text{color:#6b7280;font-size:.86rem;line-height:1.75}
+
+    .manager-list{display:grid;gap:12px;margin-top:16px}
+    .manager-card{padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}
+    .manager-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .manager-name{color:#111827;font-size:.92rem;font-weight:900}
+    .manager-role{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.75rem;font-weight:900}
+    .manager-meta{margin-top:8px;color:#6b7280;font-size:.84rem;line-height:1.7}
+
+    .status-pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:900}
+    .status-pill.success{background:rgba(22,101,52,.10);color:#166534}
+    .status-pill.watch{background:rgba(146,64,14,.10);color:#92400e}
+    .status-pill.neutral{background:rgba(15,23,42,.06);color:#374151}
+
+    .warning-box{
+      padding:16px 18px;border-radius:18px;border:1px dashed rgba(139,0,0,.18);
+      background:rgba(255,251,235,.82);color:#92400e;font-size:.86rem;line-height:1.8;
+    }
+
+    @media (max-width:1180px){
+      .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .content-grid{grid-template-columns:1fr}
+      .helper-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:680px){
+      .summary-grid{grid-template-columns:1fr}
+      .panel-card{padding:20px}
+      .form-footer{align-items:stretch}
+      .feedback-btn{width:100%}
+      .feedback-top-actions{display:grid;grid-template-columns:1fr}
+    }
+  </style>
+
+  <div class="feedback-shell">
+    <div class="feedback-top-actions">
+      <a href="{{ url_for('main.performance_scorecard', period_id=period.id) }}" class="feedback-btn secondary">
+        <i class="fa-solid fa-arrow-left"></i> Not Karnesine Dön
+      </a>
+      <a href="{{ url_for('main.manager_feedback_requests', scope='mine') }}" class="feedback-btn secondary">
+        <i class="fa-solid fa-list-check"></i> Taleplerimi Gör
+      </a>
+    </div>
+
+    <section class="summary-grid">
+      <article class="glass-card summary-card">
+        <div class="summary-label">Dönem</div>
+        <div class="summary-value">{{ period.title if period else '-' }}</div>
+        <div class="summary-sub">Talebiniz seçili değerlendirme dönemiyle ilişkilendirilir.</div>
+      </article>
+      <article class="glass-card summary-card">
+        <div class="summary-label">Personel</div>
+        <div class="summary-value">{{ current_user.ad }} {{ current_user.soyad }}</div>
+        <div class="summary-sub">Sicil No: {{ current_user.sicil_no or '-' }}</div>
+      </article>
+      <article class="glass-card summary-card">
+        <div class="summary-label">Nihai Sonuç</div>
+        <div class="summary-value">
+          {% if evaluation and evaluation.final_total_100 is not none %}
+            {{ "%.1f"|format(evaluation.final_total_100) }} / 100
+          {% else %}
+            -
+          {% endif %}
+        </div>
+        <div class="summary-sub">Talep formu, değerlendirmenizin ardından görüşme ihtiyacını kayıt altına alır.</div>
+      </article>
+      <article class="glass-card summary-card">
+        <div class="summary-label">Sonuç Görünürlüğü</div>
+        <div class="summary-value">{{ 'Yayında' if period and period.results_published else 'Kontrollü görünüm' }}</div>
+        <div class="summary-sub">İdari yayın akışı tamamlanmadan süreç kaydı korunur.</div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <div class="glass-card panel-card">
+        <h3 class="section-title">Talep açıklamanızı yazın</h3>
+        <p class="section-sub">Aşağıdaki alanı mümkün olduğunca somut kullanın. Hangi değerlendirme kriteri, hangi gözlem veya hangi görüşme ihtiyacının sizi bu talebe yönelttiğini açık yazmanız, dönüş kalitesini artırır.</p>
+
+        <div class="emphasis-box">
+          <strong>Önerilen yaklaşım:</strong> kısa bir giriş, somut gözlem, beklenti ve talep edilen görüşme çerçevesi. Kişisel kırgınlık dili yerine süreç ve kriter odaklı anlatım kullanmanız daha güçlü bir kayıt oluşturur.
+        </div>
+
+        <form method="post" class="form-grid">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="form-group">
+            <label for="reason" class="form-label">
+              <span>Talep açıklaması</span>
+              <span class="form-hint">Zorunlu alan</span>
+            </label>
+            <textarea
+              id="reason"
+              name="reason"
+              class="form-control-custom"
+              placeholder="Örneğin: Dönem değerlendirmemde özellikle iletişim, görev önceliği veya performans kriterleriyle ilgili açıklama almak istiyorum. Görüşmede hangi başlıkların ele alınmasını istediğinizi açıkça yazabilirsiniz."
+              required
+            ></textarea>
+          </div>
+
+          <div class="helper-grid">
+            <div class="helper-card">
+              <div class="helper-card-title"><i class="fa-solid fa-bullseye"></i> Net anlatım</div>
+              <div class="helper-card-text">Genel ifadeler yerine hangi konuya dair geri bildirim istediğinizi açıkça belirtin.</div>
+            </div>
+            <div class="helper-card">
+              <div class="helper-card-title"><i class="fa-solid fa-scale-balanced"></i> Süreç dili</div>
+              <div class="helper-card-text">Değerlendirme kriteri, iş akışı ve beklenti çerçevesi üzerinden ilerleyen metinler daha sağlıklı okunur.</div>
+            </div>
+            <div class="helper-card">
+              <div class="helper-card-title"><i class="fa-solid fa-handshake-angle"></i> Görüşme amacı</div>
+              <div class="helper-card-text">Amacınız açıklama almak, gelişim alanını netleştirmek veya değerlendirme gerekçesini anlamak olabilir.</div>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <div class="character-box"><i class="fa-regular fa-pen-to-square"></i> <span id="reasonCounter">0</span> karakter</div>
+            <button type="submit" class="feedback-btn primary">
+              <i class="fa-solid fa-paper-plane"></i> Talebi Gönder
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="aside-stack">
+        <div class="glass-card panel-card">
+          <h3 class="section-title">Talep özeti</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <div class="info-row-label">Değerlendirme durumu</div>
+              <div class="info-row-value">
+                {% if evaluation and evaluation.status %}
+                  {{ evaluation.status|replace('_', ' ')|title }}
+                {% else %}
+                  Kayıt hazır
+                {% endif %}
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-label">1. Amir toplamı</div>
+              <div class="info-row-value">
+                {% if evaluation and evaluation.level_1_total_100 is not none %}
+                  {{ "%.1f"|format(evaluation.level_1_total_100) }} / 100
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-label">2. Amir toplamı</div>
+              <div class="info-row-value">
+                {% if evaluation and evaluation.level_2_total_100 is not none %}
+                  {{ "%.1f"|format(evaluation.level_2_total_100) }} / 100
+                {% else %}
+                  -
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card panel-card">
+          <h3 class="section-title">İletim zinciri</h3>
+          <p class="section-sub">Talebiniz aşağıdaki amir zincirine yönlendirilir. Üçüncü amir varsa süreçte görüş tarafında yer alabilir.</p>
+          <div class="manager-list">
+            <div class="manager-card">
+              <div class="manager-top">
+                <div class="manager-name">{{ evaluation.level_1_evaluator.ad ~ ' ' ~ evaluation.level_1_evaluator.soyad if evaluation and evaluation.level_1_evaluator else 'Tanımlı değil' }}</div>
+                <span class="manager-role">1. Amir</span>
+              </div>
+              <div class="manager-meta">Birincil değerlendirme yöneticisi.</div>
+            </div>
+            <div class="manager-card">
+              <div class="manager-top">
+                <div class="manager-name">{{ evaluation.level_2_evaluator.ad ~ ' ' ~ evaluation.level_2_evaluator.soyad if evaluation and evaluation.level_2_evaluator else 'Tanımlı değil' }}</div>
+                <span class="manager-role">2. Amir</span>
+              </div>
+              <div class="manager-meta">Üst değerlendirme görünürlüğü bulunan yönetici.</div>
+            </div>
+            {% if evaluation and evaluation.level_3_evaluator %}
+            <div class="manager-card">
+              <div class="manager-top">
+                <div class="manager-name">{{ evaluation.level_3_evaluator.ad }} {{ evaluation.level_3_evaluator.soyad }}</div>
+                <span class="manager-role">3. Amir</span>
+              </div>
+              <div class="manager-meta">Varsa yorum ve görüş katkısı için zincirde yer alır.</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="glass-card panel-card">
+          <h3 class="section-title">Süreç ilkeleri</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <div class="info-row-label">Kayıt türü</div>
+              <div class="info-row-value"><span class="status-pill success">Kurumsal kayıt</span></div>
+              <div class="muted-text">Talep, dönem ve personel bazında izlenebilir şekilde saklanır.</div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-label">Kimlik yaklaşımı</div>
+              <div class="info-row-value"><span class="status-pill neutral">Sicil bazlı görünüm</span></div>
+              <div class="muted-text">Kimlik alanlarında sicil no yaklaşımı korunur.</div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-label">İnceleme akışı</div>
+              <div class="info-row-value"><span class="status-pill watch">Yönetici dönüşü</span></div>
+              <div class="muted-text">Talebiniz incelenebilir, yanıtlanabilir veya görüşme planına dönüştürülebilir.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          Yazdığınız metin kurumsal kayıt niteliği taşır. Bu nedenle tarih, olay, görev, kriter veya beklenti belirtiyorsanız mümkün olduğunca açık ve ölçülü yazmanız en doğru yaklaşım olur.
+        </div>
+      </aside>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function(){
+  const textarea = document.getElementById('reason');
+  const counter = document.getElementById('reasonCounter');
+  if (!textarea || !counter) return;
+  const updateCounter = () => {
+    counter.textContent = (textarea.value || '').trim().length;
+  };
+  textarea.addEventListener('input', updateCounter);
+  updateCounter();
+})();
+</script>
+{% endblock %}

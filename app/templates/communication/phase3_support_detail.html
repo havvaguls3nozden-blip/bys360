@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Destek Talebi | BYS360{% endblock %}
+{% block page_title %}{{ payload.ticket.ticket_no }}{% endblock %}
+{% block page_subtitle %}{{ payload.ticket.title }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <div class="small text-muted mb-2">{{ payload.ticket.module_name }} · {{ payload.ticket.priority|upper }} · {{ status_labels.get(payload.ticket.status, payload.ticket.status) }}</div>
+        <div>{{ payload.ticket.description }}</div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white border-0 px-4 pt-4"><h5 class="mb-0">Talep Akışı</h5></div>
+      <div class="card-body p-4">
+        {% for message in payload.ticket.messages %}
+        <div class="border rounded-4 p-3 mb-3">
+          <div class="d-flex justify-content-between gap-3">
+            <div><span class="fw-semibold">{{ message.user.full_name if message.user else '-' }}</span>{% if message.is_internal %} <span class="badge text-bg-warning">İç Not</span>{% endif %}</div>
+            <div class="small text-muted">{{ message.created_at.strftime('%d.%m.%Y %H:%M') if message.created_at else '' }}</div>
+          </div>
+          <div class="mt-2">{{ message.message }}</div>
+        </div>
+        {% else %}
+        <div class="text-muted">Henüz mesaj kaydı yok.</div>
+        {% endfor %}
+
+        <form method="post" class="mt-4">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label class="form-label fw-semibold">Yeni Mesaj</label>
+          <textarea class="form-control rounded-4" name="message" rows="4" required></textarea>
+          {% if payload.can_manage %}
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="is_internal" id="is_internal">
+            <label class="form-check-label" for="is_internal">İç not olarak kaydet</label>
+          </div>
+          {% endif %}
+          <div class="mt-3 text-end"><button type="submit" class="btn btn-danger rounded-pill">Mesaj Ekle</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h6>Özet</h6>
+        <div class="small text-muted mb-2">Oluşturan</div><div class="mb-3">{{ payload.ticket.created_by.full_name if payload.ticket.created_by else '-' }}</div>
+        <div class="small text-muted mb-2">Atanan</div><div class="mb-3">{{ payload.ticket.assigned_to.full_name if payload.ticket.assigned_to else '-' }}</div>
+        <div class="small text-muted mb-2">SLA İlk Yanıt</div><div class="mb-3">{{ payload.sla.first_state }}</div>
+        <div class="small text-muted mb-2">SLA Çözüm</div><div>{{ payload.sla.resolution_state }}</div>
+      </div>
+    </div>
+
+    {% if payload.can_manage %}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-4">
+        <h6>Atama</h6>
+        <form method="post" action="{{ url_for('main.communication_phase3_support_assign', ticket_id=payload.ticket.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select class="form-select rounded-4 mb-3" name="assigned_to_user_id">
+            <option value="">Atama kaldır</option>
+            {% for user in payload.assignable_users %}
+            <option value="{{ user.id }}" {% if payload.ticket.assigned_to_user_id == user.id %}selected{% endif %}>{{ user.full_name }} · {{ user.sicil_no }}</option>
+            {% endfor %}
+          </select>
+          <input class="form-control rounded-4 mb-3" type="text" name="note" placeholder="Atama notu">
+          <button type="submit" class="btn btn-danger rounded-pill w-100">Atamayı Güncelle</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4">
+        <h6>Durum</h6>
+        <form method="post" action="{{ url_for('main.communication_phase3_support_status', ticket_id=payload.ticket.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <select class="form-select rounded-4 mb-3" name="status">
+            {% for key, label in status_labels.items() %}
+            <option value="{{ key }}" {% if payload.ticket.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <input class="form-control rounded-4 mb-3" type="text" name="note" placeholder="Durum değişikliği notu">
+          <button type="submit" class="btn btn-outline-danger rounded-pill w-100">Durumu Güncelle</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

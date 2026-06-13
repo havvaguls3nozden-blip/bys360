@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Talep SLA Politikaları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Talep SLA Politikaları{% endblock %}
+{% block page_subtitle %}Talep tipi ve öncelik bazlı süre hedeflerini yönetin, eskalasyon standartlarını görünür hale getirin.{% endblock %}
+
+{% block content %}
+<style>
+.page-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.stack{display:grid;gap:16px}.field{display:grid;gap:6px}.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:100px;resize:vertical}.btn-row{display:flex;flex-wrap:wrap;gap:10px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:980px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.pill.good{background:#ecfdf5;color:#065f46}.pill.soft{background:#f3f4f6;color:#374151}.top-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.empty{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}@media (max-width:1180px){.page-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="top-actions">
+  <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_request_analytics', scope=selected_scope_mode) }}">Analitik dashboard</a>
+  <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_request_tasks', scope=selected_scope_mode) }}">Talep görev kutusu</a>
+</div>
+
+<div class="page-grid">
+  <div class="panel stack">
+    <div>
+      <h3 class="section-title">Yeni / güncel SLA politikası</h3>
+      <form method="post" action="{{ url_for('main.hr_personnel_request_sla_policy_save', scope=selected_scope_mode) }}" class="stack">
+        <input type="hidden" name="form_token" value="{{ policy_token }}">
+        <div class="field"><label>Kod</label><input type="text" name="code" placeholder="örn. ozluk_duzeltme_high"></div>
+        <div class="field"><label>Politika başlığı</label><input type="text" name="title" placeholder="Özlük düzeltme · yüksek öncelik"></div>
+        <div class="field"><label>Talep tipi</label><select name="request_type" required><option value="bilgi_guncelleme">Bilgi Güncelleme</option><option value="belge_talebi">Belge Talebi</option><option value="ozluk_duzeltme">Özlük Düzeltme</option><option value="gorev_talebi">Görev / Unvan Talebi</option><option value="diger">Diğer</option></select></div>
+        <div class="field"><label>Öncelik</label><select name="priority"><option value="">Tüm öncelikler</option><option value="normal">Normal</option><option value="high">Yüksek</option><option value="critical">Kritik</option></select></div>
+        <div class="field"><label>Hedef gün</label><input type="number" min="1" name="target_days" value="3"></div>
+        <div class="field"><label>İlk yanıt saati</label><input type="number" min="0" name="first_response_hours" value="8"></div>
+        <div class="field"><label>Eskalasyon saati</label><input type="number" min="0" name="escalation_hours" value="24"></div>
+        <div class="field"><label>Sahip rol</label><input type="text" name="owner_role" placeholder="örn. grup_baskani"></div>
+        <div class="field"><label>Not</label><textarea name="note" placeholder="Politika açıklaması veya kurum içi not"></textarea></div>
+        <div class="field"><label>Sıra</label><input type="number" min="0" name="sort_order" value="0"></div>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:800"><input type="checkbox" name="is_active" checked> Aktif</label>
+        <div class="btn-row"><button class="btn-soft primary" type="submit">Politikayı kaydet</button></div>
+      </form>
+    </div>
+
+    <div>
+      <h3 class="section-title">Son eskalasyon görünümü</h3>
+      {% if recent_escalation_rows %}
+      <div class="stack">
+        {% for row in recent_escalation_rows %}
+        <div class="empty" style="background:#fff">
+          <strong>{{ row.request_title }}</strong><br>
+          <span class="muted">{{ row.from_name or '-' }} → {{ row.to_name or '-' }} · Seviye {{ row.level }}</span>
+          <div class="muted" style="margin-top:8px">{{ row.reason }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}<div class="empty">Henüz eskalasyon kaydı görünmüyor.</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 class="section-title">Aktif politika kataloğu</h3>
+    {% if policy_rows %}
+    <div class="table-wrap"><table class="table-clean"><thead><tr><th>Kod</th><th>Tip</th><th>Öncelik</th><th>Hedef</th><th>İlk yanıt</th><th>Eskalasyon</th><th>Sahip</th><th>Durum</th></tr></thead><tbody>
+      {% for row in policy_rows %}
+      <tr>
+        <td><strong>{{ row.code }}</strong><br><span class="muted">{{ row.title }}</span></td>
+        <td>{{ row.request_type_label }}</td>
+        <td>{{ row.priority_label }}</td>
+        <td>{{ row.target_days }} gün</td>
+        <td>{{ row.first_response_hours or '-' }} saat</td>
+        <td>{{ row.escalation_hours or '-' }} saat</td>
+        <td>{{ row.owner_role }}</td>
+        <td><span class="pill {{ 'good' if row.is_active else 'soft' }}">{{ 'Aktif' if row.is_active else 'Pasif' }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty">Henüz tanımlı SLA politikası bulunmuyor.</div>{% endif %}
+  </div>
+</div>
+{% endblock %}

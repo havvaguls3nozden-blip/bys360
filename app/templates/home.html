@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Anasayfa - BYS360{% endblock %}
+{% block page_kicker %}BYS360{% endblock %}
+{% block page_title %}Gün Özeti{% endblock %}
+{% block page_subtitle %}Hava durumu, görevler, bildirimler ve günlük iş akışı tek ekranda.{% endblock %}
+{% block extra_head %}
+<!-- BYS360_PORTAL_EXPERIENCE_V3A_PRESS_NEWS_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v3a_press_news.css') }}?v=3a">
+<!-- /BYS360_PORTAL_EXPERIENCE_V3A_PRESS_NEWS_CSS -->
+
+<!-- BYS360_PORTAL_EXPERIENCE_V2_HOME_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v2.css') }}?v=2">
+<!-- /BYS360_PORTAL_EXPERIENCE_V2_HOME_CSS -->
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_home_festival_portal_v2_5.css') }}?v=home-festival-portal-v2-5-1">
+{# BYS360_HOME_FESTIVAL_PORTAL_V2_5_1_CSS #}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_home_weather.css') }}?v=home-weather-executive-v3">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/announcement_popup.css') }}?v=home-announcement-popup-fix">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz12.css') }}?v=home-karar-destek-karti-v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=corporate-portal-v1">
+{# BYS360_CORPORATE_PORTAL_V1_HOME_CSS #}
+
+<!-- BYS360_PORTAL_EXPERIENCE_V1_HOME_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal_experience_v1.css') }}?v=1">
+<!-- /BYS360_PORTAL_EXPERIENCE_V1_HOME_CSS -->
+{% endblock %}
+{% block content %}
+{# BYS360_PORTAL_PRESS_NEWS_HOME_HERO_CLEANUP_HOTFIX_V4_APPLIED #}
+{% set weather = home_weather if home_weather is defined and home_weather else {} %}
+{% set summary = home_summary if home_summary is defined and home_summary else {} %}
+{% set recs = weather.recommendations if weather.recommendations is defined else [] %}
+{% set primary_rec = recs[0] if recs else none %}
+
+<div class="home-faz1-shell">
+  <section class="home-faz1-hero">
+    <div class="home-faz1-hero-main">
+      <div class="home-faz1-kicker"><i class="fa-solid fa-location-dot"></i> {{ weather.location_name|default('Gelibolu Tarihi Alan', true) }}</div>
+      <h1>Gün Özeti</h1>
+      <p>
+        Hava durumu, görevler, bildirimler ve günlük iş akışı tek ekranda özetlenir.
+      </p>
+      <div class="home-faz1-actions">
+        <a href="{{ safe_url_for('main.performance_tasks', fallback='#') }}" class="home-faz1-btn primary"><i class="fa-solid fa-list-check"></i> Görevlerime Git</a>
+        <a href="{{ safe_url_for('main.dashboard', fallback='#') }}" class="home-faz1-btn"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="{{ safe_url_for('main.support_index', fallback='#') }}" class="home-faz1-btn"><i class="fa-solid fa-circle-info"></i> Yardım Merkezi</a>
+      </div>
+      {# BYS360_PORTAL_EXPERIENCE_V3A_HOME_HERO_PRESS_NEWS_DISABLED_BY_V4: Basında Tarihi Alan ana sayfa hero alanından kaldırıldı. #}
+    </div>
+
+    <aside class="home-faz1-weather-card home-weather-executive is-{{ weather.status|default('fallback', true) }}">
+      <div class="home-weather-glow glow-one"></div>
+      <div class="home-weather-glow glow-two"></div>
+      <div class="home-weather-header">
+        <div>
+          <span class="home-faz1-card-label"><i class="fa-solid fa-location-dot"></i> {{ weather.location_name|default('Gelibolu Tarihi Alan', true) }}</span>
+          <h2>Günlük Saha Hava Paneli</h2>
+        </div>
+        <span class="home-weather-status">
+          <i class="fa-solid {% if weather.status == 'live' %}fa-signal{% elif weather.status == 'disabled' %}fa-pause{% else %}fa-shield-halved{% endif %}"></i>
+          {{ weather.source_label|default('Güvenli mod', true) }}
+        </span>
+      </div>
+
+      <div class="home-weather-visual-row">
+        <div class="home-weather-orb" aria-hidden="true">
+          <i class="fa-solid {% if weather.weather_code in [0, 1] %}fa-sun{% elif weather.weather_code in [45, 48] %}fa-smog{% elif weather.weather_code in [51, 53, 55, 61, 63, 65, 80, 81, 82] %}fa-cloud-rain{% elif weather.weather_code in [71, 73, 75] %}fa-snowflake{% elif weather.weather_code in [95, 96, 99] %}fa-cloud-bolt{% else %}fa-cloud-sun{% endif %}"></i>
+        </div>
+        <div class="home-weather-main-value">
+          {% if weather.temperature is not none and weather.temperature is defined %}
+            <strong>{{ weather.temperature|round(0)|int }}°</strong>
+          {% else %}
+            <strong>—</strong>
+          {% endif %}
+          <div>
+            <b>{{ weather.weather_label|default('Tahmin alınıyor', true) }}</b>
+            <span>
+              {% if weather.daily_min is not none and weather.daily_min is defined and weather.daily_max is not none and weather.daily_max is defined %}
+                Günlük aralık {{ weather.daily_min|round(0)|int }}° / {{ weather.daily_max|round(0)|int }}°
+              {% else %}
+                Günlük aralık bekleniyor
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-weather-metrics">
+        <div>
+          <i class="fa-solid fa-wind"></i>
+          <span>Rüzgâr</span>
+          <b>{% if weather.wind_speed is not none and weather.wind_speed is defined %}{{ weather.wind_speed|round(0)|int }} km/sa{% else %}—{% endif %}</b>
+        </div>
+        <div>
+          <i class="fa-solid fa-cloud-rain"></i>
+          <span>Yağış</span>
+          <b>{% if weather.rain_probability is not none and weather.rain_probability is defined %}%{{ weather.rain_probability|round(0)|int }}{% else %}—{% endif %}</b>
+        </div>
+        <div>
+          <i class="fa-solid fa-temperature-half"></i>
+          <span>Hissedilen</span>
+          <b>{% if weather.apparent_temperature is not none and weather.apparent_temperature is defined %}{{ weather.apparent_temperature|round(0)|int }}°C{% else %}—{% endif %}</b>
+        </div>
+        <div>
+          <i class="fa-solid fa-droplet"></i>
+          <span>Nem</span>
+          <b>{% if weather.humidity is not none and weather.humidity is defined %}%{{ weather.humidity|round(0)|int }}{% else %}—{% endif %}</b>
+        </div>
+      </div>
+
+      <div class="home-weather-insight">
+        <div class="home-weather-insight-icon">
+          <i class="fa-solid {{ primary_rec.icon if primary_rec else 'fa-shield-halved' }}"></i>
+        </div>
+        <div>
+          <span>Karar destek notu</span>
+          <p>{{ primary_rec.title if primary_rec else (weather.message|default('Hava durumuna göre günlük saha notu hazırlanıyor.', true)) }}</p>
+        </div>
+      </div>
+
+      <div class="home-weather-footer">
+        <span><i class="fa-regular fa-clock"></i> Güncelleme: {{ weather.updated_at|default('anlık', true) }}</span>
+        {% if weather.message %}<span class="home-weather-soft-alert">{{ weather.message }}</span>{% endif %}
+      </div>
+    </aside>
+  </section>
+
+  <section class="home-faz1-quick-grid">
+    {% for item in home_quick_actions %}
+    <a href="{{ safe_url_for(item.endpoint, fallback='#') }}" class="home-faz1-quick-card tone-{{ item.tone }}">
+      <i class="fa-solid {{ item.icon }}"></i>
+      <div><span>{{ item.label }}</span><strong>{{ item.value }}</strong><small>{{ item.note }}</small></div>
+    </a>
+    {% endfor %}
+  </section>
+
+  {# BYS360_PORTAL_EXPERIENCE_V1_HOME_INCLUDE #}
+  {% include 'portal/_experience_dashboard.html' ignore missing %}
+
+  {# BYS360_PORTAL_EXPERIENCE_V2_HOME_INCLUDE #}
+  {% include 'portal/_experience_v2_hub.html' ignore missing %}
+
+  {# BYS360_CORPORATE_PORTAL_V1_HOME_FEED #}
+  {% include 'portal/_home_feed.html' ignore missing %}
+
+  <section class="home-faz1-two-col">
+    <div class="home-faz1-panel">
+      <div class="home-faz1-section-head">
+        <div>
+          <span class="home-faz1-card-label">Tarihi Alan önerileri</span>
+          <h2>Hava koşuluna göre günlük dikkat noktaları</h2>
+        </div>
+        <span class="home-faz1-pill"><i class="fa-solid fa-shield-halved"></i> Karar destek</span>
+      </div>
+      <div class="home-faz1-recs">
+        {% for rec in recs %}
+        <article class="home-faz1-rec level-{{ rec.level }}">
+          <i class="fa-solid {{ rec.icon }}"></i>
+          <div><b>{{ rec.title }}</b><p>{{ rec.text }}</p></div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="home-faz1-panel">
+      <div class="home-faz1-section-head">
+        <div>
+          <span class="home-faz1-card-label">Günlük operasyon</span>
+          <h2>Canlı omurga hızlı özeti</h2>
+        </div>
+        <span class="home-faz1-pill"><i class="fa-solid fa-calendar-day"></i> {{ summary.today_label|default('', true) }}</span>
+      </div>
+      <div class="home-faz1-op-list">
+        {% for card in home_operational_cards %}
+        <a href="{{ safe_url_for(card.endpoint, fallback='#') }}" class="home-faz1-op-card">
+          <i class="fa-solid {{ card.icon }}"></i>
+          <div><b>{{ card.title }}</b><p>{{ card.text }}</p></div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="home-faz1-status-band">
+    <div>
+      <span>Aktif dönem</span>
+      <strong>{{ summary.active_period.title if summary.active_period else 'Aktif dönem tanımlı değil' }}</strong>
+    </div>
+    <div>
+      <span>Geciken görev</span>
+      <strong>{{ summary.overdue_tasks|default(0, true) }}</strong>
+    </div>
+    <div>
+      <span>Aktif vekâlet</span>
+      <strong>{{ summary.active_delegations|default(0, true) }}</strong>
+    </div>
+    <div>
+      <span>Personel kapsamı</span>
+      <strong>{{ summary.user_count|default(0, true) if summary.user_count else 'Yetkili görünüm' }}</strong>
+    </div>
+  </section>
+
+  <section class="home-faz1-ai-decision-wrap" aria-label="Karar Destek Merkezi ana sayfa kartı">
+    {% include 'ai_decision/_final_gate_panel.html' ignore missing %}
+  </section>
+
+</div>
+{% include "communication/_announcement_popup_runtime.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/bys360_home_festival_portal_v2_5.js') }}?v=home-festival-portal-v2-5-1"></script>
+{# BYS360_HOME_FESTIVAL_PORTAL_V2_5_1_JS #}
+
+<script src="{{ url_for('static', filename='js/announcement_popup.js') }}?v=home-announcement-popup-fix"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ category.title }} - Yardım Merkezi{% endblock %}
+{% block page_kicker %}Yardım Merkezi{% endblock %}
+{% block page_title %}{{ category.title }}{% endblock %}
+{% block page_subtitle %}{{ category.description }}{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_support_learning.css') }}">
+<div class="support-learning-shell">
+  {% set current_view_key = 'support_index' %}
+  {% include 'support/_tabs.html' %}
+  <section class="support-hero" style="grid-template-columns:1fr 260px;">
+    <div>
+      <span class="support-kicker"><i class="{{ category.icon }}"></i> Modül Rehber Paketi</span>
+      <h2 class="support-title">{{ category.title }}</h2>
+      <p class="support-text">{{ category.description }}</p>
+      {% if category.learning_goal %}<div class="support-goal"><strong>Öğrenme hedefi:</strong> {{ category.learning_goal }}</div>{% endif %}
+    </div>
+    <div class="support-note"><h4>Kapsam</h4><p>{{ category.article_count }} rehber · {{ category.coverage_level }} seviye</p></div>
+  </section>
+  <section class="support-panel">
+    <div class="support-section-head"><div><h3 class="support-section-title">Rehberler</h3><p class="support-section-text">Bu modüldeki öğretici içerikler.</p></div></div>
+    {% if category.articles %}
+    <div class="support-article-list" style="margin-top:16px;">
+      {% for article in category.articles %}
+      <a class="support-article-card" href="{{ url_for('main.support_help_article', article_slug=article.slug) }}">
+        <div><h4 class="support-article-title">{{ article.title }}</h4><p class="support-article-summary">{{ article.summary }}</p><div class="support-meta">{% for tag in article.tags[:4] %}<span class="support-badge">{{ tag }}</span>{% endfor %}</div></div>
+        <span class="support-badge">İncele</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}<div class="support-empty" style="margin-top:16px;">Bu paket için henüz rehber bulunmuyor.</div>{% endif %}
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/bys360_support_learning.js') }}"></script>
+{% endblock %}

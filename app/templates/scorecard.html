@@ -1,0 +1,831 @@
+{% extends "base.html" %}
+
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{% block title %}Not Karnesi - BYS360{% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Not Karnesi{% endblock %}
+{% block page_subtitle %}
+Yayımlanan sonuçlar personele açık görünür. Yetkili kullanıcılar, yayımlanmamış ama tamamlanmış karneleri iç kullanım önizlemesi olarak da inceleyebilir.
+{% endblock %}
+
+{% block body_class %}
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+page-performance-scorecard{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz2_performance_mobile.css') }}">
+{% endblock %}
+
+{% block content %}
+<style>
+    .scorecard-shell{display:grid;gap:18px}
+    .scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+    .scope-title{color:#111827;font-size:.92rem;font-weight:900}
+    .scope-sub{color:#6b7280;font-size:.82rem;line-height:1.7}
+
+    .glass-card{
+        position:relative;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+        overflow:hidden;
+    }
+
+    .panel-card{padding:22px; position:relative; z-index:1;}
+
+    .hero-card{
+        display:grid;
+        gap:10px;
+    }
+
+    .hero-title{
+        color:#111827;
+        font-size:1.12rem;
+        font-weight:900;
+        line-height:1.35;
+        margin:0;
+    }
+
+    .hero-sub{
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+        margin:0;
+    }
+
+    .toolbar-grid{
+        display:grid;
+        grid-template-columns:1fr auto auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .form-help{
+        color:#6b7280;
+        font-size:.8rem;
+        line-height:1.7;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px);}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.95rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .view-switch{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+    }
+
+    .view-switch-label{
+        color:#374151;
+        font-size:.88rem;
+        font-weight:800;
+    }
+
+    .switch-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:42px;
+        padding:0 14px;
+        border-radius:12px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        color:#374151;
+        font-size:.84rem;
+        font-weight:800;
+        cursor:pointer;
+        transition:all .18s ease;
+    }
+
+    .switch-btn.active{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        border-color:#8B0000;
+        box-shadow:0 10px 20px rgba(139,0,0,.14);
+    }
+
+    .card-list{
+        display:grid;
+        gap:16px;
+    }
+
+    .score-card{
+        overflow:hidden;
+    }
+
+    .score-header{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:14px;
+        flex-wrap:wrap;
+        padding:22px 22px 16px 22px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.015));
+    }
+
+    .score-title{
+        color:#111827;
+        font-size:1.06rem;
+        font-weight:900;
+        line-height:1.45;
+        margin-bottom:4px;
+    }
+
+    .score-sub{
+        color:#6b7280;
+        font-size:.88rem;
+        line-height:1.7;
+    }
+
+    .header-actions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+    }
+
+    .final-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:46px;
+        padding:0 16px;
+        border-radius:16px;
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        font-size:1rem;
+        font-weight:900;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .totals-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:12px;
+        padding:18px 22px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+    }
+
+    .mini-total{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .mini-total-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .mini-total-value{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+        line-height:1.4;
+    }
+
+    .detail-wrap{
+        padding:18px 22px 22px 22px;
+        display:grid;
+        gap:14px;
+    }
+
+    .detail-top{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .detail-title{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+    }
+
+    .amir-layout{
+        display:grid;
+        gap:14px;
+    }
+
+    .layout-horizontal .amir-layout{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+
+    .layout-vertical .amir-layout{
+        grid-template-columns:1fr;
+    }
+
+    .amir-panel{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:22px;
+        background:#fff;
+        overflow:hidden;
+        min-width:0;
+    }
+
+    .amir-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+        padding:14px 16px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+    }
+
+    .amir-head-left{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        min-width:0;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.level1{background:rgba(139,0,0,.10);color:#8B0000;}
+    .pill.level2{background:rgba(29,78,216,.10);color:#1d4ed8;}
+    .pill.level3{background:rgba(107,114,128,.12);color:#374151;}
+    .pill.published{background:rgba(22,101,52,.10);color:#166534;}
+    .pill.internal{background:rgba(180,83,9,.10);color:#92400e;}
+    .pill.locked{background:rgba(107,114,128,.12);color:#374151;}
+
+    .amir-score{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:36px;
+        padding:0 12px;
+        border-radius:999px;
+        background:rgba(15,23,42,.08);
+        color:#111827;
+        font-size:.84rem;
+        font-weight:900;
+    }
+
+    .amir-body{
+        padding:14px 16px 16px 16px;
+        display:grid;
+        gap:14px;
+    }
+
+    .table-wrap{
+        overflow:auto;
+    }
+
+    table{
+        width:100%;
+        min-width:760px;
+        border-collapse:collapse;
+    }
+
+    th,td{
+        padding:10px 8px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        text-align:left;
+        vertical-align:top;
+    }
+
+    th{
+        font-size:.78rem;
+        color:#6b7280;
+        text-transform:uppercase;
+        letter-spacing:.25px;
+    }
+
+    td{
+        font-size:.88rem;
+        color:#111827;
+        line-height:1.65;
+    }
+
+    .score-pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:28px;
+        padding:0 10px;
+        border-radius:999px;
+        background:rgba(15,23,42,.08);
+        color:#111827;
+        font-size:.78rem;
+        font-weight:900;
+    }
+
+    .comment-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:16px;
+        padding:14px;
+    }
+
+    .comment-title{
+        color:#111827;
+        font-size:.84rem;
+        font-weight:900;
+        margin-bottom:8px;
+    }
+
+    .comment-text{
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.8;
+        white-space:pre-wrap;
+        word-break:break-word;
+    }
+
+    .empty-box{
+        padding:26px 20px;
+        border-radius:18px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        color:#6b7280;
+        text-align:center;
+        line-height:1.9;
+    }
+
+    @media (max-width:1400px){
+        .layout-horizontal .amir-layout{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media (max-width:900px){
+        .toolbar-grid{grid-template-columns:1fr 1fr;}
+        .stats-grid{grid-template-columns:1fr 1fr;}
+        .totals-grid{grid-template-columns:1fr 1fr;}
+    }
+
+    @media (max-width:700px){
+        .toolbar-grid,
+        .stats-grid,
+        .totals-grid{grid-template-columns:1fr;}
+    }
+</style>
+
+<div class="scorecard-shell" id="scorecardRoot">
+    <div class="glass-card panel-card">
+        <div class="hero-card">
+            <h3 class="hero-title">Performans Not Karnesi</h3>
+            <p class="hero-sub">
+                Yayımlanan değerlendirmeleri amir bazlı inceleyebilirsiniz. Görünümü yan yana veya alt alta olacak şekilde değiştirebilirsiniz.
+            </p>
+            <div class="scope-strip" style="margin-top:16px;">
+                <div>
+                    <div class="scope-title">{{ scope_role_title or 'Karne Görünümü' }} · {{ scope_label or 'Kurum geneli' }}</div>
+                    <div class="scope-sub">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim üzerinden yayımlanmış kartlar listeleniyor.</div>
+                </div>
+                <span class="pill info">{{ stats.total_card_count or 0 }} karne</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Yayımlanan Karne</div>
+            <div class="stat-value">{{ stats.total_card_count or 0 }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Ortalama Nihai Puan</div>
+            <div class="stat-value">{{ "%.2f"|format(stats.avg_score or 0) }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">En Yüksek Nihai Puan</div>
+            <div class="stat-value">{{ "%.2f"|format(stats.max_score or 0) }}</div>
+        </div>
+    </div>
+
+    <div class="glass-card panel-card">
+        <form method="GET" action="{{ url_for('main.performance_scorecard') }}">
+            <div class="toolbar-grid">
+                {% if scope_options and scope_options|length > 1 %}
+                <div class="form-group">
+                    <label>Karne Görünümü</label>
+                    <select name="scope" class="form-select">
+                        {% for value, label in scope_option_pairs or [] %}
+                            <option value="{{ value }}" {% if selected_scope == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-help">Bu seçim, not karnesinde hangi personel ve birimlerin görüntüleneceğini belirler.</div>
+                </div>
+                {% else %}
+                    <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label>Dönem</label>
+                    <select name="period_id" class="form-select">
+                        <option value="">Tüm Dönemler</option>
+                        {% for period in periods %}
+                            <option value="{{ period.id }}" {% if selected_period_id == period.id %}selected{% endif %}>{{ period.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrele
+                </button>
+
+                <a href="{{ url_for('main.performance_scorecard', scope=selected_scope) }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Temizle
+                </a>
+
+                <div class="view-switch">
+                    <span class="view-switch-label">Görünüm:</span>
+                    <button type="button" class="switch-btn active" id="horizontalBtn">
+                        <i class="fa-solid fa-table-columns"></i>
+                        Yan Yana
+                    </button>
+                    <button type="button" class="switch-btn" id="verticalBtn">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                        Alt Alta
+                    </button>
+                </div>
+            </div>
+        </form>
+        {% if stats.visible_internal_preview_count %}
+            <div class="form-help" style="margin-top:12px;">
+                Bu görünümde <strong>{{ stats.visible_internal_preview_count }}</strong> karne henüz personele açılmamış olsa da yetkili kullanıcılar için iç kullanım önizlemesi olarak gösteriliyor.
+            </div>
+        {% endif %}
+    </div>
+
+    {% if scorecard_rows %}
+        <div class="card-list layout-horizontal" id="layoutContainer">
+            {% for row in scorecard_rows %}
+                {% set evaluation = row.evaluation %}
+                <div class="glass-card score-card">
+                    <div class="score-header">
+                        <div>
+                            <div class="score-title">{{ evaluation.period.title if evaluation.period else '-' }}</div>
+                            {% if selected_scope != 'mine' %}<div class="score-sub" style="margin-bottom:6px;"><strong>{{ row.employee_name or 'Personel' }}</strong> · {{ row.employee_unit or '-' }}</div>{% endif %}
+                            <div class="score-sub" style="margin-bottom:8px;">
+                                <span class="pill {{ row.visibility.publish_badge_class or 'locked' }}">{{ row.visibility.publish_label or 'Kapalı' }}</span>
+                            </div>
+                            <div class="score-sub">
+                                Durum: {{ evaluation.status or '-' }}<br>
+                                Yayın Tarihi:
+                                {% if evaluation.published_at %}
+                                    {{ evaluation.published_at.strftime('%d.%m.%Y %H:%M') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                                {% if row.visibility.reason %}<br>{{ row.visibility.reason }}{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="header-actions">
+                            <a href="{{ url_for('main.performance_scorecard_pdf', evaluation_id=evaluation.id, scope=selected_scope, period_id=selected_period_id) }}"
+                               class="btn-soft secondary"
+                               target="_blank">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                {% if row.visibility.can_view_unpublished %}İç Önizleme PDF{% else %}PDF / Yazdır{% endif %}
+                            </a>
+
+                            <div class="final-badge">
+                                Nihai: {{ "%.2f"|format(evaluation.final_total_100 or 0) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="totals-grid">
+                        <div class="mini-total">
+                            <div class="mini-total-label">1. Amir</div>
+                            <div class="mini-total-value">{{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</div>
+                        </div>
+                        <div class="mini-total">
+                            <div class="mini-total-label">2. Amir</div>
+                            <div class="mini-total-value">{{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</div>
+                        </div>
+                        <div class="mini-total">
+                            <div class="mini-total-label">3. Amir</div>
+                            <div class="mini-total-value">{{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</div>
+                        </div>
+                        <div class="mini-total">
+                            <div class="mini-total-label">Resmi Sonuç</div>
+                            <div class="mini-total-value">{{ "%.2f"|format(evaluation.final_total_100 or 0) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-wrap">
+                        <div class="detail-top">
+                            <div class="detail-title">Amir Bazlı Detay Görünümü</div>
+                        </div>
+
+                        <div class="amir-layout">
+                            {% if row.level_1_items %}
+                                <div class="amir-panel">
+                                    <div class="amir-head">
+                                        <div class="amir-head-left">
+                                            <span class="pill level1">1. Amir</span>
+                                        </div>
+                                        <span class="amir-score">{{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</span>
+                                    </div>
+
+                                    <div class="amir-body">
+                                        <div class="table-wrap">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Kriter</th>
+                                                        <th>Ağırlık</th>
+                                                        <th>Puan</th>
+                                                        <th>100'lük</th>
+                                                        <th>Yorum / Gerekçe</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for item in row.level_1_items %}
+                                                        <tr>
+                                                            <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                                            <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                                            <td><span class="score-pill">{{ item.score }}</span></td>
+                                                            <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                                            <td>{{ item.comment or '-' }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="comment-box">
+                                            <div class="comment-title">1. Amir Genel Yorumu</div>
+                                            <div class="comment-text">{{ row.level_1_comment or 'Genel yorum girilmedi.' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if row.level_2_items %}
+                                <div class="amir-panel">
+                                    <div class="amir-head">
+                                        <div class="amir-head-left">
+                                            <span class="pill level2">2. Amir</span>
+                                        </div>
+                                        <span class="amir-score">{{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</span>
+                                    </div>
+
+                                    <div class="amir-body">
+                                        <div class="table-wrap">
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Kriter</th>
+                                                        <th>Ağırlık</th>
+                                                        <th>Puan</th>
+                                                        <th>100'lük</th>
+                                                        <th>Yorum / Gerekçe</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for item in row.level_2_items %}
+                                                        <tr>
+                                                            <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                                            <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                                            <td><span class="score-pill">{{ item.score }}</span></td>
+                                                            <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                                            <td>{{ item.comment or '-' }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="comment-box">
+                                            <div class="comment-title">2. Amir Genel Yorumu</div>
+                                            <div class="comment-text">{{ row.level_2_comment or 'Genel yorum girilmedi.' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if row.level_3_items or row.level_3_comment %}
+                                <div class="amir-panel">
+                                    <div class="amir-head">
+                                        <div class="amir-head-left">
+                                            <span class="pill level3">3. Amir</span>
+                                        </div>
+                                        <span class="amir-score">{{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</span>
+                                    </div>
+
+                                    <div class="amir-body">
+                                        {% if row.level_3_items %}
+                                            <div class="table-wrap">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Kriter</th>
+                                                            <th>Ağırlık</th>
+                                                            <th>Puan</th>
+                                                            <th>100'lük</th>
+                                                            <th>Yorum / Gerekçe</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for item in row.level_3_items %}
+                                                            <tr>
+                                                                <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                                                <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                                                <td><span class="score-pill">{{ item.score }}</span></td>
+                                                                <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                                                <td>{{ item.comment or '-' }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="comment-box">
+                                            <div class="comment-title">3. Amir Genel Yorumu</div>
+                                            <div class="comment-text">{{ row.level_3_comment or 'Genel yorum girilmedi.' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass-card panel-card">
+            <div class="empty-box">
+                Görüntülenebilir not karnesi bulunmuyor.<br>
+                {% if stats.hidden_publish_lock_count %}
+                    {{ stats.hidden_publish_lock_count }} kayıt Personel yayın kilidinde bekliyor.
+                {% elif stats.hidden_incomplete_count %}
+                    {{ stats.hidden_incomplete_count }} kayıt henüz tamamlanmadığı için görünmüyor.
+                {% else %}
+                    Sonuçlar bu ekranda amir bazlı detaylarıyla birlikte görüntülenecektir.
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const container = document.getElementById("layoutContainer");
+    const horizontalBtn = document.getElementById("horizontalBtn");
+    const verticalBtn = document.getElementById("verticalBtn");
+
+    if (!container || !horizontalBtn || !verticalBtn) return;
+
+    function setLayout(mode) {
+        if (mode === "vertical") {
+            container.classList.remove("layout-horizontal");
+            container.classList.add("layout-vertical");
+            horizontalBtn.classList.remove("active");
+            verticalBtn.classList.add("active");
+            localStorage.setItem("scorecardLayoutMode", "vertical");
+        } else {
+            container.classList.remove("layout-vertical");
+            container.classList.add("layout-horizontal");
+            verticalBtn.classList.remove("active");
+            horizontalBtn.classList.add("active");
+            localStorage.setItem("scorecardLayoutMode", "horizontal");
+        }
+    }
+
+    horizontalBtn.addEventListener("click", function () {
+        setLayout("horizontal");
+    });
+
+    verticalBtn.addEventListener("click", function () {
+        setLayout("vertical");
+    });
+
+    const savedMode = localStorage.getItem("scorecardLayoutMode");
+    if (savedMode === "vertical") {
+        setLayout("vertical");
+    } else {
+        setLayout("horizontal");
+    }
+})();
+</script>
+{% endblock %}
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

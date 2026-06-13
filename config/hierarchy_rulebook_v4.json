@@ -1,0 +1,60 @@
+{
+  "president": {
+    "evaluators": []
+  },
+  "vice_president": {
+    "manager_1": "president"
+  },
+  "group_head": {
+    "manager_1": "president",
+    "manager_2": "vice_president",
+    "flow_order": [
+      2,
+      1
+    ]
+  },
+  "hukuk_chief": {
+    "manager_1": "president",
+    "manager_2": "vice_president",
+    "flow_order": [
+      2,
+      1
+    ]
+  },
+  "direct_to_president_units": [
+    "danismanlik",
+    "ozel kalem",
+    "ic denetim"
+  ],
+  "coordinator": {
+    "manager_1": "vice_president",
+    "manager_2": "group_head",
+    "flow_order": [
+      2,
+      1
+    ]
+  },
+  "hukuk_staff": {
+    "manager_1": "hukuk_chief",
+    "flow_order": [
+      1
+    ]
+  },
+  "general_staff": {
+    "manager_1": "group_head",
+    "manager_2": "coordinator",
+    "flow_order": [
+      2,
+      1
+    ]
+  },
+  "level_3": {
+    "optional": true,
+    "selection": "any_active_non_admin_person",
+    "modes": [
+      "comment_only",
+      "comment_and_score"
+    ],
+    "default_mode": "comment_only"
+  }
+}

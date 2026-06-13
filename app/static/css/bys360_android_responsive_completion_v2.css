@@ -1,0 +1,481 @@
+/* BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_CSS_BEGIN
+   Android / Chrome / WebView güçlü responsive tamamlama katmanı.
+   V1 genel kaldığı için V2 daha sert davranır: JS sınıfı olmasa bile dar ekranda merkezi tek kolon, tablo-kart ve taşma koruması uygular.
+*/
+
+:root{
+  --bys360-android-v2-red:#8B0000;
+  --bys360-android-v2-bg:#f6f7fb;
+  --bys360-android-v2-card:#ffffff;
+  --bys360-android-v2-border:rgba(15,23,42,.10);
+  --bys360-android-v2-shadow:0 12px 30px rgba(15,23,42,.08);
+  --bys360-android-v2-radius:18px;
+}
+
+html.bys360-android-responsive-v2,
+html.bys360-android-responsive-v2 body,
+body.bys360-android-responsive-v2{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  overflow-x:hidden !important;
+  -webkit-text-size-adjust:100% !important;
+  text-size-adjust:100% !important;
+  touch-action:manipulation;
+  background-attachment:scroll !important;
+}
+
+html.bys360-android-responsive-v2{
+  min-height:100% !important;
+  scroll-padding-top:calc(var(--topbar-h, 58px) + 8px) !important;
+}
+
+body.bys360-android-responsive-v2{
+  min-height:100dvh !important;
+  min-height:calc(var(--bys360-android-v2-vh, 1vh) * 100) !important;
+  background:var(--bys360-android-v2-bg) !important;
+  overscroll-behavior-y:auto !important;
+}
+
+body.bys360-android-responsive-v2 *,
+body.bys360-android-responsive-v2 *::before,
+body.bys360-android-responsive-v2 *::after{
+  box-sizing:border-box !important;
+  min-width:0;
+}
+
+body.bys360-android-responsive-v2 img,
+body.bys360-android-responsive-v2 svg,
+body.bys360-android-responsive-v2 video,
+body.bys360-android-responsive-v2 canvas,
+body.bys360-android-responsive-v2 iframe,
+body.bys360-android-responsive-v2 object,
+body.bys360-android-responsive-v2 embed{
+  max-width:100% !important;
+}
+body.bys360-android-responsive-v2 img,
+body.bys360-android-responsive-v2 video,
+body.bys360-android-responsive-v2 canvas{height:auto !important;}
+
+body.bys360-android-responsive-v2 input,
+body.bys360-android-responsive-v2 select,
+body.bys360-android-responsive-v2 textarea,
+body.bys360-android-responsive-v2 button{
+  max-width:100% !important;
+  font-size:16px !important;
+}
+body.bys360-android-responsive-v2 textarea{min-height:96px;resize:vertical;}
+body.bys360-android-responsive-v2 pre,
+body.bys360-android-responsive-v2 code{white-space:pre-wrap !important;word-break:break-word !important;}
+body.bys360-android-responsive-v2 [style*="min-width"],
+body.bys360-android-responsive-v2 [style*="width"]{max-width:100% !important;}
+body.bys360-android-responsive-v2 .bys360-android-v2-fit{width:100% !important;max-width:100% !important;min-width:0 !important;overflow-x:hidden !important;}
+body.bys360-android-responsive-v2 .bys360-android-v2-scroll-x{max-width:100% !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch !important;}
+
+@media (max-width:1180px), (pointer:coarse){
+  html.bys360-android-responsive-v2 .app-main,
+  body.bys360-android-responsive-v2 .app-main,
+  body.bys360-android-responsive-v2 #appMain,
+  body.bys360-android-responsive-v2 main{
+    margin-left:0 !important;
+    width:100% !important;
+    max-width:100vw !important;
+    min-width:0 !important;
+  }
+
+  body.bys360-android-responsive-v2 .app-sidebar,
+  body.bys360-android-responsive-v2 #appSidebar,
+  body.bys360-android-responsive-v2 #sidebar,
+  body.bys360-android-responsive-v2 .sidebar{
+    width:min(90vw, 318px) !important;
+    max-width:min(90vw, 318px) !important;
+    top:var(--topbar-h, 58px) !important;
+    height:calc((var(--bys360-android-v2-vh, 1vh) * 100) - var(--topbar-h, 58px)) !important;
+    max-height:calc((var(--bys360-android-v2-vh, 1vh) * 100) - var(--topbar-h, 58px)) !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  body.bys360-android-responsive-v2 .app-sidebar::before,
+  body.bys360-android-responsive-v2 .app-sidebar::after{
+    top:var(--topbar-h, 58px) !important;
+    height:calc((var(--bys360-android-v2-vh, 1vh) * 100) - var(--topbar-h, 58px)) !important;
+  }
+  body.bys360-android-responsive-v2 .app-sidebar:not(.mobile-open){transform:translateX(-104%) !important;}
+  body.bys360-android-responsive-v2 .app-sidebar.mobile-open{transform:translateX(0) !important;}
+  body.bys360-android-responsive-v2.sidebar-mobile-open{overflow:hidden !important;}
+}
+
+@media (max-width:980px), (pointer:coarse) and (max-device-width:980px){
+  html.bys360-android-responsive-v2,
+  body.bys360-android-responsive-v2{position:relative !important;overflow-x:hidden !important;}
+
+  body.bys360-android-responsive-v2 .app-shell,
+  body.bys360-android-responsive-v2 .app-main,
+  body.bys360-android-responsive-v2 #appMain,
+  body.bys360-android-responsive-v2 .content-wrap,
+  body.bys360-android-responsive-v2 #contentWrap,
+  body.bys360-android-responsive-v2 .content-block,
+  body.bys360-android-responsive-v2 .page-content,
+  body.bys360-android-responsive-v2 .main-content,
+  body.bys360-android-responsive-v2 .page-body,
+  body.bys360-android-responsive-v2 .layout-content,
+  body.bys360-android-responsive-v2 .module-content{
+    width:100% !important;
+    max-width:100vw !important;
+    min-width:0 !important;
+    overflow-x:hidden !important;
+  }
+
+  body.bys360-android-responsive-v2 .topbar,
+  body.bys360-android-responsive-v2 .app-topbar,
+  body.bys360-android-responsive-v2 .navbar,
+  body.bys360-android-responsive-v2 .header,
+  body.bys360-android-responsive-v2 .mobile-header{
+    width:100% !important;
+    max-width:100vw !important;
+    min-width:0 !important;
+    min-height:var(--topbar-h, 58px) !important;
+    padding:8px 10px !important;
+    gap:8px !important;
+    flex-wrap:nowrap !important;
+    overflow:hidden !important;
+  }
+
+  body.bys360-android-responsive-v2 .sidebar-toggle,
+  body.bys360-android-responsive-v2 #sidebarToggle,
+  body.bys360-android-responsive-v2 .mobile-menu-toggle{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:42px !important;
+    min-width:42px !important;
+    height:42px !important;
+    border-radius:14px !important;
+    padding:0 !important;
+    flex:0 0 42px !important;
+  }
+
+  body.bys360-android-responsive-v2 .topbar-brand,
+  body.bys360-android-responsive-v2 .navbar-brand,
+  body.bys360-android-responsive-v2 .brand-area{max-width:104px !important;min-width:0 !important;overflow:hidden !important;}
+  body.bys360-android-responsive-v2 .topbar-brand-logo,
+  body.bys360-android-responsive-v2 .navbar-brand img,
+  body.bys360-android-responsive-v2 .brand-logo{max-width:98px !important;max-height:31px !important;object-fit:contain !important;}
+  body.bys360-android-responsive-v2 .page-title,
+  body.bys360-android-responsive-v2 .topbar-title,
+  body.bys360-android-responsive-v2 .navbar-title,
+  body.bys360-android-responsive-v2 .header-title{
+    max-width:calc(100vw - 205px) !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    font-size:.96rem !important;
+  }
+  body.bys360-android-responsive-v2 .topbar-right .quick-link,
+  body.bys360-android-responsive-v2 .topbar-right .desktop-only,
+  body.bys360-android-responsive-v2 .topbar-right .d-none-mobile,
+  body.bys360-android-responsive-v2 .navbar .quick-link,
+  body.bys360-android-responsive-v2 .navbar .desktop-only{display:none !important;}
+  body.bys360-android-responsive-v2 .user-meta,
+  body.bys360-android-responsive-v2 .user-summary .user-meta{display:none !important;}
+  body.bys360-android-responsive-v2 .user-avatar{width:32px !important;height:32px !important;border-radius:10px !important;}
+  body.bys360-android-responsive-v2 .user-summary{min-height:40px !important;padding:4px 6px !important;}
+
+  body.bys360-android-responsive-v2 .content-wrap,
+  body.bys360-android-responsive-v2 #contentWrap,
+  body.bys360-android-responsive-v2 .page-content,
+  body.bys360-android-responsive-v2 .main-content{
+    padding:12px 12px 24px 12px !important;
+    min-height:calc((var(--bys360-android-v2-vh, 1vh) * 100) - var(--topbar-h, 58px)) !important;
+  }
+
+  body.bys360-android-responsive-v2 .container,
+  body.bys360-android-responsive-v2 .container-fluid,
+  body.bys360-android-responsive-v2 .container-lg,
+  body.bys360-android-responsive-v2 .container-md,
+  body.bys360-android-responsive-v2 .container-sm,
+  body.bys360-android-responsive-v2 .container-xl,
+  body.bys360-android-responsive-v2 .container-xxl{
+    width:100% !important;
+    max-width:100% !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+  body.bys360-android-responsive-v2 .row{margin-left:0 !important;margin-right:0 !important;gap:12px !important;}
+  body.bys360-android-responsive-v2 .row > *,
+  body.bys360-android-responsive-v2 [class*="col-"]{
+    padding-left:0 !important;
+    padding-right:0 !important;
+    max-width:100% !important;
+    flex:0 0 100% !important;
+    width:100% !important;
+  }
+
+  body.bys360-android-responsive-v2 .dashboard-grid,
+  body.bys360-android-responsive-v2 .stats-grid,
+  body.bys360-android-responsive-v2 .metric-grid,
+  body.bys360-android-responsive-v2 .kpi-grid,
+  body.bys360-android-responsive-v2 .ai-grid,
+  body.bys360-android-responsive-v2 .portal-grid,
+  body.bys360-android-responsive-v2 .support-grid,
+  body.bys360-android-responsive-v2 .settings-grid,
+  body.bys360-android-responsive-v2 .performance-grid,
+  body.bys360-android-responsive-v2 .personnel-grid,
+  body.bys360-android-responsive-v2 .survey-grid,
+  body.bys360-android-responsive-v2 .cic-grid,
+  body.bys360-android-responsive-v2 .cards-grid,
+  body.bys360-android-responsive-v2 .summary-grid,
+  body.bys360-android-responsive-v2 .report-grid,
+  body.bys360-android-responsive-v2 .quick-actions-grid,
+  body.bys360-android-responsive-v2 .admin-grid,
+  body.bys360-android-responsive-v2 .bys360-grid,
+  body.bys360-android-responsive-v2 .module-grid,
+  body.bys360-android-responsive-v2 .form-grid,
+  body.bys360-android-responsive-v2 .filter-grid,
+  body.bys360-android-responsive-v2 .period-grid,
+  body.bys360-android-responsive-v2 .scope-grid,
+  body.bys360-android-responsive-v2 .category-grid,
+  body.bys360-android-responsive-v2 .cards-row{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  body.bys360-android-responsive-v2 .card,
+  body.bys360-android-responsive-v2 .panel,
+  body.bys360-android-responsive-v2 .hero,
+  body.bys360-android-responsive-v2 .hero-card,
+  body.bys360-android-responsive-v2 .page-hero,
+  body.bys360-android-responsive-v2 .dashboard-hero,
+  body.bys360-android-responsive-v2 .admin-hero-card,
+  body.bys360-android-responsive-v2 .summary-hero,
+  body.bys360-android-responsive-v2 .info-card,
+  body.bys360-android-responsive-v2 .stat-card,
+  body.bys360-android-responsive-v2 .metric-card,
+  body.bys360-android-responsive-v2 .table-card,
+  body.bys360-android-responsive-v2 .form-card,
+  body.bys360-android-responsive-v2 .approval-card,
+  body.bys360-android-responsive-v2 .timeline-card,
+  body.bys360-android-responsive-v2 .glass-card,
+  body.bys360-android-responsive-v2 .section-card,
+  body.bys360-android-responsive-v2 .bys-card,
+  body.bys360-android-responsive-v2 .bys360-card,
+  body.bys360-android-responsive-v2 .module-card,
+  body.bys360-android-responsive-v2 .feature-card,
+  body.bys360-android-responsive-v2 .status-card{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    border-radius:var(--bys360-android-v2-radius) !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+    overflow:hidden !important;
+  }
+
+  body.bys360-android-responsive-v2 .d-flex,
+  body.bys360-android-responsive-v2 .flex-row,
+  body.bys360-android-responsive-v2 .toolbar,
+  body.bys360-android-responsive-v2 .filter-bar,
+  body.bys360-android-responsive-v2 .action-bar,
+  body.bys360-android-responsive-v2 .button-row,
+  body.bys360-android-responsive-v2 .header-actions,
+  body.bys360-android-responsive-v2 .card-actions,
+  body.bys360-android-responsive-v2 .page-actions,
+  body.bys360-android-responsive-v2 .form-actions,
+  body.bys360-android-responsive-v2 .actions,
+  body.bys360-android-responsive-v2 .tab-actions,
+  body.bys360-android-responsive-v2 .nav-actions{
+    flex-wrap:wrap !important;
+    min-width:0 !important;
+    gap:8px !important;
+  }
+  body.bys360-android-responsive-v2 .toolbar > *,
+  body.bys360-android-responsive-v2 .filter-bar > *,
+  body.bys360-android-responsive-v2 .action-bar > *,
+  body.bys360-android-responsive-v2 .button-row > *,
+  body.bys360-android-responsive-v2 .page-actions > *,
+  body.bys360-android-responsive-v2 .form-actions > *{max-width:100% !important;}
+
+  body.bys360-android-responsive-v2 .btn,
+  body.bys360-android-responsive-v2 button,
+  body.bys360-android-responsive-v2 .action-btn,
+  body.bys360-android-responsive-v2 .btn-bys,
+  body.bys360-android-responsive-v2 .filter-btn{
+    min-height:42px !important;
+    white-space:normal !important;
+  }
+  body.bys360-android-responsive-v2 .page-actions .btn,
+  body.bys360-android-responsive-v2 .form-actions .btn,
+  body.bys360-android-responsive-v2 .action-bar .btn,
+  body.bys360-android-responsive-v2 .button-row .btn{flex:1 1 100% !important;width:100% !important;}
+
+  body.bys360-android-responsive-v2 input[type="text"],
+  body.bys360-android-responsive-v2 input[type="email"],
+  body.bys360-android-responsive-v2 input[type="password"],
+  body.bys360-android-responsive-v2 input[type="search"],
+  body.bys360-android-responsive-v2 input[type="number"],
+  body.bys360-android-responsive-v2 input[type="date"],
+  body.bys360-android-responsive-v2 input[type="datetime-local"],
+  body.bys360-android-responsive-v2 select,
+  body.bys360-android-responsive-v2 textarea,
+  body.bys360-android-responsive-v2 .form-control,
+  body.bys360-android-responsive-v2 .form-select,
+  body.bys360-android-responsive-v2 .select2-container,
+  body.bys360-android-responsive-v2 .choices,
+  body.bys360-android-responsive-v2 .choices__inner{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  body.bys360-android-responsive-v2 label,
+  body.bys360-android-responsive-v2 .form-label,
+  body.bys360-android-responsive-v2 .form-text{max-width:100% !important;white-space:normal !important;word-break:break-word !important;}
+
+  body.bys360-android-responsive-v2 .nav-tabs,
+  body.bys360-android-responsive-v2 .tabs,
+  body.bys360-android-responsive-v2 .tabbar,
+  body.bys360-android-responsive-v2 .pill-tabs,
+  body.bys360-android-responsive-v2 .section-tabs,
+  body.bys360-android-responsive-v2 .subnav{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:4px !important;
+    max-width:100% !important;
+  }
+  body.bys360-android-responsive-v2 .nav-tabs .nav-link,
+  body.bys360-android-responsive-v2 .tabs a,
+  body.bys360-android-responsive-v2 .tabbar a,
+  body.bys360-android-responsive-v2 .pill-tabs a,
+  body.bys360-android-responsive-v2 .section-tabs a,
+  body.bys360-android-responsive-v2 .subnav a{white-space:nowrap !important;flex:0 0 auto !important;}
+
+  body.bys360-android-responsive-v2 .table-responsive,
+  body.bys360-android-responsive-v2 .data-table-wrap,
+  body.bys360-android-responsive-v2 .report-table-wrap,
+  body.bys360-android-responsive-v2 .table-wrap,
+  body.bys360-android-responsive-v2 .android-table-scroll,
+  body.bys360-android-responsive-v2 .bys360-android-v2-table-wrap{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    border-radius:16px !important;
+  }
+
+  body.bys360-android-responsive-v2 table{
+    max-width:100% !important;
+  }
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table{
+    width:100% !important;
+    min-width:0 !important;
+    border-collapse:separate !important;
+    border-spacing:0 10px !important;
+    display:block !important;
+  }
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table thead{display:none !important;}
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table tbody,
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table tr,
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table td{display:block !important;width:100% !important;max-width:100% !important;}
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table tr{
+    border:1px solid var(--bys360-android-v2-border) !important;
+    border-radius:16px !important;
+    background:#fff !important;
+    box-shadow:0 8px 20px rgba(15,23,42,.055) !important;
+    padding:10px 12px !important;
+    margin:0 0 10px !important;
+    overflow:hidden !important;
+  }
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table td{
+    border:0 !important;
+    border-bottom:1px solid rgba(15,23,42,.07) !important;
+    padding:9px 0 !important;
+    text-align:left !important;
+    white-space:normal !important;
+    word-break:break-word !important;
+  }
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table td:last-child{border-bottom:0 !important;}
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table td::before{
+    content:attr(data-bys360-android-v2-label);
+    display:block;
+    margin:0 0 4px;
+    color:#667085;
+    font-size:.72rem;
+    font-weight:900;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+  }
+  body.bys360-android-responsive-v2 table.bys360-android-v2-card-table td[data-bys360-android-v2-label=""]::before{display:none;}
+
+  body.bys360-android-responsive-v2 .modal,
+  body.bys360-android-responsive-v2 .modal-dialog{max-width:100vw !important;}
+  body.bys360-android-responsive-v2 .modal-dialog{margin:8px !important;width:calc(100vw - 16px) !important;}
+  body.bys360-android-responsive-v2 .modal-content,
+  body.bys360-android-responsive-v2 .dropdown-menu,
+  body.bys360-android-responsive-v2 .user-dropdown{
+    max-width:calc(100vw - 20px) !important;
+    max-height:calc((var(--bys360-android-v2-vh, 1vh) * 100) - 20px) !important;
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  body.bys360-android-responsive-v2 .bys360-ai-everywhere-card,
+  body.bys360-android-responsive-v2 .bys360-ai-everywhere-panel,
+  body.bys360-android-responsive-v2 [class*="ai-everywhere"],
+  body.bys360-android-responsive-v2 [class*="assistant"],
+  body.bys360-android-responsive-v2 [id*="assistant"],
+  body.bys360-android-responsive-v2 #bys360-assistant-module-root,
+  body.bys360-android-responsive-v2 #bys360-ai-agent-widget-root{max-width:100vw !important;}
+  body.bys360-android-responsive-v2 .bys360-ai-agent-panel,
+  body.bys360-android-responsive-v2 .bys360-assistant-panel,
+  body.bys360-android-responsive-v2 [data-ai-agent-panel]{
+    position:fixed !important;
+    left:10px !important;
+    right:10px !important;
+    bottom:calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    top:auto !important;
+    width:auto !important;
+    max-width:calc(100vw - 20px) !important;
+    max-height:min(72vh, 620px) !important;
+    border-radius:20px !important;
+    overflow:hidden !important;
+  }
+  body.bys360-android-responsive-v2 .bys360-ai-agent-launcher,
+  body.bys360-android-responsive-v2 .bys360-assistant-launcher,
+  body.bys360-android-responsive-v2 [data-ai-agent-launcher]{
+    right:14px !important;
+    bottom:calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    left:auto !important;
+    top:auto !important;
+  }
+}
+
+/* JS sınıfı gelmeden de Android/dar ekranda koruma. Bu bölüm V1'den farklı olarak body class beklemez. */
+@media (max-width:760px){
+  html, body{max-width:100% !important;overflow-x:hidden !important;}
+  .app-main, #appMain, main{margin-left:0 !important;max-width:100vw !important;width:100% !important;}
+  .content-wrap, #contentWrap, .page-content, .main-content{max-width:100vw !important;width:100% !important;padding-left:12px !important;padding-right:12px !important;overflow-x:hidden !important;}
+  .container, .container-fluid{max-width:100% !important;padding-left:0 !important;padding-right:0 !important;}
+  .row{margin-left:0 !important;margin-right:0 !important;}
+  .row > *, [class*="col-"]{max-width:100% !important;flex:0 0 100% !important;width:100% !important;padding-left:0 !important;padding-right:0 !important;}
+  .dashboard-grid,.stats-grid,.metric-grid,.kpi-grid,.ai-grid,.portal-grid,.support-grid,.settings-grid,.performance-grid,.personnel-grid,.survey-grid,.cic-grid,.cards-grid,.summary-grid,.report-grid,.quick-actions-grid,.admin-grid,.bys360-grid,.module-grid,.form-grid,.filter-grid{grid-template-columns:1fr !important;max-width:100% !important;width:100% !important;}
+  .card,.panel,.hero,.hero-card,.page-hero,.dashboard-hero,.admin-hero-card,.summary-hero,.info-card,.stat-card,.metric-card,.table-card,.form-card,.approval-card,.timeline-card,.glass-card,.section-card,.bys-card,.bys360-card,.module-card{max-width:100% !important;min-width:0 !important;overflow:hidden !important;}
+  .table-responsive,.data-table-wrap,.report-table-wrap,.table-wrap{max-width:100% !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch !important;}
+  input,select,textarea,button{font-size:16px !important;max-width:100% !important;}
+}
+
+/* Çok dar Android cihazlar */
+@media (max-width:430px){
+  body.bys360-android-responsive-v2 .page-title{max-width:calc(100vw - 190px) !important;font-size:.9rem !important;}
+  body.bys360-android-responsive-v2 .content-wrap,
+  body.bys360-android-responsive-v2 #contentWrap{padding-left:10px !important;padding-right:10px !important;}
+  body.bys360-android-responsive-v2 .card,
+  body.bys360-android-responsive-v2 .panel,
+  body.bys360-android-responsive-v2 .hero,
+  body.bys360-android-responsive-v2 .page-hero,
+  body.bys360-android-responsive-v2 .section-card{border-radius:16px !important;padding-left:12px !important;padding-right:12px !important;}
+}
+/* BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_CSS_END */

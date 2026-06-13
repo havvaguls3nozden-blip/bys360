@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Anket Şablonu - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Şablonu Tasarımı{% endblock %}
+{% block page_subtitle %}Bir kez tasarla, tekrar tekrar kullan. Kurumsal anket standardizasyonu bu ekranla başlar.{% endblock %}
+{% block content %}
+<div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4 p-xl-5">
+<form method="post" class="row g-3">
+  <div class="col-xl-8"><label class="form-label fw-bold">Şablon başlığı</label><input type="text" name="title" class="form-control form-control-lg" value="{{ request.form.get('title', template.title if template else '') }}" required></div>
+  <div class="col-xl-4"><label class="form-label fw-bold">Anket türü</label><input type="text" name="survey_type" class="form-control form-control-lg" value="{{ request.form.get('survey_type', template.survey_type if template else 'kurum_ici') }}"></div>
+  <div class="col-12"><label class="form-label fw-bold">Açıklama</label><textarea name="description" class="form-control" rows="3">{{ request.form.get('description', template.description if template else '') }}</textarea></div>
+  <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="is_active" {% if request.form.get('is_active') or (template and template.is_active) or not template %}checked{% endif %}><label class="form-check-label fw-semibold" for="is_active">Şablon aktif olsun</label></div></div>
+
+  <div class="col-12 pt-2">
+    <div class="alert alert-light border rounded-4 mb-0">
+      {% set question_rows = template.questions.order_by('sort_order').all() if template else [] %}
+      {% for i in range(1,6) %}
+      {% set row = question_rows[i-1] if question_rows|length >= i else None %}
+      <div class="row g-2 align-items-start mb-3">
+        <div class="col-xl-5"><input type="text" name="question_text" class="form-control" placeholder="Soru {{ i }}" value="{{ request.form.getlist('question_text')[i-1] if request.form.getlist('question_text')|length >= i else (row.question_text if row else '') }}"></div>
+        <div class="col-xl-3"><select name="question_type" class="form-select">{% set selected_type = request.form.getlist('question_type')[i-1] if request.form.getlist('question_type')|length >= i else (row.question_type if row else 'single_choice') %}{% for value, label in question_type_labels.items() %}<option value="{{ value }}" {% if selected_type==value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="col-xl-2"><select name="question_required" class="form-select">{% set req = request.form.getlist('question_required')[i-1] if request.form.getlist('question_required')|length >= i else ('1' if (row and row.is_required) or not row else '0') %}<option value="1" {% if req=='1' %}selected{% endif %}>Zorunlu</option><option value="0" {% if req=='0' %}selected{% endif %}>Opsiyonel</option></select></div>
+        <div class="col-xl-2"><textarea name="question_options" class="form-control" rows="2" placeholder="Seçenekler&#10;Alt alta">{{ request.form.getlist('question_options')[i-1] if request.form.getlist('question_options')|length >= i else (row.options_text if row else '') }}</textarea></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-12 d-flex flex-wrap gap-2 pt-2"><button type="submit" class="btn btn-danger px-4">Şablonu Kaydet</button><a href="{{ url_for('main.communication_phase2_survey_templates') }}" class="btn btn-outline-secondary px-4">Listeye Dön</a></div>
+</form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% import "communication/_workspace_shell.html" as workspace %}
+{% block title %}Kampanya Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Geri Bildirim{% endblock %}
+{% block page_title %}Kampanya Yönetimi{% endblock %}
+{% block page_subtitle %}Taslak, yayın ve kapanış işlemlerini tek yönetim alanından yönetin.{% endblock %}
+
+{% block content %}
+{{ workspace.styles() }}
+<style>
+  .manage-panel{border:none;border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);background:#fff}
+  .manage-table thead th{font-size:.8rem;text-transform:uppercase;color:#6b7280;border-bottom-color:rgba(15,23,42,.08)}
+  .manage-row{border:1px solid rgba(15,23,42,.06);border-radius:20px;padding:16px;background:#fff}
+</style>
+<div class="cw-shell">
+  {{ workspace.hero(
+      title='Kampanya yönetim merkezi',
+      text='Taslak, yayım ve kapanış kararlarını tek tabloda görün; kurumsal geri bildirim operasyonunu kontrollü yönetin.',
+      icon='fa-solid fa-sliders',
+      kicker='Kurumsal geri bildirim',
+      primary_url=url_for('main.feedback_campaign_new'),
+      primary_label='Yeni Kampanya',
+      secondary_url=url_for('main.feedback_results'),
+      secondary_label='Sonuç Merkezi'
+  ) }}
+  {{ workspace.feedback_nav('admin') }}
+
+  <div class="manage-panel">
+    <div class="cw-panel-body">
+      <div class="table-responsive d-none d-lg-block">
+        <table class="table manage-table align-middle mb-0">
+          <thead><tr><th>Başlık</th><th>Tür</th><th>Durum</th><th>Nabız</th><th>Anonim</th><th class="text-end">İşlem</th></tr></thead>
+          <tbody>
+            {% for campaign in campaigns %}
+            <tr>
+              <td><div style="font-weight:800;color:#111827;">{{ campaign.title }}</div><div class="small text-muted">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div></td>
+              <td><span class="badge rounded-pill text-bg-light border">{{ get_campaign_type_label(campaign) }}</span></td>
+              <td><span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ campaign.status }}</span></td>
+              <td>{% if campaign_includes_pulse(campaign) %}<i class="fa-solid fa-heart-pulse text-danger"></i>{% else %}<i class="fa-solid fa-minus text-muted"></i>{% endif %}</td>
+              <td>{% if campaign.is_anonymous %}<i class="fa-solid fa-user-secret text-dark"></i>{% else %}<i class="fa-solid fa-id-badge text-muted"></i>{% endif %}</td>
+              <td class="text-end">
+                <div style="display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                  {% if campaign.status != 'published' %}<form method="post" action="{{ url_for('main.feedback_campaign_publish', campaign_id=campaign.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-bullhorn"></i>Yayınla</button></form>{% endif %}
+                  {% if campaign.status != 'closed' %}<form method="post" action="{{ url_for('main.feedback_campaign_close', campaign_id=campaign.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-lock"></i>Kapat</button></form>{% endif %}
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-muted">Gösterilecek kampanya bulunmuyor.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-lg-none">
+        {% for campaign in campaigns %}
+        <div class="manage-row mb-3">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+            <div style="font-weight:800;color:#111827;">{{ campaign.title }}</div>
+            <span class="badge rounded-pill text-bg-light border">{{ get_campaign_type_label(campaign) }}</span>
+          </div>
+          <div class="small text-muted mb-2">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+            <span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ campaign.status }}</span>
+            {% if campaign_includes_pulse(campaign) %}<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis"><i class="fa-solid fa-heart-pulse me-1"></i>Nabız</span>{% endif %}
+            {% if campaign.is_anonymous %}<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis"><i class="fa-solid fa-user-secret me-1"></i>Anonim</span>{% endif %}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            {% if campaign.status != 'published' %}<form method="post" action="{{ url_for('main.feedback_campaign_publish', campaign_id=campaign.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-bullhorn"></i>Yayınla</button></form>{% endif %}
+            {% if campaign.status != 'closed' %}<form method="post" action="{{ url_for('main.feedback_campaign_close', campaign_id=campaign.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="cw-btn cw-btn-secondary" type="submit"><i class="fa-solid fa-lock"></i>Kapat</button></form>{% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div class="cw-empty"><i class="fa-solid fa-folder-open"></i><strong>Gösterilecek kampanya bulunmuyor</strong><span>Yeni kampanyalar burada listelenecek.</span></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

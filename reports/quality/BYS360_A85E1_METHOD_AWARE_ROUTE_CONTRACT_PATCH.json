@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-12T18:07:20",
+  "phase": "A85E1_METHOD_AWARE_ROUTE_CONTRACT_PATCH",
+  "target": "tests\\mobile\\test_mobile_domain_contract_p2a.py",
+  "backup": "backups\\a85e\\test_mobile_domain_contract_p2a_20260612_180720.py.bak",
+  "changed": true,
+  "pytest_cmd": [
+    "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/mobile/test_mobile_domain_contract_p2a.py::test_mobile_route_contract_count",
+    "-q"
+  ],
+  "pytest_returncode": 0,
+  "pytest_output": ".                                                                        [100%]\n1 passed in 0.04s\n\n",
+  "ok": true
+}

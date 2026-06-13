@@ -1,0 +1,7 @@
+BYS360 Mobile Performance Full Summary Delegate P2.2 V2.17.26
+
+Bu overlay, mobil performans API refactor isinde yalnizca okuma/ozet ureten
+mobile_performance_full_feature_summary fonksiyonunu servis delegasyonuna alir.
+
+URL, endpoint ve blueprint adi degistirilmez.
+Yazma/islem yapan puan, onay, iade veya not olusturma endpointlerine dokunulmaz.

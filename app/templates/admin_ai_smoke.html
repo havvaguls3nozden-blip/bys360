@@ -1,0 +1,82 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Hızlı Doğrulama & Kabul - BYS360{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">Canlı hızlı doğrulama / son kabul</div>
+    <h3 class="ai-title">AI entegrasyonu için son dolaşım listesi</h3>
+    <p class="ai-sub">Bu ekran, canlı öncesi son turda hangi ekranların hangi rolde dolaşılacağını ve her birinde ne görülmesi gerektiğini tek yerde toplar. Otomatik test yerine insan gözüyle yapılacak son kabul turunu düzenli hale getirir.</p>
+    <div class="ai-actions" style="margin-top:16px">
+      <a class="ai-link" href="{{ url_for('main.admin_ai_center') }}"><i class="fa-solid fa-arrow-left"></i> AI kontrol merkezine dön</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_preflight') }}"><i class="fa-solid fa-shield-halved"></i> Ön kontrol ekranını aç</a>
+      <a class="ai-link" href="{{ url_for('main.admin_ai_smoke_export') }}"><i class="fa-solid fa-file-arrow-down"></i> Doğrulama CSV indir</a>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-six">
+    <article class="ai-card"><div class="ai-label">Senaryo</div><div class="ai-value">{{ summary.scenario_total or 0 }}</div><div class="ai-mini">Elle dolaşılacak toplam son kabul adımı</div></article>
+    <article class="ai-card"><div class="ai-label">Kritik</div><div class="ai-value">{{ summary.critical_total or 0 }}</div><div class="ai-mini">Önce çalıştırılması gereken çekirdek kontroller</div></article>
+    <article class="ai-card"><div class="ai-label">İzleme</div><div class="ai-value">{{ summary.watch_total or 0 }}</div><div class="ai-mini">Akış ve export kalitesi için gözlenecek adımlar</div></article>
+    <article class="ai-card"><div class="ai-label">Bilgi</div><div class="ai-value">{{ summary.info_total or 0 }}</div><div class="ai-mini">Yaygınlaştırılmış modül köprüleri</div></article>
+    <article class="ai-card"><div class="ai-label">Rol</div><div class="ai-value">{{ summary.role_total or 0 }}</div><div class="ai-mini">Kontrolde kullanılacak rol grubu</div></article>
+    <article class="ai-card"><div class="ai-label">Zaman</div><div class="ai-value" style="font-size:1.05rem">{{ snapshot.generated_at.strftime('%d.%m.%Y %H:%M') if snapshot.generated_at else '-' }}</div><div class="ai-mini">Sayfa açılışında üretildi</div></article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">Son kabul notları</h4>
+    <div class="ai-grid" style="margin-top:16px">
+      {% for item in top_notes %}
+      <article class="ai-card ai-action-card tone-{{ item.tone }}">
+        <div class="ai-label">{{ 'Öncelik' if item.tone == 'critical' else 'Takip' }}</div>
+        <div class="ai-title" style="font-size:1.02rem">{{ item.title }}</div>
+        <div class="ai-mini">{{ item.body }}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="ai-table-wrap">
+    <h4 class="ai-title" style="font-size:1.05rem">Tüm doğrulama senaryoları</h4>
+    <table class="ai-table" style="margin-top:14px">
+      <thead><tr><th>Öncelik</th><th>Rol</th><th>Ekran</th><th>Yol</th><th>Amaç</th><th>Beklenen sonuç</th></tr></thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><span class="ai-badge {{ 'warning' if row.tone in ['critical', 'watch'] else 'muted' }}">{{ row.priority }}</span></td>
+          <td>{{ row.role }}</td>
+          <td><strong>{{ row.label }}</strong></td>
+          <td><code>{{ row.path }}</code></td>
+          <td>{{ row.goal }}</td>
+          <td>{{ row.expected }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="ai-note">Doğrulama senaryosu bulunamadı.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="ai-grid">
+    {% for role, role_rows in by_role.items() %}
+    <article class="ai-table-wrap">
+      <div class="ai-actions" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h4 class="ai-title" style="font-size:1.05rem">{{ role|replace('_', ' ')|title }} rolü</h4>
+        <span class="ai-badge muted">{{ role_rows|length }} adım</span>
+      </div>
+      <ul class="ai-list">
+        {% for row in role_rows %}
+        <li class="ai-list-item" style="align-items:flex-start">
+          <span>
+            <strong>{{ row.label }}</strong><br>
+            <small style="display:block;color:#6b7280;margin-top:4px">{{ row.goal }}</small>
+            <small style="display:block;color:#6b7280;margin-top:4px"><code>{{ row.path }}</code></small>
+          </span>
+          <strong>{{ row.priority }}</strong>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

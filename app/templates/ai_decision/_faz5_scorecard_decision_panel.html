@@ -1,0 +1,46 @@
+{# BYS360_AI_DECISION_FAZ5_SCORECARD_PANEL_TEMPLATE #}
+{% set panel = ai_decision_scorecard_panel if ai_decision_scorecard_panel is defined else None %}
+{% if panel %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz5_scorecard.css') }}">
+<section class="ai-faz5-panel" aria-label="Karar destek özeti">
+    <div class="ai-faz5-head">
+        <div>
+            <span class="ai-faz5-kicker">Karar Destek Özeti</span>
+            <h3>{{ panel.score.band.headline }}</h3>
+            <p>{{ panel.period.title }} · {{ panel.status }}</p>
+        </div>
+        <div class="ai-faz5-score ai-faz5-score-{{ panel.score.band.tone }}">
+            <span>Karne Puanı</span>
+            <strong>{{ panel.score.value }}</strong>
+            <small>{{ panel.score.band.label }}</small>
+        </div>
+    </div>
+
+    <div class="ai-faz5-grid">
+        <article class="ai-faz5-card">
+            <span>Genel Değerlendirme</span>
+            <p>{{ panel.general_comment }}</p>
+        </article>
+        {% for item in panel.process_notes %}
+        <article class="ai-faz5-card ai-faz5-card-{{ item.tone }}">
+            <span>{{ item.title }}</span>
+            <p>{{ item.body }}</p>
+        </article>
+        {% endfor %}
+    </div>
+
+    {% if panel.recommendations %}
+    <div class="ai-faz5-recommendations">
+        <h4>Önerilen Kontrol Adımları</h4>
+        {% for item in panel.recommendations %}
+        <div class="ai-faz5-rec ai-faz5-rec-{{ item.severity }}">
+            <strong>{{ item.title }}</strong>
+            <p>{{ item.body }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <p class="ai-faz5-safe-note">Bu alan yalnızca karar destek amacıyla bilgi verir; nihai idari karar yetkili makam tarafından verilir.</p>
+</section>
+{% endif %}

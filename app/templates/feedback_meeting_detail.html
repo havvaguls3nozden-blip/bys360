@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Randevu Detayı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Randevu Detayı{% endblock %}
+{% block page_subtitle %}
+Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetkiniz varsa durumunu tek karttan güncelleyebilirsiniz.
+{% endblock %}
+
+{% block content %}
+<style>
+    .detail-shell{display:grid;gap:18px}
+    .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+    .panel-card{padding:22px;position:relative;z-index:1}
+    .hero-card{padding:24px}
+    .hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.07), transparent 30%),linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));pointer-events:none}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) 320px;gap:18px;align-items:start}
+    .hero-title{margin:0;font-size:1.18rem;font-weight:900;color:#111827;line-height:1.4}
+    .hero-sub{margin-top:10px;color:#6b7280;font-size:.93rem;line-height:1.85}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .status-pill,.soft-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.76rem;font-weight:900;white-space:nowrap}
+    .soft-pill{background:#eef2f7;color:#4b5563}
+    .status-pill.planlandi{background:rgba(22,101,52,.10);color:#166534}
+    .status-pill.tamamlandi{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .status-pill.ertelendi{background:rgba(146,64,14,.12);color:#92400e}
+    .status-pill.iptal_edildi{background:rgba(153,27,27,.10);color:#991b1b}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.92rem;white-space:nowrap;transition:all .18s ease}
+    .btn-soft:hover,.mini-btn:hover{transform:translateY(-1px)}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary,.mini-btn{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .hero-side{display:grid;gap:12px}
+    .side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:rgba(248,250,252,.85)}
+    .side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}
+    .side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.55}
+    .side-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.75}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+    .stat-card{padding:20px;position:relative;overflow:hidden}
+    .stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}
+    .stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}
+    .stat-value{color:#111827;font-size:1.04rem;font-weight:900;line-height:1.5;position:relative;z-index:1}
+    .stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;font-weight:700;position:relative;z-index:1;line-height:1.6}
+    .content-grid{display:grid;grid-template-columns:minmax(0,1.05fr) 360px;gap:18px}
+    .section-title{margin:0 0 14px;color:#111827;font-size:1.06rem;font-weight:900}
+    .section-sub{margin:0 0 16px;color:#6b7280;font-size:.92rem;line-height:1.75}
+    .info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .info-box{background:#f8fafc;border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:16px;height:100%}
+    .info-label{color:#6b7280;font-size:.76rem;font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+    .info-value{color:#111827;font-size:.94rem;font-weight:800;line-height:1.7;word-break:break-word}
+    .note-box,.micro-box{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#374151;font-size:.92rem;line-height:1.85}
+    .micro-box{border-style:dashed;color:#6b7280}
+    .timeline{display:grid;gap:12px}
+    .timeline-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px}
+    .timeline-label{color:#6b7280;font-size:.75rem;font-weight:800;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+    .timeline-value{color:#111827;font-size:.9rem;font-weight:800;line-height:1.7}
+    .form-grid{display:grid;gap:14px}
+    .form-group{display:flex;flex-direction:column;gap:8px}
+    .form-group label{font-weight:800;color:#374151;font-size:.92rem}
+    .form-group .form-input,.form-group select,.form-group textarea{width:100%;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:12px 14px;background:#fff;font:inherit;outline:none}
+    .form-group textarea{min-height:130px;resize:vertical}
+    .form-group .form-input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+    .sticky-actions{position:sticky;bottom:10px;z-index:5;display:flex;gap:10px;flex-wrap:wrap}
+    @media (max-width:1180px){.hero-grid,.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:768px){.stats-grid,.info-grid{grid-template-columns:1fr}.hero-actions,.btn-soft,.mini-btn{width:100%}}
+</style>
+
+<div class="detail-shell">
+    {% set related_manager_ids = [meeting.feedback_request.level_1_manager_id if meeting.feedback_request else None, meeting.feedback_request.level_2_manager_id if meeting.feedback_request else None, meeting.feedback_request.level_3_manager_id if meeting.feedback_request else None] %}
+    {% set can_manage_meeting = current_user.role == "admin" or current_user.id == meeting.manager_id or current_user.id in related_manager_ids %}
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;">
+        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}</div>
+        <span class="soft-pill"><i class="fa-solid fa-calendar-days"></i> Randevu #{{ meeting.id }}</span>
+    </div>
+    <div class="glass-card hero-card">
+        <div class="hero-grid">
+            <div>
+                <h2 class="hero-title">{{ meeting.employee.ad }} {{ meeting.employee.soyad }} için geri bildirim görüşmesi</h2>
+                <div class="hero-sub">Yönetici: {{ meeting.manager.ad }} {{ meeting.manager.soyad }} · Randevu ID: #{{ meeting.id }}{% if meeting.feedback_request and meeting.feedback_request.period %} · Dönem: {{ meeting.feedback_request.period.title }}{% endif %}{% if meeting.employee.sicil_no %} · Sicil: {{ meeting.employee.sicil_no }}{% endif %}</div>
+                <div class="pill-row">
+                    <span class="status-pill {{ meeting.status }}"><i class="fa-solid fa-calendar-check"></i> {{ meeting.status }}</span>
+                    <span class="soft-pill"><i class="fa-solid fa-user-group"></i> {{ meeting.meeting_type or 'Tür girilmedi' }}</span>
+                    <span class="soft-pill"><i class="fa-solid fa-location-dot"></i> {{ meeting.location or 'Konum girilmedi' }}</span>
+                </div>
+                <div class="hero-actions" style="margin-top:16px;">
+                    <a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i> Randevu Listesi</a>
+                    <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-halved"></i> Denetim Paneli</a>
+                    {% if can_manage_meeting %}
+                    <a href="#update-panel" class="btn-soft primary"><i class="fa-solid fa-pen"></i> Randevuyu Düzenle</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="hero-side">
+                <div class="side-card"><div class="side-label">Zaman Özeti</div><div class="side-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }} · {{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div><div class="side-sub">Randevu türü ve konum bilgisi bu kartta birlikte gösterilir.</div></div>
+                <div class="side-card"><div class="side-label">Görünüm Yetkisi</div><div class="side-value">{% if can_manage_meeting %}Amir düzenleme görünümü{% else %}Katılımcı görünümü{% endif %}</div><div class="side-sub">Bu kart ekrandaki yetki düzeyini gösterir.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Tarih</div><div class="stat-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }}</div><div class="stat-sub">Planlanan gün.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Saat Aralığı</div><div class="stat-value">{{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div><div class="stat-sub">Toplantı penceresi.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Talep Durumu</div><div class="stat-value">{{ meeting.feedback_request.status if meeting.feedback_request else 'Bağlı talep yok' }}</div><div class="stat-sub">Kaynağın şu anki durumu.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Görüşme Tipi</div><div class="stat-value">{{ meeting.meeting_type or '-' }}</div><div class="stat-sub">Yüz yüze, online veya telefon.</div></div>
+    </div>
+
+    <div class="content-grid">
+        <div class="detail-main" style="display:grid; gap:18px;">
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Temel bilgiler</h3>
+                <div class="info-grid">
+                    <div class="info-box"><div class="info-label">Personel</div><div class="info-value">{{ meeting.employee.ad }} {{ meeting.employee.soyad }}<br>{% if meeting.employee.sicil_no %}Sicil No: {{ meeting.employee.sicil_no }}<br>{% endif %}{{ meeting.employee.birim or 'Birim bilgisi yok' }}</div></div>
+                    <div class="info-box"><div class="info-label">Yönetici</div><div class="info-value">{{ meeting.manager.ad }} {{ meeting.manager.soyad }}<br>{{ meeting.manager.email or 'E-posta bilgisi yok' }}</div></div>
+                    <div class="info-box"><div class="info-label">Konum / Bağlantı</div><div class="info-value">{{ meeting.location or 'Henüz paylaşılmadı' }}</div></div>
+                    <div class="info-box"><div class="info-label">Bağlı Dönem</div><div class="info-value">{{ meeting.feedback_request.period.title if meeting.feedback_request and meeting.feedback_request.period else 'Dönem bilgisi yok' }}</div></div>
+                </div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Toplantı notu</h3>
+                <div class="note-box">{{ meeting.note or 'Toplantı için ayrı bir not girilmemiş. Gerekirse yönetici durumu güncellerken ek bağlam bırakabilir.' }}</div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Akış özeti</h3>
+                <div class="timeline">
+                    <div class="timeline-card"><div class="timeline-label">Talep</div><div class="timeline-value">{{ meeting.feedback_request.reason if meeting.feedback_request and meeting.feedback_request.reason else 'Talep metni görünmüyor.' }}</div></div>
+                    <div class="timeline-card"><div class="timeline-label">Durum mantığı</div><div class="timeline-value">Toplantı durumu planlandı, tamamlandı, ertelendi veya iptal edildi olarak güncellenebilir. Güncelleme notları mevcut kayıtla birlikte tutulur.</div></div>
+                </div>
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">İşlem izi</h3>
+                <p class="section-sub">Talep ve bağlı randevu üzerinde yapılan son aksiyonlar.</p>
+                {% if meeting_timeline %}
+                <div class="timeline">
+                    {% for item in meeting_timeline %}
+                    <div class="timeline-card">
+                        <div class="timeline-label">{{ item.entity_label }}</div>
+                        <div class="timeline-value">{{ item.action_label }}</div>
+                        <div class="helper" style="margin-top:6px;">{{ item.summary }}</div>
+                        <div class="helper" style="margin-top:8px;">{{ item.actor_name }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '-' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="micro-box">Henüz audit kaydı oluşmadı.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-side" style="display:grid; gap:18px; align-content:start;">
+            {% if can_manage_meeting %}
+            <div class="glass-card panel-card" id="update-panel">
+                <h3 class="section-title">Randevu durumu güncelle</h3>
+                <p class="section-sub">Görüşme tamamlandığında, ertelendiğinde veya iptal edildiğinde aynı kart üzerinden ilerleyin.</p>
+                <form method="post" action="{{ url_for('main.feedback_meeting_update', meeting_id=meeting.id, scope=selected_scope) }}" class="form-grid">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="meeting_date">Tarih</label>
+                        <input class="form-input" type="date" id="meeting_date" name="meeting_date" value="{{ meeting.meeting_date.isoformat() if meeting.meeting_date else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting_start">Başlangıç</label>
+                        <input class="form-input" type="time" id="meeting_start" name="meeting_start" value="{{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting_end">Bitiş</label>
+                        <input class="form-input" type="time" id="meeting_end" name="meeting_end" value="{{ meeting.meeting_end.strftime('%H:%M') if meeting.meeting_end else '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting_type">Toplantı tipi</label>
+                        <select id="meeting_type" name="meeting_type">
+                            <option value="yuz_yuze" {% if meeting.meeting_type == 'yuz_yuze' %}selected{% endif %}>Yüz Yüze</option>
+                            <option value="online" {% if meeting.meeting_type == 'online' %}selected{% endif %}>Online</option>
+                            <option value="telefon" {% if meeting.meeting_type == 'telefon' %}selected{% endif %}>Telefon</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Konum / Bağlantı</label>
+                        <input class="form-input" type="text" id="location" name="location" value="{{ meeting.location or '' }}" placeholder="Konum veya toplantı bağlantısı">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Durum</label>
+                        <select id="status" name="status">
+                            <option value="planlandi" {% if meeting.status == 'planlandi' %}selected{% endif %}>Planlandı</option>
+                            <option value="tamamlandi" {% if meeting.status == 'tamamlandi' %}selected{% endif %}>Tamamlandı</option>
+                            <option value="ertelendi" {% if meeting.status == 'ertelendi' %}selected{% endif %}>Ertelendi</option>
+                            <option value="iptal_edildi" {% if meeting.status == 'iptal_edildi' %}selected{% endif %}>İptal Edildi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="note">Durum güncelleme notu</label>
+                        <textarea id="note" name="note" placeholder="Görüşmeyle ilgili kısa bir güncelleme notu yazabilirsiniz"></textarea>
+                    </div>
+                    <div class="micro-box">Bağlı amirlerden biri randevuyu oluşturduktan sonra diğer amirler de aynı kaydı düzenleyebilir. Saat çakışmaları kaydedilmeden önce yeniden kontrol edilir.</div>
+                    <div class="sticky-actions">
+                        <button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i> Güncellemeyi Kaydet</button>
+                        <a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-list"></i> Listeye Dön</a>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Bilgilendirme</h3>
+                <div class="micro-box">Bu randevunun detaylarını görüntüleyebilirsiniz. Durum güncelleme yetkisi yalnızca randevuyu yöneten amir veya yönetici rolündeki kullanıcılar içindir.</div>
+            </div>
+            {% endif %}
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Kısa not</h3>
+                <div class="micro-box">Bu ekranda bilgiler bölümler halinde düzenli biçimde sunulur.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

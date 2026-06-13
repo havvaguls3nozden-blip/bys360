@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Mail Hatırlatma Sistemi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Mail Hatırlatma Sistemi{% endblock %}
+{% block page_subtitle %}
+Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma maili gönderebilir; otomatik reminder ayarlarını yönetebilir, SMTP sağlık durumunu test edebilir, bekleme süresini gerektiğinde zorlayabilir ve başarısız gönderimleri yeniden deneyebilirsiniz.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Mail Hatırlatma Merkezi', text='Dönem bazlı hatırlatma gönderimlerini, yeniden deneme akışını ve otomasyon görünürlüğünü tek çalışma alanında yönetin.', icon='fa-solid fa-envelope-circle-check') }}
+  {{ nav(active='mail') }}
+  {{ note('Gönderim, SMTP sağlık kontrolü, bekleme süresi, başarısız loglar ve otomatik hatırlatma ayarları aynı görsel hizada toplandı.') }}
+<style>
+ .mail-grid{display:grid;gap:18px}
+ .panel-card{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}
+ .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+ .toolbar-left,.toolbar-right{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+ .filter-row{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:14px;align-items:end}
+ .form-group{display:flex;flex-direction:column;gap:8px}
+ .form-group label{font-weight:800;color:#374151}
+ .form-group select{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:10px 14px;background:#fff;font:inherit}
+ .check-inline{display:inline-flex;gap:8px;align-items:center;font-weight:700;color:#4b5563}
+ .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.92rem;white-space:nowrap}
+ .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff}
+ .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+ .btn-soft.warning{background:#fff7ed;color:#b45309;border:1px solid rgba(251,191,36,.35)}
+ .btn-soft.ghost{background:#fff;color:#8B0000;border:1px solid rgba(139,0,0,.14)}
+ .stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+ .stat-card{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:18px}
+ .stat-label{color:#6b7280;font-size:.88rem;font-weight:700;margin-bottom:10px}
+ .stat-value{font-size:1.5rem;font-weight:900;color:#111827;line-height:1.2}
+ .preview-box,.empty-box{border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;padding:16px;line-height:1.8;color:#374151;white-space:pre-wrap}
+ .empty-box{text-align:center;color:#6b7280}
+ .table-wrap{width:100%;overflow-x:auto;border-radius:18px}
+ table{width:100%;border-collapse:collapse;background:#fff;min-width:1080px}
+ th,td{padding:14px 12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}
+ th{font-size:.84rem;color:#6b7280;text-transform:uppercase;letter-spacing:.3px}
+ .person-name{font-weight:800;color:#111827;line-height:1.45}
+ .muted-line{color:#6b7280;font-size:.87rem;line-height:1.65}
+ .status-ok{color:#166534;font-weight:800}
+ .status-warn{color:#b45309;font-weight:800}
+ .status-bad{color:#b91c1c;font-weight:800}
+ .action-stack{display:flex;flex-direction:column;gap:8px}
+ .section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+ .section-head h3{margin:0;font-size:1.02rem;font-weight:900;color:#111827}
+ .section-note{color:#6b7280;font-size:.9rem;line-height:1.7}
+ .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:#fff5f5;color:#8B0000;font-weight:800;font-size:.82rem;border:1px solid rgba(139,0,0,.12)}
+ .inline-form{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
+ .ai-summary-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+ .ai-summary-card{display:grid;gap:14px}
+ .ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18)}
+ .ai-summary-card.tone-watch{border-color:rgba(217,119,6,.18)}
+ .ai-kicker{display:inline-flex;align-items:center;gap:8px;color:#8B0000;font-size:.82rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
+ .ai-title{font-size:1.06rem;font-weight:900;color:#111827;line-height:1.35}
+ .ai-text{color:#4b5563;line-height:1.8;font-size:.92rem}
+ .ai-bullets{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+ .ai-bullets li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem}
+ .ai-bullets li i{font-size:.5rem;color:#8B0000;margin-top:.5rem}
+ .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .ai-action{border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff;padding:14px 16px}
+ .ai-action.tone-critical{background:rgba(254,242,242,.95);border-color:rgba(220,38,38,.12)}
+ .ai-action.tone-watch{background:rgba(255,247,237,.96);border-color:rgba(217,119,6,.12)}
+ .ai-action-label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:6px}
+ .ai-action-value{font-size:1.4rem;color:#111827;font-weight:900;line-height:1}
+ .ai-spotlight{display:grid;gap:10px}
+ .ai-spotlight-row{display:flex;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08);color:#374151;font-size:.86rem}
+ .ai-spotlight-row strong{color:#111827;font-weight:900}
+ .dashboard-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+ .mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .mini-stat{border-radius:18px;border:1px solid rgba(15,23,42,.08);padding:14px 16px;background:#fff}
+ .mini-stat-label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:6px}
+ .mini-stat-value{font-size:1.2rem;font-weight:900;color:#111827}
+ .history-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+ .history-chip.ok{background:#f0fdf4;color:#166534;border-color:rgba(22,101,52,.15)}
+ .history-chip.bad{background:#fef2f2;color:#b91c1c;border-color:rgba(185,28,28,.14)}
+ .kv-list{display:grid;gap:10px}
+ .kv-row{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.88rem;color:#374151}
+ .kv-row strong{color:#111827}
+ .issue-list{display:grid;gap:8px;margin-top:12px}
+ .issue-item{padding:12px 14px;border-radius:14px;background:#fff7ed;border:1px solid rgba(217,119,6,.15);color:#9a3412;font-size:.86rem;line-height:1.6}
+ .command-box{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;background:#111827;color:#f9fafb;padding:14px 16px;border-radius:16px;overflow:auto}
+ .soft-note{color:#6b7280;font-size:.84rem;line-height:1.7}
+ @media (max-width:900px){.filter-row,.stats-grid,.ai-summary-grid,.dashboard-grid,.mini-grid{grid-template-columns:1fr}.toolbar{align-items:stretch}.toolbar-left,.toolbar-right{width:100%}}
+ @media (max-width:900px){.filter-row,.stats-grid,.ai-summary-grid{grid-template-columns:1fr}.toolbar{align-items:stretch}.toolbar-left,.toolbar-right{width:100%}}
+</style>
+
+<div class="mail-grid">
+ <div class="panel-card">
+  <div class="toolbar">
+   <div class="toolbar-left">
+    <span class="pill"><i class="fa-solid fa-envelope-circle-check"></i> Hatırlatma ve yeniden deneme merkezi</span>
+   </div>
+   <div class="toolbar-right">
+    <a class="btn-soft ghost" href="{{ url_for('main.performance_mail_templates') }}"><i class="fa-solid fa-pen-to-square"></i> Mail Şablonları</a>
+   </div>
+  </div>
+  <div class="filter-row" style="margin-top:16px;">
+   <form method="get" style="display:contents;">
+    <div class="form-group">
+     <label for="period_id">Dönem Seçin</label>
+     <select id="period_id" name="period_id" onchange="this.form.submit()">
+      <option value="">Dönem seçiniz</option>
+      {% for period in periods %}
+       <option value="{{ period.id }}" {% if selected_period and selected_period.id == period.id %}selected{% endif %}>{{ period.title }}</option>
+      {% endfor %}
+     </select>
+    </div>
+   </form>
+
+   {% if selected_period %}
+   <form method="post" action="{{ url_for('main.performance_send_mail_reminders', period_id=selected_period.id) }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="check-inline"><input type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
+    <button type="submit" class="btn-soft primary" onclick="return confirm('Seçili dönem için tüm uygun amirlere hatırlatma maili gönderilsin mi?');">
+     <i class="fa-solid fa-paper-plane"></i> Tümüne Gönder
+    </button>
+   </form>
+   {% endif %}
+  </div>
+ </div>
+
+ {% if selected_period %}
+ <div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Seçili Dönem</div><div class="stat-value">{{ selected_period.title }}</div></div>
+  <div class="stat-card"><div class="stat-label">Bekleyen Toplam Görev</div><div class="stat-value">{{ total_pending }}</div></div>
+  <div class="stat-card"><div class="stat-label">Gönderime Uygun Yönetici</div><div class="stat-value">{{ manager_dashboard.eligible_manager_count or manager_summary|length }}</div></div>
+  <div class="stat-card"><div class="stat-label">Gönderimi Engelli Yönetici</div><div class="stat-value">{{ manager_dashboard.blocked_manager_count or 0 }}</div></div>
+  <div class="stat-card"><div class="stat-label">Gecikmiş Görev</div><div class="stat-value">{{ manager_dashboard.overdue_total or 0 }}</div></div>
+  <div class="stat-card"><div class="stat-label">Başarısız Mail Kaydı</div><div class="stat-value">{{ failed_mail_logs|length }}</div></div>
+ </div>
+
+ <section class="ai-summary-grid">
+  <article class="panel-card ai-summary-card tone-{{ ai_reminder_panel.tone if ai_reminder_panel else 'calm' }}">
+   <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_reminder_panel.badge if ai_reminder_panel else 'AI özeti' }}</div>
+   <div class="ai-title">{{ ai_reminder_panel.headline if ai_reminder_panel else 'Hatırlatma özeti hazır' }}</div>
+   <div class="ai-text">{{ ai_reminder_panel.summary if ai_reminder_panel else '' }}</div>
+   {% if ai_reminder_panel and ai_reminder_panel.bullets %}
+   <ul class="ai-bullets">
+    {% for bullet in ai_reminder_panel.bullets %}
+    <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+    {% endfor %}
+   </ul>
+   {% endif %}
+  </article>
+  <article class="panel-card ai-summary-card">
+   <div class="ai-kicker"><i class="fa-solid fa-envelope-circle-check"></i> Gönderim sıcaklığı</div>
+   <div class="ai-action-grid">
+    {% for item in (ai_reminder_panel.actions if ai_reminder_panel else []) %}
+    <div class="ai-action tone-{{ item.tone }}">
+     <div class="ai-action-label">{{ item.label }}</div>
+     <div class="ai-action-value">{{ item.value }}</div>
+    </div>
+    {% endfor %}
+   </div>
+   {% if ai_reminder_panel and ai_reminder_panel.spotlight %}
+   <div class="ai-spotlight">
+    {% for row in ai_reminder_panel.spotlight %}
+    <div class="ai-spotlight-row"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+    {% endfor %}
+   </div>
+   {% endif %}
+  </article>
+ </section>
+
+ <section class="dashboard-grid">
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>SMTP Sağlığı ve Test Maili</h3>
+     <div class="section-note">Sunucu ayarlarının görünür durumunu izleyin ve aynı ekrandan kontrollü test maili gönderin.</div>
+    </div>
+    <span class="pill"><i class="fa-solid fa-heart-pulse"></i> {{ 'Hazır' if mail_health.ready else 'Kontrol gerekli' }}</span>
+   </div>
+   <div class="mini-grid">
+    <div class="mini-stat"><div class="mini-stat-label">SMTP sunucusu</div><div class="mini-stat-value" style="font-size:1rem;line-height:1.45;">{{ mail_health.host }}:{{ mail_health.port }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Varsayılan gönderen</div><div class="mini-stat-value" style="font-size:1rem;line-height:1.45;">{{ mail_health.default_sender }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">TLS</div><div class="mini-stat-value">{{ 'Açık' if mail_health.use_tls else 'Kapalı' }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Son başarısız örnek</div><div class="mini-stat-value" style="font-size:.95rem;line-height:1.45;">{{ mail_health.recent_failed_preview or '-' }}</div></div>
+   </div>
+   {% if mail_health.issues %}
+   <div class="issue-list">
+    {% for item in mail_health.issues %}
+    <div class="issue-item"><i class="fa-solid fa-triangle-exclamation"></i> {{ item }}</div>
+    {% endfor %}
+   </div>
+   {% else %}
+   <div class="empty-box" style="margin-top:14px;">SMTP temel ayarlarında görünür bir eksik bulunmadı.</div>
+   {% endif %}
+   <form method="post" action="{{ url_for('main.performance_send_test_mail') }}" class="mail-grid" style="margin-top:14px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="period_id" value="{{ selected_period.id }}">
+    <div class="mini-grid">
+     <div class="form-group"><label>Test alıcısı</label><input type="email" name="test_email" value="{{ default_test_email }}" placeholder="ornek@ktb.gov.tr" style="min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);padding:10px 14px;background:#fff;font:inherit"></div>
+    </div>
+    <div class="toolbar">
+     <div class="toolbar-left soft-note">Test maili yalnızca temel SMTP akışını doğrular; reminder geçmişine karışmaz.</div>
+     <div class="toolbar-right"><button type="submit" class="btn-soft secondary"><i class="fa-solid fa-vial-circle-check"></i> Test Maili Gönder</button></div>
+    </div>
+   </form>
+  </article>
+
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>Gönderimi Engelleyen Durumlar</h3>
+     <div class="section-note">E-postası eksik olan veya cooldown nedeniyle bekleyen amirleri tek bakışta görürsünüz.</div>
+    </div>
+   </div>
+   <div class="mini-grid">
+    <div class="mini-stat"><div class="mini-stat-label">E-postası eksik yönetici</div><div class="mini-stat-value">{{ manager_dashboard.missing_email_count or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Cooldown bekleyen yönetici</div><div class="mini-stat-value">{{ manager_dashboard.cooldown_count or 0 }}</div></div>
+   </div>
+   <div class="kv-list" style="margin-top:14px;">
+    {% for row in blocked_manager_rows[:8] %}
+    <div class="kv-row">
+     <span><strong>{{ row.manager.ad }} {{ row.manager.soyad }}</strong><br><small>{{ row.email or '-' }}</small><br><small>{{ row.level_breakdown }}</small></span>
+     <strong>{{ row.send_block_reason or '-' }}</strong>
+    </div>
+    {% else %}
+    <div class="empty-box">Şu anda gönderimi engelleyen görünür bir durum yok.</div>
+    {% endfor %}
+   </div>
+  </article>
+ </section>
+
+ <section class="dashboard-grid">
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>Otomatik Reminder Merkezi</h3>
+     <div class="section-note">Windows Görev Zamanlayıcı veya cron ile çalışacak otomasyon ayarlarını bu ekrandan yönetebilirsiniz.</div>
+    </div>
+    <span class="pill"><i class="fa-solid fa-robot"></i> {{ 'Aktif' if automation_settings.enabled else 'Pasif' }}</span>
+   </div>
+   <form method="post" action="{{ url_for('main.performance_mail_automation_settings') }}" class="mail-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="period_id" value="{{ selected_period.id }}">
+    <div class="mini-grid">
+     <label class="check-inline"><input type="checkbox" name="automation_enabled" value="1" {% if automation_settings.enabled %}checked{% endif %}> Otomasyonu aktif et</label>
+     <label class="check-inline"><input type="checkbox" name="automation_force_send" value="1" {% if automation_settings.force_send %}checked{% endif %}> Cooldown beklemeden gönder</label>
+     <label class="check-inline"><input type="checkbox" name="automation_only_active_periods" value="1" {% if automation_settings.only_active_periods %}checked{% endif %}> Sadece aktif dönemler</label>
+     <label class="check-inline"><input type="checkbox" name="automation_only_during_window" value="1" {% if automation_settings.only_during_window %}checked{% endif %}> Sadece değerlendirme penceresi</label>
+    </div>
+    <div class="mini-grid">
+     <div class="form-group"><label>Çalışma saati</label><select name="automation_run_hour">{% for hour in range(0,24) %}<option value="{{ hour }}" {% if automation_settings.run_hour == hour %}selected{% endif %}>{{ '%02d:00'|format(hour) }}</option>{% endfor %}</select></div>
+     <div class="form-group"><label>Bekleme süresi (saat)</label><select name="automation_reminder_interval_hours">{% for hour in [6,8,12,24,48,72] %}<option value="{{ hour }}" {% if automation_settings.reminder_interval_hours == hour %}selected{% endif %}>{{ hour }}</option>{% endfor %}</select></div>
+     <div class="form-group"><label>Minimum bekleyen görev</label><select name="automation_min_pending_count">{% for count in [1,2,3,5,10] %}<option value="{{ count }}" {% if automation_settings.min_pending_count == count %}selected{% endif %}>{{ count }}</option>{% endfor %}</select></div>
+     <div class="form-group"><label>Tek çalıştırmada maksimum dönem</label><select name="automation_max_periods">{% for count in [1,2,3,5,10] %}<option value="{{ count }}" {% if automation_settings.max_periods == count %}selected{% endif %}>{{ count }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="toolbar">
+     <div class="toolbar-left soft-note">Önerilen çalışma planı: otomasyon günlük {{ automation_settings.run_label }} saatinde devreye alınabilir.</div>
+     <div class="toolbar-right"><button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i> Otomasyon Ayarlarını Kaydet</button></div>
+    </div>
+   </form>
+   <div class="soft-note" style="margin-top:14px;">Teknik görev zamanlama kurulumu sistem yöneticisi tarafından sunucu tarafında yapılır. Bu ekranda komut satırı gösterilmez.</div>
+  </article>
+
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>Otomasyon Önizlemesi</h3>
+     <div class="section-note">Kaydedilen kurallara göre sistem şu an çalıştırılsa hangi dönemleri ve kaç yöneticiyi işleyeceğini gösterir.</div>
+    </div>
+   </div>
+   <div class="mini-grid">
+    <div class="mini-stat"><div class="mini-stat-label">Önizlenen dönem</div><div class="mini-stat-value">{{ automation_preview.period_count or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Yönetici havuzu</div><div class="mini-stat-value">{{ automation_preview.total_managers or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Bekleyen görev</div><div class="mini-stat-value">{{ automation_preview.total_pending or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Çalıştırma saati</div><div class="mini-stat-value">{{ automation_settings.run_label }}</div></div>
+   </div>
+   <div class="kv-list" style="margin-top:14px;">
+    {% for row in automation_preview.period_items %}
+    <div class="kv-row"><span>{{ row.period_title }}</span><strong>{{ row.manager_count }} yönetici · {{ row.pending_count }} görev</strong></div>
+    {% else %}
+    <div class="empty-box">Otomasyon koşullarına uyan aktif dönem bulunamadı.</div>
+    {% endfor %}
+   </div>
+   <form method="post" action="{{ url_for('main.performance_run_mail_automation') }}" class="inline-form" style="margin-top:14px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="period_id" value="{{ selected_period.id }}">
+    <label class="check-inline"><input type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
+    <label class="check-inline"><input type="checkbox" name="dry_run" value="1"> Sadece önizleme mesajı üret</label>
+    <button type="submit" class="btn-soft secondary" onclick="return confirm('Mail otomasyonu seçili kurallarla çalıştırılsın mı?');"><i class="fa-solid fa-play"></i> Otomasyonu Çalıştır</button>
+   </form>
+  </article>
+ </section>
+
+ <section class="dashboard-grid">
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>Reminder Aktivite Özeti</h3>
+     <div class="section-note">Seçili dönemde en çok reminder giden yöneticileri ve toplam aktiviteyi izler.</div>
+    </div>
+   </div>
+   <div class="mini-grid">
+    <div class="mini-stat"><div class="mini-stat-label">Toplam reminder</div><div class="mini-stat-value">{{ reminder_activity.total_sent or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Başarılı gönderim</div><div class="mini-stat-value">{{ reminder_activity.success_count or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Başarısız gönderim</div><div class="mini-stat-value">{{ reminder_activity.failed_count or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Farklı yönetici</div><div class="mini-stat-value">{{ reminder_activity.unique_manager_count or 0 }}</div></div>
+   </div>
+   <div class="kv-list" style="margin-top:14px;">
+    {% for row in reminder_activity.top_rows %}
+    <div class="kv-row">
+     <span>{{ row.manager_name }}{% if row.recipient_email %}<br><small>{{ row.recipient_email }}</small>{% endif %}</span>
+     <strong>{{ row.sent_count }} kayıt · son {{ row.last_sent_at.strftime('%d.%m.%Y %H:%M') if row.last_sent_at else '-' }}</strong>
+    </div>
+    {% else %}
+    <div class="empty-box">Henüz reminder geçmişi oluşmadı.</div>
+    {% endfor %}
+   </div>
+  </article>
+
+  <article class="panel-card">
+   <div class="section-head">
+    <div>
+     <h3>Başarısızlık Analizi</h3>
+     <div class="section-note">Son başarısız mailler hata türüne göre gruplanır; altyapı sorunlarını hızlı görmenizi sağlar.</div>
+    </div>
+   </div>
+   <div class="mini-grid">
+    <div class="mini-stat"><div class="mini-stat-label">Toplam başarısız kayıt</div><div class="mini-stat-value">{{ failed_mail_dashboard.total_failed or 0 }}</div></div>
+    <div class="mini-stat"><div class="mini-stat-label">Son hata</div><div class="mini-stat-value" style="font-size:.96rem;line-height:1.5;">{{ failed_mail_dashboard.latest_error or '-' }}</div></div>
+   </div>
+   <div class="kv-list" style="margin-top:14px;">
+    {% for row in failed_mail_dashboard.error_buckets %}
+    <div class="kv-row"><span>{{ row.label }}</span><strong>{{ row.count }}</strong></div>
+    {% else %}
+    <div class="empty-box">Analiz edilecek başarısız mail yok.</div>
+    {% endfor %}
+   </div>
+  </article>
+ </section>
+
+ <div class="panel-card">
+  <div class="section-head">
+   <div>
+    <h3>Mail Önizleme</h3>
+    <div class="section-note">Önizleme alanı aktif şablonla oluşturulur; şablon değiştiğinde bu metin de otomatik güncellenir.</div>
+   </div>
+   <a class="btn-soft secondary" href="{{ url_for('main.performance_mail_templates') }}">Şablonları Düzenle</a>
+  </div>
+  {% if preview_subject %}
+   <div class="preview-box"><strong>Konu:</strong> {{ preview_subject }}
+
+<strong>İçerik:</strong>
+{{ preview_body }}</div>
+  {% else %}
+   <div class="empty-box">Önizleme oluşturulamadı.</div>
+  {% endif %}
+ </div>
+
+ <div class="panel-card">
+  <div class="section-head">
+   <div>
+    <h3>Bekleyen Görevi Olan Amirler</h3>
+    <div class="section-note">Seçilileri gönder, kişi bazlı gönder veya zorla tekrar gönder seçeneklerini kullanabilirsiniz.</div>
+   </div>
+  </div>
+  {% if manager_summary %}
+  <form id="selected-managers-form" method="post" action="{{ url_for('main.performance_send_selected_mail_reminders', period_id=selected_period.id) }}">
+   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+   <div class="toolbar" style="margin-bottom:14px;">
+    <div class="toolbar-left">
+     <label class="check-inline"><input type="checkbox" id="toggle-all-managers"> Tümünü seç</label>
+     <label class="check-inline"><input form="selected-managers-form" type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
+    </div>
+    <div class="toolbar-right">
+     <button form="selected-managers-form" type="submit" class="btn-soft primary" onclick="return confirm('Seçili yöneticilere hatırlatma gönderilsin mi?');"><i class="fa-solid fa-envelope-open-text"></i> Seçilileri Gönder</button>
+    </div>
+   </div>
+   <div class="table-wrap">
+    <table>
+     <thead>
+      <tr>
+       <th style="width:52px;">Seç</th>
+       <th>Yönetici</th>
+       <th>E-Posta</th>
+       <th>Bekleyen Görev</th>
+       <th>Seviye / Personel Özeti</th>
+       <th>Son Başarılı Hatırlatma</th>
+       <th>Durum</th>
+       <th>İşlem</th>
+      </tr>
+     </thead>
+     <tbody>
+      {% for item in manager_summary %}
+      <tr>
+       <td><input form="selected-managers-form" type="checkbox" class="manager-checkbox" name="manager_ids" value="{{ item.manager.id }}"></td>
+       <td>
+        <div class="person-name">{{ item.manager.ad }} {{ item.manager.soyad }}</div>
+        <div class="muted-line">{{ item.manager.unvan or item.manager.role }}</div>
+       </td>
+       <td>{{ item.manager.email or '-' }}</td>
+       <td><strong>{{ item.count }}</strong><div class="muted-line">Gecikmiş {{ item.overdue_count or 0 }} · Yaklaşan {{ item.due_soon_count or 0 }}</div></td>
+       <td><div class="person-name">{{ item.level_breakdown or '-' }}</div><div class="muted-line">{{ item.employee_preview or '-' }}</div></td>
+       <td>{% if item.last_reminder_at %}{{ item.last_reminder_at.strftime('%d.%m.%Y %H:%M') }}{% else %}-{% endif %}{% if item.last_attempt_at and (not item.last_attempt_success) %}<div class="muted-line">Son deneme başarısız: {{ item.last_attempt_at.strftime('%d.%m.%Y %H:%M') }}</div>{% endif %}</td>
+       <td>
+        {% if item.can_send_now %}
+         <div class="status-ok">Gönderime uygun</div>
+        {% else %}
+         <div class="status-warn">Bekleme süresi aktif</div>
+         <div class="muted-line">{{ item.send_block_reason }}</div>
+         {% if item.next_allowed_at %}<div class="muted-line">Yeniden uygun zaman: {{ item.next_allowed_at.strftime('%d.%m.%Y %H:%M') }}</div>{% endif %}
+        {% endif %}
+       </td>
+       <td>
+        <div class="action-stack">
+         <form method="post" action="{{ url_for('main.performance_send_single_mail_reminder', period_id=selected_period.id, manager_id=item.manager.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-soft secondary" onclick="return confirm('{{ item.manager.ad }} {{ item.manager.soyad }} için hatırlatma maili gönderilsin mi?');">Kişi Bazlı Gönder</button>
+         </form>
+         {% if not item.can_send_now %}
+         <form method="post" action="{{ url_for('main.performance_send_single_mail_reminder', period_id=selected_period.id, manager_id=item.manager.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="force_send" value="1">
+          <button type="submit" class="btn-soft warning" onclick="return confirm('Bekleme süresi aktif. Buna rağmen zorla tekrar gönderilsin mi?');">Zorla Tekrar Gönder</button>
+         </form>
+         {% endif %}
+        </div>
+       </td>
+      </tr>
+      {% endfor %}
+     </tbody>
+    </table>
+   </div>
+  {% else %}
+   <div class="empty-box">Bu dönem için bekleyen görevi olan yönetici bulunamadı.</div>
+  {% endif %}
+ </div>
+
+ <div class="panel-card">
+  <div class="section-head">
+   <div>
+    <h3>Mail Geçmişi</h3>
+    <div class="section-note">Reminder ve sonuç yayın maillerinin son kayıtları. Excel dışa aktarımla paylaşabilirsiniz.</div>
+   </div>
+   <a class="btn-soft secondary" href="{{ url_for('main.performance_mail_history_export', period_id=selected_period.id) }}"><i class="fa-solid fa-file-excel"></i> Excel'e Aktar</a>
+  </div>
+  {% if history_rows %}
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>Gönderim Zamanı</th>
+      <th>Mail Türü</th>
+      <th>Alıcı</th>
+      <th>Konu</th>
+      <th>Durum</th>
+      <th>Gönderen</th>
+     </tr>
+    </thead>
+    <tbody>
+     {% for row in history_rows %}
+     <tr>
+      <td>{{ row.sent_at.strftime('%d.%m.%Y %H:%M') if row.sent_at else '-' }}</td>
+      <td>{% if row.mail_type == reminder_mail_type %}Görev hatırlatma{% elif row.mail_type == result_mail_type %}Sonuç yayın bilgilendirme{% else %}{{ row.mail_type }}{% endif %}</td>
+      <td><div class="person-name">{{ row.recipient_email }}</div>{% if row.user_name %}<div class="muted-line">{{ row.user_name }}</div>{% endif %}</td>
+      <td>{{ row.subject }}</td>
+      <td><span class="history-chip {% if row.is_success %}ok{% else %}bad{% endif %}">{{ 'Başarılı' if row.is_success else 'Başarısız' }}</span></td>
+      <td>{{ row.sent_by_name or '-' }}</td>
+     </tr>
+     {% endfor %}
+    </tbody>
+   </table>
+  </div>
+  {% else %}
+   <div class="empty-box">Seçili dönem için mail geçmişi kaydı yok.</div>
+  {% endif %}
+ </div>
+
+ <div class="panel-card">
+  <div class="section-head">
+   <div>
+    <h3>Başarısız Mail Gönderimleri</h3>
+    <div class="section-note">Bu listede reminder ve sonuç yayın maillerinin başarısız kayıtları yer alır. İsterseniz hepsini yeniden deneyebilirsiniz.</div>
+   </div>
+   {% if failed_mail_logs %}
+   <form method="post" action="{{ url_for('main.performance_retry_failed_mail_logs', period_id=selected_period.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn-soft warning" onclick="return confirm('Bu dönem için başarısız tüm mailler yeniden denensin mi?');"><i class="fa-solid fa-rotate-right"></i> Başarısızları Yeniden Dene</button>
+   </form>
+   {% endif %}
+  </div>
+  {% if failed_mail_logs %}
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>Gönderim Zamanı</th>
+      <th>Mail Türü</th>
+      <th>Alıcı</th>
+      <th>Konu</th>
+      <th>Hata</th>
+      <th>İşlem</th>
+     </tr>
+    </thead>
+    <tbody>
+     {% for log in failed_mail_logs %}
+     <tr>
+      <td>{% if log.sent_at %}{{ log.sent_at.strftime('%d.%m.%Y %H:%M') }}{% else %}-{% endif %}</td>
+      <td>
+       {% if log.mail_type == reminder_mail_type %}
+        Görev hatırlatma
+       {% elif log.mail_type == result_mail_type %}
+        Sonuç yayın bilgilendirme
+       {% else %}
+        {{ log.mail_type }}
+       {% endif %}
+      </td>
+      <td>
+       <div class="person-name">{{ log.recipient_email }}</div>
+       {% if log.user %}<div class="muted-line">{{ log.user.ad }} {{ log.user.soyad }}</div>{% endif %}
+      </td>
+      <td>{{ log.subject }}</td>
+      <td><span class="status-bad">{{ log.error_message or 'Bilinmeyen hata' }}</span></td>
+      <td>
+       <form method="post" action="{{ url_for('main.performance_retry_single_mail_log', mail_log_id=log.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="period_id" value="{{ selected_period.id }}">
+        <button type="submit" class="btn-soft secondary">Yeniden Dene</button>
+       </form>
+      </td>
+     </tr>
+     {% endfor %}
+    </tbody>
+   </table>
+  </div>
+  {% else %}
+   <div class="empty-box">Seçili dönem için başarısız mail kaydı yok.</div>
+  {% endif %}
+ </div>
+ {% else %}
+ <div class="panel-card"><div class="empty-box">Lütfen önce bir dönem seçin.</div></div>
+ {% endif %}
+</div>
+
+<script>
+ (function(){
+  const toggleAll = document.getElementById('toggle-all-managers');
+  if (!toggleAll) return;
+  toggleAll.addEventListener('change', function(){
+   document.querySelectorAll('.manager-checkbox').forEach(function(item){ item.checked = toggleAll.checked; });
+  });
+ })();
+</script>
+</div>
+{% endblock %}

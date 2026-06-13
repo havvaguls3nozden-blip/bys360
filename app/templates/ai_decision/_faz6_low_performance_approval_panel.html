@@ -1,0 +1,43 @@
+{# BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_PANEL #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz6_low_performance.css') }}">
+<section class="bys360-faz6-approval-panel" aria-label="Düşük performans üst onay karar destek alanı">
+  <div class="faz6-panel-header">
+    <div>
+      <span class="faz6-kicker">Karar Destek Merkezi</span>
+      <h3>Başkan/Üst Onay ve Düşük Performans Süreci</h3>
+      <p>70 altı sonuçlar, üst onay ve süreç kaydı tamamlanmadan personele yayınlanmış sonuç sayılmaz.</p>
+    </div>
+    <span class="faz6-badge">Yayın Kilidi Kontrolü</span>
+  </div>
+  {% if ai_decision_faz6_panel is defined and ai_decision_faz6_panel %}
+    <div class="faz6-panel-grid">
+      <article>
+        <strong>{{ ai_decision_faz6_panel.process.status_label }}</strong>
+        <span>{{ ai_decision_faz6_panel.process.decision_note }}</span>
+      </article>
+      <article>
+        <strong>{{ ai_decision_faz6_panel.score.value }}</strong>
+        <span>Nihai performans puanı</span>
+      </article>
+      <article>
+        <strong>{{ 'Açık' if ai_decision_faz6_panel.process.publish_locked else 'Kapalı' }}</strong>
+        <span>Personel görünürlüğü yayın kilidi</span>
+      </article>
+    </div>
+  {% else %}
+    <div class="faz6-panel-grid">
+      <article>
+        <strong>Başkan/Üst Onay Bekliyor</strong>
+        <span>70 altı kayıtlar için karar destek kontrolü aktif tutulur.</span>
+      </article>
+      <article>
+        <strong>Personel Süreç Kaydı</strong>
+        <span>İlk ve tekrarlayan düşük performans kayıtları personel geçmişine bağlanır.</span>
+      </article>
+      <article>
+        <strong>İnsan Denetimi</strong>
+        <span>Sistem karar vermez; yetkili onay sürecini görünür kılar.</span>
+      </article>
+    </div>
+  {% endif %}
+</section>

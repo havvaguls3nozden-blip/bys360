@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-12T13:38:32",
+  "phase": "A7A_LOCAL_LIVE_READINESS_BASELINE",
+  "ok": true,
+  "passed": 10,
+  "warnings": 0,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "A6_SECURITY_EVIDENCE_ZIP_EXISTS",
+      "status": "pass",
+      "severity": "info",
+      "detail": "C:\\bys360\\releases\\BYS360_A6_SECURITY_EVIDENCE_20260612_133606.zip"
+    },
+    {
+      "name": "REPORT_EXISTS::reports/security/BYS360_A6D_RELEASE_LEAK_GATE.md",
+      "status": "pass",
+      "severity": "info",
+      "detail": "reports/security/BYS360_A6D_RELEASE_LEAK_GATE.md"
+    },
+    {
+      "name": "REPORT_EXISTS::reports/security/BYS360_A6F_STRICT_ENV_CONTRACT_REPORT.md",
+      "status": "pass",
+      "severity": "info",
+      "detail": "reports/security/BYS360_A6F_STRICT_ENV_CONTRACT_REPORT.md"
+    },
+    {
+      "name": "REPORT_EXISTS::reports/security/BYS360_A6I_FINAL_CSP_CSRF_DECISION_GATE.md",
+      "status": "pass",
+      "severity": "info",
+      "detail": "reports/security/BYS360_A6I_FINAL_CSP_CSRF_DECISION_GATE.md"
+    },
+    {
+      "name": "ERROR_TEMPLATE_EXISTS::app/templates/errors/404.html",
+      "status": "pass",
+      "severity": "info",
+      "detail": "app/templates/errors/404.html"
+    },
+    {
+      "name": "ERROR_TEMPLATE_EXISTS::app/templates/errors/500.html",
+      "status": "pass",
+      "severity": "info",
+      "detail": "app/templates/errors/500.html"
+    },
+    {
+      "name": "RELEASEIGNORE_EXISTS",
+      "status": "pass",
+      "severity": "info",
+      "detail": ".releaseignore var."
+    },
+    {
+      "name": "RELEASEIGNORE_REQUIRED_RULES",
+      "status": "pass",
+      "severity": "info",
+      "detail": "Eksik kurallar: []"
+    },
+    {
+      "name": "COMPILEALL_APP_SCRIPTS_TESTS",
+      "status": "pass",
+      "severity": "info",
+      "detail": "exit=0\nSTDOUT=\\20260612_090923\\\\tests\\\\architecture'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\communication'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\expert_review'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\integration'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\ops'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\release'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\security'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\services'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_090923\\\\tests\\\\sprint2'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_091655'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_091655\\\\p2_remaining'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_091655\\\\p2_remaining\\\\tests'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_091655\\\\p2_remaining\\\\tests\\\\docs'...\nListing 'tests\\\\_archive_a5_obsolete\\\\20260612_091655\\\\p2_remaining\\\\tests\\\\integration'...\nListing 'tests\\\\architecture'...\nListing 'tests\\\\behavior'...\nListing 'tests\\\\communication'...\nListing 'tests\\\\critical'...\nListing 'tests\\\\docs'...\nListing 'tests\\\\expert_review'...\nListing 'tests\\\\integration'...\nListing 'tests\\\\load'...\nListing 'tests\\\\mobile'...\nListing 'tests\\\\ops'...\nListing 'tests\\\\performance'...\nListing 'tests\\\\quality'...\nListing 'tests\\\\release'...\nListing 'tests\\\\security'...\nListing 'tests\\\\services'...\nListing 'tests\\\\sprint2'...\n\nSTDERR="
+    },
+    {
+      "name": "RUFF_F821_APP_SCRIPTS_TESTS",
+      "status": "pass",
+      "severity": "info",
+      "detail": "exit=0\nSTDOUT=All checks passed!\n\nSTDERR="
+    }
+  ]
+}

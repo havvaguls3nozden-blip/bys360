@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% block title %}Başkan Onayı Karne İncelemesi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Başkan Onayı Karne İncelemesi{% endblock %}
+{% block page_subtitle %}70 altı nihai performans sonucu için karne, puanlama geçmişi ve süreç akışı görünümü.{% endblock %}
+{% block content %}
+{# BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_PANEL_INCLUDE #}
+{% include "ai_decision/_faz6_low_performance_approval_panel.html" ignore missing %}
+
+
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+<style>
+.pres-card-shell{display:flex;flex-direction:column;gap:18px}.pres-card-hero{border:1px solid rgba(139,0,0,.14);border-radius:28px;background:linear-gradient(135deg,rgba(139,0,0,.08),rgba(255,255,255,.97));box-shadow:0 22px 50px rgba(15,23,42,.07);padding:24px}.pres-card-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}.pres-eyebrow{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.pres-title{font-size:1.6rem;font-weight:950;color:#111827;margin:5px 0}.pres-muted{color:#64748b;line-height:1.65}.pres-score{border-radius:24px;background:#fff;border:1px solid rgba(139,0,0,.12);padding:16px 18px;min-width:180px;text-align:center}.pres-score span{display:block;font-size:.75rem;font-weight:900;color:#64748b;text-transform:uppercase}.pres-score strong{display:block;font-size:2.2rem;color:#991b1b}.pres-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.pres-box{border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff;box-shadow:0 16px 32px rgba(15,23,42,.05);padding:16px}.pres-box-label{font-size:.74rem;font-weight:900;text-transform:uppercase;color:#64748b;letter-spacing:.05em}.pres-box-value{font-size:1rem;font-weight:900;color:#111827;margin-top:7px}.pres-section{border:1px solid rgba(15,23,42,.08);border-radius:24px;background:#fff;box-shadow:0 18px 34px rgba(15,23,42,.055);padding:18px}.pres-section h3{font-size:1.05rem;font-weight:950;color:#111827;margin:0 0 12px}.pres-list{display:flex;flex-direction:column;gap:10px}.pres-row{border:1px solid rgba(15,23,42,.08);border-radius:16px;background:#f8fafc;padding:12px}.pres-row-title{font-weight:950;color:#111827}.pres-row-meta{font-size:.84rem;color:#64748b;margin-top:4px;line-height:1.5}.pres-toolbar{display:flex;gap:10px;flex-wrap:wrap}.pres-btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;text-decoration:none;font-weight:900;padding:10px 14px;background:#8B0000;color:#fff}.pres-btn.secondary{background:#f1f5f9;color:#334155}@media(max-width:900px){.pres-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.pres-grid{grid-template-columns:1fr}.pres-score{width:100%}}
+</style>
+<div class="pres-card-shell">
+  {# BYS360_V55_SCORECARD_GUIDANCE_SAFE_INCLUDE: title bloğu dışında güvenli include. #}
+  {% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+  <section class="pres-card-hero">
+    <div class="pres-card-top">
+      <div>
+        <div class="pres-eyebrow">Başkan Onayları</div>
+        <h2 class="pres-title">{{ approval.employee_name }}</h2>
+        <div class="pres-muted">{{ approval.period_title }} · {{ approval.status }}</div>
+      </div>
+      <div class="pres-score"><span>Nihai Puan</span><strong>{{ approval.final_score }}</strong></div>
+    </div>
+  </section>
+
+  <section class="pres-grid">
+    <article class="pres-box"><div class="pres-box-label">Sicil No</div><div class="pres-box-value">{{ approval.sicil_no }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Birim</div><div class="pres-box-value">{{ approval.unit }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Unvan</div><div class="pres-box-value">{{ approval.title }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Başkan</div><div class="pres-box-value">{{ approval.president_name }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Talep Tarihi</div><div class="pres-box-value">{{ approval.requested_at }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Süreç Aşaması</div><div class="pres-box-value">{{ approval.current_stage }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Kimde Bekliyor</div><div class="pres-box-value">{{ approval.current_owner_name }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Yayın Kilidi</div><div class="pres-box-value">{{ approval.publish_lock_status }}</div></article>
+  </section>
+
+  <section class="pres-section">
+    <h3>Puanlama Geçmişi</h3>
+    <div class="pres-list">
+      {% if scoring_history %}
+        {% for item in scoring_history %}
+        <div class="pres-row"><div class="pres-row-title">{{ item.scorer_name }} · {{ item.score }}</div><div class="pres-row-meta">{{ item.manager_level }}. amir · {{ item.action_at }} · {{ item.status }}<br>Sonraki aşama: {{ item.next_stage }} / {{ item.next_owner_name }}</div></div>
+        {% endfor %}
+      {% else %}
+        <div class="pres-row"><div class="pres-row-title">Puanlama geçmişi için kayıt bulunamadı</div><div class="pres-row-meta"></div></div>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="pres-section">
+    <h3>Süreç Akışı</h3>
+    <div class="pres-list">
+      {% if flow_steps %}
+        {% for step in flow_steps %}
+        <div class="pres-row"><div class="pres-row-title">{{ step.title }}</div><div class="pres-row-meta">{{ step.status }} · {{ step.date }}{% if step.summary %}<br>{{ step.summary }}{% endif %}</div></div>
+        {% endfor %}
+      {% else %}
+        <div class="pres-row"><div class="pres-row-title">{{ approval.current_stage }}</div><div class="pres-row-meta">Süreç bu aşamada Başkan onayı bekliyor.</div></div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if approval.publish_lock_reason %}
+  <section class="pres-section">
+    <h3>Yayın Kilidi Açıklaması</h3>
+    <p class="pres-muted">{{ approval.publish_lock_reason }}</p>
+  </section>
+  {% endif %}
+
+  <div class="pres-toolbar">
+    <a class="pres-btn secondary" href="{{ back_url }}"><i class="fa-solid fa-arrow-left"></i> Başkan Onaylarına Dön</a>
+  </div>
+</div>
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}İletişim Faz 8{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+          <h3 class="mb-2">İletişim ve Anket Yönetimi | Kontrol 8</h3>
+          <p class="text-muted mb-0">Pilot açılış, cutover takibi ve operasyonel kapanış görünümü.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('main.communication_phase8_readiness') }}" class="btn btn-outline-danger">Hazırlık Merkezi</a>
+          <a href="{{ url_for('main.communication_phase8_cutover') }}" class="btn btn-danger">Cutover Merkezi</a>
+          <a href="{{ url_for('main.communication_phase9_dashboard') }}" class="btn btn-outline-secondary">Kontrol 9</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    {% for card in payload.summary_cards %}
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">{{ card.label }}</div>
+          <div class="fs-3 fw-semibold">{{ card.value }}{{ card.suffix }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-xl-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Pilot kararı</h5>
+            <span class="badge text-bg-{{ 'success' if payload.readiness.tone == 'success' else 'warning' if payload.readiness.tone == 'warning' else 'danger' }}">{{ payload.readiness.decision }}</span>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4"><div class="rounded-3 bg-light p-3"><div class="small text-muted">Geçen kontrol</div><div class="fs-4 fw-semibold">{{ payload.readiness.counts.pass }}</div></div></div>
+            <div class="col-md-4"><div class="rounded-3 bg-light p-3"><div class="small text-muted">Uyarı</div><div class="fs-4 fw-semibold">{{ payload.readiness.counts.warn }}</div></div></div>
+            <div class="col-md-4"><div class="rounded-3 bg-light p-3"><div class="small text-muted">Blokaj</div><div class="fs-4 fw-semibold">{{ payload.readiness.counts.fail }}</div></div></div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead><tr><th>Başlık</th><th>Durum</th><th>Sahip</th><th>Detay</th></tr></thead>
+              <tbody>
+                {% for row in payload.readiness.recommendations %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                  <td>{{ row.owner }}</td>
+                  <td>{{ row.action or row.detail }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-muted">Ek aksiyon görünmüyor.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-5">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">İlk 72 saat odağı</h5>
+          <ul class="list-group list-group-flush">
+            {% for row in payload.cutover.handoff_rows %}
+            <li class="list-group-item px-0">
+              <div class="fw-semibold">{{ row.title }}</div>
+              <div class="text-muted small">{{ row.body }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3">Son pilot kayıtları</h5>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead><tr><th>İşlem</th><th>Özet</th><th>Zaman</th></tr></thead>
+              <tbody>
+                {% for row in payload.cutover.checkpoint_logs[:10] %}
+                <tr><td>{{ row.action_type }}</td><td>{{ row.summary }}</td><td>{{ row.executed_at }}</td></tr>
+                {% else %}
+                <tr><td colspan="3" class="text-muted">Henüz pilot kaydı yok.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

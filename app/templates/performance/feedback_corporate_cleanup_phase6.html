@@ -1,0 +1,154 @@
+{# BYS360_FEEDBACK_CORPORATE_CLEANUP_ADVANCED_UI #}
+{% extends "base.html" %}
+{% block title %}Geri Bildirim Yayına Hazırlık Kontrolü{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Yayına Hazırlık Kontrolü{% endblock %}
+{% block page_subtitle %}Görüşme sonrası notlar, rehber, karne bağlantısı ve eylem planı takibi ekranlarının canlı kullanıma uygunluğunu sade bir yönetici özetiyle gösterir.{% endblock %}
+
+{% block content %}
+<style>
+.bys-live-check{--red:#8B0000;--red-2:#a31313;--ink:#111827;--muted:#64748b;--soft:#f8fafc;--line:rgba(15,23,42,.09);--green:#166534;--amber:#92400e;--danger:#991b1b;display:grid;gap:18px;max-width:1540px;margin:0 auto;padding:4px 0 36px}.bys-live-card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:26px;box-shadow:0 18px 42px rgba(15,23,42,.07);padding:20px}.bys-live-hero{display:grid;grid-template-columns:minmax(0,1.25fr) 390px;gap:18px;align-items:stretch;background:linear-gradient(135deg,rgba(139,0,0,.075),rgba(255,255,255,.98) 62%,rgba(139,0,0,.035));border-color:rgba(139,0,0,.16)}.bys-live-kicker{display:inline-flex;align-items:center;gap:8px;color:var(--red);font-weight:950;font-size:.78rem;letter-spacing:.055em;text-transform:uppercase}.bys-live-title{margin:9px 0 8px;color:var(--ink);font-size:1.62rem;font-weight:950;line-height:1.22}.bys-live-text{margin:0;color:var(--muted);line-height:1.75}.bys-live-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.bys-live-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:10px 13px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font-weight:900;transition:.16s ease}.bys-live-btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(15,23,42,.08);text-decoration:none}.bys-live-btn.primary{background:var(--red);border-color:var(--red);color:#fff}.bys-live-btn.soft{background:rgba(139,0,0,.07);border-color:rgba(139,0,0,.14);color:var(--red)}.bys-live-status{display:grid;align-content:center;border-radius:24px;background:#fff;border:1px solid rgba(139,0,0,.14);padding:22px}.bys-live-meter{display:grid;gap:12px}.bys-live-percent{font-size:3.15rem;line-height:1;color:var(--red);font-weight:950;letter-spacing:-.05em}.bys-live-bar{height:12px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden}.bys-live-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--red),var(--red-2));min-width:5%}.bys-live-pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;padding:7px 10px;background:rgba(15,23,42,.06);color:#334155;font-size:.77rem;font-weight:950;white-space:nowrap}.bys-live-pill.ok{background:rgba(22,101,52,.09);color:var(--green)}.bys-live-pill.warn{background:rgba(180,83,9,.11);color:var(--amber)}.bys-live-pill.fail{background:rgba(185,28,28,.10);color:var(--danger)}.bys-live-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.bys-live-stat{border:1px solid var(--line);border-radius:20px;background:#fff;padding:16px;min-height:94px}.bys-live-stat strong{display:block;color:var(--red);font-size:1.55rem;font-weight:950}.bys-live-stat span{display:block;color:var(--muted);font-size:.83rem;font-weight:850;line-height:1.45;margin-top:6px}.bys-live-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}.bys-live-section-head h2{margin:0;color:var(--ink);font-size:1.12rem;font-weight:950}.bys-live-section-head p{margin:5px 0 0;color:var(--muted);line-height:1.6}.bys-live-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.bys-live-checkitem{border:1px solid var(--line);border-radius:22px;background:#fff;padding:16px;display:grid;gap:11px;min-height:190px}.bys-live-checkitem.ok{border-color:rgba(22,101,52,.16);background:linear-gradient(135deg,rgba(240,253,244,.92),#fff)}.bys-live-checkitem.warn{border-color:rgba(180,83,9,.18);background:linear-gradient(135deg,rgba(255,251,235,.92),#fff)}.bys-live-checkitem.fail{border-color:rgba(185,28,28,.18);background:linear-gradient(135deg,rgba(254,242,242,.92),#fff)}.bys-live-check-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.bys-live-check-title{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:950}.bys-live-icon{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:rgba(139,0,0,.08);color:var(--red)}.bys-live-checkitem h3{margin:0;color:var(--ink);font-size:1rem;font-weight:950}.bys-live-checkitem p{margin:0;color:#475569;line-height:1.65}.bys-live-mini{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.81rem;font-weight:850}.bys-live-mini b{color:var(--ink)}.bys-live-progress{height:8px;background:rgba(15,23,42,.08);border-radius:999px;overflow:hidden}.bys-live-progress span{display:block;height:100%;border-radius:999px;background:rgba(139,0,0,.82)}.bys-live-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.bys-live-guide{display:grid;gap:10px}.bys-live-step{display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:12px;background:#fff}.bys-live-step em{width:34px;height:34px;border-radius:13px;background:rgba(139,0,0,.08);color:var(--red);font-style:normal;font-weight:950;display:grid;place-items:center}.bys-live-step strong{display:block;color:var(--ink);font-weight:950}.bys-live-step span{display:block;color:var(--muted);font-size:.86rem;line-height:1.55;margin-top:3px}.bys-live-note{border:1px dashed rgba(139,0,0,.22);background:rgba(139,0,0,.045);border-radius:20px;padding:14px;color:#374151;line-height:1.65}.bys-live-note strong{color:var(--red)}.bys-live-empty{border:1px solid var(--line);background:#fff;border-radius:20px;padding:18px;color:var(--muted);line-height:1.7}.bys-live-denied{border-color:rgba(185,28,28,.20);background:rgba(254,242,242,.96)}.bys-live-detail-list{display:grid;gap:10px;margin-top:10px}.bys-live-detail{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:16px;padding:11px}.bys-live-detail span{color:#475569;line-height:1.45}.bys-live-detail b{color:var(--ink)}@media(max-width:1180px){.bys-live-hero{grid-template-columns:1fr}.bys-live-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bys-live-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.bys-live-two{grid-template-columns:1fr}}@media(max-width:720px){.bys-live-card{padding:16px;border-radius:22px}.bys-live-title{font-size:1.3rem}.bys-live-grid,.bys-live-stats{grid-template-columns:1fr}.bys-live-actions{flex-direction:column}.bys-live-btn{width:100%}.bys-live-section-head{display:grid}.bys-live-percent{font-size:2.55rem}.bys-live-detail{display:grid}}
+</style>
+
+{% set title_map = {
+    'files': 'Ekran Bileşenleri',
+    'python': 'Uygulama Sağlığı',
+    'language': 'Kurumsal Dil',
+    'links': 'Sayfa Bağlantıları',
+    'mobile': 'Mobil Uyum',
+    'empty': 'Boş Kayıt Görünümü',
+    'access': 'Yetki ve Erişim',
+    'menu': 'Menü Bağlantıları',
+    'white_screen': 'Sayfa Açılış Sağlığı'
+} %}
+{% set desc_map = {
+    'files': 'Geri bildirim hattındaki ekranların ve yardımcı bileşenlerin yerinde olup olmadığını gösterir.',
+    'python': 'Uygulamanın bu alandaki dosyalarının sağlıklı çalışmaya hazır olup olmadığını kontrol eder.',
+    'language': 'Kullanıcıya görünen alanlarda kurumsal olmayan ifadelerin kalmamasını sağlar.',
+    'links': 'Ekranlar arası geçişlerin güvenli ve kararlı biçimde çalışmasını kontrol eder.',
+    'mobile': 'Sayfanın dar ekranlarda okunabilir ve kullanılabilir kalmasını izler.',
+    'empty': 'Kayıt olmadığında kullanıcının ne yapacağını anlayacağı boş ekran mesajlarını kontrol eder.',
+    'access': 'Bu ekranların yalnızca yetkili kullanıcıların erişimine açık olmasını doğrular.',
+    'menu': 'Sol menüden ilgili ekranlara düzenli erişim sağlanıp sağlanmadığını gösterir.',
+    'white_screen': 'Sayfa açılışında boş veya kırık görünüm oluşmaması için temel bütünlüğü kontrol eder.'
+} %}
+{% set icon_map = {
+    'files': 'fa-solid fa-layer-group',
+    'python': 'fa-solid fa-heart-pulse',
+    'language': 'fa-solid fa-pen-nib',
+    'links': 'fa-solid fa-link',
+    'mobile': 'fa-solid fa-mobile-screen',
+    'empty': 'fa-solid fa-inbox',
+    'access': 'fa-solid fa-user-shield',
+    'menu': 'fa-solid fa-bars-staggered',
+    'white_screen': 'fa-solid fa-window-restore'
+} %}
+
+<div class="bys-live-check" data-bys="feedback-live-readiness-advanced">
+    {% if access_denied %}
+    <section class="bys-live-card bys-live-denied">
+        <div class="bys-live-kicker"><i class="fa-solid fa-shield-halved"></i> Yetki Kontrolü</div>
+        <h2 class="bys-live-title">Bu sayfaya erişim yetkiniz bulunmamaktadır.</h2>
+        <p class="bys-live-text">Geri bildirim yayına hazırlık ekranı yalnızca yetkili yönetici, performans yetkilisi ve sistem yöneticisi kapsamında açılır.</p>
+    </section>
+    {% else %}
+    <section class="bys-live-card bys-live-hero">
+        <div>
+            <div class="bys-live-kicker"><i class="fa-solid fa-shield-heart"></i> Kurumsal Kullanım Kontrolü</div>
+            <h1 class="bys-live-title">Görüşme hattı canlı kullanıma hazır mı?</h1>
+            <p class="bys-live-text">Bu ekran; görüşme sonrası notlar, görüşme rehberi, karne bağlantısı ve eylem planı takibini tek bakışta değerlendirir. Amaç, kullanıcıya yansıyan dili sade tutmak, eksik bağlantıları erkenden görmek ve canlı öncesi son kontrolü anlaşılır hale getirmektir.</p>
+            <div class="bys-live-actions">
+                {% for link in quick_links %}
+                <a class="bys-live-btn {% if loop.first %}primary{% else %}soft{% endif %}" href="{{ safe_url_for(link.endpoint) }}"><i class="{{ link.icon }}"></i> {{ link.label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <aside class="bys-live-status">
+            <div class="bys-live-meter">
+                <div class="bys-live-percent">%{{ ready_percent }}</div>
+                <div class="bys-live-bar"><span style="width: {{ ready_percent }}%;"></span></div>
+                {% if ok %}
+                <span class="bys-live-pill ok"><i class="fa-solid fa-check"></i> Kullanıma uygun görünüyor</span>
+                {% elif summary.get('error_count', 0) <= 3 %}
+                <span class="bys-live-pill warn"><i class="fa-solid fa-circle-info"></i> Küçük eksikler var</span>
+                {% else %}
+                <span class="bys-live-pill fail"><i class="fa-solid fa-triangle-exclamation"></i> Kontrol gerekiyor</span>
+                {% endif %}
+            </div>
+        </aside>
+    </section>
+
+    <section class="bys-live-stats">
+        <div class="bys-live-stat"><strong>{{ summary.get('ok_count', 0) }}/{{ summary.get('total', 0) }}</strong><span>Temiz görünen kontrol başlığı</span></div>
+        <div class="bys-live-stat"><strong>{{ summary.get('error_count', 0) }}</strong><span>Düzeltilmesi gereken konu</span></div>
+        <div class="bys-live-stat"><strong>{{ summary.get('warning_count', 0) }}</strong><span>Gözden geçirme notu</span></div>
+        <div class="bys-live-stat"><strong>{% if ok %}Hazır{% else %}İncele{% endif %}</strong><span>Genel kullanım durumu</span></div>
+    </section>
+
+    <section class="bys-live-card">
+        <div class="bys-live-section-head">
+            <div>
+                <h2>Kontrol Özeti</h2>
+                <p>Her başlık, kullanıcıya görünen ekranların güvenli, anlaşılır ve kurumsal biçimde çalışmasına yardımcı olur.</p>
+            </div>
+            {% if ok %}<span class="bys-live-pill ok"><i class="fa-solid fa-check-double"></i> Temiz</span>{% else %}<span class="bys-live-pill warn"><i class="fa-solid fa-clipboard-list"></i> İnceleme gerekli</span>{% endif %}
+        </div>
+        <div class="bys-live-grid">
+            {% for check in checks %}
+            {% set key = check.get('key', '') %}
+            {% set item_count = check.get('items', [])|length %}
+            {% set error_count = check.get('errors', [])|length %}
+            {% set warning_count = check.get('warnings', [])|length %}
+            <article class="bys-live-checkitem {% if check.get('ok') %}ok{% elif error_count > 0 %}fail{% else %}warn{% endif %}">
+                <div class="bys-live-check-top">
+                    <div class="bys-live-check-title"><span class="bys-live-icon"><i class="{{ icon_map.get(key, 'fa-solid fa-circle-check') }}"></i></span><h3>{{ title_map.get(key, check.get('title', 'Kontrol')) }}</h3></div>
+                    {% if check.get('ok') %}<span class="bys-live-pill ok">Temiz</span>{% elif error_count > 0 %}<span class="bys-live-pill fail">Eksik</span>{% else %}<span class="bys-live-pill warn">İncele</span>{% endif %}
+                </div>
+                <p>{{ desc_map.get(key, 'Bu başlık sistemin canlı kullanıma uygunluğunu değerlendirir.') }}</p>
+                <div class="bys-live-progress"><span style="width:{% if check.get('ok') %}100{% elif error_count > 0 %}42{% else %}72{% endif %}%;"></span></div>
+                <div class="bys-live-mini"><span><b>{{ item_count }}</b> kontrol adımı</span><span><b>{{ error_count }}</b> eksik</span>{% if warning_count %}<span><b>{{ warning_count }}</b> not</span>{% endif %}</div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="bys-live-two">
+        <div class="bys-live-card">
+            <div class="bys-live-section-head">
+                <div>
+                    <h2>Önerilen Kullanım Sırası</h2>
+                    <p>Eksik varsa önce ilgili ekrana gidip görünümü kontrol etmek yeterli olur.</p>
+                </div>
+            </div>
+            <div class="bys-live-guide">
+                <div class="bys-live-step"><em>1</em><div><strong>Görüşme kaydı oluştur</strong><span>Personel ve dönem seçimiyle görüşme dosyasını aç.</span></div></div>
+                <div class="bys-live-step"><em>2</em><div><strong>Görüşme notunu tamamla</strong><span>Özet, güçlü yön, gelişim alanı ve personelin son sözünü kaydet.</span></div></div>
+                <div class="bys-live-step"><em>3</em><div><strong>Eylem planını bağla</strong><span>Kararlaştırılan adımlar için sorumlu, hedef tarih ve takip notu belirle.</span></div></div>
+                <div class="bys-live-step"><em>4</em><div><strong>Karneyle birlikte kontrol et</strong><span>Karne, dönem içi not ve görüşme notu aynı bütünlükte görünsün.</span></div></div>
+            </div>
+        </div>
+        <div class="bys-live-card">
+            <div class="bys-live-section-head">
+                <div>
+                    <h2>Yönetici Notu</h2>
+                    <p>Bu ekran karar vermez; yalnızca canlı kullanım öncesi görünürlük sağlar.</p>
+                </div>
+            </div>
+            <div class="bys-live-note"><strong>Temel amaç:</strong> Performans görüşmesi hattının kullanıcı gözünde sade, güvenli, okunur ve kurumsal görünmesini sağlamak.</div>
+            <div class="bys-live-detail-list">
+                <div class="bys-live-detail"><span>Görüşme sonrası notlar</span><b>ana kayıt alanı</b></div>
+                <div class="bys-live-detail"><span>Eylem planı</span><b>görüşmeye bağlı takip alanı</b></div>
+                <div class="bys-live-detail"><span>Karne bağlantısı</span><b>sonuç ve gelişim bütünlüğü</b></div>
+                <div class="bys-live-detail"><span>Yetki sınırı</span><b>yalnızca görev kapsamı</b></div>
+            </div>
+        </div>
+    </section>
+
+    {% if not checks %}
+    <section class="bys-live-empty">
+        Henüz kontrol sonucu üretilemedi. Uygulamayı yeniden başlatıp bu sayfayı tekrar açın.
+    </section>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

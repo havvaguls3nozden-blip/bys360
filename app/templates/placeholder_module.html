@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module_title }} - BYS360{% endblock %}
+{% block page_kicker %}Kurumsal Modüller{% endblock %}
+{% block page_title %}{{ module_title }}{% endblock %}
+{% block page_subtitle %}{{ module_description }}{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <p style="margin:0; color:#6b7280; line-height:1.8;">
+        {{ module_description }}
+    </p>
+</div>
+{% endblock %}

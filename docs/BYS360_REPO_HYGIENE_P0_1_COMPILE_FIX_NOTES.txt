@@ -1,0 +1,11 @@
+BYS360 Repo Hijyeni P0.1 Compile Fix V2.17.1
+
+Bu paket P0 temizlikten sonra compileall komutunu bozan eski repair/check/template dosyalarını karantinaya alır.
+Canlı uygulama modüllerinde refactor yapmaz.
+
+Hedeflenen hatalar:
+1) scripts/communication/repair_corporate_information_center_v3_0_phase7_1_base_css_link_fix.py
+2) scripts/quality/check_bys360_cic_v3_0_live_final_release.py
+3) scripts/repair/templates/app_init_factory_clean_v2_15_4.py
+
+Ayrıca proje içinde kalan .backup*, _backup*, _bys360_backups klasörlerini _local_quarantine altına taşır.

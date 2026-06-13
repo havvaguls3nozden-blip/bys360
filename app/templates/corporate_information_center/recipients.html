@@ -1,0 +1,218 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='recipients' %}
+{# BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2 #}
+
+{% block extra_head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corporate_information_center_recipients_save_v2.css') }}?v=3_0_2">
+{% endblock %}
+
+{% macro rec_name(user) -%}
+ {%- set n = ((user.ad|default('', true)) ~ ' ' ~ (user.soyad|default('', true)))|trim -%}
+ {{- n or user.full_name_cache|default('', true) or user.name|default('', true) or user.email|default('', true) or ('Kullanıcı #' ~ user.id) -}}
+{%- endmacro %}
+
+{% macro rec_initial(user) -%}
+ {%- set n = rec_name(user)|striptags|trim -%}
+ {{- (n[:1] if n else '?')|upper -}}
+{%- endmacro %}
+
+{% block cic_content %}
+{% set _cfg = config|default({}, true) %}
+{% set manager_ids = _cfg.manager_recipient_ids|default([], true) %}
+{% set staff_ids = _cfg.staff_recipient_ids|default([], true) %}
+{% set mode = _cfg.staff_recipient_mode|default('manual', true) %}
+{% set user_list = users|default([], true) %}
+
+<div class="cic-rec2" data-cic-recipient-save-v2>
+ <section class="cic-rec2-hero">
+ <div>
+ <span class="cic-rec2-eyebrow"><i class="fa-solid fa-users-gear"></i> Alıcı Yönetimi</span>
+ <h2>Alıcıları seç, kaydet, gönderimde güvenle kullan</h2>
+ <p>Personel Öğlen Bilgilendirmesi ve diğer görevler burada kaydedilen alıcı listelerini kullanır. Seçim yaptıktan sonra sağdaki özetten sayıları kontrol edip kaydetmeniz yeterlidir.</p>
+ </div>
+ <div class="cic-rec2-actions top">
+ <a class="cic-rec2-btn ghost" href="{{ url_for('main.corporate_information_center_tasks') }}"><i class="fa-solid fa-list-check"></i> Görevler</a>
+ <a class="cic-rec2-btn ghost" href="{{ url_for('main.corporate_information_center_test') }}"><i class="fa-solid fa-paper-plane"></i> Önizleme / Test</a>
+ </div>
+ </section>
+
+ <form method="post" action="{{ url_for('main.corporate_information_center_recipients_save') }}" id="cicRecipientSaveFormV2" autocomplete="off" novalidate>
+<!-- BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2_1_GATE_FIX -->
+<input type="hidden" name="staff_user_ids" id="cicStaffUserIds" value="">
+<input type="hidden" name="manager_user_ids" id="cicManagerUserIds" value="">
+ {{ cic_csrf() if cic_csrf is defined else '' }}
+ <input type="hidden" name="staff_recipient_mode" value="manual">
+ <input type="hidden" name="recipient_save_marker" value="BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2">
+ <input type="hidden" name="debug_staff_count" id="debugStaffCount" value="0">
+ <input type="hidden" name="debug_manager_count" id="debugManagerCount" value="0">
+
+ <section class="cic-rec2-toolbar">
+ <div class="cic-rec2-toolbar-head">
+ <div>
+ <h3>Hızlı seçim</h3>
+ <p>Filtreleyin, görünen kayıtları topluca seçin ve kaydedin. Kaydedilen sayılar sayfa yenilendiğinde korunur.</p>
+ </div>
+ <button type="submit" class="cic-rec2-btn primary"><i class="fa-solid fa-floppy-disk"></i> Seçimi Kaydet</button>
+ </div>
+
+ <div class="cic-rec2-filters">
+ <label>
+ <span>Arama</span>
+ <input type="search" id="rec2Search" placeholder="Ad, e-posta, sicil no, birim veya unvan ara...">
+ </label>
+ <label>
+ <span>Birim</span>
+ <select id="rec2Unit"><option value="">Tüm birimler</option></select>
+ </label>
+ <label>
+ <span>E-posta</span>
+ <select id="rec2Email"><option value="">Tümü</option><option value="ok">E-postası olanlar</option><option value="missing">E-postası eksik olanlar</option></select>
+ </label>
+ <label>
+ <span>Seçim</span>
+ <select id="rec2Type"><option value="">Tüm kayıtlar</option><option value="selected">Seçili olanlar</option><option value="staff">Personel seçili</option><option value="manager">Yönetici seçili</option><option value="none">Seçilmemiş olanlar</option></select>
+ </label>
+ </div>
+
+ <div class="cic-rec2-actions">
+ <button type="button" class="cic-rec2-btn" data-rec2-action="visible-staff"><i class="fa-solid fa-user-check"></i> Görünenleri personel seç</button>
+ <button type="button" class="cic-rec2-btn" data-rec2-action="visible-manager"><i class="fa-solid fa-user-tie"></i> Görünenleri yönetici seç</button>
+ <button type="button" class="cic-rec2-btn" data-rec2-action="email-staff"><i class="fa-solid fa-envelope-circle-check"></i> E-postası olanları personel seç</button>
+ <button type="button" class="cic-rec2-btn danger" data-rec2-action="visible-clear"><i class="fa-solid fa-eraser"></i> Görünenleri temizle</button>
+ <button type="button" class="cic-rec2-btn danger ghost-light" data-rec2-action="all-clear"><i class="fa-solid fa-broom"></i> Tüm seçimleri temizle</button>
+ </div>
+ </section>
+
+ <section class="cic-rec2-layout">
+ <div class="cic-rec2-list">
+ <div class="cic-rec2-card-head">
+ <div>
+ <h3>Personel listesi</h3>
+ <p><strong id="rec2VisibleCount">0</strong> kayıt görünüyor. Kart içindeki kutuları işaretleyerek seçim yapabilirsiniz.</p>
+ </div>
+ <span class="cic-rec2-pill"><i class="fa-solid fa-database"></i> {{ user_list|length }} kayıt</span>
+ </div>
+
+ <div class="cic-rec2-grid" id="rec2Grid">
+ {% for user in user_list %}
+ {% set display_name = rec_name(user)|striptags|trim %}
+ {% set email = user.email|default('', true)|trim %}
+ {% set unit = user.birim|default('', true) %}
+ {% set title = user.unvan|default('', true) %}
+ {% set registry = user.sicil_no|default('', true) %}
+ {% set is_manager = user.id in manager_ids %}
+ {% set is_staff = user.id in staff_ids %}
+ <article class="cic-rec2-person {% if is_manager or is_staff %}is-selected{% endif %}"
+ data-rec2-card
+ data-user-id="{{ user.id }}"
+ data-name="{{ display_name|e }}"
+ data-email="{{ email|e }}"
+ data-email-ok="{{ 1 if email else 0 }}"
+ data-unit="{{ unit|default('-', true)|e }}"
+ data-title="{{ title|default('-', true)|e }}"
+ data-search="{{ (display_name ~ ' ' ~ email ~ ' ' ~ registry ~ ' ' ~ unit ~ ' ' ~ title)|lower|e }}">
+ <div class="cic-rec2-person-top">
+ <span class="cic-rec2-avatar">{{ rec_initial(user) }}</span>
+ <div class="cic-rec2-person-info">
+ <strong>{{ display_name }}</strong>
+ <small>{{ title or 'Unvan yok' }} · {{ unit or 'Birim yok' }}</small>
+ {% if email %}
+ <span class="cic-rec2-email ok"><i class="fa-solid fa-envelope"></i> {{ email }}</span>
+ {% else %}
+ <span class="cic-rec2-email missing"><i class="fa-solid fa-triangle-exclamation"></i> E-posta yok</span>
+ {% endif %}
+ </div>
+ </div>
+ <div class="cic-rec2-checks">
+ <label>
+ <input type="checkbox" name="manager_ids" value="{{ user.id }}" data-rec2-manager {% if is_manager %}checked{% endif %}>
+ <span>Yönetici</span>
+ </label>
+ <label>
+ <input type="checkbox" name="staff_ids" value="{{ user.id }}" data-rec2-staff {% if is_staff %}checked{% endif %}>
+ <span>Personel</span>
+ </label>
+ </div>
+ </article>
+ {% else %}
+ <div class="cic-rec2-empty"><i class="fa-solid fa-circle-info"></i><strong>Kayıt bulunamadı</strong><span>Personel listesi geldiğinde alıcı seçimi yapılabilir.</span></div>
+ {% endfor %}
+ </div>
+ </div>
+
+ <aside class="cic-rec2-summary">
+ <h3>Seçim özeti</h3>
+ <p class="cic-rec2-muted">Kaydetmeden önce sayıları kontrol edin.</p>
+ <div class="cic-rec2-summary-grid">
+ <div><span>Personel</span><strong id="rec2StaffCount">0</strong></div>
+ <div><span>Yönetici</span><strong id="rec2ManagerCount">0</strong></div>
+ <div><span>Toplam</span><strong id="rec2TotalCount">0</strong></div>
+ <div><span>E-posta eksik</span><strong id="rec2MissingCount">0</strong></div>
+ </div>
+ <div class="cic-rec2-preview" id="rec2Preview"><span class="cic-rec2-muted">Henüz seçim yok.</span></div>
+ <button type="submit" class="cic-rec2-btn primary full"><i class="fa-solid fa-floppy-disk"></i> Seçimi Kaydet</button>
+ <div class="cic-rec2-note"><i class="fa-solid fa-shield-halved"></i> Personel Öğlen Bilgilendirmesi manuel alıcı listesindeki personel seçimlerini kullanır.</div>
+ </aside>
+ </section>
+ </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/corporate_information_center_recipients_save_v2.js') }}?v=3_0_2" defer></script>
+
+<script>
+(function(){
+ const VERSION = "BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2_1_GATE_FIX";
+ function byName(name){ return Array.from(document.querySelectorAll('input[name="' + name + '"]')); }
+ function bySelector(sel){ return Array.from(document.querySelectorAll(sel)); }
+ function ensureHidden(form, name, id){
+ let el = document.getElementById(id) || form.querySelector('input[type="hidden"][name="' + name + '"]');
+ if(!el){
+ el = document.createElement('input');
+ el.type = 'hidden';
+ el.name = name;
+ el.id = id;
+ form.appendChild(el);
+ }
+ return el;
+ }
+ function unique(values){
+ return Array.from(new Set(values.filter(Boolean).map(v => String(v).trim()).filter(Boolean)));
+ }
+ function checkedValues(selectors){
+ let vals = [];
+ selectors.forEach(sel => {
+ bySelector(sel).forEach(el => {
+ if(el.checked && el.value){ vals.push(el.value); }
+ });
+ });
+ return unique(vals);
+ }
+ function sync(form){
+ const staffHidden = ensureHidden(form, 'staff_user_ids', 'cicStaffUserIds');
+ const managerHidden = ensureHidden(form, 'manager_user_ids', 'cicManagerUserIds');
+ const staff = checkedValues(['input[name="staff_ids"]', 'input[data-staff-check]', 'input[name="staff_user_ids_visible"]']);
+ const managers = checkedValues(['input[name="manager_ids"]', 'input[data-manager-check]', 'input[name="manager_user_ids_visible"]']);
+ staffHidden.value = staff.join(',');
+ managerHidden.value = managers.join(',');
+ const staffCount = document.querySelector('[data-cic-staff-count], #staffSelectedCount, #selectedStaffCount');
+ const managerCount = document.querySelector('[data-cic-manager-count], #managerSelectedCount, #selectedManagerCount');
+ if(staffCount){ staffCount.textContent = staff.length; }
+ if(managerCount){ managerCount.textContent = managers.length; }
+ }
+ function init(){
+ const form = document.querySelector('form[action*="kurumsal-bilgilendirme/alicilar"], form#cicRecipientsForm, form[data-cic-recipients-form], form');
+ if(!form){ return; }
+ form.setAttribute('data-cic-recipients-form', VERSION);
+ ensureHidden(form, 'staff_user_ids', 'cicStaffUserIds');
+ ensureHidden(form, 'manager_user_ids', 'cicManagerUserIds');
+ document.addEventListener('change', function(ev){
+ if(ev.target && ev.target.matches('input[type="checkbox"]')){ sync(form); }
+ });
+ form.addEventListener('submit', function(){ sync(form); });
+ sync(form);
+ }
+ if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+{% endblock %}

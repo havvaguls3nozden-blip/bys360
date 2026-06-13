@@ -1,0 +1,255 @@
+/* BYS360_IOS_ASISTAN_RESPONSIVE_FIX_V2
+   iPhone Safari/PWA nihai düzeltme: ince uzun panel, klavye açılınca giriş alanının kaybolması,
+   eski sürükleme konumu ve safe-area taşmaları giderilir. Masaüstünü etkilemez. */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 820px) {
+    :root {
+      --bys360-ios-vvh: 100dvh;
+      --bys360-ios-vtop: 0px;
+      --bys360-ios-panel-pad: 8px;
+      --bys360-ios-launcher-h: 62px;
+    }
+
+    html.bys360-ios-assistant-open,
+    body.bys360-ios-assistant-open {
+      overflow: hidden !important;
+      overscroll-behavior: none !important;
+      -webkit-overflow-scrolling: auto !important;
+    }
+
+    #bys360-assistant-module-root {
+      position: fixed !important;
+      left: auto !important;
+      top: auto !important;
+      right: max(10px, env(safe-area-inset-right)) !important;
+      bottom: max(10px, env(safe-area-inset-bottom)) !important;
+      width: auto !important;
+      height: auto !important;
+      max-width: calc(100vw - 20px) !important;
+      z-index: 2147483600 !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+      pointer-events: auto !important;
+      isolation: isolate !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher {
+      min-width: 0 !important;
+      width: min(252px, calc(100vw - 20px - env(safe-area-inset-left) - env(safe-area-inset-right))) !important;
+      max-width: calc(100vw - 20px) !important;
+      min-height: var(--bys360-ios-launcher-h) !important;
+      padding: 8px 12px 8px 8px !important;
+      border-radius: 22px !important;
+      gap: 9px !important;
+      cursor: pointer !important;
+      touch-action: manipulation !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-icon,
+    #bys360-assistant-module-root .bys360-am-mark {
+      width: 42px !important;
+      height: 42px !important;
+      min-width: 42px !important;
+      flex: 0 0 42px !important;
+      border-radius: 15px !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-launcher-text {
+      display: flex !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      max-width: 176px !important;
+      overflow: hidden !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      color: #fff !important;
+    }
+    #bys360-assistant-module-root .bys360-am-launcher-text strong,
+    #bys360-assistant-module-root .bys360-am-launcher-text span {
+      display: block !important;
+      max-width: 100% !important;
+      color: #fff !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    #bys360-assistant-module-root .bys360-am-launcher-text strong { font-size: 13.5px !important; line-height: 1.12 !important; font-weight: 900 !important; }
+    #bys360-assistant-module-root .bys360-am-launcher-text span { margin-top: 4px !important; font-size: 10.5px !important; line-height: 1.18 !important; color: rgba(255,255,255,.92) !important; }
+    #bys360-assistant-module-root .bys360-am-launcher-dot { display: none !important; }
+
+    /* Açık panel: launcher üstünde ince-uzun değil, iPhone ekranına yayılan tam sohbet paneli. */
+    #bys360-assistant-module-root .bys360-am-panel:not([hidden]) {
+      position: fixed !important;
+      left: max(var(--bys360-ios-panel-pad), env(safe-area-inset-left)) !important;
+      right: max(var(--bys360-ios-panel-pad), env(safe-area-inset-right)) !important;
+      top: calc(max(var(--bys360-ios-panel-pad), env(safe-area-inset-top)) + var(--bys360-ios-vtop, 0px)) !important;
+      bottom: max(var(--bys360-ios-panel-pad), env(safe-area-inset-bottom)) !important;
+      width: auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      height: calc(var(--bys360-ios-vvh, 100dvh) - (var(--bys360-ios-panel-pad) * 2) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      max-height: calc(var(--bys360-ios-vvh, 100dvh) - (var(--bys360-ios-panel-pad) * 2) - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      min-height: 0 !important;
+      border-radius: 22px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+      transform-origin: center center !important;
+      box-shadow: 0 18px 48px rgba(17,24,39,.28), 0 8px 22px rgba(139,0,0,.20) !important;
+      contain: layout paint !important;
+    }
+
+    #bys360-assistant-module-root .bys360-am-header {
+      flex: 0 0 auto !important;
+      min-height: 56px !important;
+      padding: 11px 12px 9px !important;
+      cursor: default !important;
+      touch-action: manipulation !important;
+    }
+    #bys360-assistant-module-root .bys360-am-header-top { gap: 9px !important; min-width: 0 !important; }
+    #bys360-assistant-module-root .bys360-am-title { min-width: 0 !important; overflow: hidden !important; }
+    #bys360-assistant-module-root .bys360-am-title h2,
+    #bys360-assistant-module-root .bys360-am-title p {
+      display: block !important;
+      max-width: 100% !important;
+      color: #fff !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    #bys360-assistant-module-root .bys360-am-title h2 { font-size: 15.5px !important; line-height: 1.12 !important; margin: 0 !important; }
+    #bys360-assistant-module-root .bys360-am-title p { margin-top: 3px !important; font-size: 10.4px !important; line-height: 1.2 !important; color: rgba(255,255,255,.92) !important; }
+    #bys360-assistant-module-root .bys360-am-note,
+    #bys360-assistant-module-root .bys360-am-tabs,
+    #bys360-assistant-module-root [data-panel="guide"],
+    #bys360-assistant-module-root [data-panel="summary"],
+    #bys360-assistant-module-root [data-panel="security"] { display: none !important; }
+    #bys360-assistant-module-root [data-panel="chat"] { display: flex !important; }
+
+    #bys360-assistant-module-root .bys360-am-body {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    #bys360-assistant-module-root .bys360-am-view,
+    #bys360-assistant-module-root .bys360-am-view.is-active,
+    #bys360-assistant-module-root .bys360-am-view[data-panel="chat"],
+    #bys360-assistant-module-root .bys360-am-view.is-active[data-panel="chat"] {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: hidden !important;
+      padding: 10px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+    }
+    #bys360-assistant-module-root .bys360-am-log,
+    #bys360-assistant-module-root [data-chat-log="true"] {
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 10px !important;
+      gap: 10px !important;
+      border-radius: 18px !important;
+      background: radial-gradient(circle at top left, rgba(139,0,0,.055), transparent 34%), linear-gradient(180deg, #fff 0%, #fbf7f7 100%) !important;
+    }
+    #bys360-assistant-module-root .bys360-am-message { gap: 8px !important; }
+    #bys360-assistant-module-root .bys360-am-avatar { width: 28px !important; height: 28px !important; flex-basis: 28px !important; font-size: 9px !important; }
+    #bys360-assistant-module-root .bys360-am-bubble { max-width: calc(100% - 38px) !important; font-size: 13.2px !important; line-height: 1.48 !important; padding: 10px 11px !important; border-radius: 16px !important; }
+
+    #bys360-assistant-module-root .bys360-am-form {
+      flex: 0 0 auto !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 9px !important;
+      border-radius: 18px !important;
+      background: #fff !important;
+      border: 1px solid rgba(139,0,0,.14) !important;
+      box-shadow: 0 8px 22px rgba(17,24,39,.07) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    #bys360-assistant-module-root .bys360-am-form textarea {
+      display: block !important;
+      width: 100% !important;
+      min-height: 50px !important;
+      max-height: 82px !important;
+      font-size: 16px !important; /* iOS zoom engeli */
+      line-height: 1.35 !important;
+      resize: none !important;
+      border-radius: 15px !important;
+      padding: 10px 11px !important;
+      -webkit-appearance: none !important;
+      appearance: none !important;
+    }
+    #bys360-assistant-module-root .bys360-am-form-row { justify-content: flex-end !important; gap: 8px !important; }
+    #bys360-assistant-module-root .bys360-am-form-row span { display: none !important; }
+    #bys360-assistant-module-root .bys360-am-form button,
+    #bys360-assistant-module-root .bys360-am-refresh {
+      min-height: 42px !important;
+      padding: 10px 14px !important;
+      border-radius: 14px !important;
+      font-size: 13px !important;
+    }
+
+    /* Eski instant shell / ai-agent widget sınıfları kalırsa aynı iPhone kuralına alınır. */
+    #bys360-ai-agent-widget-root {
+      position: fixed !important;
+      right: max(10px, env(safe-area-inset-right)) !important;
+      bottom: max(10px, env(safe-area-inset-bottom)) !important;
+      left: auto !important;
+      top: auto !important;
+      z-index: 2147483500 !important;
+      max-width: calc(100vw - 20px) !important;
+    }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-launcher {
+      width: min(252px, calc(100vw - 20px)) !important;
+      min-width: 0 !important;
+      min-height: 58px !important;
+      border-radius: 22px !important;
+    }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-panel[data-state="open"],
+    #bys360-ai-agent-widget-root .bys360-ai-agent-panel:not([aria-hidden="true"]) {
+      position: fixed !important;
+      left: max(8px, env(safe-area-inset-left)) !important;
+      right: max(8px, env(safe-area-inset-right)) !important;
+      top: calc(max(8px, env(safe-area-inset-top)) + var(--bys360-ios-vtop, 0px)) !important;
+      bottom: max(8px, env(safe-area-inset-bottom)) !important;
+      width: auto !important;
+      height: calc(var(--bys360-ios-vvh, 100dvh) - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      max-height: calc(var(--bys360-ios-vvh, 100dvh) - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+      min-height: 0 !important;
+      max-width: none !important;
+      border-radius: 22px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+    }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-body { flex: 1 1 auto !important; min-height: 0 !important; overflow: hidden !important; }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-chat { min-height: 0 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-ask-form { flex: 0 0 auto !important; position: relative !important; bottom: auto !important; display: flex !important; }
+    #bys360-ai-agent-widget-root .bys360-ai-agent-ask-form textarea { font-size: 16px !important; min-height: 50px !important; max-height: 82px !important; display: block !important; }
+  }
+}

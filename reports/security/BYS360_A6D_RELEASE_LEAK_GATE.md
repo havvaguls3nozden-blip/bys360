@@ -1,0 +1,20 @@
+# BYS360 A?ama 6D Release S?z?nt? Kap?s?
+
+Tarih: 2026-06-12T13:13:48
+
+## ?zet
+
+- .releaseignore var: True
+- .releaseignore kural say?s?: 24
+- Pakete girecek dosya say?s? sim?lasyonu: 4068
+- D??lanan dosya say?s? sim?lasyonu: 16484
+- Yasakl? s?z?nt? say?s?: 0
+- Eksik releaseignore kural?: []
+
+## Yasakl? S?z?nt? Tipleri
+
+- S?z?nt? yok.
+
+## ?lk 80 S?z?nt?
+
+Yasakl? dosya s?z?nt?s? bulunmad?.

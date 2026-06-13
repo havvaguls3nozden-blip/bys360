@@ -1,0 +1,16 @@
+BYS360 Repo Hijyeni P0.3 - Duplicate Project Tree Cleanup V2.17.4
+
+Amaç:
+- C:\bys360\project\project gibi iç içe proje kopyalarını aktif çekirdekten ayırmak.
+- Silme yapılmaz; uygun kopyalar _local_quarantine altına taşınır.
+- İşlem öncesi/sonrası compileall ve create_app sağlık kontrolü yapılır.
+
+Önerilen komut:
+
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_repo_hygiene_p0_3_duplicate_tree_cleanup_v2_17_4.ps1 -ProjectRoot "C:\bys360\project" -Mode audit
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_repo_hygiene_p0_3_duplicate_tree_cleanup_v2_17_4.ps1 -ProjectRoot "C:\bys360\project" -Mode all
+
+Beklenen başarılı çıktı:
+BYS360_REPO_HYGIENE_P0_3_DUPLICATE_TREE_CLEANUP_V2_17_4_HEALTH_OK
+BYS360_REPO_HYGIENE_P0_3_DUPLICATE_TREE_CLEANUP_V2_17_4_APPLY_OK
+BYS360_REPO_HYGIENE_P0_3_DUPLICATE_TREE_CLEANUP_V2_17_4_OK

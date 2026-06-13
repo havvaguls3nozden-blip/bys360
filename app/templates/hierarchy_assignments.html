@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Hiyerarşi Atamaları & Ayarları - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Hiyerarşi Atamaları & Ayarları{% endblock %}
+{% block page_subtitle %}
+Personel bazında 1. amir, 2. amir ve opsiyonel 3. amir atamalarını bu ekrandan yönetin.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Hiyerarşi Atamaları', text='Personel bazlı amir atamalarını, eksik zincirleri ve kayıt doğruluğunu tek operasyon yüzeyinde yönetin.', icon='fa-solid fa-user-gear') }}
+  {{ nav(active='settings') }}
+  {{ note('Atama ekranı, ayar ekranıyla aynı aileye taşındı; görsel kopukluk azaltıldı.') }}
+<style>
+  .assign-shell{display:grid;gap:18px}
+  .glass-card{
+    position:relative;overflow:hidden;background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px);
+  }
+  .panel-card{padding:22px;position:relative;z-index:1}
+  .intro-title{font-size:1.08rem;font-weight:900;color:#111827;margin:0 0 8px}
+  .intro-sub{color:#6b7280;font-size:.92rem;line-height:1.8;margin:0}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .stat-card{padding:22px;position:relative;overflow:hidden}
+  .stat-card::after{
+    content:"";position:absolute;right:-20px;bottom:-20px;width:84px;height:84px;border-radius:50%;
+    background:rgba(139,0,0,.06);
+  }
+  .stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}
+  .stat-value{color:#111827;font-size:1.7rem;font-weight:900;line-height:1;position:relative;z-index:1}
+
+  .toolbar-grid{
+    display:grid;grid-template-columns:minmax(0,1fr) 220px auto auto;gap:12px;align-items:end;
+  }
+  .form-group{display:flex;flex-direction:column;gap:8px}
+  .form-group label{font-size:.9rem;font-weight:800;color:#374151}
+  .form-input,.form-select{
+    min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;
+    padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%;
+  }
+  .form-input:focus,.form-select:focus{
+    border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06);
+  }
+  .search-wrap{position:relative}
+  .search-wrap i{
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8B0000;font-size:.9rem;
+  }
+  .search-wrap .form-input{padding-left:40px}
+
+  .btn-soft{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;
+    border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;
+    white-space:nowrap;transition:all .18s ease;
+  }
+  .btn-soft:hover{transform:translateY(-1px)}
+  .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+  .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+  .btn-soft.success{background:linear-gradient(180deg,#166534,#14532d);color:#fff}
+
+  .layout-grid{
+    display:grid;
+    grid-template-columns:380px minmax(0,1fr);
+    gap:18px;
+  }
+
+  .personnel-list{
+    display:grid;
+    gap:10px;
+    max-height:720px;
+    overflow:auto;
+    padding-right:4px;
+  }
+
+  .personnel-item{
+    border:1px solid rgba(15,23,42,.08);
+    background:#fff;
+    border-radius:18px;
+    padding:14px;
+    text-decoration:none;
+    transition:all .18s ease;
+    display:block;
+  }
+
+  .personnel-item:hover{
+    transform:translateY(-1px);
+    box-shadow:0 14px 24px rgba(15,23,42,.06);
+  }
+
+  .personnel-item.active{
+    border-color:rgba(139,0,0,.24);
+    background:linear-gradient(180deg, rgba(139,0,0,.04), #fff);
+  }
+
+  .personnel-name{
+    color:#111827;
+    font-size:.95rem;
+    font-weight:900;
+    line-height:1.5;
+    margin-bottom:4px;
+  }
+
+  .personnel-sub{
+    color:#6b7280;
+    font-size:.84rem;
+    line-height:1.7;
+  }
+
+  .assign-form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+
+  .assign-box{
+    border:1px solid rgba(15,23,42,.08);
+    background:#f8fafc;
+    border-radius:20px;
+    padding:16px;
+    display:grid;
+    gap:10px;
+  }
+
+  .assign-label{
+    color:#6b7280;
+    font-size:.82rem;
+    font-weight:800;
+  }
+
+  .assign-value{
+    color:#111827;
+    font-size:.95rem;
+    font-weight:900;
+    line-height:1.55;
+  }
+
+  .field-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-top:8px;
+  }
+
+  .warning-strip{
+    border:1px solid rgba(180,83,9,.18);
+    background:rgba(180,83,9,.06);
+    color:#6b7280;
+    border-radius:18px;
+    padding:14px 16px;
+    line-height:1.8;
+    font-size:.88rem;
+  }
+
+  .ok-strip{
+    border:1px solid rgba(22,101,52,.16);
+    background:rgba(22,101,52,.06);
+    color:#6b7280;
+    border-radius:18px;
+    padding:14px 16px;
+    line-height:1.8;
+    font-size:.88rem;
+  }
+
+  .mini-list{
+    display:grid;
+    gap:8px;
+  }
+
+  .mini-row{
+    border:1px solid rgba(15,23,42,.08);
+    background:#fff;
+    border-radius:14px;
+    padding:10px 12px;
+    color:#374151;
+    line-height:1.7;
+    font-size:.84rem;
+  }
+
+  .empty-box{
+    padding:26px 20px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);
+    background:#f8fafc;color:#6b7280;text-align:center;line-height:1.9;
+  }
+
+  @media (max-width:1200px){
+    .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .toolbar-grid{grid-template-columns:1fr 1fr}
+    .layout-grid{grid-template-columns:1fr}
+    .assign-form-grid{grid-template-columns:1fr}
+  }
+
+  @media (max-width:700px){
+    .stats-grid,.toolbar-grid{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="assign-shell">
+  <div class="glass-card panel-card">
+    <h3 class="intro-title">Atama ve Zincir Kontrol Merkezi</h3>
+    <p class="intro-sub">
+      Personel bazında yönetici atamalarını düzenleyin, eksik zincirleri görün ve değerlendirme akışını kaydetmeden önce doğrulayın.
+    </p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="glass-card stat-card"><div class="stat-label">Toplam Personel</div><div class="stat-value">{{ stats.total_count or 0 }}</div></div>
+    <div class="glass-card stat-card"><div class="stat-label">Filtre Sonucu</div><div class="stat-value">{{ stats.filtered_count or 0 }}</div></div>
+    <div class="glass-card stat-card"><div class="stat-label">Tam Zincir</div><div class="stat-value">{{ stats.complete_count or 0 }}</div></div>
+    <div class="glass-card stat-card"><div class="stat-label">Eksik Zincir</div><div class="stat-value">{{ stats.incomplete_count or 0 }}</div></div>
+  </div>
+
+  <div class="glass-card panel-card">
+    <form method="GET" action="{{ url_for('main.hierarchy_assignments') }}">
+      <div class="toolbar-grid">
+        <div class="form-group">
+          <label>Personel Ara</label>
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" value="{{ q or '' }}" class="form-input" placeholder="Ad, sicil no, e-posta">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Birim</label>
+          <select name="birim" class="form-select">
+            <option value="">Tüm Birimler</option>
+            {% for item in birimler %}
+              <option value="{{ item }}" {% if selected_birim == item %}selected{% endif %}>{{ item }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="btn-soft primary">
+          <i class="fa-solid fa-filter"></i>
+          Filtrele
+        </button>
+
+        <a href="{{ url_for('main.hierarchy_assignments') }}" class="btn-soft secondary">
+          <i class="fa-solid fa-rotate-left"></i>
+          Temizle
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <div class="layout-grid">
+    <div class="glass-card panel-card">
+      <h3 class="intro-title" style="margin-bottom:12px;">Personel Listesi</h3>
+
+      {% if personnel %}
+        <div class="personnel-list">
+          {% for item in personnel %}
+            <a href="{{ url_for('main.hierarchy_assignments', user_id=item.id, q=q, birim=selected_birim) }}"
+              class="personnel-item {% if selected_user and selected_user.id == item.id %}active{% endif %}">
+              <div class="personnel-name">{{ item.full_name or ((item.ad or '') ~ ' ' ~ (item.soyad or ''))|trim }}</div>
+              <div class="personnel-sub">
+                {{ item.unvan or '-' }}<br>
+                {{ item.birim or '-' }}{% if item.ust_birim %} / {{ item.ust_birim }}{% endif %}
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-box">Filtreye uygun personel bulunamadı.</div>
+      {% endif %}
+    </div>
+
+    <div class="glass-card panel-card">
+      {% if selected_user %}
+        <h3 class="intro-title">Seçili Personel</h3>
+        <p class="intro-sub" style="margin-bottom:14px;">
+          {{ selected_user.full_name or ((selected_user.ad or '') ~ ' ' ~ (selected_user.soyad or ''))|trim }} ·
+          {{ selected_user.unvan or '-' }} ·
+          {{ selected_user.birim or '-' }} ·
+          Akış: {{ selected_flow_label or '-' }}
+        </p>
+
+        <div class="assign-form-grid">
+          <div class="assign-box">
+            <div class="assign-label">Sicil No</div>
+            <div class="assign-value">{{ selected_user.sicil_no or '-' }}</div>
+          </div>
+          <div class="assign-box">
+            <div class="assign-label">E-Posta</div>
+            <div class="assign-value">{{ selected_user.email or '-' }}</div>
+          </div>
+        </div>
+
+        {# BYS360_PHASE4_4_HIERARCHY_ASSIGNMENT_FORM #}
+        {% set phase4_4_show_third_form = phase4_4_should_show_third_supervisor_column([], selected_value=selected_manager_3_id, allow_setting=True) %}
+        <form method="POST" style="margin-top:16px;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+
+          <div class="field-grid">
+            <div class="form-group">
+              <label>{{ selected_chain_labels[1] if selected_chain_labels else "1. Amir" }}</label>
+              <select name="manager_1_id" class="form-select" required>
+                <option value="">Seçiniz</option>
+                {% for mgr in all_users %}
+                  {% if mgr.id != selected_user.id %}
+                    <option value="{{ mgr.id }}" {% if selected_manager_1_id == mgr.id %}selected{% endif %}>
+                      {{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{ selected_chain_labels[2] if selected_chain_labels else "2. Amir" }}</label>
+              <select name="manager_2_id" class="form-select" required>
+                <option value="">Seçiniz</option>
+                {% for mgr in all_users %}
+                  {% if mgr.id != selected_user.id %}
+                    <option value="{{ mgr.id }}" {% if selected_manager_2_id == mgr.id %}selected{% endif %}>
+                      {{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            {% if phase4_4_show_third_form %}
+            <div class="form-group">
+              <label>{{ selected_chain_labels[3] if selected_chain_labels else "3. Amir" }}</label>
+              <select name="manager_3_id" class="form-select">
+                <option value="">Opsiyonel</option>
+                {% for mgr in all_users %}
+                  {% if mgr.id != selected_user.id %}
+                    <option value="{{ mgr.id }}" {% if selected_manager_3_id == mgr.id %}selected{% endif %}>
+                      {{ mgr.full_name or ((mgr.ad or '') ~ ' ' ~ (mgr.soyad or ''))|trim }}{% if mgr.sicil_no %} - {{ mgr.sicil_no }}{% endif %}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            {% else %}
+              <input type="hidden" name="manager_3_id" value="{{ selected_manager_3_id or '' }}">
+            {% endif %}
+          </div>
+
+          {% if not selected_manager_1_id or not selected_manager_2_id %}
+            <div class="warning-strip" style="margin-top:16px;">
+              Bu personelde zorunlu zincir eksik görünüyor. Kaydetmeden önce en az 1. amir ve 2. amir alanlarını doldurmanız gerekir.
+            </div>
+          {% else %}
+            <div class="ok-strip" style="margin-top:16px;">
+              Seçili personelde zorunlu hiyerarşi zinciri tanımlı görünüyor. 3. amir alanı isteğe bağlıdır.
+            </div>
+          {% endif %}
+
+          <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+            <button type="submit" class="btn-soft success">
+              <i class="fa-solid fa-floppy-disk"></i>
+              Atamaları Kaydet
+            </button>
+          </div>
+        </form>
+      {% else %}
+        <div class="empty-box">Sağ panelde işlem yapmak için soldan bir personel seçiniz.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="glass-card panel-card">
+    <h3 class="intro-title">Eksik Zincir Uyarıları</h3>
+    <p class="intro-sub" style="margin-bottom:14px;">
+      İlk 20 eksik kayıt aşağıda listelenir. Bu alan hızlı kontrol paneli olarak kullanılabilir.
+    </p>
+
+    {% if incomplete_users %}
+      <div class="mini-list">
+        {% for item in incomplete_users %}
+          <div class="mini-row">
+            <strong>{{ item.full_name or ((item.ad or '') ~ ' ' ~ (item.soyad or ''))|trim }}</strong>
+            — {{ item.unvan or '-' }} — {{ item.birim or '-' }}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="ok-strip">
+        Tüm personelde zorunlu hiyerarşi zinciri tanımlı görünüyor.
+      </div>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}

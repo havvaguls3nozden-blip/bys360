@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+
+{% block title %}Personel Profili - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Profili{% endblock %}
+{% block page_subtitle %}
+Personelin kimlik, kurumsal konum, hiyerarşi ve hesap durumu bilgilerini tek ekranda görüntüleyin.
+{% endblock %}
+
+{% block content %}
+<style>
+    .profile-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:18px;
+        flex-wrap:wrap;
+    }
+
+    .hero-left{
+        display:flex;
+        gap:16px;
+        align-items:flex-start;
+    }
+
+    .avatar-wrap{
+        width:92px;
+        height:92px;
+        border-radius:24px;
+        overflow:hidden;
+        background:#f8fafc;
+        border:1px solid rgba(15,23,42,.08);
+        flex:0 0 92px;
+    }
+
+    .avatar-wrap img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+    }
+
+    .hero-title{
+        color:#111827;
+        font-size:1.18rem;
+        font-weight:900;
+        line-height:1.35;
+        margin:0 0 6px;
+    }
+
+    .hero-sub{
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.8;
+        margin:0;
+    }
+
+    .badge-stack{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:8px 12px;
+        border-radius:999px;
+        font-size:.82rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .pill.passive{background:rgba(107,114,128,.12);color:#374151}
+    .pill.role{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .pill.unit{background:rgba(139,0,0,.10);color:#8B0000}
+    .pill.upper{background:rgba(180,83,9,.10);color:#92400e}
+    .pill.title{background:rgba(15,23,42,.08);color:#111827}
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:20px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:78px;
+        height:78px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+        line-height:1.5;
+        position:relative;
+        z-index:1;
+        word-break:break-word;
+    }
+
+    .content-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+    }
+
+    .section-title{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+        margin:0 0 6px;
+    }
+
+    .section-sub{
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.7;
+        margin:0 0 14px;
+    }
+
+    .info-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .info-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .info-box.full{
+        grid-column:1 / -1;
+    }
+
+    .info-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .info-value{
+        color:#111827;
+        font-size:.92rem;
+        font-weight:900;
+        line-height:1.65;
+        word-break:break-word;
+    }
+
+    .manager-list{
+        display:grid;
+        gap:12px;
+    }
+
+    .manager-card{
+        border:1px solid rgba(15,23,42,.08);
+        background:#fff;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .manager-title{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .manager-name{
+        color:#111827;
+        font-size:.95rem;
+        font-weight:900;
+        line-height:1.5;
+    }
+
+    .manager-sub{
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.7;
+        margin-top:4px;
+    }
+
+    .action-bar{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.warning{
+        background:linear-gradient(180deg,#b45309,#92400e);
+        color:#fff;
+    }
+
+    .ai-panel{border:1px solid rgba(139,0,0,.10); background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+
+    @media (max-width:1100px){
+        .stats-grid,
+        .content-grid,
+        .info-grid{grid-template-columns:1fr}
+    }
+
+    .ai-trace-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+    .ai-trace-item{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:14px;padding:12px 14px;display:grid;gap:4px}
+    .ai-trace-item span{font-size:.76rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}
+    .ai-trace-item strong{font-size:.9rem;color:#111827;line-height:1.5;word-break:break-word}
+</style>
+
+<div class="profile-shell">
+    <div class="glass-card panel-card">
+        <div class="hero">
+            <div class="hero-left">
+                <div class="avatar-wrap">
+                    <img src="{{ profile.avatar_url }}"
+                         alt="{{ profile.full_name }}"
+                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                </div>
+
+                <div>
+                    <h3 class="hero-title">{{ profile.full_name or '-' }}</h3>
+                    <p class="hero-sub">
+                        Sicil No: {{ profile.sicil_no or '-' }}<br>
+                        {{ profile.email or '-' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="badge-stack">
+                {% if profile.is_active %}
+                    <span class="pill active"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                {% else %}
+                    <span class="pill passive"><i class="fa-solid fa-circle"></i> Pasif</span>
+                {% endif %}
+
+                <span class="pill role"><i class="fa-solid fa-shield-halved"></i> {{ profile.role_text or '-' }}</span>
+                <span class="pill title"><i class="fa-solid fa-briefcase"></i> {{ profile.unvan or '-' }}</span>
+                <span class="pill unit"><i class="fa-solid fa-building"></i> {{ profile.birim or '-' }}</span>
+                <span class="pill upper"><i class="fa-solid fa-sitemap"></i> {{ profile.ust_birim or '-' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card">
+            <div class="stat-label">Ad</div>
+            <div class="stat-value">{{ profile.ad or '-' }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Soyad</div>
+            <div class="stat-value">{{ profile.soyad or '-' }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">E-Posta</div>
+            <div class="stat-value">{{ profile.email or '-' }}</div>
+        </div>
+        <div class="glass-card stat-card">
+            <div class="stat-label">Sicil No</div>
+            <div class="stat-value">{{ profile.sicil_no or '-' }}</div>
+        </div>
+    </div>
+
+
+    {% if ai_personnel_chain_panel %}
+    <div class="glass-card panel-card ai-panel">
+        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_chain_panel.badge or 'AI zincir özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_personnel_chain_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_personnel_chain_panel.summary }}</p>
+        <ul class="ai-bullets">
+            {% for item in ai_personnel_chain_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        {% if ai_personnel_chain_panel.spotlight %}
+        <div class="ai-actions">
+            {% for row in ai_personnel_chain_panel.spotlight %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if ai_personnel_chain_panel.actions %}
+        <div class="ai-actions">
+            {% for row in ai_personnel_chain_panel.actions %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if ai_personnel_chain_panel.recommendations %}
+        <ul class="ai-bullets">
+            {% for item in ai_personnel_chain_panel.recommendations %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% if ai_personnel_chain_panel.trace_rows %}
+        <div class="ai-trace-grid">
+            {% for row in ai_personnel_chain_panel.trace_rows %}
+            <div class="ai-trace-item">
+                <span>{{ row.label }}</span>
+                <strong>{{ row.value }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="content-grid">        <div class="glass-card panel-card">
+            <h4 class="section-title">Kimlik ve Kurumsal Bilgiler</h4>
+            <p class="section-sub">Personelin sistem ve kurum içi temel tanımları.</p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Unvan</div>
+                    <div class="info-value">{{ profile.unvan or '-' }}</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Rol</div>
+                    <div class="info-value">{{ profile.role_text or '-' }}</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Birim</div>
+                    <div class="info-value">{{ profile.birim or '-' }}</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Üst Birim</div>
+                    <div class="info-value">{{ profile.ust_birim or '-' }}</div>
+                </div>
+
+                <div class="info-box full">
+                    <div class="info-label">Hesap Durumu</div>
+                    <div class="info-value">
+                        {% if profile.is_active %}Aktif kullanıcı{% else %}Pasif kullanıcı{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <h4 class="section-title">Hiyerarşi Bilgileri</h4>
+            <p class="section-sub">Değerlendirme ve yönetim zincirinde tanımlı amirler. Sicil, mevcut organizasyon birimi ve güncel atama geçmişi birlikte değerlendirilir.</p>
+
+            <div class="manager-list">
+                <div class="manager-card">
+                    <div class="manager-title">Hiyerarşi Durumu</div>
+                    <div class="manager-name">{{ profile.hierarchy_state or 'Tanımlı değil' }}</div>
+                    <div class="manager-sub">
+                        Organizasyon Yolu: {{ profile.org_path or '-' }}
+                    </div>
+                </div>
+
+                <div class="manager-card">
+                    <div class="manager-title">1. Amir</div>
+                    {% if profile.manager_1 %}
+                        <div class="manager-name">{{ profile.manager_1.full_name or ((profile.manager_1.ad or '') ~ ' ' ~ (profile.manager_1.soyad or ''))|trim }}</div>
+                        <div class="manager-sub">
+                            {{ profile.manager_1.unvan or '-' }}<br>
+                            {{ profile.manager_1.birim or '-' }}
+                        </div>
+                    {% else %}
+                        <div class="manager-name">Tanımlı değil</div>
+                    {% endif %}
+                </div>
+
+                <div class="manager-card">
+                    <div class="manager-title">2. Amir</div>
+                    {% if profile.manager_2 %}
+                        <div class="manager-name">{{ profile.manager_2.full_name or ((profile.manager_2.ad or '') ~ ' ' ~ (profile.manager_2.soyad or ''))|trim }}</div>
+                        <div class="manager-sub">
+                            {{ profile.manager_2.unvan or '-' }}<br>
+                            {{ profile.manager_2.birim or '-' }}
+                        </div>
+                    {% else %}
+                        <div class="manager-name">Tanımlı değil</div>
+                    {% endif %}
+                </div>
+
+                <div class="manager-card">
+                    <div class="manager-title">3. Amir</div>
+                    {% if profile.manager_3 %}
+                        <div class="manager-name">{{ profile.manager_3.full_name or ((profile.manager_3.ad or '') ~ ' ' ~ (profile.manager_3.soyad or ''))|trim }}</div>
+                        <div class="manager-sub">
+                            {{ profile.manager_3.unvan or '-' }}<br>
+                            {{ profile.manager_3.birim or '-' }}
+                        </div>
+                    {% else %}
+                        <div class="manager-name">Tanımlı değil</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card panel-card">
+            <h4 class="section-title">Hesap ve Güvenlik Durumu</h4>
+            <p class="section-sub">İlk giriş ve güvenlik kurallarına ilişkin sistem alanları.</p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">İlk Giriş Durumu</div>
+                    <div class="info-value">
+                        {% if profile.is_first_login %}İlk giriş bekleniyor{% else %}İlk giriş tamamlanmış{% endif %}
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Şifre Değiştirme</div>
+                    <div class="info-value">
+                        {% if profile.must_change_password %}Zorunlu{% else %}Zorunlu değil{% endif %}
+                    </div>
+                </div>
+
+                <div class="info-box full">
+                    <div class="info-label">Gizli Soru</div>
+                    <div class="info-value">
+                        {% if profile.must_set_security_question %}Belirlenmesi gerekli{% else %}Zorunlu değil / tamamlanmış{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    {% if hr_context and hr_context.enabled %}
+    <div class="glass-card panel-card">
+        <h4 class="section-title">Özlük Operasyon Özeti</h4>
+        <p class="section-sub">Bu panel personelin özlük tamlığı, hareket geçmişi ve açık operasyon kayıtlarını tek görünümde toplar.</p>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-label">Profil Tamlığı</div>
+                <div class="info-value">{{ hr_context.summary.profile_score }}%</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Belge Kaydı</div>
+                <div class="info-value">{{ hr_context.summary.document_count }}</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Süreç Notu</div>
+                <div class="info-value">{{ hr_context.summary.note_count }}</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Hareket Geçmişi</div>
+                <div class="info-value">{{ hr_context.summary.movement_count }}</div>
+            </div>
+            <div class="info-box full">
+                <div class="info-label">Eksik Alanlar</div>
+                <div class="info-value">{% if hr_context.summary.missing_fields %}{{ hr_context.summary.missing_fields|join(', ') }}{% else %}Eksik temel alan görünmüyor.{% endif %}</div>
+            </div>
+        </div>
+
+        <div class="content-grid" style="margin-top:18px;">
+            <div class="manager-list">
+                <div class="manager-card">
+                    <div class="manager-title">Son hareketler</div>
+                    {% for row in hr_context.movement_rows[:4] %}
+                        <div class="manager-name">{{ row.unit_name }}</div>
+                        <div class="manager-sub">{{ row.assignment_type }} · {{ row.start_date }}{% if row.is_current %} · Güncel{% endif %}<br>{{ row.reason }}</div>
+                    {% else %}
+                        <div class="manager-name">Kayıt yok</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="manager-list">
+                <div class="manager-card">
+                    <div class="manager-title">Belge ve işlem durumu</div>
+                    {% for row in hr_context.document_rows[:3] %}
+                        <div class="manager-name">{{ row.title }}</div>
+                        <div class="manager-sub">{{ row.category }} · {{ row.status }}{% if row.expiry_date %}<br>Geçerlilik: {{ row.expiry_date }}{% endif %}</div>
+                    {% endfor %}
+                    {% for row in hr_context.note_rows[:2] %}
+                        <div class="manager-name">{{ row.subject }}</div>
+                        <div class="manager-sub">{{ row.priority }} · {{ row.status }}{% if row.due_date %}<br>Termin: {{ row.due_date }}{% endif %}</div>
+                    {% endfor %}
+                    {% if not hr_context.document_rows and not hr_context.note_rows %}
+                        <div class="manager-name">Kayıt yok</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+        <div class="glass-card panel-card">
+            <h4 class="section-title">Hızlı İşlemler</h4>
+            <p class="section-sub">Personel kaydına ilişkin sık kullanılan işlemler.</p>
+
+            <div class="action-bar">
+                <a href="{{ url_for('main.personnel_list') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Listeye Dön
+                </a>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <a href="{{ url_for('main.personnel_edit', user_id=profile.id) }}" class="btn-soft warning">
+                        <i class="fa-solid fa-pen"></i>
+                        Düzenle
+                    </a>
+
+                    <a href="{{ url_for('main.personnel_list') }}" class="btn-soft primary">
+                        <i class="fa-solid fa-users"></i>
+                        Personel Yönetimi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% include 'performance/_v2_1_3_personnel_category_panel.html' ignore missing %}
+<!-- BYS360_PERFORMANCE_V2_1_3_PERSONNEL_CATEGORY_PANEL -->
+{% endblock %}

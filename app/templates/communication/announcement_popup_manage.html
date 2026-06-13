@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Duyuru Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Genel{% endblock %}
+{% block page_title %}Duyuru Yönetimi{% endblock %}
+{% block page_subtitle %}Duyurular menüsünden açılan ana yönetim yüzeyi: pop-up duyuru, hedef kitle, video ve okunma raporu.{% endblock %}
+{% block content %}
+<style>
+.ap-shell{display:grid;gap:18px}.ap-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.ap-card,.ap-panel{background:rgba(255,255,255,.94);border:1px solid rgba(139,0,0,.10);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08)}.ap-card{padding:18px}.ap-label{font-size:.78rem;font-weight:850;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}.ap-value{font-size:1.65rem;font-weight:950;color:#111827;margin-top:7px}.ap-panel{padding:20px}.ap-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}.ap-actions{display:flex;gap:10px;flex-wrap:wrap}.ap-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border-radius:14px;font-weight:850;text-decoration:none;border:1px solid rgba(139,0,0,.16);background:#fff;color:#8B0000}.ap-btn.primary{background:linear-gradient(180deg,#8B0000,#690000);color:#fff;border-color:transparent}.ap-btn.muted{color:#374151;border-color:rgba(15,23,42,.12)}.ap-filter{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.ap-input,.ap-select{min-height:42px;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:0 12px;background:#fff}.ap-input{min-width:260px}.ap-table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:20px;background:#fff}.ap-table{width:100%;min-width:1100px;border-collapse:collapse}.ap-table th{font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;background:#fafafa;text-align:left;padding:13px}.ap-table td{padding:14px 13px;border-top:1px solid rgba(15,23,42,.08);vertical-align:top}.ap-title{font-weight:900;color:#111827}.ap-muted{color:#6b7280;font-size:.86rem;line-height:1.7}.ap-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.78rem;font-weight:850}.ap-pill.gray{background:#f3f4f6;color:#374151}.ap-pill.green{background:#ecfdf5;color:#047857}.ap-pill.red{background:#fef2f2;color:#991b1b}.ap-empty{text-align:center;color:#6b7280;padding:35px 10px}@media(max-width:1000px){.ap-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ap-input{min-width:100%;width:100%}}@media(max-width:650px){.ap-stats{grid-template-columns:1fr}.ap-panel{padding:15px}.ap-toolbar{align-items:stretch}.ap-actions,.ap-btn{width:100%}}
+</style>
+<div class="ap-shell">
+    <div class="ap-stats">
+        <div class="ap-card"><div class="ap-label">Toplam duyuru</div><div class="ap-value">{{ counts.total }}</div></div>
+        <div class="ap-card"><div class="ap-label">Aktif</div><div class="ap-value">{{ counts.active }}</div></div>
+        <div class="ap-card"><div class="ap-label">Zorunlu okundu</div><div class="ap-value">{{ counts.required }}</div></div>
+        <div class="ap-card"><div class="ap-label">Video destekli</div><div class="ap-value">{{ counts.video }}</div></div>
+    </div>
+
+    <div class="ap-panel">
+        <div class="ap-toolbar">
+            <div>
+                <h3 style="margin:0;font-size:1.05rem;font-weight:950;color:#111827;">Pop-up duyuru listesi</h3>
+                <p class="ap-muted" style="margin:6px 0 0;">Bu ekran artık /announcements adresindeki ana Duyurular yüzeyidir. Eski duyuru akışına üstteki “Duyuru Akışı” bağlantısından erişilebilir.</p>
+            </div>
+            <div class="ap-actions">
+                <a class="ap-btn muted" href="{{ url_for('main.announcements_list', mode='flow') }}"><i class="fa-solid fa-list"></i> Duyuru Akışı</a>
+                <a class="ap-btn primary" href="{{ url_for('main.announcement_popup_new') }}"><i class="fa-solid fa-plus"></i> Yeni Pop-up Duyuru</a>
+            </div>
+        </div>
+        <form method="get" class="ap-filter">
+            <input class="ap-input" name="q" value="{{ q }}" placeholder="Başlık veya metinde ara">
+            <select class="ap-select" name="status">
+                <option value="all" {% if status=='all' %}selected{% endif %}>Tümü</option>
+                <option value="active" {% if status=='active' %}selected{% endif %}>Aktif</option>
+                <option value="inactive" {% if status=='inactive' %}selected{% endif %}>Pasif</option>
+                <option value="required" {% if status=='required' %}selected{% endif %}>Zorunlu</option>
+            </select>
+            <button class="ap-btn muted" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Filtrele</button>
+        </form>
+    </div>
+
+    <div class="ap-table-wrap">
+        <table class="ap-table">
+            <thead>
+                <tr>
+                    <th>Başlık</th>
+                    <th>Tür</th>
+                    <th>Durum</th>
+                    <th>Hedef</th>
+                    <th>Gösterim</th>
+                    <th>Medya</th>
+                    <th>Okunma</th>
+                    <th>Yayın</th>
+                    <th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                {% set summary = row_summaries.get(row.id, {}) %}
+                <tr>
+                    <td>
+                        <div class="ap-title">{{ row.title }}</div>
+                        <div class="ap-muted">{{ row.body[:150] }}{% if row.body|length > 150 %}...{% endif %}</div>
+                    </td>
+                    <td><span class="ap-pill">{{ announcement_types.get(row.announcement_type, row.announcement_type) }}</span></td>
+                    <td>
+                        {% if row.is_active %}<span class="ap-pill green">Aktif</span>{% else %}<span class="ap-pill gray">Pasif</span>{% endif %}
+                        {% if row.is_required %}<div style="margin-top:6px"><span class="ap-pill red">Zorunlu</span></div>{% endif %}
+                    </td>
+                    <td>
+                        <span class="ap-pill gray">{{ target_scopes.get(row.target_scope, row.target_scope) }}</span>
+                        {% if row.target_scope == 'role' and row.target_role %}<div class="ap-muted">{{ row.target_role }}</div>{% endif %}
+                        {% if row.target_scope == 'unit' and row.target_unit %}<div class="ap-muted">{{ row.target_unit.name }}</div>{% endif %}
+                    </td>
+                    <td>{{ show_rules.get(row.show_rule, row.show_rule) }}<div class="ap-muted">Buton: {{ row.button_text }}</div></td>
+                    <td>
+                        <span class="ap-pill gray">{{ media_types.get(row.media_type, row.media_type) }}</span>
+                        {% if row.media_url %}<div class="ap-muted">Bağlantı var</div>{% endif %}{% if row.media_file_path %}<div class="ap-muted">Yüklü dosya var</div>{% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ summary.get('acknowledged_count', 0) }}</strong> okudu
+                        <div class="ap-muted">{{ summary.get('seen_count', 0) }} gördü · {{ summary.get('target_count', 0) }} hedef</div>
+                    </td>
+                    <td>
+                        <div class="ap-muted">Başlangıç: {{ row.publish_start_at.strftime('%d.%m.%Y %H:%M') if row.publish_start_at else 'Hemen' }}</div>
+                        <div class="ap-muted">Bitiş: {{ row.publish_end_at.strftime('%d.%m.%Y %H:%M') if row.publish_end_at else 'Süresiz' }}</div>
+                    </td>
+                    <td>
+                        <div class="ap-actions">
+                            <a class="ap-btn" href="{{ url_for('main.announcement_popup_report', announcement_id=row.id) }}"><i class="fa-solid fa-chart-pie"></i> Rapor</a>
+                            <a class="ap-btn muted" href="{{ url_for('main.announcement_popup_report_csv', announcement_id=row.id) }}"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                            <a class="ap-btn" href="{{ url_for('main.announcement_popup_edit', announcement_id=row.id) }}"><i class="fa-solid fa-pen"></i> Düzenle</a>
+                            <form method="post" action="{{ url_for('main.announcement_popup_toggle', announcement_id=row.id) }}" style="display:inline;">
+                                {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                                <button class="ap-btn muted" type="submit">{{ 'Pasifleştir' if row.is_active else 'Aktifleştir' }}</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9" class="ap-empty">Henüz pop-up duyuru kaydı bulunmuyor.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

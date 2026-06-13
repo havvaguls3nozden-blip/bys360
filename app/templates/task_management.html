@@ -1,0 +1,949 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Görev Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Değerlendirme Görevleri{% endblock %}
+{% block page_subtitle %}
+Aktif dönem için görev üretimi, kapsama durumu ve eksik amir zincirlerinin kontrolü bu ekrandan yönetilir.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Görev Yönetimi', text='Görev üretimi, kapsama analizi, vekâlet durumu ve dönem bazlı görev durumunu tek ekranda izleyin.', icon='fa-solid fa-list-check') }}
+  {{ nav(active='tasks') }}
+  
+{% set phase5_guide_title = "Bu ekran görev üretimini ve kapsama kalitesini birlikte yönetir" %}
+{% set phase5_guide_text = "Görevleri yalnızca üretmek değil; doğru amire, doğru seviyede ve eksiksiz kapsama ile düştüğünü doğrulamak için bu ekran kullanılır." %}
+{% set phase5_guide_points = [
+  {'title': 'Ön kontrolü aç', 'text': 'Görev üretmeden önce eksik zincir, mükerrer görev ve vekâlet etkisini görün.'},
+  {'title': 'Kapsamı izle', 'text': 'Açıkta kalan, vekâletle çözülen ve muaf bırakılan kayıtları aynı panelde okuyun.'},
+  {'title': 'Logu kullan', 'text': 'Son çalışma logları, hangi kaydın neden görev alamadığını veya nasıl çözüldüğünü gösterir.'}
+] %}
+{% set phase5_guide_note = "Canlı kullanımda en güvenli yöntem, doğrudan toplu üretim yerine önce ön kontrolü çalıştırıp sonra görevleri üretmektir." %}
+{% include "performance/_phase5_microguide.html" %}
+
+<style>
+  .task-shell{display:grid;gap:18px}
+
+  .glass-card{
+    background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    backdrop-filter:blur(14px);
+  }
+
+  .panel-card{padding:22px;}
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px;
+  }
+
+  .stat-card{
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .stat-card::after{
+    content:"";
+    position:absolute;
+    right:-20px;
+    bottom:-20px;
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    background:rgba(139,0,0,.06);
+  }
+
+  .stat-label{
+    color:#6b7280;
+    font-size:.82rem;
+    font-weight:800;
+    margin-bottom:10px;
+    position:relative;
+    z-index:1;
+  }
+
+  .stat-value{
+    color:#111827;
+    font-size:1.95rem;
+    font-weight:900;
+    line-height:1;
+    position:relative;
+    z-index:1;
+  }
+
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+
+  .section-title{
+    margin:0;
+    color:#111827;
+    font-size:1.08rem;
+    font-weight:900;
+  }
+
+  .section-sub{
+    color:#6b7280;
+    font-size:.9rem;
+    line-height:1.7;
+  }
+
+  .count-chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:36px;
+    padding:0 14px;
+    border-radius:999px;
+    background:rgba(139,0,0,.08);
+    color:#8B0000;
+    font-size:.82rem;
+    font-weight:900;
+    border:1px solid rgba(139,0,0,.10);
+  }
+
+  .toolbar-grid{
+    display:grid;
+    grid-template-columns:1fr 1.2fr .8fr .65fr auto;
+    gap:12px;
+    align-items:end;
+  }
+
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .form-group label{
+    font-size:.9rem;
+    font-weight:800;
+    color:#374151;
+  }
+
+  .form-input,
+  .form-select{
+    min-height:48px;
+    border-radius:14px;
+    border:1px solid rgba(15,23,42,.10);
+    background:#fff;
+    padding:10px 14px;
+    font:inherit;
+    color:#111827;
+    outline:none;
+    width:100%;
+  }
+
+  .form-input:focus,
+  .form-select:focus{
+    border-color:rgba(139,0,0,.30);
+    box-shadow:0 0 0 4px rgba(139,0,0,.06);
+  }
+
+  .search-wrap{
+    position:relative;
+  }
+
+  .search-wrap i{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#8B0000;
+    font-size:.9rem;
+  }
+
+  .search-wrap .form-input{
+    padding-left:40px;
+  }
+
+  .action-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .btn-soft{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:48px;
+    padding:0 16px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:800;
+    font-size:.9rem;
+    white-space:nowrap;
+    transition:all .18s ease;
+  }
+
+  .btn-soft:hover{transform:translateY(-1px);}
+
+  .btn-soft.primary{
+    background:linear-gradient(180deg,#8B0000,#6f0000);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(139,0,0,.16);
+  }
+
+  .btn-soft.secondary{
+    background:#eef2f7;
+    color:#374151;
+    border:1px solid rgba(15,23,42,.08);
+  }
+
+  .btn-soft.danger{
+    background:linear-gradient(180deg,#991b1b,#7f1d1d);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(153,27,27,.16);
+  }
+
+  .table-wrap{
+    width:100%;
+    overflow-x:auto;
+    border-radius:18px;
+  }
+
+  table{
+    width:100%;
+    min-width:1180px;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+  }
+
+  th, td{
+    padding:14px 12px;
+    border-bottom:1px solid rgba(15,23,42,.08);
+    text-align:left;
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+
+  th{
+    background:rgba(248,250,252,.96);
+    color:#6b7280;
+    font-size:.8rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.35px;
+  }
+
+  td{
+    color:#111827;
+    font-size:.9rem;
+  }
+
+  tbody tr:hover{
+    background:rgba(139,0,0,.02);
+  }
+
+  .person-name{
+    font-weight:900;
+    color:#111827;
+    line-height:1.4;
+  }
+
+  .person-sub{
+    color:#6b7280;
+    font-size:.84rem;
+    line-height:1.6;
+    white-space:normal;
+  }
+
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .pill.pending{background:rgba(29,78,216,.10);color:#1d4ed8;}
+  .pill.partial{background:rgba(180,83,9,.10);color:#92400e;}
+  .pill.done{background:rgba(22,101,52,.10);color:#166534;}
+  .pill.level1{background:rgba(139,0,0,.10);color:#8B0000;}
+  .pill.level2{background:rgba(29,78,216,.10);color:#1d4ed8;}
+  .pill.level3{background:rgba(107,114,128,.12);color:#374151;}
+
+  .warn-list{
+    display:grid;
+    gap:12px;
+  }
+
+  .warn-card{
+    background:#fff;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    padding:16px;
+  }
+
+  .warn-title{
+    font-weight:900;
+    color:#111827;
+    margin-bottom:6px;
+  }
+
+  .warn-sub{
+    color:#6b7280;
+    font-size:.86rem;
+    margin-bottom:10px;
+  }
+
+  .tag-list{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:30px;
+    padding:0 10px;
+    border-radius:999px;
+    font-size:.77rem;
+    font-weight:800;
+  }
+
+  .tag.issue{
+    background:rgba(180,83,9,.12);
+    color:#92400e;
+  }
+
+  .tag.warning{
+    background:rgba(107,114,128,.12);
+    color:#374151;
+  }
+
+  .coverage-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:16px;
+  }
+
+  .coverage-card{
+    background:#fff;
+    border:1px solid rgba(15,23,42,.08);
+    border-radius:18px;
+    padding:16px;
+  }
+
+  .coverage-card.delegated{border-color:rgba(29,78,216,.16);background:rgba(239,246,255,.9)}
+  .coverage-card.uncovered{border-color:rgba(180,83,9,.18);background:rgba(255,247,237,.9)}
+  .coverage-card.skipped{border-color:rgba(107,114,128,.16);background:rgba(248,250,252,.96)}
+  .coverage-title{font-size:.92rem;font-weight:900;color:#111827;margin-bottom:10px}
+  .coverage-item{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.76);border:1px solid rgba(15,23,42,.06);margin-bottom:10px}
+  .coverage-item:last-child{margin-bottom:0}
+  .coverage-main{font-weight:800;color:#111827;line-height:1.45}
+  .coverage-sub{font-size:.83rem;color:#6b7280;line-height:1.6;margin-top:4px}
+  .coverage-inline{margin-top:8px;padding:9px 10px;border-radius:12px;font-size:.82rem;line-height:1.55;border:1px solid rgba(15,23,42,.06);background:#f8fafc}
+  .coverage-inline.delegated{background:rgba(239,246,255,.95);border-color:rgba(29,78,216,.12);color:#1d4ed8}
+  .coverage-inline.uncovered{background:rgba(255,247,237,.95);border-color:rgba(180,83,9,.16);color:#9a3412}
+
+  .scope-strip{display:grid;gap:14px;margin-bottom:18px}
+  .scope-grid{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+  .scope-meta{display:flex;gap:10px;flex-wrap:wrap}
+  .scope-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900;border:1px solid rgba(139,0,0,.10)}
+  .scope-note{padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);color:#475569;line-height:1.75;font-size:.88rem}
+  .task-tabs{display:flex;gap:10px;flex-wrap:wrap}
+  .task-tab-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-weight:800;cursor:pointer;transition:all .18s ease}
+  .task-tab-btn:hover{transform:translateY(-1px);border-color:rgba(139,0,0,.16)}
+  .task-tab-btn.is-active{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;border-color:transparent;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+  .task-tab-panel{display:none}
+  .task-tab-panel.is-active{display:block}
+
+  .log-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .log-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(15,23,42,.05);color:#374151;font-size:.82rem;font-weight:800}
+  .log-chip strong{color:#111827}
+  .log-chip.warn{background:rgba(255,247,237,.9);color:#9a3412}
+  .log-chip.soft{background:rgba(248,250,252,.96);color:#475569}
+  .event-pill{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:999px;font-size:.76rem;font-weight:900;border:1px solid transparent}
+  .event-pill.exempted{background:rgba(248,250,252,.98);color:#334155;border-color:rgba(148,163,184,.18)}
+  .event-pill.uncovered{background:rgba(255,247,237,.95);color:#9a3412;border-color:rgba(180,83,9,.16)}
+  .event-pill.chain_issue{background:rgba(254,242,242,.96);color:#b91c1c;border-color:rgba(220,38,38,.14)}
+  .event-pill.delegated{background:rgba(239,246,255,.95);color:#1d4ed8;border-color:rgba(29,78,216,.12)}
+  .event-pill.warning{background:rgba(255,251,235,.95);color:#92400e;border-color:rgba(217,119,6,.14)}
+  .event-pill.generated{background:rgba(240,253,244,.95);color:#166534;border-color:rgba(22,163,74,.12)}
+  .event-pill.special_case{background:rgba(239,246,255,.95);color:#1d4ed8;border-color:rgba(29,78,216,.12)}
+  .log-chip.info{background:rgba(239,246,255,.95);color:#1d4ed8}
+
+  .ai-summary-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:16px;}
+  .ai-summary-card{border:1px solid rgba(139,0,0,.10);border-radius:22px;background:rgba(255,255,255,.92);box-shadow:0 18px 36px rgba(15,23,42,.06);padding:18px;}
+  .ai-summary-card.tone-critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96));}
+  .ai-summary-card.tone-watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96));}
+  .ai-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.8rem;font-weight:800;margin-bottom:12px;}
+  .ai-title{font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:6px;}
+  .ai-text{color:#6b7280;line-height:1.8;font-size:.9rem;}
+  .ai-bullets{display:grid;gap:10px;margin:16px 0 0;padding:0;list-style:none;}
+  .ai-bullets li{display:flex;gap:10px;align-items:flex-start;color:#374151;line-height:1.7;font-size:.88rem;}
+  .ai-bullets i{color:#8B0000;margin-top:4px;}
+  .ai-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+  .ai-action{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;}
+  .ai-action-label{font-size:.8rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+  .ai-action-value{font-size:1.35rem;font-weight:900;color:#111827;}
+  .ai-action.tone-critical .ai-action-value{color:#b91c1c;}
+  .ai-action.tone-watch .ai-action-value{color:#b45309;}
+  .ai-spotlight{display:grid;gap:10px;margin-top:16px;}
+  .ai-spotlight-row{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#374151;font-size:.88rem;}
+  .ai-spotlight-row strong{color:#111827;}
+
+  .empty-box{
+    padding:24px;
+    border-radius:18px;
+    border:1px dashed rgba(15,23,42,.12);
+    background:#f8fafc;
+    color:#6b7280;
+    text-align:center;
+    line-height:1.8;
+  }
+
+  @media (max-width:1300px){
+    .ai-summary-grid,.ai-action-grid{grid-template-columns:1fr;}
+    .toolbar-grid{grid-template-columns:1fr 1fr 1fr;}
+    .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .coverage-grid{grid-template-columns:1fr;}
+  }
+
+  @media (max-width:700px){
+    .toolbar-grid,
+    .stats-grid{grid-template-columns:1fr;}
+  }
+</style>
+
+<div class="task-shell">
+
+  <div class="glass-card panel-card">
+    <div class="scope-strip">
+      <div>
+        <h3 class="section-title">Görev Görünümü</h3>
+        <div class="section-sub">Görev zinciri, üretim logları ve açıkta kalan kayıtlar seçtiğiniz yönetim alanına göre süzülür.</div>
+      </div>
+      <form method="get" action="{{ url_for('main.performance_task_management') }}" class="scope-grid">
+        <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+        <div class="form-group">
+          <label>Görev Alanı</label>
+          <select name="scope" class="form-select">
+            {% for option in scope_options or [] %}
+              <option value="{{ option.value }}" {% if selected_scope == option.value %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text" style="margin-top:8px;">Bu seçim, görev ekranında hangi personel ve birimlerin gösterileceğini belirler.</div>
+        </div>
+        <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-filter"></i>Görev Alanını Uygula</button>
+      </form>
+      <div class="scope-meta">
+        <span class="scope-pill"><i class="fa-solid fa-layer-group"></i>{{ scope_label or 'Seçili Alan' }}</span>
+        <span class="scope-pill"><i class="fa-solid fa-users"></i>{{ scope_user_count or 0 }} kişi</span>
+        <span class="scope-pill"><i class="fa-solid fa-building"></i>{{ scope_unit_count or 0 }} birim</span>
+      </div>
+      <div class="scope-note">{{ scope_hint or 'Seçili görünümdeki çalışanlar gösterilir.' }} içinde kalan görevler, loglar ve zincir uyarıları listelenir.</div>
+    </div>
+  </div>
+
+  <div class="glass-card panel-card">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title">Görev Üretimi ve Filtreleme</h3>
+        <div class="section-sub">
+          Dönem seçebilir, görevleri filtreleyebilir ve akıllı görev üretimini tekrar çalıştırabilirsiniz.
+        </div>
+      </div>
+      <div class="count-chip">{{ filtered_count or 0 }} kayıt</div>
+    </div>
+
+    <form method="GET" action="{{ url_for('main.performance_task_management') }}">
+      <input type="hidden" name="scope" value="{{ selected_scope or '' }}">
+      <div class="toolbar-grid">
+        <div class="form-group">
+          <label>Dönem</label>
+          <select name="period_id" class="form-select">
+            {% for period in periods %}
+              <option value="{{ period.id }}"
+                {% if selected_period and selected_period.id == period.id %}selected{% endif %}>
+                {{ period.title }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Personel / Değerlendirici / Sicil / Birim</label>
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
+              name="q"
+              class="form-input"
+              value="{{ q or '' }}"
+              placeholder="Örn: Erdem, Başkan, 1003, İç Denetim">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Durum</label>
+          <select name="status" class="form-select">
+            <option value="" {% if not selected_status %}selected{% endif %}>Tümü</option>
+            <option value="bekliyor" {% if selected_status == 'bekliyor' %}selected{% endif %}>Bekliyor</option>
+            <option value="kismen_tamamlandi" {% if selected_status == 'kismen_tamamlandi' %}selected{% endif %}>Kısmen Tamamlandı</option>
+            <option value="tamamlandi" {% if selected_status == 'tamamlandi' %}selected{% endif %}>Tamamlandı</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Amir Seviyesi</label>
+          <select name="manager_level" class="form-select">
+            <option value="" {% if not selected_manager_level %}selected{% endif %}>Tümü</option>
+            <option value="1" {% if selected_manager_level == 1 %}selected{% endif %}>1. Amir</option>
+            <option value="2" {% if selected_manager_level == 2 %}selected{% endif %}>2. Amir</option>
+            <option value="3" {% if selected_manager_level == 3 %}selected{% endif %}>3. Amir</option>
+          </select>
+        </div>
+
+        <div class="action-bar">
+          <button type="submit" class="btn-soft primary">
+            <i class="fa-solid fa-filter"></i>
+            Filtrele
+          </button>
+          <a href="{{ url_for('main.performance_task_management', period_id=selected_period.id if selected_period else None, scope=selected_scope) }}"
+            class="btn-soft secondary">
+            <i class="fa-solid fa-rotate-left"></i>
+            Temizle
+          </a>
+        </div>
+      </div>
+    </form>
+
+    <div style="height:14px;"></div>
+
+    <form method="POST" action="{{ url_for('main.performance_task_management_generate') }}" class="action-bar">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="scope" value="{{ selected_scope or '' }}">
+      <input type="hidden" name="period_id" value="{{ selected_period.id if selected_period else '' }}">
+      <input type="hidden" name="q" value="{{ q or '' }}">
+      <input type="hidden" name="status" value="{{ selected_status or '' }}">
+      <input type="hidden" name="manager_level" value="{{ selected_manager_level or '' }}">
+      <button type="submit" class="btn-soft primary">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Görevleri Yeniden Üret
+      </button>
+
+      <a href="{{ url_for('main.performance_hierarchy_settings', period_id=selected_period.id if selected_period else '', scope=selected_scope) }}"
+        class="btn-soft secondary">
+        <i class="fa-solid fa-sitemap"></i>
+        Hiyerarşi Ekranına Git
+      </a>
+    </form>
+  </div>
+
+
+  <section class="ai-summary-grid">
+    <article class="ai-summary-card tone-{{ ai_task_panel.tone if ai_task_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_task_panel.badge if ai_task_panel else 'AI özeti' }}</div>
+      <div class="ai-title">{{ ai_task_panel.headline if ai_task_panel else 'Görev üretim özeti hazır' }}</div>
+      <div class="ai-text">{{ ai_task_panel.summary if ai_task_panel else '' }}</div>
+      {% if ai_task_panel and ai_task_panel.bullets %}
+      <ul class="ai-bullets">
+        {% for bullet in ai_task_panel.bullets %}
+        <li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </article>
+    <article class="ai-summary-card tone-{{ ai_preflight_panel.tone if ai_preflight_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-shield-check"></i> {{ ai_preflight_panel.badge if ai_preflight_panel else 'AI ön kontrol' }}</div>
+      <div class="ai-title">{{ ai_preflight_panel.headline if ai_preflight_panel else 'Dönem ön kontrolü hazır' }}</div>
+      <div class="ai-text">{{ ai_preflight_panel.summary if ai_preflight_panel else '' }}</div>
+      <div class="ai-action-grid">
+        {% for item in (ai_preflight_panel.actions if ai_preflight_panel else []) %}
+        <div class="ai-action tone-{{ item.tone }}">
+          <div class="ai-action-label">{{ item.label }}</div>
+          <div class="ai-action-value">{{ item.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if ai_preflight_panel and ai_preflight_panel.spotlight %}
+      <div class="ai-spotlight">
+        {% for row in ai_preflight_panel.spotlight %}
+        <div class="ai-spotlight-row"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+  
+    <article class="ai-summary-card tone-{{ ai_audit_panel.tone if ai_audit_panel else 'calm' }}">
+      <div class="ai-kicker"><i class="fa-solid fa-list-check"></i> {{ ai_audit_panel.badge if ai_audit_panel else 'AI denetim özeti' }}</div>
+      <div class="ai-title">{{ ai_audit_panel.headline if ai_audit_panel else 'Atama denetimi hazır' }}</div>
+      <div class="ai-text">{{ ai_audit_panel.summary if ai_audit_panel else '' }}</div>
+      <div class="ai-action-grid">
+        {% for item in (ai_audit_panel.actions if ai_audit_panel else []) %}
+        <div class="ai-action tone-{{ item.tone }}">
+          <div class="ai-action-label">{{ item.label }}</div>
+          <div class="ai-action-value">{{ item.value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="action-bar" style="margin-top:14px;">
+        <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management_preflight', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-shield-check"></i> Ön Kontrol</a>
+        <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management_audit_detail', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-clipboard-check"></i> Denetim Detayı</a>
+        <a class="btn-soft secondary" href="{{ url_for('main.performance_task_management_health', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-heart-pulse"></i> Sağlık Raporu</a>
+        <a class="btn-soft primary" href="{{ url_for('main.performance_task_management_recommendations', period_id=selected_period.id if selected_period else None, scope=selected_scope or None) }}"><i class="fa-solid fa-sparkles"></i> AI Öneri Merkezi</a>
+      </div>
+    </article>
+</section>
+
+  <div class="stats-grid">
+    <div class="glass-card stat-card">
+      <div class="stat-label">Toplam Görev</div>
+      <div class="stat-value">{{ stats.total or 0 }}</div>
+    </div>
+
+    <div class="glass-card stat-card">
+      <div class="stat-label">Bekleyen</div>
+      <div class="stat-value">{{ stats.pending or 0 }}</div>
+    </div>
+
+    <div class="glass-card stat-card">
+      <div class="stat-label">Kısmen Tamamlanan</div>
+      <div class="stat-value">{{ stats.partial or 0 }}</div>
+    </div>
+
+    <div class="glass-card stat-card">
+      <div class="stat-label">Tamamlanan</div>
+      <div class="stat-value">{{ stats.completed or 0 }}</div>
+    </div>
+  </div>
+
+  <div class="glass-card panel-card">
+    <div class="section-head" style="margin-bottom:0;">
+      <div>
+        <h3 class="section-title">Çalışma Sekmeleri</h3>
+        <div class="section-sub">Canlı kapsama, kalıcı üretim logları, görev listesi ve zincir uyarıları arasında geçiş yapabilirsiniz.</div>
+      </div>
+      <div class="task-tabs" data-task-tabs>
+        <button type="button" class="task-tab-btn is-active" data-task-tab-target="coverage"><i class="fa-solid fa-shield-heart"></i> Canlı Kapsama</button>
+        <button type="button" class="task-tab-btn" data-task-tab-target="logs"><i class="fa-solid fa-clipboard-list"></i> Atlananlar / Muaflar</button>
+        <button type="button" class="task-tab-btn" data-task-tab-target="assignments"><i class="fa-solid fa-list-check"></i> Görev Listesi</button>
+        <button type="button" class="task-tab-btn" data-task-tab-target="alerts"><i class="fa-solid fa-triangle-exclamation"></i> Zincir Uyarıları</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="glass-card panel-card task-tab-panel is-active" data-task-panel="coverage">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title">Canlı kapsama özeti</h3>
+        <div class="section-sub">
+          Neden atlandığı ve hangi görevlerin vekâletle yürüdüğü burada toplu görünür.
+        </div>
+      </div>
+      <div class="count-chip">Vekâlet: {{ coverage_summary.delegated or 0 }} · Açıkta: {{ coverage_summary.uncovered or 0 }}</div>
+    </div>
+
+    <div class="coverage-grid">
+      <div class="coverage-card delegated">
+        <div class="coverage-title">Hangi vekâlet devrede</div>
+        {% if delegated_assignments %}
+          {% for row in delegated_assignments %}
+            <div class="coverage-item">
+              <div class="coverage-main">{{ row.employee.full_name if row.employee else '-' }} · {{ row.manager_level }}. amir</div>
+              <div class="coverage-sub">
+                {% if row.original_evaluator and row.evaluator %}
+                  {{ row.original_evaluator.full_name }} yerine {{ row.evaluator.full_name }} görevde.
+                {% else %}
+                  Vekâlet çözümü aktif.
+                {% endif %}
+                {% if row.coverage_note %}<br>{{ row.coverage_note }}{% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-box">Seçili dönemde vekâletle yürüyen görev görünmüyor.</div>
+        {% endif %}
+      </div>
+
+      <div class="coverage-card uncovered">
+        <div class="coverage-title">Açıkta kalan görevler</div>
+        {% if uncovered_assignments %}
+          {% for row in uncovered_assignments %}
+            <div class="coverage-item">
+              <div class="coverage-main">{{ row.employee.full_name if row.employee else '-' }} · {{ row.manager_level }}. amir</div>
+              <div class="coverage-sub">{{ row.coverage_note or 'Asıl amir müsait değil ve aktif vekâlet bulunamadı.' }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-box">Seçili dönemde açıkta kalan görev görünmüyor.</div>
+        {% endif %}
+      </div>
+
+      <div class="coverage-card skipped">
+        <div class="coverage-title">Neden atlandı / muaf kaldı</div>
+        {% if exempt_evaluations %}
+          {% for row in exempt_evaluations %}
+            <div class="coverage-item">
+              <div class="coverage-main">{{ row.employee.full_name if row.employee else '-' }}</div>
+              <div class="coverage-sub">{{ row.evaluation_exemption_reason or 'İzin/devamsızlık eşiği nedeniyle muaf.' }}</div>
+            </div>
+          {% endfor %}
+        {% elif hierarchy_alerts %}
+          {% for row in hierarchy_alerts[:12] %}
+            <div class="coverage-item">
+              <div class="coverage-main">{{ row.employee_name or '-' }}</div>
+              <div class="coverage-sub">{{ row.issues|join('; ') }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-box">Atlanan veya muaf kalan kayıt görünmüyor.</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="glass-card panel-card task-tab-panel" data-task-panel="logs">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title">Atlananlar / Muaflar</h3>
+        <div class="section-sub">Görev üretimi sırasında oluşan muafiyet, açıkta kalma ve zincir sorunları artık kalıcı log tablosunda tutulur. Burada seçili dönem için son üretim koşusunun logları görünür.</div>
+      </div>
+      <div class="count-chip">{{ latest_assignment_logs|length }} log</div>
+    </div>
+
+    {% if latest_assignment_log_created_at or latest_assignment_logs %}
+      <div class="log-meta">
+        {% if latest_assignment_log_created_at %}<div class="log-chip soft"><i class="fa-regular fa-clock"></i> Son koşu: <strong>{{ latest_assignment_log_created_at.strftime('%d.%m.%Y %H:%M') }}</strong></div>{% endif %}
+        {% if latest_assignment_log_run_key %}<div class="log-chip"><i class="fa-solid fa-fingerprint"></i> Çalışma kodu: <strong>{{ latest_assignment_log_run_key }}</strong></div>{% endif %}
+        <div class="log-chip"><i class="fa-solid fa-user-slash"></i> Muaf: <strong>{{ latest_assignment_log_summary.exempted or 0 }}</strong></div>
+        <div class="log-chip warn"><i class="fa-solid fa-unlink"></i> Açıkta: <strong>{{ latest_assignment_log_summary.uncovered or 0 }}</strong></div>
+        <div class="log-chip"><i class="fa-solid fa-sitemap"></i> Zincir sorunu: <strong>{{ latest_assignment_log_summary.chain_issue or 0 }}</strong></div>
+        <div class="log-chip"><i class="fa-solid fa-user-check"></i> Vekâletle çözülen: <strong>{{ latest_assignment_log_summary.delegated or 0 }}</strong></div>
+        <div class="log-chip info"><i class="fa-solid fa-user-shield"></i> İstisna: <strong>{{ latest_assignment_log_summary.special_case or 0 }}</strong></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Zaman</th>
+              <th>Personel</th>
+              <th>Olay</th>
+              <th>Seviye</th>
+              <th>Detay</th>
+              <th>Asıl Amir</th>
+              <th>Etkin Amir / Vekil</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in latest_assignment_logs %}
+              <tr>
+                <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+                <td>
+                  <div class="person-name">{{ row.employee.full_name if row.employee else '-' }}</div>
+                  <div class="person-sub">{{ row.employee.sicil_no if row.employee else '-' }}</div>
+                </td>
+                <td>
+                  <span class="event-pill {% if row.event_type == 'warning' and is_assignment_log_special_case(row.reason, row.event_type) %}special_case{% else %}{{ row.event_type }}{% endif %}">
+                    {% if row.event_type == 'exempted' %}Muaf
+                    {% elif row.event_type == 'uncovered' %}Açıkta
+                    {% elif row.event_type == 'chain_issue' %}Zincir Sorunu
+                    {% elif row.event_type == 'delegated' %}Vekâlet
+                    {% elif row.event_type == 'warning' and is_assignment_log_special_case(row.reason, row.event_type) %}İstisna Uygulandı
+                    {% elif row.event_type == 'warning' %}Uyarı
+                    {% else %}{{ row.event_type }}{% endif %}
+                  </span>
+                </td>
+                <td>{% if row.manager_level %}{{ row.manager_level }}. Amir{% else %}-{% endif %}</td>
+                <td>{{ row.reason or '-' }}</td>
+                <td>{{ row.original_evaluator.full_name if row.original_evaluator else '-' }}</td>
+                <td>{{ row.acting_evaluator.full_name if row.acting_evaluator else '-' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-box">Seçili dönem için henüz kalıcı görev üretim logu oluşmadı. Görevleri yeniden ürettiğinizde bu sekme otomatik dolacak.</div>
+    {% endif %}
+    {% if special_case_logs %}
+      <div class="coverage-inline delegated" style="margin-top:14px;">
+        <strong>{{ special_case_logs|length }} kayıt</strong> başkana doğrudan bağlı özel tek amir istisnası olarak bilgi amaçlı ayrıldı. Risk sayacına dahil edilmez.
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="glass-card panel-card task-tab-panel" data-task-panel="assignments">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title">Görev Listesi</h3>
+        <div class="section-sub">
+          Seçili döneme ait assignment kayıtları burada listelenir.
+        </div>
+      </div>
+      <div class="count-chip">{{ stats.total or 0 }} toplam görev</div>
+    </div>
+
+    {% if assignments %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Personel</th>
+              <th>Değerlendirici</th>
+              <th>Birim</th>
+              <th>Dönem</th>
+              <th>Seviye</th>
+              <th>Durum</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in assignments %}
+              {% set employee = row.employee %}
+              {% set evaluator = row.evaluator %}
+              <tr>
+                <td>
+                  <div class="person-name">{{ employee.full_name if employee else '-' }}</div>
+                  <div class="person-sub">Sicil No: {{ employee.sicil_no if employee else '-' }}</div>
+                </td>
+                <td>
+                  <div class="person-name">{{ evaluator.full_name if evaluator else '-' }}</div>
+                  <div class="person-sub">{{ evaluator.sicil_no if evaluator else '-' }}</div>
+                  {% if row.assignment_source == 'delegated' and row.original_evaluator %}
+                    <div class="coverage-inline delegated">
+                      <strong>Vekâlet devrede:</strong> Asıl amir {{ row.original_evaluator.full_name }} yerine bu görev şu an {{ evaluator.full_name if evaluator else '-' }} üzerinde.
+                      {% if row.coverage_note %}<br>{{ row.coverage_note }}{% endif %}
+                    </div>
+                  {% elif row.assignment_source == 'uncovered' %}
+                    <div class="coverage-inline uncovered">
+                      <strong>Açıkta kalan zincir:</strong> {{ row.coverage_note or 'Asıl amir müsait değil ve aktif vekâlet bulunamadı.' }}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="person-name">{{ employee.birim if employee and employee.birim else '-' }}</div>
+                  <div class="person-sub">{{ employee.ust_birim if employee and employee.ust_birim else '-' }}</div>
+                </td>
+                <td>{{ row.period.title if row.period else '-' }}</td>
+                <td>
+                  {% if row.manager_level == 1 %}
+                    <span class="pill level1"><i class="fa-solid fa-user-tie"></i> 1. Amir</span>
+                  {% elif row.manager_level == 2 %}
+                    <span class="pill level2"><i class="fa-solid fa-user-tie"></i> 2. Amir</span>
+                  {% else %}
+                    <span class="pill level3"><i class="fa-solid fa-user-tie"></i> 3. Amir</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if row.status == 'bekliyor' %}
+                    <span class="pill pending"><i class="fa-regular fa-clock"></i> Bekliyor</span>
+                  {% elif row.status == 'kismen_tamamlandi' %}
+                    <span class="pill partial"><i class="fa-solid fa-bars-progress"></i> Kısmen Tamamlandı</span>
+                  {% elif row.status == 'tamamlandi' %}
+                    <span class="pill done"><i class="fa-solid fa-check"></i> Tamamlandı</span>
+                  {% else %}
+                    <span class="pill">{{ row.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-box">
+        Seçilen filtrelere uygun değerlendirme görevi bulunamadı.
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="glass-card panel-card task-tab-panel" data-task-panel="alerts">
+    <div class="section-head">
+      <div>
+        <h3 class="section-title">Görev Üretim Öncesi Uyarı</h3>
+        <div class="section-sub">
+          Eksik veya geçersiz amir zinciri olan personeller burada listelenir.
+        </div>
+      </div>
+      <div class="count-chip">{{ alert_summary.problematic_users or 0 }} sorunlu kayıt</div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:16px;">
+      <div class="glass-card stat-card">
+        <div class="stat-label">Toplam Personel</div>
+        <div class="stat-value">{{ alert_summary.total_users or 0 }}</div>
+      </div>
+      <div class="glass-card stat-card">
+        <div class="stat-label">Zinciri Tam</div>
+        <div class="stat-value">{{ alert_summary.ok_users or 0 }}</div>
+      </div>
+      <div class="glass-card stat-card">
+        <div class="stat-label">Sorunlu Zincir</div>
+        <div class="stat-value">{{ alert_summary.problematic_users or 0 }}</div>
+      </div>
+    </div>
+
+    {% if hierarchy_alerts %}
+      <div class="warn-list">
+        {% for row in hierarchy_alerts %}
+          <div class="warn-card">
+            <div class="warn-title">{{ row.chain.employee_name }}</div>
+            <div class="warn-sub">Sicil No: {{ row.chain.employee_sicil }}</div>
+
+            <div class="tag-list">
+              {% for issue in row.issues %}
+                <span class="tag issue">{{ issue }}</span>
+              {% endfor %}
+              {% for warning in row.warnings %}
+                <span class="tag warning">{{ warning }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-box">
+        Seçili dönem için eksik zincir uyarısı bulunmuyor.
+      </div>
+    {% endif %}
+  </section>
+
+</div>
+<script>
+(function(){
+  const buttons = Array.from(document.querySelectorAll('[data-task-tab-target]'));
+  const panels = Array.from(document.querySelectorAll('[data-task-panel]'));
+  if (!buttons.length || !panels.length) return;
+
+  function activate(name){
+    buttons.forEach(btn => btn.classList.toggle('is-active', btn.dataset.taskTabTarget === name));
+    panels.forEach(panel => panel.classList.toggle('is-active', panel.dataset.taskPanel === name));
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function(){
+      activate(this.dataset.taskTabTarget);
+    });
+  });
+})();
+</script>
+</div>
+{% endblock %}

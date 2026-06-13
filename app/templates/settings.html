@@ -1,0 +1,1497 @@
+
+{% extends "base.html" %}
+
+{% block title %}Ayarlar - BYS360{% endblock %}
+{% block page_kicker %}Ayarlar ve Yetkilendirme{% endblock %}
+{% block page_title %}Canlı Kapsam Sistem Ayarları{% endblock %}
+{% block page_subtitle %}Canlı omurgadaki sistem, modül, görünürlük ve sağ üst avatar Hakkında penceresi içeriklerini tek ekranda yönetin.{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+<section class="settings-live-banner">
+    <div class="settings-live-banner-main">
+        <span class="settings-live-kicker"><i class="fa-solid fa-layer-group"></i> Canlı omurga</span>
+        <h3>Canlı kapsam ayar merkezi</h3>
+        <p>Bu ekran yalnızca aktif BYS360 omurgasını yönetir: kimlik/yetki, personel, performans, iletişim, anket, destek ve AI karar destek. Sağ üst avatar menüsündeki Hakkında penceresi ve Sistem Künyesi sayfası da buradan güncellenir.</p>
+    </div>
+    <div class="settings-live-banner-actions">
+        <a href="#system-group-about" class="btn-soft secondary"><i class="fa-solid fa-circle-info"></i> Avatar Hakkında penceresi</a>
+        <a href="#system-group-kunye" class="btn-soft secondary"><i class="fa-solid fa-address-card"></i> Sistem Künyesi</a>
+        <a href="#module-foundation" class="btn-soft primary"><i class="fa-solid fa-sliders"></i> Canlı modül ayarları</a>
+        <a href="{{ safe_url_for('main.admin_role_matrix_center') }}" class="btn-soft primary"><i class="fa-solid fa-table-list"></i> Rol Matrisi</a>
+    </div>
+</section>
+{% include 'partials/settings/_settings_styles.html' %}
+<div class="settings-shell">
+    <div class="card left-card">
+        <h3 class="section-title">Kullanıcı Seç</h3>
+        <p class="section-text">
+            Kişi bazlı rol matrisi düzenlemek istediğiniz kullanıcıyı seçin.
+        </p>
+
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="userSearch" placeholder="Kullanıcı ara...">
+        </div>
+
+        <div class="user-list" id="userList">
+            {% for user in users %}
+                <a
+                    href="{{ url_for('main.settings_page', user_id=user.id) }}#user-diff-panel"
+                    class="user-link {% if selected_user and selected_user.id == user.id %}active{% endif %}"
+                    data-user-label="{{ (user.ad ~ ' ' ~ user.soyad ~ ' ' ~ (user.unvan or '') ~ ' ' ~ (user.sicil_no or '') ~ ' ' ~ (user.role or ''))|lower }}"
+                >
+                    <div class="user-name">{{ user.ad }} {{ user.soyad }}</div>
+                    <div class="user-meta">
+                        {{ user.unvan or '-' }}<br>
+                        Sicil: {{ user.sicil_no or '-' }} | Rol: {{ user.role or '-' }}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="settings-hero" id="section-overview">
+            <div>
+                <div class="section-title">Admin Ayar Merkezi</div>
+                <p class="section-text" style="margin-bottom:12px;">Bu ekran genel sistemi, rol matrislerini, birim profillerini ve kişi bazlı rol matrisini tek merkezde toplar. Unvan/rol varsayılanı korunur; özel durumlar kişiye özel matrisle denetlenebilir hale gelir.</p>
+                <div class="matrix-pill-row" style="margin-top:0;">
+                    <span class="matrix-pill"><i class="fa-solid fa-building-shield"></i> Genel ayar: {{ foundation_context.stats.system_total }}</span>
+                    <span class="matrix-pill"><i class="fa-solid fa-sliders"></i> Modül ayarı: {{ foundation_context.stats.module_total }}</span>
+                    <span class="matrix-pill"><i class="fa-solid fa-user-shield"></i> Rol profili: {{ foundation_context.stats.role_total }}</span>
+                    <span class="matrix-pill"><i class="fa-solid fa-sitemap"></i> Birim profili: {{ foundation_context.stats.unit_profile_total }}</span>
+                    <span class="matrix-pill"><i class="fa-solid fa-clock-rotate-left"></i> Geçmiş: {{ foundation_context.stats.history_total or 0 }}</span>
+                </div>
+            </div>
+            <div class="settings-map">
+                {% for item in settings_section_links %}
+                <a href="#{{ item.id }}" class="settings-map-link"><i class="{{ item.icon }}"></i> {{ item.label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="foundation-grid">
+            <div class="foundation-stat">
+                <div class="summary-label">Genel Sistem Ayarı</div>
+                <div class="summary-value">{{ foundation_context.stats.system_total }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Kurumsal kimlik, güvenlik ve ortak altyapı anahtarları.</div>
+            </div>
+            <div class="foundation-stat">
+                <div class="summary-label">Modül Ayarı</div>
+                <div class="summary-value">{{ foundation_context.stats.module_total }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Canlı omurgada kalan performans, izin/vekâlet, iletişim ve karar destek kuralları.</div>
+            </div>
+            <div class="foundation-stat">
+                <div class="summary-label">Modül Grubu</div>
+                <div class="summary-value">{{ foundation_context.stats.module_group_total }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Canlı kapsam filtresinden geçen modül grupları.</div>
+            </div>
+            <div class="foundation-stat">
+                <div class="summary-label">Rol Varsayılanı</div>
+                <div class="summary-value">{{ foundation_context.stats.role_total }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Veritabanına taşınan rol bazlı menü görünürlük profilleri.</div>
+            </div>
+            <div class="foundation-stat">
+                <div class="summary-label">Birim Profili</div>
+                <div class="summary-value">{{ foundation_context.stats.unit_profile_total }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Kontrol 2 ile kalıcı hale gelen birim bazlı menü profilleri.</div>
+            </div>
+            <div class="foundation-stat">
+                <div class="summary-label">Ayar Geçmişi</div>
+                <div class="summary-value">{{ foundation_context.stats.history_total or 0 }}</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Kontrol 3 ile eklenen son değişiklik ve geri alma kayıtları.</div>
+            </div>
+        </div>
+
+        {% set ui_panel = settings_ui_panel_context|default({}) %}
+        {% if ui_panel %}
+        <div class="foundation-card settings-diagnostics-panel section-anchor" id="settings-diagnostics" style="margin-bottom:18px;">
+            <div class="settings-diagnostics-head">
+                <div>
+                    <div class="section-title" style="margin-bottom:4px;">Ayarlar Servisi Tanılama</div>
+                    <div class="section-text" style="margin-bottom:0;">Kontrol 4–11 servis köprüleri, canlı menü filtresi, veritabanı omurgası ve son değişiklik kayıtları tek bakışta izlenir.</div>
+                </div>
+                <span class="settings-diagnostics-badge {{ 'ok' if ui_panel.ok else 'warn' }}">
+                    <i class="fa-solid {{ 'fa-circle-check' if ui_panel.ok else 'fa-triangle-exclamation' }}"></i>
+                    {{ 'Servis sağlıklı' if ui_panel.ok else 'Kontrol gerekli' }}
+                </span>
+            </div>
+
+            <div class="settings-health-grid">
+                {% for card in ui_panel.health_cards %}
+                <div class="settings-health-card {{ card.state }}">
+                    <div class="settings-health-label">{{ card.label }}</div>
+                    <div class="settings-health-value">{{ card.value }}</div>
+                    <div class="settings-health-help">{{ card.help }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="matrix-pill-row" style="margin-top:0;">
+                <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Tamamlanan kontrol: {{ ui_panel.completed_phase_count }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-flag-checkered"></i> Aktif: {{ ui_panel.active_phase.phase|default('Faz 11') }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-forward-step"></i> Sıradaki: {{ ui_panel.next_phase_label }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-database"></i> DB: {{ 'Hazır' if ui_panel.db_ready else 'Eksik tablo var' }}</span>
+            </div>
+
+            <div class="settings-phase-strip" aria-label="Ayarlar servisi kontrol durumu">
+                {% for phase in ui_panel.phase_sequence %}
+                <span class="settings-phase-pill {{ phase.status_class }}" title="{{ phase.title }}">
+                    <i class="fa-solid {{ 'fa-check' if phase.status_class == 'ok' else ('fa-circle-dot' if phase.status_class == 'warn' else 'fa-clock') }}"></i>
+                    {{ phase.phase }} · {{ phase.status }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="foundation-layout">
+            <div class="foundation-stack">
+                <form method="post" class="foundation-card section-anchor" id="system-foundation">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                    <input type="hidden" name="form_action" value="save_system_foundation">
+                    <div class="foundation-head">
+                        <div>
+                            <div class="section-title">Genel Sistem Ayar Omurgası</div>
+                            <div class="section-text" style="margin-bottom:0;">Canlı omurganın ortak sistem, güvenlik, görünüm ve Avatar Hakkında penceresi burada tutulur.</div>
+                        </div>
+                        <div class="foundation-actions">
+                            <button type="submit" class="btn-soft primary"><i class="fa-solid fa-floppy-disk"></i> Genel Ayarları Kaydet</button>
+                        </div>
+                    </div>
+                    <div class="foundation-group-index">
+                        {% for group in foundation_context.system_groups %}
+                        <a class="foundation-index-pill" href="#system-group-{{ group.group_key }}"><i class="fa-solid fa-link"></i> {{ group.group_label }}</a>
+                        {% endfor %}
+                    </div>
+                    {% for group in foundation_context.system_groups %}
+                    <div class="foundation-group section-anchor" id="system-group-{{ group.group_key }}">
+                        <div class="foundation-group-title">{{ group.group_label }}</div>
+                        <div class="foundation-group-help">{{ group.group_description }}</div>
+                        <div class="foundation-field-grid">
+                            {% for row in group.rows %}
+                            <div class="foundation-field">
+                                <label for="system__{{ row.setting_key|replace('.', '__') }}">{{ row.label }}</label>
+                                {% if row.input_type == 'textarea' %}
+                                <textarea id="system__{{ row.setting_key|replace('.', '__') }}" name="system__{{ row.setting_key|replace('.', '__') }}">{{ row.current_value }}</textarea>
+                                {% elif row.input_type == 'bool' %}
+                                <label class="menu-item" style="padding:10px 12px;">
+                                    <div class="menu-left">
+                                        <div class="menu-text">
+                                            <strong>{{ row.current_value and 'Aktif' or 'Pasif' }}</strong>
+                                            <span>{{ row.setting_key }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="switch">
+                                        <input type="checkbox" id="system__{{ row.setting_key|replace('.', '__') }}" name="system__{{ row.setting_key|replace('.', '__') }}" {% if row.current_value %}checked{% endif %}>
+                                        <span class="slider"></span>
+                                    </span>
+                                </label>
+                                {% else %}
+                                <input id="system__{{ row.setting_key|replace('.', '__') }}" name="system__{{ row.setting_key|replace('.', '__') }}" type="{{ 'number' if row.input_type == 'number' else 'text' }}" value="{{ row.current_value }}">
+                                {% endif %}
+                                <div class="field-help">{{ row.description }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+
+                <form method="post" class="foundation-card section-anchor" id="module-foundation">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                    <input type="hidden" name="form_action" value="save_module_foundation">
+                    <div class="foundation-head">
+                        <div>
+                            <div class="section-title">Modül Ayar Omurgası</div>
+                            <div class="section-text" style="margin-bottom:0;">Personel, performans, iletişim, anket, destek ve AI karar destek alanlarının canlı ayarları burada tutulur.</div>
+                        </div>
+                        <div class="foundation-actions">
+                            <button type="submit" class="btn-soft primary"><i class="fa-solid fa-gear"></i> Modül Ayarlarını Kaydet</button>
+                        </div>
+                    </div>
+                    <div class="foundation-group-index">
+                        {% for group in foundation_context.module_groups %}
+                        <a class="foundation-index-pill" href="#module-group-{{ group.module_key }}"><i class="fa-solid fa-link"></i> {{ group.module_label }}</a>
+                        {% endfor %}
+                    </div>
+                    {% for group in foundation_context.module_groups %}
+                    <div class="foundation-group section-anchor" id="module-group-{{ group.module_key }}">
+                        <div class="foundation-group-title">{{ group.module_label }}</div>
+                        <div class="foundation-group-help">{{ group.module_description }}</div>
+                        <div class="foundation-field-grid">
+                            {% for row in group.rows %}
+                            <div class="foundation-field">
+                                <label for="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}">{{ row.label }}</label>
+                                {% if row.input_type == 'select' %}
+                                <select id="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}" name="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}">
+                                    {% for value, label in row.choices %}
+                                    <option value="{{ value }}" {% if row.current_value == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% elif row.input_type == 'bool' %}
+                                <label class="menu-item" style="padding:10px 12px;">
+                                    <div class="menu-left">
+                                        <div class="menu-text">
+                                            <strong>{{ row.current_value and 'Aktif' or 'Pasif' }}</strong>
+                                            <span>{{ row.module_key }} / {{ row.setting_key }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="switch">
+                                        <input type="checkbox" id="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}" name="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}" {% if row.current_value %}checked{% endif %}>
+                                        <span class="slider"></span>
+                                    </span>
+                                </label>
+                                {% else %}
+                                <input id="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}" name="module__{{ row.module_key }}__{{ row.setting_key|replace('.', '__') }}" type="text" value="{{ row.current_value }}">
+                                {% endif %}
+                                <div class="field-help">{{ row.description }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+
+            <div class="foundation-stack">
+                <div class="foundation-card section-anchor" id="module-role-matrices">
+                    <div class="foundation-head">
+                        <div>
+                            <div class="section-title">Modül Bazlı Rol Matrisleri</div>
+                            <!-- BYS360_SETTINGS_MODULE_ROLE_MATRIX_V12_TEMPLATE_MARKER -->
+                            <div class="section-text" style="margin-bottom:0;">Aşağıdaki kartlar, her modül sekmesi için rol bazlı görünürlük matrisini yönetir. Yardım Merkezi V2, güncel Performans Yönetimi süreçleri, Sanal Asistan V9, İletişim-Anket, AI Karar Destek ve Ayarlar-Güvenlik alanlarının görünürlüğü buradan yönetilir.</div>
+                        </div>
+                        <div class="matrix-pill-row">
+                            <span class="matrix-pill"><i class="fa-solid fa-table-list"></i> Ayrı ayrı matris kartları</span>
+                            <span class="matrix-pill"><i class="fa-solid fa-user-shield"></i> Rol bazlı görünürlük</span>
+                            <span class="matrix-pill"><i class="fa-solid fa-clock-rotate-left"></i> Öneri politikasına dönüş</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% for matrix in settings_role_matrix_groups %}
+                <div class="foundation-card section-anchor" id="{{ matrix.section_id }}">
+                    <div class="foundation-head">
+                        <div>
+                            <div class="section-title">{{ matrix.title }}</div>
+                            <div class="section-text" style="margin-bottom:0;">{{ matrix.description }}</div>
+                        </div>
+                        <div class="matrix-pill-row">
+                            {% for badge_icon, badge_text in matrix.badges %}
+                            <span class="matrix-pill"><i class="{{ badge_icon }}"></i> {{ badge_text }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                        <input type="hidden" name="form_action" value="{{ matrix.save_action }}">
+                        <table class="role-default-table">
+                            <thead>
+                                <tr>
+                                    <th>Sekme</th>
+                                    {% for role in matrix.roles %}
+                                    <th>{{ role.role_label }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in matrix.rows %}
+                                <tr>
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:10px;">
+                                            <i class="{{ row.icon }}" style="color:#8B0000;"></i>
+                                            <div>
+                                                <strong>{{ row.label }}</strong><br>
+                                                <span style="color:#7a6f6f;font-size:.82rem;">{{ row.key }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% for state in row.states %}
+                                    <td>
+                                        <label style="display:flex;justify-content:center;align-items:center;">
+                                            <input type="checkbox" name="role_matrix__{{ matrix.key }}__{{ state.role_key }}__{{ row.key }}" {% if state.is_visible %}checked{% endif %}>
+                                        </label>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="matrix-pill-row" style="margin-top:14px;">
+                            {% for role in matrix.roles %}
+                            <span class="matrix-pill"><i class="fa-solid fa-user-shield"></i> {{ role.role_label }}: {{ role.visible_count }} açık / öneri {{ role.recommended_count }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="group-actions" style="margin-top:16px;justify-content:flex-end;">
+                            <button type="submit" class="btn-soft"><i class="fa-solid fa-floppy-disk"></i> Rol Matrisini Kaydet</button>
+                        </div>
+                    </form>
+                    <form method="post" style="margin-top:12px;display:flex;justify-content:flex-end;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                        <input type="hidden" name="form_action" value="{{ matrix.reset_action }}">
+                        <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-rotate-left"></i> {{ matrix.reset_text }}</button>
+                    </form>
+                </div>
+                {% endfor %}
+
+<!-- BYS360_ASSISTANT_ROLE_MATRIX_SETTINGS_V11_BEGIN -->
+<div class="foundation-card section-anchor" id="assistant-role-policy">
+    <div class="foundation-head">
+        <div>
+            <div class="section-title">Sanal Asistan Rol Matrisi</div>
+            <div class="section-text" style="margin-bottom:0;">
+                Sanal Asistanı rol bazlı ana anahtar olarak açıp kapatır. <strong>Sanal Asistan Modülü</strong> satırı kapalı olan rolde asistan penceresi,
+                hızlı rehber, güvenli özet kartları ve yönlendirme kısa yolları görünmez.
+            </div>
+        </div>
+        <div class="matrix-pill-row">
+            <span class="matrix-pill"><i class="fa-solid fa-sparkles"></i> Ana anahtar: Sanal Asistan V9</span>
+            <span class="matrix-pill"><i class="fa-solid fa-lock"></i> Rolsüz kullanıcı varsayılan kapalı</span>
+            <span class="matrix-pill"><i class="fa-solid fa-user-shield"></i> Yetkili roller varsayılan açık</span>
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+        <input type="hidden" name="form_action" value="save_assistant_role_matrix">
+
+        <table class="role-default-table">
+            <thead>
+                <tr>
+                    <th>Asistan Alanı</th>
+                    {% for role in assistant_role_matrix.roles %}
+                    <th>{{ role.role_label }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in assistant_role_matrix.rows %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <i class="{{ row.icon }}" style="color:#8B0000;"></i>
+                            <div>
+                                <strong>{{ row.label }}</strong><br>
+                                <span style="color:#7a6f6f;font-size:.82rem;">{{ row.description }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    {% for state in row.states %}
+                    <td>
+                        <label style="display:flex;justify-content:center;align-items:center;">
+                            <input type="checkbox"
+                                   name="assistant_role_policy__{{ state.role_key }}__{{ row.key }}"
+                                   {% if state.is_visible %}checked{% endif %}>
+                        </label>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="matrix-pill-row" style="margin-top:14px;">
+            {% for role in assistant_role_matrix.roles %}
+            <span class="matrix-pill">
+                <i class="fa-solid fa-user-shield"></i>
+                {{ role.role_label }}: {{ role.visible_count }} açık / öneri {{ role.recommended_count }}
+            </span>
+            {% endfor %}
+        </div>
+
+        <div class="group-actions" style="margin-top:16px;justify-content:flex-end;">
+            <button type="submit" class="btn-soft">
+                <i class="fa-solid fa-floppy-disk"></i> Sanal Asistan Rol Matrisini Kaydet
+            </button>
+        </div>
+    </form>
+
+    <form method="post" style="margin-top:12px;display:flex;justify-content:flex-end;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+        <input type="hidden" name="form_action" value="reset_assistant_role_matrix">
+        <button type="submit" class="btn-soft secondary">
+            <i class="fa-solid fa-rotate-left"></i> Önerilen Sanal Asistan Politikasına Dön
+        </button>
+    </form>
+</div>
+<!-- BYS360_ASSISTANT_ROLE_MATRIX_SETTINGS_V11_END -->
+
+                <div class="foundation-card section-anchor" id="role-foundation">
+                    <div class="foundation-head">
+                        <div>
+                            <div class="section-title">Rol Varsayılanı Veritabanı Anlık Durum</div>
+                            <div class="section-text" style="margin-bottom:0;">Statik menü tanımları kontrol 1 ile veritabanına senkronize edilir ve kişi bazlı yetki mantığıyla birlikte çalışır.</div>
+                        </div>
+                        <form method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                            <input type="hidden" name="form_action" value="sync_role_defaults">
+                            <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-rotate"></i> Varsayılanları Senkronize Et</button>
+                        </form>
+                    </div>
+                    <table class="role-default-table">
+                        <thead>
+                            <tr>
+                                <th>Rol</th>
+                                <th>Açık Menü</th>
+                                <th>Kapsama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in foundation_context.role_defaults_snapshot %}
+                            <tr>
+                                <td><span class="role-pill">{{ row.role_name }}</span></td>
+                                <td>{{ row.visible_count }} / {{ row.total_count }}</td>
+                                <td>%{{ row.coverage_ratio }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if phase1_seed_summary.ok %}
+                    <div class="matrix-pill-row" style="margin-top:14px;">
+                        <span class="matrix-pill"><i class="fa-solid fa-database"></i> Rol satırı tohumlama: {{ phase1_seed_summary.seeded_role_defaults }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sliders"></i> Sistem ayarı tohumlama: {{ phase1_seed_summary.seeded_system_settings }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-cubes"></i> Modül ayarı tohumlama: {{ phase1_seed_summary.seeded_module_settings }}</span>
+                    </div>
+                    {% else %}
+                    <div class="empty-box" style="margin-top:14px;">Ayar omurgası henüz veritabanına yazılamadı: {{ phase1_seed_summary.error }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="foundation-card section-anchor" id="unit-foundation">
+                    <div class="section-title">Kontrol 2 · Birim Profili Anlık Durum</div>
+                    <div class="section-text" style="margin-bottom:12px;">Rol varsayılanına ek olarak birim bazlı menü profilleri kalıcı olarak saklanır ve kişi bazlı yetki katmanından önce uygulanır.</div>
+                    {% if foundation_context.unit_profiles_snapshot %}
+                    <table class="role-default-table">
+                        <thead>
+                            <tr>
+                                <th>Birim</th>
+                                <th>Tanımlı Satır</th>
+                                <th>Açık Menü</th>
+                                <th>Kapsama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in foundation_context.unit_profiles_snapshot[:8] %}
+                            <tr>
+                                <td><span class="role-pill">{{ row.unit_name }}</span></td>
+                                <td>{{ row.configured_count }}</td>
+                                <td>{{ row.visible_count }}</td>
+                                <td>%{{ row.coverage_ratio }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="empty-box">Henüz kaydedilmiş birim profili bulunmuyor. Kontrol 2 ile seçili matrisi birim profiline yazabilirsiniz.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="foundation-card section-anchor" id="settings-history" style="margin-top:18px;">
+            <div class="foundation-head">
+                <div>
+                    <div class="section-title">Son Ayar Değişiklikleri</div>
+                    <div class="section-text" style="margin-bottom:0;">Kim neyi ne zaman değiştirdiğini izleyin ve gerekirse tek tıkla önceki sürüme dönün.</div>
+                </div>
+            </div>
+            {% set history_rows = selected_user and profile_context.recent_change_logs or foundation_context.recent_change_logs %}
+            {% if history_rows %}
+            <div class="history-list">
+                {% for row in history_rows[:10] %}
+                <div class="history-item">
+                    <div class="history-top">
+                        <div>
+                            <div class="history-title">{{ row.summary or 'Ayar kaydı' }}</div>
+                            <div class="history-meta">
+                                Kapsam: {{ row.change_scope }} · İşlem: {{ row.action_type }}
+                                {% if row.target_role_name %}· Rol: {{ row.target_role_name }}{% endif %}
+                                {% if row.target_unit_name %}· Birim: {{ row.target_unit_name }}{% endif %}
+                                {% if row.target_user %}· Kullanıcı: {{ row.target_user.ad }} {{ row.target_user.soyad }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="history-meta">
+                            {% if row.actor %}{{ row.actor.ad }} {{ row.actor.soyad }}{% else %}Sistem{% endif %}<br>
+                            {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}
+                        </div>
+                    </div>
+                    <div class="matrix-pill-row" style="margin-top:0;">
+                        {% if row.is_rollback %}<span class="matrix-pill"><i class="fa-solid fa-rotate-left"></i> Geri alma kaydı</span>{% endif %}
+                        {% if row.reverted_from_log_id %}<span class="matrix-pill"><i class="fa-solid fa-link"></i> Kaynak kayıt #{{ row.reverted_from_log_id }}</span>{% endif %}
+                    </div>
+                    {% if not row.is_rollback and row.previous_state_json %}
+                    <div class="history-actions">
+                        <form method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
+                            <input type="hidden" name="form_action" value="rollback_settings_change_entry">
+                            <input type="hidden" name="change_log_id" value="{{ row.id }}">
+                            <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-clock-rotate-left"></i> Bu kaydı geri al</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box">Henüz ayar geçmişi kaydı oluşmadı.</div>
+            {% endif %}
+        </div>
+        {% if selected_user %}
+            <div class="matrix-box section-anchor" id="user-diff-panel" style="margin-bottom:18px;">
+                <div class="section-title" style="margin-bottom:4px;">Kullanıcı Bazlı Değişiklik Fark Ekranı</div>
+                <p class="section-text" style="margin-bottom:12px;">Seçili kullanıcının görünür menülerini başka bir kullanıcıyla kıyaslayın. Böylece hangi sekmelerin farklı açıldığını ve hangi kaynaktan geldiğini tek ekranda görün.</p>
+                <form method="get" action="{{ url_for('main.settings_page') }}" class="bulk-form-grid" style="margin-top:0;">
+                    <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                    <div class="bulk-field">
+                        <label for="compareUserId">Karşılaştırılacak Kullanıcı</label>
+                        <select name="compare_user_id" id="compareUserId">
+                            <option value="">Kullanıcı seçin</option>
+                            {% for user in users if user.id != selected_user.id %}
+                            <option value="{{ user.id }}" {% if compare_user and compare_user.id == user.id %}selected{% endif %}>{{ user.ad }} {{ user.soyad }} · {{ user.role or '-' }} · {{ user.birim or '-' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="bulk-field" style="align-self:end; display:flex; gap:10px;">
+                        <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-code-compare"></i> Farkı Göster</button>
+                        <a class="btn-soft secondary" href="{{ url_for('main.settings_page', user_id=selected_user.id) }}"><i class="fa-solid fa-rotate-left"></i> Kıyaslamayı Temizle</a>
+                    </div>
+                </form>
+                {% if user_diff_context %}
+                <div class="summary-grid" style="margin-top:14px;">
+                    <div class="summary-card">
+                        <div class="summary-label">Seçili Kullanıcı Açık</div>
+                        <div class="summary-value">{{ user_diff_context.selected_visible_total }}</div>
+                        <div class="summary-sub">{{ selected_user.ad }} {{ selected_user.soyad }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Karşı Kullanıcı Açık</div>
+                        <div class="summary-value">{{ user_diff_context.compare_visible_total }}</div>
+                        <div class="summary-sub">{{ user_diff_context.compare_user.ad }} {{ user_diff_context.compare_user.soyad }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Farklı Sekme</div>
+                        <div class="summary-value">{{ user_diff_context.difference_count }}</div>
+                        <div class="summary-sub">Görünürlük veya kaynak farkı olan kayıtlar.</div>
+                    </div>
+                </div>
+                {% if user_diff_context.rows %}
+                <div class="history-shell" style="margin-top:14px;">
+                    {% for row in user_diff_context.rows %}
+                    <div class="history-card">
+                        <div class="history-head">
+                            <div>
+                                <div class="history-title">{{ row.label }}</div>
+                                <div class="history-meta">{{ row.group_name }} · Anahtar: {{ row.key }}</div>
+                            </div>
+                            <span class="matrix-pill"><i class="fa-solid fa-code-branch"></i> {{ 'Sadece seçili kullanıcıda açık' if row.selected_visible else 'Sadece karşı kullanıcıda açık' }}</span>
+                        </div>
+                        <div class="summary-grid" style="margin-top:12px;">
+                            <div class="summary-card">
+                                <div class="summary-label">{{ selected_user.ad }} {{ selected_user.soyad }}</div>
+                                <div class="summary-value" style="font-size:1rem;">{{ 'Açık' if row.selected_visible else 'Kapalı' }}</div>
+                                <div class="summary-sub">Kaynak: {{ row.selected_source }}</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">{{ user_diff_context.compare_user.ad }} {{ user_diff_context.compare_user.soyad }}</div>
+                                <div class="summary-value" style="font-size:1rem;">{{ 'Açık' if row.compare_visible else 'Kapalı' }}</div>
+                                <div class="summary-sub">Kaynak: {{ row.compare_source }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box" style="margin-top:14px;">İki kullanıcı arasında görünürlük farkı bulunamadı.</div>
+                {% endif %}
+                {% endif %}
+            </div>
+            <form method="post" id="user-person-based-role-matrix" class="section-anchor" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+
+                <div class="top-actions">
+                    <div class="target-box" style="margin-bottom:0;">
+                        <div class="target-name">{{ selected_user.ad }} {{ selected_user.soyad }}</div>
+                        <div class="target-meta">
+                            {{ selected_user.unvan or '-' }} |
+                            Sicil: {{ selected_user.sicil_no or '-' }} |
+                            Rol: {{ selected_user.role or '-' }} |
+                            Birim: {{ selected_user.birim or '-' }}
+                        </div>
+                    </div>
+
+                    <div class="person-feature-matrix-notice" style="grid-column:1 / -1; margin-top:12px; padding:14px 16px; border-radius:18px; background:rgba(139,0,0,.06); border:1px solid rgba(139,0,0,.16); color:#334155; line-height:1.65;">
+                        <strong style="color:#8B0000;">Personel bazlı rol matrisi:</strong>
+                        Bu ekranda seçili personelin sol menüde göreceği tüm sekmeleri tek tek açıp kapatabilirsiniz.
+                        Kaydettiğiniz değişiklik yalnızca bu personele uygulanır; unvan/rol varsayılanını ve diğer personelleri değiştirmez.
+                    </div>
+
+                    
+                    <div class="person-feature-matrix-save-guide" style="grid-column:1 / -1; margin:14px 0; padding:18px 20px; border-radius:22px; background:linear-gradient(135deg, rgba(139,0,0,.10), rgba(255,255,255,.92)); border:2px solid rgba(139,0,0,.22); box-shadow:0 12px 28px rgba(15,23,42,.08);">
+                        <div style="font-size:12px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:#8B0000; margin-bottom:6px;">Kişiye göre ayar yapma sırası</div>
+                        <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; color:#334155; line-height:1.55;">
+                            <div><strong>1. Personeli seç</strong><br>Soldaki listeden yalnızca ayar vereceğin personeli aç.</div>
+                            <div><strong>2. Sekmeleri işaretle</strong><br>Açık kalsın istediklerini işaretle, kapalı kalsın istediklerini kaldır.</div>
+                            <div><strong>3. Kaydet</strong><br><span style="color:#8B0000;font-weight:900;">BU PERSONEL İÇİN KAYDET</span> butonuna bas. Sadece bu personel etkilenir.</div>
+                        </div>
+                        <div style="margin-top:12px; padding:12px 14px; border-radius:16px; background:#fff; border:1px solid rgba(139,0,0,.16); color:#475569;">
+                            Bu ekran artık tam kişi bazlı çalışır. Rol/unvan değişse bile seçili personelin menüsü burada işaretlediğin listeye göre uygulanır.
+                        </div>
+                        <!-- BYS360_PERSONNEL_FEATURE_MATRIX_V1_4_CLEAR_SAVE_UI -->
+                    </div>
+
+                    <div class="toolbar">
+                        <button type="button" class="btn-soft secondary" id="checkAllBtn">
+                            <i class="fa-solid fa-check-double"></i>
+                            Tümünü Aç
+                        </button>
+                        <button type="button" class="btn-soft secondary" id="uncheckAllBtn">
+                            <i class="fa-solid fa-ban"></i>
+                            Tümünü Kapat
+                        </button>
+                        <button type="button" class="btn-soft secondary" id="resetToRoleDefaultsBtn">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Rol Varsayılanına Dön
+                        </button>
+                        <button type="submit" class="btn-soft primary" name="form_action" value="save_personnel_feature_matrix_full">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            BU PERSONEL İÇİN KAYDET
+                        </button>
+                        <button type="submit" class="btn-soft secondary" name="form_action" value="reset_user_overrides">
+                            <i class="fa-solid fa-eraser"></i>
+                            Personelin Özel Yetkilerini Temizle
+                        </button>
+                    </div>
+                </div>
+
+                {% if selected_profile_resolution %}
+                <div class="matrix-box">
+                    <div class="section-title" style="margin-bottom:4px;">Personel Bazlı Rol Matrisi · Rol / Birim / Kişi Katmanları</div>
+                    <p class="section-text" style="margin-bottom:0;">Seçili kişinin menü yapısı katmanlı çalışır: rol/unvan varsayılanı, birim profili ve kişi bazlı rol matrisi. Aşağıdaki kayıt butonları mevcut matrisi doğrudan ilgili profile yazar.</p>
+                    <div class="matrix-pill-row" style="margin-top:10px;">
+                        <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> 1 Rol / unvan varsayılanı</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sitemap"></i> 2 Birim profili</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-user-gear"></i> 3 Kişi bazlı rol matrisi</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-clock-rotate-left"></i> Değişiklikler audit log ile izlenir</span>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-label">Rol Kaynağından Açık</div>
+                            <div class="summary-value">{{ selected_profile_resolution.visible_source_counts.role_default }}</div>
+                            <div class="summary-sub">Statik ya da veritabanı rol profilinden gelen görünür menüler.</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Birim Profilinden Açık</div>
+                            <div class="summary-value">{{ selected_profile_resolution.visible_source_counts.unit_profile }}</div>
+                            <div class="summary-sub">Birim profili ile açılan ya da kapatılan etkili menüler.</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Kişiye Özel Sekme Yetkisi</div>
+                            <div class="summary-value">{{ selected_profile_resolution.override_rows|length }}</div>
+                            <div class="summary-sub">Bu kişiye özel tutulan rol matrisi fark kayıtları.</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Taban Görünürlük</div>
+                            <div class="summary-value">{{ selected_profile_resolution.base_visible_total }}</div>
+                            <div class="summary-sub">Rol + birim katmanları uygulandığında oluşan temel görünürlük.</div>
+                        </div>
+                    </div>
+                    <div class="bulk-form-grid" style="margin-top:14px;">
+                        <div class="bulk-field">
+                            <label for="profileRoleTarget">Rol Profil Hedefi</label>
+                            <select name="profile_role_target" id="profileRoleTarget">
+                                {% for role in role_options %}
+                                <option value="{{ role }}" {% if selected_user and selected_user.role == role %}selected{% endif %}>{{ role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="bulk-field">
+                            <label for="profileUnitTarget">Birim Profil Hedefi</label>
+                            <select name="profile_unit_target" id="profileUnitTarget">
+                                {% for birim in birim_options %}
+                                <option value="{{ birim }}" {% if selected_user and selected_user.birim == birim %}selected{% endif %}>{{ birim }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bulk-cta-row">
+                        <button type="submit" class="btn-soft secondary" name="form_action" value="save_role_profile">
+                            <i class="fa-solid fa-users-gear"></i> Gelişmiş: Rol Profiline Kaydet
+                        </button>
+                        <button type="submit" class="btn-soft secondary" name="form_action" value="save_unit_profile">
+                            <i class="fa-solid fa-sitemap"></i> Gelişmiş: Birim Profiline Kaydet
+                        </button>
+                        <button type="submit" class="btn-soft primary" name="form_action" value="save_personnel_feature_matrix_full">
+                            <i class="fa-solid fa-user-gear"></i> Kullanıcı BU PERSONEL İÇİN KAYDET
+                        </button>
+                    </div>
+                    <div class="matrix-pill-row">
+                        <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Rol katmanı: {{ selected_user.role or '-' }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sitemap"></i> Birim katmanı: {{ selected_user.birim or '-' }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-user-pen"></i> Kişiye özel sekme kaydı: {{ selected_profile_resolution.override_rows|length }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-eye"></i> Rol kaynaklı açık: {{ selected_profile_resolution.visible_source_counts.role_default }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-diagram-project"></i> Birim kaynaklı açık: {{ selected_profile_resolution.visible_source_counts.unit_profile }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="matrix-box" style="margin-bottom:18px;">
+                    <div class="section-title" style="margin-bottom:4px;">Yetki Şablonu Dışa Aktar / İçe Aktar</div>
+                    <p class="section-text" style="margin-bottom:0;">Seçili personelin mevcut sekme görünürlüğünü JSON şablonu olarak dışa aktarın veya daha önce aldığınız şablonu bu kullanıcıya geri yükleyin.</p>
+                    <div class="bulk-grid" style="margin-top:14px;">
+                        <div class="bulk-preview-card">
+                            <div class="section-title" style="margin-bottom:4px;">Dışa Aktar</div>
+                            <p class="section-text" style="margin-bottom:12px;">Rol, birim ve kişi bazlı yetki çözülmüş son görünürlüğü JSON dosyası olarak alın.</p>
+                            <div class="bulk-cta-row">
+                                <button type="submit" class="btn-soft secondary" name="form_action" value="export_visibility_template">
+                                    <i class="fa-solid fa-file-export"></i> Yetki Şablonunu İndir
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bulk-preview-card">
+                            <div class="section-title" style="margin-bottom:4px;">İçe Aktar</div>
+                            <p class="section-text" style="margin-bottom:12px;">JSON dosyası seçebilir veya içeriği kutuya yapıştırabilirsiniz. İçe aktarılan görünürlük seçili personele kişi bazlı rol matrisi olarak uygulanır.</p>
+                            <div class="bulk-form-grid">
+                                <div class="bulk-field">
+                                    <label for="importTemplateFile">JSON Dosyası</label>
+                                    <input type="file" name="import_template_file" id="importTemplateFile" accept="application/json,.json" style="width:100%; border:1px solid rgba(139,0,0,.16); border-radius:14px; padding:12px; background:#fff;">
+                                </div>
+                                <div class="bulk-field" style="grid-column:1 / -1;">
+                                    <label for="importTemplateJson">JSON İçeriği</label>
+                                    <textarea name="import_template_json" id="importTemplateJson" rows="7" placeholder='{"visible_keys": ["dashboard", "my_tasks"]}' style="width:100%; border:1px solid rgba(139,0,0,.16); border-radius:18px; padding:14px 16px; background:#fff; resize:vertical;"></textarea>
+                                </div>
+                            </div>
+                            <div class="bulk-cta-row">
+                                <button type="submit" class="btn-soft primary" name="form_action" value="import_visibility_template">
+                                    <i class="fa-solid fa-file-import"></i> Şablonu Uygula
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bulk-panel">
+                    <div class="section-title" style="margin-bottom:4px;">Toplu Yetki Profili Uygula</div>
+                    <p class="section-text" style="margin-bottom:0;">Hazır kurumsal profilleri rol, birim veya rol + birim kapsamına tek seferde uygulayın. Önce etkilenecek kişi sayısını görün, sonra kaydedin.</p>
+                    <div class="bulk-grid">
+                        <div>
+                            <input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">
+                            <div class="bulk-form-grid">
+                                <div class="bulk-field">
+                                    <label for="bulkProfileKey">Yetki Profili</label>
+                                    <select name="bulk_profile_key" id="bulkProfileKey">
+                                        <option value="">Profil seçin</option>
+                                        {% for profile in bulk_settings_profiles %}
+                                        <option value="{{ profile['key'] }}" data-estimated="{{ profile['estimated_count'] or 0 }}">{{ profile['label'] }}{% if selected_user and profile['key'] == 'role::' ~ selected_user.role %} • Önerilen{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="bulk-field">
+                                    <label for="bulkScopeType">Kapsam Tipi</label>
+                                    <select name="bulk_scope_type" id="bulkScopeType">
+                                        <option value="role">Rol Bazlı</option>
+                                        <option value="birim">Birim Bazlı</option>
+                                        <option value="role_and_birim">Rol + Birim</option>
+                                    </select>
+                                </div>
+                                <div class="bulk-field">
+                                    <label for="bulkRole">Rol</label>
+                                    <select name="bulk_role" id="bulkRole">
+                                        <option value="">Rol seçin</option>
+                                        {% for role in role_options %}
+                                        <option value="{{ role }}" {% if selected_user and selected_user.role == role %}selected{% endif %}>{{ role }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="bulk-field">
+                                    <label for="bulkBirim">Birim</label>
+                                    <select name="bulk_birim" id="bulkBirim">
+                                        <option value="">Birim seçin</option>
+                                        {% for birim in birim_options %}
+                                        <option value="{{ birim }}" {% if selected_user and selected_user.birim == birim %}selected{% endif %}>{{ birim }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="bulk-profile-meta">
+                                <span class="bulk-profile-chip"><i class="fa-solid fa-people-group"></i> Etkilenecek kişi: <strong id="bulkTargetCount">0</strong></span>
+                                <span class="bulk-profile-chip"><i class="fa-solid fa-layer-group"></i> Tahmini açık sekme: <strong id="bulkEstimatedCount">0</strong></span>
+                                <span class="bulk-profile-chip"><i class="fa-solid fa-filter-circle-dollar"></i> Kapsam: <strong id="bulkScopeLabel">Rol Bazlı</strong></span>
+                            </div>
+                            <div class="bulk-cta-row">
+                                <button type="submit" class="btn-soft primary" name="form_action" value="bulk_apply_profile" id="bulkApplySubmitBtn">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Toplu Profili Uygula
+                                </button>
+                                <button type="button" class="btn-soft secondary" id="bulkUseSelectedRoleBtn">
+                                    <i class="fa-solid fa-user-check"></i> Seçili Personelin Rolünü Doldur
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bulk-preview-card">
+                            <div class="section-title" style="margin-bottom:4px;">Etkilenecek Kişi Önizlemesi</div>
+                            <p class="section-text" style="margin-bottom:0;">Kaydetmeden önce bu kapsamda kimlerin güncelleneceğini ve yaklaşık kaç menünün açılacağını görün.</p>
+                            <div class="bulk-preview-metrics">
+                                <div class="bulk-metric">
+                                    <div class="summary-label">Hedef Kullanıcı</div>
+                                    <div class="summary-value" id="bulkPreviewCount">0</div>
+                                </div>
+                                <div class="bulk-metric">
+                                    <div class="summary-label">Seçili Profil</div>
+                                    <div class="summary-value" id="bulkPreviewProfile" style="font-size:1rem; line-height:1.35;">-</div>
+                                </div>
+                                <div class="bulk-metric">
+                                    <div class="summary-label">Kapsam Detayı</div>
+                                    <div class="summary-value" id="bulkPreviewScope" style="font-size:1rem; line-height:1.35;">-</div>
+                                </div>
+                            </div>
+                            <div class="bulk-target-list" id="bulkTargetList"></div>
+                            <div class="preview-empty" id="bulkTargetEmpty">Bu kapsam için henüz hedef kullanıcı görünmüyor.</div>
+                        </div>
+                    </div>
+
+                    {% if bulk_result_summary %}
+                    <div class="bulk-summary-banner">
+                        <strong>Son toplu uygulama:</strong> {{ bulk_result_summary.profile_label }} · {{ bulk_result_summary.scope_label }} · {{ bulk_result_summary.scope_detail }} · {{ bulk_result_summary.target_count }} kişi
+                        {% if bulk_result_summary.preview_names %}
+                        <div class="bulk-summary-list">
+                            {% for name in bulk_result_summary.preview_names %}
+                            <span class="matrix-pill">{{ name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if settings_matrix %}
+                <div class="matrix-box">
+                    <div class="section-title" style="margin-bottom:4px;">Hızlı Yetki Şablonları</div>
+                    <div class="matrix-pill-row" style="margin-top:0; margin-bottom:10px;">
+                        <span class="matrix-pill"><i class="fa-solid fa-sparkles"></i> Kurumsal görünürlük setleri</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Tek tıkla uygula</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-eye"></i> Canlı önizleme ile kontrol et</span>
+                    </div>
+                    <p class="section-text" style="margin-bottom:0;">Tek tek kutucuklarla uğraşmadan, kullanıcıya uygun görünürlük setini tek tıkla uygulayın. Sonucu alttaki canlı menü önizlemesinde hemen görebilirsiniz.</p>
+                    <div class="preset-shell">
+                        {% for preset in settings_presets.presets %}
+                        <div class="preset-card">
+                            <div class="preset-name"><i class="{{ preset['icon'] }}"></i><span>{{ preset['label'] }}</span></div>
+                            <div class="preset-text">{{ preset['description'] }}</div>
+                            <div class="preset-actions">
+                                <button type="button" class="preset-btn apply-preset-btn" data-preset-mode="{{ preset['mode'] }}" data-preset-keys='{{ preset["keys"]|tojson }}'>
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Bu Şablonu Uygula
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="module-toggle-row">
+                        {% for toggle in settings_presets.group_toggles %}
+                        <div class="module-toggle-pill">
+                            <strong>{{ toggle['group_name'] }}</strong>
+                            <div class="module-toggle-actions">
+                                <button type="button" class="group-preset-open" data-group-keys='{{ toggle["keys"]|tojson }}'><i class="fa-solid fa-eye"></i> Modülü Aç</button>
+                                <button type="button" class="group-preset-close" data-group-keys='{{ toggle["keys"]|tojson }}'><i class="fa-solid fa-eye-slash"></i> Modülü Kapat</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Rol Varsayılanı</div>
+                        <div class="summary-value">{{ settings_matrix.default_total }}</div>
+                        <div class="summary-sub">Seçili rol için sistemin doğal olarak açık tuttuğu toplam sekme.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Şu An Açık</div>
+                        <div class="summary-value" id="openCountValue">{{ settings_matrix.open_total }}</div>
+                        <div class="summary-sub">Seçili personel üzerinde şu an açık kalan sekmeler.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Kapalı</div>
+                        <div class="summary-value" id="closedCountValue">{{ settings_matrix.closed_total }}</div>
+                        <div class="summary-sub">Seçili personel için kapalı bırakılmış sekmeler.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Rol Uyum Oranı</div>
+                        <div class="summary-value" id="roleAlignmentValue">%{{ settings_matrix.role_alignment_ratio }}</div>
+                        <div class="summary-sub">Seçili kullanıcının rol varsayılanına ne kadar yakın durduğunu gösterir.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Birim Kapsamı</div>
+                        <div class="summary-value">{{ selected_user.birim or '-' }}</div>
+                        <div class="summary-sub">Üst birim: {{ selected_user.ust_birim or '-' }}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Aynı Roldeki Kişiler</div>
+                        <div class="summary-value">{{ settings_matrix.role_peer_count }}</div>
+                        <div class="summary-sub">Seçili kullanıcı hariç aynı rolde bulunan toplam kişi.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Aynı Birimdeki Kişiler</div>
+                        <div class="summary-value">{{ settings_matrix.unit_peer_count }}</div>
+                        <div class="summary-sub">Seçili kişi hariç aynı birimde bulunan toplam kişi.</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Aynı Rol + Birim</div>
+                        <div class="summary-value">{{ settings_matrix.same_role_same_unit_count }}</div>
+                        <div class="summary-sub">Hem aynı rolde hem aynı birimde bulunan benzer kullanıcı sayısı.</div>
+                    </div>
+                </div>
+
+                <div class="matrix-box">
+                    <div class="section-title" style="margin-bottom:4px;">Rol / Birim Yetki Özeti</div>
+                    <p class="section-text" style="margin-bottom:0;">Aşağıdaki tablo seçili kişinin rol varsayılanını, mevcut açık sekmelerini ve grup bazında ne kadar özelleştirme yapıldığını birlikte gösterir.</p>
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Menü Grubu</th>
+                                <th>Toplam</th>
+                                <th>Rol Varsayılanı</th>
+                                <th>Varsayılan %</th>
+                                <th>Şu An Açık</th>
+                                <th>Açık %</th>
+                                <th>Kapalı</th>
+                                <th>Özelleştirme</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in settings_matrix.matrix_rows %}
+                            <tr>
+                                <td><strong>{{ row.group_name }}</strong></td>
+                                <td>{{ row.total }}</td>
+                                <td>{{ row.default_open }}</td>
+                                <td>%{{ row.default_ratio }}</td>
+                                <td>{{ row.current_open }}</td>
+                                <td>%{{ row.open_ratio }}</td>
+                                <td>{{ row.closed_count }}</td>
+                                <td>{{ row.override_count }}</td>
+                                <td>
+                                    <span class="state-badge {{ row.visibility_state }}">
+                                        {% if row.visibility_state == 'full' %}
+                                            <i class="fa-solid fa-circle-check"></i> Tam Görünür
+                                        {% elif row.visibility_state == 'hidden' %}
+                                            <i class="fa-solid fa-eye-slash"></i> Gizli
+                                        {% else %}
+                                            <i class="fa-solid fa-sliders"></i> Kısmi
+                                        {% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="matrix-pill-row">
+                        <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Rol: {{ selected_user.role or '-' }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sitemap"></i> Birim: {{ selected_user.birim or '-' }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sliders"></i> Varsayılan dışı açık: {{ settings_matrix.custom_open|length }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-lock"></i> Varsayılan dışı kapalı: {{ settings_matrix.custom_closed|length }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-eye"></i> Tam görünür grup: <span id="fullyVisibleGroupsValue">{{ settings_matrix.fully_visible_groups }}</span></span>
+                        <span class="matrix-pill"><i class="fa-solid fa-eye-slash"></i> Tam gizli grup: <span id="fullyHiddenGroupsValue">{{ settings_matrix.fully_hidden_groups }}</span></span>
+                    </div>
+                </div>
+
+                <div class="matrix-box">
+                    <div class="section-title" style="margin-bottom:4px;">Canlı Sol Şerit Önizlemesi</div>
+                    <p class="section-text" style="margin-bottom:0;">Kaydetmeden önce bu kişinin sol menüde neleri göreceğini canlı olarak izleyin. Bir grup tamamen kapanırsa burada da kaybolur.</p>
+                    <div class="preview-shell" id="sidebarPreview">
+                        {% for group in settings_matrix.preview_groups %}
+                            {% if group.visible_count > 0 %}
+                            <div class="preview-card" data-preview-group="{{ group.group_name|e }}">
+                                <div class="preview-title">
+                                    <span>{{ group.group_name }}</span>
+                                    <span class="state-badge {{ group.visibility_state }}">
+                                        {{ group.visible_count }} açık / {{ group.hidden_count }} kapalı
+                                    </span>
+                                </div>
+                                <div class="preview-list">
+                                    {% for label in group.visible_labels %}
+                                    <span class="preview-pill">{{ label }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="preview-empty" id="sidebarPreviewEmpty" {% if settings_matrix.open_total > 0 %}style="display:none;"{% endif %}>
+                        Bu kişiye görünür hiçbir sekme bırakılmadı. Sol şerit tamamen boş kalır.
+                    </div>
+                </div>
+                {% endif %}
+
+                {% for group_name, items in grouped_menu_definitions.items() %}
+                    {% set group_idx = loop.index0 %}
+                    <div class="group-card" data-group-name="{{ group_name }}">
+                        <div class="group-head">
+                            <div class="group-title">{{ group_name }}</div>
+                            <div class="group-actions">
+                                <button type="button" class="mini-btn group-check-all" data-group="{{ group_idx }}">
+                                    <i class="fa-solid fa-check"></i>
+                                    Grubu Aç
+                                </button>
+                                <button type="button" class="mini-btn group-uncheck-all" data-group="{{ group_idx }}">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    Grubu Kapat
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-grid">
+                            {% for item in items %}
+                                {% set checked = selected_rule_map.get(item.key, False) %}
+                                <label class="menu-item" data-group-name="{{ group_name }}" data-item-label="{{ item.label }}">
+                                    <div class="menu-left">
+                                        <div class="menu-icon">
+                                            <i class="{{ item.icon }}"></i>
+                                        </div>
+                                        <div class="menu-text">
+                                            <strong>{{ item.label }}</strong>
+                                            <span>{{ item.key }}</span>
+                                        </div>
+                                    </div>
+
+                                    <span class="switch">
+                                        <input
+                                            type="checkbox"
+                                            name="menu_{{ item.key }}"
+                                            class="menu-checkbox"
+                                            data-group-checkbox="{{ group_idx }}"
+                                            data-group-name="{{ group_name }}"
+                                            data-item-label="{{ item.label }}"
+                                            data-role-default="{% if item.key in role_default_keys %}1{% else %}0{% endif %}"
+                                            {% if checked %}checked{% endif %}
+                                        >
+                                        <span class="slider"></span>
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="person-feature-matrix-final-save" style="position:sticky; bottom:14px; z-index:20; margin:18px 0; padding:16px 18px; border-radius:22px; background:#fff; border:2px solid rgba(139,0,0,.28); box-shadow:0 18px 40px rgba(15,23,42,.16); display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+                    <div>
+                        <div style="font-weight:900; color:#111827; font-size:16px;">Son adım: Bu personel için kaydet</div>
+                        <div style="color:#64748b; font-size:13px; margin-top:3px;">İşaretlediğin sekmeler yalnızca seçili personele uygulanır.</div>
+                    </div>
+                    <button type="submit" class="btn-soft primary" name="form_action" value="save_personnel_feature_matrix_full" style="font-size:15px; padding:14px 20px; border-radius:16px;">
+                        <i class="fa-solid fa-floppy-disk"></i> BU PERSONEL İÇİN KAYDET
+                    </button>
+                </div>
+
+            </form>
+        {% else %}
+            <div class="empty-box">
+                Soldaki listeden bir personel seçerek kişiye özel sekme görünürlüğünü düzenleyebilirsiniz.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+(function () {
+    const userSearch = document.getElementById("userSearch");
+    const userList = document.getElementById("userList");
+    const checkAllBtn = document.getElementById("checkAllBtn");
+    const uncheckAllBtn = document.getElementById("uncheckAllBtn");
+    const resetToRoleDefaultsBtn = document.getElementById("resetToRoleDefaultsBtn");
+    const allCheckboxes = Array.from(document.querySelectorAll(".menu-checkbox"));
+    const applyPresetButtons = Array.from(document.querySelectorAll(".apply-preset-btn"));
+    const groupPresetOpenButtons = Array.from(document.querySelectorAll(".group-preset-open"));
+    const groupPresetCloseButtons = Array.from(document.querySelectorAll(".group-preset-close"));
+    const sidebarPreview = document.getElementById("sidebarPreview");
+    const sidebarPreviewEmpty = document.getElementById("sidebarPreviewEmpty");
+    const openCountValue = document.getElementById("openCountValue");
+    const closedCountValue = document.getElementById("closedCountValue");
+    const fullyVisibleGroupsValue = document.getElementById("fullyVisibleGroupsValue");
+    const fullyHiddenGroupsValue = document.getElementById("fullyHiddenGroupsValue");
+    const bulkProfileKey = document.getElementById("bulkProfileKey");
+    const bulkScopeType = document.getElementById("bulkScopeType");
+    const bulkRole = document.getElementById("bulkRole");
+    const bulkBirim = document.getElementById("bulkBirim");
+    const bulkTargetCount = document.getElementById("bulkTargetCount");
+    const bulkEstimatedCount = document.getElementById("bulkEstimatedCount");
+    const bulkScopeLabel = document.getElementById("bulkScopeLabel");
+    const bulkPreviewCount = document.getElementById("bulkPreviewCount");
+    const bulkPreviewProfile = document.getElementById("bulkPreviewProfile");
+    const bulkPreviewScope = document.getElementById("bulkPreviewScope");
+    const bulkTargetList = document.getElementById("bulkTargetList");
+    const bulkTargetEmpty = document.getElementById("bulkTargetEmpty");
+    const bulkUseSelectedRoleBtn = document.getElementById("bulkUseSelectedRoleBtn");
+    const bulkApplySubmitBtn = document.getElementById("bulkApplySubmitBtn");
+    const bulkTargetUsers = {{ bulk_target_users|tojson if bulk_target_users else '[]' }};
+
+
+    function applyPresetKeys(keys, mode) {
+        const keySet = new Set(Array.isArray(keys) ? keys : []);
+        allCheckboxes.forEach(cb => {
+            const key = (cb.name || "").replace(/^menu_/, "");
+            if (mode === "only") {
+                cb.checked = keySet.has(key);
+            } else if (mode === "open") {
+                if (keySet.has(key)) cb.checked = true;
+            } else if (mode === "close") {
+                if (keySet.has(key)) cb.checked = false;
+            }
+        });
+        renderSidebarPreview();
+    }
+
+    function getBulkScopeText() {
+        const type = (bulkScopeType && bulkScopeType.value) || "role";
+        if (type === "birim") return "Birim Bazlı";
+        if (type === "role_and_birim") return "Rol + Birim";
+        return "Rol Bazlı";
+    }
+
+    function getFilteredBulkTargets() {
+        const type = (bulkScopeType && bulkScopeType.value) || "role";
+        const role = (bulkRole && bulkRole.value) || "";
+        const birim = (bulkBirim && bulkBirim.value) || "";
+        return bulkTargetUsers.filter(user => {
+            if (user.active === false) return false;
+            if (type === "role") return !role || user.role === role;
+            if (type === "birim") return !birim || user.birim === birim;
+            const roleOk = !role || user.role === role;
+            const birimOk = !birim || user.birim === birim;
+            return roleOk && birimOk;
+        });
+    }
+
+    function renderBulkPreview() {
+        if (!bulkProfileKey || !bulkTargetList) return;
+        const selectedOption = bulkProfileKey.options[bulkProfileKey.selectedIndex];
+        const filtered = getFilteredBulkTargets();
+        const estimated = Number((selectedOption && selectedOption.dataset.estimated) || 0);
+        const profileLabel = selectedOption && selectedOption.value ? selectedOption.textContent.trim() : "Profil seçin";
+        let scopeDetail = "Tüm kullanıcılar";
+        if ((bulkScopeType && bulkScopeType.value) === "role" && bulkRole && bulkRole.value) scopeDetail = bulkRole.value;
+        if ((bulkScopeType && bulkScopeType.value) === "birim" && bulkBirim && bulkBirim.value) scopeDetail = bulkBirim.value;
+        if ((bulkScopeType && bulkScopeType.value) === "role_and_birim") {
+            const parts = [];
+            if (bulkRole && bulkRole.value) parts.push(bulkRole.value);
+            if (bulkBirim && bulkBirim.value) parts.push(bulkBirim.value);
+            scopeDetail = parts.length ? parts.join(' / ') : 'Tüm kullanıcılar';
+        }
+
+        if (bulkTargetCount) bulkTargetCount.textContent = String(filtered.length);
+        if (bulkPreviewCount) bulkPreviewCount.textContent = String(filtered.length);
+        if (bulkEstimatedCount) bulkEstimatedCount.textContent = String(estimated);
+        if (bulkScopeLabel) bulkScopeLabel.textContent = getBulkScopeText();
+        if (bulkPreviewProfile) bulkPreviewProfile.textContent = profileLabel;
+        if (bulkPreviewScope) bulkPreviewScope.textContent = scopeDetail;
+        if (bulkApplySubmitBtn) bulkApplySubmitBtn.disabled = !selectedOption || !selectedOption.value || filtered.length === 0;
+
+        bulkTargetList.innerHTML = filtered.slice(0, 6).map(user => `
+            <div class="bulk-target-item">
+                <div>
+                    <div class="bulk-target-name">${user.name || '-'}<\/div>
+                    <div class="user-meta">${user.unvan || '-'} · Sicil: ${user.sicil_no || '-'}<\/div>
+                <\/div>
+                <div class="bulk-target-meta">${user.role || '-'}<br>${user.unit || '-'}<\/div>
+            <\/div>
+        `).join('');
+        if (bulkTargetEmpty) bulkTargetEmpty.style.display = filtered.length ? 'none' : 'block';
+    }
+
+    function renderSidebarPreview() {
+        if (!sidebarPreview) return;
+        const groups = new Map();
+        let openTotal = 0;
+        allCheckboxes.forEach(cb => {
+            const groupName = cb.dataset.groupName || "Diğer";
+            const itemLabel = cb.dataset.itemLabel || cb.name;
+            if (!groups.has(groupName)) {
+                groups.set(groupName, { visible: [], hiddenCount: 0, total: 0 });
+            }
+            const group = groups.get(groupName);
+            group.total += 1;
+            if (cb.checked) {
+                group.visible.push(itemLabel);
+                openTotal += 1;
+            } else {
+                group.hiddenCount += 1;
+            }
+        });
+
+        let fullVisible = 0;
+        let fullHidden = 0;
+        let html = "";
+        groups.forEach((group, groupName) => {
+            if (group.visible.length === 0) {
+                fullHidden += 1;
+                return;
+            }
+            let state = "partial";
+            let stateText = `${group.visible.length} açık / ${group.hiddenCount} kapalı`;
+            if (group.hiddenCount === 0) {
+                state = "full";
+                fullVisible += 1;
+            }
+            html += `
+                <div class="preview-card" data-preview-group="${groupName}">
+                    <div class="preview-title">
+                        <span>${groupName}</span>
+                        <span class="state-badge ${state}">${stateText}</span>
+                    </div>
+                    <div class="preview-list">
+                        ${group.visible.map(label => `<span class="preview-pill">${label}</span>`).join("")}
+                    </div>
+                </div>`;
+        });
+        sidebarPreview.innerHTML = html;
+        if (sidebarPreviewEmpty) {
+            sidebarPreviewEmpty.style.display = openTotal > 0 ? "none" : "block";
+        }
+        if (openCountValue) openCountValue.textContent = String(openTotal);
+        if (closedCountValue) closedCountValue.textContent = String(allCheckboxes.length - openTotal);
+        if (fullyVisibleGroupsValue) fullyVisibleGroupsValue.textContent = String(fullVisible);
+        if (fullyHiddenGroupsValue) fullyHiddenGroupsValue.textContent = String(fullHidden);
+    }
+
+    if (userSearch && userList) {
+        userSearch.addEventListener("input", function () {
+            const q = (userSearch.value || "").toLowerCase().trim();
+            userList.querySelectorAll(".user-link").forEach(link => {
+                const label = link.dataset.userLabel || "";
+                link.style.display = (!q || label.includes(q)) ? "" : "none";
+            });
+        });
+    }
+
+    if (checkAllBtn) {
+        checkAllBtn.addEventListener("click", function () {
+            allCheckboxes.forEach(cb => { cb.checked = true; });
+            renderSidebarPreview();
+        });
+    }
+
+    if (uncheckAllBtn) {
+        uncheckAllBtn.addEventListener("click", function () {
+            allCheckboxes.forEach(cb => { cb.checked = false; });
+            renderSidebarPreview();
+        });
+    }
+
+    if (resetToRoleDefaultsBtn) {
+        resetToRoleDefaultsBtn.addEventListener("click", function () {
+            allCheckboxes.forEach(cb => {
+                cb.checked = cb.dataset.roleDefault === "1";
+            });
+            renderSidebarPreview();
+        });
+    }
+
+
+    applyPresetButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            let keys = [];
+            try {
+                keys = JSON.parse(btn.dataset.presetKeys || "[]");
+            } catch (err) {
+                keys = [];
+            }
+            applyPresetKeys(keys, btn.dataset.presetMode || "only");
+        });
+    });
+
+    groupPresetOpenButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            let keys = [];
+            try {
+                keys = JSON.parse(btn.dataset.groupKeys || "[]");
+            } catch (err) {
+                keys = [];
+            }
+            applyPresetKeys(keys, "open");
+        });
+    });
+
+    groupPresetCloseButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            let keys = [];
+            try {
+                keys = JSON.parse(btn.dataset.groupKeys || "[]");
+            } catch (err) {
+                keys = [];
+            }
+            applyPresetKeys(keys, "close");
+        });
+    });
+
+    document.querySelectorAll(".group-check-all").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const group = btn.dataset.group;
+            document.querySelectorAll(`[data-group-checkbox="${group}"]`).forEach(cb => {
+                cb.checked = true;
+            });
+            renderSidebarPreview();
+        });
+    });
+
+    document.querySelectorAll(".group-uncheck-all").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const group = btn.dataset.group;
+            document.querySelectorAll(`[data-group-checkbox="${group}"]`).forEach(cb => {
+                cb.checked = false;
+            });
+            renderSidebarPreview();
+        });
+    });
+
+    allCheckboxes.forEach(cb => cb.addEventListener("change", renderSidebarPreview));
+
+    [bulkProfileKey, bulkScopeType, bulkRole, bulkBirim].forEach(el => {
+        if (el) el.addEventListener("change", renderBulkPreview);
+    });
+
+    if (bulkUseSelectedRoleBtn && bulkRole) {
+        bulkUseSelectedRoleBtn.addEventListener("click", function () {
+            {% if selected_user and selected_user.role %}
+            bulkRole.value = {{ selected_user.role|tojson }};
+            {% endif %}
+            renderBulkPreview();
+        });
+    }
+
+    renderSidebarPreview();
+    renderBulkPreview();
+})();
+</script>
+
+<section class="card" style="margin-top:18px;">
+    <h3 class="section-title">Guvenlik, KVKK ve Dosya Politikasi</h3>
+    <p class="section-text">Canli kullanima geciste kimlik verisi, dosya yukleme ve oturum davranislari ayni kurumsal cizgide korunmalidir.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+        <div style="padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);">
+            <strong style="display:block;color:#111827;margin-bottom:4px;">Kimlik verisi</strong>
+            <span style="color:#6b7280;line-height:1.7;">TC yerine sicil no / kurum ID gorunurlugu korunmali; gereksiz kopyalama ve indirilebilir hassas alanlar azaltılmali.</span>
+        </div>
+        <div style="padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);">
+            <strong style="display:block;color:#111827;margin-bottom:4px;">Dosya yukleme siniri</strong>
+            <span style="color:#6b7280;line-height:1.7;">Yukleme akislarinda sadece izinli uzantilar, uygun MIME ve boyut limitleri kabul edilmelidir.</span>
+        </div>
+        <div style="padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);">
+            <strong style="display:block;color:#111827;margin-bottom:4px;">Oturum sertlestirmesi</strong>
+            <span style="color:#6b7280;line-height:1.7;">HTTPOnly, SameSite ve gerekiyorsa Secure cookie tercihleri tum ortamlarda tutarli izlenmelidir.</span>
+        </div>
+        <div style="padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);">
+            <strong style="display:block;color:#111827;margin-bottom:4px;">Denetim izi</strong>
+            <span style="color:#6b7280;line-height:1.7;">Indirme, yukleme, yayinlama ve kritik ayar degisiklikleri log mantigi ile izlenebilir tutulmalidir.</span>
+        </div>
+    </div>
+</section>
+<!-- BYS360_ASSISTANT_ROLE_MATRIX_VISIBLE_V10_BEGIN -->
+{% set arm = assistant_role_matrix_v10() if assistant_role_matrix_v10 is defined else none %}
+{% if arm %}
+<section class="settings-card bys360-assistant-role-matrix-v10" id="sanal-asistan-rol-matrisi" style="margin-top:24px;">
+  <div class="settings-card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8B0000;">Ayarlar / Rol Matrisi</div>
+      <h3 style="margin:4px 0 6px;font-size:20px;font-weight:800;">Sanal Asistan Rol Matrisi</h3>
+      <p style="margin:0;color:#6b7280;max-width:760px;">
+        Sanal Asistanı rol bazlı komple açıp kapatır. <strong>Sanal Asistan Modülü</strong> satırı kapalı olan rolde ana menü,
+        asistan sayfası ve asistan içindeki tüm kısa yollar görünmez.
+      </p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:999px;padding:7px 10px;font-size:12px;">Ana anahtar: Sanal Asistan V9</span>
+      <span style="background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:7px 10px;font-size:12px;">Personel varsayılan kapalı</span>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('assistant_role_matrix_v10_save') }}" style="margin-top:16px;">
+    {% if csrf_token is defined %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+
+    <div style="overflow:auto;border:1px solid #e5e7eb;border-radius:16px;background:#fff;">
+      <table class="table table-sm align-middle mb-0" style="min-width:980px;margin:0;">
+        <thead style="background:#f9fafb;">
+          <tr>
+            <th style="position:sticky;left:0;background:#f9fafb;z-index:2;min-width:260px;padding:12px;">Asistan Alanı</th>
+            {% for role_key, role_label in arm.roles %}
+              <th style="text-align:center;white-space:nowrap;padding:12px;font-size:12px;">{{ role_label }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for feature_key, feature_label, feature_desc in arm.rows %}
+            <tr {% if feature_key == 'assistant_module' %}style="background:#fffaf0;"{% endif %}>
+              <td style="position:sticky;left:0;background:inherit;z-index:1;padding:12px;border-top:1px solid #eef2f7;">
+                <div style="font-weight:800;color:#111827;">{{ feature_label }}</div>
+                <div style="font-size:12px;color:#6b7280;">{{ feature_desc }}</div>
+              </td>
+              {% for role_key, role_label in arm.roles %}
+                {% set checked = arm.matrix.get(feature_key, {}).get(role_key, false) %}
+                <td style="text-align:center;border-top:1px solid #eef2f7;">
+                  <label style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;cursor:pointer;">
+                    <input
+                      type="checkbox"
+                      name="assistant_matrix__{{ feature_key }}__{{ role_key }}"
+                      value="1"
+                      {% if checked %}checked{% endif %}
+                      style="width:18px;height:18px;accent-color:#2563eb;"
+                    >
+                  </label>
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap;">
+      <div style="font-size:12px;color:#6b7280;">
+        Not: Bu kart sadece Sanal Asistan görünürlüğünü yönetir; giriş, şifre, CAPTCHA ve veritabanı ayarlarına dokunmaz.
+      </div>
+      <button type="submit" class="btn btn-primary" style="background:#8B0000;border-color:#8B0000;border-radius:12px;padding:9px 16px;font-weight:700;">
+        Sanal Asistan Rol Matrisini Kaydet
+      </button>
+    </div>
+  </form>
+</section>
+{% endif %}
+<!-- BYS360_ASSISTANT_ROLE_MATRIX_VISIBLE_V10_END -->
+
+{% if selected_user %}
+<script>
+(function(){
+  function jumpToUserDiff(){
+    var panel = document.getElementById('user-diff-panel');
+    if(!panel){ return; }
+    if(typeof panel.scrollIntoView === 'function'){
+      panel.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+    var compareField = document.getElementById('compareUserId');
+    if(compareField && !compareField.value){
+      try { compareField.focus({ preventScroll: true }); } catch (e) { compareField.focus(); }
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', jumpToUserDiff, { once: true });
+  } else {
+    jumpToUserDiff();
+  }
+})();
+</script>
+{% endif %}
+<script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,44 @@
+/* BYS360 Mobile Assistant Dedupe V5
+   Amaç: Mobilde BYS360 Asistanı tek kopya kalsın ve sağ altta sabitlensin.
+   Masaüstü görünümünü değiştirmez. */
+
+@media (max-width: 768px) {
+  body.bys360-mobile-assistant-v5-ready {
+    --bys360-mobile-assistant-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-root {
+    position: fixed !important;
+    top: auto !important;
+    left: auto !important;
+    right: 16px !important;
+    bottom: var(--bys360-mobile-assistant-bottom) !important;
+    z-index: 2147483000 !important;
+    transform: none !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-root[data-bys360-assistant-panel-open="true"],
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-root.is-open,
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-root.open,
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-root.active {
+    right: 10px !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: min(420px, calc(100vw - 20px)) !important;
+    max-height: calc(100dvh - 92px) !important;
+  }
+
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-assistant-v5-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Eski mobil alt şerit kalıntıları tekrar görünürse kapat. */
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-tabbar,
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-bottom-nav,
+  body.bys360-mobile-assistant-v5-ready .bys360-mobile-native-tabbar,
+  body.bys360-mobile-assistant-v5-ready [data-bys360-mobile-tabbar="true"] {
+    display: none !important;
+  }
+}

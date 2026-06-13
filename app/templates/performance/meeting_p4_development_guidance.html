@@ -1,0 +1,164 @@
+
+<style>
+.phase10-detail-summary{
+    cursor:pointer;
+    color:#8B0000;
+    font-weight:700;
+}
+.phase10-detail-summary:hover{
+    text-decoration:underline;
+}
+.phase10-note-detail-card{
+    margin-top:.55rem;
+    padding:.85rem .95rem;
+    border:1px solid rgba(139,0,0,.14);
+    border-radius:14px;
+    background:rgba(255,255,255,.72);
+    color:#334155;
+    line-height:1.55;
+}
+.phase10-status-badge{
+    display:inline-flex;
+    padding:.25rem .55rem;
+    border-radius:999px;
+    background:rgba(15,23,42,.06);
+    border:1px solid rgba(15,23,42,.10);
+    color:#334155;
+    font-weight:700;
+    font-size:.78rem;
+}
+</style>
+
+
+{# BYS360 Aşama 10 Türkçe görünüm etiketleri #}
+{% macro phase10_label_source(value) -%}
+    {%- set labels = {
+        'system': 'Sistem',
+        'manual': 'Manuel',
+        'ai': 'AI Dikkat Notu',
+        'assistant': 'Sanal Asistan Rehberi'
+    } -%}
+    {{ labels.get(value|string, value or '-') }}
+{%- endmacro %}
+
+{% macro phase10_label_type(value) -%}
+    {%- set labels = {
+        'guidance_note': 'Rehber Notu',
+        'development_recommendation': 'Gelişim Önerisi',
+        'development_need': 'Gelişim İhtiyacı',
+        'strength_note': 'Güçlü Yön Notu',
+        'ai_attention_note': 'AI Dikkat Notu'
+    } -%}
+    {{ labels.get(value|string, value or '-') }}
+{%- endmacro %}
+
+{% macro phase10_label_visibility(value) -%}
+    {{ value or 'Görünürlük bilgisi yok' }}
+{%- endmacro %}
+
+{% macro phase10_label_status(value) -%}
+    {{ value or 'Kontrol Bekliyor' }}
+{%- endmacro %}
+
+{% extends "base.html" %}
+{% block title %}Aşama 10 Gelişim Önerisi ve Rehberlik{% endblock %}
+
+{% block content %}
+{# BYS360_PHASE10_DEVELOPMENT_GUIDANCE_TEMPLATE #}
+<style>
+  .meeting-p4-page{max-width:1180px;margin:0 auto;padding:18px 16px 34px;}
+  .meeting-p4-hero{border:1px solid rgba(139,0,0,.14);background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:24px;padding:22px;box-shadow:0 18px 45px rgba(18,18,18,.06);}
+  .meeting-p4-title{font-size:1.55rem;font-weight:800;margin:0;color:#251212;letter-spacing:-.02em;}
+  .meeting-p4-subtitle{color:#6b5b5b;margin:.45rem 0 0;line-height:1.55;}
+  .meeting-p4-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0;}
+  .meeting-p4-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.12);border-radius:20px;padding:16px;box-shadow:0 12px 28px rgba(18,18,18,.045);}
+  .meeting-p4-card b{display:block;font-size:1.25rem;color:#8B0000;margin-top:4px;}
+  .meeting-p4-section{background:rgba(255,255,255,.90);border:1px solid rgba(139,0,0,.12);border-radius:22px;padding:18px;margin-top:16px;box-shadow:0 12px 28px rgba(18,18,18,.04);}
+  .meeting-p4-check{display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid rgba(139,0,0,.08);padding:11px 0;}
+  .meeting-p4-check:last-child{border-bottom:none;}
+  .meeting-p4-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:.82rem;font-weight:700;white-space:nowrap;}
+  .meeting-p4-pill.ok{background:#eef9f1;color:#146c2e;}.meeting-p4-pill.warn{background:#fff5e7;color:#9a5a00;}
+  .meeting-p4-type-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+  .meeting-p4-type{border:1px solid rgba(139,0,0,.12);border-radius:18px;padding:13px;background:rgba(255,255,255,.78);}
+  .meeting-p4-type strong{display:block;color:#8B0000;margin-bottom:5px;}
+  .meeting-p4-table{width:100%;border-collapse:separate;border-spacing:0 8px;}
+  .meeting-p4-table th{text-align:left;color:#6b5b5b;font-size:.86rem;font-weight:700;padding:6px 10px;}
+  .meeting-p4-table td{background:rgba(255,255,255,.82);padding:10px;border-top:1px solid rgba(139,0,0,.08);border-bottom:1px solid rgba(139,0,0,.08);}
+  .meeting-p4-table td:first-child{border-left:1px solid rgba(139,0,0,.08);border-radius:12px 0 0 12px;}.meeting-p4-table td:last-child{border-right:1px solid rgba(139,0,0,.08);border-radius:0 12px 12px 0;}
+  .meeting-p4-alert{border-radius:18px;border:1px solid rgba(139,0,0,.12);background:rgba(139,0,0,.045);padding:14px;color:#5a2323;line-height:1.55;}
+  @media(max-width:980px){.meeting-p4-grid{grid-template-columns:repeat(2,1fr)}.meeting-p4-type-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.meeting-p4-grid,.meeting-p4-type-grid{grid-template-columns:1fr}.meeting-p4-page{padding:12px}}
+</style>
+<div class="meeting-p4-page">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+  <section class="meeting-p4-hero">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <h1 class="meeting-p4-title">Aşama 10 — Gelişim Önerisi ve Rehberlik</h1>
+        <p class="meeting-p4-subtitle">Performans sonucunu yalnızca puanla kapatmayan; gelişim önerisi, güçlü yön notu, kullanıcı rehberi, sanal asistan yönlendirmesi ve AI karar destek sınırlarını güvenli şekilde hazırlayan alandır.</p>
+      </div>
+      <form method="post" action="{{ url_for('main.performance_meeting_p4_development_guidance_apply') }}">
+        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+        <button type="submit" class="btn btn-danger rounded-pill px-4"><i class="fa-solid fa-seedling me-1"></i> Gelişim Rehberini Hazırla</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="meeting-p4-grid">
+    {% for card in cards %}<div class="meeting-p4-card"><span>{{ card.label }}</span><b>{{ card.value }}</b><small>{{ card.note }}</small></div>{% endfor %}
+  </div>
+
+  <section class="meeting-p4-section">
+    <h2 class="h5 mb-3">Aşama 10 Kontrol Başlıkları</h2>
+    {% for item in checks %}
+    <div class="meeting-p4-check"><span class="meeting-p4-pill {{ 'ok' if item.ok else 'warn' }}"><i class="fa-solid {{ 'fa-check' if item.ok else 'fa-triangle-exclamation' }}"></i> {{ phase10_label_status(item.status) }}</span><div><strong>{{ item.title }}</strong><div class="text-muted small">{{ item.code }}</div></div></div>
+    {% endfor %}
+  </section>
+
+  <section class="meeting-p4-section">
+    <h2 class="h5 mb-3">Gelişim ve Rehberlik Türleri</h2>
+    <div class="meeting-p4-type-grid">
+      {% for item in recommendation_types %}<div class="meeting-p4-type"><strong>{{ item.label }}</strong><small>{{ item.description }}</small></div>{% endfor %}
+    </div>
+  </section>
+
+  <section class="meeting-p4-section">
+    <h2 class="h5 mb-3">Kullanıcı Rehberi ve Güvenli Yönlendirme</h2>
+    <div class="meeting-p4-type-grid">
+      {% for item in guidance_cards %}<div class="meeting-p4-type"><strong>{{ item.title }}</strong><small>{{ item.text }}</small></div>{% endfor %}
+    </div>
+  </section>
+
+  <section class="meeting-p4-section">
+    <h2 class="h5 mb-3">Gelişim Önerisi Önizleme</h2>
+    {% if recommendation_rows %}
+    <table class="meeting-p4-table"><thead><tr><th>Kaynak</th><th>Tür</th><th>Başlık</th><th>Kimler Görebilir</th><th>Zorunlu</th><th>Durum</th><th>Oluşturma Tarihi</th>
+<th>İşlem</th></tr></thead><tbody>{% for row in recommendation_rows %}<tr><td>{{ phase10_label_source(row.source) }}</td><td>{{ row.type_label or row.recommendation_type }}</td><td>{{ row.title }}</td><td>{{ row.visibility_label or 'Yetkili görünürlük' }}</td><td>{{ 'Evet' if row.is_required else 'Hayır' }}</td><td>{{ row.status_label or 'Kontrol Bekliyor' }}</td><td>{{ row.created_at }}</td>
+<td>
+    <details>
+        <summary class="phase10-detail-summary">Notu Gör</summary>
+        <div class="phase10-note-detail-card">
+            
+{% set phase10_detail_text = row.detail_text|default('', true) %}
+{% if not phase10_detail_text %}{% set phase10_detail_text = row.recommendation_text|default('', true) %}{% endif %}
+{% if not phase10_detail_text %}{% set phase10_detail_text = row.recommendation|default('', true) %}{% endif %}
+{% if not phase10_detail_text %}{% set phase10_detail_text = row.text|default('', true) %}{% endif %}
+{% if not phase10_detail_text %}{% set phase10_detail_text = row.description|default('', true) %}{% endif %}
+{% if not phase10_detail_text and (row.title|default('')) == 'Aşama 10 gelişim önerisi altyapısı hazır' %}
+    {% set phase10_detail_text = 'Bu kayıt, performans içinde gelişim önerisi ve rehber alanının hazır olduğunu gösterir. Otomatik puan üretmez, idari karar vermez; yalnızca gelişim sürecini destekleyen rehberlik bilgisidir.' %}
+{% endif %}
+{{ phase10_detail_text or 'Detay metni henüz girilmemiş.' }}
+
+        </div>
+    </details>
+</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="text-muted mb-0">Henüz gelişim önerisi kaydı yok. Hazırlık sonrası sistem güvenli öneri/rehber tablosunu oluşturur.</p>{% endif %}
+  </section>
+
+  <section class="meeting-p4-section">
+    <div class="meeting-p4-alert"><strong>Karar destek sınırı:</strong> Gelişim önerisi, sanal asistan ve AI notları nihai karar değildir; otomatik puan, disiplin kararı, idari yaptırım veya yetkisiz veri görünürlüğü üretmez. Eğitim modülü canlıya geri açılmadan performans içinde rehber/gelişim katmanı olarak çalışır.</div>
+  </section>
+</div>
+{% endblock %}

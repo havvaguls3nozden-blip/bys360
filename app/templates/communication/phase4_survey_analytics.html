@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Anket Analitiği{% endblock %}
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Anket Analitiği</h2>
+      <div class="text-muted">Katılım, tamamlama oranı ve yanıt davranışı görünümü</div>
+    </div>
+    <div class="d-flex gap-2">
+      <form method="get" class="d-flex gap-2">
+        <select name="days" class="form-select">
+          {% for day in [30, 60, 90, 180] %}
+            <option value="{{ day }}" {% if payload.days == day %}selected{% endif %}>Son {{ day }} gün</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline-secondary">Uygula</button>
+      </form>
+      <form method="post" action="{{ url_for('main.communication_phase4_export') }}">
+        <input type="hidden" name="export_type" value="survey_analytics">
+        <input type="hidden" name="days" value="{{ payload.days }}">
+        <button class="btn btn-outline-danger">CSV dışa aktar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Toplam Anket</div><div class="display-6">{{ payload.totals.survey_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Yayında Olan</div><div class="display-6">{{ payload.totals.published_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Düşük Katılım</div><div class="display-6">{{ payload.totals.low_completion_count }}</div></div></div></div>
+    <div class="col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Ort. Tamamlama</div><div class="display-6">%{{ '%.1f'|format(payload.totals.average_completion_rate or 0) }}</div></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header"><strong>Durum dağılımı</strong></div><div class="card-body"><canvas id="surveyStatusChart" height="120"></canvas></div></div></div>
+    <div class="col-lg-6"><div class="card shadow-sm h-100"><div class="card-header"><strong>Katılım bantları</strong></div><div class="card-body"><canvas id="surveyBandChart" height="120"></canvas></div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Düşük katılımlı anketler</strong></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Başlık</th><th>Atama</th><th>Oran</th><th>Durum</th></tr></thead>
+            <tbody>
+            {% for row in payload.low_completion_rows %}
+              <tr><td>{{ row.title }}</td><td>{{ row.assignments }}</td><td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ row.status }}</td></tr>
+            {% else %}
+              <tr><td colspan="4" class="text-muted">Düşük katılım eşiğinde kayıt yok.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header"><strong>Yanıt süresi görünümü</strong></div>
+        <div class="card-body small">
+          <div class="mb-3"><strong>En hızlı 5 anket</strong></div>
+          {% for row in payload.fastest_rows %}
+            <div class="d-flex justify-content-between border-bottom py-2"><span>{{ row.title }}</span><span>{{ row.avg_submit_minutes }} dk</span></div>
+          {% else %}
+            <div class="text-muted">Veri yok.</div>
+          {% endfor %}
+          <div class="mt-4 mb-3"><strong>En yavaş 5 anket</strong></div>
+          {% for row in payload.slowest_rows %}
+            <div class="d-flex justify-content-between border-bottom py-2"><span>{{ row.title }}</span><span>{{ row.avg_submit_minutes }} dk</span></div>
+          {% else %}
+            <div class="text-muted">Veri yok.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm"><div class="card-body table-responsive">
+    <table class="table table-sm align-middle">
+      <thead><tr><th>Başlık</th><th>Tür</th><th>Atama</th><th>Tamamlanan</th><th>Oran</th><th>Ort. süre</th><th>Anonim</th><th>Durum</th></tr></thead>
+      <tbody>
+      {% for row in payload.rows %}
+        <tr>
+          <td>{{ row.title }}</td><td>{{ row.type }}</td><td>{{ row.assignments }}</td><td>{{ row.completed }}</td>
+          <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ row.avg_submit_minutes }} dk</td><td>{% if row.anonymous %}Evet{% else %}Hayır{% endif %}</td><td>{{ row.status }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="text-muted">Analiz edilecek anket bulunamadı.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div></div>
+</div>
+
+<script>
+(function () {
+  if (!window.Chart) return;
+  const statusEl = document.getElementById('surveyStatusChart');
+  const bandEl = document.getElementById('surveyBandChart');
+  if (statusEl) {
+    new Chart(statusEl, {
+      type: 'bar',
+      data: { labels: {{ payload.status_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+  }
+  if (bandEl) {
+    new Chart(bandEl, {
+      type: 'bar',
+      data: { labels: {{ payload.band_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Anket', data: {{ payload.band_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+  }
+})();
+</script>
+{% endblock %}

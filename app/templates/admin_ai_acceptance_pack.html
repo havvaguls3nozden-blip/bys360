@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}AI Kabul ve Teslim Paketi - BYS360{% endblock %}
+{% block page_kicker %}AI{% endblock %}
+{% block page_title %}AI Kabul ve Teslim Paketi{% endblock %}
+{% block page_subtitle %}İmza rolleri, teslim artefaktları ve export paketi için son durum görünümü.{% endblock %}
+{% block content %}
+<div class="glass-card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <form class="d-flex gap-2" method="get">
+      <input class="form-control" type="number" name="lookback_days" min="1" max="180" value="{{ lookback_days or 14 }}">
+      <button class="btn btn-catab">Güncelle</button>
+    </form>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_acceptance_pack_export_csv', lookback_days=lookback_days) }}">CSV</a>
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.admin_ai_go_live_readiness', lookback_days=lookback_days) }}">Hazırlık görünümü</a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">İmza / kabul rolleri</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Rol</th><th>Durum</th><th>Not</th></tr></thead>
+          <tbody>
+          {% for row in signoff_rows %}
+            <tr>
+              <td>{{ row.role }}</td>
+              <td>{{ row.status }}</td>
+              <td class="text-muted small">{{ row.note }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-muted">Rol kaydı görünmüyor.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h4 class="mb-3">Teslim artefaktları</h4>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Artefakt</th><th>Durum</th><th>Not</th></tr></thead>
+          <tbody>
+          {% for row in artifact_rows %}
+            <tr>
+              <td>{{ row.name }}</td>
+              <td>{{ row.status }}</td>
+              <td class="text-muted small">{{ row.note }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="3" class="text-muted">Artefakt görünmüyor.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card p-4">
+  <h4 class="mb-3">Kabul özeti</h4>
+  <div class="row g-3">
+    {% for gate in gates %}
+    <div class="col-lg-6">
+      <div class="border rounded-4 p-3 h-100">
+        <div class="d-flex justify-content-between gap-2 align-items-center flex-wrap">
+          <div class="fw-semibold">{{ gate.label }}</div>
+          <span class="badge text-bg-{% if gate.status == 'pass' %}success{% elif gate.status == 'warn' %}warning{% else %}danger{% endif %}">{{ gate.status }}</span>
+        </div>
+        <div class="small text-muted mt-2">{{ gate.detail }}</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-muted">Kabul maddesi görünmüyor.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

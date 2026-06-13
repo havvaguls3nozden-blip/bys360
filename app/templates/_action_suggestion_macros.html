@@ -1,0 +1,9 @@
+{% macro action_suggestion_card(item) -%}
+<div class="action-suggestion-card {{ item.tone or 'info' }}">
+    <div class="action-suggestion-main">
+        <div class="action-suggestion-title">{{ item.title }}</div>
+        {% if item.description %}<div class="action-suggestion-text">{{ item.description }}</div>{% endif %}
+    </div>
+    {% if item.action_url and item.action_label %}<a href="{{ item.action_url }}" class="action-suggestion-link">{{ item.action_label }}</a>{% endif %}
+</div>
+{%- endmacro %}

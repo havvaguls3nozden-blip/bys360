@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>503 - Bakım Modu</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f9; color: #222; margin: 0; }
+    .wrap { max-width: 720px; margin: 8vh auto; background: #fff; border-radius: 18px; padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    .badge { display:inline-block; background:#8B0000; color:#fff; padding:8px 14px; border-radius:999px; font-weight:700; margin-bottom:14px; }
+    h1 { margin: 0 0 14px; font-size: 28px; }
+    p { line-height: 1.6; }
+    .muted { color:#666; font-size:14px; margin-top:18px; }
+  </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_global_hardening.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">BYS360</div>
+    <h1>{{ title or "Bakım Modu" }}</h1>
+    <p>{{ message or "Sistem şu anda planlı bakım modunda. Lütfen kısa süre sonra tekrar deneyin." }}</p>
+    <p class="muted">Sağlık uçları erişime açıksa izleme sistemleri çalışmaya devam eder.</p>
+  </div>
+    <script src="{{ url_for('static', filename='js/mobile_global_hardening.js') }}"></script>
+</body>
+</html>

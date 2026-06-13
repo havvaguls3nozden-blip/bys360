@@ -1,0 +1,99 @@
+@media (max-width: 767.98px){
+  .wa-thread-list,
+  #chatMessages,
+  .chat-messages{
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+
+  .wa-thread-item,
+  .wa-thread-item *,
+  .chat-row,
+  .chat-row *{
+    pointer-events: auto !important;
+  }
+
+  .wa-thread-item{
+    position: relative;
+    z-index: 2;
+    touch-action: pan-y;
+  }
+
+  .wa-phone-dock,
+  .wa-mobile-switch{
+    z-index: 30 !important;
+  }
+
+  .wa-phone-dock__item,
+  .wa-mobile-fab,
+  .wa-btn,
+  .recipient-trigger,
+  .recipient-option-card,
+  .chat-send,
+  .chat-textarea,
+  .message-textarea,
+  .message-btn,
+  #selectSelfNoteBtn,
+  #messageSendBtn{
+    pointer-events: auto !important;
+  }
+
+  .wa-mobile-fab,
+  .wa-phone-dock__item,
+  .wa-btn.primary{
+    position: relative;
+  }
+
+  .wa-compose-picker,
+  .recipient-modal{
+    z-index: 2000 !important;
+  }
+
+  .message-compose-layout{
+    grid-template-columns: 1fr !important;
+  }
+
+  .message-compose-side{
+    display: none !important;
+  }
+
+  .message-compose-card{
+    position: relative;
+    z-index: 1;
+  }
+
+  #messageShell #messageComposeBox,
+  #threadMessageBody,
+  #newMessageForm textarea[name="body"],
+  .chat-textarea,
+  .message-textarea,
+  .wa-textarea{
+    display:block !important;
+    min-height:56px !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    touch-action:manipulation !important;
+    -webkit-user-select:text !important;
+    user-select:text !important;
+    -webkit-text-fill-color:#111827 !important;
+    color:#111827 !important;
+    position:relative !important;
+    z-index:6 !important;
+    background:#fff !important;
+  }
+
+  #messageShell .wa-text,
+  #messageShell .wa-row:not(.mine) .wa-text,
+  .chat-text,
+  .chat-row:not(.mine) .chat-text{
+    color:#18212c !important;
+    -webkit-text-fill-color:#18212c !important;
+  }
+
+  #messageShell .wa-row:not(.mine) .wa-bubble,
+  .chat-row:not(.mine) .chat-bubble{
+    background:#ffffff !important;
+  }
+}

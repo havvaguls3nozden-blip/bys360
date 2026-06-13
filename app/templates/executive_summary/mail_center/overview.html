@@ -1,0 +1,9 @@
+{% extends "executive_summary/mail_center/base.html" %}{% set active='overview' %}{% block mail_center_body %}
+<div class="mailx-grid">
+<div class="mailx-card mailx-col-3"><div class="mailx-muted">Aktif görev</div><div class="mailx-kpi">{{ tasks|selectattr('enabled')|list|length }}</div></div>
+<div class="mailx-card mailx-col-3"><div class="mailx-muted">Yönetici alıcısı</div><div class="mailx-kpi">{{ manager_recipients|length }}</div></div>
+<div class="mailx-card mailx-col-3"><div class="mailx-muted">Personel alıcısı</div><div class="mailx-kpi">{{ staff_recipients|length }}</div></div>
+<div class="mailx-card mailx-col-3"><div class="mailx-muted">Pilot mod</div><div class="mailx-kpi">{{ 'Açık' if config.pilot_mode else 'Kapalı' }}</div></div>
+<div class="mailx-card mailx-col-8"><h3>Görev akışı</h3><table class="mailx-table"><tr><th>Görev</th><th>Hedef</th><th>Saat</th><th>Durum</th></tr>{% for t in tasks %}<tr><td>{{ t.title }}</td><td>{{ 'Amir/Yönetici' if t.audience=='managers' else 'Personel' }}</td><td>{{ t.time_label }}</td><td><span class="mailx-pill">{{ 'Aktif' if t.enabled else 'Pasif' }}</span></td></tr>{% endfor %}</table></div>
+<div class="mailx-card mailx-col-4"><h3>Nasıl kullanılır?</h3><p>1. Alıcılar sayfasından yönetici ve personel alıcılarını seç.</p><p>2. Görevler sayfasında saatleri ve aktif/pasif durumunu belirle.</p><p>3. Test Gönderimi sayfasında önce kuru çalışma, sonra sadece bana test gönder.</p><p>4. Zamanlanmış İşler sayfasındaki komutla otomatik görevleri kur.</p></div>
+</div>{% endblock %}

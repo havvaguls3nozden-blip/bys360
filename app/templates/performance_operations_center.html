@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Performans Operasyon Merkezi - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Operasyon Merkezi{% endblock %}
+{% block page_subtitle %}Görev ön kontrolü, yayın güvenliği, sağlık raporu ve son işlem logları tek merkezde, daha sade ve daha kurumsal bir görünümle toplandı.{% endblock %}
+
+{% block content %}
+{% set phase5_guide_title = "Bu ekran performans operasyonunu tek bakışta toplar" %}
+{% set phase5_guide_text = "Görev ön kontrolü, yayın güvenliği, sağlık raporu ve son işlem logları birlikte okunarak canlı öncesi son operasyon kararı hızla verilebilir." %}
+{% set phase5_guide_points = [
+    {'title': 'Önce toplam skoru gör', 'text': 'Hazırlık skoru tek başına karar değildir; altında hangi blokajların bulunduğunu da okuyun.'},
+    {'title': 'Kaynağı ayır', 'text': 'Sorunun görev, yayın, sağlık veya geri bildirim tarafında olduğunu kaynak etiketiyle hemen ayırt edin.'},
+    {'title': 'Logla doğrula', 'text': 'Coverage, yayın ve e-posta logları son operasyon adımlarının gerçekten çalıştığını gösterir.'}
+] %}
+{% set phase5_guide_note = "Bu yüzey, teknik ekip ile yönetim arasında ortak bir okuma alanı oluşturmak için daha yalın ve daha güven veren bir dilde düzenlendi." %}
+{% include "performance/_phase5_microguide.html" %}
+
+<style>
+.ops-shell{display:grid;gap:18px}
+.glass-card{background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+.hero{padding:24px;display:grid;grid-template-columns:1.25fr .9fr;gap:18px}.hero-title{font-size:1.55rem;font-weight:900;color:#111827;margin:14px 0 8px}.hero-text{color:#6b7280;line-height:1.8;font-size:.95rem}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900}.hero-side{padding:22px;display:grid;gap:16px;align-content:start}.side-row{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.side-label{font-size:.8rem;color:#6b7280;font-weight:800;margin-bottom:6px}.side-value{font-size:1.05rem;color:#111827;font-weight:900}
+.btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;text-decoration:none;cursor:pointer;font-weight:800;font-size:.9rem;transition:all .18s ease}.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}.btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}.btn-soft:hover{transform:translateY(-1px)}
+.toolbar{padding:20px;display:grid;grid-template-columns:1fr .95fr .8fr auto;gap:12px;align-items:end}.form-group{display:flex;flex-direction:column;gap:8px}.form-group label{font-size:.9rem;font-weight:800;color:#374151}.form-input,.form-select{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%}.form-input:focus,.form-select:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}.stat-card{padding:22px;position:relative;overflow:hidden}.stat-card::after{content:"";position:absolute;right:-20px;bottom:-20px;width:84px;height:84px;border-radius:50%;background:rgba(139,0,0,.06)}.stat-label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1}.stat-value{color:#111827;font-size:1.95rem;font-weight:900;line-height:1;position:relative;z-index:1}
+.summary-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.section-card{padding:22px}.section-title{margin:0 0 8px;color:#111827;font-size:1.08rem;font-weight:900}.section-sub{color:#6b7280;font-size:.9rem;line-height:1.7}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}.mini-card{padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.mini-card strong{display:block;font-size:1.35rem;color:#111827}.mini-card span{display:block;color:#6b7280;font-size:.84rem;line-height:1.6;margin-top:4px}
+.list-grid{display:grid;gap:12px;margin-top:16px}.signal-card{padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.signal-card.critical{border-color:rgba(185,28,28,.18);background:linear-gradient(180deg,rgba(254,242,242,.96),rgba(255,255,255,.96))}.signal-card.watch{border-color:rgba(180,83,9,.16);background:linear-gradient(180deg,rgba(255,251,235,.96),rgba(255,255,255,.96))}.signal-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.signal-title{font-size:.96rem;font-weight:900;color:#111827}.signal-meta{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;background:rgba(15,23,42,.06);color:#374151;font-size:.76rem;font-weight:800}.signal-text{margin-top:8px;color:#4b5563;font-size:.88rem;line-height:1.75}.signal-action{margin-top:8px;color:#8B0000;font-size:.82rem;font-weight:800}
+.table-wrap{width:100%;overflow-x:auto;border-radius:18px;margin-top:16px}table{width:100%;min-width:980px;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden}th,td{padding:14px 12px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:middle;white-space:nowrap}th{background:rgba(248,250,252,.96);color:#6b7280;font-size:.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.35px}td{color:#111827;font-size:.9rem}tbody tr:hover{background:rgba(139,0,0,.02)}
+.empty-box{padding:18px;border-radius:18px;background:rgba(15,23,42,.03);border:1px dashed rgba(15,23,42,.10);color:#6b7280;line-height:1.7}
+@media (max-width:1100px){.hero,.summary-grid,.stats-grid,.toolbar{grid-template-columns:1fr}.mini-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<div class="ops-shell">
+    <div class="glass-card" style="margin-bottom:18px; border-radius:24px; border:1px solid rgba(139,0,0,.08);">
+        <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+            <div>
+                <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000;">İzin–Vekâlet Entegrasyon Katmanı</div>
+                <div style="font-size:1.08rem;font-weight:900;color:#111827;margin-top:6px;">Görev seviyesi korunarak vekâletle devam etmelidir</div>
+                <div style="color:#6b7280;line-height:1.75;margin-top:8px;">İzinli amirlerde görev boşa düşmemeli; aynı seviyede tanımlı vekile yönlenmeli ve bu karar denetim iziyle birlikte saklanmalıdır.</div>
+            </div>
+            {% if delegation_health is defined and delegation_health %}
+            <div class="pill {% if delegation_health.coverage_summary is defined and delegation_health.coverage_summary.uncovered %}warn{% else %}ok{% endif %}">
+                {% if delegation_health.coverage_summary is defined and delegation_health.coverage_summary.uncovered %}Vekâletsiz zincir uyarısı: {{ delegation_health.coverage_summary.uncovered }}{% else %}Vekâlet görünümü dengeli{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <section class="glass-card hero">
+        <div>
+            <span class="kicker"><i class="fa-solid fa-shield-halved"></i> {{ readiness_label }}</span>
+            <h2 class="hero-title">Performans modülünün canlıya çıkış operasyonunu tek yerden yönetin</h2>
+            <p class="hero-text">Bu merkez; görev ön kontrolü, yayın güvenliği, sağlık raporu, geri bildirim canlı skoru ve son işlem loglarını aynı bakışta toplar. Amaç, canlı öncesi son turda hangi başlığın nerede tıkandığını saniyeler içinde göstermek.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('main.performance_task_management_preflight', period_id=period.id if period else None, scope=selected_scope or None) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-check"></i> Görev ön kontrol</a>
+                <a href="{{ url_for('main.performance_v2_phase5_publish_preflight', period_id=period.id if period else None) }}" class="btn-soft secondary"><i class="fa-solid fa-share-nodes"></i> Yayın ön kontrol</a>
+                <a href="{{ url_for('main.performance_task_management_health', period_id=period.id if period else None, scope=selected_scope or None) }}" class="btn-soft secondary"><i class="fa-solid fa-heart-pulse"></i> Sağlık raporu</a>
+                <a href="{{ url_for('main.performance_go_live_center', scope=selected_scope or None) }}" class="btn-soft primary"><i class="fa-solid fa-rocket"></i> Canlı merkezi</a>
+            </div>
+        </div>
+        <div class="hero-side">
+            <div class="side-row"><div class="side-label">Üretim zamanı</div><div class="side-value">{{ generated_at.strftime('%d.%m.%Y %H:%M') if generated_at else '-' }}</div></div>
+            <div class="side-row"><div class="side-label">Aktif dönem</div><div class="side-value">{{ period.title if period else 'Aktif dönem yok' }}</div></div>
+            <div class="side-row"><div class="side-label">Okunan alan</div><div class="side-value">{{ scope_label or 'Genel görünüm' }}</div></div>
+            <div class="side-row"><div class="side-label">Birleşik hazırlık skoru</div><div class="side-value">{{ cards.readiness_score or 0 }} / 100</div></div>
+        </div>
+    </section>
+
+    <form method="get" class="glass-card toolbar">
+        <div class="form-group">
+            <label for="period_id">Dönem</label>
+            <select class="form-select" id="period_id" name="period_id">
+                <option value="">Aktif dönem</option>
+                {% for row in periods %}
+                <option value="{{ row.id }}" {% if period and row.id == period.id %}selected{% endif %}>{{ row.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="scope">Alan</label>
+            <select class="form-select" id="scope" name="scope">
+                {% for value, label in scope_option_pairs or [] %}
+                <option value="{{ value }}" {% if selected_scope == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Özet</label>
+            <input class="form-input" value="{{ scope_user_count or 0 }} personel · {{ scope_unit_count or 0 }} birim" readonly>
+        </div>
+        <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn-soft primary"><i class="fa-solid fa-filter"></i> Operasyon görünümünü uygula</button>
+        </div>
+    </form>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Hazırlık Skoru</div><div class="stat-value">{{ cards.readiness_score or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Görev Blokajı</div><div class="stat-value">{{ cards.task_blockers or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yayın Blokajı</div><div class="stat-value">{{ cards.publish_blockers or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Sağlık Kritiği</div><div class="stat-value">{{ cards.critical_health or 0 }}</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Kritik Talep</div><div class="stat-value">{{ cards.critical_feedback_requests or 0 }}</div></div>
+    </div>
+
+    <div class="summary-grid">
+        <section class="glass-card section-card">
+            <h3 class="section-title">Blokaj özeti</h3>
+            <p class="section-sub">Canlıya çıkışı doğrudan yavaşlatan başlıklar burada birleşik görünür. Aynı sorun birden fazla ekranda tekrar ediyorsa bunu tek merkezden fark etmek kolaylaşır.</p>
+            {% if blocker_rows %}
+            <div class="list-grid">
+                {% for row in blocker_rows[:8] %}
+                <div class="signal-card critical">
+                    <div class="signal-top"><div class="signal-title">{{ row.title }}</div><span class="signal-meta">{{ row.source }}</span></div>
+                    <div class="signal-text">{{ row.detail }}</div>
+                    {% if row.action %}<div class="signal-action">Öneri: {{ row.action }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box">Kritik blokaj görünmüyor.</div>
+            {% endif %}
+        </section>
+
+        <section class="glass-card section-card">
+            <h3 class="section-title">Kontrollü uyarılar</h3>
+            <p class="section-sub">Canlıyı tamamen durdurmasa da ilk kullanım kalitesini etkileyen maddeler burada toplanır.</p>
+            {% if warning_rows %}
+            <div class="list-grid">
+                {% for row in warning_rows[:8] %}
+                <div class="signal-card watch">
+                    <div class="signal-top"><div class="signal-title">{{ row.title }}</div><span class="signal-meta">{{ row.source }}</span></div>
+                    <div class="signal-text">{{ row.detail }}</div>
+                    {% if row.action %}<div class="signal-action">Öneri: {{ row.action }}</div>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-box">Ek uyarı görünmüyor.</div>
+            {% endif %}
+        </section>
+    </div>
+
+    <section class="glass-card section-card">
+        <h3 class="section-title">Hızlı sinyal kutusu</h3>
+        <p class="section-sub">Dört farklı yüzeyden gelen baskıyı sayısal olarak okumak için kısa kutu görünümü.</p>
+        <div class="mini-grid">
+            {% for item in shortcut_counts %}
+            <div class="mini-card"><strong>{{ item.value }}</strong><span>{{ item.label }}</span></div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="glass-card section-card">
+        <h3 class="section-title">Son assignment coverage logları</h3>
+        <p class="section-sub">Görev üretimi ve kapsama olayları son kayıtlardan okunur.</p>
+        {% if assignment_logs %}
+        <div class="table-wrap"><table><thead><tr><th>Zaman</th><th>Personel</th><th>Seviye</th><th>Olay</th><th>Şiddet</th><th>Detay</th></tr></thead><tbody>
+            {% for row in assignment_logs %}
+            <tr>
+                <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
+                <td>{{ row.employee_name }}</td>
+                <td>{{ row.manager_level if row.manager_level else '-' }}</td>
+                <td>{{ row.event_scope }} / {{ row.event_type }}</td>
+                <td>{{ row.severity }}</td>
+                <td>{{ row.reason }}</td>
+            </tr>
+            {% endfor %}
+        </tbody></table></div>
+        {% else %}<div class="empty-box">Son coverage logu görünmüyor.</div>{% endif %}
+    </section>
+
+    <div class="summary-grid">
+        <section class="glass-card section-card">
+            <h3 class="section-title">Son yayın logları</h3>
+            <p class="section-sub">Yayımla ve geri al işlemlerinin son örnekleri.</p>
+            {% if publish_logs %}
+            <div class="table-wrap"><table><thead><tr><th>Zaman</th><th>İşlem</th><th>Personel</th><th>İşlemi yapan</th></tr></thead><tbody>
+                {% for row in publish_logs %}
+                <tr><td>{{ row.acted_at.strftime('%d.%m.%Y %H:%M') if row.acted_at else '-' }}</td><td>{{ row.action }}</td><td>{{ row.employee_name }}</td><td>{{ row.actor_name }}</td></tr>
+                {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-box">Yayın logu görünmüyor.</div>{% endif %}
+        </section>
+
+        <section class="glass-card section-card">
+            <h3 class="section-title">Son e-posta logları</h3>
+            <p class="section-sub">Yayın ve geri bildirim akışında gönderilen posta kayıtları.</p>
+            {% if mail_logs %}
+            <div class="table-wrap"><table><thead><tr><th>Zaman</th><th>Tür</th><th>Alıcı</th><th>Durum</th></tr></thead><tbody>
+                {% for row in mail_logs %}
+                <tr><td>{{ row.sent_at.strftime('%d.%m.%Y %H:%M') if row.sent_at else '-' }}</td><td>{{ row.mail_type }}</td><td>{{ row.recipient_email }}</td><td>{% if row.is_success %}başarılı{% else %}hata{% endif %}{% if row.error_message %} · {{ row.error_message }}{% endif %}</td></tr>
+                {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-box">E-posta logu görünmüyor.</div>{% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

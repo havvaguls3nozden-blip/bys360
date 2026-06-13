@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ publication.title }} · Kurumsal Yayınlar{% endblock %}
+{% block page_kicker %}Kurumsal İçerik{% endblock %}
+{% block page_title %}{{ publication.title }}{% endblock %}
+{% block page_subtitle %}Yerel çift sayfa yayın görüntüleyici{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/publications.css') }}">
+{% endblock %}
+{% block content %}
+<div class="pub-view-shell">
+  <section class="pub-view-hero">
+    <div class="pub-view-copy">
+      <div class="pub-kicker"><i class="fa-solid fa-book-journal-whills"></i> {{ type_label }}</div>
+      <h2>{{ publication.title }}</h2>
+      {% if publication.subtitle %}<p class="pub-view-sub">{{ publication.subtitle }}</p>{% endif %}
+      <div class="pub-badge-row">
+        <span class="pub-badge status-{{ publication.status }}">{{ publication.status|replace('_', ' ')|title }}</span>
+        {% if publication.issue_no %}<span class="pub-badge">{{ publication.issue_no }}</span>{% endif %}
+        {% if publication.publication_period %}<span class="pub-badge">{{ publication.publication_period }}</span>{% endif %}
+        {% if publication.publication_date %}<span class="pub-badge">{{ publication.publication_date.strftime('%d.%m.%Y') }}</span>{% endif %}
+        {% if page_count %}<span class="pub-badge">{{ page_count }} sayfa</span>{% endif %}
+      </div>
+      <div class="pub-hero-actions">
+        {% if publication.allow_download %}<a class="pub-btn" href="{{ url_for('main.publication_download', publication_id=publication.id) }}"><i class="fa-solid fa-download"></i><span>PDF İndir</span></a>{% endif %}
+        <a class="pub-btn" href="{{ inline_pdf_url }}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i><span>Ham PDF</span></a>
+        <a class="pub-btn" href="{{ url_for('main.publication_library') }}"><i class="fa-solid fa-arrow-left"></i><span>Yayınlara Dön</span></a>
+      </div>
+      <div class="pub-related-links">
+        <a class="pub-filter-chip" href="{{ url_for('main.publication_library', publication_type=publication.publication_type) }}"><i class="fa-solid fa-layer-group"></i><span>Aynı türdeki yayınlar</span></a>
+        {% if publication.publication_date %}<a class="pub-filter-chip" href="{{ url_for('main.publication_library', publication_type=publication.publication_type, year=publication.publication_date.year) }}"><i class="fa-regular fa-calendar"></i><span>{{ publication.publication_date.year }} arşivi</span></a>{% endif %}
+      </div>
+    </div>
+    <div class="pub-view-side">
+      <div class="pub-side-card">
+        <div class="pub-side-line"><span>Tür</span><strong>{{ type_label }}</strong></div>
+        <div class="pub-side-line"><span>Durum</span><strong>{{ publication.status|replace('_', ' ')|title }}</strong></div>
+        <div class="pub-side-line"><span>Görüntüleme</span><strong>{% if renderer_available %}Yerel Çift Sayfa{% else %}Ham PDF Yedek{% endif %}</strong></div>
+        <div class="pub-side-line"><span>İndirme</span><strong>{% if publication.allow_download %}Açık{% else %}Kapalı{% endif %}</strong></div>
+      </div>
+      {% if can_manage_publications %}
+      <div class="pub-side-card">
+        <div class="pub-card-kicker">Yönetim</div>
+        <div class="pub-side-actions">
+          <form method="post" action="{{ url_for('main.publication_toggle_featured', publication_id=publication.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="pub-btn full" type="submit"><i class="fa-solid fa-star"></i><span>{% if publication.is_featured %}Öne Çıkarmayı Kaldır{% else %}Öne Çıkar{% endif %}</span></button>
+          </form>
+          <form method="post" action="{{ url_for('main.publication_set_status', publication_id=publication.id) }}" class="pub-status-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <select class="pub-select" name="status">
+              <option value="published" {% if publication.status == 'published' %}selected{% endif %}>Yayında</option>
+              <option value="draft" {% if publication.status == 'draft' %}selected{% endif %}>Taslak</option>
+              <option value="archived" {% if publication.status == 'archived' %}selected{% endif %}>Arşiv</option>
+            </select>
+            <button class="pub-btn primary full" type="submit"><i class="fa-solid fa-floppy-disk"></i><span>Durumu Kaydet</span></button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if publication.summary %}
+  <section class="pub-summary-panel">
+    <div class="pub-card-kicker">Özet</div>
+    <p>{{ publication.summary }}</p>
+  </section>
+  {% endif %}
+
+  <section id="publication-local-spread-root"
+           class="pub-reader-shell"
+           data-page-count="{{ page_count or 0 }}"
+           data-page-template="{{ page_image_template }}"
+           data-storage-key="publication-local-spread-{{ publication.id }}"
+           data-renderer-available="{{ 'true' if renderer_available else 'false' }}">
+    <div class="pub-reader-toolbar">
+      <div class="pub-reader-toolbar__left">
+        <button class="pub-btn" type="button" data-action="prev"><i class="fa-solid fa-chevron-left"></i><span>Önceki</span></button>
+        <button class="pub-btn" type="button" data-action="next"><span>Sonraki</span><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+      <div class="pub-reader-toolbar__center">
+        <span class="pub-reader-chip"><i class="fa-regular fa-file-lines"></i> <strong data-role="page-label">1</strong></span>
+        <span class="pub-reader-chip"><i class="fa-solid fa-book-open"></i> <strong data-role="mode-label">Çift Sayfa</strong></span>
+      </div>
+      <div class="pub-reader-toolbar__right">
+        <button class="pub-btn" type="button" data-action="single"><i class="fa-regular fa-square"></i><span>Tek Sayfa</span></button>
+        <button class="pub-btn primary" type="button" data-action="spread"><i class="fa-regular fa-clone"></i><span>Çift Sayfa</span></button>
+        <label class="pub-jump-wrap">
+          <span>Git</span>
+          <input class="pub-input pub-input--jump" type="number" min="1" max="{{ page_count or 1 }}" value="1" data-role="jump-input">
+        </label>
+        <button class="pub-btn" type="button" data-action="fullscreen"><i class="fa-solid fa-expand"></i><span>Tam Ekran</span></button>
+      </div>
+    </div>
+
+    <div class="pub-reader-stage-wrap">
+      <div class="pub-reader-loading" data-role="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Sayfalar yerel olarak hazırlanıyor...</span>
+      </div>
+      <div class="pub-reader-fallback" data-role="fallback" hidden>
+        <div class="pub-card-kicker">Yerel görüntüleme hazır değil</div>
+        <p>Bu görünüm için sunucuda <strong>PyMuPDF</strong> kurulu olmalı. Şimdilik ham PDF bağlantısını kullanabilirsin.</p>
+        <div class="pub-hero-actions">
+          <a class="pub-btn primary" href="{{ inline_pdf_url }}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i><span>Ham PDF Aç</span></a>
+          {% if publication.allow_download %}<a class="pub-btn" href="{{ url_for('main.publication_download', publication_id=publication.id) }}"><i class="fa-solid fa-download"></i><span>PDF İndir</span></a>{% endif %}
+        </div>
+      </div>
+      <div class="pub-reader-stage" data-role="stage"></div>
+    </div>
+
+    <div class="pub-thumb-strip" data-role="thumbs"></div>
+  </section>
+</div>
+<script src="{{ url_for('static', filename='js/publication_viewer.js') }}"></script>
+{% endblock %}

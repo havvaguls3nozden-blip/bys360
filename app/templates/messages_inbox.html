@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Mesajlar - BYS360{% endblock %}
+{% block page_kicker %}İletişim{% endblock %}
+{% block page_title %}Mesajlar{% endblock %}
+{% block page_subtitle %}Messenger benzeri birleşik konuşma ekranı{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages_messenger_mobile.css') }}">
+
+{% set inbox_url = url_for('main.messages_inbox', filter=current_filter, q=search_query, scope='self') if current_scope == 'self' else url_for('main.messages_inbox', filter=current_filter, q=search_query) %}
+
+<div class="messenger-shell {% if selected_thread %}has-thread{% endif %}">
+  <aside class="messenger-sidebar {% if selected_thread %}is-hidden-mobile{% endif %}">
+    <div class="messenger-sidebar-head">
+      <div>
+        <h2 class="messenger-title">{% if current_scope == 'self' %}Kendime Notlar{% else %}Konuşmalar{% endif %}</h2>
+        <p class="messenger-subtitle">
+          {% if current_scope == 'self' %}
+            Kişisel notlarınız ve taslaklarınız burada görünür.
+          {% else %}
+            Kurum içi mesajlaşma ekranı. Masaüstünde listeden seçip sağdan okuyabilirsiniz.
+          {% endif %}
+        </p>
+      </div>
+      <div class="messenger-head-actions">
+        <a class="msg-btn primary" href="{{ url_for('main.messages_new', recipient_user_id=current_user.id) if current_scope == 'self' else url_for('main.messages_new') }}">
+          <i class="fa-solid {% if current_scope == 'self' %}fa-note-sticky{% else %}fa-pen-to-square{% endif %}"></i>
+          {% if current_scope == 'self' %}Yeni Not{% else %}Yeni Mesaj{% endif %}
+        </a>
+        {% if current_scope == 'self' %}
+          <a class="msg-btn soft" href="{{ url_for('main.messages_inbox') }}">
+            <i class="fa-solid fa-comments"></i>
+            Tüm Konuşmalar
+          </a>
+        {% else %}
+          <a class="msg-btn soft" href="{{ url_for('main.messages_inbox', scope='self', filter=current_filter, q=search_query) }}">
+            <i class="fa-solid fa-note-sticky"></i>
+            Kendime Notlar
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="messenger-filter-bar">
+      <div class="msg-chips messenger-chips">
+        {% for key, label in [('active','Aktif'), ('unread','Okunmamış'), ('pinned','Sabit'), ('muted','Sessizde'), ('archived','Arşiv'), ('all','Tümü')] %}
+          <a
+            href="{{ url_for('main.messages_inbox', filter=key, q=search_query, scope='self') if current_scope == 'self' else url_for('main.messages_inbox', filter=key, q=search_query) }}"
+            class="msg-chip {% if current_filter == key %}active{% endif %}"
+          >
+            {{ label }}
+            <span class="msg-badge">{{ filter_counts.get(key, 0) }}</span>
+          </a>
+        {% endfor %}
+      </div>
+      <form method="GET" class="messenger-search-wrap">
+        <input type="hidden" name="filter" value="{{ current_filter }}">
+        {% if current_scope == 'self' %}<input type="hidden" name="scope" value="self">{% endif %}
+        <input id="msgThreadSearch" class="msg-search messenger-search" type="text" name="q" value="{{ search_query or '' }}" placeholder="{% if current_scope == 'self' %}Not ara...{% else %}Konuşma ara...{% endif %}">
+      </form>
+    </div>
+
+    <div class="messenger-thread-list">
+      {% if thread_cards %}
+        {% for item in thread_cards %}
+          {% set title = item.display_title or 'Konuşma' %}
+          {% set thread_url = url_for('main.messages_inbox', thread_id=item.thread.id, filter=current_filter, q=search_query, scope='self') if current_scope == 'self' else url_for('main.messages_inbox', thread_id=item.thread.id, filter=current_filter, q=search_query) %}
+          <a href="{{ thread_url }}" class="messenger-thread-item {% if selected_thread_id == item.thread.id %}active{% endif %}" data-thread-search="{{ title|lower }} {{ (item.last_message.body if item.last_message else '')|lower }}">
+            <div class="messenger-avatar" style="background:linear-gradient(180deg, {{ item.thread.accent_color or '#8B0000' }}, {{ item.thread.accent_color or '#8B0000' }}CC);">
+              <i class="{{ item.thread.icon_name or 'fa-solid fa-comments' }}"></i>
+            </div>
+            <div class="messenger-thread-main">
+              <div class="messenger-thread-top">
+                <h3 class="messenger-thread-name">{{ title }}</h3>
+                <span class="messenger-thread-time">{% if item.last_message and item.last_message.sent_at %}{{ item.last_message.sent_at.strftime('%d.%m %H:%M') }}{% else %}-{% endif %}</span>
+              </div>
+              <p class="messenger-thread-snippet">
+                {% if item.last_message %}
+                  {{ item.last_message.body }}
+                {% else %}
+                  Henüz mesaj yok.
+                {% endif %}
+              </p>
+              <div class="messenger-thread-bottom">
+                <div class="msg-badges">
+                  {% if item.thread.thread_type == 'self' %}<span class="msg-badge"><i class="fa-solid fa-note-sticky"></i> Not</span>{% endif %}
+                  {% if item.is_pinned %}<span class="msg-badge"><i class="fa-solid fa-thumbtack"></i> Sabit</span>{% endif %}
+                  {% if item.is_muted %}<span class="msg-badge"><i class="fa-solid fa-bell-slash"></i> Sessiz</span>{% endif %}
+                  {% if item.is_archived %}<span class="msg-badge"><i class="fa-solid fa-box-archive"></i> Arşiv</span>{% endif %}
+                </div>
+                {% if item.unread_count > 0 %}<span class="messenger-unread">{{ item.unread_count }}</span>{% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="msg-empty">
+          {% if current_scope == 'self' %}
+            Henüz not görünmüyor. Üstteki yeni not düğmesiyle kayıt oluşturabilirsiniz.
+          {% else %}
+            Bu görünümde konuşma bulunamadı. Filtreyi değiştirin ya da yeni mesaj başlatın.
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <section class="messenger-panel {% if not selected_thread %}is-empty-panel{% endif %}">
+    {% if selected_thread %}
+      {% set thread_title = selected_thread_card.display_title if selected_thread_card and selected_thread_card.display_title else 'Konuşma' %}
+      <div class="messenger-panel-head">
+        <div class="messenger-panel-user">
+          <a class="msg-mini-btn only-mobile" href="{{ inbox_url }}"><i class="fa-solid fa-arrow-left"></i></a>
+          <div class="messenger-avatar big" style="background:linear-gradient(180deg, {{ selected_thread.accent_color or '#8B0000' }}, {{ selected_thread.accent_color or '#8B0000' }}CC);">
+            <i class="{{ selected_thread.icon_name or 'fa-solid fa-comments' }}"></i>
+          </div>
+          <div class="messenger-panel-meta">
+            <h2 class="messenger-panel-title">{{ thread_title }}</h2>
+            <p class="messenger-panel-sub">
+              {{ selected_participants|length }} katılımcı
+              {% if selected_thread.thread_type == 'self' %} • Kendime not{% else %} • Kurumsal konuşma{% endif %}
+            </p>
+          </div>
+        </div>
+        <div class="msg-thread-actions">
+          <a href="{{ url_for('main.messages_new') }}" class="msg-mini-btn"><i class="fa-solid fa-pen-to-square"></i> Yeni</a>
+          <a href="{{ inbox_url }}" class="msg-mini-btn only-desktop"><i class="fa-solid fa-list"></i> Liste</a>
+        </div>
+      </div>
+
+      {% if selected_participants %}
+      <div class="msg-participants messenger-participants">
+        {% for p in selected_participants %}
+          {% set person_name = p.user.full_name if p.user and p.user.full_name else (((p.user.ad or '') ~ ' ' ~ (p.user.soyad or ''))|trim if p.user else '-') %}
+          <span class="msg-participant-chip">
+            <i class="fa-solid fa-user"></i>
+            {{ person_name }}
+          </span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="messenger-panel-body">
+        <div class="msg-messages messenger-messages" id="msgMessages">
+          {% if selected_messages %}
+            {% for message in selected_messages %}
+              {% set sender_name = message.sender.full_name if message.sender and message.sender.full_name else (((message.sender.ad or '') ~ ' ' ~ (message.sender.soyad or ''))|trim if message.sender else 'Kullanıcı') %}
+              {% set message_attachments = message.attachments.all() if (not message.is_deleted and message.attachments is defined) else [] %}
+              {% set has_attachments = message_attachments|length > 0 %}
+              {% set message_body_text = (message.body or '')|trim %}
+              <div class="msg-row {% if message.sender_user_id == current_user.id %}mine{% endif %}">
+                <div class="msg-bubble">
+                  <div class="msg-author">{{ sender_name }}</div>
+                  {% if message_body_text and not (has_attachments and message_body_text in ['[Ek]', '[Dosya Eki]']) %}
+                    <div class="msg-text">{{ message.body }}</div>
+                  {% endif %}
+
+                  {% if has_attachments %}
+                  <div class="msg-attachments">
+                    {% for attachment in message_attachments %}
+                      {% set ext = (attachment.file_ext or '')|lower %}
+                      {% set is_image = ext in ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.bmp', '.heic', '.heif'] %}
+                      {% set is_video = ext in ['.mp4', '.webm', '.mov', '.m4v'] %}
+                      {% if is_image %}
+                        <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank" class="msg-attachment is-image">
+                          <img src="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" alt="{{ attachment.original_filename }}">
+                        </a>
+                      {% elif is_video %}
+                        <div class="msg-attachment is-video">
+                          <video controls preload="metadata" src="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}"></video>
+                          <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank">
+                            <i class="fa-regular fa-file-video"></i>
+                            <span>{{ attachment.original_filename }}</span>
+                          </a>
+                        </div>
+                      {% else %}
+                        <a href="{{ url_for('main.message_attachment_download', filename=attachment.stored_filename) }}" target="_blank" class="msg-attachment">
+                          <i class="fa-solid fa-paperclip"></i>
+                          <span>{{ attachment.original_filename }}</span>
+                        </a>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+
+                  <div class="msg-meta">
+                    <span>{{ message.sent_at.strftime('%d.%m.%Y %H:%M') if message.sent_at else '-' }}</span>
+                    {% if message.edited_at %}<span>düzenlendi</span>{% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="msg-empty">Henüz mesaj yok. İlk mesajı siz gönderin.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="msg-compose-wrap messenger-compose-wrap">
+        <form method="POST" action="{{ url_for('main.messages_send', thread_id=selected_thread.id) }}" enctype="multipart/form-data" class="msg-compose-form js-message-attachment-compose">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="_form_token" value="{{ compose_submit_token }}">
+          <input type="hidden" name="current_filter" value="{{ current_filter }}">
+          <input type="hidden" name="current_scope" value="{{ current_scope }}">
+          <input type="hidden" name="q" value="{{ search_query or '' }}">
+
+          <div class="msg-compose-main">
+            <div class="msg-attachment-preview js-message-attachment-preview" hidden></div>
+            <div class="msg-compose-input-row">
+              <label class="msg-attach-btn" title="Dosya ekle">
+                <i class="fa-solid fa-paperclip"></i>
+                <span class="visually-hidden">Dosya ekle</span>
+                <input type="file" name="attachments" class="js-message-attachment-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.webp,.gif,.bmp,.heic,.heif,.mp4,.webm,.mov,.m4v,.zip,.rar,.7z">
+              </label>
+              <textarea name="body" id="threadMessageBody" class="msg-textarea js-msg-autogrow" placeholder="Mesajınızı yazın veya dosya ekleyin..."></textarea>
+            </div>
+          </div>
+          <button type="submit" class="msg-send" title="Gönder"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    {% else %}
+      <div class="messenger-empty-state">
+        <div class="messenger-empty-icon"><i class="fa-brands fa-facebook-messenger"></i></div>
+        <h3>Bir konuşma seçin</h3>
+        <p>Soldaki listeden bir konuşma seçin ya da yeni mesaj başlatın.</p>
+        <a class="msg-btn primary" href="{{ url_for('main.messages_new') }}"><i class="fa-solid fa-pen-to-square"></i> Yeni Mesaj</a>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}"></script>
+{% endblock %}

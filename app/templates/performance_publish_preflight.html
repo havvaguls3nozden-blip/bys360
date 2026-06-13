@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+{% block title %}Yayın Ön Kontrolü - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Yayın Ön Kontrolü{% endblock %}
+{% block page_subtitle %}Toplu yayın öncesi blokaj, uyarı ve görünürlük dengesi tek ekranda doğrulanır.{% endblock %}
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Yayın Ön Kontrolü', text='Toplu yayın öncesi blokajları, uyarıları ve yayın hazırlığını tek ekranda doğrulayın.', icon='fa-solid fa-shield-check') }}
+  {{ nav(active='publish') }}
+  
+<style>
+.preflight-shell{display:grid;gap:18px}.preflight-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.glass{background:rgba(255,255,255,.9);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}.title{margin:0 0 10px;color:#8B0000;font-size:1.05rem;font-weight:900}.text{color:#6b7280;line-height:1.75;font-size:.92rem}.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(15,23,42,.06);font-size:.82rem;font-weight:800}.pill.critical{background:rgba(185,28,28,.10);color:#991b1b}.pill.watch{background:rgba(217,119,6,.10);color:#92400e}.pill.calm{background:rgba(22,101,52,.10);color:#166534}.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.metric{padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.metric-label{font-size:.76rem;color:#6b7280;text-transform:uppercase;font-weight:800}.metric-value{margin-top:8px;font-size:1.3rem;font-weight:900;color:#111827}.row-list{display:grid;gap:10px;margin-top:14px}.row{padding:12px 14px;border-radius:16px;background:rgba(15,23,42,.04);line-height:1.7;color:#374151}.row strong{color:#111827}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn-soft{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:#fff;color:#111827;text-decoration:none;font-weight:800}.btn-soft.primary{background:#8B0000;color:#fff;border-color:#8B0000}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px;background:#fff}table{width:100%;border-collapse:collapse}th,td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:top}th{font-size:.8rem;color:#6b7280;text-transform:uppercase;background:rgba(248,250,252,.94)}tr:last-child td{border-bottom:none}@media (max-width:900px){.preflight-grid{grid-template-columns:1fr}}
+</style>
+<div class="preflight-shell">
+  <div class="glass">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;">
+      <div>
+        <h3 class="title">{{ period.title if period else 'Dönem seçiniz' }}</h3>
+        <p class="text">Toplu yayında personele açılacak kayıtları, bloklu kayıtları ve iç kullanımda bekleyen sonuçları bu ekrandan kontrol edin.</p>
+      </div>
+      <span class="pill {{ publish_preflight.readiness_tone }}">{{ publish_preflight.readiness_label }}</span>
+    </div>
+    <div class="metric-grid">
+      {% for item in publish_preflight.actions %}
+      <div class="metric"><div class="metric-label">{{ item.label }}</div><div class="metric-value">{{ item.value }}</div></div>
+      {% endfor %}
+    </div>
+    <div class="actions">
+      <a class="btn-soft" href="{{ url_for('main.performance_v2_phase5_publish', period_id=period.id if period else None) }}"><i class="fa-solid fa-arrow-left"></i> Yayın ekranı</a>
+      {% if period %}
+      <form method="post" action="{{ url_for('main.performance_v2_phase5_publish', period_id=period.id) }}" style="display:inline-flex;gap:10px;flex-wrap:wrap;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="period_id" value="{{ period.id }}">
+        <input type="hidden" name="publish_action" value="publish">
+        <input type="hidden" name="force_publish" value="1">
+        <button class="btn-soft primary" type="submit"><i class="fa-solid fa-bolt"></i> Uygun kayıtları yayımla</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div class="glass">
+    <h3 class="title">Yayın kararı matrisi</h3>
+    <p class="text">Toplu açılış öncesi yöneticinin bakması gereken üç temel alan burada sade biçimde toplanır.</p>
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-label">Blokaj Sayısı</div><div class="metric-value">{{ publish_preflight.blockers|length }}</div></div>
+      <div class="metric"><div class="metric-label">Uyarı Sayısı</div><div class="metric-value">{{ publish_preflight.warnings|length }}</div></div>
+      <div class="metric"><div class="metric-label">Bloke Örnek</div><div class="metric-value">{{ publish_summary.blocked_rows|length }}</div></div>
+      <div class="metric"><div class="metric-label">Hazır Kayıt Mantığı</div><div class="metric-value">Kontrollü</div></div>
+    </div>
+    <div class="row-list">
+      <div class="row"><strong>1.</strong> Henüz personele açılmayacak kayıtları netleştir.</div>
+      <div class="row"><strong>2.</strong> 70 altı ve 90 üstü kayıtlar için açıklama / görüş disiplinini tekrar gözden geçir.</div>
+      <div class="row"><strong>3.</strong> Toplu açılış kararı verilmeden önce ekip analizi ekranıyla dağılımı yeniden doğrula.</div>
+    </div>
+  </div>
+
+  <div class="preflight-grid">
+    <div class="glass">
+      <h3 class="title">Blokajlar</h3>
+      <p class="text">Toplu yayını durduran ana sebepler burada görünür.</p>
+      <div class="row-list">
+        {% for row in publish_preflight.blockers %}<div class="row"><strong>{{ row.title }}</strong><br>{{ row.detail }}</div>{% else %}<div class="row">Blokaj görünmüyor.</div>{% endfor %}
+      </div>
+    </div>
+    <div class="glass">
+      <h3 class="title">Uyarılar</h3>
+      <p class="text">Yayın yapılabilir olsa bile önceden görülmesi gereken dengesizlikler burada listelenir.</p>
+      <div class="row-list">
+        {% for row in publish_preflight.warnings %}<div class="row"><strong>{{ row.title }}</strong><br>{{ row.detail }}</div>{% else %}<div class="row">Uyarı görünmüyor.</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="glass">
+    <h3 class="title">Bloke örnek kayıtlar</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Personel</th><th>Birim</th><th>Nihai Puan</th><th>Durum</th><th>Bloke Nedeni</th></tr></thead>
+        <tbody>
+          {% for row in publish_summary.blocked_rows %}
+          <tr><td>{{ row.display_name }}<div class="text">{{ row.sicil_no }}</div></td><td>{{ row.unit_name }}</td><td>{{ row.final_total }}</td><td>{{ row.status }}</td><td>{{ row.reason }}</td></tr>
+          {% else %}
+          <tr><td colspan="5">Örnek bloke kayıt bulunmuyor.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

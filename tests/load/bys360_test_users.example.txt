@@ -1,0 +1,3 @@
+yuk.test01@ktb.gov.tr
+yuk.test02@ktb.gov.tr
+# Parola dosyada tutulmaz. BYS_TEST_PASS ortam değişkeninden okunur.

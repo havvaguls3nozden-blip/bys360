@@ -1,0 +1,40 @@
+{# BYS360_AI_DECISION_FAZ7_HISTORICAL_ARCHIVE_PANEL #}
+{% set archive_summary = ai_decision_faz7_archive if ai_decision_faz7_archive is defined else none %}
+<section class="ai-decision-faz7-panel" aria-label="Geçmiş karne karar destek özeti">
+  <div class="ai-decision-faz7-panel__header">
+    <div>
+      <p class="ai-decision-faz7-panel__eyebrow">Karar Destek Merkezi</p>
+      <h3>Geçmiş Karne Arşivi Özeti</h3>
+    </div>
+    <span class="ai-decision-faz7-panel__badge">Kişi detayı korumalı</span>
+  </div>
+
+  {% if archive_summary %}
+    <div class="ai-decision-faz7-panel__grid">
+      <div class="ai-decision-faz7-panel__card">
+        <span>Kayıt Sayısı</span>
+        <strong>{{ archive_summary.record_count|default('—') }}</strong>
+      </div>
+      <div class="ai-decision-faz7-panel__card">
+        <span>Ortalama</span>
+        <strong>{{ archive_summary.average_score_display|default('—') }}</strong>
+      </div>
+      <div class="ai-decision-faz7-panel__card">
+        <span>Eğilim</span>
+        <strong>{{ archive_summary.trend_label|default('Yetkili özet hazır') }}</strong>
+      </div>
+    </div>
+    {% if archive_summary.risk_note %}
+      <p class="ai-decision-faz7-panel__note">{{ archive_summary.risk_note }}</p>
+    {% endif %}
+  {% else %}
+    <p class="ai-decision-faz7-panel__note">
+      Geçmiş yıl karne ve puan arşivi, yetki kapsamına göre karar destek merkezinde özetlenir.
+      Personel kendi geçmişini görür; yönetici ekranlarında kişi detayı varsayılan olarak gösterilmez.
+    </p>
+  {% endif %}
+
+  <p class="ai-decision-faz7-panel__safety">
+    Bu alan idari karar üretmez; geçmiş kayıtları insan denetimli değerlendirme için özetler.
+  </p>
+</section>

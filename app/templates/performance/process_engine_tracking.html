@@ -1,0 +1,792 @@
+{% extends "base.html" %}
+
+{% block title %}Süreç Takibi{% endblock %}
+
+{% block content %}
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+{% set counts = counts if counts is defined and counts else {} %}
+{% set tracking_items = items if items is defined and items else (rows if rows is defined and rows else (tracking_rows if tracking_rows is defined and tracking_rows else [])) %}
+{% set status_filter = status_filter if status_filter is defined else 'all' %}
+{% set search = search if search is defined else '' %}
+{% set current_total = counts.get('total', tracking_items|length) %}
+
+<style>
+    .bys-process-page {
+        --bys-red: #8B0000;
+        --bys-red-2: #6f0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .11);
+        --bys-card: rgba(255, 255, 255, .90);
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 18px 18px 46px;
+        color: var(--bys-ink);
+    }
+
+    .bys-process-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at 10% 0%, rgba(139, 0, 0, .16), transparent 33%),
+            radial-gradient(circle at 94% 14%, rgba(31, 41, 55, .08), transparent 30%),
+            linear-gradient(135deg, rgba(255, 255, 255, .98), rgba(255, 255, 255, .74));
+        box-shadow: 0 24px 72px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin-bottom: 18px;
+    }
+
+    .bys-process-hero::after {
+        content: "";
+        position: absolute;
+        right: -95px;
+        top: -110px;
+        width: 300px;
+        height: 300px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .07);
+        pointer-events: none;
+    }
+
+    .bys-process-hero-top {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    .bys-process-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 850;
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    .bys-process-title {
+        font-size: clamp(29px, 3vw, 44px);
+        line-height: 1.05;
+        font-weight: 900;
+        letter-spacing: -.045em;
+        margin: 0;
+    }
+
+    .bys-process-subtitle {
+        max-width: 910px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.75;
+    }
+
+    .bys-process-hero-note {
+        position: relative;
+        z-index: 1;
+        min-width: 245px;
+        border: 1px solid rgba(139, 0, 0, .13);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, .72);
+        padding: 16px;
+        box-shadow: 0 12px 30px rgba(31, 41, 55, .08);
+    }
+
+    .bys-process-hero-note small {
+        display: block;
+        color: var(--bys-muted);
+        font-size: 12px;
+        margin-bottom: 7px;
+    }
+
+    .bys-process-hero-note strong {
+        display: block;
+        font-size: 15px;
+        line-height: 1.45;
+    }
+
+    .bys-process-stats {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+    }
+
+    .bys-process-stat {
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: var(--bys-card);
+        padding: 18px;
+        min-height: 132px;
+        box-shadow: 0 16px 42px rgba(31, 41, 55, .075);
+    }
+
+    .bys-process-stat i {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 14px;
+    }
+
+    .bys-process-stat-number {
+        font-size: 30px;
+        font-weight: 900;
+        letter-spacing: -.03em;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .bys-process-stat-label {
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .bys-process-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 230px auto auto;
+        gap: 10px;
+        align-items: center;
+        margin: 18px 0;
+    }
+
+    .bys-process-input,
+    .bys-process-select {
+        width: 100%;
+        border: 1px solid var(--bys-line);
+        background: rgba(255, 255, 255, .95);
+        border-radius: 16px;
+        padding: 12px 14px;
+        color: var(--bys-ink);
+        outline: none;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, .05);
+    }
+
+    .bys-process-input:focus,
+    .bys-process-select:focus {
+        border-color: rgba(139, 0, 0, .34);
+        box-shadow: 0 0 0 4px rgba(139, 0, 0, .08);
+    }
+
+    .bys-process-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 43px;
+        padding: 10px 14px;
+        border-radius: 15px;
+        border: 1px solid var(--bys-line);
+        background: rgba(255, 255, 255, .88);
+        color: var(--bys-ink);
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: 0 10px 26px rgba(31, 41, 55, .055);
+        white-space: nowrap;
+    }
+
+    .bys-process-btn:hover {
+        color: var(--bys-red);
+        border-color: rgba(139, 0, 0, .25);
+        text-decoration: none;
+    }
+
+    .bys-process-btn-primary {
+        background: linear-gradient(135deg, var(--bys-red), var(--bys-red-2));
+        color: #fff;
+        border-color: transparent;
+    }
+
+    .bys-process-btn-primary:hover {
+        color: #fff;
+        filter: brightness(.98);
+    }
+
+    .bys-process-btn-danger {
+        background: rgba(139, 0, 0, .08);
+        color: var(--bys-red);
+        border-color: rgba(139, 0, 0, .22);
+    }
+
+    .bys-process-btn-danger:hover {
+        background: rgba(139, 0, 0, .12);
+        color: var(--bys-red);
+    }
+
+    .bys-process-small-danger {
+        color: var(--bys-red);
+        border-color: rgba(139, 0, 0, .20);
+        background: rgba(139, 0, 0, .055);
+    }
+
+    .bys-process-card {
+        border: 1px solid var(--bys-line);
+        border-radius: 26px;
+        background: var(--bys-card);
+        box-shadow: 0 18px 54px rgba(31, 41, 55, .08);
+        overflow: hidden;
+        margin-top: 16px;
+    }
+
+    .bys-process-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--bys-line);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .bys-process-card-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 900;
+        letter-spacing: -.02em;
+    }
+
+    .bys-process-card-desc {
+        margin: 7px 0 0;
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.58;
+    }
+
+    .bys-process-header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+    .bys-process-card-body {
+        padding: 18px 22px 22px;
+    }
+
+    .bys-process-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 850;
+        background: rgba(31, 41, 55, .06);
+        color: var(--bys-ink);
+        white-space: nowrap;
+    }
+
+    .bys-process-pill-danger { background: rgba(139, 0, 0, .10); color: var(--bys-red); }
+    .bys-process-pill-warning { background: rgba(146, 64, 14, .11); color: #92400e; }
+    .bys-process-pill-success { background: rgba(22, 101, 52, .11); color: #166534; }
+    .bys-process-pill-neutral { background: rgba(75, 85, 99, .10); color: #374151; }
+    .bys-process-pill-info { background: rgba(30, 64, 175, .09); color: #1e40af; }
+
+    .bys-process-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border: 1px solid rgba(22, 101, 52, .18);
+        background: rgba(22, 101, 52, .07);
+        color: #14532d;
+        border-radius: 18px;
+        padding: 13px 15px;
+        margin: 0 0 14px;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .bys-process-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, .66);
+    }
+
+    .bys-process-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+
+    .bys-process-table th {
+        text-align: left;
+        padding: 14px 16px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        font-weight: 900;
+        border-bottom: 1px solid var(--bys-line);
+        background: rgba(31, 41, 55, .035);
+    }
+
+    .bys-process-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid rgba(31, 41, 55, .08);
+        vertical-align: top;
+        font-size: 13px;
+    }
+
+    .bys-process-table tr:last-child td { border-bottom: 0; }
+
+    .bys-process-person {
+        display: grid;
+        gap: 4px;
+        min-width: 190px;
+    }
+
+    .bys-process-person strong { font-size: 13px; }
+    .bys-process-person small { color: var(--bys-muted); font-size: 12px; }
+
+    .bys-process-muted {
+        color: var(--bys-muted);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .bys-process-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .bys-process-small-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid var(--bys-line);
+        background: rgba(255, 255, 255, .76);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .bys-process-small-link:hover {
+        color: var(--bys-red);
+        border-color: rgba(139, 0, 0, .25);
+        text-decoration: none;
+    }
+
+    .bys-process-details {
+        min-width: 230px;
+    }
+
+    .bys-process-details summary {
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 850;
+        color: var(--bys-red);
+        list-style: none;
+    }
+
+    .bys-process-details summary::-webkit-details-marker { display: none; }
+
+    .bys-process-step-list {
+        margin: 11px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 9px;
+    }
+
+    .bys-process-step-list li {
+        border-left: 3px solid rgba(139, 0, 0, .18);
+        padding-left: 10px;
+        color: var(--bys-ink);
+        line-height: 1.42;
+    }
+
+    .bys-process-step-list small {
+        display: block;
+        color: var(--bys-muted);
+        margin-top: 3px;
+    }
+
+    .bys-process-note {
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--bys-red-soft);
+        color: #5f0b0b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .bys-process-empty {
+        text-align: center;
+        padding: 42px 18px;
+        border: 1px dashed rgba(31, 41, 55, .18);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, .55);
+        color: var(--bys-muted);
+    }
+
+    .bys-process-empty i {
+        display: inline-flex;
+        width: 54px;
+        height: 54px;
+        border-radius: 19px;
+        align-items: center;
+        justify-content: center;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 1240px) {
+        .bys-process-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .bys-process-toolbar { grid-template-columns: 1fr 210px; }
+    }
+
+    @media (max-width: 780px) {
+        .bys-process-page { padding: 12px 10px 32px; }
+        .bys-process-hero { padding: 22px; border-radius: 24px; }
+        .bys-process-hero-top { display: block; }
+        .bys-process-hero-note { margin-top: 16px; min-width: 0; }
+        .bys-process-stats { grid-template-columns: 1fr; }
+        .bys-process-toolbar { grid-template-columns: 1fr; }
+        .bys-process-card-header { display: block; }
+        .bys-process-header-actions { justify-content: flex-start; margin-top: 14px; }
+    }
+</style>
+
+<div class="bys-process-page" data-page="performance-process-tracking">
+    <section class="bys-process-hero">
+        <div class="bys-process-hero-top">
+            <div>
+                <div class="bys-process-eyebrow">
+                    <i class="fa-solid fa-route"></i>
+                    Performans Yönetimi
+                </div>
+                <h1 class="bys-process-title">Süreç Takibi</h1>
+                <p class="bys-process-subtitle">
+                    Değerlendirme sürecindeki bekleyen işler, geciken kayıtlar, üst onay gerektiren sonuçlar ve tamamlanan işlemler tek ekranda izlenir. Bu alan yalnızca yetki kapsamındaki kayıtları gösterir.
+                </p>
+            </div>
+            <div class="bys-process-hero-note">
+                <small>Son güncelleme</small>
+                <strong>{{ last_refreshed_at if last_refreshed_at is defined else '-' }}</strong>
+                <small style="margin-top:10px;">Görüntüleyen</small>
+                <strong>{{ viewer_name if viewer_name is defined else 'Yetkili kullanıcı' }}</strong>
+            </div>
+        </div>
+
+        <div class="bys-process-stats">
+            <div class="bys-process-stat">
+                <i class="fa-solid fa-layer-group"></i>
+                <div class="bys-process-stat-number">{{ current_total }}</div>
+                <div class="bys-process-stat-label">Toplam süreç kaydı</div>
+            </div>
+            <div class="bys-process-stat">
+                <i class="fa-solid fa-hourglass-half"></i>
+                <div class="bys-process-stat-number">{{ counts.get('waiting', counts.get('pending', 0)) }}</div>
+                <div class="bys-process-stat-label">İşlem bekleyen kayıt</div>
+            </div>
+            <div class="bys-process-stat">
+                <i class="fa-solid fa-user-clock"></i>
+                <div class="bys-process-stat-number">{{ counts.get('overdue', counts.get('Geciken', 0)) }}</div>
+                <div class="bys-process-stat-label">Geciken veya aksayan kayıt</div>
+            </div>
+            <div class="bys-process-stat">
+                <i class="fa-solid fa-stamp"></i>
+                <div class="bys-process-stat-number">{{ counts.get('president_pending', counts.get('president_required', 0)) }}</div>
+                <div class="bys-process-stat-label">Başkan/üst onay bekleyen</div>
+            </div>
+            <div class="bys-process-stat">
+                <i class="fa-solid fa-circle-check"></i>
+                <div class="bys-process-stat-number">{{ counts.get('completed', counts.get('finalized', 0)) }}</div>
+                <div class="bys-process-stat-label">Tamamlanan süreç</div>
+            </div>
+        </div>
+    </section>
+
+    <form class="bys-process-toolbar" method="get" action="/performans/surec-takibi">
+        <input id="bysProcessSearch" class="bys-process-input" type="search" name="q" value="{{ search }}" placeholder="Personel, sorumlu, dönem veya işlem ara...">
+        <select class="bys-process-select" name="status" onchange="this.form.submit()">
+            <option value="all" {% if status_filter in ['', 'all'] %}selected{% endif %}>Tüm süreçler</option>
+            <option value="waiting" {% if status_filter in ['waiting', 'pending', 'bekleyen'] %}selected{% endif %}>Bekleyenler</option>
+            <option value="overdue" {% if status_filter in ['overdue', 'geciken'] %}selected{% endif %}>Gecikenler</option>
+            <option value="president" {% if status_filter in ['president', 'baskan', 'baskan_onayi'] %}selected{% endif %}>Başkan/üst onay</option>
+            <option value="completed" {% if status_filter in ['completed', 'finalized', 'tamamlanan'] %}selected{% endif %}>Tamamlananlar</option>
+            <option value="returned" {% if status_filter in ['returned', 'iade'] %}selected{% endif %}>İade edilenler</option>
+        </select>
+        <button class="bys-process-btn" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Filtrele
+        </button>
+        <a class="bys-process-btn" href="/performance/process-reports">
+            <i class="fa-solid fa-chart-line"></i>
+            Süreç Raporları
+        </a>
+    </form>
+
+    <section class="bys-process-card">
+        <div class="bys-process-card-header">
+            <div>
+                <h2 class="bys-process-card-title">Canlı Süreç Listesi</h2>
+                <p class="bys-process-card-desc">
+                    Kayıtlar; personel, dönem, güncel sorumlu, süreç durumu, bekleme süresi, son işlem ve puan bilgisiyle listelenir.
+                </p>
+            </div>
+            <div class="bys-process-header-actions">
+                <span class="bys-process-pill bys-process-pill-warning">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Yetki kapsamlı görünüm
+                </span>
+                <form method="get" action="/performans/surec-takibi" style="margin:0;">
+                    <input type="hidden" name="q" value="{{ search }}">
+                    <input type="hidden" name="status" value="{{ status_filter }}">
+                    <button class="bys-process-btn bys-process-btn-primary" type="submit" name="refresh" value="1">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Listeyi Yenile
+                    </button>
+                </form>
+                {% if can_manage_process_tracking %}
+                <form method="post" action="/performans/surec-takibi/listeyi-temizle" style="margin:0;" onsubmit="return confirm('Görünen süreç takip kayıtları listeden kaldırılacak. Karne ve değerlendirme kayıtları silinmez. Devam edilsin mi?');">
+                    {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                    <input type="hidden" name="q" value="{{ search }}">
+                    <input type="hidden" name="status" value="{{ status_filter }}">
+                    <button class="bys-process-btn bys-process-btn-danger" type="submit">
+                        <i class="fa-solid fa-broom"></i>
+                        Görünenleri Temizle
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bys-process-card-body">
+            {% if refresh_done is defined and refresh_done %}
+            <div class="bys-process-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong>Canlı süreç listesi yenilendi.</strong>
+                    {% if refresh_summary %}
+                        {{ refresh_summary.get('checked', 0) }} kayıt kontrol edildi, {{ refresh_summary.get('updated', 0) }} kayıt güncellendi.
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if deleted_count %}
+            <div class="bys-process-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong>Süreç takip listesi temizlendi.</strong> {{ deleted_count }} kayıt listeden kaldırıldı. Karne, değerlendirme ve personel kayıtları korunur.
+                </div>
+            </div>
+            {% endif %}
+
+            {% if delete_error %}
+            <div class="bys-process-alert" style="border-color:rgba(139,0,0,.20);background:rgba(139,0,0,.07);color:#6f0000;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div><strong>Kayıt silinemedi.</strong> Lütfen sayfayı yenileyip tekrar deneyin.</div>
+            </div>
+            {% endif %}
+
+            {% if tracking_items %}
+            <div class="bys-process-table-wrap">
+                <table class="bys-process-table">
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Dönem</th>
+                            <th>Güncel Sorumlu</th>
+                            <th>Süreç Durumu</th>
+                            <th>Bekleme</th>
+                            <th>Son İşlem</th>
+                            <th>Puan</th>
+                            <th>İzleme</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in tracking_items %}
+                        {% set emp_name = item.get('employee_name') or item.get('emp_full_name') or 'Personel bilgisi' %}
+                        {% set owner_name = item.get('owner_name') or item.get('owner_full_name') or item.get('current_owner_name') or '-' %}
+                        {% set status_label = item.get('status_label') or item.get('bucket_label') or 'Süreçte' %}
+                        {% set status_tone = item.get('status_tone') or 'info' %}
+                        {% set search_text = (emp_name ~ ' ' ~ owner_name ~ ' ' ~ status_label ~ ' ' ~ (item.get('period_name') or '') ~ ' ' ~ (item.get('last_action') or ''))|lower %}
+                        <tr data-search="{{ search_text }}">
+                            <td>
+                                <div class="bys-process-person">
+                                    <strong>{{ emp_name }}</strong>
+                                    <small>Sicil / kayıt: {{ item.get('employee_id') or '-' }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ item.get('period_name') or '-' }}</strong>
+                                <div class="bys-process-muted">Dönem kaydı</div>
+                            </td>
+                            <td>
+                                <strong>{{ owner_name }}</strong>
+                                {% if item.get('waiting_since') and item.get('waiting_since') != '-' %}
+                                    <div class="bys-process-muted">Bekleme başlangıcı: {{ item.get('waiting_since') }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="bys-process-pill bys-process-pill-{{ status_tone }}">
+                                    {% if status_tone == 'danger' %}<i class="fa-solid fa-triangle-exclamation"></i>{% endif %}
+                                    {% if status_tone == 'success' %}<i class="fa-solid fa-circle-check"></i>{% endif %}
+                                    {% if status_tone not in ['danger', 'success'] %}<i class="fa-solid fa-circle-dot"></i>{% endif %}
+                                    {{ status_label }}
+                                </span>
+                                {% if item.get('president_required') %}
+                                    <div style="margin-top:7px;">
+                                        <span class="bys-process-pill bys-process-pill-danger">Üst onay gerektirir</span>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.get('is_overdue') %}
+                                    <strong>{{ item.get('overdue_days') or item.get('waiting_days') or 0 }} gün</strong>
+                                    <div class="bys-process-muted">Gecikmiş kayıt</div>
+                                {% elif item.get('waiting_days') is not none %}
+                                    <strong>{{ item.get('waiting_days') }} gün</strong>
+                                    <div class="bys-process-muted">Bekleme süresi</div>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ item.get('last_action') or '-' }}</strong>
+                                {% if item.get('last_action_at') and item.get('last_action_at') != '-' %}
+                                    <div class="bys-process-muted">{{ item.get('last_action_at') }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.get('final_score') and item.get('final_score') != '-' %}
+                                    <strong>{{ item.get('final_score') }}</strong>
+                                {% else %}
+                                    <span class="bys-process-muted">Henüz oluşmadı</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <details class="bys-process-details">
+                                    <summary><i class="fa-solid fa-list-check"></i> Akışı Aç</summary>
+                                    {% if item.get('steps') %}
+                                        <ul class="bys-process-step-list">
+                                            {% for step in item.get('steps')[:5] %}
+                                            <li>
+                                                <strong>{{ step.get('title') or 'Süreç adımı' }}</strong>
+                                                <small>{{ step.get('status') or 'Süreçte' }}{% if step.get('action_at') and step.get('action_at') != '-' %} · {{ step.get('action_at') }}{% endif %}</small>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <div class="bys-process-muted" style="margin-top:10px;">Bu kayıt için görünür süreç adımı bulunmuyor.</div>
+                                    {% endif %}
+                                </details>
+                            </td>
+                            <td>
+                                <div class="bys-process-actions">
+                                    {% if item.get('evaluation_id') %}
+                                    <a class="bys-process-small-link" href="/performance/evaluation/{{ item.get('evaluation_id') }}">
+                                        <i class="fa-solid fa-eye"></i>
+                                        İncele
+                                    </a>
+                                    {% endif %}
+                                    {% if item.get('president_required') %}
+                                    <a class="bys-process-small-link" href="/performance/president-approvals">
+                                        <i class="fa-solid fa-stamp"></i>
+                                        Üst Onaylar
+                                    </a>
+                                    {% endif %}
+                                    {% if can_manage_process_tracking and item.get('flow_id') %}
+                                    <form method="post" action="/performans/surec-takibi/kayit-sil" style="margin:0;" onsubmit="return confirm('Bu kayıt yalnızca süreç takip listesinden kaldırılacak. Devam edilsin mi?');">
+                                        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+                                        <input type="hidden" name="flow_id" value="{{ item.get('flow_id') }}">
+                                        <input type="hidden" name="q" value="{{ search }}">
+                                        <input type="hidden" name="status" value="{{ status_filter }}">
+                                        <button class="bys-process-small-link bys-process-small-danger" type="submit">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                            Listeden Kaldır
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bys-process-note">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <strong>Bilgi:</strong> Bu ekran değerlendirme puanı üretmez ve idari karar vermez. Yalnızca değerlendirme süreçlerinin hangi aşamada olduğunu, gecikmeleri ve yetki kapsamındaki takip bilgisini gösterir.
+                </div>
+            </div>
+            {% else %}
+            <div class="bys-process-empty">
+                <i class="fa-solid fa-route"></i>
+                <div><strong>Yetki kapsamınızda listelenecek süreç kaydı bulunmuyor.</strong></div>
+                <div style="margin-top:6px;">Değerlendirme süreci başlatıldığında bu alan yetki kapsamınıza göre dolacaktır.</div>
+                <form method="get" action="/performans/surec-takibi" style="margin-top:16px;">
+                    <input type="hidden" name="q" value="{{ search }}">
+                    <input type="hidden" name="status" value="{{ status_filter }}">
+                    <button class="bys-process-btn bys-process-btn-primary" type="submit" name="refresh" value="1">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Listeyi Yenile
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("bysProcessSearch");
+
+    function normalize(value) {
+        return (value || "").toLocaleLowerCase("tr-TR").trim();
+    }
+
+    function applyLocalSearch() {
+        const q = normalize(search ? search.value : "");
+        const rows = document.querySelectorAll("[data-search]");
+        rows.forEach(function (row) {
+            const haystack = normalize(row.getAttribute("data-search"));
+            row.style.display = (!q || haystack.indexOf(q) !== -1) ? "" : "none";
+        });
+    }
+
+    if (search) search.addEventListener("input", applyLocalSearch);
+})();
+</script>
+{% endblock %}
+
+{# BYS360_PROCESS_TRACKING_CORPORATE_UI_V2 #}
+{# BYS360_PROCESS_TRACKING_REFRESH_BUTTON_V1 #}
+{# BYS360_PROCESS_TRACKING_DELETE_LIST_V1 #}
+{# BYS360_PROCESS_TRACKING_SAFE_CLEANUP_V1 #}

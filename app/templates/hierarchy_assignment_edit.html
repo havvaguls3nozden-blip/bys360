@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Hiyerarşi Ataması Düzenle - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Hiyerarşi Ataması Düzenle{% endblock %}
+{% block page_subtitle %}Seçilen personelin 1., 2. ve 3. amir atamalarını güncelleyin.{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Hiyerarşi Ataması Düzenle', text='Tek personel bazında zinciri kurarken üst düzey hiyerarşi akışıyla aynı bağlam korunur.', icon='fa-solid fa-user-pen') }}
+  {{ nav(active='settings') }}
+  {{ note('Tekil düzenleme ekranı, merkezi ayar yüzeyinin devamı gibi çalışır.') }}
+<style>
+  .edit-shell{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:18px;
+    align-items:start;
+  }
+  .card{
+    background:rgba(255,255,255,.84);
+    border:1px solid rgba(139,0,0,.08);
+    border-radius:24px;
+    box-shadow:0 18px 36px rgba(15,23,42,.08);
+    padding:22px;
+  }
+  .profile-card{
+    background:#fff;
+    color:#fff;
+  }
+  .avatar{
+    width:92px;
+    height:92px;
+    border-radius:24px;
+    background:rgba(139,0,0,.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2rem;
+    margin-bottom:14px;
+  }
+  .section-title{
+    margin:0 0 8px;
+    font-size:1.08rem;
+    font-weight:900;
+    color:#8B0000;
+  }
+  .profile-card .section-title{color:#111827}
+  .section-text{
+    margin:0 0 16px;
+    color:#6b7280;
+    line-height:1.75;
+  }
+  .profile-card .section-text{color:#6b7280}
+  .info-list{
+    display:grid;
+    gap:12px;
+  }
+  .info-item{
+    padding:14px 16px;
+    border-radius:18px;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.08);
+    line-height:1.7;
+  }
+  .form-grid{
+    display:grid;
+    gap:16px;
+  }
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .form-group label{
+    font-size:.92rem;
+    font-weight:800;
+    color:#374151;
+  }
+  .form-group select{
+    width:100%;
+    min-height:50px;
+    border-radius:16px;
+    border:1px solid rgba(15,23,42,.10);
+    background:#fff;
+    padding:12px 14px;
+    outline:none;
+    font-size:.95rem;
+    color:#111827;
+  }
+  .form-group select:focus{
+    border-color:rgba(139,0,0,.22);
+    box-shadow:0 0 0 4px rgba(139,0,0,.08);
+  }
+  .hint-box{
+    padding:14px 16px;
+    border-radius:18px;
+    background:rgba(139,0,0,.04);
+    border:1px solid rgba(139,0,0,.08);
+    color:#7c2d12;
+    line-height:1.8;
+    font-size:.9rem;
+  }
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:4px;
+  }
+  .person-ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 0}.person-ai-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:14px;display:grid;gap:8px}.person-ai-card.tone-watch{border-color:rgba(180,83,9,.18);background:rgba(255,251,235,.96)}.person-ai-card-title{font-size:.92rem;font-weight:900;color:#111827}.person-ai-card-sub{font-size:.8rem;color:#64748b}.person-ai-card-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.person-ai-meta-box{border:1px solid rgba(15,23,42,.06);border-radius:12px;padding:10px;background:#fff}.person-ai-meta-label{font-size:.7rem;text-transform:uppercase;font-weight:800;color:#64748b}.person-ai-meta-value{margin-top:4px;font-size:.88rem;font-weight:900;color:#111827}@media(max-width:700px){.person-ai-grid{grid-template-columns:1fr}}
+  .btn-soft{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:46px;
+    padding:0 16px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    text-decoration:none;
+    font-weight:800;
+    font-size:.92rem;
+  }
+  .btn-soft.primary{
+    background:linear-gradient(180deg,#8B0000,#6f0000);
+    color:#fff;
+    box-shadow:0 12px 24px rgba(139,0,0,.16);
+  }
+  .btn-soft.secondary{
+    background:#eef2f7;
+    color:#374151;
+    border:1px solid rgba(15,23,42,.08);
+  }
+  @media (max-width:1100px){
+    .edit-shell{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="edit-shell">
+  <div class="card profile-card">
+    <div class="avatar">
+      <i class="fa-solid fa-user"></i>
+    </div>
+
+    <h3 class="section-title">
+      {{ user_obj.full_name if user_obj.full_name is defined else (user_obj.ad ~ ' ' ~ user_obj.soyad) }}
+    </h3>
+    <p class="section-text">{{ user_obj.unvan or '-' }}</p>
+    {% if scope_label %}<div class="info-item" style="margin-bottom:12px;"><strong>Kapsam:</strong><br>{{ scope_label }}</div>{% endif %}
+
+    <div class="info-list">
+      <div class="info-item">
+        <strong>Sicil No:</strong><br>
+        {{ user_obj.sicil_no or '-' }}
+      </div>
+      <div class="info-item">
+        <strong>Birim:</strong><br>
+        {{ user_obj.birim or '-' }}
+      </div>
+      <div class="info-item">
+        <strong>Üst Birim:</strong><br>
+        {{ user_obj.ust_birim or '-' }}
+      </div>
+      <div class="info-item">
+        <strong>Rol:</strong><br>
+        {{ user_obj.role or '-' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Amir Atama Formu</h3>
+    <p class="section-text">
+      Aşağıdaki alanlardan personelin 1. amir, 2. amir ve opsiyonel 3. amir bilgisini güncelleyebilirsiniz.
+    </p>
+    {% if ai_assignment_person_panel %}<article class="ai-summary-card tone-{{ ai_assignment_person_panel.tone }}" style="margin-bottom:14px;"><div class="ai-kicker"><i class="fa-solid fa-user-check"></i> {{ ai_assignment_person_panel.badge }}</div><div class="ai-title">{{ ai_assignment_person_panel.headline }}</div><div class="ai-text">{{ ai_assignment_person_panel.summary }}</div>{% if ai_assignment_person_panel.bullets %}<ul class="ai-bullets">{% for bullet in ai_assignment_person_panel.bullets %}<li><i class="fa-solid fa-circle"></i><span>{{ bullet }}</span></li>{% endfor %}</ul>{% endif %}<div class="ai-action-grid">{% for item in ai_assignment_person_panel.actions %}<div class="ai-action tone-{{ item.tone }}"><div class="ai-action-label">{{ item.label }}</div><div class="ai-action-value">{{ item.value }}</div></div>{% endfor %}</div>{% if ai_assignment_person_panel.detail_cards %}<div class="person-ai-grid">{% for card in ai_assignment_person_panel.detail_cards %}<div class="person-ai-card tone-{{ card.tone }}"><div class="person-ai-card-title">{{ card.title }}</div><div class="person-ai-card-sub">{{ card.subtitle }}</div><div class="person-ai-card-meta">{% for meta in card.meta %}<div class="person-ai-meta-box"><div class="person-ai-meta-label">{{ meta.label }}</div><div class="person-ai-meta-value">{{ meta.value }}</div></div>{% endfor %}</div></div>{% endfor %}</div>{% endif %}</article>{% endif %}
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="period_id" value="{{ selected_period_id or '' }}">
+      <input type="hidden" name="scope" value="{{ selected_scope or '' }}">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="yonetici_sicil">1. Amir</label>
+          <select name="yonetici_sicil" id="yonetici_sicil">
+            <option value="">Seçiniz</option>
+            {% for manager in manager_candidates %}
+              <option value="{{ manager.sicil_no }}" {% if user_obj.yonetici_sicil == manager.sicil_no %}selected{% endif %}>
+                {{ manager.ad }} {{ manager.soyad }} - {{ manager.sicil_no }} {% if manager.unvan %}({{ manager.unvan }}){% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ikinci_yonetici_sicil">2. Amir</label>
+          <select name="ikinci_yonetici_sicil" id="ikinci_yonetici_sicil">
+            <option value="">Seçiniz</option>
+            {% for manager in manager_candidates %}
+              <option value="{{ manager.sicil_no }}" {% if user_obj.ikinci_yonetici_sicil == manager.sicil_no %}selected{% endif %}>
+                {{ manager.ad }} {{ manager.soyad }} - {{ manager.sicil_no }} {% if manager.unvan %}({{ manager.unvan }}){% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ucuncu_yonetici_sicil">3. Amir (Opsiyonel)</label>
+          <select name="ucuncu_yonetici_sicil" id="ucuncu_yonetici_sicil">
+            <option value="">Seçiniz</option>
+            {% for manager in manager_candidates %}
+              <option value="{{ manager.sicil_no }}" {% if user_obj.ucuncu_yonetici_sicil == manager.sicil_no %}selected{% endif %}>
+                {{ manager.ad }} {{ manager.soyad }} - {{ manager.sicil_no }} {% if manager.unvan %}({{ manager.unvan }}){% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="hint-box">
+          <strong>Güncel kural:</strong> Başkanlık seviyesinde akış <strong>2 → 1</strong> şeklindedir. Grup / çalışma grubu seviyesinde ise kayıt varsa <strong>3 → 2 → 1</strong>, yoksa <strong>2 → 1</strong> olarak ilerler. 3. amir zorunlu değildir ve başkan olamaz.
+        </div>
+
+        <div class="toolbar">
+          <button type="submit" class="btn-soft primary">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Kaydet
+          </button>
+          <a href="{{ url_for('main.performance_hierarchy_settings', period_id=selected_period_id or '', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i>Listeye Dön</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

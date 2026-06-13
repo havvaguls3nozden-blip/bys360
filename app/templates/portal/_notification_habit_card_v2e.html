@@ -1,0 +1,36 @@
+{# BYS360_PORTAL_EXPERIENCE_V2E_NOTIFICATION_HABIT_CARD #}
+{% set habit = portal_notification_habit if portal_notification_habit is defined and portal_notification_habit else {} %}
+<section class="portal-card portal-v2e-notification-card" aria-label="Bildirimlerim">
+  <div class="portal-v2e-notification-head">
+    <div>
+      <h3><i class="fa-regular fa-bell"></i> Bildirimlerim</h3>
+      <p>{{ habit.message|default('Bildirimleriniz burada görünür.', true) }}</p>
+    </div>
+    <span class="portal-v2e-count">{{ habit.unread_total|default(0, true) }}</span>
+  </div>
+
+  <div class="portal-v2e-mini-stats">
+    <a href="{{ habit.all_url|default('/notifications', true) }}"><b>{{ habit.unread_total|default(0, true) }}</b><span>Okunmamış</span></a>
+    <a href="{{ habit.portal_url|default('/notifications?filter=portal', true) }}"><b>{{ habit.portal_total|default(0, true) }}</b><span>Portal</span></a>
+    <a href="{{ habit.all_url|default('/notifications', true) }}"><b>{{ habit.priority_total|default(0, true) }}</b><span>Öncelikli</span></a>
+  </div>
+
+  <div class="portal-v2e-notification-list">
+    {% for item in habit.latest|default([], true) %}
+      <a class="portal-v2e-notification-item is-{{ item.tone|default('normal', true) }}" href="{{ item.link_url|default('/notifications', true) }}">
+        <span>{{ item.type_label|default('Bildirim', true) }}</span>
+        <b>{{ item.title }}</b>
+        <small>{{ item.body }}</small>
+      </a>
+    {% else %}
+      <div class="portal-v2e-empty">
+        <i class="fa-regular fa-circle-check"></i>
+        <p>Şu anda okunmamış bildiriminiz yok.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <a class="portal-btn ghost full portal-v2e-all-link" href="{{ habit.all_url|default('/notifications', true) }}">
+    <i class="fa-solid fa-arrow-right"></i> Tüm bildirimleri görüntüle
+  </a>
+</section>

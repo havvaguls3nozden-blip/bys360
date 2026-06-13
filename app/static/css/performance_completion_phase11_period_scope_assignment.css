@@ -1,0 +1,20 @@
+/* BYS360_PERFORMANCE_COMPLETION_PHASE11_PERIOD_SCOPE_ASSIGNMENT_CSS */
+.bys360-phase11-panel{
+  border:1px solid rgba(139,0,0,.16);
+  border-left:4px solid #8B0000;
+  border-radius:16px;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 10px 28px rgba(31,41,55,.08);
+  padding:16px 18px;
+  margin:16px 0;
+}
+.bys360-phase11-panel__title{
+  font-weight:700;
+  color:#8B0000;
+  font-size:1.02rem;
+  margin-bottom:8px;
+}
+.bys360-phase11-panel__body{color:#333;line-height:1.55;font-size:.95rem;}
+.bys360-phase11-panel__body ul{margin:8px 0 0 18px;padding:0;}
+.bys360-phase11-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(139,0,0,.08);color:#8B0000;font-weight:600;font-size:.86rem;}
+@media (max-width: 768px){.bys360-phase11-panel{padding:14px;margin:12px 0}.bys360-phase11-panel__body{font-size:.9rem}}

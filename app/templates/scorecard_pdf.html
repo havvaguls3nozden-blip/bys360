@@ -1,0 +1,670 @@
+{# BYS360_PHASE5_5_MOBILE_TABLE_GUARD: tablolar CSS ile yatay kaydırılabilir #}
+{# BYS360_PHASE5_5_SCORECARD_MOBILE_LAYOUT #}
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>Not Karnesi - {{ employee.full_name if employee else 'Personel' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% set ns = namespace(panel_count=0) %}
+    {% if row.level_1_items %}{% set ns.panel_count = ns.panel_count + 1 %}{% endif %}
+    {% if row.level_2_items %}{% set ns.panel_count = ns.panel_count + 1 %}{% endif %}
+    {% if row.level_3_items or row.level_3_comment %}{% set ns.panel_count = ns.panel_count + 1 %}{% endif %}
+
+    <style>
+        @page{
+            size:A4 landscape;
+            margin:12mm 10mm 14mm 10mm;
+        }
+
+        :root{
+            --red:#8B0000;
+            --red-dark:#6f0000;
+            --text:#111827;
+            --muted:#6b7280;
+            --border:#d1d5db;
+            --soft:#f8fafc;
+            --line:#e5e7eb;
+        }
+
+        *{box-sizing:border-box}
+
+        body{
+            margin:0;
+            font-family:Arial, Helvetica, sans-serif;
+            color:var(--text);
+            background:#fff;
+        }
+
+        .screen-toolbar{
+            position:sticky;
+            top:0;
+            z-index:20;
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            padding:14px 18px;
+            background:#fff;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-height:42px;
+            padding:0 16px;
+            border-radius:10px;
+            text-decoration:none;
+            font-size:14px;
+            font-weight:700;
+            border:1px solid #d1d5db;
+            color:#374151;
+            background:#fff;
+            cursor:pointer;
+        }
+
+        .btn.primary{
+            background:var(--red);
+            color:#fff;
+            border-color:var(--red);
+        }
+
+        .visibility-banner{
+            margin:0 0 12px 0;
+            padding:12px 14px;
+            border-radius:14px;
+            border:1px solid #e5e7eb;
+            background:#f8fafc;
+            color:#374151;
+            font-size:13px;
+            line-height:1.7;
+        }
+
+        .visibility-banner.internal{
+            border-color:#f59e0b;
+            background:rgba(245,158,11,.08);
+            color:#92400e;
+        }
+
+        .page{
+            position:relative;
+            padding:0 0 24px 0;
+            overflow:hidden;
+            background:#fff;
+        }
+
+        .page::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background-image:url("{{ url_for('static', filename='img/ay_yildiz.svg') }}");
+            background-repeat:no-repeat;
+            background-position:center 220px;
+            background-size:360px auto;
+            pointer-events:none;
+        }
+
+        .page > *{
+            position:relative;
+            z-index:1;
+        }
+
+        .antet{
+            border:1px solid var(--border);
+            border-radius:16px;
+            overflow:hidden;
+            margin:0 0 14px 0;
+            background:#fff;
+        }
+
+        .antet-top{
+            display:grid;
+            grid-template-columns:100px 1fr;
+            gap:16px;
+            align-items:center;
+            padding:14px 18px;
+            background:#fff;
+            border-bottom:4px solid var(--red);
+        }
+
+        .antet-logo-wrap{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .antet-logo{
+            width:74px;
+            height:74px;
+            object-fit:contain;
+        }
+
+        .antet-title{
+            text-align:center;
+        }
+
+        .antet-title h1{
+            margin:0;
+            font-size:21px;
+            line-height:1.2;
+            font-weight:800;
+            color:#111827;
+        }
+
+        .antet-title h2{
+            margin:6px 0 0 0;
+            font-size:14px;
+            line-height:1.35;
+            font-weight:700;
+            color:#374151;
+        }
+
+        .antet-band{
+            background:linear-gradient(180deg, var(--red), var(--red-dark));
+            color:#fff;
+            text-align:center;
+            padding:10px 16px;
+            font-size:13px;
+            font-weight:700;
+            letter-spacing:.2px;
+        }
+
+        .content{
+            padding:0 14px;
+        }
+
+        .meta-grid{
+            display:grid;
+            grid-template-columns:repeat(4, minmax(0,1fr));
+            gap:10px;
+            margin-bottom:12px;
+        }
+
+        .meta-box{
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:10px;
+            background:rgba(255,255,255,.96);
+        }
+
+        .meta-label{
+            font-size:10.5px;
+            font-weight:700;
+            color:var(--muted);
+            margin-bottom:6px;
+            text-transform:uppercase;
+            letter-spacing:.25px;
+        }
+
+        .meta-value{
+            font-size:13px;
+            font-weight:700;
+            line-height:1.5;
+            color:#111827;
+        }
+
+        .totals{
+            display:grid;
+            grid-template-columns:repeat(4, minmax(0,1fr));
+            gap:10px;
+            margin-bottom:14px;
+        }
+
+        .total-box{
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:12px;
+            background:#fff;
+        }
+
+        .total-label{
+            font-size:10.5px;
+            font-weight:700;
+            color:var(--muted);
+            margin-bottom:8px;
+            text-transform:uppercase;
+            letter-spacing:.2px;
+        }
+
+        .total-value{
+            font-size:22px;
+            font-weight:800;
+            color:#111827;
+            line-height:1;
+        }
+
+        .total-box.final{
+            border-color:#d9a3a3;
+            background:#fff7f7;
+        }
+
+        .total-box.final .total-value{
+            color:var(--red);
+        }
+
+        .section{
+            border:1px solid var(--border);
+            border-radius:16px;
+            overflow:hidden;
+            background:rgba(255,255,255,.98);
+            page-break-inside:avoid;
+        }
+
+        .section-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            padding:12px 14px;
+            background:#f3f4f6;
+            border-bottom:1px solid var(--border);
+        }
+
+        .section-title{
+            font-size:15px;
+            font-weight:800;
+            margin:0;
+            color:#111827;
+        }
+
+        .amir-grid{
+            display:grid;
+            grid-template-columns:repeat({{ 3 if ns.panel_count >= 3 else (2 if ns.panel_count == 2 else 1) }}, minmax(0,1fr));
+            gap:12px;
+            padding:14px;
+        }
+
+        .amir-panel{
+            border:1px solid var(--border);
+            border-radius:14px;
+            overflow:hidden;
+            background:#fff;
+            min-width:0;
+        }
+
+        .amir-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            padding:10px 12px;
+            background:#fafafa;
+            border-bottom:1px solid var(--border);
+        }
+
+        .amir-title{
+            font-size:13px;
+            font-weight:800;
+            color:#111827;
+        }
+
+        .amir-score{
+            font-size:12px;
+            font-weight:800;
+            color:var(--red);
+        }
+
+        .amir-body{
+            padding:10px 12px 12px 12px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            table-layout:auto;
+        }
+
+        th,td{
+            border-bottom:1px solid var(--line);
+            padding:7px 6px;
+            text-align:left;
+            vertical-align:top;
+            font-size:10.5px;
+            line-height:1.55;
+            word-break:break-word;
+        }
+
+        th{
+            background:#fafafa;
+            font-size:10px;
+            font-weight:800;
+            color:#6b7280;
+            text-transform:uppercase;
+            letter-spacing:.18px;
+        }
+
+        .score-pill{
+            display:inline-block;
+            min-width:30px;
+            text-align:center;
+            padding:3px 7px;
+            border-radius:999px;
+            background:#f1f5f9;
+            font-weight:800;
+            color:#111827;
+        }
+
+        .comment-box{
+            margin-top:10px;
+            border:1px solid var(--border);
+            border-radius:10px;
+            padding:10px;
+            background:#fafafa;
+        }
+
+        .comment-title{
+            font-size:11px;
+            font-weight:800;
+            margin-bottom:6px;
+            color:#111827;
+        }
+
+        .comment-text{
+            font-size:11px;
+            color:#4b5563;
+            line-height:1.7;
+            white-space:pre-wrap;
+            word-break:break-word;
+        }
+
+        .footer-note{
+            margin-top:12px;
+            text-align:center;
+            font-size:10.5px;
+            color:#6b7280;
+            line-height:1.7;
+            padding:10px 0 0 0;
+            border-top:1px solid var(--line);
+        }
+
+
+        /* BYS360_SCORECARD_INTERIM_NOTES_PDF_STYLE */
+        .interim-notes-section{margin-bottom:14px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.98);overflow:hidden;page-break-inside:avoid;}
+        .interim-note-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 14px;}
+        .interim-note-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;}
+        .interim-note-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;font-weight:700;margin-bottom:6px;}
+        .interim-note-title{font-size:12px;font-weight:800;color:#111827;margin-bottom:6px;}
+        .interim-note-body{font-size:10.5px;color:#374151;line-height:1.65;white-space:pre-wrap;word-break:break-word;}
+
+        /* BYS360_PHASE10_SCORECARD_DEVELOPMENT_PDF_STYLE */
+        .development-section{margin-bottom:14px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.98);overflow:hidden;page-break-inside:avoid;}
+        .development-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 14px;}
+        .development-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;}
+        .development-meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:10px;font-weight:700;margin-bottom:6px;}
+        .development-title{font-size:12px;font-weight:800;color:#111827;margin-bottom:6px;}
+        .development-body{font-size:10.5px;color:#374151;line-height:1.65;white-space:pre-wrap;word-break:break-word;}
+        .development-alert{margin:12px 14px;border:1px solid #f59e0b;border-radius:12px;background:rgba(245,158,11,.08);color:#92400e;padding:9px 10px;font-size:10.5px;line-height:1.6;}
+        @media print{
+            .screen-toolbar{display:none !important;}
+            body{background:#fff;}
+            .page{padding:0;}
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-toolbar">
+        <button class="btn" type="button" onclick="window.close()">Kapat</button>
+        <button class="btn primary" type="button" onclick="window.print()">PDF Olarak Kaydet / Yazdır</button>
+    </div>
+
+    <div class="page">
+        {% if visibility_state and visibility_state.can_view_unpublished %}
+            <div class="visibility-banner internal">
+                Bu çıktı henüz personele açılmamış karne için <strong>iç kullanım önizlemesi</strong> olarak üretildi.
+            </div>
+        {% endif %}
+        <div class="antet">
+            <div class="antet-top">
+                <div class="antet-logo-wrap">
+                    <img src="{{ url_for('static', filename='img/catab_logo.png') }}"
+                         alt="ÇATAB Logo"
+                         class="antet-logo"
+                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+                </div>
+                <div class="antet-title">
+                    <h1>Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı</h1>
+                    <h2>BYS360 - Bütünleşik Yönetim Sistemi</h2>
+                </div>
+            </div>
+            <div class="antet-band">PERFORMANS NOT KARNESİ</div>
+        </div>
+
+        <div class="content">
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <div class="meta-label">Personel</div>
+                    <div class="meta-value">{{ employee.full_name if employee else '-' }}</div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Birim</div>
+                    <div class="meta-value">{{ employee.birim if employee else '-' }}</div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Dönem</div>
+                    <div class="meta-value">{{ period.title if period else '-' }}</div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Yayın Tarihi</div>
+                    <div class="meta-value">
+                        {% if evaluation.published_at %}
+                            {{ evaluation.published_at.strftime('%d.%m.%Y %H:%M') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="totals">
+                <div class="total-box">
+                    <div class="total-label">1. Amir Toplamı</div>
+                    <div class="total-value">{{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</div>
+                </div>
+                <div class="total-box">
+                    <div class="total-label">2. Amir Toplamı</div>
+                    <div class="total-value">{{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</div>
+                </div>
+                <div class="total-box">
+                    <div class="total-label">3. Amir Toplamı</div>
+                    <div class="total-value">{{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</div>
+                </div>
+                <div class="total-box final">
+                    <div class="total-label">Nihai Puan</div>
+                    <div class="total-value">{{ "%.2f"|format(evaluation.final_total_100 or 0) }}</div>
+                </div>
+            </div>
+
+
+            {% set scorecard_interim_ctx = interim_notes_context if interim_notes_context is defined and interim_notes_context else {} %}
+            {% set scorecard_interim_notes = scorecard_interim_ctx.notes if scorecard_interim_ctx.notes is defined else [] %}
+            {% if scorecard_interim_notes %}
+            <!-- BYS360_SCORECARD_INTERIM_NOTES_PDF_BLOCK -->
+            <div class="interim-notes-section">
+                <div class="section-head">
+                    <h2 class="section-title">Dönem İçi Notlar</h2>
+                    <span style="font-size:10.5px;color:#6b7280;font-weight:700;">Karne detayında gösterilsin işaretli kayıtlar</span>
+                </div>
+                <div class="interim-note-list">
+                    {% for note in scorecard_interim_notes %}
+                    <div class="interim-note-card">
+                        <div class="interim-note-meta">
+                            <span>{{ note.note_type_label or 'Dönem İçi Not' }}</span>
+                            <span>{{ note.created_display or '-' }}</span>
+                        </div>
+                        <div class="interim-note-title">{{ note.title or note.note_type_label or 'Dönem İçi Not' }}</div>
+                        <div class="interim-note-body">{{ note.body or note.note_body or 'Açıklama girilmemiş.' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+
+            {% set development_ctx = development_guidance_context if development_guidance_context is defined and development_guidance_context else {} %}
+            {% set development_rows = development_ctx.recommendations if development_ctx.recommendations is defined else [] %}
+            {% if development_ctx.enabled is not defined or development_ctx.enabled %}
+            <!-- BYS360_PHASE10_SCORECARD_DEVELOPMENT_PDF_BLOCK -->
+            <div class="development-section">
+                <div class="section-head">
+                    <h2 class="section-title">Gelişim Önerisi ve Rehberlik</h2>
+                    <span style="font-size:10.5px;color:#6b7280;font-weight:700;">Otomatik puan veya idari karar üretmez</span>
+                </div>
+                <div class="development-alert"><strong>{{ development_ctx.status_label or 'Rehberlik alanı' }}:</strong> {{ development_ctx.status_detail or 'Gelişim önerileri ve güçlü yön notları karar destek niteliğindedir.' }}</div>
+                {% if development_rows %}
+                <div class="development-list">
+                    {% for item in development_rows %}
+                    <div class="development-card">
+                        <div class="development-meta"><span>{{ item.type_label or item.recommendation_type or 'Gelişim Önerisi' }}</span><span>{{ item.created_display or '-' }}</span></div>
+                        <div class="development-title">{{ item.title or 'Gelişim Önerisi' }}</div>
+                        <div class="development-body">{{ item.recommendation_text or 'Açıklama girilmemiş.' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="section">
+                <div class="section-head">
+                    <h2 class="section-title">Amir Bazlı Değerlendirme Detayı</h2>
+                </div>
+
+                <div class="amir-grid">
+                    {% if row.level_1_items %}
+                    <div class="amir-panel">
+                        <div class="amir-head">
+                            <div class="amir-title">1. Amir</div>
+                            <div class="amir-score">{{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</div>
+                        </div>
+                        <div class="amir-body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Kriter</th>
+                                        <th>Ağ.</th>
+                                        <th>Puan</th>
+                                        <th>100'lük</th>
+                                        <th>Yorum / Gerekçe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in row.level_1_items %}
+                                    <tr>
+                                        <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                        <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                        <td><span class="score-pill">{{ item.score }}</span></td>
+                                        <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                        <td>{{ item.comment or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <div class="comment-box">
+                                <div class="comment-title">1. Amir Genel Yorumu</div>
+                                <div class="comment-text">{{ row.level_1_comment or 'Genel yorum girilmedi.' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if row.level_2_items %}
+                    <div class="amir-panel">
+                        <div class="amir-head">
+                            <div class="amir-title">2. Amir</div>
+                            <div class="amir-score">{{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</div>
+                        </div>
+                        <div class="amir-body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Kriter</th>
+                                        <th>Ağ.</th>
+                                        <th>Puan</th>
+                                        <th>100'lük</th>
+                                        <th>Yorum / Gerekçe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in row.level_2_items %}
+                                    <tr>
+                                        <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                        <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                        <td><span class="score-pill">{{ item.score }}</span></td>
+                                        <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                        <td>{{ item.comment or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <div class="comment-box">
+                                <div class="comment-title">2. Amir Genel Yorumu</div>
+                                <div class="comment-text">{{ row.level_2_comment or 'Genel yorum girilmedi.' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if row.level_3_items or row.level_3_comment %}
+                    <div class="amir-panel">
+                        <div class="amir-head">
+                            <div class="amir-title">3. Amir</div>
+                            <div class="amir-score">{{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</div>
+                        </div>
+                        <div class="amir-body">
+                            {% if row.level_3_items %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Kriter</th>
+                                        <th>Ağ.</th>
+                                        <th>Puan</th>
+                                        <th>100'lük</th>
+                                        <th>Yorum / Gerekçe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in row.level_3_items %}
+                                    <tr>
+                                        <td>{{ item.criteria.name if item.criteria else '-' }}</td>
+                                        <td>%{{ item.criteria.weight if item.criteria else 0 }}</td>
+                                        <td><span class="score-pill">{{ item.score }}</span></td>
+                                        <td>{{ "%.2f"|format(item.score_100 or 0) }}</td>
+                                        <td>{{ item.comment or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+
+                            <div class="comment-box">
+                                <div class="comment-title">3. Amir Genel Yorumu</div>
+                                <div class="comment-text">{{ row.level_3_comment or 'Genel yorum girilmedi.' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="footer-note">
+                Bu belge BYS360 üzerinden oluşturulmuştur.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("load", function () {
+            setTimeout(function () {
+                window.print();
+            }, 400);
+        });
+    </script>
+</body>
+</html>
+
+{% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+
+{# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}

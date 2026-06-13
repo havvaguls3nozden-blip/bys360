@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Geri Bildirim Denetim ve SLA Paneli - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Denetim ve SLA Paneli{% endblock %}
+{% block page_subtitle %}
+Talep ve randevu akışının işlem izi ile yönetici cevap hızını aynı ekranda görün.
+{% endblock %}
+
+{% block content %}
+<style>
+.audit-shell{display:grid;gap:18px}
+.glass-card{background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+.hero-card{padding:24px;position:relative;overflow:hidden}
+.hero-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right, rgba(139,0,0,.08), transparent 28%),linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));pointer-events:none}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.2fr) 330px;gap:18px;align-items:start}
+.hero-title{margin:0;font-size:1.16rem;font-weight:900;color:#111827;line-height:1.45}
+.hero-text{margin-top:10px;color:#6b7280;font-size:.93rem;line-height:1.85}
+.scope-row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.scope-pill,.soft-pill,.tone-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.76rem;font-weight:900;white-space:nowrap}
+.scope-pill,.soft-pill{background:#eef2f7;color:#4b5563}
+.tone-pill.critical{background:rgba(153,27,27,.10);color:#991b1b}
+.tone-pill.watch{background:rgba(146,64,14,.12);color:#92400e}
+.tone-pill.positive{background:rgba(22,101,52,.10);color:#166534}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn-soft,.mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.92rem;white-space:nowrap;transition:all .18s ease}
+.btn-soft:hover,.mini-btn:hover{transform:translateY(-1px)}
+.btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+.btn-soft.secondary,.mini-btn{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+.side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:rgba(248,250,252,.9)}
+.side-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px}
+.side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.55}
+.side-sub{margin-top:8px;color:#6b7280;font-size:.82rem;line-height:1.75}
+.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.stat-card{padding:20px;position:relative;overflow:hidden}
+.stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}
+.stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}
+.stat-value{color:#111827;font-size:1.1rem;font-weight:900;position:relative;z-index:1}
+.stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;font-weight:700;position:relative;z-index:1;line-height:1.6}
+.layout-grid{display:grid;grid-template-columns:minmax(0,1.05fr) 390px;gap:18px}
+.panel-card{padding:22px}
+.section-title{margin:0 0 14px;color:#111827;font-size:1.06rem;font-weight:900}
+.section-sub{margin:0 0 16px;color:#6b7280;font-size:.92rem;line-height:1.75}
+.table-wrap{overflow:auto;border-radius:18px;border:1px solid rgba(15,23,42,.08)}
+.audit-table{width:100%;border-collapse:collapse;background:#fff}
+.audit-table th,.audit-table td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;font-size:.9rem;vertical-align:top}
+.audit-table th{background:#f8fafc;color:#475569;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.3px}
+.audit-table tr:last-child td{border-bottom:none}
+.manager-name{font-weight:900;color:#111827}
+.helper{color:#6b7280;font-size:.8rem;line-height:1.65}
+.list-grid{display:grid;gap:12px}
+.item-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:16px}
+.item-title{margin:0;color:#111827;font-size:.98rem;font-weight:900;line-height:1.5}
+.item-meta{margin-top:6px;color:#6b7280;font-size:.82rem;font-weight:700}
+.item-text{margin-top:10px;color:#374151;font-size:.9rem;line-height:1.75}
+.item-actions{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+.empty-box{padding:18px;border-radius:18px;background:#f8fafc;border:1px dashed rgba(15,23,42,.12);color:#64748b;line-height:1.8}
+@media (max-width:1200px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout-grid,.hero-grid{grid-template-columns:1fr}}
+@media (max-width:768px){.stats-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="audit-shell">
+    <div class="scope-row">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span class="scope-pill"><i class="fa-solid fa-shield-halved"></i> {{ scope_label or 'Kapsam' }}</span>
+            <span class="helper">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için audit akışı okunuyor.</span>
+        </div>
+        <span class="scope-pill"><i class="fa-solid fa-wave-square"></i> Denetim ve SLA</span>
+    </div>
+
+    <div class="glass-card hero-card">
+        <div class="hero-grid">
+            <div>
+                <h3 class="hero-title">Talep ile randevu arasındaki işlem izini ve yönetici cevap hızını birlikte takip edin</h3>
+                <p class="hero-text">Bu panel canlı kullanımda iki soruya cevap verir: Hangi talep nerede yavaşlıyor ve hangi yönetici akışta yük biriktiriyor? Audit kaydı açıksa son olaylar aşağıda satır satır görünür.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+                    <span class="soft-pill"><i class="fa-solid fa-timeline"></i> {{ audit_counts.event_count or 0 }} kayıtlı olay</span>
+                    <span class="tone-pill watch"><i class="fa-solid fa-hourglass-half"></i> {{ audit_counts.open_requests or 0 }} açık talep</span>
+                    <span class="tone-pill positive"><i class="fa-solid fa-gauge-high"></i> {% if audit_counts.avg_first_response_hours is not none %}{{ audit_counts.avg_first_response_hours }} saat{% else %}Veri yok{% endif %} ort. ilk yanıt</span>
+                </div>
+                <div class="hero-actions">
+                    <a href="{{ url_for('main.feedback_operations_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-chart-line"></i> Operasyon Paneli</a>
+                    <a href="{{ url_for('main.feedback_watch_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-bell"></i> Takip Merkezi</a>
+                    <a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="btn-soft primary"><i class="fa-solid fa-calendar-week"></i> Randevu Listesi</a>
+                </div>
+            </div>
+            <div class="side-card">
+                <div class="side-label">Audit durumu</div>
+                <div class="side-value">{% if audit_ready %}Audit kayıtları okunuyor{% else %}Audit tablosu hazır değil{% endif %}</div>
+                <div class="side-sub">{% if audit_ready %}Talep ve randevu aksiyonları oluştuğu anda işlem izi bu panelden izlenebilir.{% else %}Kod hazır. Veritabanında audit_logs tablosu yoksa olaylar işlenmez; canlıya geçmeden önce migration çalıştırılmalı.{% endif %}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Audit Olayı</div><div class="stat-value">{{ audit_counts.event_count or 0 }}</div><div class="stat-sub">Talep ve randevu akışından okunan toplam işlem izi.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Talep Sayısı</div><div class="stat-value">{{ audit_counts.request_count or 0 }}</div><div class="stat-sub">Kapsama giren geri bildirim talebi.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Randevu Sayısı</div><div class="stat-value">{{ audit_counts.meeting_count or 0 }}</div><div class="stat-sub">Kapsama giren görüşme kaydı.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Ort. İlk Yanıt</div><div class="stat-value">{% if audit_counts.avg_first_response_hours is not none %}{{ audit_counts.avg_first_response_hours }} sa{% else %}-{% endif %}</div><div class="stat-sub">Talep açılışından ilk müdahaleye kadar geçen ortalama süre.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Ort. Planlama</div><div class="stat-value">{% if audit_counts.avg_schedule_hours is not none %}{{ audit_counts.avg_schedule_hours }} sa{% else %}-{% endif %}</div><div class="stat-sub">Talebin randevuya bağlanma ortalaması.</div></div>
+    </div>
+
+    <div class="layout-grid">
+        <div style="display:grid;gap:18px;align-content:start;">
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Yönetici bazlı cevap ve planlama görünümü</h3>
+                <p class="section-sub">Açık talep yükü yüksek olan ve cevap süresi uzayan yöneticileri ön sıraya aldım.</p>
+                {% if manager_rows %}
+                <div class="table-wrap">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Yönetici</th>
+                                <th>Bağlı Talep</th>
+                                <th>Açık / Geciken</th>
+                                <th>Ort. İlk Yanıt</th>
+                                <th>Ort. Planlama</th>
+                                <th>Tamamlanan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in manager_rows %}
+                            <tr>
+                                <td><div class="manager-name">{{ row.manager_name }}</div><div class="helper">Yanıt: {{ row.response_count }} · Planlama: {{ row.scheduled_count }}</div></td>
+                                <td>{{ row.assigned_requests }}</td>
+                                <td>{{ row.open_linked_requests }} / {{ row.overdue_linked_requests }}</td>
+                                <td>{% if row.avg_response_hours is not none %}{{ row.avg_response_hours }} sa{% else %}-{% endif %}</td>
+                                <td>{% if row.avg_schedule_hours is not none %}{{ row.avg_schedule_hours }} sa{% else %}-{% endif %}</td>
+                                <td>{% if row.avg_completion_hours is not none %}{{ row.completed_count }} · {{ row.avg_completion_hours }} sa{% else %}{{ row.completed_count }}{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-box">Henüz audit verisi oluşmadı. İlk talep veya randevu aksiyonlarından sonra bu tablo dolacaktır.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Gecikme riski yüksek talepler</h3>
+                <p class="section-sub">İlk yanıtı veya randevuya bağlanması belirgin şekilde uzayan kayıtlar burada görünür.</p>
+                {% if slow_requests %}
+                <div class="list-grid">
+                    {% for item in slow_requests %}
+                    <div class="item-card">
+                        <div class="tone-pill critical">{{ item.kind }}</div>
+                        <h4 class="item-title" style="margin-top:10px;">{{ item.employee_name }}</h4>
+                        <div class="item-meta">{{ item.period_title }} · {{ item.status_label }}</div>
+                        <div class="item-text">Bu kayıt için geçen süre: <strong>{{ item.hours }} saat</strong>.</div>
+                        <div class="item-actions">
+                            <a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=item.request_id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Şu an eşik üstü yavaş kayıt görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display:grid;gap:18px;align-content:start;">
+            <div class="glass-card panel-card">
+                <h3 class="section-title">Son audit olayları</h3>
+                <p class="section-sub">Kim ne zaman ne yaptı sorusunun özet akışı.</p>
+                {% if recent_events %}
+                <div class="list-grid">
+                    {% for event in recent_events %}
+                    <div class="item-card">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                            <div>
+                                <div class="tone-pill {{ event.tone }}">{{ event.entity_label }}</div>
+                                <h4 class="item-title" style="margin-top:10px;">{{ event.action_label }}</h4>
+                                <div class="item-meta">{{ event.actor_name }} · {{ event.created_at.strftime('%d.%m.%Y %H:%M') if event.created_at else '-' }}</div>
+                            </div>
+                            {% if event.status_label and event.status_label != '-' %}<span class="soft-pill">{{ event.status_label }}</span>{% endif %}
+                        </div>
+                        <div class="item-text">{{ event.summary }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Audit olayı bulunmuyor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

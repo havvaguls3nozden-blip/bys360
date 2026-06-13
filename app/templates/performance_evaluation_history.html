@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% block title %}Süreç Geçmişi{% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+{% endblock %}
+{% block content %}
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="mb-1">Süreç Geçmişi</h2>
+            <div class="text-muted">{{ employee.full_name if employee else '-' }} · {{ period.title if period else '-' }}</div>
+        </div>
+        <a href="{{ back_url }}" class="btn btn-outline-secondary">Listeye Dön</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+
+        {# BYS360_PHASE2_5_SCORECARD_CATEGORY_AVERAGE_CONTEXT #}
+        {% if evaluation is defined %}
+            {% set category_average = category_average if category_average is defined and category_average else (bys360_category_average_for_evaluation(evaluation) if bys360_category_average_for_evaluation is defined else {}) %}
+            <div class="card shadow-sm border-0 h-100" data-bys360-marker="BYS360_PHASE2_5_SCORECARD_CATEGORY_AVERAGE_CARD"><div class="card-body"><div class="text-muted small mb-1">Kategori Ortalaması</div><div class="fs-4 fw-semibold">{{ '%.2f'|format(category_average.average_score|default(0, true)) }}</div><div class="text-muted small mt-1">{{ category_average.category_label|default('Diğer', true) }} · kişi detayı gösterilmez</div></div></div>
+        {% endif %}
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Toplam Olay</div>
+                    <div class="fs-4 fw-semibold">{{ history_summary.total_events if history_summary else 0 }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Son İşlem</div>
+                    <div class="fw-semibold">{{ history_summary.latest_action if history_summary else '-' }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Son İşlemi Yapan Seviye</div>
+                    <div class="fw-semibold">{{ history_summary.latest_actor if history_summary else '-' }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">Nihai Puan</div>
+                    <div class="fs-4 fw-semibold">{{ "%.2f"|format(evaluation.final_total_100 or 0) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3"><strong>1. Amir:</strong> {{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</div>
+                <div class="col-md-3"><strong>2. Amir:</strong> {{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</div>
+                <div class="col-md-3"><strong>3. Amir:</strong> {{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</div>
+                <div class="col-md-3"><strong>İş Akışı:</strong> {{ evaluation.workflow_status or '-' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            {% if history_rows %}
+                <div class="d-flex flex-column gap-3">
+                    {% for row in history_rows %}
+                        {% set score = row.score_summary or {} %}
+                        <div class="border rounded-4 p-3 bg-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                <div>
+                                    <div class="fw-semibold">{{ row.action_label }}</div>
+                                    <div class="text-muted small mt-1">
+                                        {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}
+                                        · {{ row.actor_level_label }}
+                                        {% if row.actor_name_label and row.actor_name_label != '-' %}· {{ row.actor_name_label }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="text-end small text-muted">
+                                    <div>{{ row.from_status_label|phase5_4_status_label }} → {{ row.to_status_label|phase5_4_status_label }}</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-1">
+                                <div class="col-lg-7">
+                                    <div class="small text-muted mb-1">İşlem Notu</div>
+                                    <div>{{ row.note or 'Not girilmedi.' }}</div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="small text-muted mb-1">Puan Özeti</div>
+                                    <div class="row g-2 small">
+                                        <div class="col-6">1. Amir: <strong>{{ '%.2f'|format(score.level_1 or 0) }}</strong></div>
+                                        <div class="col-6">2. Amir: <strong>{{ '%.2f'|format(score.level_2 or 0) }}</strong></div>
+                                        <div class="col-6">3. Amir: <strong>{{ '%.2f'|format(score.level_3 or 0) }}</strong></div>
+                                        <div class="col-6">Nihai: <strong>{{ '%.2f'|format(score.final or 0) }}</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-muted">Henüz kayıtlı süreç geçmişi bulunmuyor.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}
+{% include 'ai_decision/_development_guidance_panel.html' ignore missing %}
+{% endblock %}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_BOUND #}

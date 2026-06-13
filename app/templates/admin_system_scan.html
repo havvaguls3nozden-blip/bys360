@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Sistem Taraması - BYS360{% endblock %}
+{% block page_kicker %}Yonetim / Guvenlik ve Saglik Taramasi{% endblock %}
+{% block page_title %}Toplu Sistem Taramasi{% endblock %}
+{% block page_subtitle %}Canli oncesi saglik, guvenlik, KVKK ve veri butunlugu gorunumu tek ekranda sunulur.{% endblock %}
+{% block content %}
+<style>
+.scan-shell{display:grid;gap:18px}
+.scan-hero,.scan-card{background:rgba(255,255,255,.86);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 16px 34px rgba(15,23,42,.08)}
+.scan-hero{padding:24px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.scan-title{margin:0 0 10px;font-size:1.5rem;font-weight:900;color:#111827}
+.scan-text{margin:0;color:#6b7280;line-height:1.8}
+.scan-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.scan-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.scan-stat{padding:18px;border-radius:18px;background:rgba(255,255,255,.86);border:1px solid rgba(15,23,42,.07)}
+.scan-stat .label{font-size:.84rem;color:#6b7280;margin-bottom:6px}.scan-stat .value{font-size:1.7rem;font-weight:900;color:#111827}
+.scan-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.scan-card{padding:20px}.scan-card h3{margin:0 0 12px;font-size:1.05rem;font-weight:900;color:#111827}
+.scan-list{margin:0;padding-left:18px;color:#4b5563;line-height:1.8}
+.scan-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:.84rem;font-weight:800}
+.badge-ok{background:rgba(22,163,74,.12);color:#166534}.badge-warn{background:rgba(245,158,11,.14);color:#92400e}.badge-danger{background:rgba(185,28,28,.10);color:#991b1b}
+.scan-alert{padding:14px 16px;border-radius:16px;border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg, rgba(139,0,0,.06), rgba(139,0,0,.03));color:#7f1d1d;line-height:1.7}
+.scan-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.scan-mini{padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}
+.scan-mini strong{display:block;margin-bottom:4px;color:#111827}.scan-mini span{color:#6b7280;line-height:1.7;font-size:.9rem}
+@media (max-width:1200px){.scan-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.scan-hero,.scan-columns{grid-template-columns:1fr}}
+@media (max-width:768px){.scan-grid,.scan-mini-grid{grid-template-columns:1fr}}
+</style>
+{% set schema = schema_summary or {} %}
+{% set missing_tables = schema.missing_tables if schema and schema.missing_tables is defined else [] %}
+{% set missing_columns = schema.missing_columns if schema and schema.missing_columns is defined else [] %}
+<div class="scan-shell">
+  <section class="scan-hero">
+    <div>
+      <h2 class="scan-title">Sistem sagligi, KVKK ve canliya hazirlik ozeti</h2>
+      <p class="scan-text">Bu ekran; ekran yogunlugu, kritik tablo butunlugu, degerlendirme omurgasi ve guvenlik sertlestirme basliklarini yonetsel gozle izlenebilir hale getirir.</p>
+      <div class="scan-actions">
+        <a class="btn btn-outline-danger" href="{{ url_for('main.admin_dashboard') }}">Panele don</a>
+        <span class="scan-badge {{ 'badge-danger' if critical_missing else 'badge-ok' }}">{{ 'Kritik eksik var' if critical_missing else 'Kritik cekirdek tablolar gorunur durumda' }}</span>
+      </div>
+    </div>
+    <div class="scan-alert">
+      <strong>Kurumsal not:</strong> Canli oncesi en kritik alanlar; eksik tablo/kolonlar, captcha ve oturum sertlestirmesi, dosya yukleme sinirlari ve yetki gorunurlugu tarafidir. Sicil no yaklasiminin tum ekranlarda korunmasi ve TC odakli gorunumlerin azaltılması esastir.
+    </div>
+  </section>
+  <section class="scan-grid">
+    <div class="scan-stat"><div class="label">Route</div><div class="value">{{ route_count|default(0) }}</div></div>
+    <div class="scan-stat"><div class="label">Personel</div><div class="value">{{ total_users|default(0) }}</div></div>
+    <div class="scan-stat"><div class="label">Birim</div><div class="value">{{ total_units|default(0) }}</div></div>
+    <div class="scan-stat"><div class="label">Donem</div><div class="value">{{ total_periods|default(0) }}</div></div>
+    <div class="scan-stat"><div class="label">Kriter</div><div class="value">{{ total_criteria|default(0) }}</div></div>
+    <div class="scan-stat"><div class="label">Degerlendirme</div><div class="value">{{ total_evaluations|default(0) }}</div></div>
+  </section>
+  <section class="scan-columns">
+    <article class="scan-card">
+      <h3>Schema ve canliya cikis riski</h3>
+      {% if critical_missing %}
+        <div class="scan-alert">Eksik kritik tablolar bulundu. Veri geçiş zinciri tamamlanmadan canliya cikilmamasi gerekir.</div>
+        <ul class="scan-list">{% for item in critical_missing %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% else %}
+        <span class="scan-badge badge-ok">Kritik tablo eksigi gorunmuyor</span>
+      {% endif %}
+      <div class="scan-mini-grid mt-3">
+        <div class="scan-mini"><strong>Eksik tablo</strong><span>{{ missing_tables|length }}</span></div>
+        <div class="scan-mini"><strong>Eksik kolon</strong><span>{{ missing_columns|length }}</span></div>
+      </div>
+    </article>
+    <article class="scan-card">
+      <h3>Guvenlik ve KVKK odaklari</h3>
+      <div class="scan-mini-grid">
+        <div class="scan-mini"><strong>Kimlik ilkesi</strong><span>TC yerine sicil no / kurum ID odakli gorunum korunmali.</span></div>
+        <div class="scan-mini"><strong>Dosya guvenligi</strong><span>Uzanti, MIME, boyut ve erisim siniri politikasi aktif tutulmali.</span></div>
+        <div class="scan-mini"><strong>Oturum sertlestirmesi</strong><span>HTTPOnly, SameSite ve gerekiyorsa Secure cookie yapisi korunmali.</span></div>
+        <div class="scan-mini"><strong>Giris korumasi</strong><span>Hatali denemelerde captcha ve savunmaci giris akisi izlenmeli.</span></div>
+      </div>
+    </article>
+  </section>
+  <section class="scan-columns">
+    <article class="scan-card">
+      <h3>Eksik tablolar</h3>
+      {% if missing_tables %}
+        <ul class="scan-list">{% for item in missing_tables %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% else %}
+        <span class="scan-badge badge-ok">Eksik tablo gorunmuyor</span>
+      {% endif %}
+    </article>
+    <article class="scan-card">
+      <h3>Eksik kolonlar</h3>
+      {% if missing_columns %}
+        <ul class="scan-list">{% for item in missing_columns[:80] %}<li>{{ item }}</li>{% endfor %}</ul>
+        {% if missing_columns|length > 80 %}<div class="text-muted small mt-2">Ilk 80 kayit gosterildi.</div>{% endif %}
+      {% else %}
+        <span class="scan-badge badge-ok">Eksik kolon gorunmuyor</span>
+      {% endif %}
+    </article>
+  </section>
+</div>
+{% endblock %}

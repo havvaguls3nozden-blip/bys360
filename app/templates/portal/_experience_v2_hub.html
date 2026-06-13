@@ -1,0 +1,86 @@
+{# BYS360_PORTAL_EXPERIENCE_V2_HUB #}
+{% set v2 = portal_v2 if portal_v2 is defined and portal_v2 else {} %}
+{% if portal_v2_enabled is not defined or portal_v2_enabled %}
+<section class="portal-v2-hub" aria-label="BYS360 Kurumsal Portal">
+  <div class="portal-v2-hero">
+    <div class="portal-v2-hero-copy">
+      <span class="portal-v2-kicker"><i class="fa-solid fa-building-columns"></i> BYS360 Kurumsal Portal</span>
+      <h2>Kurum içi bilgilendirme, paylaşım ve takip alanı</h2>
+      <p>{{ v2.safe_note|default('Duyurular, bildirimler, destek talepleri, anketler ve kurumsal paylaşımlar bu alanda bir araya gelir.', true) }}</p>
+      <div class="portal-v2-actions">
+        <a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}#portal-body"><i class="fa-solid fa-pen-to-square"></i> Paylaşım Yap</a>
+        <a href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-id-card"></i> Profilimi Aç</a>
+      </div>
+    </div>
+    {% set p = v2.profile if v2.profile is defined else {} %}
+    <aside class="portal-v2-profile-card">
+      <div class="portal-v2-profile-top">
+        <div class="portal-v2-avatar">
+          {% if p.photo_url %}<img src="{{ p.photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-empty')">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+        </div>
+        <div>
+          <b>{{ p.name|default(current_user.full_name or current_user.email, true) }}</b>
+          <span>{{ p.title|default('Kurumsal kullanıcı', true) }}</span>
+        </div>
+      </div>
+      <div class="portal-v2-profile-meter" aria-label="Profil tamamlanma oranı">
+        <div><span style="width: {{ p.completion|default(0, true) }}%"></span></div>
+        <strong>%{{ p.completion|default(0, true) }}</strong>
+      </div>
+      <p><i class="fa-solid fa-building"></i> {{ p.unit|default('Birim bilgisi bekleniyor', true) }}</p>
+      {% if p.missing %}<small>Profilde tamamlanabilecek alanlar: {{ p.missing|join(', ') }}</small>{% else %}<small>Profil bilgileri güncel görünüyor.</small>{% endif %}
+    </aside>
+  </div>
+
+  {% set pulse = v2.pulse if v2.pulse is defined else {} %}
+  <div class="portal-v2-pulse-grid">
+    <div><b>{{ pulse.post_count|default(0, true) }}</b><span>Son 30 gün paylaşım</span></div>
+    <div><b>{{ pulse.recognition_count|default(0, true) }}</b><span>Takdir / başarı</span></div>
+    <div><b>{{ pulse.announcement_count|default(0, true) }}</b><span>Duyuru / etkinlik</span></div>
+    <div><b>{{ pulse.reaction_count|default(0, true) }}</b><span>Tepki</span></div>
+    <div><b>{{ pulse.comment_count|default(0, true) }}</b><span>Yorum</span></div>
+    <div><b>{{ pulse.top_type|default('Henüz veri yok', true) }}</b><span>Öne çıkan akış</span></div>
+  </div>
+
+  <div class="portal-v2-content-grid">
+    <section class="portal-v2-panel portal-v2-quick-share">
+      <div class="portal-v2-panel-head"><span>Hızlı İşlemler</span><h3>Yeni paylaşım oluşturun</h3></div>
+      <div class="portal-v2-card-list compact">
+        {% for card in v2.quick_share_cards|default([], true) %}
+        <a href="{{ card.anchor|default('#portal-body', true) }}" data-post-type="{{ card.type }}">
+          <i class="{{ card.icon }}"></i>
+          <div><b>{{ card.title }}</b><small>{{ card.hint }}</small></div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="portal-v2-panel">
+      <div class="portal-v2-panel-head"><span>Öne Çıkan Duyurular</span><h3>Güncel duyurular ve bilgilendirmeler</h3></div>
+      <div class="portal-v2-card-list">
+        {% for item in v2.featured_announcements|default([], true) %}
+        <a href="{{ item.link_url }}"><i class="fa-solid fa-bullhorn"></i><div><b>{{ item.title }}</b><small>{{ item.body }}</small><em>{{ item.author }}</em></div></a>
+        {% else %}<div class="portal-v2-empty"><i class="fa-regular fa-newspaper"></i><span>Henüz öne çıkan duyuru bulunmuyor.</span></div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="portal-v2-panel">
+      <div class="portal-v2-panel-head"><span>Teşekkür ve Başarılar</span><h3>Son teşekkür ve iyi uygulamalar</h3></div>
+      <div class="portal-v2-card-list">
+        {% for item in v2.recognition_highlights|default([], true) %}
+        <a href="{{ item.link_url }}"><i class="fa-solid fa-award"></i><div><b>{{ item.title }}</b><small>{{ item.body }}</small><em>{{ item.author }}</em></div></a>
+        {% else %}<div class="portal-v2-empty"><i class="fa-regular fa-heart"></i><span>İlk teşekkür veya iyi uygulama paylaşımı bekleniyor.</span></div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="portal-v2-panel">
+      <div class="portal-v2-panel-head"><span>Personel Bilgileri</span><h3>Kurumsal profil alanı</h3></div>
+      <div class="portal-v2-people-list">
+        {% for person in v2.people_spotlight|default([], true) %}
+        <div><span>{% if person.photo_url %}<img src="{{ person.photo_url }}" alt="" loading="lazy">{% else %}<i class="fa-regular fa-user"></i>{% endif %}</span><b>{{ person.name }}</b><small>{{ person.title }} · {{ person.unit }}</small></div>
+        {% else %}<div class="portal-v2-empty"><i class="fa-regular fa-user"></i><span>Kullanıcı vitrini için kayıt bekleniyor.</span></div>{% endfor %}
+      </div>
+    </section>
+  </div>
+</section>
+{% endif %}

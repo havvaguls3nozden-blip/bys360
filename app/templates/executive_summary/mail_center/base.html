@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block page_kicker %}Yönetici Özeti{% endblock %}
+{% block page_title %}BYS360 Executive Mail Center{% endblock %}
+{% block page_subtitle %}Amir/yönetici özetleri ve personel günlük bilgilendirme maillerini tek merkezden yönetin.{% endblock %}
+{% block content %}
+<style>
+.mailx-hero{background:linear-gradient(135deg,rgba(139,0,0,.96),rgba(90,0,0,.92));color:#fff;border-radius:24px;padding:26px;box-shadow:0 22px 55px rgba(80,0,0,.22);position:relative;overflow:hidden}.mailx-hero:after{content:"";position:absolute;right:-80px;top:-80px;width:240px;height:240px;border-radius:999px;background:rgba(255,255,255,.10)}.mailx-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:18px}.mailx-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.10);border-radius:22px;padding:20px;box-shadow:0 12px 32px rgba(31,41,55,.08)}.mailx-col-3{grid-column:span 3}.mailx-col-4{grid-column:span 4}.mailx-col-6{grid-column:span 6}.mailx-col-8{grid-column:span 8}.mailx-col-12{grid-column:span 12}.mailx-kpi{font-size:30px;font-weight:800;color:#8B0000}.mailx-muted{color:#667085}.mailx-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.mailx-tabs a{padding:10px 14px;border-radius:999px;border:1px solid rgba(139,0,0,.18);color:#8B0000;text-decoration:none;background:#fff;font-weight:700}.mailx-tabs a.active{background:#8B0000;color:#fff}.mailx-table{width:100%;border-collapse:collapse}.mailx-table th,.mailx-table td{padding:10px;border-bottom:1px solid #eee;text-align:left}.mailx-pill{display:inline-flex;align-items:center;border-radius:999px;padding:6px 10px;background:#fff3f3;color:#8B0000;font-weight:700;font-size:12px}.mailx-btn{border:0;border-radius:12px;padding:10px 14px;background:#8B0000;color:#fff;font-weight:700}.mailx-btn.secondary{background:#f7f7f8;color:#344054;border:1px solid #e4e7ec}.mailx-input{width:100%;padding:10px 12px;border:1px solid #d0d5dd;border-radius:12px}.mailx-person{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eee}.mailx-checkrow{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:9px;border:1px solid #eee;border-radius:12px;margin-bottom:8px;background:#fff}@media(max-width:900px){.mailx-col-3,.mailx-col-4,.mailx-col-6,.mailx-col-8{grid-column:span 12}}
+</style>
+<div class="mailx-hero"><h2 style="margin:0 0 8px">Executive Mail Center V2.0</h2><div>İki ana akış: amirlere sabah/akşam yönetici özeti, personele sabah/öğlen/akşam günlük bilgilendirme. Mailler her çalışmada güncel alıcı, görev ve hava durumu bilgisiyle yeniden üretilir.</div></div>
+<div class="mailx-tabs">
+<a href="/executive-summary/mail-center" class="{% if active=='overview' %}active{% endif %}">Genel Bakış</a>
+<a href="/executive-summary/mail-center/tasks" class="{% if active=='tasks' %}active{% endif %}">Görevler</a>
+<a href="/executive-summary/mail-center/recipients" class="{% if active=='recipients' %}active{% endif %}">Alıcılar</a>
+<a href="/executive-summary/mail-center/test" class="{% if active=='test' %}active{% endif %}">Test Gönderimi</a>
+<a href="/executive-summary/mail-center/logs" class="{% if active=='logs' %}active{% endif %}">Mail Logları</a>
+<a href="/executive-summary/mail-center/scheduler" class="{% if active=='scheduler' %}active{% endif %}">Zamanlanmış İşler</a>
+</div>
+{% block mail_center_body %}{% endblock %}
+{% endblock %}
+<!-- BYS360_LOGOUT_FORCE_CLEAR_V2_15_12_BEGIN -->
+<form id="bys360LogoutForceClearForm" action="/logout" method="post" style="display:none;" aria-hidden="true">
+    {% if csrf_token is defined %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+</form>
+<script>
+(function () {
+    "use strict";
+    var formId = "bys360LogoutForceClearForm";
+    function isLogoutUrl(value) {
+        if (!value) return false;
+        try {
+            var url = new URL(value, window.location.origin);
+            return url.pathname.replace(/\/+$/, "") === "/logout";
+        } catch (error) {
+            return value === "/logout" || /\/logout\/?$/.test(String(value));
+        }
+    }
+    function clearLightClientState() {
+        try { window.sessionStorage && window.sessionStorage.clear(); } catch (error) {}
+        try {
+            if (window.caches && window.caches.keys) {
+                window.caches.keys().then(function (keys) {
+                    keys.forEach(function (key) {
+                        if (/bys360/i.test(key)) window.caches.delete(key);
+                    });
+                }).catch(function () {});
+            }
+        } catch (error) {}
+    }
+    function postLogout(event) {
+        if (event && typeof event.preventDefault === "function") event.preventDefault();
+        clearLightClientState();
+        var form = document.getElementById(formId) || document.getElementById("logoutForm") || document.getElementById("bys360LogoutPostForm");
+        if (form) {
+            try { form.submit(); return false; } catch (error) {}
+        }
+        window.location.assign("/logout");
+        return false;
+    }
+    window.bys360ForceLogout = postLogout;
+    window.submitLogoutForm = postLogout;
+    document.addEventListener("click", function (event) {
+        var target = event.target && event.target.closest ? event.target.closest("a[href],button[data-logout]") : null;
+        if (!target) return;
+        var href = target.getAttribute("href") || target.getAttribute("data-logout") || "";
+        if (!isLogoutUrl(href)) return;
+        postLogout(event);
+    }, true);
+    window.addEventListener("pageshow", function (event) {
+        if (event && event.persisted && /\/logout\/?$/.test(window.location.pathname)) {
+            window.location.replace("/login");
+        }
+    });
+})();
+</script>
+<!-- BYS360_LOGOUT_FORCE_CLEAR_V2_15_12_END -->

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}V2.1.3 Personel Kartı Kategori ve Atama Merkezi{% endblock %}
+
+{% block content %}
+<style>
+  .bys-v213-shell{--bys-red:#8B0000;--bys-ink:#111827;--bys-muted:#6b7280;--bys-line:rgba(31,41,55,.10);max-width:1500px;margin:0 auto;padding:18px 18px 42px;}
+  .bys-v213-hero{border:1px solid var(--bys-line);border-radius:28px;background:radial-gradient(circle at top left,rgba(139,0,0,.13),transparent 34%),linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,255,255,.76));box-shadow:0 24px 70px rgba(31,41,55,.10);padding:28px;margin-bottom:18px;}
+  .bys-v213-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:var(--bys-red);font-weight:900;font-size:12px;margin-bottom:14px;}
+  .bys-v213-title{font-size:clamp(26px,3vw,42px);line-height:1.05;font-weight:900;color:var(--bys-ink);margin:0;letter-spacing:-.04em;}
+  .bys-v213-subtitle{max-width:980px;margin:14px 0 0;color:var(--bys-muted);font-size:15px;line-height:1.7;}
+  .bys-v213-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0;}
+  .bys-v213-card{border:1px solid var(--bys-line);border-radius:22px;background:rgba(255,255,255,.90);padding:18px;box-shadow:0 16px 42px rgba(31,41,55,.08);}
+  .bys-v213-card strong{display:block;color:var(--bys-ink);font-size:13px;margin-bottom:8px;}.bys-v213-card span{color:var(--bys-muted);font-size:13px;line-height:1.55;}
+  .bys-v213-section{border:1px solid var(--bys-line);border-radius:24px;background:rgba(255,255,255,.92);padding:22px;margin-top:16px;box-shadow:0 16px 42px rgba(31,41,55,.07);}
+  .bys-v213-section h2{margin:0 0 14px;color:var(--bys-ink);font-size:20px;font-weight:900;}
+  .bys-v213-toolbar{display:grid;grid-template-columns:1.2fr 240px 130px auto;gap:12px;align-items:end;}
+  .bys-v213-input,.bys-v213-select,.bys-v213-textarea{width:100%;border:1px solid var(--bys-line);border-radius:14px;background:#fff;padding:11px 12px;color:var(--bys-ink);font:inherit;min-height:46px;}
+  .bys-v213-textarea{min-height:92px;resize:vertical;}
+  .bys-v213-label{display:flex;flex-direction:column;gap:7px;font-weight:850;color:#374151;font-size:.9rem;}
+  .bys-v213-table{width:100%;border-collapse:separate;border-spacing:0 10px;}.bys-v213-table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;text-align:left;padding:0 12px;}
+  .bys-v213-table td{background:rgba(248,250,252,.96);border-top:1px solid var(--bys-line);border-bottom:1px solid var(--bys-line);padding:14px 12px;vertical-align:middle;}
+  .bys-v213-table td:first-child{border-left:1px solid var(--bys-line);border-radius:16px 0 0 16px;}.bys-v213-table td:last-child{border-right:1px solid var(--bys-line);border-radius:0 16px 16px 0;}
+  .bys-v213-badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;}.bys-v213-badge.ok{background:rgba(22,163,74,.10);color:#15803d;}.bys-v213-badge.no{background:rgba(220,38,38,.10);color:#b91c1c;}.bys-v213-badge.info{background:rgba(139,0,0,.08);color:var(--bys-red);}.bys-v213-badge.muted{background:rgba(107,114,128,.10);color:#374151;}
+  .bys-v213-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}.bys-v213-btn{border:0;border-radius:16px;min-height:44px;padding:0 15px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;}
+  .bys-v213-btn.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 14px 30px rgba(139,0,0,.22);}.bys-v213-btn.soft{background:rgba(139,0,0,.08);color:var(--bys-red);}.bys-v213-btn.gray{background:rgba(107,114,128,.10);color:#374151;}
+  .bys-v213-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .bys-v213-small{color:#6b7280;font-size:.83rem;line-height:1.6;}
+  @media(max-width:1100px){.bys-v213-grid{grid-template-columns:1fr 1fr}.bys-v213-toolbar{grid-template-columns:1fr 1fr}.bys-v213-two{grid-template-columns:1fr}}
+  @media(max-width:720px){.bys-v213-shell{padding:12px}.bys-v213-grid,.bys-v213-toolbar{grid-template-columns:1fr}.bys-v213-table{font-size:13px}.bys-v213-table th:nth-child(4),.bys-v213-table td:nth-child(4),.bys-v213-table th:nth-child(5),.bys-v213-table td:nth-child(5){display:none}}
+</style>
+
+<div class="bys-v213-shell">
+  <section class="bys-v213-hero">
+    <div class="bys-v213-eyebrow">Performans Yönetimi · V2.1.3</div>
+    <h1 class="bys-v213-title">Personel Kartı Kategori ve Atama Merkezi</h1>
+    <p class="bys-v213-subtitle">Bu ekran V2.1.2 kategori altyapısını personel yönetimine bağlar. Yetkili kullanıcılar personel için performans kategorisi atayabilir, toplu atama yapabilir ve değişiklikleri denetim iziyle takip edebilir.</p>
+  </section>
+
+  <div class="bys-v213-grid">
+    <div class="bys-v213-card"><strong>Kural Sürümü</strong><span>{{ summary.rule_version }}</span></div>
+    <div class="bys-v213-card"><strong>Listelenen Personel</strong><span>{{ summary.visible_personnel_count }}</span></div>
+    <div class="bys-v213-card"><strong>Kategori Atanmış</strong><span>{{ summary.assigned_count }}</span></div>
+    <div class="bys-v213-card"><strong>Audit Kaydı</strong><span>{{ summary.audit_count }}</span></div>
+  </div>
+
+  <section class="bys-v213-section">
+    <h2>Filtrele</h2>
+    <form method="get" class="bys-v213-toolbar">
+      <label class="bys-v213-label">Arama<input class="bys-v213-input" type="text" name="q" value="{{ filters.q }}" placeholder="Ad, e-posta veya ID"></label>
+      <label class="bys-v213-label">Kategori<select class="bys-v213-select" name="category"><option value="">Tüm kategoriler</option>{% for item in categories %}<option value="{{ item.category_key }}" {% if filters.category == item.category_key %}selected{% endif %}>{{ item.display_name }}</option>{% endfor %}</select></label>
+      <label class="bys-v213-label">Limit<input class="bys-v213-input" type="number" name="limit" value="{{ filters.limit }}" min="10" max="500"></label>
+      <button class="bys-v213-btn primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Uygula</button>
+    </form>
+  </section>
+
+  <section class="bys-v213-section">
+    <h2>Personel Kategori Listesi</h2>
+    <table class="bys-v213-table">
+      <thead><tr><th>Personel</th><th>Sicil / E-posta</th><th>Unvan / Birim</th><th>Mevcut Kategori</th><th>Durum</th><th>Atama</th></tr></thead>
+      <tbody>
+      {% for row in personnel_rows %}
+        <tr>
+          <td><strong>{{ row.display_name }}</strong><div class="bys-v213-small">ID: {{ row.user_id }}</div></td>
+          <td>{{ row.sicil_no or '-' }}<div class="bys-v213-small">{{ row.email or '-' }}</div></td>
+          <td>{{ row.title or '-' }}<div class="bys-v213-small">{{ row.unit_name or '-' }}</div></td>
+          <td>{% if row.category_key %}<span class="bys-v213-badge info">{{ row.category_name }}</span>{% else %}<span class="bys-v213-badge muted">Kategori Atanmamış</span>{% endif %}<div class="bys-v213-small">{{ row.category_since or '' }}</div></td>
+          <td>{% if row.is_active %}<span class="bys-v213-badge ok">Aktif</span>{% else %}<span class="bys-v213-badge no">Pasif</span>{% endif %}</td>
+          <td>
+            <form method="post" class="bys-v213-actions">
+              {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+              <input type="hidden" name="action" value="assign_user_category">
+              <input type="hidden" name="user_id" value="{{ row.user_id }}">
+              <select class="bys-v213-select" name="category_key" style="min-width:160px;">
+                {% for item in categories %}<option value="{{ item.category_key }}" {% if row.category_key == item.category_key %}selected{% endif %}>{{ item.display_name }}</option>{% endfor %}
+              </select>
+              <button class="bys-v213-btn soft" type="submit">Kaydet</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6"><span class="bys-v213-badge muted">Kayıt bulunamadı</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <div class="bys-v213-two">
+    <section class="bys-v213-section">
+      <h2>Toplu Kategori Atama</h2>
+      <form method="post" class="bys-v213-actions" style="display:grid;gap:12px;align-items:stretch;">
+        {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+        <input type="hidden" name="action" value="bulk_assign_category">
+        <label class="bys-v213-label">Kullanıcı ID listesi<textarea class="bys-v213-textarea" name="user_ids" placeholder="Örn. 12, 18, 25 veya her satıra bir ID"></textarea></label>
+        <label class="bys-v213-label">Kategori<select class="bys-v213-select" name="category_key">{% for item in categories %}<option value="{{ item.category_key }}">{{ item.display_name }}</option>{% endfor %}</select></label>
+        <label class="bys-v213-label">Not<input class="bys-v213-input" type="text" name="notes" value="V2.1.3 toplu kategori ataması"></label>
+        <button class="bys-v213-btn primary" type="submit"><i class="fa-solid fa-layer-group"></i> Toplu Ata</button>
+      </form>
+    </section>
+
+    <section class="bys-v213-section">
+      <h2>Kalite Kapısı</h2>
+      <table class="bys-v213-table">
+        <thead><tr><th>Kontrol</th><th>Durum</th><th>Sonuç</th></tr></thead>
+        <tbody>
+        {% for item in gate.checks %}
+          <tr><td>{{ item.name }}</td><td>{% if item.ok %}<span class="bys-v213-badge ok">Geçti</span>{% else %}<span class="bys-v213-badge no">Kontrol Gerekli</span>{% endif %}</td><td>{{ item.message }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <form method="post" class="bys-v213-actions"><input type="hidden" name="action" value="seed">{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<button class="bys-v213-btn gray" type="submit">Varsayılan Kategorileri Kontrol Et</button></form>
+    </section>
+  </div>
+
+  <section class="bys-v213-section">
+    <h2>Son Kategori Değişiklikleri</h2>
+    <table class="bys-v213-table">
+      <thead><tr><th>Tarih</th><th>Kullanıcı</th><th>Eski</th><th>Yeni</th><th>Kaynak</th><th>Not</th></tr></thead>
+      <tbody>
+      {% for row in audit_rows %}
+        <tr><td>{{ row.created_at }}</td><td>#{{ row.user_id }}</td><td>{{ row.old_category_key or '-' }}</td><td><span class="bys-v213-badge info">{{ row.new_category_key }}</span></td><td>{{ row.source }}</td><td>{{ row.notes or '-' }}</td></tr>
+      {% else %}
+        <tr><td colspan="6"><span class="bys-v213-badge muted">Henüz audit kaydı yok</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

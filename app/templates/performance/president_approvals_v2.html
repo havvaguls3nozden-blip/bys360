@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{# BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP #}
+{% block title %}Başkan Onayları{% include "performance/_development_guidance_scorecard_section.html" ignore missing %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <div class="text-muted small">Performans Yönetimi</div>
+      <h1 class="h3 mb-1">Başkan Onayları</h1>
+      <div class="text-muted">70 altı performans sonuçları için başkan onayı bekleyen kayıtlar.</div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Personel</th>
+              <th>Dönem</th>
+              <th>Puan</th>
+              <th>Süreç Aşaması</th>
+              <th>Yayın Kilidi</th>
+              <th class="text-end">İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr data-approval-id="{{ item.id }}">
+              <td>
+                <div class="fw-semibold">{{ item.employee_name }}</div>
+                <div class="text-muted small">{{ item.sicil_no }}{% if item.unit_name and item.unit_name != '—' %} · {{ item.unit_name }}{% endif %}</div>
+              </td>
+              <td>{{ item.period_name }}</td>
+              <td>{{ item.final_score if item.final_score is not none else '—' }}</td>
+              <td><span class="badge text-bg-warning">{{ item.status_label }}</span></td>
+              <td><span class="badge text-bg-danger">{{ item.publish_lock_label }}</span></td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('president_scorecard_v2.president_approval_scorecard_v2', approval_id=item.id) }}">Karneye Bak</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-muted">Başkan onayı bekleyen kayıt bulunamadı.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{# base.html içinde iletişim ve anket yönetimi altına opsiyonel Faz 3 kısayolları #}
+<a class="nav-link" href="{{ url_for('main.communication_phase3_dashboard_view') }}">
+  <i class="fa-solid fa-wave-square"></i> İletişim Faz 3
+</a>
+<a class="nav-link" href="{{ url_for('main.communication_phase3_notifications') }}">
+  <i class="fa-solid fa-bell"></i> Bildirim Merkezi
+</a>
+<a class="nav-link" href="{{ url_for('main.communication_phase3_my_surveys') }}">
+  <i class="fa-solid fa-list-check"></i> Anketlerim
+</a>
+<a class="nav-link" href="{{ url_for('main.communication_phase3_support_queue') }}">
+  <i class="fa-solid fa-life-ring"></i> Destek Kuyruğu
+</a>
+<a class="nav-link" href="{{ url_for('main.communication_phase3_help_center') }}">
+  <i class="fa-solid fa-book-open"></i> Bilgi Bankası
+</a>

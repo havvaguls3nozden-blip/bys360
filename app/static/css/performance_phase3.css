@@ -1,0 +1,9 @@
+/* BYS360 Performans CSS wrapper.
+   Bu dosya P11-H1 kapsamında cascade sırası korunarak parçalara ayrılmıştır.
+   HTML referansları değişmemeli; parçalar aşağıdaki sırayla yüklenmelidir. */
+
+@import url("./performance_phase3_parts/performance_phase3_part_01.css");
+@import url("./performance_phase3_parts/performance_phase3_part_02.css");
+@import url("./performance_phase3_parts/performance_phase3_part_03.css");
+@import url("./performance_phase3_parts/performance_phase3_part_04.css");
+@import url("./performance_phase3_parts/performance_phase3_part_05.css");

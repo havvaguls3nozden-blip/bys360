@@ -1,0 +1,225 @@
+/* BYS360_MOBILE_APP_EXPERIENCE_V1
+   Tüm ekranlar için mobil öncelikli görünüm sertleştirmesi.
+   Amaç: BYS360 mobilde masaüstü kırılmasını engellemek, özellikle Performans Puanlama/Karne/Onay ekranlarını app hissine yaklaştırmak.
+*/
+
+:root{
+  --bys-mobile-red:#8B0000;
+  --bys-mobile-bg:#f6f7fb;
+  --bys-mobile-card:#ffffff;
+  --bys-mobile-text:#111827;
+  --bys-mobile-muted:#667085;
+  --bys-mobile-border:rgba(15,23,42,.10);
+  --bys-mobile-shadow:0 12px 28px rgba(15,23,42,.08);
+  --bys-mobile-radius:22px;
+}
+
+html{ -webkit-text-size-adjust:100%; }
+body.bys360-mobile-viewport{ background:var(--bys-mobile-bg)!important; }
+body.bys360-mobile-viewport input,
+body.bys360-mobile-viewport select,
+body.bys360-mobile-viewport textarea,
+body.bys360-mobile-viewport button{ font-size:16px; }
+
+.bys360-mobile-table-scroll{
+  width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  border-radius:18px; border:1px solid var(--bys-mobile-border);
+  background:#fff; box-shadow:0 10px 24px rgba(15,23,42,.055);
+}
+.bys360-mobile-table-scroll > table{ margin-bottom:0!important; min-width:760px; }
+.bys360-mobile-table-scroll::-webkit-scrollbar{height:8px;}
+.bys360-mobile-table-scroll::-webkit-scrollbar-thumb{background:rgba(139,0,0,.28);border-radius:999px;}
+
+@media (max-width: 900px){
+  /* BYS360_MOBILE_FOUNDATION_HARDENING */
+  body{ overflow-x:hidden!important; }
+  .app-shell,.app-main,.content-wrap,.content-block,main{ max-width:100vw!important; min-width:0!important; }
+  .content-wrap{ padding:12px!important; }
+
+  .container,.container-fluid,.row,[class*="col-"]{ min-width:0!important; }
+  .row{ --bs-gutter-x:.75rem!important; --bs-gutter-y:.75rem!important; }
+
+  h1,.h1{font-size:1.38rem!important;line-height:1.18!important;}
+  h2,.h2{font-size:1.18rem!important;line-height:1.24!important;}
+  h3,.h3{font-size:1.05rem!important;line-height:1.28!important;}
+  p,.text-muted,small{line-height:1.55;}
+
+  .card,.panel,.glass-card,.surface-card,.summary-card,.metric-card,.stat-card,.info-card,
+  .performance-card,.scorecard-card,.approval-card,.report-card,.settings-card,
+  .table-card,.filter-card,.form-card,.dashboard-card{
+    border-radius:var(--bys-mobile-radius)!important;
+    box-shadow:var(--bys-mobile-shadow)!important;
+    border:1px solid var(--bys-mobile-border)!important;
+    background:var(--bys-mobile-card)!important;
+    overflow:hidden;
+  }
+  .card-body,.panel-body,.glass-card-body,.surface-body{ padding:14px!important; }
+
+  .page-hero,.hero,.hero-card,.dashboard-hero,.admin-hero-card,.summary-hero,.quick-hero,
+  .portalv2-hero,.performance-hero,.scorecard-hero{
+    border-radius:24px!important; padding:16px!important; margin-bottom:12px!important;
+    display:flex!important; flex-direction:column!important; gap:12px!important;
+  }
+  .page-hero *, .hero *, .dashboard-hero *, .performance-hero *, .scorecard-hero *{ max-width:100%!important; }
+
+  .btn,.button,a.btn,button.btn{
+    min-height:44px; border-radius:14px!important; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    white-space:normal!important; line-height:1.25!important;
+  }
+  .btn-group,.action-group,.toolbar,.page-actions,.hero-actions,.filter-actions{
+    display:grid!important; grid-template-columns:1fr!important; gap:8px!important; width:100%!important;
+  }
+  .btn-group > .btn,.action-group > .btn,.toolbar > .btn,.page-actions > .btn,.hero-actions > .btn,.filter-actions > .btn{ width:100%!important; }
+
+  form .row{ gap:10px 0!important; }
+  .form-control,.form-select,input[type="text"],input[type="number"],input[type="date"],input[type="search"],textarea,select{
+    min-height:46px!important; border-radius:14px!important; width:100%!important;
+  }
+  textarea{ min-height:110px!important; }
+
+  .table-responsive{ border-radius:18px!important; border:1px solid var(--bys-mobile-border)!important; background:#fff; }
+  table.table, .table{ font-size:.86rem!important; }
+  table.table th, table.table td{ padding:.72rem .76rem!important; vertical-align:middle!important; }
+
+  .modal-dialog{ margin:10px!important; max-width:calc(100vw - 20px)!important; }
+  .modal-content{ border-radius:24px!important; overflow:hidden; }
+
+  .pagination{ flex-wrap:wrap; justify-content:center; gap:4px; }
+  .badge,.chip,.status-badge{ white-space:normal!important; text-align:center; line-height:1.25; }
+}
+
+@media (max-width: 768px){
+  /* BYS360_PERFORMANCE_MOBILE_APP_VIEW */
+  .performance-shell,.performance-page,.performance-dashboard,.scorecard-page,.scorecard-shell,
+  .president-approval-page,.low-score-page,.evaluation-page,.scoring-page,
+  [class*="performance"],[class*="scorecard"],[class*="approval"]{
+    max-width:100%!important;
+  }
+
+  .performance-tabs,.nav-tabs,.tabs,.subnav,.section-tabs{
+    display:flex!important; gap:8px!important; overflow-x:auto!important; flex-wrap:nowrap!important;
+    padding:6px 2px 10px!important; margin-left:-2px!important; margin-right:-2px!important;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .performance-tabs::-webkit-scrollbar,.nav-tabs::-webkit-scrollbar,.tabs::-webkit-scrollbar,.subnav::-webkit-scrollbar{display:none;}
+  .performance-tabs .nav-link,.nav-tabs .nav-link,.tabs a,.subnav a,.section-tabs a{
+    flex:0 0 auto!important; min-height:40px!important; border-radius:999px!important; padding:8px 13px!important;
+    background:#fff!important; border:1px solid var(--bys-mobile-border)!important; color:#344054!important;
+    box-shadow:0 8px 18px rgba(15,23,42,.045); font-weight:800!important; font-size:.82rem!important;
+  }
+  .performance-tabs .nav-link.active,.nav-tabs .nav-link.active,.tabs a.active,.subnav a.active,.section-tabs a.active{
+    background:var(--bys-mobile-red)!important; color:#fff!important; border-color:var(--bys-mobile-red)!important;
+  }
+
+  .score-summary,.scorecard-summary,.performance-summary,.approval-summary,.metric-grid,.stats-grid,
+  .dashboard-grid,.kpi-grid,.summary-grid,.cards-grid{
+    display:grid!important; grid-template-columns:1fr!important; gap:10px!important;
+  }
+  .score-card,.score-tile,.metric-card,.stat-card,.summary-card{
+    min-height:auto!important; padding:14px!important;
+  }
+  .score-value,.final-score,.score-number,.metric-value,.stat-value{
+    font-size:clamp(1.8rem,11vw,3.1rem)!important; line-height:1!important; letter-spacing:-.04em;
+  }
+
+  .evaluation-form,.scoring-form,.scorecard-form,.criteria-form{
+    display:grid!important; gap:12px!important;
+  }
+  .criterion-row,.criteria-row,.evaluation-item,.scoring-item,.score-item{
+    display:grid!important; grid-template-columns:1fr!important; gap:10px!important;
+    padding:14px!important; border:1px solid var(--bys-mobile-border)!important;
+    border-radius:20px!important; background:#fff!important; box-shadow:0 10px 24px rgba(15,23,42,.055)!important;
+  }
+  .criterion-title,.criteria-title,.evaluation-title,.score-item-title{ font-size:.98rem!important; font-weight:900!important; color:var(--bys-mobile-text)!important; }
+  .criterion-desc,.criteria-desc,.evaluation-desc{ font-size:.86rem!important; color:var(--bys-mobile-muted)!important; }
+
+  .score-inputs,.rating-group,.puanlama-grubu,.rating-options{
+    display:grid!important; grid-template-columns:repeat(5,minmax(0,1fr))!important; gap:7px!important; width:100%!important;
+  }
+  .score-inputs label,.rating-group label,.puanlama-grubu label,.rating-options label,
+  .score-inputs .btn,.rating-group .btn,.puanlama-grubu .btn,.rating-options .btn{
+    min-height:46px!important; border-radius:15px!important; padding:0!important; font-weight:900!important;
+  }
+  input[type="radio"] + label, input[type="checkbox"] + label{ touch-action:manipulation; }
+
+  .supervisor-comment,.general-comment,.approval-comment,.score-comment,
+  textarea[name*="comment"], textarea[name*="aciklama"], textarea[name*="gorus"]{
+    min-height:124px!important; border-radius:18px!important;
+  }
+
+  .approval-actions,.score-submit-bar,.publish-actions,.sticky-actions,.form-actions{
+    position:sticky!important; bottom:0!important; z-index:30!important; margin:12px -12px -12px!important;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;
+    background:rgba(246,247,251,.92)!important; backdrop-filter:blur(14px)!important;
+    border-top:1px solid rgba(15,23,42,.09)!important; display:grid!important; grid-template-columns:1fr!important; gap:8px!important;
+  }
+  .approval-actions .btn,.score-submit-bar .btn,.publish-actions .btn,.sticky-actions .btn,.form-actions .btn{ width:100%!important; }
+
+  .timeline,.process-history,.score-history,.approval-history{ display:grid!important; gap:10px!important; }
+  .timeline-item,.process-item,.history-item,.approval-history-item{
+    border-radius:18px!important; border:1px solid var(--bys-mobile-border)!important; background:#fff!important; padding:12px!important;
+  }
+
+  .filter-row,.filter-grid,.search-filter,.report-filter,.toolbar-filter{
+    display:grid!important; grid-template-columns:1fr!important; gap:10px!important;
+  }
+
+  /* Geniş yönetim tabloları mobilde kart gibi okunur; veri kaybı olmaz. */
+  .performance-mobile-card-table table,
+  table.performance-mobile-card-table,
+  .mobile-card-table table,
+  table.mobile-card-table{ min-width:0!important; width:100%!important; }
+  .performance-mobile-card-table thead,
+  table.performance-mobile-card-table thead,
+  .mobile-card-table thead,
+  table.mobile-card-table thead{ display:none!important; }
+  .performance-mobile-card-table tr,
+  table.performance-mobile-card-table tr,
+  .mobile-card-table tr,
+  table.mobile-card-table tr{
+    display:block!important; margin:0 0 10px!important; padding:12px!important; border:1px solid var(--bys-mobile-border)!important;
+    border-radius:18px!important; background:#fff!important; box-shadow:0 8px 20px rgba(15,23,42,.05)!important;
+  }
+  .performance-mobile-card-table td,
+  table.performance-mobile-card-table td,
+  .mobile-card-table td,
+  table.mobile-card-table td{
+    display:flex!important; justify-content:space-between!important; gap:14px!important; width:100%!important;
+    border:0!important; border-bottom:1px dashed rgba(15,23,42,.09)!important; padding:8px 0!important; text-align:right!important;
+  }
+  .performance-mobile-card-table td:last-child,
+  table.performance-mobile-card-table td:last-child,
+  .mobile-card-table td:last-child,
+  table.mobile-card-table td:last-child{ border-bottom:0!important; }
+  .performance-mobile-card-table td::before,
+  table.performance-mobile-card-table td::before,
+  .mobile-card-table td::before,
+  table.mobile-card-table td::before{
+    content:attr(data-label); font-weight:900; color:#475467; text-align:left; min-width:42%;
+  }
+}
+
+@media (max-width: 520px){
+  /* BYS360_PHONE_APP_POLISH */
+  .content-wrap{ padding:10px!important; }
+  .page-title{ max-width:42vw!important; font-size:.92rem!important; }
+  .topbar{ position:sticky!important; top:0!important; z-index:1030!important; }
+  .app-sidebar{ width:min(88vw,320px)!important; }
+  .app-sidebar::before{ width:min(88vw,320px)!important; background-size:190px auto!important; }
+  .brand-logo{ width:min(210px,calc(100% - 12px))!important; }
+
+  .card,.panel,.surface-card,.summary-card,.metric-card,.stat-card{ border-radius:20px!important; }
+  .card-body{ padding:12px!important; }
+  .score-inputs,.rating-group,.puanlama-grubu,.rating-options{ gap:5px!important; }
+  .score-inputs label,.rating-group label,.puanlama-grubu label,.rating-options label,
+  .score-inputs .btn,.rating-group .btn,.puanlama-grubu .btn,.rating-options .btn{ min-height:43px!important; font-size:.9rem!important; }
+  .table:not(.mobile-card-table):not(.performance-mobile-card-table){ font-size:.80rem!important; }
+
+  .toast-container,.alert-stack,.flash-stack{ left:10px!important; right:10px!important; width:auto!important; }
+}
+
+@supports (padding:max(0px)){
+  @media (max-width:768px){
+    .content-wrap{ padding-left:max(10px,env(safe-area-inset-left))!important; padding-right:max(10px,env(safe-area-inset-right))!important; }
+  }
+}

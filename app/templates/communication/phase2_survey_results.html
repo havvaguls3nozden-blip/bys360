@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Anket Sonuçları - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Anket Sonuç Özeti{% endblock %}
+{% block page_subtitle %}Soru bazlı dağılımlar ve tamamlanma görünürlüğü yönetsel yorumlamaya hazır şekilde sunulur.{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Hedef kullanıcı</div><div class="fs-2 fw-bold">{{ payload.target_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Tamamlanan</div><div class="fs-2 fw-bold">{{ payload.completed_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Bekleyen</div><div class="fs-2 fw-bold">{{ payload.pending_total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4"><div class="text-muted small">Hatırlatma</div><div class="fs-2 fw-bold">{{ payload.reminder_count }}</div></div></div></div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4">
+  <h5 class="fw-bold mb-1">{{ payload.survey.title }}</h5>
+  <div class="text-muted small mb-4">Durum: {{ status_labels.get(payload.survey.status, payload.survey.status) }} · Tür: {{ payload.survey.survey_type }} · Tamamlanma: %{{ payload.completion_rate }}</div>
+  <div class="accordion" id="surveyResultsAccordion">
+    {% for row in payload.question_summaries %}
+    <div class="accordion-item rounded-4 border mb-3 overflow-hidden">
+      <h2 class="accordion-header" id="heading{{ loop.index }}">
+        <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+          {{ loop.index }}. {{ row.question.question_text }}
+        </button>
+      </h2>
+      <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#surveyResultsAccordion">
+        <div class="accordion-body">
+          <div class="small text-muted mb-3">Tür: {{ question_type_labels.get(row.question.question_type, row.question.question_type) }} · Yanıt sayısı: {{ row.answer_count }}</div>
+          <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Seçenek / Değer</th><th>Adet</th></tr></thead><tbody>
+            {% for label, count in row.distribution %}
+            <tr><td>{{ label }}</td><td>{{ count }}</td></tr>
+            {% else %}
+            <tr><td colspan="2" class="text-center text-muted py-3">Bu soru için henüz veri oluşmadı.</td></tr>
+            {% endfor %}
+          </tbody></table></div>
+          {% if row.text_answers %}
+          <div class="small text-muted mt-3">İlk açık uçlu yanıtlar:</div>
+          <ul class="small text-muted mt-2 mb-0">
+            {% for answer in row.text_answers %}<li>{{ answer }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div></div>
+{% endblock %}

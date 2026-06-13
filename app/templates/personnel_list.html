@@ -1,0 +1,718 @@
+{% extends "base.html" %}
+{% from "_premium_workspace_macros.html" import premium_context_banner, premium_metric_card, premium_action_shell, premium_helper_note %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Personel Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Personel Yönetimi{% endblock %}
+{% block page_subtitle %}
+Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreleyin, yönetin ve toplu işlemleri buradan yürütün.
+{% endblock %}
+
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .personnel-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:24px;
+        box-shadow:0 18px 36px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:22px;
+        position:relative;
+        z-index:1;
+    }
+
+    .intro-card{display:grid;gap:8px}
+    .intro-title{
+        font-size:1.08rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.35;
+        margin:0;
+    }
+    .intro-sub{
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.8;
+        margin:0;
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:16px;
+    }
+    .personnel-shell .bys-metric-grid{grid-template-columns:repeat(5,minmax(0,1fr));}
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        line-height:1.5;
+        position:relative;
+        z-index:1;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.7rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .toolbar-grid{
+        display:grid;
+        grid-template-columns:minmax(0,1.2fr) 200px 170px 190px 200px auto auto auto;
+        gap:12px;
+        align-items:end;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group label{
+        font-size:.9rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,
+    .form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,
+    .form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .search-wrap{position:relative}
+    .search-wrap i{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        color:#8B0000;
+        font-size:.9rem;
+    }
+    .search-wrap .form-input{padding-left:40px}
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:48px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{transform:translateY(-1px)}
+
+    .btn-soft.primary{
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        box-shadow:0 12px 24px rgba(139,0,0,.16);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .btn-soft.success{
+        background:linear-gradient(180deg,#166534,#14532d);
+        color:#fff;
+    }
+
+    .btn-soft.warning{
+        background:linear-gradient(180deg,#b45309,#92400e);
+        color:#fff;
+    }
+
+    .ai-panel{border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.02));}
+    .ai-kicker{color:#8B0000;font-size:.8rem;font-weight:900;letter-spacing:.02em;margin-bottom:8px}
+    .ai-headline{font-size:1rem;font-weight:900;color:#111827;margin:0 0 8px}
+    .ai-summary{color:#6b7280;font-size:.9rem;line-height:1.8;margin:0 0 12px}
+    .ai-bullets{display:grid;gap:8px;margin:0;padding-left:18px;color:#374151;font-size:.86rem;line-height:1.7}
+    .ai-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .ai-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);font-size:.8rem;font-weight:800;color:#374151}
+
+    .personnel-list{
+        display:grid;
+        gap:14px;
+    }
+
+    .select-check{width:18px;height:18px;accent-color:#8B0000;}
+    .select-wrap{display:flex;align-items:center;gap:10px;margin-right:0;flex:0 0 auto;padding-top:4px;}
+
+    .personnel-card{
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:24px;
+        background:#fff;
+        overflow:hidden;
+        transition:all .18s ease;
+    }
+
+    .personnel-card:hover{
+        transform:translateY(-1px);
+        box-shadow:0 18px 30px rgba(15,23,42,.06);
+    }
+
+    .personnel-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:16px;
+        flex-wrap:wrap;
+        padding:18px 18px 14px 18px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(139,0,0,.015));
+    }
+
+    .personnel-head-left{
+        display:flex;
+        gap:14px;
+        align-items:flex-start;
+        min-width:0;
+        flex:1 1 auto;
+    }
+
+    .avatar-wrap{
+        width:64px;
+        height:64px;
+        border-radius:18px;
+        overflow:hidden;
+        flex:0 0 64px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+    }
+
+    .avatar-wrap img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+    }
+
+    .personnel-title{
+        color:#111827;
+        font-size:1rem;
+        font-weight:900;
+        line-height:1.45;
+        margin-bottom:4px;
+    }
+
+    .personnel-sub{
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.7;
+    }
+
+    .badge-stack{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        padding:7px 11px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .pill.passive{background:rgba(107,114,128,.12);color:#374151}
+    .pill.role{background:rgba(29,78,216,.10);color:#1d4ed8}
+    .pill.unit{background:rgba(139,0,0,.10);color:#8B0000}
+    .pill.upper{background:rgba(180,83,9,.10);color:#92400e}
+    .pill.title{background:rgba(15,23,42,.08);color:#111827}
+
+    .personnel-grid{
+        display:grid;
+        grid-template-columns:repeat(5,minmax(0,1fr));
+        gap:12px;
+        padding:16px 18px;
+    }
+
+    .mini-box{
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        border-radius:18px;
+        padding:14px;
+    }
+
+    .mini-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .mini-value{
+        color:#111827;
+        font-size:.92rem;
+        font-weight:900;
+        line-height:1.55;
+        word-break:break-word;
+    }
+
+    .personnel-foot{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:14px;
+        flex-wrap:wrap;
+        padding:0 18px 18px 18px;
+    }
+
+    .personnel-note{
+        color:#6b7280;
+        font-size:.84rem;
+        line-height:1.7;
+    }
+
+    .personnel-actions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+    }
+
+    .inline-form{display:inline;margin:0;padding:0}
+
+    .btn-soft.sm{
+        min-height:40px;
+        padding:0 14px;
+        font-size:.84rem;
+        border-radius:12px;
+    }
+
+    .empty-box{
+        padding:26px 20px;
+        border-radius:18px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        color:#6b7280;
+        text-align:center;
+        line-height:1.9;
+    }
+
+    @media (max-width:1450px){
+        .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .toolbar-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+    }
+
+    @media (max-width:1100px){
+        .personnel-grid{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width:700px){
+        .stats-grid,
+        .toolbar-grid,
+        .personnel-grid{grid-template-columns:1fr}
+        .personnel-head-left{flex-direction:column}
+    }
+</style>
+
+<div class="personnel-shell bys-premium-page">
+    {{ premium_context_banner(
+        title='Merkezi personel havuzu',
+        text='Kurumdaki tüm personel kayıtları burada merkezi olarak yönetilir. Performans, eğitim, randevu ve iletişim ekranları bu veri yapısından beslenir; o yüzden arama, filtre ve toplu işlem dili burada daha görünür hale getirildi.',
+        kicker='Kurumsal personel omurgası',
+        icon='fa-solid fa-users-gear',
+        badges=[
+            {'icon':'fa-solid fa-user-group','text': (stats.total_count or 0) ~ ' toplam personel', 'tone':'soft-red'},
+            {'icon':'fa-solid fa-user-check','text': (stats.active_count or 0) ~ ' aktif kayıt', 'tone':'soft-green'},
+            {'icon':'fa-solid fa-sitemap','text': (stats.unit_count or 0) ~ ' bağlı birim', 'tone':'soft-blue'}
+        ],
+        side_title='Bugünkü görünüm',
+        side_text=(stats.filtered_count or 0) ~ ' kayıt görünür durumda. Filtreler daralsa bile toplu işlemler ve yeni kayıt aksiyonları aynı yerde kalır; göz tekrar aramaz.'
+    ) }}
+
+    <div class="bys-metric-grid" style="grid-template-columns:repeat(5,minmax(0,1fr));">
+        {{ premium_metric_card('Toplam Personel', stats.total_count or 0, 'fa-solid fa-users') }}
+        {{ premium_metric_card('Aktif Personel', stats.active_count or 0, 'fa-solid fa-user-check', tone='success') }}
+        {{ premium_metric_card('Pasif Personel', stats.passive_count or 0, 'fa-solid fa-user-slash', tone='warning') }}
+        {{ premium_metric_card('Birim Sayısı', stats.unit_count or 0, 'fa-solid fa-sitemap', tone='info') }}
+        {{ premium_metric_card('Filtre Sonucu', stats.filtered_count or 0, 'fa-solid fa-filter') }}
+    </div>
+
+    {% if ai_personnel_list_panel %}
+    <div class="glass-card panel-card ai-panel">
+        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_list_panel.badge or 'AI veri kalite özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_personnel_list_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_personnel_list_panel.summary }}</p>
+        <ul class="ai-bullets">
+            {% for item in ai_personnel_list_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        <div class="ai-actions">
+            {% for row in ai_personnel_list_panel.actions or [] %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+            {% for row in ai_personnel_list_panel.spotlight or [] %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if ai_personnel_density_panel %}
+    <div class="glass-card panel-card ai-panel" style="margin-top:-4px;">
+        <div class="ai-kicker"><i class="fa-solid fa-chart-column"></i> {{ ai_personnel_density_panel.badge or 'AI yoğunluk özeti' }}</div>
+        <h4 class="ai-headline">{{ ai_personnel_density_panel.headline }}</h4>
+        <p class="ai-summary">{{ ai_personnel_density_panel.summary }}</p>
+        <ul class="ai-bullets">
+            {% for item in ai_personnel_density_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+        <div class="ai-actions">
+            {% for row in ai_personnel_density_panel.actions or [] %}
+                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+            {% endfor %}
+        </div>
+        <div class="table-responsive" style="margin-top:14px;">
+            <table class="table table-borderless align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:50%;">Birim yoğunluğu</th>
+                        <th style="width:50%;">Rol yoğunluğu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set max_rows = [ai_personnel_density_panel.unit_density|length, ai_personnel_density_panel.role_density|length]|max %}
+                    {% for i in range(max_rows) %}
+                    {% set unit_row = ai_personnel_density_panel.unit_density[i] if i < (ai_personnel_density_panel.unit_density|length) else None %}
+                    {% set role_row = ai_personnel_density_panel.role_density[i] if i < (ai_personnel_density_panel.role_density|length) else None %}
+                    <tr>
+                        <td>
+                            {% if unit_row %}
+                            <div style="font-weight:800;color:#111827;">{{ unit_row.label }}</div>
+                            <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
+                                <div style="height:100%;width:{{ unit_row.share }}%;background:linear-gradient(90deg,#8B0000,rgba(139,0,0,.45));"></div>
+                            </div>
+                            <div style="font-size:.82rem;color:#6b7280;">{{ unit_row.value }} kişi · %{{ '%.1f'|format(unit_row.share) }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if role_row %}
+                            <div style="font-weight:800;color:#111827;">{{ role_row.label }}</div>
+                            <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
+                                <div style="height:100%;width:{{ role_row.share }}%;background:linear-gradient(90deg,#111827,rgba(17,24,39,.35));"></div>
+                            </div>
+                            <div style="font-size:.82rem;color:#6b7280;">{{ role_row.value }} kişi · %{{ '%.1f'|format(role_row.share) }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% call premium_action_shell('Filtre ve hızlı aksiyonlar', 'Personel yönetimi ekranındaki ana arama, filtre ve yeni kayıt aksiyonları burada tek hatta toplandı. Excel yükleme ve örnek şablon da aynı blokta duruyor.', 'fa-solid fa-sliders') %}
+        <form method="GET" action="{{ url_for('main.personnel_list') }}">
+            <div class="toolbar-grid">
+                <div class="form-group">
+                    <label>Personel Ara</label>
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="q" value="{{ q or '' }}" class="form-input" placeholder="Ad, soyad, e-posta, sicil no, birim">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Birim</label>
+                    <select name="birim" class="form-select">
+                        <option value="">Tüm Birimler</option>
+                        {% for item in birimler %}
+                            <option value="{{ item }}" {% if selected_birim == item %}selected{% endif %}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Durum</label>
+                    <select name="durum" class="form-select">
+                        <option value="" {% if not selected_durum %}selected{% endif %}>Tümü</option>
+                        <option value="aktif" {% if selected_durum == 'aktif' %}selected{% endif %}>Aktif</option>
+                        <option value="pasif" {% if selected_durum == 'pasif' %}selected{% endif %}>Pasif</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select name="rol" class="form-select">
+                        <option value="">Tüm Roller</option>
+                        {% for value, label in role_choices %}
+                            <option value="{{ value }}" {% if selected_rol == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" data-bys360-marker="BYS360_PERSONNEL_CATEGORY_LIST_FILTER">
+                    <label>Personel Kategorisi</label>
+                    <select name="kategori" class="form-select">
+                        <option value="">Tüm Kategoriler</option>
+                        {% for value, label in category_choices or [] %}
+                            <option value="{{ value }}" {% if selected_kategori == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-soft primary">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrele
+                </button>
+
+                <a href="{{ url_for('main.personnel_list') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Temizle
+                </a>
+
+                <a href="{{ url_for('main.personnel_add') }}" class="btn-soft success">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Yeni Personel
+                </a>
+            </div>
+
+            <div class="bys-inline-action-row" style="margin-top:14px;">
+                <a href="{{ url_for('main.personnel_excel_upload') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    Excel Yükle
+                </a>
+
+                <a href="{{ url_for('main.download_personnel_template') }}" class="btn-soft secondary">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Örnek Şablon
+                </a>
+            </div>
+        </form>
+        {{ premium_helper_note('Arama ve filtreleme sonrası toplu işlem alanı kullanılmaya devam eder.') }}
+    {% endcall %}
+
+    {% call premium_action_shell('Toplu işlemler', 'Seçili personeller için arşivleme, toplu silme ve tüm kayıtları sıfırlama işlemlerini buradan yönetin.', 'fa-solid fa-layer-group', compact=True) %}
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+                <h3 class="intro-title" style="margin:0;">Toplu İşlemler</h3>
+                <p class="intro-sub" style="margin-top:6px;">Seçili personeller için arşivleme, toplu silme ve tüm kayıtları sıfırlama işlemlerini buradan yönetin.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <form method="POST" action="{{ url_for('main.admin_users_bulk_archive') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="selected_ids" id="bulkArchiveIds">
+                    <button type="submit" class="btn-soft warning" onclick="return fillBulkIds('bulkArchiveIds','Seçili personeller arşivlensin mi?');">
+                        <i class="fa-solid fa-box-archive"></i>
+                        Toplu Arşivle
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('main.admin_users_bulk_delete') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="selected_ids" id="bulkDeleteIds">
+                    <button type="submit" class="btn-soft primary" onclick="return fillBulkIds('bulkDeleteIds','Seçili personeller silinsin mi?');">
+                        <i class="fa-solid fa-trash"></i>
+                        Toplu Sil
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('main.admin_users_reset_all') }}" onsubmit="return confirm('Tüm personel verileri ve bağlı kayıtlar sıfırlansın mı?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-soft secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Sistemi Sıfırla
+                    </button>
+                </form>
+            </div>
+        </div>
+        {{ premium_helper_note('Kartların sol üstündeki kutucuklarla toplu işlem listesi oluşturabilirsiniz.') }}
+    {% endcall %}
+<div class="glass-card panel-card">
+        {% call list_workspace_panel(title='Personel kayıt listesi', text='Filtre sonrası görünümde kalan personel kartları burada. Başlık, rozet, mini bilgi kutuları ve aksiyonlar her kayıtta aynı ritimle akar.', badge=(stats.filtered_count or 0) ~ ' görünür', badge_tone='gray', icon='fa-solid fa-address-book', note='Toplu seçim kutusu her kartın aynı yerinde bırakıldı. Böylece yoğun listede bile toplu işlem akışı bozulmaz.', note_icon='fa-solid fa-users-viewfinder') %}
+    {% if user_rows %}
+        <div class="personnel-list">
+            {% for row in user_rows %}
+                <div class="personnel-card">
+                    <div class="personnel-head">
+                        <div class="select-wrap">
+                            <input type="checkbox" class="select-check" name="selected_person" value="{{ row.id }}">
+                        </div>
+                        <div class="personnel-head-left">
+                            <div class="avatar-wrap">
+                                <img src="{{ row.avatar_url }}"
+                                     alt="{{ row.full_name }}"
+                                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                            </div>
+
+                            <div>
+                                <div class="personnel-title">{{ row.full_name or '-' }}</div>
+                                <div class="personnel-sub">
+                                    Sicil No: {{ row.sicil_no }}<br>
+                                    {{ row.email }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="badge-stack">
+                            {% if row.is_active %}
+                                <span class="pill active"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                            {% else %}
+                                <span class="pill passive"><i class="fa-solid fa-circle"></i> Pasif</span>
+                            {% endif %}
+
+                            <span class="pill role"><i class="fa-solid fa-shield-halved"></i> {{ row.role_text }}</span>
+                            <span class="pill category"><i class="fa-solid fa-layer-group"></i> {{ row.personnel_category or 'Diğer' }}</span>
+                            <span class="pill title"><i class="fa-solid fa-briefcase"></i> {{ row.unvan }}</span>
+                            <span class="pill unit"><i class="fa-solid fa-building"></i> {{ row.birim }}</span>
+                            <span class="pill upper"><i class="fa-solid fa-sitemap"></i> {{ row.ust_birim }}</span>
+                        </div>
+                    </div>
+
+                    <div class="personnel-grid">
+                        <div class="mini-box">
+                            <div class="mini-label">Ad</div>
+                            <div class="mini-value">{{ row.ad or '-' }}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Soyad</div>
+                            <div class="mini-value">{{ row.soyad or '-' }}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">E-Posta</div>
+                            <div class="mini-value">{{ row.email or '-' }}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Unvan</div>
+                            <div class="mini-value">{{ row.unvan or '-' }}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Rol</div>
+                            <div class="mini-value">{{ row.role_text or '-' }}</div>
+                        </div>
+
+                        <div class="mini-box">
+                            <div class="mini-label">Kategori</div>
+                            <div class="mini-value">{{ row.personnel_category or 'Diğer' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="personnel-foot">
+                        <div class="personnel-note">
+                            Personel kaydı merkezi veri havuzunda tutulur ve diğer modüller bu yapıdan beslenir.
+                        </div>
+
+                        <div class="personnel-actions">
+                            <a href="{{ url_for('main.personnel_profile', user_id=row.id) }}" class="btn-soft secondary sm">
+                                <i class="fa-solid fa-id-card"></i>
+                                Profil
+                            </a>
+
+                            <a href="{{ url_for('main.personnel_edit', user_id=row.id) }}" class="btn-soft secondary sm">
+                                <i class="fa-solid fa-pen"></i>
+                                Düzenle
+                            </a>
+
+                            {% if row.is_active %}
+                                <form method="POST" action="{{ url_for('main.personnel_toggle_active', user_id=row.id) }}" class="inline-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn-soft warning sm">
+                                        <i class="fa-solid fa-user-slash"></i>
+                                        Pasif Yap
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('main.personnel_toggle_active', user_id=row.id) }}" class="inline-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn-soft success sm">
+                                        <i class="fa-solid fa-user-check"></i>
+                                        Aktif Yap
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <form method="POST" action="{{ url_for('main.personnel_delete', user_id=row.id) }}" class="inline-form" onsubmit="return confirm('Bu personel kaydını silmek istediğinize emin misiniz?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-soft primary sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                    Sil
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+            <div class="empty-box">
+                Filtreye uygun personel kaydı bulunamadı.
+            </div>
+    {% endif %}
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}
+<script>
+function fillBulkIds(targetId, confirmText){
+    const ids = Array.from(document.querySelectorAll('input[name="selected_person"]:checked')).map(el => el.value);
+    if (!ids.length){ alert('Önce en az bir personel seçiniz.'); return false; }
+    document.getElementById(targetId).value = ids.join(',');
+    return confirm(confirmText);
+}
+</script>

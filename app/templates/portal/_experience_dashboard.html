@@ -1,0 +1,54 @@
+{# BYS360_PORTAL_EXPERIENCE_V1B_BEGIN #}
+{% set px_enabled = portal_experience_enabled if portal_experience_enabled is defined else false %}
+{% set px = portal_experience if portal_experience is defined and portal_experience else {} %}
+{% if px_enabled and px %}
+<section class="portal-experience-v1 portal-experience-v1b tone-{{ px.priority_tone|default('calm', true) }}" aria-label="BYS360 kişisel portal deneyimi">
+  <div class="portal-exp-hero">
+    <div class="portal-exp-hero-main">
+      <span class="portal-exp-kicker"><i class="fa-solid fa-sparkles"></i> Benim Günüm</span>
+      <h2>{{ px.display_name|default('BYS360 Kullanıcısı', true) }}, bugün portalda size özel özet hazır.</h2>
+      <p>{{ px.priority_note|default('Bekleyen işleriniz ve kurumsal akışınız bu alanda özetlenir.', true) }}</p>
+      <div class="portal-exp-hero-actions">
+        <a href="{{ safe_url_for('main.portal_feed', fallback='/portal') }}"><i class="fa-solid fa-stream"></i> Yayın Akışına Git</a>
+        <a href="{{ safe_url_for('main.portal_my_profile', fallback='/portal/profile/me') }}"><i class="fa-regular fa-user"></i> Profilim</a>
+      </div>
+    </div>
+    <aside class="portal-exp-status-card">
+      <span>Gün durumu</span>
+      <strong>{{ px.priority_label|default('Gün Özeti', true) }}</strong>
+      <small><i class="fa-solid fa-location-dot"></i> {{ px.unit_name|default('BYS360', true) }}</small>
+    </aside>
+  </div>
+
+  <div class="portal-exp-day-grid">
+    {% for card in px.my_day_cards|default([], true) %}
+      <a class="portal-exp-day-card tone-{{ card.tone|default('neutral', true) }}" href="{{ card.href|default('#', true) }}">
+        <i class="{{ card.icon|default('fa-regular fa-circle', true) }}"></i>
+        <div><span>{{ card.label }}</span><strong>{{ card.value|default(0, true) }}</strong><small>{{ card.note }}</small></div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="portal-exp-content-grid">
+    <div class="portal-exp-panel portal-exp-panel-wide">
+      <div class="portal-exp-panel-head"><div><span>Canlı Akış</span><h3>Öncelikli takip alanları</h3></div><i class="fa-solid fa-bolt"></i></div>
+      <div class="portal-exp-focus-list">
+        {% if px.notifications %}{% for n in px.notifications[:3] %}<a href="{{ n.link_url|default('/notifications', true) }}"><i class="fa-regular fa-bell"></i><div><b>{{ n.title }}</b><small>{{ n.body }}</small></div></a>{% endfor %}{% endif %}
+        {% if px.support_items %}{% for t in px.support_items[:2] %}<a href="{{ t.link_url|default('/support/tickets', true) }}"><i class="fa-solid fa-circle-info"></i><div><b>{{ t.title }}</b><small>{{ t.status }} · {{ t.priority }}</small></div></a>{% endfor %}{% endif %}
+        {% if px.survey_items %}{% for s in px.survey_items[:2] %}<a href="{{ s.link_url|default('/surveys', true) }}"><i class="fa-solid fa-square-poll-vertical"></i><div><b>{{ s.title }}</b><small>{{ s.description }}</small></div></a>{% endfor %}{% endif %}
+        {% if not px.notifications and not px.support_items and not px.survey_items %}<div class="portal-exp-empty"><i class="fa-regular fa-circle-check"></i><b>Öncelikli bekleyen işlem görünmüyor.</b><span>Yayın akışını ve duyuruları takip edebilirsiniz.</span></div>{% endif %}
+      </div>
+    </div>
+    <div class="portal-exp-panel">
+      <div class="portal-exp-panel-head compact"><div><span>Takdir Kültürü</span><h3>Teşekkür ve başarı</h3></div><i class="fa-solid fa-award"></i></div>
+      <div class="portal-exp-stat-row"><div><b>{{ px.culture_stats.recognitions|default(0, true) }}</b><span>son 30 gün takdir</span></div><div><b>{{ px.culture_stats.reactions|default(0, true) }}</b><span>toplam tepki</span></div></div>
+      {% if px.recognition_items %}<div class="portal-exp-recognition-list">{% for item in px.recognition_items[:3] %}<a href="{{ item.link_url }}"><b>{{ item.title }}</b><small>{{ item.author }} · {{ item.body }}</small></a>{% endfor %}</div>{% else %}<p class="portal-exp-muted">İlk teşekkür veya başarı paylaşımı yapıldığında burada görünür.</p>{% endif %}
+    </div>
+    <div class="portal-exp-panel">
+      <div class="portal-exp-panel-head compact"><div><span>Hızlı Başlat</span><h3>Portalı canlı tut</h3></div><i class="fa-solid fa-compass"></i></div>
+      <div class="portal-exp-action-list">{% for action in px.quick_actions|default([], true) %}<a href="{{ action.href }}"><i class="{{ action.icon }}"></i><div><b>{{ action.label }}</b><small>{{ action.hint }}</small></div></a>{% endfor %}</div>
+    </div>
+  </div>
+</section>
+{% endif %}
+{# BYS360_PORTAL_EXPERIENCE_V1B_END #}

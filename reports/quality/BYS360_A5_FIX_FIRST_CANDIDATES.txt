@@ -1,0 +1,186 @@
+P2	fix_runtime_or_contract	ai_agent_repository	tests.architecture.test_ai_dashboard_panels_split::test_dashboard_panels_public_exports_exist
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: assert 'build_repository_dashboard_ai_panel' in '\n"""AI panel public facade.\n\nBu modül eski import yolunu korur; gerçek üreticiler küçük dosyalara bölünmüştür.\nYe...ld_announcements_ai_panel",\n    "build_announcement_form_ai_panel",\n    "build_dashboard_ai_operations_bridge",\n]\n'
+P1	fix_runtime_or_route_contract	mobile_pwa	tests.architecture.test_android_responsive_core_styles_p5b::test_android_responsive_core_styles_gate_p5b
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: AssertionError: {     "ok": false,     "package": "BYS360_CLAUDE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE",     "android_responsive_core_styles_gate_ok": false,     "responsive_hardening_ok": false,     "p5a_baseline_report_ok": false,     "android_core_css_ok": true,     "base_template_
+P1	fix_or_mark_realdb_contract	database_contract	tests.architecture.test_message_live_contract::test_message_db_writes_do_not_skip_basic_safety_keywords
+    reason: database contract/schema/write-flow issue; either create isolated fixture or mark realdb
+    detail: AssertionError: messages_send_impl commit sözleşmesi korunmalı assert 'db.session.commit' in 'def messages_send_impl(thread_id):\n    participant = _participant_for_thread(thread_id)\n\n    if not participant:\n...aj gönderilirken hata oluştu: {exc}", "danger")\n\n    return _redirect_message_destin
+P2	fix_runtime_or_contract	communication_mail	tests.architecture.test_mobile_api_personnel_kpi_communication_response_p3c::test_mobile_personnel_kpi_communication_response_gate_p3c
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: assert False is True
+P2	fix_runtime_or_contract	auth_session	tests.architecture.test_mobile_api_security_suite_p4c::test_mobile_security_suite_gate_p4c
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ality/bys360_mobile_security_suite_gate_p4c.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...} assert False
+P2	fix_runtime_or_contract	auth_session	tests.architecture.test_mobile_api_security_suite_p4c_v2::test_mobile_security_suite_gate_p4c_v2
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: AssertionError: {'app_factory_ok': True, 'app_factory_smoke': {'ok': True}, 'auth_guard_matrix_ok': False, 'ci_commands': ['python -m ...ty/bys360_mobile_security_suite_gate_p4c_v2.py --root . --compile-all --app-factory --secret-gate --pytest-gate'], ...} assert False
+P2	fix_runtime_or_contract	auth_session	tests.architecture.test_mobile_auth_dashboard_assistant_response_p3b::test_mobile_auth_dashboard_assistant_response_gate_p3b
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: assert False is True
+P1	fix_runtime_or_route_contract	performance	tests.communication.test_communication_route_contracts::test_no_direct_query_get_usage_in_communication_and_services
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: AssertionError: query.get() kullanılan dosyalar bulundu: ['app\\services\\assignment_sync_service.py', 'app\\services\\corporate_information_center.py', 'app\\services\\instagram_portal_sync.py', 'app\\services\\leave_delegation_service.py', 'app\\services\\ai\\query_adapters.py', 'app\\services\\ai
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_live_settings_contract_is_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 18   def test_live_settings_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_sch
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_performance_manager_constitution_contract_is_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 40   def test_performance_manager_constitution_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_performance_visibility_and_chain_fields_remain_present
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 53   def test_performance_visibility_and_chain_fields_remain_present(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_feedback_pulse_campaign_contract_is_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 66   def test_feedback_pulse_campaign_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_message_and_survey_contract_is_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 82   def test_message_and_survey_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smok
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_ai_decision_support_contract_is_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 92   def test_ai_decision_support_contract_is_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smo
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_security_and_mail_contracts_are_covered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 102   def test_security_and_mail_contracts_are_covered(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_sm
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase5_critical_contracts::test_phase5_quality_gate_exists
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase5_critical_contracts.py, line 115   def test_phase5_quality_gate_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fi
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_index_catalog_covers_live_core_tables
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 20   def test_phase6_index_catalog_covers_live_core_tables(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_sql_generation_is_create_index_only
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 43   def test_phase6_sql_generation_is_create_index_only(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_query_guard_can_scan_without_db
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 51   def test_phase6_query_guard_can_scan_without_db(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqli
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase6_sql_performance_contracts::test_phase6_quality_gate_exists
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase6_sql_performance_contracts.py, line 58   def test_phase6_quality_gate_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_sch
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase7_final_gate_contracts::test_phase7_contract_module_is_complete
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase7_final_gate_contracts.py, line 4   def test_phase7_contract_module_is_complete(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_s
+P0	fix_test_infra	database_contract	tests.critical.test_claude_phase7_final_gate_contracts::test_phase7_quality_script_exists
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_claude_phase7_final_gate_contracts.py, line 23   def test_phase7_quality_script_exists(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_assistant_context_processors_are_registered
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 28   def test_v58_assistant_context_processors_are_registered(app): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/dashboard]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/dashboard/heavy-panels]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/settings]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-pipeline]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-corporate-cleanup]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/process-tracking]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/process-reports]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/president-approvals/1/card]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-aftercare]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_critical_routes_never_return_500[/performance/feedback-final-gate]
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 44   @pytest.mark.parametrize("path", CRITICAL_ROUTES)   def test_v58_critical_routes_never_return_500(client, path): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest
+P0	fix_test_infra	database_contract	tests.critical.test_v58_claude_roadmap_smoke::test_v58_smoke_route_count_contract
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v58_claude_roadmap_smoke.py, line 50   def test_v58_smoke_route_count_contract(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture
+P0	fix_test_infra	database_contract	tests.critical.test_v59_4_assistant_shortcut_context::test_v59_4_assistant_shortcut_context_keys_are_always_available
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v59_4_assistant_shortcut_context.py, line 9   def test_v59_4_assistant_shortcut_context_keys_are_always_available(app): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _by
+P0	fix_test_infra	database_contract	tests.critical.test_v59_broad_route_smoke::test_static_route_list_is_broad_enough
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v59_broad_route_smoke.py, line 88   def test_static_route_list_is_broad_enough(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixture
+P0	fix_test_infra	database_contract	tests.critical.test_v59_broad_route_smoke::test_v59_broad_routes_do_not_return_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\critical\test_v59_broad_route_smoke.py, line 92   def test_v59_broad_routes_do_not_return_500(): file C:\bys360\project\tests\critical\conftest.py, line 142   @_bys360_v59_3_pytest.fixture(autouse=True)   def _bys360_v59_3_sqlite_smoke_schema_fixtur
+P3	manual_review	other	tests.docs.test_docs_expert_review_contract::test_expert_review_docs_exist
+    reason: cannot safely classify automatically
+    detail: AssertionError: TEKNIK_MIMARI.md assert False  +  where False = exists()  +    where exists = (WindowsPath('C:/bys360/project/docs/uzman_inceleme') / 'TEKNIK_MIMARI.md').exists
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse/history]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/pulse/analytics]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/admin/pulse-analytics]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/campaigns]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	database_contract	tests.integration.test_feedback_http_behavior::test_feedback_routes_exist_and_do_not_500[/feedback/results]
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: failed on setup with "file C:\bys360\project\tests\integration\test_feedback_http_behavior.py, line 6   @pytest.mark.parametrize("path", [       "/feedback",       "/feedback/pulse",       "/feedback/pulse/history",       "/feedback/pulse/analytics",       "/feedback/admin/pulse-analytics",       "/
+P1	fix_runtime_or_route_contract	auth_session	tests.mobile.test_mobile_domain_contract_p2a::test_mobile_route_contract_count
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: AssertionError: assert 24 == 23  +  where 24 = len(['/auth/login', '/auth/refresh', '/me', '/dashboard/summary', '/notifications/<int:notification_id>/read', '/notifications/read-all', ...])  +  and   23 = len({'/assistant/v2/ask', '/auth/login', '/auth/refresh', '/communication/messages/create-thre
+P0	fix_test_infra	database_contract	tests.performance.test_critical_performance_routes_smoke::test_feedback_pipeline_loads_without_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 24   def test_feedback_pipeline_loads_without_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse
+P0	fix_test_infra	database_contract	tests.performance.test_critical_performance_routes_smoke::test_feedback_corporate_cleanup_no_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 43   def test_feedback_corporate_cleanup_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=T
+P0	fix_test_infra	database_contract	tests.performance.test_critical_performance_routes_smoke::test_process_tracking_no_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 60   def test_process_tracking_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def
+P0	fix_test_infra	database_contract	tests.performance.test_critical_performance_routes_smoke::test_process_reports_no_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 78   def test_process_reports_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True)   def 
+P0	fix_test_infra	database_contract	tests.performance.test_critical_performance_routes_smoke::test_president_approval_card_no_500
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 97   def test_president_approval_card_no_500(client, monkeypatch): file C:\bys360\project\tests\performance\test_critical_performance_routes_smoke.py, line 17   @pytest.fixture(autouse=True
+P1	fix_runtime_or_route_contract	auth_session	tests.test_10_10_core_static_gate::test_schema_guard_is_check_first_not_auto_repair_default
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: assert 'auto_repair_schema and should_auto_repair_schema()' in '\n"""BYS360 application factory.\n\nBu dosya public ``create_app`` girişini, login user_loader sözleşmesini ve\nmevcu...n_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))\n    return app
+P0	fix_test_infra	database_contract	tests.test_ai_routes::test_run_json_service_success
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 9   def test_run_json_service_success(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_
+P0	fix_test_infra	database_contract	tests.test_ai_routes::test_run_json_service_maps_403
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 16   def test_run_json_service_maps_403(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, recor
+P0	fix_test_infra	database_contract	tests.test_ai_routes::test_run_json_service_maps_503
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\test_ai_routes.py, line 23   def test_run_json_service_maps_503(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, recor
+P0	fix_test_infra	database_contract	tests.test_compat_redirects::test_soft_redirect_targets_endpoint
+    reason: pytest app/client fixture missing; many critical errors likely share one root cause
+    detail: failed on setup with "file C:\bys360\project\tests\test_compat_redirects.py, line 8   def test_soft_redirect_targets_endpoint(app): E       fixture 'app' not found >       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestco
+P3	manual_review	database_contract	tests.test_feedback_pulse_admin_tab_static::test_base_has_separate_pulse_analysis_menu_item
+    reason: cannot safely classify automatically
+    detail: assert "current_ep in ['main.feedback_pulse_analytics', 'main.feedback_admin_pulse_analytics']" in '\ufeff\n\n{# BYS360_BASE_CLEAN_V13: temiz, sabit ve rol bazlı ana iskelet #}\n<!doctype html>\n<html lang="tr">\n<hea...pletion_v2.js\') }}?v=2" defer></script>\n<!-- /BYS360_ANDROID_RESPONSIVE_COMPLE
+P1	fix_runtime_or_route_contract	database_contract	tests.test_feedback_pulse_admin_tab_static::test_feedback_core_menu_policy_contains_pulse_keys
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: assert '"feedback_pulse"' in 'from __future__ import annotations\n\n\nimport logging\nlogger = logging.getLogger(__name__)\n\n"""Ortak route destek...not _bys360_v13_route_support_is_removed_menu_key(key)}\n# BYS360_CLAUDE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_END\n\n'
+P1	fix_runtime_or_route_contract	database_contract	tests.test_feedback_pulse_menu_visibility_static::test_feedback_pulse_is_core_visible_for_all_roles
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: assert '"feedback_pulse": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"}' in 'from __future__ import annotations\n\n\nimport logging\nlogger = logging.getLogger(__name__)\n\n"""Ortak route destek...not _bys360_v13_route_support_
+P2	fix_runtime_or_contract	performance	tests.test_performance_preflight::test_validate_score_comment_rules_requires_comment_for_edge_scores
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: AssertionError: assert '1 ve 5 puanlarında açıklama zorunlu.' in ['Bu puan için sistem ayarında açıklama zorunluluğu aktiftir.', '70 altı ve 90 üstü sonuçlarda genel görüş zorunlu.']
+P2	fix_runtime_or_contract	performance	tests.test_performance_publish_preflight_static::test_publish_guard_shows_strict_blockers
+    reason: module-level contract likely still valuable; review and update implementation or test expectation
+    detail: assert '2026-04-18-publish-preflight-lock-v1' in 'from __future__ import annotations\n\n\nimport logging\n\nfrom typing import Any\n\nfrom app.models import Performanc...ocked,\n        "viewed": viewed,\n        "acknowledged": acknowledged,\n        "top_reasons": top_reasons,\n    }\n'
+P1	fix_runtime_or_route_contract	auth_session	tests.test_redis_ready_static::test_redis_ready_cache_and_rate_limit_contracts
+    reason: route/auth/session behavior test; likely useful for pilot stability
+    detail: AssertionError: assert 'redis>=' in 'Flask==3.0.3\nFlask-Login==0.6.3\nFlask-SQLAlchemy==3.1.1\nFlask-WTF==1.2.1\nFlask-Migrate==4.0.7\nSQLAlchemy==2.0.36...entry-sdk[flask]==2.20.0\nredis==5.0.8\nrq==2.3.3\nprometheus-client==0.20.0\nFlask-Limiter==3.5.0\npip-audit==2.7.0\n'

@@ -1,0 +1,81 @@
+/* FAZ 27 – Portal sol profil kartı kapak alanı düzeltmesi
+   main.css dosyasının en sonuna eklenebilir.
+   Amaç: kırmızı kapak alanının gereksiz yüksekliğini azaltmak
+   ve avatarın kapağın içine fazla gömülmesini engellemek. */
+
+/* Sol kolon profil kartı */
+.portal-profile-card .profile-cover,
+.portal-profile-card .card-cover,
+.portal-profile-card .cover-banner,
+.portal-profile-card .cover-area,
+.portal-profile-card .user-cover,
+.portal-profile-card .profile-header-cover,
+.portal-side-card .profile-cover,
+.portal-side-card .card-cover,
+.portal-side-card .cover-banner,
+.portal-side-card .cover-area,
+.portal-user-card .profile-cover,
+.portal-user-card .card-cover,
+.portal-user-card .cover-banner,
+.portal-user-card .cover-area {
+    min-height: 92px !important;
+    height: 92px !important;
+    max-height: 92px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+/* Avatar kutusu */
+.portal-profile-card .profile-avatar,
+.portal-profile-card .avatar-wrap,
+.portal-profile-card .avatar-box,
+.portal-profile-card .user-avatar,
+.portal-profile-card .profile-photo,
+.portal-side-card .profile-avatar,
+.portal-side-card .avatar-wrap,
+.portal-side-card .avatar-box,
+.portal-user-card .profile-avatar,
+.portal-user-card .avatar-wrap,
+.portal-user-card .avatar-box {
+    margin-top: -22px !important;
+    position: relative !important;
+    z-index: 3 !important;
+}
+
+/* Kart iç üst boşluk */
+.portal-profile-card .card-body,
+.portal-side-card .card-body,
+.portal-user-card .card-body {
+    padding-top: 18px !important;
+}
+
+/* Eğer doğrudan ilk bloksa fazla yüksek header alanını kıs */
+.portal-profile-card .card-header,
+.portal-side-card .card-header,
+.portal-user-card .card-header {
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+/* Güvenli genel fallback:
+   feed sol kolonundaki ilk profil kartında kapak alanını sakinleştir */
+.portal-feed .left-column .card:first-child .profile-cover,
+.portal-feed .left-column .card:first-child .card-cover,
+.portal-feed .left-column .card:first-child .cover-banner,
+.portal-feed .left-column .card:first-child .cover-area,
+.portal-feed .left-column .card:first-child .user-cover {
+    min-height: 92px !important;
+    height: 92px !important;
+    max-height: 92px !important;
+}
+
+.portal-feed .left-column .card:first-child .profile-avatar,
+.portal-feed .left-column .card:first-child .avatar-wrap,
+.portal-feed .left-column .card:first-child .avatar-box,
+.portal-feed .left-column .card:first-child .user-avatar {
+    margin-top: -22px !important;
+    position: relative !important;
+    z-index: 3 !important;
+}

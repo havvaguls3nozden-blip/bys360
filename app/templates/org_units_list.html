@@ -1,0 +1,762 @@
+﻿{% extends "base.html" %}
+{% from "_management_workspace_macros.html" import management_workspace_header %}
+{% from "_premium_workspace_macros.html" import premium_action_shell %}
+{% from "_list_workspace_macros.html" import list_workspace_panel %}
+
+{% block title %}Birim ve Pozisyon Yönetimi - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Birim ve Pozisyon Yönetimi{% endblock %}
+{% block page_subtitle %}
+Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin ve kayıtları yönetin.
+{% endblock %}
+
+{% block content %}
+{% include "_premium_ui_kit.html" %}
+<style>
+    .org-shell{display:grid;gap:18px}
+
+    .glass-card{
+        position:relative;
+        overflow:hidden;
+        background:rgba(255,255,255,.84);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:26px;
+        box-shadow:0 20px 40px rgba(15,23,42,.08);
+        backdrop-filter:blur(14px);
+    }
+
+    .panel-card{
+        padding:24px;
+        position:relative;
+        z-index:1;
+    }
+
+    .hero-panel{
+        display:grid;
+        grid-template-columns:1.2fr .8fr;
+        gap:18px;
+        align-items:stretch;
+    }
+
+    .hero-main{
+        position:relative;
+        overflow:hidden;
+        border-radius:24px;
+        padding:26px;
+        background:
+            radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 26%),
+            linear-gradient(135deg, #8B0000 0%, #760000 55%, #640000 100%);
+        color:#fff;
+        min-height:220px;
+    }
+
+    .hero-main::after{
+        content:"";
+        position:absolute;
+        right:-40px;
+        bottom:-40px;
+        width:180px;
+        height:180px;
+        border-radius:50%;
+        background:rgba(255,255,255,.08);
+    }
+
+    .hero-kicker{
+        font-size:.78rem;
+        font-weight:900;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        opacity:.86;
+        margin-bottom:10px;
+    }
+
+    .hero-title{
+        margin:0;
+        font-size:1.38rem;
+        font-weight:900;
+        line-height:1.28;
+        max-width:740px;
+    }
+
+    .hero-text{
+        margin:12px 0 0;
+        font-size:.95rem;
+        line-height:1.9;
+        color:rgba(255,255,255,.92);
+        max-width:760px;
+    }
+
+    .hero-actions{
+        margin-top:18px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    .hero-side{
+        display:grid;
+        gap:14px;
+    }
+
+    .mini-stat{
+        border-radius:22px;
+        padding:20px;
+        background:#fff;
+        border:1px solid rgba(15,23,42,.08);
+        box-shadow:0 12px 26px rgba(15,23,42,.05);
+        position:relative;
+        overflow:hidden;
+    }
+
+    .mini-stat::after{
+        content:"";
+        position:absolute;
+        right:-18px;
+        bottom:-18px;
+        width:72px;
+        height:72px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .mini-stat-label{
+        color:#6b7280;
+        font-size:.8rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-value{
+        color:#111827;
+        font-size:1.5rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .mini-stat-sub{
+        margin-top:8px;
+        color:#6b7280;
+        font-size:.82rem;
+        line-height:1.65;
+        position:relative;
+        z-index:1;
+    }
+
+    .btn-soft{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        min-height:46px;
+        padding:0 16px;
+        border:none;
+        border-radius:14px;
+        cursor:pointer;
+        text-decoration:none;
+        font-weight:800;
+        font-size:.9rem;
+        white-space:nowrap;
+        transition:all .18s ease;
+    }
+
+    .btn-soft:hover{
+        transform:translateY(-1px);
+    }
+
+    .btn-soft.primary{
+        background:#fff;
+        color:#8B0000;
+        box-shadow:0 12px 24px rgba(0,0,0,.12);
+    }
+
+    .btn-soft.secondary{
+        background:#eef2f7;
+        color:#374151;
+        border:1px solid rgba(15,23,42,.08);
+    }
+
+    .stats-grid{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+
+    .stat-card{
+        padding:22px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .stat-card::after{
+        content:"";
+        position:absolute;
+        right:-20px;
+        bottom:-20px;
+        width:84px;
+        height:84px;
+        border-radius:50%;
+        background:rgba(139,0,0,.06);
+    }
+
+    .stat-label{
+        color:#6b7280;
+        font-size:.82rem;
+        font-weight:800;
+        margin-bottom:10px;
+        position:relative;
+        z-index:1;
+        line-height:1.5;
+    }
+
+    .stat-value{
+        color:#111827;
+        font-size:1.7rem;
+        font-weight:900;
+        line-height:1;
+        position:relative;
+        z-index:1;
+    }
+
+    .filter-wrap{
+        display:grid;
+        gap:14px;
+    }
+
+    .filter-title{
+        margin:0;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .filter-sub{
+        margin:6px 0 0;
+        color:#6b7280;
+        font-size:.86rem;
+        line-height:1.7;
+    }
+
+    .filter-grid{
+        display:grid;
+        grid-template-columns:2fr 1.2fr 1fr auto;
+        gap:14px;
+        align-items:end;
+    }
+
+    .field{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .field label{
+        font-size:.85rem;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-input,.form-select{
+        min-height:48px;
+        border-radius:14px;
+        border:1px solid rgba(15,23,42,.10);
+        background:#fff;
+        padding:10px 14px;
+        font:inherit;
+        color:#111827;
+        outline:none;
+        width:100%;
+    }
+
+    .form-input:focus,.form-select:focus{
+        border-color:rgba(139,0,0,.30);
+        box-shadow:0 0 0 4px rgba(139,0,0,.06);
+    }
+
+    .table-wrap{
+        overflow:auto;
+        border:1px solid rgba(15,23,42,.08);
+        border-radius:24px;
+        background:#fff;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:1360px;
+    }
+
+    th,td{
+        padding:16px 15px;
+        border-bottom:1px solid rgba(15,23,42,.08);
+        text-align:left;
+        vertical-align:middle;
+    }
+
+    th{
+        font-size:.8rem;
+        color:#6b7280;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+        white-space:nowrap;
+        font-weight:900;
+        background:rgba(248,250,252,.92);
+    }
+
+    td{
+        font-size:.9rem;
+        color:#111827;
+    }
+
+    tbody tr{
+        transition:all .18s ease;
+    }
+
+    tbody tr:hover{
+        background:rgba(248,250,252,.76);
+    }
+
+    .unit-cell{
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+        min-width:260px;
+    }
+
+    .unit-icon{
+        width:48px;
+        height:48px;
+        border-radius:16px;
+        background:linear-gradient(180deg,#8B0000,#6f0000);
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1rem;
+        flex-shrink:0;
+        box-shadow:0 10px 22px rgba(139,0,0,.16);
+    }
+
+    .unit-name{
+        font-size:.96rem;
+        font-weight:900;
+        color:#111827;
+        line-height:1.4;
+        margin:0;
+    }
+
+    .unit-sub{
+        margin:4px 0 0;
+        font-size:.79rem;
+        color:#6b7280;
+        line-height:1.65;
+    }
+
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:24px;
+        padding:0 10px;
+        border-radius:999px;
+        font-size:.74rem;
+        font-weight:900;
+        white-space:nowrap;
+    }
+
+    .pill.active{background:rgba(22,101,52,.10);color:#166534}
+    .pill.passive{background:rgba(153,27,27,.10);color:#991b1b}
+    .pill.type{background:#eef2f7;color:#4b5563}
+
+    .action-row{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+    }
+
+    .mini-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        min-height:38px;
+        padding:0 12px;
+        border-radius:12px;
+        border:1px solid rgba(15,23,42,.08);
+        background:#f8fafc;
+        color:#374151;
+        font-size:.82rem;
+        font-weight:800;
+        text-decoration:none;
+    }
+
+    .mini-btn:hover{
+        color:#8B0000;
+        border-color:rgba(139,0,0,.16);
+    }
+
+    .mini-btn.danger{
+        color:#991b1b;
+    }
+
+    .empty-box{
+        padding:38px 24px;
+        border-radius:22px;
+        border:1px dashed rgba(15,23,42,.12);
+        background:#f8fafc;
+        text-align:center;
+        color:#6b7280;
+    }
+
+    .empty-box i{
+        font-size:2rem;
+        color:#8B0000;
+        margin-bottom:10px;
+    }
+
+    .empty-box h5{
+        margin:0 0 8px;
+        font-size:1rem;
+        font-weight:900;
+        color:#111827;
+    }
+
+    .empty-box p{
+        margin:0;
+        line-height:1.8;
+    }
+
+    @media (max-width:1280px){
+        .hero-panel{grid-template-columns:1fr}
+        .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:900px){
+        .filter-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:700px){
+        .stats-grid{grid-template-columns:1fr}
+        .btn-soft{width:100%}
+    }
+
+    .ai-panel{border-radius:24px;border:1px solid rgba(139,0,0,.10);background:linear-gradient(180deg, rgba(139,0,0,.04), rgba(255,255,255,.95));padding:22px;display:grid;gap:14px}
+    .ai-kicker{display:inline-flex;align-items:center;gap:8px;color:#8B0000;font-weight:900;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+    .ai-headline{margin:0;color:#111827;font-size:1.08rem;font-weight:900}
+    .ai-summary{margin:0;color:#6b7280;line-height:1.8;font-size:.92rem}
+    .ai-bullets{margin:0;padding-left:18px;display:grid;gap:8px;color:#4b5563}
+    .ai-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .ai-action-item,.ai-heat-item{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:16px;padding:14px}
+    .ai-action-item span,.ai-heat-item span{display:block;font-size:.76rem;color:#6b7280;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .ai-action-item strong,.ai-heat-item strong{display:block;margin-top:6px;font-size:1rem;color:#111827}
+    .ai-heat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .ai-heat-item em{display:block;margin-top:6px;color:#6b7280;font-style:normal;font-size:.84rem;line-height:1.6}
+    .tone-critical{box-shadow:inset 0 0 0 1px rgba(153,27,27,.18)}
+    .tone-watch{box-shadow:inset 0 0 0 1px rgba(180,83,9,.18)}
+</style>
+
+{% set total_units = rows|length if rows is defined else 0 %}
+{% set active_units = rows|selectattr('unit.is_active', 'equalto', true)|list|length if rows is defined else 0 %}
+{% set passive_units = total_units - active_units %}
+{% set root_units = rows|selectattr('unit.parent_id', 'equalto', none)|list|length if rows is defined else 0 %}
+
+<div class="org-shell">
+    {{ management_workspace_header(
+        title='Birim ve Pozisyon Yönetimi',
+        text='Kurumsal birim, üst birim ve pozisyon kayıtlarını bu alandan görüntüleyebilir, düzenleyebilir ve yönetebilirsiniz.',
+        icon='fa-solid fa-sitemap',
+        kicker='Kurumsal yapı',
+        badges=[
+            {'text':'Hiyerarşik yapı', 'icon':'fa-solid fa-diagram-project', 'tone':'soft-red'},
+            {'text':'Personel ilişkisi', 'icon':'fa-solid fa-users-viewfinder', 'tone':'soft-blue'},
+            {'text':'Aktif kayıt takibi', 'icon':'fa-solid fa-circle-check', 'tone':'soft-green'}
+        ],
+        side_title='Yönetim özeti',
+        side_text='Birim kayıtları; personel ataması, üst birim ilişkileri ve yönetici zinciri ile doğrudan bağlantılıdır.',
+        metric_cards=[
+            {'label':'Toplam Kayıt', 'value': stats.total_count if stats is defined else total_units, 'icon':'fa-solid fa-building-circle-check'},
+            {'label':'Aktif', 'value': stats.active_count if stats is defined else active_units, 'icon':'fa-solid fa-circle-check', 'tone':'success'},
+            {'label':'Pasif', 'value': stats.passive_count if stats is defined else passive_units, 'icon':'fa-solid fa-circle-stop', 'tone':'warning'},
+            {'label':'Ana Birim', 'value': stats.root_count if stats is defined else root_units, 'icon':'fa-solid fa-landmark'}
+        ]
+    ) }}
+
+    {% call premium_action_shell(title='Filtre ve işlemler', text='Arama, filtreleme ve yeni kayıt işlemleri bu alandan yapılır.', icon='fa-solid fa-sliders') %}
+        <div style="display:grid;gap:16px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{{ url_for('main.admin_org_unit_create') }}" class="btn-soft primary">
+                    <i class="fa-solid fa-plus"></i>
+                    Yeni Birim / Pozisyon
+                </a>
+
+                <a href="/performance/hierarchy-tree" class="btn-soft primary">
+                    <i class="fa-solid fa-sitemap"></i>
+                    Hiyerarşi Ağacı
+                </a>
+            </div>
+
+            <form method="GET">
+                <div class="filter-grid">
+                    <div class="field">
+                        <label for="q">Arama</label>
+                        <input type="text" id="q" name="q" class="form-input" value="{{ q or '' }}" placeholder="Birim adı, kod veya üst birim">
+                    </div>
+
+                    <div class="field">
+                        <label for="ust_birim">Üst Birim</label>
+                        <select id="ust_birim" name="ust_birim" class="form-select">
+                            <option value="">Tümü</option>
+                            {% for parent_name in parent_names %}
+                                <option value="{{ parent_name }}" {% if selected_parent == parent_name %}selected{% endif %}>{{ parent_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="durum">Durum</label>
+                        <select id="durum" name="durum" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="aktif" {% if selected_durum == 'aktif' %}selected{% endif %}>Aktif</option>
+                            <option value="pasif" {% if selected_durum == 'pasif' %}selected{% endif %}>Pasif</option>
+                        </select>
+                    </div>
+
+                    <div class="field" style="display:flex; gap:10px; align-items:stretch;">
+                        <button type="submit" class="btn-soft secondary" style="width:100%;">
+                            <i class="fa-solid fa-filter"></i>
+                            Filtrele
+                        </button>
+                        <a href="{{ safe_url_for('main.admin_org_units') }}" class="btn-soft secondary" style="width:100%;">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Temizle
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    {% endcall %}
+
+    
+    {% if ai_org_units_risk_panel %}
+        <section class="ai-panel">
+            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_org_units_risk_panel.badge or 'AI risk haritası' }}</div>
+            <h4 class="ai-headline">{{ ai_org_units_risk_panel.headline }}</h4>
+            <p class="ai-summary">{{ ai_org_units_risk_panel.summary }}</p>
+            <ul class="ai-bullets">
+                {% for item in ai_org_units_risk_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+            </ul>
+            <div class="ai-action-grid">
+                {% for row in ai_org_units_risk_panel.actions or [] %}
+                    <div class="ai-action-item tone-{{ row.tone or 'calm' }}"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+                {% endfor %}
+            </div>
+            {% if ai_org_units_risk_panel.risk_map %}
+                <div class="ai-heat-grid">
+                    {% for row in ai_org_units_risk_panel.risk_map %}
+                        <div class="ai-heat-item tone-{{ row.tone or 'watch' }}">
+                            <span>{{ row.label }}</span>
+                            <strong>Veri Kontrolü {{ row.value }}</strong>
+                            <em>{{ row.detail }}</em>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+
+    {% call list_workspace_panel(title='Organizasyon kayıt listesi', text='Birim kayıtlarını üst birim, tür, personel sayısı ve durum bilgileriyle görüntüleyin.', badge=(stats.filtered_count if stats is defined else total_units) ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-table-tree', note='Liste filtrelere göre güncellenir.', note_icon='fa-solid fa-circle-info') %}
+        {% set unit_type_labels = {
+            'baskanlik':'Başkanlık',
+            'baskan_yardimciligi':'Başkan Yardımcılığı',
+            'grup_baskanligi':'Grup Başkanlığı',
+            'calisma_grubu':'Çalışma Grubu',
+            'koordinatorluk':'Koordinatörlük',
+            'musavirlik':'Müşavirlik',
+            'denetci':'Denetçi',
+            'diger':'Diğer'
+        } %}
+        {% if rows %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Birim / Pozisyon</th>
+                            <th>Kod</th>
+                            <th>Tür</th>
+                            <th>Üst Birim</th>
+                            <th>Alt Birim Sayısı</th>
+                            <th>Personel Sayısı</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            {% set unit = row.unit if row.unit is defined else row[0] %}
+                            {% set child_count = row.child_count if row.child_count is defined else (row[1] if row|length > 1 else 0) %}
+                            <tr>
+                                <td>
+                                    <div class="unit-cell">
+                                        <div class="unit-icon">
+                                            <i class="fa-solid fa-diagram-project"></i>
+                                        </div>
+                                        <div>
+                                            <p class="unit-name">{{ unit.name or unit.birim_adi or '-' }}</p>
+                                            <p class="unit-sub">
+                                                {% if unit.description %}
+                                                    {{ unit.description }}
+                                                {% else %}
+                                                    Birim kaydı
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>{{ unit.unit_code or unit.code or '-' }}</td>
+
+                                <td>
+                                    <span class="pill type">{{ unit_type_labels.get(unit.unit_type or unit.type or 'diger', unit.unit_type or unit.type or 'Birim') }}</span>
+                                </td>
+
+                                <td>
+                                    {% if unit.parent %}
+                                        {{ unit.parent.name or unit.parent.birim_adi or '-' }}
+                                    {% elif unit.parent_name %}
+                                        {{ unit.parent_name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ child_count or 0 }}</td>
+                                <td>{{ row.personnel_count or 0 }}</td>
+
+                                <td>
+                                    <span class="pill {% if unit.is_active %}active{% else %}passive{% endif %}">
+                                        {% if unit.is_active %}Aktif{% else %}Pasif{% endif %}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="action-row">
+                                        <a href="{{ url_for('main.admin_org_unit_edit', unit_id=unit.id) }}" class="mini-btn">
+                                            <i class="fa-solid fa-pen"></i>
+                                            Düzenle
+                                        </a>
+
+                                        <form method="POST" action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}" style="display:inline;" onsubmit="return confirm('Bu kayıt silinsin mi?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="mini-btn danger">
+                                                <i class="fa-solid fa-trash"></i>
+                                                Sil
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-box">
+                <i class="fa-solid fa-diagram-project"></i>
+                <h5>Birim kaydı bulunamadı</h5>
+                <p>Filtre kriterlerinize uygun organizasyon kaydı listelenemedi.</p>
+            </div>
+        {% endif %}
+    {% endcall %}
+</div>
+
+{# BYS360_ORG_UNITS_TARGETED_DATA_WARNING_V2_1_BEGIN #}
+{% set _org_units_admin_data_visible =
+    current_user.is_authenticated and
+    (
+        current_user.role in ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi']
+        or current_user.is_admin|default(false)
+        or current_user.is_superuser|default(false)
+    )
+%}
+
+<script>
+(function () {
+    const canSeeAdminDataWarning = {{ 'true' if _org_units_admin_data_visible else 'false' }};
+
+    function lower(value) {
+        return (value || "").toLocaleLowerCase("tr-TR");
+    }
+
+    function hasOrgDataWarning(value) {
+        const text = lower(value);
+        return (
+            text.includes("risk skoru") ||
+            text.includes("veri tamamlığı") ||
+            text.includes("veri tamamligi") ||
+            text.includes("dar kapsama") ||
+            text.includes("dar kapsam") ||
+            text.includes("kod boş") ||
+            text.includes("kod bos")
+        );
+    }
+
+    function cleanOrgDataWarning(value) {
+        let text = value || "";
+
+        text = text.replace(/Risk skoru/gi, "Veri Kontrolü");
+        text = text.replace(/risk skoru/gi, "Veri Kontrolü");
+        text = text.replace(/Veri Tamamlığı/gi, "Veri Kontrolü");
+        text = text.replace(/Veri Tamamligi/gi, "Veri Kontrolü");
+
+        text = text.replace(/dar kapsama,\s*kod boş/gi, "Birim kodu tanımlanmamış; kapsam bilgisi kontrol edilmeli.");
+        text = text.replace(/dar kapsama,\s*kod bos/gi, "Birim kodu tanımlanmamış; kapsam bilgisi kontrol edilmeli.");
+        text = text.replace(/dar kapsam,\s*kod boş/gi, "Birim kodu tanımlanmamış; kapsam bilgisi kontrol edilmeli.");
+        text = text.replace(/dar kapsam,\s*kod bos/gi, "Birim kodu tanımlanmamış; kapsam bilgisi kontrol edilmeli.");
+
+        text = text.replace(/dar kapsama/gi, "Kapsam bilgisi kontrol edilmeli.");
+        text = text.replace(/dar kapsam/gi, "Kapsam bilgisi kontrol edilmeli.");
+        text = text.replace(/kod boş/gi, "Birim kodu tanımlanmamış.");
+        text = text.replace(/kod bos/gi, "Birim kodu tanımlanmamış.");
+
+        return text;
+    }
+
+    function nearestCleanBlock(el) {
+        return el.closest(".small, small, .text-muted, .muted, .meta, .badge, div, span, p") || el;
+    }
+
+    function normalizeWarnings() {
+        const elements = Array.from(document.querySelectorAll("body *"));
+
+        elements.forEach(function (el) {
+            if (!el || el.children.length > 0) return;
+
+            const original = el.textContent || "";
+            if (!hasOrgDataWarning(original)) return;
+
+            const target = nearestCleanBlock(el);
+
+            if (!canSeeAdminDataWarning) {
+                target.style.display = "none";
+                target.setAttribute("data-bys-hidden-org-data-warning", "1");
+                return;
+            }
+
+            el.textContent = cleanOrgDataWarning(original);
+            el.setAttribute("data-bys-org-data-warning", "admin-only");
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", normalizeWarnings);
+    } else {
+        normalizeWarnings();
+    }
+})();
+</script>
+{# BYS360_ORG_UNITS_TARGETED_DATA_WARNING_V2_1_END #}
+
+{% endblock %}

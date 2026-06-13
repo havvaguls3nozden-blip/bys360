@@ -1,0 +1,157 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}{{ page_title }} - BYS360{% endblock %}
+{% block page_kicker %}{{ page_kicker }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle }}{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell ai-executive-report-shell">
+  <section class="ai-panel ai-hero">
+    <div class="ai-hero-grid">
+      <div>
+        <div class="ai-kicker">Kontrol 11 · Profesyonel yönetici raporu</div>
+        <h3 class="ai-title">AI Yönetici Rapor ve Export Merkezi</h3>
+        <p class="ai-sub">Bu ekran karar vermez; işlem hacmi, açık öneri, maskeleme, risk ve aksiyon sinyallerini yönetici okunabilirliğinde toplar. Export çıktıları ham AI istem/yanıt metni ve kişisel veri içermez.</p>
+        <div class="ai-actions" style="margin-top:16px">
+          <span class="ai-badge success"><i class="fa-solid fa-shield-halved"></i> KVKK güvenli görünürlük</span>
+          <span class="ai-badge muted"><i class="fa-solid fa-clock"></i> Son {{ lookback_days }} gün</span>
+          <span class="ai-badge {{ 'warning' if summary.unmasked_total else 'success' }}"><i class="fa-solid fa-user-shield"></i> Maskeleme %{{ summary.masked_rate }}</span>
+          <span class="ai-badge muted"><i class="fa-solid fa-file-export"></i> Güvenli export</span>
+        </div>
+      </div>
+      <div class="ai-table-wrap" style="box-shadow:none">
+        <div class="ai-kicker">Filtre</div>
+        <form class="ai-filters" method="get" style="grid-template-columns:1fr 1fr auto">
+          <div class="ai-group">
+            <label for="lookback_days">Dönem</label>
+            <select class="ai-select" id="lookback_days" name="lookback_days">
+              {% for day in [7,14,30,60,90,180] %}
+              <option value="{{ day }}" {% if lookback_days == day %}selected{% endif %}>Son {{ day }} gün</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="ai-group">
+            <label for="module_type">Modül</label>
+            <select class="ai-select" id="module_type" name="module_type">
+              <option value="">Tüm canlı modüller</option>
+              {% for option in module_options %}
+              <option value="{{ option.value }}" {% if selected_module_type == option.value %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="ai-submit" type="submit"><i class="fa-solid fa-filter"></i> Uygula</button>
+        </form>
+        <div class="ai-note" style="margin-top:14px">{{ visibility_policy.note }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-grid ai-grid-four">
+    {% for card in executive_cards %}
+    <article class="ai-card ai-action-card tone-{{ card.tone }}">
+      <div class="ai-label"><i class="fa-solid {{ card.icon }}"></i> {{ card.label }}</div>
+      <div class="ai-value">{{ card.value }}</div>
+      <div class="ai-mini">{{ card.note }}</div>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-panel">
+      <div class="ai-kicker">Güvenli export</div>
+      <h3 class="ai-title">Yönetici rapor çıktıları</h3>
+      <p class="ai-sub">CSV, JSON ve Markdown çıktıları yalnız özet, metrik, risk ve aksiyon notu verir. Ham AI metni, kişisel veri ve dosya içe aktarım satırı export edilmez.</p>
+      <div class="ai-actions" style="margin-top:16px">
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_executive_report_export_csv', fallback='#', lookback_days=lookback_days, module_type=selected_module_type) }}"><i class="fa-solid fa-file-csv"></i> CSV dışa aktar</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_executive_report_export_json', fallback='#', lookback_days=lookback_days, module_type=selected_module_type) }}"><i class="fa-solid fa-code"></i> JSON dışa aktar</a>
+        <a class="ai-link" href="{{ safe_url_for('main.admin_ai_executive_report_export_md', fallback='#', lookback_days=lookback_days, module_type=selected_module_type) }}"><i class="fa-solid fa-file-lines"></i> MD dışa aktar</a>
+      </div>
+      <ul class="ai-list" style="margin-top:16px">
+        <li class="ai-list-item"><div><strong>Ham AI metni</strong><div class="ai-mini">İstem/yanıt içeriği panelde ve export dosyasında açılmaz.</div></div><span class="ai-badge success">Kapalı</span></li>
+        <li class="ai-list-item"><div><strong>KVKK maskeleme</strong><div class="ai-mini">Kişisel veri ve hassas alanlar rapor satırlarına taşınmaz.</div></div><span class="ai-badge success">Zorunlu</span></li>
+        <li class="ai-list-item"><div><strong>İnsan onayı</strong><div class="ai-mini">AI önerileri otomatik uygulanmaz; yönetici incelemesi gerekir.</div></div><span class="ai-badge muted">Aktif</span></li>
+      </ul>
+    </article>
+
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Yönetici aksiyon kuyruğu</div>
+      <ul class="ai-list">
+        {% for action in action_queue %}
+        <li class="ai-list-item">
+          <div>
+            <strong>{{ action.title }}</strong>
+            <div class="ai-mini">{{ action.body }}</div>
+          </div>
+          <span class="ai-badge {{ 'warning' if action.tone in ['warning','danger'] else 'success' if action.tone == 'success' else 'muted' }}">{{ action.priority }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+  </section>
+
+  <section class="ai-table-wrap">
+    <div class="ai-kicker">Modül bazlı rapor kartları</div>
+    <table class="ai-table">
+      <thead>
+        <tr>
+          <th>Modül</th>
+          <th>AI işlem</th>
+          <th>Risk</th>
+          <th>Maskeleme</th>
+          <th>Öneri / hata</th>
+          <th>Gecikme</th>
+          <th>Yönetici notu</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in module_rows %}
+        <tr>
+          <td><strong>{{ row.module_label }}</strong><div class="ai-mini">{{ row.module_type }}</div></td>
+          <td><strong>{{ row.request_total }}</strong><div class="ai-mini">Uyarı {{ row.warning_total }} · Hata {{ row.failed_total }}</div></td>
+          <td style="min-width:160px">
+            <span class="ai-badge {{ 'warning' if row.tone in ['warning','danger'] else 'success' if row.tone == 'success' else 'muted' }}">{{ row.risk_label }}</span>
+            <div class="ai-mini">Skor {{ row.risk_score }}/100</div>
+            <div style="height:8px;background:#f3f4f6;border-radius:999px;overflow:hidden;margin-top:8px"><div style="width:{{ row.progress_width }}%;height:8px;background:#8B0000;border-radius:999px"></div></div>
+          </td>
+          <td>%{{ row.masked_rate }}<div class="ai-mini">Maskesiz {{ row.unmasked_total }}</div></td>
+          <td>{{ row.open_recommendations }} açık<div class="ai-mini">Kritik {{ row.critical_recommendations }} · Negatif {{ row.negative_feedback }}</div></td>
+          <td>{{ row.avg_latency_ms }} ms<div class="ai-mini">Yavaş {{ row.slow_total }}</div></td>
+          <td>{{ row.action_note }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7"><div class="ai-note">Bu filtreyle raporlanacak AI sinyali bulunamadı.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="ai-grid ai-grid-two">
+    <article class="ai-table-wrap">
+      <div class="ai-kicker">Öne çıkan açık öneriler</div>
+      <ul class="ai-list">
+        {% for item in recommendation_cards %}
+        <li class="ai-list-item">
+          <div>
+            <strong>{{ item.title }}</strong>
+            <div class="ai-mini">{{ item.module_label }} · {{ item.body }}</div>
+          </div>
+          <span class="ai-badge {{ 'warning' if item.tone in ['warning','danger'] else 'muted' }}">{{ item.severity_label }}</span>
+        </li>
+        {% else %}
+        <li class="ai-list-item"><div class="ai-mini">Açık/kritik öneri görünmüyor.</div></li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <article class="ai-panel">
+      <div class="ai-kicker">Güvenlik sözleşmesi</div>
+      <h3 class="ai-title">Kontrol 11 sınırları</h3>
+      <ul class="ai-list" style="margin-top:16px">
+        <li class="ai-list-item"><div><strong>DB yazımı</strong><div class="ai-mini">Rapor ekranı kayıt oluşturmaz ve güncellemez.</div></div><span class="ai-badge success">Kapalı</span></li>
+        <li class="ai-list-item"><div><strong>Gerçek içe aktarım</strong><div class="ai-mini">Excel/CSV içe aktarım yapmaz; Kontrol 7 önizleme çizgisi korunur.</div></div><span class="ai-badge success">Yok</span></li>
+        <li class="ai-list-item"><div><strong>Nihai karar</strong><div class="ai-mini">AI yalnız risk/öncelik sinyali üretir, idari karar vermez.</div></div><span class="ai-badge muted">İnsan onayı</span></li>
+        <li class="ai-list-item"><div><strong>Export kapsamı</strong><div class="ai-mini">Yalnız güvenli özet, metrik ve aksiyon satırları dışa aktarılır.</div></div><span class="ai-badge success">Güvenli</span></li>
+      </ul>
+    </article>
+  </section>
+</div>
+{% endblock %}

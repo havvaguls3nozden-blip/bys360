@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="0.091" timestamp="2026-06-12T11:49:30.151916+03:00" hostname="HavvaGulsen"><testcase classname="tests.critical.test_claude_phase5_critical_contracts" name="test_security_and_mail_contracts_are_covered" time="0.001"><failure message="AssertionError: assert 'get_smtp_settings' in set()">tests\critical\test_claude_phase5_critical_contracts.py:112: in test_security_and_mail_contracts_are_covered
+    assert name in mail_defs
+E   AssertionError: assert 'get_smtp_settings' in set()</failure></testcase><testcase classname="tests.critical.test_claude_phase5_critical_contracts" name="test_phase5_quality_gate_exists" time="0.000"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = WindowsPath('C:/bys360/project/scripts/quality/check_critical_services_phase5_gate.py').exists">tests\critical\test_claude_phase5_critical_contracts.py:117: in test_phase5_quality_gate_exists
+    assert gate.exists()
+E   AssertionError: assert False
+E    +  where False = exists()
+E    +    where exists = WindowsPath('C:/bys360/project/scripts/quality/check_critical_services_phase5_gate.py').exists</failure></testcase><testcase classname="tests.critical.test_claude_phase6_sql_performance_contracts" name="test_phase6_quality_gate_exists" time="0.000"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = WindowsPath('C:/bys360/project/scripts/quality/check_sql_performance_phase6_gate.py').exists">tests\critical\test_claude_phase6_sql_performance_contracts.py:60: in test_phase6_quality_gate_exists
+    assert gate.exists()
+E   AssertionError: assert False
+E    +  where False = exists()
+E    +    where exists = WindowsPath('C:/bys360/project/scripts/quality/check_sql_performance_phase6_gate.py').exists</failure></testcase><testcase classname="tests.critical.test_claude_phase7_final_gate_contracts" name="test_phase7_quality_script_exists" time="0.000"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = WindowsPath('scripts/quality/check_claude_phase7_final_gate.py').exists&#10; +      where WindowsPath('scripts/quality/check_claude_phase7_final_gate.py') = Path('scripts/quality/check_claude_phase7_final_gate.py')">tests\critical\test_claude_phase7_final_gate_contracts.py:24: in test_phase7_quality_script_exists
+    assert Path("scripts/quality/check_claude_phase7_final_gate.py").exists()
+E   AssertionError: assert False
+E    +  where False = exists()
+E    +    where exists = WindowsPath('scripts/quality/check_claude_phase7_final_gate.py').exists
+E    +      where WindowsPath('scripts/quality/check_claude_phase7_final_gate.py') = Path('scripts/quality/check_claude_phase7_final_gate.py')</failure></testcase></testsuite></testsuites>

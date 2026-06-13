@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+
+{% block title %}Kurum Grafikleri - BYS360
+<section class="admin-block" style="margin-top:18px;">
+    <h3 class="block-title">Kurumsal Guvenlik ve Uyum Odagi</h3>
+    <div class="info-grid">
+        <div class="info-item"><strong>KVKK yaklasimi:</strong> ekranlarda TC yerine sicil no / kurum ID gorunurlugu esas alinmali, asgari veri ilkesi korunmali.</div>
+        <div class="info-item"><strong>Dosya guvenligi:</strong> yukleme akislarinda uzanti, boyut, MIME ve erisim kontrolleri zorunlu tutulmali.</div>
+        <div class="info-item"><strong>Hesap guvenligi:</strong> hatali giris denemelerinde captcha, ilk giris guvenlik adimlari ve savunmaci form davranisi korunmali.</div>
+    </div>
+</section>
+
+{% endblock %}
+{% block page_kicker %}Genel / Gösterge Paneli
+<section class="admin-block" style="margin-top:18px;">
+    <h3 class="block-title">Kurumsal Guvenlik ve Uyum Odagi</h3>
+    <div class="info-grid">
+        <div class="info-item"><strong>KVKK yaklasimi:</strong> ekranlarda TC yerine sicil no / kurum ID gorunurlugu esas alinmali, asgari veri ilkesi korunmali.</div>
+        <div class="info-item"><strong>Dosya guvenligi:</strong> yukleme akislarinda uzanti, boyut, MIME ve erisim kontrolleri zorunlu tutulmali.</div>
+        <div class="info-item"><strong>Hesap guvenligi:</strong> hatali giris denemelerinde captcha, ilk giris guvenlik adimlari ve savunmaci form davranisi korunmali.</div>
+    </div>
+</section>
+
+{% endblock %}
+{% block page_title %}Kurum Grafikleri
+<section class="admin-block" style="margin-top:18px;">
+    <h3 class="block-title">Kurumsal Guvenlik ve Uyum Odagi</h3>
+    <div class="info-grid">
+        <div class="info-item"><strong>KVKK yaklasimi:</strong> ekranlarda TC yerine sicil no / kurum ID gorunurlugu esas alinmali, asgari veri ilkesi korunmali.</div>
+        <div class="info-item"><strong>Dosya guvenligi:</strong> yukleme akislarinda uzanti, boyut, MIME ve erisim kontrolleri zorunlu tutulmali.</div>
+        <div class="info-item"><strong>Hesap guvenligi:</strong> hatali giris denemelerinde captcha, ilk giris guvenlik adimlari ve savunmaci form davranisi korunmali.</div>
+    </div>
+</section>
+
+{% endblock %}
+{% block page_subtitle %}Kurumsal istatistikler, süreç özeti ve yönetsel hızlı erişim alanı
+<section class="admin-block" style="margin-top:18px;">
+    <h3 class="block-title">Kurumsal Guvenlik ve Uyum Odagi</h3>
+    <div class="info-grid">
+        <div class="info-item"><strong>KVKK yaklasimi:</strong> ekranlarda TC yerine sicil no / kurum ID gorunurlugu esas alinmali, asgari veri ilkesi korunmali.</div>
+        <div class="info-item"><strong>Dosya guvenligi:</strong> yukleme akislarinda uzanti, boyut, MIME ve erisim kontrolleri zorunlu tutulmali.</div>
+        <div class="info-item"><strong>Hesap guvenligi:</strong> hatali giris denemelerinde captcha, ilk giris guvenlik adimlari ve savunmaci form davranisi korunmali.</div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block content %}
+<style>
+    .admin-hero{
+        display:block;
+        display:grid;
+        grid-template-columns:1.35fr .95fr;
+        gap:18px;
+        margin-bottom:18px;
+    }
+
+    .admin-hero-card,
+    .admin-stat,
+    .admin-block,
+    .mini-card{
+        background:rgba(255,255,255,.68);
+        border:1px solid rgba(139,0,0,.08);
+        border-radius:22px;
+        box-shadow:0 16px 34px rgba(15,23,42,.08);
+    }
+
+    .admin-hero-card{
+        padding:24px;
+    }
+
+    .admin-hero-title{
+        margin:0 0 10px;
+        font-size:1.55rem;
+        font-weight:800;
+        color:#111827;
+    }
+
+    .admin-hero-text{
+        margin:0;
+        color:#6b7280;
+        line-height:1.7;
+    }
+
+    .admin-hero-actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-top:18px;
+    }
+
+    .admin-side-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px;
+    }
+
+    .admin-stat{
+        padding:18px;
+    }
+
+    .admin-stat .label{
+        font-size:.88rem;
+        color:#6b7280;
+        margin-bottom:8px;
+    }
+
+    .admin-stat .value{
+        font-size:1.9rem;
+        font-weight:800;
+        color:#111827;
+    }
+
+    .admin-section-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+        margin-bottom:18px;
+    }
+
+    .admin-block{
+        padding:20px;
+    }
+
+    .block-title{
+        margin:0 0 14px;
+        font-size:1.08rem;
+        font-weight:800;
+        color:#1f2937;
+    }
+
+    .info-grid{
+        display:grid;
+        gap:10px;
+    }
+
+    .info-item{
+        padding:12px 14px;
+        border-radius:14px;
+        background:rgba(255,255,255,.74);
+        border:1px solid rgba(15,23,42,.06);
+        color:#4b5563;
+        line-height:1.6;
+    }
+
+    .info-item strong{
+        color:#111827;
+    }
+
+    .progress-wrap{
+        display:grid;
+        gap:12px;
+    }
+
+    .progress-row{
+        padding:12px 14px;
+        border-radius:14px;
+        background:rgba(255,255,255,.74);
+        border:1px solid rgba(15,23,42,.06);
+    }
+
+    .progress-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:8px;
+        font-weight:700;
+        color:#374151;
+    }
+
+    .progress-bar{
+        width:100%;
+        height:10px;
+        border-radius:999px;
+        background:#e5e7eb;
+        overflow:hidden;
+    }
+
+    .progress-fill{
+        height:100%;
+        border-radius:999px;
+        background:linear-gradient(90deg, #8B0000, #b91c1c);
+    }
+
+    .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+    .risk-row{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.76);border:1px solid rgba(15,23,42,.06);display:grid;gap:8px;}
+    .risk-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+    .risk-meta{display:flex;gap:8px;flex-wrap:wrap;}
+    .risk-pill{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;font-size:.76rem;font-weight:800;background:rgba(107,114,128,.12);color:#374151;}
+    .risk-pill.critical{background:rgba(185,28,28,.10);color:#991b1b;}
+    .risk-pill.watch{background:rgba(217,119,6,.10);color:#92400e;}
+    .risk-pill.calm{background:rgba(22,101,52,.10);color:#166534;}
+    .risk-mini{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,.05);font-size:.76rem;font-weight:800;color:#374151;}
+
+    .quick-grid{
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:16px;
+    }
+
+    .mini-card{
+        padding:18px;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .mini-card .icon{
+        width:48px;
+        height:48px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(139,0,0,.10);
+        color:#111827;
+        font-size:1.15rem;
+    }
+
+    .mini-card .title{
+        font-size:1rem;
+        font-weight:800;
+        color:#1f2937;
+    }
+
+    .mini-card .text{
+        color:#6b7280;
+        font-size:.92rem;
+        line-height:1.6;
+        min-height:48px;
+    }
+
+    .mini-card .actions{
+        margin-top:auto;
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+    }
+
+    @media (max-width: 1200px){
+        .admin-hero,
+        .admin-section-grid,
+        .risk-grid,
+        .quick-grid{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media (max-width: 700px){
+        .admin-side-grid{
+            grid-template-columns:1fr;
+        }
+    }
+</style>
+
+<div class="admin-hero">
+    <div class="admin-hero-card">
+        <h3 class="admin-hero-title">Yönetim özeti</h3>
+        <p class="admin-hero-text">
+            Bu alan, sistemdeki personel, birim, dönem ve değerlendirme süreçlerini üst düzeyde
+            izlemek için hazırlanmıştır. Yönetici ekranı olarak daha yoğun veriyi sade bir
+            düzen içinde sunar.
+        </p>
+
+        <div class="admin-hero-actions">
+            <a class="btn btn-danger" href="{{ url_for("main.admin_import_health_report") }}"><i class="fas fa-stethoscope me-2"></i>Toplu Sistem Taraması</a>
+            <a class="btn" href="{{ url_for('main.performance_periods') }}">
+                <i class="fa-solid fa-calendar-days"></i>
+                Dönemler
+            </a>
+            <a class="btn btn-secondary" href="{{ url_for('main.performance_reports') }}">
+                <i class="fa-solid fa-file-lines"></i>
+                Raporlar
+            </a>
+            <a class="btn btn-secondary" href="{{ url_for('main.performance_hierarchy_tree') }}">
+                <i class="fa-solid fa-diagram-project"></i>
+                Hiyerarşi Ağacı
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-side-grid">
+        <div class="admin-stat">
+            <div class="label">Toplam Personel</div>
+            <div class="value">{{ user_count }}</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="label">Aktif Personel</div>
+            <div class="value">{{ active_user_count }}</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="label">Toplam Birim</div>
+            <div class="value">{{ unit_count }}</div>
+        </div>
+
+        <div class="admin-stat">
+            <div class="label">Aktif Dönem</div>
+            <div class="value" style="font-size:1.15rem;">
+                {{ active_period.title if active_period else '-' }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-section-grid">
+    <div class="admin-block">
+        <h4 class="block-title">Sistem Özeti</h4>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Toplam Dönem:</strong> {{ period_count }}
+            </div>
+            <div class="info-item">
+                <strong>Toplam Değerlendirme Kriteri:</strong> {{ criteria_count }}
+            </div>
+            <div class="info-item">
+                <strong>Toplam Değerlendirme Görevi:</strong> {{ total_assignments }}
+            </div>
+            <div class="info-item">
+                <strong>Yayımlanan Dönem Sayısı:</strong> {{ published_period_count }}
+            </div>
+            <div class="info-item">
+                <strong>Toplam Değerlendirme Kaydı:</strong> {{ total_evaluations }}
+            </div>
+            <div class="info-item">
+                <strong>Tamamlanan Değerlendirme:</strong> {{ completed_evaluations }}
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-block">
+        <h4 class="block-title">Süreç Durumu</h4>
+        <div class="progress-wrap">
+            <div class="progress-row">
+                <div class="progress-head">
+                    <span>Bekleyen Görevler</span>
+                    <span>{{ pending_assignments }}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:{% if total_assignments > 0 %}{{ (pending_assignments / total_assignments * 100)|round(2) }}{% else %}0{% endif %}%"></div>
+                </div>
+            </div>
+
+            <div class="progress-row">
+                <div class="progress-head">
+                    <span>Kısmi Tamamlanan Görevler</span>
+                    <span>{{ partial_assignments }}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:{% if total_assignments > 0 %}{{ (partial_assignments / total_assignments * 100)|round(2) }}{% else %}0{% endif %}%"></div>
+                </div>
+            </div>
+
+            <div class="progress-row">
+                <div class="progress-head">
+                    <span>Tamamlanan Görevler</span>
+                    <span>{{ completed_assignments }}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:{% if total_assignments > 0 %}{{ (completed_assignments / total_assignments * 100)|round(2) }}{% else %}0{% endif %}%"></div>
+                </div>
+            </div>
+
+            <div class="progress-row">
+                <div class="progress-head">
+                    <span>Genel Tamamlanma Oranı</span>
+                    <span>%{{ completion_rate }}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:{{ completion_rate }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="risk-grid">
+    <div class="admin-block">
+        <h4 class="block-title">Kritik Birimler</h4>
+        {% if critical_units %}
+            <div class="info-grid">
+                {% for unit in critical_units[:4] %}
+                <div class="risk-row">
+                    <div class="risk-top">
+                        <div>
+                            <div style="font-weight:800;color:#1f2937;">{{ unit.unit_name }}</div>
+                            <div style="color:#6b7280;font-size:.88rem;">Risk puanı: {{ unit.risk_score }} · Toplam kayıt: {{ unit.log_count }}</div>
+                        </div>
+                        <span class="risk-pill {% if unit.risk_score >= 12 %}critical{% elif unit.risk_score >= 5 %}watch{% else %}calm{% endif %}">{% if unit.risk_score >= 12 %}Kritik{% elif unit.risk_score >= 5 %}İzlenmeli{% else %}Dengeli{% endif %}</span>
+                    </div>
+                    <div class="risk-meta">
+                        <span class="risk-mini">Açıkta {{ unit.uncovered }}</span>
+                        <span class="risk-mini">Zincir {{ unit.chain_issue }}</span>
+                        <span class="risk-mini">Muaf {{ unit.exempted }}</span>
+                        <span class="risk-mini">Vekâlet {{ unit.delegated }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="info-item">Aktif dönem için henüz kapsama riski oluşmadı.</div>
+        {% endif %}
+    </div>
+
+    <div class="admin-block">
+        <h4 class="block-title">Kritik Dönemler ve Güncel Uyarılar</h4>
+        <div class="info-grid">
+            <div class="info-item"><strong>Canlı kapsama riski:</strong> {{ coverage_risk_label }} ({{ coverage_risk_score or 0 }})</div>
+            <div class="info-item"><strong>Açıkta zincir:</strong> {{ coverage_summary.uncovered if coverage_summary else 0 }} · <strong>Muafiyet:</strong> {{ coverage_summary.exempted if coverage_summary else 0 }} · <strong>Vekâlet:</strong> {{ coverage_summary.delegated if coverage_summary else 0 }}</div>
+            {% if today_coverage_alerts %}
+                {% for row in today_coverage_alerts[:4] %}
+                <div class="risk-row">
+                    <div class="risk-top">
+                        <div>
+                            <div style="font-weight:800;color:#1f2937;">{{ row.employee.full_name if row.employee and row.employee.full_name else ((row.employee.ad ~ ' ' ~ row.employee.soyad) if row.employee else 'Personel') }}</div>
+                            <div style="color:#6b7280;font-size:.88rem;">{{ row.reason or 'Açıklama yok.' }}</div>
+                        </div>
+                        <span class="risk-pill {% if row.event_type in ['uncovered','chain_issue'] %}critical{% else %}watch{% endif %}">{{ row.event_type|replace('_',' ')|title }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-item">Bugün için müdahale gerektiren kapsama uyarısı görünmüyor.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="quick-grid">
+    <div class="mini-card">
+        <div class="icon">
+            <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <div class="title">Personel Yönetimi</div>
+        <div class="text">
+            Personel kayıtları, rol yapısı ve bağlı birim ilişkilerini yönetin.
+        </div>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('main.personnel_list') }}">Aç</a>
+        </div>
+    </div>
+
+    <div class="mini-card">
+        <div class="icon">
+            <i class="fa-solid fa-clipboard-question"></i>
+        </div>
+        <div class="title">Kriterler</div>
+        <div class="text">
+            Değerlendirme kriterlerini ve ağırlık mantığını gözden geçirin.
+        </div>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('main.performance_criteria') }}">Aç</a>
+        </div>
+    </div>
+
+    <div class="mini-card">
+        <div class="icon">
+            <i class="fa-solid fa-table-list"></i>
+        </div>
+        <div class="title">Personel Analizi</div>
+        <div class="text">
+            Yönetsel karşılaştırma ekranından ekip performansını izleyin.
+        </div>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('main.performance_team_compare') }}">Aç</a>
+        </div>
+    </div>
+
+    <div class="mini-card">
+        <div class="icon">
+            <i class="fa-solid fa-file-lines"></i>
+        </div>
+        <div class="title">Raporlar</div>
+        <div class="text">
+            Dönemsel çıktıların ve genel süreç oranlarının özet görünümü.
+        </div>
+        <div class="actions">
+            <a class="btn" href="{{ url_for('main.performance_reports') }}">Aç</a>
+        </div>
+    </div>
+</div>
+
+<section class="admin-block" style="margin-top:18px;">
+    <h3 class="block-title">Kurumsal Guvenlik ve Uyum Odagi</h3>
+    <div class="info-grid">
+        <div class="info-item"><strong>KVKK yaklasimi:</strong> ekranlarda TC yerine sicil no / kurum ID gorunurlugu esas alinmali, asgari veri ilkesi korunmali.</div>
+        <div class="info-item"><strong>Dosya guvenligi:</strong> yukleme akislarinda uzanti, boyut, MIME ve erisim kontrolleri zorunlu tutulmali.</div>
+        <div class="info-item"><strong>Hesap guvenligi:</strong> hatali giris denemelerinde captcha, ilk giris guvenlik adimlari ve savunmaci form davranisi korunmali.</div>
+    </div>
+</section>
+
+{% endblock %}

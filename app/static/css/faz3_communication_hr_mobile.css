@@ -1,0 +1,110 @@
+/* Faz 3 responsive güçlendirmesi: izin/vekâlet + bildirim + mesajlar */
+
+/* Ortak mobil yardımcılar */
+.faz3-mobile-scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.faz3-mobile-hidden{display:none}
+.faz3-mobile-stack{display:grid;gap:12px}
+
+/* Bildirimler */
+@media (max-width: 991.98px){
+  .notification-page{gap:14px}
+  .notification-hero{padding:18px !important;grid-template-columns:1fr !important}
+  .notification-toolbar{padding:14px !important;position:sticky;top:72px;z-index:4}
+  .toolbar-top,.toolbar-foot{align-items:stretch !important}
+  .filter-row{flex-wrap:nowrap !important;overflow:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .filter-chip{flex:0 0 auto}
+  .notification-card{grid-template-columns:1fr !important;padding:15px !important}
+  .notification-side{grid-template-columns:repeat(2,minmax(0,1fr));display:grid}
+  .notification-select{order:-1;justify-content:flex-start !important;padding-top:0 !important}
+  .notification-note{font-size:.82rem !important}
+}
+@media (max-width: 767.98px){
+  .stats-grid{grid-template-columns:1fr !important}
+  .notification-toolbar{top:64px}
+  .notification-side{grid-template-columns:1fr}
+  .toolbar-search{display:grid !important;grid-template-columns:1fr;align-items:stretch}
+  .toolbar-search input{width:100% !important;min-width:0 !important}
+  .bulk-bar,.toolbar-top,.toolbar-foot{display:grid !important;grid-template-columns:1fr}
+  .inline-empty{display:block}
+}
+
+/* Mesaj kutusu */
+@media (max-width: 991.98px){
+  .wa-shell{grid-template-columns:1fr !important;min-height:auto !important}
+  .wa-sidebar,.wa-main{min-height:auto !important;height:auto !important}
+  .wa-card{border-radius:20px !important}
+  .wa-search-wrap{position:sticky;top:64px;z-index:3;background:rgba(255,255,255,.96)}
+  .wa-thread-list{max-height:48vh}
+  .wa-main{min-height:58vh}
+}
+@media (max-width: 767.98px){
+  .wa-shell{gap:10px !important}
+  .wa-sidebar-top,.wa-main-head,.wa-compose{padding-left:14px !important;padding-right:14px !important}
+  .wa-thread-list{padding:6px !important;max-height:none}
+  .wa-thread-item{padding:12px !important;border-radius:14px !important}
+  .wa-avatar{width:42px !important;height:42px !important;border-radius:14px !important}
+  .wa-mobile-switch{position:sticky;top:8px;z-index:8;background:transparent}
+  .wa-mobile-fab{position:fixed !important;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:15;box-shadow:0 18px 30px rgba(139,0,0,.24)}
+  .wa-actions,.wa-head-actions{display:grid !important;grid-template-columns:1fr}
+  .wa-btn,.wa-mini-btn,.wa-send{width:100% !important}
+  .wa-compose{position:sticky;bottom:0;background:rgba(255,255,255,.98) !important;padding-bottom:calc(12px + env(safe-area-inset-bottom)) !important}
+}
+
+/* Mesaj thread */
+@media (max-width: 991.98px){
+  .chat-shell{display:grid !important;grid-template-columns:1fr !important;gap:12px !important}
+  .chat-main{order:1}
+  .chat-side{order:2}
+}
+@media (max-width: 767.98px){
+  .chat-card{border-radius:20px !important}
+  .chat-main-head,.chat-compose,.chat-side-head{padding-left:14px !important;padding-right:14px !important}
+  .chat-messages{padding:16px 12px 10px !important;max-height:58vh !important}
+  .chat-form{grid-template-columns:1fr !important}
+  .chat-send{width:100% !important;min-height:48px !important;border-radius:16px !important}
+  .chat-compose{position:sticky;bottom:0;background:rgba(255,255,255,.98) !important;padding-bottom:calc(12px + env(safe-area-inset-bottom)) !important}
+}
+
+/* Yeni mesaj */
+@media (max-width: 991.98px){
+  .message-compose-layout{grid-template-columns:1fr !important}
+  .message-compose-hero{padding:18px !important}
+}
+@media (max-width: 767.98px){
+  .message-compose-shell{gap:12px !important}
+  .message-compose-card{border-radius:20px !important;padding:16px !important}
+  .self-note-box{display:grid !important;grid-template-columns:1fr;justify-items:start}
+  .message-actions{position:sticky;bottom:0;z-index:6;background:rgba(255,255,255,.98);padding:10px 0 calc(10px + env(safe-area-inset-bottom));margin-top:6px}
+  .message-actions .message-btn{width:100%}
+  .message-inline-actions{overflow:auto;flex-wrap:nowrap !important;padding-bottom:4px}
+  .recipient-trigger{padding:14px !important}
+  .recipient-trigger-main{min-width:0}
+  .recipient-trigger-action{display:none !important}
+}
+
+/* İzin / vekâlet */
+@media (max-width: 991.98px){
+  .page-grid,.hero-stack,.stack{gap:14px !important}
+  .hero-mini-grid,.stats,.notice-grid{grid-template-columns:1fr !important}
+  .scope-strip{display:grid !important;grid-template-columns:1fr !important;gap:12px !important}
+  .scope-options{display:flex !important;overflow:auto;flex-wrap:nowrap !important;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .scope-pill{flex:0 0 auto}
+  .filter-form{grid-template-columns:1fr 1fr !important}
+  .form-grid,.check-grid{grid-template-columns:1fr !important}
+}
+@media (max-width: 767.98px){
+  .panel{padding:16px !important;border-radius:20px !important}
+  .top-strip-badges,.btn-row,.mini-actions,.toolbar{display:grid !important;grid-template-columns:1fr}
+  .subtle-btn,.submit-btn{width:100%;justify-content:center}
+  .filter-form{grid-template-columns:1fr !important}
+  .table-wrap{display:none}
+  .mobile-table-cards{display:grid;gap:12px;margin-top:12px}
+  .mobile-data-card{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.05)}
+  .mobile-data-card__title{margin:0 0 10px;font-size:1rem;font-weight:900;color:#111827;line-height:1.4}
+  .mobile-data-card__grid{display:grid;gap:8px}
+  .mobile-data-row{display:grid;gap:4px;padding:8px 0;border-bottom:1px dashed rgba(15,23,42,.08)}
+  .mobile-data-row:last-child{border-bottom:none;padding-bottom:0}
+  .mobile-data-label{font-size:.74rem;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.02em}
+  .mobile-data-value{font-size:.9rem;color:#111827;line-height:1.6;word-break:break-word}
+  .mobile-data-empty{padding:18px;border-radius:16px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;text-align:center}
+}

@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-12T18:24:30",
+  "phase": "A85E3_RUNTIME_SECURITY_GATE_NORMALIZE_PATCH",
+  "changed_files": [
+    "tests\\architecture\\test_mobile_api_personnel_kpi_communication_response_p3c.py",
+    "tests\\architecture\\test_mobile_auth_dashboard_assistant_response_p3b.py",
+    "scripts\\quality\\bys360_mobile_security_suite_gate_p4c.py",
+    "scripts\\quality\\bys360_mobile_security_suite_gate_p4c_v2.py"
+  ],
+  "backups": [
+    "backups\\a85e\\test_mobile_api_personnel_kpi_communication_response_p3c.py_20260612_182424.bak",
+    "backups\\a85e\\test_mobile_auth_dashboard_assistant_response_p3b.py_20260612_182424.bak",
+    "backups\\a85e\\bys360_mobile_security_suite_gate_p4c.py_20260612_182424.bak",
+    "backups\\a85e\\bys360_mobile_security_suite_gate_p4c_v2.py_20260612_182424.bak"
+  ],
+  "pytest_cmd": [
+    "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "tests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py",
+    "tests/architecture/test_mobile_api_security_suite_p4c.py",
+    "tests/architecture/test_mobile_api_security_suite_p4c_v2.py",
+    "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py",
+    "tests/mobile/test_mobile_domain_contract_p2a.py::test_mobile_route_contract_count",
+    "-q",
+    "-ra"
+  ],
+  "pytest_returncode": 0,
+  "pytest_output": ".....                                                                    [100%]\n============================== warnings summary ===============================\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py::test_mobile_personnel_kpi_communication_response_gate_p3c\ntests/architecture/test_mobile_api_security_suite_p4c.py::test_mobile_security_suite_gate_p4c\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py::test_mobile_security_suite_gate_p4c_v2\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-app.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\ntests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c.py::test_mobile_personnel_kpi_communication_response_gate_p3c\ntests/architecture/test_mobile_api_security_suite_p4c.py::test_mobile_security_suite_gate_p4c\ntests/architecture/test_mobile_api_security_suite_p4c_v2.py::test_mobile_security_suite_gate_p4c_v2\n  C:\\bys360\\project\\app\\bootstrap\\startup.py:22: ResourceWarning: unclosed file <_io.TextIOWrapper name='C:\\\\bys360\\\\project\\\\logs\\\\bys360-ops.log' mode='a' encoding='utf-8'>\n    configure_operational_logging(app)\n  Enable tracemalloc to get traceback where the object was allocated.\n  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n5 passed, 6 warnings in 5.89s\n\n",
+  "ok": true
+}

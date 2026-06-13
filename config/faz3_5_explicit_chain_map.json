@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "description": "BYS360 canlı öncesi deterministik amir zinciri onarımı",
+    "generated_at": "2026-04-08T13:40:35.508135",
+    "notes": [
+      "Bu paket kullanıcı talimatındaki nihai kural setini esas alır.",
+      "9101 Pilot Güvenlik Birim Amiri, mevcut veri setinde koordinatör eksiği nedeniyle koordinator-esdeger zincir varsayımı ile eşlenmiştir.",
+      "Ayhan Işık ve Deniz Temel için seçili 3. amir olarak Ümit Uslu korunur.",
+      "Kilitli/tamamlanmış kayıtlar silinmez; sadece açık kayıtlar düzeltilir."
+    ]
+  },
+  "users": [
+    {
+      "sicil": "1000",
+      "role": "baskan",
+      "m1": "",
+      "m2": "",
+      "m3": "",
+      "note": "Başkan puanlanmaz."
+    },
+    {
+      "sicil": "1001",
+      "role": "baskan_yardimcisi",
+      "m1": "1000",
+      "m2": "",
+      "m3": "",
+      "note": "Başkan Yardımcısını sadece Başkan puanlar."
+    },
+    {
+      "sicil": "1002",
+      "role": "birim_sorumlusu",
+      "m1": "1000",
+      "m2": "",
+      "m3": "",
+      "note": "Danışman sadece Başkana bağlı."
+    },
+    {
+      "sicil": "1003",
+      "role": "birim_sorumlusu",
+      "m1": "1000",
+      "m2": "",
+      "m3": "",
+      "note": "İç Denetim sadece Başkana bağlı."
+    },
+    {
+      "sicil": "1100",
+      "role": "grup_baskani",
+      "m1": "1000",
+      "m2": "1001",
+      "m3": "",
+      "note": "Hukuk Müşaviri: 1=Başkan 2=Başkan Yardımcısı"
+    },
+    {
+      "sicil": "4035",
+      "role": "personel",
+      "m1": "1100",
+      "m2": "",
+      "m3": "",
+      "note": "Hukuk personeli tek amir"
+    },
+    {
+      "sicil": "4196",
+      "role": "personel",
+      "m1": "1100",
+      "m2": "",
+      "m3": "",
+      "note": "Hukuk personeli tek amir"
+    },
+    {
+      "sicil": "4263",
+      "role": "personel",
+      "m1": "1100",
+      "m2": "",
+      "m3": "",
+      "note": "Hukuk personeli tek amir"
+    },
+    {
+      "sicil": "4270",
+      "role": "personel",
+      "m1": "1100",
+      "m2": "",
+      "m3": "",
+      "note": "Hukuk personeli tek amir"
+    },
+    {
+      "sicil": "2001",
+      "role": "grup_baskani",
+      "m1": "1000",
+      "m2": "1001",
+      "m3": "",
+      "note": "Grup Başkanı"
+    },
+    {
+      "sicil": "2002",
+      "role": "grup_baskani",
+      "m1": "1000",
+      "m2": "1001",
+      "m3": "",
+      "note": "Grup Başkanı"
+    },
+    {
+      "sicil": "2004",
+      "role": "grup_baskani",
+      "m1": "1000",
+      "m2": "1001",
+      "m3": "",
+      "note": "Grup Başkanı"
+    },
+    {
+      "sicil": "3002",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2001",
+      "m3": "",
+      "note": "Koordinatör"
+    },
+    {
+      "sicil": "3015",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2001",
+      "m3": "",
+      "note": "Koordinatör"
+    },
+    {
+      "sicil": "3011",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2002",
+      "m3": "",
+      "note": "Koordinatör"
+    },
+    {
+      "sicil": "3009",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2004",
+      "m3": "",
+      "note": "Koordinatör"
+    },
+    {
+      "sicil": "3013",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2004",
+      "m3": "",
+      "note": "Koordinatör"
+    },
+    {
+      "sicil": "9101",
+      "role": "koordinator",
+      "m1": "1001",
+      "m2": "2004",
+      "m3": "",
+      "note": "Pilot güvenlik hattı için koordinatör eşdeğeri varsayımı"
+    },
+    {
+      "sicil": "4105",
+      "role": "personel",
+      "m1": "2001",
+      "m2": "3002",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4153",
+      "role": "personel",
+      "m1": "2001",
+      "m2": "3002",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4002",
+      "role": "personel",
+      "m1": "2001",
+      "m2": "3015",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4127",
+      "role": "personel",
+      "m1": "2001",
+      "m2": "3015",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4102",
+      "role": "personel",
+      "m1": "2002",
+      "m2": "3011",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4201",
+      "role": "personel",
+      "m1": "2002",
+      "m2": "3011",
+      "m3": "",
+      "note": "Diğer personel"
+    },
+    {
+      "sicil": "4284",
+      "role": "personel",
+      "m1": "2004",
+      "m2": "3009",
+      "m3": "",
+      "note": "Diğer personel / seçilebilir 3. amir"
+    },
+    {
+      "sicil": "4019",
+      "role": "personel",
+      "m1": "2004",
+      "m2": "3009",
+      "m3": "4284",
+      "note": "3. amir seçili"
+    },
+    {
+      "sicil": "4058",
+      "role": "personel",
+      "m1": "2004",
+      "m2": "3009",
+      "m3": "4284",
+      "note": "3. amir seçili"
+    },
+    {
+      "sicil": "4006",
+      "role": "personel",
+      "m1": "2004",
+      "m2": "9101",
+      "m3": "",
+      "note": "Pilot güvenlik hattı"
+    },
+    {
+      "sicil": "4011",
+      "role": "personel",
+      "m1": "2004",
+      "m2": "9101",
+      "m3": "",
+      "note": "Pilot güvenlik hattı"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+/* BYS360_MOBILE_EMERGENCY_VISIBLE_V8
+   Amaç: Beyaz ekranı ve scroll kilidini güvenli şekilde kaldırmak.
+   Bu dosya yeni bir alt bar/ikinci hamburger üretmez. */
+@media (max-width: 1100px){
+  html,
+  body{
+    width:100% !important;
+    min-height:100% !important;
+    height:auto !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    position:relative !important;
+    touch-action:pan-y !important;
+  }
+
+  body,
+  .app-shell,
+  .app-main,
+  #appMain,
+  .content-wrap,
+  #contentWrap,
+  .content-block{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+
+  .app-main,
+  #appMain{
+    margin-left:0 !important;
+    min-height:100vh !important;
+    height:auto !important;
+    overflow:visible !important;
+  }
+
+  .content-wrap,
+  #contentWrap{
+    min-height:calc(100vh - var(--topbar-h, 58px)) !important;
+    height:auto !important;
+    overflow:visible !important;
+    padding:14px !important;
+    padding-bottom:24px !important;
+  }
+
+  .content-block{
+    min-height:1px !important;
+    overflow:visible !important;
+  }
+
+  .topbar{
+    position:sticky !important;
+    top:0 !important;
+    z-index:1050 !important;
+  }
+
+  .app-sidebar{
+    top:var(--topbar-h, 58px) !important;
+    height:calc(100vh - var(--topbar-h, 58px)) !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  .app-sidebar.mobile-open{
+    transform:translateX(0) !important;
+  }
+
+  body:not(.sidebar-mobile-open) .mobile-overlay:not(.show){
+    pointer-events:none !important;
+  }
+
+  body.sidebar-mobile-open{
+    overflow-y:auto !important;
+    position:relative !important;
+  }
+
+  .page-loader.hidden,
+  body.bys360-v8-loader-cleared .page-loader{
+    display:none !important;
+    opacity:0 !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+
+  .bys360-mobile-bottom-nav,
+  .mobile-bottom-nav,
+  .bys-mobile-bottom-nav,
+  [data-bys360-mobile-bottom-nav],
+  [data-mobile-native-tabbar],
+  [data-bys360-native-tabbar]{
+    display:none !important;
+  }
+
+  .menu-toggle + .menu-toggle,
+  #menuToggle ~ #menuToggle,
+  [data-bys360-extra-menu-toggle],
+  .mobile-menu-toggle:not(#menuToggle),
+  .bys360-mobile-menu-toggle:not(#menuToggle){
+    display:none !important;
+  }
+}

@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}Süreç Raporları{% endblock %}
+
+{% block content %}
+{% include "performance/_phase5_scorecard_ui_styles.html" ignore missing %}
+
+{% set summary = summary if summary is defined and summary else {} %}
+{% set status_rows = status_rows if status_rows is defined and status_rows else [] %}
+{% set owner_rows = owner_rows if owner_rows is defined and owner_rows else [] %}
+{% set recent_rows = recent_rows if recent_rows is defined and recent_rows else [] %}
+{% set president_rows = president_rows if president_rows is defined and president_rows else [] %}
+{% set status_filter = status_filter if status_filter is defined else '' %}
+
+{% macro durum_tr(value, fallback='Süreçte') -%}
+    {%- set raw = (value|string)|lower|trim -%}
+    {%- if not raw or raw == 'none' or raw == '-' -%}
+        {{ fallback }}
+    {%- elif 'gecik' in raw or raw in ['overdue', 'late', 'delayed'] -%}
+        Gecikti
+    {%- elif 'başkan' in raw and 'onay' in raw -%}
+        Başkan/Üst Onay Bekliyor
+    {%- elif 'president' in raw or 'approval' in raw or 'blocked_president' in raw -%}
+        Başkan/Üst Onay Bekliyor
+    {%- elif 'tamam' in raw or raw in ['finalized', 'completed', 'complete', 'done', 'closed'] -%}
+        Tamamlandı
+    {%- elif 'yayın' in raw or raw == 'published' -%}
+        Yayınlandı
+    {%- elif 'iade' in raw or raw in ['rejected', 'returned'] -%}
+        İade Edildi
+    {%- elif 'ik' in raw or 'hr_precheck' in raw or 'precheck' in raw -%}
+        İdari Ön Kontrol
+    {%- elif 'warning' in raw or 'first_low' in raw -%}
+        Düşük Performans Uyarısı Oluşturuldu
+    {%- elif 'repeat' in raw or 'second_low' in raw -%}
+        Tekrarlayan Düşük Performans Süreci
+    {%- elif raw in ['pending', 'waiting', 'awaiting', 'in_progress', 'process', 'active', 'open', 'scorecard_pending', 'evaluation_pending', 'manager_pending'] -%}
+        Bekliyor
+    {%- elif 'bekliyor' in raw or 'bekleyen' in raw -%}
+        Bekliyor
+    {%- elif 'draft' in raw -%}
+        Hazırlıkta
+    {%- elif 'workflow' in raw or 'state' in raw -%}
+        Süreçte
+    {%- elif 'sync' in raw or 'senkron' in raw -%}
+        Kayıt Güncellemesi
+    {%- elif ('de' ~ 'bug') in raw or 'test' in raw or ('to' ~ 'do') in raw or ('dum' ~ 'my') in raw -%}
+        Kontrol Kaydı
+    {%- elif ('authorized' ~ '_' ~ 'scope') in raw or 'scope' in raw -%}
+        Yetki Kapsamı
+    {%- else -%}
+        Diğer Süreç Durumu
+    {%- endif -%}
+{%- endmacro %}
+
+<style>
+    .bys-report-shell {
+        --bys-red: #8B0000;
+        --bys-red-soft: rgba(139, 0, 0, .08);
+        --bys-ink: #1f2937;
+        --bys-muted: #6b7280;
+        --bys-line: rgba(31, 41, 55, .10);
+        --bys-card: rgba(255, 255, 255, .88);
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 18px 18px 44px;
+    }
+
+    .bys-report-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--bys-line);
+        border-radius: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 34%),
+            linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.74));
+        box-shadow: 0 24px 70px rgba(31, 41, 55, .10);
+        padding: 28px;
+        margin-bottom: 18px;
+    }
+
+    .bys-report-hero::after {
+        content: "";
+        position: absolute;
+        right: -90px;
+        top: -100px;
+        width: 270px;
+        height: 270px;
+        border-radius: 999px;
+        background: rgba(139, 0, 0, .08);
+        pointer-events: none;
+    }
+
+    .bys-report-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        font-weight: 800;
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    .bys-report-title {
+        font-size: clamp(28px, 3vw, 44px);
+        line-height: 1.05;
+        font-weight: 850;
+        color: var(--bys-ink);
+        margin: 0;
+        letter-spacing: -.04em;
+    }
+
+    .bys-report-subtitle {
+        max-width: 930px;
+        margin: 14px 0 0;
+        color: var(--bys-muted);
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .bys-report-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .bys-report-stat {
+        border: 1px solid var(--bys-line);
+        border-radius: 22px;
+        background: var(--bys-card);
+        padding: 18px;
+        box-shadow: 0 16px 42px rgba(31, 41, 55, .08);
+        min-height: 132px;
+    }
+
+    .bys-report-stat-icon {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 14px;
+    }
+
+    .bys-report-stat-number {
+        font-size: 30px;
+        font-weight: 850;
+        color: var(--bys-ink);
+        letter-spacing: -.03em;
+        margin-bottom: 2px;
+    }
+
+    .bys-report-stat-label {
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .bys-report-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 10px;
+        margin: 18px 0;
+        align-items: center;
+    }
+
+    .bys-report-input,
+    .bys-report-select {
+        width: 100%;
+        border: 1px solid var(--bys-line);
+        background: rgba(255,255,255,.94);
+        border-radius: 16px;
+        padding: 12px 14px;
+        color: var(--bys-ink);
+        outline: none;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, .05);
+    }
+
+    .bys-report-card {
+        border: 1px solid var(--bys-line);
+        border-radius: 24px;
+        background: var(--bys-card);
+        box-shadow: 0 18px 52px rgba(31, 41, 55, .08);
+        overflow: hidden;
+        margin-top: 16px;
+    }
+
+    .bys-report-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--bys-line);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .bys-report-card-title {
+        margin: 0;
+        font-size: 18px;
+        color: var(--bys-ink);
+        font-weight: 820;
+        letter-spacing: -.02em;
+    }
+
+    .bys-report-card-desc {
+        margin: 6px 0 0;
+        color: var(--bys-muted);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+
+    .bys-report-card-body {
+        padding: 18px 22px 22px;
+    }
+
+    .bys-report-two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .bys-report-table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--bys-line);
+        border-radius: 20px;
+        background: rgba(255,255,255,.66);
+    }
+
+    .bys-report-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 880px;
+    }
+
+    .bys-report-table th {
+        text-align: left;
+        padding: 14px 16px;
+        color: var(--bys-muted);
+        font-size: 12px;
+        font-weight: 850;
+        border-bottom: 1px solid var(--bys-line);
+        background: rgba(31, 41, 55, .035);
+    }
+
+    .bys-report-table td {
+        padding: 15px 16px;
+        border-bottom: 1px solid rgba(31, 41, 55, .08);
+        color: var(--bys-ink);
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .bys-report-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .bys-report-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, .06);
+        color: var(--bys-ink);
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .bys-report-badge-danger {
+        background: rgba(139, 0, 0, .10);
+        color: var(--bys-red);
+    }
+
+    .bys-report-badge-warning {
+        background: rgba(146, 64, 14, .10);
+        color: #92400e;
+    }
+
+    .bys-report-badge-success {
+        background: rgba(22, 101, 52, .10);
+        color: #166534;
+    }
+
+    .bys-report-empty {
+        text-align: center;
+        padding: 34px 18px;
+        border: 1px dashed rgba(31, 41, 55, .18);
+        border-radius: 20px;
+        background: rgba(255,255,255,.52);
+        color: var(--bys-muted);
+    }
+
+    .bys-report-empty i {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        border-radius: 18px;
+        align-items: center;
+        justify-content: center;
+        background: var(--bys-red-soft);
+        color: var(--bys-red);
+        margin-bottom: 12px;
+    }
+
+    .bys-report-bar-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .bys-report-bar-item {
+        padding: 14px;
+        border: 1px solid var(--bys-line);
+        border-radius: 18px;
+        background: rgba(255,255,255,.66);
+    }
+
+    .bys-report-bar-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--bys-ink);
+        font-weight: 780;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .bys-report-bar {
+        height: 9px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, .08);
+        overflow: hidden;
+    }
+
+    .bys-report-bar-fill {
+        height: 100%;
+        width: var(--value, 0%);
+        border-radius: 999px;
+        background: var(--bys-red);
+    }
+
+    .bys-report-note {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--bys-red-soft);
+        color: #5f0b0b;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 1180px) {
+        .bys-report-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .bys-report-two {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .bys-report-shell {
+            padding: 12px 10px 30px;
+        }
+        .bys-report-hero {
+            padding: 22px;
+            border-radius: 22px;
+        }
+        .bys-report-toolbar {
+            grid-template-columns: 1fr;
+        }
+        .bys-report-grid {
+            grid-template-columns: 1fr;
+        }
+        .bys-report-card-header {
+            display: block;
+        }
+    }
+</style>
+
+<div class="bys-report-shell" data-screen="surec-raporlari">
+    <section class="bys-report-hero">
+        <div class="bys-report-eyebrow">
+            <i class="fa-solid fa-chart-line"></i>
+            Performans Yönetimi
+        </div>
+
+        <h1 class="bys-report-title">Süreç Raporları</h1>
+
+        <p class="bys-report-subtitle">
+            Performans süreçlerinin genel durumu, geciken işlemler, aksatan amirler, Başkan/üst onay bekleyen kayıtlar
+            ve tamamlanma dağılımları bu ekrandan izlenir. Görünürlük kullanıcının yetki kapsamına göre belirlenir.
+        </p>
+
+        <div class="bys-report-grid">
+            <div class="bys-report-stat">
+                <div class="bys-report-stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="bys-report-stat-number">{{ summary.total|default(0) }}</div>
+                <div class="bys-report-stat-label">Toplam süreç kaydı</div>
+            </div>
+
+            <div class="bys-report-stat">
+                <div class="bys-report-stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="bys-report-stat-number">{{ summary.pending|default(0) }}</div>
+                <div class="bys-report-stat-label">Bekleyen süreç</div>
+            </div>
+
+            <div class="bys-report-stat">
+                <div class="bys-report-stat-icon"><i class="fa-solid fa-user-clock"></i></div>
+                <div class="bys-report-stat-number">{{ summary.overdue|default(0) }}</div>
+                <div class="bys-report-stat-label">Geciken veya aksayan kayıt</div>
+            </div>
+
+            <div class="bys-report-stat">
+                <div class="bys-report-stat-icon"><i class="fa-solid fa-stamp"></i></div>
+                <div class="bys-report-stat-number">{{ summary.president_required|default(0) }}</div>
+                <div class="bys-report-stat-label">Başkan/üst onay gerektiren kayıt</div>
+            </div>
+
+            <div class="bys-report-stat">
+                <div class="bys-report-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="bys-report-stat-number">{{ summary.finalized|default(0) }}</div>
+                <div class="bys-report-stat-label">Tamamlanan süreç</div>
+            </div>
+        </div>
+    </section>
+
+    <form class="bys-report-toolbar" method="get">
+        <input id="bysReportSearch" class="bys-report-input" type="search" placeholder="Amir, personel, durum veya işlem ara...">
+        <select class="bys-report-select" name="status" onchange="this.form.submit()">
+            <option value="" {% if not status_filter %}selected{% endif %}>Tüm durumlar</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Bekleyenler</option>
+            <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Gecikenler</option>
+            <option value="president" {% if status_filter == 'president' %}selected{% endif %}>Başkan/üst onay</option>
+            <option value="finalized" {% if status_filter == 'finalized' %}selected{% endif %}>Tamamlananlar</option>
+        </select>
+        <a class="btn btn-sm btn-outline-secondary" href="/performance/process-tracking">
+            <i class="fa-solid fa-route me-1"></i> Süreç Takibi
+        </a>
+    </form>
+
+    <section class="bys-report-two">
+        <div class="bys-report-card">
+            <div class="bys-report-card-header">
+                <div>
+                    <h2 class="bys-report-card-title">Durum Dağılımı</h2>
+                    <p class="bys-report-card-desc">Süreç kayıtlarının Türkçe durum kırılımı.</p>
+                </div>
+            </div>
+            <div class="bys-report-card-body">
+                {% if status_rows %}
+                <div class="bys-report-bar-list">
+                    {% for row in status_rows %}
+                    {% set label = durum_tr(row.label|default(row.status|default('Süreçte'))) %}
+                    <div class="bys-report-bar-item" data-search="{{ label|lower }}">
+                        <div class="bys-report-bar-top">
+                            <span>{{ label }}</span>
+                            <span>{{ row.count|default(0) }}</span>
+                        </div>
+                        <div class="bys-report-bar">
+                            <div class="bys-report-bar-fill" style="--value: {{ row.percent|default(0) }}%;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bys-report-empty">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <div><strong>Durum dağılımı için kayıt bulunamadı.</strong></div>
+                    <div>Süreç kayıtları oluştuğunda bu alan otomatik dolacaktır.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bys-report-card">
+            <div class="bys-report-card-header">
+                <div>
+                    <h2 class="bys-report-card-title">Aksatan Amir Yoğunluğu</h2>
+                    <p class="bys-report-card-desc">Geciken görevlerin sorumlu amir bazlı görünümü.</p>
+                </div>
+            </div>
+            <div class="bys-report-card-body">
+                {% if owner_rows %}
+                <div class="bys-report-table-wrap">
+                    <table class="bys-report-table" style="min-width:640px;">
+                        <thead>
+                            <tr>
+                                <th>Amir / Sorumlu</th>
+                                <th>Toplam</th>
+                                <th>Geciken</th>
+                                <th>Ortalama Bekleme</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in owner_rows %}
+                            <tr data-search="{{ (row.owner_name|default('Sorumlu belirtilmedi') ~ ' ' ~ row.total|string ~ ' ' ~ row.overdue|string)|lower }}">
+                                <td><strong>{{ row.owner_name|default('Sorumlu belirtilmedi') }}</strong></td>
+                                <td>{{ row.total|default(0) }}</td>
+                                <td>
+                                    <span class="bys-report-badge {% if row.overdue|default(0) > 0 %}bys-report-badge-danger{% else %}bys-report-badge-success{% endif %}">
+                                        {{ row.overdue|default(0) }}
+                                    </span>
+                                </td>
+                                <td>{{ row.avg_waiting_days|default(0) }} gün</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="bys-report-empty">
+                    <i class="fa-solid fa-user-check"></i>
+                    <div><strong>Aksatan amir yoğunluğu bulunmuyor.</strong></div>
+                    <div>Geciken görev oluştuğunda bu tablo dolacaktır.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-report-card">
+        <div class="bys-report-card-header">
+            <div>
+                <h2 class="bys-report-card-title">Başkan/Üst Onay Bekleyen Kayıtlar</h2>
+                <p class="bys-report-card-desc">
+                    70 altı veya özel süreç nedeniyle üst onay gerektiren kayıtlar burada izlenir.
+                </p>
+            </div>
+            <span class="bys-report-badge bys-report-badge-warning">
+                <i class="fa-solid fa-lock"></i>
+                Yayın kilidi kontrolü
+            </span>
+        </div>
+        <div class="bys-report-card-body">
+            {% if president_rows %}
+            <div class="bys-report-table-wrap">
+                <table class="bys-report-table">
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Güncel Sorumlu</th>
+                            <th>Nihai Puan</th>
+                            <th>Onay Durumu</th>
+                            <th>Son İşlem</th>
+                            <th>Bekleme</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in president_rows %}
+                        {% set approval_label = durum_tr(row.president_status_label|default('Başkan/Üst Onay Bekliyor'), 'Başkan/Üst Onay Bekliyor') %}
+                        <tr data-search="{{ (row.employee_name|default('') ~ ' ' ~ row.owner_name|default('') ~ ' ' ~ approval_label)|lower }}">
+                            <td><strong>{{ row.employee_name|default('Personel') }}</strong></td>
+                            <td>{{ row.owner_name|default('-') }}</td>
+                            <td>{{ row.final_score|default('-') }}</td>
+                            <td>
+                                <span class="bys-report-badge bys-report-badge-warning">
+                                    {{ approval_label }}
+                                </span>
+                            </td>
+                            <td>{{ row.last_action_title|default('-') }}</td>
+                            <td>{{ row.waiting_days|default(0) }} gün</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="bys-report-empty">
+                <i class="fa-solid fa-stamp"></i>
+                <div><strong>Başkan/üst onay bekleyen kayıt görünmüyor.</strong></div>
+                <div>Onay gerektiren süreç oluştuğunda bu alana düşecektir.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="bys-report-card">
+        <div class="bys-report-card-header">
+            <div>
+                <h2 class="bys-report-card-title">Son Süreç Hareketleri</h2>
+                <p class="bys-report-card-desc">Performans süreçlerinde son işlem gören kayıtlar.</p>
+            </div>
+        </div>
+        <div class="bys-report-card-body">
+            {% if recent_rows %}
+            <div class="bys-report-table-wrap">
+                <table class="bys-report-table">
+                    <thead>
+                        <tr>
+                            <th>Personel</th>
+                            <th>Güncel Sorumlu</th>
+                            <th>Durum</th>
+                            <th>Son İşlem</th>
+                            <th>Bekleme</th>
+                            <th>Öncelik</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in recent_rows %}
+                        {% set row_status = durum_tr(row.status_label|default('Süreçte')) %}
+                        {% set priority_label = durum_tr(row.priority_label|default('Normal'), 'Normal') %}
+                        <tr data-search="{{ (row.employee_name|default('') ~ ' ' ~ row.owner_name|default('') ~ ' ' ~ row_status ~ ' ' ~ row.last_action_title|default(''))|lower }}">
+                            <td><strong>{{ row.employee_name|default('Personel') }}</strong></td>
+                            <td>{{ row.owner_name|default('-') }}</td>
+                            <td>
+                                <span class="bys-report-badge {% if row.is_overdue %}bys-report-badge-danger{% elif row.is_finalized %}bys-report-badge-success{% else %}bys-report-badge-warning{% endif %}">
+                                    {% if row.is_overdue %}
+                                        Gecikti
+                                    {% elif row.is_finalized %}
+                                        Tamamlandı
+                                    {% else %}
+                                        {{ row_status }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>{{ row.last_action_title|default('-') }}</td>
+                            <td>{{ row.waiting_days|default(0) }} gün</td>
+                            <td>{{ priority_label }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bys-report-note">
+                <strong>Bilgi:</strong> Bu rapor idari karar üretmez. Yalnızca performans süreçlerinin durumunu,
+                gecikmeleri ve yetki kapsamındaki takip bilgisini kurumsal dille gösterir.
+            </div>
+            {% else %}
+            <div class="bys-report-empty">
+                <i class="fa-solid fa-route"></i>
+                <div><strong>Listelenecek süreç hareketi bulunamadı.</strong></div>
+                <div>Süreç motoru kayıt ürettikçe bu ekran zenginleşecektir.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+(function () {
+    const search = document.getElementById("bysReportSearch");
+
+    function normalize(value) {
+        return (value || "").toLocaleLowerCase("tr-TR").trim();
+    }
+
+    function applySearch() {
+        const q = normalize(search ? search.value : "");
+        const rows = document.querySelectorAll("[data-search]");
+
+        rows.forEach(function (row) {
+            const haystack = normalize(row.getAttribute("data-search"));
+            row.style.display = (!q || haystack.indexOf(q) !== -1) ? "" : "none";
+        });
+    }
+
+    if (search) search.addEventListener("input", applySearch);
+})();
+</script>
+{% endblock %}
+
+{# BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE9_REMINDER_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE11_REPORTING_RISK_BOUND #}
+{# BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_READINESS_BOUND #}

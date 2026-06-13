@@ -1,0 +1,18 @@
+{
+  "version": "BYS360_MOBILE_V2_8_80_PORTAL_HOME_APK",
+  "mobile_root": "C:\\bys360\\project\\mobile_flutter\\bys360_mobile_native",
+  "package_name": "bys360_mobile_native",
+  "portal_file": "C:\\bys360\\project\\mobile_flutter\\bys360_mobile_native\\lib\\bys360_mobile_portal_v2_8_80.dart",
+  "route_patched": [],
+  "home_patched": [
+    "C:\\bys360\\project\\mobile_flutter\\bys360_mobile_native\\lib\\features\\dashboard\\dashboard_screen.dart"
+  ],
+  "drawer_patched": [],
+  "backup_root": "C:\\bys360\\project\\mobile_flutter\\bys360_mobile_native\\.backup\\mobile_v2_8_80_portal_home_20260602_081634",
+  "notes": [
+    "Ana sayfa karti eklendi: home_patched bos degilse APK ana sayfada Portal karti gorunur.",
+    "Drawer tile eklendi: drawer_patched bos degilse sol menude Portal gorunur.",
+    "Route map bulunduysa /portal named route eklendi.",
+    "Proje farkli router kullaniyorsa portal ekrani MaterialPageRoute ile drawer/home kartindan yine acilir."
+  ]
+}

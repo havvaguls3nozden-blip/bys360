@@ -1,0 +1,153 @@
+from __future__ import annotations
+
+
+import logging
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 8 route ekleri.
+
+Çoklu dönem, özel dönem, kategori/grup dönemi ve seçili personel kapsamını
+karar destek merkezi üzerinden güvenli JSON çıktılarıyla sunar.
+
+BYS360_AI_DECISION_FAZ8_ROUTES
+"""
+
+from typing import Any, Callable
+
+from flask import jsonify, request
+from flask_login import current_user, login_required
+from sqlalchemy import text
+
+from app.extensions import db
+from app.route_registry import main_bp
+from app.route_support import safe_db_rollback
+from app.services.ai_decision.period_scope_integration import (
+    build_period_scope_summary_payload,
+    build_single_period_payload,
+)
+
+ResponseBuilder = Callable[..., dict[str, Any]]
+
+
+def _run_faz8_json(builder: ResponseBuilder, *args: Any) -> tuple[Any, int]:
+    try:
+        payload = builder(*args)
+        return jsonify(payload), 200
+    except PermissionError as exc:
+        safe_db_rollback()
+        return jsonify({"ok": False, "error": str(exc) or "Bu sayfaya erişim yetkiniz bulunmamaktadır."}), 403
+    except LookupError as exc:
+        safe_db_rollback()
+        return jsonify({"ok": False, "error": str(exc) or "Kayıt bulunamadı."}), 404
+    except ValueError as exc:
+        safe_db_rollback()
+        return jsonify({"ok": False, "error": str(exc)}), 400
+    except Exception as exc:  # pragma: no cover
+        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz8_routes.py | line=43")
+        safe_db_rollback()
+        return jsonify({"ok": False, "error": f"Dönem kapsam karar destek kontrolünde beklenmeyen hata: {exc}"}), 500
+
+
+def _load_settings() -> dict[str, Any]:
+    rows = db.session.execute(
+        text(
+            """
+            SELECT setting_key, value_text
+              FROM module_settings
+             WHERE module_key = 'ai_decision'
+               AND setting_key IN (
+                'faz8_allow_multiple_periods', 'faz8_allow_special_periods',
+                'faz8_require_scope_for_special_period', 'faz8_overlap_warning_enabled',
+                'faz8_selected_personnel_limit', 'faz8_low_assignment_warning_limit'
+               )
+            """
+        )
+    ).mappings().all()
+    return {row["setting_key"]: row["value_text"] for row in rows}
+
+
+def _limit(default: int = 250) -> int:
+    try:
+        value = int(request.args.get("limit", default))
+        return max(1, min(value, 1000))
+    except Exception:
+        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz8_routes.py | line=70")
+        return default
+
+
+def _periods(limit: int = 250) -> list[Any]:
+    return db.session.execute(
+        text(
+            """
+            SELECT id, title, name, period_name, period_type, scope_type, scope_reference,
+                   category_id, unit_id, start_date, end_date, is_active, created_at
+              FROM performance_periods
+             ORDER BY COALESCE(start_date, created_at) DESC NULLS LAST, id DESC
+             LIMIT :limit
+            """
+        ),
+        {"limit": limit},
+    ).mappings().all()
+
+
+def _single_period(period_id: int) -> Any:
+    row = db.session.execute(
+        text(
+            """
+            SELECT id, title, name, period_name, period_type, scope_type, scope_reference,
+                   category_id, unit_id, start_date, end_date, is_active, created_at
+              FROM performance_periods
+             WHERE id = :period_id
+            """
+        ),
+        {"period_id": period_id},
+    ).mappings().first()
+    if row is None:
+        raise LookupError("Dönem kaydı bulunamadı.")
+    return row
+
+
+def _assignments(limit: int = 5000, period_id: int | None = None) -> list[Any]:
+    where = "WHERE period_id = :period_id" if period_id is not None else ""
+    params = {"limit": limit}
+    if period_id is not None:
+        params["period_id"] = period_id
+    return db.session.execute(
+        text(
+            f"""
+            SELECT id, period_id, evaluator_id, evaluated_user_id, status, created_at
+              FROM evaluation_assignments
+              {where}
+             ORDER BY id DESC
+             LIMIT :limit
+            """
+        ),
+        params,
+    ).mappings().all()
+
+
+@main_bp.route("/ai/decision-support/faz8/health")
+@login_required
+def ai_decision_faz8_health():
+    return jsonify({
+        "ok": True,
+        "phase": "Faz 8",
+        "module": "AI Karar Destek Merkezi",
+        "scope": "Çoklu ve Özel Dönem Yönetimi",
+        "marker": "BYS360_AI_DECISION_FAZ8_HEALTH_OK",
+    })
+
+
+@main_bp.route("/ai/decision-support/performance/periods/scope-summary")
+@login_required
+def ai_decision_faz8_period_scope_summary():
+    settings = _load_settings()
+    return _run_faz8_json(build_period_scope_summary_payload, _periods(_limit()), _assignments(), current_user, settings)
+
+
+@main_bp.route("/ai/decision-support/performance/periods/<int:period_id>/scope-check")
+@login_required
+def ai_decision_faz8_single_period_scope_check(period_id: int):
+    period = _single_period(period_id)
+    settings = _load_settings()
+    return _run_faz8_json(build_single_period_payload, period, _periods(500), _assignments(period_id=period_id), settings)

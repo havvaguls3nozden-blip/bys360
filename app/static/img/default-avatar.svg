@@ -1,0 +1,23 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="28" y1="20" x2="210" y2="222" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B0000"></stop>
+      <stop offset="1" stop-color="#5C0000"></stop>
+    </linearGradient>
+    <linearGradient id="inner" x1="58" y1="52" x2="185" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC"></stop>
+      <stop offset="1" stop-color="#E5E7EB"></stop>
+    </linearGradient>
+  </defs>
+
+  <rect x="12" y="12" width="216" height="216" rx="56" fill="url(#bg)"></rect>
+  <rect x="22" y="22" width="196" height="196" rx="48" stroke="rgba(255,255,255,0.22)" stroke-width="2"></rect>
+
+  <circle cx="120" cy="94" r="34" fill="url(#inner)"></circle>
+  <path d="M65 184C65 153.624 89.6243 129 120 129C150.376 129 175 153.624 175 184V188H65V184Z" fill="url(#inner)"></path>
+
+  <circle cx="186" cy="54" r="16" fill="#D4AF37" opacity="0.95"></circle>
+  <path d="M186 43L188.9 50.1L196 53L188.9 55.9L186 63L183.1 55.9L176 53L183.1 50.1L186 43Z" fill="white"></path>
+
+  <path d="M44 175C58 192 84 205 120 205C156 205 182 192 196 175" stroke="rgba(255,255,255,0.18)" stroke-width="3" stroke-linecap="round"></path>
+</svg>

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Amir Hatırlatma Merkezi{% endblock %}
+{% block content %}
+<style>
+:root{--bys-red:#8B0000;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--soft:#f8fafc;--ok:#166534;--warn:#92400e;--danger:#991b1b;--info:#1d4ed8}.erc-shell{padding:18px;max-width:1500px;margin:0 auto}.erc-hero{position:relative;overflow:hidden;border:1px solid rgba(139,0,0,.16);border-radius:28px;padding:28px;background:linear-gradient(135deg,rgba(139,0,0,.10),rgba(255,255,255,.96)),#fff;box-shadow:0 18px 50px rgba(17,24,39,.08)}.erc-eyebrow{font-weight:900;color:var(--bys-red);letter-spacing:.03em;text-transform:uppercase;font-size:12px}.erc-title{font-size:30px;line-height:1.1;margin:8px 0;color:var(--ink);font-weight:950}.erc-sub{max-width:980px;color:var(--muted);font-size:15px;line-height:1.65;margin:0}.erc-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.erc-btn{border:0;border-radius:14px;padding:11px 15px;font-weight:850;text-decoration:none;display:inline-flex;align-items:center;gap:8px;cursor:pointer}.erc-btn.primary{background:var(--bys-red);color:#fff}.erc-btn.soft{background:#fff;color:var(--bys-red);border:1px solid rgba(139,0,0,.18)}.erc-btn.gray{background:#f3f4f6;color:#374151}.erc-badge{border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;display:inline-flex;align-items:center;gap:6px}.erc-badge.ok{background:rgba(22,101,52,.10);color:var(--ok)}.erc-badge.warn{background:rgba(245,158,11,.14);color:var(--warn)}.erc-badge.danger{background:rgba(220,38,38,.10);color:var(--danger)}.erc-badge.info{background:rgba(29,78,216,.10);color:var(--info)}.erc-badge.muted{background:#f3f4f6;color:#4b5563}.erc-section{margin-top:18px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.96);padding:20px;box-shadow:0 10px 30px rgba(17,24,39,.05)}.erc-section-title{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}.erc-section h2{margin:0;color:var(--ink);font-size:19px;font-weight:950}.erc-small{color:var(--muted);font-size:13px;line-height:1.5}.erc-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:16px}.erc-card{border:1px solid var(--line);border-radius:20px;background:#fff;padding:17px;box-shadow:0 8px 20px rgba(17,24,39,.04)}.erc-card strong{display:block;color:#374151;font-size:13px}.erc-card b{font-size:27px;color:var(--ink);display:block;margin:5px 0}.erc-card span{font-size:13px;color:var(--muted)}.erc-form-grid{display:grid;grid-template-columns:2fr 1.2fr 1.2fr 1.1fr 1.5fr auto;gap:12px;align-items:end}.erc-label{display:grid;gap:6px;color:#374151;font-weight:850;font-size:13px}.erc-input,.erc-select{border:1px solid var(--line);border-radius:14px;padding:11px 12px;background:#fff;color:var(--ink);width:100%}.erc-progress{height:10px;border-radius:999px;background:#f3f4f6;overflow:hidden}.erc-progress-bar{height:100%;background:var(--bys-red);border-radius:999px}.erc-note{border-radius:18px;padding:14px;font-size:13px;font-weight:750}.erc-note.ok{background:rgba(22,163,74,.10);color:#166534}.erc-note.warn{background:rgba(245,158,11,.13);color:#78350f}.erc-note.danger{background:rgba(220,38,38,.10);color:#991b1b}.erc-note.info{background:rgba(29,78,216,.10);color:#1d4ed8}.erc-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.erc-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.erc-table{width:100%;border-collapse:separate;border-spacing:0 10px}.erc-table th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;text-align:left;padding:0 12px}.erc-table td{background:#f8fafc;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 12px;vertical-align:top}.erc-table td:first-child{border-left:1px solid var(--line);border-radius:16px 0 0 16px}.erc-table td:last-child{border-right:1px solid var(--line);border-radius:0 16px 16px 0}.erc-preview{background:#fff;border:1px dashed rgba(139,0,0,.28);border-radius:16px;padding:12px;margin-top:8px}.erc-preview h4{margin:0 0 7px 0;color:#111827;font-size:13px}.erc-preview p{margin:0;color:#4b5563;font-size:12px;line-height:1.55}.erc-kv{display:grid;grid-template-columns:150px 1fr;gap:6px;font-size:13px;line-height:1.55;margin-top:8px}.erc-kv strong{color:#374151}.erc-kv span{color:#6b7280}@media(max-width:1240px){.erc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.erc-form-grid,.erc-three,.erc-two{grid-template-columns:1fr}}@media(max-width:760px){.erc-shell{padding:12px}.erc-grid{grid-template-columns:1fr}.erc-table{display:block;overflow:auto}.erc-section-title{display:block}.erc-actions{margin-top:10px}.erc-kv{grid-template-columns:1fr}}
+</style>
+<div class="erc-shell">
+  <section class="erc-hero">
+    <div class="erc-eyebrow"><i class="fa-solid fa-bell"></i> Performans Yönetimi</div>
+    <h1 class="erc-title">Amir Hatırlatma Merkezi</h1>
+    <p class="erc-sub">Bekleyen, geciken veya son tarihi yaklaşan değerlendirme görevlerini amir bazında sadeleştirir. Bu ekran gerçek e-posta göndermez; yalnızca güvenli hatırlatma hazırlığı ve önizleme metni üretir.</p>
+    <div class="erc-actions" style="margin-top:18px">
+      <span class="erc-badge {{ state.stage_class }}">{{ state.stage }}</span>
+      {% if state.selected_period %}<span class="erc-badge info">{{ state.selected_period.display_title }}</span>{% endif %}
+      <a class="erc-btn soft" href="/performance/v2-1-10-evaluation-live-tracking"><i class="fa-solid fa-chart-line"></i> Canlı Takip</a>
+      <a class="erc-btn gray" href="/performance/v2-1-7-period-management-center"><i class="fa-solid fa-calendar-check"></i> Dönem Merkezi</a>
+    </div>
+  </section>
+
+  <section class="erc-section">
+    <div class="erc-section-title">
+      <div><h2>Dönem ve Hatırlatma Filtreleri</h2><div class="erc-small">Filtreleme sadece okuma yapar. Gönderim için ayrıca onaylı faz gerekir.</div></div>
+      <span class="erc-badge muted">V2.1.11</span>
+    </div>
+    <form method="get" class="erc-form-grid">
+      <label class="erc-label">Performans Dönemi
+        <select class="erc-select" name="period_id">
+          {% for period in state.periods %}<option value="{{ period.id }}" {% if period.id == state.selected_period_id %}selected{% endif %}>{{ period.display_title }}{% if period.is_active is defined and period.is_active %} — Aktif{% endif %}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="erc-label">Hatırlatma Türü
+        <select class="erc-select" name="risk_filter">
+          <option value="all" {% if state.filters.risk_filter == 'all' %}selected{% endif %}>Tüm amirler</option>
+          <option value="overdue" {% if state.filters.risk_filter == 'overdue' %}selected{% endif %}>Gecikenler</option>
+          <option value="due_soon" {% if state.filters.risk_filter == 'due_soon' %}selected{% endif %}>Son tarihi yaklaşanlar</option>
+          <option value="pending" {% if state.filters.risk_filter == 'pending' %}selected{% endif %}>Bekleyen görevi olanlar</option>
+          <option value="low_progress" {% if state.filters.risk_filter == 'low_progress' %}selected{% endif %}>Düşük tamamlanma</option>
+          <option value="ready" {% if state.filters.risk_filter == 'ready' %}selected{% endif %}>Hatırlatma gerekmeyen</option>
+        </select>
+      </label>
+      <label class="erc-label">Amir Seviyesi
+        <select class="erc-select" name="manager_level">
+          <option value="">Tüm seviyeler</option>
+          <option value="1" {% if state.filters.manager_level == '1' %}selected{% endif %}>1. Amir</option>
+          <option value="2" {% if state.filters.manager_level == '2' %}selected{% endif %}>2. Amir</option>
+          <option value="3" {% if state.filters.manager_level == '3' %}selected{% endif %}>3. Amir</option>
+        </select>
+      </label>
+      <label class="erc-label">Yaklaşan gün
+        <input class="erc-input" name="due_days" value="{{ state.filters.due_days }}" type="number" min="1" max="30">
+      </label>
+      <label class="erc-label">Arama
+        <input class="erc-input" name="q" value="{{ state.filters.q }}" placeholder="Amir adı veya e-posta ara">
+      </label>
+      <button class="erc-btn primary" type="submit"><i class="fa-solid fa-filter"></i> Göster</button>
+    </form>
+  </section>
+
+  <div class="erc-grid">
+    <div class="erc-card"><strong>Listelenen Amir</strong><b>{{ state.summary.total_evaluators }}</b><span>Seçili filtreye göre amir sayısı.</span></div>
+    <div class="erc-card"><strong>Hatırlatma Gereken</strong><b>{{ state.summary.needs_reminder }}</b><span>Açık görevi olan amir sayısı.</span></div>
+    <div class="erc-card"><strong>Bekleyen Görev</strong><b>{{ state.summary.total_pending }}</b><span>Tamamlanmamış değerlendirme görevi.</span></div>
+    <div class="erc-card"><strong>Geciken Görev</strong><b>{{ state.summary.total_overdue }}</b><span>Son tarihi geçmiş açık görev.</span></div>
+    <div class="erc-card"><strong>Yaklaşan Görev</strong><b>{{ state.summary.total_due_soon }}</b><span>Son tarihi yaklaşan açık görev.</span></div>
+  </div>
+
+  <section class="erc-section">
+    <div class="erc-section-title"><div><h2>Hatırlatma Durumu</h2><div class="erc-small">Bu özet mail göndermez; gönderim öncesi karar desteği sağlar.</div></div><span class="erc-badge {{ state.stage_class }}">%{{ state.summary.progress }}</span></div>
+    <div class="erc-card"><strong>Seçili filtrede tamamlanma oranı</strong><div class="erc-progress" style="margin-top:10px"><div class="erc-progress-bar" style="width:{{ state.summary.progress }}%"></div></div><span style="margin-top:8px;display:block">%{{ state.summary.progress }} tamamlandı.</span></div>
+    <div class="erc-three" style="margin-top:14px">{% for note in state.notes %}<div class="erc-note {{ note.class }}"><strong>{{ note.title }}</strong><br>{{ note.message }}</div>{% endfor %}</div>
+  </section>
+
+  <section class="erc-section">
+    <div class="erc-section-title"><div><h2>Amir Bazlı Hatırlatma Hazırlığı</h2><div class="erc-small">Önizleme metinleri gönderilmiş sayılmaz. Amaç aksayan görevi sade biçimde görünür yapmaktır.</div></div><div class="erc-actions"><a class="erc-btn gray" href="/performance/v2-1-11-evaluator-reminder-center/export.csv?period_id={{ state.selected_period_id }}&risk_filter={{ state.filters.risk_filter }}&manager_level={{ state.filters.manager_level }}&due_days={{ state.filters.due_days }}&q={{ state.filters.q }}"><i class="fa-solid fa-file-csv"></i> CSV Hazırlık Listesi</a></div></div>
+    <table class="erc-table">
+      <thead><tr><th>Amir</th><th>Görev Özeti</th><th>Tamamlanma</th><th>Önerilen Hatırlatma</th><th>Önizleme</th></tr></thead>
+      <tbody>
+      {% for item in state.evaluators %}
+        <tr>
+          <td><strong>{{ item.evaluator_name or '-' }}</strong><div class="erc-small">{{ item.evaluator_title or '-' }}{% if item.evaluator_email %}<br>{{ item.evaluator_email }}{% endif %}</div></td>
+          <td><span class="erc-badge muted">Toplam {{ item.total }}</span> <span class="erc-badge ok">Tamamlanan {{ item.completed }}</span> <span class="erc-badge info">Bekleyen {{ item.pending }}</span> {% if item.overdue %}<span class="erc-badge danger">Geciken {{ item.overdue }}</span>{% endif %} {% if item.due_soon %}<span class="erc-badge warn">Yaklaşan {{ item.due_soon }}</span>{% endif %}</td>
+          <td><div class="erc-progress"><div class="erc-progress-bar" style="width:{{ item.progress }}%"></div></div><div class="erc-small" style="margin-top:6px">%{{ item.progress }}</div></td>
+          <td><span class="erc-badge {{ item.reminder_class }}">{{ item.reminder_type }}</span><div class="erc-small" style="margin-top:6px">{{ item.employee_count }} personel kapsamında.</div></td>
+          <td><div class="erc-preview"><h4>{{ item.preview_subject }}</h4><p>{{ item.preview_body }}</p></div></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5"><span class="erc-badge muted">Seçili filtreye uygun amir kaydı bulunamadı.</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="erc-section">
+    <h2>Güvenli Kullanım Notu</h2>
+    <div class="erc-two" style="margin-top:12px">
+      <div class="erc-note info"><strong>Bu faz gönderim yapmaz.</strong><br>V2.1.11 yalnızca hatırlatma hazırlığı, önizleme ve CSV listesi üretir. Gerçek e-posta gönderimi ayrıca onaylı güvenli faza bağlanmalıdır.</div>
+      <div class="erc-note warn"><strong>Yetki sınırı korunur.</strong><br>Bu ekran Admin/Performans yetkilisi seviyesinde tasarlanmıştır. Personel veya standart amir ekranı değildir.</div>
+    </div>
+  </section>
+
+  <section class="erc-section">
+    <h2>V2.1.11 Gate Kontrolü</h2>
+    <table class="erc-table"><thead><tr><th>Kontrol</th><th>Durum</th><th>Açıklama</th></tr></thead><tbody>{% for check in gate.checks %}<tr><td>{{ corporate_gate_label(check.name) }}</td><td><span class="erc-badge {{ 'ok' if check.ok else 'warn' }}">{{ 'Geçti' if check.ok else 'Kontrol Gerekli' }}</span></td><td>{{ check.message }}</td></tr>{% endfor %}</tbody></table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% from "performance/_workspace_shell.html" import styles, hero, nav, note %}
+
+{% block title %}Geçmiş Dönem Sonuç Aktarımı - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geçmiş Dönem Sonuç Aktarımı{% endblock %}
+{% block page_subtitle %}
+Eski Excel dosyalarındaki tamamlanmış performans sonuçlarını güvenli ön izleme ile sisteme alın.
+{% endblock %}
+
+{% block content %}
+{{ styles() }}
+<div class="pw-shell">
+  {{ hero(title='Geçmiş Sonuç Aktarım Merkezi', text='Eski dönem verilerini içeri alın; satır doğrulaması ve işlem özetini tek ekranda izleyin.', icon='fa-solid fa-file-arrow-up') }}
+  {{ nav(active='import') }}
+  {{ note('Yükleme, parti takibi ve ön izleme akışı daha okunur bir yönetim yüzeyine taşındı.') }}
+<style>
+  .import-shell{display:grid;gap:18px}
+  .glass-card{position:relative;overflow:hidden;background:rgba(255,255,255,.84);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);backdrop-filter:blur(14px)}
+  .panel-card{padding:22px;position:relative;z-index:1}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;width:max-content;padding:8px 12px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900}
+  .hero-title{margin:0;font-size:1.26rem;font-weight:900;color:#111827;line-height:1.35}
+  .hero-text{margin:0;color:#6b7280;font-size:.93rem;line-height:1.8}
+  .hero-notes{display:grid;gap:10px;margin-top:12px}
+  .note-item{border:1px solid rgba(15,23,42,.08);background:#fff;border-radius:16px;padding:12px 14px;color:#4b5563;font-size:.86rem;line-height:1.7}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .stat-card{padding:18px;border-radius:20px;border:1px solid rgba(15,23,42,.08);background:#fff}
+  .stat-label{color:#6b7280;font-size:.8rem;font-weight:800;margin-bottom:8px}
+  .stat-value{color:#111827;font-size:1.5rem;font-weight:900}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}
+  .field{display:grid;gap:8px}
+  .field label{font-size:.9rem;font-weight:800;color:#374151}
+  .form-input,.form-select{min-height:48px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:#fff;padding:10px 14px;font:inherit;color:#111827;outline:none;width:100%}
+  .form-input:focus,.form-select:focus{border-color:rgba(139,0,0,.30);box-shadow:0 0 0 4px rgba(139,0,0,.06)}
+  .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+  .btn-soft:hover{transform:translateY(-1px)}
+  .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+  .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .panel-title{margin:0;font-size:1rem;font-weight:900;color:#111827}
+  .panel-sub{margin:4px 0 0;color:#6b7280;font-size:.88rem;line-height:1.75}
+  .table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  th,td{padding:15px 14px;border-bottom:1px solid rgba(15,23,42,.08);text-align:left;vertical-align:middle}
+  th{font-size:.8rem;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;font-weight:900;background:rgba(248,250,252,.92)}
+  td{font-size:.92rem;color:#111827}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:.8rem;font-weight:800}
+  .badge.ok{background:rgba(22,101,52,.10);color:#166534}
+  .badge.warn{background:rgba(180,83,9,.10);color:#92400e}
+  .badge.info{background:rgba(37,99,235,.10);color:#1d4ed8}
+  .empty{padding:30px 22px;border-radius:22px;border:1px dashed rgba(15,23,42,.12);text-align:center;color:#6b7280;background:#f8fafc;display:grid;gap:10px}
+  @media (max-width:1100px){.hero-grid,.form-grid,.stats-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="import-shell">
+  <div class="hero-grid">
+    <div class="glass-card panel-card">
+      <span class="hero-badge"><i class="fa-solid fa-file-import"></i> Dönemsel Sonuç Aktarımı</span>
+      <h3 class="hero-title">Eski performans sonuçlarını ön izleme ile içeri alın.</h3>
+      <p class="hero-text">
+        Yüklenen dosya önce kontrol edilir, ardından doğrulanan satırlar dönemsel sonuç olarak kaydedilir.
+      </p>
+      <div class="hero-notes">
+        <div class="note-item">Asgari önerilen sütunlar: <strong>Sicil No</strong>, <strong>Ad Soyad</strong>, <strong>Birim</strong>, <strong>Üst Birim</strong>, <strong>Nihai Puan</strong>.</div>
+        <div class="note-item">Aktarılan kayıtlar <strong>{{ history_source_label }}</strong> etiketiyle tutulur; aktif dönem verisi gibi değerlendirilmez.</div>
+        <div class="note-item">Aktif dönemler geçmiş veri aktarımı için kapalıdır. Önce pasif/geçmiş bir dönem seçin.</div>
+      </div>
+    </div>
+
+    <div class="glass-card panel-card">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Dönem Sayısı</div>
+          <div class="stat-value">{{ periods|length }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Son Partiler</div>
+          <div class="stat-value">{{ recent_batches|length }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Veri Etiketi</div>
+          <div class="stat-value" style="font-size:1rem;">{{ history_source_label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card panel-card">
+    <div class="panel-head">
+      <div>
+        <h3 class="panel-title">Yeni Excel Yükle</h3>
+        <p class="panel-sub">Bir dönem seçin, dosyayı yükleyin ve ön izlemeyi oluşturun.</p>
+      </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-grid">
+        <div class="field">
+          <label>Dönem</label>
+          <select name="period_id" class="form-select" required>
+            <option value="">Seçiniz</option>
+            {% for period in periods or [] %}
+            <option value="{{ period.id }}" {% if period.is_active %}disabled{% endif %}>
+              {{ period.title }}{% if period.is_active %} — aktif döneme aktarılamaz{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Excel Dosyası</label>
+          <input type="file" name="excel_file" class="form-input" accept=".xlsx,.xlsm" required>
+        </div>
+
+        <button type="submit" class="btn-soft primary">
+          <i class="fa-solid fa-upload"></i>
+          Ön İzleme Oluştur
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="glass-card panel-card">
+    <div class="panel-head">
+      <div>
+        <h3 class="panel-title">Son Aktarım Partileri</h3>
+        <p class="panel-sub">Ön izleme oluşturduğunuz son partileri buradan açabilirsiniz.</p>
+      </div>
+    </div>
+
+    {% if recent_batches %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Dönem</th>
+            <th>Dosya</th>
+            <th>Durum</th>
+            <th>Satır</th>
+            <th>Başarılı</th>
+            <th>Hatalı</th>
+            <th>Not</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for batch in recent_batches %}
+          <tr>
+            <td>#{{ batch.id }}</td>
+            <td>{{ batch.period.title if batch.period else '-' }}</td>
+            <td>{{ batch.file_name or '-' }}</td>
+            <td>
+              {% if batch.status == 'tamamlandi' %}
+                <span class="badge ok"><i class="fa-solid fa-circle-check"></i> Tamamlandı</span>
+              {% else %}
+                <span class="badge warn"><i class="fa-solid fa-eye"></i> {{ batch.status }}</span>
+              {% endif %}
+            </td>
+            <td>{{ batch.row_count or 0 }}</td>
+            <td>{{ batch.success_count or 0 }}</td>
+            <td>{{ batch.error_count or 0 }}</td>
+            <td><span class="badge info">{{ history_source_label }}</span></td>
+            <td>
+              <a href="{{ url_for('main.performance_history_import_detail', batch_id=batch.id) }}" class="btn-soft secondary" style="min-height:38px;">Detay</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">
+      <i class="fa-solid fa-file-circle-plus"></i>
+      <div>Henüz oluşturulmuş aktarım partisi yok.</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}

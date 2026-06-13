@@ -1,0 +1,16 @@
+{
+  "report_title": "BYS360 AI Yönetici Özeti",
+  "report_subtitle": "Kalite, yönetişim, risk ve aksiyon görünümü",
+  "share_pack": {
+    "default_recipients": ["Üst Yönetim", "BT", "İK"],
+    "recommended_formats": ["markdown", "json", "csv"]
+  },
+  "labels": {
+    "high": "Yüksek",
+    "medium": "Orta",
+    "low": "Düşük",
+    "critical": "Kritik",
+    "warning": "Uyarı",
+    "stable": "Dengeli"
+  }
+}

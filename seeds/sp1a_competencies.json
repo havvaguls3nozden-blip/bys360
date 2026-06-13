@@ -1,0 +1,34 @@
+[
+  {
+    "category": "Yönetim",
+    "name": "Liderlik"
+  },
+  {
+    "category": "Yönetim",
+    "name": "Stratejik Düşünme"
+  },
+  {
+    "category": "İletişim",
+    "name": "Temsil Yeteneği"
+  },
+  {
+    "category": "İletişim",
+    "name": "Takım Çalışması"
+  },
+  {
+    "category": "Teknik",
+    "name": "Teknik Uzmanlık"
+  },
+  {
+    "category": "Operasyon",
+    "name": "Kriz Yönetimi"
+  },
+  {
+    "category": "Operasyon",
+    "name": "Süreç Takibi"
+  },
+  {
+    "category": "Analitik",
+    "name": "Veri Analizi"
+  }
+]

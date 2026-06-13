@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Yönetici Özeti{% endblock %}
+{% block content %}
+<style>
+.exec-wrap{max-width:1180px;margin:0 auto;padding:22px}.exec-hero{background:linear-gradient(135deg,#8B0000,#5f0000);color:#fff;border-radius:22px;padding:26px 30px;box-shadow:0 18px 40px rgba(0,0,0,.16)}.exec-hero h1{margin:0;font-size:28px}.exec-hero p{margin:8px 0 0;opacity:.92}.exec-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}.exec-card{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.14);border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.08)}.exec-card h3{margin:0 0 10px;color:#8B0000;font-size:17px}.exec-value{font-size:30px;font-weight:800;color:#222}.exec-muted{color:#666;font-size:13px}.exec-two{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}.exec-list{margin:0;padding:0;list-style:none}.exec-list li{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0}.exec-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.exec-btn{border:0;border-radius:12px;padding:11px 15px;background:#8B0000;color:#fff;font-weight:700;cursor:pointer}.exec-btn.secondary{background:#333}@media(max-width:900px){.exec-grid{grid-template-columns:repeat(2,1fr)}.exec-two{grid-template-columns:1fr}}@media(max-width:560px){.exec-grid{grid-template-columns:1fr}.exec-wrap{padding:12px}.exec-hero{padding:20px}}
+</style>
+<div class="exec-wrap">
+  <section class="exec-hero">
+    <h1>Yönetici Özeti</h1>
+    <p>BYS360 günlük yönetim özeti, Tarihi Alan hava durumu, otomatik e-posta görevleri ve mail gönderim motoru.</p>
+    <p class="exec-muted" style="color:#fff;opacity:.85">Son güncelleme: {{ payload.generated_at }}</p>
+  </section>
+
+  <div class="exec-grid">
+    <div class="exec-card"><h3>Bekleyen Geri Bildirim</h3><div class="exec-value">{{ payload.metrics.pending_feedback }}</div><div class="exec-muted">Geri bildirim modülü</div></div>
+    <div class="exec-card"><h3>Açık Destek Talebi</h3><div class="exec-value">{{ payload.metrics.open_support }}</div><div class="exec-muted">Destek merkezi</div></div>
+    <div class="exec-card"><h3>Performans Görevi</h3><div class="exec-value">{{ payload.metrics.pending_performance_tasks }}</div><div class="exec-muted">Bekleyen değerlendirme</div></div>
+    <div class="exec-card"><h3>Onay Süreci</h3><div class="exec-value">{{ payload.metrics.pending_approvals }}</div><div class="exec-muted">Yönetsel onaylar</div></div>
+  </div>
+
+  <div class="exec-two">
+    <div class="exec-card">
+      <h3>Otomatik E-Posta Gönderimleri</h3>
+      <ul class="exec-list">
+        <li><span>00:01 Gece Sistem Kontrolü</span><strong>Aktif</strong></li>
+        <li><span>08:30 Günaydın Yönetici Özeti</span><strong>Aktif</strong></li>
+        <li><span>Alıcılar</span><strong>{{ payload.recipients|join(', ') if payload.recipients else 'ENV bekleniyor' }}</strong></li>
+      </ul>
+      <div class="exec-actions">
+        <form method="post" action="{{ url_for('executive_summary.yonetici_ozeti_test_mail') }}"><input type="hidden" name="type" value="morning"><button class="exec-btn" type="submit">08:30 Test Maili Gönder</button></form>
+        <form method="post" action="{{ url_for('executive_summary.yonetici_ozeti_test_mail') }}"><input type="hidden" name="type" value="night"><button class="exec-btn secondary" type="submit">00:01 Test Maili Gönder</button></form>
+      </div>
+    </div>
+    <div class="exec-card">
+      <h3>Tarihi Alan Hava Durumu</h3>
+      <ul class="exec-list">
+        <li><span>Konum</span><strong>{{ payload.weather.location }}</strong></li>
+        <li><span>Durum</span><strong>{{ payload.weather.status }}</strong></li>
+        <li><span>Sıcaklık</span><strong>{{ payload.weather.temperature }}</strong></li>
+        <li><span>Nem</span><strong>{{ payload.weather.humidity }}</strong></li>
+        <li><span>Rüzgâr</span><strong>{{ payload.weather.wind }}</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exec-card" style="margin-top:16px">
+    <h3>Sistem Sağlık Durumu</h3>
+    <ul class="exec-list">
+      <li><span>Uygulama</span><strong>{{ payload.system.application }}</strong></li>
+      <li><span>Veritabanı</span><strong>{{ payload.system.database }}</strong></li>
+      <li><span>Mail Servisi</span><strong>{{ payload.system.mail_service }}</strong></li>
+      <li><span>Bildirim Altyapısı</span><strong>{{ payload.system.notification_service }}</strong></li>
+      <li><span>Güvenlik</span><strong>{{ payload.system.security }}</strong></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

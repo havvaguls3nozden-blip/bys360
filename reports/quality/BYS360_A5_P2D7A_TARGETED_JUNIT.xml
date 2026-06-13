@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="1.127" timestamp="2026-06-12T12:25:57.076912+03:00" hostname="HavvaGulsen"><testcase classname="tests.architecture.test_message_faz10_closure_contract" name="test_message_route_is_below_refactor_line_budget" time="0.001" /><testcase classname="tests.critical.test_v58_claude_roadmap_smoke" name="test_v58_critical_routes_never_return_500[/performance/feedback-aftercare]" time="0.981"><failure message="assert 500 != 500&#10; +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code">tests\critical\test_v58_claude_roadmap_smoke.py:47: in test_v58_critical_routes_never_return_500
+    assert response.status_code != 500
+E   assert 500 != 500
+E    +  where 500 = &lt;WrapperTestResponse streamed [500 INTERNAL SERVER ERROR]&gt;.status_code</failure></testcase></testsuite></testsuites>

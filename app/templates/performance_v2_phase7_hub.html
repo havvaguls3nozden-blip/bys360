@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Performans V2 Kontrol Merkezi{% endblock %}
+{% block content %}
+<style>
+.v2-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.v2-card{background:#fff;border:1px solid rgba(139,0,0,.12);border-radius:20px;box-shadow:0 16px 40px rgba(15,23,42,.08);padding:20px}.v2-card h3{margin:0 0 8px;color:#7a0b0b;font-size:1.05rem}.v2-card p{margin:0 0 14px;color:#5b6475;line-height:1.55}.v2-actions{display:flex;gap:10px;flex-wrap:wrap}.btn-soft{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600}.btn-soft.primary{background:linear-gradient(135deg,#8b0000,#b91c1c);color:#fff}.btn-soft.secondary{background:#f8fafc;color:#7a0b0b;border:1px solid rgba(139,0,0,.14)}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:18px}.toolbar .form-group{display:flex;flex-direction:column;gap:6px}.glass-card{background:#fff;border:1px solid rgba(139,0,0,.10);border-radius:20px;box-shadow:0 16px 40px rgba(15,23,42,.08);padding:18px}.muted{color:#6b7280}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:18px}.metric{background:#faf7f7;border:1px solid rgba(139,0,0,.08);border-radius:16px;padding:14px}.metric .label{font-size:.85rem;color:#6b7280}.metric .value{font-size:1.45rem;font-weight:700;color:#7a0b0b;margin-top:4px}</style>
+<div class="page-header"><div><h1>Performans V2 Kontrol Merkezi</h1><p class="muted">Görev senkronu, değerlendirme, yayınlama ve rapor akışlarını tek yerden açın.</p></div></div>
+<div class="glass-card">
+  <form method="get" class="toolbar">
+    <div class="form-group">
+      <label>Dönem</label>
+      <select class="form-select" name="period_id">
+        {% for item in periods %}<option value="{{ item.id }}" {% if period and item.id == period.id %}selected{% endif %}>{{ item.title }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="v2-actions"><button class="btn-soft primary" type="submit">Merkezi Aç</button></div>
+  </form>
+  {% if dashboard %}
+  <div class="metrics">
+    <div class="metric"><div class="label">Toplam Görev</div><div class="value">{{ dashboard.assignment_count or 0 }}</div></div>
+    <div class="metric"><div class="label">Tamamlanan</div><div class="value">{{ dashboard.completed_count or 0 }}</div></div>
+    <div class="metric"><div class="label">Geciken</div><div class="value">{{ dashboard.overdue_count or 0 }}</div></div>
+    <div class="metric"><div class="label">Yayınlanan</div><div class="value">{{ dashboard.published_count or 0 }}</div></div>
+  </div>
+  {% endif %}
+</div>
+<div class="v2-grid" style="margin-top:18px;">
+  {% if is_admin %}
+  <div class="v2-card"><h3>Kontrol 2 · Görev Senkronu</h3><p>Aktif dönem için evaluator zincirini ve görev satırlarını V2 omurgasıyla yeniden üretir.</p><div class="v2-actions"><a class="btn-soft primary" href="{{ url_for('main.performance_v2_phase2_dashboard', period_id=period.id if period else None) }}">Görev senkronunu aç</a></div></div>
+  {% endif %}
+  <div class="v2-card"><h3>Değerlendirme Görevlerim</h3><p>Kullanıcının değerlendirme çalışma alanını değerlendirme formu ve süreç akışıyla açar.</p><div class="v2-actions"><a class="btn-soft primary" href="{{ url_for('main.performance_v2_phase4_dashboard', period_id=period.id if period else None) }}">Görevlerimi aç</a></div></div>
+  <div class="v2-card"><h3>Not Karnesi</h3><p>Dönem sonuçlarını, yayımlama durumunu ve personel bazlı karne görünümünü açar.</p><div class="v2-actions"><a class="btn-soft primary" href="{{ url_for('main.performance_v2_phase5_scorecard', period_id=period.id if period else None) }}">Not karnesini aç</a></div></div>
+  {% if is_admin %}
+  <div class="v2-card"><h3>Kontrol 5 · Yayın Yönetimi</h3><p>Dönem sonuçlarını toplu yayımlama ve geri alma işlemlerini yönetir.</p><div class="v2-actions"><a class="btn-soft primary" href="{{ url_for('main.performance_v2_phase5_publish', period_id=period.id if period else None) }}">Yayın yönetimini aç</a></div></div>
+  <div class="v2-card"><h3>Kontrol 6 · Yönetici Dashboard</h3><p>Excel ve CSV exportlarıyla birlikte yönetici özet göstergelerini açar.</p><div class="v2-actions"><a class="btn-soft primary" href="{{ url_for('main.performance_v2_phase6_dashboard', period_id=period.id if period else None) }}">Dashboard'u aç</a></div></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Geri Bildirim Operasyon Paneli - BYS360{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Operasyon Paneli{% endblock %}
+{% block page_subtitle %}
+Bekleyen talepleri, yaklaşan görüşmeleri ve sıkışan randevu yükünü tek operasyon ekranında izleyin.
+{% endblock %}
+
+{% block content %}
+<style>
+    .ops-shell{display:grid;gap:18px}
+    .glass-card{background:rgba(255,255,255,.88);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08);padding:22px}
+    .scope-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+    .scope-pill,.soft-pill,.tone-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:900;white-space:nowrap}
+    .scope-pill{background:rgba(139,0,0,.08);color:#8B0000}
+    .soft-pill{background:#eef2f7;color:#4b5563}
+    .tone-pill.critical{background:rgba(185,28,28,.10);color:#991b1b}
+    .tone-pill.watch{background:rgba(180,83,9,.12);color:#92400e}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) 320px;gap:18px}
+    .hero-title{margin:0;font-size:1.15rem;font-weight:900;color:#111827;line-height:1.45}
+    .hero-text{margin-top:10px;color:#6b7280;line-height:1.85;font-size:.93rem}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .btn-soft{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:none;border-radius:14px;cursor:pointer;text-decoration:none;font-weight:800;font-size:.9rem;white-space:nowrap;transition:all .18s ease}
+    .btn-soft.primary{background:linear-gradient(180deg,#8B0000,#6f0000);color:#fff;box-shadow:0 12px 24px rgba(139,0,0,.16)}
+    .btn-soft.secondary{background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08)}
+    .btn-soft:hover{transform:translateY(-1px)}
+    .side-card{border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;background:#f8fafc;display:grid;gap:8px}
+    .side-label{color:#6b7280;font-size:.78rem;font-weight:800}
+    .side-value{color:#111827;font-size:1rem;font-weight:900;line-height:1.6}
+    .stats-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
+    .stat-card{position:relative;overflow:hidden}
+    .stat-card::after{content:"";position:absolute;right:-18px;bottom:-18px;width:76px;height:76px;border-radius:50%;background:rgba(139,0,0,.06)}
+    .stat-label{color:#6b7280;font-size:.78rem;font-weight:800;margin-bottom:8px;position:relative;z-index:1}
+    .stat-value{color:#111827;font-size:1.35rem;font-weight:900;line-height:1;position:relative;z-index:1}
+    .stat-sub{margin-top:8px;color:#6b7280;font-size:.78rem;line-height:1.65;position:relative;z-index:1}
+    .layout-grid{display:grid;grid-template-columns:minmax(0,1.1fr) 360px;gap:18px}
+    .section-title{margin:0 0 14px;color:#111827;font-size:1.06rem;font-weight:900}
+    .section-sub{margin:0 0 14px;color:#6b7280;font-size:.9rem;line-height:1.75}
+    .list-grid{display:grid;gap:12px}
+    .item-card{border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#fff;padding:16px;display:grid;gap:10px}
+    .item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .item-title{margin:0;color:#111827;font-size:.98rem;font-weight:900;line-height:1.5}
+    .item-meta{color:#6b7280;font-size:.84rem;line-height:1.75}
+    .item-text{color:#4b5563;font-size:.86rem;line-height:1.8}
+    .item-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .mini-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 12px;border-radius:12px;text-decoration:none;background:#eef2f7;color:#374151;border:1px solid rgba(15,23,42,.08);font-size:.82rem;font-weight:800}
+    .empty-box{padding:24px;border-radius:18px;border:1px dashed rgba(15,23,42,.12);background:#f8fafc;color:#6b7280;text-align:center;line-height:1.8}
+    .manager-list{display:grid;gap:10px}
+    .manager-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}
+    .manager-name{font-weight:800;color:#111827}
+    .manager-count{display:inline-flex;align-items:center;justify-content:center;min-width:42px;min-height:32px;padding:0 10px;border-radius:999px;background:rgba(139,0,0,.08);color:#8B0000;font-size:.82rem;font-weight:900}
+    @media (max-width:1280px){.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.layout-grid,.hero-grid{grid-template-columns:1fr}}
+    @media (max-width:768px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.btn-soft,.mini-btn{width:100%}}
+</style>
+
+<div class="ops-shell">
+    <div class="scope-strip">
+        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için operasyon akışı izleniyor.</span></div>
+        <span class="scope-pill"><i class="fa-solid fa-wave-square"></i> Operasyon görünümü</span>
+    </div>
+
+    <div class="glass-card">
+        <div class="hero-grid">
+            <div>
+                <h3 class="hero-title">Geri bildirim talebi ile randevu akışını tek yerden okuyun</h3>
+                <p class="hero-text">Bu ekran bekleyen talepleri, geciken görüşmeleri ve amir bazlı yük yoğunluğunu aynı ritimde toplar. Amaç sadece liste göstermek değil; ilk hangi kayda dokunmanız gerektiğini görünür kılmaktır.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+                    <span class="soft-pill"><i class="fa-solid fa-inbox"></i> {{ ops_counts.pending_requests or 0 }} bekleyen talep</span>
+                    <span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ ops_counts.overdue_requests or 0 }} geciken talep</span>
+                    <span class="tone-pill watch"><i class="fa-solid fa-clock-rotate-left"></i> {{ ops_counts.delayed_meetings or 0 }} sorunlu randevu</span>
+                </div>
+                <div class="hero-actions">
+                    <a href="{{ url_for('main.manager_feedback_requests', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-comments"></i> Talep Listesi</a>
+                    <a href="{{ url_for('main.feedback_watch_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-bell"></i> Takip Merkezi</a>
+                    <a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="btn-soft primary"><i class="fa-solid fa-calendar-check"></i> Randevu Listesi</a>
+                </div>
+            </div>
+            <div class="side-card">
+                <div class="side-label">Öncelik notu</div>
+                <div class="side-value">Önce geciken talep, sonra ertelenen randevu, ardından yoğun amir yükü okunmalı.</div>
+                <div style="color:#6b7280;font-size:.84rem;line-height:1.75;">Bu sıralama, canlı kullanımda akışın masada kalmasını azaltır ve talep sahibinin uzun süre cevapsız beklemesini önler.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-label">Toplam Talep</div><div class="stat-value">{{ ops_counts.total_requests or 0 }}</div><div class="stat-sub">Görünür talep kaydı sayısı.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Bekleyen Talep</div><div class="stat-value">{{ ops_counts.pending_requests or 0 }}</div><div class="stat-sub">Henüz cevap veya randevuya bağlanmayan talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Geciken Talep</div><div class="stat-value">{{ ops_counts.overdue_requests or 0 }}</div><div class="stat-sub">3 günden uzun süredir açık duran kayıtlar.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Randevuya Bağlı</div><div class="stat-value">{{ ops_counts.scheduled_requests or 0 }}</div><div class="stat-sub">Takvime bağlanmış veya görüşmesi tamamlanmış talepler.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Yaklaşan Görüşme</div><div class="stat-value">{{ ops_counts.upcoming_meetings or 0 }}</div><div class="stat-sub">Bugün ve sonrası için planlı kayıtlar.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Sorunlu Görüşme</div><div class="stat-value">{{ ops_counts.delayed_meetings or 0 }}</div><div class="stat-sub">Ertelenen veya tarihi geçmiş planlı görüşmeler.</div></div>
+    </div>
+
+    <div class="layout-grid">
+        <div style="display:grid;gap:18px;">
+            <div class="glass-card">
+                <h3 class="section-title">İlk dokunulacak kayıtlar</h3>
+                <p class="section-sub">Kritik ve izlenmesi gereken kayıtları tek listede sıraladım.</p>
+                {% if action_items %}
+                <div class="list-grid">
+                    {% for item in action_items %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <div class="tone-pill {{ item.tone }}">{{ item.kind }}</div>
+                                <h4 class="item-title" style="margin-top:10px;">{{ item.title }}</h4>
+                                <div class="item-meta">{{ item.meta }}</div>
+                            </div>
+                        </div>
+                        <div class="item-text">{{ item.detail }}</div>
+                        <div class="item-actions">
+                            {% if item.request_id %}<a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=item.request_id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>{% endif %}
+                            {% if item.meeting_id %}<a class="mini-btn" href="{{ url_for('main.feedback_meeting_detail', meeting_id=item.meeting_id, scope=selected_scope) }}"><i class="fa-solid fa-eye"></i> Randevuyu Aç</a>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Öncelikli operasyon kaydı görünmüyor.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Geciken talepler</h3>
+                <p class="section-sub">Randevuya bağlanması veya cevaplanması geciken kayıtlar.</p>
+                {% if overdue_requests %}
+                <div class="list-grid">
+                    {% for req in overdue_requests %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <h4 class="item-title">{{ req.employee.ad }} {{ req.employee.soyad }}</h4>
+                                <div class="item-meta">{{ req.period.title if req.period else 'Dönem bilgisi yok' }} · {{ req.requested_at.strftime('%d.%m.%Y %H:%M') if req.requested_at else '-' }}</div>
+                            </div>
+                            <span class="tone-pill critical">{{ status_labels.get(req.status, req.status) }}</span>
+                        </div>
+                        <div class="item-text">{{ (req.reason or '-')[:180] }}{% if req.reason and req.reason|length > 180 %}...{% endif %}</div>
+                        <div class="item-actions">
+                            <a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=req.id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Detaya Git</a>
+                            <a class="mini-btn" href="{{ url_for('main.manager_feedback_request_schedule', request_id=req.id, scope=selected_scope) }}"><i class="fa-solid fa-calendar-plus"></i> Randevu Planla</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Geciken talep görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display:grid;gap:18px;align-content:start;">
+            <div class="glass-card">
+                <h3 class="section-title">Yoğun amirler</h3>
+                <p class="section-sub">Yaklaşan randevu yükü en yüksek olan amirler.</p>
+                {% if busiest_managers %}
+                <div class="manager-list">
+                    {% for row in busiest_managers %}
+                    <div class="manager-row"><span class="manager-name">{{ row.manager_name }}</span><span class="manager-count">{{ row.meeting_count }}</span></div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Yoğunluk verisi oluşmadı.</div>
+                {% endif %}
+            </div>
+
+            <div class="glass-card">
+                <h3 class="section-title">Sorunlu görüşmeler</h3>
+                <p class="section-sub">Ertelenen veya tarihine rağmen tamamlanmamış planlar.</p>
+                {% if delayed_meetings %}
+                <div class="list-grid">
+                    {% for meeting in delayed_meetings %}
+                    <div class="item-card">
+                        <div class="item-top">
+                            <div>
+                                <h4 class="item-title">{{ meeting.employee.ad }} {{ meeting.employee.soyad }}</h4>
+                                <div class="item-meta">{{ meeting.manager.ad }} {{ meeting.manager.soyad }} · {{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }}</div>
+                            </div>
+                            <span class="tone-pill watch">{{ status_labels.get(meeting.status, meeting.status) }}</span>
+                        </div>
+                        <div class="item-text">{{ meeting.location or 'Konum girilmedi' }} · {{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div>
+                        <div class="item-actions">
+                            <a class="mini-btn" href="{{ url_for('main.feedback_meeting_detail', meeting_id=meeting.id, scope=selected_scope) }}"><i class="fa-solid fa-eye"></i> Randevuyu Aç</a>
+                            {% if meeting.feedback_request %}<a class="mini-btn" href="{{ url_for('main.manager_feedback_request_detail', request_id=meeting.feedback_request.id, scope=selected_scope) }}"><i class="fa-solid fa-file-lines"></i> Talebi Aç</a>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-box">Sorunlu görüşme görünmüyor.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

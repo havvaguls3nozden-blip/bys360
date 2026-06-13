@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Faz 1 Destek Merkezi - BYS360{% endblock %}
+{% block page_kicker %}İletişim ve Anket Yönetimi{% endblock %}
+{% block page_title %}Faz 1 Destek Merkezi{% endblock %}
+{% block page_subtitle %}Destek talepleri ile bilgi bankasını tek merkezde görünür hale getirir.{% endblock %}
+{% block content %}
+<style>
+.shell{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}.card,.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 36px rgba(15,23,42,.08)}.card{padding:20px}.label{color:#6b7280;font-size:.82rem;font-weight:800;margin-bottom:8px}.value{font-size:1.62rem;font-weight:900;color:#111827}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:22px;background:#fff}.table{margin:0;min-width:1100px}.table td,.table th{padding:14px;border-bottom:1px solid rgba(15,23,42,.08);vertical-align:top}.table thead th{font-size:.79rem;color:#6b7280;background:#fafafa;text-transform:uppercase}.panel{padding:22px}.muted{color:#6b7280;font-size:.84rem;line-height:1.7}@media (max-width:1200px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:720px){.stats{grid-template-columns:1fr}}
+</style>
+<div class="shell">
+    <div class="stats">
+        <div class="card"><div class="label">Toplam talep</div><div class="value">{{ payload.counts.total }}</div></div>
+        <div class="card"><div class="label">Açık / işlemde</div><div class="value">{{ payload.counts.open }}</div></div>
+        <div class="card"><div class="label">Çözüldü</div><div class="value">{{ payload.counts.resolved }}</div></div>
+        <div class="card"><div class="label">Kapandı</div><div class="value">{{ payload.counts.closed }}</div></div>
+        <div class="card"><div class="label">Bilgi bankası</div><div class="value">{{ payload.counts.help_articles }}</div></div>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin:0 0 8px;font-size:1.04rem;font-weight:900;color:#111827;">Destek görünürlük ekranı</h3>
+        <p style="margin:0 0 16px;color:#6b7280;line-height:1.8;">Bu fazda destek modülü ile iletişim modülü arasında yönetimsel görünürlük köprüsü kurulur.</p>
+        <div class="table-wrap">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Talep</th>
+                        <th>Kategori</th>
+                        <th>Öncelik</th>
+                        <th>Durum</th>
+                        <th>Oluşturan</th>
+                        <th>Atanan</th>
+                        <th>İleti / Ek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in payload.rows %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:800;color:#111827;">{{ row.ticket.ticket_no }} · {{ row.ticket.title }}</div>
+                            <div class="muted">{{ row.ticket.description[:160] ~ ('…' if row.ticket.description|length > 160 else '') }}</div>
+                        </td>
+                        <td>{{ row.ticket.ticket_type }}</td>
+                        <td>{{ row.ticket.priority_label if row.ticket.priority_label is defined else row.ticket.priority }}</td>
+                        <td>{{ row.ticket.status_label if row.ticket.status_label is defined else row.ticket.status }}</td>
+                        <td>{{ row.creator_name }}</td>
+                        <td>{{ row.assignee_name }}</td>
+                        <td>{{ row.message_count }} / {{ row.attachment_count }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-4">Destek talebi bulunamadı.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

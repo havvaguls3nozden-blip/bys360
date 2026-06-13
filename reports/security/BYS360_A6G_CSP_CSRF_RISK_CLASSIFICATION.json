@@ -1,0 +1,309 @@
+{
+  "generated_at": "2026-06-12T13:22:37",
+  "total_findings": 31,
+  "classification_counts": {
+    "accepted_or_review": 6,
+    "noise": 2,
+    "audit_rule": 4,
+    "actionable": 19
+  },
+  "issue_counts": {
+    "CSP_UNSAFE_INLINE": 20,
+    "CSRF_EXEMPT": 4,
+    "CSRF_DISABLED": 7
+  },
+  "severity_counts": {
+    "medium": 17,
+    "low": 2,
+    "info": 4,
+    "high": 8
+  },
+  "actionable_count": 19,
+  "review_count": 6,
+  "noise_or_audit_count": 6,
+  "actionable_findings": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "app/security/startup_audit.py",
+      "line": 101,
+      "excerpt": "if \"'unsafe-inline'\" in script_src and not bool(app.config.get(\"CSP_ALLOW_UNSAFE_INLINE_SCRIPT\", False)):",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "app/security/startup_audit.py",
+      "line": 102,
+      "excerpt": "security_errors.append(\"CSP_SCRIPT_SRC icinde unsafe-inline bulunamaz; nonce tabanli CSP kullanilmalidir.\")",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "app/api/mobile/__init__.py",
+      "line": 18,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "CSRF muafiyeti ger?ek endpointte g?r?n?yor; gerek?e ve koruma kontrol edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "app/api/mobile/__init__.py",
+      "line": 31,
+      "excerpt": "csrf.exempt(mobile_api_bp)",
+      "recommendation": "CSRF muafiyeti ger?ek endpointte g?r?n?yor; gerek?e ve koruma kontrol edilmeli."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "line": 243,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_performance_response_gate_p3e.py",
+      "line": 152,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "line": 258,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v2.py",
+      "line": 293,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "line": 312,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "actionable",
+      "severity": "high",
+      "file": "scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "line": 143,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)",
+      "recommendation": "CSRF global kapal? olabilir; canl?da kabul edilmez."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 107,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 112,
+      "excerpt": "if 'inject_csp_nonce_into_html' not in headers or \"'unsafe-inline'\" in script_default:",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_security_observability_v1.py",
+      "line": 113,
+      "excerpt": "failures.append('CSP header/nonce uygulaması eksik veya DEFAULT_CSP script tarafında unsafe-inline içeriyor.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 98,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 113,
+      "excerpt": "if \"'unsafe-inline'\" in script_default:",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 114,
+      "excerpt": "failures.append('DEFAULT_CSP script-src hala unsafe-inline içeriyor.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 166,
+      "excerpt": "failures.append('.env içinde CSP_ALLOW_UNSAFE_INLINE_SCRIPT=true var; script unsafe-inline kapatılmalı.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 167,
+      "excerpt": "if \"'unsafe-inline'\" in csp_script:",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "actionable",
+      "severity": "medium",
+      "file": "scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 168,
+      "excerpt": "failures.append('.env CSP_SCRIPT_SRC içinde unsafe-inline var; nonce tabanlı CSP kullanılmalı.')",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    }
+  ],
+  "review_findings": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "config.py",
+      "line": 334,
+      "excerpt": "CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', \"'self' 'unsafe-inline' https:\").strip() or \"'self' 'unsafe-inline' https:\"",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 380,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Popup/duyuru endpoint muafiyeti gerek?elendirilmeli; rate limit ve auth kontrol edilmeli."
+    },
+    {
+      "issue": "CSRF_EXEMPT",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "app/communication/announcement_popup_routes.py",
+      "line": 395,
+      "excerpt": "@csrf.exempt",
+      "recommendation": "Popup/duyuru endpoint muafiyeti gerek?elendirilmeli; rate limit ve auth kontrol edilmeli."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "app/security/csp_nonce.py",
+      "line": 61,
+      "excerpt": "f\"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; \"",
+      "recommendation": "style-src unsafe-inline ge?ici uyumluluk olabilir; nonce/stylesheet plan?yla azalt?lmal?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "app/security/headers.py",
+      "line": 25,
+      "excerpt": "\"style-src\": \"'self' 'unsafe-inline' https:\",",
+      "recommendation": "style-src unsafe-inline ge?ici uyumluluk olabilir; nonce/stylesheet plan?yla azalt?lmal?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "accepted_or_review",
+      "severity": "medium",
+      "file": "app/security/headers.py",
+      "line": 67,
+      "excerpt": "value = _remove_token(value, \"'unsafe-inline'\")",
+      "recommendation": "CSP unsafe kullan?m? g?zden ge?irilmeli."
+    }
+  ],
+  "noise_or_audit_sample": [
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "noise",
+      "severity": "low",
+      "file": "config.py",
+      "line": 335,
+      "excerpt": "# BYS360_P0_SECURITY_OBSERVABILITY_V1: script tarafinda unsafe-inline varsayilan kapali; nonce uygulanir.",
+      "recommendation": "Yorum/doc sat?r?; do?rudan runtime riski de?il."
+    },
+    {
+      "issue": "CSRF_DISABLED",
+      "classification": "audit_rule",
+      "severity": "info",
+      "file": "app/security/audit.py",
+      "line": 92,
+      "excerpt": "code='csrf_disabled',",
+      "recommendation": "G?venlik denetim kural?/mesaj?; risk de?il, kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "audit_rule",
+      "severity": "info",
+      "file": "app/security/audit.py",
+      "line": 150,
+      "excerpt": "if observability_like and csp_enabled and \"'unsafe-inline'\" in script_src and not _is_truthy(config.get('CSP_ALLOW_UNSAFE_INLINE_SCRIPT', False)):",
+      "recommendation": "G?venlik denetim kural?/mesaj?; risk de?il, kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "audit_rule",
+      "severity": "info",
+      "file": "app/security/audit.py",
+      "line": 154,
+      "excerpt": "message='CSP script-src icinde unsafe-inline var.',",
+      "recommendation": "G?venlik denetim kural?/mesaj?; risk de?il, kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "audit_rule",
+      "severity": "info",
+      "file": "app/security/audit.py",
+      "line": 155,
+      "excerpt": "action='Nonce tabanli CSP kullan ve unsafe-inline script iznini kaldir.',",
+      "recommendation": "G?venlik denetim kural?/mesaj?; risk de?il, kontrol mekanizmas?."
+    },
+    {
+      "issue": "CSP_UNSAFE_INLINE",
+      "classification": "noise",
+      "severity": "low",
+      "file": "app/security/headers.py",
+      "line": 9,
+      "excerpt": "- script-src tarafinda unsafe-inline varsayilan kullanilmaz.",
+      "recommendation": "Yorum/doc sat?r?; do?rudan runtime riski de?il."
+    }
+  ]
+}

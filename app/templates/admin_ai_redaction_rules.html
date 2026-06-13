@@ -1,0 +1,52 @@
+{% extends "admin_ai_base.html" %}
+{% block title %}Karar Destek Maskeleme Kuralları - BYS360{% endblock %}
+{% block page_kicker %}Yönetim ve Denetim{% endblock %}
+{% block page_title %}Karar Destek Maskeleme Kuralları{% endblock %}
+{% block page_subtitle %}Alan bazlı maskeleme kurallarını yönetin; kişisel veri ve hassas metinlerin özetlere nasıl yansıyacağını kontrol edin{% endblock %}
+{% block ai_inner %}
+<div class="ai-shell">
+  <section class="ai-panel">
+    <div class="ai-kicker">AI güvenlik çerçevesi</div>
+    <h3 class="ai-title">Maskeleme ve veri görünürlüğü kurallarını merkezden yönetin</h3>
+    <p class="ai-sub">KVKK ve kurum içi görünürlük ilkeleri gereği, AI özetlerine giden alanlar için maskeleme tanımları bu merkezden tutulur.</p>
+  </section>
+
+  <section class="ai-grid">
+    <article class="ai-card"><div class="ai-label">Toplam kural</div><div class="ai-value">{{ rows|length }}</div></article>
+    <article class="ai-card"><div class="ai-label">Aktif kural</div><div class="ai-value">{{ active_count }}</div></article>
+  </section>
+
+  <form class="ai-form-wrap" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h4 class="ai-title" style="font-size:1.05rem;margin-bottom:14px">Yeni kural ekle / güncelle</h4>
+    <div class="ai-filters" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="ai-group"><label>Modül</label><input class="ai-input" name="module_type" list="module-options" placeholder="ör. performance / hr / dashboard" required><datalist id="module-options">{% for value in module_options %}<option value="{{ value }}">{{ value|ai_module_label }}</option>{% endfor %}</datalist></div>
+      <div class="ai-group"><label>Alan adı</label><input class="ai-input" name="field_name" list="field-options" placeholder="ör. sicil_no / e_posta / yorum" required><datalist id="field-options">{% for value in field_name_options %}<option value="{{ value }}"></option>{% endfor %}</datalist></div>
+      <div class="ai-group"><label>Maskeleme tipi</label><select class="ai-select" name="redaction_type" required><option value="mask">Maskele</option><option value="remove">Kaldır</option><option value="hash">Özet değere çevir</option><option value="role_based">Role göre göster</option></select></div>
+      <div class="ai-group"><label>Yerine yazılacak metin</label><input class="ai-input" name="replacement_text" placeholder="ör. *** veya GİZLİ"></div>
+    </div>
+    <div class="ai-actions" style="margin-top:14px"><button class="ai-submit" type="submit"><i class="fa-solid fa-floppy-disk"></i> Kuralı kaydet</button></div>
+  </form>
+
+  <section class="ai-table-wrap">
+    <table class="ai-table">
+      <thead><tr><th>Modül</th><th>Alan</th><th>Tip</th><th>Yerine Yazı</th><th>Durum</th><th>İşlem</th></tr></thead>
+      <tbody>
+        {% for row in rows %}<tr>
+          <td>{{ row.module_type|ai_module_label }}</td>
+          <td>{{ row.field_name }}</td>
+          <td>{{ row.redaction_type|ai_redaction_type_label }}</td>
+          <td>{{ row.replacement_text or '-' }}</td>
+          <td><span class="ai-badge {{ 'success' if row.is_active else 'muted' }}">{{ 'Aktif' if row.is_active else 'Pasif' }}</span></td>
+          <td>
+            <form method="post" action="{{ url_for('main.admin_ai_redaction_toggle', rule_id=row.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="ai-action-btn {{ 'secondary' if row.is_active else '' }}" type="submit">{{ 'Pasife Al' if row.is_active else 'Aktifleştir' }}</button>
+            </form>
+          </td>
+        </tr>{% else %}<tr><td colspan="6"><div class="ai-note">Henüz AI maskeleme kuralı tanımlanmadı.</div></td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

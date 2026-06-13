@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-06-13T10:22:09",
+  "phase": "S0G_OLD_VENV_ARCHIVE_CLEANUP",
+  "mode": "move_old_venv_to_release_archive_no_delete",
+  "ok": true,
+  "decision": "S0G_GREEN",
+  "archive_root": "C:\\bys360\\releases\\S0G_OLD_VENV_ARCHIVE_20260613_102048",
+  "restore_script": "C:\\bys360\\releases\\S0G_OLD_VENV_ARCHIVE_20260613_102048\\RESTORE_S0G_OLD_VENV.ps1",
+  "candidate_count": 1,
+  "before_state": {
+    "old_venv_dir_count": 1,
+    "old_venv_total_mb": 197.11,
+    "old_venv_dirs": [
+      {
+        "path": ".venv_old_20260612_200915",
+        "file_count": 8935,
+        "dir_count": 991,
+        "size_mb": 197.11
+      }
+    ]
+  },
+  "operation_count": 1,
+  "operations": [
+    {
+      "type": "move_old_venv_to_release_archive",
+      "status": "moved",
+      "source": ".venv_old_20260612_200915",
+      "destination": "C:\\bys360\\releases\\S0G_OLD_VENV_ARCHIVE_20260613_102048\\moved\\.venv_old_20260612_200915",
+      "before": {
+        "source": ".venv_old_20260612_200915",
+        "file_count": 8935,
+        "dir_count": 991,
+        "size_mb": 197.11
+      },
+      "after": {
+        "destination": "C:\\bys360\\releases\\S0G_OLD_VENV_ARCHIVE_20260613_102048\\moved\\.venv_old_20260612_200915",
+        "destination_exists": true,
+        "source_exists_after_move": false,
+        "destination_file_count": 8935,
+        "destination_dir_count": 991,
+        "destination_size_mb": 197.11
+      }
+    }
+  ],
+  "errors": [],
+  "after_state": {
+    "old_venv_dir_count": 0,
+    "old_venv_total_mb": 0,
+    "old_venv_dirs": []
+  },
+  "compileall_returncode": 0,
+  "pytest_quality_smoke_returncode": 0,
+  "pytest_quality_smoke_summary": {
+    "passed": 5,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "warnings": 0
+  },
+  "pytest_full_returncode": 0,
+  "pytest_full_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "pytest_default_returncode": 0,
+  "pytest_default_summary": {
+    "passed": 744,
+    "skipped": 2,
+    "deselected": 34,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "s0a_rerun": {
+    "returncode": 0,
+    "ok": true,
+    "red_flag_count": 0,
+    "pip_audit_available": true,
+    "pip_audit_vulnerability_count": 0,
+    "old_venv_dir_count": 0,
+    "old_venv_total_mb": 0
+  },
+  "next_action": "S0Z final güvenlik/test hijyen kapanış raporu üretilebilir."
+}

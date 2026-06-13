@@ -1,0 +1,9 @@
+/* BYS360_PERFORMANCE_COMPLETION_PHASE6_LOW_SCORE_PROCESS_CSS */
+.bys360-phase6-low-score-panel{border:1px solid rgba(139,0,0,.16);border-left:5px solid #8B0000;border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 10px 30px rgba(0,0,0,.06);padding:18px;margin:16px 0;}
+.bys360-phase6-low-score-title{font-weight:800;color:#8B0000;font-size:1.05rem;margin-bottom:12px;}
+.bys360-phase6-low-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.bys360-phase6-low-score-grid div{background:rgba(139,0,0,.035);border-radius:14px;padding:12px;}
+.bys360-phase6-low-score-grid strong{display:block;color:#3b3b3b;font-size:.82rem;margin-bottom:4px;}
+.bys360-phase6-low-score-grid span{display:block;color:#111;font-weight:700;}
+.bys360-phase6-low-score-note{margin:12px 0 0;color:#555;line-height:1.55;}
+@media (max-width:700px){.bys360-phase6-low-score-panel{padding:14px;border-radius:14px}.bys360-phase6-low-score-grid{grid-template-columns:1fr}}

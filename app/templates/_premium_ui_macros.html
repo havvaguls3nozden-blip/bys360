@@ -1,0 +1,28 @@
+{% macro premium_hub_strip(active='', note='', metric='', secondary='') -%}
+<div class="bys-premium-hub">
+    <div class="bys-premium-hub-card">
+        <div class="bys-premium-hub-body">
+            <span class="bys-premium-hub-kicker"><i class="fa-solid fa-swatchbook"></i> Kurumsal akış dili</span>
+            <h4 class="bys-premium-hub-title">İletişim, duyuru, anket ve randevu aynı kurumsal ritimde çalışsın</h4>
+            <p class="bys-premium-hub-text">{{ note or 'Personel yönetimi ekranındaki netlik hissini burada da koruyoruz; kartlar, filtreler ve boş durumlar aynı aileye ait gibi davranıyor.' }}</p>
+            <div class="bys-premium-hub-meta">
+                {% if metric %}<span class="bys-premium-hub-meta-pill"><i class="fa-solid fa-chart-line"></i> {{ metric }}</span>{% endif %}
+                {% if secondary %}<span class="bys-premium-hub-meta-pill"><i class="fa-solid fa-sparkles"></i> {{ secondary }}</span>{% endif %}
+                <span class="bys-premium-hub-meta-pill"><i class="fa-solid fa-sliders"></i> Filtreler ve kartlar aynı dilde</span>
+            </div>
+        </div>
+    </div>
+    <div class="bys-premium-hub-card">
+        <div class="bys-premium-hub-body">
+            <span class="bys-premium-hub-kicker"><i class="fa-solid fa-compass"></i> Hızlı geçiş</span>
+            <div class="bys-premium-nav-grid">
+                <a href="{{ url_for('main.messages_inbox') }}" class="bys-premium-nav-link {% if active == 'messages' %}active{% endif %}"><span><i class="fa-solid fa-comments"></i> Mesajlaşma</span><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{{ url_for('main.notifications_list') }}" class="bys-premium-nav-link {% if active == 'notifications' %}active{% endif %}"><span><i class="fa-solid fa-bell"></i> Bildirimler</span><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{{ url_for('main.surveys_list') }}" class="bys-premium-nav-link {% if active == 'surveys' %}active{% endif %}"><span><i class="fa-solid fa-list-check"></i> Anketler</span><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{{ url_for('main.announcements_list') }}" class="bys-premium-nav-link {% if active == 'announcements' %}active{% endif %}"><span><i class="fa-solid fa-bullhorn"></i> Duyurular</span><i class="fa-solid fa-arrow-right"></i></a>
+                <a href="{{ url_for('main.feedback_meetings_list') }}" class="bys-premium-nav-link {% if active == 'meetings' %}active{% endif %}"><span><i class="fa-solid fa-calendar-check"></i> Randevu Sistemi</span><i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endmacro %}

@@ -1,0 +1,3086 @@
+{
+  "generated_at": "2026-06-12T13:11:30",
+  "total_findings": 883,
+  "classification_counts": {
+    "actionable": 262,
+    "reference_or_example": 590,
+    "comment_only": 31
+  },
+  "actionable_count": 262,
+  "actionable_severity_counts": {
+    "medium": 160,
+    "high": 102
+  },
+  "actionable_id_counts": {
+    "SQLITE_REFERENCE": 128,
+    "DEFAULT_PASSWORD_LITERAL": 68,
+    "SECRET_ASSIGNMENT": 21,
+    "CSP_UNSAFE_INLINE_OR_EVAL": 19,
+    "CSRF_DISABLED_OR_EXEMPT": 11,
+    "DB_SSL_DISABLED": 6,
+    "DEBUG_ENABLED": 2,
+    "SENTRY_EMPTY_OR_PLACEHOLDER": 5,
+    "ENV_FILE_PRESENT": 1,
+    "DATABASE_FILE_PRESENT": 1
+  },
+  "actionable_findings": [
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": ".env",
+      "line": 2,
+      "excerpt": "DATABASE_URL=sqlite:///C:/bys360/project/instance/bys360_local_dev.sqlite3"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "alembic.ini",
+      "line": 16,
+      "excerpt": "sqlalchemy.url = sqlite:///:memory:"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 171,
+      "excerpt": "'CHANGE_ME',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 173,
+      "excerpt": "'changeme',"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 178,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 182,
+      "excerpt": "SECRET_KEY=***MASKED*** '').strip() or secrets.token_urlsafe(48)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 185,
+      "excerpt": "_raw_database_url = (os.getenv(\"DATABASE_URL\") or \"\").strip() or 'sqlite:///:memory:'"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 246,
+      "excerpt": "DEFAULT_FIRST_LOGIN_PASSWORD=***MASKED*** '').strip()"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 310,
+      "excerpt": "SENTRY_DSN=***MASKED*** or \"\").strip()"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 334,
+      "excerpt": "CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', \"'self' 'unsafe-inline' https:\").strip() or \"'self' 'unsafe-inline' https:\""
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 351,
+      "excerpt": "MAIL_PASSWORD=***MASKED*** '')"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "config.py",
+      "line": 361,
+      "excerpt": "AI_API_KEY=***MASKED*** '').strip()"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "docker-compose.yml",
+      "line": 12,
+      "excerpt": "POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_only_for_local}"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\menu_registry_data_sections.py",
+      "line": 620,
+      "excerpt": "\"endpoint\": \"main.db_check\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\menu_registry_data_sections.py",
+      "line": 621,
+      "excerpt": "\"active_endpoints\": [\"main.db_check\"],"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\startup_checks.py",
+      "line": 80,
+      "excerpt": "if strict_env_validation and (not database_uri or \"CHANGE_ME\" in database_uri or database_uri == \"sqlite:///:memory:\"):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\startup_checks.py",
+      "line": 80,
+      "excerpt": "if strict_env_validation and (not database_uri or \"CHANGE_ME\" in database_uri or database_uri == \"sqlite:///:memory:\"):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "migrations\\env.py",
+      "line": 21,
+      "excerpt": "return current_app.extensions['migrate'].db.get_engine()"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "migrations\\env.py",
+      "line": 24,
+      "excerpt": "return current_app.extensions['migrate'].db.engine"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "migrations\\env.py",
+      "line": 40,
+      "excerpt": "target_db = current_app.extensions['migrate'].db"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\check_bys360_mobile_v2_8_74_android_release_ready_p0.py",
+      "line": 88,
+      "excerpt": "if \"YOUR_LOCAL_\" in key_text or \"CHANGE_ME\" in key_text:"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\split_clean_bys360_source_for_upload.ps1",
+      "line": 47,
+      "excerpt": "\"*.db\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\split_clean_bys360_source_for_upload.ps1",
+      "line": 48,
+      "excerpt": "\"*.sqlite\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\split_clean_bys360_source_for_upload.ps1",
+      "line": 49,
+      "excerpt": "\"*.sqlite3\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\communication\\announcement_popup_routes.py",
+      "line": 380,
+      "excerpt": "@csrf.exempt"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\communication\\announcement_popup_routes.py",
+      "line": 395,
+      "excerpt": "@csrf.exempt"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\core\\monitoring.py",
+      "line": 16,
+      "excerpt": "\"CHANGE_ME\","
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 30,
+      "excerpt": "secret_key=***MASKED*** '') or '').strip()"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 92,
+      "excerpt": "code='csrf_disabled',"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 113,
+      "excerpt": "sentry_dsn=***MASKED*** '') or '').strip().lower()"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 131,
+      "excerpt": "if observability_like and db_uri.startswith('postgres') and 'sslmode=disable' in db_uri:"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 135,
+      "excerpt": "message='PostgreSQL baglantisinda sslmode=disable gorunuyor.',"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 150,
+      "excerpt": "if observability_like and csp_enabled and \"'unsafe-inline'\" in script_src and not _is_truthy(config.get('CSP_ALLOW_UNSAFE_INLINE_SCRIPT', False)):"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 154,
+      "excerpt": "message='CSP script-src icinde unsafe-inline var.',"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\audit.py",
+      "line": 155,
+      "excerpt": "action='Nonce tabanli CSP kullan ve unsafe-inline script iznini kaldir.',"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\csp_nonce.py",
+      "line": 61,
+      "excerpt": "f\"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; \""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\headers.py",
+      "line": 9,
+      "excerpt": "- script-src tarafinda unsafe-inline varsayilan kullanilmaz."
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\headers.py",
+      "line": 25,
+      "excerpt": "\"style-src\": \"'self' 'unsafe-inline' https:\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\headers.py",
+      "line": 67,
+      "excerpt": "value = _remove_token(value, \"'unsafe-inline'\")"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 43,
+      "excerpt": "secret_key=***MASKED*** or \"\").strip()"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 48,
+      "excerpt": "if first_login_password in {\"123456\", \"12345678\", \"password\", \"admin\", \"changeme\", \"CHANGE_ME\"}:"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 51,
+      "excerpt": "sentry_dsn=***MASKED*** or \"\").strip()"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 59,
+      "excerpt": "security_errors.append(\"PostgreSQL baglantisinda sslmode=disable canli/staging icin kullanilamaz.\")"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 101,
+      "excerpt": "if \"'unsafe-inline'\" in script_src and not bool(app.config.get(\"CSP_ALLOW_UNSAFE_INLINE_SCRIPT\", False)):"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\startup_audit.py",
+      "line": 102,
+      "excerpt": "security_errors.append(\"CSP_SCRIPT_SRC icinde unsafe-inline bulunamaz; nonce tabanli CSP kullanilmalidir.\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\__init__.py",
+      "line": 205,
+      "excerpt": "\"123456\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\__init__.py",
+      "line": 206,
+      "excerpt": "\"12345678\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\__init__.py",
+      "line": 209,
+      "excerpt": "\"changeme\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\security\\__init__.py",
+      "line": 211,
+      "excerpt": "\"CHANGE_ME\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\services\\config_hardening_service.py",
+      "line": 26,
+      "excerpt": "\"changeme\","
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\config_hardening_service.py",
+      "line": 99,
+      "excerpt": "secret_key=***MASKED*** \"\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\services\\message_service.py",
+      "line": 112,
+      "excerpt": "allowed = set(\"abcdefghijklmnopqrstuvwxyz0123456789-\")"
+    },
+    {
+      "id": "DEBUG_ENABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\services\\security_compliance_final_gate.py",
+      "line": 272,
+      "excerpt": "_add(findings, \"UYARI\", \"runtime.debug_true\", \"debug=True izi bulundu\", \", \".join(debug_true[:8]))"
+    },
+    {
+      "id": "DEBUG_ENABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\services\\security_compliance_final_gate.py",
+      "line": 274,
+      "excerpt": "_add(findings, \"OK\", \"runtime.debug_true\", \"Çalışma zamanı dosyalarında debug=True izi bulunmadı\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "app\\services\\security_hardening_service.py",
+      "line": 61,
+      "excerpt": "\"changeme\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\api\\mobile\\__init__.py",
+      "line": 18,
+      "excerpt": "csrf.exempt(mobile_api_bp)"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\api\\mobile\\__init__.py",
+      "line": 31,
+      "excerpt": "csrf.exempt(mobile_api_bp)"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\ai\\client.py",
+      "line": 169,
+      "excerpt": "api_key=***MASKED*** \"\") or \"\").strip()"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\ai\\client.py",
+      "line": 174,
+      "excerpt": "api_key=***MASKED***"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\ai\\excel_preview.py",
+      "line": 172,
+      "excerpt": "\"db_write_enabled\": self.db_write_enabled,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\ai\\excel_preview.py",
+      "line": 179,
+      "excerpt": "\"db_write_enabled\": self.db_write_enabled,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "app\\services\\ui_context\\__init__.py",
+      "line": 2,
+      "excerpt": "from .db_check import build_db_check_context"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 86,
+      "excerpt": "return raw in {\"\", \"sqlite:///:memory:\", \"sqlite://\", \"sqlite:///:memory\"} or raw.endswith(\":memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 92,
+      "excerpt": "return f\"sqlite:///{posix}\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 102,
+      "excerpt": "if raw.startswith(\"sqlite:///\"):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 103,
+      "excerpt": "value = unquote(raw[len(\"sqlite:///\"):])"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 157,
+      "excerpt": "patterns = [\"*.sqlite\", \"*.sqlite3\", \"*.db\"]"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 209,
+      "excerpt": "default_path = root / \"instance\" / \"bys360_local.sqlite\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\db\\repair_bys360_local_sqlite_schema_bootstrap_v2.py",
+      "line": 368,
+      "excerpt": "\"Local geliştirme ortamında boş `sqlite:///:memory:` veya yanlış SQLite bağlantısı nedeniyle oluşan `no such table: users` beyaz ekranını düzeltir.\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v19.py",
+      "line": 324,
+      "excerpt": "elif name.endswith((\".sqlite\", \".sqlite3\", \".db\")):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v19.py",
+      "line": 330,
+      "excerpt": "\"has_sqlite_rule\": \".sqlite\" in gitignore_text or \"*.db\" in gitignore_text,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v20.py",
+      "line": 323,
+      "excerpt": "local_dbs = list((project_root / \"instance\").glob(\"*.sqlite3\")) if (project_root / \"instance\").exists() else []"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v20.py",
+      "line": 332,
+      "excerpt": "\"has_sqlite_rule\": \"*.sqlite\" in text or \"*.sqlite3\" in text,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v21.py",
+      "line": 323,
+      "excerpt": "elif name.endswith((\".sqlite\", \".sqlite3\", \".db\")):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v21.py",
+      "line": 329,
+      "excerpt": "\"has_sqlite_rule\": \".sqlite\" in gitignore_text or \"*.db\" in gitignore_text or \".sqlite3\" in gitignore_text,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v8.py",
+      "line": 41,
+      "excerpt": "LOCAL_DB_EXTS = {\".sqlite\", \".sqlite3\", \".db\"}"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v9.py",
+      "line": 205,
+      "excerpt": "local_db_count = len(list((root / \"instance\").glob(\"*.sqlite*\"))) if (root / \"instance\").exists() else 0"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_technical_debt_cleanup_safe_v9.py",
+      "line": 308,
+      "excerpt": "\"local_dbs\": [str(p.relative_to(root)) for p in (root / \"instance\").glob(\"*.sqlite*\")] if (root / \"instance\").exists() else [],"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_tech_debt_cleanup_safe_v1.py",
+      "line": 109,
+      "excerpt": "\".zip\", \".7z\", \".rar\", \".gz\", \".tar\", \".exe\", \".dll\", \".pyd\", \".pyc\", \".sqlite\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\bys360_tech_debt_cleanup_safe_v1.py",
+      "line": 110,
+      "excerpt": "\".db\", \".woff\", \".woff2\", \".ttf\", \".eot\", \".mp4\", \".mov\", \".avi\", \".mp3\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_claude_score_uplift_p0c_source_secret_sanitizer_v1.py",
+      "line": 28,
+      "excerpt": "SQLITE_TEST = \"sqlite:///:memory:\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_claude_score_uplift_p0c_source_secret_sanitizer_v1.py",
+      "line": 81,
+      "excerpt": "if any(token in low for token in [\"change_me\", \"placeholder\", \"example\", \"redacted\", \"<\", \"${\"]):"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_final_gate_review_cleanup_v2_17_71.py",
+      "line": 325,
+      "excerpt": "if any(x in val.lower() for x in [\"example\", \"change-me\", \"changeme\", \"placeholder\", \"your_\", \"buraya\", \"env\", \"os.getenv\"]):"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_final_gate_scanner_finalize_v2_17_73.py",
+      "line": 76,
+      "excerpt": "SAFE_SECRET_VALUES = {\"change-me\", \"changeme\", \"example\", \"placeholder\", \"your-secret-key\", \"\"}"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_phase1_bleeding_stop_safe_v1.py",
+      "line": 65,
+      "excerpt": "\".sqlite3\", \".sqlite\", \".db\", \".dump\", \".bak\", \".backup\", \".old\", \".orig\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_phase1_bleeding_stop_safe_v1.py",
+      "line": 222,
+      "excerpt": "checks[\"secret_gate_blocks_sqlite_instance\"] = \"scan_blocked_repo_artifacts\" in gate_text and \"BLOCKED_REPO_DIR_NAMES\" in gate_text and \".sqlite3\" in gate_text"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v1.py",
+      "line": 33,
+      "excerpt": "LOCAL_DB_EXTS = {\".sqlite\", \".sqlite3\", \".db\"}"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v1.py",
+      "line": 41,
+      "excerpt": "re.compile(r\"(?i)\\b123456\\b\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v1.py",
+      "line": 312,
+      "excerpt": "\"*.sqlite\", \"*.sqlite3\", \"*.db\", \"__pycache__/\", \"*.pyc\", \".pytest_cache/\", \".mypy_cache/\", \".ruff_cache/\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v13.py",
+      "line": 279,
+      "excerpt": "for pattern in (\"*.sqlite\", \"*.sqlite3\", \"*.db\"):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v16.py",
+      "line": 237,
+      "excerpt": "elif path.suffix.lower() in {\".sqlite\", \".sqlite3\", \".db\"}:"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 84,
+      "excerpt": "patterns = [\"**/*.sqlite\", \"**/*.sqlite3\", \"**/*.db\"]"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 92,
+      "excerpt": "if rel_text.startswith(\"instance\\\\\") or \"local\" in rel_text or \"dev\" in rel_text or p.suffix.lower() in {\".sqlite\", \".sqlite3\"}:"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 242,
+      "excerpt": "\"instance/*.sqlite\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 243,
+      "excerpt": "\"instance/*.sqlite3\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 244,
+      "excerpt": "\"instance/*.db\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 245,
+      "excerpt": "\"*.sqlite\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 246,
+      "excerpt": "\"*.sqlite3\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v17.py",
+      "line": 247,
+      "excerpt": "\"*.db\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 30,
+      "excerpt": "LOCAL_DB_EXTS = {\".sqlite\", \".sqlite3\", \".db\"}"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 39,
+      "excerpt": "re.compile(r\"(?i)\\b123456\\b\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 68,
+      "excerpt": "instance/*.sqlite3"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 69,
+      "excerpt": "instance/*.sqlite"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 70,
+      "excerpt": "instance/*.db"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 390,
+      "excerpt": "example_path.write_text(\"# BYS360 env example\\n# .env dosyasındaki gerçek değerleri buraya koymayın.\\nFLASK_ENV=production\\nAPP_HOST=0.0.0.0\\nAPP_PORT=80\\nDATABASE_URL=CHANGE_ME\\nS..."
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\repair_bys360_technical_debt_cleanup_safe_v2.py",
+      "line": 407,
+      "excerpt": "placeholder = \"CHANGE_ME\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\maintenance\\run_bys360_final_gate_v2_17_69.py",
+      "line": 77,
+      "excerpt": "\"changeme\", \"change_me\", \"placeholder\", \"example\", \"your_\", \"dummy\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_baseline_gate_p5a.py",
+      "line": 233,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_final_evidence_gate_p5f.py",
+      "line": 160,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_inventory_precision_gate_p6c.py",
+      "line": 225,
+      "excerpt": "\"DATABASE_URL\": \"sqlite:///:memory:\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_release_suite_gate_p5d.py",
+      "line": 162,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_release_suite_gate_p5d_v2.py",
+      "line": 162,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_visual_regression_evidence_suite_gate_p6b.py",
+      "line": 162,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_visual_regression_evidence_suite_gate_p6b_v2.py",
+      "line": 162,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_android_responsive_visual_uat_evidence_gate_p5e.py",
+      "line": 154,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_ci_active_architecture_gate_p2f.py",
+      "line": 144,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_claude_score_uplift_p0e_final_secret_gate.py",
+      "line": 46,
+      "excerpt": "\"example\", \"placeholder\", \"dummy\", \"change_me\", \"changeme\", \"redacted\", \"replace_me\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_local_sqlite_persistent_db_hotfix_v2.py",
+      "line": 24,
+      "excerpt": "return \"sqlite:///\" + path.resolve().as_posix()"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_local_sqlite_persistent_db_hotfix_v2.py",
+      "line": 213,
+      "excerpt": "report[\"error\"] = \"Uygulama hala sqlite:///:memory: ile aciliyor. Config env DB URI okumuyor olabilir. start_bys360_local_sqlite_persistent.ps1 ile baslatin.\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_local_sqlite_persistent_db_hotfix_v2.py",
+      "line": 288,
+      "excerpt": "db_path = Path(args.db_path) if args.db_path else root / \"instance\" / \"bys360_local_dev.sqlite3\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py",
+      "line": 126,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py",
+      "line": 126,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py",
+      "line": 117,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "line": 98,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "line": 243,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "line": 312,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_domain_smoke_p1f.py",
+      "line": 131,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_domain_smoke_p1f.py",
+      "line": 132,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_performance_response_gate_p3e.py",
+      "line": 140,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_performance_response_gate_p3e.py",
+      "line": 152,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_performance_response_gate_p3e.py",
+      "line": 254,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c.py",
+      "line": 141,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c.py",
+      "line": 160,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c.py",
+      "line": 223,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py",
+      "line": 141,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py",
+      "line": 160,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py",
+      "line": 229,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_pytest_contract_gate_p2a.py",
+      "line": 279,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_pytest_contract_gate_p2a_v2.py",
+      "line": 280,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_pytest_contract_gate_p2a_v3.py",
+      "line": 136,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_pytest_contract_gate_p2a_v3.py",
+      "line": 137,
+      "excerpt": "\"SQLALCHEMY_DATABASE_URI\": os.environ.get(\"SQLALCHEMY_DATABASE_URI\", os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\")),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_release_evidence_gate_p4e.py",
+      "line": 136,
+      "excerpt": "\"DATABASE_URL\": env.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v2.py",
+      "line": 205,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v2.py",
+      "line": 206,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v2.py",
+      "line": 236,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v2.py",
+      "line": 237,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v3.py",
+      "line": 205,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v3.py",
+      "line": 206,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v3.py",
+      "line": 236,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_level_smoke_gate_p2c_v3.py",
+      "line": 237,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_scenario_gate_p3a.py",
+      "line": 135,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_request_scenario_gate_p3a.py",
+      "line": 198,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_response_suite_gate_p3f.py",
+      "line": 95,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "line": 93,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "line": 258,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "line": 322,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v2.py",
+      "line": 95,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v2.py",
+      "line": 293,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v2.py",
+      "line": 357,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "line": 95,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "line": 312,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "line": 376,
+      "excerpt": "\"DATABASE_URL\": os.environ.get(\"DATABASE_URL\", \"sqlite:///:memory:\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_security_evidence_gate_p4d.py",
+      "line": 137,
+      "excerpt": "\"DATABASE_URL\": \"sqlite:///:memory:\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_security_suite_gate_p4c.py",
+      "line": 226,
+      "excerpt": "\"DATABASE_URL\": \"sqlite:///:memory:\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_security_suite_gate_p4c_v2.py",
+      "line": 220,
+      "excerpt": "\"DATABASE_URL\": \"sqlite:///:memory:\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "line": 131,
+      "excerpt": "os.environ.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "line": 143,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "line": 251,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_pytest_standard_gate_p2d.py",
+      "line": 128,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_2_active_audit_health_v2_17_2.py",
+      "line": 111,
+      "excerpt": "if name.endswith((\".dump\", \".db\", \".sqlite\", \".sqlite3\", \".log\")):"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_2_active_audit_health_v2_17_3.py",
+      "line": 46,
+      "excerpt": "re.compile(r\"(?i)^\\s*(SECRET_KEY|JWT_SECRET|SECURITY_PASSWORD_SALT)\\s*=\\s*(?!$|change|changeme|example|placeholder|none|null).{8,}\"),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_2_active_audit_health_v2_17_3.py",
+      "line": 48,
+      "excerpt": "re.compile(r\"(?i)^\\s*(MAIL_PASSWORD|SMTP_PASSWORD|DB_PASSWORD|POSTGRES_PASSWORD|REDIS_PASSWORD)\\s*=\\s*(?!$|change|changeme|example|placeholder|none|null).{4,}\"),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_v2_17_0.py",
+      "line": 169,
+      "excerpt": "if name.endswith((\".dump\", \".db\", \".sqlite\", \".sqlite3\")):"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_v2_17_0.py",
+      "line": 227,
+      "excerpt": "return \"CHANGE_ME\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_repo_hygiene_p0_v2_17_0.py",
+      "line": 343,
+      "excerpt": "if SECRET_KEY_RE.search(key) and value and value.upper() not in {\"CHANGE_ME\", \"TODO\", \"NONE\", \"NULL\", \"\"}:"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_secret_repo_gate.py",
+      "line": 32,
+      "excerpt": "\"\", \"none\", \"null\", \"false\", \"true\", \"change_me\", \"changeme\", \"placeholder\", \"example\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\quality\\bys360_secret_repo_gate.py",
+      "line": 67,
+      "excerpt": "\".sqlite3\", \".sqlite\", \".db\", \".dump\", \".bak\", \".backup\", \".old\", \".orig\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\refactor\\bys360_config_env_strip_hotfix_v3.py",
+      "line": 131,
+      "excerpt": "env.setdefault(\"DATABASE_URL\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\refactor\\bys360_config_env_strip_hotfix_v3.py",
+      "line": 132,
+      "excerpt": "env.setdefault(\"SQLALCHEMY_DATABASE_URI\", \"sqlite:///:memory:\")"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\release\\build_bys360_safe_release.py",
+      "line": 21,
+      "excerpt": "\".sqlite3\", \".sqlite\", \".db\", \".dump\", \".bak\", \".backup\", \".old\", \".orig\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_1.py",
+      "line": 12,
+      "excerpt": "EXCLUDED_EXTS = {\".pyc\", \".pyo\", \".zip\", \".7z\", \".rar\", \".log\", \".db\", \".sqlite\", \".sqlite3\", \".dump\"}"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_2.py",
+      "line": 15,
+      "excerpt": "EXCLUDED_EXTS = {\".pyc\", \".pyo\", \".zip\", \".7z\", \".rar\", \".log\", \".dump\", \".db\", \".sqlite\", \".sqlite3\"}"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_2.py",
+      "line": 18,
+      "excerpt": "re.compile(r'initial_password\\s*=\\s*[\"\\']123456[\"\\']'),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_2.py",
+      "line": 19,
+      "excerpt": "re.compile(r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)'),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_3.py",
+      "line": 25,
+      "excerpt": "\".pyc\", \".pyo\", \".log\", \".tmp\", \".bak\", \".zip\", \".7z\", \".rar\", \".db\", \".sqlite\", \".sqlite3\", \".dump\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_3.py",
+      "line": 42,
+      "excerpt": "(\"hardcoded_initial_password\", re.compile(r\"(initial_password\\s*=\\s*[\\\"']123456[\\\"']|set_password\\(\\s*[\\\"']123456[\\\"']\\s*\\))\", re.IGNORECASE)),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_3.py",
+      "line": 43,
+      "excerpt": "(\"known_weak_password_text\", re.compile(r\"(?<![A-Za-z0-9])123456(?![A-Za-z0-9])\")),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_3.py",
+      "line": 46,
+      "excerpt": "ALLOWED_123456_PATH_PARTS = {"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_3.py",
+      "line": 92,
+      "excerpt": "if label == \"known_weak_password_text\" and any(part in name for part in ALLOWED_123456_PATH_PARTS):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_4.py",
+      "line": 14,
+      "excerpt": "\".pyc\", \".pyo\", \".log\", \".sqlite\", \".sqlite3\", \".db\", \".dump\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\build_bys360_secure_release_v1_5.py",
+      "line": 13,
+      "excerpt": "\".pyc\", \".pyo\", \".log\", \".sqlite\", \".sqlite3\", \".db\", \".dump\", \".bak\", \".backup\", \".zip\", \".7z\", \".rar\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 11,
+      "excerpt": "r'initial_password\\s*=\\s*[\"\\']123456[\"\\']',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 12,
+      "excerpt": "r'initial_password\\s*=\\s*[\"\\']123456[\"\\']\\s*,',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 13,
+      "excerpt": "r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 14,
+      "excerpt": "r'password_hash\\s*=\\s*generate_password_hash\\(\\s*[\"\\']123456[\"\\']\\s*\\)',"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 107,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 112,
+      "excerpt": "if 'inject_csp_nonce_into_html' not in headers or \"'unsafe-inline'\" in script_default:"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 113,
+      "excerpt": "failures.append('CSP header/nonce uygulaması eksik veya DEFAULT_CSP script tarafında unsafe-inline içeriyor.')"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 116,
+      "excerpt": "sentry_dsn=***MASKED*** '')"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_security_observability_v1.py",
+      "line": 120,
+      "excerpt": "failures.append('.env DATABASE_URL production/staging için sslmode=disable içeriyor; sslmode=require yapılmalı.')"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 19,
+      "excerpt": "r'initial_password\\s*=\\s*[\"\\']123456[\"\\']',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 20,
+      "excerpt": "r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)',"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 21,
+      "excerpt": "r'password_hash\\s*=\\s*generate_password_hash\\(\\s*[\"\\']123456[\"\\']\\s*\\)',"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 98,
+      "excerpt": "failures.append('CSP_SCRIPT_SRC varsayılanı unsafe-inline içermeyecek şekilde güncellenmemiş.')"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 113,
+      "excerpt": "if \"'unsafe-inline'\" in script_default:"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 114,
+      "excerpt": "failures.append('DEFAULT_CSP script-src hala unsafe-inline içeriyor.')"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 125,
+      "excerpt": "if 'sslmode=disable canli/pilot' not in startup_audit:"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 142,
+      "excerpt": "sentry_dsn=***MASKED*** '')"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 159,
+      "excerpt": "failures.append(f'.env {label} sslmode=disable içeriyor; sslmode=require yapılmalı.')"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 166,
+      "excerpt": "failures.append('.env içinde CSP_ALLOW_UNSAFE_INLINE_SCRIPT=true var; script unsafe-inline kapatılmalı.')"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 167,
+      "excerpt": "if \"'unsafe-inline'\" in csp_script:"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_p0_sentry_dbssl_csp_v2.py",
+      "line": 168,
+      "excerpt": "failures.append('.env CSP_SCRIPT_SRC içinde unsafe-inline var; nonce tabanlı CSP kullanılmalı.')"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 23,
+      "excerpt": "re.compile(r'initial_password\\s*=\\s*[\"\\']123456[\"\\']'),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 24,
+      "excerpt": "re.compile(r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)'),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 65,
+      "excerpt": "errors.append(f\"{rel} içinde hardcode 123456 başlangıç şifresi bulundu\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 81,
+      "excerpt": "if value and value.lower() not in {\"change_me\", \"changeme\"}:"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 82,
+      "excerpt": "errors.append(\".env.example SENTRY_DSN boş veya CHANGE_ME olmalı; gerçek DSN yazılmamalı\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 24,
+      "excerpt": "re.compile(r'initial_password\\s*=\\s*[\"\\']123456[\"\\']'),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 25,
+      "excerpt": "re.compile(r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)'),"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 85,
+      "excerpt": "errors.append(f\"{rel} içinde hardcode 123456 başlangıç şifresi bulundu\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 102,
+      "excerpt": "if value and value.lower() not in {\"change_me\", \"changeme\"}:"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 103,
+      "excerpt": "errors.append(\".env.example SENTRY_DSN boş veya CHANGE_ME olmalı; gerçek DSN yazılmamalı\")"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_3.py",
+      "line": 16,
+      "excerpt": "(\"hardcoded_123456_password_assignment\", re.compile(r\"(initial_password\\s*=\\s*[\\\"']123456[\\\"']|set_password\\(\\s*[\\\"']123456[\\\"']\\s*\\))\", re.IGNORECASE)),"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_4.py",
+      "line": 38,
+      "excerpt": "if name.endswith((\".zip\", \".pyc\", \".pyo\", \".log\", \".sqlite\", \".sqlite3\", \".db\", \".dump\", \".bak\", \".backup\")):"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\check_bys360_secure_release_secret_clean_v1_5.py",
+      "line": 6,
+      "excerpt": "SKIP_SUFFIXES = {\".zip\", \".7z\", \".rar\", \".pyc\", \".pyo\", \".sqlite\", \".sqlite3\", \".db\", \".dump\", \".log\"}"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 61,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 61,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 66,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 107,
+      "excerpt": "return \"\" if K==\"AI_API_KEY\" else \"CHANGE_ME\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 122,
+      "excerpt": "for k,v in [(\"APP_ENV\",\"development\"),(\"FLASK_ENV\",\"development\"),(\"SECRET_KEY\",\"CHANGE_ME_WITH_STRONG_RANDOM_VALUE\"),(\"DATABASE_URL\",\"DB_CONNECTION_STRING_SUPPLIED_BY_ENVIRONMENT\"..."
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 137,
+      "excerpt": "def patch_123456(root: Path):"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 141,
+      "excerpt": "assign=re.compile(r'(?P<i>^[ \\t]*)(?P<n>(?:initial|default|temporary|temp|first)_password)\\s*=\\s*[\\'\"]123456[\\'\"]', re.I|re.M)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 142,
+      "excerpt": "setter=re.compile(r'\\.set_password\\(\\s*[\\'\"]123456[\\'\"]\\s*\\)')"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1.py",
+      "line": 157,
+      "excerpt": "changed=patch_123456(root)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 16,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 16,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 22,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 147,
+      "excerpt": "text = re.sub(r'initial_password\\s*=\\s*[\"\\']123456[\"\\']', 'initial_password = generate_initial_password()', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 148,
+      "excerpt": "text = re.sub(r'\\.set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)', '.set_password(generate_initial_password())', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_1.py",
+      "line": 149,
+      "excerpt": "text = re.sub(r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)', 'set_password(generate_initial_password())', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 16,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 16,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 22,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 153,
+      "excerpt": "text = re.sub(r'initial_password\\s*=\\s*[\"\\']123456[\"\\']', 'initial_password = generate_initial_password()', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 154,
+      "excerpt": "text = re.sub(r'\\.set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)', '.set_password(generate_initial_password())', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_2.py",
+      "line": 155,
+      "excerpt": "text = re.sub(r'set_password\\(\\s*[\"\\']123456[\"\\']\\s*\\)', 'set_password(generate_initial_password())', text)"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_3.py",
+      "line": 72,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_3.py",
+      "line": 72,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_3.py",
+      "line": 76,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_3.py",
+      "line": 138,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_4.py",
+      "line": 56,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\security\\repair_bys360_secure_release_secret_clean_v1_4.py",
+      "line": 67,
+      "excerpt": "SENTRY_DSN=***MASKED***"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\technical_debt\\technical_debt_cleanup_safe_v10.py",
+      "line": 332,
+      "excerpt": "\"local_db_count\": len(list((project_root / \"instance\").glob(\"*.sqlite*\"))) if (project_root / \"instance\").exists() else 0,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\technical_debt\\technical_debt_cleanup_safe_v10.py",
+      "line": 456,
+      "excerpt": "\"local_dbs\": [str(p.relative_to(project_root)).replace(\"/\", \"\\\\\") for p in (project_root / \"instance\").glob(\"*.sqlite*\")] if (project_root / \"instance\").exists() else [],"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\repair_bys360_local_sqlite_persistent_db_hotfix_v2.ps1",
+      "line": 24,
+      "excerpt": "$DbPath = Join-Path $ProjectRoot \"instance\\bys360_local_dev.sqlite3\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\repair_bys360_local_sqlite_persistent_db_hotfix_v2.ps1",
+      "line": 28,
+      "excerpt": "$DbUri = \"sqlite:///\" + (($DbPath -replace \"\\\\\", \"/\"))"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\repair_bys360_technical_debt_cleanup_safe_v22.ps1",
+      "line": 44,
+      "excerpt": "$result.has_sqlite_rule = ($txt -match '(?i)sqlite' -or $txt -match '(?i)instance/.*\\.db' -or $txt -match '(?i)instance\\\\.*\\.db')"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\repair_bys360_technical_debt_cleanup_safe_v22.ps1",
+      "line": 63,
+      "excerpt": "if ($db.Extension -match '(?i)\\.sqlite3|\\.sqlite|\\.db') {"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\start_bys360_local_sqlite_persistent.ps1",
+      "line": 13,
+      "excerpt": "$DbPath = Join-Path $ProjectRoot \"instance\\bys360_local_dev.sqlite3\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "actionable",
+      "file": "scripts\\windows\\start_bys360_local_sqlite_persistent.ps1",
+      "line": 17,
+      "excerpt": "$DbUri = \"sqlite:///\" + (($DbPath -replace \"\\\\\", \"/\"))"
+    },
+    {
+      "id": "ENV_FILE_PRESENT",
+      "severity": "high",
+      "classification": "actionable",
+      "file": ".env",
+      "line": 1,
+      "excerpt": ".env benzeri dosya bulundu"
+    },
+    {
+      "id": "DATABASE_FILE_PRESENT",
+      "severity": "high",
+      "classification": "actionable",
+      "file": "instance\\bys360_local_dev.sqlite3",
+      "line": 1,
+      "excerpt": "DB dosyas? bulundu: bys360_local_dev.sqlite3"
+    }
+  ],
+  "reference_or_noise_sample": [
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 11,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 12,
+      "excerpt": "DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 12,
+      "excerpt": "DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 13,
+      "excerpt": "SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 13,
+      "excerpt": "SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 15,
+      "excerpt": "DB_SSLMODE=disable"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 18,
+      "excerpt": "POSTGRES_PASSWORD=***MASKED***"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 18,
+      "excerpt": "POSTGRES_PASSWORD=***MASKED***"
+    },
+    {
+      "id": "SENTRY_EMPTY_OR_PLACEHOLDER",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.docker.example",
+      "line": 39,
+      "excerpt": "SENTRY_DSN="
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.example",
+      "line": 6,
+      "excerpt": "DATABASE_URL=CHANGE_ME"
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": ".env.production.example",
+      "line": 6,
+      "excerpt": "SECRET_KEY=***MASKED***"
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.production.example",
+      "line": 8,
+      "excerpt": "# PostgreSQL SSL zorunlu: sslmode=disable kullanılmaz."
+    },
+    {
+      "id": "SECRET_ASSIGNMENT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": ".env.production.example",
+      "line": 14,
+      "excerpt": "SENTRY_DSN=***MASKED***"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.production.example",
+      "line": 21,
+      "excerpt": "# CSP: script tarafında unsafe-inline yok, nonce tabanlı çalışır."
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": ".env.production.example",
+      "line": 27,
+      "excerpt": "CSP_STYLE_SRC='self' 'unsafe-inline' https:"
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "comment_only",
+      "file": "config.py",
+      "line": 335,
+      "excerpt": "# BYS360_P0_SECURITY_OBSERVABILITY_V1: script tarafinda unsafe-inline varsayilan kapali; nonce uygulanir."
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "docs\\BYS360_OPS_HARDENING_V1_README.md",
+      "line": 47,
+      "excerpt": "- Docker local örneğinde `sslmode=disable` sadece yerel Postgres içindir. Canlı dış veritabanında `sslmode=require` kullanılmalıdır."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "tests\\conftest.py",
+      "line": 91,
+      "excerpt": "db_path = test_runtime / \"bys360_a5_test.sqlite3\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "tests\\conftest.py",
+      "line": 92,
+      "excerpt": "db_uri = \"sqlite:///\" + db_path.as_posix()"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "tests\\conftest.py",
+      "line": 105,
+      "excerpt": "WTF_CSRF_ENABLED=False,"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "tests\\test_sp_routes_smoke.py",
+      "line": 33,
+      "excerpt": "app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\admin_ai_visibility_gate.html",
+      "line": 94,
+      "excerpt": "<div class=\"item\"><div class=\"k\">DB yazımı</div><div class=\"v\">{{ 'Açık' if visibility_contract.DB_WRITE_ENABLED else 'Kapalı' }}</div></div>"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\admin_analysis_excel_preview.html",
+      "line": 55,
+      "excerpt": "<article class=\"ai-card\"><div class=\"ai-label\">Aktarım durumu</div><div class=\"ai-value\">Kapalı</div><div class=\"ai-mini\">DB yazımı: {{ 'Açık' if preview.db_write_enabled else 'Kap..."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\admin_analysis_recommendation_priority.html",
+      "line": 43,
+      "excerpt": "<div class=\"item\"><div class=\"k\">DB yazımı</div><div class=\"v\">{{ 'Açık' if safety_contract.DB_WRITE_ENABLED else 'Kapalı' }}</div></div>"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\admin_analysis_visual_reports.html",
+      "line": 153,
+      "excerpt": "<li class=\"ai-list-item\"><div><strong>DB yazımı</strong><div class=\"ai-mini\">Kontrol 8 servisinde yazma komutu bulunmaz.</div></div><span class=\"ai-badge success\">{{ 'Kapalı' if no..."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\base.html",
+      "line": 442,
+      "excerpt": "{% set is_user_open = current_ep.startswith('main.account') or current_ep == 'main.settings_page' or current_ep == 'main.db_check' or current_ep == 'main.notifications_list' or cur..."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\base.html",
+      "line": 654,
+      "excerpt": "{% if menu_map.get('db_check', False) %}{{ nav_item(safe_url_for('main.db_check'), 'fa-database', 'DB Kontrol', current_ep == 'main.db_check') }}{% endif %}"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 52,
+      "excerpt": ".db-shell{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 343,
+      "excerpt": ".db-table-wrap{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 350,
+      "excerpt": ".db-table{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 356,
+      "excerpt": ".db-table th,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 357,
+      "excerpt": ".db-table td{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 364,
+      "excerpt": ".db-table th{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\db_check.html",
+      "line": 373,
+      "excerpt": ".db-table td{"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "app\\templates\\settings.html",
+      "line": 137,
+      "excerpt": "<span class=\"matrix-pill\"><i class=\"fa-solid fa-database\"></i> DB: {{ 'Hazır' if ui_panel.db_ready else 'Eksik tablo var' }}</span>"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "docs\\db\\BYS360_LOCAL_SQLITE_SCHEMA_BOOTSTRAP_V2_README.md",
+      "line": 3,
+      "excerpt": "Bu hotfix, local geliştirme ortamında `DATABASE_URL` boş veya `sqlite:///:memory:` olduğunda oluşan `no such table: users` / `no such table: audit_logs` beyaz ekranını düzeltir."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "docs\\local\\BYS360_LOCAL_SQLITE_PERSISTENT_DB_HOTFIX_V2.md",
+      "line": 3,
+      "excerpt": "Bu hotfix local geliştirme ortamında `sqlite:///:memory:` nedeniyle her Flask başlatmada sıfırlanan veritabanını kalıcı SQLite dosyasına yönlendirmek için hazırlanmıştır."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "docs\\local\\BYS360_LOCAL_SQLITE_PERSISTENT_DB_HOTFIX_V2.md",
+      "line": 7,
+      "excerpt": "`instance/bys360_local_dev.sqlite3`"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "docs\\security\\BYS360_P0C_SOURCE_SECRET_SANITIZER_NOTES.md",
+      "line": 14,
+      "excerpt": "- Test default DB bağlantısı gerekiyorsa `sqlite:///:memory:` kullanılır."
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "docs\\security\\BYS360_PHASE1_BLEEDING_STOP_RUNBOOK.md",
+      "line": 10,
+      "excerpt": "- `*.sqlite3`, `*.sqlite`, `*.db`, `*.dump`"
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "docs\\security\\BYS360_SECRET_RELEASE_GUIDE.md",
+      "line": 10,
+      "excerpt": "- Kod içinde yeni kullanıcı başlangıç şifresi olarak `123456` kalıntısı aranır."
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "docs\\security\\BYS360_SECRET_ROTATION_AND_HISTORY_CLEANUP_RUNBOOK.md",
+      "line": 20,
+      "excerpt": "- Örnek dosyalarda yalnızca `CHANGE_ME`, `<SECRET>`, `DB_CONNECTION_STRING_SUPPLIED_BY_ENVIRONMENT` gibi placeholder değerler bulunur."
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 12,
+      "excerpt": "\"HARDCODED_DEFAULT_PASSWORD\": 75,"
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 16,
+      "excerpt": "\"CSRF_DISABLED_OR_EXEMPT\": 21,"
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 28,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=sqlite:///C:/bys360/project/instance/bys360_local_dev.sqlite3\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 36,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 36,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 40,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 44,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 44,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 52,
+      "excerpt": "\"excerpt\": \"SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 52,
+      "excerpt": "\"excerpt\": \"SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 56,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 60,
+      "excerpt": "\"excerpt\": \"SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 60,
+      "excerpt": "\"excerpt\": \"SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://bys_user:change_me_only_for_local@postgres:5432/bys_db?sslmode=disable\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 68,
+      "excerpt": "\"excerpt\": \"DB_SSLMODE=disable\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 72,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 96,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 100,
+      "excerpt": "\"excerpt\": \"DATABASE_URL=CHANGE_ME\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 108,
+      "excerpt": "\"excerpt\": \"# PostgreSQL SSL zorunlu: sslmode=disable kullanılmaz.\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 140,
+      "excerpt": "\"excerpt\": \"# CSP: script tarafında unsafe-inline yok, nonce tabanlı çalışır.\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 141,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 148,
+      "excerpt": "\"excerpt\": \"CSP_STYLE_SRC='self' 'unsafe-inline' https:\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 149,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 156,
+      "excerpt": "\"excerpt\": \"sqlalchemy.url = sqlite:///:memory:\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 168,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 172,
+      "excerpt": "\"excerpt\": \"'CHANGE_ME',\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 176,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 180,
+      "excerpt": "\"excerpt\": \"'changeme',\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 196,
+      "excerpt": "\"excerpt\": \"_raw_database_url = (os.getenv(\\\"DATABASE_URL\\\") or \\\"\\\").strip() or 'sqlite:///:memory:'\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 228,
+      "excerpt": "\"excerpt\": \"CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', \\\"'self' 'unsafe-inline' https:\\\").strip() or \\\"'self' 'unsafe-inline' https:\\\"\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 229,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 236,
+      "excerpt": "\"excerpt\": \"# BYS360_P0_SECURITY_OBSERVABILITY_V1: script tarafinda unsafe-inline varsayilan kapali; nonce uygulanir.\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 237,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 256,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 276,
+      "excerpt": "\"excerpt\": \"\\\"endpoint\\\": \\\"main.db_check\\\",\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 284,
+      "excerpt": "\"excerpt\": \"\\\"active_endpoints\\\": [\\\"main.db_check\\\"],\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 320,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 324,
+      "excerpt": "\"excerpt\": \"if strict_env_validation and (not database_uri or \\\"CHANGE_ME\\\" in database_uri or database_uri == \\\"sqlite:///:memory:\\\"):\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 324,
+      "excerpt": "\"excerpt\": \"if strict_env_validation and (not database_uri or \\\"CHANGE_ME\\\" in database_uri or database_uri == \\\"sqlite:///:memory:\\\"):\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 332,
+      "excerpt": "\"excerpt\": \"if strict_env_validation and (not database_uri or \\\"CHANGE_ME\\\" in database_uri or database_uri == \\\"sqlite:///:memory:\\\"):\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 332,
+      "excerpt": "\"excerpt\": \"if strict_env_validation and (not database_uri or \\\"CHANGE_ME\\\" in database_uri or database_uri == \\\"sqlite:///:memory:\\\"):\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 348,
+      "excerpt": "\"excerpt\": \"- Docker local örneğinde `sslmode=disable` sadece yerel Postgres içindir. Canlı dış veritabanında `sslmode=require` kullanılmalıdır.\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 356,
+      "excerpt": "\"excerpt\": \"return current_app.extensions['migrate'].db.get_engine()\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 364,
+      "excerpt": "\"excerpt\": \"return current_app.extensions['migrate'].db.engine\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 380,
+      "excerpt": "\"excerpt\": \"target_db = current_app.extensions['migrate'].db\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 384,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 388,
+      "excerpt": "\"excerpt\": \"if \\\"YOUR_LOCAL_\\\" in key_text or \\\"CHANGE_ME\\\" in key_text:\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 500,
+      "excerpt": "\"excerpt\": \"\\\"*.db\\\",\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 508,
+      "excerpt": "\"excerpt\": \"\\\"*.sqlite\\\",\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 516,
+      "excerpt": "\"excerpt\": \"\\\"*.sqlite3\\\",\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 524,
+      "excerpt": "\"excerpt\": \"db_path = test_runtime / \\\"bys360_a5_test.sqlite3\\\"\","
+    },
+    {
+      "id": "SQLITE_REFERENCE",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 532,
+      "excerpt": "\"excerpt\": \"db_uri = \\\"sqlite:///\\\" + db_path.as_posix()\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 536,
+      "excerpt": "\"id\": \"CSRF_DISABLED_OR_EXEMPT\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 540,
+      "excerpt": "\"excerpt\": \"WTF_CSRF_ENABLED=False,\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 544,
+      "excerpt": "\"id\": \"CSRF_DISABLED_OR_EXEMPT\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 548,
+      "excerpt": "\"excerpt\": \"app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 648,
+      "excerpt": "\"id\": \"CSRF_DISABLED_OR_EXEMPT\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 652,
+      "excerpt": "\"excerpt\": \"@csrf.exempt\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 656,
+      "excerpt": "\"id\": \"CSRF_DISABLED_OR_EXEMPT\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 660,
+      "excerpt": "\"excerpt\": \"@csrf.exempt\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1112,
+      "excerpt": "\"id\": \"HARDCODED_DEFAULT_PASSWORD\","
+    },
+    {
+      "id": "DEFAULT_PASSWORD_LITERAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1116,
+      "excerpt": "\"excerpt\": \"\\\"CHANGE_ME\\\",\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1560,
+      "excerpt": "\"id\": \"CSRF_DISABLED_OR_EXEMPT\","
+    },
+    {
+      "id": "CSRF_DISABLED_OR_EXEMPT",
+      "severity": "medium",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1564,
+      "excerpt": "\"excerpt\": \"code='csrf_disabled',\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1636,
+      "excerpt": "\"excerpt\": \"if observability_like and db_uri.startswith('postgres') and 'sslmode=disable' in db_uri:\","
+    },
+    {
+      "id": "DB_SSL_DISABLED",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1644,
+      "excerpt": "\"excerpt\": \"message='PostgreSQL baglantisinda sslmode=disable gorunuyor.',\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1652,
+      "excerpt": "\"excerpt\": \"if observability_like and csp_enabled and \\\"'unsafe-inline'\\\" in script_src and not _is_truthy(config.get('CSP_ALLOW_UNSAFE_INLINE_SCRIPT', False)):\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1653,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1660,
+      "excerpt": "\"excerpt\": \"message='CSP script-src icinde unsafe-inline var.',\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1661,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1668,
+      "excerpt": "\"excerpt\": \"action='Nonce tabanli CSP kullan ve unsafe-inline script iznini kaldir.',\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1669,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1676,
+      "excerpt": "\"excerpt\": \"f\\\"style-src 'self' 'nonce-{nonce}' 'unsafe-inline'; \\\"\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1677,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1684,
+      "excerpt": "\"excerpt\": \"- script-src tarafinda unsafe-inline varsayilan kullanilmaz.\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1685,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1692,
+      "excerpt": "\"excerpt\": \"\\\"style-src\\\": \\\"'self' 'unsafe-inline' https:\\\",\","
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1693,
+      "excerpt": "\"hint\": \"CSP nonce/hash tabanl? hale getirilmeli; unsafe-inline/unsafe-eval azalt?lmal?.\""
+    },
+    {
+      "id": "CSP_UNSAFE_INLINE_OR_EVAL",
+      "severity": "high",
+      "classification": "reference_or_example",
+      "file": "reports\\security\\BYS360_A6A_SECURITY_LIVE_BASELINE.json",
+      "line": 1700,
+      "excerpt": "\"excerpt\": \"value = _remove_token(value, \\\"'unsafe-inline'\\\")\","
+    }
+  ]
+}

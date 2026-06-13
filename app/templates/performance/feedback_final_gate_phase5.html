@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Geri Bildirim Yayına Hazırlık Kontrolü{% endblock %}
+{% block page_kicker %}Performans Yönetimi{% endblock %}
+{% block page_title %}Geri Bildirim Yayına Hazırlık Kontrolü{% endblock %}
+{% block page_subtitle %}Görüşme notları, rehber, karne bağlantısı ve eylem planı takibi canlı kullanıma uygunluk açısından birlikte değerlendirilir.{% endblock %}
+
+{% block content %}
+<style>
+.bys-ready{--red:#8B0000;--ink:#111827;--muted:#64748b;--line:rgba(15,23,42,.09);--soft:rgba(139,0,0,.075);display:grid;gap:18px;max-width:1500px;margin:0 auto;padding:4px 0 34px}.bys-ready-card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:26px;box-shadow:0 18px 42px rgba(15,23,42,.075);padding:22px}.bys-ready-hero{display:grid;grid-template-columns:minmax(0,1.08fr) 390px;gap:18px;align-items:stretch;background:linear-gradient(135deg,rgba(139,0,0,.07),rgba(255,255,255,.97));border-color:rgba(139,0,0,.14)}.bys-ready-kicker{display:inline-flex;align-items:center;gap:8px;color:var(--red);font-weight:950;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase}.bys-ready-title{margin:9px 0 8px;color:var(--ink);font-size:1.7rem;font-weight:950;line-height:1.22}.bys-ready-sub{margin:0;color:var(--muted);line-height:1.75;max-width:900px}.bys-ready-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.bys-ready-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:15px;padding:11px 14px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;font-weight:900;box-shadow:0 8px 16px rgba(15,23,42,.04)}.bys-ready-btn.primary{background:var(--red);border-color:var(--red);color:#fff}.bys-ready-btn.soft{background:rgba(139,0,0,.07);border-color:rgba(139,0,0,.13);color:var(--red)}.bys-ready-score{display:grid;place-items:center;text-align:center;border-radius:24px;background:linear-gradient(180deg,#fff,rgba(248,250,252,.9));border:1px solid rgba(139,0,0,.13);padding:24px}.bys-ready-score strong{display:block;font-size:3.25rem;line-height:1;color:var(--red);font-weight:950}.bys-ready-score span{display:block;color:var(--muted);font-weight:850;margin-top:8px}.bys-ready-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 10px;background:rgba(15,23,42,.06);color:#334155;font-size:.77rem;font-weight:900;white-space:nowrap}.bys-ready-pill.ok{background:rgba(22,101,52,.09);color:#166534}.bys-ready-pill.warn{background:rgba(180,83,9,.11);color:#92400e}.bys-ready-pill.fail{background:rgba(185,28,28,.09);color:#991b1b}.bys-ready-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.bys-ready-stat{border:1px solid var(--line);border-radius:20px;background:#fff;padding:16px}.bys-ready-stat strong{display:block;color:var(--red);font-size:1.62rem;font-weight:950}.bys-ready-stat span{display:block;color:var(--muted);font-size:.83rem;font-weight:850;margin-top:5px;line-height:1.45}.bys-ready-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.bys-ready-section-title{margin:0;color:var(--ink);font-size:1.12rem;font-weight:950}.bys-ready-section-sub{margin:6px 0 0;color:var(--muted);line-height:1.65}.bys-ready-list{display:grid;gap:12px;margin-top:15px}.bys-ready-row{border:1px solid var(--line);border-radius:20px;background:#fff;padding:15px}.bys-ready-row.ok{border-color:rgba(22,101,52,.16);background:linear-gradient(135deg,rgba(240,253,244,.95),#fff)}.bys-ready-row.fail{border-color:rgba(185,28,28,.16);background:linear-gradient(135deg,rgba(254,242,242,.95),#fff)}.bys-ready-row.warn{border-color:rgba(180,83,9,.18);background:linear-gradient(135deg,rgba(255,251,235,.95),#fff)}.bys-ready-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.bys-ready-row h4{margin:8px 0 5px;color:var(--ink);font-weight:950}.bys-ready-row p{margin:0;color:#374151;line-height:1.62}.bys-ready-progress{height:9px;background:rgba(15,23,42,.07);border-radius:999px;overflow:hidden;margin-top:11px}.bys-ready-progress span{display:block;height:100%;background:var(--red);border-radius:999px}.bys-ready-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}.bys-ready-step{border:1px dashed rgba(139,0,0,.22);border-radius:18px;background:rgba(139,0,0,.045);padding:14px}.bys-ready-step b{display:block;color:var(--ink);font-weight:950;margin-bottom:5px}.bys-ready-step p{margin:0;color:#475569;line-height:1.55}.bys-ready-note{border-radius:20px;border:1px solid rgba(139,0,0,.14);background:rgba(139,0,0,.055);padding:16px;color:#374151;line-height:1.7}.bys-ready-denied{border-color:rgba(185,28,28,.20);background:rgba(254,242,242,.96)}@media(max-width:1100px){.bys-ready-hero,.bys-ready-grid{grid-template-columns:1fr}.bys-ready-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.bys-ready-steps{grid-template-columns:1fr}}@media(max-width:680px){.bys-ready-card{padding:16px}.bys-ready-title{font-size:1.32rem}.bys-ready-actions{flex-direction:column}.bys-ready-btn{width:100%}.bys-ready-stats{grid-template-columns:1fr}.bys-ready-row-top{display:grid}.bys-ready-score strong{font-size:2.5rem}}
+</style>
+
+<div class="bys-ready" data-bys="feedback-ready-control">
+{# BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+{% include "components/_stub_ai_panel.html" ignore missing %}
+{# /BYS360_STUB_AI_V60_PANEL_INCLUDE #}
+
+    {% if access_denied %}
+    <section class="bys-ready-card bys-ready-denied">
+        <div class="bys-ready-kicker"><i class="fa-solid fa-shield-halved"></i> Yetki Kontrolü</div>
+        <h2 class="bys-ready-title">Bu sayfaya erişim yetkiniz bulunmamaktadır.</h2>
+        <p class="bys-ready-sub">Bu kontrol alanı yalnızca yetkili yönetici, performans yetkilisi ve sistem yöneticisi kapsamında açılır.</p>
+    </section>
+    {% else %}
+    {% set process_titles = ['Görüşme Notları', 'Görüşme Rehberi', 'Karne ve Süreç Hafızası', 'Eylem Takibi'] %}
+    {% set process_notes = [
+        'Görüşmeden önce ve sonra tutulacak kayıtların hazır olmasını sağlar.',
+        'Yöneticinin görüşmeyi doğru ton, doğru soru ve somut örnekle yürütmesine yardım eder.',
+        'Karne, dönem içi gözlem ve görüşme kayıtlarını tek bakışta okunur hale getirir.',
+        'Kararlaştırılan aksiyonların takip tarihini, durumunu ve sonucunu görünür kılar.'
+    ] %}
+    {% set scenario_titles = ['Görüşme hazırlığı', 'Görüşme sonrası özet', 'Eylem planı', '60 dakikalık akış', 'Senaryo bazlı görüşme dili', 'Somut geri bildirim örnekleri', 'Karneyle süreç hafızası', 'Yaklaşan ve geciken aksiyonlar', 'Yetki ve görünürlük', 'Kurumsal dil'] %}
+    {% set scenario_notes = [
+        'Amir, görüşmeye girmeden amacı, güçlü yönleri ve hassas noktaları hazırlayabilir.',
+        'Görüşme özeti, personelin değerlendirmesi, amir gözlemi ve son söz kayıt altında tutulur.',
+        'Görüşme somut aksiyon, sorumlu kişi ve takip tarihiyle kapanır.',
+        'Açılış, öz değerlendirme, yönetici görüşü, güçlü yön, gelişim alanı ve kapanış akışı görünürdür.',
+        'Farklı personel durumları için yargısız ve yapıcı başlangıç dili desteklenir.',
+        'Geri bildirim kişiye değil; gözlenen durum, davranış ve etki üzerinden kurulur.',
+        'Karne yalnızca puan olarak kalmaz; görüşme ve gelişim kayıtlarıyla birlikte okunur.',
+        'Takip zamanı yaklaşan veya geciken aksiyonlar yöneticiye net biçimde gösterilir.',
+        'Kullanıcı yalnızca yetkisi dahilindeki kayıtları görür.',
+        'Ekranlarda kurum diline uygun, sade ve anlaşılır ifadeler kullanılır.'
+    ] %}
+
+    <section class="bys-ready-card bys-ready-hero">
+        <div>
+            <div class="bys-ready-kicker"><i class="fa-solid fa-clipboard-check"></i> Yayına Hazırlık</div>
+            <h1 class="bys-ready-title">Geri bildirim görüşmeleri canlı kullanıma hazır mı?</h1>
+            <p class="bys-ready-sub">Bu sayfa; görüşme notları, görüşme rehberi, karne bağlantısı ve eylem takibi alanlarını tek yönetici yüzeyinde değerlendirir. Amaç, performans görüşmesi sürecinin eksiksiz, anlaşılır ve kurumsal kullanıma uygun biçimde çalıştığını görmektir.</p>
+            <div class="bys-ready-actions">
+                <a class="bys-ready-btn primary" href="{{ safe_url_for('main.performance_feedback_aftercare') }}"><i class="fa-solid fa-clipboard-list"></i> Görüşme Notları</a>
+                <a class="bys-ready-btn soft" href="{{ safe_url_for('main.performance_feedback_meeting_guide') }}"><i class="fa-solid fa-comments"></i> Görüşme Rehberi</a>
+                <a class="bys-ready-btn soft" href="{{ safe_url_for('main.performance_feedback_integration') }}"><i class="fa-solid fa-layer-group"></i> Karne ve Süreç Hafızası</a>
+                <a class="bys-ready-btn soft" href="{{ safe_url_for('main.performance_feedback_followup') }}"><i class="fa-solid fa-calendar-check"></i> Eylem Takibi</a>
+            </div>
+        </div>
+        <div class="bys-ready-score">
+            <strong>%{{ ready_percent }}</strong>
+            <span>Genel hazırlık durumu</span>
+            {% if ok %}
+            <span class="bys-ready-pill ok" style="margin-top:13px;"><i class="fa-solid fa-check"></i> Yayına uygun görünüyor</span>
+            {% else %}
+            <span class="bys-ready-pill warn" style="margin-top:13px;"><i class="fa-solid fa-circle-info"></i> Tamamlanacak başlık var</span>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="bys-ready-stats">
+        <div class="bys-ready-stat"><strong>{{ summary.component_ok }}/{{ summary.component_total }}</strong><span>Süreç başlığı hazır</span></div>
+        <div class="bys-ready-stat"><strong>{{ summary.scenario_ok }}/{{ summary.scenario_total }}</strong><span>Kullanım senaryosu geçti</span></div>
+        <div class="bys-ready-stat"><strong>{{ summary.error_count }}</strong><span>Tamamlanacak kontrol</span></div>
+        <div class="bys-ready-stat"><strong>{{ summary.warning_count }}</strong><span>Dikkat notu</span></div>
+    </section>
+
+    {% if errors %}
+    <section class="bys-ready-card bys-ready-row warn">
+        <div class="bys-ready-kicker"><i class="fa-solid fa-circle-info"></i> Yönetici Özeti</div>
+        <h3 class="bys-ready-section-title">Bazı hazırlık başlıkları tamamlanmayı bekliyor.</h3>
+        <p class="bys-ready-section-sub">Bu sonuç, görüşme hattının kullanıcıya açılmadan önce yeniden gözden geçirilmesi gerektiğini gösterir. Öncelikle aşağıdaki hazır olmayan kartlardan başlayın; ardından sayfayı yeniden açarak genel hazırlık durumunu kontrol edin.</p>
+    </section>
+    {% elif warnings %}
+    <section class="bys-ready-card bys-ready-row warn">
+        <div class="bys-ready-kicker"><i class="fa-solid fa-circle-info"></i> Yönetici Özeti</div>
+        <h3 class="bys-ready-section-title">Süreç büyük ölçüde hazır; yalnızca dikkat notları var.</h3>
+        <p class="bys-ready-section-sub">Görüşme hattı kullanılabilir görünüyor. Dikkat notları, canlı kullanım öncesi son gözden geçirme için hatırlatma niteliğindedir.</p>
+    </section>
+    {% else %}
+    <section class="bys-ready-card bys-ready-row ok">
+        <div class="bys-ready-kicker"><i class="fa-solid fa-check"></i> Yönetici Özeti</div>
+        <h3 class="bys-ready-section-title">Geri bildirim görüşmesi hattı canlı kullanım için hazır görünüyor.</h3>
+        <p class="bys-ready-section-sub">Görüşme hazırlığı, görüşme sonrası notlar, karne bağlantısı, eylem planı ve takip ekranları birlikte okunabilir ve kullanılabilir durumda.</p>
+    </section>
+    {% endif %}
+
+    <section class="bys-ready-grid">
+        <div class="bys-ready-card">
+            <h3 class="bys-ready-section-title">Süreç Başlıkları</h3>
+            <p class="bys-ready-section-sub">Performans görüşmesinin ana parçaları, canlı kullanıma uygunluk açısından özetlenir.</p>
+            <div class="bys-ready-list">
+                {% for component in components %}
+                {% set idx = loop.index0 %}
+                <article class="bys-ready-row {% if component.ok %}ok{% else %}fail{% endif %}">
+                    <div class="bys-ready-row-top">
+                        <span class="bys-ready-pill {% if component.ok %}ok{% else %}fail{% endif %}">{% if component.ok %}Hazır{% else %}Tamamlanacak{% endif %}</span>
+                        <span class="bys-ready-pill">%{{ component.percent|default(0) }}</span>
+                    </div>
+                    <h4>{{ process_titles[idx] if idx < process_titles|length else component.title }}</h4>
+                    <p>{{ process_notes[idx] if idx < process_notes|length else 'Bu başlık görüşme sürecinin tamamlanmasına katkı sağlar.' }}</p>
+                    <div class="bys-ready-progress" aria-hidden="true"><span style="width:{{ component.percent|default(0) }}%"></span></div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bys-ready-card">
+            <h3 class="bys-ready-section-title">Kullanım Senaryoları</h3>
+            <p class="bys-ready-section-sub">Görüşmenin hazırlıktan takip sonucuna kadar kapanıp kapanmadığı sade senaryolarla izlenir.</p>
+            <div class="bys-ready-list">
+                {% for scenario in scenarios %}
+                {% set idx = loop.index0 %}
+                <article class="bys-ready-row {% if scenario.ok %}ok{% else %}fail{% endif %}">
+                    <div class="bys-ready-row-top">
+                        <span class="bys-ready-pill {% if scenario.ok %}ok{% else %}fail{% endif %}">{% if scenario.ok %}Tamam{% else %}Eksik{% endif %}</span>
+                        <span class="bys-ready-pill">{{ scenario.passed }}/{{ scenario.total }}</span>
+                    </div>
+                    <h4>{{ scenario_titles[idx] if idx < scenario_titles|length else 'Kullanım senaryosu' }}</h4>
+                    <p>{{ scenario_notes[idx] if idx < scenario_notes|length else 'Bu senaryo görüşme sürecinin doğru ilerlemesini destekler.' }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="bys-ready-card">
+        <h3 class="bys-ready-section-title">Önerilen Kullanım Sırası</h3>
+        <p class="bys-ready-section-sub">Canlı kullanımda yöneticilerin ekranları hangi sırayla kullanacağını netleştirir.</p>
+        <div class="bys-ready-steps">
+            <div class="bys-ready-step"><b>1. Görüşme kaydı açılır</b><p>Personel, dönem, görüşme tarihi ve görüşme amacı belirlenir.</p></div>
+            <div class="bys-ready-step"><b>2. Görüşme notu tamamlanır</b><p>Personelin değerlendirmesi, amir gözlemi, güçlü yönler ve gelişim alanları yazılır.</p></div>
+            <div class="bys-ready-step"><b>3. Eylem takibi yapılır</b><p>Kararlaştırılan aksiyonların hedef tarihi, durumu ve takip sonucu güncellenir.</p></div>
+        </div>
+    </section>
+
+    <section class="bys-ready-note">
+        Bu sayfa, kullanıcıya gösterilecek görüşme hattının anlaşılır ve kurumsal kalmasını sağlar. Ayrıntılı bakım kayıtları kullanıcı ekranına taşınmaz; bu ekranda yalnızca yönetici için gerekli sade durum özeti gösterilir.
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

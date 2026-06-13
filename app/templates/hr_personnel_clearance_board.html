@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}İlişik Kesme Panosu - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}İlişik Kesme Panosu{% endblock %}
+{% block page_subtitle %}Devir teslim işlemlerini durum, termin ve kapanış yüzdesine göre toplu görünümde izleyin.{% endblock %}
+{% block content %}
+<style>
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat,.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:22px}.label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.value{font-size:1.6rem;font-weight:900;color:#111827}.grid{display:grid;grid-template-columns:.75fr 1.25fr;gap:18px}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:760px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.empty{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}.type-grid{display:grid;gap:12px}.type-card{padding:14px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}@media (max-width:980px){.stats,.grid{grid-template-columns:1fr}}
+</style>
+{% if not board_ready %}
+<div class="panel empty">İlişik kesme panosu veri geçişi sonrası aktifleşecek.</div>
+{% else %}
+<div class="stats">
+  <div class="stat"><div class="label">Toplam kayıt</div><div class="value">{{ clearance_summary.total }}</div></div>
+  <div class="stat"><div class="label">Tamamlanan</div><div class="value">{{ clearance_summary.completed }}</div></div>
+  <div class="stat"><div class="label">Kritik kayıt</div><div class="value">{{ clearance_summary.critical }}</div></div>
+  <div class="stat"><div class="label">Toplam işlem satırı</div><div class="value">{{ clearance_summary.get('items', 0) if clearance_summary is mapping else 0 }}</div></div>
+</div>
+<div class="grid">
+  <div class="panel">
+    <h3 style="margin-top:0">Operasyon türleri</h3>
+    <div class="type-grid">
+      {% for key, label in operation_type_labels.items() %}
+      {% set row = type_totals.get(key, {'total':0,'completed':0}) %}
+      <div class="type-card">
+        <strong>{{ label }}</strong>
+        <div class="label">{{ row.completed }} / {{ row.total }} tamamlandı</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">Kayıt listesi</h3>
+    {% if clearance_rows %}
+    <div class="table-wrap"><table class="table-clean"><thead><tr><th>Başlık</th><th>Tür</th><th>Durum</th><th>İlerleme</th><th>İşlem</th><th>Termin</th></tr></thead><tbody>
+    {% for row in clearance_rows %}<tr><td><strong>{{ row.title }}</strong><div class="label">{{ row.user_name }}</div></td><td>{{ row.operation_type_label }}</td><td>{% if row.critical %}<span class="tag bad">Kritik</span>{% elif row.status == 'completed' %}<span class="tag good">{{ row.status_label }}</span>{% else %}<span class="tag warn">{{ row.status_label }}</span>{% endif %}</td><td>%{{ row.progress }}</td><td>{{ row.completed_total }}/{{ row.required_total }}<div class="label">{{ row.pending_total }} açık</div></td><td><a href="{{ url_for('main.hr_personnel_handover_center', scope=selected_scope_mode, handover_id=row.id) }}">{{ row.due_date or '-' }}</a></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty">İlişik kesme kaydı bulunmuyor.</div>{% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

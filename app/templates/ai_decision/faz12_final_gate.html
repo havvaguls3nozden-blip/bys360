@@ -1,0 +1,50 @@
+{# BYS360_AI_DECISION_FAZ12_PAGE_OK #}
+{% extends "base.html" %}
+{% block title %}Karar Destek Merkezi Final Kontrol{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz12.css') }}">
+<div class="ai-faz12-page">
+  {% include 'ai_decision/_final_gate_panel.html' ignore missing %}
+
+  <section class="ai-faz12-summary">
+    <div class="ai-faz12-card ai-faz12-main">
+      <p class="ai-faz12-kicker">Final durum</p>
+      <h1>{{ 'Canlı hazırlık kontrolü temiz' if report.ok else 'Canlı hazırlık kontrolü inceleme istiyor' }}</h1>
+      <p>Hata: {{ report.hata }} · Uyarı: {{ report.uyari }}</p>
+      <small>Bu ekran karar vermez; canlıya geçiş öncesi kontrol notu üretir.</small>
+    </div>
+  </section>
+
+  <section class="ai-faz12-section">
+    <h2>Kontrol Kontrol Özeti</h2>
+    <div class="ai-faz12-table-wrap">
+      <table class="ai-faz12-table">
+        <thead>
+          <tr><th>Kontrol</th><th>Durum</th><th>Detay</th></tr>
+        </thead>
+        <tbody>
+          {% for item in report.phases %}
+          <tr>
+            <td>Kontrol {{ item.phase }}</td>
+            <td>{{ item.status }}</td>
+            <td>{{ item.detail }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="ai-faz12-section">
+    <h2>Canlı Hazırlık Sinyalleri</h2>
+    <div class="ai-faz12-signal-list">
+      {% for item in report.signals %}
+      <article class="ai-faz12-signal ai-faz12-{{ item.level }}">
+        <strong>{{ item.title }}</strong>
+        <span>{{ item.detail }}</span>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

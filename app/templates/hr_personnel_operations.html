@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Özlük Operasyonları - BYS360{% endblock %}
+{% block page_kicker %}Personel Yönetimi{% endblock %}
+{% block page_title %}Özlük Operasyonları{% endblock %}
+{% block page_subtitle %}Personel ana kartı, belge dosyası, pozisyon geçmişi, işlem notları ve geçerlilik uyarılarını tek çalışma ekranında yönetin.{% endblock %}
+
+{% block content %}
+<style>
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);border-radius:24px;box-shadow:0 18px 34px rgba(15,23,42,.08);padding:24px}.stack{display:grid;gap:18px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.stat{padding:16px 18px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.stat .label{font-size:.82rem;color:#6b7280;font-weight:800;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:900;color:#111827;line-height:1}.muted{font-size:.9rem;color:#6b7280;line-height:1.7}.page-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}.triple-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.two-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.section-title{margin:0 0 14px;font-size:1.04rem;font-weight:900;color:#111827}.table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.06);border-radius:18px}.table-clean{width:100%;min-width:760px;border-collapse:collapse}.table-clean th,.table-clean td{padding:12px 14px;border-bottom:1px solid rgba(15,23,42,.06);text-align:left;vertical-align:top}.table-clean th{background:#f8fafc;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase;color:#6b7280}.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.tag.good{background:#ecfdf5;color:#065f46}.tag.warn{background:#fff7ed;color:#9a3412}.tag.bad{background:#fef2f2;color:#991b1b}.tag.soft{background:#f3f4f6;color:#374151}.action-list{display:grid;gap:12px}.action-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;border:1px solid rgba(15,23,42,.08);background:#fff}.action-row.critical{border-color:#fecaca;background:#fff7f7}.action-row.watch{border-color:#fed7aa;background:#fffaf3}.count{min-width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#f8fafc;font-weight:900}.scope-strip{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:rgba(255,255,255,.92);border:1px solid rgba(139,0,0,.08);box-shadow:0 14px 28px rgba(15,23,42,.06)}.scope-meta{display:grid;gap:4px}.scope-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.scope-title{font-size:1.05rem;font-weight:900;color:#111827}.scope-sub{font-size:.9rem;color:#6b7280;line-height:1.65}.scope-options{display:flex;flex-wrap:wrap;gap:8px}.scope-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;border:1px solid rgba(15,23,42,.1);color:#374151;background:#fff;font-weight:700}.scope-pill.active{background:#8B0000;color:#fff;border-color:#8B0000}.category-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.category-card{padding:16px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08);display:grid;gap:10px}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field{display:grid;gap:6px}.field label{font-size:.84rem;font-weight:800;color:#374151}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(15,23,42,.12);border-radius:14px;padding:11px 13px;background:#fff}.field textarea{min-height:110px;resize:vertical}.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}.btn-soft{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:14px;text-decoration:none;border:1px solid transparent;font-weight:800;cursor:pointer}.btn-soft.primary{background:#8B0000;color:#fff}.btn-soft.secondary{background:#fff;color:#374151;border-color:rgba(15,23,42,.12)}.btn-soft.warn{background:#fff7ed;color:#9a3412}.btn-soft.danger{background:#fef2f2;color:#991b1b}.inline-actions{display:flex;flex-wrap:wrap;gap:8px}.inline-form{display:inline}.empty-state{padding:18px;border:1px dashed rgba(15,23,42,.14);border-radius:18px;background:#f8fafc;color:#6b7280}.timeline{display:grid;gap:12px}.timeline-item{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:flex-start;padding:14px;border-radius:18px;background:#fff;border:1px solid rgba(15,23,42,.08)}.timeline-date{font-size:.85rem;font-weight:800;color:#8B0000}.timeline-body{display:grid;gap:6px}.timeline-title{font-weight:900;color:#111827}.timeline-detail{color:#4b5563;line-height:1.6}.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.summary-card{padding:16px;border-radius:18px;background:#f8fafc;border:1px solid rgba(15,23,42,.06)}.summary-card strong{display:block;font-size:1.4rem;color:#111827}.help-note{padding:14px 16px;border-radius:18px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}.mini-table td,.mini-table th{padding:10px 12px}.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.hero-card{padding:18px;border-radius:22px;background:linear-gradient(135deg,rgba(139,0,0,.06),rgba(255,255,255,.95));border:1px solid rgba(139,0,0,.1)}.hero-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.hero-meta .meta-box{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.06)}.hero-title{font-size:1.28rem;font-weight:900;color:#111827}.hero-kicker{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#8B0000}.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.alert-list{display:grid;gap:10px}.alert-item{padding:14px 16px;border-radius:16px;border:1px solid rgba(15,23,42,.08);background:#fff}.alert-item.expired{background:#fff7f7;border-color:#fecaca}.alert-item.critical{background:#fffaf3;border-color:#fed7aa}.alert-item.soon{background:#fff;border-color:#fde68a}.manager-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.manager-chip{padding:12px 14px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08)}@media (max-width:1200px){.stats,.summary-grid,.category-grid,.triple-grid,.two-grid,.form-grid,.page-grid,.hero,.manager-grid{grid-template-columns:1fr 1fr}}@media (max-width:860px){.stats,.summary-grid,.category-grid,.triple-grid,.two-grid,.form-grid,.page-grid,.hero,.manager-grid,.hero-meta{grid-template-columns:1fr}.scope-strip{align-items:flex-start;flex-direction:column}.timeline-item{grid-template-columns:1fr}}
+</style>
+
+<div class="stack">
+    <div class="scope-strip">
+        <div class="scope-meta">
+            <div class="scope-kicker">Özlük kapsama görünümü</div>
+            <div class="scope-title">{{ scope_label }}</div>
+            <div class="scope-sub">Kapsamdaki {{ scope_user_count }} personelin özlük tamlığını, pozisyon geçmişini ve belge geçerlilik risklerini tek ekranda izleyin.</div>
+        </div>
+        <div class="scope-options">
+            {% for option in hr_scope.scope_options or [] %}
+                <a class="scope-pill {% if selected_scope_mode == option.value %}active{% endif %}" href="{{ url_for('main.hr_personnel_operations', scope=option.value) }}">{{ option.label }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat"><div class="label">Kapsam personeli</div><div class="value">{{ scope_user_count }}</div></div>
+        <div class="stat"><div class="label">Eksik profil</div><div class="value">{{ missing_profile_count }}</div></div>
+        <div class="stat"><div class="label">Dosya riski</div><div class="value">{{ dossier_gap_count }}</div></div>
+        <div class="stat"><div class="label">Belge</div><div class="value">{{ document_count }}</div></div>
+        <div class="stat"><div class="label">Açık not</div><div class="value">{{ open_note_count }}</div></div>
+        <div class="stat"><div class="label">Hareket</div><div class="value">{{ movement_count }}</div></div>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h3 class="section-title">Personel operasyon gündemi</h3>
+            <div class="action-list">
+                {% for row in action_rows %}
+                <div class="action-row {{ row.tone }}">
+                    <div>
+                        <div class="timeline-title">{{ row.title }}</div>
+                        <div class="muted">{{ row.detail }}</div>
+                    </div>
+                    <div class="count">{{ row.count }}</div>
+                </div>
+                {% else %}
+                <div class="empty-state">Şu an için kritik özlük operasyon uyarısı görünmüyor.</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h3 class="section-title">Belge kategori kataloğu</h3>
+            <div class="category-grid">
+                {% for row in category_rows %}
+                <div class="category-card">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                        <div>
+                            <div class="timeline-title">{{ row.label }}</div>
+                            <div class="muted">{{ row.description or 'Kategori açıklaması henüz eklenmedi.' }}</div>
+                        </div>
+                        {% if row.is_required %}<span class="tag bad">Zorunlu</span>{% else %}<span class="tag soft">Opsiyonel</span>{% endif %}
+                    </div>
+                    <div class="muted">Kod: {{ row.code }}{% if row.validity_days %} · Geçerlilik: {{ row.validity_days }} gün{% endif %}</div>
+                    <div><span class="tag good">{{ row.document_count }} kayıt</span></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if selected_user and selected_profile_header %}
+    <div class="panel hero">
+        <div class="hero-card">
+            <div class="hero-kicker">Personel ana kartı</div>
+            <div class="hero-title">{{ selected_user_summary.full_name }}</div>
+            <div class="muted">{{ selected_profile_header.current_position_title }} · {{ selected_user_summary.unit_name }} · {{ selected_user_summary.role_label }}</div>
+            <div class="hero-meta">
+                <div class="meta-box"><div class="muted">Sicil No</div><strong>{{ selected_profile_header.sicil_no }}</strong></div>
+                <div class="meta-box"><div class="muted">E-posta</div><strong>{{ selected_profile_header.email }}</strong></div>
+                <div class="meta-box"><div class="muted">Üst birim</div><strong>{{ selected_profile_header.ust_birim }}</strong></div>
+                <div class="meta-box"><div class="muted">Pozisyon geçmişi</div><strong>{{ selected_profile_header.position_count }}</strong></div>
+            </div>
+            <div class="hero-actions">
+                <a class="btn-soft primary" href="{{ url_for('main.personnel_profile', user_id=selected_user_id) }}">Personel profiline git</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_validity_center', scope=selected_scope_mode) }}">Geçerlilik uyarı merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_request_review_index', scope=selected_scope_mode) }}">Talep onay kutusu</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_assets_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Zimmet merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_checklist_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Checklist merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_reminder_center', scope=selected_scope_mode) }}">Yenileme hatırlatmaları</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_renewal_calendar', scope=selected_scope_mode, user_id=selected_user_id) }}">Yenileme takvimi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_asset_transfer_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Zimmet devir akışı</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_dashboard', scope=selected_scope_mode) }}">Personel dashboard</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_lifecycle_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Onboarding / ayrılış merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_lifecycle_board', scope=selected_scope_mode) }}">Yaşam döngüsü panosu</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_handover_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Devir teslim merkezi</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_clearance_board', scope=selected_scope_mode) }}">İlişik kesme panosu</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_approval_station_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Onay istasyonları</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_digital_handover_documents', scope=selected_scope_mode, user_id=selected_user_id) }}">Dijital teslim tutanakları</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_exit_risk_center', scope=selected_scope_mode, user_id=selected_user_id) }}">Ayrılış Veri Tamamlığı</a>
+                <a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_exit_interviews', scope=selected_scope_mode, user_id=selected_user_id) }}">Çıkış görüşmeleri</a>
+            </div>
+        </div>
+        <div class="hero-card">
+            <div class="hero-kicker">Amir ve risk özeti</div>
+            <div class="manager-grid">
+                <div class="manager-chip"><div class="muted">1. Amir</div><strong>{{ selected_profile_header.manager_1_name }}</strong></div>
+                <div class="manager-chip"><div class="muted">2. Amir</div><strong>{{ selected_profile_header.manager_2_name }}</strong></div>
+                <div class="manager-chip"><div class="muted">3. Amir</div><strong>{{ selected_profile_header.manager_3_name }}</strong></div>
+            </div>
+            <div class="summary-grid" style="margin-top:14px">
+                <div class="summary-card"><div class="muted">Profil puanı</div><strong>{{ selected_user_summary.profile_score }}%</strong></div>
+                <div class="summary-card"><div class="muted">Zorunlu evrak</div><strong>{{ selected_user_summary.required_ratio }}%</strong></div>
+                <div class="summary-card"><div class="muted">Belge</div><strong>{{ selected_user_summary.document_count }}</strong></div>
+                <div class="summary-card"><div class="muted">İşlem notu</div><strong>{{ selected_user_summary.note_count }}</strong></div>
+                <div class="summary-card"><div class="muted">Geçerlilik alarmı</div><strong>{{ selected_profile_header.validity_alert_count }}</strong></div>
+            </div>
+            {% if selected_user_summary.missing_fields or selected_user_summary.missing_required_labels %}
+            <div class="help-note" style="margin-top:14px">
+                {% if selected_user_summary.missing_fields %}<strong>Eksik profil alanları:</strong> {{ selected_user_summary.missing_fields|join(', ') }}.<br>{% endif %}
+                {% if selected_user_summary.missing_required_labels %}<strong>Eksik zorunlu evrak:</strong> {{ selected_user_summary.missing_required_labels|join(', ') }}.{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="panel">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
+            <div>
+                <h3 class="section-title" style="margin-bottom:6px">Seçili personel çalışma alanı</h3>
+                <div class="muted">{{ selected_user_summary.full_name }} · {{ selected_user_summary.unit_name }} · {{ selected_user_summary.role_label }}</div>
+            </div>
+            <form method="get" action="{{ url_for('main.hr_personnel_operations') }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="field" style="min-width:280px;margin:0"><label>Personel seç</label><select name="user_id">
+                    {% for row in scope_user_options %}
+                        <option value="{{ row.id }}" {% if row.id == selected_user_id %}selected{% endif %}>{{ row.full_name }} · {{ row.unit_name }}</option>
+                    {% endfor %}
+                </select></div>
+                <button class="btn-soft primary" type="submit">Aç</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="page-grid">
+        <div class="panel">
+            <h3 class="section-title">Süresi yaklaşan belgeler</h3>
+            {% if expiring_document_rows %}
+            <div class="table-wrap"><table class="table-clean mini-table"><thead><tr><th>Personel</th><th>Belge</th><th>Kategori</th><th>Kalan</th></tr></thead><tbody>
+                {% for row in expiring_document_rows %}
+                <tr><td>{{ row.user_name }}</td><td>{{ row.title }}</td><td>{{ row.category }}</td><td>{% if row.days_left <= 0 %}<span class="tag bad">{{ row.days_left }} gün</span>{% else %}<span class="tag warn">{{ row.days_left }} gün</span>{% endif %}</td></tr>
+                {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Yakın tarihte süresi dolacak belge görünmüyor.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h3 class="section-title">Son toplu yükleme kayıtları</h3>
+            {% if recent_batch_rows %}
+            <div class="table-wrap"><table class="table-clean mini-table"><thead><tr><th>Personel</th><th>Paket</th><th>Sonuç</th><th>Tarih</th></tr></thead><tbody>
+                {% for row in recent_batch_rows %}
+                <tr><td>{{ row.user_name }}</td><td>{{ row.category_label }} · {{ row.source_name }}</td><td>{{ row.success_count }}/{{ row.total_file_count }}<br><span class="muted">{{ row.status }}</span></td><td>{{ row.created_at or '-' }}</td></tr>
+                {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Henüz toplu belge yükleme kaydı oluşmadı.</div>{% endif %}
+        </div>
+    </div>
+
+    {% if selected_user %}
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Belge kaydı</h4>
+            {% if documents_ready %}
+            <form method="post" action="{{ url_for('main.hr_personnel_document_save') }}" enctype="multipart/form-data" class="stack">
+                <input type="hidden" name="form_token" value="{{ document_form_token }}">
+                <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                <input type="hidden" name="document_id" value="{{ selected_document.id if selected_document else '' }}">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="form-grid">
+                    <div class="field"><label>Kategori</label><select name="category">{% for row in document_category_options %}<option value="{{ row.code }}" {% if (selected_document.category if selected_document else 'ozluk') == row.code %}selected{% endif %}>{{ row.label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Belge başlığı</label><input type="text" name="title" value="{{ selected_document.title if selected_document else '' }}" required></div>
+                    <div class="field"><label>Belge No</label><input type="text" name="document_no" value="{{ selected_document.document_no if selected_document else '' }}"></div>
+                    <div class="field"><label>Durum</label><select name="status">{% for value,label in document_status_options %}<option value="{{ value }}" {% if (selected_document.status if selected_document else 'aktif') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Düzenlenme tarihi</label><input type="date" name="issue_date" value="{{ selected_document.issue_date.isoformat() if selected_document and selected_document.issue_date else '' }}"></div>
+                    <div class="field"><label>Geçerlilik bitişi</label><input type="date" name="expiry_date" value="{{ selected_document.expiry_date.isoformat() if selected_document and selected_document.expiry_date else '' }}"></div>
+                    <div class="field"><label>Belge dosyası</label><input type="file" name="document_file"></div>
+                    <div class="field"><label>Gizli</label><select name="is_confidential"><option value="0" {% if not selected_document or not selected_document.is_confidential %}selected{% endif %}>Hayır</option><option value="1" {% if selected_document and selected_document.is_confidential %}selected{% endif %}>Evet</option></select></div>
+                    <div class="field" style="grid-column:1/-1"><label>Açıklama</label><textarea name="description">{{ selected_document.description if selected_document else '' }}</textarea></div>
+                </div>
+                <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Belgeyi güncelle' if selected_document else 'Belgeyi kaydet' }}</button>{% if selected_document %}<a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">İptal</a>{% endif %}</div>
+            </form>
+            {% else %}<div class="empty-state">Belge tablosu veri geçişi sonrası aktifleşecek.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Toplu belge yükleme</h4>
+            {% if documents_ready %}
+            <form method="post" action="{{ url_for('main.hr_personnel_document_bulk_upload') }}" enctype="multipart/form-data" class="stack">
+                <input type="hidden" name="form_token" value="{{ bulk_document_form_token }}">
+                <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                <input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="help-note">Aynı personele ait birden fazla belgeyi tek hamlede yükleyin. Dosya adı başlığa otomatik işlenir; isterseniz ortak ön ek verebilirsiniz.</div>
+                <div class="form-grid">
+                    <div class="field"><label>Kategori</label><select name="category">{% for row in document_category_options %}<option value="{{ row.code }}">{{ row.label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Durum</label><select name="status">{% for value,label in document_status_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Ortak başlık ön eki</label><input type="text" name="title_prefix" placeholder="Örn. 2026 Evrak Paketi"></div>
+                    <div class="field"><label>Gizli</label><select name="is_confidential"><option value="0">Hayır</option><option value="1">Evet</option></select></div>
+                    <div class="field"><label>Düzenlenme tarihi</label><input type="date" name="issue_date"></div>
+                    <div class="field"><label>Geçerlilik bitişi</label><input type="date" name="expiry_date"></div>
+                    <div class="field" style="grid-column:1/-1"><label>Dosyalar</label><input class="w-full" type="file" name="document_files" multiple required></div>
+                    <div class="field" style="grid-column:1/-1"><label>Açıklama</label><textarea name="description" placeholder="Bu yükleme paketiyle ilgili kısa not"></textarea></div>
+                </div>
+                <div class="btn-row"><button class="btn-soft primary" type="submit">Toplu yüklemeyi başlat</button></div>
+            </form>
+            {% else %}<div class="empty-state">Toplu yükleme için belge tabloları veri geçişi sonrası aktifleşecek.</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="two-grid">
+        <div class="panel">
+            <h4 class="section-title">Pozisyon / görev geçmişi</h4>
+            {% if position_ready %}
+            <form method="post" action="{{ url_for('main.hr_personnel_position_save') }}" class="stack">
+                <input type="hidden" name="form_token" value="{{ position_form_token }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><input type="hidden" name="position_id" value="{{ selected_position.id if selected_position else '' }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="form-grid">
+                    <div class="field"><label>Pozisyon / görev</label><input type="text" name="position_title" value="{{ selected_position.position_title if selected_position else (selected_user.unvan or '') }}" required></div>
+                    <div class="field"><label>Kademe / derece</label><input type="text" name="position_grade" value="{{ selected_position.position_grade if selected_position else '' }}"></div>
+                    <div class="field"><label>İşlem türü</label><select name="assignment_type">{% for value,label in position_assignment_type_options %}<option value="{{ value }}" {% if (selected_position.assignment_type if selected_position else 'atama') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Atama şekli</label><select name="appointment_kind"><option value="">Seçiniz</option>{% for value,label in position_appointment_kind_options %}<option value="{{ value }}" {% if (selected_position.appointment_kind if selected_position else '') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Başlangıç</label><input type="date" name="start_date" value="{{ selected_position.start_date.isoformat() if selected_position and selected_position.start_date else '' }}"></div>
+                    <div class="field"><label>Bitiş</label><input type="date" name="end_date" value="{{ selected_position.end_date.isoformat() if selected_position and selected_position.end_date else '' }}"></div>
+                    <div class="field"><label>Karar / yazı no</label><input type="text" name="decision_no" value="{{ selected_position.decision_no if selected_position else '' }}"></div>
+                    <div class="field"><label>Güncel kayıt</label><select name="is_current"><option value="0" {% if not selected_position or not selected_position.is_current %}selected{% endif %}>Hayır</option><option value="1" {% if selected_position and selected_position.is_current %}selected{% endif %}>Evet</option></select></div>
+                    <div class="field"><label>Birim adı</label><input type="text" name="unit_name_snapshot" value="{{ selected_position.unit_name_snapshot if selected_position else (selected_user.birim or '') }}"></div>
+                    <div class="field"><label>Üst birim adı</label><input type="text" name="parent_unit_name_snapshot" value="{{ selected_position.parent_unit_name_snapshot if selected_position else (selected_user.ust_birim or '') }}"></div>
+                    <div class="field" style="grid-column:1/-1"><label>Gerekçe / açıklama</label><textarea name="reason">{{ selected_position.reason if selected_position else '' }}</textarea></div>
+                </div>
+                <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Geçmişi güncelle' if selected_position else 'Geçmiş kaydı ekle' }}</button>{% if selected_position %}<a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">İptal</a>{% endif %}</div>
+            </form>
+            {% else %}<div class="empty-state">Pozisyon geçmişi tablosu veri geçişi sonrası aktifleşecek.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Belge geçerlilik uyarıları</h4>
+            {% if selected_document_validity_rows %}
+            <div class="alert-list">
+                {% for row in selected_document_validity_rows[:6] %}
+                <div class="alert-item {{ row.severity }}">
+                    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+                        <div>
+                            <div class="timeline-title">{{ row.title }}</div>
+                            <div class="muted">{{ row.category_label }} · Bitiş: {{ row.expiry_date or '-' }}</div>
+                        </div>
+                        <span class="tag {% if row.severity == 'expired' %}bad{% elif row.severity == 'critical' %}warn{% else %}soft{% endif %}">{{ row.severity_label }}</span>
+                    </div>
+                    <div class="muted" style="margin-top:6px">Kalan süre: {{ row.days_left }} gün</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="btn-row" style="margin-top:14px"><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_validity_center', scope=selected_scope_mode) }}">Tüm uyarı merkezini aç</a></div>
+            {% else %}<div class="empty-state">Seçili personelde kritik belge geçerlilik uyarısı görünmüyor.</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="two-grid">
+        <div class="panel">
+            <h4 class="section-title">İşlem notu</h4>
+            {% if notes_ready %}
+            <form method="post" action="{{ url_for('main.hr_personnel_note_save') }}" class="stack">
+                <input type="hidden" name="form_token" value="{{ note_form_token }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><input type="hidden" name="note_id" value="{{ selected_note.id if selected_note else '' }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="form-grid">
+                    <div class="field"><label>Not türü</label><select name="note_type">{% for value,label in note_type_options %}<option value="{{ value }}" {% if (selected_note.note_type if selected_note else 'ozluk') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Öncelik</label><select name="priority">{% for value,label in note_priority_options %}<option value="{{ value }}" {% if (selected_note.priority if selected_note else 'normal') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Konu</label><input type="text" name="subject" value="{{ selected_note.subject if selected_note else '' }}" required></div>
+                    <div class="field"><label>Durum</label><select name="status">{% for value,label in note_status_options %}<option value="{{ value }}" {% if (selected_note.status if selected_note else 'open') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Termin</label><input type="date" name="due_date" value="{{ selected_note.due_date.isoformat() if selected_note and selected_note.due_date else '' }}"></div>
+                    <div class="field"><label>Görünürlük</label><select name="is_private"><option value="1" {% if not selected_note or selected_note.is_private %}selected{% endif %}>Özel</option><option value="0" {% if selected_note and not selected_note.is_private %}selected{% endif %}>Genel</option></select></div>
+                    <div class="field" style="grid-column:1/-1"><label>Not</label><textarea name="note" required>{{ selected_note.note if selected_note else '' }}</textarea></div>
+                </div>
+                <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Notu güncelle' if selected_note else 'Not ekle' }}</button>{% if selected_note %}<a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">İptal</a>{% endif %}</div>
+            </form>
+            {% else %}<div class="empty-state">İşlem notu tablosu veri geçişi sonrası aktifleşecek.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Durum geçmişi</h4>
+            {% if status_ready %}
+            <form method="post" action="{{ url_for('main.hr_personnel_status_save') }}" class="stack">
+                <input type="hidden" name="form_token" value="{{ status_form_token }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><input type="hidden" name="status_id" value="{{ selected_status.id if selected_status else '' }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}">
+                <div class="form-grid">
+                    <div class="field"><label>Olay türü</label><select name="event_type">{% for value,label in status_event_options %}<option value="{{ value }}" {% if (selected_status.event_type if selected_status else 'durum') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Olay tarihi</label><input type="date" name="event_date" value="{{ selected_status.event_date.isoformat() if selected_status and selected_status.event_date else '' }}" required></div>
+                    <div class="field"><label>Geçerlilik başlangıcı</label><input type="date" name="effective_start_date" value="{{ selected_status.effective_start_date.isoformat() if selected_status and selected_status.effective_start_date else '' }}"></div>
+                    <div class="field"><label>Geçerlilik bitişi</label><input type="date" name="effective_end_date" value="{{ selected_status.effective_end_date.isoformat() if selected_status and selected_status.effective_end_date else '' }}"></div>
+                    <div class="field"><label>Önceki değer</label><input type="text" name="previous_value" value="{{ selected_status.previous_value if selected_status else '' }}"></div>
+                    <div class="field"><label>Yeni değer</label><input type="text" name="new_value" value="{{ selected_status.new_value if selected_status else '' }}"></div>
+                    <div class="field" style="grid-column:1/-1"><label>Özet</label><input type="text" name="summary" value="{{ selected_status.summary if selected_status else '' }}" required></div>
+                    <div class="field" style="grid-column:1/-1"><label>Açıklama</label><textarea name="description">{{ selected_status.description if selected_status else '' }}</textarea></div>
+                </div>
+                <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Kaydı güncelle' if selected_status else 'Durum kaydı ekle' }}</button>{% if selected_status %}<a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id) }}">İptal</a>{% endif %}</div>
+            </form>
+            {% else %}<div class="empty-state">Durum geçmişi tablosu veri geçişi sonrası aktifleşecek.</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">Personel zaman çizelgesi</h4>
+            {% if selected_timeline_rows %}
+            <div class="timeline">
+                {% for row in selected_timeline_rows %}
+                <div class="timeline-item">
+                    <div class="timeline-date">{{ row.date or '-' }}<br><span class="tag {{ row.tone }}" style="margin-top:8px">{{ row.kind_label }}</span></div>
+                    <div class="timeline-body">
+                        <div class="timeline-title">{{ row.title }}</div>
+                        <div class="muted">{{ row.subtitle }}</div>
+                        <div class="timeline-detail">{{ row.detail }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}<div class="empty-state">Seçili personel için zaman çizelgesi kaydı bulunmuyor.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Belge listesi</h4>
+            {% if selected_document_rows %}
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Belge</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead><tbody>
+            {% for row in selected_document_rows %}
+                <tr>
+                    <td><strong>{{ row.title }}</strong><br><span class="muted">{{ row.category_label }} · {{ row.original_filename }}</span>{% if row.is_confidential %}<br><span class="tag bad">Gizli</span>{% endif %}</td>
+                    <td><span class="tag {% if row.status == 'aktif' %}good{% elif row.status == 'arsiv' %}soft{% else %}warn{% endif %}">{{ row.status_label }}</span>{% if row.days_left is not none %}<br><span class="muted">{{ row.days_left }} gün</span>{% endif %}</td>
+                    <td>{{ row.issue_date or '-' }}<br><span class="muted">{{ row.expiry_date or '-' }}</span></td>
+                    <td><div class="inline-actions"><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id, edit_document_id=row.id) }}">Düzenle</a><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_document_download', document_id=row.id, scope=selected_scope_mode, user_id=selected_user_id) }}">İndir</a><form class="inline-form" method="post" action="{{ url_for('main.hr_personnel_document_delete', document_id=row.id) }}"><input type="hidden" name="form_token" value="{{ document_delete_token }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><button class="btn-soft danger" type="submit">Sil</button></form></div></td>
+                </tr>
+            {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Seçili personele ait belge kaydı bulunmuyor.</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="page-grid">
+        <div class="panel">
+            <h4 class="section-title">İşlem notları</h4>
+            {% if selected_note_rows %}
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Konu</th><th>Öncelik</th><th>Termin</th><th>İşlem</th></tr></thead><tbody>
+            {% for row in selected_note_rows %}
+                <tr>
+                    <td><strong>{{ row.subject }}</strong><br><span class="muted">{{ row.note_type_label }} · {{ row.status_label }}</span>{% if row.is_private %}<br><span class="tag soft">Özel</span>{% endif %}</td>
+                    <td><span class="tag {% if row.priority == 'critical' %}bad{% elif row.priority == 'high' %}warn{% else %}soft{% endif %}">{{ row.priority_label }}</span></td>
+                    <td>{{ row.due_date or '-' }}{% if row.resolved_at %}<br><span class="muted">Kapandı: {{ row.resolved_at.strftime('%Y-%m-%d %H:%M') }}</span>{% endif %}</td>
+                    <td><div class="inline-actions"><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id, edit_note_id=row.id) }}">Düzenle</a><form class="inline-form" method="post" action="{{ url_for('main.hr_personnel_note_toggle', note_id=row.id) }}"><input type="hidden" name="form_token" value="{{ note_close_token }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><button class="btn-soft warn" type="submit">{{ 'Aç' if row.status == 'closed' else 'Kapat' }}</button></form><form class="inline-form" method="post" action="{{ url_for('main.hr_personnel_note_delete', note_id=row.id) }}"><input type="hidden" name="form_token" value="{{ note_delete_token }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><button class="btn-soft danger" type="submit">Sil</button></form></div></td>
+                </tr>
+            {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Seçili personele ait işlem notu bulunmuyor.</div>{% endif %}
+        </div>
+        <div class="panel">
+            <h4 class="section-title">Durum ve görev geçmişi</h4>
+            {% if selected_status_rows or selected_position_rows or selected_movement_rows %}
+            <div class="table-wrap"><table class="table-clean"><thead><tr><th>Tür</th><th>Özet</th><th>Tarih</th><th>İşlem</th></tr></thead><tbody>
+            {% for row in selected_status_rows %}
+                <tr><td>{{ row.event_type_label }}</td><td>{{ row.summary }}<br><span class="muted">{{ row.previous_value or '-' }} → {{ row.new_value or '-' }}</span></td><td>{{ row.event_date or '-' }}</td><td>—</td></tr>
+            {% endfor %}
+            {% for row in selected_position_rows %}
+                <tr><td>{{ row.assignment_type_label }}</td><td><strong>{{ row.position_title }}</strong><br><span class="muted">{{ row.unit_name }} · {{ row.manager_name }}</span></td><td>{{ row.start_date or '-' }}</td><td><div class="inline-actions"><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id, edit_position_id=row.id) }}">Düzenle</a><form class="inline-form" method="post" action="{{ url_for('main.hr_personnel_position_delete', position_id=row.id) }}"><input type="hidden" name="form_token" value="{{ position_delete_token }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><button class="btn-soft danger" type="submit">Sil</button></form></div></td></tr>
+            {% endfor %}
+            {% for row in selected_movement_rows %}
+                <tr><td>Hareket</td><td>{{ row.assignment_type }}<br><span class="muted">{{ row.unit_name }} · {{ row.reason }}</span></td><td>{{ row.start_date or '-' }}</td><td>—</td></tr>
+            {% endfor %}
+            </tbody></table></div>
+            {% else %}<div class="empty-state">Seçili personele ait durum veya görev geçmişi bulunmuyor.</div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel">
+        <h4 class="section-title">Özlük dosyası tamlık görünümü</h4>
+        <div class="table-wrap"><table class="table-clean"><thead><tr><th>Personel</th><th>Birim</th><th>Profil</th><th>Zorunlu evrak</th><th>Belge</th><th>Not</th><th>Risk</th></tr></thead><tbody>
+        {% for row in dossier_rows %}
+            <tr>
+                <td><a href="{{ url_for('main.personnel_profile', user_id=row.user_id) }}">{{ row.user_name }}</a><br><span class="muted">{{ row.role_label }}</span></td>
+                <td>{{ row.unit_name }}</td>
+                <td><span class="tag {% if row.profile_score >= 90 %}good{% elif row.profile_score >= 70 %}warn{% else %}bad{% endif %}">{{ row.profile_score }}%</span></td>
+                <td><span class="tag {% if row.required_ratio >= 100 %}good{% elif row.required_ratio >= 50 %}warn{% else %}bad{% endif %}">{{ row.required_ratio }}%</span>{% if row.missing_required_labels %}<br><span class="muted">{{ row.missing_required_labels|join(', ') }}</span>{% endif %}</td>
+                <td>{{ row.document_count }}{% if row.confidential_count %}<br><span class="muted">Gizli: {{ row.confidential_count }}</span>{% endif %}</td>
+                <td>{{ row.note_count }}</td>
+                <td>{% if row.gap_reasons %}{{ row.gap_reasons|join(', ') }}{% else %}<span class="tag good">Tam</span>{% endif %}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7">Gösterilecek personel kaydı yok.</td></tr>
+        {% endfor %}
+        </tbody></table></div>
+    </div>
+</div>
+{% endblock %}

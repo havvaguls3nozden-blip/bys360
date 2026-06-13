@@ -1,0 +1,60 @@
+{% extends "corporate_information_center/base.html" %}
+{% set active_tab='system' %}
+{% block cic_content %}
+<div class="cic-grid">
+ <section class="cic-card span-12" id="release">
+ <div class="release-head">
+ <div>
+ <span class="cic-eyebrow"><i class="fa-solid fa-shield-halved"></i> Canlı Geçiş</span>
+ <h2>Kontrollü canlı kullanım paneli</h2>
+ <p>Canlı kullanımda önce test yapılır, loglar kontrol edilir ve yetkili onaydan sonra gerçek gönderim başlatılır.</p>
+ </div>
+ <div class="cic-score mini"><strong>{{ release_context.score }}</strong><span>/100</span></div>
+ </div>
+ <div class="release-steps">{% for step in release_context.steps %}<div><b>{{ loop.index }}</b><span>{{ step }}</span></div>{% endfor %}</div>
+ <div class="cic-actions"><a class="cic-btn secondary" href="/dashboard/kurumsal-bilgilendirme/kutlamalar#excel-yukleme"><i class="fa-solid fa-file-excel"></i><span>Excel ile tarih yükle</span></a>
+      <a class="cic-btn cic-primary-action" href="/dashboard/kurumsal-bilgilendirme/test"><i class="fa-solid fa-eye"></i><span>Önizleme / test gönderimi</span></a>
+      <a class="cic-btn secondary" href="/dashboard/kurumsal-bilgilendirme/loglar"><i class="fa-solid fa-clock-rotate-left"></i><span>Logları incele</span></a>
+      <a class="cic-btn secondary" href="/dashboard/kurumsal-bilgilendirme/kutlamalar"><i class="fa-solid fa-cake-candles"></i><span>Kutlamaları yönet</span></a>
+      <a class="cic-btn ghost" href="/dashboard/kurumsal-bilgilendirme/sablonlar"><i class="fa-solid fa-briefcase"></i><span>Şablonları kontrol et</span></a>
+    </div>
+ </section>
+
+ <form method="post" class="cic-card span-5">
+ {{ cic_csrf() }}
+ <div class="cic-card-head"><div><h2>Sistem Ayarları</h2><p>Konum ve otomatik gönderim çalışma mantığını yönetin.</p></div></div>
+ <label>Konum adı<input class="cic-input" name="location_name" value="{{ config.location_name }}"></label>
+ <label>Enlem<input class="cic-input" name="latitude" value="{{ config.latitude }}"></label>
+ <label>Boylam<input class="cic-input" name="longitude" value="{{ config.longitude }}"></label>
+
+ <hr class="cic-soft-line">
+ <h3>Otomatik Gönderim Zamanlayıcısı</h3>
+ <label class="cic-switch-card">
+ <input type="checkbox" name="auto_scheduler_enabled" {% if auto_scheduler and auto_scheduler.enabled %}checked{% endif %}>
+ <span><strong>{% if auto_scheduler and auto_scheduler.enabled %}Aktif{% else %}Pasif{% endif %}</strong><small>Aktif olduğunda zamanı gelen görevler sistem tarafından otomatik gönderilir.</small></span>
+ </label>
+
+ <label class="cic-switch-card">
+ <input type="checkbox" name="auto_scheduler_weekdays_only" {% if auto_scheduler is not defined or auto_scheduler.weekdays_only %}checked{% endif %}>
+ <span><strong>Sadece hafta içi gönder</strong><small>Cumartesi ve pazar günleri otomatik mail gönderilmez.</small></span>
+ </label>
+ <div class="cic-weekday-policy"><i class="fa-solid fa-calendar-check"></i><strong>Hafta sonu koruması aktif:</strong> Otomatik görev açık olsa bile cumartesi ve pazar günleri mail gönderimi yapılmaz.</div>
+ <label>Gecikme toleransı (dk)
+ <input class="cic-input" name="auto_scheduler_late_window_minutes" type="number" min="1" max="120" value="{{ auto_scheduler.late_window_minutes if auto_scheduler else 20 }}">
+ </label>
+ <p class="cic-muted">Görev saatleri ve hangi mailin aktif/pasif olduğu <strong>Görevler</strong> ekranından yönetilir. Windows tarafında tek görev sadece 5 dakikada bir BYS360 ayarlarını kontrol eder.</p>
+ <button class="cic-btn wide">Sistem Ayarlarını Kaydet</button>
+ </form>
+
+ <section class="cic-card span-7">
+ <div class="cic-card-head"><div><h2>Sistem Sağlığı ve Denetim</h2><p>Görev, alıcı, şablon, log ve otomatik zamanlayıcı kontrolleri.</p></div>{{ status_pill(phase5.mail_health.status, phase5.mail_health.label) }}</div>
+ <div class="cic-check"><span>Otomatik zamanlayıcı</span><strong>{% if auto_scheduler and auto_scheduler.enabled %}Aktif{% else %}Pasif{% endif %}</strong></div>
+ <div class="cic-check"><span>Yoklama aralığı</span><strong>{{ auto_scheduler.poll_interval_minutes if auto_scheduler else 5 }} dk</strong></div>
+ <div class="cic-check"><span>Windows görev adı</span><small>{{ auto_scheduler.windows_task_name if auto_scheduler else 'BYS360 CIC Auto Mail Scheduler' }}</small></div>
+ <div class="cic-check"><span>Aktif görev</span><strong>{{ stats.active_tasks }}</strong></div>
+ <div class="cic-check"><span>Yönetici alıcısı</span><strong>{{ stats.manager_count }}</strong></div>
+ <div class="cic-check"><span>Personel alıcısı</span><strong>{{ stats.staff_count }}</strong></div>
+ <div class="cic-check"><span>Son durum</span><small>{{ stats.last_status or 'Henüz gönderim yapılmadı' }}</small></div>
+ </section>
+</div>
+{% endblock %}

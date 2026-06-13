@@ -1,0 +1,356 @@
+from __future__ import annotations
+
+import json
+import os
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+PACKAGE = "BYS360_SECRET_REPO_GATE_V2_PHASE1"
+
+IGNORED_DIR_NAMES = {
+    ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".idea", ".vscode", ".dart_tool", ".gradle",
+    "reports", "backups", "backup", "archive", "archives", "releases", "release", "quarantine", ".quarantine",
+    "_quarantine", "build", "dist", "android_build", "ios_build", "coverage", ".coverage",
+}
+
+TEXT_EXTS = {
+    ".py", ".ps1", ".sh", ".bat", ".cmd", ".yml", ".yaml", ".toml", ".ini",
+    ".cfg", ".conf", ".json", ".txt", ".md", ".env", ".example", ".dockerignore",
+}
+
+SECRET_KEYS = (
+    "SECRET_KEY", "DATABASE_URL", "SQLALCHEMY_DATABASE_URI", "POSTGRES_PASSWORD",
+    "DB_PASSWORD", "PASSWORD", "TCKN_ENCRYPTION_KEY", "SENTRY_DSN", "AI_API_KEY",
+    "API_KEY", "ACCESS_TOKEN", "INSTAGRAM_ACCESS_TOKEN", "TOKEN",
+)
+
+PLACEHOLDER_WORDS = (
+    "", "none", "null", "false", "true", "change_me", "changeme", "placeholder", "example",
+    "dummy", "redacted", "your_", "buraya", "degistir", "değiştir", "not_set", "unset",
+    "local", "localhost", "127.0.0.1", "test", "testing", "dev", "development", "bys_pass",
+    "secret_key_from_env", "database_url_from_env", "sentry_dsn_from_env",
+)
+
+ENV_REFERENCE_MARKERS = (
+    "os.environ", "os.getenv", "getenv(", "environ.get", "current_app.config", "config.get(",
+    "${", "%", "env:", "Environment.GetEnvironmentVariable", "load_dotenv", "from_env",
+)
+
+REGEX_OR_SCANNER_MARKERS = (
+    "re.compile", "regex", "pattern", "SECRET_KEYS", "PLACEHOLDER", "secret scanner",
+    "secret_repo_gate", "database_url_with_password", "hardcoded_secret", "SENTRY_DSN i",
+    "SECRET_KEY i", "DATABASE_URL i", "SQLALCHEMY_DATABASE_URI i",
+)
+
+DB_URL_RE = re.compile(r"(?:postgresql|postgres|mysql|mariadb)://([^\s:'\"/@]+):([^\s'\"/@]+)@", re.I)
+ASSIGN_RE = re.compile(
+    r"(?P<key>SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|INSTAGRAM_ACCESS_TOKEN|TOKEN)\s*[:=]\s*(?P<quote>[\"'])(?P<value>.*?)(?P=quote)",
+    re.I,
+)
+DICT_ASSIGN_RE = re.compile(
+    r"(?P<quote>[\"'])(?P<key>SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|INSTAGRAM_ACCESS_TOKEN|TOKEN)(?P=quote)\s*:\s*(?P<vquote>[\"'])(?P<value>.*?)(?P=vquote)",
+    re.I,
+)
+
+
+# BYS360_PHASE1_BLOCKED_REPO_ARTIFACTS
+# Bu kontrol secret taramasindan ayridir: gerçek DB, local runtime, yedek ve paket kalintilari
+# kaynak agacinda veya release paketinde bulunmamalidir.
+BLOCKED_REPO_DIR_NAMES = {
+    "instance", "_local_secrets", "_security_quarantine", "_cleanup_quarantine", "payload", "overlay_payload",
+}
+BLOCKED_REPO_SUFFIXES = {
+    ".sqlite3", ".sqlite", ".db", ".dump", ".bak", ".backup", ".old", ".orig",
+    ".log", ".key", ".pem", ".p12", ".pfx", ".ppk", ".jks", ".keystore",
+}
+BLOCKED_REPO_NAME_PATTERNS = (
+    re.compile(r"(^|/|\\)\.env($|\.)", re.I),
+    re.compile(r"\.gitignore\.bak", re.I),
+    re.compile(r"\.bak_", re.I),
+    re.compile(r"disabled_by_rollback", re.I),
+    re.compile(r"clean_package_manifest.*\.json$", re.I),
+)
+BLOCKED_SCAN_SKIP_DIRS = {
+    ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".idea", ".vscode", ".dart_tool",
+    "reports", "backups", "backup", "archive", "releases", "release", "quarantine", ".quarantine",
+}
+
+
+def is_ignored(path: Path, root: Path) -> bool:
+    try:
+        rel = path.relative_to(root)
+    except ValueError:
+        rel = path
+    return any(part in IGNORED_DIR_NAMES for part in rel.parts)
+
+
+def is_env_file(path: Path) -> bool:
+    name = path.name.lower()
+    return name == ".env" or name.startswith(".env.")
+
+
+def is_allowed_env_example(path: Path) -> bool:
+    name = path.name.lower()
+    return name.endswith(".example") or ".example." in name or name in {".env.template", ".env.sample", ".env.docker.example", ".env.production.example"}
+
+
+def is_probably_text(path: Path) -> bool:
+    if path.suffix.lower() in TEXT_EXTS:
+        return True
+    return path.name.lower().startswith(".env") or path.name.lower() in {"docker-compose.yml", "dockerfile", "makefile"}
+
+
+def safe_read(path: Path) -> str | None:
+    try:
+        data = path.read_bytes()
+    except Exception:
+        return None
+    if b"\x00" in data[:4096]:
+        return None
+    try:
+        return data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        try:
+            return data.decode("cp1254")
+        except UnicodeDecodeError:
+            return data.decode("utf-8", errors="ignore")
+
+
+def looks_placeholder(value: str) -> bool:
+    v = value.strip().strip('"\'').strip()
+    lower = v.lower()
+    if any(word in lower for word in PLACEHOLDER_WORDS):
+        return True
+    if lower.startswith("${") or lower.startswith("%") or lower.startswith("os.environ"):
+        return True
+    if "<" in v and ">" in v:
+        return True
+    if len(v) < 16 and not ("://" in v and "@" in v):
+        return True
+    return False
+
+
+def looks_env_reference(line: str, value: str = "") -> bool:
+    hay = f"{line} {value}"
+    return any(marker in hay for marker in ENV_REFERENCE_MARKERS)
+
+
+def looks_regex_or_scanner(line: str, path: Path) -> bool:
+    lower_path = str(path).replace("\\", "/").lower()
+    if "/scripts/security/" in lower_path or "/scripts/quality/" in lower_path:
+        if any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS):
+            return True
+    return any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS)
+
+
+def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any], limit: int = 80) -> None:
+    if len(warnings) < limit:
+        warnings.append(item)
+
+
+def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: list[dict[str, Any]]) -> None:
+    rel = str(path.relative_to(root)).replace("\\", "/")
+    if is_env_file(path) and not is_allowed_env_example(path):
+        findings.append({
+            "type": "runtime_env_file_in_source_tree",
+            "path": rel,
+            "line": 1,
+            "detail": "Gerçek .env dosyası kaynak klasöründe bulunmamalıdır; değer rapora yazılmadı.",
+        })
+        return
+
+    if not is_probably_text(path):
+        return
+    text = safe_read(path)
+    if text is None:
+        return
+
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or stripped.startswith("//"):
+            continue
+
+        # Database URLs with embedded password. Regex/test/scanner placeholders are warnings, real values are findings.
+        for m in DB_URL_RE.finditer(line):
+            password = m.group(2)
+            if looks_placeholder(password) or looks_env_reference(line, password) or looks_regex_or_scanner(line, path):
+                add_warning(warnings, {
+                    "type": "database_url_reference_or_placeholder",
+                    "path": rel,
+                    "line": lineno,
+                    "detail": "Veritabanı URL ifadesi gerçek secret gibi görünmüyor; uyarı olarak izlendi.",
+                })
+            else:
+                findings.append({
+                    "type": "database_url_with_password",
+                    "path": rel,
+                    "line": lineno,
+                    "detail": "Veritabanı bağlantısında gömülü parola bulundu; değer rapora yazılmadı.",
+                })
+
+        # Literal assignments/dicts for sensitive keys.
+        for regex in (ASSIGN_RE, DICT_ASSIGN_RE):
+            for m in regex.finditer(line):
+                key = m.group("key").upper()
+                value = m.group("value")
+                if looks_placeholder(value) or looks_env_reference(line, value) or looks_regex_or_scanner(line, path):
+                    add_warning(warnings, {
+                        "type": "secret_reference_or_placeholder",
+                        "path": rel,
+                        "line": lineno,
+                        "detail": f"{key} için referans/placeholder değer bulundu.",
+                    })
+                    continue
+                # Local test defaults are warnings, not production secret findings.
+                lower_path = rel.lower()
+                if lower_path.startswith("tests/") and ("localhost" in value.lower() or "127.0.0.1" in value.lower() or "test" in value.lower()):
+                    add_warning(warnings, {
+                        "type": "test_secret_like_default",
+                        "path": rel,
+                        "line": lineno,
+                        "detail": f"{key} için test/local varsayılan değer bulundu.",
+                    })
+                    continue
+                findings.append({
+                    "type": "hardcoded_secret_value",
+                    "path": rel,
+                    "line": lineno,
+                    "detail": f"{key} için kaynak kodda gömülü değer bulundu; değer rapora yazılmadı.",
+                })
+
+
+
+def scan_blocked_repo_artifacts(root: Path, findings: list[dict[str, Any]]) -> None:
+    """Kaynak agacinda bulunmamasi gereken local/hassas artefaktlari yakalar."""
+    root = root.resolve()
+    reported_dirs: set[str] = set()
+    for path in root.rglob("*"):
+        try:
+            rel_path = path.relative_to(root)
+        except ValueError:
+            continue
+        rel = str(rel_path).replace("\\", "/")
+        parts = rel_path.parts
+        lower_parts = [p.lower() for p in parts]
+        if any(part in BLOCKED_SCAN_SKIP_DIRS for part in lower_parts):
+            continue
+
+        if path.is_dir():
+            if path.name.lower() in BLOCKED_REPO_DIR_NAMES and rel not in reported_dirs:
+                reported_dirs.add(rel)
+                findings.append({
+                    "type": "blocked_repo_directory",
+                    "path": rel,
+                    "line": 0,
+                    "detail": "Kaynak paketinde bulunmamasi gereken local/runtime klasor tespit edildi.",
+                })
+            continue
+
+        blocked_parent = next((p for p in lower_parts[:-1] if p in BLOCKED_REPO_DIR_NAMES), None)
+        if blocked_parent:
+            idx = lower_parts.index(blocked_parent)
+            parent = "/".join(parts[: idx + 1])
+            if parent not in reported_dirs:
+                reported_dirs.add(parent)
+                findings.append({
+                    "type": "blocked_repo_directory",
+                    "path": parent,
+                    "line": 0,
+                    "detail": "Kaynak paketinde bulunmamasi gereken local/runtime klasor tespit edildi.",
+                })
+            continue
+
+        suffix = path.suffix.lower()
+        if suffix in BLOCKED_REPO_SUFFIXES:
+            findings.append({
+                "type": "blocked_repo_file",
+                "path": rel,
+                "line": 0,
+                "detail": f"Kaynak paketinde bulunmamasi gereken dosya uzantisi tespit edildi: {suffix}",
+            })
+            continue
+
+        for pattern in BLOCKED_REPO_NAME_PATTERNS:
+            if pattern.search(rel):
+                findings.append({
+                    "type": "blocked_repo_file_name",
+                    "path": rel,
+                    "line": 0,
+                    "detail": "Kaynak paketinde bulunmamasi gereken dosya adi/deseni tespit edildi.",
+                })
+                break
+
+
+def run(root: Path) -> dict[str, Any]:
+    root = root.resolve()
+    findings: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+    scanned = 0
+
+    scan_blocked_repo_artifacts(root, findings)
+
+    for path in root.rglob("*"):
+        if path.is_dir():
+            continue
+        if is_ignored(path, root):
+            continue
+        scanned += 1
+        scan_file(path, root, findings, warnings)
+
+    warning_count_real = len(warnings)
+    if warning_count_real >= 80:
+        warnings.append({
+            "type": "warning_output_truncated",
+            "path": "-",
+            "line": 0,
+            "detail": f"Uyarı listesi rapor okunabilirliği için 80 kayıtla sınırlandı. Toplam uyarı: {warning_count_real}",
+        })
+
+    reports_dir = root / "reports" / "quality"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    report_path = reports_dir / "BYS360_SECRET_REPO_GATE_V1_REPORT.json"
+    result: dict[str, Any] = {
+        "package": PACKAGE,
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "root": str(root),
+        "ok": len(findings) == 0,
+        "scanned_file_count": scanned,
+        "finding_count": len(findings),
+        "warning_count": warning_count_real,
+        "ignored_dirs": sorted(IGNORED_DIR_NAMES),
+        "findings": findings,
+        "warnings": warnings[:81],
+        "report": str(report_path),
+        "next_actions": [
+            "finding_count 0 ise P0 güvenlik/repo hijyen gate tamamlanmış kabul edilebilir.",
+            "Gerçek secret dosyaları kaynak klasöründe tutulmamalı; .env sadece local/canlı ortamda dışarıdan sağlanmalıdır.",
+            "warning_count kalite kapısını düşürmez; örnek dosya/env referansı/regex tarama kalıbı olarak izlenir.",
+        ],
+    }
+    report_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    return result
+
+
+def main(argv: list[str]) -> int:
+    root = Path.cwd()
+    if "--root" in argv:
+        idx = argv.index("--root")
+        if idx + 1 < len(argv):
+            root = Path(argv[idx + 1])
+    result = run(root)
+    print(json.dumps({
+        "ok": result["ok"],
+        "finding_count": result["finding_count"],
+        "warning_count": result["warning_count"],
+        "report": result["report"],
+    }, ensure_ascii=False, indent=2))
+    return 0 if result["ok"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
