@@ -632,6 +632,67 @@ def build_menu_visibility_map(
         visibility["logout"] = True
     # PHASE3A_EFFECTIVE_MENU_V7_V8_INLINE_END
 
+
+    # PHASE3A_EFFECTIVE_MENU_V14_GENERAL_HOME_INLINE_BEGIN
+    if user:
+        try:
+            active_menu_items = _active_menu_items()
+            active_keys = {
+                str((item or {}).get("key") or "").strip()
+                for item in active_menu_items or []
+                if str((item or {}).get("key") or "").strip()
+            }
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=v14_active_keys")
+            active_keys = set(visibility.keys())
+
+        try:
+            user_state = _load_user_override_state(user, rollback=rollback)
+        except Exception:
+            log = __import__("logging").getLogger(__name__)
+            log.exception("BYS360 effective menu fallback failed | phase=v14_user_state")
+            user_state = {}
+
+        for key, is_visible in (user_state or {}).items():
+            key = str(key or "").strip()
+            if not key or key not in active_keys or is_removed_menu_key(key):
+                continue
+            visibility[key] = bool(is_visible)
+
+        performance_children = {
+            "scorecards", "performance_dashboard", "performance_criteria", "criteria",
+            "performance_periods", "periods", "performance_evaluation_tasks", "assignments",
+            "performance_tasks", "performance_task_management", "performance_hierarchy_tree",
+            "performance_hierarchy_assignments", "performance_team_compare", "team_analysis",
+            "team_performance_comparison_history", "performance_feedback_meetings", "feedback_meetings",
+            "performance_publish", "publish", "performance_mail_settings", "performance_mail",
+            "performance_process_tracking", "performance_process_reports", "performance_president_approvals",
+            "performance_personnel_support_publish_approval", "performance_interim_notes",
+            "performance_development_guidance", "performance_meeting_p3_reminders",
+            "performance_kpi_dashboard", "performance_kpi_management", "performance_competency_library",
+            "performance_self_assessment", "performance_kpi_analysis", "performance_feedback_aftercare",
+            "performance_feedback_aftercare_new", "performance_feedback_meeting_guide", "performance_feedback_followup",
+            "performance_archive", "performance_reports", "performance_scorecard", "my_performance_comparison",
+        }
+        if any(bool(visibility.get(key)) for key in performance_children):
+            for main_key in ("performance_module", "performance_management", "performans_yonetimi"):
+                if main_key in active_keys or main_key in visibility:
+                    visibility[main_key] = True
+
+        assistant_children = {"ai_agent_panel", "ai_agent_knowledge", "ai_agent_teaching_center", "assistant_center"}
+        if any(bool(visibility.get(key)) for key in assistant_children):
+            for main_key in ("assistant_module", "ai_agent_panel"):
+                if main_key in active_keys or main_key in visibility:
+                    visibility[main_key] = True
+
+        visibility["account"] = True
+        visibility["logout"] = True
+
+    visibility = _bys360_apply_general_category_visibility_fix_v1(visibility, user, rollback=rollback)
+    visibility = _bys360_force_home_menu_visible_v1(visibility, user)
+    # PHASE3A_EFFECTIVE_MENU_V14_GENERAL_HOME_INLINE_END
+
     return visibility
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
@@ -1527,61 +1588,8 @@ def _apply_bys360_settings_live_authority_v1(
 # BYS360_PERSON_BASED_ROLE_MATRIX_V1_END
 
 # BYS360_PERSONNEL_FEATURE_MATRIX_V1_4_FINAL_USER_OVERRIDE_RUNTIME
-_BYS360_PERSONNEL_FEATURE_MATRIX_V14_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = dict(_BYS360_PERSONNEL_FEATURE_MATRIX_V14_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, logger=logger, rollback=rollback) or {})
-    if not user:
-        return visibility
-    try:
-        active_menu_items = _active_menu_items()
-        active_keys = {str((item or {}).get("key") or "").strip() for item in active_menu_items or [] if str((item or {}).get("key") or "").strip()}
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        active_keys = set(visibility.keys())
-    try:
-        user_state = _load_user_override_state(user, rollback=rollback)
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        user_state = {}
-    for key, is_visible in (user_state or {}).items():
-        key = str(key or "").strip()
-        if not key or key not in active_keys or is_removed_menu_key(key):
-            continue
-        visibility[key] = bool(is_visible)
-
-    performance_children = {
-        "scorecards", "performance_dashboard", "performance_criteria", "criteria",
-        "performance_periods", "periods", "performance_evaluation_tasks", "assignments",
-        "performance_tasks", "performance_task_management", "performance_hierarchy_tree",
-        "performance_hierarchy_assignments", "performance_team_compare", "team_analysis",
-        "team_performance_comparison_history", "performance_feedback_meetings", "feedback_meetings",
-        "performance_publish", "publish", "performance_mail_settings", "performance_mail",
-        "performance_process_tracking", "performance_process_reports", "performance_president_approvals",
-        "performance_personnel_support_publish_approval", "performance_interim_notes",
-        "performance_development_guidance", "performance_meeting_p3_reminders",
-        "performance_kpi_dashboard", "performance_kpi_management", "performance_competency_library",
-        "performance_self_assessment", "performance_kpi_analysis", "performance_feedback_aftercare",
-        "performance_feedback_aftercare_new", "performance_feedback_meeting_guide", "performance_feedback_followup",
-        "performance_archive", "performance_reports", "performance_scorecard", "my_performance_comparison",
-    }
-    if any(bool(visibility.get(key)) for key in performance_children):
-        for main_key in ("performance_module", "performance_management", "performans_yonetimi"):
-            if main_key in active_keys or main_key in visibility:
-                visibility[main_key] = True
-
-    assistant_children = {"ai_agent_panel", "ai_agent_knowledge", "ai_agent_teaching_center", "assistant_center"}
-    if any(bool(visibility.get(key)) for key in assistant_children):
-        for main_key in ("assistant_module", "ai_agent_panel"):
-            if main_key in active_keys or main_key in visibility:
-                visibility[main_key] = True
-
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_BEGIN
 # Genel kategorisi icin son karar duzeltmesi.
@@ -1660,12 +1668,8 @@ def _bys360_apply_general_category_visibility_fix_v1(visibility, user, *, rollba
     return visibility
 
 
-_BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = _BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, logger=logger, rollback=rollback)
-    return _bys360_apply_general_category_visibility_fix_v1(visibility, user, rollback=rollback)
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_END
 
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_BEGIN
@@ -1681,12 +1685,8 @@ def _bys360_force_home_menu_visible_v1(visibility, user):
     visibility["logout"] = True
     return visibility
 
-_BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 
 
-def build_menu_visibility_map(user, *, logger=None, rollback=None):  # type: ignore[no-redef]
-    visibility = _BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, logger=logger, rollback=rollback)
-    return _bys360_force_home_menu_visible_v1(visibility, user)
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_END
 
 # BYS360_CORPORATE_PORTAL_V1_EFFECTIVE_MENU_POLICY
