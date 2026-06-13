@@ -473,7 +473,7 @@ def _dashboard_counts() -> dict[str, str]:
     }
 
 
-def _render_template_text(text: str, user: User | None, task_key: str) -> str:
+def _render_template_text_base(text: str, user: User | None, task_key: str) -> str:
     cfg = get_config()
     w = _weather() if task_key.startswith("staff_") else {"bugun_hava": "-", "yarin_hava": "-", "kiyafet_onerisi": "-", "yarin_oneri": "-"}
     counts = _dashboard_counts()
@@ -502,7 +502,7 @@ def get_template(task_key: str) -> dict[str, str]:
     }
 
 
-def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
+def _recipients_for_task_base(task_key: str, override_users: list[User] | None = None) -> list[User]:
     if override_users is not None:
         return override_users
     group = TASK_DEFINITIONS[task_key]["recipient_group"]
@@ -2085,14 +2085,13 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
     return _cic_v40_active_staff_candidates()
 
 
-try:
-    _cic_v40_previous_recipients_for_task = _recipients_for_task
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:2226")
-    _cic_v40_previous_recipients_for_task = None
 
 
-def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:  # type: ignore[override]
+
+
+# PHASE3A_CIC_EXPLICIT_RECIPIENT_RENDER_BEGIN
+def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
+    """Resolve CIC task recipients through one explicit public layer."""
     if override_users is not None:
         return override_users
     if task_key == "staff_birthday":
@@ -2101,33 +2100,23 @@ def _recipients_for_task(task_key: str, override_users: list[User] | None = None
         return _cic_v40_anniversary_users()
     if task_key == "special_day":
         return _cic_v40_special_day_users()
-    if _cic_v40_previous_recipients_for_task is not None:
-        return _cic_v40_previous_recipients_for_task(task_key, override_users)
-    return []
+    return _recipients_for_task_base(task_key, override_users)
 
 
-try:
-    _cic_v40_previous_render_template_text = _render_template_text
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:2246")
-    _cic_v40_previous_render_template_text = None
-
-
-def _render_template_text(text: str, user: User | None, task_key: str) -> str:  # type: ignore[override]
-    if _cic_v40_previous_render_template_text is not None:
-        rendered = _cic_v40_previous_render_template_text(text, user, task_key)
-    else:
-        rendered = text or ""
-    special_names = ", ".join(str(d.get("name")) for d in _cic_v40_special_days_today()) or "Özel Gün"
+def _render_template_text(text: str, user: User | None, task_key: str) -> str:
+    """Render CIC mail template text through one explicit public layer."""
+    rendered = _render_template_text_base(text, user, task_key)
+    special_names = ", ".join(str(d.get("name")) for d in _cic_v40_special_days_today()) or "\u00d6zel G\u00fcn"
     service_year = _cic_v40_service_year(user) if user is not None else 0
     extra = {
         "ozel_gun_adi": special_names,
-        "hizmet_yili": service_year or "değerli",
-        "kutlama_notu": "Yaş bilgisi gösterilmeden, KVKK uyumlu kutlama metni oluşturulmuştur.",
+        "hizmet_yili": service_year or "de\u011ferli",
+        "kutlama_notu": "Ya\u015f bilgisi g\u00f6sterilmeden, KVKK uyumlu kutlama metni olu\u015fturulmu\u015ftur.",
     }
     for key, value in extra.items():
         rendered = rendered.replace("{" + key + "}", str(value))
     return rendered
+# PHASE3A_CIC_EXPLICIT_RECIPIENT_RENDER_END
 
 
 def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor_user_id: int | None = None) -> int:
