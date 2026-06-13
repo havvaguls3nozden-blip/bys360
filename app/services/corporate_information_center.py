@@ -510,52 +510,6 @@ def _recipients_for_task_base(task_key: str, override_users: list[User] | None =
     return rec["managers"] if group == "managers" else rec["staff"]
 
 
-def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, Any]:
-    ensure_defaults(actor_user_id=actor_user_id)
-    if task_key not in TASK_DEFINITIONS:
-        return {"ok": False, "message": "Bilinmeyen görev.", "task_key": task_key}
-    cfg = get_config()
-    task_cfg = cfg["tasks"].get(task_key, {})
-    if not task_cfg.get("enabled", False) and not dry_run:
-        return {"ok": False, "skipped": True, "message": "Görev pasif.", "task_key": task_key}
-    users = [u for u in _recipients_for_task(task_key, override_users) if getattr(u, "email", None)]
-    tmpl = get_template(task_key)
-    started = time.time()
-    ok_count = 0
-    fail_count = 0
-    errors: list[str] = []
-    sent_preview: list[str] = []
-    for user in users:
-        subject = _render_template_text(tmpl["subject"], user, task_key)
-        body = _render_template_text(tmpl["body"], user, task_key)
-        if dry_run:
-            ok = True
-            msg = "Kuru çalışma: gönderim yapılmadı."
-        else:
-            if send_email is None:
-                ok, msg = False, "Mail servisi bulunamadı."
-            else:
-                ok, msg = send_email(user.email, subject, body)
-        if ok:
-            ok_count += 1
-        else:
-            fail_count += 1
-            errors.append(f"{user.email}: {msg}")
-        sent_preview.append(user.email)
-        try:
-            if create_mail_log is not None:
-                create_mail_log(mail_type=f"corporate_information_{task_key}", recipient_email=user.email, subject=subject, body=body, user_id=getattr(user, "id", None), sent_by_id=actor_user_id, is_success=ok, error_message=None if ok else msg)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:550")
-            pass
-    elapsed = round(time.time() - started, 2)
-    status = f"Başarılı: {ok_count}, Hatalı: {fail_count}, Süre: {elapsed} sn"
-    tasks = cfg["tasks"]
-    tasks.setdefault(task_key, {}).update({"last_status": status, "last_run_at": _now().strftime("%d.%m.%Y %H:%M")})
-    set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.last_status", f"{TASK_DEFINITIONS[task_key]['label']}: {status}", label="Son kurumsal bilgilendirme durumu", actor_user_id=actor_user_id)
-    db.session.commit()
-    return {"ok": fail_count == 0, "task_key": task_key, "task_label": TASK_DEFINITIONS[task_key]["label"], "dry_run": dry_run, "recipient_count": len(users), "success_count": ok_count, "fail_count": fail_count, "errors": errors[:20], "recipients": sent_preview[:20], "elapsed_seconds": elapsed}
 
 
 
@@ -634,152 +588,6 @@ def _cic_phase3_make_result(*, task_key: str, dry_run: bool, users: list[User], 
     }
 
 
-def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, Any]:
-    # Faz 3 güvenli gönderim akışı: dry-run, kişi bazlı log ve sade Türkçe sonuç.
-    ensure_defaults(actor_user_id=actor_user_id)
-    started = time.time()
-    if task_key not in TASK_DEFINITIONS:
-        result = {
-            "version": VERSION,
-            "ok": False,
-            "task_key": task_key,
-            "task_label": task_key,
-            "dry_run": bool(dry_run),
-            "recipient_count": 0,
-            "success_count": 0,
-            "fail_count": 1,
-            "skipped_count": 0,
-            "message": "Bilinmeyen görev seçildi. Görev listesi kontrol edilmelidir.",
-            "ran_at": _now().strftime("%d.%m.%Y %H:%M:%S"),
-            "actor": _cic_phase3_actor_label(actor_user_id),
-            "elapsed_seconds": 0,
-            "details": [],
-        }
-        _cic_phase3_store_result(task_key, result, actor_user_id)
-        try:
-            db.session.commit()
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:694")
-            pass
-        return result
-
-    cfg = get_config()
-    task_cfg = cfg.get("tasks", {}).get(task_key, {})
-    task_label = _cic_phase3_task_label(task_key)
-
-    if not task_cfg.get("enabled", False) and not dry_run:
-        result = _cic_phase3_make_result(
-            task_key=task_key,
-            dry_run=dry_run,
-            users=[],
-            ok_count=0,
-            fail_count=1,
-            skipped_count=0,
-            details=[],
-            started=started,
-            actor_user_id=actor_user_id,
-            message=f"{task_label} pasif durumda. Gerçek gönderim yapılmadı. Görevi aktifleştirip tekrar deneyiniz.",
-        )
-        _cic_phase3_store_result(task_key, result, actor_user_id)
-        db.session.commit()
-        return result
-
-    users = list(_recipients_for_task(task_key, override_users) or [])
-    unique: list[User] = []
-    seen: set[str] = set()
-    for u in users:
-        key = str(getattr(u, "id", "") or getattr(u, "email", "") or id(u))
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(u)
-    users = unique
-
-    if not users:
-        result = _cic_phase3_make_result(
-            task_key=task_key,
-            dry_run=dry_run,
-            users=[],
-            ok_count=0,
-            fail_count=1,
-            skipped_count=0,
-            details=[],
-            started=started,
-            actor_user_id=actor_user_id,
-            message=f"{task_label} için alıcı bulunamadı. Alıcı Yönetimi ekranından personel veya yönetici alıcıları seçilmelidir.",
-        )
-        _cic_phase3_store_result(task_key, result, actor_user_id)
-        tasks = cfg.get("tasks", {})
-        tasks.setdefault(task_key, {}).update({"last_status": "Alıcı bulunamadı", "last_run_at": _now().strftime("%d.%m.%Y %H:%M")})
-        set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
-        set_setting(f"{BASE_KEY}.last_status", f"{task_label}: Alıcı bulunamadı", label="Son kurumsal bilgilendirme durumu", actor_user_id=actor_user_id)
-        db.session.commit()
-        return result
-
-    tmpl = get_template(task_key)
-    ok_count = 0
-    fail_count = 0
-    skipped_count = 0
-    details: list[dict[str, Any]] = []
-    mail_type = f"corporate_information_{'dry_run_' if dry_run else ''}{task_key}"
-
-    for user in users:
-        user_id = getattr(user, "id", None)
-        email = (getattr(user, "email", None) or "").strip()
-        name = _user_name(user)
-        subject = _render_template_text(tmpl.get("subject", ""), user, task_key).strip()
-        body = _render_template_text(tmpl.get("body", ""), user, task_key).strip()
-
-        if not email:
-            fail_count += 1
-            status_text = "E-posta adresi bulunmadığı için gönderim yapılamadı."
-            details.append({"user_id": user_id, "name": name, "email": "", "ok": False, "status": status_text, "subject": subject})
-            try:
-                if create_mail_log is not None:
-                    create_mail_log(mail_type=mail_type, recipient_email=f"user-{user_id or 'unknown'}@no-email.local", subject=subject or task_label, body=body, user_id=user_id, sent_by_id=actor_user_id, is_success=False, error_message=status_text)
-            except Exception:
-                __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:772")
-                pass
-            continue
-
-        if dry_run:
-            ok = True
-            raw_msg = "Kuru çalışma: gerçek mail gönderilmedi."
-        else:
-            if send_email is None:
-                ok, raw_msg = False, "Mail gönderim servisi bulunamadı."
-            else:
-                try:
-                    sent_result = send_email(email, subject, body)
-                    if isinstance(sent_result, tuple):
-                        ok, raw_msg = bool(sent_result[0]), str(sent_result[1] if len(sent_result) > 1 else "")
-                    else:
-                        ok, raw_msg = bool(sent_result), "Gönderim tamamlandı." if sent_result else "Gönderim tamamlanamadı."
-                except Exception as exc:
-                    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:789")
-                    ok, raw_msg = False, str(exc)
-        status_text = "Kuru çalışma tamamlandı; mail gönderilmedi." if dry_run else ("Gönderildi." if ok else _cic_phase3_public_error(raw_msg))
-        if ok:
-            ok_count += 1
-        else:
-            fail_count += 1
-        details.append({"user_id": user_id, "name": name, "email": email, "ok": bool(ok), "status": status_text, "subject": subject})
-        try:
-            if create_mail_log is not None:
-                create_mail_log(mail_type=mail_type, recipient_email=email, subject=subject or task_label, body=body, user_id=user_id, sent_by_id=actor_user_id, is_success=bool(ok), error_message=None if ok else status_text)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:800")
-            pass
-
-    result = _cic_phase3_make_result(task_key=task_key, dry_run=dry_run, users=users, ok_count=ok_count, fail_count=fail_count, skipped_count=skipped_count, details=details, started=started, actor_user_id=actor_user_id)
-    tasks = cfg.get("tasks", {})
-    status = f"{'Kuru çalışma' if dry_run else 'Gönderim'}: {ok_count} başarılı, {fail_count} hatalı, {round(time.time() - started, 2)} sn"
-    tasks.setdefault(task_key, {}).update({"last_status": status, "last_run_at": _now().strftime("%d.%m.%Y %H:%M")})
-    set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.last_status", f"{task_label}: {status}", label="Son kurumsal bilgilendirme durumu", actor_user_id=actor_user_id)
-    _cic_phase3_store_result(task_key, result, actor_user_id)
-    db.session.commit()
-    return result
 
 
 def get_recent_logs(limit: int = 120) -> list[Any]:
@@ -996,43 +804,8 @@ def _cic_phase5_task_preview(tasks: list[dict[str, Any]], recipients: dict[str, 
     return out
 
 
-try:
-    _cic_phase5_previous_send_task
-except NameError:
-    _cic_phase5_previous_send_task = send_task
 
 
-def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, Any]:
-    """Faz 5 denetim izli gönderim sarmalayıcısı."""
-    result = _cic_phase5_previous_send_task(task_key, dry_run=dry_run, override_users=override_users, actor_user_id=actor_user_id)
-    try:
-        dispatch_id = f"CIC-{_now().strftime('%Y%m%d-%H%M%S')}-{task_key}"
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1063")
-        dispatch_id = f"CIC-{int(time.time())}-{task_key}"
-    try:
-        result["dispatch_id"] = dispatch_id
-        result["phase5"] = True
-        result["risk_level"] = "Yüksek" if (not dry_run and _cic_phase5_safe_int(result.get("recipient_count")) >= 100) else ("Orta" if (not dry_run and _cic_phase5_safe_int(result.get("recipient_count")) >= 25) else "Düşük")
-        set_setting(f"{BASE_KEY}.phase5.last_dispatch", _dumps_json(result), label="Kurumsal bilgilendirme son denetimli işlem", value_type="json", actor_user_id=actor_user_id)
-        _cic_phase5_store_audit({
-            "dispatch_id": dispatch_id,
-            "task_key": task_key,
-            "task_label": result.get("task_label") or task_key,
-            "dry_run": bool(dry_run),
-            "recipient_count": result.get("recipient_count", 0),
-            "success_count": result.get("success_count", 0),
-            "fail_count": result.get("fail_count", 0),
-            "risk_level": result.get("risk_level"),
-            "message": result.get("message") or "İşlem tamamlandı.",
-            "actor": _cic_phase5_actor(actor_user_id),
-            "ran_at": _cic_phase5_now_label(),
-        }, actor_user_id=actor_user_id)
-        db.session.commit()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1084")
-        pass
-    return result
 
 
 def _context_base(search: str | None = None) -> dict[str, Any]:
@@ -1400,7 +1173,7 @@ def _cic_v11_send_email_direct(to_email, subject, body):
         return False, detail
 
 
-def send_task(task_key: str, *, dry_run: bool = False, override_users=None, actor_user_id: int | None = None):
+def _send_task_base(task_key: str, *, dry_run: bool = False, override_users=None, actor_user_id: int | None = None):
     ensure_defaults(actor_user_id=actor_user_id)
     if task_key not in TASK_DEFINITIONS:
         return {"ok": False, "message": "Bilinmeyen görev.", "task_key": task_key}
@@ -2166,23 +1939,40 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
     return created
 
 
-try:
-    _cic_v40_previous_send_task = send_task
-except Exception:  # pragma: no cover
-    __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:2314")
-    _cic_v40_previous_send_task = None
 
 
-def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, _cic_v40_Any]:  # type: ignore[override]
+
+# PHASE3A_CIC_EXPLICIT_SEND_TASK_BEGIN
+def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, _cic_v40_Any]:
+    """Send CIC mail task through one explicit public layer.
+
+    Preserves current runtime behavior:
+    - V11 direct mail implementation is handled by _send_task_base.
+    - V40 celebration system notifications are applied after successful base execution path.
+    """
     users_for_notification: list[User] = []
     if task_key in _CIC_V40_CELEBRATION_TASKS and override_users is None:
         users_for_notification = list(_recipients_for_task(task_key) or [])
     elif task_key in _CIC_V40_CELEBRATION_TASKS and override_users is not None:
         users_for_notification = list(override_users or [])
-    result = _cic_v40_previous_send_task(task_key, dry_run=dry_run, override_users=override_users, actor_user_id=actor_user_id) if _cic_v40_previous_send_task is not None else {"ok": False, "message": "Gönderim servisi bulunamadı."}
+
+    result = _send_task_base(
+        task_key,
+        dry_run=dry_run,
+        override_users=override_users,
+        actor_user_id=actor_user_id,
+    )
+
     if task_key in _CIC_V40_CELEBRATION_TASKS and not dry_run:
-        result["system_notification_count"] = _cic_v40_create_system_notifications(task_key, users_for_notification, actor_user_id=actor_user_id)
+        result["system_notification_count"] = _cic_v40_create_system_notifications(
+            task_key,
+            users_for_notification,
+            actor_user_id=actor_user_id,
+        )
+
     return result
+# PHASE3A_CIC_EXPLICIT_SEND_TASK_END
+
 
 
 def _cic_v40_date_input(value: object) -> str:
