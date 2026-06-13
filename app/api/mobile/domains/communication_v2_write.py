@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-# BYS360_P1D_MOBILE_ROUTES_COMM_ASSISTANT_SPLIT
-# Domain: communication_v2_write
-# Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
-# URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
+from datetime import datetime, timezone
+from statistics import mean
+from typing import Any
 
-from app.api.mobile.shared import MessageThread, MessageThreadParticipant, User, current_app, datetime, db, jsonify, mobile_api_bp, request, require_mobile_user, timezone
+from flask import current_app
+from sqlalchemy.exc import IntegrityError
 
+# BYS360 V1E: emergency runtime recovery for the Phase2Y wildcard-import regression.
+# This deliberately restores the shared mobile contract first; explicit imports can be
+# reintroduced later only after a per-file F821 gate and smoke test.
+from app.api.mobile.shared import *  # noqa: F401,F403
 
-# BYS360_MOBILE_V2_8_48_COMMUNICATION_V2_API
-# Mobil iletişim/mesajlaşma V2: hata toleranslı konuşma, alıcı ve mesaj gönderme endpointleri.
 def _b48_txt(value):
     text = str(value or "").strip()
     return "" if text.lower() == "none" else text

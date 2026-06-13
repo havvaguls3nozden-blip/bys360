@@ -5,7 +5,21 @@ from __future__ import annotations
 # Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
 # URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
 
-from app.api.mobile.shared import EvaluationAssignment, Notification, SupportTicket, User, jsonify, mobile_api_bp, request, require_mobile_user
+from app.api.mobile.shared import (
+    EvaluationAssignment,
+    Notification,
+    SupportTicket,
+    User,
+    _clean_mobile_text,
+    _full_name,
+    _has_global_scope,
+    _metric,
+    _safe_count,
+    jsonify,
+    mobile_api_bp,
+    request,
+    require_mobile_user,
+)
 
 
 # BYS360_MOBILE_V2_8_49_ASSISTANT_CHAT_API

@@ -1,14 +1,17 @@
 from __future__ import annotations
 
-# BYS360_P1E_MOBILE_ROUTES_PERSONNEL_KPI_SPLIT
-# Domain: kpi_target_management
-# Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
-# URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
+from datetime import datetime, timezone
+from statistics import mean
+from typing import Any
 
-from app.api.mobile.shared import User, db, jsonify, mean, mobile_api_bp, request, require_mobile_user
+from flask import current_app
+from sqlalchemy.exc import IntegrityError
 
+# BYS360 V1E: emergency runtime recovery for the Phase2Y wildcard-import regression.
+# This deliberately restores the shared mobile contract first; explicit imports can be
+# reintroduced later only after a per-file F821 gate and smoke test.
+from app.api.mobile.shared import *  # noqa: F401,F403
 
-# BYS360_MOBILE_V2_8_53_KPI_TARGET_MANAGEMENT_API
 def _v2853_float(value, default=0.0):
     try:
         text_value = str(value if value is not None else '').replace(',', '.').replace('%', '').strip()

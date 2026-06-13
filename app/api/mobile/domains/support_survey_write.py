@@ -1,12 +1,24 @@
 from __future__ import annotations
 
-# BYS360_P1C_MOBILE_ROUTES_DOMAIN_SPLIT
-# Domain: support_survey_write
-# Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
-# URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
+from datetime import datetime, timezone
+from statistics import mean
+from typing import Any
 
-from app.api.mobile.shared import Any, SupportTicket, SupportTicketMessage, SupportTicketStatusHistory, Survey, SurveyAnswer, SurveyResponse, User, datetime, db, jsonify, mobile_api_bp, notify_support_ticket_comment, notify_support_ticket_created, request, require_mobile_user, timezone
+from flask import current_app
+from sqlalchemy.exc import IntegrityError
 
+# BYS360 V1E: emergency runtime recovery for the Phase2Y wildcard-import regression.
+# This deliberately restores the shared mobile contract first; explicit imports can be
+# reintroduced later only after a per-file F821 gate and smoke test.
+from app.api.mobile.shared import *  # noqa: F401,F403
+
+try:
+    from app.api.mobile.services import support_survey_service as _mobile_support_service  # type: ignore
+except Exception:  # pragma: no cover - compatibility fallback
+    try:
+        from app.api.mobile.services import support_service as _mobile_support_service  # type: ignore
+    except Exception:  # pragma: no cover
+        _mobile_support_service = None  # type: ignore
 
 def _mobile_support_status_label(value: Any) -> str:
     status = str(value or "open").strip().lower()
@@ -37,7 +49,9 @@ def _mobile_support_priority_label(value: Any) -> str:
 @mobile_api_bp.post("/support/tickets")
 @require_mobile_user
 def mobile_support_ticket_create(user: User):
-    return _mobile_support_service.mobile_support_ticket_create(user, _bys360_legacy_mobile_support_ticket_create)
+    if _mobile_support_service is not None:
+        return _mobile_support_service.mobile_support_ticket_create(user, _bys360_legacy_mobile_support_ticket_create)
+    return _bys360_legacy_mobile_support_ticket_create(user)
 
 def _bys360_legacy_mobile_support_ticket_create(user: User):
     data = request.get_json(silent=True) or {}
@@ -87,7 +101,9 @@ def _bys360_legacy_mobile_support_ticket_create(user: User):
 @mobile_api_bp.post("/support/tickets/<int:ticket_id>/reply")
 @require_mobile_user
 def mobile_support_ticket_reply(user: User, ticket_id: int):
-    return _mobile_support_service.mobile_support_ticket_reply(user, ticket_id, _bys360_legacy_mobile_support_ticket_reply)
+    if _mobile_support_service is not None:
+        return _mobile_support_service.mobile_support_ticket_reply(user, ticket_id, _bys360_legacy_mobile_support_ticket_reply)
+    return _bys360_legacy_mobile_support_ticket_reply(user, ticket_id)
 
 def _bys360_legacy_mobile_support_ticket_reply(user: User, ticket_id: int):
     ticket = db.session.get(SupportTicket, ticket_id)

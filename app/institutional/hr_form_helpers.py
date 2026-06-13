@@ -2,7 +2,34 @@ from __future__ import annotations
 
 
 
-from app.institutional.hr_common import Any, consume_form_token, date, db, flash, redirect, request, url_for, utc_now
+from app.institutional.hr_common import (
+    Any,
+    AttendanceException,
+    DelegationAssignment,
+    LeaveBalance,
+    PersonnelLeave,
+    _active_delegation_exists,
+    _attendance_overlaps,
+    _bool_from_form,
+    _calculate_leave_day_count,
+    _current_user_id,
+    _leave_overlaps,
+    _model_ready,
+    _parse_date,
+    _resolve_period_id_from_form,
+    _safe_commit,
+    _safe_float,
+    _safe_int,
+    _safe_text,
+    consume_form_token,
+    date,
+    db,
+    flash,
+    redirect,
+    request,
+    url_for,
+    utc_now,
+)
 
 def _create_delegation_from_form(*, delegator_user_id: int, start_date: date, end_date: date, source_leave_id: int | None = None, source_attendance_id: int | None = None) -> bool:
     delegate_user_id = _safe_int(request.form.get("delegate_user_id"))

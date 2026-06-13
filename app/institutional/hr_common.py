@@ -334,3 +334,39 @@ def _active_period():
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 F821 V2: aktif performans dönemi okunamadı")
         return None
+# BYS360 HR AppFactory HOTFIX V1
+# hr_form_helpers.py bu helper'i import eder. F821 temizliği sırasında import listesine
+# eklendiği halde hr_common.py içinde bulunmadığı için create_app import aşamasında düşüyordu.
+def _parse_date(value: Any) -> date | None:
+    """Form alanından gelen tarihi güvenli biçimde date nesnesine çevirir.
+
+    Desteklenen formatlar:
+    - YYYY-MM-DD / ISO date
+    - DD.MM.YYYY
+    - DD/MM/YYYY
+    - DD-MM-YYYY
+
+    Boş, None, null veya geçersiz değerlerde None döner; handler seviyesinde
+    kullanıcıya kurumsal uyarı verilmesi korunur.
+    """
+    if value is None:
+        return None
+    if isinstance(value, date):
+        return value
+    text = str(value).strip()
+    if not text or text.lower() in {"none", "null", "undefined"}:
+        return None
+
+    # HTML date input varsayılanı: 2026-06-13
+    try:
+        return date.fromisoformat(text[:10])
+    except Exception:
+        pass
+
+    for fmt in ("%d.%m.%Y", "%d/%m/%Y", "%d-%m-%Y"):
+        try:
+            from datetime import datetime
+            return datetime.strptime(text, fmt).date()
+        except Exception:
+            continue
+    return None

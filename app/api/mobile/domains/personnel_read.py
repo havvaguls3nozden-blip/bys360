@@ -5,7 +5,19 @@ from __future__ import annotations
 # Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
 # URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
 
-from app.api.mobile.shared import User, mobile_api_bp, require_mobile_user
+from app.api.mobile.shared import (
+    User,
+    _full_name,
+    _has_global_scope,
+    _item,
+    _metric,
+    _module_payload,
+    _safe_count,
+    jsonify,
+    mobile_api_bp,
+    request,
+    require_mobile_user,
+)
 
 
 @mobile_api_bp.get("/personnel/list")
