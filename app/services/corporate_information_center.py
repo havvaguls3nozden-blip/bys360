@@ -312,16 +312,6 @@ def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> Non
     db.session.commit()
 
 
-def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
-    manager_ids = _clean_ids(payload.getlist("manager_user_ids") if hasattr(payload, "getlist") else payload.get("manager_user_ids", []))
-    staff_ids = _clean_ids(payload.getlist("staff_user_ids") if hasattr(payload, "getlist") else payload.get("staff_user_ids", []))
-    mode = (payload.get("staff_recipient_mode") or "manual").strip()
-    if mode not in {"manual", "all_active"}:
-        mode = "manual"
-    set_setting(f"{BASE_KEY}.manager_recipient_ids", _dumps_json(manager_ids), label="Yönetici alıcıları", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.staff_recipient_ids", _dumps_json(staff_ids), label="Personel alıcıları", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.staff_recipient_mode", mode, label="Personel alıcı modu", actor_user_id=actor_user_id)
-    db.session.commit()
 
 
 def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
@@ -568,13 +558,6 @@ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User
     return {"ok": fail_count == 0, "task_key": task_key, "task_label": TASK_DEFINITIONS[task_key]["label"], "dry_run": dry_run, "recipient_count": len(users), "success_count": ok_count, "fail_count": fail_count, "errors": errors[:20], "recipients": sent_preview[:20], "elapsed_seconds": elapsed}
 
 
-def get_recent_logs(limit: int = 80) -> list[Any]:
-    try:
-        from app.models import MailLog
-        return MailLog.query.filter(MailLog.mail_type.like("corporate_information_%")).order_by(MailLog.sent_at.desc()).limit(limit).all()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:566")
-        return []
 
 
 def context(search: str | None = None) -> dict[str, Any]:
@@ -1629,37 +1612,8 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
 # BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1
 # Sistem uzerinden aktif/pasif ve saat kontrollu otomatik mail zamanlayici.
 
-def get_auto_scheduler_config() -> dict[str, object]:
-    enabled_raw = str(get_setting(f"{BASE_KEY}.auto_scheduler_enabled", "false") or "false").lower()
-    try:
-        late_window = int(get_setting(f"{BASE_KEY}.auto_scheduler_late_window_minutes", "20") or "20")
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1598")
-        late_window = 20
-    late_window = max(1, min(120, late_window))
-    return {
-        "enabled": enabled_raw in {"1", "true", "on", "yes", "aktif"},
-        "late_window_minutes": late_window,
-        "windows_task_name": "BYS360 CIC Auto Mail Scheduler",
-        "poll_interval_minutes": 5,
-        "description": "Windows gorevi yalnizca yoklama yapar; hangi mailin aktif/pasif oldugu ve saati BYS360 G\u00f6revler ekranindan y\u00f6netilir.",
-    }
 
 
-def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:
-    enabled = "true" if str(payload.get("auto_scheduler_enabled", "")).lower() in {"1", "true", "on", "yes"} else "false"
-    try:
-        late_window = int(payload.get("auto_scheduler_late_window_minutes") or 20)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1614")
-        late_window = 20
-    late_window = max(1, min(120, late_window))
-    set_setting(f"{BASE_KEY}.auto_scheduler_enabled", enabled, label="Otomatik mail zamanlayici", value_type="boolean", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.auto_scheduler_late_window_minutes", str(late_window), label="Otomatik mail gecikme toleransi", value_type="integer", actor_user_id=actor_user_id)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
 
 
 try:
@@ -1688,8 +1642,6 @@ def context(search: str | None = None) -> dict[str, Any]:  # type: ignore[overri
     return data
 
 
-def _cic_auto_last_run_key(task_key: str) -> str:
-    return f"{BASE_KEY}.auto.last_run.{task_key}"
 
 
 def run_due_tasks(*, now: datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, Any]:
