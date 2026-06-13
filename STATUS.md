@@ -43,3 +43,18 @@ Faz 2C6 kapsamında kalan wildcard importlar artık otomatik toplu temizlik konu
 
 Faz 2Z final kapanış: compileall, route contract, auth guard, quality smoke, default pytest ve doküman kararlarının birlikte doğrulanması.
 
+
+<!-- PHASE2Y_ROOT_DOC_ARCHIVE_20260613 -->
+
+## 2026-06-13 12:09:35 - Faz 2Y-1 Kök Dizin Doküman Sadeleştirme
+
+Kök dizindeki eski SAFE/HOTFIX/MANIFEST odaklı geçici dokümanlar docs/archive/legacy-root/ altına taşındı.
+
+Amaç:
+
+- Kök dizini sadeleştirmek
+- Güncel durum bilgisini STATUS.md içinde toplamak
+- Güncel mimari bilgiyi ARCHITECTURE.md içinde toplamak
+- Yeni README / manifest üretme alışkanlığını bırakmak
+
+Bu adımda uygulama koduna dokunulmadı.
