@@ -190,6 +190,8 @@ def create_app() -> Flask:
 
     # BYS360_APP_INIT_HARD_REPAIR_V2_15_5: removed broken executive_summary_bp direct blueprint registration
     _run_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))
+    from app.utils.url_map_dedupe import dedupe_identical_url_rules
+    dedupe_identical_url_rules(app)
     return app
 
 

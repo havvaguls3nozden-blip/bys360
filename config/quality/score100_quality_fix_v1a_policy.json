@@ -1,0 +1,18 @@
+{
+  "package": "BYS360_SCORE_100_QUALITY_FIX_V1A",
+  "version": "1.0.0",
+  "excluded_from_quality_self_scan": [
+    "reports/",
+    "backups/",
+    "archive/",
+    "releases/"
+  ],
+  "priority_order": [
+    "APP_FACTORY_DUPLICATE_RULES",
+    "DEPENDENCY_REPORT_FLAGGED_PINS",
+    "TCKN_ENCRYPTION_CONFIG_WITHOUT_USAGE",
+    "WILDCARD_IMPORTS",
+    "BROAD_EXCEPT_COUNT",
+    "RUFF_CHECK"
+  ]
+}

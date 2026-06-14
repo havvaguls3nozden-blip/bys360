@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "policy": "legacy_baseline_regression_gate",
+  "broad_except_count": 2028,
+  "ruff_total": 7592,
+  "ruff_f821": 0,
+  "ruff_f403": 0,
+  "notes": [
+    "BROAD_EXCEPT_COUNT is a legacy debt baseline; gate fails only if it rises above this value.",
+    "F821 and F403 remain hard-zero targets.",
+    "This baseline does not mark broad except debt as solved; it prevents legacy debt from blocking releases while it is reduced in controlled batches."
+  ],
+  "updated_at": "2026-06-14T07:34:30+00:00"
+}

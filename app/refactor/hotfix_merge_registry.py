@@ -9,4 +9,4 @@ Yeni gerçek modül:
 app/refactor/maintenance_merge_registry.py
 """
 
-from .maintenance_merge_registry import *  # noqa: F401,F403
+from .maintenance_merge_registry import HOTFIX_MERGE_REGISTRY

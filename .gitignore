@@ -11,3 +11,12 @@ reports/tmp/
 reports/cache/
 .DS_Store
 Thumbs.db
+
+
+# BYS360 SCORE 100 QUALITY GATE V1 - local secrets
+.env
+.env.local
+.env.production
+mobile_flutter/**/android/key.properties
+mobile_flutter/**/android/*.jks
+mobile_flutter/**/android/*.keystore

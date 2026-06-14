@@ -1,0 +1,761 @@
+{
+  "package": "BYS360_SCORE_100_QUALITY_GATE_V1",
+  "version": "1.0.0",
+  "generated_at": "2026-06-14T10:44:52",
+  "project_root": "C:\\bys360\\project",
+  "mode": "gate",
+  "status": "PASS",
+  "score_estimate": 92,
+  "counts": {
+    "py_files": 1446,
+    "jinja_templates": 443,
+    "css_files": 158,
+    "js_files": 90,
+    "md_files": 331,
+    "scripts_files": 364
+  },
+  "findings": [
+    {
+      "check_id": "DEPENDENCY_REPORT_FLAGGED_PINS",
+      "title": "Saha raporunda işaretlenen eski bağımlılık pinleri görünmüyor",
+      "severity": "PASS",
+      "message": "requirements.txt, rapordaki riskli pinlerle birebir eşleşmiyor.",
+      "path": "requirements.txt",
+      "line": null,
+      "evidence": null,
+      "recommendation": null
+    },
+    {
+      "check_id": "ANDROID_SIGNING_EXAMPLE_SECRET",
+      "title": "Android imzalama örnek dosyası placeholder görünüyor",
+      "severity": "PASS",
+      "message": "key.properties.example içinde gerçek parola gibi görünen değer bulunmadı.",
+      "path": "mobile_flutter/bys360_mobile_native/android/key.properties.example",
+      "line": null,
+      "evidence": null,
+      "recommendation": null
+    },
+    {
+      "check_id": "ENV_TRACKED_BY_GIT",
+      "title": ".env git takibinde görünmüyor",
+      "severity": "PASS",
+      "message": "git ls-files çıktısında .env/.env.production gibi gerçek ortam dosyası takipli görünmedi.",
+      "path": null,
+      "line": null,
+      "evidence": null,
+      "recommendation": null
+    },
+    {
+      "check_id": "SECRET_PATTERN_SCAN",
+      "title": "Secret pattern taraması temiz",
+      "severity": "PASS",
+      "message": "Taranan konfigürasyon dosyalarında bariz secret pattern bulunmadı.",
+      "path": null,
+      "line": null,
+      "evidence": null,
+      "recommendation": null
+    },
+    {
+      "check_id": "TCKN_ENCRYPTION_CONFIG_WITH_USAGE",
+      "title": "TCKN şifreleme kullanımı için aday kod bulundu",
+      "severity": "WARN",
+      "message": "Anahtar ve encrypt/decrypt benzeri kullanım var; gerçek model alanlarına bağlandığı manuel doğrulanmalı.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "config_hits": [
+          {
+            "path": "config.py",
+            "line": 325,
+            "preview": "TCKN_ENCRYPTION_KEY = os.getenv('TCKN_ENCRYPTION_KEY', '').strip()"
+          },
+          {
+            "path": "app/config/release_manifest.py",
+            "line": 72,
+            "preview": "\"TCKN_ENCRYPTION_KEY\","
+          },
+          {
+            "path": "app/security/audit.py",
+            "line": 105,
+            "preview": "if prod_like and not str(config.get('TCKN_ENCRYPTION_KEY', '') or '').strip():"
+          },
+          {
+            "path": "app/security/audit.py",
+            "line": 109,
+            "preview": "message='TCKN_ENCRYPTION_KEY tanimli degil.',"
+          },
+          {
+            "path": "app/security/startup_audit.py",
+            "line": 80,
+            "preview": "if not app.config.get(\"TCKN_ENCRYPTION_KEY\"):"
+          },
+          {
+            "path": "app/security/startup_audit.py",
+            "line": 81,
+            "preview": "app.logger.warning(\"TCKN_ENCRYPTION_KEY tanimli degil; hassas kimlik verisi modulu acik kalacaksa canliya cikmadan once anahtar set edin.\")"
+          },
+          {
+            "path": "app/security/tckn_crypto.py",
+            "line": 44,
+            "preview": "raise TcknCryptoError(\"TCKN_ENCRYPTION_KEY tanımlı değil.\")"
+          },
+          {
+            "path": "app/security/tckn_crypto.py",
+            "line": 65,
+            "preview": "key = current_app.config.get(\"TCKN_ENCRYPTION_KEY\")"
+          },
+          {
+            "path": "app/security/tckn_crypto.py",
+            "line": 70,
+            "preview": "return os.getenv(\"TCKN_ENCRYPTION_KEY\", \"\").strip()"
+          },
+          {
+            "path": "app/services/security_compliance_final_gate.py",
+            "line": 191,
+            "preview": "generic_secret = re.compile(r\"(?i)(SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|MAIL_PASSWORD|TCKN_ENCRYPTION_KEY)\\s*=\\s*['\\\"][^'\\\"]{8,}['\\\"]\")"
+          }
+        ],
+        "usage_hits": [
+          {
+            "path": "app/security/tckn_crypto.py",
+            "line": 72,
+            "preview": "def encrypt_tckn(value: str | int | None, *, key: str | None = None) -> str:"
+          }
+        ]
+      },
+      "recommendation": "Unit test ekleyin: düz TCKN değeri DB'ye açık yazılmamalı; yetkili okuma maskeli/çözülmüş kurala göre çalışmalı."
+    },
+    {
+      "check_id": "DUPLICATE_ENDPOINT_TEST_ACTIVE",
+      "title": "Çift endpoint testi aktif görünüyor",
+      "severity": "PASS",
+      "message": "Duplicate endpoint testi tests altında bulundu ve skip/env koşulu arkasında görünmüyor.",
+      "path": null,
+      "line": null,
+      "evidence": [
+        {
+          "path": "tests/integration/test_http_db_core_flows.py",
+          "line": 67
+        },
+        {
+          "path": "tests/quality/test_app_factory_registers_routes_without_duplicate_endpoints.py",
+          "line": 16
+        }
+      ],
+      "recommendation": null
+    },
+    {
+      "check_id": "APP_FACTORY_DUPLICATE_RULES",
+      "title": "Flask URL map çift route kontrolü temiz",
+      "severity": "PASS",
+      "message": "Aynı endpoint + path + method kombinasyonu tekrar etmiyor.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "rules": 933
+      },
+      "recommendation": null
+    },
+    {
+      "check_id": "PYTHON_EXEC_COMPILE_USAGE",
+      "title": "exec()/compile() kullanımı bulundu",
+      "severity": "WARN",
+      "message": "Dinamik kod yürütme lint, test ve IDE görünürlüğünü zayıflatır; route yükleme için özellikle risklidir.",
+      "path": null,
+      "line": null,
+      "evidence": [
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 22,
+          "preview": "INDEX_COLUMNS_RE = re.compile(r\"\\bON\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\((.*?)\\)\", re.IGNORECASE | re.DOTALL)"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 23,
+          "preview": "TABLE_RE = re.compile(r\"(?:ALTER|CREATE TABLE(?: IF NOT EXISTS)?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 142,
+          "preview": "def _safe_exec(connection, statement: str) -> str:"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 167,
+          "preview": "applied.append(f\"{repair.table}: {_safe_exec(connection, repair.create_sql)}\")"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 187,
+          "preview": "applied.append(f\"{repair.table}: {_safe_exec(connection, statement)}\")"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 205,
+          "preview": "applied.append(f\"{repair.table}: {_safe_exec(connection, statement)}\")"
+        },
+        {
+          "path": "app/schema_guard_engine.py",
+          "line": 229,
+          "preview": "applied.append(f\"{label}: {_safe_exec(connection, statement)}\")"
+        },
+        {
+          "path": "app/api/mobile/communication_read_routes.py",
+          "line": 19,
+          "preview": "exec(_COMMUNICATION_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/communication_v2_read_routes.py",
+          "line": 19,
+          "preview": "exec(_COMMUNICATION_V2_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/detail_read_routes.py",
+          "line": 19,
+          "preview": "exec(_DETAIL_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/light_read_routes.py",
+          "line": 19,
+          "preview": "exec(_LIGHT_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/performance_read_routes.py",
+          "line": 18,
+          "preview": "exec(_PERFORMANCE_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/support_survey_read_routes.py",
+          "line": 19,
+          "preview": "exec(_SUPPORT_SURVEY_READ_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/api/mobile/utility_routes.py",
+          "line": 19,
+          "preview": "exec(_UTILITY_ROUTE_SOURCE, route_globals, route_globals)"
+        },
+        {
+          "path": "app/security/headers.py",
+          "line": 35,
+          "preview": "_SCRIPT_TAG_WITHOUT_NONCE_RE = re.compile(r\"<script\\b(?![^>]*\\bnonce=)\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/security/tckn_crypto.py",
+          "line": 21,
+          "preview": "_TCKN_RE: Final[re.Pattern[str]] = re.compile(r\"^\\d{11}$\")"
+        },
+        {
+          "path": "app/services/announcement_popup_service.py",
+          "line": 81,
+          "preview": "VIDEO_ID_RE = re.compile(r\"^[A-Za-z0-9_-]{6,64}$\")"
+        },
+        {
+          "path": "app/services/announcement_popup_service.py",
+          "line": 82,
+          "preview": "VIMEO_ID_RE = re.compile(r\"^[0-9]{4,32}$\")"
+        },
+        {
+          "path": "app/services/announcement_popup_service.py",
+          "line": 83,
+          "preview": "DAILYMOTION_ID_RE = re.compile(r\"^[A-Za-z0-9]{4,32}$\")"
+        },
+        {
+          "path": "app/services/live_core_smoke_endpoint_gate.py",
+          "line": 22,
+          "preview": "ROUTE_RE = re.compile(r\"@[^\\n]*?\\.route\\(\\s*([\\\"'])(?P<path>/[^\\\"']*)\\1\", re.UNICODE)"
+        },
+        {
+          "path": "app/services/live_core_smoke_endpoint_gate.py",
+          "line": 23,
+          "preview": "URL_FOR_RE = re.compile(r\"url_for\\(\\s*([\\\"'])(?P<endpoint>[^\\\"']+)\\1\", re.UNICODE)"
+        },
+        {
+          "path": "app/services/security_compliance_final_gate.py",
+          "line": 164,
+          "preview": "def _check_compile(root: Path, files: dict[str, str], findings: list[Finding]) -> None:"
+        },
+        {
+          "path": "app/services/security_compliance_final_gate.py",
+          "line": 190,
+          "preview": "secret_url = re.compile(r\"postgresql\\+psycopg2://[^\\s'\\\"<>]+:[^\\s'\\\"<>]+@\", re.I)"
+        },
+        {
+          "path": "app/services/security_compliance_final_gate.py",
+          "line": 191,
+          "preview": "generic_secret = re.compile(r\"(?i)(SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|MAIL_PASSWORD|TCKN_ENCRYPTION_KEY)\\s*=\\s*['\\\"][^'\\\"]{8,}['\\\"]\")"
+        },
+        {
+          "path": "app/services/security_compliance_final_gate.py",
+          "line": 374,
+          "preview": "_check_compile(root, files, findings)"
+        },
+        {
+          "path": "app/services/ai/excel_preview.py",
+          "line": 87,
+          "preview": "_EMAIL_RE = re.compile(r\"^[^@\\s]{2,}@[^@\\s]+\\.[^@\\s]+$\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/services/ai/excel_preview.py",
+          "line": 88,
+          "preview": "_TCKN_RE = re.compile(r\"(?<!\\d)\\d{11}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai/excel_preview.py",
+          "line": 89,
+          "preview": "_PHONE_RE = re.compile(r\"(?<!\\d)(?:\\+?90)?0?5\\d{9}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai/excel_preview.py",
+          "line": 90,
+          "preview": "_IBAN_RE = re.compile(r\"\\bTR\\d{2}[A-Z0-9]{5,}\\b\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/services/ai/excel_preview.py",
+          "line": 91,
+          "preview": "_LONG_DIGIT_RE = re.compile(r\"\\d{7,}\")"
+        },
+        {
+          "path": "app/services/ai/redaction.py",
+          "line": 9,
+          "preview": "EMAIL_RE = re.compile(r\"([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})\")"
+        },
+        {
+          "path": "app/services/ai/redaction.py",
+          "line": 10,
+          "preview": "LONG_NUMBER_RE = re.compile(r\"\\b\\d{8,11}\\b\")"
+        },
+        {
+          "path": "app/services/ai/visibility_gate.py",
+          "line": 168,
+          "preview": "_EMAIL_RE = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/services/ai/visibility_gate.py",
+          "line": 169,
+          "preview": "_IBAN_RE = re.compile(r\"\\bTR\\d{2}[\\s\\d]{10,}\\b\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/services/ai/visibility_gate.py",
+          "line": 170,
+          "preview": "_PHONE_RE = re.compile(r\"(?<!\\d)(?:\\+?90\\s*)?0?5\\d{2}[\\s\\-.]?\\d{3}[\\s\\-.]?\\d{2}[\\s\\-.]?\\d{2}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai/visibility_gate.py",
+          "line": 171,
+          "preview": "_TCKN_RE = re.compile(r\"(?<!\\d)[1-9]\\d{10}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai/visibility_gate.py",
+          "line": 172,
+          "preview": "_SICIL_RE = re.compile(r\"(?i)\\b(sicil\\s*(?:no|numarası|numarasi)?\\s*[:#-]?\\s*)([A-Z0-9-]{3,20})\\b\")"
+        },
+        {
+          "path": "app/services/ai_agent/policy.py",
+          "line": 25,
+          "preview": "(re.compile(r\"\\b[1-9][0-9]{10}\\b\"), \"[MASKELI_TCKN]\"),"
+        },
+        {
+          "path": "app/services/ai_agent/policy.py",
+          "line": 26,
+          "preview": "(re.compile(r\"\\b05\\d{9}\\b\"), \"[MASKELI_TELEFON]\"),"
+        },
+        {
+          "path": "app/services/ai_agent/policy.py",
+          "line": 27,
+          "preview": "(re.compile(r\"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\"), \"[MASKELI_EPOSTA]\"),"
+        },
+        {
+          "path": "app/services/ai_decision/redaction_bridge.py",
+          "line": 133,
+          "preview": "_EMAIL_RE = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.IGNORECASE)"
+        },
+        {
+          "path": "app/services/ai_decision/redaction_bridge.py",
+          "line": 134,
+          "preview": "_PHONE_RE = re.compile(r\"(?<!\\d)(?:\\+?90\\s*)?(?:0?\\d{3})[\\s\\-.]?\\d{3}[\\s\\-.]?\\d{2}[\\s\\-.]?\\d{2}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai_decision/redaction_bridge.py",
+          "line": 135,
+          "preview": "_TCKN_RE = re.compile(r\"(?<!\\d)\\d{11}(?!\\d)\")"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 39,
+          "preview": "re.compile(r\"\\bauthorized[_\\s-]*scope\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 40,
+          "preview": "re.compile(r\"\\bworkflow[_\\s-]*state\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 41,
+          "preview": "re.compile(r\"\\bdraft\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 42,
+          "preview": "re.compile(r\"\\bsync\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 43,
+          "preview": "re.compile(r\"\\bdebug\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 44,
+          "preview": "re.compile(r\"\\btest\\s+only\\b\", re.IGNORECASE),"
+        },
+        {
+          "path": "app/services/ai_decision/scorecard_ui_policy.py",
+          "line": 45,
+          "preview": "re.compile(r\"\\b\" + \"du\" + \"mmy\" + r\"\\b\", re.IGNORECASE),"
+        }
+      ],
+      "recommendation": "Route/string yükleme kalıntılarını normal Python modüllerine taşıyın. Gerekli teknik kullanım varsa allowlist'e gerekçeli ekleyin."
+    },
+    {
+      "check_id": "WILDCARD_IMPORTS",
+      "title": "Wildcard import bulunmadı",
+      "severity": "PASS",
+      "message": "Python AST taramasında wildcard import görünmedi.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "parse_errors": 55
+      },
+      "recommendation": null
+    },
+    {
+      "check_id": "BROAD_EXCEPT_COUNT",
+      "title": "Geniş except blokları bulundu",
+      "severity": "PASS",
+      "message": "Toplam 2004 adet except Exception / bare except pattern'i bulundu.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "count": 2004,
+        "sample": [
+          {
+            "path": "app/error_handlers.py",
+            "line": 24,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 58,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 103,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 116,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 129,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 150,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 170,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 173,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 179,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 194,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 199,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 208,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_handlers.py",
+            "line": 217,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/error_support.py",
+            "line": 21,
+            "preview": "except Exception:  # pragma: no cover - rollback'in de patlamasi zor ama can sıkıcı."
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 336,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 468,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 489,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 492,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 513,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/live_scope.py",
+            "line": 516,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 423,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 467,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 480,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 493,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 520,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 525,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 531,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 576,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 588,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 643,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 662,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 683,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 713,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 721,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 749,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 810,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 824,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 848,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 887,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 910,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 947,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 971,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1161,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1174,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1250,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1259,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1278,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1325,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1331,
+            "preview": "except Exception:"
+          },
+          {
+            "path": "app/menu_registry.py",
+            "line": 1345,
+            "preview": "except Exception:"
+          }
+        ]
+      },
+      "recommendation": "Sessiz hata yutma yerine spesifik exception yakalayın ve log/geri bildirim standardını uygulayın."
+    },
+    {
+      "check_id": "RUFF_CHECK",
+      "title": "ruff bulguları var",
+      "severity": "PASS",
+      "message": "ruff check app toplam 7522 bulgu döndürdü. F821=0, F403=0.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "returncode": 1,
+        "count": 7522,
+        "F821": 0,
+        "F403": 0,
+        "stderr_tail": ""
+      },
+      "recommendation": "Önce F821 ve wildcard importları sıfırlayın; sonra ruff backlog'u paket paket azaltın."
+    },
+    {
+      "check_id": "LARGE_SOURCE_FILES",
+      "title": "Devasa kaynak dosyaları var",
+      "severity": "WARN",
+      "message": "Bakım maliyeti yüksek dosyalar tespit edildi.",
+      "path": null,
+      "line": null,
+      "evidence": [
+        {
+          "path": "app/static/js/bys360_assistant_module.js",
+          "size_kb": 367.6
+        }
+      ],
+      "recommendation": "Devasa dosyaları alan bazlı modüllere bölün; özellikle JS/Python route dosyalarını küçük servis dosyalarına ayırın."
+    },
+    {
+      "check_id": "REPO_SCRIPT_DOC_BLOAT",
+      "title": "Script/doküman kalabalığı yüksek",
+      "severity": "WARN",
+      "message": "Tek seferlik script veya dağınık dokümantasyon sayısı yüksek görünüyor.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "scripts_files": 364,
+        "md_files": 331
+      },
+      "recommendation": "Yeni tek seferlik SAFE/HOTFIX üretimini durdurun; kalıcı gate ve merkezi doküman yaklaşımına geçin."
+    },
+    {
+      "check_id": "REPO_SHAPE_SUMMARY",
+      "title": "Repo şekil özeti üretildi",
+      "severity": "INFO",
+      "message": "Kaynak dosya sayıları rapora eklendi.",
+      "path": null,
+      "line": null,
+      "evidence": {
+        "py_files": 1446,
+        "jinja_templates": 443,
+        "css_files": 158,
+        "js_files": 90,
+        "md_files": 331,
+        "scripts_files": 364
+      },
+      "recommendation": null
+    }
+  ],
+  "artifacts": {
+    "output_dir": "C:\\bys360\\project\\reports\\quality\\score100_quality_gate_v1"
+  }
+}

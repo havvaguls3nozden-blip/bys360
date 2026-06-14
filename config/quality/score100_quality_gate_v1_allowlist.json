@@ -1,0 +1,13 @@
+{
+  "package": "BYS360_SCORE_100_QUALITY_GATE_V1",
+  "version": "1.0.0",
+  "note": "Bu dosya yalnızca gerekçeli ve geçici istisnalar için kullanılmalıdır. Kalıcı çözüm yerine geçmez.",
+  "secret_scan_allowed_paths": [
+    ".env.example",
+    ".env.production.example",
+    ".env.docker.example"
+  ],
+  "duplicate_endpoint_allowed": [],
+  "exec_compile_allowed": [],
+  "broad_except_allowed": []
+}

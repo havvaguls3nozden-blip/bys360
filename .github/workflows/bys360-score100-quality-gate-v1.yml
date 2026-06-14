@@ -1,0 +1,37 @@
+name: BYS360 Score 100 Quality Gate V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  score100-quality-gate:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install quality tools
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) { python -m pip install -r requirements.txt }
+          python -m pip install ruff pip-audit
+
+      - name: Run BYS360 Score 100 Quality Gate V1
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_score100_quality_gate_v1.ps1 -ProjectRoot "." -Mode gate -RunPipAudit -RunRuff
+
+      - name: Upload gate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bys360-score100-quality-gate-v1-report
+          path: reports/quality/score100_quality_gate_v1/

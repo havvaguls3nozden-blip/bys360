@@ -9,4 +9,4 @@ Yeni gerçek modül:
 app/schema_guard_core_maintenances.py
 """
 
-from .schema_guard_core_maintenances import *  # noqa: F401,F403
+from .schema_guard_core_maintenances import TableRepair, TABLE_REPAIRS

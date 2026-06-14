@@ -4,7 +4,42 @@ from __future__ import annotations
 
 import logging
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-from app.services.ai.dashboard_panel_common import *  # noqa: F401,F403
+from app.services.ai.dashboard_panel_common import (
+    logging,
+    THIRD_MANAGER_STANDARD_KEY,
+    THIRD_MANAGER_HEADER_ALIASES,
+    Any,
+    Iterable,
+    unicodedata,
+    current_app,
+    url_for,
+    func,
+    BuildError,
+    db,
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRequestLog,
+    AISummaryCache,
+    get_ai_schema_status,
+    _get,
+    _to_int,
+    _to_float,
+    _tone_from_counts,
+    _badge_from_tone,
+    _top_reason_pairs,
+    _normalize_text,
+    _is_informational_hierarchy_reason,
+    _extract_hierarchy_issue_messages,
+    _has_real_hierarchy_warning,
+    _is_hierarchy_missing_exempt,
+    _has_first_manager_binding,
+    _has_level_3_binding,
+    _safe_url_for,
+    _safe_len,
+    _safe_bool,
+    _safe_title_case,
+    _compose_standard_panel,
+)
 
 DASHBOARD_AI_MODULE_META = [
     {"module_type": "performance", "label": "Performans AI", "page_label": "Performans görünümü", "page_href": "main.performance_reports", "icon": "fa-chart-line"},

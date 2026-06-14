@@ -1,0 +1,4 @@
+{
+  "duplicate_endpoints": [],
+  "note": "Gerçek istisna olmadıkça boş kalmalı. Her kayıt endpoint/rule/method/reason içermelidir."
+}
