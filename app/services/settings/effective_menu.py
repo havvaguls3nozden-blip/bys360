@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """Ayarlar servis menü görünürlük çözümleyicisi.
 
@@ -148,9 +146,6 @@ def _role_allowed_for_menu(item: dict[str, Any], role_name: str) -> bool:
         return False
     return True
 
-
-
-
 # BYS360_SETTINGS_ROLE_MATRIX_RUNTIME_V6_CORE_POLICY
 # Eski çekirdek canlı menü savunması, rol matrisinde kapatılan satırı artık
 # yeniden açamaz. Kullanıcı Ayarlar ekranında tik kaldırdıysa kapalı kalır.
@@ -234,9 +229,6 @@ def _apply_role_gate(visibility: dict[str, bool], active_menu_items: list[dict[s
             continue
         if not _role_allowed_for_menu(item, role_name):
             visibility[key] = False
-
-
-
 
 # BYS360_PHASE3_VISIBILITY_PERMISSION_MENU_MATRIX
 PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
@@ -359,8 +351,6 @@ def _apply_phase3_2_performance_menu_visibility(visibility: dict[str, bool], rol
             visibility[key] = normalized_role in normalized_allowed
     return visibility
 # BYS360_PHASE3_2_MENU_VISIBILITY_END
-
-
 
 # BYS360_SETTINGS_LIVE_AUTHORITY_V1_BEGIN
 # Ayarlar modülünün son karar katmanı.
@@ -1513,8 +1503,6 @@ def _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_
             visibility[key] = False
     return visibility
 
-
-
 # BYS360_PERFORMANCE_ROLE_MATRIX_PERSONNEL_V8_END
 
 
@@ -1630,8 +1618,6 @@ def _apply_bys360_settings_live_authority_v1(
 
 # BYS360_PERSONNEL_FEATURE_MATRIX_V1_4_FINAL_USER_OVERRIDE_RUNTIME
 
-
-
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_BEGIN
 # Genel kategorisi icin son karar duzeltmesi.
 # Sorun: Rol matrisinde Genel alt sekmeleri acik olsa bile eski DB kaydi
@@ -1708,9 +1694,6 @@ def _bys360_apply_general_category_visibility_fix_v1(visibility, user, *, rollba
     visibility["logout"] = True
     return visibility
 
-
-
-
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_END
 
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_BEGIN
@@ -1725,8 +1708,6 @@ def _bys360_force_home_menu_visible_v1(visibility, user):
     visibility["account"] = True
     visibility["logout"] = True
     return visibility
-
-
 
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_END
 
@@ -2053,8 +2034,6 @@ except Exception:
     logging.getLogger(__name__).exception("BYS360 V2.1.6 kategori dönem entegrasyonu effective_menu force uygulanamadı")
 # BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_EFFECTIVE_MENU_END
 
-
-
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_AUTHORITY_BEGIN
 # Dönem Yönetim Merkezi görünürlüğü Ayarlar > Rol Matrisi / birim profili / kişi bazlı menü görünürlüğü kararına bağlanır.
 _BYS360_PERIOD_CENTER_MENU_KEY_V221 = "performance_period_management_center"
@@ -2098,3 +2077,56 @@ for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
 # Portal prefix canl? kapsam/karantina s?zle?mesinde a??k?a izlenir.
 # BYS360_A5_P2D4_LIVE_SCOPE_PORTAL_PREFIX_ANCHOR_END
 
+
+# BYS360_ADMIN_PERIOD_REMINDER_ACCESS_FIX_V1_BEGIN
+# Admin/Sistem Yöneticisi için Dönem Yönetim Merkezi ve Amir Hatırlatma Merkezi
+# rol matrisi veya kişi bazlı eski kapalı kayıtlar yüzünden gizlenmesin.
+_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_visibility_map
+
+def _bys360_admin_period_reminder_norm_v1(value):
+    text = str(value or "").strip().lower()
+    return (text
+            .replace("İ", "i").replace("ı", "i")
+            .replace("ğ", "g").replace("ü", "u").replace("ş", "s")
+            .replace("ö", "o").replace("ç", "c")
+            .replace("-", "_").replace(" ", "_"))
+
+def _bys360_admin_period_reminder_is_admin_v1(user):
+    if not user:
+        return False
+    for attr in ("is_admin", "is_superuser", "is_system_admin", "is_sistem_yoneticisi"):
+        try:
+            if bool(getattr(user, attr, False)):
+                return True
+        except Exception:
+            pass
+    terms = set()
+    for attr in ("role", "role_name", "user_role", "authority_level", "title", "unvan", "position", "gorev", "username"):
+        try:
+            terms.add(_bys360_admin_period_reminder_norm_v1(getattr(user, attr, "")))
+        except Exception:
+            pass
+    try:
+        role_obj = getattr(user, "role", None)
+        terms.add(_bys360_admin_period_reminder_norm_v1(getattr(role_obj, "name", "")))
+        terms.add(_bys360_admin_period_reminder_norm_v1(getattr(role_obj, "role_name", "")))
+    except Exception:
+        pass
+    return bool(terms & {
+        "admin", "administrator", "super_admin", "system_admin",
+        "sistem_yoneticisi", "sistem_yöneticisi", "yonetici", "yönetici"
+    })
+
+def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
+    visibility = dict(_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1(user, *args, **kwargs) or {})
+    if _bys360_admin_period_reminder_is_admin_v1(user):
+        for key in (
+            "performance_period_management_center",
+            "performance_evaluator_reminder_center",
+            "performance_evaluation_live_tracking",
+        ):
+            visibility[key] = True
+        for parent in ("performance_module", "performance_management", "performans_yonetimi"):
+            visibility[parent] = True
+    return visibility
+# BYS360_ADMIN_PERIOD_REMINDER_ACCESS_FIX_V1_END

@@ -3,8 +3,8 @@
 
 {% block title %}Ayarlar - BYS360{% endblock %}
 {% block page_kicker %}Ayarlar ve Yetkilendirme{% endblock %}
-{% block page_title %}Canlı Kapsam Sistem Ayarları{% endblock %}
-{% block page_subtitle %}Canlı omurgadaki sistem, modül, görünürlük ve sağ üst avatar Hakkında penceresi içeriklerini tek ekranda yönetin.{% endblock %}
+{% block page_title %}Sistem Ayarları ve Yetkilendirme Merkezi{% endblock %}
+{% block page_subtitle %}Sistem davranışlarını, modül ayarlarını, rol-yetki görünürlüğünü, güvenlik ve denetim kayıtlarını tek merkezden yönetin.{% endblock %}
 
 
 {% block content %}
@@ -12,8 +12,8 @@
 <section class="settings-live-banner">
     <div class="settings-live-banner-main">
         <span class="settings-live-kicker"><i class="fa-solid fa-layer-group"></i> Canlı omurga</span>
-        <h3>Canlı kapsam ayar merkezi</h3>
-        <p>Bu ekran yalnızca aktif BYS360 omurgasını yönetir: kimlik/yetki, personel, performans, iletişim, anket, destek ve AI karar destek. Sağ üst avatar menüsündeki Hakkında penceresi ve Sistem Künyesi sayfası da buradan güncellenir.</p>
+        <h3>Sistem ayarları kontrol merkezi</h3>
+        <p>Bu ekran BYS360’ın kimlik, yetki, personel, performans, iletişim, anket, destek, bildirim ve karar destek ayarlarını tek merkezde toplar. Sistem Künyesi ve Hakkında içerikleri de buradan yönetilir.</p>
     </div>
     <div class="settings-live-banner-actions">
         <a href="#system-group-about" class="btn-soft secondary"><i class="fa-solid fa-circle-info"></i> Avatar Hakkında penceresi</a>
@@ -97,12 +97,12 @@
             <div class="foundation-stat">
                 <div class="summary-label">Birim Profili</div>
                 <div class="summary-value">{{ foundation_context.stats.unit_profile_total }}</div>
-                <div class="section-text" style="margin:8px 0 0 0;">Kontrol 2 ile kalıcı hale gelen birim bazlı menü profilleri.</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Birimlere göre tanımlanan kalıcı menü profilleri.</div>
             </div>
             <div class="foundation-stat">
                 <div class="summary-label">Ayar Geçmişi</div>
                 <div class="summary-value">{{ foundation_context.stats.history_total or 0 }}</div>
-                <div class="section-text" style="margin:8px 0 0 0;">Kontrol 3 ile eklenen son değişiklik ve geri alma kayıtları.</div>
+                <div class="section-text" style="margin:8px 0 0 0;">Son değişiklik ve geri alma kayıtları.</div>
             </div>
         </div>
 
@@ -111,8 +111,8 @@
         <div class="foundation-card settings-diagnostics-panel section-anchor" id="settings-diagnostics" style="margin-bottom:18px;">
             <div class="settings-diagnostics-head">
                 <div>
-                    <div class="section-title" style="margin-bottom:4px;">Ayarlar Servisi Tanılama</div>
-                    <div class="section-text" style="margin-bottom:0;">Kontrol 4–11 servis köprüleri, canlı menü filtresi, veritabanı omurgası ve son değişiklik kayıtları tek bakışta izlenir.</div>
+                    <div class="section-title" style="margin-bottom:4px;">Ayar Sağlığı ve Kontrol Paneli</div>
+                    <div class="section-text" style="margin-bottom:0;">Menü görünürlüğü, veritabanı omurgası ve son ayar değişiklikleri tek bakışta izlenir.</div>
                 </div>
                 <span class="settings-diagnostics-badge {{ 'ok' if ui_panel.ok else 'warn' }}">
                     <i class="fa-solid {{ 'fa-circle-check' if ui_panel.ok else 'fa-triangle-exclamation' }}"></i>
@@ -131,19 +131,10 @@
             </div>
 
             <div class="matrix-pill-row" style="margin-top:0;">
-                <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Tamamlanan kontrol: {{ ui_panel.completed_phase_count }}</span>
-                <span class="matrix-pill"><i class="fa-solid fa-flag-checkered"></i> Aktif: {{ ui_panel.active_phase.phase|default('Faz 11') }}</span>
-                <span class="matrix-pill"><i class="fa-solid fa-forward-step"></i> Sıradaki: {{ ui_panel.next_phase_label }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Tamamlanan adım: {{ ui_panel.completed_phase_count }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-flag-checkered"></i> Durum: {{ ui_panel.active_phase.title|default('Sağlıklı') }}</span>
+                <span class="matrix-pill"><i class="fa-solid fa-forward-step"></i> Sıradaki kontrol: {{ ui_panel.next_phase_label }}</span>
                 <span class="matrix-pill"><i class="fa-solid fa-database"></i> DB: {{ 'Hazır' if ui_panel.db_ready else 'Eksik tablo var' }}</span>
-            </div>
-
-            <div class="settings-phase-strip" aria-label="Ayarlar servisi kontrol durumu">
-                {% for phase in ui_panel.phase_sequence %}
-                <span class="settings-phase-pill {{ phase.status_class }}" title="{{ phase.title }}">
-                    <i class="fa-solid {{ 'fa-check' if phase.status_class == 'ok' else ('fa-circle-dot' if phase.status_class == 'warn' else 'fa-clock') }}"></i>
-                    {{ phase.phase }} · {{ phase.status }}
-                </span>
-                {% endfor %}
             </div>
         </div>
         {% endif %}
@@ -459,9 +450,9 @@
                     </table>
                     {% if phase1_seed_summary.ok %}
                     <div class="matrix-pill-row" style="margin-top:14px;">
-                        <span class="matrix-pill"><i class="fa-solid fa-database"></i> Rol satırı tohumlama: {{ phase1_seed_summary.seeded_role_defaults }}</span>
-                        <span class="matrix-pill"><i class="fa-solid fa-sliders"></i> Sistem ayarı tohumlama: {{ phase1_seed_summary.seeded_system_settings }}</span>
-                        <span class="matrix-pill"><i class="fa-solid fa-cubes"></i> Modül ayarı tohumlama: {{ phase1_seed_summary.seeded_module_settings }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-database"></i> Rol satırı senkronu: {{ phase1_seed_summary.seeded_role_defaults }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-sliders"></i> Sistem ayarı senkronu: {{ phase1_seed_summary.seeded_system_settings }}</span>
+                        <span class="matrix-pill"><i class="fa-solid fa-cubes"></i> Modül ayarı senkronu: {{ phase1_seed_summary.seeded_module_settings }}</span>
                     </div>
                     {% else %}
                     <div class="empty-box" style="margin-top:14px;">Ayar omurgası henüz veritabanına yazılamadı: {{ phase1_seed_summary.error }}</div>
@@ -469,7 +460,7 @@
                 </div>
 
                 <div class="foundation-card section-anchor" id="unit-foundation">
-                    <div class="section-title">Kontrol 2 · Birim Profili Anlık Durum</div>
+                    <div class="section-title">Birim Profili Anlık Durumu</div>
                     <div class="section-text" style="margin-bottom:12px;">Rol varsayılanına ek olarak birim bazlı menü profilleri kalıcı olarak saklanır ve kişi bazlı yetki katmanından önce uygulanır.</div>
                     {% if foundation_context.unit_profiles_snapshot %}
                     <table class="role-default-table">
@@ -493,7 +484,7 @@
                         </tbody>
                     </table>
                     {% else %}
-                    <div class="empty-box">Henüz kaydedilmiş birim profili bulunmuyor. Kontrol 2 ile seçili matrisi birim profiline yazabilirsiniz.</div>
+                    <div class="empty-box">Henüz kaydedilmiş birim profili bulunmuyor. Seçili matrisi birim profiline kaydedebilirsiniz.</div>
                     {% endif %}
                 </div>
             </div>
@@ -1376,8 +1367,8 @@
 </script>
 
 <section class="card" style="margin-top:18px;">
-    <h3 class="section-title">Guvenlik, KVKK ve Dosya Politikasi</h3>
-    <p class="section-text">Canli kullanima geciste kimlik verisi, dosya yukleme ve oturum davranislari ayni kurumsal cizgide korunmalidir.</p>
+    <h3 class="section-title">Güvenlik, KVKK ve Dosya Politikası</h3>
+    <p class="section-text">Canlı kullanımda kimlik verisi, dosya yükleme ve oturum davranışları aynı kurumsal çizgide korunmalıdır.</p>
     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
         <div style="padding:14px 16px;border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.06);">
             <strong style="display:block;color:#111827;margin-bottom:4px;">Kimlik verisi</strong>

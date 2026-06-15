@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from collections import OrderedDict
 import json
@@ -87,9 +85,6 @@ from app.services.settings.final_hardening import (
     get_settings_final_release_checklist as _get_settings_final_release_checklist,
 )
 
-
-
-
 def _table_exists(table_name: str) -> bool:
     try:
         return inspect(db.engine).has_table(table_name)
@@ -149,9 +144,6 @@ def build_settings_defaults_snapshot() -> dict[str, Any]:
         _iter_live_module_setting_definitions(),
     )
 
-
-
-
 def _safe_rollback() -> None:
     try:
         db.session.rollback()
@@ -176,8 +168,6 @@ def ensure_settings_phase1_seeded(updated_by_user_id: int | None = None) -> dict
         safe_rollback=_safe_rollback,
     )
 
-
-
 def get_role_default_menu_keys(role_name: str, prefer_database: bool = True) -> set[str]:
     return _get_role_default_menu_keys_handler(
         role_name=role_name,
@@ -189,18 +179,12 @@ def get_role_default_menu_keys(role_name: str, prefer_database: bool = True) -> 
         safe_rollback_func=_safe_rollback,
     )
 
-
-
 def _build_role_default_snapshot() -> list[dict[str, Any]]:
     return _build_role_default_snapshot_handler(
         role_menu_defaults=ROLE_MENU_DEFAULTS,
         flatten_menu_definitions_func=flatten_menu_definitions,
         get_role_default_menu_keys_func=get_role_default_menu_keys,
     )
-
-
-
-
 
 def _build_unit_profile_snapshot() -> list[dict[str, Any]]:
     return _build_unit_profile_snapshot_handler(
@@ -210,8 +194,6 @@ def _build_unit_profile_snapshot() -> list[dict[str, Any]]:
         safe_rollback_func=_safe_rollback,
     )
 
-
-
 def get_unit_profile_menu_keys(unit_name: str) -> set[str]:
     return _get_unit_profile_menu_keys_handler(
         unit_name=unit_name,
@@ -220,8 +202,6 @@ def get_unit_profile_menu_keys(unit_name: str) -> set[str]:
         safe_rollback_func=_safe_rollback,
     )
 
-
-
 def build_role_default_rule_map(role_name: str, flat_menu_items: list[dict[str, Any]] | None = None) -> dict[str, bool]:
     return _build_role_default_rule_map_handler(
         role_name=role_name,
@@ -229,8 +209,6 @@ def build_role_default_rule_map(role_name: str, flat_menu_items: list[dict[str, 
         flatten_menu_definitions_func=flatten_menu_definitions,
         get_role_default_menu_keys_func=get_role_default_menu_keys,
     )
-
-
 
 def build_base_rule_map_for_user(user, flat_menu_items: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     return _build_base_rule_map_for_user_handler(
@@ -243,8 +221,6 @@ def build_base_rule_map_for_user(user, flat_menu_items: list[dict[str, Any]] | N
         safe_rollback_func=_safe_rollback,
     )
 
-
-
 def build_effective_user_menu_context(user, flat_menu_items: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     return _build_effective_user_menu_context_handler(
         user=user,
@@ -255,8 +231,6 @@ def build_effective_user_menu_context(user, flat_menu_items: list[dict[str, Any]
         filter_live_menu_rows_func=_filter_live_menu_rows,
         safe_rollback_func=_safe_rollback,
     )
-
-
 
 def save_role_menu_defaults(role_name: str, all_menu_keys: list[str], visible_keys: set[str], *, updated_by_user_id: int | None = None) -> int:
     return _save_role_menu_defaults_handler(
@@ -272,8 +246,6 @@ def save_role_menu_defaults(role_name: str, all_menu_keys: list[str], visible_ke
         create_settings_change_log_func=_create_settings_change_log,
     )
 
-
-
 def save_unit_menu_profile(unit_name: str, all_menu_keys: list[str], visible_keys: set[str], *, updated_by_user_id: int | None = None) -> int:
     return _save_unit_menu_profile_handler(
         unit_name=unit_name,
@@ -288,8 +260,6 @@ def save_unit_menu_profile(unit_name: str, all_menu_keys: list[str], visible_key
         build_complete_visibility_map_func=_build_complete_visibility_map,
         create_settings_change_log_func=_create_settings_change_log,
     )
-
-
 
 def save_user_menu_overrides(user, flat_menu_items: list[dict[str, Any]], visible_keys: set[str], *, updated_by_user_id: int | None = None) -> dict[str, int]:
     return _save_user_menu_overrides_handler(
@@ -307,8 +277,6 @@ def save_user_menu_overrides(user, flat_menu_items: list[dict[str, Any]], visibl
         create_settings_change_log_func=_create_settings_change_log,
     )
 
-
-
 def clear_user_menu_overrides(user_id: int, *, updated_by_user_id: int | None = None) -> int:
     return _clear_user_menu_overrides_handler(
         user_id=user_id,
@@ -319,8 +287,6 @@ def clear_user_menu_overrides(user_id: int, *, updated_by_user_id: int | None = 
         snapshot_user_override_state_func=_snapshot_user_override_state,
         create_settings_change_log_func=_create_settings_change_log,
     )
-
-
 
 def build_settings_profile_context(selected_user=None, flat_menu_items: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     return _build_settings_profile_context_handler(
@@ -333,8 +299,6 @@ def build_settings_profile_context(selected_user=None, flat_menu_items: list[dic
         list_recent_settings_change_logs_func=list_recent_settings_change_logs,
         safe_rollback_func=_safe_rollback,
     )
-
-
 
 def build_settings_foundation_context() -> dict[str, Any]:
     return _build_settings_foundation_context_handler(
@@ -351,8 +315,6 @@ def build_settings_foundation_context() -> dict[str, Any]:
         role_menu_defaults=ROLE_MENU_DEFAULTS,
         safe_rollback=_safe_rollback,
     )
-
-
 
 def save_system_settings_from_form(form, *, updated_by_user_id: int | None = None) -> int:
     """Genel sistem ayarlarını Faz 9 form pipeline servisi üzerinden kaydeder.
@@ -472,8 +434,6 @@ def build_settings_ui_diagnostics_panel(
         profile_context=profile_context,
         selected_user=selected_user,
     )
-
-
 
 # ---------------------------------------------------------------------------
 # BYS360 Faz 12 final canlı sertleştirme / kapanış raporu servis köprüsü

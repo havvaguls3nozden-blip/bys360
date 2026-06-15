@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """Ayarlar servisi tanılama ve sağlık özeti yardımcıları.
 
