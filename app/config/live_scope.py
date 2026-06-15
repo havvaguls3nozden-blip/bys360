@@ -113,8 +113,6 @@ LIVE_CORE_AREAS: tuple[str, ...] = (
     "raporlama_karar_destek",
 )
 
-
-
 def get_removed_module_names() -> tuple[str, ...]:
     return tuple(sorted(module for module in REMOVED_ROUTE_PATH_PREFIXES if is_removed(module)))
 

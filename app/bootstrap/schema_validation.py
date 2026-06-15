@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections.abc import Mapping, Set as AbstractSet
 
 from flask import Flask

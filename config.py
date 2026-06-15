@@ -129,8 +129,6 @@ def _append_db_sslmode(db_url: str, app_env: str) -> str:
         query['sslmode'] = 'disable'
     return urlunparse(parsed._replace(query=urlencode(query)))
 
-
-
 def _normalize_runtime_redis_url(raw_url: str | None, app_env: str) -> tuple[str, str | None]:
     """Bare-metal canlıda docker hostname redis://redis:6379 ayarını sessizce bozmasın.
 
@@ -221,8 +219,6 @@ class Config:
             'pool_timeout': _coerce_positive_int(os.getenv('DB_POOL_TIMEOUT'), _default_pool_timeout),
             'pool_use_lifo': str_to_bool(os.getenv('DB_POOL_USE_LIFO'), True),
         }
-
-
 
     # BYS360_CLAUDE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_CONFIG
     # Faz 4: cache, DB pool ve bildirim polling yükünü azaltma ayarları.

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
 from flask import Flask, current_app, flash, g, jsonify, redirect, render_template, request, session, url_for
@@ -35,8 +33,6 @@ def render_error_page(status_code: int, title: str, message: str):
             """,
             status_code,
         )
-
-
 
 def _safe_logout_after_expired_csrf() -> bool:
     """CSRF suresi dolmus logout POST isteginde beyaz hata yerine guvenli cikis yapar."""
@@ -150,10 +146,6 @@ def request_log_context() -> dict[str, Any]:
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/error_handlers.py:148")
         return {"request_id": getattr(g, "request_id", "-")}
-
-
-
-
 
 # BYS360_LIVE_FULL_OVERLAY_V2_17_61_CSRF_RECOVERY_BEGIN
 def _safe_csrf_referer_target() -> str:
