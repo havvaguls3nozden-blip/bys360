@@ -101,19 +101,13 @@ def _run_legacy_route(legacy_fn, *args, **kwargs):
     """Run an extracted legacy route implementation without changing endpoint behavior."""
     return legacy_fn(*args, **kwargs)
 
-
-
 def delegate_mobile_login(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_login; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
 
-
-
 def delegate_mobile_refresh(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_refresh; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
-
-
 
 def delegate_mobile_me(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_me; keeps route endpoint and URL stable."""

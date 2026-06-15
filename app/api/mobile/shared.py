@@ -4,8 +4,6 @@ from __future__ import annotations
 
 # BYS360_MOBILE_V2_8_50_ASSISTANT_ASCII_GATEFIX
 
-
-
 from datetime import datetime, timezone
 import hashlib
 from functools import wraps
@@ -200,8 +198,6 @@ def _user_org_unit_id(user: User) -> int | None:
             continue
     return None
 
-
-
 def _can_mobile_view_ticket(user: User, ticket: SupportTicket) -> bool:
     if _has_global_scope(user):
         return True
@@ -283,8 +279,6 @@ def _ticket_detail_payload(ticket: SupportTicket, user: User) -> dict[str, Any]:
         "status_history": status_history,
         "attachments": attachments,
     }
-
-
 
 _SURVEY_ACTIVE_STATUSES = {"active", "published", "yayinda", "yayında", "open", "aktif"}
 _SURVEY_QUESTION_TYPE_LABELS = {
@@ -584,9 +578,6 @@ def require_mobile_user(fn):
             return jsonify({"message": "Mobil oturum bulunamadı veya süresi doldu."}), 401
         return fn(user, *args, **kwargs)
     return wrapper
-
-
-
 
 # BYS360_MOBILE_V2_8_57_IOS_SAFARI_WEB_PREVIEW_CORS
 def _bys360_mobile_preview_allowed_origin(origin: str | None) -> bool:

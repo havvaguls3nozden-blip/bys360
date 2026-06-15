@@ -30,7 +30,4 @@ def test_mobile_personnel_kpi_communication_response_gate_p3c() -> None:
     assert result["routes_py_lines"] <= 300
     assert result["total_mobile_route_decorator_count"] == 24
 
-
-
-
 pytestmark = pytest.mark.mobile

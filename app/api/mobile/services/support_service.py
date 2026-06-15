@@ -6,8 +6,6 @@ def mobile_support_ticket_create(user, legacy_handler):
     """Delegated mobile support ticket creation handler."""
     return legacy_handler(user)
 
-
-
 def mobile_support_ticket_reply(user, ticket_id, legacy_handler):
     """Delegated mobile support ticket reply handler."""
     return legacy_handler(user, ticket_id)

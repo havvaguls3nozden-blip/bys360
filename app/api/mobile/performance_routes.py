@@ -668,9 +668,6 @@ def mobile_performance_task_detail(user: User, assignment_id: int):
         _metric('Dönem', _period_name(period), _date_range(period), 'red', 'timeline'),
     ], items)
 
-
-
-
 # BYS360 MOBILE V2.8.35 PERFORMANCE SCORING FORM REAL API
 
 def _v2835_json_error(message: str, status_code: int = 400):
@@ -1051,8 +1048,6 @@ def mobile_performance_task_score_submit(user: User, assignment_id: int):
         'final_score_100': round(float(getattr(evaluation, 'final_total_100', 0) or 0), 2),
     })
 
-
-
 @mobile_api_bp.post('/performance/tasks/<int:assignment_id>/score-action')
 @require_mobile_user
 def mobile_performance_task_score_action(user: User, assignment_id: int):
@@ -1082,8 +1077,6 @@ def mobile_performance_task_score_action(user: User, assignment_id: int):
     return jsonify(result)
 
 # BYS360 P11-C1: mobile_performance_manager_tasks read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
-
-
 
 # BYS360_MOBILE_V2_8_52_PERFORMANCE_WEB_PARITY_API
 # Mobil performans modülü web performans başlıklarıyla aynı kapsamda özet/listeler üretir.
@@ -1213,8 +1206,6 @@ def _v2852_due_label_safe(row):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return (_label(getattr(row, 'status', None), 'Bekliyor'), 40, 'red')
 
-
-
 @mobile_api_bp.get('/performance/full-feature-summary')
 @require_mobile_user
 def _bys360_legacy_mobile_performance_full_feature_summary(user: User):
@@ -1251,11 +1242,7 @@ def mobile_performance_full_feature_summary(user: User):
     from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_full_feature_summary as _bys360_delegate
     return _bys360_delegate(_bys360_legacy_mobile_performance_full_feature_summary, user)
 
-
-
 # BYS360 P11-C1: mobile_performance_categories read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
-
-
 
 @mobile_api_bp.get('/performance/president-approvals')
 @require_mobile_user
@@ -1266,8 +1253,6 @@ def _bys360_prev_mobile_performance_president_approvals_alias_v21748(user: User)
 def mobile_performance_president_approvals_alias(user: User):    # BYS360_SAFE_SMOKE_500_FIX_V2_17_48: wrapper keeps endpoint name and adds safe fallback for smoke-tested mobile GET.
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_president_approvals_safe_fallback_v21749(user)
-
-
 
 @mobile_api_bp.get('/performance/publish-preapproval')
 @require_mobile_user
@@ -1294,8 +1279,6 @@ def mobile_performance_publish_preapproval(user: User):
         _metric('Yetki', 'Rol Bazlı', 'Yayın işlemi yetkili kullanıcıyla sınırlıdır', 'green', 'shield'),
     ], items)
 
-
-
 def _bys360_legacy_mobile_performance_history_archive(user: User):
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_history_archive_safe_fallback_v21749(user)
@@ -1309,8 +1292,6 @@ def _bys360_prev_mobile_performance_history_archive_v21748(user):
 def mobile_performance_history_archive(user):    # BYS360_SAFE_SMOKE_500_FIX_V2_17_48: wrapper keeps endpoint name and adds safe fallback for smoke-tested mobile GET.
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_history_archive_safe_fallback_v21749(user)
-
-
 
 @mobile_api_bp.get('/performance/in-period-notes')
 @require_mobile_user
@@ -1327,8 +1308,6 @@ def _bys360_legacy_mobile_performance_in_period_notes(user: User):
 def mobile_performance_in_period_notes(user: User):
     from app.api.mobile.services.performance_period_service import delegate_mobile_performance_in_period_notes
     return delegate_mobile_performance_in_period_notes(user)
-
-
 
 def _bys360_legacy_mobile_performance_development_suggestions(user: User):
     items = _v2852_items_from_models(['PerformanceDevelopmentSuggestion', 'PerformanceDevelopmentPlan', 'DevelopmentSuggestion', 'FeedbackActionPlan'], ['employee_name', 'title', 'suggestion_title', 'name'], ['suggestion', 'description', 'development_area', 'action_text'], ['status', 'state'], ['period_name', 'created_at', 'owner_name'], ['priority', 'score'], limit=100, progress=65)
@@ -1357,8 +1336,6 @@ def _bys360_legacy_mobile_performance_development_suggestions(user: User):
 def mobile_performance_development_suggestions(user: User):
     from app.api.mobile.services.performance_summary_service import mobile_performance_development_suggestions_delegate
     return mobile_performance_development_suggestions_delegate(user)
-
-
 
 def _bys360_legacy_mobile_performance_reports(user: User):
     try:
@@ -1393,15 +1370,9 @@ def mobile_performance_reports(user: User):
     from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_reports
     return delegate_mobile_performance_reports(_bys360_legacy_mobile_performance_reports, user)
 
-
-
 # BYS360 P11-C1: mobile_performance_reminders read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
 
-
-
 # BYS360 P11-C1: mobile_performance_manager_view_v2852 read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
-
-
 
 @mobile_api_bp.get('/performance/risk-analysis')
 @require_mobile_user
@@ -1431,8 +1402,6 @@ def _bys360_legacy_mobile_performance_risk_analysis_v2852(user: User):
 def mobile_performance_risk_analysis_v2852(user):
     from app.api.mobile.services.performance_summary_service import mobile_performance_risk_analysis_v2852_delegate
     return mobile_performance_risk_analysis_v2852_delegate(_bys360_legacy_mobile_performance_risk_analysis_v2852, user)
-
-
 
 # BYS360_MOBILE_V2_8_53_IN_PERIOD_NOTES_API
 # BYS360 P11-C1: mobile_performance_in_period_note_options_v2853 read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.

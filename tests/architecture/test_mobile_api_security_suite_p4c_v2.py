@@ -37,7 +37,4 @@ def test_mobile_security_suite_gate_p4c_v2():
     assert report["total_probe_count"] >= 90
     assert report["direct_contract_ok"] is True
 
-
-
-
 pytestmark = pytest.mark.mobile

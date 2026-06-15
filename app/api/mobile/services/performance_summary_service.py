@@ -8,9 +8,6 @@ def delegate_mobile_performance_summary(user, legacy_func):
     """Delegate mobile performance summary without changing route contract."""
     return legacy_func(user)
 
-
-
-
 def delegate_mobile_performance_full_feature_summary(legacy_func, *args, **kwargs):
     """mobile_performance_full_feature_summary icin guvenli servis delegasyonu."""
     return legacy_func(*args, **kwargs)
@@ -37,8 +34,6 @@ def mobile_performance_history_archive(*args, legacy_func=None, **kwargs):
 def delegate_mobile_performance_reports(legacy_func, *args, **kwargs):
     """Delegate performance reports endpoint while preserving legacy behavior."""
     return legacy_func(*args, **kwargs)
-
-
 
 def mobile_performance_risk_analysis_v2852_delegate(legacy_func, user):
     """Servis delegasyonu: mobil performans risk analizi.

@@ -23,7 +23,4 @@ def test_mobile_auth_dashboard_assistant_response_gate_p3b() -> None:
     assert result["compile_ok"] is True
     assert result["app_factory_ok"] is True
 
-
-
-
 pytestmark = pytest.mark.mobile

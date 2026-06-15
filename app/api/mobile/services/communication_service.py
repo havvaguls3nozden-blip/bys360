@@ -2,8 +2,6 @@
 # BYS360_MOBILE_SERVICE_SCAFFOLD_P1_2_V2_17_7
 """Communication/message service extraction target for mobile routes."""
 
-
-
 from __future__ import annotations
 
 from typing import Any

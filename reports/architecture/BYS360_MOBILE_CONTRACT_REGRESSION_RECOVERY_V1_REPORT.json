@@ -1,0 +1,28 @@
+{
+  "package": "BYS360_MOBILE_CONTRACT_REGRESSION_RECOVERY_V1",
+  "root": "C:\\bys360\\project",
+  "mode": "verify",
+  "inventory": {
+    "routes_py_exists": true,
+    "routes_py_lines": 193,
+    "routes_py_decorator_count": 0,
+    "domain_route_decorator_count": 24,
+    "routes_compile": {
+      "path": "C:\\bys360\\project\\app\\api\\mobile\\routes.py",
+      "ok": true,
+      "error": ""
+    },
+    "personnel_service_compile": {
+      "path": "C:\\bys360\\project\\app\\api\\mobile\\services\\personnel_service.py",
+      "ok": true,
+      "error": ""
+    }
+  },
+  "status": "OK",
+  "compileall": {
+    "ok": true,
+    "returncode": 0,
+    "stdout_tail": "Listing 'app/api/mobile'...\nListing 'app/api/mobile\\\\domains'...\nListing 'app/api/mobile\\\\services'...\n",
+    "stderr_tail": ""
+  }
+}

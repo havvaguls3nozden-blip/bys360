@@ -58,8 +58,6 @@ def test_mobile_domain_files_exist():
     for filename in EXPECTED_DOMAIN_FILES:
         assert (domain_dir / filename).exists(), filename
 
-
-
 def _bys360_method_aware_route_keys(path):
     import ast
     import re
@@ -111,8 +109,5 @@ if __name__ == "__main__":
     test_mobile_domain_files_exist()
     test_mobile_route_contract_count()
     print("P2A_MOBILE_CONTRACT_TEST_OK")
-
-
-
 
 pytestmark = pytest.mark.mobile

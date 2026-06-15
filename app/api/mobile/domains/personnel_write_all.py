@@ -117,8 +117,6 @@ def mobile_personnel_all(user: User):
     from app.api.mobile.services import personnel_service as _bys360_personnel_service
     return _bys360_personnel_service.mobile_personnel_all(user)
 
-
-
 # BYS360_MOBILE_V2_8_62_PERSONNEL_CREATE_BEGIN
 _PERSONNEL_CREATE_ROLES = {
     "admin",
@@ -163,8 +161,6 @@ def _mobile_role_label(role: str) -> str:
     }
     return labels.get((role or "personel").strip(), (role or "Personel").strip())
 
-
-
 # BYS360 P1.7 service delegation - legacy implementation preserved
 def _bys360_legacy__mobile_created_personnel_row(u: User) -> dict[str, Any]:
     full_name = _full_name(u)
@@ -200,8 +196,6 @@ def _bys360_legacy__mobile_created_personnel_row(u: User) -> dict[str, Any]:
 def _mobile_created_personnel_row(u: User) -> dict[str, Any]:
     from app.api.mobile.services import personnel_service as _bys360_personnel_service
     return _bys360_personnel_service._mobile_created_personnel_row(u)
-
-
 
 # BYS360 P1.7 service delegation - legacy implementation preserved
 def _bys360_legacy_mobile_personnel_create(user: User):

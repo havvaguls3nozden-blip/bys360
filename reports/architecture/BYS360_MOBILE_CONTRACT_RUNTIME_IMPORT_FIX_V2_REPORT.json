@@ -1,0 +1,40 @@
+{
+  "package": "BYS360_MOBILE_CONTRACT_RUNTIME_IMPORT_FIX_V2",
+  "root": "C:\\bys360\\project",
+  "mode": "verify",
+  "inventory": {
+    "routes_py_exists": true,
+    "routes_py_lines": 194,
+    "routes_py_decorator_count": 0,
+    "domain_route_decorator_count": 24,
+    "routes_exports": {
+      "require_mobile_user": true
+    },
+    "performance_routes_imports": {
+      "require_mobile_user": true
+    },
+    "routes_compile": {
+      "path": "C:\\bys360\\project\\app\\api\\mobile\\routes.py",
+      "ok": true,
+      "error": ""
+    },
+    "performance_routes_compile": {
+      "path": "C:\\bys360\\project\\app\\api\\mobile\\performance_routes.py",
+      "ok": true,
+      "error": ""
+    },
+    "runtime_smoke": {
+      "ok": true,
+      "returncode": 0,
+      "stdout_tail": "BYS360_RUNTIME_SMOKE_OK route_count=936 mobile_route_count=68\nBYS360_RUNTIME_MOBILE_SAMPLE=/api/mobile/ai/insights|/api/mobile/assistant/suggestions|/api/mobile/assistant/v2/ask|/api/mobile/auth/login|/api/mobile/auth/refresh|/api/mobile/communication/messages/create-thread|/api/mobile/communication/messages/threads|/api/mobile/communication/messages/threads/<int:thread_id>|/api/mobile/communication/messages/threads/<int:thread_id>/send|/api/mobile/communication/messages/users|/api/mobile/communication/threads|/api/mobile/communication/v2/create-thread|/api/mobile/communication/v2/threads|/api/mobile/communication/v2/threads/<int:thread_id>|/api/mobile/communication/v2/threads/<int:thread_id>/send|/api/mobile/communication/v2/users|/api/mobile/dashboard/summary|/api/mobile/health|/api/mobile/kpi/goals|/api/mobile/kpi/target-management\n",
+      "stderr_tail": "[2026-06-15 11:24:04,711] WARNING in monitoring: Sentry DSN tanimli degil; hata izleme kapali.\n[2026-06-15 11:24:04,726] INFO in startup: Startup ozeti | env=development | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\n[2026-06-15 11:24:04,726] INFO in feedback_followup_scheduler: BYS360 eylem planı takip zamanlayıcısı kapalı. Harici script/Görev Zamanlayıcı kullanılabilir.\n[2026-06-15 11:24:04,726] INFO in audit: Guvenlik ozeti | critical=0 warning=0 info=2\n[2026-06-15 11:24:04,726] INFO in startup_checks: Schema validation SQLite duman/test ortamında pas geçildi.\n"
+    }
+  },
+  "status": "OK",
+  "compileall": {
+    "ok": true,
+    "returncode": 0,
+    "stdout_tail": "Listing 'app/api/mobile'...\nListing 'app/api/mobile\\\\domains'...\nListing 'app/api/mobile\\\\services'...\n",
+    "stderr_tail": ""
+  }
+}

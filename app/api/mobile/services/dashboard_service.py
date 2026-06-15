@@ -10,31 +10,21 @@ def _run_legacy_route(legacy_fn, *args, **kwargs):
     """Run an extracted legacy route implementation without changing endpoint behavior."""
     return legacy_fn(*args, **kwargs)
 
-
-
 def delegate_mobile_dashboard_summary(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_dashboard_summary; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
-
-
 
 def delegate_mobile_kpi_target_management_v2853(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_kpi_target_management_v2853; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
 
-
-
 def delegate_mobile_kpi_target_create_v2853(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_kpi_target_create_v2853; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
 
-
-
 def delegate_mobile_kpi_target_progress_v2853(legacy_fn, *args, **kwargs):
     """Delegate wrapper for mobile_kpi_target_progress_v2853; keeps route endpoint and URL stable."""
     return _run_legacy_route(legacy_fn, *args, **kwargs)
-
-
 
 def _call_legacy(legacy_func, *args, **kwargs):
     return legacy_func(*args, **kwargs)

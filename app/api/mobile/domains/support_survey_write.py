@@ -285,8 +285,6 @@ def mobile_survey_submit(user: User, survey_id: int):
     db.session.commit()
     return jsonify({"message": "Anket cevabınız kaydedildi.", "detail": _mobile_survey_detail_payload(survey, user)})
 
-
-
 # BYS360 P11-B4: mobile_communication_threads detail read route app/api/mobile/detail_read_routes.py modülüne taşındı.
 
 

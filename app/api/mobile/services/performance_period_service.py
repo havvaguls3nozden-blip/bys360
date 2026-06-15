@@ -27,8 +27,6 @@ def delegate_mobile_performance_note_scorecard_v2863a(*args, **kwargs):
     from app.api.mobile.performance_routes import _bys360_legacy_mobile_performance_note_scorecard_v2863a
     return _bys360_legacy_mobile_performance_note_scorecard_v2863a(*args, **kwargs)
 
-
-
 def mobile_performance_period_detail(*args, **kwargs):
     """Delegated wrapper for mobile_performance_period_detail."""
     from app.api.mobile import performance_routes as _routes
