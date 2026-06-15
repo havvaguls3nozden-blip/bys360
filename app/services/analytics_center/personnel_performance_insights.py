@@ -15,8 +15,7 @@ kullanilabilecek personel / performans icgoru yuzeyi uretmektir.
 """
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
-from typing import Any, Iterable
+from typing import Any
 logger = logging.getLogger(__name__)
 
 try:

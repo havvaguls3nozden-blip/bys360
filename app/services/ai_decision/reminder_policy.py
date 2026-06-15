@@ -14,7 +14,7 @@ BYS360_AI_DECISION_FAZ9_REMINDER_POLICY
 """
 
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Any, Iterable, Mapping
 
 

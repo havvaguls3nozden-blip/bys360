@@ -1,0 +1,548 @@
+﻿diff --git a/app/refactor/hotfix_merge_registry.py b/app/refactor/hotfix_merge_registry.py
+index 5fdd7ad..88a87fc 100644
+--- a/app/refactor/hotfix_merge_registry.py
++++ b/app/refactor/hotfix_merge_registry.py
+@@ -8,5 +8,3 @@ Eski import yolunu k─▒rmamak i├ğin yeni mod├╝le y├Ânlendiren compatibility wrapp
+ Yeni ger├ğek mod├╝l:
+ app/refactor/maintenance_merge_registry.py
+ """
+-
+-from .maintenance_merge_registry import HOTFIX_MERGE_REGISTRY
+diff --git a/app/scripts/quality/analyze_p11_b1a_mobile_routes_split_candidates_v1.py b/app/scripts/quality/analyze_p11_b1a_mobile_routes_split_candidates_v1.py
+index dcf8d85..d753fbc 100644
+--- a/app/scripts/quality/analyze_p11_b1a_mobile_routes_split_candidates_v1.py
++++ b/app/scripts/quality/analyze_p11_b1a_mobile_routes_split_candidates_v1.py
+@@ -1,11 +1,8 @@
+ from __future__ import annotations
+ 
+-
+-
+ import argparse
+ import ast
+ import json
+-import re
+ from collections import Counter, defaultdict
+ from pathlib import Path
+ from typing import Any
+diff --git a/app/services/ai/stub_engine_extension.py b/app/services/ai/stub_engine_extension.py
+index 49fa499..fd294c7 100644
+--- a/app/services/ai/stub_engine_extension.py
++++ b/app/services/ai/stub_engine_extension.py
+@@ -12,7 +12,6 @@ Bu dosya do─şrudan ├ğal─▒┼şt─▒r─▒lmaz; stub_engine.py ile birle┼ştirilir.
+ """
+ from __future__ import annotations
+ 
+-from collections import defaultdict
+ from typing import Any
+ 
+ # ÔöÇÔöÇ Yard─▒mc─▒ fonksiyonlar (stub_engine.py'dekilerle ayn─▒ imza) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+diff --git a/app/services/ai_decision/reminder_policy.py b/app/services/ai_decision/reminder_policy.py
+index 2f5137d..eae229c 100644
+--- a/app/services/ai_decision/reminder_policy.py
++++ b/app/services/ai_decision/reminder_policy.py
+@@ -14,7 +14,7 @@ BYS360_AI_DECISION_FAZ9_REMINDER_POLICY
+ """
+ 
+ from dataclasses import dataclass
+-from datetime import date, datetime, timedelta
++from datetime import date, datetime
+ from typing import Any, Iterable, Mapping
+ 
+ 
+diff --git a/app/services/ai_decision/service_inventory.py b/app/services/ai_decision/service_inventory.py
+index 5091583..8d7d22b 100644
+--- a/app/services/ai_decision/service_inventory.py
++++ b/app/services/ai_decision/service_inventory.py
+@@ -1,11 +1,8 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+ """AI Karar Destek servis envanteri."""
+ 
+-from datetime import datetime
+ 
+ from .live_scope import (
+     AI_DECISION_PHASES,
+diff --git a/app/services/analytics_center/dashboard_surface.py b/app/services/analytics_center/dashboard_surface.py
+index 26582bd..d6e68ec 100644
+--- a/app/services/analytics_center/dashboard_surface.py
++++ b/app/services/analytics_center/dashboard_surface.py
+@@ -1,7 +1,5 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+ """Karar Destek Dashboard veri y├╝zeyi servisleri.
+ 
+@@ -13,7 +11,6 @@ Faz 3 notu:
+ """
+ 
+ from dataclasses import asdict, dataclass
+-from datetime import datetime
+ from typing import Any
+ 
+ try:
+diff --git a/app/services/analytics_center/personnel_performance_insights.py b/app/services/analytics_center/personnel_performance_insights.py
+index f437b0a..d08fcb6 100644
+--- a/app/services/analytics_center/personnel_performance_insights.py
++++ b/app/services/analytics_center/personnel_performance_insights.py
+@@ -15,8 +15,7 @@ kullanilabilecek personel / performans icgoru yuzeyi uretmektir.
+ """
+ 
+ from dataclasses import asdict, dataclass
+-from datetime import datetime
+-from typing import Any, Iterable
++from typing import Any
+ logger = logging.getLogger(__name__)
+ 
+ try:
+diff --git a/app/services/analytics_center/service_inventory.py b/app/services/analytics_center/service_inventory.py
+index 444e3aa..4ece29a 100644
+--- a/app/services/analytics_center/service_inventory.py
++++ b/app/services/analytics_center/service_inventory.py
+@@ -1,11 +1,8 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+ """Analiz Merkezi servis envanteri."""
+ 
+-from datetime import datetime
+ 
+ from .live_scope import ANALYTICS_SURFACE_KEYS, build_analytics_surface_summary, get_analytics_surfaces
+ from .summary_pipeline import build_analytics_summary_cache_plan, build_analytics_summary_pipeline_summary
+diff --git a/app/services/analytics_center/summary_pipeline.py b/app/services/analytics_center/summary_pipeline.py
+index 9bddc47..89a149b 100644
+--- a/app/services/analytics_center/summary_pipeline.py
++++ b/app/services/analytics_center/summary_pipeline.py
+@@ -7,7 +7,7 @@ atmaz ve yaln─▒zca dashboard/analiz fazlar─▒ i├ğin g├╝venli ├Âzet haz─▒rl─▒─ş─▒
+ from __future__ import annotations
+ 
+ from dataclasses import asdict, dataclass
+-from typing import Any, Iterable, Mapping
++from typing import Any, Iterable
+ 
+ try:
+     from app.services.ai_decision.summary_cache import (
+diff --git a/app/services/chain_warning_alignment_service.py b/app/services/chain_warning_alignment_service.py
+index a49c341..f3a1a73 100644
+--- a/app/services/chain_warning_alignment_service.py
++++ b/app/services/chain_warning_alignment_service.py
+@@ -1,13 +1,9 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+ from dataclasses import dataclass
+-from datetime import datetime
+-from typing import Any, Dict, Iterable, List, Optional, Set
++from typing import Any, Dict, List, Optional, Set
+ 
+-from flask import current_app
+ 
+ try:
+     import app.models as models
+diff --git a/app/services/cic/template_service.py b/app/services/cic/template_service.py
+index a7ec052..84196cb 100644
+--- a/app/services/cic/template_service.py
++++ b/app/services/cic/template_service.py
+@@ -8,14 +8,13 @@ from app.models import User
+ 
+ 
+ import logging
+-import json
+ from typing import Any
+ try:
+     from flask import current_app
+ except Exception:  # pragma: no cover - optional Flask context
+     current_app = None  # type: ignore
+ from app.services.cic.repository import (
+-    get_setting, set_setting, _loads_json, _dumps_json, _now, _clean_ids,
++    get_setting, set_setting,
+ )
+ from app.services.cic.task_contract import BASE_KEY, TASK_DEFINITIONS
+ logger = logging.getLogger(__name__)
+@@ -28,7 +27,6 @@ The legacy implementation remains in app.services.corporate_information_center.
+ Routes, template names, endpoint contracts and public function names are not changed.
+ """
+ 
+-from typing import Any
+ 
+ 
+ __all__ = [
+diff --git a/app/services/corporate_information_center.py b/app/services/corporate_information_center.py
+index 6842157..d0ac980 100644
+--- a/app/services/corporate_information_center.py
++++ b/app/services/corporate_information_center.py
+@@ -1,11 +1,9 @@
+ from __future__ import annotations
+ 
+-
+-
+ import json
+ import ssl
+ import time
+-from datetime import datetime, timedelta
++from datetime import datetime
+ from typing import Any
+ from urllib.request import urlopen
+ 
+@@ -311,9 +309,6 @@ def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> Non
+     set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme g├Ârevleri", value_type="json", actor_user_id=actor_user_id)
+     db.session.commit()
+ 
+-
+-
+-
+ def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
+     for key, meta in TASK_DEFINITIONS.items():
+         subject = (payload.get(f"subject_{key}") or meta["subject"]).strip()
+@@ -509,12 +504,6 @@ def _recipients_for_task_base(task_key: str, override_users: list[User] | None =
+     rec = get_recipients()
+     return rec["managers"] if group == "managers" else rec["staff"]
+ 
+-
+-
+-
+-
+-
+-
+ # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
+ 
+ 
+@@ -587,9 +576,6 @@ def _cic_phase3_make_result(*, task_key: str, dry_run: bool, users: list[User],
+         "details": details[:120],
+     }
+ 
+-
+-
+-
+ def get_recent_logs(limit: int = 120) -> list[Any]:
+     try:
+         from app.models import MailLog
+@@ -603,8 +589,6 @@ def _cic_phase3_last_result() -> dict[str, Any]:
+     value = _loads_json(f"{BASE_KEY}.phase3.last_result", {})
+     return value if isinstance(value, dict) else {}
+ 
+-
+-
+ # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_END
+ 
+ # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL_BEGIN
+@@ -803,11 +787,6 @@ def _cic_phase5_task_preview(tasks: list[dict[str, Any]], recipients: dict[str,
+         })
+     return out
+ 
+-
+-
+-
+-
+-
+ def _context_base(search: str | None = None) -> dict[str, Any]:
+     ensure_defaults()
+     cfg = get_config()
+@@ -1022,10 +1001,6 @@ def _cic_phase6_build(data: dict[str, Any]) -> dict[str, Any]:
+         "top_checks": top_checks,
+     }
+ 
+-
+-
+-
+-
+ # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_END
+ 
+ # BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1_1_BEGIN
+@@ -1311,22 +1286,6 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
+ # BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1
+ # Sistem uzerinden aktif/pasif ve saat kontrollu otomatik mail zamanlayici.
+ 
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+ # BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1
+ # Otomatik mail zamanlayicisi hafta sonu guvenlik kilidi.
+ # Cumartesi ve pazar gunleri otomatik mail gonderimi yapilmaz.
+@@ -1401,10 +1360,6 @@ def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | N
+     except Exception:
+         db.session.rollback()
+ 
+-
+-
+-
+-
+ # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_BEGIN
+ def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:
+     """Persist CIC system settings through one explicit public layer.
+@@ -1417,11 +1372,6 @@ def save_system(payload: dict[str, object], actor_user_id: int | None = None) ->
+     set_auto_scheduler_config(payload, actor_user_id=actor_user_id)
+ # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_END
+ 
+-
+-
+-
+-
+-
+ # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
+ def context(search: str | None = None) -> dict[str, Any]:
+     """Build CIC management context through one explicit public layer.
+@@ -1447,8 +1397,6 @@ def context(search: str | None = None) -> dict[str, Any]:
+     return data
+ # PHASE3A_CIC_EXPLICIT_CONTEXT_END
+ 
+-
+-
+ def _cic_auto_last_run_key(task_key: str) -> str:
+     return f"{BASE_KEY}.auto.last_run.{task_key}"
+ 
+@@ -1562,7 +1510,7 @@ def _run_due_tasks_base(*, now: _cic_dt_datetime | None = None, dry_run: bool =
+ # Akilli Kutlama ve Otomatik Ozel Gun Bilgilendirme Motoru.
+ # Bu blok mevcut Kurumsal Bilgilendirme motorunu bozmadan genisletir.
+ 
+-from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime, timedelta as _cic_v40_timedelta
++from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
+ from typing import Any as _cic_v40_Any
+ 
+ _CIC_V40_CELEBRATION_TASKS = {"staff_birthday", "work_anniversary", "special_day"}
+@@ -1734,10 +1682,6 @@ def ensure_celebration_schema() -> dict[str, object]:
+         result.setdefault("warnings", []).append(str(exc))
+     return result
+ 
+-
+-
+-
+-
+ # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_BEGIN
+ def ensure_defaults(actor_user_id: int | None = None) -> None:
+     """Ensure CIC default settings through one explicit public layer."""
+@@ -1768,8 +1712,6 @@ def ensure_defaults(actor_user_id: int | None = None) -> None:
+             db.session.rollback()
+ # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_END
+ 
+-
+-
+ def _cic_v40_special_days() -> list[dict[str, object]]:
+     data = _loads_json(f"{BASE_KEY}.special_days", _CIC_V40_SPECIAL_DAY_DEFAULTS)
+     if not isinstance(data, list):
+@@ -1859,11 +1801,6 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
+             return []
+     return _cic_v40_active_staff_candidates()
+ 
+-
+-
+-
+-
+-
+ # PHASE3A_CIC_EXPLICIT_RECIPIENT_RENDER_BEGIN
+ def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
+     """Resolve CIC task recipients through one explicit public layer."""
+@@ -1940,10 +1877,6 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
+         db.session.rollback()
+     return created
+ 
+-
+-
+-
+-
+ # PHASE3A_CIC_EXPLICIT_SEND_TASK_BEGIN
+ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, _cic_v40_Any]:
+     """Send CIC mail task through one explicit public layer.
+@@ -1975,8 +1908,6 @@ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User
+     return result
+ # PHASE3A_CIC_EXPLICIT_SEND_TASK_END
+ 
+-
+-
+ def _cic_v40_date_input(value: object) -> str:
+     d = _cic_v40_parse_date(value)
+     return d.isoformat() if d else ""
+@@ -2114,9 +2045,6 @@ def save_celebration_settings(payload: dict[str, object], actor_user_id: int | N
+         db.session.rollback()
+         raise
+ 
+-
+-
+-
+ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
+     if not _cic_v40_setting_bool("celebrations_include_weekend", False):
+         return []
+@@ -2147,8 +2075,6 @@ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool
+         db.session.rollback()
+     return results
+ 
+-
+-
+ # PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_BEGIN
+ def run_due_tasks(*, now: _cic_v40_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_v40_Any]:
+     """Run due CIC mail tasks through one explicit public layer.
+diff --git a/app/services/corporate_information_center_engine.py b/app/services/corporate_information_center_engine.py
+index f92b469..c8cf53d 100644
+--- a/app/services/corporate_information_center_engine.py
++++ b/app/services/corporate_information_center_engine.py
+@@ -1,9 +1,6 @@
+ from __future__ import annotations
+ 
+-
+-
+ import json
+-from dataclasses import dataclass
+ from datetime import date, datetime
+ from typing import Any
+ 
+@@ -13,7 +10,6 @@ except Exception:  # pragma: no cover
+     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center_engine.py:12")
+     current_user = None
+ 
+-from app.extensions import db
+ from app.models import User
+ try:
+     from app.services.settings.settings_service import get_setting_value, set_setting_value
+diff --git a/app/services/feedback_action_service.py b/app/services/feedback_action_service.py
+index c6b12f9..4dd6789 100644
+--- a/app/services/feedback_action_service.py
++++ b/app/services/feedback_action_service.py
+@@ -2,10 +2,6 @@ from __future__ import annotations
+ 
+ 
+ 
+-from app.models import FeedbackActionPlan
+-from app.services.feedback_service import create_action_plan, update_action_status
+-
+-
+ def get_priority_badge(priority: str) -> str:
+     normalized = (priority or "medium").strip().lower()
+     return {
+diff --git a/app/services/messages/thread_detail.py b/app/services/messages/thread_detail.py
+index a3305b3..15cc5ad 100644
+--- a/app/services/messages/thread_detail.py
++++ b/app/services/messages/thread_detail.py
+@@ -18,7 +18,6 @@ from app.extensions import db
+ from app.models import Message, MessageThread, MessageThreadParticipant
+ 
+ from .inbox import build_thread_counts_payload
+-from .presence import build_thread_presence
+ from .repository import orm_entity, thread_for_user
+ from .serialization import build_reaction_map, serialize_message
+ 
+diff --git a/app/services/publish/operations.py b/app/services/publish/operations.py
+index 5f5e488..df67fd3 100644
+--- a/app/services/publish/operations.py
++++ b/app/services/publish/operations.py
+@@ -1,9 +1,6 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+-from datetime import datetime
+ from typing import Any
+ 
+ from app.extensions import db
+diff --git a/app/services/redis_config_guard.py b/app/services/redis_config_guard.py
+index 6196bb5..587d961 100644
+--- a/app/services/redis_config_guard.py
++++ b/app/services/redis_config_guard.py
+@@ -1,10 +1,7 @@
+ from __future__ import annotations
+ 
+-
+-
+ from urllib.parse import urlparse
+ import socket
+-from typing import Any
+ 
+ DOCKER_REDIS_HOSTS = {"redis", "cache", "valkey"}
+ PROD_LIKE_ENVS = {"production", "staging", "pilot", "live", "canli", "canl─▒"}
+diff --git a/app/services/risk_dashboard_alignment_service.py b/app/services/risk_dashboard_alignment_service.py
+index 63a50e6..389a3d4 100644
+--- a/app/services/risk_dashboard_alignment_service.py
++++ b/app/services/risk_dashboard_alignment_service.py
+@@ -1,13 +1,11 @@
+ from __future__ import annotations
+ 
+-
+-
+ import csv
+ import json
+ from dataclasses import dataclass, asdict
+ from datetime import datetime
+ from pathlib import Path
+-from typing import Dict, Iterable, List, Optional
++from typing import Dict, Iterable
+ 
+ 
+ SPECIAL_INFO_PATTERNS = (
+@@ -37,13 +35,9 @@ class DashboardIssue:
+     reason: str
+     should_display_red: bool
+ 
+-
+-
+ def _normalize_text(value: str) -> str:
+     return (value or "").strip().lower()
+ 
+-
+-
+ def normalize_issue(person_name: str, unit_name: str, raw_label: str, message: str) -> DashboardIssue:
+     raw = _normalize_text(raw_label)
+     detail = _normalize_text(message)
+@@ -84,8 +78,6 @@ def normalize_issue(person_name: str, unit_name: str, raw_label: str, message: s
+         should_display_red=sev == "critical",
+     )
+ 
+-
+-
+ def export_dashboard_alignment_report(project_root: Path, issues: Iterable[DashboardIssue]) -> Dict[str, Path]:
+     out_dir = project_root / "reports" / "faz3_1"
+     out_dir.mkdir(parents=True, exist_ok=True)
+diff --git a/app/services/workflow/transitions.py b/app/services/workflow/transitions.py
+index 6d588e7..a9645a4 100644
+--- a/app/services/workflow/transitions.py
++++ b/app/services/workflow/transitions.py
+@@ -1,16 +1,12 @@
+ from __future__ import annotations
+ 
+-
+-
+ from app.core.datetime_utils import utc_now
+-from datetime import datetime
+ from typing import Optional
+ 
+ from app.extensions import db
+ from app.models import EvaluationAssignment, PerformanceEvaluation
+ 
+ from .constants import (
+-    WORKFLOW_DRAFT,
+     WORKFLOW_LEVEL2_DONE,
+     WORKFLOW_LEVEL3_DONE,
+     WORKFLOW_RESUBMITTED,
+diff --git a/app/support/help_center_content.py b/app/support/help_center_content.py
+index 3557e1b..dea0520 100644
+--- a/app/support/help_center_content.py
++++ b/app/support/help_center_content.py
+@@ -1,8 +1,5 @@
+ from __future__ import annotations
+ 
+-
+-
+-from collections import defaultdict
+ from typing import Any
+ import logging
+ logger = logging.getLogger(__name__)

@@ -8,5 +8,3 @@ Eski import yolunu kırmamak için yeni modüle yönlendiren compatibility wrapp
 Yeni gerçek modül:
 app/refactor/maintenance_merge_registry.py
 """
-
-from .maintenance_merge_registry import HOTFIX_MERGE_REGISTRY

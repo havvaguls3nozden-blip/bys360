@@ -12,7 +12,6 @@ Bu dosya doğrudan çalıştırılmaz; stub_engine.py ile birleştirilir.
 """
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Any
 
 # ── Yardımcı fonksiyonlar (stub_engine.py'dekilerle aynı imza) ──────────────

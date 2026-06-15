@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
-from datetime import datetime
 from typing import Optional
 
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformanceEvaluation
 
 from .constants import (
-    WORKFLOW_DRAFT,
     WORKFLOW_LEVEL2_DONE,
     WORKFLOW_LEVEL3_DONE,
     WORKFLOW_RESUBMITTED,

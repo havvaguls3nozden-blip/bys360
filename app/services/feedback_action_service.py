@@ -2,10 +2,6 @@ from __future__ import annotations
 
 
 
-from app.models import FeedbackActionPlan
-from app.services.feedback_service import create_action_plan, update_action_status
-
-
 def get_priority_badge(priority: str) -> str:
     normalized = (priority or "medium").strip().lower()
     return {

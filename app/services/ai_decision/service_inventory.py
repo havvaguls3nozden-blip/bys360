@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """AI Karar Destek servis envanteri."""
 
-from datetime import datetime
 
 from .live_scope import (
     AI_DECISION_PHASES,

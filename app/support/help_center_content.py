@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-
-
-from collections import defaultdict
 from typing import Any
 import logging
 logger = logging.getLogger(__name__)

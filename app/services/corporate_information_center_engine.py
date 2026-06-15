@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-
-
 import json
-from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
@@ -13,7 +10,6 @@ except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center_engine.py:12")
     current_user = None
 
-from app.extensions import db
 from app.models import User
 try:
     from app.services.settings.settings_service import get_setting_value, set_setting_value

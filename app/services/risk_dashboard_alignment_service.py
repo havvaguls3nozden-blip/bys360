@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-
-
 import csv
 import json
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable
 
 
 SPECIAL_INFO_PATTERNS = (
@@ -37,12 +35,8 @@ class DashboardIssue:
     reason: str
     should_display_red: bool
 
-
-
 def _normalize_text(value: str) -> str:
     return (value or "").strip().lower()
-
-
 
 def normalize_issue(person_name: str, unit_name: str, raw_label: str, message: str) -> DashboardIssue:
     raw = _normalize_text(raw_label)
@@ -83,8 +77,6 @@ def normalize_issue(person_name: str, unit_name: str, raw_label: str, message: s
         reason="Ham UI etiketi korundu; manuel gözden geçirme gerekebilir.",
         should_display_red=sev == "critical",
     )
-
-
 
 def export_dashboard_alignment_report(project_root: Path, issues: Iterable[DashboardIssue]) -> Dict[str, Path]:
     out_dir = project_root / "reports" / "faz3_1"

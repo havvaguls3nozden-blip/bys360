@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
-from flask import current_app
 
 try:
     import app.models as models

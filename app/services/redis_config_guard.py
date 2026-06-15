@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-
-
 from urllib.parse import urlparse
 import socket
-from typing import Any
 
 DOCKER_REDIS_HOSTS = {"redis", "cache", "valkey"}
 PROD_LIKE_ENVS = {"production", "staging", "pilot", "live", "canli", "canlı"}

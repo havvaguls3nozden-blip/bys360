@@ -8,14 +8,13 @@ from app.models import User
 
 
 import logging
-import json
 from typing import Any
 try:
     from flask import current_app
 except Exception:  # pragma: no cover - optional Flask context
     current_app = None  # type: ignore
 from app.services.cic.repository import (
-    get_setting, set_setting, _loads_json, _dumps_json, _now, _clean_ids,
+    get_setting, set_setting,
 )
 from app.services.cic.task_contract import BASE_KEY, TASK_DEFINITIONS
 logger = logging.getLogger(__name__)
@@ -28,7 +27,6 @@ The legacy implementation remains in app.services.corporate_information_center.
 Routes, template names, endpoint contracts and public function names are not changed.
 """
 
-from typing import Any
 
 
 __all__ = [

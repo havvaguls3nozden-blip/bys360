@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """Karar Destek Dashboard veri yüzeyi servisleri.
 
@@ -13,7 +11,6 @@ Faz 3 notu:
 """
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
 from typing import Any
 
 try:

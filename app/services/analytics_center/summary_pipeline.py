@@ -7,7 +7,7 @@ atmaz ve yalnızca dashboard/analiz fazları için güvenli özet hazırlığı 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable
 
 try:
     from app.services.ai_decision.summary_cache import (

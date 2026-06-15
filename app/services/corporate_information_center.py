@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-
-
 import json
 import ssl
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 from urllib.request import urlopen
 
@@ -311,9 +309,6 @@ def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> Non
     set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
     db.session.commit()
 
-
-
-
 def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
     for key, meta in TASK_DEFINITIONS.items():
         subject = (payload.get(f"subject_{key}") or meta["subject"]).strip()
@@ -509,12 +504,6 @@ def _recipients_for_task_base(task_key: str, override_users: list[User] | None =
     rec = get_recipients()
     return rec["managers"] if group == "managers" else rec["staff"]
 
-
-
-
-
-
-
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
 
 
@@ -587,9 +576,6 @@ def _cic_phase3_make_result(*, task_key: str, dry_run: bool, users: list[User], 
         "details": details[:120],
     }
 
-
-
-
 def get_recent_logs(limit: int = 120) -> list[Any]:
     try:
         from app.models import MailLog
@@ -602,8 +588,6 @@ def get_recent_logs(limit: int = 120) -> list[Any]:
 def _cic_phase3_last_result() -> dict[str, Any]:
     value = _loads_json(f"{BASE_KEY}.phase3.last_result", {})
     return value if isinstance(value, dict) else {}
-
-
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_END
 
@@ -802,11 +786,6 @@ def _cic_phase5_task_preview(tasks: list[dict[str, Any]], recipients: dict[str, 
             "subject": task.get("subject") or "",
         })
     return out
-
-
-
-
-
 
 def _context_base(search: str | None = None) -> dict[str, Any]:
     ensure_defaults()
@@ -1021,10 +1000,6 @@ def _cic_phase6_build(data: dict[str, Any]) -> dict[str, Any]:
         "final_send_checks": final_send_checks,
         "top_checks": top_checks,
     }
-
-
-
-
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_END
 
@@ -1311,22 +1286,6 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
 # BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1
 # Sistem uzerinden aktif/pasif ve saat kontrollu otomatik mail zamanlayici.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1
 # Otomatik mail zamanlayicisi hafta sonu guvenlik kilidi.
 # Cumartesi ve pazar gunleri otomatik mail gonderimi yapilmaz.
@@ -1401,10 +1360,6 @@ def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | N
     except Exception:
         db.session.rollback()
 
-
-
-
-
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_BEGIN
 def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:
     """Persist CIC system settings through one explicit public layer.
@@ -1416,11 +1371,6 @@ def save_system(payload: dict[str, object], actor_user_id: int | None = None) ->
     _save_system_base(payload, actor_user_id=actor_user_id)
     set_auto_scheduler_config(payload, actor_user_id=actor_user_id)
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_END
-
-
-
-
-
 
 # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
 def context(search: str | None = None) -> dict[str, Any]:
@@ -1446,8 +1396,6 @@ def context(search: str | None = None) -> dict[str, Any]:
 
     return data
 # PHASE3A_CIC_EXPLICIT_CONTEXT_END
-
-
 
 def _cic_auto_last_run_key(task_key: str) -> str:
     return f"{BASE_KEY}.auto.last_run.{task_key}"
@@ -1562,7 +1510,7 @@ def _run_due_tasks_base(*, now: _cic_dt_datetime | None = None, dry_run: bool = 
 # Akilli Kutlama ve Otomatik Ozel Gun Bilgilendirme Motoru.
 # Bu blok mevcut Kurumsal Bilgilendirme motorunu bozmadan genisletir.
 
-from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime, timedelta as _cic_v40_timedelta
+from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 from typing import Any as _cic_v40_Any
 
 _CIC_V40_CELEBRATION_TASKS = {"staff_birthday", "work_anniversary", "special_day"}
@@ -1734,10 +1682,6 @@ def ensure_celebration_schema() -> dict[str, object]:
         result.setdefault("warnings", []).append(str(exc))
     return result
 
-
-
-
-
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_BEGIN
 def ensure_defaults(actor_user_id: int | None = None) -> None:
     """Ensure CIC default settings through one explicit public layer."""
@@ -1767,8 +1711,6 @@ def ensure_defaults(actor_user_id: int | None = None) -> None:
         except Exception:
             db.session.rollback()
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_END
-
-
 
 def _cic_v40_special_days() -> list[dict[str, object]]:
     data = _loads_json(f"{BASE_KEY}.special_days", _CIC_V40_SPECIAL_DAY_DEFAULTS)
@@ -1859,11 +1801,6 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
             return []
     return _cic_v40_active_staff_candidates()
 
-
-
-
-
-
 # PHASE3A_CIC_EXPLICIT_RECIPIENT_RENDER_BEGIN
 def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
     """Resolve CIC task recipients through one explicit public layer."""
@@ -1940,10 +1877,6 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
         db.session.rollback()
     return created
 
-
-
-
-
 # PHASE3A_CIC_EXPLICIT_SEND_TASK_BEGIN
 def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, _cic_v40_Any]:
     """Send CIC mail task through one explicit public layer.
@@ -1974,8 +1907,6 @@ def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User
 
     return result
 # PHASE3A_CIC_EXPLICIT_SEND_TASK_END
-
-
 
 def _cic_v40_date_input(value: object) -> str:
     d = _cic_v40_parse_date(value)
@@ -2114,9 +2045,6 @@ def save_celebration_settings(payload: dict[str, object], actor_user_id: int | N
         db.session.rollback()
         raise
 
-
-
-
 def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
     if not _cic_v40_setting_bool("celebrations_include_weekend", False):
         return []
@@ -2146,8 +2074,6 @@ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool 
     except Exception:
         db.session.rollback()
     return results
-
-
 
 # PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_BEGIN
 def run_due_tasks(*, now: _cic_v40_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_v40_Any]:

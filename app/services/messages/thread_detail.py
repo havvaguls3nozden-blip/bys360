@@ -18,7 +18,6 @@ from app.extensions import db
 from app.models import Message, MessageThread, MessageThreadParticipant
 
 from .inbox import build_thread_counts_payload
-from .presence import build_thread_presence
 from .repository import orm_entity, thread_for_user
 from .serialization import build_reaction_map, serialize_message
 
