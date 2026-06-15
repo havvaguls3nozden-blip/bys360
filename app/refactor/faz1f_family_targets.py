@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 CANONICAL_TARGETS = {
     "communication_routes": [
         "app/communication/messages_routes.py",
