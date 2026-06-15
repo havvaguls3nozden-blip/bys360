@@ -356,8 +356,6 @@ def queue_social_urls(urls: list[str], *, source: str = 'manual') -> dict[str, A
     _write_json(_queue_path(), current)
     return {'ok': True, 'added': len(added), 'path': str(_queue_path())}
 
-
-
 def discover_and_queue_social_links() -> dict[str, Any]:
     """Kurumsal hesapları kontrol eder, bulunan bağlantıları yalnızca sıraya alır.
 

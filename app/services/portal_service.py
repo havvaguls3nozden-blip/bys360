@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections import Counter
 from datetime import timedelta
 from typing import Any
@@ -120,8 +118,6 @@ def get_or_create_profile(user: Any) -> PortalProfile | None:
     db.session.flush()
     return profile
 
-
-
 # BYS360_PORTAL_PROFILE_WALL_V2_8_CAN_POST_TO_WALL
 def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | None = None) -> bool:
     # Profil duvarına paylaşım bırakma iznini güvenli şekilde kontrol eder.
@@ -144,8 +140,6 @@ def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | 
     # Kurumsal portal V2.8: varsayılan davranış, aktif kullanıcıların açık profil duvarına paylaşım bırakabilmesidir.
     return True
 
-
-
 # BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_PERMISSIONS
 def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | None = None) -> bool:
     """Kullanıcının bir profil duvarına paylaşım bırakıp bırakamayacağını kontrol eder."""
@@ -166,8 +160,6 @@ def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | 
     if profile is not None and getattr(profile, "is_wall_enabled", True) is False:
         return False
     return True
-
-
 
 # BYS360_PORTAL_PEOPLE_PREMIUM_V2_10_REMOVED_HELPER
 def is_portal_post_removed(post: PortalPost) -> bool:
@@ -421,16 +413,12 @@ def record_activity(actor: Any, entity_type: str, entity_id: int | None, action_
     except SQLAlchemyError:
         db.session.rollback()
 
-
-
 # BYS360_PORTAL_INSTAGRAM_FEED_V2_11_2_PORTAL_STORY_STORY_HELPER_BEGIN
 def portal_instagram_story_items(user: Any, *, limit: int = 8) -> list[dict[str, Any]]:
     """Instagram story kartları geçici olarak portal ve ana sayfada gizlenir."""
     # BYS360_PORTAL_LIGHT_HOME_V2_8_81_HIDE_INSTAGRAM_STORIES_SERVICE
     return []
 # BYS360_PORTAL_INSTAGRAM_FEED_V2_11_2_PORTAL_STORY_STORY_HELPER_END
-
-
 
 def _bys360_home_normalize_text_v4(value: Any) -> str:
     """Ana sayfa filtreleri için Türkçe karakter duyarlı sadeleştirme."""

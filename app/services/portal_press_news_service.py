@@ -91,9 +91,6 @@ STOPWORDS = {
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
 
-
-
-
 def _press_news_sort_key(item: dict[str, Any]) -> float:
     # Haberleri gerçek yayın/işlem tarihine göre sıralar; en yeni kayıt en üstte görünür.
     values = [item.get('published_at_iso'), item.get('published_at'), item.get('published_at_text'), item.get('approved_at'), item.get('created_at'), item.get('updated_at')]

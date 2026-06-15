@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import re
 
 from sqlalchemy import or_
@@ -71,8 +69,6 @@ from app.services.portal_service import (
     visible_posts_for_user,
 )
 
-
-
 # BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_BEGIN
 _PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLES = {"admin", "super_admin", "system_admin", "sistem_yoneticisi"}
 
@@ -92,10 +88,6 @@ def _slugify(value: str) -> str:
     text = re.sub(r"[^a-z0-9]+", "-", text)
     text = re.sub(r"-+", "-", text).strip("-")
     return text or "portal-grubu"
-
-
-
-
 
 # BYS360_CORPORATE_PORTAL_MEDIA_VIDEO_V2_3_HELPERS
 # BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_HELPERS
@@ -386,8 +378,6 @@ def _portal_common_context() -> dict:
         **portal_experience_v2_context(current_user),
     }
 
-
-
 # BYS360_PORTAL_PROFILE_WALL_V2_8_WALL_HELPER
 def _wall_owner_id_from_form() -> int:
     raw_value = request.form.get("target_wall_user_id") or request.form.get("wall_owner_user_id")
@@ -398,8 +388,6 @@ def _wall_owner_id_from_form() -> int:
     if wall_owner_id <= 0:
         wall_owner_id = int(getattr(current_user, "id", 0) or 0)
     return wall_owner_id
-
-
 
 # BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_HELPERS
 def _wall_owner_id_from_form() -> int:
@@ -637,8 +625,6 @@ def portal_post_save(post_id: int):
     flash("Paylaşım kaydedildi." if action == "added" else "Kaydedilenlerden kaldırıldı.", "success")
     return redirect(request.referrer or url_for("main.portal_feed"))
 
-
-
 @main_bp.post("/portal/posts/<int:post_id>/report")
 @login_required
 @menu_key_required("portal_feed")
@@ -658,9 +644,6 @@ def portal_post_report(post_id: int):
     db.session.commit()
     flash("Paylaşım inceleme için bildirildi.", "success")
     return redirect(request.referrer or url_for("main.portal_feed"))
-
-
-
 
 # BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_MENTION_ROUTE
 @main_bp.get("/portal/mentions/users")
@@ -736,11 +719,6 @@ def portal_profile(user_id: int):
         portal_feed_posts=enrich_posts(posts, current_user),
     )
     return safe_render("portal/profile.html", "<h3>Portal Profili</h3>", **context)
-
-
-
-
-
 
 @main_bp.get("/portal/groups")
 @login_required
@@ -897,9 +875,6 @@ def portal_post_delete(post_id: int):
 
 # BYS360_PORTAL_DELETE_ROUTE_DEDUPE_V2_10_2: duplicate portal_post_delete blocks removed safely
 
-
-
-
 # BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_HELPER
 def _portal_press_news_admin_only(user) -> bool:
     if not user or not getattr(user, 'is_authenticated', False):
@@ -970,11 +945,6 @@ def portal_press_news_archive(candidate_id: str):
     flash(result.get("message") or "Haber adayı arşivlendi.", "info")
     return redirect(url_for("main.portal_press_news_review"))
 # BYS360_PORTAL_EXPERIENCE_V3A_PRESS_NEWS_ROUTES_END
-
-
-
-
-
 
 # BYS360_PORTAL_EXPERIENCE_V3B8_SOCIAL_IMPORT_REMOVED_REDIRECT_BEGIN
 @main_bp.before_app_request
