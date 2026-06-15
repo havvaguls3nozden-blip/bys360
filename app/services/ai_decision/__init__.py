@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from .live_scope import (
     AI_DECISION_PHASES,
     LIVE_AI_DATA_DOMAINS,

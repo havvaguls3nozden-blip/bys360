@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 AI Karar Destek Faz 6 düşük performans onay entegrasyonu.
 
