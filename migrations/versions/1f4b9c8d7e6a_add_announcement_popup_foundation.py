@@ -8,8 +8,6 @@ Create Date: 2026-04-24 12:10:00
 from alembic import op
 import sqlalchemy as sa
 
-
-
 # BYS360_ANNOUNCEMENT_POPUP_IDEMPOTENT_HELPERS
 def _bys360_has_table(table_name):
     bind = op.get_bind()

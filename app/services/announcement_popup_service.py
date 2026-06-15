@@ -621,9 +621,6 @@ def export_announcement_report_csv(announcement: Announcement) -> str:
         ])
     return output.getvalue()
 
-
-
-
 def is_announcement_in_publish_window(announcement: Announcement, *, now: datetime | None = None) -> bool:
     moment = now or _now()
     if not announcement.is_active:
