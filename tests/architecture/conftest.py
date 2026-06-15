@@ -19,6 +19,7 @@ ACTIVE_ARCHITECTURE_TEST_FILES = {
     "test_mobile_api_request_level_smoke_p2c_v3.py",
 
     "test_mobile_api_personnel_kpi_communication_response_p3c_v2.py",
+    "test_public_exports_live_guard_v1.py",
 }
 
 

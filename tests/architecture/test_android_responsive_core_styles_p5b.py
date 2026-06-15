@@ -32,7 +32,4 @@ def test_android_responsive_core_styles_gate_p5b() -> None:
     assert data["core_css_media_query_count"] >= 5
     assert data["direct_contract_ok"] is True
 
-
-
-
 pytestmark = pytest.mark.mobile

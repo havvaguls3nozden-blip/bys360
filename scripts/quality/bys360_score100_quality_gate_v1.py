@@ -195,9 +195,6 @@ def load_allowlist(project_root: Path, explicit: Path | None) -> dict[str, Any]:
                 return {}
     return {}
 
-
-
-
 def _load_score100_quality_baseline_v1e(root: Path) -> dict[str, Any]:
     """Load legacy debt baselines for the senior regression gate."""
     path = root / "config" / "quality" / "score100_quality_gate_baseline_v1e.json"

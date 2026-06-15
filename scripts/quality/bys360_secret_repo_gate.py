@@ -223,8 +223,6 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
                     "detail": f"{key} için kaynak kodda gömülü değer bulundu; değer rapora yazılmadı.",
                 })
 
-
-
 def scan_blocked_repo_artifacts(root: Path, findings: list[dict[str, Any]]) -> None:
     """Kaynak agacinda bulunmamasi gereken local/hassas artefaktlari yakalar."""
     root = root.resolve()

@@ -10,8 +10,6 @@ from app.services.performance.team_compare_service import (
     build_unit_rankings,
 )
 
-
-
 def _evaluation(**kwargs):
     employee = kwargs.pop('employee', SimpleNamespace(full_name='Ada Lovelace', ad='Ada', soyad='Lovelace', sicil_no='001', birim='YAZILIM', ust_birim='BT'))
     level_1 = kwargs.pop('level_1_evaluator', SimpleNamespace(full_name='Birinci Amir'))

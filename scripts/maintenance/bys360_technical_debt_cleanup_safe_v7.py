@@ -354,8 +354,6 @@ def patch_file(root: Path, path: Path, max_for_file: int | None = None) -> int:
     path.write_text("".join(lines), encoding="utf-8")
     return patched
 
-
-
 def compile_single_file(root: Path, path: Path) -> dict:
     try:
         py_compile.compile(str(path), doraise=True)

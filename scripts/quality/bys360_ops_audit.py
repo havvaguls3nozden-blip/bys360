@@ -59,9 +59,6 @@ def iter_files(root: Path, suffixes: Iterable[str]) -> Iterable[Path]:
         if path.suffix.lower() in suffix_set:
             yield path
 
-
-
-
 def iter_source_files(root: Path, source_paths: list[str] | None, suffixes: Iterable[str]) -> Iterable[Path]:
     """Yield files from explicit source paths while preserving project-root reports.
 
