@@ -56,9 +56,6 @@ def _user_text_values(user: Any) -> dict[str, str]:
         "ust_birim": str(getattr(user, "ust_birim", "") or "").strip(),
     }
 
-
-
-
 def _normalize(value: Any) -> str:
     raw = str(value or "").strip().lower()
     tr_map = str.maketrans("çğıöşüâîûİ", "cgiosuaiui")

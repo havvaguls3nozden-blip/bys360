@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
 from .dashboard_kpi_bridge import build_dashboard_kpi_summary_for_user

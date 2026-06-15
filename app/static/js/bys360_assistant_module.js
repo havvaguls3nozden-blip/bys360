@@ -1,4 +1,4 @@
-﻿/* BYS360_ASSISTANT_ADVANCED_INTELLIGENCE_V32: Sekme yönlendirme, niyet yakalama ve güvenli cevap güçlendirmesi */
+/* BYS360_ASSISTANT_ADVANCED_INTELLIGENCE_V32: Sekme yönlendirme, niyet yakalama ve güvenli cevap güçlendirmesi */
 /* BYS360_ASSISTANT_CURRENT_FINAL_POLISH_V31_3: V31 server-first güvenli localFallback ve final kalite düzeltmesi */
 /* BYS360_ASSISTANT_HOME_DASHBOARD_SPLIT_V31_2: Ana Sayfa ve Dashboard cevapları ayrıldı */
 /* BYS360_ASSISTANT_VISIBILITY_RESTORE_V31_1: visible launcher/panel restored, V31 server-first preserved */
@@ -160,17 +160,17 @@
 
   function knownRoute(href) {
     if (!href || href === '#') return false;
-    if (ROUTES.some(function (sayfa yolu) { return sayfa yolu.href === href; })) return true;
+    if (ROUTES.some(function (route) { return route.href === href; })) return true;
     return SAFE_ROUTE_PREFIXES.some(function (prefix) { return href.indexOf(prefix) === 0; });
   }
 
   function canonicalizeHref(href) {
     if (!href) return '#';
-    var işlenmemiş veri = String(href || '').trim();
-    if (!işlenmemiş veri || işlenmemiş veri === '#') return '#';
-    if (/^(javascript|data|vbscript):/i.test(işlenmemiş veri)) return '#';
+    var rawData = String(href || '').trim();
+    if (!rawData || rawData === '#') return '#';
+    if (/^(javascript|data|vbscript):/i.test(rawData)) return '#';
     var a = document.createElement('a');
-    a.href = işlenmemiş veri;
+    a.href = rawData;
     if (a.origin && a.origin !== window.location.origin) return '#';
     var path = a.pathname || '/';
     if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
@@ -183,16 +183,16 @@
 
   function titleToRoute(title) {
     var n = normalize(title || '');
-    if (!n) return boş;
-    var exact = ROUTES.find(function (sayfa yolu) { return normalize(sayfa yolu.title) === n; });
+    if (!n) return null;
+    var exact = ROUTES.find(function (route) { return normalize(route.title) === n; });
     if (exact) return exact;
-    return ROUTES.find(function (sayfa yolu) {
-      return sayfa yolu.keywords.some(function (keyword) { return n.indexOf(normalize(keyword)) !== -1; }) || n.indexOf(normalize(sayfa yolu.title)) !== -1;
-    }) || boş;
+    return ROUTES.find(function (route) {
+      return route.keywords.some(function (keyword) { return n.indexOf(normalize(keyword)) !== -1; }) || n.indexOf(normalize(route.title)) !== -1;
+    }) || null;
   }
 
   function normalizeAssistantLink(item) {
-    if (!item) return boş;
+    if (!item) return null;
     var title = String(item.title || item.label || 'Ekrana git');
     var href = canonicalizeHref(item.href || item.url || '#');
     if (normalize(title) === 'izin ve vekalet' || normalize(title) === 'izin ve vekâlet') {
@@ -214,7 +214,7 @@
   }
 
   function removeTransientNotice(root) {
-    var kayıt = root ? qs('[data-chat-log]', root) : boş;
+    var kayıt = root ? qs('[data-chat-log]', root) : null;
     if (!kayıt) return;
     var last = kayıt.lastElementChild;
     if (last && last.getAttribute('data-transient') === 'true') kayıt.removeChild(last);
@@ -232,7 +232,7 @@
     fetch(safe.href, {
       method: 'GET',
       credentials: 'same-origin',
-      geçici kayıt: 'no-store',
+      cache: 'no-store',
       headers: { 'Accept': 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8', 'X-BYS360-Assistant-Preflight': '1' }
     }).then(function (response) {
       if (!response.ok) throw new Error('http_' + response.status);
@@ -249,7 +249,7 @@
 
   // V7_CEVAP_HIJYENI_KATMANI: server veya eski bilgi bankasından gelse bile kullanıcı ekranına yanlış/alaycı/teknik ifade düşmesini engeller.
   function sanitizeAssistantText(text) {
-    var value = String(text == boş ? '' : text);
+    var value = String(text == null ? '' : text);
     var replacements = [
       [/Dönem\s+Yönetimi/g, 'Dönemler'],
       [/donem yonetimi/gi, 'Dönemler'],
@@ -352,8 +352,6 @@
     ]);
   }
 
-
-
   function isWeatherIntent(message) {
     var n = normalize(message);
     return /\b(hava|havadurumu|hava durumu|bugun hava|bugün hava|yagmur|yağmur|sicaklik|sıcaklık|ruzgar|rüzgar|open meteo|open-meteo)\b/.test(n);
@@ -363,7 +361,7 @@
     var n = normalize(message);
     if (!n) return false;
     // V31.1: Sunucu beyni önceliklidir. Yerel cevap yalnızca ekran/oturum veya anlık güvenli sayfa yardımı için çalışır.
-    return /\b(bu sayfa|bu ekran|burada ne|neredeyim|hangi ekrandayim|hangi ekrandayım|hangi sayfadayim|hangi sayfadayım|sayfa yardimi|sayfa yardımı|ekran yardimi|ekran yardımı|az onceki konu|az önceki konu|kaldigimiz yer|kaldığımız yer|devam edelim|nereden devam|sayfa değişince|sayfa degisince|konusmalar silinmesin|konuşmalar silinmesin|sohbet kayboluyor)\b/.test(n);
+    return /\b(bu sayfa|bu ekran|burada ne|neredeyim|hangi ekrandayim|hangi ekrandayım|hangi sayfadayim|hangi sayfadayım|sayfa yardimi|sayfa yardımı|ekran yardimi|ekran yardımı|az onceki konu|az önceki konu|kaldigimiz yer|kaldığımız yer|devam edelim|nereden devam|sayfa değişince|sayfa degisince|konusmalar silinmesin|konuşmalar silinmesin|sohbet kayboluyor|seni kim gelistirdi|seni kim geliştirdi|kim gelistirdi|kim geliştirdi|kim yapti|kim yaptı|gelistiren kim|geliştiren kim|havva gulsen ozden|havva gülsen özden|gulsen ozden|gülsen özden|havva mi|havva mı|gulsen mi|gülsen mi)\b/.test(n);
   }
 
   var WEATHER_PATHS = [
@@ -446,26 +444,26 @@
         if (temp || code || condition) return { temperature: temp, wind: wind, code: code, condition: condition, source: 'BYS360 hava durumu kartı' };
       }
     } catch (e) {}
-    return boş;
+    return null;
   }
 
-  function pickWeatherPayload(form verisi) {
-    if (!form verisi || typeof form verisi !== 'object') return boş;
-    var candidates = [form verisi, form verisi.weather, form verisi.current, form verisi.current_weather, form verisi.data, form verisi.result, form verisi.open_meteo, form verisi.openMeteo];
+  function pickWeatherPayload(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    var candidates = [payload, payload.weather, payload.current, payload.current_weather, payload.data, payload.result, payload.open_meteo, payload.openMeteo];
     for (var i = 0; i < candidates.length; i += 1) {
       var p = candidates[i];
       if (!p || typeof p !== 'object') continue;
-      var temp = p.temperature_2m != boş ? p.temperature_2m : (p.temperature != boş ? p.temperature : (p.temp != boş ? p.temp : p.current_temperature));
-      var wind = p.wind_speed_10m != boş ? p.wind_speed_10m : (p.windspeed != boş ? p.windspeed : (p.wind_speed != boş ? p.wind_speed : p.wind));
-      var code = p.weather_code != boş ? p.weather_code : (p.weathercode != boş ? p.weathercode : p.code);
+      var temp = p.temperature_2m != null ? p.temperature_2m : (p.temperature != null ? p.temperature : (p.temp != null ? p.temp : p.current_temperature));
+      var wind = p.wind_speed_10m != null ? p.wind_speed_10m : (p.windspeed != null ? p.windspeed : (p.wind_speed != null ? p.wind_speed : p.wind));
+      var code = p.weather_code != null ? p.weather_code : (p.weathercode != null ? p.weathercode : p.code);
       var condition = p.condition || p.description || p.summary || p.text || p.weather || '';
-      var precipitation = p.precipitation != boş ? p.precipitation : (p.rain != boş ? p.rain : p.showers);
-      var humidity = p.relative_humidity_2m != boş ? p.relative_humidity_2m : (p.humidity != boş ? p.humidity : boş);
-      if (temp != boş || code != boş || condition) {
-        return { temperature: temp, wind: wind, code: code, condition: condition, precipitation: precipitation, humidity: humidity, source: form verisi.source || p.source || 'Open-Meteo' };
+      var precipitation = p.precipitation != null ? p.precipitation : (p.rain != null ? p.rain : p.showers);
+      var humidity = p.relative_humidity_2m != null ? p.relative_humidity_2m : (p.humidity != null ? p.humidity : null);
+      if (temp != null || code != null || condition) {
+        return { temperature: temp, wind: wind, code: code, condition: condition, precipitation: precipitation, humidity: humidity, source: payload.source || p.source || 'Open-Meteo' };
       }
     }
-    return boş;
+    return null;
   }
 
   function weatherCodeText(code, condition) {
@@ -483,7 +481,7 @@
   }
 
   function parseWeatherTemperature(value) {
-    if (value == boş || value === '') return NaN;
+    if (value == null || value === '') return NaN;
     var cleaned = String(value).replace(',', '.').replace(/[^0-9.\-]/g, '');
     return Number(cleaned);
   }
@@ -532,10 +530,10 @@
   function formatWeatherAnswer(data) {
     var parts = [];
     var condition = safeWeatherCondition(data);
-    if (data.temperature != boş && data.temperature !== '') parts.push('sıcaklık ' + data.temperature + '°C');
+    if (data.temperature != null && data.temperature !== '') parts.push('sıcaklık ' + data.temperature + '°C');
     if (condition) parts.push('durum ' + condition);
-    if (data.wind != boş && data.wind !== '') parts.push('rüzgâr ' + data.wind + ' km/sa');
-    if (data.humidity != boş && data.humidity !== '') parts.push('nem %' + data.humidity);
+    if (data.wind != null && data.wind !== '') parts.push('rüzgâr ' + data.wind + ' km/sa');
+    if (data.humidity != null && data.humidity !== '') parts.push('nem %' + data.humidity);
     var base = parts.length ? ('BYS360 hava durumu bilgisini aldım: ' + parts.join(', ') + '.') : 'BYS360 hava durumu servisinden güncel veri aldım.';
     return base + ' ' + weatherTone(data);
   }
@@ -549,10 +547,10 @@
     function tryNext() {
       if (index >= weatherPaths.length) return Promise.reject(new Error('weather_unavailable'));
       var url = weatherPaths[index++];
-      return fetch(url, { credentials: 'same-origin', geçici kayıt: 'no-store', headers: { 'Accept': 'application/sistem verisi', 'X-BYS360-Assistant-Weather': '1' } })
-        .then(function (response) { if (!response.ok) throw new Error('http_' + response.status); return response.sistem verisi(); })
-        .then(function (form verisi) {
-          var data = pickWeatherPayload(form verisi);
+      return fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { 'Accept': 'application/json', 'X-BYS360-Assistant-Weather': '1' } })
+        .then(function (response) { if (!response.ok) throw new Error('http_' + response.status); return response.json(); })
+        .then(function (payload) {
+          var data = pickWeatherPayload(payload);
           if (!data) throw new Error('weather_payload');
           return makeAnswer(formatWeatherAnswer(data));
         })
@@ -609,16 +607,16 @@
 
   function routeForCurrentPage() {
     var path = canonicalizeHref(window.location.pathname || '/');
-    return ROUTES.find(function (r) { return r.href === path; }) || ROUTES.find(function (r) { return path.indexOf(r.href + '/') === 0; }) || boş;
+    return ROUTES.find(function (r) { return r.href === path; }) || ROUTES.find(function (r) { return path.indexOf(r.href + '/') === 0; }) || null;
   }
 
   function currentPageContext() {
-    var sayfa yolu = routeForCurrentPage();
+    var route = routeForCurrentPage();
     var path = canonicalizeHref(window.location.pathname || '/');
     return {
       path: path,
-      routeTitle: sayfa yolu ? sayfa yolu.title : '',
-      routeText: sayfa yolu ? sayfa yolu.text : '',
+      routeTitle: route ? route.title : '',
+      routeText: route ? route.text : '',
       heading: pageHeadingText(),
       activeMenu: activeMenuText(),
       at: new Date().toISOString()
@@ -629,17 +627,17 @@
     try {
       var ctx = currentPageContext();
       if (extra && typeof extra === 'object') Object.keys(extra).forEach(function (k) { ctx[k] = extra[k]; });
-      sessionStorage.setItem(STORAGE_CONTEXT, sistem verisi.stringify(ctx));
-      sessionStorage.setItem(STORAGE_LAST_PAGE, sistem verisi.stringify(ctx));
+      sessionStorage.setItem(STORAGE_CONTEXT, JSON.stringify(ctx));
+      sessionStorage.setItem(STORAGE_LAST_PAGE, JSON.stringify(ctx));
       return ctx;
-    } catch (e) { return boş; }
+    } catch (e) { return null; }
   }
 
   function loadSavedContext() {
     try {
-      var işlenmemiş veri = sessionStorage.getItem(STORAGE_CONTEXT) || sessionStorage.getItem(STORAGE_LAST_PAGE);
-      return işlenmemiş veri ? sistem verisi.parse(işlenmemiş veri) : boş;
-    } catch (e) { return boş; }
+      var rawData = sessionStorage.getItem(STORAGE_CONTEXT) || sessionStorage.getItem(STORAGE_LAST_PAGE);
+      return rawData ? JSON.parse(rawData) : null;
+    } catch (e) { return null; }
   }
 
   function lastMeaningfulChat() {
@@ -647,34 +645,32 @@
       var msg = chatHistory[i];
       if (msg && msg.text && String(msg.text).indexOf('Sorunuzu BYS360 kapsamında yorumluyorum') === -1) return msg;
     }
-    return boş;
+    return null;
   }
 
   function pageAwareAnswer() {
     var ctx = saveCurrentPageContext() || currentPageContext();
 
-
-
     /* BYS360_ASSISTANT_SCREEN_INTELLIGENCE_V23_PAGE_AWARE_BRIDGE */
-    var v23Page = (window.BYS360AssistantScreenIntelligenceV23 && typeof window.BYS360AssistantScreenIntelligenceV23.answerCurrentPage === 'function') ? window.BYS360AssistantScreenIntelligenceV23.answerCurrentPage() : boş;
+    var v23Page = (window.BYS360AssistantScreenIntelligenceV23 && typeof window.BYS360AssistantScreenIntelligenceV23.answerCurrentPage === 'function') ? window.BYS360AssistantScreenIntelligenceV23.answerCurrentPage() : null;
     if (v23Page && v23Page.text) return makeAnswer(v23Page.text, v23Page.links || []);
     /* BYS360_ASSISTANT_SCREEN_AGENT_V22_PAGE_AWARE_BRIDGE */
-    var v22Page = (window.BYS360AssistantScreenAgentV22 && typeof window.BYS360AssistantScreenAgentV22.answerCurrentPage === 'function') ? window.BYS360AssistantScreenAgentV22.answerCurrentPage() : boş;
+    var v22Page = (window.BYS360AssistantScreenAgentV22 && typeof window.BYS360AssistantScreenAgentV22.answerCurrentPage === 'function') ? window.BYS360AssistantScreenAgentV22.answerCurrentPage() : null;
     if (v22Page && v22Page.text) return makeAnswer(v22Page.text, v22Page.links || []);
     /* BYS360_ASSISTANT_SCREEN_AGENT_V21_PAGE_AWARE_BRIDGE */
-    var v21Page = (window.BYS360AssistantScreenAgentV21 && typeof window.BYS360AssistantScreenAgentV21.answerCurrentPage === 'function') ? window.BYS360AssistantScreenAgentV21.answerCurrentPage() : boş;
+    var v21Page = (window.BYS360AssistantScreenAgentV21 && typeof window.BYS360AssistantScreenAgentV21.answerCurrentPage === 'function') ? window.BYS360AssistantScreenAgentV21.answerCurrentPage() : null;
     if (v21Page && v21Page.text) return makeAnswer(v21Page.text, v21Page.links || []);
 
     /* BYS360_ASSISTANT_SCREEN_MAP_V20_PAGE_AWARE_BRIDGE */
-    var v20Page = (window.BYS360AssistantScreenMapV20 && typeof window.BYS360AssistantScreenMapV20.answerCurrentPage === 'function') ? window.BYS360AssistantScreenMapV20.answerCurrentPage() : boş;
+    var v20Page = (window.BYS360AssistantScreenMapV20 && typeof window.BYS360AssistantScreenMapV20.answerCurrentPage === 'function') ? window.BYS360AssistantScreenMapV20.answerCurrentPage() : null;
     if (v20Page && v20Page.text) return makeAnswer(v20Page.text, v20Page.links || []);
-    var sayfa yolu = routeForCurrentPage();
-    if (sayfa yolu) {
-      var parts = ['Şu an “' + sayfa yolu.title + '” ekranındasınız. ' + sayfa yolu.text];
-      if (ctx.heading && normalize(ctx.heading) !== normalize(sayfa yolu.title)) parts.push('Ekranda görünen başlık: “' + ctx.heading + '”.');
-      if (ctx.activeMenu && normalize(ctx.activeMenu).indexOf(normalize(sayfa yolu.title)) === -1) parts.push('Sol şeritte seçili görünen alan: “' + ctx.activeMenu + '”.');
+    var route = routeForCurrentPage();
+    if (route) {
+      var parts = ['Şu an “' + route.title + '” ekranındasınız. ' + route.text];
+      if (ctx.heading && normalize(ctx.heading) !== normalize(route.title)) parts.push('Ekranda görünen başlık: “' + ctx.heading + '”.');
+      if (ctx.activeMenu && normalize(ctx.activeMenu).indexOf(normalize(route.title)) === -1) parts.push('Sol şeritte seçili görünen alan: “' + ctx.activeMenu + '”.');
       parts.push('Bu ekranda işlem yaparken rol matrisi, kişi/birim bazlı görünürlük ve güvenli erişim sınırları geçerlidir. Ne yapmak istediğinizi yazarsanız bu ekrandan devam edilecek adımları sırayla anlatırım.');
-      return makeAnswer(parts.join(' '), [{ title: sayfa yolu.title, href: sayfa yolu.href }]);
+      return makeAnswer(parts.join(' '), [{ title: route.title, href: route.href }]);
     }
     var label = ctx.heading || ctx.activeMenu || ctx.path || 'bulunduğunuz sayfa';
     return makeAnswer('Şu an “' + label + '” alanındasınız. Bu ekranı Ekran Tanıma Ajanı ile yorumluyorum; yanlış linke yönlendirmemek için ekran adını doğrulamadan işlem bağlantısı açmam. Yapmak istediğiniz işlemi yazarsanız sizi güvenli BYS360 ekranına yönlendiririm.');
@@ -683,13 +679,13 @@
   function resumeAnswer() {
     var ctx = loadSavedContext() || currentPageContext();
     var last = lastMeaningfulChat();
-    var sayfa yolu = routeForCurrentPage();
+    var route = routeForCurrentPage();
     var text = 'Aynı oturum içinde kaldığımız yerden devam edebiliriz.';
-    if (sayfa yolu) text += ' Şu an “' + sayfa yolu.title + '” ekranındasınız.';
+    if (route) text += ' Şu an “' + route.title + '” ekranındasınız.';
     else if (ctx && (ctx.routeTitle || ctx.heading)) text += ' Son bağlam: “' + (ctx.routeTitle || ctx.heading) + '”.';
     if (last && last.text) text += ' Son konuşulan konu: “' + cleanSmallText(last.text, 120) + '”.';
     text += ' Bir önceki işlemden devam etmek için yapmak istediğiniz adımı yazın; ben aynı oturum bağlamını koruyarak yönlendireceğim.';
-    return makeAnswer(text, sayfa yolu ? [{ title: sayfa yolu.title, href: sayfa yolu.href }] : []);
+    return makeAnswer(text, route ? [{ title: route.title, href: route.href }] : []);
   }
 
 
@@ -741,8 +737,6 @@
     if (/\b(anket nasil cevaplanir|anket nasıl cevaplanır|anket nerede|anketler nerede|anket gonder|anket gönder)\b/.test(n)) {
       return moduleStepAnswer('Anketler', 'Sol şerit > Anketler', ['Anket atanan kullanıcı', 'Anket yetkilisi'], ['Anketler ekranını açın', 'Size atanan anketi seçin', 'Zorunlu soruları doldurun', 'Açık uçlu cevap varsa kurumsal ve net yazın', 'Gönder butonuyla yanıtı tamamlayın'], ['Anket cevapları yetki ve gizlilik kurallarıyla korunur.', 'Başka kullanıcıların cevapları yetkisiz gösterilmemelidir.'], ['Gönderim sonrası anketin tamamlandı durumuna geçtiğini kontrol edin.'], [{ title: 'Anketler', href: '/surveys' }]);
     }
-
-
 
     // V9_PERSONEL_IZIN_DEVAMSIZLIK_VEKALET_TAM_BILGI_BANKASI_CEVAPLARI
     if (/\b(v9|personel bilgi bankasi|personel bilgi bankası|izin bilgi bankasi|izin bilgi bankası|vekalet bilgi bankasi|vekâlet bilgi bankası)\b/.test(n)) {
@@ -854,8 +848,8 @@
       return makeAnswer('Hava durumunu BYS360’daki hava durumu kartından veya Open-Meteo bağlantısından okumaya çalışırım. Güncel veri gelirse kısa, ciddi ve doğrulanabilir bir hava notu paylaşırım; veri yoksa hava bilgisi uydurmam.');
     }
 
-    if (/\b(kim gelistirdi|seni kim|kim yapti|gelistiren kim|kimin tarafindan|kurumsal geliştirme|kurumsal kullanım|kurumsal kullanım)\b/.test(n)) {
-      return makeAnswer('Ben BYS360 Asistanı’yım. BYS360 için Personel kurumsal kullanım Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri sade, güvenli ve doğru sırayla anlatmak; sizi gerçek ekranlara yönlendirmek ve sistemi daha kolay kullanmanıza yardımcı olmaktır.', [{ title: 'Asistan Bilgi Bankası', href: '/ai-agent/knowledge' }]);
+    if (/\b(kim gelistirdi|kim geliştirdi|seni kim|seni kim gelistirdi|seni kim geliştirdi|kim yapti|kim yaptı|gelistiren kim|geliştiren kim|kimin tarafindan|kimin tarafından|havva gulsen ozden|havva gülsen özden|gulsen ozden|gülsen özden|havva mi|havva mı|gulsen mi|gülsen mi)\b/.test(n)) {
+      return makeAnswer('Ben BYS360 Asistanı’yım. BYS360 için Havva Gülsen Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri sade, güvenli ve doğru sırayla anlatmak; sizi gerçek ekranlara yönlendirmek ve sistemi daha kolay kullanmanıza yardımcı olmaktır.', [{ title: 'Asistan Bilgi Bankası', href: '/ai-agent/knowledge' }]);
     }
 
     if (/\b(sen nesin|kimsin|ne ise yararsin|ne işe yararsın|kendini tanit|kendini tanıt|asistan misin|asistan mısın)\b/.test(n)) {
@@ -931,7 +925,7 @@
     }
 
     if (/\b(rol matrisi nasil|rol matrisi nasıl|menu gorunmuyor|menü görünmüyor|sekme gorunmuyor|sekme görünmüyor|yetki yok|erisim yok|erişim yok|modul acilmiyor|modül açılmıyor)\b/.test(n)) {
-      return makeAnswer('Menü veya sekme görünmüyorsa kontrol sırası şöyledir: 1) Sistem Ayarları içinde Modül Bazlı Rol Matrisi açık mı? 2) İlgili modülün kendi rol matrisi açık mı? 3) Kullanıcıya kişi bazlı özel menü görünürlüğü verilmiş mi? 4) Birim bazlı profil kullanılıyorsa o profil ilgili ekranı kapatıyor mu? 5) Backend sayfa yolu yetkisi de aynı kuralla çalışıyor mu? Doğru kural şudur: Kullanıcı görmemesi gereken menüyü hiç görmemeli; URL yazarsa da güvenli erişim engeli almalıdır, beyaz ekran almamalıdır.', [{ title: 'Sistem Ayarları', href: '/settings' }, { title: 'Modül Bazlı Rol Matrisi', href: '/settings/role-matrix' }, { title: 'Performans Yönetimi Rol Matrisi', href: '/settings/performance-role-matrix' }]);
+      return makeAnswer('Menü veya sekme görünmüyorsa kontrol sırası şöyledir: 1) Sistem Ayarları içinde Modül Bazlı Rol Matrisi açık mı? 2) İlgili modülün kendi rol matrisi açık mı? 3) Kullanıcıya kişi bazlı özel menü görünürlüğü verilmiş mi? 4) Birim bazlı profil kullanılıyorsa o profil ilgili ekranı kapatıyor mu? 5) Backend route yetkisi de aynı kuralla çalışıyor mu? Doğru kural şudur: Kullanıcı görmemesi gereken menüyü hiç görmemeli; URL yazarsa da güvenli erişim engeli almalıdır, beyaz ekran almamalıdır.', [{ title: 'Sistem Ayarları', href: '/settings' }, { title: 'Modül Bazlı Rol Matrisi', href: '/settings/role-matrix' }, { title: 'Performans Yönetimi Rol Matrisi', href: '/settings/performance-role-matrix' }]);
     }
 
     if (/\b(rapor|raporlar|dashboard|yonetici gorunumu|yönetici görünümü|riskli personel|aksatan amir|performans haritasi|performans haritası)\b/.test(n)) {
@@ -989,6 +983,7 @@
         '</div>' +
         '<div class="bys360-am-body">' +
           '<div class="bys360-am-view is-active" data-panel="chat">' +
+            '<div class="bys360-am-intro" data-assistant-intro="true">' +'<strong>Ben BYS360 Asistanı’yım.</strong>' +'<span>BYS360 içinde doğru ekranı, işlem sırasını ve güvenli kontrol adımlarını anlatan kurumsal dijital yardımcıyım.</span>' +'</div>' +
             '<div class="bys360-am-log" data-chat-log="true"></div>' +
             '<form class="bys360-am-form" data-chat-form="true">' +
               '<textarea data-chat-input="true" rows="3" maxlength="900" placeholder="Sorunuzu yazın..."></textarea>' +
@@ -1021,15 +1016,15 @@
   }
 
   function saveChatHistory() {
-    try { sessionStorage.setItem(STORAGE_CHAT, sistem verisi.stringify(chatHistory.slice(-CHAT_LIMIT))); } catch (e) {}
+    try { sessionStorage.setItem(STORAGE_CHAT, JSON.stringify(chatHistory.slice(-CHAT_LIMIT))); } catch (e) {}
   }
 
   function restoreChatHistory(root) {
-    var işlenmemiş veri = boş;
-    try { işlenmemiş veri = sessionStorage.getItem(STORAGE_CHAT); } catch (e) {}
-    if (!işlenmemiş veri) return false;
+    var rawData = null;
+    try { rawData = sessionStorage.getItem(STORAGE_CHAT); } catch (e) {}
+    if (!rawData) return false;
     try {
-      var parsed = sistem verisi.parse(işlenmemiş veri);
+      var parsed = JSON.parse(rawData);
       if (!Array.isArray(parsed) || !parsed.length) return false;
       chatHistory = parsed.slice(-CHAT_LIMIT);
       chatHistory.forEach(function (msg) { appendMessage(root, msg.role, msg.text, msg.links || [], false); });
@@ -1040,7 +1035,7 @@
   function appendMessage(root, role, text, links, persist, transient) {
     links = safeLinks(links);
     if (role !== 'user') text = sanitizeAssistantText(text);
-    var kayıt = qs('[data-chat-kayıt]', root);
+    var kayıt = qs('[data-chat-log]', root);
     if (!kayıt) return;
     var row = document.createElement('div');
     row.className = 'bys360-am-message ' + (role === 'user' ? 'is-user' : 'is-bot');
@@ -1389,12 +1384,9 @@
     if (search) search.addEventListener('input', function () { renderGuide(root, search.value); });
     var refresh = qs('[data-refresh-summary]', root);
     if (refresh) refresh.addEventListener('click', function () { fetchSummary(root); });
-
-    if (!restoreChatHistory(root)) {
-      appendMessage(root, 'bot', 'Merhaba, ben ' + MODULE_NAME + '. Bulunduğunuz ekrana göre sizi doğru sekmeye, doğru işlem sırasına ve güvenli kontrol adımına yönlendiririm. Performans, personel, izin, vekâlet, rol matrisi, raporlar, destek, anket, AI Karar Destek ve sayfa bazlı yardım konularında sorunuzu yazabilirsiniz.');
-    }
-
-    var form = qs('[data-chat-form]', root);
+    // BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34: Sohbet içine otomatik tanıtım mesajı basılmaz.
+    restoreChatHistory(root);
+var form = qs('[data-chat-form]', root);
     var input = qs('[data-chat-input]', root);
     if (input) {
       input.addEventListener('keydown', function (event) {
@@ -1443,7 +1435,7 @@
       fallback.type = 'button';
       fallback.textContent = 'BYS360 Asistanı';
       fallback.style.cssText = 'position:fixed;right:24px;bottom:24px;z-index:2147483647;border:0;border-radius:999px;background:#8B0000;color:#fff;padding:14px 18px;font-weight:800;box-shadow:0 12px 36px rgba(0,0,0,.22);';
-      fallback.onclick = function () { location.href = '/ai-agent/panel'; };
+      fallback.onclick = function () { try { if (window.BYS360AssistantModule && window.BYS360AssistantModule.open) window.BYS360AssistantModule.open(); } catch (e) {} };
       document.body.appendChild(fallback);
     }
   });
@@ -1549,8 +1541,8 @@
       ].join("\n");
     }
 
-    if (/sen kimsin|seni kim geliştirdi|kim geliştirdi|nasıl çalışıyorsun|yapay zekaya bağlı mısın|chatgpt misin/.test(q)) {
-      return "Ben BYS360 Asistanı’yım. BYS360 için Personel kurumsal kullanım Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri doğru ekrana ve doğru işlem sırasına göre anlatmak; sistemi daha kolay, güvenli ve anlaşılır kullanmanıza yardımcı olmaktır. İdari karar üretmem, performans puanı belirlemem ve hassas veri göstermem.";
+    if (/sen kimsin|seni kim gelistirdi|seni kim geliştirdi|kim gelistirdi|kim geliştirdi|kim yaptı|kim yapti|havva gulsen ozden|havva gülsen özden|gulsen ozden|gülsen özden|nasıl çalışıyorsun|yapay zekaya bağlı mısın|chatgpt misin/.test(q)) {
+      return "Ben BYS360 Asistanı’yım. BYS360 için Havva Gülsen Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri sade, güvenli ve doğru sırayla anlatmak; sizi gerçek ekranlara yönlendirmek ve sistemi daha kolay kullanmanıza yardımcı olmaktır. İdari karar üretmem, performans puanı belirlemem ve hassas veri göstermem.";
     }
 
     if (/neler yapabiliyorsun|hangi konularda yardımcı|bana nasıl yardımcı/.test(q)) {
@@ -1622,7 +1614,7 @@
       return "Şu an bulunduğunuz ekranı dikkate alarak yardımcı olabilirim. Sayfa yolu: " + path + ". Sorunuzu bu ekran üzerinden sorarsanız ilgili işlem adımlarını buradan devam ettiririm.";
     }
 
-    return boş;
+    return null;
   }
 
   function install(){
@@ -1669,8 +1661,6 @@
   }
 })();
 /* BYS360_ASISTANI_MODULU_V12_FINAL_GATE_END */
-
-
 
 /* BYS360_V14_INTENT_ENGINE_START */
 (function(){
@@ -1733,7 +1723,7 @@
       }
     }
 
-    return boş;
+    return null;
   }
 
   window.BYS360IntentEngine = {
@@ -1917,7 +1907,7 @@
 
   function getPageHelp(path){
     const current = String(path || getCurrentPath());
-    let best = boş;
+    let best = null;
     for (const item of pageHelpMap){
       for (const m of item.match){
         if (current === m || current.startsWith(m + "/") || current.indexOf(m) === 0){
@@ -1982,7 +1972,7 @@
   const troubleshootingMap = [
     {
       key: "white_screen",
-      phrases: ["beyaz ekran", "sayfa beyaz", "ekran boş", "500 hata", "sayfa açılmıyor"],
+      phrases: ["beyaz ekran", "sayfa beyaz", "ekran null", "500 hata", "sayfa açılmıyor"],
       answer: [
         "Bu durum sayfanın yüklenirken hata aldığını gösterir.",
         "",
@@ -2091,7 +2081,7 @@
     },
     {
       key: "president_approvals_empty",
-      phrases: ["başkan onayları boş", "başkan onayı görünmüyor", "70 altı görünmüyor"],
+      phrases: ["başkan onayları null", "başkan onayı görünmüyor", "70 altı görünmüyor"],
       answer: [
         "Başkan Onayları ekranı boşsa önce gerçekten 70 altı ve onay bekleyen kayıt olup olmadığı kontrol edilmelidir.",
         "",
@@ -2125,7 +2115,7 @@
     },
     {
       key: "report_not_opening",
-      phrases: ["rapor açılmıyor", "rapor gelmiyor", "dashboard boş", "grafik görünmüyor"],
+      phrases: ["rapor açılmıyor", "rapor gelmiyor", "dashboard null", "grafik görünmüyor"],
       answer: [
         "Rapor veya dashboard açılmıyorsa veri, yetki ve route/template katmanı birlikte kontrol edilmelidir.",
         "",
@@ -2134,7 +2124,7 @@
         "2. Kullanıcının rapor kapsamını görme yetkisi var mı bakın.",
         "3. Rapor URL’si güvenli menü haritasında mı kontrol edin.",
         "4. Backend loglarında rapor route hatası var mı inceleyin.",
-        "5. Grafik için gereken veri boşsa kullanıcıya anlaşılır boş durum mesajı gösterilmelidir.",
+        "5. Grafik için gereken veri boşsa kullanıcıya anlaşılır null durum mesajı gösterilmelidir.",
         "",
         "Dikkat:",
         "Raporlarda kişi detayları yalnızca yetki kapsamına göre gösterilmelidir."
@@ -2184,7 +2174,7 @@
         }
       }
     }
-    return boş;
+    return null;
   }
 
   window.BYS360TroubleshootingGuide = {
@@ -2570,7 +2560,7 @@
         }
       }
     } catch(e){}
-    return boş;
+    return null;
   }
 
   function answerFromPage(question){
@@ -2583,7 +2573,7 @@
         return window.BYS360PageContextHelp.getPageHelp();
       }
     } catch(e){}
-    return boş;
+    return null;
   }
 
   function answerFromTroubleshooting(question){
@@ -2592,15 +2582,15 @@
         return window.BYS360TroubleshootingGuide.findTroubleshooting(question);
       }
     } catch(e){}
-    return boş;
+    return null;
   }
 
   function answerFromTrainingBank(question){
     try {
       const q = norm(question);
-      const işlenmemiş veri = document.getElementById("trainingBankSeed") ? document.getElementById("trainingBankSeed").textContent : boş;
-      if (!işlenmemiş veri) return boş;
-      const bank = sistem verisi.parse(işlenmemiş veri);
+      const rawData = document.getElementById("trainingBankSeed") ? document.getElementById("trainingBankSeed").textContent : null;
+      if (!rawData) return null;
+      const bank = JSON.parse(rawData);
       const items = bank.knowledge || [];
       for (const item of items) {
         const questionText = norm(item.question);
@@ -2621,7 +2611,7 @@
         }
       }
     } catch(e){}
-    return boş;
+    return null;
   }
 
   function answerDirect(question){
@@ -2707,15 +2697,15 @@
       ].join("\n");
     }
 
-    if (q.includes("seni kim geliştirdi") || q.includes("sen kimsin") || q.includes("chatgpt misin") || q.includes("nasıl çalışıyorsun")) {
-      return "Ben BYS360 Asistanı’yım. BYS360 için Personel kurumsal kullanım Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri doğru ekrana ve doğru işlem sırasına göre anlatmak; sistemi daha kolay, güvenli ve anlaşılır kullanmanıza yardımcı olmaktır.";
+    if (q.includes("seni kim geliştirdi") || q.includes("seni kim gelistirdi") || q.includes("kim geliştirdi") || q.includes("kim gelistirdi") || q.includes("havva gülsen özden") || q.includes("havva gulsen ozden") || q.includes("gülsen özden") || q.includes("gulsen ozden") || q.includes("sen kimsin") || q.includes("chatgpt misin") || q.includes("nasıl çalışıyorsun")) {
+      return "Ben BYS360 Asistanı’yım. BYS360 için Havva Gülsen Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri sade, güvenli ve doğru sırayla anlatmak; sizi gerçek ekranlara yönlendirmek ve sistemi daha kolay kullanmanıza yardımcı olmaktır.";
     }
 
     if (q.includes("neler yapabiliyorsun") || q.includes("hangi konularda yardımcı")) {
       return "BYS360 içinde personel işlemleri, izin-devamsızlık-vekalet süreçleri, performans dönemleri, Değerlendirme Kriterleri, görev üretimi, Başkan Onayları, karne-yayın süreci, rol matrisi, menü görünürlüğü, raporlar, destek talepleri, anketler, bildirimler ve AI Karar Destek Merkezi hakkında adım adım yardımcı olurum.";
     }
 
-    return boş;
+    return null;
   }
 
   function smartAnswer(question, previousAnswer){
@@ -2960,7 +2950,7 @@
       return Object.assign({score: bestScore, matched: details}, best);
     }
 
-    return boş;
+    return null;
   }
 
   function answerDeepPageQuestion(question){
@@ -3237,7 +3227,7 @@
 
   function recognizeContentFirstPage(){
     const signals = getSignals();
-    let best = boş;
+    let best = null;
     let bestScore = 0;
     let bestMatched = [];
 
@@ -3408,11 +3398,11 @@
     for (const key of keys) {
       if (p.startsWith(key + "/")) return officialScreenIdentityMap[key];
     }
-    return boş;
+    return null;
   }
 
   function ensureIdentityNode(identity){
-    if (!identity) return boş;
+    if (!identity) return null;
 
     let node = document.getElementById("bys360-official-screen-identity");
     if (!node) {
@@ -3484,7 +3474,7 @@
       const official = answerOfficialScreenQuestion(question);
       if (official) return official;
       if (typeof previousLocal === "function") return previousLocal(question);
-      return boş;
+      return null;
     };
 
     if (window.BYS360AssistantModule) {
@@ -3672,7 +3662,7 @@
         }
         return ans;
       }
-      return boş;
+      return null;
     };
 
     if (window.BYS360AssistantModule) {
@@ -3792,7 +3782,7 @@
     for (const key of keys) {
       if (p.startsWith(key + "/")) return Object.assign({url:key}, safeMenuFullMap[key]);
     }
-    return boş;
+    return null;
   }
 
   function isBadFallback(answer){
@@ -3844,7 +3834,7 @@
 
   function replaceVisibleTitle(){
     const screen = applySafeScreenIdentity();
-    if (!screen) return boş;
+    if (!screen) return null;
 
     const selectors = "h1,h2,.page-title,.content-title,.module-title,.dashboard-title,.page-header-title,.section-title,[data-page-title],[data-title]";
     document.querySelectorAll(selectors).forEach(function(el){
@@ -3865,7 +3855,7 @@
 
   function safeScreenAnswer(){
     const screen = replaceVisibleTitle() || applySafeScreenIdentity();
-    if (!screen) return boş;
+    if (!screen) return null;
 
     return [
       "Bulunduğunuz ekran: " + screen.title,
@@ -3931,7 +3921,7 @@
         return old;
       }
 
-      return boş;
+      return null;
     };
 
     if (window.BYS360AssistantModule) {
@@ -3984,7 +3974,7 @@
   }
 
   function escapeText(value) {
-    return String(value == boş ? '' : value).replace(/[&<>\"]/g, function (ch) {
+    return String(value == null ? '' : value).replace(/[&<>\"]/g, function (ch) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch];
     });
   }
@@ -4131,7 +4121,7 @@
       keywords: ['değerlendirme görevleri', 'görev üretimi', 'puanlama görevi', 'amir görevi'],
       description: 'Amir değerlendirme görevlerinin üretildiği ve takip edildiği ekrandır.',
       actions: ['Dönem için görev üretme', 'Eksik amir veya hatalı zincir kontrolü yapma', 'Puanlama bekleyen görevleri izleme'],
-      attention: ['Sahte görev veya boş 3. amir bekleme durumu üretilmemelidir.']
+      attention: ['Sahte görev veya null 3. amir bekleme durumu üretilmemelidir.']
     },
     {
       key: 'president_approvals',
@@ -4378,7 +4368,7 @@
 
   function matchScreen() {
     var signals = collectSignals();
-    var best = boş;
+    var best = null;
     var bestScore = 0;
     var bestMatches = [];
     SCREENS.forEach(function (screen) {
@@ -4414,11 +4404,11 @@
       best.matches = bestMatches;
       return best;
     }
-    return boş;
+    return null;
   }
 
   function buildAnswer(screen) {
-    if (!screen) return boş;
+    if (!screen) return null;
     var lines = [];
     lines.push('Bulunduğunuz ekran: ' + screen.title);
     lines.push('Alan: ' + screen.bölüm);
@@ -4455,7 +4445,7 @@
       var kpi = SCREENS.filter(function (s) { return s.key === 'kpi_dashboard'; })[0];
       return buildAnswer(kpi);
     }
-    return boş;
+    return null;
   }
 
   var previousLocal = window.BYS360AssistantLocalAnswer;
@@ -4463,7 +4453,7 @@
     var answer = answerQuestion(question);
     if (answer && answer.text) return answer.text;
     if (typeof previousLocal === 'function') return previousLocal(question);
-    return boş;
+    return null;
   };
 
   window.BYS360AssistantScreenMapV20 = {
@@ -4512,7 +4502,7 @@
   }
 
   function uniq(list, limit) {
-    var seen = Object.create(boş);
+    var seen = Object.create(null);
     var out = [];
     (list || []).forEach(function (item) {
       var t = cleanText(item, 120);
@@ -4529,7 +4519,7 @@
     try {
       document.querySelectorAll(selector).forEach(function (el) {
         if (!el) return;
-        var style = window.getComputedStyle ? window.getComputedStyle(el) : boş;
+        var style = window.getComputedStyle ? window.getComputedStyle(el) : null;
         if (style && (style.display === 'none' || style.visibility === 'hidden')) return;
         items.push(el.textContent || el.getAttribute('aria-label') || el.getAttribute('title') || '');
       });
@@ -4677,7 +4667,7 @@
       (facts.dataSignals || []).join(' '),
       facts.bodySample
     ].join(' '));
-    var best = boş;
+    var best = null;
     var bestScore = -1;
     MODULE_RULES.forEach(function (rule) {
       var score = 0;
@@ -4733,7 +4723,7 @@
         }
       }
     } catch (e) {}
-    return boş;
+    return null;
   }
 
   function buildDynamicAnswer(facts, rule) {
@@ -4790,7 +4780,7 @@
 
   function answerQuestion(question) {
     if (isPageQuestion(question)) return answerCurrentPage();
-    return boş;
+    return null;
   }
 
   var previousLocal = window.BYS360AssistantLocalAnswer;
@@ -4798,7 +4788,7 @@
     var answer = answerQuestion(question);
     if (answer && answer.text) return answer.text;
     if (typeof previousLocal === 'function') return previousLocal(question);
-    return boş;
+    return null;
   };
 
   window.BYS360AssistantScreenAgentV21 = {
@@ -4848,7 +4838,7 @@
   }
 
   function uniq(list, limit) {
-    var seen = Object.create(boş);
+    var seen = Object.create(null);
     var out = [];
     (list || []).forEach(function (item) {
       var t = cleanText(item, 140);
@@ -4863,9 +4853,9 @@
   function isVisible(el) {
     try {
       if (!el) return false;
-      var style = window.getComputedStyle ? window.getComputedStyle(el) : boş;
+      var style = window.getComputedStyle ? window.getComputedStyle(el) : null;
       if (style && (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0')) return false;
-      var rect = el.getBoundingClientRect ? el.getBoundingClientRect() : boş;
+      var rect = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
       if (rect && rect.width === 0 && rect.height === 0) return false;
     } catch (e) {}
     return true;
@@ -4900,10 +4890,10 @@
   function pathMatches(path, patterns) {
     var p = norm(path || '');
     return (patterns || []).some(function (pattern) {
-      var işlenmemiş veri = String(pattern || '');
-      var n = norm(işlenmemiş veri);
+      var rawData = String(pattern || '');
+      var n = norm(rawData);
       if (!n) return false;
-      if (işlenmemiş veri.slice(-1) === '*') return p.indexOf(norm(işlenmemiş veri.slice(0, -1))) === 0;
+      if (rawData.slice(-1) === '*') return p.indexOf(norm(rawData.slice(0, -1))) === 0;
       return p === n || p.indexOf(n + '/') === 0 || p.indexOf(n) === 0;
     });
   }
@@ -5188,12 +5178,12 @@
     if (rule.exactHomeOnly && !pathIsHome(facts.path)) return -1000;
 
     (rule.paths || []).forEach(function (pattern) {
-      var işlenmemiş veri = String(pattern || '');
-      var base = işlenmemiş veri.slice(-1) === '*' ? işlenmemiş veri.slice(0, -1) : işlenmemiş veri;
+      var rawData = String(pattern || '');
+      var base = rawData.slice(-1) === '*' ? rawData.slice(0, -1) : rawData;
       var n = norm(base);
       if (!n) return;
       if (p === n) score += 1000;
-      else if (işlenmemiş veri.slice(-1) === '*' && p.indexOf(n) === 0) score += 900;
+      else if (rawData.slice(-1) === '*' && p.indexOf(n) === 0) score += 900;
       else if (p.indexOf(n + '/') === 0) score += 850;
     });
 
@@ -5218,7 +5208,7 @@
   }
 
   function matchScreen(facts) {
-    var best = boş;
+    var best = null;
     var bestScore = -9999;
     SCREEN_RULES.forEach(function (rule) {
       var score = scoreRule(rule, facts);
@@ -5311,7 +5301,7 @@
 
   function answerQuestion(question) {
     if (isPageQuestion(question)) return answerCurrentPage();
-    return boş;
+    return null;
   }
 
   var previousLocal = window.BYS360AssistantLocalAnswer;
@@ -5319,7 +5309,7 @@
     var answer = answerQuestion(question);
     if (answer && answer.text) return answer.text;
     if (typeof previousLocal === 'function') return previousLocal(question);
-    return boş;
+    return null;
   };
 
   window.BYS360AssistantScreenAgentV22 = {
@@ -5370,7 +5360,7 @@
   }
 
   function uniq(list, limit) {
-    var seen = Object.create(boş);
+    var seen = Object.create(null);
     var out = [];
     (list || []).forEach(function (item) {
       var t = cleanText(item, 180);
@@ -5385,9 +5375,9 @@
   function isVisible(el) {
     try {
       if (!el) return false;
-      var style = window.getComputedStyle ? window.getComputedStyle(el) : boş;
+      var style = window.getComputedStyle ? window.getComputedStyle(el) : null;
       if (style && (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0')) return false;
-      var rect = el.getBoundingClientRect ? el.getBoundingClientRect() : boş;
+      var rect = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
       if (rect && rect.width === 0 && rect.height === 0) return false;
     } catch (e) {}
     return true;
@@ -5472,7 +5462,7 @@
     { id:'periods', screen:'Dönemler', bölüm:'Performans Yönetimi', href:'/performance/periods', paths:['/performance/periods*','/performans/donem*','/performans/dönem*'], keywords:['dönemler','performans dönemi','yeni dönem','kapsam tipi','aktif dönem'], family:'performance', description:'Bu ekran performans dönemlerinin yıl, dönem türü, tarih aralığı ve kapsam tipiyle yönetilmesi için kullanılır.', actions:['Dönem listesini ve aktif dönemi kontrol etme','Yetki varsa yeni dönem oluşturma','Tüm kurum, birim, kategori veya seçili personel kapsamını belirleme','Görev üretimi öncesi dönem bilgilerini doğrulama'], attention:['Doğru sekme adı Dönemlerdir; yönlendirme bu adla yapılmalıdır.'] },
     { id:'criteria', screen:'Değerlendirme Kriterleri', bölüm:'Performans Yönetimi', href:'/performance/criteria', paths:['/performance/criteria*','/performans/kriter*','/performance/evaluation-criteria*'], keywords:['değerlendirme kriterleri','kriterler','kriter ekle','aktif kriter'], family:'performance', description:'Bu ekran performans değerlendirmesinde kullanılacak kurumsal kriterlerin tanımlanması ve yönetilmesi için kullanılır.', actions:['Kriter listesini kontrol etme','Yetki varsa kriter ekleme veya düzenleme','Aktif/pasif durumunu kontrol etme'], attention:['Ekran dilinde ana terim Değerlendirme Kriterleri olmalıdır.'] },
     { id:'weights', screen:'Ağırlık Ayarları', bölüm:'Performans Yönetimi', href:'/performance/weights', paths:['/performance/weights*','/performans/agirlik*','/performans/ağırlık*'], keywords:['ağırlık','agirlik','1. amir','2. amir','3. amir','yüzde','%100'], family:'performance', description:'Bu ekran amir seviyelerine göre puan ağırlıklarının ve 3. amir modunun kontrol edilmesi için kullanılır.', actions:['Ağırlık toplamının %100 olduğunu kontrol etme','3. amir yorum/puan modunu ayırt etme','Yetki varsa dönem veya rol bazlı ağırlık düzenleme'], attention:['3. amir yorum modundaysa puana etkisi olmamalıdır.'] },
-    { id:'assignments', screen:'Görev Üretimi ve Değerlendirme Görevleri', bölüm:'Performans Yönetimi', href:'/performance/assignments', paths:['/performance/assignments*','/performance/tasks*','/performans/gorev*','/performans/görev*'], keywords:['görev üretimi','değerlendirme görevi','atanan görev','amir zinciri','eksik amir'], family:'performance', description:'Bu ekran dönem kapsamındaki personel için gerçek amir zincirine göre değerlendirme görevlerinin üretilmesi ve takip edilmesi için kullanılır.', actions:['Dönemi ve kapsamı seçme','Eksik amir veya hatalı zincir kontrolü yapma','Görevleri üretme veya yeniden üretme','Bekleyen görevleri izleme'], attention:['Sahte görev veya boş 3. amir beklemesi üretilmemelidir.'] },
+    { id:'assignments', screen:'Görev Üretimi ve Değerlendirme Görevleri', bölüm:'Performans Yönetimi', href:'/performance/assignments', paths:['/performance/assignments*','/performance/tasks*','/performans/gorev*','/performans/görev*'], keywords:['görev üretimi','değerlendirme görevi','atanan görev','amir zinciri','eksik amir'], family:'performance', description:'Bu ekran dönem kapsamındaki personel için gerçek amir zincirine göre değerlendirme görevlerinin üretilmesi ve takip edilmesi için kullanılır.', actions:['Dönemi ve kapsamı seçme','Eksik amir veya hatalı zincir kontrolü yapma','Görevleri üretme veya yeniden üretme','Bekleyen görevleri izleme'], attention:['Sahte görev veya null 3. amir beklemesi üretilmemelidir.'] },
     { id:'scoring', screen:'Puanlama ve Değerlendirme', bölüm:'Performans Yönetimi', href:'/performance/scoring', paths:['/performance/scoring*','/performans/puan*','/performance/evaluations*'], keywords:['puanlama','değerlendirme yap','1-5','genel görüş','açıklama'], family:'performance', description:'Bu ekran amirlerin kendilerine atanmış personeli kriter bazlı puan ve görüş ile değerlendirmesi için kullanılır.', actions:['Atanmış değerlendirme görevini açma','Kriter bazlı puanları girme','Zorunlu açıklama alanlarını doldurma','Değerlendirmeyi kaydetme veya tamamlama'], attention:['Asistan puan önermez veya puan belirlemez; yalnızca işlem sırasını açıklar.'] },
     { id:'publish_approvals', screen:'Yayın Ön Onayı', bölüm:'Performans Yönetimi', href:'/performance/personnel-support-publish-approvals', paths:['/performance/personnel-support-publish-approvals*','/performance/publish*','/performans/yayin*','/performans/yayın*'], keywords:['yayın ön onayı','yayınla','personel ve destek','final yayın','yayın kilidi'], family:'performance', description:'Bu ekran sonuçların personele açılmadan önce yetkili yayın ön onayı ve final yayın kontrolünden geçmesi için kullanılır.', actions:['Yayın öncesi bekleyen kayıtları kontrol etme','Başkan onayı gerektiren kayıtların tamamlandığını doğrulama','Yetki varsa yayın ön onayı veya final yayın adımına geçme'], attention:['Yayın tamamlanmadan personel kendi kesin sonucunu görmemelidir.'] },
     { id:'period_notes', screen:'Dönem İçi Notlar', bölüm:'Performans Yönetimi', href:'/performance/period-notes', paths:['/performance/period-notes*','/performans/donem-ici-not*','/performans/dönem-içi-not*'], keywords:['dönem içi not','ara geri bildirim','olumlu olay','gelişim ihtiyacı','gözlem'], family:'performance', description:'Bu ekran dönem boyunca olumlu/olumsuz gözlem, başarı, gelişim ihtiyacı ve ara geri bildirim notlarının kayıt altına alınması için kullanılır.', actions:['Personel veya dönem filtresini seçme','Not türünü ve açıklamayı kontrol etme','Yetki varsa yeni dönem içi not ekleme'], attention:['Dönem içi not otomatik nihai puan üretmez; değerlendirmeye destek kayıt sağlar.'] },
@@ -5540,12 +5530,12 @@
     if (rule.exactHomeOnly && !pathIsHome(facts.pathOnly || facts.path)) return -2000;
 
     (rule.paths || []).forEach(function (pattern) {
-      var işlenmemiş veri = String(pattern || '');
-      var base = işlenmemiş veri.slice(-1) === '*' ? işlenmemiş veri.slice(0, -1) : işlenmemiş veri;
+      var rawData = String(pattern || '');
+      var base = rawData.slice(-1) === '*' ? rawData.slice(0, -1) : rawData;
       var n = norm(base);
       if (!n) return;
       if (p === n) score += 1400;
-      else if (işlenmemiş veri.slice(-1) === '*' && p.indexOf(n) === 0) score += 1250;
+      else if (rawData.slice(-1) === '*' && p.indexOf(n) === 0) score += 1250;
       else if (p.indexOf(n + '/') === 0) score += 1150;
       else if (fullPath.indexOf(n) !== -1) score += 850;
     });
@@ -5565,7 +5555,7 @@
       if (body.indexOf(k) !== -1) score += 6;
     });
 
-    // Çok olgun öncelik: Ana Sayfa yalnızca gerçek ana sayfa yolunda kazanabilir.
+    // Çok olgun öncelik: Ana Sayfa yalnızca gerçek ana routenda kazanabilir.
     if (rule.id === 'home' && !pathIsHome(facts.pathOnly || facts.path)) score -= 1800;
     if (rule.id === 'home' && /(rapor|report|kpi|hedef|target|performans|scorecard|karne|onay|approval|period|donem|dönem|personel|izin|leave|support|destek|settings|ayar|ai-agent|decision|survey|anket|message|mesaj)/.test(strong)) score -= 1400;
 
@@ -5592,7 +5582,7 @@
     var p = facts.path || '';
     var title = facts.rawTitle || (facts.titleCandidates || [])[0] || '';
     var combined = [p, title, (facts.activeMenu || []).join(' '), (facts.breadcrumb || []).join(' '), (facts.headings || []).join(' ')].join(' ');
-    var family = boş;
+    var family = null;
     FAMILY_HINTS.forEach(function (hint) {
       if (!family && (hint.path.test(p) || containsAny(combined, hint.keywords))) family = hint;
     });
@@ -5612,8 +5602,8 @@
 
   function matchScreen(facts) {
     var ranked = rankedRules(facts);
-    var first = ranked[0] || boş;
-    var second = ranked[1] || boş;
+    var first = ranked[0] || null;
+    var second = ranked[1] || null;
     if (!first || first.score < 85) {
       var generic = inferGenericScreen(facts, ranked);
       generic.confidence = 'düşük';
@@ -5622,7 +5612,7 @@
     }
     var rule = Object.assign({}, first.rule);
     rule.score = first.score;
-    rule.secondBest = second ? { screen: second.rule.screen, score: second.score } : boş;
+    rule.secondBest = second ? { screen: second.rule.screen, score: second.score } : null;
     rule.confidence = first.score >= 900 ? 'yüksek' : (first.score >= 300 ? 'orta' : 'düşük');
     if (second && first.score < 400 && (first.score - second.score) < 90) {
       rule.ambiguous = true;
@@ -5709,7 +5699,7 @@
 
   function answerQuestion(question) {
     if (isPageQuestion(question)) return answerCurrentPage();
-    return boş;
+    return null;
   }
 
   var previousLocal = window.BYS360AssistantLocalAnswer;
@@ -5717,7 +5707,7 @@
     var answer = answerQuestion(question);
     if (answer && answer.text) return answer.text;
     if (typeof previousLocal === 'function') return previousLocal(question);
-    return boş;
+    return null;
   };
 
   window.BYS360AssistantScreenIntelligenceV23 = {
@@ -5760,7 +5750,7 @@
   var history = [];
   var lastTopic = '';
   var restoredOnce = false;
-  var restoreTimer = boş;
+  var restoreTimer = null;
   var isRestoring = false;
   var suppressRestoreUntil = 0;
   var lastRestoreSignature = '';
@@ -5775,7 +5765,7 @@
       .trim();
   }
   function escapeText(value) {
-    return String(value == boş ? '' : value).replace(/[&<>"']/g, function (ch) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
       return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
     });
   }
@@ -5944,7 +5934,7 @@
   var KNOWLEDGE = [
     {id:'home',module:'Genel',screen:'Ana Sayfa',href:'/home',keys:['anasayfa','ana sayfa','başlangıç','baslangic','bugün ne var','bugun ne var','nereden başlayacağım','nereden baslayacagim','günlük özet','gunluk ozet'],who:['Tüm kullanıcılar, yalnızca kendisine açık kartları ve modül geçişlerini görür.'],steps:['Ana Sayfa ekranını açın.','Bugünkü kısa özetleri, bekleyen bildirimleri, size ait görevleri ve modül geçişlerini kontrol edin.','İşlem yapmak için ilgili modülün gerçek ekranına geçin.'],watch:['Ana Sayfa günlük başlangıç ve hızlı geçiş ekranıdır; yönetici analizleri için Dashboard ekranı kullanılmalıdır.']},
     {id:'general_dashboard',module:'Yönetici Dashboard',screen:'Dashboard',href:'/dashboard',keys:['dashboard','genel dashboard','yönetici dashboard','yonetici dashboard','gösterge paneli','gosterge paneli','yönetici görünümü','yonetici gorunumu'],who:['Başkan, Admin, yöneticiler ve rol matrisinde yetki verilmiş kullanıcılar; herkes yalnızca yetkili olduğu kartları görür.'],steps:['Dashboard ekranını açın.','Yönetici özet kartlarını, grafik/gösterge alanlarını ve yetki kapsamındaki analizleri inceleyin.','Performans, KPI, destek veya anket gibi ayrıntı gereken başlıklarda ilgili modül ekranına geçin.'],watch:['Dashboard analiz ve yönetici görünürlüğü ekranıdır; Ana Sayfa ile aynı cevap verilmemelidir. Kart görünmüyorsa rol matrisi, kişi bazlı menü izni veya modül ayarı kontrol edilmelidir.']},
-    {id:'person_add',module:'Personel Yönetimi',screen:'Personel Özlük Dosyaları / Personel Ekle',href:'/admin/users',keys:['kişi ekle','kisi ekle','kişi nasıl eklenir','personel ekle','personel nasıl eklenir','çalışan ekle','calisan ekle','yeni kişi','yeni kisi','yeni personel','kullanıcı ekle','kullanici ekle','hesap aç','hesap ac','personel kaydı','personel kaydi','sicil no','profil fotoğrafı','profil fotografi'],who:['Admin','Sistem Yöneticisi','Personel Yönetimi yetkilisi','Yetki verilmiş İK/personel kullanıcısı'],steps:['Sol menüden Personel Yönetimi bölümüne girin.','Personel Özlük Dosyaları / Personel Listesi ekranını açın.','Yeni Personel Ekle veya Yeni Kayıt butonuna basın.','Sicil No, ad, soyad, unvan, görev, birim, üst birim ve yönetici alanlarını doldurun.','Gerekliyse profil fotoğrafı, kullanıcı hesabı ve rol bilgisini belirleyin.','Kaydedin ve personelin listede göründüğünü kontrol edin.'],watch:['TC yerine Sicil No kullanılmalı.','Birim, üst birim, unvan ve yönetici boş kalırsa performans amir zinciri yanlış üretilebilir.','Rol ve menü görünürlüğü ayrıca kontrol edilmelidir.']},
+    {id:'person_add',module:'Personel Yönetimi',screen:'Personel Özlük Dosyaları / Personel Ekle',href:'/admin/users',keys:['kişi ekle','kisi ekle','kişi nasıl eklenir','personel ekle','personel nasıl eklenir','çalışan ekle','calisan ekle','yeni kişi','yeni kisi','yeni personel','kullanıcı ekle','kullanici ekle','hesap aç','hesap ac','personel kaydı','personel kaydi','sicil no','profil fotoğrafı','profil fotografi'],who:['Admin','Sistem Yöneticisi','Personel Yönetimi yetkilisi','Yetki verilmiş İK/personel kullanıcısı'],steps:['Sol menüden Personel Yönetimi bölümüne girin.','Personel Özlük Dosyaları / Personel Listesi ekranını açın.','Yeni Personel Ekle veya Yeni Kayıt butonuna basın.','Sicil No, ad, soyad, unvan, görev, birim, üst birim ve yönetici alanlarını doldurun.','Gerekliyse profil fotoğrafı, kullanıcı hesabı ve rol bilgisini belirleyin.','Kaydedin ve personelin listede göründüğünü kontrol edin.'],watch:['TC yerine Sicil No kullanılmalı.','Birim, üst birim, unvan ve yönetici null kalırsa performans amir zinciri yanlış üretilebilir.','Rol ve menü görünürlüğü ayrıca kontrol edilmelidir.']},
     {id:'person_update',module:'Personel Yönetimi',screen:'Personel Bilgisi Güncelleme',href:'/admin/users',keys:['personel güncelle','personel guncelle','kişi bilgisi değiştir','kisi bilgisi degistir','birim değiştir','unvan değiştir','yönetici değiştir','personel pasif','aktif pasif'],who:['Admin','Sistem Yöneticisi','Personel Yönetimi yetkilisi'],steps:['Personel Yönetimi > Personel Özlük Dosyaları ekranına girin.','Personeli ad, soyad veya sicil no ile arayın.','Detay / Düzenle butonuna basın.','Birim, üst birim, görev, unvan, yönetici, rol veya aktiflik bilgisini güncelleyin.','Kaydedin.'],watch:['Bu değişiklik performans görev üretimi, rol matrisi, raporlar ve bildirim hedeflerini etkileyebilir.']},
     {id:'org',module:'Personel Yönetimi',screen:'Birim ve Organizasyon Yönetimi',href:'/admin/org-units',keys:['birim ekle','üst birim','ust birim','organizasyon','çalışma grubu','calisma grubu','koordinatör','koordinator','grup başkanlığı','grup baskanligi','pozisyon'],who:['Admin','Sistem Yöneticisi','Organizasyon/personel yetkilisi'],steps:['Birim ve Organizasyon Yönetimi ekranını açın.','Üst birimi ve bağlı birimi tanımlayın.','Çalışma grubu, koordinatör ve yönetici ilişkilerini kurun.','Personel atamalarını doğru birime bağlayın.'],watch:['Organizasyon yanlışsa performans amir zinciri, yetki görünürlüğü ve rapor kırılımları da yanlış olur.']},
     {id:'leave',module:'Personel Yönetimi',screen:'İzin ve Devamsızlık Takibi',href:'/hr-management/leave',keys:['izin','izin nasıl girilir','izin nasil girilir','izin talebi','izin kaydı','izin kaydi','izin bakiyesi','devamsızlık','devamsizlik','rapor izin'],who:['Personel yetkilisi','İK/Admin','Yetki verilmiş yönetici'],steps:['Personel Yönetimi veya İzin Yönetimi bölümüne girin.','İzin Talebi / İzin Kaydı ekranını açın.','Personeli seçin.','İzin türünü, başlangıç ve bitiş tarihini girin.','Gerekli açıklama veya belge varsa ekleyin.','Kaydedin ve onay sürecini kontrol edin.'],watch:['İzinli kişi amirse vekâlet ve performans görev devri etkilenebilir.']},
@@ -5972,7 +5962,7 @@
     {id:'kpi',module:'KPI ve Hedef Yönetimi',screen:'KPI / Hedef Yönetimi',href:'/performans/stratejik/hedefler',keys:['kpi','hedef','hedef kartı','hedef karti','hedef dönemi','hedef donemi','gerçekleşme','gerceklesme','riskli hedef','başarı oranı','basari orani'],who:['Başkan/Admin genel; koordinatör ve yöneticiler yetki kapsamına göre görür.'],steps:['KPI / Hedef Yönetimi ekranına girin.','Hedef dönemi veya hedef kartı oluşturun.','Hedef tipi, kategori, sahip, hedef değer, gerçekleşen değer ve ağırlığı girin.','Kaydedin ve dashboard’da başarı/risk durumunu kontrol edin.'],watch:['KPI otomatik idari karar üretmez; ölçüm ve karar destek verisi sağlar.']},
     {id:'assistant_knowledge',module:'BYS360 Asistanı',screen:'Asistan Bilgi Bankası / Öğretim Merkezi',href:'/ai-agent/knowledge',keys:['asistan öğret','asistan ogret','bilgi bankası','bilgi bankasi','öğretim merkezi','ogretim merkezi','asistan eğit','asistan egit'],who:['Admin','Sistem Yöneticisi','Asistan bilgi yöneticisi'],steps:['Asistan Bilgi Bankası / Öğretim Merkezi ekranına girin.','Yeni soru-cevap veya rehber kaydı ekleyin.','Dili sade, kurumsal ve gerçek ekran adlarıyla yazın.','Test sorusuyla cevabı kontrol edin.'],watch:['Asistan idari karar ve hassas veri içeriği öğrenmemelidir.']},
     {id:'profile',module:'Kullanıcı Hesabı',screen:'Profil / Şifre / Oturum',href:'/account',keys:['profilim','hesabım','hesabim','şifre','sifre','parola','çıkış','cikis','oturum','giriş yapamıyorum','giris yapamiyorum'],who:['Kullanıcı kendi hesabında; Admin yetkili kullanıcı hesaplarında işlem yapar.'],steps:['Profil / Hesabım ekranına girin.','Yetkiniz dahilindeki bilgileri kontrol edin.','Şifre/parola işlemlerinde güvenlik kurallarına uyun.'],watch:['3 hatalı giriş gibi güvenlik kuralları devreye girebilir.']},
-    {id:'live',module:'Canlı/Pilot Operasyon',screen:'Canlı Kontrol ve Yayın',href:'/home',keys:['canlı','canli','pilot','yayın','yayin','beyaz ekran','servis başlat','scheduled task','waitress','ctrl f5','cache'],who:['Sistem yöneticisi / teknik yetkili'],steps:['Önce son kontrol scriptlerini çalıştırın.','Python compileall ile sözdizimi kontrolü yapın.','Pilot/canlı scheduled task görevini yeniden başlatın.','Tarayıcıda Ctrl+F5 ile geçici kayıt temizleyerek test edin.'],watch:['base.html hatası tüm sayfaları beyaz ekrana düşürebilir; önce şablon sözdizimini kontrol edin.']}
+    {id:'live',module:'Canlı/Pilot Operasyon',screen:'Canlı Kontrol ve Yayın',href:'/home',keys:['canlı','canli','pilot','yayın','yayin','beyaz ekran','servis başlat','scheduled task','waitress','ctrl f5','cache'],who:['Sistem yöneticisi / teknik yetkili'],steps:['Önce son kontrol scriptlerini çalıştırın.','Python compileall ile sözdizimi kontrolü yapın.','Pilot/canlı scheduled task görevini yeniden başlatın.','Tarayıcıda Ctrl+F5 ile cache temizleyerek test edin.'],watch:['base.html hatası tüm sayfaları beyaz ekrana düşürebilir; önce şablon sözdizimini kontrol edin.']}
   ];
 
   function canonicalUiTextV31_4(value) {
@@ -6022,9 +6012,9 @@
   }
   function smallTalk(q) {
     var n = normalize(q);
-    if (/^(merhaba|selam|slm|iyi misin|nasilsin|nasılsın)/.test(n)) return response('Merhaba', 'Merhaba, ben BYS360 Asistanı. Personel ekleme, izin, vekâlet, performans dönemi, karne, Başkan Onayı, rol matrisi, destek, anket, KPI/Hedef ve AI Karar Destek konularında sizi doğru ekrana ve işlem sırasına yönlendirebilirim.', [['Ana Sayfa','/home']]);
+    if (/^(merhaba|selam|slm|iyi misin|nasilsin|nasılsın)/.test(n)) return response('Merhaba', 'Merhaba. Personel ekleme, izin, vekâlet, performans dönemi, karne, Başkan Onayı, rol matrisi, destek, anket, KPI/Hedef ve AI Karar Destek konularında sizi doğru ekrana ve işlem sırasına yönlendirebilirim.', [['Ana Sayfa','/home']]);
     if (/(ne yapabilirsin|ne ise yararsin|yardim et|yardım et|bys360 asistan)/.test(n)) return response('BYS360 Asistanı', 'BYS360 içinde gerçek ekran adlarıyla rehberlik yaparım. Sorunuzu günlük dille yazabilirsiniz: “kişi nasıl eklenir”, “dönem açacağım”, “karne görünmüyor”, “menü yok”, “izin nasıl girilir”, “KPI hedef kartı oluşturacağım” gibi.', [['Asistan Bilgi Bankası','/ai-agent/knowledge']]);
-    if (/(seni kim gelistirdi|seni kim geliştirdi|kim yapti|kim yaptı)/.test(n)) return response('Geliştiren bilgi', 'BYS360 Asistanı, BYS360 projesi kapsamında Personel kurumsal kullanım Özden tarafından geliştirilen kurumsal rehberlik ve yönlendirme katmanıdır.', []);
+    if (/(seni kim gelistirdi|seni kim geliştirdi|kim gelistirdi|kim geliştirdi|kim yapti|kim yaptı|gelistiren kim|geliştiren kim|havva gulsen ozden|havva gülsen özden|gulsen ozden|gülsen özden|havva mi|havva mı|gulsen mi|gülsen mi)/.test(n)) return response('Geliştiren bilgi', 'Ben BYS360 Asistanı’yım. BYS360 için Havva Gülsen Özden tarafından geliştirildim. Görevim, BYS360 içinde yetkiniz dâhilindeki işlemleri sade, güvenli ve doğru sırayla anlatmak; sizi gerçek ekranlara yönlendirmek ve sistemi daha kolay kullanmanıza yardımcı olmaktır.', []);
     if (/(kaldigimiz yer|kaldığımız yer|devam edelim|son konu)/.test(n)) {
       var st = loadState();
       return response('Kaldığımız yer', st && st.topic ? ('Son konuştuğumuz konu: ' + st.topic + '. Aynı konu üzerinden devam edebiliriz; yapmak istediğiniz adımı yazmanız yeterli.') : 'Bu oturumda kayıtlı son konu bulamadım. Yapmak istediğiniz işlemi yazarsanız kaldığınız yerden yönlendiririm.', []);
@@ -6147,7 +6137,7 @@
       if (isRestoring || Date.now() < suppressRestoreUntil) return;
       var root = rootEl();
       if (root !== lastRootSeen) { lastRootSeen = root; scheduleRestore('mutation-root'); return; }
-      if (root && !root.querySelector('[data-chat-kayıt], .bys360-am-kayıt, [data-chat-list], .bys360-assistant-chat-kayıt, [data-assistant-kayıt]')) {
+      if (root && !root.querySelector('[data-chat-log], .bys360-am-log, [data-chat-list], .bys360-assistant-chat-log, [data-assistant-log]')) {
         scheduleRestore('mutation-log-missing');
       }
     });
@@ -6200,5 +6190,3 @@
   });
 })();
 /* BYS360_ASSISTANT_STABLE_SCROLL_MEMORY_V30_END */
-
-

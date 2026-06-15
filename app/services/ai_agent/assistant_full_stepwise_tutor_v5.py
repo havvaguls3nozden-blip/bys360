@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_ASSISTANT_FULL_STEPWISE_TUTOR_V5
 
-
-
 from dataclasses import dataclass, field
 from typing import Any, Callable
 import re
@@ -382,7 +380,7 @@ GUIDES: list[Guide] = [
         ],
         attention=["3. amir zorunlu değildir. Her personelde olmak zorunda değildir."],
         checks=["3. amir yoksa boş sütun/görev görünmemeli.", "Puan modunda toplam ağırlık %100 olmalı."],
-        actions=[_a("Performans Ayarları", "/admin/settings/performance"), _a("Görev Üretimi", "/performance/assignments")],
+        actions=[_a("Performans Ayarları", "/settings#module-foundation"), _a("Görev Üretimi", "/performance/assignments")],
         next_questions=["Amir zinciri nasıl oluşur?", "Ağırlık nasıl tanımlanır?"],
         priority=86,
     ),
@@ -543,7 +541,7 @@ GUIDES: list[Guide] = [
         ],
         attention=["Kapalı menü kullanıcıya hiç görünmemelidir; sadece tıklayınca erişim engeli vermek yeterli değildir.", "Backend route yetkisi de korunmalıdır."],
         checks=["Menü UI’da doğru görünmeli/gizlenmeli.", "URL elle yazılsa bile yetkisiz veri dönmemeli."],
-        actions=[_a("Rol Matrisi", "/admin/role-matrix"), _a("Sistem Ayarları", "/admin/settings")],
+        actions=[_a("Rol Matrisi", "/admin/role-matrix"), _a("Sistem Ayarları", "/settings")],
         next_questions=["Menü görünmüyor ne yapmalıyım?", "Kişi bazlı yetki nasıl verilir?"],
         priority=88,
     ),

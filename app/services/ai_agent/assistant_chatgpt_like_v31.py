@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import re
 import unicodedata
 from dataclasses import dataclass
@@ -428,7 +426,7 @@ TOPICS: Tuple[Topic, ...] = (
         ),
         warnings=("Kapalı sekmeler sol menüde hiç görünmemelidir; tıklayınca erişim engeli vermesi tek başına yeterli değildir.", "Kritik yetki değişiklikleri audit log’a düşmelidir."),
         checks=("Menü görünürlüğü, route erişimi ve veri yetkisi birlikte çalışıyor mu kontrol edin.",),
-        actions=(("Sistem Ayarları", "/admin/settings"), ("Rol Matrisi", "/admin/role-matrix")),
+        actions=(("Sistem Ayarları", "/settings"), ("Rol Matrisi", "/admin/role-matrix")),
         aliases=("menu", "menü", "sekme", "yetki"),
         score_boost=7,
     ),
@@ -518,7 +516,7 @@ TOPICS: Tuple[Topic, ...] = (
         ),
         warnings=("Menünün görünmemesi bazen doğru davranıştır; ancak yetkili kullanıcıda görünmüyorsa rol matrisi veya ayar katmanı bozulmuş olabilir.",),
         checks=("Aynı kullanıcıyla oturumu yenileyip menü ve URL erişimini birlikte test edin.",),
-        actions=(("Rol Matrisi", "/admin/role-matrix"), ("Sistem Ayarları", "/admin/settings")),
+        actions=(("Rol Matrisi", "/admin/role-matrix"), ("Sistem Ayarları", "/settings")),
         score_boost=6,
     ),
     Topic(
@@ -555,8 +553,6 @@ def _contains_sensitive_request(normalized: str) -> bool:
 
 def _is_out_of_scope(normalized: str) -> bool:
     return any(hint in normalized for hint in OUT_OF_SCOPE_HINTS)
-
-
 
 def _question_universe_answer_v31_5() -> str:
     return (
@@ -668,8 +664,6 @@ def _safe_block_answer(reason: str) -> Dict[str, Any]:
             "rol matrisi, menü görünürlüğü, anket, destek, bildirim, AI Karar Destek ve KPI/Hedef süreçlerinde yardımcı olurum."
         )
     return {"ok": True, "marker": V31_MARKER, "engine": "bys360-assistant-chatgpt-like-v31", "mode": "safe_boundary", "answer": answer, "actions": [], "quick_replies": ["Personel ekleme", "Performans dönemi açma", "Rol matrisi", "Başkan Onayı"], "notice": "Güvenli sınır uygulandı."}
-
-
 
 def _topic_by_key(key: str) -> Optional[Topic]:
     for topic in TOPICS:

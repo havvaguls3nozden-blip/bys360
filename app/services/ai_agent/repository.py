@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 
@@ -19,20 +17,11 @@ def _safe_scalar(sql: str, params: dict[str, Any] | None = None, default: int = 
 
 def table_exists(table_name: str) -> bool:
     try:
-        value = db.session.execute(
-            text("""
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = 'public' AND table_name = :table_name
-                )
-            """),
-            {"table_name": table_name},
-        ).scalar()
-        return bool(value)
+        inspector = inspect(db.engine)
+        return bool(inspector.has_table(table_name))
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+        logging.getLogger(__name__).exception("BYS360 Asistanı tablo kontrolü yapılamadı.")
         return False
 
 
@@ -40,15 +29,8 @@ def table_columns(table_name: str) -> set[str]:
     if not table_exists(table_name):
         return set()
     try:
-        rows = db.session.execute(
-            text("""
-                SELECT column_name
-                FROM information_schema.columns
-                WHERE table_schema = 'public' AND table_name = :table_name
-            """),
-            {"table_name": table_name},
-        ).fetchall()
-        return {str(row[0]) for row in rows}
+        inspector = inspect(db.engine)
+        return {str(col.get("name")) for col in inspector.get_columns(table_name)}
     except Exception:
         return set()
 
@@ -57,7 +39,14 @@ def count_table(table_name: str, where_sql: str = "", params: dict[str, Any] | N
     if not table_exists(table_name):
         return 0
     where_clause = f" WHERE {where_sql}" if where_sql else ""
-    return _safe_scalar(f"SELECT COUNT(*) FROM {table_name}{where_clause}", params=params)
+    sql = f"SELECT COUNT(*) FROM {table_name}{where_clause}"
+    if getattr(db.engine.dialect, "name", "") == "sqlite":
+        sql = sql.replace("NOW()", "CURRENT_TIMESTAMP")
+        sql = sql.replace("COALESCE(is_read, false)", "COALESCE(is_read, 0)")
+    try:
+        return _safe_scalar(sql, params=params)
+    except Exception:
+        return 0
 
 
 def safe_count_with_columns(
@@ -82,7 +71,7 @@ def insert_agent_request_log(*, user_id: int | None, prompt: str, intent: str, r
                 INSERT INTO ai_agent_request_logs
                     (user_id, prompt_text, detected_intent, response_summary, safety_status, created_at)
                 VALUES
-                    (:user_id, :prompt_text, :detected_intent, :response_summary, 'safe_ag2', NOW())
+                    (:user_id, :prompt_text, :detected_intent, :response_summary, 'safe_ag2', CURRENT_TIMESTAMP)
                 RETURNING id
             """),
             {
@@ -107,7 +96,7 @@ def insert_agent_audit_log(*, user_id: int | None, action_key: str, detail: str)
                 INSERT INTO ai_agent_action_audit_logs
                     (user_id, action_key, target_table, target_id, action_status, detail, created_at)
                 VALUES
-                    (:user_id, :action_key, 'performance_summary', NULL, 'read_only_summary', :detail, NOW())
+                    (:user_id, :action_key, 'performance_summary', NULL, 'read_only_summary', :detail, CURRENT_TIMESTAMP)
                 RETURNING id
             """),
             {

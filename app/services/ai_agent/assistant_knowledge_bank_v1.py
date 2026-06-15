@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_ASSISTANT_KNOWLEDGE_BANK_V1
 
-
-
 from dataclasses import dataclass
 from typing import Any, Iterable
 
@@ -309,7 +307,7 @@ Değerlendirme kriterleri için adımlar:
 
 Yetki notu: {{ROLE_NOTE}}
         """,
-        actions=(("Değerlendirme Kriterleri", "/performance/criteria", "Kriter yönetimi"), ("Sistem Ayarları", "/admin/settings", "Modül ayarları")),
+        actions=(("Değerlendirme Kriterleri", "/performance/criteria", "Kriter yönetimi"), ("Sistem Ayarları", "/settings", "Modül ayarları")),
     ),
     GuideTopic(
         key="assignment_generation",
@@ -367,7 +365,7 @@ Yetki notu: {{ROLE_NOTE}}
 
 Yetki notu: {{ROLE_NOTE}}
         """,
-        actions=(("Sistem Ayarları", "/admin/settings", "3. amir modu ve görünürlük"), ("Performans Görevleri", "/performance/tasks", "Görev akışı kontrolü")),
+        actions=(("Sistem Ayarları", "/settings", "3. amir modu ve görünürlük"), ("Performans Görevleri", "/performance/tasks", "Görev akışı kontrolü")),
     ),
     GuideTopic(
         key="scorecard_publish",
@@ -497,7 +495,7 @@ Asistan yetki vermez veya kaldırmaz; yalnızca doğru ayar ekranına yönlendir
 
 Yetki notu: {{ROLE_NOTE}}
         """,
-        actions=(("Rol Matrisi", "/admin/role-matrix", "Rol ve menü ayarları"), ("Sistem Ayarları", "/admin/settings", "Genel ayarlar")),
+        actions=(("Rol Matrisi", "/admin/role-matrix", "Rol ve menü ayarları"), ("Sistem Ayarları", "/settings", "Genel ayarlar")),
         quick_replies=("Menü kapalı ama görünüyor ne yapmalıyım?", "Yetkisiz erişim ekranı nasıl olmalı?", "Asistan menüsü kimlere görünür?"),
     ),
     GuideTopic(
@@ -514,7 +512,7 @@ Yetkisiz erişim veya beyaz sayfa durumunda kontrol adımları:
 
 Yetki notu: {{ROLE_NOTE}}
         """,
-        actions=(("Rol Matrisi", "/admin/role-matrix", "Yetki kontrolü"), ("Sistem Ayarları", "/admin/settings", "Güvenlik ve görünürlük ayarları")),
+        actions=(("Rol Matrisi", "/admin/role-matrix", "Yetki kontrolü"), ("Sistem Ayarları", "/settings", "Güvenlik ve görünürlük ayarları")),
     ),
     GuideTopic(
         key="support_ticket",
@@ -633,7 +631,7 @@ Güvenlik ve oturum ayarları için adımlar:
 
 Yetki notu: {{ROLE_NOTE}}
         """,
-        actions=(("Sistem Ayarları", "/admin/settings", "Güvenlik ayarları"), ("Audit Log", "/admin/audit-logs", "Değişiklik geçmişi")),
+        actions=(("Sistem Ayarları", "/settings", "Güvenlik ayarları"), ("Audit Log", "/admin/audit-logs", "Değişiklik geçmişi")),
     ),
     GuideTopic(
         key="live_operation",

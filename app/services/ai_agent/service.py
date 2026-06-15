@@ -418,7 +418,7 @@ def _ag3_answer_and_actions(intent: str, counts: dict[str, Any], performance_sum
     if intent == "settings":
         return (
             "Rol, menü ve modül görünürlüğü Sistem Ayarları üzerinden yönetilmelidir. Asistan yetki vermez veya kaldırmaz; yalnızca doğru ayar alanına yönlendirir.",
-            [_ag3_action("Rol Matrisi", "/admin/role-matrix"), _ag3_action("Sistem Ayarları", "/admin/settings")]
+            [_ag3_action("Rol Matrisi", "/admin/role-matrix"), _ag3_action("Sistem Ayarları", "/settings")]
         )
 
     if intent == "assistant_help":
@@ -585,7 +585,7 @@ def _ag3c_detect_intent(question):
     if _ag3c_any(q, ("sen kimsin", "kimsin", "adin ne", "adın ne", "nesin", "kendini tanit", "kendini tanıt")):
         return "identity"
 
-    if _ag3c_any(q, ("kim gelistirdi", "kim geliştirdi", "kim yapti", "kim yaptı", "gelistiricin", "geliştiricin", "seni kim", "yapimcin", "yapımcın")):
+    if _ag3c_any(q, ("kim gelistirdi", "kim geliştirdi", "kim yapti", "kim yaptı", "gelistiricin", "geliştiricin", "seni kim", "seni kim gelistirdi", "seni kim geliştirdi", "yapimcin", "yapımcın", "havva gulsen ozden", "havva gülsen özden", "gulsen ozden", "gülsen özden", "havva mi", "havva mı", "gulsen mi", "gülsen mi")):
         return "developer"
 
     if _ag3c_any(q, ("ne yapabilirsin", "neler yapabilirsin", "yardimci olur musun", "yardımcı olur musun", "nasil yardimci", "nasıl yardımcı")):
@@ -698,7 +698,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
 
     if intent == "identity":
         return (
-            "Ben BYS360 Asistanı. BYS360 içinde kullanıcıları doğru ekrana yönlendirmek, performans ve süreçlerle ilgili güvenli rehberlik sunmak ve yetki dahilindeki özetleri göstermek için tasarlandım.",
+            "Ben BYS360 Asistanı. BYS360 için Havva Gülsen Özden tarafından geliştirildim. BYS360 içinde kullanıcıları doğru ekrana yönlendirmek, performans ve süreçlerle ilgili güvenli rehberlik sunmak ve yetki dahilindeki özetleri göstermek için tasarlandım.",
             [
                 _ag3c_action("Ana sayfa", "/home"),
                 _ag3c_action("Destek", "/support"),
@@ -707,7 +707,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
 
     if intent == "developer":
         return (
-            "Beni BYS360 projesi kapsamında Personel Gülsen Özden geliştirdi. Kurumsal süreçlerde kullanıcıya rehberlik etmek, doğru ekrana yönlendirmek ve güvenli asistan deneyimi sunmak için tasarlandım.",
+            "Beni BYS360 projesi kapsamında Havva Gülsen Özden geliştirdi. Kurumsal süreçlerde kullanıcıya rehberlik etmek, doğru ekrana yönlendirmek ve güvenli asistan deneyimi sunmak için tasarlandım.",
             [
                 _ag3c_action("BYS360 ana sayfa", "/home"),
                 _ag3c_action("Yardım ve destek", "/support"),
@@ -793,7 +793,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
         return (
             "Açıklama zorunlulukları sistem ayarlarına göre yönetilir. Düşük performans, yüksek başarı veya uç puanlarda açıklama istenebilir. Amaç puanı gerekçelendirmek ve karne sürecini denetlenebilir hale getirmektir.",
             [
-                _ag3c_action("Sistem Ayarları", "/admin/settings"),
+                _ag3c_action("Sistem Ayarları", "/settings"),
                 _ag3c_action("Rol Matrisi", "/admin/role-matrix"),
             ],
         )
@@ -802,7 +802,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
         return (
             "3. amir her personelde zorunlu değildir. Sistem ayarına göre yalnızca yorumcu olabilir veya puana katkı veren amir olarak tanımlanabilir. 3. amir yoksa boş görev veya gereksiz sütun gösterilmemelidir.",
             [
-                _ag3c_action("Performans ayarları", "/admin/settings"),
+                _ag3c_action("Performans ayarları", "/settings"),
                 _ag3c_action("Performans görevleri", "/performance/tasks"),
             ],
         )
@@ -889,7 +889,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
             "Rol, menü ve modül görünürlüğü Sistem Ayarları üzerinden yönetilir. Asistan yetki vermez veya kaldırmaz; doğru ayar alanına yönlendirir.",
             [
                 _ag3c_action("Rol Matrisi", "/admin/role-matrix"),
-                _ag3c_action("Sistem Ayarları", "/admin/settings"),
+                _ag3c_action("Sistem Ayarları", "/settings"),
             ],
         )
 
@@ -1292,6 +1292,45 @@ def build_ai_agent_reply(user, question, context=None):
         }
 # BYS360_ASSISTANT_CHATGPT_LIKE_V31_END
 
-
-
 # BYS360_ASSISTANT_CURRENT_FINAL_POLISH_V31_3: V31.3 final polish aktif; V31.2 server-first bridge korunur.
+
+
+# BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32_START
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32 = globals().get("build_ai_agent_reply")
+
+
+def build_ai_agent_reply(user, question, context=None):
+    """BYS360 Asistanı V32: güncel kullanım kılavuzu tabanlı doğal dil rehberi."""
+    try:
+        from app.services.ai_agent.assistant_usage_manual_brain_v32 import build_bys360_assistant_usage_manual_reply_v32
+        previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32
+        if previous is build_ai_agent_reply:
+            previous = None
+        reply = build_bys360_assistant_usage_manual_reply_v32(
+            user,
+            question or "",
+            legacy_builder=previous if callable(previous) else None,
+            context=context if isinstance(context, dict) else None,
+        )
+        if reply:
+            return reply
+    except Exception:
+        __import__("logging").getLogger(__name__).exception("BYS360 Asistanı V32 kullanım kılavuzu beyni çalışırken hata oluştu.")
+    if callable(_BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32):
+        try:
+            try:
+                return _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32(user, question, context=context)
+            except TypeError:
+                return _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32(user, question)
+        except Exception:
+            __import__("logging").getLogger(__name__).exception("BYS360 Asistanı V32 legacy cevap motoruna dönerken hata oluştu.")
+    return {
+        "ok": True,
+        "version": "BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32_SAFE_FALLBACK",
+        "intent": "usage_manual_fallback",
+        "assistant_name": "BYS360 Asistanı",
+        "answer": "Ben BYS360 Asistanı’yım. BYS360 içinde doğru ekranı, işlem sırasını ve güvenli kontrol adımlarını anlatırım. Sorunuzu günlük cümleyle yazabilirsiniz: performans dönemi açacağım, karnemi göremiyorum, menü görünmüyor, destek talebi açacağım gibi.",
+        "notice": "BYS360 Asistanı idari karar vermez, performans puanı belirlemez ve yetki dışı hassas veri göstermez.",
+        "actions": [{"label": "Ana Sayfa", "title": "Ana Sayfa", "route": "/home", "url": "/home", "safety_level": "rehber_yonlendirme"}],
+    }
+# BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32_END

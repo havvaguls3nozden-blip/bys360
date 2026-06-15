@@ -416,3 +416,15 @@
   gap: 8px;
   margin-top: 10px;
 }
+/* BYS360_MY_ORIGINAL_ASSISTANT_IDENTITY_INTRO_V5 */
+.bys360-am-intro{
+  margin:0 0 12px 0;
+  padding:13px 14px;
+  border:1px solid rgba(139,0,0,.16);
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(139,0,0,.08), rgba(255,255,255,.92));
+  color:#262626;
+  box-shadow:0 10px 24px rgba(27,31,42,.06);
+}
+.bys360-am-intro strong{display:block;font-size:14px;font-weight:900;color:#8B0000;margin-bottom:4px;}
+.bys360-am-intro span{display:block;font-size:12.5px;line-height:1.45;color:#3d3d3d;}

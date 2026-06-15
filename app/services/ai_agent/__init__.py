@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from .service import (
     build_ai_agent_action_cards,
     build_ai_agent_action_queue_summary,

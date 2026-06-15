@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_ASSISTANT_CANONICAL_STEP_GUIDE_V1
 
-
-
 from typing import Any
 
 VERSION = "BYS360 Asistanı Kullanım Rehberi V1"
@@ -219,7 +217,7 @@ Asistan onay/ret işlemi yapmaz; yalnızca Başkan Onayları ve Süreç Takibi e
 
 Bu ayarlar Sistem Ayarları ve Performans Yönetimi yetkileriyle kontrol edilir.
             """,
-            [_action("Sistem Ayarları", "/admin/settings"), _action("Performans Görevleri", "/performance/tasks")],
+            [_action("Sistem Ayarları", "/settings"), _action("Performans Görevleri", "/performance/tasks")],
         )
 
     # Rol matrisi / menü
@@ -237,7 +235,7 @@ Rol matrisi ve menü görünürlüğü için adımlar:
 
 Asistan yetki vermez veya kaldırmaz; yalnızca doğru ayar ekranına yönlendirir.
             """,
-            [_action("Rol Matrisi", "/admin/role-matrix"), _action("Sistem Ayarları", "/admin/settings")],
+            [_action("Rol Matrisi", "/admin/role-matrix"), _action("Sistem Ayarları", "/settings")],
         )
 
     # Destek

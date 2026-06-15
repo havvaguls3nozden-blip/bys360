@@ -1,0 +1,61 @@
+/* BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34
+   Üst tanıtım kartı kalsın; sohbet içinde otomatik tanıtım/boş beyaz kart görünmesin. */
+#bys360-ai-agent-widget-root,
+#bys360-floating-assistant-force-root,
+#bys360-ai-agent-widget,
+#bys360AiAgentWidget{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+#bys360-assistant-module-root{
+  z-index:2147483000!important;
+}
+
+#bys360-assistant-module-root .bys360-am-panel[hidden]{
+  display:none!important;
+}
+#bys360-assistant-module-root .bys360-am-panel:not([hidden]){
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+#bys360-assistant-module-root [data-chat-log].is-empty,
+#bys360-assistant-module-root .bys360-am-log.is-empty,
+#bys360-assistant-module-root [data-chat-log][data-empty="true"],
+#bys360-assistant-module-root .bys360-am-log[data-empty="true"]{
+  display:none!important;
+  min-height:0!important;
+  height:0!important;
+  max-height:0!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+
+#bys360-assistant-module-root .bys360-am-message:has(.bys360-am-bubble:empty),
+#bys360-assistant-module-root .bys360-am-message:has(.bys360-am-bubble:blank){
+  display:none!important;
+}
+#bys360-assistant-module-root .bys360-am-bubble:empty{
+  display:none!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+
+#bys360-assistant-module-root .bys360-am-intro{
+  margin-bottom:14px!important;
+}
+#bys360-assistant-module-root .bys360-am-view[data-panel="chat"]{
+  gap:0!important;
+}
+#bys360-assistant-module-root .bys360-am-form{
+  margin-top:0!important;
+}

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_ASSISTANT_STEPWISE_TUTOR_V4
 
-
-
 from typing import Any
 
 VERSION = "BYS360 Asistanı Öğretici Rehber Motoru V4"
@@ -255,7 +253,7 @@ STEPWISE_GUIDES: list[dict[str, Any]] = [
             "1 ve 5 puan açıklama zorunluluğu ayarı gerekiyorsa Sistem Ayarları tarafındaki ilgili parametreyi kontrol edin.",
             "Kriterleri döneme bağlamadan önce test veya ön izleme yapın.",
         ],
-        [("Değerlendirme Kriterleri", "/performance/criteria", "Kriter yönetimi"), ("Performans Ayarları", "/admin/settings/performance", "Ayar kontrolü"), ("Rol Matrisi", "/admin/role-matrix", "Yetki")],
+        [("Değerlendirme Kriterleri", "/performance/criteria", "Kriter yönetimi"), ("Performans Ayarları", "/settings#module-foundation", "Ayar kontrolü"), ("Rol Matrisi", "/admin/role-matrix", "Yetki")],
         intro="BYS360 ekranlarında ana terim ‘Değerlendirme Kriterleri’ olmalıdır; kullanıcıya teknik/yabancı terimlerle karışık anlatılmamalıdır.",
         safety="Asistan puan veya ağırlık değiştirmez; yalnızca nasıl tanımlanacağını anlatır.",
         quick=["70 altı açıklama zorunlu mu?", "3. amir ağırlığı nasıl çalışır?", "Dönem nasıl açılır?"],
@@ -314,7 +312,7 @@ STEPWISE_GUIDES: list[dict[str, Any]] = [
             "3. amir olmayan personelde boş sütun, sahte görev veya yanlış bekleme statüsü gösterilmemelidir.",
             "Çok seviyeli yapılarda işlem sırası genellikle varsa 3 → 2 → 1 şeklinde ilerler.",
         ],
-        [("Performans Ayarları", "/admin/settings/performance", "3. amir modu"), ("Görev Üretimi", "/performance/assignments", "Görev kontrolü"), ("Süreç Takibi", "/performance/process-tracking", "Akış durumu")],
+        [("Performans Ayarları", "/settings#module-foundation", "3. amir modu"), ("Görev Üretimi", "/performance/assignments", "Görev kontrolü"), ("Süreç Takibi", "/performance/process-tracking", "Akış durumu")],
         intro="3. amir BYS360’da zorunlu değildir; yalnızca kurum yapısında gerçekten gerekiyorsa kullanılır.",
         safety="Asistan 3. amir atamaz; kuralı anlatır ve ilgili ayar ekranına yönlendirir.",
         quick=["Amir zinciri nasıl çalışır?", "Görev üretimi nasıl yapılır?", "Ağırlık toplamı nasıl korunur?"],
@@ -444,7 +442,7 @@ STEPWISE_GUIDES: list[dict[str, Any]] = [
             "Backend route yetkisi de ayrıca korunmalıdır; URL yazan kullanıcı yetkisiz veri alamamalıdır.",
             "Değişiklik sonrası çıkış/giriş veya cache yenileme gerekiyorsa bunu uygulayın.",
         ],
-        [("Rol Matrisi", "/admin/role-matrix", "Rol bazlı görünürlük"), ("Sistem Ayarları", "/admin/settings", "Genel ayarlar"), ("Audit Log", "/admin/audit-logs", "Değişiklik izleri")],
+        [("Rol Matrisi", "/admin/role-matrix", "Rol bazlı görünürlük"), ("Sistem Ayarları", "/settings", "Genel ayarlar"), ("Audit Log", "/admin/audit-logs", "Değişiklik izleri")],
         intro="BYS360’da rol matrisi yalnızca menü düzeni değildir; güvenlik, süreç ve veri görünürlüğü kontrolüdür.",
         safety="Asistan yetki vermez veya kaldırmaz; sadece hangi ayarın kontrol edileceğini anlatır.",
         quick=["Menü kapalı ama görünüyor ne yapmalıyım?", "Kişi bazlı yetki nedir?", "Backend route yetkisi neden önemli?"],
@@ -571,7 +569,7 @@ STEPWISE_GUIDES: list[dict[str, Any]] = [
             "Bakım modu veya canlı ortam uyarılarını yalnızca yetkili kişi yönetmelidir.",
             "Şüpheli erişim veya yetki kaçağı şüphesinde log ve rol matrisi birlikte incelenmelidir.",
         ],
-        [("Güvenlik Ayarları", "/admin/settings/security", "Güvenlik"), ("Audit Log", "/admin/audit-logs", "Denetim izleri"), ("Rol Matrisi", "/admin/role-matrix", "Yetki kontrolü")],
+        [("Güvenlik Ayarları", "/settings#settings-security-role-policy", "Güvenlik"), ("Audit Log", "/admin/audit-logs", "Denetim izleri"), ("Rol Matrisi", "/admin/role-matrix", "Yetki kontrolü")],
         intro="BYS360’da güvenlik teknik ek değil, sistemin temel tasarım ilkesidir.",
         safety="Asistan güvenlik ayarı değiştirmez; yetkili ekranı ve kontrol sırasını gösterir.",
         quick=["Rol matrisi nasıl çalışır?", "Yetki kaçağı nasıl test edilir?"],

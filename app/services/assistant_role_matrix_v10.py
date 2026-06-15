@@ -31,7 +31,7 @@ except Exception:  # pragma: no cover
     current_user = None
 
 try:
-    from sqlalchemy import text
+    from sqlalchemy import bindparam, inspect, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=33")
     text = None
@@ -94,24 +94,22 @@ def _db_session():
 
 
 def _table_columns(session, table_name: str) -> set[str]:
-    if text is None:
+    if text is None or session is None:
+        return set()
+    table = str(table_name or "").strip()
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", table):
         return set()
     try:
-        rows = session.execute(
-            text("select column_name from information_schema.columns where table_name = :t"),
-            {"t": table_name},
-        ).fetchall()
-        cols = {str(row[0]) for row in rows}
-        if cols:
-            return cols
+        bind = session.get_bind() if hasattr(session, "get_bind") else getattr(session, "bind", None)
+        if bind is not None:
+            return {str(col.get("name")) for col in inspect(bind).get_columns(table) if col.get("name")}
     except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
+        logger.exception("BYS360 settings hardening: table column inspection failed | table=%s", table)
     try:
-        rows = session.execute(text(f"pragma table_info({table_name})")).fetchall()
-        return {str(row[1]) for row in rows}
+        rows = session.execute(text(f'PRAGMA table_info("{table}")')).fetchall()
+        return {str(row[1]) for row in rows if len(row) > 1}
     except Exception:
-        logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=109")
+        logger.exception("BYS360 settings hardening: sqlite table_info failed | table=%s", table)
         return set()
 
 
@@ -153,14 +151,15 @@ def _get_db_value(session, role: str, feature_key: str) -> bool | None:
         "sanal_asistan" if feature_key == "assistant_module" else feature_key,
     }
     try:
-        row = session.execute(text(f"""
+        stmt = text(f"""
             select {value_col}
             from role_menu_defaults
             where lower(cast({role_col} as text)) = lower(:role)
               and lower(cast({key_col} as text)) in :keys
             order by id desc
             limit 1
-        """), {"role": role, "keys": tuple(_normalize(x) for x in candidates)}).fetchone()
+        """).bindparams(bindparam("keys", expanding=True))
+        row = session.execute(stmt, {"role": role, "keys": tuple(_normalize(x) for x in candidates)}).fetchone()
         if row:
             return _truthy(row[0])
     except Exception:
@@ -243,7 +242,7 @@ def assistant_role_matrix_v10_save_endpoint():
     if session is None:
         if flash:
             flash("Sanal Asistan Rol Matrisi kaydedilemedi: DB oturumu bulunamadı.", "danger")
-        return redirect(request.referrer or "/admin/settings")
+        return redirect(request.referrer or "/settings")
 
     changed = 0
     for feature_key, _, _ in ASSISTANT_FEATURE_ROWS:
@@ -266,7 +265,7 @@ def assistant_role_matrix_v10_save_endpoint():
         if flash:
             flash(f"Sanal Asistan Rol Matrisi kaydedilemedi: {exc}", "danger")
 
-    return redirect(request.referrer or "/admin/settings")
+    return redirect(request.referrer or "/settings")
 
 
 def register_assistant_role_matrix_v10(app):
@@ -277,7 +276,7 @@ def register_assistant_role_matrix_v10(app):
             "assistant_module_master_enabled_for_role": assistant_module_master_enabled_for_role,
         }
 
-    route = "/admin/settings/assistant-role-matrix-v10/save"
+    route = "/settings/assistant-role-matrix-v10/save"
     if route not in {getattr(rule, "rule", "") for rule in app.url_map.iter_rules()}:
         app.add_url_rule(
             route,

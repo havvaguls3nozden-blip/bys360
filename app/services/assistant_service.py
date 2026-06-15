@@ -329,7 +329,7 @@ def build_assistant_reply(question: str, *, role: object | None = None) -> Assis
     if _has(q, "yetki", "menu", "menü", "rol", "görünürlük", "gorunurluk", "ayar", "ayarlar"):
         actions = [("Yardım Merkezi", "/support")]
         if privileged:
-            actions.insert(0, ("Ayarlar", "/admin/settings"))
+            actions.insert(0, ("Ayarlar", "/settings"))
         return AssistantReply(
             topic="yetki_menu",
             answer=("BYS360’da menü görünürlüğü ve işlem yetkileri rol, kişi, birim ve sistem ayarlarına göre yönetilir. Kullanıcının görmemesi gereken menü ekranda kalmamalı; özel yetkiler kontrollü ve izlenebilir şekilde verilmelidir."),

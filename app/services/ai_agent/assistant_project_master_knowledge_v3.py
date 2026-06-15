@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_ASSISTANT_MASTER_KNOWLEDGE_V3
 
-
-
 from typing import Any
 
 VERSION = "BYS360 Asistanı Proje Hafızası V3"
@@ -98,10 +96,10 @@ TOPICS: list[dict[str, Any]] = [
         "key": "identity_creator",
         "title": "BYS360 Asistanı kimdir ve kim geliştirdi?",
         "section": "Kimlik",
-        "keywords": ["sen kimsin", "adın ne", "adin ne", "kim geliştirdi", "kim gelistirdi", "seni kim", "kurumsal geliştirme", "kurumsal kullanım", "kurumsal kullanım", "bys360 asistanı", "bys360 asistani"],
+        "keywords": ["sen kimsin", "adın ne", "adin ne", "kim geliştirdi", "kim gelistirdi", "seni kim", "seni kim geliştirdi", "havva gülsen özden", "havva gulsen ozden", "gülsen özden", "gulsen ozden", "kurumsal geliştirme", "bys360 asistanı", "bys360 asistani"],
         "answer": """Ben BYS360 Asistanı. BYS360’ın kullanımını öğretmek, doğru ekranı göstermek, süreçleri sade anlatmak ve kullanıcıyı yetkisi dahilinde güvenli şekilde yönlendirmek için tasarlandım.
 
-BYS360 projesi kurum içi ihtiyaçlara göre Personel kurumsal kullanım Özden tarafından geliştirilen kurumsal yönetim platformudur. Ben de bu yapının kullanıcı rehberliği katmanıyım.
+BYS360 projesi kurum içi ihtiyaçlara göre Havva Gülsen Özden tarafından geliştirilen kurumsal yönetim platformudur. Ben de bu yapının kullanıcı rehberliği katmanıyım.
 
 Benim sınırım nettir: idari karar vermem, performans puanı belirlemem, onay/ret işlemi yapmam, mesaj içeriği, anket cevabı, amir görüşü veya yetki dışı hassas verileri doğrudan göstermem.
 

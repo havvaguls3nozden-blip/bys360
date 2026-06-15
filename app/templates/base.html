@@ -238,8 +238,6 @@
     <!-- /BYS360_MOBILE_EMERGENCY_VISIBLE_V8_CSS -->
 
     <!-- BYS360_ASISTANI_MODULU_CANONICAL_V1_CSS_INCLUDE -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_module.css') }}?v=assistant-stable-scroll-memory-v30">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_chatgpt_like_v31.css') }}?v=31_1">
 <!-- /BYS360_ASISTANI_MODULU_CANONICAL_V1_CSS_INCLUDE -->
                 <!-- BYS360_ASSISTANT_MODULE_CANONICAL_CSS -->
     <!-- /BYS360_ASSISTANT_MODULE_CANONICAL_CSS -->
@@ -313,7 +311,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='pwa/ios_pwa_premium.css') }}">
 <!-- BYS360_IOS_PWA_V3_5_STABLE_HEAD_END -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_ios_assistant_clean_chat_v2.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_closed_label_fix.css') }}">
 <!-- BYS360_CONTENT_VISIBILITY_FIX_V2_15_6_BEGIN -->
 <style>
 html, body { min-height: 100% !important; }
@@ -369,7 +366,13 @@ html, body { min-height: 100% !important; }
 <!-- /BYS360_ANDROID_RESPONSIVE_COMPLETION_V2_CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_android_responsive_core_p5b.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_android_responsive_targeted_p5c.css') }}"></head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_chatgpt_like_v31.css') }}?v=31_1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_closed_label_fix.css') }}?v=original-v4">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_module.css') }}?v=assistant-identity-intro-v5">
+
+<!-- BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_no_chat_intro_open_fix_v34.css') }}?v=34">
+</head>
 <body class="{% block body_class %}{% endblock %}" data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}">
 <div id="pageLoader" class="page-loader">
     <div class="page-loader-inner">
@@ -1043,7 +1046,6 @@ function submitLogoutForm(event){
 {% block extra_scripts %}{% endblock %}
 
 <!-- BYS360_LIVE_FULL_OVERLAY_V2_17_61_BODY_BEGIN -->
-<div id="bys360-assistant-module-root" data-bys360-assistant-module="assistant-deep-knowledge-context-v27"></div>
 
 <script src="{{ url_for('static', filename='js/bys360_screen_title_fix_v18_8.js') }}?v=2_17_61" defer></script>
 <script src="{{ url_for('static', filename='js/bys360_form_csrf_guard_v2_17_61.js') }}?v=2_17_61" defer></script>
@@ -1051,8 +1053,6 @@ function submitLogoutForm(event){
 <script src="{{ url_for('static', filename='js/bys360_ios_pwa_v2.js') }}?v=ios-pwa-v2-2_17_61" defer></script>
 <script src="{{ url_for('static', filename='pwa/ios_pwa_performance_mobile_v3_1.js') }}?v=2_17_61" defer></script>
 <script src="{{ url_for('static', filename='pwa/ios_pwa_premium.js') }}?v=2_17_61" defer></script>
-<script src="{{ url_for('static', filename='js/bys360_assistant_module.js') }}?v=assistant-2_17_61" defer></script>
-<script src="{{ url_for('static', filename='js/bys360_assistant_closed_label_v2.js') }}?v=2_17_61" defer></script>
 <!-- BYS360_AI_EVERYWHERE_V1_JS -->
 <script src="{{ url_for('static', filename='js/bys360_ai_everywhere_v1.js') }}?v=ai-everywhere-v1" defer></script>
 <!-- /BYS360_AI_EVERYWHERE_V1_JS -->
@@ -1117,7 +1117,12 @@ function submitLogoutForm(event){
 
 {# BYS360_A5_P2D2_FEEDBACK_PULSE_BASE_ACTIVE_ENDPOINTS: Nab?z ?l??m? men? aktiflik s?zle?mesi #}
 {# current_ep in ['main.feedback_pulse_analytics', 'main.feedback_admin_pulse_analytics'] #}
+<script src="{{ url_for('static', filename='js/bys360_assistant_closed_label_v2.js') }}?v=2_17_61" defer></script>
+<div id="bys360-assistant-module-root" data-bys360-assistant-module="assistant-deep-knowledge-context-v27"></div>
+<script src="{{ url_for('static', filename='js/bys360_assistant_module.js') }}?v=assistant-identity-intro-v5" defer></script>
 
+<!-- BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34_JS -->
+<script src="{{ url_for('static', filename='js/bys360_assistant_no_chat_intro_open_fix_v34.js') }}?v=34" defer></script>
 </body>
 </html>
 
