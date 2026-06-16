@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from app.core.datetime_utils import utc_now
 import re
@@ -309,8 +307,6 @@ def build_publication_portal_spotlight(*, limit: int = 4) -> dict:
         "latest_bulletin": _publication_card_payload(latest_bulletin) if latest_bulletin else None,
     }
 
-
-
 def publication_renderer_available() -> bool:
     return pymupdf is not None
 
@@ -367,8 +363,6 @@ def render_publication_page_image(*, publication: PublicationIssue, page_number:
     finally:
         doc.close()
     return target
-
-
 
 def _remove_path_quietly(path_value: str | Path | None) -> None:
     if not path_value:
