@@ -182,9 +182,6 @@ def build_home_page_context(user: Any) -> dict[str, Any]:
         "home_operational_cards": operational_cards,
     }
 
-
-
-
 # BYS360_RUNTIME_LOGGEDIN_SLOW_PAGES_V3_HOME_SUMMARY_CACHE
 _HOME_SUMMARY_CACHE_TTL_SECONDS = 45
 _HOME_SUMMARY_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
