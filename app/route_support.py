@@ -74,8 +74,6 @@ PORTAL_PROFILE_ADMIN_ROLES = {"admin", "baskan", "baskan_yardimcisi"}
 # Tek kaynak artık app.services.settings.effective_menu.build_menu_visibility_map.
 # Böylece rol/birim/kullanıcı override çözümlemesi route katmanında tekrar etmez.
 
-
-
 # BYS360_SPRINT0_REMOVED_MENU_FILTER_BRIDGE_V1
 def is_removed_menu_key(menu_key: str | None) -> bool:
     """Canlı kapsam dışı menü anahtarlarını route katmanında da süzer."""
@@ -121,9 +119,6 @@ def safe_render(template_name: str, fallback_html: str = "", **context: Any):
         current_app.logger.exception("Template patladi: %s", template_name)
         flash(f"{template_name} şablonunda hata var: {exc}", "danger")
         return fallback_html or f"<h3>{template_name} şablonu hatalı</h3><p>{exc}</p>"
-
-
-
 
 # BYS360_PHASE3_VISIBILITY_PERMISSION_ACCESS_DENIED_RENDERER
 PHASE3_ACCESS_DENIED_MESSAGE = "Bu sayfaya erişim yetkiniz bulunmamaktadır."
@@ -207,9 +202,6 @@ def int_from_form(value: Any, default: int | None = None) -> int | None:
     except (TypeError, ValueError):
         return default
 
-
-
-
 def normalize_status_value(value: Any, allowed_values: Iterable[str] | None = None, default: str = "") -> str:
     normalized = (str(value).strip().lower() if value is not None else "")
     if allowed_values is None:
@@ -231,8 +223,6 @@ def ensure_state_change(*, current_value: Any, target_value: Any, entity_label: 
 
 def redirect_back_or(default_endpoint: str, **values: Any):
     return redirect_to_next_or(default_endpoint=default_endpoint, **values)
-
-
 
 def ensure_boolean_toggle(*, current_value: Any, entity_label: str, requested_state: Any | None = None) -> bool:
     current_flag = bool(current_value)

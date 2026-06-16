@@ -159,8 +159,6 @@ def _register_mobile_api(app: Flask) -> None:
 
     register_mobile_api_real_v1(app)
 
-
-
 def _register_executive_summary_module(app: Flask) -> None:
     """Register BYS360 Yönetici Özeti routes safely."""
     try:

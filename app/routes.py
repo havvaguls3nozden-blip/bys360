@@ -205,8 +205,6 @@ from app.communication import user_feedback_routes as _bys360_user_feedback_rout
 from app.support import routes as _support_routes  # noqa: E402,F401
 from app.ai import routes as _ai_routes  # noqa: E402,F401
 
-
-
 __all__ = [
     "main_bp",
     "healthz",
@@ -274,9 +272,6 @@ def bys360_pwa_service_worker():
 
 
 # BYS360 V2 route bootstrap tarafindan yukleniyor; app.routes importu kapatildi
-
-
-
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_ROUTE_IMPORT
 try:

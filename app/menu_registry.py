@@ -1410,8 +1410,6 @@ except Exception:
     pass
 # BYS360_EXECUTIVE_SUMMARY_V1_0_10_ADMIN_ONLY_MENU_LOCK_END
 
-
-
 # BYS360_PERFORMANCE_V2_1_3A_RUNTIME_MENU_GUARD_BEGIN
 try:
     _BYS360_V213A_CATEGORY_MENU_KEY = "performance_personnel_category_card"
