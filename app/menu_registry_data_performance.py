@@ -29,6 +29,7 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_criteria",
         "performance_periods",
         "performance_period_management_center",
+        "performance_evaluator_reminder_center",
         "performance_evaluation_tasks",
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
@@ -481,8 +482,6 @@ except Exception:
     logger.exception("Performans modulu kritik isleminde hata olustu", exc_info=True)
     pass
 # BYS360_PERFORMANCE_V2_1_5_CATEGORY_PERIOD_SCOPE_ROLE_DEFAULTS_END
-
-
 
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_DEFAULTS_BEGIN
 # Dönem Yönetim Merkezi statik rol varsayılanına bağlıdır. DB satırı varsa son karar Ayarlar ekranındadır.
