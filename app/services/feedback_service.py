@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from app.core.datetime_utils import utc_now
 """BYS360 feedback service.
@@ -311,8 +309,6 @@ def save_pulse_entry(*, user, mood_value: int, short_note: str = "", is_anonymou
     _clear_pulse_cache_for_unit(unit_id)
     _enqueue_pulse_analytics_refresh(unit_id, days=30)
     return entry
-
-
 
 # ---------------------------------------------------------------------------
 # Pulse analytics privacy/performance helpers
