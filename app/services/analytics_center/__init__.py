@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from .live_scope import ANALYTICS_SURFACE_KEYS, ANALYTICS_SURFACES, build_analytics_surface_summary, get_analytics_surfaces
 from .service_inventory import (
     build_analytics_center_bridge_summary,
