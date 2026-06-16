@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import logging
 
@@ -388,9 +386,6 @@ def performance_go_live_center():
         active_period=active_period,
         **dashboard,
     )
-
-
-
 
 @main_bp.route("/performance/go-live-center/uat")
 @login_required

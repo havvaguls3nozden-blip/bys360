@@ -91,9 +91,6 @@ def _is_hukuk_subject(employee) -> bool:
     )
     return 'hukuk musavir' in blob or 'sorumlu hukuk musavir' in blob
 
-
-
-
 def _is_hukuk_musaviri_subject(employee) -> bool:
     blob = ' | '.join(
         str(getattr(employee, attr, '') or '').strip().lower()

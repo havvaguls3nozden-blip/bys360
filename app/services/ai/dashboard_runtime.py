@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask_login import current_user
 
 from .audit import log_ai_request, upsert_ai_summary_cache
@@ -9,8 +7,6 @@ from .client import get_ai_client
 from .guardrails import ensure_ai_access, sanitize_output_text
 from .prompts import get_prompt_definition
 from .redaction import redact_payload
-
-
 
 def _build_dashboard_context(*args, **kwargs):
     from app.services.ui_context.dashboard import build_dashboard_context as _impl

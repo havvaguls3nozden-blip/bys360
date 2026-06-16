@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import datetime, timedelta
 from math import ceil
@@ -35,8 +33,6 @@ def _severity_rank(value: str) -> int:
     if text == "warning":
         return 2
     return 1
-
-
 
 def _determine_module_alert(row: dict[str, Any], *, module_quality_floor: int, backlog_limit: int, negative_feedback_limit: int) -> dict[str, Any] | None:
     reasons: list[str] = []
@@ -79,8 +75,6 @@ def _determine_module_alert(row: dict[str, Any], *, module_quality_floor: int, b
         "queue_href": url_for("main.admin_ai_review_queue", module_type=row.get("module_type") or "", status="open"),
     }
 
-
-
 def _determine_prompt_alert(row: dict[str, Any], *, prompt_quality_floor: int, backlog_limit: int, negative_feedback_limit: int) -> dict[str, Any] | None:
     reasons: list[str] = []
     quality_score = int(row.get("quality_score") or 0)
@@ -121,8 +115,6 @@ def _determine_prompt_alert(row: dict[str, Any], *, prompt_quality_floor: int, b
         "href": url_for("main.admin_ai_quality_hub", prompt_version=prompt_version, lookback_days=row.get("selected_lookback_days") or 30),
         "queue_href": url_for("main.admin_ai_review_queue", status="open"),
     }
-
-
 
 def _recent_incidents(*, lookback_days: int, limit: int = 10) -> list[dict[str, Any]]:
     since = utc_now() - timedelta(days=max(int(lookback_days or 1), 1))
@@ -188,8 +180,6 @@ def _recent_incidents(*, lookback_days: int, limit: int = 10) -> list[dict[str, 
 
     incidents.sort(key=lambda item: ((item.get("created_at") or datetime.min), _severity_rank(item.get("severity"))), reverse=True)
     return incidents[:limit]
-
-
 
 def _build_actions(*, summary: dict[str, Any], module_alerts: list[dict[str, Any]], prompt_alerts: list[dict[str, Any]], backlog_limit: int, negative_feedback_limit: int) -> list[dict[str, Any]]:
     actions: list[dict[str, Any]] = []
@@ -269,8 +259,6 @@ def _build_actions(*, summary: dict[str, Any], module_alerts: list[dict[str, Any
         )
 
     return actions[:6]
-
-
 
 def build_ai_governance_snapshot(*, module_type: str = "", prompt_version: str = "", lookback_days: int = 30, module_quality_floor: int = 65, prompt_quality_floor: int = 60, backlog_limit: int = 8, negative_feedback_limit: int = 3) -> dict[str, Any]:
     lookback_days = _safe_int(lookback_days, 30, minimum=1, maximum=180)

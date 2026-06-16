@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Performans Tamamlama Faz 2 kategori merkezi.
 

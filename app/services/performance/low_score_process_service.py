@@ -57,8 +57,6 @@ PHASE6_1_LOW_SCORE_RULE_VERSION = "2026-05-02-phase6.1-low-score-detection-v1"
 FINAL_STATUSES = {"tamamlandi", "tamamlandı", "completed", "published"}
 DONE_ASSIGNMENT_STATUSES = {"tamamlandi", "tamamlandı", "completed", "submitted"}
 
-
-
 # BYS360_PHASE6_DIRECT_PRESIDENT_CONTRACT_V3_STATUS_GUARDS
 # Taslak / bekleyen / iade edilmiş değerlendirmeler tamamlanmış düşük performans sayılmaz.
 DRAFT_OR_PENDING_EVALUATION_STATUSES = {
@@ -1008,8 +1006,6 @@ LOW_SCORE_SECOND_REPEAT_VISIBLE_MESSAGE = "Tekrarlayan Düşük Performans Süre
 LOW_SCORE_NO_AUTO_ACTION_MESSAGE = "Sistem otomatik işten çıkarma yapmaz; yalnızca idari süreç takibi ve yetkili onay akışı başlatılır."
 
 # BYS360_PHASE6_5_PUBLISH_LOCK_MARKER_ALIGNMENT: Faz 6.5 sonrası Faz 6.2 yayın kilidi marker uyumu korundu.
-
-
 
 # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_6_LOW_SCORE_STABILIZED
 # Yayın kesinleşmesi iade durumunu engelliyor.

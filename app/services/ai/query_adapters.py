@@ -1,8 +1,6 @@
 from __future__ import annotations
 from app import db
 
-
-
 from typing import Any
 
 from flask_login import current_user

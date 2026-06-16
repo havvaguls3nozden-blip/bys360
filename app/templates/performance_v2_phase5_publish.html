@@ -12,8 +12,6 @@
 
 {% block page_subtitle %}Yayımla ve geri al işlemleri, idari onay mantığı korunarak daha güvenli ve daha okunur bir kontrol yüzeyinden yürütülür.{% endblock %}
 
-
-
 {% block content %}
 
 {{ styles() }}
@@ -45,8 +43,6 @@
 {% set phase5_guide_note = "Sonuçlar, Personel veya yetkili idari onay tamamlanmadan personele açılmamalıdır. Bu yüzey yayın güvenliği için son kapıdır." %}
 
 {% include "performance/_phase5_microguide.html" %}
-
-
 
 <style>
 
@@ -133,8 +129,6 @@
 
   </section>
 
-
-
   <section class="performance-surface">
 
     <form method="get" class="performance-toolbar">
@@ -168,8 +162,6 @@
     </form>
 
   </section>
-
-
 
   {% if publish_preflight %}
 
@@ -214,8 +206,6 @@
   </section>
 
   {% endif %}
-
-
 
   <section class="ai-summary-grid">
 
@@ -281,8 +271,6 @@
 
   </section>
 
-
-
   <section class="performance-metrics">
 
     <article class="performance-metric">
@@ -327,8 +315,6 @@
 
   </section>
 
-
-
   <section class="performance-grid-2">
 
     <article class="performance-surface">
@@ -336,8 +322,6 @@
       <h3 class="performance-section-title">Yayın işlemi</h3>
 
       <p class="performance-section-text">Bu dönem için yayımlanan sonuç sayısı {{ scorecard.published_count }} / {{ scorecard.count }} olarak izlenmektedir.</p>
-
-
 
       <div class="performance-legend" style="margin-top:14px;">
 
@@ -366,8 +350,6 @@
         </div>
 
       </div>
-
-
 
       <form method="post" class="performance-toolbar" style="margin-top:18px;">
 
@@ -415,8 +397,6 @@
 
     </article>
 
-
-
     <article class="performance-surface">
 
       <h3 class="performance-section-title">Bloke neden özeti</h3>
@@ -456,8 +436,6 @@
     </article>
 
   </section>
-
-
 
   
 

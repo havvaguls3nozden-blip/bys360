@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import abort, flash, redirect, render_template, request
 from flask_login import current_user, login_required
 

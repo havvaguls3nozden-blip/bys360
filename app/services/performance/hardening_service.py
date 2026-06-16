@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import re
 from typing import Any
 
@@ -25,16 +23,12 @@ def slugify_filename_part(value: Any, default: str = "dosya") -> str:
     text = re.sub(r"_+", "_", text).strip("_")
     return text or default
 
-
-
 def build_period_download_name(prefix: str, period: Any | None = None, extension: str = "xlsx") -> str:
     prefix_part = slugify_filename_part(prefix, default="bys360")
     period_label = getattr(period, "title", None) or getattr(period, "name", None) or "donem"
     period_part = slugify_filename_part(period_label, default="donem")
     ext = slugify_filename_part(extension, default="xlsx")
     return f"{prefix_part}_{period_part}.{ext}"
-
-
 
 def humanize_export_exception(exc: Exception) -> str:
     raw = str(exc).strip() or exc.__class__.__name__

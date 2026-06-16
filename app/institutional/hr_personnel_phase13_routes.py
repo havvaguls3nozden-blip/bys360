@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_CHILD_IMPORT
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import date, datetime
 from hashlib import sha256

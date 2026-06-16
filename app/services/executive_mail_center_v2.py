@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import json
 import urllib.parse
 import urllib.request
@@ -253,6 +251,4 @@ def run_due_tasks(actor_user_id: int|None=None, dry_run: bool=False) -> dict[str
 def dashboard_context(search: str|None=None) -> dict[str, Any]:
     cfg=current_config(); people=selected_people()
     return {"config":cfg,"tasks":cfg["tasks"],"manager_recipients":people["managers"],"staff_recipients":people["staff"],"users":list_users(search=search, limit=500),"search":search or "","logs":get_recent_logs(80),"location":cfg["location"]}
-
-
 

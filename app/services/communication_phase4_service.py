@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import csv
 from collections import Counter, defaultdict
@@ -183,9 +181,6 @@ def _metric_series(metric_group: str, metric_name: str, days: int = 14) -> dict[
         "max_value": max(values) if values else 0,
         "last_value": values[-1] if values else 0,
     }
-
-
-
 
 def _json_safe(value: Any):
     if isinstance(value, dict):

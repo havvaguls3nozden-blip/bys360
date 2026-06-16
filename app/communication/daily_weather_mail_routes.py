@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import abort, flash, redirect, render_template, request
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
@@ -216,6 +214,4 @@ def daily_weather_mail_dry_run():
         logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=209")
         flash(f"Kuru çalışma başlatılamadı: {exc}", "danger")
     return redirect("/executive-summary/daily-weather-mail")
-
-
 

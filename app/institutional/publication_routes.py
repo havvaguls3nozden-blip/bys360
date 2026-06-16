@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from datetime import datetime
 from pathlib import Path
 
@@ -206,8 +204,6 @@ def publication_archive(publication_id: int):
         safe_db_rollback()
         flash(f"Arşivleme yapılamadı: {exc}", "danger")
     return redirect(url_for("main.publication_library"))
-
-
 
 @main_bp.route("/publications/<int:publication_id>/delete", methods=["POST"])
 @login_required

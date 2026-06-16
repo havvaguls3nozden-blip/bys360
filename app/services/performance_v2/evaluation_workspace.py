@@ -21,9 +21,6 @@ from app.services.performance.interim_notes_runtime import build_interim_notes_c
 from app.services.performance.period_state_guard import ensure_scoring_window_open
 logger = logging.getLogger(__name__)
 
-
-
-
 # BYS360_PHASE5_3_MANAGER_SCORING_SETTINGS_CONTEXT
 def _phase5_3_comment_rule_from_settings() -> bool:
     """1/5 kriter açıklama zorunluluğunu canlı performans ayarından okur."""
@@ -172,8 +169,6 @@ def _validate_submission(assignment, evaluation, items, *, score_enabled: bool, 
     # Böylece kullanıcı 3 puan verdiği halde eski taslak veya hatalı runtime
     # eşleşmesi nedeniyle burada bloke olmaz; nihai anayasa kontrolü ise
     # publish_integrity katmanında korunur.
-
-
 
 def _update_level_totals(evaluation, employee, period):
     resolved_chain = build_resolved_chain(employee=employee, period=period)

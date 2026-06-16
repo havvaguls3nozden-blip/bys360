@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.services.safe_user_delete_service import safe_delete_user_by_id
 from app.core.datetime_utils import utc_now
 """Admin operasyon route ailesi.

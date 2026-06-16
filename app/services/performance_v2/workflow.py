@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-
-
-
 def current_actionable_levels(resolved_chain, existing_assignments: list[object]) -> list[int]:
     submitted_levels = {
         getattr(item, 'manager_level', None)

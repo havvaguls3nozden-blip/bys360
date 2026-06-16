@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import csv
 import io
@@ -35,9 +33,6 @@ from app.services.ai.preflight import build_ai_preflight_snapshot
 from app.services.ai.smoke import build_ai_smoke_snapshot
 from app.services.ai.schema_guard import get_ai_schema_status
 from app.services.sql_refactor_query_helpers import distinct_non_empty_values, distinct_normalized_non_empty_values
-
-
-
 
 KNOWN_AI_MODULES: tuple[str, ...] = live_ai_modules(include_system=True)
 
@@ -272,8 +267,6 @@ def _redaction_choices() -> dict[str, list[str]]:
     field_names = distinct_non_empty_values(AIRedactionRule.field_name)
     return {"modules": modules, "field_names": field_names}
 
-
-
 def _all_ai_modules() -> list[str]:
     values: set[str] = set(KNOWN_AI_MODULES)
     for column in (
@@ -284,8 +277,6 @@ def _all_ai_modules() -> list[str]:
     ):
         values.update(distinct_normalized_non_empty_values(column))
     return visible_module_options(values)
-
-
 
 def _module_health_rows(selected_module_type: str | None = None) -> list[dict[str, int | str]]:
     rows: list[dict[str, int | str]] = []
@@ -833,8 +824,6 @@ def admin_ai_feedback_export():
         csv_rows,
     )
 
-
-
 @main_bp.route("/admin/ai-module-health")
 @login_required
 @admin_required
@@ -1048,9 +1037,6 @@ def admin_ai_preflight_export():
         ["Kategori", "Kontrol", "Durum", "Detay", "Oneri"],
         csv_rows,
     )
-
-
-
 
 @main_bp.route("/admin/ai-smoke")
 @login_required

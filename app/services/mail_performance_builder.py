@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.services.mail_core import (
     utc_now,
     smtplib,
@@ -323,8 +321,5 @@ def build_pending_assignment_manager_dashboard(period_id: int, *, reminder_inter
 def build_pending_assignment_manager_rows(period_id: int, *, reminder_interval_hours: int = REMINDER_COOLDOWN_HOURS) -> list[dict[str, Any]]:
     dashboard = build_pending_assignment_manager_dashboard(period_id, reminder_interval_hours=reminder_interval_hours)
     return list(dashboard.get('eligible_rows') or [])
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

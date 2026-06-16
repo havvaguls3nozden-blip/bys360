@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.main_handlers.account_communication_helpers import (
     utc_now,
     datetime,

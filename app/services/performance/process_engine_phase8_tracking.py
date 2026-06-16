@@ -109,9 +109,6 @@ def _table_columns(table_name: str) -> set[str]:
         )
     }
 
-
-
-
 def _qident(name: str) -> str:
     return '"' + str(name).replace('\"', '\"\"') + '"'
 
@@ -691,8 +688,6 @@ def build_process_tracking_workspace(
         "viewer_name": user_display_name(viewer),
         "last_refreshed_at": _safe_date(datetime.now()),
     }
-
-
 
 def _delete_tracking_flow_ids(flow_ids: list[int]) -> int:
     """Delete tracking-list records and their visible tracking children.

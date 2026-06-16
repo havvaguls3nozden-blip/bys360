@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.services.mail_core import (
     utc_now,
     smtplib,
@@ -490,8 +488,6 @@ def retry_failed_performance_mail_logs(
         "items": items,
     }
 
-
-
 def get_performance_mail_automation_settings() -> dict[str, Any]:
     def _get_value(setting_key: str) -> str:
         definition = AUTOMATION_SETTING_DEFINITIONS[setting_key]
@@ -800,8 +796,5 @@ def run_performance_mail_automation(
         "skipped_count": total_skipped,
         "command": settings.get("command"),
     }
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

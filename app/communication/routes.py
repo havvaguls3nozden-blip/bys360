@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """Communication route family compatibility hub.
 
@@ -110,8 +108,6 @@ messages_thread_mark_read = messages_mark_read
 messages_thread_mute_toggle = messages_toggle_mute
 messages_thread_archive_toggle = messages_toggle_archive
 messages_thread_pin_toggle = messages_toggle_pin
-
-
 
 # BYS360 V2.15.10 - Günlük personel bilgilendirme maili route bağlantısı
 # Bu import main_bp üzerinde /executive-summary/daily-weather-mail endpointini kayıt eder.

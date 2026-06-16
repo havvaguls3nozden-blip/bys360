@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.main_handlers.account_communication_helpers import (
     utc_now,
     datetime,
@@ -201,9 +199,6 @@ def _build_settings_matrix(grouped_menu_definitions, selected_rule_map: dict[str
         "fully_hidden_groups": fully_hidden_groups,
     }
 
-
-
-
 def _build_settings_presets(grouped_menu_definitions, role_defaults: set[str]):
     group_key_map: dict[str, list[str]] = {}
     for group_name, items in grouped_menu_definitions.items():
@@ -271,8 +266,6 @@ def _build_settings_presets(grouped_menu_definitions, role_defaults: set[str]):
         "presets": presets,
         "group_toggles": group_toggles,
     }
-
-
 
 def _collect_all_menu_keys(grouped_menu_definitions):
     keys = []
@@ -714,9 +707,6 @@ def _build_user_visibility_diff(selected_user, compare_user, flat_menu_items) ->
         "difference_count": len(rows),
         "rows": rows,
     }
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]
 

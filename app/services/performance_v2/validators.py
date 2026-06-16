@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections.abc import Iterable
 
 from .policy_flags import score_requires_criterion_comment

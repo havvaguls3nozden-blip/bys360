@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta

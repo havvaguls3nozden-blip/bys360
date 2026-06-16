@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 ROUTE_FAMILY = "communication"
 
 REQUIRED_ROUTE_MODULES = [

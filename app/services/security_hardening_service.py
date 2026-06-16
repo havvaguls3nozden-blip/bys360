@@ -593,8 +593,6 @@ def run_security_and_access_audit() -> AuditReport:
 
     return report
 
-
-
 def build_security_posture_snapshot() -> dict[str, Any]:
     """UI dostu ozet guvenlik pozisyonu dondurur.
 

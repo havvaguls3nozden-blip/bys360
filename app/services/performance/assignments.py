@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
@@ -42,8 +40,6 @@ from .rules import (
     WARNING_REASON_PRESIDENT_MISSING,
     WARNING_REASON_SELF_MANAGER,
 )
-
-
 
 TR_ASCII_MAP = str.maketrans({
     "ç": "c", "Ç": "c",

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Faz 8.4 — dönem kapsamına göre görev üretimi filtresi.
 
@@ -163,9 +161,6 @@ def employee_unit_tokens(employee) -> set[str]:
         getattr(org, "unit_name", None),
     }
     return {normalize_match_text(value) for value in values if normalize_match_text(value)}
-
-
-
 
 def _matches_scope_token(target: object, tokens: set[str]) -> bool:
     """Kapsam etiketi ile personel etiketini güvenli/esnek eşleştirir.

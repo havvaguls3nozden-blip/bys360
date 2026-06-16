@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """Personel profil fotoğrafı servis köprüsü.
 

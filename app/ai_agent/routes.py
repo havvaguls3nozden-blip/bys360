@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import Blueprint, jsonify, render_template, request
 from flask_login import current_user, login_required
 
@@ -22,12 +20,6 @@ ai_agent_bp = Blueprint(
 
 
 "ai_agent", __name__, url_prefix="/ai-agent")
-
-
-
-
-
-
 
 # BYS360_AG1_AG2_AI_AGENT_ROUTE_GUARD_START
 @ai_agent_bp.before_request

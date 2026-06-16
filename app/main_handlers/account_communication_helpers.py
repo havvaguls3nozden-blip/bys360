@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import datetime
 import io
@@ -344,8 +342,6 @@ ROLE_MATRIX_POLICY_CONFIGS = [
 def get_assistant_role_matrix_recommended_keys(role_key):
     return set(ASSISTANT_ROLE_MATRIX_RECOMMENDED.get((role_key or "").strip(), set()))
 
-
-
 ROLE_MATRIX_POLICY_CONFIGS = [
     {
         "key": "general",
@@ -462,9 +458,6 @@ def _find_menu_item_by_key(flat_menu_items, wanted_key):
             return item
     return None
 
-
-
-
 def _build_role_matrix_group(matrix_key, policy_items):
     config = _role_matrix_policy_config_map().get((matrix_key or "").strip())
     if not config:
@@ -515,13 +508,8 @@ def _collect_role_matrix_visible_keys_from_form(matrix_key, role_key, scoped_key
         if request.form.get(_role_matrix_form_field_name(matrix_key, role_key, item_key))
     }
 
-
-
 def enforce_first_login_security_flow():
     return enforce_first_login_security_flow_redirect()
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]
 

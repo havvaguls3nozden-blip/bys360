@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_OPTIONAL
 # STATUS_SOURCE: app.communication.route_manifest OPTIONAL_ROUTE_MODULES
 
-
-
 import json
 from io import BytesIO
 

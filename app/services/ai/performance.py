@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections import defaultdict
 from typing import Any
 
@@ -149,8 +147,6 @@ def build_performance_consistency_response(evaluation_id: int) -> dict[str, Any]
     consistency["ai_request_log_id"] = log_row.id if log_row else None
     consistency["recommendation_ids"] = [row.id for row in created_rows]
     return {"ok": True, "data": consistency}
-
-
 
 def _clip_percent(value: float | int | None) -> float:
     try:

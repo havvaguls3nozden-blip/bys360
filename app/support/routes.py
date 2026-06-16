@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from datetime import datetime, timezone
 from pathlib import Path
 from secrets import token_hex
@@ -138,8 +136,6 @@ def _support_tables_ready() -> bool:
         return _store_ready_value("tables", False)
     return _store_ready_value("tables", SUPPORT_ALLOWED_TABLES.issubset(existing))
 
-
-
 def _support_help_tables_ready() -> bool:
     cached = _cached_ready_value("help")
     if cached is not None:
@@ -151,8 +147,6 @@ def _support_help_tables_ready() -> bool:
         safe_db_rollback()
         return _store_ready_value("help", False)
     return _store_ready_value("help", SUPPORT_HELP_ALLOWED_TABLES.issubset(existing))
-
-
 
 def _ensure_support_tables_for_current_db() -> None:
     bind = db.engine
@@ -170,13 +164,9 @@ def _ensure_support_tables_for_current_db() -> None:
         db.session.add(SupportCategory(name=name, description=description, sort_order=sort_order, is_active=True))
     db.session.commit()
 
-
-
 def _ensure_support_help_tables_for_current_db() -> None:
     SupportHelpArticle.__table__.create(bind=db.engine, checkfirst=True)
     db.session.commit()
-
-
 
 def _support_guard_or_redirect():
     if _support_tables_ready():
@@ -184,22 +174,14 @@ def _support_guard_or_redirect():
     flash("Destek ve Talep Yönetimi tabloları henüz kurulmamış. Yetkili kullanıcı kurulum ekranından modülü aktifleştirebilir.", "warning")
     return redirect(url_for("main.support_index"))
 
-
-
 def _build_ticket_no() -> str:
     return f"DTY-{datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y%m%d')}-{token_hex(3).upper()}"
-
-
 
 def _ticket_type_map() -> dict[str, str]:
     return {key: label for key, label in SUPPORT_TICKET_TYPES}
 
-
-
 def _priority_map() -> dict[str, str]:
     return {key: label for key, label in SUPPORT_PRIORITY_CHOICES}
-
-
 
 def _default_support_category_id(ticket_type: str | None) -> int | None:
     """Yeni talep ekranında kategori alanı kullanıcıdan kaldırıldı.
@@ -221,12 +203,8 @@ def _default_support_category_id(ticket_type: str | None) -> int | None:
         return int(fallback.id)
     return None
 
-
-
 def _status_map() -> dict[str, str]:
     return {key: label for key, label in SUPPORT_STATUS_CHOICES}
-
-
 
 def _is_ticket_assignee(ticket: SupportTicket) -> bool:
     return int(getattr(ticket, "assigned_to_user_id", 0) or 0) == int(getattr(current_user, "id", 0) or 0)
@@ -244,9 +222,6 @@ def _can_use_assigned_support_view() -> bool:
     if not current_user.is_authenticated:
         return False
     return bool(is_manager_family_user(current_user) or can_access_menu(current_user, "support_assigned"))
-
-
-
 
 def _can_use_all_support_view() -> bool:
     """Tüm Talepler ekranı kişi bazlı menü izniyle de açılabilir.
@@ -277,13 +252,9 @@ def _can_operate_ticket(ticket: SupportTicket) -> bool:
     current_id = int(getattr(current_user, "id", 0) or 0)
     return int(ticket.created_by_user_id or 0) == current_id or _is_ticket_assignee(ticket)
 
-
-
 def _normalize_choice(value: str | None, allowed: set[str], default: str) -> str:
     normalized = (value or "").strip().lower()
     return normalized if normalized in allowed else default
-
-
 
 def _apply_support_search_filter(query, search: str | None, *, include_requester: bool = False):
     """Destek talebi aramasını Python sonrası eleme yerine SQL WHERE tarafında kurar."""
@@ -314,8 +285,6 @@ def _support_upload_root() -> Path:
     root.mkdir(parents=True, exist_ok=True)
     return root
 
-
-
 def _store_ticket_attachment(ticket: SupportTicket, file_obj, attachment_type: str = "document") -> None:
     meta = validate_upload(
         file_obj,
@@ -339,8 +308,6 @@ def _store_ticket_attachment(ticket: SupportTicket, file_obj, attachment_type: s
         )
     )
 
-
-
 def _build_help_center_context(search_query: str | None = None) -> dict:
     context = build_home_context()
     context["can_manage_help_content"] = bool(current_user.is_authenticated and getattr(current_user, "is_admin", False))
@@ -348,8 +315,6 @@ def _build_help_center_context(search_query: str | None = None) -> dict:
     if search_query is not None:
         context["search_query"] = search_query
     return context
-
-
 
 def _build_recent_support_streams(limit: int = 6) -> dict:
     manager_mode = _can_use_all_support_view()
@@ -363,8 +328,6 @@ def _build_recent_support_streams(limit: int = 6) -> dict:
         "assigned_recent_tickets": assigned_base.order_by(*base_order).limit(limit).all() if assigned_view else [],
         "all_recent_tickets": SupportTicket.query.order_by(*base_order).limit(limit).all() if manager_mode else [],
     }
-
-
 
 def _build_dashboard_context() -> dict:
     open_statuses = {"open", "reviewing", "waiting_info", "assigned", "planned"}
@@ -393,8 +356,6 @@ def _build_dashboard_context() -> dict:
         "is_support_ready": True,
     }
 
-
-
 def _slugify(value: str | None) -> str:
     value = (value or "").strip().lower()
     replacements = {
@@ -407,12 +368,8 @@ def _slugify(value: str | None) -> str:
     value = re.sub(r"-{2,}", "-", value).strip("-")
     return value or f"makale-{token_hex(4)}"
 
-
-
 def _parse_csv(value: str | None) -> list[str]:
     return [item.strip() for item in (value or "").split(",") if item and item.strip()]
-
-
 
 def _build_help_form_context(article: SupportHelpArticle | None = None) -> dict:
     return {
@@ -1146,8 +1103,6 @@ def support_attachment_download(ticket_id: int, attachment_id: int):
     attachment = SupportTicketAttachment.query.filter_by(id=attachment_id, ticket_id=ticket.id).first_or_404()
     folder = _support_upload_root() / str(ticket.id)
     return send_from_directory(folder, attachment.stored_name, as_attachment=True, download_name=attachment.filename)
-
-
 
 def _sync_seeded_help_articles(*, update_existing: bool = False) -> tuple[int, int, int]:
     inserted = 0

@@ -138,9 +138,6 @@ def performance_archive_import_template():
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
-
-
-
 # BYS360_PHASE7_6_TEMPLATE_ENDPOINT_ALIAS_V2
 @main_bp.route("/performance/archive/template", methods=["GET"])
 @main_bp.route("/performans/gecmis-karne-arsivi/sablon", methods=["GET"])

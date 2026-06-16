@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from collections import Counter
 from datetime import datetime, timedelta
@@ -33,32 +31,22 @@ def _full_name(user: Any) -> str:
         or "-"
     )
 
-
-
 def _safe_email(user: User | None) -> str:
     raw = (getattr(user, "email", None) or "").strip()
     if "@" not in raw or " " in raw:
         return ""
     return raw
 
-
-
 def _request_is_open(feedback_request: FeedbackRequest | None) -> bool:
     return (getattr(feedback_request, "status", None) or "") in PENDING_REQUEST_STATUSES
 
-
-
 def _meeting_is_active(meeting: FeedbackMeeting | None) -> bool:
     return (getattr(meeting, "status", None) or "") in ACTIVE_MEETING_STATUSES
-
-
 
 def _meeting_start_dt(meeting: FeedbackMeeting | None) -> datetime | None:
     if not meeting or not getattr(meeting, "meeting_date", None) or not getattr(meeting, "meeting_start", None):
         return None
     return datetime.combine(meeting.meeting_date, meeting.meeting_start)
-
-
 
 def _summary_source_id(now: datetime, preset: str) -> int:
     preset = (preset or "daily").strip().lower()
@@ -66,8 +54,6 @@ def _summary_source_id(now: datetime, preset: str) -> int:
         iso = now.isocalendar()
         return int(f"{iso.year}{iso.week:02d}")
     return int(now.strftime("%Y%m%d"))
-
-
 
 def _summary_notification_exists(*, user_id: int | None, preset: str, source_id: int) -> bool:
     if not user_id:
@@ -79,8 +65,6 @@ def _summary_notification_exists(*, user_id: int | None, preset: str, source_id:
         source_id=source_id,
         is_read=False,
     ).first() is not None
-
-
 
 def _normalize_recipient_users(recipients: Iterable[Any] | None) -> list[User]:
     resolved: list[User] = []
@@ -106,8 +90,6 @@ def _normalize_recipient_users(recipients: Iterable[Any] | None) -> list[User]:
         seen_ids.add(int(user_id))
         resolved.append(user)
     return resolved
-
-
 
 def _suggest_recipient_users(requests_list: list[Any], meetings: list[Any]) -> list[User]:
     user_ids: set[int] = set()
@@ -154,8 +136,6 @@ def _suggest_recipient_users(requests_list: list[Any], meetings: list[Any]) -> l
         .order_by(User.ad.asc(), User.soyad.asc(), User.id.asc())
         .all()
     )
-
-
 
 def build_feedback_executive_summary(
     requests_list: list[Any],
@@ -276,8 +256,6 @@ def build_feedback_executive_summary(
         "digest_subject": subject,
         "digest_body_plain": body_plain,
     }
-
-
 
 def dispatch_feedback_executive_summary(
     requests_list: list[Any],

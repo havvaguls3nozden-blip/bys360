@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask_login import current_user
 
 from app.models import PerformancePeriod

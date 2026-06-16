@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 ROUTE_FAMILY = "institutional"
 
 REQUIRED_ROUTE_MODULES = [

@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_OPTIONAL
 # STATUS_SOURCE: app.communication.route_manifest OPTIONAL_ROUTE_MODULES
 
-
-
 from flask import Response, redirect, request, url_for, flash
 from flask_login import current_user, login_required
 

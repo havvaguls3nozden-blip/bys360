@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
 from app.services.hierarchy_admin_service import get_manager_scope_users

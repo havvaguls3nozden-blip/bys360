@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü servisleri.
 

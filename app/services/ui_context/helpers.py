@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.route_support import safe_url_for
 
 

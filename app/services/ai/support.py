@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask_login import current_user
 
 from .audit import log_ai_request, upsert_ai_summary_cache

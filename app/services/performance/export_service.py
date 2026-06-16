@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """Performans export / download yardimcilari.
 
@@ -146,8 +144,6 @@ def build_mail_history_export_response(rows: Iterable[dict[str, Any]], *, period
         widths={"A": 22, "B": 22, "C": 28, "D": 30, "E": 48, "F": 14, "G": 36, "H": 28},
     )
     return build_excel_download_response(output, download_name=f"bys360_performans_mail_gecmisi_{period_id}.xlsx")
-
-
 
 def build_performance_report_excel_download_response(evaluations: Iterable[Any], *, download_name: str = "bys360_performans_raporu.xlsx"):
     rows: list[list[Any]] = []

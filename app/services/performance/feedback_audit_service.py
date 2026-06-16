@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import json
 from collections import defaultdict
@@ -59,8 +57,6 @@ def _safe_json(value: Any) -> str | None:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/feedback_audit_service.py | line=56")
         return None
 
-
-
 def _safe_load_json(value: str | None) -> dict[str, Any]:
     if not value:
         return {}
@@ -71,8 +67,6 @@ def _safe_load_json(value: str | None) -> dict[str, Any]:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/feedback_audit_service.py | line=67")
         return {}
 
-
-
 def _table_ready() -> bool:
     try:
         inspector = db.inspect(db.engine)
@@ -80,8 +74,6 @@ def _table_ready() -> bool:
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/feedback_audit_service.py | line=76")
         return False
-
-
 
 def _user_name(user: Any) -> str:
     if not user:
@@ -92,8 +84,6 @@ def _user_name(user: Any) -> str:
         or getattr(user, "email", None)
         or "Sistem"
     )
-
-
 
 def _status_label(value: str | None) -> str:
     labels = {
@@ -113,15 +103,11 @@ def _status_label(value: str | None) -> str:
     raw = (value or "").strip()
     return labels.get(raw, raw or "-")
 
-
-
 def _hours_between(start_value: datetime | None, end_value: datetime | None) -> float | None:
     if not start_value or not end_value:
         return None
     delta = end_value - start_value
     return round(delta.total_seconds() / 3600, 2)
-
-
 
 def _audit_meta() -> tuple[str | None, str | None]:
     if not has_request_context():
@@ -133,8 +119,6 @@ def _audit_meta() -> tuple[str | None, str | None]:
         or request.remote_addr
     )
     return endpoint, ip_address
-
-
 
 def record_feedback_audit_event(
     *,
@@ -181,8 +165,6 @@ def record_feedback_audit_event(
         )
         return False
 
-
-
 def _load_logs(*, request_ids: list[int], meeting_ids: list[int]) -> list[AuditLog]:
     if not _table_ready() or (not request_ids and not meeting_ids):
         return []
@@ -199,8 +181,6 @@ def _load_logs(*, request_ids: list[int], meeting_ids: list[int]) -> list[AuditL
         .order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
         .all()
     )
-
-
 
 def _timeline_rows(logs: list[AuditLog]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
@@ -222,16 +202,12 @@ def _timeline_rows(logs: list[AuditLog]) -> list[dict[str, Any]]:
         )
     return rows
 
-
-
 def get_feedback_request_timeline(request_id: int, *, limit: int = 20) -> list[dict[str, Any]]:
     if not request_id:
         return []
     meeting = FeedbackMeeting.query.filter_by(feedback_request_id=request_id).first()
     logs = _load_logs(request_ids=[request_id], meeting_ids=[meeting.id] if meeting else [])
     return _timeline_rows(logs[:limit])
-
-
 
 def get_feedback_meeting_timeline(meeting_id: int, *, limit: int = 20) -> list[dict[str, Any]]:
     if not meeting_id:
@@ -240,8 +216,6 @@ def get_feedback_meeting_timeline(meeting_id: int, *, limit: int = 20) -> list[d
     request_ids = [meeting.feedback_request_id] if meeting and getattr(meeting, "feedback_request_id", None) else []
     logs = _load_logs(request_ids=request_ids, meeting_ids=[meeting_id])
     return _timeline_rows(logs[:limit])
-
-
 
 def build_feedback_audit_dashboard(requests_list: list[Any], meetings: list[Any], *, today=None) -> dict[str, Any]:
     now = utc_now()

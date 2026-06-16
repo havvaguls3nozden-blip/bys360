@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 from flask import render_template, request
 from flask_login import current_user, login_required
 

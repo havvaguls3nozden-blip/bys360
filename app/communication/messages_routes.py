@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import flash, jsonify, redirect, request, send_from_directory, session, url_for
 from flask_login import current_user, login_required
 
@@ -117,8 +115,6 @@ def _build_reaction_map(messages):
 
 def _build_thread_presence(thread, participants):
     return _svc_build_thread_presence(thread, participants, _utcnow())
-
-
 
 def _participant_for_thread(thread_id):
     return _svc_participant_for_thread(thread_id)
@@ -246,9 +242,6 @@ def messages_inbox_impl():
         ai_message_thread_panel=ai_message_thread_panel,
         ai_message_inbox_panel=ai_message_inbox_panel,
     )
-
-
-
 
 def messages_new_impl():
     users = _svc_load_all_active_compose_users()

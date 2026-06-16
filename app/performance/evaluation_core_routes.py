@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import datetime
 import logging
@@ -103,9 +101,6 @@ from app.services.performance.evaluation_ui_service import (
 @login_required
 def performance_scorecard():
     return redirect(url_for("main.performance_v2_phase5_scorecard", **request.args.to_dict(flat=True)))
-
-
-
 
 @main_bp.route("/performance/scorecard/<int:evaluation_id>")
 @login_required
@@ -453,10 +448,6 @@ def performance_evaluation_history(evaluation_id):
         history_summary=history_summary,
         back_url=request.referrer or url_for("main.performance_tasks"),
     )
-
-
-
-
 
 @main_bp.route("/performance/evaluate/<int:assignment_id>", methods=["GET", "POST"])
 @login_required

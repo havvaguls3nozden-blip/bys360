@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from sqlalchemy import or_
 
 from app.models import EvaluationAssignment, PerformanceEvaluation, User

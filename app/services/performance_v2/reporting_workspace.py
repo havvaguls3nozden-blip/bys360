@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from app.core.datetime_utils import utc_now
 from collections import defaultdict
@@ -51,8 +49,6 @@ def _score_band(final_score: float) -> tuple[str, str]:
         return "Çok Başarılı", "success"
     return "Normal", "neutral"
 
-
-
 def _effective_final_total(evaluation: Any) -> float:
     if not evaluation:
         return 0.0
@@ -97,9 +93,6 @@ def _coerce_employee_ids(values: Iterable[Any] | None) -> list[int]:
             continue
     return sorted(set(result))
 
-
-
-
 def _skip_publish_exempt(evaluation: Any) -> bool:
     try:
         return bool(is_evaluation_publish_exempt(evaluation))
@@ -142,9 +135,6 @@ def _is_assignment_overdue(assignment: Any) -> bool:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return False
-
-
-
 
 def _load_period_evaluations(period_id: int, employee_ids: list[int] | None = None):
     query = (

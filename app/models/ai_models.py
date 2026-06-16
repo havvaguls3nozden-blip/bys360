@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.extensions import db
 from app.model_mixins import OwnershipMixin, TimestampMixin
 

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """Faz 12: AI Karar Destek / Analiz Merkezi final canlı sertleştirme servisi.
 

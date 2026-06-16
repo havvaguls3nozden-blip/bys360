@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """BYS360 canlı çekirdek kurumsal/personel route düzeltmeleri.
 
@@ -314,9 +312,6 @@ def _attendance_overlaps(user_id: int, record_date: date) -> bool:
     except Exception:
         safe_db_rollback()
         return False
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]
 

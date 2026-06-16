@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from app.core.datetime_utils import utc_now
 from datetime import datetime
@@ -185,9 +183,6 @@ def _summarize_breakdown(rows):
             if 'vekâlet' in lowered or 'vekalet' in lowered:
                 breakdown['delegation_warning'] += 1
     return breakdown
-
-
-
 
 def _canonical_manager_tuple(employee) -> tuple[str | None, str | None, str | None]:
     return (
@@ -397,8 +392,6 @@ def _ensure_assignment_notifications_for_period(period) -> dict[str, int]:
 
     db.session.flush()
     return {'created': created, 'updated': updated, 'deduped': deduped, 'total': len(assignments)}
-
-
 
 def _resolved_payloads(period, resolved_chain):
     payloads = {}
@@ -784,8 +777,6 @@ def ensure_assignments_for_period(period, employee_ids: list[int] | None = None,
         'notification_total_count': notification_summary.get('total', 0),
         'message': 'Görev senkronu tamamlandı.',
     }
-
-
 
 def sync_assignments_v2_for_period(period_id=None, actor_user_id=None):
     from app.models import PerformancePeriod

@@ -107,8 +107,6 @@ def _columns(table_name: str) -> set[str]:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/feedback_aftercare.py | line=102")
         return set()
 
-
-
 def _ensure_sqlite_database_parent_exists() -> None:
     """SQLite dosya yolu parent klas?r? yoksa test/dev ortam?nda olu?turur."""
     try:

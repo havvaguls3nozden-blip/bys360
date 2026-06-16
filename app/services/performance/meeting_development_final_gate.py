@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import logging
 ops_logger = logging.getLogger(__name__)
 logger = ops_logger

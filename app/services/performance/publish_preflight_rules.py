@@ -169,9 +169,6 @@ def expected_publish_levels(period: Any, evaluation: Any) -> tuple[int, ...]:
         return (1,)
     return tuple(sorted(set(levels)))
 
-
-
-
 def _workflow_ordered_levels(levels: Iterable[int]) -> tuple[int, ...]:
     """Amir değerlendirme işlem sırasına göre seviyeleri döndürür.
 

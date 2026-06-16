@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
 
 from .service import build_executive_summary_payload

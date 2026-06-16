@@ -126,8 +126,6 @@ class PerformanceProcessNotification(db.Model):
     read_at = db.Column(db.DateTime, nullable=True)
     rule_version = db.Column(db.String(120), nullable=False, default="phase2_process_engine_v1")
 
-
-
 class PerformanceFeedbackPipelineFlow(db.Model):
     """Geri bildirim görüşme hattının P0 -> Final ana süreç kaydı."""
 

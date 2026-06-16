@@ -149,8 +149,6 @@ def performance_mail_history_export(period_id):
         flash(f"Mail geçmişi dışa aktarma sırasında hata oluştu: {humanize_export_exception(exc)}", "danger")
         return redirect(url_for("main.performance_mail_reminders", period_id=period.id))
 
-
-
 @main_bp.route("/performance/mail-reminders/test-mail", methods=["POST"])
 @login_required
 @admin_required

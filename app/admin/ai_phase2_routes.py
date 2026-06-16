@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
 
-
-
 from flask import flash, redirect, request, url_for
 from flask_login import login_required
 

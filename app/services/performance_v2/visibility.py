@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from .rules import visible_previous_levels
 
 

@@ -241,8 +241,6 @@ class PersonnelStatusHistory(TimestampMixin, db.Model):
         backref=db.backref("recorded_personnel_status_history", lazy="dynamic"),
     )
 
-
-
 class PersonnelSelfServiceRequestTemplate(TimestampMixin, db.Model):
     __tablename__ = "personnel_self_service_request_templates"
 
@@ -397,8 +395,6 @@ class PersonnelSelfServiceRequestTask(TimestampMixin, db.Model):
         foreign_keys=[assigned_by_id],
         backref=db.backref("delegated_personnel_request_tasks", lazy="dynamic"),
     )
-
-
 
 # BYS360_CLAUDE_V13_P1_WAITRESS_MODEL_IMPORT_HOTFIX_MODELS
 class PersonnelSelfServiceRequestSlaPolicy(TimestampMixin, db.Model):
@@ -778,9 +774,6 @@ class PersonnelExitInterview(TimestampMixin, db.Model):
         backref=db.backref("conducted_personnel_exit_interviews", lazy="dynamic"),
     )
 
-
-
-
 class PersonnelHandoverRecord(TimestampMixin, db.Model):
     __tablename__ = "personnel_handover_records"
 
@@ -859,8 +852,6 @@ class PersonnelHandoverItem(TimestampMixin, db.Model):
         foreign_keys=[created_by_id],
         backref=db.backref("created_personnel_handover_items", lazy="dynamic"),
     )
-
-
 
 class PersonnelApprovalStation(TimestampMixin, db.Model):
     __tablename__ = "personnel_approval_stations"

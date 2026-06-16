@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Faz 4.1 - 3. amir merkezi ayar/politika servisi.
 

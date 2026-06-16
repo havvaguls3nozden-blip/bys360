@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.services.mail_core import (
     utc_now,
     smtplib,

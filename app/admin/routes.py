@@ -87,8 +87,6 @@ LEGACY_NOTE = (
 # katmanina tasindi. Bu dosyada yalnizca route sozlesmesi ve Flask akis
 # kontrolu kalir.
 
-
-
 def _get_role_values():
     role_values = []
     if hasattr(User, "role"):
@@ -120,10 +118,6 @@ def _get_user_role_text(user):
     if hasattr(user, "role_label") and (getattr(user, "role_label", "") or "").strip():
         return user.role_label
     return ""
-
-
-
-
 
 def _refresh_active_period_assignments(actor_user_id=None):
     active_period = (

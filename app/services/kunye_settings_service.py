@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Sistem Künyesi ayar okuma servisi.
 

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import Response, current_app, flash, jsonify, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func

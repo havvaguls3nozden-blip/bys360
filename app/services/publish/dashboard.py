@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.models import PerformanceEvaluation, PerformancePeriod
 from .policy import PUBLISHABLE_FINAL_STATUSES, is_evaluation_publish_exempt
 

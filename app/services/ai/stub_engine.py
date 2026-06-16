@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 import ast
 from collections import defaultdict

@@ -5,8 +5,6 @@ from __future__ import annotations
 # Bu dosyadaki mevcut can_access_president_approvals / abort(403) kontrolleri Faz 3.3 kapsamının parçasıdır.
 # -*- coding: utf-8 -*-
 
-
-
 from flask import abort, render_template
 from flask_login import current_user, login_required
 

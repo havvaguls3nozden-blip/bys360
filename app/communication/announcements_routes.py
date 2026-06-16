@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import flash, redirect, request, url_for
 import logging
 logger = logging.getLogger(__name__)

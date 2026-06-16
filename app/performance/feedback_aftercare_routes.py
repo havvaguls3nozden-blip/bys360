@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from sqlalchemy.exc import SQLAlchemyError
 
-
-
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
@@ -169,8 +167,6 @@ def performance_feedback_aftercare():
             200,
             {"Content-Type": "text/html; charset=utf-8"},
         )
-
-
 
 # BYS360_FEEDBACK_AFTERCARE_PHASE7_USABILITY_CREATE_ROUTE
 @main_bp.route("/performance/feedback-aftercare/create", methods=["POST"], endpoint="performance_feedback_aftercare_create")

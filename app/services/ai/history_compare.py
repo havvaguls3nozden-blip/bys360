@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import json
 import re
@@ -52,12 +50,8 @@ def _safe_int(value: Any, default: int, minimum: int = 1, maximum: int | None = 
         parsed = min(parsed, maximum)
     return parsed
 
-
-
 def _cutoff(lookback_days: int) -> datetime:
     return utc_now() - timedelta(days=_safe_int(lookback_days, 30, 1, 365))
-
-
 
 def _clip(text: str | None, limit: int = 180) -> str:
     value = str(text or "").strip()
@@ -68,19 +62,13 @@ def _clip(text: str | None, limit: int = 180) -> str:
         return value
     return value[: limit - 3].rstrip() + "..."
 
-
-
 def _preview_request(row: AIRequestLog) -> str:
     if not bool(getattr(row, "was_masked", True)):
         return "Maskesiz kayıt — ayrıntı görünümü gizlendi."
     return _clip(getattr(row, "request_text", None), 180)
 
-
-
 def _preview_response(row: AIRequestLog) -> str:
     return _clip(getattr(row, "response_text", None), 180)
-
-
 
 def _version_key(value: str | None) -> tuple[int, ...]:
     text = str(value or "").strip().lower()
@@ -88,8 +76,6 @@ def _version_key(value: str | None) -> tuple[int, ...]:
         return (0,)
     parts = [int(chunk) for chunk in re.findall(r"\d+", text)]
     return tuple(parts or [0])
-
-
 
 def _status_bucket(value: str | None) -> str:
     text = str(value or "").strip().lower()
@@ -101,12 +87,8 @@ def _status_bucket(value: str | None) -> str:
         return "failed"
     return text or "completed"
 
-
-
 def _template_path() -> Path:
     return Path(__file__).resolve().parents[3] / "config" / MANAGEMENT_TEMPLATE_FILE_NAME
-
-
 
 def _merge_dict(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     merged = deepcopy(base)
@@ -116,8 +98,6 @@ def _merge_dict(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any
         else:
             merged[key] = value
     return merged
-
-
 
 def get_ai_management_template() -> dict[str, Any]:
     path = _template_path()
@@ -130,8 +110,6 @@ def get_ai_management_template() -> dict[str, Any]:
     if not isinstance(payload, dict):
         return deepcopy(DEFAULT_MANAGEMENT_TEMPLATE)
     return _merge_dict(DEFAULT_MANAGEMENT_TEMPLATE, payload)
-
-
 
 def build_ai_decision_history_snapshot(
     *,
@@ -335,8 +313,6 @@ def build_ai_decision_history_snapshot(
         },
     }
 
-
-
 def build_ai_prompt_compare_snapshot(
     *,
     lookback_days: int | None = None,
@@ -534,8 +510,6 @@ def build_ai_prompt_compare_snapshot(
         "selected_feature_type": selected_feature_type,
     }
 
-
-
 def build_ai_management_pack(*, lookback_days: int | None = None) -> dict[str, Any]:
     lookback = _safe_int(lookback_days, 30, 1, 365)
     template = get_ai_management_template()
@@ -612,8 +586,6 @@ def build_ai_management_pack(*, lookback_days: int | None = None) -> dict[str, A
         "distribution_plan": distribution_plan,
         "generated_at": utc_now(),
     }
-
-
 
 def render_ai_management_pack_markdown(snapshot: dict[str, Any]) -> str:
     lines: list[str] = []

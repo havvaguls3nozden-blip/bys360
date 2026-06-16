@@ -21,8 +21,6 @@ def _phase6_2_publish_preflight_rules():
 def validate_evaluation_for_publish(period, evaluation):
     return _phase6_2_publish_preflight_rules().validate_evaluation_for_publish(period, evaluation)
 
-
-
 def _safe_int(value: Any) -> int:
     try:
         return int(value or 0)

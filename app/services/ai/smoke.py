@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,8 +16,6 @@ class SmokeScenario:
     expected: str
     tone: str = "info"
     priority: int = 50
-
-
 
 SCENARIOS: tuple[SmokeScenario, ...] = (
     SmokeScenario(

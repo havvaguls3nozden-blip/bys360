@@ -254,9 +254,6 @@ def hr_management():
         unit_pulse_rows=_unit_pulse(scope_users, scope_user_ids),
     )
 
-
-
-
 # Alt HR route ailelerini yükle ve eski app.institutional.routes import uyumluluğunu koru.
 from app.institutional.org_unit_routes import (
     LEGACY_SHIM,

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 """Faz 9: AI öneri motoru ve risk/önceliklendirme paneli.
 

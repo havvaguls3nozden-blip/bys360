@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
 
-
-
 import csv
 import io
 import json
@@ -24,15 +22,11 @@ from app.services.ai.history_compare import (
 )
 from app.services.ai.schema_guard import get_ai_schema_status
 
-
-
 def _safe_int(value: str | None, default: int = 30) -> int:
     try:
         return max(int(value or default), 1)
     except (TypeError, ValueError):
         return default
-
-
 
 def _schema_fallback(page_title: str):
     schema_status = get_ai_schema_status()

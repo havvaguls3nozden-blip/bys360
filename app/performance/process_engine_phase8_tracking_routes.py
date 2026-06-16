@@ -52,8 +52,6 @@ def performance_process_tracking():
     workspace["delete_error"] = request.args.get("delete_error")
     return render_template("performance/process_engine_tracking.html", **workspace)
 
-
-
 def _process_tracking_redirect(**extra):
     params = {
         "status": (request.form.get("status") or request.args.get("status") or "all").strip() or "all",

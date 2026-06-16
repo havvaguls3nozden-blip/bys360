@@ -139,8 +139,6 @@ def _resolve_report_scope(raw_scope: str | None, q: str):
     filtered_user_ids = [user.id for user in filtered_users]
     return scope, filtered_users, filtered_user_ids
 
-
-
 def _resolve_report_scope_with_category(raw_scope: str | None, q: str, category: str | None):
     scope, filtered_users, filtered_user_ids = _resolve_report_scope(raw_scope, q)
     phase3_allowed_ids = phase3_allowed_employee_ids(current_user)  # BYS360_PHASE3_3_REPORT_SCOPE_BACKEND_INTERSECTION

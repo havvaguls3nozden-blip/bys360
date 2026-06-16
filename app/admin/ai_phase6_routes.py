@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
 
-
-
 import csv
 import io
 
@@ -16,8 +14,6 @@ from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_render
 from app.services.ai.quality import build_ai_quality_snapshot
 from app.services.ai.schema_guard import get_ai_schema_status
-
-
 
 def _safe_int(value: str | None, default: int = 30) -> int:
     try:

@@ -296,8 +296,6 @@ def _check_phase_plan(report: GateReport) -> None:
     else:
         report.ok.append("Final Gate faz planı 8 faz olarak sabit.")
 
-
-
 def _load_chain_contract_module(root: Path):
     service_path = root / "app" / "services" / "performance" / "chain_contract_gate.py"
     if not service_path.exists():
@@ -347,8 +345,6 @@ def _check_task_generation_gate(root: Path, report: GateReport) -> None:
     for finding in task_report.findings:
         report.findings.append(GateFinding(f"task_generation.{finding.code}", finding.message, finding.severity))
 
-
-
 def _load_visibility_publication_module(root: Path):
     service_path = root / "app" / "services" / "performance" / "visibility_publication_gate.py"
     if not service_path.exists():
@@ -372,8 +368,6 @@ def _check_visibility_publication_gate(root: Path, report: GateReport) -> None:
         report.ok.append(f"Faz 3 visibility/publication gate geçti: OK={len(visibility_report.ok)}")
     for finding in visibility_report.findings:
         report.findings.append(GateFinding(f"visibility_publication.{finding.code}", finding.message, finding.severity))
-
-
 
 def _load_scoring_weight_module(root: Path):
     service_path = root / "app" / "services" / "performance" / "scoring_weight_gate.py"
@@ -423,8 +417,6 @@ def _check_leave_delegation_gate(root: Path, report: GateReport) -> None:
         report.ok.append(f"Faz 5 izin/devamsızlık/vekâlet gate geçti: OK={len(leave_report.ok)}")
     for finding in leave_report.findings:
         report.findings.append(GateFinding(f"leave_delegation.{finding.code}", finding.message, finding.severity))
-
-
 
 def _load_ui_report_language_module(root: Path):
     service_path = root / "app" / "services" / "performance" / "ui_report_language_gate.py"

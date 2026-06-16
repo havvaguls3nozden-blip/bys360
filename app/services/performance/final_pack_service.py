@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import csv
 import io
 from typing import Any
@@ -164,8 +162,6 @@ def export_go_live_smoke_csv(smoke: dict[str, Any]) -> str:
             ]
         )
     return buffer.getvalue()
-
-
 
 def export_go_live_management_brief_txt(report: dict[str, Any], smoke: dict[str, Any]) -> str:
     cards = report.get("cards") or {}

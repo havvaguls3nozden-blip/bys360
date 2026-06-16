@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from .base import TimestampMixin, db
 
@@ -161,9 +159,6 @@ class PortalCommentReaction(TimestampMixin, db.Model):
     user = db.relationship("User", foreign_keys=[user_id])
 
     __table_args__ = (db.UniqueConstraint("comment_id", "user_id", name="uq_portal_comment_reaction_user"),)
-
-
-
 
 class PortalCommentMention(TimestampMixin, db.Model):
     # BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_MODEL

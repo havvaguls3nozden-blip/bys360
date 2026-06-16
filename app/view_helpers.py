@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from datetime import datetime
 
 from flask import current_app, redirect, request, url_for

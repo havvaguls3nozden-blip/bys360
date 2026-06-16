@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
 from app.config.live_scope import get_live_scope_summary

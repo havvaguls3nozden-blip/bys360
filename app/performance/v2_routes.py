@@ -41,8 +41,6 @@ from app.services.performance_v2 import (
 )
 logger = logging.getLogger(__name__)
 
-
-
 # BYS360_RUNTIME_LOGGEDIN_SLOW_PAGES_V3_SCORECARD_MEMORY_CACHE
 _SCORECARD_CONTEXT_CACHE_TTL_SECONDS = 30
 _SCORECARD_CONTEXT_CACHE = {}
@@ -474,9 +472,6 @@ def performance_v2_phase6_export_csv():
         download_name=f'bys360_performance_v2_{export_type}_{period.id}.csv',
         mimetype='text/csv; charset=utf-8',
     )
-
-
-
 
 @main_bp.route('/performance/v2/faz6/print')
 @main_bp.route('/performans/v2/faz6/print')

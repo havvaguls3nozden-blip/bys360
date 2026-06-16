@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any, Iterable
 
 from flask import current_app

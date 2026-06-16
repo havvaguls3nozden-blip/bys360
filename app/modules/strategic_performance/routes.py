@@ -3,8 +3,6 @@ from __future__ import annotations
 # BYS360 SP-1D KPI/Hedef Oluşturma, Listeleme ve Düzenleme Route Katmanı
 # SP-1C route yapısının üzerine güvenli şekilde genişletilmiştir.
 
-
-
 import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for

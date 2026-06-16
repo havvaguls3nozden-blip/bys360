@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_6_LOW_SCORE_MODEL
 
-
-
 import logging
 logger = logging.getLogger(__name__)
 """BYS360 70 altı performans sonuçları için Başkan onaylı süreç zinciri modelleri.

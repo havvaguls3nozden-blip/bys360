@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import text
@@ -54,8 +52,6 @@ def _first_president_user_id():
         ORDER BY CASE WHEN LOWER(COALESCE(role,'')) IN ('baskan','başkan') THEN 0 ELSE 1 END, id ASC
         LIMIT 1
     """)).scalar()
-
-
 
 def ensure_tables():
     """Faz 3: iş akış omurgası + gecikme/süre/bildirim kuyruğu tabloları."""
@@ -715,8 +711,6 @@ def workflow_president_decide(approval_id):
     db.session.commit()
     flash('Başkan onay kararı kaydedildi ve süreç güncellendi.', 'success')
     return redirect(url_for('main.workflow_president_approvals'))
-
-
 
 def _executive_dashboard_payload():
     ensure_tables()

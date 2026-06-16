@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import smtplib
 from collections import Counter
@@ -442,8 +440,5 @@ def send_email(to_email: str, subject: str, body: str) -> tuple[bool, str]:
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/mail_core.py | line=436")
         return False, str(exc)
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

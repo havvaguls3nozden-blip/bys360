@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from typing import Any, Callable

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.institutional.hr_common import (
     utc_now,
     date,
@@ -416,8 +414,5 @@ def hr_delegation_update_status(delegation_id: int):
 @menu_key_required("hr_leave_tracking")
 def hr_delegation_delete(delegation_id: int):
     return _delete_row(DelegationAssignment, delegation_id, "main.hr_attendance_management")
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

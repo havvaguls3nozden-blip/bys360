@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any
 
 from flask import request
@@ -40,8 +38,6 @@ def _risk_score(summary: dict[str, Any]) -> int:
         + int(summary.get("warning", 0))
     )
 
-
-
 def _row_value(row: Any, key: str, default: Any = None) -> Any:
     if isinstance(row, dict):
         return row.get(key, default)
@@ -50,9 +46,6 @@ def _row_value(row: Any, key: str, default: Any = None) -> Any:
 
 def _is_risk_special_case(row: Any) -> bool:
     return is_informational_special_case(_row_value(row, "reason", None), _row_value(row, "event_type", None), _row_value(row, "manager_level", None))
-
-
-
 
 def _risk_rows(rows: list[Any]) -> list[Any]:
     return [

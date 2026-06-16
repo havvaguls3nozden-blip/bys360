@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from collections import Counter
 import csv
 import io
@@ -175,9 +173,6 @@ def _filtered_assignment_query(period_id: int, *, q: str = "", status: str = "",
     if normalized_level is not None:
         query = query.filter(EvaluationAssignment.manager_level == normalized_level)
     return query, normalized_status, normalized_level
-
-
-
 
 def build_task_management_dashboard_payload(selected_period, *, q: str = "", status: str = "", manager_level: int | None = None, scope_user_ids: set | None = None, selected_scope: str = "") -> dict[str, Any]:
     scope_user_ids = scope_user_ids or set()

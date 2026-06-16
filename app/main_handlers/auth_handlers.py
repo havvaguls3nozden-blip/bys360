@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import datetime, timedelta
 
@@ -280,8 +278,6 @@ def forgot_password():
         found_user=found_user,
         question=question,
     )
-
-
 
 # BYS360_LOGOUT_FORCE_CLEAR_V2_15_12_BEGIN
 def _bys360_unique_values(values):

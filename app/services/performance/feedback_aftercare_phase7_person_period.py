@@ -214,8 +214,6 @@ def _create_feedback_request(employee_id: int, period_id: int, manager_id: int |
         db.session.rollback()
         return None
 
-
-
 # BYS360_FEEDBACK_AFTERCARE_PHASE7_3_ADVANCED_PREPARATION_HELPER
 PREPARATION_FORM_FIELDS = {
     "purpose",

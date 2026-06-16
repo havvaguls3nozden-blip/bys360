@@ -513,22 +513,15 @@ def get_president_user(users_by_sicil=None):
         logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     return None
 
-
-
-
 def get_evaluation_window_start(period: Optional[PerformancePeriod]) -> Optional[date]:
     if not period:
         return None
     return getattr(period, "evaluation_start_date", None) or getattr(period, "start_date", None)
 
-
-
 def get_evaluation_window_end(period: Optional[PerformancePeriod]) -> Optional[date]:
     if not period:
         return None
     return getattr(period, "evaluation_end_date", None) or getattr(period, "end_date", None)
-
-
 
 def get_evaluation_due_days(period: Optional[PerformancePeriod]) -> Optional[int]:
     if not period:
@@ -539,8 +532,6 @@ def get_evaluation_due_days(period: Optional[PerformancePeriod]) -> Optional[int
     except (TypeError, ValueError):
         return None
     return value if value > 0 else None
-
-
 
 def get_evaluation_window_state(period: Optional[PerformancePeriod], check_date: Optional[date] = None) -> Dict[str, Any]:
     target = check_date or date.today()
@@ -560,8 +551,6 @@ def get_evaluation_window_state(period: Optional[PerformancePeriod], check_date:
         "is_open": is_open,
         "can_submit": is_open,
     }
-
-
 
 def build_assignment_due_date(period: Optional[PerformancePeriod], assigned_at: Optional[datetime] = None):
     if not period:

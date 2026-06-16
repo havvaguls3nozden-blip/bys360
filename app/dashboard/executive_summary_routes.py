@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_EXECUTIVE_SUMMARY_V3_LOCAL_PRO_UI
 
-
-
 from functools import wraps
 from typing import Any
 

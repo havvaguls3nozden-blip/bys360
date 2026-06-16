@@ -4,8 +4,6 @@ from __future__ import annotations
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
 
-
-
 from io import BytesIO
 
 from flask import flash, redirect, request, send_file, session, url_for

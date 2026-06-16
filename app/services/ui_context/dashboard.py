@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from datetime import datetime, timedelta
 from typing import Any
@@ -58,9 +56,6 @@ def _row_value(row: Any, key: str, default: Any = None) -> Any:
 
 def _is_risk_special_case(row: Any) -> bool:
     return is_informational_special_case(_row_value(row, "reason", None), _row_value(row, "event_type", None))
-
-
-
 
 def _period_rows(limit: int = 8) -> list[Any]:
     return (
@@ -177,9 +172,6 @@ def _period_risk_rows(periods: list[Any], scope_user_ids: list[int]) -> list[dic
             "risk_label": label,
         })
     return rows
-
-
-
 
 def _notification_unread_count(user_id: int) -> int:
     try:

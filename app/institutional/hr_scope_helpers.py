@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.institutional.hr_common import (
     utc_now,
     date,
@@ -410,8 +408,5 @@ def _unit_pulse(scope_users: list[Any], scope_user_ids: list[int]) -> list[dict[
     for row in bucket.values():
         row["risk_score"] = int(row["incomplete_profiles"] or 0) + int(row["leave_today"] or 0) + int(row["attendance_today"] or 0)
     return sorted(bucket.values(), key=lambda r: (-int(r["risk_score"]), r["unit_name"].lower()))[:12]
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

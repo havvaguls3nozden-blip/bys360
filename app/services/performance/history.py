@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any, Dict, Optional
 
 from app.extensions import db
@@ -53,22 +51,16 @@ def humanize_workflow_status(status: Optional[str]) -> str:
         return "-"
     return STATUS_LABELS.get(clean, clean.replace("_", " ").strip())
 
-
-
 def humanize_action_type(action_type: Optional[str]) -> str:
     clean = (action_type or "").strip()
     if not clean:
         return "-"
     return ACTION_LABELS.get(clean, clean.replace("_", " ").title())
 
-
-
 def humanize_actor_level(level: Optional[int]) -> str:
     if level is None:
         return "-"
     return ACTOR_LEVEL_LABELS.get(level, f"Seviye {level}")
-
-
 
 def log_evaluation_action(
     evaluation: PerformanceEvaluation,
@@ -93,8 +85,6 @@ def log_evaluation_action(
     db.session.add(row)
     db.session.flush()
     return row
-
-
 
 def build_history_rows(evaluation_id: int):
     rows = (
@@ -125,8 +115,6 @@ def build_history_rows(evaluation_id: int):
         )
     return rows
 
-
-
 def build_history_summary(history_rows) -> Dict[str, Any]:
     action_counts: Dict[str, int] = {}
     actor_counts: Dict[str, int] = {}
@@ -145,8 +133,6 @@ def build_history_summary(history_rows) -> Dict[str, Any]:
         "action_counts": action_counts,
         "actor_counts": actor_counts,
     }
-
-
 
 def get_evaluation_history(evaluation_id: int):
     return build_history_rows(evaluation_id)

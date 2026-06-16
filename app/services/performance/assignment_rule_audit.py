@@ -125,9 +125,6 @@ def _active_period(period_id: Optional[int] = None) -> Optional[PerformancePerio
 def _subject_users() -> list[User]:
     return User.query.filter(User.is_active.is_(True), User.role != "admin").order_by(User.ad.asc(), User.soyad.asc()).all()
 
-
-
-
 def _scored_subject_users_for_period(period: PerformancePeriod, subject_users: list[User]) -> tuple[list[User], list[User]]:
     """Ön kontrolü dönem kapsamındaki puanlanacak personele indirger.
 

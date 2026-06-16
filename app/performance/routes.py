@@ -33,8 +33,6 @@ from app.services.performance_service import (
 from app.services.ai.dashboard_panels import build_hierarchy_ai_panel, build_hierarchy_tree_ai_panel, build_hierarchy_bulk_edit_ai_panel, build_hierarchy_assignment_person_ai_panel
 logger = logging.getLogger(__name__)
 
-
-
 def _build_surface_scope_context(user, raw_scope):
     """Surface scope context üretimini import anından çağrı anına taşır.
 
@@ -59,8 +57,6 @@ def _is_info_message(item):
     kullanıcıya gösterilen metnin değişmesi ekran davranışını bozmaz.
     """
     return is_informational_reason(item)
-
-
 
 def _dedupe_messages(items):
     seen = set()

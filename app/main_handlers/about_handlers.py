@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from flask import url_for
 
 from app.models import (

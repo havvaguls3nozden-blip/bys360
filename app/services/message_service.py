@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import mimetypes
 import uuid
@@ -156,8 +154,6 @@ def thread_icon_name(thread: MessageThread | None) -> str:
 
 def thread_accent_color(thread: MessageThread | None) -> str:
     return (getattr(thread, "accent_color", None) or _DEFAULT_THREAD_COLOR).strip() or _DEFAULT_THREAD_COLOR
-
-
 
 def _file_size(file_storage) -> int:
     current = None

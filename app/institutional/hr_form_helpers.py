@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.institutional.hr_common import (
     Any,
     AttendanceException,
@@ -247,8 +245,5 @@ def _handle_manual_delegation_post() -> Any:
     db.session.add(delegation)
     _safe_commit("Vekâlet kaydı oluşturuldu.", danger_prefix="Vekâlet kaydı oluşturulamadı")
     return redirect(url_for("main.hr_attendance_management", scope=request.form.get("scope") or "personal"))
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]

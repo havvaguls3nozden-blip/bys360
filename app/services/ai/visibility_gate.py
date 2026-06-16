@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 from app.core.datetime_utils import utc_now
 """Faz 10: AI yetki, KVKK maskeleme ve güvenli görünürlük kapısı.

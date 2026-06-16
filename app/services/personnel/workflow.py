@@ -50,8 +50,6 @@ except Exception:  # pragma: no cover
         import secrets
         return secrets.token_urlsafe(12)
 
-
-
 @dataclass(frozen=True, slots=True)
 class PersonnelMutationSummary:
     phase: str

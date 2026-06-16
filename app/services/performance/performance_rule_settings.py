@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import logging
 """BYS360 Performans Faz 1.2 - ayar anahtarları ve okuma katmanı.
 

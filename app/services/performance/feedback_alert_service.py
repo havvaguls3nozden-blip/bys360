@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -29,8 +27,6 @@ def _full_name(user: Any) -> str:
         or "-"
     )
 
-
-
 def _request_manager_ids(feedback_request: FeedbackRequest | None) -> set[int]:
     ids: set[int] = set()
     if not feedback_request:
@@ -49,37 +45,25 @@ def _request_manager_ids(feedback_request: FeedbackRequest | None) -> set[int]:
             continue
     return ids
 
-
-
 def _request_age_days(feedback_request: FeedbackRequest, now: datetime) -> int:
     requested_at = getattr(feedback_request, "requested_at", None) or now
     return max(int((now - requested_at).total_seconds() // 86400), 0)
 
-
-
 def _request_is_open(feedback_request: FeedbackRequest) -> bool:
     return (getattr(feedback_request, "status", None) or "") in PENDING_REQUEST_STATUSES
-
-
 
 def _meeting_start_dt(meeting: FeedbackMeeting) -> datetime | None:
     if not getattr(meeting, "meeting_date", None) or not getattr(meeting, "meeting_start", None):
         return None
     return datetime.combine(meeting.meeting_date, meeting.meeting_start)
 
-
-
 def _meeting_end_dt(meeting: FeedbackMeeting) -> datetime | None:
     if not getattr(meeting, "meeting_date", None) or not getattr(meeting, "meeting_end", None):
         return None
     return datetime.combine(meeting.meeting_date, meeting.meeting_end)
 
-
-
 def _meeting_is_active(meeting: FeedbackMeeting) -> bool:
     return (getattr(meeting, "status", None) or "") in ACTIVE_MEETING_STATUSES
-
-
 
 def _meeting_within_window(meeting: FeedbackMeeting, now: datetime, hours: int) -> bool:
     if not _meeting_is_active(meeting):
@@ -89,8 +73,6 @@ def _meeting_within_window(meeting: FeedbackMeeting, now: datetime, hours: int) 
         return False
     return now <= start_dt <= now + timedelta(hours=hours)
 
-
-
 def _meeting_is_overdue(meeting: FeedbackMeeting, now: datetime) -> bool:
     if not _meeting_is_active(meeting):
         return False
@@ -98,8 +80,6 @@ def _meeting_is_overdue(meeting: FeedbackMeeting, now: datetime) -> bool:
     if not end_dt:
         return False
     return end_dt < now - timedelta(hours=MEETING_OVERDUE_GRACE_HOURS)
-
-
 
 def _notification_exists(*, user_id: int | None, notification_type: str, source_type: str, source_id: int | None) -> bool:
     if not user_id or not source_id:
@@ -112,25 +92,17 @@ def _notification_exists(*, user_id: int | None, notification_type: str, source_
         is_read=False,
     ).first() is not None
 
-
-
 def _safe_email(user: User | None) -> str:
     raw = (getattr(user, "email", None) or "").strip()
     if "@" not in raw or " " in raw:
         return ""
     return raw
 
-
-
 def _request_link(feedback_request: FeedbackRequest) -> str:
     return f"/performance/feedback-requests/{feedback_request.id}"
 
-
-
 def _meeting_link(meeting: FeedbackMeeting) -> str:
     return f"/performance/feedback-meetings/{meeting.id}"
-
-
 
 def build_feedback_alert_dashboard(requests_list: list[Any], meetings: list[Any], *, today=None, now: datetime | None = None) -> dict[str, Any]:
     now = now or utc_now()
@@ -256,8 +228,6 @@ def build_feedback_alert_dashboard(requests_list: list[Any], meetings: list[Any]
         "manager_rows": manager_rows[:12],
         "runner_rules": runner_rules,
     }
-
-
 
 def dispatch_feedback_alerts(
     requests_list: list[Any],

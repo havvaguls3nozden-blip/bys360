@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from typing import Any, Iterable
 
 HISTORY_IMPORT_SOURCE_TYPE = "historical_excel_import"

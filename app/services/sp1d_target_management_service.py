@@ -2,9 +2,6 @@ from __future__ import annotations
 
 # BYS360 SP-1D KPI/Hedef Kayıt ve Listeleme Servisi
 
-
-
-
 from datetime import date
 from typing import Any, Dict, Iterable, List, Tuple
 

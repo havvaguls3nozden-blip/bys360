@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.institutional.hr_common import Any, Response, csv, current_app, flash, io, jsonify, login_required, main_bp, manager_required, menu_key_required, or_, redirect, request, safe_db_rollback, safe_render
 from app.institutional.hr_form_helpers import (
     Any,

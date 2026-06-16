@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-
-
-
 PRIMARY_TERM_TR = "Değerlendirme Kriterleri"
 PRIMARY_TERM_ASCII = "Degerlendirme Kriterleri"
 PRIMARY_TERM = PRIMARY_TERM_TR

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import re
 import unicodedata
 from datetime import datetime
@@ -351,9 +349,6 @@ def get_hierarchy_scope_users(user: User):
         .all()
     )
 
-
-
-
 def _existing_table_names() -> set[str]:
     try:
         return set(sa_inspect(db.engine).get_table_names())
@@ -387,8 +382,6 @@ def _safe_user_reference_nullify(model: Any, *columns: str) -> None:
             updates[attr] = None
     if updates:
         model.query.update(updates, synchronize_session=False)
-
-
 
 def _q(identifier: str) -> str:
     """SQL identifier icin guvenli cift tirnaklama."""

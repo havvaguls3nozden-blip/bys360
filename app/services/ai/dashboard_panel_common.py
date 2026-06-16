@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 import logging
 # Ortak yardımcılar: AI panel üreticileri küçük dosyalara bölündü; public import yolu korunur.
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"

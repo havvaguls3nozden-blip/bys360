@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL
 
-
-
 from flask import abort, flash, redirect, render_template, request, url_for, session
 from flask_login import current_user, login_required
 

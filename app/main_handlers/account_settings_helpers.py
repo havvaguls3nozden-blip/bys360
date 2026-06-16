@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.main_handlers.account_communication_helpers import (
     utc_now,
     datetime,
@@ -726,9 +724,6 @@ def account():
         user=current_user,
         security_questions=SECURITY_QUESTION_CHOICES,
     )
-
-
-
 
 __all__ = [name for name in globals() if not name.startswith("__")]
 

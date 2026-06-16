@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from app.core.datetime_utils import utc_now
 import importlib
 from dataclasses import dataclass
@@ -19,8 +17,6 @@ class PreflightTarget:
     key: str
     label: str
     detail: str = ""
-
-
 
 CRITICAL_ENDPOINTS: tuple[PreflightTarget, ...] = (
     PreflightTarget("main.dashboard", "Ana dashboard", "Üst yönetim görünümü"),
