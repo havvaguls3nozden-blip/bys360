@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-
-
 from .attachments import (
     attachment_icon_class,
     attachment_is_image,
