@@ -25,6 +25,9 @@ def enforce_first_login_security_flow():
 
 
 @main_bp.route("/settings", methods=["GET", "POST"])
+@main_bp.route("/admin/settings", methods=["GET", "POST"])
+@main_bp.route("/admin/settings/performance", methods=["GET", "POST"])
+@main_bp.route("/admin/settings/security", methods=["GET", "POST"])
 @login_required
 @admin_required
 def settings_page():
