@@ -2,8 +2,6 @@ from __future__ import annotations
 
 # BYS360_AG1_AG2_ASSISTANT_MENU_VISIBILITY_SERVICE_START
 
-
-
 def _bys360_assistant_norm(value):
     value = str(value or "").strip().lower()
     return (
@@ -279,7 +277,7 @@ def _bys360_assistant_collect_from_db(user, menu_map):
     if db is None:
         return
     try:
-        from sqlalchemy import inspect, text
+        from sqlalchemy import bindparam, inspect, text
         inspector = inspect(db.engine)
         table_names = set(inspector.get_table_names())
     except Exception:
@@ -307,7 +305,7 @@ def _bys360_assistant_collect_from_db(user, menu_map):
         where = []
         params = {}
         if role_col and role_col in cols:
-            where.append(f"lower(cast({role_col} as text)) in :roles")
+            where.append(f"lower(cast({role_col} as text)) IN :roles")
             params["roles"] = tuple(role_values)
         if user_col and user_col in cols:
             where.append(f"{user_col} = :uid")
@@ -315,7 +313,10 @@ def _bys360_assistant_collect_from_db(user, menu_map):
         if not where:
             continue
         try:
-            rows = db.session.execute(text(f"SELECT menu_key, is_visible FROM {table} WHERE " + " AND ".join(where)), params).mappings().all()
+            stmt = text(f"SELECT menu_key, is_visible FROM {table} WHERE " + " AND ".join(where))
+            if "roles" in params:
+                stmt = stmt.bindparams(bindparam("roles", expanding=True))
+            rows = db.session.execute(stmt, params).mappings().all()
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/menu_visibility.py:312)")
             continue
