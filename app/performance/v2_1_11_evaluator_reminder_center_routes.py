@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
-
 import csv
 import io
 from flask import Response, request
@@ -122,13 +120,24 @@ def period_center_menu_or_admin_required(view_func):
         return menu_protected(*args, **kwargs)
 
     return wrapper
+
+def evaluator_reminder_menu_or_admin_required(view_func):
+    menu_protected = menu_key_required("performance_evaluator_reminder_center")(view_func)
+
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if _period_center_is_admin_user_v222a(current_user):
+            return view_func(*args, **kwargs)
+        return menu_protected(*args, **kwargs)
+
+    return wrapper
+
 # BYS360_PERFORMANCE_V2_1_22A_PERIOD_CENTER_ADMIN_ACCESS_END
 
 @main_bp.route("/performance/v2-1-11-evaluator-reminder-center", methods=["GET"])
 @main_bp.route("/performans/amir-hatirlatma-merkezi", methods=["GET"])
-@menu_key_required("performance_evaluator_reminder_center")
 @login_required
-@period_center_menu_or_admin_required
+@evaluator_reminder_menu_or_admin_required
 def performance_v2_1_11_evaluator_reminder_center():
     state = build_evaluator_reminder_center_state(
         period_id=_period_id_from_request(),
@@ -148,9 +157,8 @@ def performance_v2_1_11_evaluator_reminder_center():
 
 
 @main_bp.route("/performance/v2-1-11-evaluator-reminder-center/export.csv", methods=["GET"])
-@menu_key_required("performance_evaluator_reminder_center")
 @login_required
-@period_center_menu_or_admin_required
+@evaluator_reminder_menu_or_admin_required
 def performance_v2_1_11_evaluator_reminder_center_export_csv():
     state = build_evaluator_reminder_center_state(
         period_id=_period_id_from_request(),
