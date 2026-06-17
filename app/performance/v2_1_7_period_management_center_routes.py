@@ -74,9 +74,6 @@ from app.services.performance.v2_1_18_executive_view import collect_user_role_te
 
 logger = logging.getLogger(__name__)
 
-
-
-
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_HELPERS_BEGIN
 PERIOD_CENTER_MENU_KEY = "performance_period_management_center"
 _PERIOD_CENTER_OPERATOR_ROLES = {
@@ -199,7 +196,6 @@ def period_center_menu_or_admin_required(view_func):
 
 @main_bp.route("/performance/v2-1-7-period-management-center", methods=["GET", "POST"])
 @main_bp.route("/performans/donem-yonetim-merkezi", methods=["GET", "POST"])
-@menu_key_required("performance_period_management_center")
 @login_required
 @period_center_menu_or_admin_required
 def performance_v2_1_7_period_management_center():
