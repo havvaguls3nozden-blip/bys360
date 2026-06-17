@@ -18,7 +18,7 @@ except Exception:
     db = None
 
 try:
-    from sqlalchemy import text
+    from sqlalchemy import inspect, text
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center.py | line=19")
     text = None
@@ -58,25 +58,50 @@ DEFAULT_TASKS = [
 def _db_ready() -> bool:
     return db is not None and text is not None
 
+def _system_settings_columns() -> set[str]:
+    if not _db_ready():
+        return set()
+    try:
+        return {str(col.get("name")) for col in inspect(db.engine).get_columns("system_settings") if col.get("name")}
+    except Exception:
+        logger.exception("BYS360 settings hardening: system_settings kolonları okunamadı")
+        return set()
+
+
 def _setting_get(key: str, default: str = "") -> str:
     if not _db_ready():
         return default
     try:
-        row = db.session.execute(text("SELECT value FROM system_settings WHERE key=:k LIMIT 1"), {"k": key}).fetchone()
-        return (row[0] if row and row[0] is not None else default)
+        cols = _system_settings_columns()
+        if {"setting_key", "value_text"} <= cols:
+            row = db.session.execute(text("SELECT value_text FROM system_settings WHERE setting_key=:k LIMIT 1"), {"k": key}).fetchone()
+        elif {"key", "value"} <= cols:
+            row = db.session.execute(text("SELECT value FROM system_settings WHERE key=:k LIMIT 1"), {"k": key}).fetchone()
+        else:
+            return default
+        return str(row[0]) if row and row[0] is not None else default
     except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center.py | line=63")
+        logger.exception("BYS360 settings hardening: system setting read failed | key=%s", key)
         return default
+
 
 def _setting_set(key: str, value: str) -> None:
     if not _db_ready():
         return
     try:
-        exists = db.session.execute(text("SELECT id FROM system_settings WHERE key=:k LIMIT 1"), {"k": key}).fetchone()
-        if exists:
-            db.session.execute(text("UPDATE system_settings SET value=:v WHERE key=:k"), {"k": key, "v": value})
-        else:
-            db.session.execute(text("INSERT INTO system_settings (key, value) VALUES (:k, :v)"), {"k": key, "v": value})
+        cols = _system_settings_columns()
+        if {"setting_key", "value_text"} <= cols:
+            exists = db.session.execute(text("SELECT id FROM system_settings WHERE setting_key=:k LIMIT 1"), {"k": key}).fetchone()
+            if exists:
+                db.session.execute(text("UPDATE system_settings SET value_text=:v, updated_at=CURRENT_TIMESTAMP WHERE setting_key=:k"), {"k": key, "v": value})
+            else:
+                db.session.execute(text("INSERT INTO system_settings (setting_key, group_key, label, value_text, value_type, description, is_active) VALUES (:k, 'mail', :label, :v, 'json', :desc, 1)"), {"k": key, "v": value, "label": key, "desc": "Yönetici mail merkezi ayarı"})
+        elif {"key", "value"} <= cols:
+            exists = db.session.execute(text("SELECT id FROM system_settings WHERE key=:k LIMIT 1"), {"k": key}).fetchone()
+            if exists:
+                db.session.execute(text("UPDATE system_settings SET value=:v WHERE key=:k"), {"k": key, "v": value})
+            else:
+                db.session.execute(text("INSERT INTO system_settings (key, value) VALUES (:k, :v)"), {"k": key, "v": value})
         db.session.commit()
     except Exception:
         db.session.rollback()
