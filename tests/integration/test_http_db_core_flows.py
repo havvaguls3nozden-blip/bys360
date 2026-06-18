@@ -84,6 +84,36 @@ def test_app_factory_registers_routes_without_duplicate_endpoints(app):
     }
     assert duplicated == {}, f"Duplicate endpoint/path/method found: {duplicated}"
 
+def test_main_blueprint_namespace_is_modular_source_distributed(app):
+    """Shared main blueprint is allowed, but it must stay source-module distributed."""
+    module_counts = Counter()
+
+    for rule in app.url_map.iter_rules():
+        if not rule.endpoint.startswith("main."):
+            continue
+
+        view_func = app.view_functions.get(rule.endpoint)
+        module_name = getattr(view_func, "__module__", "<unknown>")
+        module_counts[module_name] += 1
+
+    main_route_count = sum(module_counts.values())
+    assert main_route_count > 0
+
+    # If the legacy main namespace is still large, it must be distributed across modules.
+    # If future work moves domains to their own blueprints and main shrinks, this test stays valid.
+    if main_route_count >= 200:
+        largest_module, largest_count = module_counts.most_common(1)[0]
+        assert len(module_counts) >= 20, {
+            "main_route_count": main_route_count,
+            "source_module_count": len(module_counts),
+        }
+        assert largest_count <= 80, {
+            "largest_module": largest_module,
+            "largest_count": largest_count,
+            "main_route_count": main_route_count,
+        }
+
+
 def test_database_session_is_available(app):
     from app.extensions import db
 
