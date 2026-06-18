@@ -599,18 +599,40 @@ def check_tckn_encryption(root: Path, report: GateReport) -> None:
 
 
 def check_exec_routes(root: Path, report: GateReport) -> None:
+    """Find real builtin exec()/compile() calls.
+
+    Regex literals such as re.compile(...) are expected and should not trigger
+    this gate. This check intentionally focuses on builtin exec/compile calls
+    that execute or construct Python code dynamically.
+    """
     hits: list[dict[str, Any]] = []
+
     for path in iter_files(root):
         if path.suffix.lower() != ".py":
             continue
+
         text = safe_read_text(path)
-        if not text:
+        if not text or ("exec(" not in text and "compile(" not in text):
             continue
-        if "exec(" not in text and "compile(" not in text:
+
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
             continue
-        for i, line in enumerate(text.splitlines(), 1):
-            if "exec(" in line or "compile(" in line:
-                hits.append({"path": relpath(path, root), "line": i, "preview": line.strip()[:180]})
+
+        lines = text.splitlines()
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if not isinstance(node.func, ast.Name):
+                continue
+            if node.func.id not in {"exec", "compile"}:
+                continue
+
+            line_no = getattr(node, "lineno", 0) or 0
+            preview = lines[line_no - 1].strip()[:180] if 0 < line_no <= len(lines) else node.func.id
+            hits.append({"path": relpath(path, root), "line": line_no, "preview": preview})
+
     if hits:
         report.add(
             Finding(
@@ -628,7 +650,7 @@ def check_exec_routes(root: Path, report: GateReport) -> None:
                 "PYTHON_EXEC_COMPILE_USAGE",
                 "exec()/compile() kalıntısı bulunmadı",
                 "PASS",
-                "Python dosyalarında exec/compile pattern'i görünmüyor.",
+                "Python dosyalarında builtin exec/compile çağrısı görünmüyor.",
             )
         )
 
