@@ -984,8 +984,34 @@ def check_repo_shape(root: Path, report: GateReport) -> None:
         "js_files": 0,
         "md_files": 0,
         "scripts_files": 0,
+        "active_script_files": 0,
+        "active_md_files": 0,
+        "governance_script_files": 0,
+        "governance_md_files": 0,
     }
     large_files = []
+    script_buckets: dict[str, int] = {}
+    md_buckets: dict[str, int] = {}
+
+    governance_script_prefixes = (
+        "scripts/quality/",
+        "scripts/windows/",
+    )
+    governance_md_prefixes = (
+        "docs/quality/",
+        "docs/architecture/",
+        "docs/security/",
+        "docs/qa/",
+        "docs/technical_debt/",
+        "docs/handover/",
+        "docs/portal/",
+        "reports/",
+    )
+
+    def _bucket(rp: str, depth: int = 2) -> str:
+        parts = rp.split("/")
+        return "/".join(parts[:depth]) if len(parts) >= depth else rp
+
     for path in iter_files(root):
         suffix = path.suffix.lower()
         rp = relpath(path, root)
@@ -999,15 +1025,32 @@ def check_repo_shape(root: Path, report: GateReport) -> None:
             counts["js_files"] += 1
         if suffix == ".md":
             counts["md_files"] += 1
+            bucket = _bucket(rp, 2) if rp.startswith(("docs/", "reports/")) else _bucket(rp, 1)
+            md_buckets[bucket] = md_buckets.get(bucket, 0) + 1
+            if rp.startswith(governance_md_prefixes):
+                counts["governance_md_files"] += 1
+            else:
+                counts["active_md_files"] += 1
         if rp.startswith("scripts/"):
             counts["scripts_files"] += 1
+            bucket = _bucket(rp, 2)
+            script_buckets[bucket] = script_buckets.get(bucket, 0) + 1
+            if rp.startswith(governance_script_prefixes):
+                counts["governance_script_files"] += 1
+            else:
+                counts["active_script_files"] += 1
         try:
             size = path.stat().st_size
         except Exception:
             size = 0
         if suffix in {".py", ".js", ".css", ".html"} and size > 250_000:
             large_files.append({"path": rp, "size_kb": round(size / 1024, 1)})
+
     report.counts.update(counts)
+
+    script_buckets_top = dict(sorted(script_buckets.items(), key=lambda item: item[1], reverse=True)[:15])
+    md_buckets_top = dict(sorted(md_buckets.items(), key=lambda item: item[1], reverse=True)[:15])
+
     if large_files:
         report.add(
             Finding(
@@ -1019,17 +1062,51 @@ def check_repo_shape(root: Path, report: GateReport) -> None:
                 recommendation="Devasa dosyaları alan bazlı modüllere bölün; özellikle JS/Python route dosyalarını küçük servis dosyalarına ayırın.",
             )
         )
-    if counts["scripts_files"] > 250 or counts["md_files"] > 150:
+
+    active_script_limit = 250
+    active_md_limit = 150
+    evidence = {
+        "totals": {
+            "scripts_files": counts["scripts_files"],
+            "md_files": counts["md_files"],
+        },
+        "active": {
+            "active_script_files": counts["active_script_files"],
+            "active_md_files": counts["active_md_files"],
+            "active_script_limit": active_script_limit,
+            "active_md_limit": active_md_limit,
+        },
+        "governance_or_evidence": {
+            "governance_script_files": counts["governance_script_files"],
+            "governance_md_files": counts["governance_md_files"],
+        },
+        "script_buckets_top": script_buckets_top,
+        "md_buckets_top": md_buckets_top,
+    }
+
+    if counts["active_script_files"] > active_script_limit or counts["active_md_files"] > active_md_limit:
         report.add(
             Finding(
                 "REPO_SCRIPT_DOC_BLOAT",
-                "Script/doküman kalabalığı yüksek",
+                "Aktif script/doküman kalabalığı yüksek",
                 "WARN",
-                "Tek seferlik script veya dağınık dokümantasyon sayısı yüksek görünüyor.",
-                evidence={"scripts_files": counts["scripts_files"], "md_files": counts["md_files"]},
-                recommendation="Yeni tek seferlik SAFE/HOTFIX üretimini durdurun; kalıcı gate ve merkezi doküman yaklaşımına geçin.",
+                "Aktif bakım yüzeyindeki script veya doküman sayısı eşik üstünde görünüyor.",
+                evidence=evidence,
+                recommendation="Tek seferlik scriptleri arşive taşıyın; kalıcı kalite kontrollerini merkezi gate altında toplayın.",
             )
         )
+    elif counts["scripts_files"] > 250 or counts["md_files"] > 150:
+        report.add(
+            Finding(
+                "REPO_SCRIPT_DOC_BLOAT",
+                "Script/doküman envanteri yapılandırılmış görünüyor",
+                "INFO",
+                "Toplam sayı yüksek olsa da aktif bakım yüzeyi eşik altında; yük kalite/dokümantasyon kanıtı olarak sınıflandırıldı.",
+                evidence=evidence,
+                recommendation="Yeni tek seferlik SAFE/HOTFIX üretimini artırmayın; kalite ve canlı hazırlık kanıtlarını merkezi rapor düzeninde tutun.",
+            )
+        )
+
     report.add(
         Finding(
             "REPO_SHAPE_SUMMARY",
