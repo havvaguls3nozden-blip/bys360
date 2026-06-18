@@ -53,7 +53,7 @@ def _scorecard_cache_key(period, viewer=None, allowed_employee_ids=None, **kwarg
     role = str(getattr(viewer, "role", "") or getattr(current_user, "role", "") or "")
     try:
         allowed = tuple(sorted(int(x) for x in (allowed_employee_ids or []) if x))
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         allowed = tuple()
     allowed_token = hash(allowed)
