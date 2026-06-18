@@ -132,7 +132,7 @@ def _date_text(value: Any) -> str:
         return ""
     try:
         return value.strftime("%d.%m.%Y")
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return str(value)[:10]
 
@@ -398,7 +398,7 @@ def _v2821_float(value, default: float = 0.0) -> float:
         if value is None:
             return default
         return float(value)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return default
 
@@ -583,7 +583,7 @@ def _v2822_sicil(user: Any) -> str:
 def _v2822_level_label(level: Any) -> str:
     try:
         n = int(level or 0)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         n = 0
     if n == 3:
