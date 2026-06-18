@@ -599,13 +599,25 @@ def check_tckn_encryption(root: Path, report: GateReport) -> None:
 
 
 def check_exec_routes(root: Path, report: GateReport) -> None:
-    """Find real builtin exec()/compile() calls.
+    """Classify builtin exec()/compile() calls by runtime risk.
 
     Regex literals such as re.compile(...) are expected and should not trigger
-    this gate. This check intentionally focuses on builtin exec/compile calls
-    that execute or construct Python code dynamically.
+    this gate. Contract-protected legacy mobile bridge calls and tooling/test
+    compile checks are reported as INFO; unreviewed runtime app usage remains WARN.
     """
-    hits: list[dict[str, Any]] = []
+    legacy_mobile_bridge_paths = {
+        "app/api/mobile/communication_read_routes.py",
+        "app/api/mobile/communication_v2_read_routes.py",
+        "app/api/mobile/detail_read_routes.py",
+        "app/api/mobile/light_read_routes.py",
+        "app/api/mobile/performance_read_routes.py",
+        "app/api/mobile/support_survey_read_routes.py",
+        "app/api/mobile/utility_routes.py",
+    }
+
+    runtime_hits: list[dict[str, Any]] = []
+    reviewed_hits: list[dict[str, Any]] = []
+    tooling_hits: list[dict[str, Any]] = []
 
     for path in iter_files(root):
         if path.suffix.lower() != ".py":
@@ -620,6 +632,7 @@ def check_exec_routes(root: Path, report: GateReport) -> None:
         except SyntaxError:
             continue
 
+        rp = relpath(path, root)
         lines = text.splitlines()
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
@@ -631,26 +644,48 @@ def check_exec_routes(root: Path, report: GateReport) -> None:
 
             line_no = getattr(node, "lineno", 0) or 0
             preview = lines[line_no - 1].strip()[:180] if 0 < line_no <= len(lines) else node.func.id
-            hits.append({"path": relpath(path, root), "line": line_no, "preview": preview})
+            hit = {"path": rp, "line": line_no, "preview": preview}
 
-    if hits:
+            if rp in legacy_mobile_bridge_paths and node.func.id == "exec":
+                reviewed_hits.append(hit)
+            elif rp.startswith("scripts/") or rp.startswith("tests/"):
+                tooling_hits.append(hit)
+            else:
+                runtime_hits.append(hit)
+
+    if runtime_hits:
         report.add(
             Finding(
                 "PYTHON_EXEC_COMPILE_USAGE",
-                "exec()/compile() kullanımı bulundu",
+                "İncelenmemiş runtime exec()/compile() kullanımı bulundu",
                 "WARN",
-                "Dinamik kod yürütme lint, test ve IDE görünürlüğünü zayıflatır; route yükleme için özellikle risklidir.",
-                evidence=hits[:50],
-                recommendation="Route/string yükleme kalıntılarını normal Python modüllerine taşıyın. Gerekli teknik kullanım varsa allowlist'e gerekçeli ekleyin.",
+                "Uygulama runtime kodunda dinamik kod yürütme lint, test ve IDE görünürlüğünü zayıflatır.",
+                evidence=runtime_hits[:50],
+                recommendation="Runtime app kodundaki exec/compile kullanımını normal Python modülüne taşıyın veya gerekçeli allowlist ekleyin.",
             )
         )
     else:
         report.add(
             Finding(
                 "PYTHON_EXEC_COMPILE_USAGE",
-                "exec()/compile() kalıntısı bulunmadı",
+                "İncelenmemiş runtime exec()/compile() kullanımı bulunmadı",
                 "PASS",
-                "Python dosyalarında builtin exec/compile çağrısı görünmüyor.",
+                "Regex compile, test/tooling compile ve sözleşme testiyle korunan legacy bridge kullanımları runtime risk uyarısından ayrıştırıldı.",
+            )
+        )
+
+    if reviewed_hits or tooling_hits:
+        report.add(
+            Finding(
+                "PYTHON_EXEC_COMPILE_REVIEWED_USAGE",
+                "Gerekçeli exec()/compile() kullanımları raporlandı",
+                "INFO",
+                "Legacy mobil bridge ve kalite/test amaçlı compile kullanımları görünür tutuldu; genel runtime WARN kapsamına alınmadı.",
+                evidence={
+                    "legacy_mobile_bridge": reviewed_hits[:20],
+                    "tooling_or_tests": tooling_hits[:20],
+                },
+                recommendation="Mobil bridge kaldırılacaksa route contract snapshot güncellenmeden ve endpoint davranışı doğrulanmadan commit etmeyin.",
             )
         )
 
