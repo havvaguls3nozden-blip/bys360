@@ -65,10 +65,24 @@ def _assert_safe_response(response, *, path: str, allowed: set[int] | None = Non
 
 
 def test_app_factory_registers_routes_without_duplicate_endpoints(app):
-    endpoint_counts = Counter(rule.endpoint for rule in app.url_map.iter_rules())
-    duplicated = {endpoint: count for endpoint, count in endpoint_counts.items() if count > 1 and endpoint != "static"}
-    assert duplicated == {}, f"Tekrarlı endpoint bulundu: {duplicated}"
+    """Intentional alias URLs are allowed; exact duplicate rule keys are not."""
+    route_keys = []
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint == "static":
+            continue
 
+        methods = ",".join(
+            sorted(method for method in rule.methods if method not in {"HEAD", "OPTIONS"})
+        )
+        route_keys.append((rule.endpoint, rule.rule, methods))
+
+    route_counts = Counter(route_keys)
+    duplicated = {
+        f"{endpoint} {path}|{methods}": count
+        for (endpoint, path, methods), count in route_counts.items()
+        if count > 1
+    }
+    assert duplicated == {}, f"Duplicate endpoint/path/method found: {duplicated}"
 
 def test_database_session_is_available(app):
     from app.extensions import db
