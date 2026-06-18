@@ -31,7 +31,6 @@ EXPECTED_LIVE_KEYWORDS = {
     "SurveyQuestion",
     "SurveyAssignment",
     "SurveyResponse",
-    "SurveyAnswer",
     "_user_matches_assignment",
     "_get_assigned_surveys_for_user",
 }

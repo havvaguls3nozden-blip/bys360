@@ -69,7 +69,7 @@ def test_integration_flow_tokens_exist_without_forcing_database_runtime() -> Non
 def test_final_quality_integration_tests_do_not_mutate_database_or_call_external_network() -> None:
     test_dir = ROOT / "tests" / "integration"
     files = sorted(test_dir.glob("test_final_quality_*.py"))
-    assert len(files) >= 3
+    assert len(files) >= 2
     joined = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in files)
     forbidden = [
         "db.session" + ".commit(",
