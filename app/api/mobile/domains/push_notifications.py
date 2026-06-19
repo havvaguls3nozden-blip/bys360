@@ -2,9 +2,9 @@
 
 from sqlalchemy import text
 
-from app.extensions import db
-from app.api.mobile.shared import jsonify, request, require_mobile_user
 from app.api.mobile import mobile_api_bp
+from app.api.mobile.shared import jsonify, request, require_mobile_user
+from app.extensions import db
 
 
 def _push_text(value, *, limit=500):
@@ -14,22 +14,46 @@ def _push_text(value, *, limit=500):
     return text_value[:limit]
 
 
-def _ensure_mobile_push_token_table():
-    db.session.execute(text("""
-        CREATE TABLE IF NOT EXISTS mobile_push_tokens (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            token VARCHAR(512) NOT NULL,
-            platform VARCHAR(30),
-            device_id VARCHAR(120),
-            app_version VARCHAR(60),
-            device_label VARCHAR(180),
-            is_active BOOLEAN NOT NULL DEFAULT TRUE,
-            last_seen_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        )
-    """))
+def _is_sqlite() -> bool:
+    try:
+        return db.session.bind.dialect.name == "sqlite"
+    except Exception:
+        return False
+
+
+def _ensure_mobile_push_token_table() -> None:
+    if _is_sqlite():
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS mobile_push_tokens (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                token VARCHAR(512) NOT NULL,
+                platform VARCHAR(30),
+                device_id VARCHAR(120),
+                app_version VARCHAR(60),
+                device_label VARCHAR(180),
+                is_active BOOLEAN NOT NULL DEFAULT 1,
+                last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+    else:
+        db.session.execute(text("""
+            CREATE TABLE IF NOT EXISTS mobile_push_tokens (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                token VARCHAR(512) NOT NULL,
+                platform VARCHAR(30),
+                device_id VARCHAR(120),
+                app_version VARCHAR(60),
+                device_label VARCHAR(180),
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                last_seen_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
 
     db.session.execute(text("""
         CREATE UNIQUE INDEX IF NOT EXISTS ix_mobile_push_tokens_token
@@ -42,9 +66,7 @@ def _ensure_mobile_push_token_table():
     """))
 
 
-@mobile_api_bp.post("/push/register-token")
-@require_mobile_user
-def mobile_push_register_token(user):
+def _register_push_token_impl(user):
     payload = request.get_json(silent=True) or {}
 
     token = _push_text(payload.get("token"), limit=512)
@@ -114,6 +136,18 @@ def mobile_push_register_token(user):
         "push_enabled": True,
         "platform": platform,
     })
+
+
+@mobile_api_bp.post("/push/register-token")
+@require_mobile_user
+def mobile_push_register_token(user):
+    return _register_push_token_impl(user)
+
+
+@mobile_api_bp.post("/notifications/fcm-token")
+@require_mobile_user
+def mobile_push_register_token_legacy_alias(user):
+    return _register_push_token_impl(user)
 
 
 @mobile_api_bp.post("/push/unregister-token")
