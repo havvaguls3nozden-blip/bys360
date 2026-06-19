@@ -26,7 +26,7 @@ class AppConfig {
 
   static const String fcmTokenPath = String.fromEnvironment(
     'BYS360_FCM_TOKEN_' 'END' 'POINT',
-    defaultValue: '/' 'api' '/mobile/notifications/fcm-token',
+    defaultValue: '/' 'api' '/mobile/push/register-token',
   );
 
   static bool get isProduction => appEnvironment.toLowerCase() == 'prod';
