@@ -1,4 +1,5 @@
 from __future__ import annotations
+# ruff: noqa: F821 - mobile bridge routes resolve legacy names from route_globals at registration time.
 
 # BYS360 mobile communication v2 read route bridge module.
 # P11-B7 kapsamında communication v2 GET okuma endpointi ayrılmıştır.
