@@ -37,6 +37,7 @@ from app.api.mobile.domains import kpi_target_management as _kpi_target_manageme
 from app.api.mobile.domains import notifications as _notifications  # noqa: F401
 from app.api.mobile.domains import personnel_read as _personnel_read  # noqa: F401
 from app.api.mobile.domains import personnel_write_all as _personnel_write_all
+from app.api.mobile.domains import push_notifications as _push_notifications  # noqa: F401
 from app.api.mobile.domains import support_survey_write as _support_survey_write
 
 
