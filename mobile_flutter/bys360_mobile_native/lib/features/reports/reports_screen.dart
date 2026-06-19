@@ -22,37 +22,37 @@ class ReportsScreen extends StatelessWidget {
         children: [
           _HeaderCard(theme: theme),
           const SizedBox(height: 16),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.insights_outlined,
             title: 'Yönetici Özeti',
             subtitle: 'Performans, iletişim, anket ve personel göstergelerini tek bakışta izleyin.',
             color: const Color(0xFF1D4ED8),
           ),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.assignment_turned_in_outlined,
             title: 'Performans Raporları',
             subtitle: 'Dönem, görev, puanlama, düşük skor ve onay süreçleri için özet alan.',
             color: const Color(0xFF0F766E),
           ),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.groups_2_outlined,
             title: 'Personel ve Birim Görünümü',
             subtitle: 'Personel dağılımı, birim bazlı durum ve görev yoğunluğu raporları.',
             color: const Color(0xFF7C3AED),
           ),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.campaign_outlined,
             title: 'Portal ve İletişim',
             subtitle: 'Duyuru, iç haber, mesaj, bildirim ve katılım hareketleri.',
             color: const Color(0xFFEA580C),
           ),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.poll_outlined,
             title: 'Anket ve Geri Bildirim',
             subtitle: 'Anket katılımı, destek talepleri ve geri bildirim özetleri.',
             color: const Color(0xFF15803D),
           ),
-          _ReportTile(
+          const _ReportTile(
             icon: Icons.smart_toy_outlined,
             title: 'AI Karar Destek',
             subtitle: 'Risk, öneri, karar desteği ve aksiyon takip özetleri.',
@@ -141,7 +141,7 @@ class _ReportTile extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: color.withOpacity(0.16)),
+        side: BorderSide(color: color.withValues(alpha: 0.16)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -149,7 +149,7 @@ class _ReportTile extends StatelessWidget {
           width: 46,
           height: 46,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(icon, color: color),
@@ -180,7 +180,7 @@ class _InfoBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.55),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Text(
