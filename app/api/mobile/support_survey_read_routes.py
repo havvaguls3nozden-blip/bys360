@@ -4,14 +4,87 @@ from __future__ import annotations
 # P11-B5 kapsamında destek ve anket GET listeleme endpointleri ayrılmıştır.
 # URL path ve JSON cevap davranışı değiştirilmemelidir.
 
-_SUPPORT_SURVEY_READ_ROUTE_SOURCE = '@mobile_api_bp.get("/support/tickets")\n@require_mobile_user\ndef mobile_support_tickets(user: User):\n    q_base = SupportTicket.query.order_by(SupportTicket.created_at.desc())\n    if not _has_global_scope(user):\n        q_base = q_base.filter(SupportTicket.created_by_user_id == user.id)\n\n    rows = q_base.limit(80).all()\n    items = []\n    for t in rows:\n        status = getattr(t, "status", "") or "open"\n        status_label = _mobile_support_status_label(status)\n        priority = getattr(t, "priority", "") or "normal"\n        progress = 100 if str(status).lower() in {"closed", "kapalı", "kapali", "resolved"} else 45\n        item = _item(\n            getattr(t, "id", ""),\n            getattr(t, "title", "") or "Destek talebi",\n            _clean_mobile_text(getattr(t, "description", "") or "", limit=180),\n            status_label,\n            _dt_label(getattr(t, "updated_at", None) or getattr(t, "created_at", None)),\n            getattr(t, "ticket_no", "") or _mobile_support_priority_label(priority),\n            progress,\n        )\n        item["tone"] = "green" if progress == 100 else "blue"\n        item["icon"] = "support"\n        items.append(item)\n\n    open_count = sum(1 for t in rows if str(getattr(t, "status", "") or "open").lower() not in {"closed", "kapalı", "kapali", "resolved"})\n    closed_count = sum(1 for t in rows if str(getattr(t, "status", "") or "open").lower() in {"closed", "kapalı", "kapali", "resolved"})\n    return _module_payload([\n        _metric("Açık Talep", open_count, "İşlemde olan destek kaydı", "blue", "support"),\n        _metric("Sonuçlanan", closed_count, "Tamamlanan destek kaydı", "green", "done"),\n        _metric("Toplam", len(rows), "Size ait destek kaydı", "blue", "list"),\n    ], items)\n\n@mobile_api_bp.get("/surveys")\n@require_mobile_user\ndef mobile_surveys(user: User):\n    q = Survey.query.order_by(Survey.created_at.desc())\n    rows = q.limit(80).all()\n    items = []\n    visible_count = 0\n    completed_count = 0\n    waiting_count = 0\n    for survey in rows:\n        if not _mobile_survey_visible(user, survey):\n            continue\n        visible_count += 1\n        completed = _mobile_survey_completed(user, survey)\n        active = _survey_is_active(survey)\n        if completed:\n            completed_count += 1\n        elif active:\n            waiting_count += 1\n        status_label = "Cevaplandı" if completed else _survey_status_label(getattr(survey, "status", ""))\n        progress = 100 if completed else 35 if active else 0\n        items.append(_item(\n            getattr(survey, "id", ""),\n            getattr(survey, "title", "Anket"),\n            getattr(survey, "description", "") or getattr(survey, "survey_type", ""),\n            status_label,\n            "Anonim" if getattr(survey, "is_anonymous", False) else "Kurum içi",\n            "",\n            progress,\n        ))\n    # value alanı bilinçli boş bırakılır; mobil kartta yanlış sayı gösterilmez.\n    for item in items:\n        item["value"] = ""\n    return _module_payload([\n        _metric("Yanıt Bekleyen", waiting_count, "Yetkinize atanmış aktif anket", "yellow", "poll"),\n        _metric("Cevaplanan", completed_count, "Mobil/kullanıcı tamamlanan", "yellow", "verified_user"),\n        _metric("Geri Bildirim", _safe_count(FeedbackCampaign.query.filter_by(is_active=True)), "Aktif kampanya", "yellow", "feedback"),\n    ], items)\n'
-
-
-def register_mobile_support_survey_read_routes_v1(mobile_bp, route_globals: dict) -> None:
+def register_mobile_support_survey_read_routes_v1(mobile_bp, route_globals) -> None:
     """Register support/survey read mobile routes on the existing mobile blueprint."""
     if route_globals.get("_BYS360_P11_B5_SUPPORT_SURVEY_READ_ROUTES_REGISTERED"):
         return
 
-    route_globals["mobile_bp"] = mobile_bp
-    exec(_SUPPORT_SURVEY_READ_ROUTE_SOURCE, route_globals, route_globals)
+    route_globals['mobile_bp'] = mobile_bp
+    route_globals.setdefault('mobile_api_bp', mobile_bp)
+    globals().update(route_globals)
+
+    @mobile_api_bp.get("/support/tickets")
+    @require_mobile_user
+    def mobile_support_tickets(user: User):
+        q_base = SupportTicket.query.order_by(SupportTicket.created_at.desc())
+        if not _has_global_scope(user):
+            q_base = q_base.filter(SupportTicket.created_by_user_id == user.id)
+
+        rows = q_base.limit(80).all()
+        items = []
+        for t in rows:
+            status = getattr(t, "status", "") or "open"
+            status_label = _mobile_support_status_label(status)
+            priority = getattr(t, "priority", "") or "normal"
+            progress = 100 if str(status).lower() in {"closed", "kapalı", "kapali", "resolved"} else 45
+            item = _item(
+                getattr(t, "id", ""),
+                getattr(t, "title", "") or "Destek talebi",
+                _clean_mobile_text(getattr(t, "description", "") or "", limit=180),
+                status_label,
+                _dt_label(getattr(t, "updated_at", None) or getattr(t, "created_at", None)),
+                getattr(t, "ticket_no", "") or _mobile_support_priority_label(priority),
+                progress,
+            )
+            item["tone"] = "green" if progress == 100 else "blue"
+            item["icon"] = "support"
+            items.append(item)
+
+        open_count = sum(1 for t in rows if str(getattr(t, "status", "") or "open").lower() not in {"closed", "kapalı", "kapali", "resolved"})
+        closed_count = sum(1 for t in rows if str(getattr(t, "status", "") or "open").lower() in {"closed", "kapalı", "kapali", "resolved"})
+        return _module_payload([
+            _metric("Açık Talep", open_count, "İşlemde olan destek kaydı", "blue", "support"),
+            _metric("Sonuçlanan", closed_count, "Tamamlanan destek kaydı", "green", "done"),
+            _metric("Toplam", len(rows), "Size ait destek kaydı", "blue", "list"),
+        ], items)
+
+    @mobile_api_bp.get("/surveys")
+    @require_mobile_user
+    def mobile_surveys(user: User):
+        q = Survey.query.order_by(Survey.created_at.desc())
+        rows = q.limit(80).all()
+        items = []
+        visible_count = 0
+        completed_count = 0
+        waiting_count = 0
+        for survey in rows:
+            if not _mobile_survey_visible(user, survey):
+                continue
+            visible_count += 1
+            completed = _mobile_survey_completed(user, survey)
+            active = _survey_is_active(survey)
+            if completed:
+                completed_count += 1
+            elif active:
+                waiting_count += 1
+            status_label = "Cevaplandı" if completed else _survey_status_label(getattr(survey, "status", ""))
+            progress = 100 if completed else 35 if active else 0
+            items.append(_item(
+                getattr(survey, "id", ""),
+                getattr(survey, "title", "Anket"),
+                getattr(survey, "description", "") or getattr(survey, "survey_type", ""),
+                status_label,
+                "Anonim" if getattr(survey, "is_anonymous", False) else "Kurum içi",
+                "",
+                progress,
+            ))
+        # value alanı bilinçli boş bırakılır; mobil kartta yanlış sayı gösterilmez.
+        for item in items:
+            item["value"] = ""
+        return _module_payload([
+            _metric("Yanıt Bekleyen", waiting_count, "Yetkinize atanmış aktif anket", "yellow", "poll"),
+            _metric("Cevaplanan", completed_count, "Mobil/kullanıcı tamamlanan", "yellow", "verified_user"),
+            _metric("Geri Bildirim", _safe_count(FeedbackCampaign.query.filter_by(is_active=True)), "Aktif kampanya", "yellow", "feedback"),
+        ], items)
+
     route_globals["_BYS360_P11_B5_SUPPORT_SURVEY_READ_ROUTES_REGISTERED"] = True
