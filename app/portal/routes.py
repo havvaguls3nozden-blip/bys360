@@ -62,8 +62,10 @@ from app.services.portal_service import (
     normalize_visibility,
     portal_home_context,
     portal_instagram_story_items,
+    reaction_counts,
     toggle_reaction,
     toggle_save,
+    user_reaction_for_post,
     user_unit_name,
     user_upper_unit_name,
     visible_posts_for_user,
@@ -435,6 +437,32 @@ def _portal_permission_denied_redirect(message: str):
 
 def _portal_has_permission(key: str) -> bool:
     return portal_permission_allowed(current_user, key)
+
+
+# BYS360_PORTAL_AJAX_REACTIONS_V1_BEGIN
+def _portal_wants_json_response() -> bool:
+    """Portal küçük etkileşimlerinde sayfa yenilemeden JSON cevap üretir."""
+    requested_with = (request.headers.get("X-Requested-With") or "").lower()
+    accept = (request.headers.get("Accept") or "").lower()
+    return (
+        requested_with == "xmlhttprequest"
+        or "application/json" in accept
+        or request.form.get("_ajax") == "1"
+    )
+
+
+def _portal_reaction_payload(post: PortalPost, action: str, message: str) -> dict:
+    counts = reaction_counts(post)
+    return {
+        "ok": True,
+        "post_id": int(post.id),
+        "action": action,
+        "message": message,
+        "reaction_counts": counts,
+        "total_reactions": int(sum(counts.values())),
+        "user_reaction": user_reaction_for_post(post, current_user),
+    }
+# BYS360_PORTAL_AJAX_REACTIONS_V1_END
 # BYS360_PORTAL_SETTINGS_ROLE_MATRIX_V2_12_ROUTE_GUARDS_END
 
 
@@ -556,15 +584,24 @@ def portal_post_create():
 @login_required
 @menu_key_required("portal_feed")
 def portal_post_react(post_id: int):
+    wants_json = _portal_wants_json_response()
     if not _portal_has_permission("portal_post_interact"):
-        return _portal_permission_denied_redirect("Bu paylaşımda etkileşim yapma yetkiniz bulunmamaktadır.")
+        message = "Bu paylaşımda etkileşim yapma yetkiniz bulunmamaktadır."
+        if wants_json:
+            return jsonify({"ok": False, "message": message}), 403
+        return _portal_permission_denied_redirect(message)
     post = PortalPost.query.get_or_404(post_id)
     if not can_user_view_post(current_user, post):
+        if wants_json:
+            return jsonify({"ok": False, "message": "Bu paylaşımı görüntüleme yetkiniz bulunmamaktadır."}), 403
         return render_access_denied()
     action = toggle_reaction(post, current_user, request.form.get("reaction_type", "like"))
     notify_portal_reaction(post, current_user, action=action)
     db.session.commit()
-    flash("Tepkiniz güncellendi." if action != "removed" else "Tepkiniz kaldırıldı.", "success")
+    message = "Tepkiniz güncellendi." if action != "removed" else "Tepkiniz kaldırıldı."
+    if wants_json:
+        return jsonify(_portal_reaction_payload(post, action, message))
+    flash(message, "success")
     return redirect(request.referrer or url_for("main.portal_feed"))
 
 

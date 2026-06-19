@@ -47,7 +47,96 @@
     });
   });
 
-  document.querySelectorAll('[data-portal-inline-form], [data-portal-quick-action]').forEach(function (form) {
+  function portalFetchHeaders() {
+    return {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    };
+  }
+
+  function showPortalInlineMessage(card, message, isError) {
+    if (!card || !message) return;
+    var box = card.querySelector('[data-portal-inline-message]');
+    if (!box) {
+      box = document.createElement('div');
+      box.setAttribute('data-portal-inline-message', '');
+      box.className = 'portal-inline-message';
+      var row = card.querySelector('.portal-reaction-row');
+      if (row && row.parentNode) row.parentNode.insertBefore(box, row.nextSibling);
+      else card.appendChild(box);
+    }
+    box.textContent = message;
+    box.classList.toggle('is-error', !!isError);
+    box.hidden = false;
+    window.clearTimeout(box._portalTimer);
+    box._portalTimer = window.setTimeout(function () { box.hidden = true; }, isError ? 4500 : 2200);
+  }
+
+  function updateReactionUi(card, data) {
+    if (!card || !data || !data.ok) return;
+    var counts = data.reaction_counts || {};
+    card.querySelectorAll('[data-portal-reaction-button]').forEach(function (button) {
+      var key = button.getAttribute('data-reaction-key');
+      var countNode = button.querySelector('[data-portal-reaction-count]');
+      var count = parseInt(counts[key] || 0, 10);
+      button.classList.toggle('active', data.user_reaction === key);
+      button.disabled = false;
+      if (countNode) {
+        countNode.textContent = String(count);
+        countNode.hidden = !count;
+      }
+    });
+    var totalNode = card.querySelector('[data-portal-reaction-total]');
+    if (totalNode) {
+      totalNode.innerHTML = '<i class="fa-regular fa-face-smile"></i> ' + String(data.total_reactions || 0) + ' tepki';
+    }
+  }
+
+  document.querySelectorAll('[data-portal-quick-action]').forEach(function (form) {
+    var reactionButton = form.querySelector('[data-portal-reaction-button]');
+    if (!reactionButton) {
+      form.addEventListener('submit', function () {
+        var btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+      });
+      return;
+    }
+
+    form.addEventListener('submit', function (event) {
+      if (!window.fetch || !window.FormData) return;
+      event.preventDefault();
+      var card = form.closest('[data-portal-post-card]') || form.closest('.portal-post-card');
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      var body = new FormData(form);
+      body.set('_ajax', '1');
+      fetch(form.action, {
+        method: 'POST',
+        body: body,
+        credentials: 'same-origin',
+        headers: portalFetchHeaders()
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok || !data.ok) throw data;
+            return data;
+          });
+        })
+        .then(function (data) {
+          updateReactionUi(card, data);
+          showPortalInlineMessage(card, data.message || 'Tepkiniz güncellendi.', false);
+        })
+        .catch(function (error) {
+          var message = (error && error.message) || 'Tepki kaydedilemedi. Lütfen tekrar deneyin.';
+          showPortalInlineMessage(card, message, true);
+        })
+        .finally(function () {
+          if (btn) btn.disabled = false;
+        });
+    });
+  });
+
+  document.querySelectorAll('[data-portal-inline-form]').forEach(function (form) {
     form.addEventListener('submit', function () {
       var btn = form.querySelector('button[type="submit"]');
       if (btn) btn.disabled = true;

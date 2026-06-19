@@ -11,5 +11,5 @@
   <section class="portal-card portal-group-hero upgraded"><i class="fa-solid fa-user-group"></i><div><span class="portal-kicker">Grup Akışı</span><h1>{{ portal_group.name }}</h1><p>{{ portal_group.description or 'Kurumsal portal grubu' }}</p></div></section>
   <div class="portal-layout single-side"><main class="portal-main wide-feed">{% include 'portal/_composer.html' %}{% if portal_feed_posts %}{% for item in portal_feed_posts %}{% include 'portal/_post_card.html' %}{% endfor %}{% else %}<section class="portal-card portal-empty"><i class="fa-regular fa-comments"></i><h3>Bu grupta henüz paylaşım yok</h3><p>Grup kapsamındaki ilk paylaşımı oluşturabilirsiniz.</p></section>{% endif %}</main></div>
 </div>
-<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-iphone-responsive-v2-11"></script>
+<script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-ajax-reactions-v1"></script>
 {% endblock %}

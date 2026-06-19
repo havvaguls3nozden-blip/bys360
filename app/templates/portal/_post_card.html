@@ -37,7 +37,7 @@
     {% if attachment.mime_type == 'text/x-instagram-kind' %}{% set ig.kind = attachment.stored_path %}{% endif %}
   {% endfor %}
 {% endif %}
-<article id="post-{{ post.id }}" class="portal-card portal-post-card {{ 'has-social-embed-v3b' if bys360_social.url else '' }} portal-v2c-post-card {{ 'is-pinned' if post.is_pinned else '' }} {{ 'is-instagram' if is_instagram else '' }} {{ 'is-instagram-story' if post.post_type == 'instagram_story' else '' }}" aria-label="Portal paylaşımı">
+<article id="post-{{ post.id }}" class="portal-card portal-post-card {{ 'has-social-embed-v3b' if bys360_social.url else '' }} portal-v2c-post-card {{ 'is-pinned' if post.is_pinned else '' }} {{ 'is-instagram' if is_instagram else '' }} {{ 'is-instagram-story' if post.post_type == 'instagram_story' else '' }}" aria-label="Portal paylaşımı" data-portal-post-card data-portal-post-id="{{ post.id }}">
   <header class="portal-post-head">
     {% if is_instagram %}
       <a class="portal-avatar portal-avatar-ring portal-instagram-avatar" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram profilini aç"><i class="fa-brands fa-instagram"></i></a>
@@ -169,7 +169,7 @@
 {% endif %}
 {# BYS360_PORTAL_INSTAGRAM_FEED_V2_11_6_POSTCARD_ACTION_END #}
 <div class="portal-post-stats">
-      <span><i class="fa-regular fa-face-smile"></i> {{ item.total_reactions }} tepki</span>
+      <span data-portal-reaction-total><i class="fa-regular fa-face-smile"></i> {{ item.total_reactions }} tepki</span>
       <span><i class="fa-regular fa-comment"></i> {{ item.comments_count }} yorum</span>
       {% if item.saved %}<span><i class="fa-solid fa-bookmark"></i> Kaydedildi</span>{% endif %}
     </div>
@@ -179,8 +179,8 @@
         <form method="post" action="{{ safe_url_for('main.portal_post_react', post_id=post.id, fallback='#') }}" data-portal-quick-action>
           {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
           <input type="hidden" name="reaction_type" value="{{ r.key }}">
-          <button class="portal-reaction {{ 'active' if item.user_reaction == r.key else '' }}" type="submit" title="{{ r.label }}">
-            <i class="{{ r.icon }}"></i><span>{{ r.label }}</span>{% if item.reaction_counts.get(r.key) %}<b>{{ item.reaction_counts.get(r.key) }}</b>{% endif %}
+          <button class="portal-reaction {{ 'active' if item.user_reaction == r.key else '' }}" type="submit" title="{{ r.label }}" data-portal-reaction-button data-reaction-key="{{ r.key }}" data-reaction-label="{{ r.label }}">
+            <i class="{{ r.icon }}"></i><span>{{ r.label }}</span><b data-portal-reaction-count="{{ r.key }}"{% if not item.reaction_counts.get(r.key) %} hidden{% endif %}>{{ item.reaction_counts.get(r.key, 0) }}</b>
           </button>
         </form>
       {% endfor %}

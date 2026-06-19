@@ -691,3 +691,7 @@ html, body {
   font-size:1.25rem;
 }
 .portal-person-avatar-v210.is-photo-missing::before{font-size:1.05rem;}
+
+/* BYS360_PORTAL_AJAX_REACTIONS_V1_BEGIN */
+.portal-inline-message{margin:0 18px 10px;border:1px solid rgba(139,0,0,.10);background:rgba(139,0,0,.045);color:#5a3030;border-radius:14px;padding:8px 11px;font-size:.82rem;font-weight:850}.portal-inline-message.is-error{border-color:rgba(185,28,28,.20);background:rgba(185,28,28,.06);color:#7f1d1d}.portal-reaction[disabled]{opacity:.72;cursor:progress}
+/* BYS360_PORTAL_AJAX_REACTIONS_V1_END */

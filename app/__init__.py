@@ -36,6 +36,7 @@ OPTIONAL_STARTUP_REGISTRATIONS: tuple[tuple[str, str], ...] = (
     ("app.services.assistant_role_matrix_v10", "register_assistant_role_matrix_v10"),
     ("app.services.assistant_module_access", "register_assistant_module_master_access"),
     ("app.services.assistant_shortcut_visibility", "register_assistant_shortcut_visibility_context"),
+    ("app.services.notification_mailer", "register_notification_mailer"),
 )
 
 
