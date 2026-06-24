@@ -802,37 +802,45 @@ def _v2852_due_label_safe(row):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return (_label(getattr(row, 'status', None), 'Bekliyor'), 40, 'red')
 
+from app.api.mobile.services.performance_summary_risk_route_services import (
+    phase3c_mobile_performance_full_feature_summary_service as _phase3c_full_feature_summary_service,
+    phase3c_mobile_performance_publish_preapproval_service as _phase3c_publish_preapproval_service,
+    phase3c_mobile_performance_risk_analysis_v2852_service as _phase3c_risk_analysis_v2852_service,
+)
+
+
+def _phase3c_summary_risk_route_deps() -> dict[str, Any]:
+    return {
+        '__route_globals__': globals(),
+        'EvaluationAssignment': EvaluationAssignment,
+        'PerformancePeriod': PerformancePeriod,
+        'PerformancePresidentApproval': PerformancePresidentApproval,
+        'PerformanceResultSnapshot': PerformanceResultSnapshot,
+        'User': User,
+        '_assignment_query_for': _assignment_query_for,
+        '_full_name': _full_name,
+        '_has_global_scope': _has_global_scope,
+        '_item': _item,
+        '_low_score_count': _low_score_count,
+        '_metric': _metric,
+        '_mobile_perf_safe_all': _mobile_perf_safe_all,
+        '_mobile_perf_safe_count': _mobile_perf_safe_count,
+        '_mobile_perf_safe_get': _mobile_perf_safe_get,
+        '_module_payload': _module_payload,
+        '_period_name': _period_name,
+        '_safe_avg_score': _safe_avg_score,
+        '_snapshot_query_for': _snapshot_query_for,
+        '_v2852_items_from_models': _v2852_items_from_models,
+        '_v2852_pending_assignments': _v2852_pending_assignments,
+        '_v2852_score': _v2852_score,
+        'logger': logger,
+    }
+
+
 @mobile_api_bp.get('/performance/full-feature-summary')
 @require_mobile_user
 def _bys360_legacy_mobile_performance_full_feature_summary(user: User):
-    try:
-        assignment_q = _assignment_query_for(user)
-        snapshot_q = _snapshot_query_for(user)
-    except Exception:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        assignment_q = EvaluationAssignment.query
-        snapshot_q = PerformanceResultSnapshot.query
-    active_periods = _mobile_perf_safe_count(PerformancePeriod.query.filter_by(is_active=True)) if hasattr(PerformancePeriod, 'is_active') else _mobile_perf_safe_count(PerformancePeriod.query)
-    pending = len(_v2852_pending_assignments(user, 1000))
-    scorecards = _mobile_perf_safe_count(snapshot_q)
-    avg_score = _safe_avg_score(snapshot_q) if '_safe_avg_score' in globals() else 0
-    low_score = _low_score_count(snapshot_q) if '_low_score_count' in globals() else 0
-    approvals = _mobile_perf_safe_count(PerformancePresidentApproval.query.filter_by(status='pending')) if _has_global_scope(user) and PerformancePresidentApproval is not None else 0
-    items = [
-        _item('periods', 'Dönem Yönetimi', 'Yıllık, 6 aylık, 3 aylık, aylık ve özel dönemler', 'Aktif' if active_periods else 'Kontrol', 'Kapsam: kurum, birim, kategori, seçili personel', str(active_periods), 100 if active_periods else 45),
-        _item('tasks', 'Değerlendirme Görevleri', 'Puanlama, taslak, tamamlama, geri çekme ve iade', 'Bekleyen' if pending else 'Tamamlandı', 'Mobil puanlama formu', str(pending), 60 if pending else 100),
-        _item('scorecards', 'Karne ve Arşiv', 'Yayınlanmış karneler ve geçmiş kayıtlar', 'Yetki Kontrollü', 'Personel yalnızca yayınlanan kendi sonucunu görür', str(scorecards), 85),
-        _item('approvals', 'Başkan/Üst Onay ve Yayın Ön Onayı', '70 altı ve final yayın kontrol akışları', 'Onay Bekliyor' if approvals else 'Kontrollü', 'Yayın kilidi korunur', str(approvals), 55 if approvals else 100),
-        _item('reports', 'Raporlar, Risk ve Gelişim', 'Kategori, dönem, amir, personel, risk, gelişim ve hatırlatma ekranları', 'Aktif', 'Web performans modülüyle aynı başlıklar', '', 100),
-    ]
-    return _module_payload([
-        _metric('Aktif Dönem', active_periods, 'Açık veya hazırlıktaki performans dönemi', 'red', 'timeline'),
-        _metric('Bekleyen Görev', pending, 'Puanlama veya takip bekleyen görev', 'red', 'assignment'),
-        _metric('Karne', scorecards, 'Yetki kapsamındaki karne kayıtları', 'green', 'scorecard'),
-        _metric('Ortalama', f'{avg_score}/100' if avg_score else '-', 'Yayınlanmış sonuç ortalaması', 'green', 'trending_up'),
-        _metric('70 Altı', low_score, 'Düşük performans takibi', 'yellow', 'warning'),
-        _metric('Üst Onay', approvals, 'Başkan/Üst Onay bekleyen kayıt', 'red', 'verified_user'),
-    ], items)
+    return _phase3c_full_feature_summary_service(user, _phase3c_summary_risk_route_deps())
 
 def mobile_performance_full_feature_summary(user: User):
     from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_full_feature_summary as _bys360_delegate
@@ -853,27 +861,7 @@ def mobile_performance_president_approvals_alias(user: User):  # compatibility g
 @mobile_api_bp.get('/performance/publish-preapproval')
 @require_mobile_user
 def mobile_performance_publish_preapproval(user: User):
-    items = _v2852_items_from_models(['PerformancePublishPreApproval', 'PerformancePublicationPreApproval', 'PerformancePublishApproval', 'PerformancePublishLog', 'PerformancePublicationApproval'], ['employee_name', 'title', 'name', 'period_name'], ['description', 'note', 'period_name', 'status_text'], ['status', 'approval_status', 'state'], ['period_name', 'created_at', 'approved_by_name'], ['final_score', 'score'])
-    if not items:
-        pending = []
-        try:
-            q = _snapshot_query_for(user)
-            if hasattr(PerformanceResultSnapshot, 'is_published'):
-                q = q.filter(PerformanceResultSnapshot.is_published.is_(False))
-            pending = _mobile_perf_safe_all(q.limit(60))
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            pending = []
-        for row in pending:
-            employee = getattr(row, 'employee', None) or _mobile_perf_safe_get(User, getattr(row, 'employee_id', None))
-            period = getattr(row, 'period', None) or _mobile_perf_safe_get(PerformancePeriod, getattr(row, 'period_id', None))
-            score = _v2852_score(row)
-            items.append(_item(getattr(row, 'id', ''), _full_name(employee), _period_name(period), 'Yayın Ön Kontrol', 'Final yayın öncesi kontrol', f'{score}/100' if score else '', 55))
-    return _module_payload([
-        _metric('Ön Onay', len(items), 'Final yayın öncesi görünen kayıt', 'red', 'approval'),
-        _metric('Yayın Kilidi', 'Aktif', 'Ön onay olmadan final yayın engellenir', 'yellow', 'lock'),
-        _metric('Yetki', 'Rol Bazlı', 'Yayın işlemi yetkili kullanıcıyla sınırlıdır', 'green', 'shield'),
-    ], items)
+    return _phase3c_publish_preapproval_service(user, _phase3c_summary_risk_route_deps())
 
 def _bys360_legacy_mobile_performance_history_archive(user: User):
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
@@ -973,27 +961,7 @@ def mobile_performance_reports(user: User):
 @mobile_api_bp.get('/performance/risk-analysis')
 @require_mobile_user
 def _bys360_legacy_mobile_performance_risk_analysis_v2852(user: User):
-    try:
-        snapshot_q = _snapshot_query_for(user).order_by(PerformanceResultSnapshot.id.desc())
-        rows = _mobile_perf_safe_all(snapshot_q.limit(200))
-    except Exception:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        rows = []
-    low = [row for row in rows if 0 < _v2852_score(row) < 70]
-    high = [row for row in rows if _v2852_score(row) >= 90]
-    items = []
-    for row in low[:80]:
-        employee = getattr(row, 'employee', None) or _mobile_perf_safe_get(User, getattr(row, 'employee_id', None))
-        period = getattr(row, 'period', None) or _mobile_perf_safe_get(PerformancePeriod, getattr(row, 'period_id', None))
-        score = _v2852_score(row)
-        items.append(_item(getattr(row, 'id', ''), _full_name(employee), _period_name(period), '70 Altı Risk', 'Başkan/Üst Onay ve gelişim takibi gerekebilir', f'{score}/100', 35))
-    if not items:
-        items = [_item('risk-empty', 'Riskli kayıt bulunmadı', 'Yetki kapsamınızda 70 altı performans sonucu görünmüyor.', 'Normal', 'Risk takibi aktif', '', 100)]
-    return _module_payload([
-        _metric('70 Altı', len(low), 'Düşük performans/risk kaydı', 'yellow', 'warning'),
-        _metric('90 Üstü', len(high), 'Yüksek başarı takibi', 'green', 'trending_up'),
-        _metric('Risk Takibi', 'Aktif', 'Başkan/Üst Onay ve gelişim süreciyle bağlantılıdır', 'red', 'risk'),
-    ], items)
+    return _phase3c_risk_analysis_v2852_service(user, _phase3c_summary_risk_route_deps())
 
 def mobile_performance_risk_analysis_v2852(user):
     from app.api.mobile.services.performance_summary_service import mobile_performance_risk_analysis_v2852_delegate
