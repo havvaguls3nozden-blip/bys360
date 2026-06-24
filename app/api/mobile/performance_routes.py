@@ -127,23 +127,10 @@ from app.api.mobile.services.performance_query_helpers import (
 )
 
 
-def _assignment_item(assignment: Any) -> dict[str, Any]:
-    employee = getattr(assignment, "employee", None)
-    evaluator = getattr(assignment, "evaluator", None) or getattr(assignment, "manager", None)
-    period = getattr(assignment, "period", None)
-    completed = getattr(assignment, "completed_at", None)
-    status = _label(getattr(assignment, "status", None))
-    level = getattr(assignment, "manager_level", None) or getattr(assignment, "supervisor_level", None) or "-"
-    evaluator_text = _full_name(evaluator) if evaluator else "Değerlendirici bilgisi"
-    return _item(getattr(assignment, "id", ""), _full_name(employee), _period_name(period), status, f"{level}. amir / {evaluator_text}" if str(level) != "-" else evaluator_text, "Tamamlandı" if completed else "İşlem bekliyor", 100 if completed else 40)
-
-
-def _scorecard_item(row: Any) -> dict[str, Any]:
-    employee = getattr(row, "employee", None) or _mobile_perf_safe_get(User, getattr(row, "employee_id", None))
-    period = getattr(row, "period", None)
-    score = _score_value(row)
-    status = "Yayınlandı" if getattr(row, "is_published", False) else _label(getattr(row, "status", None), "Kontrol Bekliyor")
-    return _item(getattr(row, "id", ""), _full_name(employee), _period_name(period), status, "70 altı takip" if 0 < score < 70 else "Karne", f"{score}/100" if score else "", score if score else 35)
+from app.api.mobile.services.performance_item_helpers import (
+    _assignment_item,
+    _scorecard_item,
+)
 
 
 @mobile_api_bp.get("/performance/summary")
