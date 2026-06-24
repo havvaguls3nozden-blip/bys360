@@ -39,12 +39,18 @@ EXPECTED_ROUTE_SUFFIXES = {
     "support_reply": ("POST", "/support/tickets/<int:ticket_id>/reply"),
     "survey_submit": ("POST", "/surveys/<int:survey_id>/submit"),
     "assistant_v2_ask": ("POST", "/assistant/v2/ask"),
+
+    "push_register_token": ("POST", "/push/register-token"),
+    "push_fcm_token_alias": ("POST", "/notifications/fcm-token"),
+    "push_unregister_token": ("POST", "/push/unregister-token"),
+    "push_status": ("GET", "/push/status"),
 }
 
 EXPECTED_DOMAIN_OWNERS = {
     "/auth/": "auth.py",
     "/me": "auth.py",
     "/dashboard/": "dashboard.py",
+    "/notifications/fcm-token": "push_notifications.py",
     "/notifications/": "notifications.py",
     "/personnel/list": "personnel_read.py",
     "/personnel/all": "personnel_write_all.py",
@@ -53,6 +59,7 @@ EXPECTED_DOMAIN_OWNERS = {
     "/kpi/": "kpi_target_management.py",
     "/communication/messages/": "communication_v1_write.py",
     "/communication/v2/": "communication_v2_write.py",
+    "/push/": "push_notifications.py",
     "/support/": "support_survey_write.py",
     "/surveys/": "support_survey_write.py",
     "/assistant/": "assistant_chat.py",

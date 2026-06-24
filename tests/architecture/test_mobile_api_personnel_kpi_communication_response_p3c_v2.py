@@ -19,4 +19,4 @@ def test_mobile_personnel_kpi_communication_response_gate_p3c_v2() -> None:
     assert result["runtime_route_map_ok"] is True
     assert result["response_code_smoke_ok"] is True
     assert result["routes_py_lines"] <= 300
-    assert result["total_mobile_route_decorator_count"] == 24
+    assert result["total_mobile_route_decorator_count"] == 28
