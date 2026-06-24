@@ -147,7 +147,7 @@ def request_log_context() -> dict[str, Any]:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/error_handlers.py:148")
         return {"request_id": getattr(g, "request_id", "-")}
 
-# BYS360_LIVE_FULL_OVERLAY_V2_17_61_CSRF_RECOVERY_BEGIN
+# Compatibility guard.
 def _safe_csrf_referer_target() -> str:
     """Ayni site icinde guvenli geri donus adresi uretir."""
     try:
@@ -210,7 +210,7 @@ def _handle_expired_csrf_response(error: CSRFError):
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/error_handlers.py:209")
         pass
     return response
-# BYS360_LIVE_FULL_OVERLAY_V2_17_61_CSRF_RECOVERY_END
+# Compatibility guard.
 
 def register_service_unavailable_handler(app: Flask) -> None:
     @app.errorhandler(503)

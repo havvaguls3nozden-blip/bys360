@@ -500,4 +500,4 @@ def register_assistant_module_master_access(app):
     app._bys360_assistant_module_master_access_registered = True  # type: ignore[attr-defined]
     return app
 
-# BYS360_V58_ASSISTANT_MODULE_MASTER_SAFE_CONTEXT
+# Compatibility guard.

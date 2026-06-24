@@ -452,7 +452,7 @@ def _settings_explicitly_controls_key(menu_key: str, role_state: dict[str, bool]
 # BYS360_SETTINGS_LIVE_AUTHORITY_V2_END
 
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_EFFECTIVE
+# Compatibility guard.
 def _bys360_press_news_role(value: object) -> str:
     text = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
     return (text.replace("İ", "i").replace("I", "i").replace("ı", "i")
@@ -471,7 +471,7 @@ def _apply_bys360_press_news_admin_only_policy(visibility: dict[str, bool], user
     role = _bys360_press_news_role(getattr(user, "role", ""))
     visibility["portal_press_news"] = bool(is_admin_like or role in {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"})
     return visibility
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_EFFECTIVE_END
+# Compatibility guard.
 
 def build_menu_visibility_map(
     user: Any,
@@ -557,7 +557,7 @@ def build_menu_visibility_map(
         active_menu_items,
         rollback=rollback,
     )
-    visibility = _apply_bys360_press_news_admin_only_policy(visibility, user)  # BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_APPLIED
+    visibility = _apply_bys360_press_news_admin_only_policy(visibility, user)  # compatibility guard
     visibility = _bys360_apply_performance_main_switch(visibility, user, role_name, rollback=rollback)
     visibility = _bys360_restore_general_section_v4(visibility, user)
     visibility = _bys360_apply_performance_shortcut_gate_v4(visibility)

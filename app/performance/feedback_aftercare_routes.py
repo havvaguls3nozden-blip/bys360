@@ -154,7 +154,7 @@ def _can_edit_meeting(meeting_id: int) -> bool:
 @main_bp.route("/performans/gorusme-sonrasi-notlar", endpoint="performance_feedback_aftercare_tr")
 @login_required
 def performance_feedback_aftercare():
-    # BYS360_A5_P2D7B_FEEDBACK_AFTERCARE_SAFE_FALLBACK
+    # Compatibility guard.
     try:
         return render_template("performance/feedback_aftercare.html", **_context())
     except SQLAlchemyError:

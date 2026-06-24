@@ -136,7 +136,7 @@ def _bys360_register_blueprint_safely(app: Flask, blueprint: Blueprint) -> None:
 
 
 def _bys360_phase1_7_register_blueprint_safely(app: Flask, blueprint: Blueprint) -> None:
-    # BYS360_PHASE1_7_SAFE_REGISTER_COMPAT_NO_RECURSION
+    # Compatibility guard.
     return _register_blueprint_with_narrow_duplicate_guard(app, blueprint)
 
 

@@ -396,7 +396,7 @@ class PersonnelSelfServiceRequestTask(TimestampMixin, db.Model):
         backref=db.backref("delegated_personnel_request_tasks", lazy="dynamic"),
     )
 
-# BYS360_MAINTENANCE_V13_P1_WAITRESS_MODEL_IMPORT_HOTFIX_MODELS
+# Compatibility guard.
 class PersonnelSelfServiceRequestSlaPolicy(TimestampMixin, db.Model):
     __tablename__ = "personnel_self_service_request_sla_policies"
 

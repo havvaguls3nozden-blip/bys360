@@ -315,7 +315,7 @@ def _attendance_overlaps(user_id: int, record_date: date) -> bool:
 
 __all__ = [name for name in globals() if not name.startswith("__")]
 
-# BYS360_F821_CLEANUP_SAFE_V2: HR helper fallbacks.
+# Compatibility guard.
 def _bool_from_form(name: str) -> bool:
     value = str(request.form.get(name, "") or "").strip().lower()
     return value in {"1", "true", "on", "yes", "evet", "e"}
@@ -329,7 +329,7 @@ def _active_period():
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 F821 V2: aktif performans dönemi okunamadı")
         return None
-# BYS360 HR AppFactory HOTFIX V1
+# Compatibility guard.
 # hr_form_helpers.py bu helper'i import eder. F821 temizliği sırasında import listesine
 # eklendiği halde hr_common.py içinde bulunmadığı için create_app import aşamasında düşüyordu.
 def _parse_date(value: Any) -> date | None:

@@ -445,7 +445,7 @@ def _is_press_news_home_excluded_v4(post: Any) -> bool:
         return True
     return False
 
-# BYS360_PORTAL_PRESS_NEWS_HOME_HERO_CLEANUP_HOTFIX_V4_APPLIED
+# Compatibility guard.
 def portal_home_context(user: Any) -> dict[str, Any]:
     """Ana sayfa için Kurumsal Portal V2.5 bağlamı.
 

@@ -69,7 +69,7 @@ def feedback_dashboard():
 @login_required
 @menu_key_required('feedback_pulse')
 def feedback_pulse():
-    # BYS360_FEEDBACK_AI_SCOPE_HOTFIX
+    # Compatibility guard.
     ai_results_support = None
     ai_analytics_support = None
     ai_manager_support = None
@@ -145,7 +145,7 @@ def feedback_pulse_analytics():
 @menu_key_required('feedback_manager')
 @manager_required
 def feedback_admin_pulse_analytics():
-    # BYS360_FEEDBACK_AI_SCOPE_HOTFIX
+    # Compatibility guard.
     ai_results_support = None
     ai_analytics_support = None
     ai_manager_support = None
@@ -158,7 +158,7 @@ def feedback_admin_pulse_analytics():
 @login_required
 @menu_key_required('feedback_campaigns')
 def feedback_campaigns():
-    # BYS360_FEEDBACK_AI_SCOPE_HOTFIX
+    # Compatibility guard.
     ai_results_support = None
     ai_analytics_support = None
     ai_manager_support = None
@@ -206,7 +206,7 @@ def feedback_campaign_detail(campaign_id: int):
 @menu_key_required('feedback_results')
 @manager_required
 def feedback_results():
-    # BYS360_FEEDBACK_AI_SCOPE_HOTFIX
+    # Compatibility guard.
     ai_results_support = None
     ai_analytics_support = None
     ai_manager_support = None
@@ -273,7 +273,7 @@ def feedback_action_new():
 @menu_key_required('feedback_manager')
 @manager_required
 def feedback_manager():
-    # BYS360_FEEDBACK_AI_SCOPE_HOTFIX
+    # Compatibility guard.
     ai_results_support = None
     ai_analytics_support = None
     ai_manager_support = None

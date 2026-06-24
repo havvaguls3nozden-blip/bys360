@@ -108,7 +108,7 @@ def _register_csrf_refresh_handler(app: Flask) -> None:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/__init__.py:106")
             pass
 
-        # BYS360_CSRF_FORM_TOKEN_AND_REFERRER_HOTFIX_V2_15_15
+        # Compatibility guard.
         # Kurumsal ekranlarda CSRF süresi dolarsa kullanıcı login/home'a savrulmasın;
         # geldiği ekrana güvenli şekilde dönsün. Böylece mail test gibi POST ekranları
         # kullanıcı dostu biçimde yeniden denenebilir.

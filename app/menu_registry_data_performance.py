@@ -583,7 +583,7 @@ except Exception:
     pass
 # BYS360_PORTAL_EXPERIENCE_V3B8C_RESTORE_PORTAL_ROLE_DEFAULTS_END
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_BEGIN
+# Compatibility guard.
 # Basında Tarihi Alan varsayılan menü yetkisi yalnızca admin/admin-benzeri teknik roldedir.
 try:
     _bys360_press_news_admin_roles_v1 = {"admin", "super_admin", "system_admin", "sistem_yoneticisi"}
@@ -603,10 +603,10 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry_data_performance.py:601")
     pass
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_END
+# Compatibility guard.
 
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_ROLE_DEFAULTS
+# Compatibility guard.
 try:
     for _role in ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"]:
         ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("portal_press_news")  # noqa: F821 - dynamic menu registry global
@@ -620,4 +620,4 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry_data_performance.py:617")
     pass
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_ROLE_DEFAULTS_END
+# Compatibility guard.

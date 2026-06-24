@@ -71,7 +71,7 @@ from app.services.portal_service import (
     visible_posts_for_user,
 )
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_BEGIN
+# Compatibility guard.
 _PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLES = {"admin", "super_admin", "system_admin", "sistem_yoneticisi"}
 
 def _portal_press_news_admin_only_allowed(user) -> bool:
@@ -81,7 +81,7 @@ def _portal_press_news_admin_only_allowed(user) -> bool:
 
 def _portal_press_news_visible_for_user(user) -> bool:
     return _portal_press_news_admin_only_allowed(user) and can_access_menu(user, "portal_press_news")
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_END
+# Compatibility guard.
 
 def _slugify(value: str) -> str:
     text = str(value or "").strip().lower()
@@ -912,7 +912,7 @@ def portal_post_delete(post_id: int):
 
 # BYS360_PORTAL_DELETE_ROUTE_DEDUPE_V2_10_2: duplicate portal_post_delete blocks removed safely
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ROUTE_AUTHORITY_HOTFIX_V3_HELPER
+# Compatibility guard.
 def _portal_press_news_admin_only(user) -> bool:
     if not user or not getattr(user, 'is_authenticated', False):
         return False

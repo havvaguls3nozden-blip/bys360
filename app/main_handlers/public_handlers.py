@@ -20,7 +20,7 @@ def index():
 
 
 def home():
-    # BYS360_PORTAL_PRESS_NEWS_HOME_HERO_CLEANUP_HOTFIX_V4_APPLIED
+    # Compatibility guard.
     context = build_home_page_context(current_user)
     # BYS360_CORPORATE_PORTAL_V1_HOME_CONTEXT
     context.update(portal_home_context(current_user))

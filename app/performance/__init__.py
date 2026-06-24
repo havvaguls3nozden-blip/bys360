@@ -64,7 +64,7 @@ OPTIONAL_ROUTE_MODULES = [
     "v2_1_1_rule_settings_routes",
     # Faz 8 - Performans Süreç Takibi route yüklemesi
     "process_engine_phase8_tracking_routes",
-    # BYS360_MEETING_DEVELOPMENT_OVERLAY_IMPORT
+    # Compatibility guard.
     "meeting_development_routes",
     # BYS360_MEETING_DEVELOPMENT_FAZ2_TEST_ROUTES_IMPORT
     "meeting_test_routes",

@@ -1250,7 +1250,7 @@ def _bys360_prev_mobile_performance_president_approvals_alias_v21748(user: User)
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_president_approvals_safe_fallback_v21749(user)
 
-def mobile_performance_president_approvals_alias(user: User):    # BYS360_SAFE_SMOKE_500_FIX_V2_17_48: wrapper keeps endpoint name and adds safe fallback for smoke-tested mobile GET.
+def mobile_performance_president_approvals_alias(user: User):  # compatibility guard
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_president_approvals_safe_fallback_v21749(user)
 
@@ -1289,7 +1289,7 @@ def _bys360_prev_mobile_performance_history_archive_v21748(user):
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_history_archive_safe_fallback_v21749(user)
 
-def mobile_performance_history_archive(user):    # BYS360_SAFE_SMOKE_500_FIX_V2_17_48: wrapper keeps endpoint name and adds safe fallback for smoke-tested mobile GET.
+def mobile_performance_history_archive(user):  # compatibility guard
     # BYS360 V2.17.49: 500 smoke fix - guvenli JSON fallback
     return _bys360_mobile_perf_history_archive_safe_fallback_v21749(user)
 
@@ -1667,7 +1667,7 @@ def mobile_performance_note_scorecard_v2863a(user: User):
 from app.api.mobile.performance_read_routes import register_mobile_performance_read_routes_v1 as _register_mobile_performance_read_routes_v1
 _register_mobile_performance_read_routes_v1(globals())
 
-# BYS360_SAFE_SMOKE_500_FIX_V2_17_48: safe JSON fallback helper for authenticated smoke endpoints.
+# Compatibility guard.
 def _bys360_safe_smoke_500_json_response_v21748(kind, exc=None):
     try:
         from flask import jsonify, current_app
@@ -1710,7 +1710,7 @@ def _bys360_safe_smoke_500_json_response_v21748(kind, exc=None):
         # Flask baglami disinda cagrilirsa bile fonksiyon patlamasin.
         return {"items": [], "metrics": [], "status": "safe_fallback", "kind": kind}, 200
 
-# BYS360_FORCE_SAFE_500_FALLBACK_V2_17_49
+# Compatibility guard.
 # Bu blok yalnizca mobil GET smoke testinde 500 veren iki endpoint icin guvenli JSON fallback saglar.
 def _bys360_mobile_perf_safe_json_response_v21749(payload, status=200):
     try:

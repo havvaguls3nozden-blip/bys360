@@ -727,7 +727,7 @@ def build_role_matrix_ui_context(active_group_key: str | None = None):
     return context
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_UI_END
 
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_BEGIN
+# Compatibility guard.
 # Ayarlar > Rol Matrisi ekranında Basında Tarihi Alan satırı görünür, fakat varsayılan yetki admin-only kalır.
 try:
     _BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROW = MatrixRow(
@@ -781,5 +781,5 @@ try:
     GROUPS = tuple(_patched_groups)
 except Exception:
     __import__("logging").getLogger(__name__).exception("Basında Tarihi Alan admin-only rol matrisi satırı uygulanamadı")
-# BYS360_PORTAL_PRESS_NEWS_ADMIN_ONLY_ROLE_MATRIX_HOTFIX_V1_END
+# Compatibility guard.
 

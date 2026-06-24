@@ -64,7 +64,7 @@ def dashboard_heavy_panels():
 
     try:
         html = cache_get_or_set(cache_key, _factory, ttl_seconds=45)
-    except Exception as exc:  # BYS360_V58_DASHBOARD_HEAVY_PANELS_SAFE_FALLBACK
+    except Exception as exc:  # compatibility guard
         current_app.logger.exception("Dashboard ek panelleri güvenli fallback ile açıldı: %s", exc)
         html = (
             '<section class="dashboard-card" style="padding:16px;border-radius:18px;background:#fff;border-left:6px solid #8B0000;box-shadow:0 12px 30px rgba(0,0,0,.06);">'

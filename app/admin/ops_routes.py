@@ -1204,7 +1204,7 @@ except Exception:
         return str(value or "Diğer").strip() or "Diğer"
 
 
-# BYS360_F821_CLEANUP_SAFE_V2: admin operation fallback helpers.
+# Compatibility guard.
 def ensure_not_self_target(actor_id, target_id, entity_label="kayıt"):
     if actor_id is not None and target_id is not None and str(actor_id) == str(target_id):
         raise ValueError(f"Kendi {entity_label} kaydınız üzerinde bu işlem yapılamaz.")

@@ -33,7 +33,7 @@ def enforce_first_login_security_flow():
 def settings_page():
     try:
         return _handlers.settings_page()
-    except Exception as exc:  # BYS360_V58_SETTINGS_SAFE_FALLBACK
+    except Exception as exc:  # compatibility guard
         current_app.logger.exception("Ayarlar sayfası güvenli fallback ile açıldı: %s", exc)
         return render_template_string(
             """

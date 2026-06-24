@@ -107,7 +107,7 @@ def _cic_phase6_template_quality(tasks: list[dict[str, Any]]) -> dict[str, Any]:
     return {"status": "ok" if problems == 0 else "warn", "label": "Şablonlar hazır" if problems == 0 else "Şablonları kontrol et", "items": items, "problem_count": problems}
 
 
-# BYS360_F821_CLEANUP_SAFE_V2: CIC template literal fallback bindings.
+# Compatibility guard.
 try:
     _cic_v40_previous_render_template_text
 except NameError:
