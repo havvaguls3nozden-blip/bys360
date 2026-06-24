@@ -1,0 +1,29 @@
+{
+  "package": "BYS360_PHASE2_AUTH_SUCCESS_FLOW_GATE_V1",
+  "generated_at": "2026-06-24T16:24:45",
+  "root": "C:\\bys360\\project",
+  "auth_success_flow_ok": true,
+  "steps": [
+    {
+      "name": "login_with_sicil",
+      "status_code": 200,
+      "has_access_token": true,
+      "has_refresh_token": true,
+      "ok": true
+    },
+    {
+      "name": "me_with_access_token",
+      "status_code": 200,
+      "source": "real_api",
+      "has_items": true,
+      "ok": true
+    },
+    {
+      "name": "refresh_with_refresh_token",
+      "status_code": 200,
+      "has_access_token": true,
+      "has_refresh_token": true,
+      "ok": true
+    }
+  ]
+}
