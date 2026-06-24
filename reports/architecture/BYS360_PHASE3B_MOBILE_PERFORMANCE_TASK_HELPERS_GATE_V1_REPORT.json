@@ -1,0 +1,49 @@
+{
+  "package": "BYS360_PHASE3B_MOBILE_PERFORMANCE_TASK_HELPERS_GATE_V1",
+  "generated_at": "2026-06-24T21:35:09",
+  "root": "C:\\bys360\\project",
+  "task_helpers_gate_ok": true,
+  "route_path": "app\\api\\mobile\\performance_routes.py",
+  "service_path": "app\\api\\mobile\\services\\performance_task_helpers.py",
+  "route_exists": true,
+  "service_exists": true,
+  "route_lines": 1469,
+  "service_lines": 133,
+  "route_decorator_count": 22,
+  "route_line_reduction_ok": true,
+  "route_import_ok": true,
+  "service_imports_ok": true,
+  "helper_presence": {
+    "_v2822_now": true,
+    "_v2822_due_label": true,
+    "_v2822_unit_name": true,
+    "_v2822_sicil": true,
+    "_v2822_level_label": true,
+    "_v2822_assignment_card": true,
+    "_v2822_can_view_assignment": true,
+    "_v2822_assignment_query": true,
+    "_v2822_open_query": true
+  },
+  "helper_removed_from_route": {
+    "_v2822_now": true,
+    "_v2822_due_label": true,
+    "_v2822_unit_name": true,
+    "_v2822_sicil": true,
+    "_v2822_level_label": true,
+    "_v2822_assignment_card": true,
+    "_v2822_can_view_assignment": true,
+    "_v2822_assignment_query": true,
+    "_v2822_open_query": true
+  },
+  "expected_helpers": [
+    "_v2822_now",
+    "_v2822_due_label",
+    "_v2822_unit_name",
+    "_v2822_sicil",
+    "_v2822_level_label",
+    "_v2822_assignment_card",
+    "_v2822_can_view_assignment",
+    "_v2822_assignment_query",
+    "_v2822_open_query"
+  ]
+}
