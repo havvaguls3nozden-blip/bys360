@@ -1,0 +1,135 @@
+{
+  "package": "BYS360_PHASE2_TEST_COVERAGE_EVIDENCE_GATE_V1",
+  "generated_at": "2026-06-24T17:34:18",
+  "root": "C:\\bys360\\project",
+  "evidence_gate_ok": true,
+  "git_clean_ok": true,
+  "required_files_ok": true,
+  "reports_ok": true,
+  "git_status": {
+    "cmd": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "returncode": 0,
+    "stdout": "M scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py",
+    "stderr": "",
+    "ok": true
+  },
+  "git_log": {
+    "cmd": [
+      "git",
+      "log",
+      "--oneline",
+      "-9"
+    ],
+    "returncode": 0,
+    "stdout": "0647aec test: add phase2 test coverage evidence gate\nacfc6ab test: add phase2 mobile role token matrix gate\nd41d6c2 test: align mobile auth guard matrix with push routes\n6a9369e test: add phase2 mobile auth success flow gate\n4f69f65 test: add phase2 mobile auth smoke gate\n3430fea test: add phase2 pytest invocation guard\n7ada4bd docs: refresh secure release preflight evidence\n81151b8 test: align mobile API contract gates with 28 routes\n7119f6f docs: add handover runbooks and quality gate entrypoint",
+    "stderr": "",
+    "ok": true
+  },
+  "required_files": [
+    {
+      "name": "phase2_pytest_runner",
+      "path": "scripts/windows/run_bys360_tests.ps1",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "phase2_pytest_invocation_contract",
+      "path": "tests/quality/test_phase2_pytest_invocation_contract_v1.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "phase2_auth_smoke_gate",
+      "path": "scripts/quality/bys360_phase2_auth_smoke_gate_v1.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "phase2_auth_success_flow_gate",
+      "path": "scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "phase2_role_token_matrix_gate",
+      "path": "scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "p4a_mobile_auth_guard_matrix",
+      "path": "scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    },
+    {
+      "name": "p2b_mobile_behavior_contract",
+      "path": "tests/architecture/test_mobile_api_behavior_smoke_p2b.py",
+      "exists": true,
+      "missing_tokens": [],
+      "ok": true
+    }
+  ],
+  "reports": [
+    {
+      "name": "phase2_auth_smoke_report",
+      "path": "reports/architecture/BYS360_PHASE2_AUTH_SMOKE_GATE_V1_REPORT.json",
+      "exists": true,
+      "boolean_results": {
+        "auth_smoke_ok": true
+      },
+      "empty_list_results": {},
+      "ok": true
+    },
+    {
+      "name": "phase2_auth_success_flow_report",
+      "path": "reports/architecture/BYS360_PHASE2_AUTH_SUCCESS_FLOW_GATE_V1_REPORT.json",
+      "exists": true,
+      "boolean_results": {
+        "auth_success_flow_ok": true
+      },
+      "empty_list_results": {},
+      "ok": true
+    },
+    {
+      "name": "phase2_role_token_matrix_report",
+      "path": "reports/architecture/BYS360_PHASE2_MOBILE_ROLE_TOKEN_MATRIX_GATE_V1_REPORT.json",
+      "exists": true,
+      "boolean_results": {
+        "role_token_matrix_ok": true,
+        "login_ok": true,
+        "role_identity_ok": true,
+        "matrix_route_ok": true
+      },
+      "empty_list_results": {
+        "failures": true
+      },
+      "ok": true
+    },
+    {
+      "name": "p4a_mobile_auth_guard_matrix_report",
+      "path": "reports/architecture/BYS360_MOBILE_AUTH_GUARD_MATRIX_GATE_P4A_REPORT.json",
+      "exists": true,
+      "boolean_results": {
+        "ok": true,
+        "direct_contract_ok": true,
+        "runtime_route_map_ok": true,
+        "auth_guard_matrix_ok": true,
+        "compile_ok": true,
+        "app_factory_ok": true
+      },
+      "empty_list_results": {},
+      "ok": true
+    }
+  ]
+}
