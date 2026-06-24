@@ -31,28 +31,26 @@ def _git(root: Path, *args: str) -> str:
     ).strip()
 
 
+def _to_git_path(value: str) -> str:
+    return value.strip().strip('"').replace(chr(92), "/").lower()
+
+
 def _clean_status_ignoring_generated_files(root: Path) -> dict[str, Any]:
     raw = _git(root, "status", "--short").splitlines()
     ignored_paths = {
-        str(REPORT_REL).replace("\", "/").lower(),
-        str(SCRIPT_REL).replace("\", "/").lower(),
+        _to_git_path(str(REPORT_REL)),
+        _to_git_path(str(SCRIPT_REL)),
     }
 
     meaningful = []
     ignored = []
 
     for line in raw:
-        raw_path = line[3:].strip().strip('"').replace("\", "/")
-        if " -> " in raw_path:
-            raw_path = raw_path.split(" -> ")[-1].strip().strip('"').replace("\", "/")
+        path = _to_git_path(line[3:])
+        if " -> " in path:
+            path = _to_git_path(path.split(" -> ")[-1])
 
-        normalized = raw_path.lower()
-
-        should_ignore = (
-            normalized in ignored_paths
-            or normalized.endswith(str(REPORT_REL).replace("\", "/").lower())
-            or normalized.endswith(str(SCRIPT_REL).replace("\", "/").lower())
-        )
+        should_ignore = path in ignored_paths or any(path.endswith(p) for p in ignored_paths)
 
         if should_ignore:
             ignored.append(line)
@@ -68,18 +66,18 @@ def _clean_status_ignoring_generated_files(root: Path) -> dict[str, Any]:
 
 
 def _parse_pytest_summary(output: str) -> dict[str, Any]:
-    # Handles:
-    # "13 passed, 800 skipped in 5.74s"
-    # "1 failed, 12 passed, 800 skipped in 10.20s"
-    summary_line = None
-    for line in reversed(output.splitlines()):
-        if " passed" in line or " skipped" in line or " failed" in line or " error" in line:
-            if " in " in line and "=" in line:
-                summary_line = line
-                break
+    summary_line = ""
 
-    if summary_line is None:
-        summary_line = ""
+    for line in reversed(output.splitlines()):
+        has_result_word = (
+            " passed" in line
+            or " skipped" in line
+            or " failed" in line
+            or " error" in line
+        )
+        if has_result_word and " in " in line and "=" in line:
+            summary_line = line
+            break
 
     body_match = re.search(r"=+\s*(.*?)\s+in\s+([0-9.]+)s\s*=+", summary_line)
     body = body_match.group(1) if body_match else ""
