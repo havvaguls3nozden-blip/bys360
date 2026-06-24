@@ -1,0 +1,490 @@
+{
+  "package": "BYS360_PHASE3C_PERFORMANCE_ROUTE_FUNCTION_INVENTORY_V1",
+  "generated_at": "2026-06-24T21:55:47",
+  "route_path": "app\\api\\mobile\\performance_routes.py",
+  "total_lines": 1466,
+  "route_function_count": 22,
+  "helper_like_function_count": 24,
+  "route_functions": [
+    {
+      "name": "mobile_performance_summary",
+      "start_line": 138,
+      "end_line": 141,
+      "line_count": 4,
+      "decorators": [
+        {
+          "line": 136,
+          "decorator": "@mobile_api_bp.get(\"/performance/summary\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_period_detail",
+      "start_line": 182,
+      "end_line": 185,
+      "line_count": 4,
+      "decorators": [
+        {
+          "line": 180,
+          "decorator": "@mobile_api_bp.get(\"/performance/periods/<int:period_id>\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_approvals",
+      "start_line": 234,
+      "end_line": 248,
+      "line_count": 15,
+      "decorators": [
+        {
+          "line": 232,
+          "decorator": "@mobile_api_bp.get(\"/performance/approvals\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_scorecards",
+      "start_line": 249,
+      "end_line": 256,
+      "line_count": 8,
+      "decorators": [
+        {
+          "line": 247,
+          "decorator": "@mobile_api_bp.get(\"/performance/scorecards\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_rules_summary",
+      "start_line": 257,
+      "end_line": 274,
+      "line_count": 18,
+      "decorators": [
+        {
+          "line": 255,
+          "decorator": "@mobile_api_bp.get(\"/performance/rules-summary\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_criteria",
+      "start_line": 275,
+      "end_line": 298,
+      "line_count": 24,
+      "decorators": [
+        {
+          "line": 273,
+          "decorator": "@mobile_api_bp.get(\"/performance/criteria\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_third_manager",
+      "start_line": 299,
+      "end_line": 346,
+      "line_count": 48,
+      "decorators": [
+        {
+          "line": 297,
+          "decorator": "@mobile_api_bp.get(\"/performance/third-manager\")"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_task_detail",
+      "start_line": 347,
+      "end_line": 380,
+      "line_count": 34,
+      "decorators": [
+        {
+          "line": 345,
+          "decorator": "@mobile_api_bp.get('/performance/tasks/<int:assignment_id>')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_task_score_form",
+      "start_line": 644,
+      "end_line": 652,
+      "line_count": 9,
+      "decorators": [
+        {
+          "line": 642,
+          "decorator": "@mobile_api_bp.get('/performance/tasks/<int:assignment_id>/score-form')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_task_score_submit",
+      "start_line": 653,
+      "end_line": 760,
+      "line_count": 108,
+      "decorators": [
+        {
+          "line": 651,
+          "decorator": "@mobile_api_bp.post('/performance/tasks/<int:assignment_id>/score-form')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_task_score_action",
+      "start_line": 761,
+      "end_line": 790,
+      "line_count": 30,
+      "decorators": [
+        {
+          "line": 759,
+          "decorator": "@mobile_api_bp.post('/performance/tasks/<int:assignment_id>/score-action')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_full_feature_summary",
+      "start_line": 919,
+      "end_line": 948,
+      "line_count": 30,
+      "decorators": [
+        {
+          "line": 917,
+          "decorator": "@mobile_api_bp.get('/performance/full-feature-summary')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_prev_mobile_performance_president_approvals_alias_v21748",
+      "start_line": 957,
+      "end_line": 960,
+      "line_count": 4,
+      "decorators": [
+        {
+          "line": 955,
+          "decorator": "@mobile_api_bp.get('/performance/president-approvals')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_publish_preapproval",
+      "start_line": 967,
+      "end_line": 989,
+      "line_count": 23,
+      "decorators": [
+        {
+          "line": 965,
+          "decorator": "@mobile_api_bp.get('/performance/publish-preapproval')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_prev_mobile_performance_history_archive_v21748",
+      "start_line": 996,
+      "end_line": 999,
+      "line_count": 4,
+      "decorators": [
+        {
+          "line": 994,
+          "decorator": "@mobile_api_bp.get('/performance/history-archive')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_in_period_notes",
+      "start_line": 1006,
+      "end_line": 1015,
+      "line_count": 10,
+      "decorators": [
+        {
+          "line": 1004,
+          "decorator": "@mobile_api_bp.get('/performance/in-period-notes')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_development_suggestions",
+      "start_line": 1044,
+      "end_line": 1047,
+      "line_count": 4,
+      "decorators": [
+        {
+          "line": 1042,
+          "decorator": "@mobile_api_bp.get('/performance/development-suggestions')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_reports",
+      "start_line": 1077,
+      "end_line": 1086,
+      "line_count": 10,
+      "decorators": [
+        {
+          "line": 1075,
+          "decorator": "@mobile_api_bp.get('/performance/reports')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_risk_analysis_v2852",
+      "start_line": 1087,
+      "end_line": 1109,
+      "line_count": 23,
+      "decorators": [
+        {
+          "line": 1085,
+          "decorator": "@mobile_api_bp.get('/performance/risk-analysis')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_in_period_notes_v2853",
+      "start_line": 1187,
+      "end_line": 1244,
+      "line_count": 58,
+      "decorators": [
+        {
+          "line": 1185,
+          "decorator": "@mobile_api_bp.get('/performance/in-period-notes/v2')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "mobile_performance_create_in_period_note_v2853",
+      "start_line": 1252,
+      "end_line": 1306,
+      "line_count": 55,
+      "decorators": [
+        {
+          "line": 1250,
+          "decorator": "@mobile_api_bp.post('/performance/in-period-notes/v2')"
+        }
+      ],
+      "is_route": true
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_note_scorecard_v2863a",
+      "start_line": 1307,
+      "end_line": 1366,
+      "line_count": 60,
+      "decorators": [
+        {
+          "line": 1305,
+          "decorator": "@mobile_api_bp.get('/performance/note-scorecard')"
+        }
+      ],
+      "is_route": true
+    }
+  ],
+  "helper_like_functions": [
+    {
+      "name": "_bys360_legacy__period_progress",
+      "start_line": 108,
+      "end_line": 137,
+      "line_count": 30,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_summary",
+      "start_line": 142,
+      "end_line": 181,
+      "line_count": 40,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_period_detail",
+      "start_line": 186,
+      "end_line": 233,
+      "line_count": 48,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2835_score_form_payload",
+      "start_line": 456,
+      "end_line": 516,
+      "line_count": 61,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2837_find_return_target",
+      "start_line": 530,
+      "end_line": 544,
+      "line_count": 15,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2837_action_capabilities",
+      "start_line": 550,
+      "end_line": 565,
+      "line_count": 16,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2837_withdraw_assignment",
+      "start_line": 581,
+      "end_line": 598,
+      "line_count": 18,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2837_return_assignment",
+      "start_line": 604,
+      "end_line": 636,
+      "line_count": 33,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_full_feature_summary",
+      "start_line": 949,
+      "end_line": 956,
+      "line_count": 8,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_president_approvals_alias",
+      "start_line": 961,
+      "end_line": 966,
+      "line_count": 6,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_history_archive",
+      "start_line": 990,
+      "end_line": 995,
+      "line_count": 6,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_history_archive",
+      "start_line": 1000,
+      "end_line": 1005,
+      "line_count": 6,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_in_period_notes",
+      "start_line": 1016,
+      "end_line": 1019,
+      "line_count": 4,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_development_suggestions",
+      "start_line": 1020,
+      "end_line": 1043,
+      "line_count": 24,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_reports",
+      "start_line": 1048,
+      "end_line": 1076,
+      "line_count": 29,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_risk_analysis_v2852",
+      "start_line": 1110,
+      "end_line": 1117,
+      "line_count": 8,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2853_note_bool",
+      "start_line": 1118,
+      "end_line": 1124,
+      "line_count": 7,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_legacy__v2853_note_type_label",
+      "start_line": 1169,
+      "end_line": 1179,
+      "line_count": 11,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_in_period_notes_v2853",
+      "start_line": 1245,
+      "end_line": 1251,
+      "line_count": 7,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "mobile_performance_note_scorecard_v2863a",
+      "start_line": 1367,
+      "end_line": 1378,
+      "line_count": 12,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_safe_smoke_500_json_response_v21748",
+      "start_line": 1379,
+      "end_line": 1422,
+      "line_count": 44,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_mobile_perf_safe_json_response_v21749",
+      "start_line": 1423,
+      "end_line": 1431,
+      "line_count": 9,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_mobile_perf_president_approvals_safe_fallback_v21749",
+      "start_line": 1432,
+      "end_line": 1449,
+      "line_count": 18,
+      "decorators": [],
+      "is_route": false
+    },
+    {
+      "name": "_bys360_mobile_perf_history_archive_safe_fallback_v21749",
+      "start_line": 1450,
+      "end_line": 1466,
+      "line_count": 17,
+      "decorators": [],
+      "is_route": false
+    }
+  ]
+}
