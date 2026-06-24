@@ -55,5 +55,5 @@ def health_deep():
         "service": "BYS360",
         "timestamp": int(time.time()),
         "checks": checks,
-        "marker": "BYS360_CLAUDE_ROADMAP_PHASE5_HEALTHCHECK_SYNTAX_OK",
+        "marker": "BYS360_MAINTENANCE_ROADMAP_PHASE5_HEALTHCHECK_SYNTAX_OK",
     }), 200 if overall_ok else 503

@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P0F_SECRET_GATE_FINAL_V1"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P0F_SECRET_GATE_FINAL_V1"
 
 
 def compile_file(path: Path) -> bool:

@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P4B_MOBILE_ROLE_BOUNDARY_MATRIX_GATE_V3"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4B_MOBILE_ROLE_BOUNDARY_MATRIX_GATE_V3"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_ROLE_BOUNDARY_MATRIX_GATE_P4B_V3_REPORT.json")
 ACTIVE_TEST_FILE = "test_mobile_api_role_boundary_matrix_p4b_v3.py"
 OLD_ACTIVE_TEST_FILES = ["test_mobile_api_role_boundary_matrix_p4b.py", "test_mobile_api_role_boundary_matrix_p4b_v2.py"]

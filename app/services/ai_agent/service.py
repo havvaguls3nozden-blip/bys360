@@ -1264,13 +1264,13 @@ def build_ai_agent_reply(user, question):
 
 
 # BYS360_ASSISTANT_ASSISTANT_LIKE_V31_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_CHATGPT_LIKE_V31 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31 = globals().get("build_ai_agent_reply")
 
 def build_ai_agent_reply(user, question, context=None):
     # V31.2 final answer bridge: server-first, BYS360-only, home/dashboard ayrımı korunur.
     try:
         from .assistant_chatgpt_like_v31 import build_bys360_assistant_chatgpt_like_reply_v31
-        previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_CHATGPT_LIKE_V31
+        previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31
         if previous is build_ai_agent_reply:
             previous = None
         return build_bys360_assistant_chatgpt_like_reply_v31(
@@ -1280,14 +1280,14 @@ def build_ai_agent_reply(user, question, context=None):
             context=context if isinstance(context, dict) else None,
         )
     except Exception:
-        if callable(_BYS360_ASSISTANT_PREV_BUILD_REPLY_CHATGPT_LIKE_V31):
+        if callable(_BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31):
             try:
-                return _BYS360_ASSISTANT_PREV_BUILD_REPLY_CHATGPT_LIKE_V31(user, question)
+                return _BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31(user, question)
             except Exception:
                 __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/ai_agent/service.py)")
         return {
             "ok": True,
-            "marker": "BYS360_ASSISTANT_CHATGPT_LIKE_V31_SAFE_FALLBACK",
+            "marker": "BYS360_ASSISTANT_ASSISTANT_LIKE_V31_SAFE_FALLBACK",
             "answer": "BYS360 Asistanı şu anda sorunuzu güvenli modda yorumluyor. Lütfen yapmak istediğiniz işlemi yazın; personel, performans, rol matrisi, karne, anket, destek veya AI karar destek başlıklarında yönlendirme sağlayabilirim.",
         }
 # BYS360_ASSISTANT_ASSISTANT_LIKE_V31_END

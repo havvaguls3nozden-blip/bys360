@@ -81,7 +81,7 @@ def _infer_scenario(*, prompt_version: str | None, system_prompt: str, user_prom
         hints.update(NEW_SCENARIO_HINTS)
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
     for key, tokens in hints.items():
         if all(token in joined for token in tokens):
             return key
@@ -98,7 +98,7 @@ def _extract_payload(user_prompt: str) -> Any:
             return ast.literal_eval(candidate)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
     start = text.find("[")
     end = text.rfind("]")
     if 0 <= start < end:
@@ -107,7 +107,7 @@ def _extract_payload(user_prompt: str) -> Any:
             return ast.literal_eval(candidate)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
     return {}
 
 
@@ -379,4 +379,4 @@ try:
     _SCENARIO_BUILDERS.update(NEW_SCENARIO_BUILDERS)
 except Exception:
     import logging
-    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")
+    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/stub_engine.py")

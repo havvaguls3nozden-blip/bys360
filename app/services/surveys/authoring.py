@@ -18,7 +18,7 @@ def _rollback_session() -> None:
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/authoring.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/authoring.py")
 def survey_question_attr(question: Any, attr_name: str, default: Any = None) -> Any:
     """Faz 2 soru alanları yoksa eski canlı şemayla uyumlu değer döndürür."""
     try:

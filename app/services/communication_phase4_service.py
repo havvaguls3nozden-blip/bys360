@@ -214,7 +214,7 @@ def executive_summary_snapshot(days: int = 30) -> dict[str, Any]:
         critical_unread = _query_count(Notification.query.filter_by(is_read=False, priority="critical"))
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase4_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase4_service.py")
     bulletin_published = [row for row in bulletins if safe_str(getattr(row, "status", "")).lower() in BULLETIN_PUBLISHED_STATUSES]
     bulletin_receipts = 0
     bulletin_reads = 0

@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P2D_PYTEST_STANDARD_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P2D_PYTEST_STANDARD_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_PYTEST_STANDARD_GATE_P2D_REPORT.json")
 
 DEV_REQUIREMENTS = [

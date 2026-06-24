@@ -242,7 +242,7 @@ def _scope_context_employee_ids(user: Any) -> set[int]:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/completion_phase3_visibility_scope.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/completion_phase3_visibility_scope.py")
     user_id = _safe_int(getattr(user, "id", None))
     return {user_id} if user_id is not None else set()
 
@@ -351,7 +351,7 @@ def phase3_denied_response(message: str | None = None, *, status_code: int = 403
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/completion_phase3_visibility_scope.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/completion_phase3_visibility_scope.py")
     return (
         """
         <html>

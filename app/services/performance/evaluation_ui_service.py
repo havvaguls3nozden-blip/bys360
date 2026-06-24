@@ -361,7 +361,7 @@ def build_scorecard_detail_context(*, evaluation, actor, selected_scope=None, se
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/evaluation_ui_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/evaluation_ui_service.py")
     return {
         "scope_ctx": scope_ctx,
         "allowed_employee_ids": allowed_employee_ids,

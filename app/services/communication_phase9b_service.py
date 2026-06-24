@@ -144,25 +144,25 @@ def _data_quality_summary() -> dict[str, Any]:
             summary['inactive_total'] = query.filter_by(is_active=False).count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
     try:
         if MenuPermission is not None:
             summary['custom_permission_total'] = MenuPermission.query.count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
     try:
         if AuditLog is not None:
             summary['audit_log_total'] = AuditLog.query.count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
     try:
         if ImportLog is not None:
             summary['import_log_total'] = ImportLog.query.count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9b_service.py")
     return summary
 
 

@@ -51,7 +51,7 @@ def record_security_event(
                 payload.setdefault("actor", {"user_id": getattr(current_user, "id", None), "role": getattr(current_user, "role", None)})
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
         audit = write_audit_log(
             action=action,
             entity_type=entity_type,
@@ -68,10 +68,10 @@ def record_security_event(
             db.session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
         try:
             current_app.logger.warning("Audit log yazilamadi | action=%s | hata=%s", action, exc)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/audit_event_service.py")
         return None

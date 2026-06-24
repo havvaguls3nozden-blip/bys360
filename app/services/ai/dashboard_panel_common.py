@@ -163,7 +163,7 @@ def _safe_url_for(endpoint: str, **values: Any) -> str | None:
             current_app.logger.warning("AI dashboard link uretilemedi: %s", endpoint)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_common.py")
         return None
     except Exception as exc:
         try:
@@ -175,7 +175,7 @@ def _safe_url_for(endpoint: str, **values: Any) -> str | None:
             )
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_common.py")
         return None
 
 

@@ -33,21 +33,21 @@ def _reset(reset_callback: ResetCallback | None = None) -> None:
             return
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
     try:
         from app.extensions import db
 
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
 def _log(label: str, exc: BaseException, log_callback: LogCallback | None = None) -> None:
     if log_callback is not None:
         try:
             log_callback(label, exc)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/targets.py")
 def user_item(user: Any) -> dict[str, Any]:
     """Canlı route/template sözleşmesiyle uyumlu kullanıcı etiketi üretir."""
     full_name = safe_text(getattr(user, "full_name", None))

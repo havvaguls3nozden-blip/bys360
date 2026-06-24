@@ -170,10 +170,10 @@ RELEASE_EVIDENCE_CONTRACTS: Final[tuple[ReleaseEvidenceContract, ...]] = (
     ),
     ReleaseEvidenceContract(
         key="claude_scorecard_gate",
-        title="Claude 10/10 kalite kapısı",
+        title="Maintenance 10/10 kalite kapısı",
         required_paths=("scripts/check_claude_10_10_gate.py", "scripts/cleanup_claude_release_artifacts.py"),
         forbidden_release_paths=(".pytest_runtime/", "*.pyc", "*.pyo"),
-        result_marker="CLAUDE_10_10_GATE_OK",
+        result_marker="QUALITY_GATE_OK",
     ),
     ReleaseEvidenceContract(
         key="core_refactor_final_chain",

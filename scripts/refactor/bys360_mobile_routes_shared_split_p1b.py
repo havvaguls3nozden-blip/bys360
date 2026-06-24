@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P1B_MOBILE_ROUTES_SHARED_SPLIT"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P1B_MOBILE_ROUTES_SHARED_SPLIT"
 MARKER = "# BYS360_P1B_MOBILE_ROUTES_SHARED_SPLIT"
 ROUTE_DECORATOR_RE = re.compile(r"^\s*@mobile_api_bp\.(route|get|post|put|patch|delete)\s*\(", re.M)
 ROUTE_COUNT_RE = re.compile(r"^\s*@mobile_api_bp\.(route|get|post|put|patch|delete)\s*\(", re.M)

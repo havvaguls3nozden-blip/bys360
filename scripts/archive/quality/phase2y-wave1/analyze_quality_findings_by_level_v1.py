@@ -144,7 +144,7 @@ def main() -> int:
         "DUPLICATE",
         "HARDCODED",
         "PLACEHOLDER",
-        "CLAUDE",
+        "MAINTENANCE",
         "PASS",
         "BROAD_EXCEPT",
         "EXCEPT",

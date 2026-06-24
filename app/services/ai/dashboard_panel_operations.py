@@ -198,11 +198,11 @@ def build_dashboard_ai_operations_bridge(*, can_view_admin_ai: bool = False) -> 
             db.session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_operations.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_operations.py")
         try:
             current_app.logger.warning("AI dashboard bridge devre disi birakildi: %s", exc, exc_info=True)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_operations.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/dashboard_panel_operations.py")
         return None
 

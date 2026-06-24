@@ -1,7 +1,7 @@
-"""BYS360 Claude Faz 7 final canlı kalite sözleşmeleri.
+"""BYS360 Maintenance Faz 7 final canlı kalite sözleşmeleri.
 
 Bu modül runtime davranışını değiştirmez. Amaç, canlıya kalan omurganın ve
-Claude Faz 1-6 refactor/guard zincirinin tek yerde izlenebilmesini sağlamaktır.
+Maintenance Faz 1-6 refactor/guard zincirinin tek yerde izlenebilmesini sağlamaktır.
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from typing import Final
 
 @dataclass(frozen=True)
 class GateScript:
-    """Önceki Claude fazlarının beklenen kalite kapısı."""
+    """Önceki Maintenance fazlarının beklenen kalite kapısı."""
 
     phase: str
     path: str
@@ -118,7 +118,7 @@ FINAL_GATE_REQUIRED_PATHS: Final[tuple[str, ...]] = (
     "app/services/query_health/static_query_guard.py",
 )
 
-PREVIOUS_CLAUDE_GATES: Final[tuple[GateScript, ...]] = (
+PREVIOUS_QUALITY_GATES: Final[tuple[GateScript, ...]] = (
     GateScript("Faz 1", "scripts/quality/check_claude_review_gate.py"),
     GateScript("Faz 2.5", "scripts/quality/check_app_factory_phase2_5_final_gate.py"),
     GateScript("Faz 3", "scripts/quality/check_settings_service_phase3_gate.py"),

@@ -233,7 +233,7 @@ try:
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     import logging
-    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/performance_rule_settings.py")
+    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/performance_rule_settings.py")
 try:
     _PHASE4_1_THIRD_SUPERVISOR_SETTINGS = (
         PerformanceRuleSetting(
@@ -282,4 +282,4 @@ try:
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     import logging
-    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/performance_rule_settings.py")
+    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/performance_rule_settings.py")

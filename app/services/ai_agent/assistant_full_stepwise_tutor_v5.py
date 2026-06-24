@@ -8,7 +8,7 @@ import re
 
 ASSISTANT_NAME = "BYS360 Asistanı"
 VERSION = "BYS360 Asistanı Tam Öğretici Rehber Motoru V5"
-MODE = "ChatGPT benzeri doğal dil anlama; yalnızca BYS360 sınırlarında adım adım güvenli yönlendirme"
+MODE = "Assistant benzeri doğal dil anlama; yalnızca BYS360 sınırlarında adım adım güvenli yönlendirme"
 SAFETY_NOTICE = (
     "BYS360 Asistanı idari karar üretmez, performans puanı belirlemez, onay/ret işlemi yapmaz, "
     "mesaj/anket/amir görüşü gibi hassas içerikleri dökmez ve yetki dışı veri göstermez."
@@ -140,7 +140,7 @@ GUIDES: list[Guide] = [
             "Takıldığınız yerde aynı konuşmada 'sonra ne yapacağım?' diye sorabilirsiniz.",
         ],
         attention=[
-            "BYS360 Asistanı ChatGPT gibi doğal dili anlar; ancak yalnızca BYS360 işlemlerinde rehberlik eder.",
+            "BYS360 Asistanı Assistant gibi doğal dili anlar; ancak yalnızca BYS360 işlemlerinde rehberlik eder.",
             "İdari karar, performans puanı, onay/ret, mesaj içeriği ve anket cevabı üretmez/göstermez.",
         ],
         checks=["Ana sayfada rolünüze uygun menüler görünmelidir.", "Görünmeyen menüler için rol matrisi ve kişi/birim bazlı yetkiler kontrol edilmelidir."],

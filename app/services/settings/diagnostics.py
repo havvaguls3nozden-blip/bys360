@@ -41,7 +41,7 @@ def _safe_rollback() -> None:
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/diagnostics.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/diagnostics.py")
 def _table_exists(table_name: str) -> bool:
     try:
         return bool(inspect(db.engine).has_table(table_name))

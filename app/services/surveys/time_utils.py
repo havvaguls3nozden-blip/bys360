@@ -23,7 +23,7 @@ def survey_local_now() -> _dt.datetime:
             return _dt.datetime.now(_ZoneInfo("Europe/Istanbul")).replace(tzinfo=None)
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/time_utils.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/time_utils.py")
     return utc_now() + _dt.timedelta(hours=3)
 
 

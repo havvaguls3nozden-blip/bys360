@@ -16,7 +16,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P5C_ANDROID_RESPONSIVE_TARGETED_TEMPLATES_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P5C_ANDROID_RESPONSIVE_TARGETED_TEMPLATES_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_ANDROID_RESPONSIVE_TARGETED_TEMPLATES_GATE_P5C_REPORT.json")
 CSS_REL = Path("app/static/css/bys360_android_responsive_targeted_p5c.css")
 BASE_REL = Path("app/templates/base.html")

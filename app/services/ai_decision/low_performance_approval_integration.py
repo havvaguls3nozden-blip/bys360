@@ -58,7 +58,7 @@ def _period_year(evaluation: Any) -> int | None:
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/low_performance_approval_integration.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/low_performance_approval_integration.py")
         start = safe_attr(source, "start_date", "date_start", default=None)
         if start:
             if isinstance(start, (date, datetime)):
@@ -68,7 +68,7 @@ def _period_year(evaluation: Any) -> int | None:
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/low_performance_approval_integration.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/low_performance_approval_integration.py")
     return None
 
 

@@ -88,7 +88,7 @@ def _user_name(user: Any) -> str:
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/hierarchy_stable.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/hierarchy_stable.py")
         elif value:
             return _safe_str(value)
     return f"{_safe_str(getattr(user, 'ad', ''))} {_safe_str(getattr(user, 'soyad', ''))}".strip()
@@ -107,7 +107,7 @@ def _log(level: str, message: str):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/hierarchy_stable.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/hierarchy_stable.py")
 def fetch_active_users() -> List[Any]:
     if not User:
         return []

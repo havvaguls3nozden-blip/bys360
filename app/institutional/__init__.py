@@ -1,6 +1,6 @@
 """Institutional live-core route package.
 
-BYS360 Claude v13 P0 canlı kapısı kapsamında birim/pozisyon ve personel özlük
+BYS360 Maintenance v13 P0 canlı kapısı kapsamında birim/pozisyon ve personel özlük
 route aileleri paket importunda açıkça yüklenir. Kapsam dışı eğitim/strateji/
 portal/repository route aileleri burada çağrılmaz.
 """

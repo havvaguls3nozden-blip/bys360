@@ -168,7 +168,7 @@ def _user_name(user_id: Any) -> str:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/president_card_review_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/president_card_review_service.py")
         return "-"
 
     if not row:
@@ -487,7 +487,7 @@ def _criteria_scorecard(evaluation_id: int | None) -> list[dict[str, Any]]:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/president_card_review_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/president_card_review_service.py")
         return []
 
     grouped: dict[str, dict[str, Any]] = {}

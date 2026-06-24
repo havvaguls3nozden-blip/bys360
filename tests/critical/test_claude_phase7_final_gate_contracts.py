@@ -6,7 +6,7 @@ def test_phase7_contract_module_is_complete():
         FINAL_GATE_REQUIRED_PATHS,
         LIVE_CORE_TABLES,
         LIVE_MODULE_FAMILIES,
-        PREVIOUS_CLAUDE_GATES,
+        PREVIOUS_QUALITY_GATES,
     )
 
     assert "users" in LIVE_CORE_TABLES
@@ -17,7 +17,7 @@ def test_phase7_contract_module_is_complete():
     assert "ai_karar_destek" in LIVE_MODULE_FAMILIES
     assert "app/error_handlers.py" in FINAL_GATE_REQUIRED_PATHS
     assert "app/services/settings/catalog.py" in FINAL_GATE_REQUIRED_PATHS
-    assert any(gate.phase == "Faz 6" for gate in PREVIOUS_CLAUDE_GATES)
+    assert any(gate.phase == "Faz 6" for gate in PREVIOUS_QUALITY_GATES)
 
 
 def test_phase7_quality_script_exists():

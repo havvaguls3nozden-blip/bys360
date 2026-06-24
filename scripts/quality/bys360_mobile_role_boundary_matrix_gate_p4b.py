@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P4B_MOBILE_ROLE_BOUNDARY_MATRIX_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4B_MOBILE_ROLE_BOUNDARY_MATRIX_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_ROLE_BOUNDARY_MATRIX_GATE_P4B_REPORT.json")
 ACTIVE_TEST_FILE = "test_mobile_api_role_boundary_matrix_p4b.py"
 

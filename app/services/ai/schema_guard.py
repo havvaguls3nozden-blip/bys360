@@ -137,7 +137,7 @@ def get_ai_schema_status() -> dict[str, object]:
             db.session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/schema_guard.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/schema_guard.py")
         status.update(
             {
                 "ready": False,

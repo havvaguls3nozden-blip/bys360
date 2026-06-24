@@ -161,7 +161,7 @@ def get_json(key: str) -> Any | None:
             return json.loads(raw) if raw else None
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
     file_key = _safe_file_key(raw_key)
     result = _with_file(lambda payload: deepcopy(payload.get(file_key, {}).get("value")) if isinstance(payload.get(file_key), dict) else None)
     if result is not None:
@@ -188,7 +188,7 @@ def set_json(key: str, value: Any, ttl_seconds: int = 60) -> bool:
             return True
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
     file_key = _safe_file_key(raw_key)
     def mutator(payload):
         payload[file_key] = {"key": raw_key, "expires_at": time.time() + ttl, "value": deepcopy(value)}
@@ -217,7 +217,7 @@ def delete_prefix(prefix: str) -> int:
                     break
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/shared_cache_store.py")
     def mutator(payload):
         count = 0
         for file_key, row in list(payload.items()):

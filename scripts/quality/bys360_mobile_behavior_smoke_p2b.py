@@ -12,7 +12,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Any, Dict, List, Tuple
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P2B_MOBILE_BEHAVIOR_SMOKE_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P2B_MOBILE_BEHAVIOR_SMOKE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_BEHAVIOR_SMOKE_GATE_P2B_REPORT.json")
 TEST_REL = Path("tests/architecture/test_mobile_api_behavior_smoke_p2b.py")
 

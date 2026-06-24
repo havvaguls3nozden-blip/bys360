@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P1F_MOBILE_DOMAIN_SMOKE_CONTRACT"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P1F_MOBILE_DOMAIN_SMOKE_CONTRACT"
 ROUTE_DECORATOR_RE = re.compile(r"^\s*@mobile_api_bp\.(route|get|post|put|patch|delete)\s*\(", re.M)
 ROUTE_RULE_RE = re.compile(r"^\s*@mobile_api_bp\.(?:route|get|post|put|patch|delete)\s*\(([^\n]*)", re.M)
 FUNC_RE = re.compile(r"^def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", re.M)

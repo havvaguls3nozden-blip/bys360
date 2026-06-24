@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """BYS360 geri bildirim süreç hattı durum makinesi.
 
-Claude'un orta/uzun vadeli önerisindeki P0 -> P1 -> P2 -> P3 -> P4 -> Final
+Maintenance'un orta/uzun vadeli önerisindeki P0 -> P1 -> P2 -> P3 -> P4 -> Final
 sıralamasını tek merkezde tutar. Bu servis idari karar üretmez; yalnızca
 adım sırası, atlama kontrolü ve kurumsal durum etiketlerini sağlar.
 
@@ -129,7 +129,7 @@ def _tables_available() -> bool:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/feedback_process_state_machine.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/feedback_process_state_machine.py")
         return False
 
 

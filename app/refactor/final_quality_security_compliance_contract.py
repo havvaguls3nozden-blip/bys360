@@ -160,10 +160,10 @@ SECURITY_AUDIT_EVIDENCE: Final[tuple[SecurityAuditEvidence, ...]] = (
     ),
     SecurityAuditEvidence(
         key="claude_quality_gate",
-        title="Claude 10/10 kalite gate",
+        title="Maintenance 10/10 kalite gate",
         required_paths=("scripts/check_claude_10_10_gate.py", "scripts/cleanup_claude_release_artifacts.py"),
-        required_markers=("CLAUDE_10_10_GATE_OK",),
-        release_gate_marker="CLAUDE_10_10_GATE_OK",
+        required_markers=("QUALITY_GATE_OK",),
+        release_gate_marker="QUALITY_GATE_OK",
     ),
     SecurityAuditEvidence(
         key="final_quality_faz3_backbone",

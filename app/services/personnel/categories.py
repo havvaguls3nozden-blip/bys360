@@ -95,7 +95,7 @@ def get_personnel_category_options(db_session: Any | None = None) -> list[str]:
                 return labels
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/personnel/categories.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/personnel/categories.py")
     return list(PERSONNEL_CATEGORY_DEFAULTS)
 
 

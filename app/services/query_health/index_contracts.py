@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""BYS360 Claude Faz 6 - SQL / performans indeks sozlesmeleri.
+"""BYS360 Maintenance Faz 6 - SQL / performans indeks sozlesmeleri.
 
 Bu modul veritabaninda otomatik DDL calistirmaz. Canli omurgadaki yogun
 okuma/yazma yuzeyleri icin onerilen indeksleri merkezi katalogda tutar ve
@@ -114,7 +114,7 @@ def iter_recommended_indexes(module: str | None = None) -> Iterable[RecommendedI
 
 def build_postgresql_index_sql(*, concurrently: bool = False) -> str:
     header = [
-        "-- BYS360 Claude Faz 6 - onerilen indeksler",
+        "-- BYS360 Maintenance Faz 6 - onerilen indeksler",
         "-- Otomatik calistirilmaz. Canli DB icin once yedek + DBA/Admin kontrolu onerilir.",
         "-- CREATE INDEX CONCURRENTLY kullanilacaksa transaction icinde calistirmayin.",
         "",

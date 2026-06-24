@@ -11,7 +11,7 @@ EXCLUDED_DIRS = {
     ".git", ".venv", "venv", "__pycache__", ".pytest_cache", "node_modules",
     "dist", "build", "backups", "backup", ".mypy_cache", ".ruff_cache",
 }
-COMMENT_MARKERS = ("BYS360_CLAUDE_", "Claude", "CLAUDE_")
+COMMENT_MARKERS = ("BYS360_MAINTENANCE_", "Maintenance", "MAINTENANCE_")
 TECHNICAL_UI_TERMS = (
     "workflow state", "authorized_scope", "phase sync", "Faz 3 senkronu", "endpoint", "raw error",
     "traceback", "exception", "debug", "unauthorized_scope",
@@ -84,7 +84,7 @@ def scan_comments(root: Path, findings: list[Finding]) -> None:
         text = p.read_text(encoding="utf-8", errors="ignore")
         for i, line in enumerate(text.splitlines(), start=1):
             if any(marker in line for marker in COMMENT_MARKERS):
-                findings.append(Finding("P2", "CLAUDE_OR_DEV_MARKER", rel(root, p), "Geliştirme/Claude etiketi ADR veya changelog'a taşınmalı.", i))
+                findings.append(Finding("P2", "MAINTENANCE_OR_DEV_MARKER", rel(root, p), "Geliştirme/Maintenance etiketi ADR veya changelog'a taşınmalı.", i))
 
 
 def scan_technical_ui_terms(root: Path, findings: list[Finding]) -> None:

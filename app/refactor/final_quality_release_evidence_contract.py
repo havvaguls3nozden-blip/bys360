@@ -129,15 +129,15 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
     ),
     ReleaseEvidenceItem(
         key="claude_10_10_gate",
-        title="Claude 10/10 kalite gate",
+        title="Maintenance 10/10 kalite gate",
         category="quality_gate",
         required_paths=(
             "scripts/check_claude_10_10_gate.py",
             "scripts/cleanup_claude_release_artifacts.py",
         ),
-        command_markers=("CLAUDE_10_10_GATE_OK",),
+        command_markers=("QUALITY_GATE_OK",),
         evidence_outputs=("reports/refactor/",),
-        release_value="Claude değerlendirmesinde tekrar eden paket/artefakt eksikleri yakalanır.",
+        release_value="Maintenance değerlendirmesinde tekrar eden paket/artefakt eksikleri yakalanır.",
     ),
 )
 
@@ -210,7 +210,7 @@ def get_final_quality_faz5_summary() -> dict[str, object]:
             "FINAL_QUALITY_FAZ5_GATE_OK",
             "FINAL_QUALITY_FAZ5_RELEASE_EVIDENCE_OK",
             "CLEAN_LIVE_RELEASE_GATE_OK",
-            "CLAUDE_10_10_GATE_OK",
+            "QUALITY_GATE_OK",
         ),
         "runtime_mutation": False,
         "database_migration": False,

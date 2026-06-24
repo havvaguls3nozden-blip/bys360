@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BYS360 Claude 10E - Geçmiş karne arşivi görünürlük sözleşmesi."""
+"""BYS360 Maintenance 10E - Geçmiş karne arşivi görünürlük sözleşmesi."""
 from __future__ import annotations
 
 from types import SimpleNamespace

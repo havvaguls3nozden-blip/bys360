@@ -2,7 +2,7 @@
 """BYS360 Anasayfa Prestij SAFE V1A geri alma aracı.
 
 Amaç:
-- Claude/Prestij SAFE V1/V1A tasarım kaplamasını kaldırmak.
+- Maintenance/Prestij SAFE V1/V1A tasarım kaplamasını kaldırmak.
 - Mevcut home.html omurgasını, portal sekmelerini, hava durumu, feed ve diğer alanları korumak.
 - Yalnızca home.html içindeki prestij CSS/JS bağlantı bloklarını kaldırmak.
 - Uygulamadan önce otomatik yedek almak.

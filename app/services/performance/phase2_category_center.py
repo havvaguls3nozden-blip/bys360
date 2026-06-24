@@ -267,7 +267,7 @@ def build_category_average_summary_for_users(*args: Any, **kwargs: Any) -> dict[
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/phase2_category_center.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/phase2_category_center.py")
     items = args[0] if args else kwargs.get("items") or []
     label = kwargs.get("selected_category") or kwargs.get("category_label") or kwargs.get("personnel_category")
     return category_average_without_person_detail(items, label)

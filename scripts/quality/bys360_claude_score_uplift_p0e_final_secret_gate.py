@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P0E_FINAL_SECRET_GATE_V1"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P0E_FINAL_SECRET_GATE_V1"
 
 GATE_CODE = r'''from __future__ import annotations
 

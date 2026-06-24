@@ -276,7 +276,7 @@ def _category_catalog() -> list[dict[str, Any]]:
                 return payload
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/hr_operations_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/hr_operations_service.py")
     return sorted(defaults.values(), key=lambda item: (int(item.get("sort_order") or 0), str(item.get("label") or "").lower()))
 
 

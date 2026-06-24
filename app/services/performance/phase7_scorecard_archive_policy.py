@@ -104,7 +104,7 @@ def _role_names(user: Any) -> set[str]:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/phase7_scorecard_archive_policy.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/phase7_scorecard_archive_policy.py")
     return names
 
 

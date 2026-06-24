@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BYS360 Claude 10E - SP servis unit testleri."""
+"""BYS360 Maintenance 10E - SP servis unit testleri."""
 from __future__ import annotations
 
 from decimal import Decimal

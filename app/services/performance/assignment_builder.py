@@ -39,7 +39,7 @@ def build_assignments(period_id:int, chains:List[Dict[str,Any]]):
                 except Exception:
                     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                     import logging
-                    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/assignment_builder.py")
+                    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/assignment_builder.py")
             key = build_assignment_key(period_id, emp, evaluator, level)
             if not prevent_duplicate_assignment(existing_keys, key):
                 continue

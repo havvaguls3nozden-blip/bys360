@@ -118,4 +118,4 @@ def test_phase5_quality_gate_exists():
     source = gate.read_text(encoding="utf-8")
     assert "LIVE_CONTRACTS" in source
     assert "CRITICAL_TEST_PATTERNS" in source
-    assert "BYS360 Claude Faz 5" in source
+    assert "BYS360 Maintenance Faz 5" in source

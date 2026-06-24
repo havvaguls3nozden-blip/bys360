@@ -138,7 +138,7 @@ def _legacy_assignment_unit_summary(
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_service.py")
     return result
 
 

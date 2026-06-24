@@ -291,7 +291,7 @@ def get_period_level_3_flags(
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     if not enabled:
         mode = "off"
         scoring_enabled = False
@@ -436,7 +436,7 @@ def get_president_user(users_by_sicil=None):
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     """
     Geriye dönük uyumluluk hotfix'i.
     Bazı modüller app.services.performance.common içinden bu fonksiyonu bekliyor.
@@ -467,7 +467,7 @@ def get_president_user(users_by_sicil=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     for attr in ("title", "unvan", "position", "job_title"):
         try:
             column = getattr(User, attr)
@@ -480,7 +480,7 @@ def get_president_user(users_by_sicil=None):
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     for rel_name in ("organization_unit", "unit", "department"):
         try:
             rel = getattr(User, rel_name)
@@ -492,7 +492,7 @@ def get_president_user(users_by_sicil=None):
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     for attr in ("is_top_manager", "is_president", "is_baskan"):
         try:
             column = getattr(User, attr)
@@ -502,7 +502,7 @@ def get_president_user(users_by_sicil=None):
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     try:
         user = _first(User.query.filter(User.email.ilike("%baskan%")))
         if user:
@@ -510,7 +510,7 @@ def get_president_user(users_by_sicil=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     return None
 
 def get_evaluation_window_start(period: Optional[PerformancePeriod]) -> Optional[date]:

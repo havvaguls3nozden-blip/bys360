@@ -17,7 +17,7 @@ def _rollback_session() -> None:
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
 def safe_count(model: Any, *filters: Any) -> int:
     try:
         from sqlalchemy import func
@@ -121,7 +121,7 @@ def survey_question_compat_defaults(question: Any) -> Any:
             return question
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
     try:
         state = getattr(question, "__dict__", None)
         if isinstance(state, dict):
@@ -129,7 +129,7 @@ def survey_question_compat_defaults(question: Any) -> Any:
                 state.setdefault(key, value)
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/surveys/repository.py")
     return question
 
 

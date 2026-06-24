@@ -47,7 +47,7 @@ def _rollback(rollback: RollbackHook | None) -> None:
         rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
 def _log_warning(logger: Any, message: str, *args: Any) -> None:
     if logger is None:
         return
@@ -55,7 +55,7 @@ def _log_warning(logger: Any, message: str, *args: Any) -> None:
         logger.warning(message, *args)
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
 # Ayarlar > Rol Matrisi ekranında kapatılan sekmeler, çekirdek menü savunması
 # veya kişi bazlı eski override nedeniyle yeniden açılmasın.
 ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS: set[str] = {
@@ -863,7 +863,7 @@ try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS)
 except Exception:
     import logging
-    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
+    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
 _BYS360_ROLE_MATRIX_V12_POLICY = {
     "support_index": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
     "support_new": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},

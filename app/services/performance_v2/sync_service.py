@@ -407,7 +407,7 @@ def _resolved_payloads(period, resolved_chain):
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_v2/sync_service.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_v2/sync_service.py")
             explicit_mode = str(getattr(period, 'level_3_mode', '') or '').strip().lower()
             enable_level_3 = bool(getattr(period, 'enable_level_3', False))
             enable_level_3_scoring = bool(getattr(period, 'enable_level_3_scoring', False))

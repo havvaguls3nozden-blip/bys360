@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P4E_MOBILE_RELEASE_EVIDENCE_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4E_MOBILE_RELEASE_EVIDENCE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_RELEASE_EVIDENCE_GATE_P4E_REPORT.json")
 P3F_REPORT_REL = Path("reports/architecture/BYS360_MOBILE_RESPONSE_SUITE_GATE_P3F_REPORT.json")
 P4D_REPORT_REL = Path("reports/architecture/BYS360_MOBILE_SECURITY_EVIDENCE_GATE_P4D_REPORT.json")

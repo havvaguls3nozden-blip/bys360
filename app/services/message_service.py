@@ -173,7 +173,7 @@ def _file_size(file_storage) -> int:
                 file_storage.stream.seek(current)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/message_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/message_service.py")
     return size
 
 
@@ -195,7 +195,7 @@ def _peek_bytes(file_storage, size: int = 32) -> bytes:
                 file_storage.stream.seek(current)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/message_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/message_service.py")
     return data
 
 

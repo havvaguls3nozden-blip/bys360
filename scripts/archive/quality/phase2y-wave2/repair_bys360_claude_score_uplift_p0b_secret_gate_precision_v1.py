@@ -7,7 +7,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P0B_SECRET_GATE_PRECISION_V1"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P0B_SECRET_GATE_PRECISION_V1"
 
 
 def main() -> int:

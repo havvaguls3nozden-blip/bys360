@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-BYS360 Claude Faz 5 - Tüm Jinja2 şablon derleme testi.
+BYS360 Maintenance Faz 5 - Tüm Jinja2 şablon derleme testi.
 
 Bu test Faz 1'de yaşanan endb/endblock, unexpected '*', eksik blok kapanışı
 ve benzeri üretim hatalarının tekrar canlıya çıkmasını engellemek için vardır.
 
-Marker: BYS360_CLAUDE_ROADMAP_PHASE5_TEMPLATE_COMPILATION_TEST
+Marker: BYS360_MAINTENANCE_ROADMAP_PHASE5_TEMPLATE_COMPILATION_TEST
 """
 from __future__ import annotations
 

@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1"
 
 EXAMPLE_ENV_NAMES = {
     ".env.example",
@@ -72,7 +72,7 @@ PIN_REPLACEMENTS = {
 }
 
 GITIGNORE_BLOCK = """
-# --- BYS360 Claude score uplift P0 security/repo hygiene V1 ---
+# --- BYS360 Maintenance score uplift P0 security/repo hygiene V1 ---
 # Real secrets and local runtime configuration must never be committed.
 .env
 .env.*
@@ -130,11 +130,11 @@ _cleanup_quarantine/
 *.ppk
 *.jks
 *.keystore
-# --- /BYS360 Claude score uplift P0 security/repo hygiene V1 ---
+# --- /BYS360 Maintenance score uplift P0 security/repo hygiene V1 ---
 """.strip()
 
 DOCKERIGNORE_BLOCK = """
-# --- BYS360 Claude score uplift P0 security/repo hygiene V1 ---
+# --- BYS360 Maintenance score uplift P0 security/repo hygiene V1 ---
 .env
 .env.*
 !.env.example
@@ -171,7 +171,7 @@ _cleanup_quarantine
 *.ppk
 *.jks
 *.keystore
-# --- /BYS360 Claude score uplift P0 security/repo hygiene V1 ---
+# --- /BYS360 Maintenance score uplift P0 security/repo hygiene V1 ---
 """.strip()
 
 @dataclass
@@ -351,8 +351,8 @@ def scan_findings(root: Path, report: Report) -> None:
 def write_reports(root: Path, report: Report) -> None:
     out = root / "reports" / "quality"
     out.mkdir(parents=True, exist_ok=True)
-    json_path = out / "BYS360_CLAUDE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.json"
-    md_path = out / "BYS360_CLAUDE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.md"
+    json_path = out / "BYS360_MAINTENANCE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.json"
+    md_path = out / "BYS360_MAINTENANCE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.md"
     json_path.write_text(json.dumps(asdict(report), ensure_ascii=False, indent=2), encoding="utf-8")
     lines = [
         f"# {PACKAGE} Raporu",
@@ -395,8 +395,8 @@ def main() -> int:
         raise SystemExit(f"Project root bulunamadı: {root}")
 
     if apply:
-        ensure_block(root / ".gitignore", GITIGNORE_BLOCK, report, "BYS360 Claude score uplift P0")
-        ensure_block(root / ".dockerignore", DOCKERIGNORE_BLOCK, report, "BYS360 Claude score uplift P0")
+        ensure_block(root / ".gitignore", GITIGNORE_BLOCK, report, "BYS360 Maintenance score uplift P0")
+        ensure_block(root / ".dockerignore", DOCKERIGNORE_BLOCK, report, "BYS360 Maintenance score uplift P0")
         patch_requirements(root, report)
         patch_ci(root, report)
     quarantine_local_only(root, report, apply=apply)
@@ -415,7 +415,7 @@ def main() -> int:
         "changed_count": len(report.changed),
         "quarantined_count": len(report.quarantined),
         "finding_count": len(report.findings),
-        "report": str(root / "reports" / "quality" / "BYS360_CLAUDE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.json"),
+        "report": str(root / "reports" / "quality" / "BYS360_MAINTENANCE_SCORE_UPLIFT_P0_SECURITY_REPO_HYGIENE_V1_REPORT.json"),
     }, ensure_ascii=False, indent=2))
     return 0
 

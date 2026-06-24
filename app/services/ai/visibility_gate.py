@@ -224,7 +224,7 @@ def _rollback() -> None:
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/visibility_gate.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai/visibility_gate.py")
 def _safe_count(query) -> int:
     try:
         return int(query.count() or 0)

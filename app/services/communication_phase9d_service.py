@@ -86,13 +86,13 @@ def _feedback_metrics() -> dict[str, int]:
             ).count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9d_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9d_service.py")
     try:
         if Notification is not None and hasattr(Notification, 'is_read'):
             rows['unread_notifications'] = Notification.query.filter_by(is_read=False).count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9d_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9d_service.py")
     return rows
 
 

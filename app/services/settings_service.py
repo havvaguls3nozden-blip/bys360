@@ -149,7 +149,7 @@ def _safe_rollback() -> None:
         db.session.rollback()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings_service.py")
 def ensure_settings_phase1_seeded(updated_by_user_id: int | None = None) -> dict[str, Any]:
     return _ensure_settings_phase1_seeded_handler(
         updated_by_user_id=updated_by_user_id,

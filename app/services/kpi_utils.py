@@ -1,6 +1,6 @@
 """BYS360 KPI ortak hesaplama yardımcıları.
 
-Claude 10E yol haritası kapsamında ``calculate_completion_rate`` tekrarı tek
+Maintenance 10E yol haritası kapsamında ``calculate_completion_rate`` tekrarı tek
 merkezde toplandı. Servisler Decimal tabanlı bu yardımcıyı kullanır; ekran
 servisleri gerekirse 100 üstünü kart görünümü için sınırlayabilir.
 """

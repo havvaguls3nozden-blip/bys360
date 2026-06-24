@@ -1,7 +1,7 @@
 
 """Gelişim rehberi template yardımcıları.
 
-BYS360_CLAUDE_V13_P1_TEMPLATE_HELPERS
+BYS360_MAINTENANCE_V13_P1_TEMPLATE_HELPERS
 """
 from __future__ import annotations
 

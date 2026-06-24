@@ -109,7 +109,7 @@ def get(key: str, default: Any = None) -> Any:
             return json.loads(raw)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
     now = time.time()
     with _LOCK:
         row = _CACHE.get(safe_key)
@@ -134,7 +134,7 @@ def set(key: str, value: Any, ttl_seconds: int = 30) -> Any:
             return value
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
     expires_at = time.time() + ttl if ttl else 0
     with _LOCK:
         _CACHE[safe_key] = (expires_at, value)
@@ -159,7 +159,7 @@ def invalidate(key: str) -> None:
             client.delete(safe_key)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
     with _LOCK:
         _CACHE.pop(safe_key, None)
 
@@ -179,7 +179,7 @@ def invalidate_prefix(prefix: str) -> None:
                     break
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/runtime_cache.py")
     with _LOCK:
         for key in [row for row in _CACHE.keys() if str(row).startswith(raw_prefix)]:
             _CACHE.pop(key, None)

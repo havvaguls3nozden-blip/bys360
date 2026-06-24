@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-BYS360 Claude Faz 5 - Kritik fonksiyon imzası ve tanım testi.
+BYS360 Maintenance Faz 5 - Kritik fonksiyon imzası ve tanım testi.
 
 Amaç: build_category_average_summary_for_users(period_id=...),
 build_phase10_report_context(viewer=...) gibi çok noktadan çağrılan
 fonksiyonların sessizce kırılmasını önlemek.
 
-Marker: BYS360_CLAUDE_ROADMAP_PHASE5_FUNCTION_SIGNATURE_TEST
+Marker: BYS360_MAINTENANCE_ROADMAP_PHASE5_FUNCTION_SIGNATURE_TEST
 """
 from __future__ import annotations
 

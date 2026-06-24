@@ -135,10 +135,10 @@ def fetch_previous_scores(
                     scores.append(float(row.get("score")))
                 except Exception:
                     import logging
-                    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
+                    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
     try:
         if _table_exists(db_session, "performance_evaluations"):
             result = db_session.execute(text("""
@@ -154,10 +154,10 @@ def fetch_previous_scores(
                     scores.append(float(row.get("score")))
                 except Exception:
                     import logging
-                    logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
+                    logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
     return scores[-limit:]
 
 
@@ -345,7 +345,7 @@ def persist_development_guidance_snapshot(
             db_session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
         return False
 
 

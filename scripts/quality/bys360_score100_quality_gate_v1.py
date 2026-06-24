@@ -4,7 +4,7 @@
 BYS360 SCORE 100 QUALITY GATE V1
 
 Amaç:
-- Claude/BYS360 saha raporunda puan kırdıran kritik kalite ve güvenlik başlıklarını
+- Maintenance/BYS360 saha raporunda puan kırdıran kritik kalite ve güvenlik başlıklarını
   tek komutla ölçmek.
 - Varsayılan modda projeyi değiştirmemek.
 - fix-safe modunda yalnızca düşük riskli, geri alınabilir düzeltmeleri yapmak.

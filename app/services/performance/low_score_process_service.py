@@ -393,7 +393,7 @@ def get_low_score_publish_block_reason(evaluation, *, ensure: bool = False) -> s
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     process = None
     if ensure:
         try:
@@ -489,7 +489,7 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     if getattr(process, "is_second_or_later", False):
         auto_start_second_low_score_process(process, actor=actor_obj, note=note or "Aynı takvim yılı içinde ikinci kez 70 altı performans sonucu oluştu. Sistem otomatik işten çıkarma yapmaz; Tekrarlayan Düşük Performans Süreci idari takip için başlatıldı.")
     else:
@@ -499,13 +499,13 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 def add_low_score_process_note(process_id=None, actor=None, note=None, process=None):
     from datetime import datetime
@@ -588,19 +588,19 @@ def start_second_repeat_admin_process(process, *, actor=None, note=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         _record_personnel_history(process, actor_user_id=actor_user_id, summary="Tekrarlayan Düşük Performans Süreci", description=getattr(process, "administrative_process_note", None) or "Tekrarlayan Düşük Performans Süreci")
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 def auto_start_second_low_score_process(process, *, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
@@ -732,13 +732,13 @@ def president_reject_process(process=None, *, process_id=None, actor=None, note=
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return target
 def _phase1_5_now():
     from datetime import datetime
@@ -882,19 +882,19 @@ def start_second_repeat_admin_process(process, *, actor=None, note=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         _record_personnel_history(process, actor_user_id=actor_user_id, summary="Tekrarlayan Düşük Performans Süreci", description=getattr(process, "administrative_process_note", None) or "Tekrarlayan Düşük Performans Süreci")
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 def auto_start_second_low_score_process(process, *, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
@@ -930,7 +930,7 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     if getattr(process, "is_second_or_later", False):
         auto_start_second_low_score_process(process, actor=actor_obj, note=note or "Aynı takvim yılı içinde ikinci kez 70 altı performans sonucu oluştu. Sistem otomatik işten çıkarma yapmaz; Tekrarlayan Düşük Performans Süreci idari takip için başlatıldı.")
     else:
@@ -940,13 +940,13 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 def president_reject_process(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN_REJECT
@@ -978,13 +978,13 @@ def president_reject_process(process=None, *, process_id=None, actor=None, note=
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return target
 def add_low_score_process_note(process_or_id, user_or_id=None, note=None):
     process = _phase1_5_get_process(process_or_id)
@@ -1042,21 +1042,21 @@ def _phase16_flush():
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
 def _phase16_mark_event(process, key, *, status="pending", actor_user_id=None, note=None):
     try:
         _mark_event(process, key, status=status, actor_user_id=actor_user_id, note=note)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
 def _phase16_sync_current_stage(process):
     try:
         _sync_current_stage(process)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 
@@ -1103,7 +1103,7 @@ def _phase1_7_find_low_score_process(value=None, *, evaluation=None, ensure=Fals
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         from app.models.performance_low_score_models import PerformanceLowScoreProcess
         eval_id = getattr(target, "id", None)
@@ -1114,7 +1114,7 @@ def _phase1_7_find_low_score_process(value=None, *, evaluation=None, ensure=Fals
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         from app.extensions import db
         from app.models.performance_low_score_models import PerformanceLowScoreProcess
@@ -1196,19 +1196,19 @@ def record_first_warning(process, *, actor=None, note=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         _record_personnel_history(process, actor_user_id=actor_user_id, summary="Birinci 70 altı performans uyarısı oluşturuldu", description=getattr(process, "warning_note", None) or "Düşük performans uyarısı oluşturuldu.")
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 def auto_record_first_low_score_warning(process, *, actor=None, note=None):
@@ -1373,14 +1373,14 @@ def record_first_warning(process, *, actor=None, note=None, user_or_id=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         _sync_current_stage(process)
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 
@@ -1429,14 +1429,14 @@ def start_second_repeat_admin_process(process, *, actor=None, note=None, user_or
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     try:
         _sync_current_stage(process)
         db.session.flush()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 
@@ -1482,7 +1482,7 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 
@@ -1515,7 +1515,7 @@ def president_reject_process(process, *, actor=None, note=None, user_or_id=None)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
 # Gate markerları: Başkan onayı bekliyor | Başkan/Üst Onay Bekliyor | Başkan/Üst Onay Yayın Kilidi | Başkan/Üst Onay tarafından iade edildi | Tekrarlayan Düşük Performans Süreci | Sistem otomatik işten çıkarma yapmaz

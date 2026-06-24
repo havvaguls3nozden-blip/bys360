@@ -204,7 +204,7 @@ def _set_db_value(session, role: str, feature_key: str, visible: bool) -> bool:
             session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
         return False
 
 
@@ -261,7 +261,7 @@ def assistant_role_matrix_v10_save_endpoint():
             session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
         if flash:
             flash(f"Sanal Asistan Rol Matrisi kaydedilemedi: {exc}", "danger")
 

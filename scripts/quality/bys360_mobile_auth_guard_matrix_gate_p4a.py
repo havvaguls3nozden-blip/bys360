@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P4A_MOBILE_AUTH_GUARD_MATRIX_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4A_MOBILE_AUTH_GUARD_MATRIX_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_AUTH_GUARD_MATRIX_GATE_P4A_REPORT.json")
 ACTIVE_TEST_FILE = "test_mobile_api_auth_guard_matrix_p4a.py"
 

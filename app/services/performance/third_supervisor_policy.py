@@ -156,7 +156,7 @@ def should_create_third_supervisor_task(*, period: Any | None = None, payload: A
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/third_supervisor_policy.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/third_supervisor_policy.py")
     resolved = evaluator_id if evaluator_id is not None else _phase4_2_payload_evaluator_id(payload)
     try:
         return bool(int(resolved or 0) > 0)
@@ -330,7 +330,7 @@ def _phase4_6_resolve_third_supervisor_mode(period: Any | None = None) -> str:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/third_supervisor_policy.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/third_supervisor_policy.py")
     return "comment_only"
 
 

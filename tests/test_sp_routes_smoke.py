@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BYS360 Claude 10E - SP route smoke testi.
+"""BYS360 Maintenance 10E - SP route smoke testi.
 
 Amaç: SP kritik route'larında 500/beyaz ekran regresyonunu yakalamak.
 Auth bekleyen ekranlarda 302/401/403 kabul edilir; 404 veya 500 kabul edilmez.

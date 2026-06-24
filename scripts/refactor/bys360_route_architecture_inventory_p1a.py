@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P1A_ARCHITECTURE_ROUTE_INVENTORY"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P1A_ARCHITECTURE_ROUTE_INVENTORY"
 
 IGNORED_DIRS = {
     ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",

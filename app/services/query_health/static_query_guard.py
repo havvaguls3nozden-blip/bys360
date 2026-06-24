@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""BYS360 Claude Faz 6 - statik sorgu sagligi tarayicisi.
+"""BYS360 Maintenance Faz 6 - statik sorgu sagligi tarayicisi.
 
 Bu tarayici veritabanina baglanmaz. Servis/route dosyalarinda yavas liste ekranina
 sebep olabilecek pattern'leri uyarı olarak raporlar. Bulgu üretmesi tek başına

@@ -82,7 +82,7 @@ def auto_apply_manager_chains(
                 user.role_label = role_label
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/auto_hierarchy_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/auto_hierarchy_service.py")
         normalized_targets.append(user)
     db.session.flush()
     lookup = build_lookup(normalized_targets)

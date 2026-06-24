@@ -95,7 +95,7 @@ def _support_summary() -> dict[str, int]:
                     stale_total = 0
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
     return {
         'open_total': open_total,
         'stale_total': stale_total,
@@ -111,13 +111,13 @@ def _pending_feedback_summary() -> dict[str, int]:
             assigned = SurveyAssignment.query.filter(SurveyAssignment.status.in_(['assigned', 'atandi', 'started', 'basladi'])).count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
     try:
         if Notification is not None and hasattr(Notification, 'is_read'):
             notifications_unread = Notification.query.filter_by(is_read=False).count()
     except Exception:
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/communication_phase9c_service.py")
     return {
         'pending_assignments': assigned,
         'unread_notifications': notifications_unread,

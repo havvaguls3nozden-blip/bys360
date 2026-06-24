@@ -1,7 +1,7 @@
 
 """BYS360 startup ve schema guard yardimcilari.
 
-Claude Faz 2.4 kapsaminda app/__init__.py icindeki baslangic on kosullari
+Maintenance Faz 2.4 kapsaminda app/__init__.py icindeki baslangic on kosullari
 ve schema guard akisi daha okunur bir modüle tasinir. Davranis degismez;
 mevcut log metinleri ve production/staging korumalari korunur.
 """

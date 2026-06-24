@@ -315,7 +315,7 @@ def deactivate_out_of_scope_assignments_for_period(period, allowed_employee_ids:
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/period_scope_assignment.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/period_scope_assignment.py")
     return changed
 
 

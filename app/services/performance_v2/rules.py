@@ -204,7 +204,7 @@ def normalize_level_mode(period) -> LevelMode:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_v2/rules.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance_v2/rules.py")
     raw = getattr(period, 'level_3_mode', None)
     if raw == 'scoring':
         return LevelMode.SCORE_ENABLED

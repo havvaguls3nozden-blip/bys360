@@ -390,7 +390,7 @@ def _remove_path_quietly(path_value: str | Path | None) -> None:
                 path.rmdir()
             except Exception:
                 import logging
-                logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/publication_service.py")
+                logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/publication_service.py")
     except Exception:
         import logging
         logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")

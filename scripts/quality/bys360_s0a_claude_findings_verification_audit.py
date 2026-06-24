@@ -13,8 +13,8 @@ import sys
 ROOT = Path(".").resolve()
 QUALITY = ROOT / "reports" / "quality"
 
-OUT_JSON = QUALITY / "BYS360_S0A_CLAUDE_FINDINGS_VERIFICATION_AUDIT.json"
-OUT_MD = QUALITY / "BYS360_S0A_CLAUDE_FINDINGS_VERIFICATION_AUDIT.md"
+OUT_JSON = QUALITY / "BYS360_S0A_MAINTENANCE_FINDINGS_VERIFICATION_AUDIT.json"
+OUT_MD = QUALITY / "BYS360_S0A_MAINTENANCE_FINDINGS_VERIFICATION_AUDIT.md"
 
 SECRET_TERMS = [
     "SECRET_KEY",
@@ -664,7 +664,7 @@ def main() -> int:
 
     result = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
-        "phase": "S0A_CLAUDE_FINDINGS_VERIFICATION_AUDIT",
+        "phase": "S0A_MAINTENANCE_FINDINGS_VERIFICATION_AUDIT",
         "mode": "audit_only_no_code_change_no_delete_no_secret_values",
         "ok": True,
         "decision": "S0A_AUDIT_COMPLETED_REVIEW_REQUIRED" if red_flag_count else "S0A_AUDIT_COMPLETED_NO_CRITICAL_FLAGS",
@@ -677,7 +677,7 @@ def main() -> int:
     OUT_JSON.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
     lines = [
-        "# BYS360 S0A Claude Bulguları Doğrulama Audit",
+        "# BYS360 S0A Maintenance Bulguları Doğrulama Audit",
         "",
         f"Tarih: {result['generated_at']}",
         "",

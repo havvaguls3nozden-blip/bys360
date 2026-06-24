@@ -44,7 +44,7 @@ def test_personal_data_flows_are_bound_to_live_backbone_tables_and_audit() -> No
 def test_security_audit_evidence_keeps_required_release_markers() -> None:
     markers = {evidence.release_gate_marker for evidence in SECURITY_AUDIT_EVIDENCE}
     assert "CLEAN_LIVE_RELEASE_GATE_OK" in markers
-    assert "CLAUDE_10_10_GATE_OK" in markers
+    assert "QUALITY_GATE_OK" in markers
     assert "FINAL_QUALITY_FAZ3_CHAIN_OK" in markers
     assert "FINAL_QUALITY_FAZ4_CHAIN_OK" in markers
 

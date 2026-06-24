@@ -247,7 +247,7 @@ def manager_archive_allowed_employee_ids(user: Any) -> set[int]:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
-        logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/archive_service.py")
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/archive_service.py")
     return {own_id} if own_id else set()
 
 
@@ -362,7 +362,7 @@ def resolve_employee(*, employee_id: Any = None, sicil_no: Any = None, personel:
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/archive_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/archive_service.py")
     sicil = str(sicil_no or "").strip()
     sicil_col = _user_column("sicil_no")
     if sicil and sicil_col is not None:

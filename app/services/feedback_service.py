@@ -408,7 +408,7 @@ def _enqueue_pulse_analytics_refresh(unit_id: int | None, *, days: int = 30):
             current_app.logger.warning("Nabız analitiği async yenileme kuyruğa alınamadı: %s", exc)
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/feedback_service.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/feedback_service.py")
         return None
 
 

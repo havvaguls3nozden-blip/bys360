@@ -192,5 +192,5 @@ def persist_interim_feedback_snapshot(
             db_session.rollback()
         except Exception:
             import logging
-            logging.getLogger(__name__).exception("BYS360_CLAUDE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/interim_feedback_integration.py")
+            logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/interim_feedback_integration.py")
         return False

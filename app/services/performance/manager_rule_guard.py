@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 
-"""Claude Faz 4 performans amir kuralları kalıcı guard.
+"""Maintenance Faz 4 performans amir kuralları kalıcı guard.
 
 Canlı davranış değiştirmez. Nihai amir kural anayasasının ve mevcut performans
 servislerindeki kritik izlerin korunup korunmadığını statik olarak denetler.
@@ -345,13 +345,13 @@ def build_manager_rule_guard_report(root: Path | str) -> GuardReport:
 
 def format_manager_rule_guard_report(report: GuardReport) -> str:
     lines = [
-        f"BYS360 Claude Faz 4 Performans Amir Kuralları Gate | OK={len(report.ok)} HATA={report.error_count} UYARI={report.warning_count}",
+        f"BYS360 Maintenance Faz 4 Performans Amir Kuralları Gate | OK={len(report.ok)} HATA={report.error_count} UYARI={report.warning_count}",
     ]
     for finding in report.findings:
         label = "HATA" if finding.severity == "error" else "UYARI"
         lines.append(f"{label} | {finding.code} | {finding.message}")
     if report.passed():
-        lines.append("BYS360 Claude Faz 4 performans amir kuralları gate | OK")
+        lines.append("BYS360 Maintenance Faz 4 performans amir kuralları gate | OK")
     return "\n".join(lines)
 
 

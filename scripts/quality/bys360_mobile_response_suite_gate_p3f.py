@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable
 
-PACKAGE = "BYS360_CLAUDE_SCORE_UPLIFT_P3F_MOBILE_RESPONSE_SUITE_GATE"
+PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3F_MOBILE_RESPONSE_SUITE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_RESPONSE_SUITE_GATE_P3F_REPORT.json")
 TEST_NAME = "test_mobile_api_response_suite_p3f.py"
 EXPECTED_CONTRACT_ROUTE_COUNT = 24
