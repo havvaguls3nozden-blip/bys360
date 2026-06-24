@@ -491,7 +491,7 @@ def consume_form_token(namespace: str, submitted_token: str | None, scope: str =
     session.modified = True
     return True
 
-# BYS360_CLAUDE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_BEGIN
+# BYS360_MAINTENANCE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_BEGIN
 # Route katmanı izin haritası da kapsam dışı menü anahtarlarını geri döndürmez.
 _BYS360_V13_ORIGINAL_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map
 _BYS360_V13_REMOVED_DIRECT_MENU_KEYS = {"education", "egitim", "eğitim", "repository", "strategy", "strateji"}
@@ -514,7 +514,7 @@ def _bys360_v13_route_support_is_removed_menu_key(key: str) -> bool:
 def build_menu_visibility_map(user) -> dict[str, bool]:  # type: ignore[no-redef]
     visibility = dict(_BYS360_V13_ORIGINAL_BUILD_MENU_VISIBILITY_MAP(user) or {})
     return {key: value for key, value in visibility.items() if not _bys360_v13_route_support_is_removed_menu_key(key)}
-# BYS360_CLAUDE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_END
+# BYS360_MAINTENANCE_V13_ROUTE_SUPPORT_REMOVED_MENU_FILTER_END
 
 
 # BYS360_A5_P2D2_FEEDBACK_PULSE_ROUTE_SUPPORT_POLICY_START

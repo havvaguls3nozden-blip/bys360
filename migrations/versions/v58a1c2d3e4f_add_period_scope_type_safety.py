@@ -67,7 +67,7 @@ def upgrade() -> None:
             _safe_execute(bind, f"UPDATE {table_name} SET allow_overlap=false WHERE allow_overlap IS NULL")
 
 
-    # Claude raporunda görünen düşük performans süreci NOT NULL güvenliği.
+    # Maintenance raporunda görünen düşük performans süreci NOT NULL güvenliği.
     if _has_table(bind, "performance_low_score_processes"):
         _add_column_if_missing(bind, "performance_low_score_processes", sa.Column("low_score_detected_at", sa.DateTime(), nullable=True))
         _add_column_if_missing(bind, "performance_low_score_processes", sa.Column("rule_version", sa.String(length=120), nullable=True))

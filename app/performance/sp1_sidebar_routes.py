@@ -227,4 +227,4 @@ def sp1_ai_kpi_analysis():
         fallback_html="<h3>KPI Analiz Merkezi</h3>",
     )
 
-# BYS360_CLAUDE_10E_SIDEBAR_ROLE_GUARDS_IMPORTED
+# BYS360_MAINTENANCE_10E_SIDEBAR_ROLE_GUARDS_IMPORTED

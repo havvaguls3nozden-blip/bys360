@@ -62,8 +62,8 @@ def configure_runtime_services(app: Flask) -> None:
     )
     register_assistant_module_master_access(app)  # BYS360_V58_ASSISTANT_CONTEXT_PROCESSOR_BOOTSTRAP
     register_assistant_shortcut_visibility_context(app)  # BYS360_V58_ASSISTANT_SHORTCUT_VISIBILITY_BOOTSTRAP
-    register_template_helpers(app)  # BYS360_CLAUDE_V13_P1_TEMPLATE_HELPERS_BOOTSTRAP
-    init_feedback_followup_scheduler(app)  # BYS360_CLAUDE_MEDIUM_FEEDBACK_FOLLOWUP_SCHEDULER
+    register_template_helpers(app)  # BYS360_MAINTENANCE_V13_P1_TEMPLATE_HELPERS_BOOTSTRAP
+    init_feedback_followup_scheduler(app)  # BYS360_MAINTENANCE_MEDIUM_FEEDBACK_FOLLOWUP_SCHEDULER
 
 
 def run_startup_validation_pipeline(app: Flask) -> None:

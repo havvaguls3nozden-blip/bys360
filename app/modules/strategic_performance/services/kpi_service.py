@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from app.services.kpi_utils import calculate_completion_rate, classify_kpi_status, to_decimal as _to_decimal
 
-# BYS360_CLAUDE_10E_KPI_SERVICE_USES_SHARED_UTILS
+# BYS360_MAINTENANCE_10E_KPI_SERVICE_USES_SHARED_UTILS
 
 
 def enrich_target(target):

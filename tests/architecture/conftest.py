@@ -47,7 +47,7 @@ def pytest_collection_modifyitems(config, items):
         if file_name.startswith("test_") and file_name not in ACTIVE_ARCHITECTURE_TEST_FILES:
             item.add_marker(skip_legacy)
 
-# BYS360_CLAUDE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE: active architecture test -> test_mobile_auth_dashboard_assistant_response_p3b.py
+# BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE: active architecture test -> test_mobile_auth_dashboard_assistant_response_p3b.py
 
 # BYS360_P3D_ACTIVE_SCOPE_MARKER
 try:

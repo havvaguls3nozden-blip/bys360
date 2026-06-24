@@ -248,7 +248,7 @@ def repair_runtime_schema(app: Flask) -> None:
     for item in skipped:
         app.logger.warning("Schema guard atladi: %s", item)
 
-# BYS360_CLAUDE_V13_SCHEMA_GUARD_DEFAULT_OFF_BEGIN
+# BYS360_MAINTENANCE_V13_SCHEMA_GUARD_DEFAULT_OFF_BEGIN
 # Canlı güvenlik kapısı: ad-hoc DDL onarımı yalnızca açık AUTO_REPAIR_SCHEMA=true
 # verildiğinde ve migration komutu değilken çalışabilir. BYS_FORCE_SCHEMA_GUARD
 # bilinçli acil durum anahtarı olarak korunur.
@@ -268,7 +268,7 @@ def should_auto_repair_schema() -> bool:  # type: ignore[no-redef]
     if not _bys360_v13_env_bool("AUTO_REPAIR_SCHEMA", False):
         return False
     return _BYS360_V13_ORIGINAL_SHOULD_AUTO_REPAIR_SCHEMA()
-# BYS360_CLAUDE_V13_SCHEMA_GUARD_DEFAULT_OFF_END
+# BYS360_MAINTENANCE_V13_SCHEMA_GUARD_DEFAULT_OFF_END
 
 
 # BYS360_A5_P2D4_SCHEMA_GUARD_SKIP_ENV_ANCHOR_START

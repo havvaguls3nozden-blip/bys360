@@ -37,7 +37,7 @@ from .performance_process_engine_models import (
     PerformanceProcessNotification,
     PerformanceFeedbackPipelineFlow,
     PerformanceFeedbackPipelineStep,
-)  # BYS360_CLAUDE_FEEDBACK_STATE_MACHINE_MODEL_IMPORT
+)  # BYS360_MAINTENANCE_FEEDBACK_STATE_MACHINE_MODEL_IMPORT
 from .hr_models import (
     AttendanceException,
     DelegationAssignment,
@@ -256,4 +256,4 @@ __all__ = [
     "PortalActivityLog",
 ]
 
-# BYS360_CLAUDE_V13_P1_WAITRESS_MODEL_IMPORT_HOTFIX_EXPORTS
+# BYS360_MAINTENANCE_V13_P1_WAITRESS_MODEL_IMPORT_HOTFIX_EXPORTS

@@ -12,7 +12,7 @@ from app.services.kpi_utils import (
     to_decimal as _to_decimal,
 )
 
-# BYS360_CLAUDE_10E_DASHBOARD_SERVICE_USES_SHARED_KPI_UTILS
+# BYS360_MAINTENANCE_10E_DASHBOARD_SERVICE_USES_SHARED_KPI_UTILS
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:

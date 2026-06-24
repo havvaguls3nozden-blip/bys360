@@ -445,8 +445,8 @@ for _role, _keys in _BYS360_ROLE_MATRIX_V12_ROLE_DEFAULTS.items():
         _current.extend([_key for _key in _keys if _key not in _current])
 # BYS360_SETTINGS_MODULE_ROLE_MATRIX_V12_MENU_SECTION_SYNC_END
 
-# BYS360_CLAUDE_V13_REMOVED_MENU_FILTER_BEGIN
-# Claude v13 P0 canlı kapısı: eğitim/portal/repository/strategy gibi kapsam dışı
+# BYS360_MAINTENANCE_V13_REMOVED_MENU_FILTER_BEGIN
+# Maintenance v13 P0 canlı kapısı: eğitim/portal/repository/strategy gibi kapsam dışı
 # modül izleri sidebar, ayarlar menü listesi ve force-visible haritasından süzülür.
 _BYS360_V13_REMOVED_DIRECT_MENU_KEYS = {"education", "egitim", "eğitim", "repository", "strategy", "strateji"}
 
@@ -533,7 +533,7 @@ def _bys360_v13_prune_removed_menu_registry() -> None:
 
 
 _bys360_v13_prune_removed_menu_registry()
-# BYS360_CLAUDE_V13_REMOVED_MENU_FILTER_END
+# BYS360_MAINTENANCE_V13_REMOVED_MENU_FILTER_END
 # BYS360_AY1_AI_PERFORMANCE_SETTINGS_INTEGRATION_V1_BEGIN
 # Ayarlar/Rol Matrisi ile sidebar aynı BYS360 Asistanı ve performans sekme anahtarlarını görsün.
 _BYS360_AY1_AI_AGENT_MENU_ITEMS = [

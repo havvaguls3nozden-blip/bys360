@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-# BYS360_CLAUDE_10E_ROLE_GUARDS
+# BYS360_MAINTENANCE_10E_ROLE_GUARDS
 
 TOP_OR_MANAGER_TOKENS = (
     "admin",

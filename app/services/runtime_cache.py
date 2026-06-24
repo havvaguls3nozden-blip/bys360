@@ -26,7 +26,7 @@ try:
 except Exception:  # pragma: no cover
     redis = None  # type: ignore
 
-# BYS360_CLAUDE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_RUNTIME_CACHE
+# BYS360_MAINTENANCE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_RUNTIME_CACHE
 _CACHE: dict[str, tuple[float, Any]] = {}
 _LOCK = RLock()
 _REDIS_CLIENT: Any = None

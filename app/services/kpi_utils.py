@@ -9,7 +9,7 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any
 
-# BYS360_CLAUDE_10E_KPI_UTILS
+# BYS360_MAINTENANCE_10E_KPI_UTILS
 
 TWO_PLACES = Decimal("0.01")
 

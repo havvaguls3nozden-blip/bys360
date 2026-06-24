@@ -7,7 +7,7 @@ portal/repository route aileleri burada çağrılmaz.
 from __future__ import annotations
 
 
-# BYS360_CLAUDE_V13_INSTITUTIONAL_CHILD_ROUTES_BEGIN
+# BYS360_MAINTENANCE_V13_INSTITUTIONAL_CHILD_ROUTES_BEGIN
 _LIVE_CHILD_ROUTE_MODULES = (
     "routes",
     "org_unit_routes",
@@ -32,4 +32,4 @@ for _module_name in _LIVE_CHILD_ROUTE_MODULES:
     __import__(f"{__name__}.{_module_name}", fromlist=["*"])
 
 __all__ = ["_LIVE_CHILD_ROUTE_MODULES"]
-# BYS360_CLAUDE_V13_INSTITUTIONAL_CHILD_ROUTES_END
+# BYS360_MAINTENANCE_V13_INSTITUTIONAL_CHILD_ROUTES_END

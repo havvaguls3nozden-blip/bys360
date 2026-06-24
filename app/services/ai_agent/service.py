@@ -1263,7 +1263,7 @@ def build_ai_agent_reply(user, question):
 # BYS360_ASSISTANT_FULL_STEPWISE_TUTOR_V5_END
 
 
-# BYS360_ASSISTANT_CHATGPT_LIKE_V31_START
+# BYS360_ASSISTANT_ASSISTANT_LIKE_V31_START
 _BYS360_ASSISTANT_PREV_BUILD_REPLY_CHATGPT_LIKE_V31 = globals().get("build_ai_agent_reply")
 
 def build_ai_agent_reply(user, question, context=None):
@@ -1290,7 +1290,7 @@ def build_ai_agent_reply(user, question, context=None):
             "marker": "BYS360_ASSISTANT_CHATGPT_LIKE_V31_SAFE_FALLBACK",
             "answer": "BYS360 Asistanı şu anda sorunuzu güvenli modda yorumluyor. Lütfen yapmak istediğiniz işlemi yazın; personel, performans, rol matrisi, karne, anket, destek veya AI karar destek başlıklarında yönlendirme sağlayabilirim.",
         }
-# BYS360_ASSISTANT_CHATGPT_LIKE_V31_END
+# BYS360_ASSISTANT_ASSISTANT_LIKE_V31_END
 
 # BYS360_ASSISTANT_CURRENT_FINAL_POLISH_V31_3: V31.3 final polish aktif; V31.2 server-first bridge korunur.
 

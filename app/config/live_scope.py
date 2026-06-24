@@ -32,7 +32,7 @@ REMOVED_SCOPE_COMPAT_PATHS: set[str] = {
 }
 
 _DIRECT_MENU_KEY_MAP: dict[str, str] = {
-# BYS360_CLAUDE_V13_REMOVED_DIRECT_MENU_KEYS
+# BYS360_MAINTENANCE_V13_REMOVED_DIRECT_MENU_KEYS
     "repository": "repository",
     "education": "education",
     "egitim": "education",

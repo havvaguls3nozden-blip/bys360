@@ -160,7 +160,7 @@ class Config:
     REQUIRE_DOTENV_FILE = str_to_bool(os.getenv('REQUIRE_DOTENV_FILE'), APP_ENV in {'production', 'staging'})
     STRICT_ENV_VALIDATION = str_to_bool(os.getenv('STRICT_ENV_VALIDATION'), APP_ENV in {'production', 'staging'})
 
-    # BYS360_CLAUDE_10_SHORT_TERM_SECRET_KEY_HARDENING
+    # BYS360_MAINTENANCE_10_SHORT_TERM_SECRET_KEY_HARDENING
     # Production/staging ortamı güçlü SECRET_KEY olmadan başlamamalıdır.
     # Development ortamında sabit anahtar yerine her süreçte geçici anahtar üretilir.
     _raw_secret_key = (os.getenv("SECRET_KEY") or "").strip()
@@ -220,7 +220,7 @@ class Config:
             'pool_use_lifo': str_to_bool(os.getenv('DB_POOL_USE_LIFO'), True),
         }
 
-    # BYS360_CLAUDE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_CONFIG
+    # BYS360_MAINTENANCE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_CONFIG
     # Faz 4: cache, DB pool ve bildirim polling yükünü azaltma ayarları.
     CACHE_DEFAULT_TTL = _coerce_positive_int(os.getenv('CACHE_DEFAULT_TTL'), 30)
     _raw_runtime_redis_url, RUNTIME_REDIS_CONFIG_WARNING = _normalize_runtime_redis_url(os.getenv('REDIS_URL', ''), APP_ENV)
@@ -236,7 +236,7 @@ class Config:
     _base_max_content_length = int(os.getenv('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))
     MAX_CONTENT_LENGTH = max(_base_max_content_length, PUBLICATION_UPLOAD_MAX_CONTENT_LENGTH, EDUCATION_EBOOK_MAX_CONTENT_LENGTH)
 
-    # BYS360_CLAUDE_ROADMAP_PHASE2_SECURITY_HARDENING_V1
+    # BYS360_MAINTENANCE_ROADMAP_PHASE2_SECURITY_HARDENING_V1
     ALLOWED_UPLOAD_EXTENSIONS = os.getenv('ALLOWED_UPLOAD_EXTENSIONS', 'pdf,png,jpg,jpeg,gif,webp,docx,xlsx,pptx,zip,csv,txt').strip() or 'pdf,png,jpg,jpeg,gif,webp,docx,xlsx,pptx,zip,csv,txt'
     UPLOAD_MAX_FILENAME_LENGTH = _coerce_positive_int(os.getenv('UPLOAD_MAX_FILENAME_LENGTH'), 180)
     UPLOAD_STRICT_MIME_VALIDATION = str_to_bool(os.getenv('UPLOAD_STRICT_MIME_VALIDATION'), True)
@@ -320,7 +320,7 @@ class Config:
 
     TCKN_ENCRYPTION_KEY = os.getenv('TCKN_ENCRYPTION_KEY', '').strip()
 
-    # BYS360_CLAUDE_ROADMAP_PHASE2_SECURITY_HARDENING_V1
+    # BYS360_MAINTENANCE_ROADMAP_PHASE2_SECURITY_HARDENING_V1
     SENTRY_DSN = (os.getenv("SENTRY_DSN") or "").strip()
     SENTRY_ENVIRONMENT = os.getenv('SENTRY_ENVIRONMENT', APP_ENV).strip() or APP_ENV
     SENTRY_RELEASE = os.getenv('SENTRY_RELEASE', '').strip()
@@ -334,7 +334,7 @@ class Config:
     SLOW_REQUEST_THRESHOLD_MS = int(os.getenv('SLOW_REQUEST_THRESHOLD_MS', 1000))
 
     CSP_ENABLED = str_to_bool(os.getenv('CSP_ENABLED'), True)
-    # BYS360_CLAUDE_10_SHORT_TERM_CSP_ENFORCE_DEFAULT
+    # BYS360_MAINTENANCE_10_SHORT_TERM_CSP_ENFORCE_DEFAULT
     # Geliştirmede raporlama, production/staging ortamında aksi belirtilmezse enforce.
     CSP_REPORT_ONLY = str_to_bool(os.getenv('CSP_REPORT_ONLY'), APP_ENV not in {'production', 'staging'})
     CSP_POLICY = os.getenv('CSP_POLICY', '').strip()
