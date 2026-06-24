@@ -40,6 +40,10 @@ AUTH_GUARD_CASES: list[dict[str, str]] = [
     {"feature": "notifications", "method": "GET", "path": "/api/mobile/notifications", "kind": "protected"},
     {"feature": "performance", "method": "GET", "path": "/api/mobile/performance/summary", "kind": "protected"},
     {"feature": "performance", "method": "GET", "path": "/api/mobile/performance/tasks", "kind": "protected"},
+    {"feature": "push", "method": "POST", "path": "/api/mobile/push/register-token", "kind": "protected"},
+    {"feature": "push", "method": "POST", "path": "/api/mobile/notifications/fcm-token", "kind": "protected"},
+    {"feature": "push", "method": "POST", "path": "/api/mobile/push/unregister-token", "kind": "protected"},
+    {"feature": "push", "method": "GET", "path": "/api/mobile/push/status", "kind": "protected"},
 ]
 
 PROTECTED_EXPECTED_STATUSES = {400, 401, 403, 422}
@@ -160,7 +164,7 @@ def mobile_route_inventory(root: Path) -> dict[str, Any]:
         "domains_dir_exists": domains_dir.exists(),
         "domain_inventory": domain_inventory,
         "total_mobile_route_decorator_count": total_routes,
-        "expected_contract_route_count": 24,
+        "expected_contract_route_count": 28,
         "duplicate_route_decorators": duplicate_candidates,
         "route_rules_sample": sorted(route_rules)[:40],
     }
