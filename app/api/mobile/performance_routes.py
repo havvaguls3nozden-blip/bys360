@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import logging
 
-from statistics import mean
 from typing import Any
 
 from flask import jsonify, request
@@ -326,9 +325,6 @@ def mobile_performance_third_manager(user: User):
 
 
 # BYS360 MOBILE V2.8.22 PERFORMANCE TASKS
-from datetime import datetime as _v2822_datetime, timezone as _v2822_timezone
-
-
 from app.api.mobile.services.performance_task_helpers import (
     _v2822_assignment_card,
     _v2822_assignment_query,
