@@ -1,4 +1,3 @@
-/* BYS360_LIVE_FULL_OVERLAY_V2_17_61 */
 (function(){
   'use strict';
   function metaToken(){

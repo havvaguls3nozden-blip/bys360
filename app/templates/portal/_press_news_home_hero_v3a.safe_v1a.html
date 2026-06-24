@@ -1,5 +1,4 @@
 {# BYS360_PORTAL_EXPERIENCE_V3A_HOME_HERO_TEMPLATE #}
-{# BYS360_HOME_PRESTIGE_SAFE_V1A_PRESS_NEWS_RELEVANCE_GUARD #}
 {% set pn = press_news if press_news is defined and press_news else {} %}
 {% set latest = pn.latest if pn.latest is defined else none %}
 {% set latest_title = latest.title if latest and latest.title else '' %}

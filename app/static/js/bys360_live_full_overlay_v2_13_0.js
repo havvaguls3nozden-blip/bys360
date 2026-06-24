@@ -1,4 +1,3 @@
-// BYS360_LIVE_FULL_OVERLAY_V2_13_0
 (function(){
   "use strict";
 

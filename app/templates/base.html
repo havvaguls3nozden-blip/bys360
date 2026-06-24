@@ -348,13 +348,11 @@ html, body { min-height: 100% !important; }
 
     <!-- BYS360_CIC_V4_1B_FORCE_PRO_UI -->
 
-<!-- BYS360_LIVE_FULL_OVERLAY_V2_17_61_HEAD_BEGIN -->
 {% if csrf_token is defined %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_live_full_v2_17_61.css') }}?v=2_17_61">
 {% if request and request.path and ('kurumsal-bilgilendirme/alicilar' in request.path or 'kurumsal-bilgilendirme/alicilar' in request.path|lower) %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_recipient_ux_v2_3.css') }}?v=2_17_61">
 {% endif %}
-<!-- BYS360_LIVE_FULL_OVERLAY_V2_17_61_HEAD_END -->
 <!-- BYS360_IOS_RESPONSIVE_COMPLETION_V1_CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_ios_responsive_completion_v1.css') }}?v=1">
 <!-- /BYS360_IOS_RESPONSIVE_COMPLETION_V1_CSS -->
@@ -1045,7 +1043,6 @@ function submitLogoutForm(event){
 
 {% block extra_scripts %}{% endblock %}
 
-<!-- BYS360_LIVE_FULL_OVERLAY_V2_17_61_BODY_BEGIN -->
 
 <script src="{{ url_for('static', filename='js/bys360_screen_title_fix_v18_8.js') }}?v=2_17_61" defer></script>
 <script src="{{ url_for('static', filename='js/bys360_form_csrf_guard_v2_17_61.js') }}?v=2_17_61" defer></script>
@@ -1104,7 +1101,6 @@ function submitLogoutForm(event){
     });
 })();
 </script>
-<!-- BYS360_LIVE_FULL_OVERLAY_V2_17_61_BODY_END -->
 <!-- BYS360_IOS_RESPONSIVE_COMPLETION_V1_JS -->
 <script src="{{ url_for('static', filename='js/bys360_ios_responsive_completion_v1.js') }}?v=1" defer></script>
 <!-- /BYS360_IOS_RESPONSIVE_COMPLETION_V1_JS -->

@@ -2237,7 +2237,6 @@
 /* BYS360_V18_8_2_KPI_ANALIZ_MERKEZI_FIX_END */
 
 
-/* BYS360_V19_SAFE_MENU_FULL_MAP_START */
 (function(){
   "use strict";
 
@@ -2502,6 +2501,5 @@
   setTimeout(replaceVisibleTitle, 900);
   setTimeout(replaceVisibleTitle, 1800);
 })();
-/* BYS360_V19_SAFE_MENU_FULL_MAP_END */
 
 /* BYS360_ASSISTANT_SCREEN_MAP_V20_START */
