@@ -1,0 +1,64 @@
+{
+  "package": "BYS360_HANDOVER_DOCS_GATE_V1",
+  "generated_at": "2026-06-24T12:12:58",
+  "project_root": "C:\\bys360\\project",
+  "status": "PASS",
+  "failures": [],
+  "passes": [
+    {
+      "type": "file_present",
+      "path": "DEPLOYMENT.md",
+      "chars": 3793
+    },
+    {
+      "type": "file_present",
+      "path": "BACKUP_RUNBOOK.md",
+      "chars": 2700
+    },
+    {
+      "type": "file_present",
+      "path": "SECURITY.md",
+      "chars": 3250
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/README.md",
+      "chars": 758
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_DEVIR_PAKETI_V1.md",
+      "chars": 1594
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_KURULUM_REHBERI.md",
+      "chars": 1419
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_CANLIYA_ALMA_REHBERI.md",
+      "chars": 1188
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_BAKIM_RUNBOOK.md",
+      "chars": 1116
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_GUVENLIK_KVKK_NOTLARI.md",
+      "chars": 964
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_MODUL_ENVANTERI.md",
+      "chars": 1127
+    },
+    {
+      "type": "file_present",
+      "path": "docs/handover/BYS360_RISK_VE_SUREKLILIK_PLANI.md",
+      "chars": 1341
+    }
+  ]
+}
