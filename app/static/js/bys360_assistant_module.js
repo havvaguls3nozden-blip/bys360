@@ -3,17 +3,6 @@
 /* BYS360_ASSISTANT_HOME_DASHBOARD_SPLIT_V31_2: Ana Sayfa ve Dashboard cevapları ayrıldı */
 /* BYS360_ASSISTANT_VISIBILITY_RESTORE_V31_1: visible launcher/panel restored, V31 server-first preserved */
 /* BYS360_ASSISTANT_SCREEN_MAP_V20_1_KPI_DESCRIPTION_FIX */
-/* BYS360_ASSISTANT_MODULE_SAFE_MENU_BROKEN_LINK_GUARD_V2
- * BYS360_ASSISTANT_MODULE_LIVE_QUALITY_FINAL_GATE_V6
- * V6_CEVAP_HIJYENI_KATMANI
- * V6_FINAL_TEST_SENARYOLARI
- * V6_GUVENLI_YONLENDIRME_SIKILASTIRMA
- * V6_CANLI_KALITE_KONTROL
- * Kurumsal Rehberlik, Akıllı Yönlendirme ve Yetki Kontrollü Dijital Yardımcı
- * Dönemlerdir; yönlendirme bu adla yapılmalıdır
- * Hava durumunu doğru verebilmem için canlı ve doğrulanabilir hava verisi gerekir.
- * Hava durumu açıklaması sıcaklık bilgisiyle uyumlu görünmediği için yalnızca doğrulanabilen bilgileri paylaşıyorum.
- */
 /* BYS360_ASSISTANT_MODULE_PERSONEL_LEAVE_DELEGATION_KB_V9_JS
    Eksiksiz ekran öğretimi, adım adım modül cevap sözleşmesi, güvenli eylem sınırı ve canlı kalite V7
    BYS360 Asistanı — Kurumsal Rehberlik, Akıllı Yönlendirme ve Yetki Kontrollü Dijital Yardımcı
