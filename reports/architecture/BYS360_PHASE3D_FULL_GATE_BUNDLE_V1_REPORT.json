@@ -1,13 +1,23 @@
 {
   "package": "BYS360_PHASE3D_FULL_GATE_BUNDLE_V1",
-  "generated_at": "2026-06-24T23:13:34",
+  "generated_at": "2026-06-24T23:20:38",
   "branch": "phase3d-service-layer-stabilization-v1",
-  "head": "5102a1c",
-  "git_status_clean_before_bundle": false,
+  "head_before_report_commit": "3eb632b",
+  "git_status_before_bundle": {
+    "raw": [
+      "M scripts/quality/bys360_phase3d_full_gate_bundle_v1.py"
+    ],
+    "meaningful": [
+      "M scripts/quality/bys360_phase3d_full_gate_bundle_v1.py"
+    ],
+    "ignored": [],
+    "clean": false
+  },
+  "meaningful_git_status_clean_before_bundle": false,
   "gates": {
     "phase3d_import_route_smoke": {
       "package": "BYS360_PHASE3D_IMPORT_ROUTE_SMOKE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "target_files": [
         "app/api/mobile/performance_routes.py",
         "app/api/mobile/services/performance_score_route_services.py",
@@ -549,7 +559,7 @@
     },
     "phase3c_score_route_service": {
       "package": "BYS360_PHASE3C_SCORE_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_score_route_services.py",
       "route_exists": true,
@@ -576,7 +586,7 @@
     },
     "phase3c_note_route_service": {
       "package": "BYS360_PHASE3C_NOTE_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_note_route_services.py",
       "route_exists": true,
@@ -603,7 +613,7 @@
     },
     "phase3c_task_detail_route_service": {
       "package": "BYS360_PHASE3C_TASK_DETAIL_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_task_detail_route_services.py",
       "route_exists": true,
@@ -628,7 +638,7 @@
     },
     "phase3c_summary_risk_route_service": {
       "package": "BYS360_PHASE3C_SUMMARY_RISK_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_summary_risk_route_services.py",
       "route_exists": true,
@@ -656,7 +666,7 @@
     },
     "phase3c_compact_route_service": {
       "package": "BYS360_PHASE3C_COMPACT_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T23:13:28",
+      "generated_at": "2026-06-24T23:20:32",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_compact_route_services.py",
       "route_exists": true,
@@ -696,16 +706,17 @@
     "returncode": 0,
     "summary": {
       "collected": 813,
-      "passed": null,
-      "skipped": null,
+      "passed": 13,
+      "skipped": 800,
       "failed": 0,
       "errors": 0,
-      "seconds": null,
-      "summary_found": false
+      "seconds": 5.61,
+      "summary_found": true,
+      "summary_line": "======================= 13 passed, 800 skipped in 5.61s ======================="
     },
-    "stdout_tail": "\\test_mobile_domain_contract_p2a.py sss                      [ 26%]\ntests\\performance\\test_critical_performance_routes_smoke.py sssss        [ 26%]\ntests\\performance\\test_performance_completion_phase1_rule_center.py ssss [ 27%]\ns                                                                        [ 27%]\ntests\\performance\\test_performance_completion_phase2_category_center.py s [ 27%]\nss                                                                       [ 27%]\ntests\\performance\\test_performance_completion_phase3_visibility_scope.py s [ 27%]\nssss                                                                     [ 28%]\ntests\\performance\\test_phase12_performance_rules_contract.py ssssss      [ 29%]\ntests\\quality\\test_app_factory_registers_routes_without_duplicate_endpoints.py s [ 29%]\n                                                                         [ 29%]\ntests\\quality\\test_assistant_js_split_contract_v1.py sss                 [ 29%]\ntests\\quality\\test_code_quality_architecture_score_contract_v1.py sss    [ 29%]\ntests\\quality\\test_phase2_pytest_invocation_contract_v1.py s             [ 30%]\ntests\\quality\\test_phase2_test_coverage_evidence_gate_v1.py s            [ 30%]\ntests\\quality\\test_quality9_ci_safe_contract.py sssss                    [ 30%]\ntests\\quality\\test_tckn_crypto_storage_contract_v1.py s                  [ 30%]\ntests\\quality\\test_tckn_crypto_v1a.py s                                  [ 30%]\ntests\\release\\test_final_quality_release_evidence_contract.py ssssss     [ 31%]\ntests\\security\\test_admin_path_guard_contract.py ss                      [ 31%]\ntests\\security\\test_audit_observability_contract.py sss                  [ 32%]\ntests\\security\\test_final_quality_security_compliance_contract.py sssss  [ 32%]\ntests\\security\\test_final_quality_security_source_contract.py sss        [ 33%]\ntests\\security\\test_final_quality_security_static_release_contract.py ss [ 33%]\n                                                                         [ 33%]\ntests\\security\\test_static_release_contract_presence.py ss               [ 33%]\ntests\\services\\test_final_quality_performance_rule_matrix.py ssss        [ 34%]\ntests\\services\\test_final_quality_performance_visibility_contract.py sss [ 34%]\n                                                                         [ 34%]\ntests\\services\\test_final_quality_service_contract_manifest.py ssss      [ 35%]\ntests\\services\\test_final_quality_third_manager_modes.py sss             [ 35%]\ntests\\services\\test_leave_delegation_contract.py ss                      [ 35%]\ntests\\services\\test_performance_assignments_contract.py ss               [ 36%]\ntests\\services\\test_performance_common_contract.py ss                    [ 36%]\ntests\\services\\test_sp_kpi_services.py sssss                             [ 36%]\ntests\\test_10_10_core_static_gate.py ssssss                              [ 37%]\ntests\\test_ai_analysis_excel_preview_static.py ssss                      [ 38%]\ntests\\test_ai_executive_report_static.py ss                              [ 38%]\ntests\\test_ai_recommendation_priority_static.py sss                      [ 38%]\ntests\\test_ai_routes.py sss                                              [ 39%]\ntests\\test_claude_phase5_function_signatures.py ssss                     [ 39%]\ntests\\test_claude_phase5_template_compilation.py sssssssssssssssssssssss [ 42%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 51%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 60%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 69%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 77%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 86%]\nsssssssssssssssssssssssssssssssssssssssssssssssss                        [ 92%]\ntests\\test_compat_redirects.py s                                         [ 92%]\ntests\\test_datetime_utils.py ss                                          [ 93%]\ntests\\test_error_support.py sss                                          [ 93%]\ntests\\test_feedback_admin_endpoint_static.py s                           [ 93%]\ntests\\test_feedback_privacy_static.py s                                  [ 93%]\ntests\\test_feedback_pulse_admin_tab_static.py sss                        [ 94%]\ntests\\test_feedback_pulse_menu_visibility_static.py ss                   [ 94%]\ntests\\test_feedback_pulse_privacy_behavior.py ss                         [ 94%]\ntests\\test_hr_reports_template_no_unpack_static.py s                     [ 94%]\ntests\\test_live_scope_and_security_static.py sss                         [ 95%]\ntests\\test_module_maturity_scoring.py ss                                 [ 95%]\ntests\\test_no_admin_org_units_duplicate_static.py s                      [ 95%]\ntests\\test_no_duplicate_admin_org_units_static.py s                      [ 95%]\ntests\\test_performance_archive_visibility_contract.py sss                [ 95%]\ntests\\test_performance_chain_constitution.py sssssss                     [ 96%]\ntests\\test_performance_form_guard.py ss                                  [ 97%]\ntests\\test_performance_ops_center.py sss                                 [ 97%]\ntests\\test_performance_preflight.py sss                                  [ 97%]\ntests\\test_performance_publish_guard.py ss                               [ 98%]\ntests\\test_performance_publish_preflight_static.py sss                   [ 98%]\ntests\\test_personel_analizi_dalga7_static.py sss                         [ 98%]\ntests\\test_score100_handover_docs_contract_v1.py sss                     [ 99%]\ntests\\test_shared_cache_store_behavior.py s                              [ 99%]\ntests\\test_sp_routes_smoke.py s                                          [ 99%]\ntests\\test_team_compare_publish_visibility.py s                          [ 99%]\ntests\\test_team_compare_service.py ssss                                  [100%]\n\n======================= 13 passed, 800 skipped in 5.53s =======================\n",
+    "stdout_tail": "\\test_mobile_domain_contract_p2a.py sss                      [ 26%]\ntests\\performance\\test_critical_performance_routes_smoke.py sssss        [ 26%]\ntests\\performance\\test_performance_completion_phase1_rule_center.py ssss [ 27%]\ns                                                                        [ 27%]\ntests\\performance\\test_performance_completion_phase2_category_center.py s [ 27%]\nss                                                                       [ 27%]\ntests\\performance\\test_performance_completion_phase3_visibility_scope.py s [ 27%]\nssss                                                                     [ 28%]\ntests\\performance\\test_phase12_performance_rules_contract.py ssssss      [ 29%]\ntests\\quality\\test_app_factory_registers_routes_without_duplicate_endpoints.py s [ 29%]\n                                                                         [ 29%]\ntests\\quality\\test_assistant_js_split_contract_v1.py sss                 [ 29%]\ntests\\quality\\test_code_quality_architecture_score_contract_v1.py sss    [ 29%]\ntests\\quality\\test_phase2_pytest_invocation_contract_v1.py s             [ 30%]\ntests\\quality\\test_phase2_test_coverage_evidence_gate_v1.py s            [ 30%]\ntests\\quality\\test_quality9_ci_safe_contract.py sssss                    [ 30%]\ntests\\quality\\test_tckn_crypto_storage_contract_v1.py s                  [ 30%]\ntests\\quality\\test_tckn_crypto_v1a.py s                                  [ 30%]\ntests\\release\\test_final_quality_release_evidence_contract.py ssssss     [ 31%]\ntests\\security\\test_admin_path_guard_contract.py ss                      [ 31%]\ntests\\security\\test_audit_observability_contract.py sss                  [ 32%]\ntests\\security\\test_final_quality_security_compliance_contract.py sssss  [ 32%]\ntests\\security\\test_final_quality_security_source_contract.py sss        [ 33%]\ntests\\security\\test_final_quality_security_static_release_contract.py ss [ 33%]\n                                                                         [ 33%]\ntests\\security\\test_static_release_contract_presence.py ss               [ 33%]\ntests\\services\\test_final_quality_performance_rule_matrix.py ssss        [ 34%]\ntests\\services\\test_final_quality_performance_visibility_contract.py sss [ 34%]\n                                                                         [ 34%]\ntests\\services\\test_final_quality_service_contract_manifest.py ssss      [ 35%]\ntests\\services\\test_final_quality_third_manager_modes.py sss             [ 35%]\ntests\\services\\test_leave_delegation_contract.py ss                      [ 35%]\ntests\\services\\test_performance_assignments_contract.py ss               [ 36%]\ntests\\services\\test_performance_common_contract.py ss                    [ 36%]\ntests\\services\\test_sp_kpi_services.py sssss                             [ 36%]\ntests\\test_10_10_core_static_gate.py ssssss                              [ 37%]\ntests\\test_ai_analysis_excel_preview_static.py ssss                      [ 38%]\ntests\\test_ai_executive_report_static.py ss                              [ 38%]\ntests\\test_ai_recommendation_priority_static.py sss                      [ 38%]\ntests\\test_ai_routes.py sss                                              [ 39%]\ntests\\test_claude_phase5_function_signatures.py ssss                     [ 39%]\ntests\\test_claude_phase5_template_compilation.py sssssssssssssssssssssss [ 42%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 51%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 60%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 69%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 77%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 86%]\nsssssssssssssssssssssssssssssssssssssssssssssssss                        [ 92%]\ntests\\test_compat_redirects.py s                                         [ 92%]\ntests\\test_datetime_utils.py ss                                          [ 93%]\ntests\\test_error_support.py sss                                          [ 93%]\ntests\\test_feedback_admin_endpoint_static.py s                           [ 93%]\ntests\\test_feedback_privacy_static.py s                                  [ 93%]\ntests\\test_feedback_pulse_admin_tab_static.py sss                        [ 94%]\ntests\\test_feedback_pulse_menu_visibility_static.py ss                   [ 94%]\ntests\\test_feedback_pulse_privacy_behavior.py ss                         [ 94%]\ntests\\test_hr_reports_template_no_unpack_static.py s                     [ 94%]\ntests\\test_live_scope_and_security_static.py sss                         [ 95%]\ntests\\test_module_maturity_scoring.py ss                                 [ 95%]\ntests\\test_no_admin_org_units_duplicate_static.py s                      [ 95%]\ntests\\test_no_duplicate_admin_org_units_static.py s                      [ 95%]\ntests\\test_performance_archive_visibility_contract.py sss                [ 95%]\ntests\\test_performance_chain_constitution.py sssssss                     [ 96%]\ntests\\test_performance_form_guard.py ss                                  [ 97%]\ntests\\test_performance_ops_center.py sss                                 [ 97%]\ntests\\test_performance_preflight.py sss                                  [ 97%]\ntests\\test_performance_publish_guard.py ss                               [ 98%]\ntests\\test_performance_publish_preflight_static.py sss                   [ 98%]\ntests\\test_personel_analizi_dalga7_static.py sss                         [ 98%]\ntests\\test_score100_handover_docs_contract_v1.py sss                     [ 99%]\ntests\\test_shared_cache_store_behavior.py s                              [ 99%]\ntests\\test_sp_routes_smoke.py s                                          [ 99%]\ntests\\test_team_compare_publish_visibility.py s                          [ 99%]\ntests\\test_team_compare_service.py ssss                                  [100%]\n\n======================= 13 passed, 800 skipped in 5.61s =======================\n",
     "stderr_tail": ""
   },
-  "pytest_ok": false,
+  "pytest_ok": true,
   "phase3d_full_gate_bundle_ok": false
 }
