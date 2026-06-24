@@ -1,0 +1,185 @@
+{
+  "package": "BYS360_PHASE3C_COMPACT_ROUTE_DEPENDENCY_V1",
+  "generated_at": "2026-06-24T22:34:56",
+  "route_path": "app\\api\\mobile\\performance_routes.py",
+  "targets": [
+    "mobile_performance_approvals",
+    "mobile_performance_criteria",
+    "_bys360_legacy_mobile_performance_in_period_notes"
+  ],
+  "items": [
+    {
+      "name": "mobile_performance_approvals",
+      "exists": true,
+      "start_line": 234,
+      "end_line": 244,
+      "line_count": 11,
+      "external_names": [
+        "PerformancePresidentApproval",
+        "User",
+        "_as_int",
+        "_full_name",
+        "_has_global_scope",
+        "_item",
+        "_label",
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_mobile_perf_safe_count",
+        "_module_payload",
+        "_period_name",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "project_globals_or_helpers": [
+        "_as_int",
+        "_full_name",
+        "_has_global_scope",
+        "_item",
+        "_label",
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_mobile_perf_safe_count",
+        "_module_payload",
+        "_period_name"
+      ],
+      "likely_imported_or_model_names": [
+        "PerformancePresidentApproval",
+        "User",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "called_names": [
+        "_as_int",
+        "_full_name",
+        "_has_global_scope",
+        "_item",
+        "_label",
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_mobile_perf_safe_count",
+        "_module_payload",
+        "_period_name",
+        "getattr",
+        "items.append",
+        "mobile_api_bp.get",
+        "q.limit"
+      ],
+      "attributes": [
+        "append",
+        "desc",
+        "endswith",
+        "filter_by",
+        "get",
+        "id",
+        "limit",
+        "order_by",
+        "query"
+      ],
+      "source_preview": "def mobile_performance_approvals(user: User):\n    if not _has_global_scope(user):\n        return _module_payload([_metric(\"Üst Onay\", \"Sınırlı\", \"Bu alan yalnızca yetkili roller için açılır\", \"red\", \"lock\"), _metric(\"Görünürlük\", \"Güvenli\", \"Yetkisiz kayıt gösterilmez\", \"red\", \"shield\"), _metric(\"Süreç\", \"Kontrollü\", \"70 altı sonuçlar yayın öncesi onaya bağlıdır\", \"yellow\", \"verified_user\")], [])\n    q = PerformancePresidentApproval.query.order_by(PerformancePresidentApproval.id.desc())\n    items: list[dict[str, Any]] = []\n    for approval in _mobile_perf_safe_all(q.limit(30)):\n        employee = getattr(approval, \"employee\", None) or getattr(approval, \"user\", None)\n        period = getattr(approval, \"period\", None)\n        score = getattr(approval, \"final_score\", None) or getattr(approval, \"score\", None) or getattr(approval, \"final_total_100\", None)\n        items.append(_item(getattr(approval, \"id\", \"\"), _full_name(employee), _period_name(period), _label(getattr(approval, \"status\", None), \"Başkan Onayı Bekliyor\"), \"70 altı süreç\" if _as_int(score, 0) and _as_int(score, 0) < 70 else \"Üst onay\", f\"{_as_int(score, 0)}/100\" if score is not None else \"\", 45 if _label(getattr(approval, \"status\", None)).endswith(\"Bekliyor\") else 100))\n    return _module_payload([_metric(\"Bekleyen\", _mobile_perf_safe_count(PerformancePresidentApproval.query.filter_by(status=\"pending\")), \"Başkan/Üst Onay bekleyen\", \"red\", \"verified_user\"), _metric(\"Toplam\", _mobile_perf_safe_count(q), \"Onay süreç kayıtları\", \"red\", \"list\"), _metric(\"Yayın Kilidi\", \"Aktif\", \"Onay tamamlanmadan personel karnesi açılmaz\", \"red\", \"lock\")], items)"
+    },
+    {
+      "name": "mobile_performance_criteria",
+      "exists": true,
+      "start_line": 275,
+      "end_line": 291,
+      "line_count": 17,
+      "external_names": [
+        "PerformanceCriteria",
+        "User",
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_module_payload",
+        "_v2821_criteria_item",
+        "_v2821_float",
+        "logger",
+        "mean",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "project_globals_or_helpers": [
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_module_payload",
+        "_v2821_criteria_item",
+        "_v2821_float",
+        "logger"
+      ],
+      "likely_imported_or_model_names": [
+        "PerformanceCriteria",
+        "User",
+        "mean",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "called_names": [
+        "_metric",
+        "_mobile_perf_safe_all",
+        "_module_payload",
+        "_v2821_criteria_item",
+        "_v2821_float",
+        "bool",
+        "getattr",
+        "int",
+        "len",
+        "logger.exception",
+        "mean",
+        "mobile_api_bp.get",
+        "q.limit",
+        "q.order_by"
+      ],
+      "attributes": [
+        "asc",
+        "exception",
+        "get",
+        "id",
+        "limit",
+        "order_by",
+        "query",
+        "sort_order"
+      ],
+      "source_preview": "def mobile_performance_criteria(user: User):\n    q = PerformanceCriteria.query\n    try:\n        q = q.order_by(PerformanceCriteria.sort_order.asc(), PerformanceCriteria.id.asc())\n    except Exception:\n        logger.exception(\"BYS360 performans modülünde beklenmeyen hata yakalandı.\")\n        q = q.order_by(PerformanceCriteria.id.asc())\n    rows = _mobile_perf_safe_all(q.limit(120))\n    active_rows = [row for row in rows if bool(getattr(row, \"is_active\", True))]\n    weights = [_v2821_float(getattr(row, \"weight\", 0)) for row in active_rows]\n    avg_weight = int(mean(weights)) if weights else 0\n    items = [_v2821_criteria_item(row) for row in rows]\n    return _module_payload([\n        _metric(\"Kriter\", len(rows), \"Mobilde görünen değerlendirme kriteri\", \"red\", \"rule\"),\n        _metric(\"Aktif\", len(active_rows), \"Puanlama sürecinde kullanılabilecek kriter\", \"green\", \"check\"),\n        _metric(\"Ortalama Ağırlık\", f\"%{avg_weight}\" if avg_weight else \"-\", \"Aktif kriterlerin yaklaşık ağırlığı\", \"blue\", \"trending_up\"),\n    ], items)"
+    },
+    {
+      "name": "_bys360_legacy_mobile_performance_in_period_notes",
+      "exists": true,
+      "start_line": 882,
+      "end_line": 890,
+      "line_count": 9,
+      "external_names": [
+        "User",
+        "_item",
+        "_metric",
+        "_module_payload",
+        "_v2852_items_from_models",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "project_globals_or_helpers": [
+        "_item",
+        "_metric",
+        "_module_payload",
+        "_v2852_items_from_models"
+      ],
+      "likely_imported_or_model_names": [
+        "User",
+        "mobile_api_bp",
+        "require_mobile_user"
+      ],
+      "called_names": [
+        "_item",
+        "_metric",
+        "_module_payload",
+        "_v2852_items_from_models",
+        "i.get",
+        "len",
+        "max",
+        "mobile_api_bp.get"
+      ],
+      "attributes": [
+        "get"
+      ],
+      "source_preview": "def _bys360_legacy_mobile_performance_in_period_notes(user: User):\n    items = _v2852_items_from_models(['PerformanceInPeriodNote', 'PerformancePeriodNote', 'PerformanceObservationNote', 'PerformanceInterimFeedback', 'FeedbackActionPlan'], ['employee_name', 'title', 'subject', 'note_type'], ['note', 'description', 'body', 'observation'], ['status', 'note_type', 'state'], ['period_name', 'created_at', 'created_by_name'], ['value'], limit=100, progress=60)\n    if not items:\n        items = [_item('note-empty', 'Dönem içi not kaydı bulunmadı', 'Olumlu/olumsuz olay, başarı, gelişim ihtiyacı veya genel gözlem notu oluştuğunda burada görünür.', 'Bilgi', 'Puanı otomatik üretmez', '', 35)]\n    return _module_payload([\n        _metric('Not', max(0, len([i for i in items if i.get('id') != 'note-empty'])), 'Yetki kapsamındaki dönem içi not', 'blue', 'note'),\n        _metric('Kural', 'Destek Bilgi', 'Bu notlar puanı otomatik oluşturmaz', 'green', 'shield'),\n        _metric('Görünürlük', 'Yetki Kontrollü', 'Hassas içerik rol kapsamına göre korunur', 'red', 'lock'),\n    ], items)"
+    }
+  ],
+  "inventory_ok": true
+}
