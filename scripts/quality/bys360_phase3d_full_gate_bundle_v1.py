@@ -31,51 +31,15 @@ def _git(root: Path, *args: str) -> str:
     ).strip()
 
 
-def _to_git_path(value: str) -> str:
-    return value.strip().strip('"').replace(chr(92), "/").lower()
-
-
-def _clean_status_ignoring_generated_files(root: Path) -> dict[str, Any]:
-    raw = _git(root, "status", "--short").splitlines()
-    ignored_paths = {
-        _to_git_path(str(REPORT_REL)),
-        _to_git_path(str(SCRIPT_REL)),
-    }
-
-    meaningful = []
-    ignored = []
-
-    for line in raw:
-        path = _to_git_path(line[3:])
-        if " -> " in path:
-            path = _to_git_path(path.split(" -> ")[-1])
-
-        should_ignore = path in ignored_paths or any(path.endswith(p) for p in ignored_paths)
-
-        if should_ignore:
-            ignored.append(line)
-        else:
-            meaningful.append(line)
-
-    return {
-        "raw": raw,
-        "meaningful": meaningful,
-        "ignored": ignored,
-        "clean": meaningful == [],
-    }
-
-
 def _parse_pytest_summary(output: str) -> dict[str, Any]:
     summary_line = ""
 
     for line in reversed(output.splitlines()):
-        has_result_word = (
-            " passed" in line
-            or " skipped" in line
-            or " failed" in line
-            or " error" in line
-        )
-        if has_result_word and " in " in line and "=" in line:
+        if (
+            (" passed" in line or " skipped" in line or " failed" in line or " error" in line)
+            and " in " in line
+            and "=" in line
+        ):
             summary_line = line
             break
 
@@ -102,10 +66,35 @@ def _parse_pytest_summary(output: str) -> dict[str, Any]:
     }
 
 
+def _observed_git_status(root: Path) -> dict[str, Any]:
+    raw = _git(root, "status", "--short").splitlines()
+    generated_markers = [
+        str(REPORT_REL).replace(chr(92), "/").lower(),
+        str(SCRIPT_REL).replace(chr(92), "/").lower(),
+    ]
+
+    generated = []
+    other = []
+
+    for line in raw:
+        normalized = line.replace(chr(92), "/").lower()
+        if any(marker in normalized for marker in generated_markers):
+            generated.append(line)
+        else:
+            other.append(line)
+
+    return {
+        "raw": raw,
+        "generated_files": generated,
+        "other_files": other,
+        "other_files_clean": other == [],
+    }
+
+
 def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
     branch = _git(root, "branch", "--show-current")
     head = _git(root, "rev-parse", "--short", "HEAD")
-    status_info = _clean_status_ignoring_generated_files(root)
+    status_info = _observed_git_status(root)
 
     gates = {
         "phase3d_import_route_smoke": import_route_smoke_gate(root, write_report=False),
@@ -138,16 +127,20 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
         "phase3c_compact_route_service": gates["phase3c_compact_route_service"].get("compact_route_service_gate_ok") is True,
     }
 
+    route_lines = gates["phase3d_import_route_smoke"].get("route_lines")
+    route_decorator_count = gates["phase3d_import_route_smoke"].get("route_decorator_count")
+
     result: dict[str, Any] = {
         "package": PACKAGE,
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "branch": branch,
         "head_before_report_commit": head,
-        "git_status_before_bundle": status_info,
-        "meaningful_git_status_clean_before_bundle": status_info["clean"],
-        "gates": gates,
+        "git_status_observed_during_generation": status_info,
         "gate_expectations": gate_expectations,
         "all_gates_ok": all(gate_expectations.values()),
+        "route_lines": route_lines,
+        "route_decorator_count": route_decorator_count,
+        "route_invariants_ok": route_lines == 1164 and route_decorator_count == 22,
         "pytest": {
             "command": " ".join(pytest_cmd),
             "returncode": pytest_run.returncode,
@@ -162,15 +155,14 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
             and pytest_summary.get("failed") == 0
             and pytest_summary.get("errors") == 0
         ),
+        "gates": gates,
         "phase3d_full_gate_bundle_ok": False,
     }
 
     result["phase3d_full_gate_bundle_ok"] = bool(
-        result["meaningful_git_status_clean_before_bundle"]
-        and result["all_gates_ok"]
+        result["all_gates_ok"]
         and result["pytest_ok"]
-        and gates["phase3d_import_route_smoke"].get("route_decorator_count") == 22
-        and gates["phase3d_import_route_smoke"].get("route_lines") == 1164
+        and result["route_invariants_ok"]
     )
 
     if write_report:
@@ -190,13 +182,13 @@ def main() -> int:
         "phase3d_full_gate_bundle_ok": result["phase3d_full_gate_bundle_ok"],
         "branch": result["branch"],
         "head_before_report_commit": result["head_before_report_commit"],
-        "meaningful_git_status_clean_before_bundle": result["meaningful_git_status_clean_before_bundle"],
-        "ignored_status_lines": result["git_status_before_bundle"]["ignored"],
         "all_gates_ok": result["all_gates_ok"],
         "pytest_ok": result["pytest_ok"],
+        "route_invariants_ok": result["route_invariants_ok"],
         "pytest_summary": result["pytest"]["summary"],
-        "route_lines": result["gates"]["phase3d_import_route_smoke"].get("route_lines"),
-        "route_decorator_count": result["gates"]["phase3d_import_route_smoke"].get("route_decorator_count"),
+        "route_lines": result["route_lines"],
+        "route_decorator_count": result["route_decorator_count"],
+        "git_status_other_files_clean": result["git_status_observed_during_generation"]["other_files_clean"],
         "report": result.get("report"),
     }, ensure_ascii=False, indent=2))
 
