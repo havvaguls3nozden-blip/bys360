@@ -1,9 +1,9 @@
 {
   "package": "BYS360_PHASE3C_SERVICE_LAYER_REFACTOR_CLOSURE_V1",
-  "generated_at": "2026-06-24T22:44:39",
+  "generated_at": "2026-06-24T22:47:43",
   "branch": "phase3-service-layer-refactor-v1",
-  "head": "0b05d71",
-  "git_status_clean": false,
+  "head": "3366c7b",
+  "git_status_clean_before_report_write": false,
   "route_path": "app\\api\\mobile\\performance_routes.py",
   "route_lines": 1164,
   "route_decorator_count": 22,
@@ -31,7 +31,7 @@
   "gates": {
     "score_route_service": {
       "package": "BYS360_PHASE3C_SCORE_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T22:44:39",
+      "generated_at": "2026-06-24T22:47:43",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_score_route_services.py",
       "route_exists": true,
@@ -58,7 +58,7 @@
     },
     "note_route_service": {
       "package": "BYS360_PHASE3C_NOTE_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T22:44:39",
+      "generated_at": "2026-06-24T22:47:43",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_note_route_services.py",
       "route_exists": true,
@@ -85,7 +85,7 @@
     },
     "task_detail_route_service": {
       "package": "BYS360_PHASE3C_TASK_DETAIL_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T22:44:39",
+      "generated_at": "2026-06-24T22:47:43",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_task_detail_route_services.py",
       "route_exists": true,
@@ -110,7 +110,7 @@
     },
     "summary_risk_route_service": {
       "package": "BYS360_PHASE3C_SUMMARY_RISK_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T22:44:39",
+      "generated_at": "2026-06-24T22:47:43",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_summary_risk_route_services.py",
       "route_exists": true,
@@ -138,7 +138,7 @@
     },
     "compact_route_service": {
       "package": "BYS360_PHASE3C_COMPACT_ROUTE_SERVICE_GATE_V1",
-      "generated_at": "2026-06-24T22:44:39",
+      "generated_at": "2026-06-24T22:47:43",
       "route_path": "app\\api\\mobile\\performance_routes.py",
       "service_path": "app\\api\\mobile\\services\\performance_compact_route_services.py",
       "route_exists": true,
