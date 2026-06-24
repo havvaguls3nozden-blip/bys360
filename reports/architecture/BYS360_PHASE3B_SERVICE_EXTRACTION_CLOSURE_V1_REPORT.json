@@ -1,0 +1,90 @@
+{
+  "package": "BYS360_PHASE3B_SERVICE_EXTRACTION_CLOSURE_V1",
+  "generated_at": "2026-06-24T21:50:43",
+  "root": "C:\\bys360\\project",
+  "closure_ok": true,
+  "route_path": "app\\api\\mobile\\performance_routes.py",
+  "route_lines": 1466,
+  "route_decorator_count": 22,
+  "route_line_reduction_ok": true,
+  "route_decorator_count_ok": true,
+  "mean_import_ok": true,
+  "v2822_datetime_removed_ok": true,
+  "services": [
+    {
+      "path": "app/api/mobile/services/performance_base_helpers.py",
+      "exists": true
+    },
+    {
+      "path": "app/api/mobile/services/performance_query_helpers.py",
+      "exists": true
+    },
+    {
+      "path": "app/api/mobile/services/performance_item_helpers.py",
+      "exists": true
+    },
+    {
+      "path": "app/api/mobile/services/performance_config_helpers.py",
+      "exists": true
+    },
+    {
+      "path": "app/api/mobile/services/performance_task_helpers.py",
+      "exists": true
+    }
+  ],
+  "scripts": [
+    {
+      "path": "scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py",
+      "exists": true
+    }
+  ],
+  "tests": [
+    {
+      "path": "tests/architecture/test_phase3b_mobile_performance_base_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "tests/architecture/test_phase3b_mobile_performance_query_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "tests/architecture/test_phase3b_mobile_performance_item_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "tests/architecture/test_phase3b_mobile_performance_config_helpers_gate_v1.py",
+      "exists": true
+    },
+    {
+      "path": "tests/architecture/test_phase3b_mobile_performance_task_helpers_gate_v1.py",
+      "exists": true
+    }
+  ],
+  "expected_commits": {
+    "cdf0585": true,
+    "ee34c5c": true,
+    "1658bb0": true,
+    "a7f15c5": true,
+    "70e2fca": true,
+    "91b3d97": true,
+    "2221ad2": true
+  },
+  "tag_ok": true,
+  "git_status_short": "?? _phase3b_closure_report.py"
+}
