@@ -20,3 +20,5 @@ Thumbs.db
 mobile_flutter/**/android/key.properties
 mobile_flutter/**/android/*.jks
 mobile_flutter/**/android/*.keystore
+
+dist_secure/
