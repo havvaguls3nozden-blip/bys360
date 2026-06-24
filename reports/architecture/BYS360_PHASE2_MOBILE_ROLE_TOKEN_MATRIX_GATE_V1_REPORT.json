@@ -1,0 +1,248 @@
+{
+  "package": "BYS360_PHASE2_MOBILE_ROLE_TOKEN_MATRIX_GATE_V1",
+  "generated_at": "2026-06-24T17:02:14",
+  "root": "C:\\bys360\\project",
+  "role_token_matrix_ok": true,
+  "login_ok": true,
+  "role_identity_ok": true,
+  "matrix_route_ok": true,
+  "users": {
+    "personel": {
+      "login_status_code": 200,
+      "has_access_token": true,
+      "response_role": "Personel"
+    },
+    "admin": {
+      "login_status_code": 200,
+      "has_access_token": true,
+      "response_role": "Sistem Yöneticisi"
+    }
+  },
+  "responses": [
+    {
+      "method": "GET",
+      "path": "/api/mobile/me",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "real_api",
+      "has_items": true,
+      "payload_keys": [
+        "items",
+        "metrics",
+        "source"
+      ],
+      "role": "personel",
+      "name": "me",
+      "must_success": true,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/dashboard/summary",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": null,
+      "has_items": false,
+      "payload_keys": [
+        "active_goals",
+        "active_personnel",
+        "ai_alerts",
+        "assigned_surveys",
+        "certificates",
+        "kpi_success_rate",
+        "open_tickets",
+        "pending_approvals",
+        "pending_performance",
+        "unread_messages",
+        "unread_notifications",
+        "user_name"
+      ],
+      "role": "personel",
+      "name": "dashboard_summary",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/push/status",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": null,
+      "has_items": false,
+      "payload_keys": [
+        "active_tokens",
+        "ok",
+        "push_ready"
+      ],
+      "role": "personel",
+      "name": "push_status",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/personnel/list",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "real_api",
+      "has_items": true,
+      "payload_keys": [
+        "items",
+        "metrics",
+        "source"
+      ],
+      "role": "personel",
+      "name": "personnel_list",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/personnel/all",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "web_personnel_user_table_all",
+      "has_items": true,
+      "payload_keys": [
+        "all_active_count",
+        "can_create_personnel",
+        "count",
+        "has_more",
+        "items",
+        "limit",
+        "metrics",
+        "offset",
+        "page",
+        "personnel",
+        "recordsTotal",
+        "rows",
+        "scope",
+        "source",
+        "total",
+        "total_count"
+      ],
+      "role": "personel",
+      "name": "personnel_all",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/me",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "real_api",
+      "has_items": true,
+      "payload_keys": [
+        "items",
+        "metrics",
+        "source"
+      ],
+      "role": "admin",
+      "name": "me",
+      "must_success": true,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/dashboard/summary",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": null,
+      "has_items": false,
+      "payload_keys": [
+        "active_goals",
+        "active_personnel",
+        "ai_alerts",
+        "assigned_surveys",
+        "certificates",
+        "kpi_success_rate",
+        "open_tickets",
+        "pending_approvals",
+        "pending_performance",
+        "unread_messages",
+        "unread_notifications",
+        "user_name"
+      ],
+      "role": "admin",
+      "name": "dashboard_summary",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/push/status",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": null,
+      "has_items": false,
+      "payload_keys": [
+        "active_tokens",
+        "ok",
+        "push_ready"
+      ],
+      "role": "admin",
+      "name": "push_status",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/personnel/list",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "real_api",
+      "has_items": true,
+      "payload_keys": [
+        "items",
+        "metrics",
+        "source"
+      ],
+      "role": "admin",
+      "name": "personnel_list",
+      "must_success": false,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/mobile/personnel/all",
+      "status_code": 200,
+      "no_route_break": true,
+      "no_server_error": true,
+      "source": "web_personnel_user_table_all",
+      "has_items": true,
+      "payload_keys": [
+        "all_active_count",
+        "can_create_personnel",
+        "count",
+        "has_more",
+        "items",
+        "limit",
+        "metrics",
+        "offset",
+        "page",
+        "personnel",
+        "recordsTotal",
+        "rows",
+        "scope",
+        "source",
+        "total",
+        "total_count"
+      ],
+      "role": "admin",
+      "name": "personnel_all",
+      "must_success": false,
+      "ok": true
+    }
+  ],
+  "failures": []
+}
