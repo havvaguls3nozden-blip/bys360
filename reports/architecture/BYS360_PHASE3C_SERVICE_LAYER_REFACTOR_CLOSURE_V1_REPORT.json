@@ -1,0 +1,168 @@
+{
+  "package": "BYS360_PHASE3C_SERVICE_LAYER_REFACTOR_CLOSURE_V1",
+  "generated_at": "2026-06-24T22:44:39",
+  "branch": "phase3-service-layer-refactor-v1",
+  "head": "0b05d71",
+  "git_status_clean": false,
+  "route_path": "app\\api\\mobile\\performance_routes.py",
+  "route_lines": 1164,
+  "route_decorator_count": 22,
+  "route_decorator_count_ok": true,
+  "route_line_reduction": {
+    "phase3b_start_lines": 1466,
+    "phase3c_end_lines": 1164,
+    "reduced_lines": 302,
+    "reduction_ok": true
+  },
+  "service_files": [
+    "app/api/mobile/services/performance_score_route_services.py",
+    "app/api/mobile/services/performance_note_route_services.py",
+    "app/api/mobile/services/performance_task_detail_route_services.py",
+    "app/api/mobile/services/performance_summary_risk_route_services.py",
+    "app/api/mobile/services/performance_compact_route_services.py"
+  ],
+  "service_files_exist": {
+    "app/api/mobile/services/performance_score_route_services.py": true,
+    "app/api/mobile/services/performance_note_route_services.py": true,
+    "app/api/mobile/services/performance_task_detail_route_services.py": true,
+    "app/api/mobile/services/performance_summary_risk_route_services.py": true,
+    "app/api/mobile/services/performance_compact_route_services.py": true
+  },
+  "gates": {
+    "score_route_service": {
+      "package": "BYS360_PHASE3C_SCORE_ROUTE_SERVICE_GATE_V1",
+      "generated_at": "2026-06-24T22:44:39",
+      "route_path": "app\\api\\mobile\\performance_routes.py",
+      "service_path": "app\\api\\mobile\\services\\performance_score_route_services.py",
+      "route_exists": true,
+      "service_exists": true,
+      "route_lines": 1164,
+      "service_lines": 180,
+      "route_decorator_count": 22,
+      "route_import_ok": true,
+      "deps_function_ok": true,
+      "route_wrappers": {
+        "mobile_performance_task_score_form": 2,
+        "mobile_performance_task_score_submit": 2,
+        "mobile_performance_task_score_action": 2
+      },
+      "route_wrappers_small_ok": true,
+      "service_presence": {
+        "phase3c_mobile_performance_task_score_form_service": true,
+        "phase3c_mobile_performance_task_score_submit_service": true,
+        "phase3c_mobile_performance_task_score_action_service": true
+      },
+      "service_logic_ok": true,
+      "route_line_reduction_ok": true,
+      "score_route_service_gate_ok": true
+    },
+    "note_route_service": {
+      "package": "BYS360_PHASE3C_NOTE_ROUTE_SERVICE_GATE_V1",
+      "generated_at": "2026-06-24T22:44:39",
+      "route_path": "app\\api\\mobile\\performance_routes.py",
+      "service_path": "app\\api\\mobile\\services\\performance_note_route_services.py",
+      "route_exists": true,
+      "service_exists": true,
+      "route_lines": 1164,
+      "service_lines": 211,
+      "route_decorator_count": 22,
+      "route_import_ok": true,
+      "deps_function_ok": true,
+      "route_wrappers": {
+        "_bys360_legacy_mobile_performance_in_period_notes_v2853": 2,
+        "mobile_performance_create_in_period_note_v2853": 2,
+        "_bys360_legacy_mobile_performance_note_scorecard_v2863a": 2
+      },
+      "route_wrappers_small_ok": true,
+      "service_presence": {
+        "phase3c_mobile_performance_in_period_notes_v2853_service": true,
+        "phase3c_mobile_performance_create_in_period_note_v2853_service": true,
+        "phase3c_mobile_performance_note_scorecard_v2863a_service": true
+      },
+      "service_logic_ok": true,
+      "route_line_reduction_ok": true,
+      "note_route_service_gate_ok": true
+    },
+    "task_detail_route_service": {
+      "package": "BYS360_PHASE3C_TASK_DETAIL_ROUTE_SERVICE_GATE_V1",
+      "generated_at": "2026-06-24T22:44:39",
+      "route_path": "app\\api\\mobile\\performance_routes.py",
+      "service_path": "app\\api\\mobile\\services\\performance_task_detail_route_services.py",
+      "route_exists": true,
+      "service_exists": true,
+      "route_lines": 1164,
+      "service_lines": 98,
+      "route_decorator_count": 22,
+      "route_import_ok": true,
+      "deps_function_ok": true,
+      "route_wrappers": {
+        "mobile_performance_third_manager": 2,
+        "mobile_performance_task_detail": 2
+      },
+      "route_wrappers_small_ok": true,
+      "service_presence": {
+        "phase3c_mobile_performance_third_manager_service": true,
+        "phase3c_mobile_performance_task_detail_service": true
+      },
+      "service_logic_ok": true,
+      "route_line_reduction_ok": true,
+      "task_detail_route_service_gate_ok": true
+    },
+    "summary_risk_route_service": {
+      "package": "BYS360_PHASE3C_SUMMARY_RISK_ROUTE_SERVICE_GATE_V1",
+      "generated_at": "2026-06-24T22:44:39",
+      "route_path": "app\\api\\mobile\\performance_routes.py",
+      "service_path": "app\\api\\mobile\\services\\performance_summary_risk_route_services.py",
+      "route_exists": true,
+      "service_exists": true,
+      "route_lines": 1164,
+      "service_lines": 127,
+      "route_decorator_count": 22,
+      "route_import_ok": true,
+      "deps_function_ok": true,
+      "route_globals_bridge_ok": true,
+      "route_wrappers": {
+        "_bys360_legacy_mobile_performance_full_feature_summary": 2,
+        "mobile_performance_publish_preapproval": 2,
+        "_bys360_legacy_mobile_performance_risk_analysis_v2852": 2
+      },
+      "route_wrappers_small_ok": true,
+      "service_presence": {
+        "phase3c_mobile_performance_full_feature_summary_service": true,
+        "phase3c_mobile_performance_publish_preapproval_service": true,
+        "phase3c_mobile_performance_risk_analysis_v2852_service": true
+      },
+      "service_logic_ok": true,
+      "route_line_reduction_ok": true,
+      "summary_risk_route_service_gate_ok": true
+    },
+    "compact_route_service": {
+      "package": "BYS360_PHASE3C_COMPACT_ROUTE_SERVICE_GATE_V1",
+      "generated_at": "2026-06-24T22:44:39",
+      "route_path": "app\\api\\mobile\\performance_routes.py",
+      "service_path": "app\\api\\mobile\\services\\performance_compact_route_services.py",
+      "route_exists": true,
+      "service_exists": true,
+      "route_lines": 1164,
+      "service_lines": 72,
+      "route_decorator_count": 22,
+      "route_import_ok": true,
+      "globals_bridge_ok": true,
+      "route_wrappers": {
+        "mobile_performance_approvals": 2,
+        "mobile_performance_criteria": 2,
+        "_bys360_legacy_mobile_performance_in_period_notes": 2
+      },
+      "route_wrappers_small_ok": true,
+      "service_presence": {
+        "phase3c_mobile_performance_approvals_service": true,
+        "phase3c_mobile_performance_criteria_service": true,
+        "phase3c_mobile_performance_in_period_notes_legacy_service": true
+      },
+      "service_logic_ok": true,
+      "route_line_reduction_ok": true,
+      "compact_route_service_gate_ok": true
+    }
+  },
+  "phase3c_closure_ok": false
+}
