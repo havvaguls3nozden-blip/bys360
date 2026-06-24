@@ -23,7 +23,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_mobile_v
 
 ## Release keystore olusturma
 
-Gercek sifreleri ChatGPT'ye veya zip dosyasina koymayin.
+Gercek sifreleri harici sohbet araclarina veya zip dosyasina koymayin.
 
 ```powershell
 cd C:\bys360\project\mobile_flutter\bys360_mobile_native
