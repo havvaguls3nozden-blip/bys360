@@ -1,0 +1,333 @@
+{
+  "phase": "post-phase4j-master-checklist-status-v13",
+  "generated_at": "2026-06-25T16:42:38",
+  "phase4j": {
+    "tag": "phase4j-ops-routes-split-pass-20260625",
+    "head": "9f006fb",
+    "branch": "phase4j-script-reduction-godobject-v1",
+    "status": "?? _post_phase4j_master_checklist_v13.py",
+    "ops_routes_report": [
+      "reports/architecture/BYS360_PHASE4J_FINAL_GATE_V12B_CORRECTED_REPORT.md"
+    ]
+  },
+  "docs": {
+    "DEPLOYMENT": [
+      "DEPLOYMENT.md"
+    ],
+    "BACKUP": [
+      "BACKUP_RUNBOOK.md",
+      "docs/quality/BYS360_QUALITY_10_10_P3_CLEAN_AUDIT_EXCLUDE_BACKUPS.md"
+    ],
+    "SECURITY": [
+      "SECURITY.md",
+      "docs/architecture/BYS360_MOBILE_SECURITY_EVIDENCE_GATE_P4D.md",
+      "docs/architecture/BYS360_MOBILE_SECURITY_SUITE_GATE_P4C.md",
+      "docs/architecture/BYS360_MOBILE_SECURITY_SUITE_GATE_P4C_V2.md",
+      "docs/handover/BYS360_SCORE100_HANDOVER_SECURITY_V1_README.md"
+    ],
+    "CONTRIBUTING": [
+      "CONTRIBUTING.md"
+    ],
+    "OPENAPI": [
+      "docs/api/BYS360_OPENAPI_BOOTSTRAP.md",
+      "docs/api/openapi_draft.json"
+    ],
+    "NGINX": []
+  },
+  "tests": {
+    "integration_tests": [
+      "tests/integration/test_feedback_http_behavior.py",
+      "tests/integration/test_final_quality_live_backbone_contract.py",
+      "tests/integration/test_final_quality_live_backbone_sources.py",
+      "tests/integration/test_http_core_smoke.py",
+      "tests/integration/test_http_db_core_flows.py"
+    ],
+    "auth_tests": [
+      "tests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py",
+      "tests/architecture/test_mobile_api_auth_guard_matrix_p4a.py",
+      "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py",
+      "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b_v2.py",
+      "tests/architecture/test_phase2_auth_smoke_gate_v1.py",
+      "tests/architecture/test_phase2_auth_success_flow_gate_v1.py",
+      "tests/load/locust_remote_auth.py",
+      "tests/load/locust_remote_auth_pool.py",
+      "tests/load/locust_remote_auth_strict.py"
+    ],
+    "performance_tests": [
+      "tests/architecture/test_mobile_api_performance_response_p3e.py",
+      "tests/architecture/test_phase3b_mobile_performance_base_helpers_gate_v1.py",
+      "tests/architecture/test_phase3b_mobile_performance_config_helpers_gate_v1.py",
+      "tests/architecture/test_phase3b_mobile_performance_item_helpers_gate_v1.py",
+      "tests/architecture/test_phase3b_mobile_performance_query_helpers_gate_v1.py",
+      "tests/architecture/test_phase3b_mobile_performance_task_helpers_gate_v1.py",
+      "tests/critical/test_claude_phase6_sql_performance_contracts.py",
+      "tests/performance/test_critical_performance_routes_smoke.py",
+      "tests/performance/test_performance_completion_phase1_rule_center.py",
+      "tests/performance/test_performance_completion_phase2_category_center.py",
+      "tests/performance/test_performance_completion_phase3_visibility_scope.py",
+      "tests/performance/test_phase12_performance_rules_contract.py",
+      "tests/services/test_final_quality_performance_rule_matrix.py",
+      "tests/services/test_final_quality_performance_visibility_contract.py",
+      "tests/services/test_performance_assignments_contract.py",
+      "tests/services/test_performance_common_contract.py",
+      "tests/test_performance_archive_visibility_contract.py",
+      "tests/test_performance_chain_constitution.py",
+      "tests/test_performance_form_guard.py",
+      "tests/test_performance_ops_center.py",
+      "tests/test_performance_preflight.py",
+      "tests/test_performance_publish_guard.py",
+      "tests/test_performance_publish_preflight_static.py"
+    ],
+    "ci_workflows": [
+      ".github/workflows/bys360-ci.yml",
+      ".github/workflows/bys360-score100-quality-gate-v1.yml"
+    ]
+  },
+  "counts": {
+    "python_files": 1688,
+    "ps1_files": 54,
+    "total_py_ps1": 1742,
+    "large_py_500_plus_count": 122
+  },
+  "large_py_500_plus_top30": [
+    {
+      "path": "app/services/corporate_information_center.py",
+      "lines": 2353
+    },
+    {
+      "path": "app/services/settings/effective_menu.py",
+      "lines": 2132
+    },
+    {
+      "path": "app/menu_registry.py",
+      "lines": 1567
+    },
+    {
+      "path": "app/services/performance/low_score_process_service.py",
+      "lines": 1529
+    },
+    {
+      "path": "scripts/quality/bys360_score100_quality_gate_v1.py",
+      "lines": 1340
+    },
+    {
+      "path": "app/services/ai_agent/service.py",
+      "lines": 1336
+    },
+    {
+      "path": "app/services/settings/catalog.py",
+      "lines": 1331
+    },
+    {
+      "path": "app/institutional/hr_personnel_operations_routes.py",
+      "lines": 1243
+    },
+    {
+      "path": "app/main_handlers/account_communication_helpers.py",
+      "lines": 1234
+    },
+    {
+      "path": "app/admin/ai_routes.py",
+      "lines": 1202
+    },
+    {
+      "path": "app/support/routes.py",
+      "lines": 1168
+    },
+    {
+      "path": "app/api/mobile/performance_routes.py",
+      "lines": 1164
+    },
+    {
+      "path": "app/admin/routes.py",
+      "lines": 1149
+    },
+    {
+      "path": "app/performance/engagement_feedback_routes.py",
+      "lines": 1135
+    },
+    {
+      "path": "app/communication/surveys_routes.py",
+      "lines": 1072
+    },
+    {
+      "path": "app/workflow/routes.py",
+      "lines": 1065
+    },
+    {
+      "path": "app/support/help_center_content.py",
+      "lines": 1058
+    },
+    {
+      "path": "app/services/ai/dashboard_panel_personnel.py",
+      "lines": 1039
+    },
+    {
+      "path": "app/services/performance/process_engine_phase6_president_approvals.py",
+      "lines": 1015
+    },
+    {
+      "path": "app/portal/routes.py",
+      "lines": 997
+    },
+    {
+      "path": "app/models/hr_models.py",
+      "lines": 995
+    },
+    {
+      "path": "app/main_handlers/account_settings_helpers.py",
+      "lines": 972
+    },
+    {
+      "path": "app/services/ai/dashboard_panel_repository.py",
+      "lines": 965
+    },
+    {
+      "path": "app/services/feedback_service.py",
+      "lines": 916
+    },
+    {
+      "path": "app/services/dashboard_rebuild_service.py",
+      "lines": 898
+    },
+    {
+      "path": "app/services/ai_agent/assistant_full_stepwise_tutor_v5.py",
+      "lines": 887
+    },
+    {
+      "path": "app/services/hr_operations_service.py",
+      "lines": 881
+    },
+    {
+      "path": "app/services/communication_phase2_service.py",
+      "lines": 875
+    },
+    {
+      "path": "app/services/ai_agent/assistant_chatgpt_like_v31.py",
+      "lines": 870
+    },
+    {
+      "path": "app/performance/phase10_development_guidance_ui.py",
+      "lines": 867
+    }
+  ],
+  "checklist": [
+    {
+      "id": 0,
+      "item": ".env git gecmisinden temizle",
+      "status": "needs_manual_verification",
+      "evidence": "Git gecmisindeki secret taramasi ayri komutla dogrulanmali."
+    },
+    {
+      "id": 1,
+      "item": "DEPLOYMENT.md + BACKUP runbook",
+      "status": "found",
+      "evidence": [
+        "DEPLOYMENT.md",
+        "BACKUP_RUNBOOK.md",
+        "docs/quality/BYS360_QUALITY_10_10_P3_CLEAN_AUDIT_EXCLUDE_BACKUPS.md"
+      ]
+    },
+    {
+      "id": 2,
+      "item": "SECURITY.md KVKK politikasi",
+      "status": "found",
+      "evidence": [
+        "SECURITY.md",
+        "docs/architecture/BYS360_MOBILE_SECURITY_EVIDENCE_GATE_P4D.md",
+        "docs/architecture/BYS360_MOBILE_SECURITY_SUITE_GATE_P4C.md",
+        "docs/architecture/BYS360_MOBILE_SECURITY_SUITE_GATE_P4C_V2.md",
+        "docs/handover/BYS360_SCORE100_HANDOVER_SECURITY_V1_README.md"
+      ]
+    },
+    {
+      "id": 3,
+      "item": "CONTRIBUTING.md onboarding bolumu",
+      "status": "found",
+      "evidence": [
+        "CONTRIBUTING.md"
+      ]
+    },
+    {
+      "id": 4,
+      "item": "Integration testleri auth + performans",
+      "status": "found",
+      "evidence": [
+        "tests/integration/test_feedback_http_behavior.py",
+        "tests/integration/test_final_quality_live_backbone_contract.py",
+        "tests/integration/test_final_quality_live_backbone_sources.py",
+        "tests/integration/test_http_core_smoke.py",
+        "tests/integration/test_http_db_core_flows.py",
+        "tests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py",
+        "tests/architecture/test_mobile_api_auth_guard_matrix_p4a.py",
+        "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py",
+        "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b_v2.py",
+        "tests/architecture/test_phase2_auth_smoke_gate_v1.py",
+        "tests/architecture/test_phase2_auth_success_flow_gate_v1.py",
+        "tests/load/locust_remote_auth.py",
+        "tests/load/locust_remote_auth_pool.py",
+        "tests/load/locust_remote_auth_strict.py",
+        "tests/architecture/test_mobile_api_performance_response_p3e.py",
+        "tests/architecture/test_phase3b_mobile_performance_base_helpers_gate_v1.py",
+        "tests/architecture/test_phase3b_mobile_performance_config_helpers_gate_v1.py",
+        "tests/architecture/test_phase3b_mobile_performance_item_helpers_gate_v1.py",
+        "tests/architecture/test_phase3b_mobile_performance_query_helpers_gate_v1.py",
+        "tests/architecture/test_phase3b_mobile_performance_task_helpers_gate_v1.py",
+        "tests/critical/test_claude_phase6_sql_performance_contracts.py",
+        "tests/performance/test_critical_performance_routes_smoke.py",
+        "tests/performance/test_performance_completion_phase1_rule_center.py",
+        "tests/performance/test_performance_completion_phase2_category_center.py"
+      ]
+    },
+    {
+      "id": 5,
+      "item": "CI'a integration testleri ekle",
+      "status": "found",
+      "evidence": [
+        ".github/workflows/bys360-ci.yml",
+        ".github/workflows/bys360-score100-quality-gate-v1.yml"
+      ]
+    },
+    {
+      "id": 6,
+      "item": "God-object dosyalari bol",
+      "status": "partial_pass_ops_routes_done",
+      "evidence": [
+        "reports/architecture/BYS360_PHASE4J_FINAL_GATE_V12B_CORRECTED_REPORT.md"
+      ]
+    },
+    {
+      "id": 7,
+      "item": "Aktif script sayisini 100 altina indir",
+      "status": "needs_more_work",
+      "evidence": {
+        "python_files": 1688,
+        "ps1_files": 54,
+        "total_py_ps1": 1742
+      }
+    },
+    {
+      "id": 8,
+      "item": "Nginx config ornegi + otomatik yedek",
+      "status": "missing_or_partial",
+      "evidence": [
+        "BACKUP_RUNBOOK.md",
+        "docs/quality/BYS360_QUALITY_10_10_P3_CLEAN_AUDIT_EXCLUDE_BACKUPS.md"
+      ]
+    },
+    {
+      "id": 9,
+      "item": "OpenAPI semasini tamamla",
+      "status": "found",
+      "evidence": [
+        "docs/api/BYS360_OPENAPI_BOOTSTRAP.md",
+        "docs/api/openapi_draft.json"
+      ]
+    }
+  ],
+  "recommendation": [
+    "Phase4J ops_routes split tamamlandi ve taglendi.",
+    "Ana listede siradaki net teknik hedef aktif script sayisini dusurmek veya integration/CI kanitlarini sertlestirmektir.",
+    "large_py_500_plus listesi kalan god-object adaylarini gosterir."
+  ]
+}
