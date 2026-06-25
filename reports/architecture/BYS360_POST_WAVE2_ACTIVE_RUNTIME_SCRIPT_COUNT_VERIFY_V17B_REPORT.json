@@ -1,0 +1,21 @@
+{
+  "phase": "post-wave2-active-runtime-script-count-verify-v17b",
+  "generated_at": "2026-06-25T18:05:15",
+  "source_report": "reports/architecture/BYS360_POST_WAVE2_ACTIVE_RUNTIME_SCRIPT_DEFINITION_V17_REPORT.json",
+  "git_head": "12f833b",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "raw_git_status": "?? _post_wave2_active_runtime_script_count_verify_v17b.py",
+  "actionable_git_status": [],
+  "current_script_candidates": 290,
+  "strict_active_runtime_script_count": 48,
+  "required_keep_count": 180,
+  "historical_candidate_count": 86,
+  "strict_active_runtime_under_100": true,
+  "ok": true,
+  "decision": [
+    "Aktif runtime script sayisi 48 olarak dogrulandi.",
+    "100 alti hedefi aktif runtime script tanimina gore PASS durumundadir.",
+    "Fiziksel script adayi 290 olarak kalmistir; bu sayi tarihsel/kanit/onarim scriptlerini de icerir.",
+    "Tarihsel scriptleri fiziksel olarak azaltmak icin sonraki arsiv dalgalari ayrica planlanabilir."
+  ]
+}
