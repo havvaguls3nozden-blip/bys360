@@ -214,7 +214,37 @@ def recipients_for_task(task: dict[str, Any]) -> list[Any]:
     cfg=current_config(); ids=cfg["manager_recipient_ids"] if task["audience"]=="managers" else cfg["staff_recipient_ids"]
     return [u for u in users_by_ids(ids) if user_email(u)]
 
+
+
+# BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_HELPER_START
+def _bys360_phase4b_is_weekend(now=None) -> bool:
+    """Cumartesi/Pazar otomatik personel gün ortası mailini durdurmak için servis katmanı kilidi."""
+    from datetime import datetime as _bys360_weekend_guard_datetime
+
+    current = now or _bys360_weekend_guard_datetime.now()
+    try:
+        return current.weekday() >= 5
+    except Exception:
+        return False
+# BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_HELPER_END
+
 def run_task(task_key: str, dry_run: bool=False, actor_user_id: int|None=None, only_user_id: int|None=None) -> dict[str, Any]:
+    # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_START
+    _bys360_phase4b_task_key = str((task_key).get("key") or "").strip().lower() if isinstance(task_key, dict) else ""
+    _bys360_phase4b_period = str((task_key).get("period") or "").strip().lower() if isinstance(task_key, dict) else ""
+    _bys360_phase4b_audience = str((task_key).get("audience") or "").strip().lower() if isinstance(task_key, dict) else ""
+    if (
+        (_bys360_phase4b_task_key == "staff_midday" or (_bys360_phase4b_period == "midday" and _bys360_phase4b_audience == "staff"))
+        and _bys360_phase4b_is_weekend()
+    ):
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "weekend_guard",
+            "task_key": _bys360_phase4b_task_key or "staff_midday",
+            "message": "Hafta sonu olduğu için personel gün ortası maili gönderilmedi.",
+        }
+    # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_END
     ensure_defaults(actor_user_id); tasks={t["key"]:t for t in current_config()["tasks"]}; task=tasks.get(task_key)
     if not task: return {"ok":False,"task_key":task_key,"error":"Görev bulunamadı.","sent":0,"failed":0}
     if not task.get("enabled") and not dry_run: return {"ok":True,"task_key":task_key,"skipped":True,"reason":"Görev pasif.","sent":0,"failed":0}

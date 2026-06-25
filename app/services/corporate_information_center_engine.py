@@ -220,7 +220,31 @@ def _send_email(to: str, subject: str, body: str) -> bool:
     return False
 
 
+
+
+# BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_HELPER_START
+def _bys360_phase4b_is_weekend(now=None) -> bool:
+    """Cumartesi/Pazar otomatik personel gün ortası mailini durdurmak için servis katmanı kilidi."""
+    from datetime import datetime as _bys360_weekend_guard_datetime
+
+    current = now or _bys360_weekend_guard_datetime.now()
+    try:
+        return current.weekday() >= 5
+    except Exception:
+        return False
+# BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_HELPER_END
+
 def run_task(task_key: str, *, dry_run: bool = False, force: bool = False, actor_user_id: int | None = None) -> dict[str, Any]:
+    # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_START
+    if str(task_key or "").strip().upper() == "PERSONEL_NOON" and _bys360_phase4b_is_weekend():
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "weekend_guard",
+            "task_key": "PERSONEL_NOON",
+            "message": "Hafta sonu olduğu için Personel Öğlen Bilgilendirmesi gönderilmedi.",
+        }
+    # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_END
     ensure_defaults(actor_user_id=actor_user_id)
     cfg = current_config()
     task = cfg["tasks"].get(task_key)

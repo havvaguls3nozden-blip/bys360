@@ -1,0 +1,51 @@
+{
+  "package": "BYS360_PHASE4B_WEEKEND_MAIL_GUARD_PATCH_V1",
+  "generated_at": "2026-06-25T09:36:41",
+  "branch": "phase4b-weekend-mail-guard-v1",
+  "head_before_report_commit": "16108ed",
+  "meaningful_git_status_clean_before_patch": true,
+  "patches": [
+    {
+      "file": "app/services/corporate_information_center_engine.py",
+      "changed": true,
+      "helper_changed": true,
+      "guard_inserted": true,
+      "run_task_args": [
+        "task_key"
+      ]
+    },
+    {
+      "file": "app/services/executive_mail_center_v2.py",
+      "changed": true,
+      "helper_changed": true,
+      "guard_inserted": true,
+      "run_task_args": [
+        "task_key",
+        "dry_run",
+        "actor_user_id",
+        "only_user_id"
+      ]
+    }
+  ],
+  "compile_ok": true,
+  "static_verify": [
+    {
+      "file": "app/services/corporate_information_center_engine.py",
+      "has_helper": true,
+      "has_guard": true,
+      "has_required_key": true,
+      "has_weekend_call": true,
+      "run_task_found": true
+    },
+    {
+      "file": "app/services/executive_mail_center_v2.py",
+      "has_helper": true,
+      "has_guard": true,
+      "has_required_key": true,
+      "has_weekend_call": true,
+      "run_task_found": true
+    }
+  ],
+  "patch_ok": true,
+  "error": null
+}
