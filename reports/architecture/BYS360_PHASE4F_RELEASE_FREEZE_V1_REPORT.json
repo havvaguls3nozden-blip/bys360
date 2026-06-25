@@ -1,0 +1,75 @@
+{
+  "package": "BYS360_PHASE4F_RELEASE_FREEZE_V1",
+  "generated_at": "2026-06-25T12:29:01",
+  "branch": "phase4f-release-freeze-v1",
+  "head_before_report_commit": "693a456",
+  "status_clean_before_zip": false,
+  "zip": {
+    "path": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+    "name": "BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+    "exists": true,
+    "size_bytes": 17688854,
+    "sha256": "C227AA4A1CBB0388E2DFD4CB64878D313CC456A7734250AEEC7DBCF6D0E8E2F9",
+    "entry_count": 3759
+  },
+  "archive_result": {
+    "cmd": [
+      "git",
+      "archive",
+      "--format=zip",
+      "--output=C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stdout_tail": "",
+    "stderr_tail": ""
+  },
+  "risk_scan": {
+    "risk_patterns": [
+      ".env",
+      ".venv/",
+      "venv/",
+      "__pycache__/",
+      ".pytest_cache/",
+      ".git/",
+      ".sqlite",
+      ".sqlite3",
+      ".db",
+      ".bak",
+      "backups/",
+      "node_modules/",
+      "instance/"
+    ],
+    "risk_entries": [
+      ".env.example",
+      "reports/security/a6b_backups/",
+      "reports/security/a6b_backups/.gitignore",
+      "reports/security/a6b_backups/.releaseignore",
+      "reports/security/a6b_backups/500.html"
+    ],
+    "risk_entry_count": 5
+  },
+  "required_entries": {
+    "checked": [
+      "app/__init__.py",
+      "app/templates/errors/400.html",
+      "app/templates/errors/401.html",
+      "app/templates/errors/405.html",
+      "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_V2_REPORT.json",
+      "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_CLOSURE_V1_REPORT.json"
+    ],
+    "missing": []
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_zip": false,
+    "archive_ok": true,
+    "zip_exists": true,
+    "zip_nonempty": true,
+    "sha256_ok": true,
+    "risk_scan_clean": false,
+    "required_entries_ok": true
+  },
+  "freeze_ok": false,
+  "live_deploy_status": "Canlıya dağıtım yapılmadı; sadece release ZIP üretildi."
+}
