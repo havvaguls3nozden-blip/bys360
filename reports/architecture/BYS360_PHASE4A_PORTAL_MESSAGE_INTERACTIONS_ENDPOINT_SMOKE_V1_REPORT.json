@@ -1,0 +1,31 @@
+{
+  "package": "BYS360_PHASE4A_PORTAL_MESSAGE_INTERACTIONS_ENDPOINT_SMOKE_V1",
+  "generated_at": "2026-06-25T09:11:28",
+  "branch": "phase4a-offline-stabilization-v1",
+  "head_before_report_commit": "5f9ad7f",
+  "status_clean_before_report": false,
+  "app_factory_ok": true,
+  "route_map_ok": true,
+  "endpoint_checks": [
+    {
+      "name": "comment_ajax_post_requires_auth_without_500",
+      "path": "/messages/1/comment",
+      "status_code": 400,
+      "location": null,
+      "content_type": "application/json",
+      "ok_without_server_error": true,
+      "expected_note": "Login yoksa 302/401/403 kontrollü cevap normal; 500 olmamalı."
+    },
+    {
+      "name": "reaction_ajax_post_requires_auth_without_500",
+      "path": "/messages/1/react",
+      "status_code": 400,
+      "location": null,
+      "content_type": "application/json",
+      "ok_without_server_error": true,
+      "expected_note": "Login yoksa 302/401/403 kontrollü cevap normal; 500 olmamalı."
+    }
+  ],
+  "endpoint_smoke_ok": false,
+  "error": null
+}
