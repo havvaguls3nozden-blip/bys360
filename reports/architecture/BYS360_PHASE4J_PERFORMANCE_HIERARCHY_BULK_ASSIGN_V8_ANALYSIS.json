@@ -1,0 +1,420 @@
+{
+  "phase": "phase4j-performance-hierarchy-bulk-assign-analysis-v8",
+  "generated_at": "2026-06-25T14:20:53",
+  "target": "app/admin/ops_routes.py",
+  "function": "performance_hierarchy_bulk_assign",
+  "line_start": 354,
+  "line_end": 400,
+  "line_count": 47,
+  "decorators": [
+    "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])",
+    "login_required",
+    "admin_required"
+  ],
+  "return_count": 2,
+  "returns": [
+    {
+      "line": 400,
+      "text": "redirect(url_for('main.performance_hierarchy_settings'))"
+    },
+    {
+      "line": 375,
+      "text": "redirect(url_for('main.performance_hierarchy_settings'))"
+    }
+  ],
+  "used_names": [
+    "PerformancePeriod",
+    "User",
+    "active_period",
+    "admin_required",
+    "assignment_result",
+    "birim",
+    "current_user",
+    "db",
+    "flash",
+    "generate_assignments_for_active_period",
+    "ikinci_yonetici_sicil",
+    "level_3_enabled",
+    "login_required",
+    "main_bp",
+    "query",
+    "redirect",
+    "request",
+    "role",
+    "ucuncu_yonetici_sicil",
+    "updated_count",
+    "url_for",
+    "user_obj",
+    "users",
+    "ust_birim",
+    "yonetici_sicil"
+  ],
+  "assigned_names": [
+    "active_period",
+    "assignment_result",
+    "birim",
+    "ikinci_yonetici_sicil",
+    "level_3_enabled",
+    "query",
+    "role",
+    "ucuncu_yonetici_sicil",
+    "updated_count",
+    "user_obj",
+    "users",
+    "ust_birim",
+    "yonetici_sicil"
+  ],
+  "call_names": [
+    "all",
+    "commit",
+    "desc",
+    "filter",
+    "filter_by",
+    "first",
+    "flash",
+    "generate_assignments_for_active_period",
+    "get",
+    "order_by",
+    "redirect",
+    "route",
+    "strip",
+    "url_for"
+  ],
+  "call_items": [
+    {
+      "line": 351,
+      "call": "route",
+      "text": "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])"
+    },
+    {
+      "line": 355,
+      "call": "strip",
+      "text": "(request.form.get('ust_birim') or '').strip()"
+    },
+    {
+      "line": 356,
+      "call": "strip",
+      "text": "(request.form.get('birim') or '').strip()"
+    },
+    {
+      "line": 357,
+      "call": "strip",
+      "text": "(request.form.get('role') or '').strip()"
+    },
+    {
+      "line": 364,
+      "call": "filter",
+      "text": "User.query.filter(User.role != 'admin')"
+    },
+    {
+      "line": 372,
+      "call": "all",
+      "text": "query.all()"
+    },
+    {
+      "line": 388,
+      "call": "commit",
+      "text": "db.session.commit()"
+    },
+    {
+      "line": 390,
+      "call": "first",
+      "text": "PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc()).first()"
+    },
+    {
+      "line": 395,
+      "call": "flash",
+      "text": "flash(f'Toplu hiyerarşi ataması tamamlandı. Güncellenen personel: {updated_count}', 'success')"
+    },
+    {
+      "line": 400,
+      "call": "redirect",
+      "text": "redirect(url_for('main.performance_hierarchy_settings'))"
+    },
+    {
+      "line": 359,
+      "call": "strip",
+      "text": "(request.form.get('bulk_yonetici_sicil') or '').strip()"
+    },
+    {
+      "line": 360,
+      "call": "strip",
+      "text": "(request.form.get('bulk_ikinci_yonetici_sicil') or '').strip()"
+    },
+    {
+      "line": 361,
+      "call": "strip",
+      "text": "(request.form.get('bulk_ucuncu_yonetici_sicil') or '').strip()"
+    },
+    {
+      "line": 362,
+      "call": "get",
+      "text": "request.form.get('bulk_level_3_enabled')"
+    },
+    {
+      "line": 366,
+      "call": "filter",
+      "text": "query.filter(User.ust_birim == ust_birim)"
+    },
+    {
+      "line": 368,
+      "call": "filter",
+      "text": "query.filter(User.birim == birim)"
+    },
+    {
+      "line": 370,
+      "call": "filter",
+      "text": "query.filter(User.role == role)"
+    },
+    {
+      "line": 374,
+      "call": "flash",
+      "text": "flash('Toplu atama için uygun personel bulunamadı.', 'warning')"
+    },
+    {
+      "line": 375,
+      "call": "redirect",
+      "text": "redirect(url_for('main.performance_hierarchy_settings'))"
+    },
+    {
+      "line": 393,
+      "call": "generate_assignments_for_active_period",
+      "text": "generate_assignments_for_active_period(period_id=active_period.id, actor_user_id=current_user.id)"
+    },
+    {
+      "line": 396,
+      "call": "get",
+      "text": "assignment_result.get('ok')"
+    },
+    {
+      "line": 397,
+      "call": "flash",
+      "text": "flash('Aktif dönem görevleri toplu hiyerarşi ataması sonrası yeniden senkronlandı.', 'success')"
+    },
+    {
+      "line": 400,
+      "call": "url_for",
+      "text": "url_for('main.performance_hierarchy_settings')"
+    },
+    {
+      "line": 375,
+      "call": "url_for",
+      "text": "url_for('main.performance_hierarchy_settings')"
+    },
+    {
+      "line": 390,
+      "call": "order_by",
+      "text": "PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc())"
+    },
+    {
+      "line": 399,
+      "call": "flash",
+      "text": "flash(assignment_result.get('message', 'Aktif dönem görevleri yeniden senkronlanamadı.'), 'warning')"
+    },
+    {
+      "line": 355,
+      "call": "get",
+      "text": "request.form.get('ust_birim')"
+    },
+    {
+      "line": 356,
+      "call": "get",
+      "text": "request.form.get('birim')"
+    },
+    {
+      "line": 357,
+      "call": "get",
+      "text": "request.form.get('role')"
+    },
+    {
+      "line": 390,
+      "call": "desc",
+      "text": "PerformancePeriod.id.desc()"
+    },
+    {
+      "line": 398,
+      "call": "get",
+      "text": "assignment_result.get('ok')"
+    },
+    {
+      "line": 399,
+      "call": "get",
+      "text": "assignment_result.get('message', 'Aktif dönem görevleri yeniden senkronlanamadı.')"
+    },
+    {
+      "line": 359,
+      "call": "get",
+      "text": "request.form.get('bulk_yonetici_sicil')"
+    },
+    {
+      "line": 360,
+      "call": "get",
+      "text": "request.form.get('bulk_ikinci_yonetici_sicil')"
+    },
+    {
+      "line": 361,
+      "call": "get",
+      "text": "request.form.get('bulk_ucuncu_yonetici_sicil')"
+    },
+    {
+      "line": 390,
+      "call": "filter_by",
+      "text": "PerformancePeriod.query.filter_by(is_active=True)"
+    }
+  ],
+  "external_refs": [
+    "PerformancePeriod",
+    "User",
+    "admin_required",
+    "current_user",
+    "db",
+    "flash",
+    "generate_assignments_for_active_period",
+    "login_required",
+    "main_bp",
+    "redirect",
+    "request",
+    "url_for"
+  ],
+  "internal_function_refs": [],
+  "body_items": [
+    {
+      "type": "Assign",
+      "line_start": 355,
+      "line_end": 355,
+      "preview": "ust_birim = (request.form.get('ust_birim') or '').strip()"
+    },
+    {
+      "type": "Assign",
+      "line_start": 356,
+      "line_end": 356,
+      "preview": "birim = (request.form.get('birim') or '').strip()"
+    },
+    {
+      "type": "Assign",
+      "line_start": 357,
+      "line_end": 357,
+      "preview": "role = (request.form.get('role') or '').strip()"
+    },
+    {
+      "type": "Assign",
+      "line_start": 359,
+      "line_end": 359,
+      "preview": "yonetici_sicil = (request.form.get('bulk_yonetici_sicil') or '').strip() or None"
+    },
+    {
+      "type": "Assign",
+      "line_start": 360,
+      "line_end": 360,
+      "preview": "ikinci_yonetici_sicil = (request.form.get('bulk_ikinci_yonetici_sicil') or '').strip() or None"
+    },
+    {
+      "type": "Assign",
+      "line_start": 361,
+      "line_end": 361,
+      "preview": "ucuncu_yonetici_sicil = (request.form.get('bulk_ucuncu_yonetici_sicil') or '').strip() or None"
+    },
+    {
+      "type": "Assign",
+      "line_start": 362,
+      "line_end": 362,
+      "preview": "level_3_enabled = request.form.get('bulk_level_3_enabled') == 'on'"
+    },
+    {
+      "type": "Assign",
+      "line_start": 364,
+      "line_end": 364,
+      "preview": "query = User.query.filter(User.role != 'admin')"
+    },
+    {
+      "type": "If",
+      "line_start": 365,
+      "line_end": 366,
+      "preview": "if ust_birim:\n    query = query.filter(User.ust_birim == ust_birim)"
+    },
+    {
+      "type": "If",
+      "line_start": 367,
+      "line_end": 368,
+      "preview": "if birim:\n    query = query.filter(User.birim == birim)"
+    },
+    {
+      "type": "If",
+      "line_start": 369,
+      "line_end": 370,
+      "preview": "if role:\n    query = query.filter(User.role == role)"
+    },
+    {
+      "type": "Assign",
+      "line_start": 372,
+      "line_end": 372,
+      "preview": "users = query.all()"
+    },
+    {
+      "type": "If",
+      "line_start": 373,
+      "line_end": 375,
+      "preview": "if not users:\n    flash('Toplu atama için uygun personel bulunamadı.', 'warning')\n    return redirect(url_for('main.performance_hierarchy_settings'))"
+    },
+    {
+      "type": "Assign",
+      "line_start": 377,
+      "line_end": 377,
+      "preview": "updated_count = 0"
+    },
+    {
+      "type": "For",
+      "line_start": 378,
+      "line_end": 386,
+      "preview": "for user_obj in users:\n    user_obj.yonetici_sicil = yonetici_sicil\n    user_obj.ikinci_yonetici_sicil = ikinci_yonetici_sicil\n    user_obj.ucuncu_yonetici_sicil = ucuncu_yonetici_sicil if level_3_enabled else None\n    updated_count += 1"
+    },
+    {
+      "type": "Expr",
+      "line_start": 388,
+      "line_end": 388,
+      "preview": "db.session.commit()"
+    },
+    {
+      "type": "Assign",
+      "line_start": 390,
+      "line_end": 390,
+      "preview": "active_period = PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc()).first()"
+    },
+    {
+      "type": "Assign",
+      "line_start": 391,
+      "line_end": 391,
+      "preview": "assignment_result = None"
+    },
+    {
+      "type": "If",
+      "line_start": 392,
+      "line_end": 393,
+      "preview": "if active_period:\n    assignment_result = generate_assignments_for_active_period(period_id=active_period.id, actor_user_id=current_user.id)"
+    },
+    {
+      "type": "Expr",
+      "line_start": 395,
+      "line_end": 395,
+      "preview": "flash(f'Toplu hiyerarşi ataması tamamlandı. Güncellenen personel: {updated_count}', 'success')"
+    },
+    {
+      "type": "If",
+      "line_start": 396,
+      "line_end": 399,
+      "preview": "if assignment_result and assignment_result.get('ok'):\n    flash('Aktif dönem görevleri toplu hiyerarşi ataması sonrası yeniden senkronlandı.', 'success')\nelif assignment_result and (not assignment_result.get('ok')):\n    flash(assignment_result.get('message', 'Aktif dönem görevleri yeniden senkronlanamadı.'), 'warning')"
+    },
+    {
+      "type": "Return",
+      "line_start": 400,
+      "line_end": 400,
+      "preview": "return redirect(url_for('main.performance_hierarchy_settings'))"
+    }
+  ],
+  "recommendation": [
+    "performance_hierarchy_bulk_assign kalan en buyuk route adaylarindan biridir.",
+    "internal_function_refs bos ise wrapper/service bolmesi guvenli gorunur.",
+    "Bu route performans hiyerarsisi ile ilgili oldugu icin app/admin/ops_performance_services.py icine alinmasi daha temiz olur.",
+    "Tasima sonrasi compileall, import smoke, duplicate kontrol ve architecture testleri calistirilmelidir."
+  ]
+}
