@@ -1,0 +1,431 @@
+# BYS360 Post Wave2 Active Runtime Script Definition V17
+- Generated at: 2026-06-25T18:02:35
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD: 40d582d
+- Current script candidates: 290
+- Strict active runtime script count: 48
+- Required keep count: 180
+- Historical candidate count: 86
+
+## Decision Counts
+- active_runtime_script: 48
+- historical_archive_candidate: 2
+- historical_review_candidate: 21
+- keep_code_referenced: 61
+- keep_operational_referenced: 56
+- keep_operational_review: 15
+- keep_other_reference_review: 24
+- unreferenced_review_candidate: 63
+
+## Conclusion
+- strict_active_runtime_under_100: True
+- required_keep_under_100: False
+- candidate_count_under_100: False
+
+## Active Runtime Scripts
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: 382 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: 482 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: 547 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_62.py: 293 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/a8_live_cutover_guard.ps1: 105 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release.ps1: 90 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v2.ps1: 100 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v3.ps1: 109 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v4.ps1: 105 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.ps1: 11 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.ps1: 10 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys36043_restore_v1.py: 74 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_emergency_full_sidebar_restore_v2_14_12.ps1: 28 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_emergency_restore_remove_exec_menu_v2_14_18.ps1: 28 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_fixes_source_sync_v1.ps1: 40 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_13_0.ps1: 31 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_60.ps1: 9 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_61.ps1: 52 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_62.ps1: 14 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1.ps1: 13 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_2.ps1: 39 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_3.ps1: 47 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_restore_from_bys36043_v1.ps1: 18 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_quality_10_10_p2_live_scope.ps1: 26 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_cic_auto_mail_scheduler_task.ps1: 17 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_corporate_information_tasks_v3_0.ps1: 21 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_4.ps1: 50 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_5.ps1: 18 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_6.ps1: 28 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_pulse_mail_task.ps1: 27 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_weather_mail_task.ps1: 50 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_executive_mail_center_v2_tasks.ps1: 23 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_press_news_scan_v3a_task.ps1: 27 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_social_auto_import_v3b2_task.ps1: 26 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_corporate_information_center_tasks_v3_0_phase2.ps1: 33 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/pre_live_backup_plan.ps1: 143 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_1.ps1: 26 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_3.ps1: 34 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1.py: 413 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_2.py: 413 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_3.py: 413 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys36043_safe_extract_v1.py: 210 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14f4_source_aware_existing_assistant.ps1: 21 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14j2_performance_archive_corporate_template.ps1: 22 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14j_performance_archive_template.ps1: 22 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/rollback_bys360_live_full_overlay_v2_13_0.ps1: 21 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/rollback_bys360_live_full_overlay_v2_17_60.ps1: 12 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/run_bys360_tests.ps1: 17 lines | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+
+## Required Keep Scripts Top 180
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py: decision=keep_operational_referenced | refs=5 | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py: decision=keep_operational_referenced | refs=5 | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: decision=keep_operational_referenced | refs=5 | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/communication/run_corporate_information_center_task.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/communication/run_corporate_information_center_task_v3_0_phase2.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/communication/run_corporate_information_task.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/communication/run_executive_mail_center_v2.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/communication/send_daily_evening_tomorrow_mail.py: decision=keep_code_referenced | refs=3 | classes={'code_reference': 1, 'operational_reference': 2}
+- scripts/communication/send_daily_pulse_check_mail.py: decision=keep_code_referenced | refs=7 | classes={'code_reference': 1, 'other_reference': 1, 'operational_reference': 5}
+- scripts/communication/send_daily_weather_personnel_mail.py: decision=keep_code_referenced | refs=7 | classes={'code_reference': 2, 'other_reference': 1, 'operational_reference': 4}
+- scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/executive/seed_executive_summary_menu_v2_14_8.py: decision=keep_operational_referenced | refs=3 | classes={'operational_reference': 3}
+- scripts/executive/send_daily_executive_summary.py: decision=keep_operational_referenced | refs=6 | classes={'other_reference': 4, 'operational_reference': 2}
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: decision=active_runtime_script | refs=2 | classes={'operational_reference': 2}
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: decision=active_runtime_script | refs=2 | classes={'historical_script_reference': 1, 'operational_reference': 1}
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: decision=active_runtime_script | refs=3 | classes={'operational_reference': 2, 'historical_script_reference': 1}
+- scripts/live/repair_bys360_live_full_overlay_v2_17_62.py: decision=active_runtime_script | refs=1 | classes={'historical_script_reference': 1}
+- scripts/live_readiness/a7d_local_smoke_contract.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/maintenance/ensure_message_comments_table_v1.py: decision=keep_operational_review | refs=0 | classes={}
+- scripts/menu/check_emergency_restore_remove_exec_menu_v2_14_18.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/menu/check_full_sidebar_restore_v2_14_12.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/menu/emergency_restore_remove_exec_menu_v2_14_18.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/overlay/bys360_live_full_overlay_v2_13_0.py: decision=keep_operational_referenced | refs=3 | classes={'historical_script_reference': 1, 'operational_reference': 2}
+- scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase1_rule_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py: decision=keep_code_referenced | refs=3 | classes={'code_reference': 2, 'other_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py: decision=keep_code_referenced | refs=3 | classes={'code_reference': 2, 'other_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py: decision=keep_code_referenced | refs=2 | classes={'code_reference': 2}
+- scripts/performance/check_bys360_performance_completion_phase5_scorecard_ui_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase6_low_score_process_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase7_scorecard_archive_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase8_midterm_feedback_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py: decision=keep_code_referenced | refs=3 | classes={'code_reference': 1, 'other_reference': 2}
+- scripts/performance/repair_bys360_performance_completion_phase2_category_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance/repair_bys360_performance_completion_phase3_visibility_center.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/performance_mail_automation_runner.py: decision=keep_code_referenced | refs=4 | classes={'code_reference': 1, 'operational_reference': 3}
+- scripts/portal/rollback_bys360_home_prestige_safe_v1a.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/portal/run_bys360_press_news_scan_v3a.py: decision=keep_operational_referenced | refs=4 | classes={'other_reference': 3, 'operational_reference': 1}
+- scripts/portal/run_bys360_social_media_embed_scan_v3b.py: decision=keep_code_referenced | refs=5 | classes={'code_reference': 1, 'other_reference': 3, 'operational_reference': 1}
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_handover_docs_gate_v1.py: decision=keep_operational_referenced | refs=2 | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py: decision=keep_code_referenced | refs=8 | classes={'other_reference': 2, 'historical_script_reference': 3, 'code_reference': 3}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py: decision=keep_code_referenced | refs=2 | classes={'other_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py: decision=keep_code_referenced | refs=3 | classes={'other_reference': 1, 'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py: decision=keep_code_referenced | refs=4 | classes={'historical_script_reference': 3, 'code_reference': 1}
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py: decision=keep_code_referenced | refs=6 | classes={'other_reference': 2, 'historical_script_reference': 2, 'code_reference': 2}
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py: decision=keep_code_referenced | refs=4 | classes={'other_reference': 2, 'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py: decision=keep_code_referenced | refs=3 | classes={'other_reference': 1, 'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py: decision=keep_code_referenced | refs=5 | classes={'other_reference': 1, 'historical_script_reference': 3, 'code_reference': 1}
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py: decision=keep_code_referenced | refs=4 | classes={'other_reference': 1, 'historical_script_reference': 2, 'code_reference': 1}
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py: decision=keep_code_referenced | refs=3 | classes={'historical_script_reference': 1, 'code_reference': 2}
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_ops_audit.py: decision=keep_operational_referenced | refs=3 | classes={'other_reference': 2, 'operational_reference': 1}
+- scripts/quality/bys360_phase2_auth_smoke_gate_v1.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3_route_density_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_compact_route_service_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_note_route_service_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_score_route_service_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_summary_risk_route_service_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_task_detail_route_service_gate_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_pytest_standard_gate_p2d.py: decision=keep_code_referenced | refs=1 | classes={'code_reference': 1}
+- scripts/quality/bys360_quality9_ci_gate.py: decision=keep_code_referenced | refs=4 | classes={'operational_reference': 1, 'other_reference': 2, 'code_reference': 1}
+- scripts/quality/bys360_score100_quality_gate_v1.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 2, 'other_reference': 2}
+- scripts/quality/bys360_secret_repo_gate.py: decision=keep_operational_referenced | refs=34 | classes={'other_reference': 8, 'operational_reference': 1, 'historical_script_reference': 25}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v2.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v3.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v4.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_60.py: decision=keep_operational_referenced | refs=2 | classes={'operational_reference': 2}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_61.py: decision=keep_operational_referenced | refs=3 | classes={'operational_reference': 3}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_62.py: decision=keep_operational_referenced | refs=2 | classes={'operational_reference': 2}
+- scripts/quality/check_bys360_message_interactions_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_notification_email_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_portal_ajax_reactions_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_claude_phase7_final_gate.py: decision=keep_code_referenced | refs=2 | classes={'operational_reference': 1, 'code_reference': 1}
+- scripts/quality/check_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/check_critical_services_phase5_gate.py: decision=keep_code_referenced | refs=2 | classes={'code_reference': 2}
+- scripts/quality/check_sql_performance_phase6_gate.py: decision=keep_code_referenced | refs=2 | classes={'code_reference': 2}
+- scripts/quality/repair_bys360_message_interactions_v1.py: decision=keep_operational_referenced | refs=2 | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/repair_bys360_notification_email_v1.py: decision=keep_operational_referenced | refs=3 | classes={'other_reference': 2, 'operational_reference': 1}
+- scripts/quality/repair_bys360_portal_ajax_reactions_v1.py: decision=keep_operational_referenced | refs=2 | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/restore_p14f4_source_aware_existing_assistant_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/restore_p14j2_performance_archive_corporate_template_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/quality/restore_p14j_performance_archive_template_v1.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/release/build_bys360_safe_release.py: decision=keep_operational_referenced | refs=3 | classes={'operational_reference': 1, 'other_reference': 2}
+- scripts/scheduled/run_cic_staff_noon.py: decision=keep_operational_referenced | refs=3 | classes={'operational_reference': 3}
+- scripts/security/build_bys360_secure_release_v1_5.py: decision=keep_operational_referenced | refs=7 | classes={'other_reference': 5, 'historical_script_reference': 1, 'operational_reference': 1}
+- scripts/security/bys360_release_zip_preflight_v1.py: decision=keep_operational_referenced | refs=5 | classes={'other_reference': 3, 'operational_reference': 2}
+- scripts/security/repair_bys360_csrf_form_token_and_referrer_hotfix_v2_15_15.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_csrf_main_login_hotfix_v2_15_14.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_logout_base_client_hotfix_v2_15_13.py: decision=keep_operational_referenced | refs=4 | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_logout_force_clear_v2_15_12.py: decision=keep_operational_referenced | refs=5 | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/security/validate_a6e_production_env_contract.py: decision=keep_operational_referenced | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/a8_live_cutover_guard.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release.ps1: decision=active_runtime_script | refs=3 | classes={'other_reference': 1, 'operational_reference': 2}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v2.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v3.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v4.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/build_bys360_secure_release_and_preflight_v1.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/check_bys36043_restore_v1.py: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/check_bys360_emergency_full_sidebar_restore_v2_14_12.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_emergency_restore_remove_exec_menu_v2_14_18.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_live_fixes_source_sync_v1.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_live_full_overlay_v2_13_0.ps1: decision=active_runtime_script | refs=1 | classes={'historical_script_reference': 1}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_60.ps1: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_61.ps1: decision=active_runtime_script | refs=2 | classes={'operational_reference': 2}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_62.ps1: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_2.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_3.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_live_restore_from_bys36043_v1.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_quality_10_10_p2_live_scope.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/check_bys360_release_zip_preflight_v1.ps1: decision=keep_operational_review | refs=3 | classes={'other_reference': 3}
+- scripts/windows/claude_phase7_final_quality.ps1: decision=keep_code_referenced | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/windows/emergency_rollback_executive_summary_v1_0_8.ps1: decision=keep_operational_review | refs=0 | classes={}
+- scripts/windows/fix_local_admin_display_utf8.py: decision=keep_operational_review | refs=0 | classes={}
+- scripts/windows/install_bys360_cic_auto_mail_scheduler_task.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_corporate_information_tasks_v3_0.ps1: decision=active_runtime_script | refs=1 | classes={'historical_script_reference': 1}
+- scripts/windows/install_bys360_daily_mail_tasks_v1_4.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_daily_mail_tasks_v1_5.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_daily_mail_tasks_v1_6.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_daily_pulse_mail_task.ps1: decision=active_runtime_script | refs=1 | classes={'other_reference': 1}
+- scripts/windows/install_bys360_daily_weather_mail_task.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_executive_mail_center_v2_tasks.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/install_bys360_press_news_scan_v3a_task.ps1: decision=active_runtime_script | refs=1 | classes={'other_reference': 1}
+- scripts/windows/install_bys360_social_auto_import_v3b2_task.ps1: decision=active_runtime_script | refs=1 | classes={'code_reference': 1}
+- scripts/windows/install_corporate_information_center_tasks_v3_0_phase2.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/pre_live_backup_plan.ps1: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/recover_bys360_messages_from_interactions_v1.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_1.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_3.ps1: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/repair_bys360_handover_docs_gate_v1.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1.py: decision=active_runtime_script | refs=3 | classes={'operational_reference': 3}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_2.py: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_3.py: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/repair_bys360_message_interactions_v1.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/repair_bys360_notification_email_v1.ps1: decision=keep_operational_review | refs=2 | classes={'other_reference': 2}
+- scripts/windows/repair_bys360_portal_ajax_reactions_v1.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/repair_bys360_score100_quality_gate_v1.ps1: decision=keep_operational_referenced | refs=2 | classes={'operational_reference': 1, 'other_reference': 1}
+- scripts/windows/restore_bys36043_safe_extract_v1.py: decision=active_runtime_script | refs=0 | classes={}
+- scripts/windows/restore_bys360_p14f4_source_aware_existing_assistant.ps1: decision=active_runtime_script | refs=1 | classes={'other_reference': 1}
+- scripts/windows/restore_bys360_p14j2_performance_archive_corporate_template.ps1: decision=active_runtime_script | refs=1 | classes={'other_reference': 1}
+- scripts/windows/restore_bys360_p14j_performance_archive_template.ps1: decision=active_runtime_script | refs=1 | classes={'other_reference': 1}
+- scripts/windows/rollback_bys360_home_prestige_safe_v1a.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/rollback_bys360_live_full_overlay_v2_13_0.ps1: decision=active_runtime_script | refs=1 | classes={'historical_script_reference': 1}
+- scripts/windows/rollback_bys360_live_full_overlay_v2_17_60.ps1: decision=active_runtime_script | refs=1 | classes={'operational_reference': 1}
+- scripts/windows/rollback_bys360_quality_10_10_p1_silent_except_logging.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/run_bys360_tests.ps1: decision=active_runtime_script | refs=2 | classes={'historical_script_reference': 1, 'code_reference': 1}
+- scripts/windows/seed_bys36043_portal_defaults_v1.py: decision=keep_operational_review | refs=0 | classes={}
+- scripts/windows/tools/mobile_portal_patch_v2_8_80.py: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+- scripts/windows/verify_bys360_quality_10_10_p1_rollback.ps1: decision=keep_operational_review | refs=1 | classes={'other_reference': 1}
+
+## Historical Candidates Top 220
+- scripts/admin/check_system_admin_email_v2_16_0.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/admin/check_system_admin_email_v2_16_1_checkfix.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/apply_bys360_corporate_portal_v1.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/check_bys360_feedback_campaign_form_v2_13_2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/check_bys360_feedback_left_menu_fix_v2_13_1.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/check_bys360_portal_instagram_hide_v2_11_7.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py: decision=historical_archive_candidate | Tarihsel script klasorunde ve tarihsel/onarim ismi tasiyor.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_1.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_2.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/executive/check_executive_summary_advanced_v2_14_20.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/check_executive_summary_advanced_v2_14_21.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/fix_executive_summary_blueprint_indent_v2_14_4.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/patch_register_executive_summary.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/probe_exec_summary_routes_v1_3_3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_2_force_template.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/local_check_cic_v4_0_user_columns.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/local_emergency_cic_v4_0_schema_patch.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/local_fix_cic_v4_0_schema_patch.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/menu/check_executive_summary_menu_v2_14_9.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/menu/check_executive_summary_native_menu_v2_14_19.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_completion_phase12_final_gate.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_1_rule_engine_settings.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_2_personnel_category.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_3_personnel_category_card.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_3a_personnel_category_sidebar.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_4_category_scope_visibility.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_5_category_period_scope.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_6_category_period_integration.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_6a_corporate_ui_category_delete.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center_v1a_hotfix.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v1.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v1b.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2b_feed_first.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2c_post_cards.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2d1_profile_visual_fix.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2d_profile_area.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2f_news_left.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3a2_news_hardening.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3a_press_news.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b2_social_auto_import.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b3_social_import_center.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b4_social_auto_flow_fix.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b5_app_task_control.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b_social_posts.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_portal_interaction_permissions_v2_12_2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/check_portal_role_matrix_deep_v2_12_3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/portal/seed_portal_interaction_permissions_v2_12_2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/quality/bys360_a10d_hard_ui_precision_decision.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_a10e_hard_ui_false_positive_close.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_a10q_compat_wrapper_rename_apply.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_claude_score_uplift_p0_security_repo_hygiene.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_mobile_behavior_smoke_p2b.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_mobile_domain_smoke_p1f.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_mobile_request_level_smoke_p2c.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py: decision=historical_archive_candidate | Tarihsel script klasorunde ve tarihsel/onarim ismi tasiyor.
+- scripts/quality/bys360_s0f3_pytest_isolated_update_verify.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/refactor/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_apply.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1c.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1d.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_personnel_kpi_split_p1e.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_shared_split_p1b.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/refactor/bys360_route_architecture_inventory_p1a.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v1.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v3.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p8_cic_template_service_migration_v1.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/run_bys360_instagram_portal_sync_v2_11_0.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/run_bys360_instagram_portal_sync_v2_11_2.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/scheduled/run_cic_auto_scheduler.py: decision=unreferenced_review_candidate | Referans yok; manuel inceleme gerekir.
+- scripts/security/build_bys360_secure_release_v1_3.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/build_bys360_secure_release_v1_4.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_3.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_4.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_p0_security_observability_v1.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_p1_risk_hardening_v1.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_3.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_4.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_5.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+- scripts/security/check_bys360_session_timeout_security_v1.py: decision=historical_review_candidate | Tarihsel script klasorunde ancak isim sinyali zayif.
+
+## Largest Remaining Scripts Top 80
+- scripts/quality/bys360_score100_quality_gate_v1.py: 1340 lines | keep_operational_referenced
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py: 789 lines | keep_code_referenced
+- scripts/overlay/bys360_live_full_overlay_v2_13_0.py: 706 lines | keep_operational_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py: 666 lines | keep_operational_referenced
+- scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py: 663 lines | historical_archive_candidate
+- scripts/windows/tools/mobile_portal_patch_v2_8_80.py: 617 lines | keep_operational_review
+- scripts/quality/repair_bys360_message_interactions_v1.py: 592 lines | keep_operational_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py: 557 lines | keep_operational_referenced
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: 547 lines | active_runtime_script
+- scripts/security/repair_bys360_logout_force_clear_v2_15_12.py: 539 lines | keep_operational_referenced
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py: 526 lines | keep_code_referenced
+- scripts/quality/bys360_s0f3_pytest_isolated_update_verify.py: 487 lines | historical_review_candidate
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: 482 lines | active_runtime_script
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py: 472 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py: 470 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py: 466 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_request_level_smoke_p2c.py: 457 lines | historical_review_candidate
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py: 452 lines | keep_code_referenced
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py: 450 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_behavior_smoke_p2b.py: 431 lines | historical_review_candidate
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v3.py: 429 lines | unreferenced_review_candidate
+- scripts/quality/bys360_claude_score_uplift_p0_security_repo_hygiene.py: 423 lines | historical_review_candidate
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py: 422 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py: 416 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py: 415 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py: 414 lines | keep_code_referenced
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1.py: 413 lines | active_runtime_script
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_2.py: 413 lines | active_runtime_script
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_3.py: 413 lines | active_runtime_script
+- scripts/refactor/bys360_mobile_routes_domain_split_p1d.py: 412 lines | unreferenced_review_candidate
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py: 397 lines | keep_code_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: 394 lines | keep_operational_referenced
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v1.py: 386 lines | unreferenced_review_candidate
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: 382 lines | active_runtime_script
+- scripts/refactor/bys360_mobile_routes_personnel_kpi_split_p1e.py: 381 lines | unreferenced_review_candidate
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v2.py: 370 lines | unreferenced_review_candidate
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py: 369 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py: 367 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py: 366 lines | keep_code_referenced
+- scripts/refactor/bys360_route_architecture_inventory_p1a.py: 366 lines | unreferenced_review_candidate
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py: 365 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py: 360 lines | keep_code_referenced
+- scripts/quality/bys360_secret_repo_gate.py: 354 lines | keep_operational_referenced
+- scripts/refactor/bys360_mobile_routes_domain_split_p1c.py: 350 lines | unreferenced_review_candidate
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py: 341 lines | keep_code_referenced
+- scripts/quality/bys360_a10q_compat_wrapper_rename_apply.py: 336 lines | historical_review_candidate
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py: 330 lines | keep_code_referenced
+- scripts/quality/bys360_mobile_domain_smoke_p1f.py: 309 lines | historical_review_candidate
+- scripts/quality/bys360_ops_audit.py: 309 lines | keep_operational_referenced
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py: 307 lines | keep_code_referenced
+- scripts/live/repair_bys360_live_full_overlay_v2_17_62.py: 293 lines | active_runtime_script
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_3.py: 288 lines | unreferenced_review_candidate
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py: 285 lines | keep_code_referenced
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py: 283 lines | keep_code_referenced
+- scripts/portal/repair_bys360_portal_experience_v3b1_social_post_live.py: 282 lines | keep_other_reference_review
+- scripts/quality/bys360_pytest_standard_gate_p2d.py: 280 lines | keep_code_referenced
+- scripts/live_readiness/a7d_local_smoke_contract.py: 274 lines | keep_operational_referenced
+- scripts/quality/restore_p14f4_source_aware_existing_assistant_v1.py: 269 lines | keep_operational_referenced
+- scripts/quality/bys360_phase3_route_density_gate_v1.py: 255 lines | keep_code_referenced
+- scripts/portal/repair_bys360_portal_experience_v3a1_press_news_sidebar.py: 246 lines | keep_other_reference_review
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py: 243 lines | keep_code_referenced
+- scripts/refactor/bys360_mobile_routes_shared_split_p1b.py: 242 lines | unreferenced_review_candidate
+- scripts/security/repair_bys360_logout_base_client_hotfix_v2_15_13.py: 237 lines | keep_operational_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: 236 lines | keep_operational_referenced
+- scripts/security/repair_bys360_csrf_form_token_and_referrer_hotfix_v2_15_15.py: 236 lines | keep_operational_referenced
+- scripts/security/validate_a6e_production_env_contract.py: 236 lines | keep_operational_referenced
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py: 233 lines | keep_code_referenced
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py: 229 lines | keep_code_referenced
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py: 224 lines | keep_code_referenced
+- scripts/portal/rollback_bys360_home_prestige_safe_v1a.py: 215 lines | keep_operational_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py: 213 lines | keep_operational_referenced
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py: 213 lines | keep_code_referenced
+- scripts/windows/restore_bys36043_safe_extract_v1.py: 210 lines | active_runtime_script
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py: 208 lines | keep_code_referenced
+- scripts/quality/bys360_quality9_ci_gate.py: 201 lines | keep_code_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: 200 lines | keep_operational_referenced
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py: 200 lines | keep_code_referenced
+- scripts/quality/bys360_a10d_hard_ui_precision_decision.py: 199 lines | historical_review_candidate
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py: 192 lines | keep_code_referenced
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py: 191 lines | unreferenced_review_candidate
+
+## Decision
+- Bu rapor dosya tasimaz.
+- 313/290 gibi sayilar tum script adaylarini ifade eder; asil aktif runtime script sayisi ayrica hesaplanmistir.
+- 100 alti hedefinin aktif runtime script olarak saglanip saglanmadigi bu raporda netlestirilir.
+- Tarihsel adaylar sonraki dalgada arsivlenebilir ama kod/operasyon referansli dosyalar korunmalidir.
