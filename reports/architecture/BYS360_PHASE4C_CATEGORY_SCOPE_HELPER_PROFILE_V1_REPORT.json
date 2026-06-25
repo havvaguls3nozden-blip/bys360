@@ -1,0 +1,113 @@
+{
+  "package": "BYS360_PHASE4C_CATEGORY_SCOPE_HELPER_PROFILE_V1",
+  "generated_at": "2026-06-25T09:56:11",
+  "branch": "phase4c-performance-category-scope-v1",
+  "head_before_report_commit": "f3ad3db",
+  "meaningful_git_status_clean_before_report_write": true,
+  "target_path": "/performance/v2-1-4-category-scope",
+  "helper_timings": [
+    {
+      "name": "category_visibility_policy_for_user",
+      "ok": true,
+      "elapsed_ms": 0.004,
+      "result_type": "dict",
+      "result_size": 6,
+      "preview": "{'role': 'admin', 'can_manage_scope': True, 'can_see_person_details': True, 'default_visibility_mode': 'detail_allowed', 'person_detail_message': 'Kişi detayı yetki kapsamında gösterilebilir.', 'rule_version': 'performance_v2_1_4_category_scope_visibility'}",
+      "error": null
+    },
+    {
+      "name": "ensure_category_scope_schema",
+      "ok": true,
+      "elapsed_ms": 12.0,
+      "result_type": "dict",
+      "result_size": 4,
+      "preview": "{'ok': True, 'created': [], 'dialect': 'sqlite', 'rule_version': 'performance_v2_1_4_category_scope_visibility'}",
+      "error": null
+    },
+    {
+      "name": "seed_default_categories",
+      "ok": true,
+      "elapsed_ms": 1.143,
+      "result_type": "dict",
+      "result_size": 7,
+      "preview": "{'ok': True, 'created': 0, 'updated': 0, 'unchanged': 6, 'details': [{'category_key': 'guvenlik', 'action': 'unchanged'}, {'category_key': 'temizlik', 'action': 'unchanged'}, {'category_key': 'idari_personel', 'action': 'unchanged'}, {'category_key': 'teknik_personel', 'action': 'unchanged'}, {'category_key': 'deneme_sureli_personel', 'action': 'unchanged'}, {'category_key': 'diger', 'action': 'unchanged'}], 'rule_version': 'performance_v2_1_2_personnel_category', 'dialect': 'sqlite'}",
+      "error": null
+    },
+    {
+      "name": "active_categories",
+      "ok": true,
+      "elapsed_ms": 1.243,
+      "result_type": "list",
+      "result_size": 6,
+      "preview": "[CategorySummary(category_key='guvenlik', display_name='Güvenlik', description='Güvenlik personeline özel dönem, ortalama ve raporlama kapsamı.', display_order=10, is_active=True, assignment_count=0), CategorySummary(category_key='temizlik', display_name='Temizlik', description='Temizlik personeline özel dönem, ortalama ve raporlama kapsamı.', display_order=20, is_active=True, assignment_count=0), CategorySummary(category_key='idari_personel', display_name='İdari Personel', description='İdari gö",
+      "error": null
+    },
+    {
+      "name": "category_scope_summaries_without_person_details",
+      "ok": true,
+      "elapsed_ms": 22.793,
+      "result_type": "list",
+      "result_size": 6,
+      "preview": "[{'category_key': 'guvenlik', 'display_name': 'Güvenlik', 'description': 'Güvenlik personeline özel dönem, ortalama ve raporlama kapsamı.', 'assignment_count': 0, 'active_personnel_count': 0, 'passive_personnel_count': 0, 'visibility_mode': 'summary_only', 'detail_locked': True, 'scope_ready': False, 'draft_count': 0, 'personnel_preview': []}, {'category_key': 'temizlik', 'display_name': 'Temizlik', 'description': 'Temizlik personeline özel dönem, ortalama ve raporlama kapsamı.', 'assignment_cou",
+      "error": null
+    },
+    {
+      "name": "category_scope_summaries_policy_based",
+      "ok": true,
+      "elapsed_ms": 20.37,
+      "result_type": "list",
+      "result_size": 6,
+      "preview": "[{'category_key': 'guvenlik', 'display_name': 'Güvenlik', 'description': 'Güvenlik personeline özel dönem, ortalama ve raporlama kapsamı.', 'assignment_count': 0, 'active_personnel_count': 0, 'passive_personnel_count': 0, 'visibility_mode': 'detail_allowed', 'detail_locked': False, 'scope_ready': False, 'draft_count': 0, 'personnel_preview': []}, {'category_key': 'temizlik', 'display_name': 'Temizlik', 'description': 'Temizlik personeline özel dönem, ortalama ve raporlama kapsamı.', 'assignment_",
+      "error": null
+    },
+    {
+      "name": "all_categories_with_usage",
+      "ok": true,
+      "elapsed_ms": 9.51,
+      "result_type": "list",
+      "result_size": 6,
+      "preview": "[{'category_key': 'guvenlik', 'display_name': 'Güvenlik', 'description': 'Güvenlik personeline özel dönem, ortalama ve raporlama kapsamı.', 'display_order': 10, 'is_active': True, 'assignment_count': 0, 'active_assignments': 0, 'all_assignments': 0, 'scope_drafts': 0, 'period_plans': 0, 'period_integrations': 0, 'total_links': 0, 'can_hard_delete': True, 'delete_label': 'Sil', 'status_label': 'Aktif'}, {'category_key': 'temizlik', 'display_name': 'Temizlik', 'description': 'Temizlik personeline ",
+      "error": null
+    },
+    {
+      "name": "list_scope_drafts",
+      "ok": true,
+      "elapsed_ms": 2.88,
+      "result_type": "list",
+      "result_size": 0,
+      "preview": "[]",
+      "error": null
+    },
+    {
+      "name": "category_scope_dashboard_summary",
+      "ok": true,
+      "elapsed_ms": 28.712,
+      "result_type": "dict",
+      "result_size": 7,
+      "preview": "{'rule_version': 'performance_v2_1_4_category_scope_visibility', 'category_count': 6, 'assigned_total': 0, 'ready_category_count': 0, 'draft_count': 0, 'unassigned_count': 1, 'visibility_mode': 'summary_only'}",
+      "error": null
+    },
+    {
+      "name": "run_v2_1_4_category_scope_visibility_gate",
+      "ok": true,
+      "elapsed_ms": 49.327,
+      "result_type": "dict",
+      "result_size": 3,
+      "preview": "{'ok': True, 'checks': [{'name': 'v2_1_2_tables', 'ok': True, 'message': 'V2.1.2 kategori tabloları mevcut.'}, {'name': 'scope_draft_table', 'ok': True, 'message': 'V2.1.4 kapsam taslak tablosu mevcut.'}, {'name': 'default_categories', 'ok': True, 'message': 'Kategori sayısı: 6'}, {'name': 'summary_only', 'ok': True, 'message': 'Kategori özeti kişi detayı göstermeden üretildi.'}, {'name': 'category_alias', 'ok': True, 'message': 'Türkçe kategori anahtarı dönüşümü çalışıyor.'}, {'name': 'scope_up",
+      "error": null
+    }
+  ],
+  "route_get_timing": {
+    "ok": true,
+    "elapsed_ms": 599.899,
+    "result_type": "str",
+    "status_code": null,
+    "location": null,
+    "content_type": null,
+    "body_preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/img/favicon.png\">\\n    <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/img/apple-touch-icon.png\">\\n\\n    <link rel=\"preconnect\" h"
+  },
+  "slow_helpers_over_250ms": [],
+  "slow_helpers_over_1000ms": [],
+  "profile_ok": true,
+  "error": null
+}
