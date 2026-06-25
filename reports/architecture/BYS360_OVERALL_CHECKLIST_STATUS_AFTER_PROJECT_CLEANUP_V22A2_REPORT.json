@@ -1,0 +1,213 @@
+{
+  "phase": "overall-checklist-status-after-project-cleanup-v22a2",
+  "generated_at": "2026-06-25T19:53:30",
+  "git_head": "23ab227",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "items": [
+    {
+      "id": 0,
+      "title": ".env git gecmisinden temizle",
+      "status": "PASS",
+      "evidence": {
+        "tracked_env": [],
+        "env_history_hit_count": 0
+      },
+      "note": ".env aktif takipte degil; history izleri varsa ayrica history rewrite kaniti gerekir."
+    },
+    {
+      "id": 1,
+      "title": "DEPLOYMENT.md + BACKUP runbook",
+      "status": "PASS",
+      "evidence": {
+        "deployment_files": [
+          "DEPLOYMENT.md"
+        ],
+        "backup_docs": [
+          "BACKUP_RUNBOOK.md",
+          "docs/quality/BYS360_QUALITY_10_10_P3_CLEAN_AUDIT_EXCLUDE_BACKUPS.md"
+        ]
+      },
+      "note": "DEPLOYMENT ve backup/yedek dokumani arandi."
+    },
+    {
+      "id": 2,
+      "title": "SECURITY.md KVKK politikasi",
+      "status": "PASS",
+      "evidence": {
+        "security_files": [
+          "SECURITY.md"
+        ],
+        "kvkk_hits": [
+          "BACKUP_RUNBOOK.md",
+          "README.md",
+          "SECURITY.md",
+          "app/admin/ai_phase10_routes.py",
+          "app/admin/ai_phase11_routes.py",
+          "app/admin/ai_phase12_routes.py",
+          "app/ai/decision_support_faz1_ui_safe.py",
+          "app/docs/ai/FAZ7_ANALIZ_MERKEZI_EXCEL_ONIZLEME.md",
+          "app/docs/communication/FAZ9_CANLIYA_GECIS_RUNBOOK.md",
+          "app/models/core_models.py",
+          "app/refactor/final_quality_release_evidence_contract.py",
+          "app/refactor/final_quality_security_compliance_contract.py",
+          "app/services/ai/excel_preview.py",
+          "app/services/ai/executive_report_exports.py",
+          "app/services/ai/final_live_hardening.py",
+          "app/services/ai/prompts.py",
+          "app/services/ai/recommendation_priority.py",
+          "app/services/ai/visibility_gate.py",
+          "app/services/ai/visual_reports.py",
+          "app/services/ai_agent/assistant_chatgpt_like_v31.py",
+          "app/services/ai_agent/assistant_full_live_usage_guide_v2.py",
+          "app/services/ai_agent/assistant_knowledge_bank_v1.py",
+          "app/services/ai_agent/assistant_project_master_knowledge_v3.py",
+          "app/services/ai_agent/assistant_step_guide.py",
+          "app/services/ai_agent/assistant_stepwise_tutor_v4.py",
+          "app/services/ai_agent/assistant_usage_manual_brain_v32.py",
+          "app/services/ai_decision/live_scope.py",
+          "app/services/ai_decision/security_contract.py",
+          "app/services/analytics_center/dashboard_surface.py",
+          "app/services/analytics_center/survey_feedback_insights.py"
+        ]
+      },
+      "note": "SECURITY/KVKK kanitlari arandi."
+    },
+    {
+      "id": 3,
+      "title": "CONTRIBUTING.md onboarding bolumu",
+      "status": "PASS",
+      "evidence": {
+        "contributing_files": [
+          "CONTRIBUTING.md"
+        ]
+      },
+      "note": "CONTRIBUTING.md arandi."
+    },
+    {
+      "id": 4,
+      "title": "Integration testleri auth + performans",
+      "status": "PASS",
+      "evidence": {
+        "auth_tests_top20": [
+          "tests/architecture/test_mobile_api_auth_dashboard_assistant_response_p3b_v3.py",
+          "tests/architecture/test_mobile_api_auth_guard_matrix_p4a.py",
+          "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b.py",
+          "tests/architecture/test_mobile_auth_dashboard_assistant_response_p3b_v2.py",
+          "tests/architecture/test_phase2_auth_smoke_gate_v1.py",
+          "tests/architecture/test_phase2_auth_success_flow_gate_v1.py",
+          "tests/load/locust_remote_auth.py",
+          "tests/load/locust_remote_auth_pool.py",
+          "tests/load/locust_remote_auth_strict.py"
+        ],
+        "performance_tests_top20": [
+          "tests/architecture/test_mobile_api_performance_response_p3e.py",
+          "tests/architecture/test_phase3b_mobile_performance_base_helpers_gate_v1.py",
+          "tests/architecture/test_phase3b_mobile_performance_config_helpers_gate_v1.py",
+          "tests/architecture/test_phase3b_mobile_performance_item_helpers_gate_v1.py",
+          "tests/architecture/test_phase3b_mobile_performance_query_helpers_gate_v1.py",
+          "tests/architecture/test_phase3b_mobile_performance_task_helpers_gate_v1.py",
+          "tests/critical/test_claude_phase6_sql_performance_contracts.py",
+          "tests/performance/test_critical_performance_routes_smoke.py",
+          "tests/performance/test_performance_completion_phase1_rule_center.py",
+          "tests/performance/test_performance_completion_phase2_category_center.py",
+          "tests/performance/test_performance_completion_phase3_visibility_scope.py",
+          "tests/performance/test_phase12_performance_rules_contract.py",
+          "tests/services/test_final_quality_performance_rule_matrix.py",
+          "tests/services/test_final_quality_performance_visibility_contract.py",
+          "tests/services/test_performance_assignments_contract.py",
+          "tests/services/test_performance_common_contract.py",
+          "tests/test_performance_archive_visibility_contract.py",
+          "tests/test_performance_chain_constitution.py",
+          "tests/test_performance_form_guard.py",
+          "tests/test_performance_ops_center.py"
+        ],
+        "integration_tests_top20": [
+          "tests/integration/test_feedback_http_behavior.py",
+          "tests/integration/test_final_quality_live_backbone_contract.py",
+          "tests/integration/test_final_quality_live_backbone_sources.py",
+          "tests/integration/test_http_core_smoke.py",
+          "tests/integration/test_http_db_core_flows.py"
+        ]
+      },
+      "note": "Auth ve performans testleri arandi."
+    },
+    {
+      "id": 5,
+      "title": "CI'a integration testleri ekle",
+      "status": "PASS",
+      "evidence": {
+        "workflow_files": [
+          ".github/workflows/bys360-ci.yml",
+          ".github/workflows/bys360-score100-quality-gate-v1.yml"
+        ],
+        "workflow_test_hits": [
+          ".github/workflows/bys360-ci.yml"
+        ]
+      },
+      "note": "CI workflow icinde pytest/tests calistirma izi arandi."
+    },
+    {
+      "id": 6,
+      "title": "God-object dosyalari bol 37 adet",
+      "status": "PARTIAL_PASS",
+      "evidence": {
+        "ops_routes_split_tag": true
+      },
+      "note": "ops_routes.py split tamam; 37 dosyanin tumu icin ayri final kanit gerekir."
+    },
+    {
+      "id": 7,
+      "title": "Aktif script sayisini 100'un altina indir",
+      "status": "PASS",
+      "evidence": {
+        "strict_active_runtime_script_count": 48,
+        "physical_script_candidates": 273,
+        "final_tag": true
+      },
+      "note": "Aktif runtime script 48; fiziksel script adayi 273."
+    },
+    {
+      "id": 8,
+      "title": "Nginx config ornegi + otomatik yedek",
+      "status": "DEFERRED_BY_SCOPE",
+      "evidence": {},
+      "note": "Kullanici talebiyle canli/Nginx/backup kapsami bu fazda disarida tutuldu."
+    },
+    {
+      "id": 9,
+      "title": "OpenAPI semasini tamamla",
+      "status": "PASS_OR_NEEDS_VERIFY",
+      "evidence": {
+        "openapi_hits": [
+          "docs/api/BYS360_OPENAPI_BOOTSTRAP.md",
+          "docs/api/openapi_draft.json",
+          "docs/architecture/BYS360_P1A_ARCHITECTURE_ROUTE_INVENTORY_GUIDE.md",
+          "docs/architecture/BYS360_ROUTE_ARCHITECTURE_INVENTORY_P1A.md",
+          "docs/quality/BYS360_SCORECARD_TARGETS.md",
+          "docs/quality/BYS360_SCORE_UPLIFT_ROADMAP.md",
+          "scripts/refactor/bys360_route_architecture_inventory_p1a.py"
+        ]
+      },
+      "note": "OpenAPI/Swagger izleri bulunduysa sema tamligi ayrica dogrulanmali."
+    }
+  ],
+  "status_counts": {
+    "PASS": 7,
+    "PARTIAL_PASS": 1,
+    "DEFERRED_BY_SCOPE": 1,
+    "PASS_OR_NEEDS_VERIFY": 1
+  },
+  "cleanup_context": {
+    "strict_active_runtime_script_count": 48,
+    "physical_script_candidates": 273,
+    "script_cleanup_final_tag_present": true
+  },
+  "safety": {
+    "live_system_changed": false,
+    "files_moved": false,
+    "files_deleted": false,
+    "nginx_or_backup_created": false,
+    "database_touched": false
+  },
+  "ok": true
+}
