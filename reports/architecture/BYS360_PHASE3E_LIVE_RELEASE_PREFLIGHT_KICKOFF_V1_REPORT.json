@@ -1,12 +1,13 @@
 {
   "package": "BYS360_PHASE3E_LIVE_RELEASE_PREFLIGHT_KICKOFF_V1",
-  "generated_at": "2026-06-25T07:20:26",
+  "generated_at": "2026-06-25T07:22:10",
   "branch": "phase3e-live-release-preflight-v1",
-  "head": "6b5f6f2",
-  "git_status_clean": false,
-  "tags_at_head": [
-    "phase3d-service-layer-stabilization-pass-20260624"
+  "head_before_report_commit": "01c5258",
+  "meaningful_git_status_clean_before_report_write": true,
+  "ignored_generation_status_lines": [
+    "?? _phase3e_kickoff_fix.py"
   ],
+  "tags_at_head": [],
   "phase3d_closure_ok": true,
   "phase3d_full_gate_bundle_ok": true,
   "pytest_summary": {
@@ -28,5 +29,5 @@
     "Canlı güncelleme öncesi geri dönüş noktasını netleştirmek",
     "Faz 3D PASS tag üzerinden ilerlemek"
   ],
-  "phase3e_kickoff_ok": false
+  "phase3e_kickoff_ok": true
 }
