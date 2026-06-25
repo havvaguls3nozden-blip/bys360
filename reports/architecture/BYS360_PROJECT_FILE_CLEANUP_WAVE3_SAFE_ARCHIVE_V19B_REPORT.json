@@ -1,22 +1,23 @@
 {
   "phase": "project-file-cleanup-wave3-safe-archive-v19b",
-  "generated_at": "2026-06-25T18:16:29",
-  "git_head_before_report_commit": "04ef66d",
+  "generated_at": "2026-06-25T18:18:10",
+  "git_head_before_report_commit": "21d338a",
   "git_branch": "phase4j-script-reduction-godobject-v1",
   "source_report": "reports/architecture/BYS360_PROJECT_FILE_CLEANUP_HISTORICAL_SCRIPT_MANIFEST_V19A_REPORT.json",
   "archive_root": "archive/scripts_retired_20260625_wave3",
-  "before_active_script_candidates": 290,
+  "before_active_script_candidates": 288,
   "after_active_script_candidates": 288,
   "expected_after_active_script_candidates": 288,
   "manifest_count": 2,
-  "moved_count": 2,
-  "already_archived_count": 0,
+  "moved_count": 0,
+  "already_archived_count": 2,
   "missing_count": 0,
-  "moved": [
+  "moved": [],
+  "already_archived": [
     {
       "source": "scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py",
       "destination": "archive/scripts_retired_20260625_wave3/scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py",
-      "status": "moved",
+      "status": "already_archived",
       "sha256": "b5d9db76951bd3541ba33057ea6bb7e8188ad4a33a1567845dafd1189b9132b0",
       "lines": 152,
       "kb": 6.1,
@@ -26,7 +27,7 @@
     {
       "source": "scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py",
       "destination": "archive/scripts_retired_20260625_wave3/scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py",
-      "status": "moved",
+      "status": "already_archived",
       "sha256": "4f9ccd178557790cff3a93f7315c3f8021be3e4fa73bdc16169013d42c2835ba",
       "lines": 663,
       "kb": 20.9,
@@ -34,7 +35,6 @@
       "decision_reason": "Tarihsel script klasorunde ve tarihsel/onarim ismi tasiyor."
     }
   ],
-  "already_archived": [],
   "missing": [],
   "safety": {
     "live_system_changed": false,
@@ -42,7 +42,7 @@
     "files_moved_to_archive": true,
     "nginx_or_backup_created": false
   },
-  "ok": true,
+  "ok": false,
   "decision": [
     "V19A archive_wave3_safe listesindeki 2 tarihsel script arsivlendi.",
     "Dosyalar silinmedi; archive/scripts_retired_20260625_wave3 altina kaynak yol yapisi korunarak tasindi.",
