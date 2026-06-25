@@ -1,0 +1,65 @@
+{
+  "package": "BYS360_PHASE4G_RELEASE_MANIFEST_V2",
+  "generated_at": "2026-06-25T12:39:20",
+  "branch": "phase4g-release-manifest-v1",
+  "head_before_report_commit": "7c62f3b",
+  "meaningful_git_status_clean_before_report": true,
+  "ignored_status": [
+    "?? _phase4g_release_manifest_v2.py"
+  ],
+  "release_candidate": {
+    "valid_zip": {
+      "path": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip",
+      "exists": true,
+      "size_bytes": 17450218,
+      "sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+      "entry_count": 3479,
+      "readable": true,
+      "error": null
+    },
+    "expected_sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+    "valid_release_tag": "phase4f-release-freeze-clean-v2-pass-20260625",
+    "valid_source_commit": "028f6e4",
+    "manifest_v1_commit": "7c62f3b"
+  },
+  "do_not_use": {
+    "invalid_zip": {
+      "path": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+      "exists": true,
+      "size_bytes": 17688854,
+      "sha256": "C227AA4A1CBB0388E2DFD4CB64878D313CC456A7734250AEEC7DBCF6D0E8E2F9",
+      "entry_count": 3759,
+      "readable": true,
+      "error": null
+    },
+    "invalid_tag": "phase4f-release-freeze-pass-20260625",
+    "reason": "V1 freeze raporunda risk_entry_count=5 ve freeze_ok=false olduğu için canlı paket olarak kullanılmamalıdır."
+  },
+  "required_tags": {
+    "phase4c-category-scope-performance-pass-20260625": true,
+    "phase4d-offline-integration-gate-pass-20260625": true,
+    "phase4e-release-preflight-pass-20260625": true,
+    "phase4f-release-freeze-clean-v2-pass-20260625": true,
+    "phase4g-release-manifest-pass-20260625": true
+  },
+  "deployment_status": {
+    "live_deploy_done": false,
+    "note": "Bu rapor sadece release manifesttir; canlıya dağıtım yapılmadı."
+  },
+  "known_live_prerequisites": [
+    "Canlıya alınmadan önce mevcut canlı klasör ve veritabanı yedeği alınmalı.",
+    "Phase4A portal yorum/beğeni için canlı PostgreSQL tarafında message_comments tablo/migration kontrolü yapılmalı.",
+    "Canlıda görev zamanlayıcı adı BYS360 Live Waitress 80 olarak doğrulanmalı.",
+    "Yükleme sonrası /login, /portal, /messages, /performance/v2-1-4-category-scope smoke kontrolleri yapılmalı."
+  ],
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_report": true,
+    "required_tags_ok": true,
+    "valid_zip_exists": true,
+    "valid_zip_readable": true,
+    "valid_zip_nonempty": true,
+    "valid_zip_sha256_matches": true
+  },
+  "manifest_ok": true
+}
