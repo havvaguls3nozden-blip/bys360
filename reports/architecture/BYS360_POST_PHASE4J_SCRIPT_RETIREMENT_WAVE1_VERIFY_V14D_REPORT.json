@@ -1,0 +1,24 @@
+{
+  "phase": "post-phase4j-script-retirement-wave1-verify-v14d",
+  "generated_at": "2026-06-25T17:45:40",
+  "source_report": "reports/architecture/BYS360_POST_PHASE4J_SCRIPT_RETIREMENT_WAVE1_V14C2_REPORT.json",
+  "archive_root": "archive/scripts_retired_20260625",
+  "git_head": "fa8148f",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "raw_git_status": "?? _post_phase4j_script_retirement_wave1_verify_v14d.py",
+  "actionable_git_status": [],
+  "v14c2_ok": true,
+  "expected_moved_count": 47,
+  "moved_count": 47,
+  "archive_py_ps1_count": 47,
+  "expected_active_script_candidates": 313,
+  "active_script_candidates": 313,
+  "source_still_exists": [],
+  "destination_missing": [],
+  "ok": true,
+  "decision": [
+    "V14C2 wave1 script retirement sonrasi aktif script sayisi 313 olarak dogrulandi.",
+    "47 script silinmeden archive/scripts_retired_20260625 altina tasindi.",
+    "Kaynak pathlerde emekli dosya kalmadigi ve hedef arşiv dosyalarinin bulundugu dogrulandi."
+  ]
+}
