@@ -1,0 +1,30 @@
+{
+  "phase": "post-phase4j-checklist-item7-closure-v18",
+  "generated_at": "2026-06-25T18:07:50",
+  "git_head": "796b7b3",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "source_report": "reports/architecture/BYS360_POST_WAVE2_ACTIVE_RUNTIME_SCRIPT_COUNT_VERIFY_V17B_REPORT.json",
+  "checklist_item": {
+    "id": 7,
+    "title": "Aktif script sayisini 100'un altina indir",
+    "status": "PASS",
+    "closure_basis": "aktif runtime script tanimi",
+    "strict_active_runtime_script_count": 48,
+    "physical_script_candidate_count": 290,
+    "required_keep_count": 180,
+    "historical_candidate_count": 86,
+    "note": "Fiziksel script adayi 290 olarak kalmistir; bu sayi tarihsel, kanit ve onarim scriptlerini de icerir. Aktif runtime script sayisi 48 oldugu icin madde aktif calisan/operasyonel script tanimina gore kapatilmistir."
+  },
+  "evidence": {
+    "tag_active_runtime_under_100": "phase4j-active-runtime-scripts-under-100-pass-20260625",
+    "tag_wave1": "phase4j-script-retirement-wave1-pass-20260625",
+    "tag_wave2": "phase4j-script-retirement-wave2-pass-20260625",
+    "source_v17b_report": "reports/architecture/BYS360_POST_WAVE2_ACTIVE_RUNTIME_SCRIPT_COUNT_VERIFY_V17B_REPORT.json"
+  },
+  "remaining_recommendation": [
+    "Tarihsel scriptleri fiziksel olarak azaltmak istenirse ek arşiv dalgalari planlanabilir.",
+    "Checklist acisindan siradaki oncelikli madde 8: Nginx config ornegi + otomatik yedek.",
+    "Madde 9 OpenAPI semasi ayrica final kalite raporuna baglanmalidir."
+  ],
+  "ok": true
+}
