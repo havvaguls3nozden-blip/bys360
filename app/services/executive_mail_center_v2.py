@@ -230,18 +230,15 @@ def _bys360_phase4b_is_weekend(now=None) -> bool:
 
 def run_task(task_key: str, dry_run: bool=False, actor_user_id: int|None=None, only_user_id: int|None=None) -> dict[str, Any]:
     # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_START
-    _bys360_phase4b_task_key = str((task_key).get("key") or "").strip().lower() if isinstance(task_key, dict) else ""
-    _bys360_phase4b_period = str((task_key).get("period") or "").strip().lower() if isinstance(task_key, dict) else ""
-    _bys360_phase4b_audience = str((task_key).get("audience") or "").strip().lower() if isinstance(task_key, dict) else ""
-    if (
-        (_bys360_phase4b_task_key == "staff_midday" or (_bys360_phase4b_period == "midday" and _bys360_phase4b_audience == "staff"))
-        and _bys360_phase4b_is_weekend()
-    ):
+    _bys360_phase4b_task_key = str(task_key or "").strip().lower()
+    if _bys360_phase4b_task_key == "staff_midday" and _bys360_phase4b_is_weekend():
         return {
             "ok": True,
             "skipped": True,
             "reason": "weekend_guard",
-            "task_key": _bys360_phase4b_task_key or "staff_midday",
+            "task_key": "staff_midday",
+            "sent_count": 0,
+            "failed_count": 0,
             "message": "Hafta sonu olduğu için personel gün ortası maili gönderilmedi.",
         }
     # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_END
