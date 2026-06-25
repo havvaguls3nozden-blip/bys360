@@ -1,0 +1,277 @@
+{
+  "phase": "phase4j-ops-routes-residual-analysis-v6",
+  "generated_at": "2026-06-25T13:56:00",
+  "target": "app/admin/ops_routes.py",
+  "target_lines": 614,
+  "target_kb": 23.1,
+  "function_count": 16,
+  "route_function_count": 15,
+  "helper_function_count": 1,
+  "largest_functions": [
+    {
+      "name": "download_personnel_template",
+      "line_start": 405,
+      "line_end": 472,
+      "line_count": 68,
+      "decorators": [
+        "main_bp.route('/personnel/template/download')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/template/download')"
+      ]
+    },
+    {
+      "name": "personnel_profile",
+      "line_start": 524,
+      "line_end": 576,
+      "line_count": 53,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')"
+      ]
+    },
+    {
+      "name": "performance_hierarchy_bulk_assign",
+      "line_start": 352,
+      "line_end": 398,
+      "line_count": 47,
+      "decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])",
+        "login_required",
+        "admin_required"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_delete",
+      "line_start": 223,
+      "line_end": 260,
+      "line_count": 38,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_user_change_photo",
+      "line_start": 108,
+      "line_end": 138,
+      "line_count": 31,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_user_archive",
+      "line_start": 167,
+      "line_end": 190,
+      "line_count": 24,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_archive",
+      "line_start": 267,
+      "line_end": 289,
+      "line_count": 23,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_user_delete",
+      "line_start": 197,
+      "line_end": 216,
+      "line_count": 20,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_passive",
+      "line_start": 296,
+      "line_end": 314,
+      "line_count": 19,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "personnel_toggle_active",
+      "line_start": 479,
+      "line_end": 496,
+      "line_count": 18,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_user_toggle_active",
+      "line_start": 145,
+      "line_end": 160,
+      "line_count": 16,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "personnel_delete",
+      "line_start": 503,
+      "line_end": 517,
+      "line_count": 15,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "admin_users_reset_all",
+      "line_start": 337,
+      "line_end": 346,
+      "line_count": 10,
+      "decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])"
+      ]
+    },
+    {
+      "name": "ensure_not_self_target",
+      "line_start": 611,
+      "line_end": 613,
+      "line_count": 3,
+      "decorators": [],
+      "is_route": false,
+      "route_decorators": []
+    },
+    {
+      "name": "admin_user_import",
+      "line_start": 321,
+      "line_end": 322,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])"
+      ]
+    },
+    {
+      "name": "admin_import_health_report",
+      "line_start": 329,
+      "line_end": 330,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/import-health-report')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/import-health-report')"
+      ]
+    }
+  ],
+  "next_candidates": [
+    "download_personnel_template",
+    "personnel_profile",
+    "performance_hierarchy_bulk_assign",
+    "admin_users_bulk_delete",
+    "admin_user_change_photo",
+    "admin_user_archive",
+    "admin_users_bulk_archive",
+    "admin_user_delete",
+    "admin_users_bulk_passive"
+  ],
+  "recommendation": [
+    "ops_routes.py ana iki agir bloktan arindirildi.",
+    "Kalan parcalar daha kucuk route wrapper/service bolmelerine uygundur.",
+    "Bir sonraki guvenli hamle download_personnel_template veya personnel_profile govdesini service'e almak olabilir.",
+    "Her bolme sonrasi compileall, import smoke ve architecture testleri calistirilmelidir."
+  ]
+}
