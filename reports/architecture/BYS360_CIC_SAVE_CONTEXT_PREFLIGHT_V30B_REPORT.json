@@ -1,7 +1,7 @@
 {
   "phase": "cic-save-context-preflight-v30b",
-  "generated_at": "2026-06-25T20:56:19",
-  "git_head": "37853bc",
+  "generated_at": "2026-06-25T20:57:16",
+  "git_head": "e8012a1",
   "git_branch": "phase4j-script-reduction-godobject-v1",
   "source_report": "reports/architecture/BYS360_CIC_STATUS_AFTER_CIC_CONTEXT_SPLIT_V30A_REPORT.json",
   "target": "app/services/corporate_information_center.py",
