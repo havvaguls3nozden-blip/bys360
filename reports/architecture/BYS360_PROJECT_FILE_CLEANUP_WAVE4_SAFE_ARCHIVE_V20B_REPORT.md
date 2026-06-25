@@ -1,19 +1,22 @@
 # BYS360 Project File Cleanup Wave4 Safe Archive V20B
-- Generated at: 2026-06-25T18:24:39
+- Generated at: 2026-06-25T18:25:25
 - OK: True
 - Branch: phase4j-script-reduction-godobject-v1
-- HEAD before report commit: fd241da
+- HEAD before report commit: 54a67c4
 - Source report: reports/architecture/BYS360_PROJECT_FILE_CLEANUP_REVIEW_CANDIDATES_DEEP_CLASSIFICATION_V20A_REPORT.json
 - Archive root: archive/scripts_retired_20260625_wave4
-- Before active script candidates: 288
+- Before active script candidates: 273
 - After active script candidates: 273
 - Expected after active script candidates: 273
 - Manifest count: 15
-- Moved count: 15
-- Already archived count: 0
+- Moved count: 0
+- Already archived count: 15
 - Missing count: 0
 
 ## Moved Files
+- none
+
+## Already Archived Files
 - scripts/security/check_bys360_session_timeout_security_v1.py -> archive/scripts_retired_20260625_wave4/scripts/security/check_bys360_session_timeout_security_v1.py | sha256=81499c52a4fca0f1e6c318eae5de747292c6f1f26a07f105216d63e0b73737ef
 - scripts/admin/check_system_admin_email_v2_16_1_checkfix.py -> archive/scripts_retired_20260625_wave4/scripts/admin/check_system_admin_email_v2_16_1_checkfix.py | sha256=5cb34222fb43751f918f812de3ec9a909bc7ffd5839f682a52c8ed9e6d6841ea
 - scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py -> archive/scripts_retired_20260625_wave4/scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py | sha256=48c024f31368a84bdcfd2d2362a517b4f84f3db64335797a6bf0c29f1a506d8b
@@ -29,9 +32,6 @@
 - scripts/portal/check_bys360_portal_experience_v2f_news_left.py -> archive/scripts_retired_20260625_wave4/scripts/portal/check_bys360_portal_experience_v2f_news_left.py | sha256=0e299379f0cb5f35bb9463123664011f5108448db2452872e81d58d8f65a9267
 - scripts/portal/check_bys360_portal_experience_v3b3_social_import_center.py -> archive/scripts_retired_20260625_wave4/scripts/portal/check_bys360_portal_experience_v3b3_social_import_center.py | sha256=60b158ea73500f86cf02dbde7af23ed86b2d96b40e7461c746014b4dcb32231a
 - scripts/refactor/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_apply.py -> archive/scripts_retired_20260625_wave4/scripts/refactor/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_apply.py | sha256=70fb6c646a49591c9e6cfc7594cd8c95114a3d79dd4837d75ca8e9aadc7b4279
-
-## Already Archived Files
-- none
 
 ## Safety
 - live_system_changed: False
