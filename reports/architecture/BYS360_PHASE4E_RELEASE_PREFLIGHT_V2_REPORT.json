@@ -1,0 +1,122 @@
+{
+  "package": "BYS360_PHASE4E_RELEASE_PREFLIGHT_V2",
+  "generated_at": "2026-06-25T12:23:52",
+  "branch": "phase4e-release-preflight-v1",
+  "head_before_report_commit": "e61c336",
+  "python_executable": "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+  "meaningful_git_status_clean_before_report_write": true,
+  "ignored_status": [
+    "?? _phase4e_release_preflight_v2.py"
+  ],
+  "meaningful_status": [],
+  "compile_results": {
+    "app/__init__.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/__init__.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 102.163,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/error_handlers.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/error_handlers.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 110.554,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/route_support.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/route_support.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 98.502,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/performance/v2_1_4_category_scope_routes.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/performance/v2_1_4_category_scope_routes.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 104.208,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/corporate_information_center_engine.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/services/corporate_information_center_engine.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 99.075,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/executive_mail_center_v2.py": {
+      "cmd": [
+        "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+        "-m",
+        "py_compile",
+        "app/services/executive_mail_center_v2.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 102.62,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    }
+  },
+  "required_files": {
+    "app/templates/errors/400.html": true,
+    "app/templates/errors/401.html": true,
+    "app/templates/errors/403.html": true,
+    "app/templates/errors/404.html": true,
+    "app/templates/errors/405.html": true,
+    "app/templates/errors/500.html": true,
+    "app/templates/errors/503.html": true
+  },
+  "required_tags": {
+    "phase4c-category-scope-performance-pass-20260625": true,
+    "phase4d-offline-integration-gate-pass-20260625": true
+  },
+  "pytest_result": {
+    "cmd": [
+      "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "returncode": 0,
+    "elapsed_ms": 13338.61,
+    "stdout_tail": "ssssssss..ssssssssssssssssssssssssssssssssssssssssssssss.....ss.s..sssss [  8%]\nsssssssssssssssssss...ssssssssssssssssssssssssssssssssssssssssssssssssss [ 17%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 26%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 35%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 44%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 52%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 61%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 70%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 79%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 88%]\nssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 97%]\nssssssssssssssssssssssss                                                 [100%]\n13 passed, 803 skipped in 10.71s\n",
+    "stderr_tail": ""
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean": true,
+    "compile_ok": true,
+    "required_files_ok": true,
+    "required_tags_ok": true,
+    "pytest_ok": true,
+    "venv_python_used": true
+  },
+  "preflight_ok": true,
+  "live_deploy_status": "Canlıya dağıtım yapılmadı."
+}
