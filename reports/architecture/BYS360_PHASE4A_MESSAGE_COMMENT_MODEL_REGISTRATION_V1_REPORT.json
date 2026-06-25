@@ -1,0 +1,40 @@
+{
+  "package": "BYS360_PHASE4A_MESSAGE_COMMENT_MODEL_REGISTRATION_V1",
+  "generated_at": "2026-06-25T08:10:38",
+  "branch": "phase4a-offline-stabilization-v1",
+  "head_before_report_commit": "c576ef8",
+  "meaningful_git_status_clean_before_patch": true,
+  "ignored_generation_status_lines": [
+    "?? _phase4a_register_message_comment_model.py"
+  ],
+  "model_file": "app/models/communication_models.py",
+  "model_patch": {
+    "changed": true,
+    "reason": "MessageComment modeli eklendi."
+  },
+  "models_init_patch": {
+    "changed": true,
+    "reason": "MessageComment app.models export zincirine eklendi."
+  },
+  "runtime_registry": {
+    "registry_found": true,
+    "registry_matches": [
+      {
+        "class": "MessageComment",
+        "table": "message_comments",
+        "columns": [
+          "id",
+          "message_id",
+          "user_id",
+          "body",
+          "is_deleted",
+          "edited_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    ]
+  },
+  "registration_ok": true,
+  "error": null
+}

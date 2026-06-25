@@ -337,6 +337,39 @@ class MessageReaction(TimestampMixin, db.Model):
         return f"<MessageReaction message={self.message_id} user={self.user_id} value={self.reaction_value}>"
 
 
+
+class MessageComment(TimestampMixin, db.Model):
+    __tablename__ = "message_comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(
+        db.Integer,
+        db.ForeignKey("messages.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    body = db.Column(db.Text, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    edited_at = db.Column(db.DateTime, nullable=True)
+
+    message = db.relationship(
+        "Message",
+        backref=db.backref("comments", lazy="dynamic", cascade="all, delete-orphan"),
+    )
+    user = db.relationship("User", foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f"<MessageComment message={self.message_id} user={self.user_id}>"
+
+# BYS360_PHASE4A_MESSAGE_COMMENT_MODEL
+
+
 class MessageTypingState(TimestampMixin, db.Model):
     __tablename__ = "message_typing_states"
 

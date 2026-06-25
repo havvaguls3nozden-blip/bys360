@@ -109,6 +109,7 @@ from .communication_models import (
     SurveyQuestion,
     SurveyQuestionOption,
     SurveyResponse,
+    MessageComment,
 )
 
 # BYS360_CORPORATE_PORTAL_V1_MODEL_IMPORTS
