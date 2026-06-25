@@ -1,0 +1,947 @@
+{
+  "phase": "cic-status-after-send-split-v29a",
+  "generated_at": "2026-06-25T20:47:09",
+  "git_head": "b40c91a",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "status": "READY_FOR_NEXT_SPLIT",
+  "target": "app/services/corporate_information_center.py",
+  "target_analysis": {
+    "path": "app/services/corporate_information_center.py",
+    "line_count": 1370,
+    "function_count": 43,
+    "syntax_ok": true
+  },
+  "god_object_status": {
+    "line_count_ge_800": true,
+    "function_count_ge_50": false,
+    "still_god_object_candidate": true
+  },
+  "cic_modules": [
+    {
+      "path": "app/services/cic/__init__.py",
+      "line_count": 20,
+      "function_count": 0,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/celebration_service.py",
+      "line_count": 55,
+      "function_count": 8,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/config_context.py",
+      "line_count": 375,
+      "function_count": 14,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/facade.py",
+      "line_count": 120,
+      "function_count": 0,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/mail_scheduler_service.py",
+      "line_count": 470,
+      "function_count": 23,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/misc_context.py",
+      "line_count": 672,
+      "function_count": 24,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/query_service.py",
+      "line_count": 45,
+      "function_count": 6,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/repository.py",
+      "line_count": 471,
+      "function_count": 60,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/send_context.py",
+      "line_count": 683,
+      "function_count": 26,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/task_contract.py",
+      "line_count": 234,
+      "function_count": 5,
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/cic/template_service.py",
+      "line_count": 137,
+      "function_count": 7,
+      "syntax_ok": true
+    }
+  ],
+  "prefix_group_count": 11,
+  "best_next_target": {
+    "prefix": "_cic",
+    "seed_function_count": 28,
+    "seed_total_lines": 328,
+    "closure_function_count": 29,
+    "closure_total_lines": 356,
+    "closure_functions": [
+      "_cic_auto_last_run_key",
+      "_cic_is_weekend",
+      "_cic_phase3_actor_label",
+      "_cic_phase3_last_result",
+      "_cic_phase3_make_result",
+      "_cic_phase3_public_error",
+      "_cic_phase3_store_result",
+      "_cic_phase3_task_label",
+      "_cic_phase5_actor",
+      "_cic_phase5_now_label",
+      "_cic_phase5_store_audit",
+      "_cic_phase6_bool",
+      "_cic_v40_create_system_notifications",
+      "_cic_v40_date_input",
+      "_cic_v40_days_until",
+      "_cic_v40_run_weekend_celebrations",
+      "_cic_v40_upcoming_special_days",
+      "_cic_v40_upcoming_users",
+      "_cic_v45_bool",
+      "_cic_v45_build_user_indexes",
+      "_cic_v45_ensure_schema",
+      "_cic_v45_existing_user_rows",
+      "_cic_v45_header_key",
+      "_cic_v45_norm",
+      "_cic_v45_norm_name",
+      "_cic_v45_parse_date",
+      "_cic_v45_text",
+      "_cic_weekday_name_tr",
+      "send_task"
+    ],
+    "outside_calls": [],
+    "used_imports": [
+      "Any",
+      "User",
+      "_cic_phase5_audit_list",
+      "_cic_v40_Any",
+      "_cic_v40_active_staff_candidates",
+      "_cic_v40_date",
+      "_cic_v40_mmdd",
+      "_cic_v40_parse_date",
+      "_cic_v40_service_year",
+      "_cic_v40_setting_bool",
+      "_cic_v40_special_days",
+      "_cic_v40_today",
+      "_cic_v40_user_date",
+      "_cic_v45_date",
+      "_cic_v45_datetime",
+      "_cic_v45_re",
+      "_cic_v45_timedelta",
+      "_cic_v45_unicodedata",
+      "_dumps_json",
+      "_loads_json",
+      "_now",
+      "_recipients_for_task",
+      "_render_template_text",
+      "_send_task_base",
+      "_user_name",
+      "datetime",
+      "db",
+      "get_auto_scheduler_config",
+      "get_config",
+      "get_setting",
+      "get_template",
+      "set_setting",
+      "time"
+    ],
+    "used_assignments": [
+      "BASE_KEY",
+      "TASK_DEFINITIONS",
+      "VERSION",
+      "_CIC_V40_CELEBRATION_TASKS"
+    ],
+    "unknown_external_names": [
+      "Notification",
+      "_sa_inspect",
+      "_sa_text"
+    ],
+    "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+    "suggested_module": "app/services/cic/cic_context.py"
+  },
+  "recommended_candidates_top20": [
+    {
+      "prefix": "_cic",
+      "seed_function_count": 28,
+      "seed_total_lines": 328,
+      "closure_function_count": 29,
+      "closure_total_lines": 356,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_phase3_actor_label",
+        "_cic_phase3_last_result",
+        "_cic_phase3_make_result",
+        "_cic_phase3_public_error",
+        "_cic_phase3_store_result",
+        "_cic_phase3_task_label",
+        "_cic_phase5_actor",
+        "_cic_phase5_now_label",
+        "_cic_phase5_store_audit",
+        "_cic_phase6_bool",
+        "_cic_v40_create_system_notifications",
+        "_cic_v40_date_input",
+        "_cic_v40_days_until",
+        "_cic_v40_run_weekend_celebrations",
+        "_cic_v40_upcoming_special_days",
+        "_cic_v40_upcoming_users",
+        "_cic_v45_bool",
+        "_cic_v45_build_user_indexes",
+        "_cic_v45_ensure_schema",
+        "_cic_v45_existing_user_rows",
+        "_cic_v45_header_key",
+        "_cic_v45_norm",
+        "_cic_v45_norm_name",
+        "_cic_v45_parse_date",
+        "_cic_v45_text",
+        "_cic_weekday_name_tr",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "Any",
+        "User",
+        "_cic_phase5_audit_list",
+        "_cic_v40_Any",
+        "_cic_v40_active_staff_candidates",
+        "_cic_v40_date",
+        "_cic_v40_mmdd",
+        "_cic_v40_parse_date",
+        "_cic_v40_service_year",
+        "_cic_v40_setting_bool",
+        "_cic_v40_special_days",
+        "_cic_v40_today",
+        "_cic_v40_user_date",
+        "_cic_v45_date",
+        "_cic_v45_datetime",
+        "_cic_v45_re",
+        "_cic_v45_timedelta",
+        "_cic_v45_unicodedata",
+        "_dumps_json",
+        "_loads_json",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "_user_name",
+        "datetime",
+        "db",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting",
+        "time"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "VERSION",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification",
+        "_sa_inspect",
+        "_sa_text"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/cic_context.py"
+    },
+    {
+      "prefix": "run",
+      "seed_function_count": 1,
+      "seed_total_lines": 20,
+      "closure_function_count": 8,
+      "closure_total_lines": 238,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_v40_create_system_notifications",
+        "_cic_v40_run_weekend_celebrations",
+        "_cic_weekday_name_tr",
+        "_run_due_tasks_base",
+        "run_due_tasks",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_typing_any",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "ensure_defaults",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/run_context.py"
+    },
+    {
+      "prefix": "import",
+      "seed_function_count": 1,
+      "seed_total_lines": 119,
+      "closure_function_count": 10,
+      "closure_total_lines": 224,
+      "closure_functions": [
+        "_cic_v45_bool",
+        "_cic_v45_build_user_indexes",
+        "_cic_v45_ensure_schema",
+        "_cic_v45_existing_user_rows",
+        "_cic_v45_header_key",
+        "_cic_v45_norm",
+        "_cic_v45_norm_name",
+        "_cic_v45_parse_date",
+        "_cic_v45_text",
+        "import_celebration_dates_from_excel"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "_cic_v45_date",
+        "_cic_v45_datetime",
+        "_cic_v45_re",
+        "_cic_v45_timedelta",
+        "_cic_v45_unicodedata",
+        "db"
+      ],
+      "used_assignments": [],
+      "unknown_external_names": [
+        "_cic_v45_load_workbook",
+        "_sa_inspect",
+        "_sa_text",
+        "exc"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/import_context.py"
+    },
+    {
+      "prefix": "_run",
+      "seed_function_count": 1,
+      "seed_total_lines": 104,
+      "closure_function_count": 6,
+      "closure_total_lines": 189,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_v40_create_system_notifications",
+        "_cic_weekday_name_tr",
+        "_run_due_tasks_base",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_typing_any",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "ensure_defaults",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/run_context.py"
+    },
+    {
+      "prefix": "save",
+      "seed_function_count": 5,
+      "seed_total_lines": 121,
+      "closure_function_count": 8,
+      "closure_total_lines": 178,
+      "closure_functions": [
+        "_save_system_base",
+        "ensure_celebration_schema",
+        "save_celebration_settings",
+        "save_recipients",
+        "save_system",
+        "save_tasks",
+        "save_templates",
+        "set_auto_scheduler_config"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "Any",
+        "User",
+        "_cic_auto_bool",
+        "_cic_v40_bool",
+        "_cic_v40_parse_date",
+        "_clean_ids",
+        "_dumps_json",
+        "_now",
+        "db",
+        "get_config",
+        "get_setting",
+        "json",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS"
+      ],
+      "unknown_external_names": [
+        "_sa_inspect",
+        "_sa_text",
+        "exc",
+        "getlist_all"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/save_context.py"
+    },
+    {
+      "prefix": "celebration",
+      "seed_function_count": 1,
+      "seed_total_lines": 40,
+      "closure_function_count": 5,
+      "closure_total_lines": 110,
+      "closure_functions": [
+        "_cic_v40_days_until",
+        "_cic_v40_upcoming_special_days",
+        "_cic_v40_upcoming_users",
+        "celebration_context",
+        "ensure_celebration_schema"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "_cic_v40_Any",
+        "_cic_v40_active_staff_candidates",
+        "_cic_v40_anniversary_users",
+        "_cic_v40_birthday_users",
+        "_cic_v40_date",
+        "_cic_v40_mmdd",
+        "_cic_v40_service_year",
+        "_cic_v40_setting_bool",
+        "_cic_v40_special_days",
+        "_cic_v40_special_days_today",
+        "_cic_v40_today",
+        "_cic_v40_user_date",
+        "_dumps_json",
+        "context",
+        "db",
+        "ensure_defaults",
+        "get_setting",
+        "list_users"
+      ],
+      "used_assignments": [
+        "BASE_KEY"
+      ],
+      "unknown_external_names": [
+        "_sa_inspect",
+        "_sa_text",
+        "exc"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/celebration_context.py"
+    },
+    {
+      "prefix": "send",
+      "seed_function_count": 1,
+      "seed_total_lines": 28,
+      "closure_function_count": 2,
+      "closure_total_lines": 73,
+      "closure_functions": [
+        "_cic_v40_create_system_notifications",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "get_template"
+      ],
+      "used_assignments": [
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/send_context.py"
+    }
+  ],
+  "all_prefix_groups": [
+    {
+      "prefix": "_cic",
+      "seed_function_count": 28,
+      "seed_total_lines": 328,
+      "closure_function_count": 29,
+      "closure_total_lines": 356,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_phase3_actor_label",
+        "_cic_phase3_last_result",
+        "_cic_phase3_make_result",
+        "_cic_phase3_public_error",
+        "_cic_phase3_store_result",
+        "_cic_phase3_task_label",
+        "_cic_phase5_actor",
+        "_cic_phase5_now_label",
+        "_cic_phase5_store_audit",
+        "_cic_phase6_bool",
+        "_cic_v40_create_system_notifications",
+        "_cic_v40_date_input",
+        "_cic_v40_days_until",
+        "_cic_v40_run_weekend_celebrations",
+        "_cic_v40_upcoming_special_days",
+        "_cic_v40_upcoming_users",
+        "_cic_v45_bool",
+        "_cic_v45_build_user_indexes",
+        "_cic_v45_ensure_schema",
+        "_cic_v45_existing_user_rows",
+        "_cic_v45_header_key",
+        "_cic_v45_norm",
+        "_cic_v45_norm_name",
+        "_cic_v45_parse_date",
+        "_cic_v45_text",
+        "_cic_weekday_name_tr",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "Any",
+        "User",
+        "_cic_phase5_audit_list",
+        "_cic_v40_Any",
+        "_cic_v40_active_staff_candidates",
+        "_cic_v40_date",
+        "_cic_v40_mmdd",
+        "_cic_v40_parse_date",
+        "_cic_v40_service_year",
+        "_cic_v40_setting_bool",
+        "_cic_v40_special_days",
+        "_cic_v40_today",
+        "_cic_v40_user_date",
+        "_cic_v45_date",
+        "_cic_v45_datetime",
+        "_cic_v45_re",
+        "_cic_v45_timedelta",
+        "_cic_v45_unicodedata",
+        "_dumps_json",
+        "_loads_json",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "_user_name",
+        "datetime",
+        "db",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting",
+        "time"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "VERSION",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification",
+        "_sa_inspect",
+        "_sa_text"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/cic_context.py"
+    },
+    {
+      "prefix": "run",
+      "seed_function_count": 1,
+      "seed_total_lines": 20,
+      "closure_function_count": 8,
+      "closure_total_lines": 238,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_v40_create_system_notifications",
+        "_cic_v40_run_weekend_celebrations",
+        "_cic_weekday_name_tr",
+        "_run_due_tasks_base",
+        "run_due_tasks",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_typing_any",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "ensure_defaults",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/run_context.py"
+    },
+    {
+      "prefix": "import",
+      "seed_function_count": 1,
+      "seed_total_lines": 119,
+      "closure_function_count": 10,
+      "closure_total_lines": 224,
+      "closure_functions": [
+        "_cic_v45_bool",
+        "_cic_v45_build_user_indexes",
+        "_cic_v45_ensure_schema",
+        "_cic_v45_existing_user_rows",
+        "_cic_v45_header_key",
+        "_cic_v45_norm",
+        "_cic_v45_norm_name",
+        "_cic_v45_parse_date",
+        "_cic_v45_text",
+        "import_celebration_dates_from_excel"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "_cic_v45_date",
+        "_cic_v45_datetime",
+        "_cic_v45_re",
+        "_cic_v45_timedelta",
+        "_cic_v45_unicodedata",
+        "db"
+      ],
+      "used_assignments": [],
+      "unknown_external_names": [
+        "_cic_v45_load_workbook",
+        "_sa_inspect",
+        "_sa_text",
+        "exc"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/import_context.py"
+    },
+    {
+      "prefix": "_run",
+      "seed_function_count": 1,
+      "seed_total_lines": 104,
+      "closure_function_count": 6,
+      "closure_total_lines": 189,
+      "closure_functions": [
+        "_cic_auto_last_run_key",
+        "_cic_is_weekend",
+        "_cic_v40_create_system_notifications",
+        "_cic_weekday_name_tr",
+        "_run_due_tasks_base",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_typing_any",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_now",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "ensure_defaults",
+        "get_auto_scheduler_config",
+        "get_config",
+        "get_setting",
+        "get_template",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS",
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/run_context.py"
+    },
+    {
+      "prefix": "save",
+      "seed_function_count": 5,
+      "seed_total_lines": 121,
+      "closure_function_count": 8,
+      "closure_total_lines": 178,
+      "closure_functions": [
+        "_save_system_base",
+        "ensure_celebration_schema",
+        "save_celebration_settings",
+        "save_recipients",
+        "save_system",
+        "save_tasks",
+        "save_templates",
+        "set_auto_scheduler_config"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "Any",
+        "User",
+        "_cic_auto_bool",
+        "_cic_v40_bool",
+        "_cic_v40_parse_date",
+        "_clean_ids",
+        "_dumps_json",
+        "_now",
+        "db",
+        "get_config",
+        "get_setting",
+        "json",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY",
+        "TASK_DEFINITIONS"
+      ],
+      "unknown_external_names": [
+        "_sa_inspect",
+        "_sa_text",
+        "exc",
+        "getlist_all"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/save_context.py"
+    },
+    {
+      "prefix": "celebration",
+      "seed_function_count": 1,
+      "seed_total_lines": 40,
+      "closure_function_count": 5,
+      "closure_total_lines": 110,
+      "closure_functions": [
+        "_cic_v40_days_until",
+        "_cic_v40_upcoming_special_days",
+        "_cic_v40_upcoming_users",
+        "celebration_context",
+        "ensure_celebration_schema"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "_cic_v40_Any",
+        "_cic_v40_active_staff_candidates",
+        "_cic_v40_anniversary_users",
+        "_cic_v40_birthday_users",
+        "_cic_v40_date",
+        "_cic_v40_mmdd",
+        "_cic_v40_service_year",
+        "_cic_v40_setting_bool",
+        "_cic_v40_special_days",
+        "_cic_v40_special_days_today",
+        "_cic_v40_today",
+        "_cic_v40_user_date",
+        "_dumps_json",
+        "context",
+        "db",
+        "ensure_defaults",
+        "get_setting",
+        "list_users"
+      ],
+      "used_assignments": [
+        "BASE_KEY"
+      ],
+      "unknown_external_names": [
+        "_sa_inspect",
+        "_sa_text",
+        "exc"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/celebration_context.py"
+    },
+    {
+      "prefix": "send",
+      "seed_function_count": 1,
+      "seed_total_lines": 28,
+      "closure_function_count": 2,
+      "closure_total_lines": 73,
+      "closure_functions": [
+        "_cic_v40_create_system_notifications",
+        "send_task"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "User",
+        "_cic_v40_Any",
+        "_cic_v40_setting_bool",
+        "_cic_v40_today",
+        "_recipients_for_task",
+        "_render_template_text",
+        "_send_task_base",
+        "db",
+        "get_template"
+      ],
+      "used_assignments": [
+        "_CIC_V40_CELEBRATION_TASKS"
+      ],
+      "unknown_external_names": [
+        "Notification"
+      ],
+      "recommended_status": "GOOD_NEXT_SPLIT_CANDIDATE",
+      "suggested_module": "app/services/cic/send_context.py"
+    },
+    {
+      "prefix": "ensure",
+      "seed_function_count": 1,
+      "seed_total_lines": 30,
+      "closure_function_count": 1,
+      "closure_total_lines": 30,
+      "closure_functions": [
+        "ensure_celebration_schema"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "db"
+      ],
+      "used_assignments": [],
+      "unknown_external_names": [
+        "_sa_inspect",
+        "_sa_text",
+        "exc"
+      ],
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/cic/ensure_context.py"
+    },
+    {
+      "prefix": "set",
+      "seed_function_count": 1,
+      "seed_total_lines": 22,
+      "closure_function_count": 1,
+      "closure_total_lines": 22,
+      "closure_functions": [
+        "set_auto_scheduler_config"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "_cic_auto_bool",
+        "db",
+        "get_setting",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY"
+      ],
+      "unknown_external_names": [],
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/cic/set_context.py"
+    },
+    {
+      "prefix": "_save",
+      "seed_function_count": 1,
+      "seed_total_lines": 5,
+      "closure_function_count": 1,
+      "closure_total_lines": 5,
+      "closure_functions": [
+        "_save_system_base"
+      ],
+      "outside_calls": [],
+      "used_imports": [
+        "db",
+        "set_setting"
+      ],
+      "used_assignments": [
+        "BASE_KEY"
+      ],
+      "unknown_external_names": [],
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/cic/save_context.py"
+    },
+    {
+      "prefix": "can",
+      "seed_function_count": 1,
+      "seed_total_lines": 5,
+      "closure_function_count": 1,
+      "closure_total_lines": 5,
+      "closure_functions": [
+        "can_manage"
+      ],
+      "outside_calls": [],
+      "used_imports": [],
+      "used_assignments": [
+        "ADMIN_ROLES"
+      ],
+      "unknown_external_names": [],
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/cic/can_context.py"
+    }
+  ],
+  "safety": {
+    "live_system_changed": false,
+    "files_moved": false,
+    "files_deleted": false,
+    "database_touched": false,
+    "source_files_modified": false
+  },
+  "decision": [
+    "Bu rapor kaynak kodu degistirmez.",
+    "send_context split sonrasinda CIC hedef dosyasi yeniden olculdu.",
+    "Bir sonraki guvenli split adayi guncel AST uzerinden secildi.",
+    "Hedef dosya 800 satir altina inene kadar god-object temizligi devam eder."
+  ],
+  "ok": true
+}
