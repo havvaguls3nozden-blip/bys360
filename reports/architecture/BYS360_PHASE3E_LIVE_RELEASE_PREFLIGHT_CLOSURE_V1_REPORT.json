@@ -1,0 +1,22 @@
+{
+  "package": "BYS360_PHASE3E_LIVE_RELEASE_PREFLIGHT_CLOSURE_V1",
+  "generated_at": "2026-06-25T07:41:00",
+  "branch": "phase3e-live-release-preflight-v1",
+  "head_before_closure_commit": "1928c29",
+  "meaningful_git_status_clean_before_report_write": true,
+  "preflight_report": "reports\\architecture\\BYS360_PHASE3E_LIVE_RELEASE_PREFLIGHT_GATE_V1_REPORT.json",
+  "zip_gate_report": "reports\\architecture\\BYS360_PHASE3E_RELEASE_ZIP_GATE_V1_REPORT.json",
+  "phase3e_live_release_preflight_gate_ok": true,
+  "release_zip_gate_ok": true,
+  "forbidden_tracked_files_ok": true,
+  "forbidden_zip_entries_ok": true,
+  "pytest_ok": true,
+  "route_lines": 1164,
+  "route_decorator_count": 22,
+  "zip_name": "BYS360_PHASE3E_RELEASE_b38a00c_20260625_073903.zip",
+  "zip_path": "C:\\bys360\\release\\BYS360_PHASE3E_RELEASE_b38a00c_20260625_073903.zip",
+  "zip_size_bytes": 15605147,
+  "zip_sha256": "17cd51027e39ea0ff841004dd6468f49b78837d7d59b5d9fad355e56740ad9af",
+  "expected_tag": "phase3e-live-release-preflight-pass-20260625",
+  "phase3e_closure_ok": true
+}
