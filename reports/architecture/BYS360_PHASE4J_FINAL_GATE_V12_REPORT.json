@@ -1,0 +1,508 @@
+{
+  "phase": "phase4j-final-gate-v12",
+  "generated_at": "2026-06-25T15:12:49",
+  "branch": "phase4j-script-reduction-godobject-v1",
+  "head": "8187844",
+  "git_status_short": "?? _phase4j_final_gate_v12.py",
+  "files": {
+    "ops_routes": {
+      "path": "app/admin/ops_routes.py",
+      "exists": true,
+      "lines": 291,
+      "kb": 10.0,
+      "function_count": 16,
+      "route_function_count": 15,
+      "largest_functions": [
+        {
+          "name": "personnel_toggle_active",
+          "line_start": 207,
+          "line_end": 224,
+          "line_count": 18,
+          "is_route": true
+        },
+        {
+          "name": "personnel_delete",
+          "line_start": 231,
+          "line_end": 245,
+          "line_count": 15,
+          "is_route": true
+        },
+        {
+          "name": "ensure_not_self_target",
+          "line_start": 288,
+          "line_end": 290,
+          "line_count": 3,
+          "is_route": false
+        },
+        {
+          "name": "admin_user_change_photo",
+          "line_start": 112,
+          "line_end": 113,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_user_toggle_active",
+          "line_start": 120,
+          "line_end": 121,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_user_archive",
+          "line_start": 128,
+          "line_end": 129,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_user_delete",
+          "line_start": 136,
+          "line_end": 137,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_users_bulk_delete",
+          "line_start": 144,
+          "line_end": 145,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_users_bulk_archive",
+          "line_start": 152,
+          "line_end": 153,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_users_bulk_passive",
+          "line_start": 160,
+          "line_end": 161,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_user_import",
+          "line_start": 168,
+          "line_end": 169,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_import_health_report",
+          "line_start": 176,
+          "line_end": 177,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "admin_users_reset_all",
+          "line_start": 184,
+          "line_end": 185,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "performance_hierarchy_bulk_assign",
+          "line_start": 191,
+          "line_end": 192,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "download_personnel_template",
+          "line_start": 199,
+          "line_end": 200,
+          "line_count": 2,
+          "is_route": true
+        },
+        {
+          "name": "personnel_profile",
+          "line_start": 252,
+          "line_end": 253,
+          "line_count": 2,
+          "is_route": true
+        }
+      ]
+    },
+    "ops_helpers": {
+      "path": "app/admin/ops_helpers.py",
+      "exists": true,
+      "lines": 234,
+      "kb": 10.2,
+      "function_count": 10,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "_resolve_personnel_profile_hierarchy",
+          "line_start": 112,
+          "line_end": 179,
+          "line_count": 68,
+          "is_route": false
+        },
+        {
+          "name": "_has_explicit_manager_columns",
+          "line_start": 197,
+          "line_end": 225,
+          "line_count": 29,
+          "is_route": false
+        },
+        {
+          "name": "_serialize_manager_card",
+          "line_start": 98,
+          "line_end": 110,
+          "line_count": 13,
+          "is_route": false
+        },
+        {
+          "name": "_build_org_path",
+          "line_start": 85,
+          "line_end": 96,
+          "line_count": 12,
+          "is_route": false
+        },
+        {
+          "name": "_canonicalize_import_headers",
+          "line_start": 181,
+          "line_end": 191,
+          "line_count": 11,
+          "is_route": false
+        },
+        {
+          "name": "get_default_first_login_password",
+          "line_start": 227,
+          "line_end": 234,
+          "line_count": 8,
+          "is_route": false
+        },
+        {
+          "name": "_profile_full_name",
+          "line_start": 67,
+          "line_end": 73,
+          "line_count": 7,
+          "is_route": false
+        },
+        {
+          "name": "_resolve_user_by_sicil",
+          "line_start": 79,
+          "line_end": 83,
+          "line_count": 5,
+          "is_route": false
+        },
+        {
+          "name": "_safe_text",
+          "line_start": 75,
+          "line_end": 77,
+          "line_count": 3,
+          "is_route": false
+        },
+        {
+          "name": "_collapse_spaces",
+          "line_start": 193,
+          "line_end": 195,
+          "line_count": 3,
+          "is_route": false
+        }
+      ]
+    },
+    "ops_health_services": {
+      "path": "app/admin/ops_health_services.py",
+      "exists": true,
+      "lines": 220,
+      "kb": 9.4,
+      "function_count": 1,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "admin_import_health_report_impl",
+          "line_start": 46,
+          "line_end": 220,
+          "line_count": 175,
+          "is_route": false
+        }
+      ]
+    },
+    "ops_import_services": {
+      "path": "app/admin/ops_import_services.py",
+      "exists": true,
+      "lines": 327,
+      "kb": 16.9,
+      "function_count": 1,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "admin_user_import_impl",
+          "line_start": 47,
+          "line_end": 327,
+          "line_count": 281,
+          "is_route": false
+        }
+      ]
+    },
+    "ops_personnel_services": {
+      "path": "app/admin/ops_personnel_services.py",
+      "exists": true,
+      "lines": 169,
+      "kb": 7.2,
+      "function_count": 2,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "download_personnel_template_impl",
+          "line_start": 48,
+          "line_end": 115,
+          "line_count": 68,
+          "is_route": false
+        },
+        {
+          "name": "personnel_profile_impl",
+          "line_start": 117,
+          "line_end": 169,
+          "line_count": 53,
+          "is_route": false
+        }
+      ]
+    },
+    "ops_performance_services": {
+      "path": "app/admin/ops_performance_services.py",
+      "exists": true,
+      "lines": 96,
+      "kb": 5.0,
+      "function_count": 1,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "performance_hierarchy_bulk_assign_impl",
+          "line_start": 50,
+          "line_end": 96,
+          "line_count": 47,
+          "is_route": false
+        }
+      ]
+    },
+    "ops_user_action_services": {
+      "path": "app/admin/ops_user_action_services.py",
+      "exists": true,
+      "lines": 242,
+      "kb": 10.3,
+      "function_count": 9,
+      "route_function_count": 0,
+      "largest_functions": [
+        {
+          "name": "admin_users_bulk_delete_impl",
+          "line_start": 55,
+          "line_end": 92,
+          "line_count": 38,
+          "is_route": false
+        },
+        {
+          "name": "admin_user_change_photo_impl",
+          "line_start": 94,
+          "line_end": 124,
+          "line_count": 31,
+          "is_route": false
+        },
+        {
+          "name": "admin_user_archive_impl",
+          "line_start": 126,
+          "line_end": 149,
+          "line_count": 24,
+          "is_route": false
+        },
+        {
+          "name": "admin_users_bulk_archive_impl",
+          "line_start": 151,
+          "line_end": 173,
+          "line_count": 23,
+          "is_route": false
+        },
+        {
+          "name": "admin_user_delete_impl",
+          "line_start": 175,
+          "line_end": 194,
+          "line_count": 20,
+          "is_route": false
+        },
+        {
+          "name": "admin_users_bulk_passive_impl",
+          "line_start": 196,
+          "line_end": 214,
+          "line_count": 19,
+          "is_route": false
+        },
+        {
+          "name": "admin_user_toggle_active_impl",
+          "line_start": 216,
+          "line_end": 231,
+          "line_count": 16,
+          "is_route": false
+        },
+        {
+          "name": "admin_users_reset_all_impl",
+          "line_start": 233,
+          "line_end": 242,
+          "line_count": 10,
+          "is_route": false
+        },
+        {
+          "name": "ensure_not_self_target",
+          "line_start": 51,
+          "line_end": 53,
+          "line_count": 3,
+          "is_route": false
+        }
+      ]
+    }
+  },
+  "ops_routes_summary": {
+    "initial_lines": 1220,
+    "final_lines": 291,
+    "reduced_lines": 929,
+    "reduction_percent": 76.1,
+    "largest_remaining_routes": [
+      {
+        "name": "personnel_toggle_active",
+        "line_start": 207,
+        "line_end": 224,
+        "line_count": 18,
+        "is_route": true
+      },
+      {
+        "name": "personnel_delete",
+        "line_start": 231,
+        "line_end": 245,
+        "line_count": 15,
+        "is_route": true
+      },
+      {
+        "name": "admin_user_change_photo",
+        "line_start": 112,
+        "line_end": 113,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_user_toggle_active",
+        "line_start": 120,
+        "line_end": 121,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_user_archive",
+        "line_start": 128,
+        "line_end": 129,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_user_delete",
+        "line_start": 136,
+        "line_end": 137,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_users_bulk_delete",
+        "line_start": 144,
+        "line_end": 145,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_users_bulk_archive",
+        "line_start": 152,
+        "line_end": 153,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_users_bulk_passive",
+        "line_start": 160,
+        "line_end": 161,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_user_import",
+        "line_start": 168,
+        "line_end": 169,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_import_health_report",
+        "line_start": 176,
+        "line_end": 177,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "admin_users_reset_all",
+        "line_start": 184,
+        "line_end": 185,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "performance_hierarchy_bulk_assign",
+        "line_start": 191,
+        "line_end": 192,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "download_personnel_template",
+        "line_start": 199,
+        "line_end": 200,
+        "line_count": 2,
+        "is_route": true
+      },
+      {
+        "name": "personnel_profile",
+        "line_start": 252,
+        "line_end": 253,
+        "line_count": 2,
+        "is_route": true
+      }
+    ]
+  },
+  "created_service_files": [
+    "app/admin/ops_helpers.py",
+    "app/admin/ops_health_services.py",
+    "app/admin/ops_import_services.py",
+    "app/admin/ops_personnel_services.py",
+    "app/admin/ops_performance_services.py",
+    "app/admin/ops_user_action_services.py"
+  ],
+  "recent_log": [
+    "8187844 docs: add final ops routes phase4j inventory",
+    "5d35c4a test: verify admin user action service split",
+    "c4d16d3 refactor: split admin user action services",
+    "3bae852 docs: analyze admin user action routes group",
+    "4165e5c docs: inventory current ops routes after phase4j splits",
+    "eb1a6a7 test: verify performance hierarchy bulk assign service split",
+    "c70f7da refactor: split performance hierarchy bulk assign service",
+    "961a250 docs: analyze performance hierarchy bulk assign route",
+    "15e0dba test: verify personnel profile service split",
+    "9a7b89f refactor: split personnel profile service",
+    "325cd9c docs: analyze personnel profile route split",
+    "b6dea12 fix: remove duplicate personnel template service implementation",
+    "8fa1bf3 test: verify personnel template service split",
+    "a859e66 refactor: split personnel template download service",
+    "0f6110a refactor: split personnel template download service",
+    "fba5d46 docs: analyze residual ops routes after splits",
+    "d4c35cf docs: analyze residual ops routes after splits",
+    "ab3f18e test: verify admin user import service split",
+    "c0cf2ff refactor: split admin user import service",
+    "0c77457 docs: analyze admin user import route"
+  ],
+  "decision": [
+    "ops_routes.py agir route govdelerinden arindirildi.",
+    "Kalan en buyuk route fonksiyonlari 18 ve 15 satir seviyesindedir.",
+    "Bu asamada Phase4J ops_routes split calismasi stabil ara tag icin uygundur."
+  ],
+  "ok": false
+}
