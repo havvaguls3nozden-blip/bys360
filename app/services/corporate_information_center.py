@@ -320,80 +320,50 @@ from app.services.cic.misc_context import (
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
 
 
-def _cic_phase3_public_error(message: str) -> str:
-    raw = (message or "").strip()
-    lowered = raw.lower()
-    if not raw:
-        return "Gönderim tamamlanamadı. Mail altyapısı ve alıcı bilgileri kontrol edilmelidir."
-    if "mail_server" in lowered or "smtp" in lowered or "connection" in lowered or "timeout" in lowered:
-        return "Mail sunucusuna ulaşılamadı. Kurumsal mail sunucu ayarları kontrol edilmelidir."
-    if "mail_default_sender" in lowered or "sender" in lowered or "from" in lowered:
-        return "Gönderici mail adresi tanımlı değil. Mail ayarları kontrol edilmelidir."
-    if "password" in lowered or "authentication" in lowered or "login" in lowered:
-        return "Mail kullanıcı adı veya şifre doğrulanamadı. Kurumsal mail bilgileri kontrol edilmelidir."
-    if "geçersiz" in lowered or "invalid" in lowered or "@" in raw:
-        return raw[:220]
-    return raw[:220]
-
-
-def _cic_phase3_task_label(task_key: str) -> str:
-    meta = TASK_DEFINITIONS.get(task_key) or {}
-    return meta.get("label") or task_key
-
-
-def _cic_phase3_actor_label(actor_user_id: int | None = None) -> str:
-    try:
-        if actor_user_id:
-            u = db.session.get(User, actor_user_id)
-            return _user_name(u)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:628")
-        pass
-    return "Sistem"
-
-
-def _cic_phase3_store_result(task_key: str, result: dict[str, Any], actor_user_id: int | None = None) -> None:
-    try:
-        set_setting(f"{BASE_KEY}.phase3.last_result", _dumps_json(result), label="Kurumsal bilgilendirme son gönderim özeti", value_type="json", actor_user_id=actor_user_id)
-        set_setting(f"{BASE_KEY}.phase3.last_result.{task_key}", _dumps_json(result), label=f"{_cic_phase3_task_label(task_key)} son işlem özeti", value_type="json", actor_user_id=actor_user_id)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:637")
-        pass
-
-
-def _cic_phase3_make_result(*, task_key: str, dry_run: bool, users: list[User], ok_count: int, fail_count: int, skipped_count: int, details: list[dict[str, Any]], started: float, actor_user_id: int | None = None, message: str | None = None) -> dict[str, Any]:
-    elapsed = round(time.time() - started, 2)
-    task_label = _cic_phase3_task_label(task_key)
-    if message:
-        public_message = message
-    elif dry_run:
-        public_message = f"{task_label} kuru çalışma tamamlandı. Gerçek mail gönderilmedi. Alıcı sayısı: {len(users)}."
-    elif fail_count:
-        public_message = f"{task_label} tamamlandı; {ok_count} başarılı, {fail_count} hatalı kayıt var. Hatalı alıcılar gönderim geçmişinden kontrol edilmelidir."
-    else:
-        public_message = f"{task_label} başarıyla tamamlandı. {ok_count} alıcıya gönderildi."
-    return {
-        "version": VERSION,
-        "ok": fail_count == 0 and len(users) > 0,
-        "task_key": task_key,
-        "task_label": task_label,
-        "dry_run": bool(dry_run),
-        "recipient_count": len(users),
-        "success_count": ok_count,
-        "fail_count": fail_count,
-        "skipped_count": skipped_count,
-        "message": public_message,
-        "ran_at": _now().strftime("%d.%m.%Y %H:%M:%S"),
-        "actor": _cic_phase3_actor_label(actor_user_id),
-        "elapsed_seconds": elapsed,
-        "details": details[:120],
-    }
+# Phase4J V29C CIC cic_context facade imports
+from app.services.cic.cic_context import (
+    _cic_auto_last_run_key,
+    _cic_is_weekend,
+    _cic_phase3_actor_label,
+    _cic_phase3_last_result,
+    _cic_phase3_make_result,
+    _cic_phase3_public_error,
+    _cic_phase3_store_result,
+    _cic_phase3_task_label,
+    _cic_phase5_actor,
+    _cic_phase5_now_label,
+    _cic_phase5_store_audit,
+    _cic_phase6_bool,
+    _cic_v40_create_system_notifications,
+    _cic_v40_date_input,
+    _cic_v40_days_until,
+    _cic_v40_run_weekend_celebrations,
+    _cic_v40_upcoming_special_days,
+    _cic_v40_upcoming_users,
+    _cic_v45_bool,
+    _cic_v45_build_user_indexes,
+    _cic_v45_ensure_schema,
+    _cic_v45_existing_user_rows,
+    _cic_v45_header_key,
+    _cic_v45_norm,
+    _cic_v45_norm_name,
+    _cic_v45_parse_date,
+    _cic_v45_text,
+    _cic_weekday_name_tr,
+    send_task,
+)
 
 
 
-def _cic_phase3_last_result() -> dict[str, Any]:
-    value = _loads_json(f"{BASE_KEY}.phase3.last_result", {})
-    return value if isinstance(value, dict) else {}
+
+
+
+
+
+
+
+
+
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_END
 
@@ -402,43 +372,14 @@ def _cic_phase3_last_result() -> dict[str, Any]:
 
 
 
-def _cic_phase5_now_label() -> str:
-    try:
-        return _now().strftime("%d.%m.%Y %H:%M:%S")
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:875")
-        return datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-
-
-def _cic_phase5_actor(actor_user_id: int | None = None) -> str:
-    try:
-        if actor_user_id:
-            return _user_name(db.session.get(User, actor_user_id))
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:883")
-        pass
-    return "Sistem"
 
 
 
 
 
 
-def _cic_phase5_store_audit(item: dict[str, Any], actor_user_id: int | None = None) -> None:
-    try:
-        items = _cic_phase5_audit_list()
-        items.insert(0, item)
-        items = items[:120]
-        set_setting(
-            f"{BASE_KEY}.phase5.audit",
-            _dumps_json(items),
-            label="Kurumsal bilgilendirme denetim izi",
-            value_type="json",
-            actor_user_id=actor_user_id,
-        )
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:916")
-        pass
+
+
 
 
 
@@ -454,8 +395,6 @@ def _cic_phase5_store_audit(item: dict[str, Any], actor_user_id: int | None = No
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_BEGIN
 
 
-def _cic_phase6_bool(value: Any) -> bool:
-    return bool(value)
 
 
 
@@ -536,18 +475,8 @@ from typing import Any as _cic_typing_any
 
 
 
-def _cic_is_weekend(dt: _cic_dt_datetime) -> bool:
-    # Python weekday: Monday=0 ... Sunday=6
-    return dt.weekday() >= 5
 
 
-def _cic_weekday_name_tr(dt: _cic_dt_datetime) -> str:
-    names = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
-    try:
-        return names[dt.weekday()]
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1760")
-        return "Bilinmiyor"
 
 
 
@@ -590,8 +519,6 @@ def save_system(payload: dict[str, object], actor_user_id: int | None = None) ->
 # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
 # PHASE3A_CIC_EXPLICIT_CONTEXT_END
 
-def _cic_auto_last_run_key(task_key: str) -> str:
-    return f"{BASE_KEY}.auto.last_run.{task_key}"
 
 
 def _run_due_tasks_base(*, now: _cic_dt_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_typing_any]:  # type: ignore[override]
@@ -780,17 +707,6 @@ Nice başarılı yıllar dileriz.
 
 
 
-def _cic_v40_days_until(month_day: str, today: _cic_v40_date | None = None) -> int | None:
-    today = today or _cic_v40_today()
-    try:
-        month, day = [int(x) for x in month_day.split("-", 1)]
-        target = _cic_v40_date(today.year, month, day)
-        if target < today:
-            target = _cic_v40_date(today.year + 1, month, day)
-        return (target - today).days
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2073")
-        return None
 
 
 
@@ -848,119 +764,14 @@ def ensure_celebration_schema() -> dict[str, object]:
 # PHASE3A_CIC_EXPLICIT_RECIPIENT_RENDER_END
 
 
-def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor_user_id: int | None = None) -> int:
-    if not _cic_v40_setting_bool("celebration_system_notifications_enabled", True):
-        return 0
-    if task_key not in _CIC_V40_CELEBRATION_TASKS:
-        return 0
-    try:
-        from app.models import Notification
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2286")
-        return 0
-    today_id = int(_cic_v40_today().strftime("%Y%m%d"))
-    tmpl = get_template(task_key)
-    created = 0
-    for user in users or []:
-        try:
-            exists = Notification.query.filter_by(
-                user_id=getattr(user, "id", None),
-                notification_type="corporate_celebration",
-                source_type=task_key,
-                source_id=today_id,
-            ).first()
-            if exists:
-                continue
-            title = _render_template_text(tmpl.get("subject", "Kurumsal Kutlama"), user, task_key).strip()[:255] or "Kurumsal Kutlama"
-            body = _render_template_text(tmpl.get("body", ""), user, task_key).strip()
-            db.session.add(Notification(
-                user_id=getattr(user, "id"),
-                title=title,
-                body=body,
-                notification_type="corporate_celebration",
-                source_type=task_key,
-                source_id=today_id,
-                link_url="/dashboard/kurumsal-bilgilendirme/kutlamalar",
-                priority="normal",
-                is_read=False,
-            ))
-            created += 1
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2315")
-            pass
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-    return created
 
 # PHASE3A_CIC_EXPLICIT_SEND_TASK_BEGIN
-def send_task(task_key: str, *, dry_run: bool = False, override_users: list[User] | None = None, actor_user_id: int | None = None) -> dict[str, _cic_v40_Any]:
-    """Send CIC mail task through one explicit public layer.
-
-    Preserves current runtime behavior:
-    - V11 direct mail implementation is handled by _send_task_base.
-    - V40 celebration system notifications are applied after successful base execution path.
-    """
-    users_for_notification: list[User] = []
-    if task_key in _CIC_V40_CELEBRATION_TASKS and override_users is None:
-        users_for_notification = list(_recipients_for_task(task_key) or [])
-    elif task_key in _CIC_V40_CELEBRATION_TASKS and override_users is not None:
-        users_for_notification = list(override_users or [])
-
-    result = _send_task_base(
-        task_key,
-        dry_run=dry_run,
-        override_users=override_users,
-        actor_user_id=actor_user_id,
-    )
-
-    if task_key in _CIC_V40_CELEBRATION_TASKS and not dry_run:
-        result["system_notification_count"] = _cic_v40_create_system_notifications(
-            task_key,
-            users_for_notification,
-            actor_user_id=actor_user_id,
-        )
-
-    return result
 # PHASE3A_CIC_EXPLICIT_SEND_TASK_END
 
-def _cic_v40_date_input(value: object) -> str:
-    d = _cic_v40_parse_date(value)
-    return d.isoformat() if d else ""
 
 
-def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]]:
-    today = _cic_v40_today()
-    rows: list[dict[str, object]] = []
-    for user in _cic_v40_active_staff_candidates():
-        if kind == "birthday":
-            d = _cic_v40_user_date(user, "birth_date", "dogum_tarihi", "date_of_birth")
-        else:
-            d = _cic_v40_user_date(user, "hire_date", "goreve_baslama_tarihi", "ise_baslama_tarihi", "start_date")
-        if not d:
-            continue
-        left = _cic_v40_days_until(_cic_v40_mmdd(d), today)
-        if left is None or left > days:
-            continue
-        row = {"user": user, "date": d, "days_left": left}
-        if kind == "anniversary":
-            row["service_year"] = _cic_v40_service_year(user, today)
-            if int(row["service_year"] or 0) <= 0:
-                continue
-        rows.append(row)
-    return sorted(rows, key=lambda x: int(x.get("days_left") or 0))
 
 
-def _cic_v40_upcoming_special_days(days: int = 45) -> list[dict[str, object]]:
-    today = _cic_v40_today()
-    rows: list[dict[str, object]] = []
-    for item in _cic_v40_special_days():
-        left = _cic_v40_days_until(str(item.get("date") or ""), today)
-        if left is None or left > days:
-            continue
-        rows.append({**item, "days_left": left})
-    return sorted(rows, key=lambda x: int(x.get("days_left") or 0))
 
 
 def celebration_context(search: str | None = None) -> dict[str, _cic_v40_Any]:
@@ -1062,35 +873,6 @@ def save_celebration_settings(payload: dict[str, object], actor_user_id: int | N
         db.session.rollback()
         raise
 
-def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
-    if not _cic_v40_setting_bool("celebrations_include_weekend", False):
-        return []
-    cfg = get_config()
-    tasks_cfg = cfg.get("tasks", {}) if isinstance(cfg, dict) else {}
-    results: list[dict[str, object]] = []
-    today = current.strftime("%Y-%m-%d")
-    late_window = int(get_auto_scheduler_config().get("late_window_minutes") or 20)
-    for task_key in _CIC_V40_CELEBRATION_TASKS:
-        task_cfg = tasks_cfg.get(task_key, {}) if isinstance(tasks_cfg, dict) else {}
-        if not task_cfg.get("enabled", False):
-            continue
-        hour = int(task_cfg.get("hour", TASK_DEFINITIONS[task_key].get("default_hour", 9)))
-        minute = int(task_cfg.get("minute", TASK_DEFINITIONS[task_key].get("default_minute", 0)))
-        scheduled = current.replace(hour=max(0, min(23, hour)), minute=max(0, min(59, minute)), second=0, microsecond=0)
-        diff_minutes = (current - scheduled).total_seconds() / 60.0
-        last_run = get_setting(_cic_auto_last_run_key(task_key), "") or ""
-        if last_run.startswith(today):
-            continue
-        if not (0 <= diff_minutes <= late_window):
-            continue
-        result = send_task(task_key, dry_run=dry_run, actor_user_id=actor_user_id)
-        set_setting(_cic_auto_last_run_key(task_key), current.strftime("%Y-%m-%d %H:%M:%S"), label=f"{TASK_DEFINITIONS[task_key].get('label', task_key)} son otomatik çalışma", actor_user_id=actor_user_id)
-        results.append({"task_key": task_key, "action": "ran", "result": result})
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-    return results
 
 # PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_BEGIN
 def run_due_tasks(*, now: _cic_v40_datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, _cic_v40_Any]:
@@ -1125,127 +907,22 @@ import re as _cic_v45_re
 import unicodedata as _cic_v45_unicodedata
 
 
-def _cic_v45_text(value: object) -> str:
-    return "" if value is None else str(value).strip()
 
 
-def _cic_v45_norm(value: object) -> str:
-    text = _cic_v45_text(value).lower()
-    repl = str.maketrans({"ı":"i","İ":"i","ğ":"g","Ğ":"g","ü":"u","Ü":"u","ş":"s","Ş":"s","ö":"o","Ö":"o","ç":"c","Ç":"c"})
-    text = text.translate(repl)
-    text = _cic_v45_unicodedata.normalize("NFKD", text)
-    text = "".join(ch for ch in text if not _cic_v45_unicodedata.combining(ch))
-    return _cic_v45_re.sub(r"[^a-z0-9]+", "", text)
 
 
-def _cic_v45_norm_name(value: object) -> str:
-    text = _cic_v45_text(value).lower()
-    repl = str.maketrans({"ı":"i","İ":"i","ğ":"g","Ğ":"g","ü":"u","Ü":"u","ş":"s","Ş":"s","ö":"o","Ö":"o","ç":"c","Ç":"c"})
-    text = text.translate(repl)
-    return _cic_v45_re.sub(r"\s+", " ", _cic_v45_re.sub(r"[^a-z0-9 ]+", " ", text)).strip()
 
 
-def _cic_v45_bool(value: object) -> bool | None:
-    raw = _cic_v45_text(value)
-    if not raw:
-        return None
-    text = _cic_v45_norm(raw)
-    if text in {"1","true","evet","e","yes","y","aktif","pasifdegil","kutlamadisi","harictut"}:
-        return True
-    if text in {"0","false","hayir","h","no","n","pasif","yok"}:
-        return False
-    return None
 
 
-def _cic_v45_parse_date(value: object) -> _cic_v45_date | None:
-    if value is None:
-        return None
-    if isinstance(value, _cic_v45_datetime):
-        return value.date()
-    if isinstance(value, _cic_v45_date):
-        return value
-    if isinstance(value, (int, float)):
-        try:
-            if value > 20000:
-                return (_cic_v45_datetime(1899, 12, 30) + _cic_v45_timedelta(days=float(value))).date()
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2583")
-            pass
-    text = _cic_v45_text(value)
-    if not text:
-        return None
-    text = text.replace("-", ".").replace("/", ".")
-    for fmt in ("%d.%m.%Y", "%Y.%m.%d", "%d.%m.%y"):
-        try:
-            return _cic_v45_datetime.strptime(text, fmt).date()
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2592")
-            pass
-    return None
 
 
-def _cic_v45_header_key(value: object) -> str | None:
-    h = _cic_v45_norm(value)
-    mapping = {
-        "sicilno":"sicil_no", "sicil":"sicil_no", "personelsicilno":"sicil_no", "kurumsicilno":"sicil_no",
-        "adsoyad":"ad_soyad", "adisoyadi":"ad_soyad", "adsoyadi":"ad_soyad", "personel":"ad_soyad", "ad":"ad", "soyad":"soyad",
-        "eposta":"email", "email":"email", "mail":"email", "kurummail":"email", "kurumeposta":"email",
-        "dogumtarihi":"birth_date", "dogumgunu":"birth_date", "birthdate":"birth_date", "birthday":"birth_date",
-        "isebaslamatarihi":"hire_date", "gorevebaslamatarihi":"hire_date", "baslamatarihi":"hire_date", "hizmetbaslangic":"hire_date", "hiredate":"hire_date",
-        "kutlamadisi":"celebration_opt_out", "kutlamaharic":"celebration_opt_out", "kutlamaistemiyor":"celebration_opt_out", "optout":"celebration_opt_out",
-        "not":"note", "aciklama":"note",
-    }
-    return mapping.get(h)
 
 
-def _cic_v45_ensure_schema() -> None:
-    try:
-        from sqlalchemy import inspect as _sa_inspect, text as _sa_text
-        inspector = _sa_inspect(db.engine)
-        if not inspector.has_table("users"):
-            return
-        cols = {c.get("name") for c in inspector.get_columns("users")}
-        with db.engine.begin() as conn:
-            if "birth_date" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date DATE"))
-            if "hire_date" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hire_date DATE"))
-            if "celebration_opt_out" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS celebration_opt_out BOOLEAN NOT NULL DEFAULT FALSE"))
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2625")
-        pass
 
 
-def _cic_v45_existing_user_rows() -> list[dict[str, object]]:
-    from sqlalchemy import inspect as _sa_inspect, text as _sa_text
-    inspector = _sa_inspect(db.engine)
-    cols = {c.get("name") for c in inspector.get_columns("users")}
-    select_cols = ["id"]
-    for col in ("sicil_no", "email", "ad", "soyad", "name", "full_name_cache"):
-        if col in cols:
-            select_cols.append(col)
-    sql = "SELECT " + ", ".join(select_cols) + " FROM users"
-    rows = db.session.execute(_sa_text(sql)).mappings().all()
-    return [dict(r) for r in rows]
 
 
-def _cic_v45_build_user_indexes(rows: list[dict[str, object]]) -> dict[str, dict[str, object]]:
-    by_sicil: dict[str, dict[str, object]] = {}
-    by_email: dict[str, dict[str, object]] = {}
-    by_name: dict[str, dict[str, object]] = {}
-    for r in rows:
-        sicil = _cic_v45_text(r.get("sicil_no"))
-        email = _cic_v45_text(r.get("email")).lower()
-        adsoyad = _cic_v45_text(((_cic_v45_text(r.get("ad")) + " " + _cic_v45_text(r.get("soyad"))).strip()) or r.get("full_name_cache") or r.get("name"))
-        if sicil and sicil not in by_sicil:
-            by_sicil[sicil] = r
-        if email and email not in by_email:
-            by_email[email] = r
-        n = _cic_v45_norm_name(adsoyad)
-        if n and n not in by_name:
-            by_name[n] = r
-    return {"sicil": by_sicil, "email": by_email, "name": by_name}
 
 
 def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = False, actor_user_id: int | None = None) -> dict[str, object]:
