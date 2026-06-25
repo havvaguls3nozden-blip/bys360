@@ -1,0 +1,783 @@
+{
+  "phase": "post-phase4j-focused-script-inventory-v13b",
+  "generated_at": "2026-06-25T16:48:20",
+  "counts": {
+    "all_py": 1481,
+    "all_ps1": 52,
+    "all_py_ps1": 1533,
+    "application_code_py_ps1": 949,
+    "test_code_py_ps1": 150,
+    "root_runtime_files": 3,
+    "active_script_candidates": 360,
+    "root_temp_candidates": 1,
+    "other_py_ps1": 70
+  },
+  "root_runtime": [
+    {
+      "path": "config.py",
+      "suffix": ".py",
+      "lines": 376,
+      "kb": 21.1
+    },
+    {
+      "path": "run.py",
+      "suffix": ".py",
+      "lines": 6,
+      "kb": 0.1
+    },
+    {
+      "path": "wsgi.py",
+      "suffix": ".py",
+      "lines": 6,
+      "kb": 0.1
+    }
+  ],
+  "active_script_candidates_top80": [
+    {
+      "path": "run_server.py",
+      "suffix": ".py",
+      "lines": 33,
+      "kb": 0.8
+    },
+    {
+      "path": "scripts/admin/check_system_admin_email_v2_16_0.py",
+      "suffix": ".py",
+      "lines": 103,
+      "kb": 3.3
+    },
+    {
+      "path": "scripts/admin/check_system_admin_email_v2_16_1_checkfix.py",
+      "suffix": ".py",
+      "lines": 110,
+      "kb": 3.6
+    },
+    {
+      "path": "scripts/apply_bys360_corporate_portal_v1.py",
+      "suffix": ".py",
+      "lines": 93,
+      "kb": 3.8
+    },
+    {
+      "path": "scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py",
+      "suffix": ".py",
+      "lines": 191,
+      "kb": 6.8
+    },
+    {
+      "path": "scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py",
+      "suffix": ".py",
+      "lines": 40,
+      "kb": 1.1
+    },
+    {
+      "path": "scripts/check_bys360_feedback_campaign_form_v2_13_2.py",
+      "suffix": ".py",
+      "lines": 56,
+      "kb": 2.1
+    },
+    {
+      "path": "scripts/check_bys360_feedback_center_v2_13_0.py",
+      "suffix": ".py",
+      "lines": 49,
+      "kb": 2.1
+    },
+    {
+      "path": "scripts/check_bys360_feedback_left_menu_fix_v2_13_1.py",
+      "suffix": ".py",
+      "lines": 64,
+      "kb": 2.1
+    },
+    {
+      "path": "scripts/check_bys360_mobile_v2_8_74_android_release_ready_p0.py",
+      "suffix": ".py",
+      "lines": 107,
+      "kb": 5.0
+    },
+    {
+      "path": "scripts/check_bys360_mobile_v2_8_75_app_maturity_p1.py",
+      "suffix": ".py",
+      "lines": 92,
+      "kb": 4.0
+    },
+    {
+      "path": "scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py",
+      "suffix": ".py",
+      "lines": 84,
+      "kb": 3.2
+    },
+    {
+      "path": "scripts/check_bys360_portal_instagram_hide_v2_11_7.py",
+      "suffix": ".py",
+      "lines": 66,
+      "kb": 2.3
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_1b_force_pro_ui.py",
+      "suffix": ".py",
+      "lines": 420,
+      "kb": 15.1
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_2c_active_passive_hard_patch.py",
+      "suffix": ".py",
+      "lines": 2,
+      "kb": 0.1
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_6b_celebrations_template_final_fix.py",
+      "suffix": ".py",
+      "lines": 89,
+      "kb": 3.8
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py",
+      "suffix": ".py",
+      "lines": 666,
+      "kb": 22.8
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py",
+      "suffix": ".py",
+      "lines": 557,
+      "kb": 26.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py",
+      "suffix": ".py",
+      "lines": 168,
+      "kb": 7.1
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py",
+      "suffix": ".py",
+      "lines": 151,
+      "kb": 6.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py",
+      "suffix": ".py",
+      "lines": 200,
+      "kb": 8.5
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_11_template_compat_fix.py",
+      "suffix": ".py",
+      "lines": 216,
+      "kb": 8.1
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py",
+      "suffix": ".py",
+      "lines": 236,
+      "kb": 15.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_3_flat_css_link_fix.py",
+      "suffix": ".py",
+      "lines": 196,
+      "kb": 6.5
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_6_quality_script_repair.py",
+      "suffix": ".py",
+      "lines": 320,
+      "kb": 11.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py",
+      "suffix": ".py",
+      "lines": 54,
+      "kb": 16.3
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py",
+      "suffix": ".py",
+      "lines": 80,
+      "kb": 16.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py",
+      "suffix": ".py",
+      "lines": 394,
+      "kb": 14.1
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py",
+      "suffix": ".py",
+      "lines": 213,
+      "kb": 12.1
+    },
+    {
+      "path": "scripts/communication/repair_daily_weather_mail_v1_0.py",
+      "suffix": ".py",
+      "lines": 251,
+      "kb": 12.0
+    },
+    {
+      "path": "scripts/communication/repair_daily_weather_mail_v1_0_5_premium_exec_menu.py",
+      "suffix": ".py",
+      "lines": 374,
+      "kb": 17.0
+    },
+    {
+      "path": "scripts/communication/run_corporate_information_center_task.py",
+      "suffix": ".py",
+      "lines": 29,
+      "kb": 1.0
+    },
+    {
+      "path": "scripts/communication/run_corporate_information_center_task_v3_0_phase2.py",
+      "suffix": ".py",
+      "lines": 33,
+      "kb": 1.2
+    },
+    {
+      "path": "scripts/communication/run_corporate_information_task.py",
+      "suffix": ".py",
+      "lines": 28,
+      "kb": 0.8
+    },
+    {
+      "path": "scripts/communication/run_executive_mail_center_v2.py",
+      "suffix": ".py",
+      "lines": 16,
+      "kb": 0.6
+    },
+    {
+      "path": "scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py",
+      "suffix": ".py",
+      "lines": 152,
+      "kb": 6.1
+    },
+    {
+      "path": "scripts/communication/seed_daily_mail_pilot_recipients_v1_1.py",
+      "suffix": ".py",
+      "lines": 125,
+      "kb": 4.6
+    },
+    {
+      "path": "scripts/communication/seed_daily_mail_pilot_recipients_v1_2.py",
+      "suffix": ".py",
+      "lines": 111,
+      "kb": 3.8
+    },
+    {
+      "path": "scripts/communication/send_daily_evening_tomorrow_mail.py",
+      "suffix": ".py",
+      "lines": 19,
+      "kb": 0.9
+    },
+    {
+      "path": "scripts/communication/send_daily_pulse_check_mail.py",
+      "suffix": ".py",
+      "lines": 19,
+      "kb": 0.8
+    },
+    {
+      "path": "scripts/communication/send_daily_weather_personnel_mail.py",
+      "suffix": ".py",
+      "lines": 36,
+      "kb": 1.2
+    },
+    {
+      "path": "scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py",
+      "suffix": ".py",
+      "lines": 161,
+      "kb": 5.5
+    },
+    {
+      "path": "scripts/executive/check_executive_summary_advanced_v2_14_20.py",
+      "suffix": ".py",
+      "lines": 35,
+      "kb": 1.7
+    },
+    {
+      "path": "scripts/executive/check_executive_summary_advanced_v2_14_21.py",
+      "suffix": ".py",
+      "lines": 61,
+      "kb": 2.2
+    },
+    {
+      "path": "scripts/executive/fix_executive_summary_blueprint_indent_v2_14_4.py",
+      "suffix": ".py",
+      "lines": 79,
+      "kb": 2.5
+    },
+    {
+      "path": "scripts/executive/fix_send_daily_executive_summary_indent_v1_0_2.py",
+      "suffix": ".py",
+      "lines": 181,
+      "kb": 5.7
+    },
+    {
+      "path": "scripts/executive/fix_send_daily_executive_summary_indent_v1_0_3.py",
+      "suffix": ".py",
+      "lines": 288,
+      "kb": 9.6
+    },
+    {
+      "path": "scripts/executive/patch_register_executive_summary.py",
+      "suffix": ".py",
+      "lines": 55,
+      "kb": 1.7
+    },
+    {
+      "path": "scripts/executive/probe_exec_summary_routes_v1_3_3.py",
+      "suffix": ".py",
+      "lines": 24,
+      "kb": 1.0
+    },
+    {
+      "path": "scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_2_force_template.py",
+      "suffix": ".py",
+      "lines": 77,
+      "kb": 4.1
+    },
+    {
+      "path": "scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py",
+      "suffix": ".py",
+      "lines": 177,
+      "kb": 7.9
+    },
+    {
+      "path": "scripts/executive/seed_executive_summary_menu_v2_14_8.py",
+      "suffix": ".py",
+      "lines": 17,
+      "kb": 0.5
+    },
+    {
+      "path": "scripts/executive/send_daily_executive_summary.py",
+      "suffix": ".py",
+      "lines": 44,
+      "kb": 1.3
+    },
+    {
+      "path": "scripts/live/check_bys360_live_full_overlay_v2_17_61.py",
+      "suffix": ".py",
+      "lines": 382,
+      "kb": 13.4
+    },
+    {
+      "path": "scripts/live/repair_bys360_live_full_overlay_v2_17_60.py",
+      "suffix": ".py",
+      "lines": 482,
+      "kb": 21.9
+    },
+    {
+      "path": "scripts/live/repair_bys360_live_full_overlay_v2_17_61.py",
+      "suffix": ".py",
+      "lines": 547,
+      "kb": 23.5
+    },
+    {
+      "path": "scripts/live/repair_bys360_live_full_overlay_v2_17_62.py",
+      "suffix": ".py",
+      "lines": 293,
+      "kb": 11.8
+    },
+    {
+      "path": "scripts/live_readiness/a7d_local_smoke_contract.py",
+      "suffix": ".py",
+      "lines": 274,
+      "kb": 9.1
+    },
+    {
+      "path": "scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.py",
+      "suffix": ".py",
+      "lines": 71,
+      "kb": 3.2
+    },
+    {
+      "path": "scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.py",
+      "suffix": ".py",
+      "lines": 113,
+      "kb": 4.3
+    },
+    {
+      "path": "scripts/local_check_cic_v4_0_user_columns.py",
+      "suffix": ".py",
+      "lines": 16,
+      "kb": 0.4
+    },
+    {
+      "path": "scripts/local_emergency_cic_v4_0_schema_patch.py",
+      "suffix": ".py",
+      "lines": 33,
+      "kb": 1.3
+    },
+    {
+      "path": "scripts/local_fix_cic_v4_0_schema_patch.py",
+      "suffix": ".py",
+      "lines": 17,
+      "kb": 0.5
+    },
+    {
+      "path": "scripts/maintenance/ensure_message_comments_table_v1.py",
+      "suffix": ".py",
+      "lines": 147,
+      "kb": 4.8
+    },
+    {
+      "path": "scripts/maintenance/repair_bys360_developer_comment_cleanup_v2_17_67.py",
+      "suffix": ".py",
+      "lines": 293,
+      "kb": 11.7
+    },
+    {
+      "path": "scripts/maintenance/run_bys360_final_gate_v2_17_69.py",
+      "suffix": ".py",
+      "lines": 556,
+      "kb": 18.8
+    },
+    {
+      "path": "scripts/maintenance/run_bys360_final_gate_v2_17_70.py",
+      "suffix": ".py",
+      "lines": 372,
+      "kb": 15.0
+    },
+    {
+      "path": "scripts/menu/check_emergency_restore_remove_exec_menu_v2_14_18.py",
+      "suffix": ".py",
+      "lines": 61,
+      "kb": 1.7
+    },
+    {
+      "path": "scripts/menu/check_executive_summary_menu_v2_14_9.py",
+      "suffix": ".py",
+      "lines": 57,
+      "kb": 1.5
+    },
+    {
+      "path": "scripts/menu/check_executive_summary_native_menu_v2_14_19.py",
+      "suffix": ".py",
+      "lines": 88,
+      "kb": 2.5
+    },
+    {
+      "path": "scripts/menu/check_full_sidebar_restore_v2_14_12.py",
+      "suffix": ".py",
+      "lines": 53,
+      "kb": 1.6
+    },
+    {
+      "path": "scripts/menu/emergency_restore_remove_exec_menu_v2_14_18.py",
+      "suffix": ".py",
+      "lines": 166,
+      "kb": 6.0
+    },
+    {
+      "path": "scripts/overlay/bys360_live_full_overlay_v2_13_0.py",
+      "suffix": ".py",
+      "lines": 706,
+      "kb": 26.7
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py",
+      "suffix": ".py",
+      "lines": 102,
+      "kb": 5.8
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py",
+      "suffix": ".py",
+      "lines": 200,
+      "kb": 8.9
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase12_final_gate.py",
+      "suffix": ".py",
+      "lines": 189,
+      "kb": 8.4
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase1_rule_center.py",
+      "suffix": ".py",
+      "lines": 134,
+      "kb": 5.3
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase2_category_center.py",
+      "suffix": ".py",
+      "lines": 229,
+      "kb": 8.7
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py",
+      "suffix": ".py",
+      "lines": 213,
+      "kb": 8.6
+    },
+    {
+      "path": "scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py",
+      "suffix": ".py",
+      "lines": 208,
+      "kb": 9.3
+    }
+  ],
+  "root_temp_cleanup_candidates": [
+    {
+      "path": "_post_phase4j_focused_script_inventory_v13b.py",
+      "suffix": ".py",
+      "lines": 220,
+      "kb": 5.8
+    }
+  ],
+  "largest_active_scripts_top50": [
+    {
+      "path": "scripts/quality/bys360_score100_quality_gate_v1.py",
+      "lines": 1340,
+      "kb": 51.5
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py",
+      "lines": 789,
+      "kb": 24.4
+    },
+    {
+      "path": "scripts/quality/bys360_s0a_claude_findings_verification_audit.py",
+      "lines": 789,
+      "kb": 25.9
+    },
+    {
+      "path": "scripts/quality/bys360_phase2a_architecture_debt_map.py",
+      "lines": 779,
+      "kb": 26.6
+    },
+    {
+      "path": "scripts/quality/bys360_phase2b_route_snapshot_contract.py",
+      "lines": 733,
+      "kb": 22.1
+    },
+    {
+      "path": "scripts/overlay/bys360_live_full_overlay_v2_13_0.py",
+      "lines": 706,
+      "kb": 26.7
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py",
+      "lines": 666,
+      "kb": 22.8
+    },
+    {
+      "path": "scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py",
+      "lines": 663,
+      "kb": 20.9
+    },
+    {
+      "path": "scripts/windows/tools/mobile_portal_patch_v2_8_80.py",
+      "lines": 617,
+      "kb": 21.2
+    },
+    {
+      "path": "scripts/quality/repair_bys360_message_interactions_v1.py",
+      "lines": 592,
+      "kb": 44.2
+    },
+    {
+      "path": "scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py",
+      "lines": 557,
+      "kb": 26.2
+    },
+    {
+      "path": "scripts/maintenance/run_bys360_final_gate_v2_17_69.py",
+      "lines": 556,
+      "kb": 18.8
+    },
+    {
+      "path": "scripts/quality/bys360_phase2c1_wildcard_import_explicit_plan.py",
+      "lines": 554,
+      "kb": 17.7
+    },
+    {
+      "path": "scripts/live/repair_bys360_live_full_overlay_v2_17_61.py",
+      "lines": 547,
+      "kb": 23.5
+    },
+    {
+      "path": "scripts/security/repair_bys360_logout_force_clear_v2_15_12.py",
+      "lines": 539,
+      "kb": 20.1
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+      "lines": 526,
+      "kb": 21.8
+    },
+    {
+      "path": "scripts/quality/bys360_a85_contract_failure_and_mobile_route_diagnosis.py",
+      "lines": 508,
+      "kb": 17.4
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_final_evidence_gate_p5f.py",
+      "lines": 504,
+      "kb": 24.8
+    },
+    {
+      "path": "scripts/quality/bys360_s0f1_pip_audit_remediation_plan.py",
+      "lines": 504,
+      "kb": 16.4
+    },
+    {
+      "path": "scripts/quality/bys360_s0g_old_venv_archive_cleanup.py",
+      "lines": 501,
+      "kb": 15.8
+    },
+    {
+      "path": "scripts/quality/bys360_phase2c2_mobile_shared_wildcard_apply.py",
+      "lines": 498,
+      "kb": 17.8
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b_v2.py",
+      "lines": 497,
+      "kb": 21.7
+    },
+    {
+      "path": "scripts/quality/bys360_s0f3_pytest_isolated_update_verify.py",
+      "lines": 487,
+      "kb": 15.9
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_release_suite_gate_p5d_v2.py",
+      "lines": 485,
+      "kb": 23.4
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b.py",
+      "lines": 484,
+      "kb": 20.8
+    },
+    {
+      "path": "scripts/live/repair_bys360_live_full_overlay_v2_17_60.py",
+      "lines": 482,
+      "kb": 21.9
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py",
+      "lines": 472,
+      "kb": 19.4
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py",
+      "lines": 470,
+      "kb": 20.5
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "lines": 466,
+      "kb": 19.4
+    },
+    {
+      "path": "scripts/quality/bys360_s0c2_config_secretkey_exc_final_evidence.py",
+      "lines": 464,
+      "kb": 15.6
+    },
+    {
+      "path": "scripts/quality/bys360_phase2c4_mobile_routes_shared_facade_apply.py",
+      "lines": 458,
+      "kb": 15.9
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_request_level_smoke_p2c.py",
+      "lines": 457,
+      "kb": 21.2
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_visual_uat_evidence_gate_p5e.py",
+      "lines": 453,
+      "kb": 21.8
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py",
+      "lines": 452,
+      "kb": 19.7
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py",
+      "lines": 450,
+      "kb": 21.3
+    },
+    {
+      "path": "scripts/quality/bys360_s0b_secret_signal_classification_audit.py",
+      "lines": 442,
+      "kb": 13.0
+    },
+    {
+      "path": "scripts/quality/bys360_s0b2_secret_risk_decision_matrix.py",
+      "lines": 439,
+      "kb": 15.6
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_behavior_smoke_p2b.py",
+      "lines": 431,
+      "kb": 18.6
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_visual_regression_gate_p6a.py",
+      "lines": 430,
+      "kb": 20.1
+    },
+    {
+      "path": "scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v3.py",
+      "lines": 429,
+      "kb": 19.3
+    },
+    {
+      "path": "scripts/quality/bys360_a11c_warning_zero_final_evidence.py",
+      "lines": 424,
+      "kb": 14.6
+    },
+    {
+      "path": "scripts/quality/bys360_android_responsive_baseline_gate_p5a.py",
+      "lines": 423,
+      "kb": 19.0
+    },
+    {
+      "path": "scripts/quality/bys360_claude_score_uplift_p0_security_repo_hygiene.py",
+      "lines": 423,
+      "kb": 13.9
+    },
+    {
+      "path": "scripts/quality/bys360_a11b2_resource_warning_fix.py",
+      "lines": 422,
+      "kb": 13.4
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_security_suite_gate_p4c.py",
+      "lines": 422,
+      "kb": 17.8
+    },
+    {
+      "path": "scripts/quality/bys360_s0f2_pip_audit_wave1_runtime_verify.py",
+      "lines": 422,
+      "kb": 14.0
+    },
+    {
+      "path": "scripts/communication/repair_cic_v4_1b_force_pro_ui.py",
+      "lines": 420,
+      "kb": 15.1
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py",
+      "lines": 416,
+      "kb": 17.7
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_performance_response_gate_p3e.py",
+      "lines": 415,
+      "kb": 20.5
+    },
+    {
+      "path": "scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+      "lines": 414,
+      "kb": 18.6
+    }
+  ],
+  "decision": [
+    "V13 genel sayim app modullerini de dahil ettigi icin aktif script hedefini fazla genis olcmustu.",
+    "V13B aktif script adaylarini scripts/tools/deploy/ops/bin ve root scriptler uzerinden ayirir.",
+    "Root gecici script adaylari ayri listelenmistir; dogrudan silinmeden once manuel gozden gecirilmelidir.",
+    "Aktif script sayisi 100 uzerindeyse sonraki adim scripts klasoru icin archive/retire plani hazirlamaktir."
+  ]
+}
