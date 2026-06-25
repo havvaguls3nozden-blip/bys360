@@ -174,6 +174,44 @@ def _register_executive_summary_module(app: Flask) -> None:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/__init__.py:171")
             pass
 
+
+# BYS360_MENU_VISIBILITY_PREWARM_V1
+class _BYS360MenuVisibilityPrewarmUser:
+    id = 0
+    username = "bys360_menu_prewarm"
+    email = "bys360_menu_prewarm@example.local"
+    role = "admin"
+    roles = ("admin", "Sistem Yöneticisi", "sistem_yoneticisi")
+    is_admin = True
+    is_active = True
+    is_authenticated = True
+    is_anonymous = False
+
+    def get_id(self):
+        return "0"
+
+    def has_role(self, role_name):
+        return role_name in set(self.roles)
+
+
+def _prewarm_menu_visibility(app):
+    """Warm menu visibility internals once during app startup.
+
+    This moves the first cold menu visibility cost from the first user request
+    into application startup. Failure is intentionally non-fatal.
+    """
+    try:
+        from app.route_support import build_menu_visibility_map
+
+        with app.app_context():
+            build_menu_visibility_map(_BYS360MenuVisibilityPrewarmUser())
+    except Exception as exc:
+        try:
+            app.logger.info("BYS360 menu visibility prewarm skipped: %s", exc)
+        except Exception:
+            pass
+
+
 def create_app() -> Flask:
     app = create_bys360_application(__name__)
 
@@ -191,6 +229,7 @@ def create_app() -> Flask:
     _run_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))
     from app.utils.url_map_dedupe import dedupe_identical_url_rules
     dedupe_identical_url_rules(app)
+    _prewarm_menu_visibility(app)  # BYS360_MENU_VISIBILITY_PREWARM_V1
     return app
 
 

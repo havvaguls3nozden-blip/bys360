@@ -1,0 +1,27 @@
+{
+  "package": "BYS360_PHASE4C_MENU_PREWARM_PATCH_V1",
+  "generated_at": "2026-06-25T10:29:51",
+  "branch": "phase4c-performance-category-scope-v1",
+  "head_before_patch": "602c695",
+  "git_status_before": [
+    "?? _phase4c_menu_prewarm_patch.py"
+  ],
+  "patch": {
+    "helper_added": true,
+    "call_added": true,
+    "changed": true
+  },
+  "compile_ok": true,
+  "prewarm_effectiveness": {
+    "create_app_elapsed_ms": 966.935,
+    "inject_after_create_app_elapsed_ms": 9.549,
+    "inject_result_type": "dict",
+    "inject_result_size": 1,
+    "inject_keys": [
+      "menu_visibility_map"
+    ]
+  },
+  "diff_summary": "diff --git a/app/__init__.py b/app/__init__.py\nindex b5c5e42..ee411d4 100644\n--- a/app/__init__.py\n+++ b/app/__init__.py\n@@ -174,6 +174,44 @@ def _register_executive_summary_module(app: Flask) -> None:\n             __import__(\"logging\").getLogger(__name__).exception(\"BYS360 SAFE V4: sessiz except loglandi: app/__init__.py:171\")\n             pass\n \n+\n+# BYS360_MENU_VISIBILITY_PREWARM_V1\n+class _BYS360MenuVisibilityPrewarmUser:\n+    id = 0\n+    username = \"bys360_menu_prewarm\"\n+    email = \"bys360_menu_prewarm@example.local\"\n+    role = \"admin\"\n+    roles = (\"admin\", \"Sistem Yöneticisi\", \"sistem_yoneticisi\")\n+    is_admin = True\n+    is_active = True\n+    is_authenticated = True\n+    is_anonymous = False\n+\n+    def get_id(self):\n+        return \"0\"\n+\n+    def has_role(self, role_name):\n+        return role_name in set(self.roles)\n+\n+\n+def _prewarm_menu_visibility(app):\n+    \"\"\"Warm menu visibility internals once during app startup.\n+\n+    This moves the first cold menu visibility cost from the first user request\n+    into application startup. Failure is intentionally non-fatal.\n+    \"\"\"\n+    try:\n+        from app.route_support import build_menu_visibility_map\n+\n+        with app.app_context():\n+            build_menu_visibility_map(_BYS360MenuVisibilityPrewarmUser())\n+    except Exception as exc:\n+        try:\n+            app.logger.info(\"BYS360 menu visibility prewarm skipped: %s\", exc)\n+        except Exception:\n+            pass\n+\n+\n def create_app() -> Flask:\n     app = create_bys360_application(__name__)\n \n@@ -191,6 +229,7 @@ def create_app() -> Flask:\n     _run_optional_startup(app, \"Executive Summary routes\", lambda: _register_executive_summary_module(app))\n     from app.utils.url_map_dedupe import dedupe_identical_url_rules\n     dedupe_identical_url_rules(app)\n+    _prewarm_menu_visibility(app)  # BYS360_MENU_VISIBILITY_PREWARM_V1\n     return app\n \n \n",
+  "patch_ok": true,
+  "error": null
+}
