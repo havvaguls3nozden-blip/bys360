@@ -1,0 +1,330 @@
+# BYS360 Project Cleanup Final Remaining Status V21A
+- Generated at: 2026-06-25T19:42:32
+- OK: False
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD: 3988842
+- Current active/physical script candidates: 273
+- Expected active/physical script candidates: 273
+
+## Cleanup Summary
+- phase4j_start_focused_script_candidates: 360
+- after_wave1: 313
+- after_wave2: 290
+- after_wave3: 288
+- after_wave4: 273
+- total_reduction_from_phase4j_start: 87
+- strict_active_runtime_script_count: 48
+- strict_active_runtime_under_100: True
+
+## Bucket Counts
+- active_runtime_script: 48
+- archive_wave5_review: 1
+- keep_code_referenced: 61
+- keep_operational_referenced: 56
+- keep_operational_review: 15
+- keep_risk_review: 68
+- unknown: 24
+
+## Remaining Buckets Detail
+
+### active_runtime_script
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: lines=382 | refs=2 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: lines=482 | refs=2 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: lines=547 | refs=3 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_62.py: lines=293 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/a8_live_cutover_guard.ps1: lines=105 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release.ps1: lines=90 | refs=3 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v2.ps1: lines=100 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v3.ps1: lines=109 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v4.ps1: lines=105 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.ps1: lines=11 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.ps1: lines=10 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys36043_restore_v1.py: lines=74 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_emergency_full_sidebar_restore_v2_14_12.ps1: lines=28 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_emergency_restore_remove_exec_menu_v2_14_18.ps1: lines=28 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_fixes_source_sync_v1.ps1: lines=40 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_13_0.ps1: lines=31 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_60.ps1: lines=9 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_61.ps1: lines=52 | refs=2 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_full_overlay_v2_17_62.ps1: lines=14 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1.ps1: lines=13 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_2.ps1: lines=39 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_portal_db_after_bys36043_v1_3.ps1: lines=47 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_live_restore_from_bys36043_v1.ps1: lines=18 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/check_bys360_quality_10_10_p2_live_scope.ps1: lines=26 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_cic_auto_mail_scheduler_task.ps1: lines=17 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_corporate_information_tasks_v3_0.ps1: lines=21 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_4.ps1: lines=50 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_5.ps1: lines=18 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_mail_tasks_v1_6.ps1: lines=28 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_pulse_mail_task.ps1: lines=27 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_daily_weather_mail_task.ps1: lines=50 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_executive_mail_center_v2_tasks.ps1: lines=23 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_press_news_scan_v3a_task.ps1: lines=27 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_bys360_social_auto_import_v3b2_task.ps1: lines=26 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/install_corporate_information_center_tasks_v3_0_phase2.ps1: lines=33 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/pre_live_backup_plan.ps1: lines=143 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_1.ps1: lines=26 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/register_bys360_executive_summary_tasks_v2_14_3.ps1: lines=34 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1.py: lines=413 | refs=3 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_2.py: lines=413 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_3.py: lines=413 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys36043_safe_extract_v1.py: lines=210 | refs=0 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14f4_source_aware_existing_assistant.ps1: lines=21 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14j2_performance_archive_corporate_template.ps1: lines=22 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/restore_bys360_p14j_performance_archive_template.ps1: lines=22 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/rollback_bys360_live_full_overlay_v2_13_0.ps1: lines=21 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/rollback_bys360_live_full_overlay_v2_17_60.ps1: lines=12 | refs=1 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+- scripts/windows/run_bys360_tests.ps1: lines=17 | refs=2 | Operasyon klasorunde ve runtime/operasyon isim isareti var.
+
+### archive_wave5_review
+- scripts/executive/patch_register_executive_summary.py: lines=55 | refs=0 | Referanssiz ama guvenli tarihsel marker zayif; manuel onay gerekir.
+
+### keep_code_referenced
+- scripts/communication/send_daily_evening_tomorrow_mail.py: lines=19 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/communication/send_daily_pulse_check_mail.py: lines=19 | refs=7 | app/tests/migrations tarafinda referans var.
+- scripts/communication/send_daily_weather_personnel_mail.py: lines=36 | refs=7 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py: lines=102 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py: lines=200 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase1_rule_center.py: lines=134 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py: lines=229 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py: lines=213 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py: lines=208 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase5_scorecard_ui_center.py: lines=44 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase6_low_score_process_center.py: lines=54 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase7_scorecard_archive_center.py: lines=179 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase8_midterm_feedback_center.py: lines=185 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py: lines=192 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/performance/repair_bys360_performance_completion_phase2_category_center.py: lines=61 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance/repair_bys360_performance_completion_phase3_visibility_center.py: lines=149 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/performance_mail_automation_runner.py: lines=62 | refs=4 | app/tests/migrations tarafinda referans var.
+- scripts/portal/run_bys360_social_media_embed_scan_v3b.py: lines=27 | refs=5 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py: lines=233 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py: lines=450 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py: lines=789 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py: lines=341 | refs=8 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py: lines=369 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py: lines=366 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py: lines=466 | refs=4 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py: lines=415 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py: lines=452 | refs=6 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py: lines=470 | refs=4 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py: lines=360 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py: lines=307 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py: lines=365 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py: lines=397 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py: lines=330 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py: lines=367 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py: lines=472 | refs=5 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py: lines=526 | refs=4 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py: lines=422 | refs=3 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py: lines=416 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py: lines=414 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase2_auth_smoke_gate_v1.py: lines=105 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py: lines=224 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py: lines=283 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py: lines=285 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3_route_density_gate_v1.py: lines=255 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py: lines=108 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py: lines=110 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py: lines=106 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py: lines=109 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py: lines=113 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3c_compact_route_service_gate_v1.py: lines=132 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3c_note_route_service_gate_v1.py: lines=132 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3c_score_route_service_gate_v1.py: lines=132 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3c_summary_risk_route_service_gate_v1.py: lines=134 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3c_task_detail_route_service_gate_v1.py: lines=131 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py: lines=243 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_pytest_standard_gate_p2d.py: lines=280 | refs=1 | app/tests/migrations tarafinda referans var.
+- scripts/quality/bys360_quality9_ci_gate.py: lines=201 | refs=4 | app/tests/migrations tarafinda referans var.
+- scripts/quality/check_claude_phase7_final_gate.py: lines=33 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/check_critical_services_phase5_gate.py: lines=87 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/quality/check_sql_performance_phase6_gate.py: lines=63 | refs=2 | app/tests/migrations tarafinda referans var.
+- scripts/windows/claude_phase7_final_quality.ps1: lines=10 | refs=2 | app/tests/migrations tarafinda referans var.
+
+### keep_operational_referenced
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py: lines=666 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py: lines=557 | refs=5 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py: lines=168 | refs=5 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py: lines=151 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: lines=200 | refs=5 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: lines=236 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py: lines=54 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py: lines=80 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: lines=394 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py: lines=213 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/run_corporate_information_center_task.py: lines=29 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/run_corporate_information_center_task_v3_0_phase2.py: lines=33 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/run_corporate_information_task.py: lines=28 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/communication/run_executive_mail_center_v2.py: lines=16 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py: lines=161 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/executive/seed_executive_summary_menu_v2_14_8.py: lines=17 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/executive/send_daily_executive_summary.py: lines=44 | refs=6 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/live_readiness/a7d_local_smoke_contract.py: lines=274 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.py: lines=71 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.py: lines=113 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/menu/check_emergency_restore_remove_exec_menu_v2_14_18.py: lines=61 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/menu/check_full_sidebar_restore_v2_14_12.py: lines=53 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/menu/emergency_restore_remove_exec_menu_v2_14_18.py: lines=166 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/overlay/bys360_live_full_overlay_v2_13_0.py: lines=706 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/portal/rollback_bys360_home_prestige_safe_v1a.py: lines=215 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/portal/run_bys360_press_news_scan_v3a.py: lines=25 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/bys360_handover_docs_gate_v1.py: lines=102 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/bys360_ops_audit.py: lines=309 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/bys360_score100_quality_gate_v1.py: lines=1340 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/bys360_secret_repo_gate.py: lines=354 | refs=34 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v2.py: lines=84 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v3.py: lines=75 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v4.py: lines=76 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_60.py: lines=28 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_61.py: lines=35 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_62.py: lines=36 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_message_interactions_v1.py: lines=97 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_notification_email_v1.py: lines=40 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_bys360_portal_ajax_reactions_v1.py: lines=95 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: lines=54 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/repair_bys360_message_interactions_v1.py: lines=592 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/repair_bys360_notification_email_v1.py: lines=112 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/repair_bys360_portal_ajax_reactions_v1.py: lines=167 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/restore_p14f4_source_aware_existing_assistant_v1.py: lines=269 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/restore_p14j2_performance_archive_corporate_template_v1.py: lines=120 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/quality/restore_p14j_performance_archive_template_v1.py: lines=136 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/release/build_bys360_safe_release.py: lines=127 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/scheduled/run_cic_staff_noon.py: lines=58 | refs=3 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/build_bys360_secure_release_v1_5.py: lines=165 | refs=7 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/bys360_release_zip_preflight_v1.py: lines=127 | refs=5 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/repair_bys360_csrf_form_token_and_referrer_hotfix_v2_15_15.py: lines=236 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/repair_bys360_csrf_main_login_hotfix_v2_15_14.py: lines=145 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/repair_bys360_logout_base_client_hotfix_v2_15_13.py: lines=237 | refs=4 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/repair_bys360_logout_force_clear_v2_15_12.py: lines=539 | refs=5 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/security/validate_a6e_production_env_contract.py: lines=236 | refs=1 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+- scripts/windows/repair_bys360_score100_quality_gate_v1.ps1: lines=102 | refs=2 | workflow/deploy/live/windows/maintenance gibi operasyonel referans var.
+
+### keep_operational_review
+- scripts/maintenance/ensure_message_comments_table_v1.py: lines=147 | refs=0 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/build_bys360_secure_release_and_preflight_v1.ps1: lines=30 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/check_bys360_release_zip_preflight_v1.ps1: lines=50 | refs=3 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/emergency_rollback_executive_summary_v1_0_8.ps1: lines=22 | refs=0 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/fix_local_admin_display_utf8.py: lines=32 | refs=0 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/recover_bys360_messages_from_interactions_v1.ps1: lines=96 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/repair_bys360_handover_docs_gate_v1.ps1: lines=47 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/repair_bys360_message_interactions_v1.ps1: lines=34 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/repair_bys360_notification_email_v1.ps1: lines=31 | refs=2 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/repair_bys360_portal_ajax_reactions_v1.ps1: lines=40 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/rollback_bys360_home_prestige_safe_v1a.ps1: lines=43 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/rollback_bys360_quality_10_10_p1_silent_except_logging.ps1: lines=68 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/seed_bys36043_portal_defaults_v1.py: lines=97 | refs=0 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/tools/mobile_portal_patch_v2_8_80.py: lines=617 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+- scripts/windows/verify_bys360_quality_10_10_p1_rollback.ps1: lines=21 | refs=1 | Operasyon klasorunde; manuel inceleme gerekir.
+
+### keep_risk_review
+- scripts/admin/check_system_admin_email_v2_16_0.py: lines=103 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/apply_bys360_corporate_portal_v1.py: lines=93 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py: lines=191 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py: lines=40 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/check_bys360_feedback_campaign_form_v2_13_2.py: lines=56 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/check_bys360_feedback_left_menu_fix_v2_13_1.py: lines=64 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_1.py: lines=125 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_2.py: lines=111 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/fix_executive_summary_blueprint_indent_v2_14_4.py: lines=79 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_2.py: lines=181 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_3.py: lines=288 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/probe_exec_summary_routes_v1_3_3.py: lines=24 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_2_force_template.py: lines=77 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py: lines=177 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/local_check_cic_v4_0_user_columns.py: lines=16 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/local_emergency_cic_v4_0_schema_patch.py: lines=33 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/local_fix_cic_v4_0_schema_patch.py: lines=17 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_completion_phase12_final_gate.py: lines=189 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_1_rule_engine_settings.py: lines=24 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_2_personnel_category.py: lines=22 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_3_personnel_category_card.py: lines=22 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_3a_personnel_category_sidebar.py: lines=60 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_4_category_scope_visibility.py: lines=19 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_5_category_period_scope.py: lines=19 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_6_category_period_integration.py: lines=11 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/check_bys360_performance_v2_1_6a_corporate_ui_category_delete.py: lines=29 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center_v1a_hotfix.py: lines=166 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v1.py: lines=59 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v1b.py: lines=22 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3a2_news_hardening.py: lines=49 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3a_press_news.py: lines=45 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3b2_social_auto_import.py: lines=31 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3b4_social_auto_flow_fix.py: lines=39 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3b5_app_task_control.py: lines=30 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_bys360_portal_experience_v3b_social_posts.py: lines=32 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_portal_interaction_permissions_v2_12_2.py: lines=46 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/check_portal_role_matrix_deep_v2_12_3.py: lines=70 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/portal/seed_portal_interaction_permissions_v2_12_2.py: lines=71 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_a10d_hard_ui_precision_decision.py: lines=199 | refs=1 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_a10e_hard_ui_false_positive_close.py: lines=152 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_a10q_compat_wrapper_rename_apply.py: lines=336 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_claude_score_uplift_p0_security_repo_hygiene.py: lines=423 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_mobile_behavior_smoke_p2b.py: lines=431 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_mobile_domain_smoke_p1f.py: lines=309 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_mobile_request_level_smoke_p2c.py: lines=457 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/quality/bys360_s0f3_pytest_isolated_update_verify.py: lines=487 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1c.py: lines=350 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1d.py: lines=412 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/refactor/bys360_mobile_routes_personnel_kpi_split_p1e.py: lines=381 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/refactor/bys360_mobile_routes_shared_split_p1b.py: lines=242 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/refactor/bys360_route_architecture_inventory_p1a.py: lines=366 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v1.py: lines=386 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v2.py: lines=370 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v3.py: lines=429 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p8_cic_template_service_migration_v1.py: lines=126 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/run_bys360_instagram_portal_sync_v2_11_0.py: lines=11 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/run_bys360_instagram_portal_sync_v2_11_2.py: lines=9 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/scheduled/run_cic_auto_scheduler.py: lines=34 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/build_bys360_secure_release_v1_3.py: lines=144 | refs=1 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/build_bys360_secure_release_v1_4.py: lines=130 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_3.py: lines=82 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_4.py: lines=103 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_p0_security_observability_v1.py: lines=133 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py: lines=183 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_p1_risk_hardening_v1.py: lines=80 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_3.py: lines=137 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_4.py: lines=116 | refs=1 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_5.py: lines=98 | refs=0 | Canli/DB/yedek/migration/silme gibi risk markerlari bulundu.
+
+### unknown
+- run_server.py: lines=None | refs=None | 
+- scripts/check_bys360_feedback_center_v2_13_0.py: lines=None | refs=None | 
+- scripts/check_bys360_mobile_v2_8_74_android_release_ready_p0.py: lines=None | refs=None | 
+- scripts/check_bys360_mobile_v2_8_75_app_maturity_p1.py: lines=None | refs=None | 
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center.py: lines=None | refs=None | 
+- scripts/portal/check_bys360_portal_experience_v2.py: lines=None | refs=None | 
+- scripts/portal/check_bys360_portal_experience_v3a1_press_news_sidebar.py: lines=None | refs=None | 
+- scripts/portal/check_bys360_portal_experience_v3b1_social_post_live.py: lines=None | refs=None | 
+- scripts/portal/repair_bys360_portal_experience_v3a1_press_news_sidebar.py: lines=None | refs=None | 
+- scripts/portal/repair_bys360_portal_experience_v3b1_social_post_live.py: lines=None | refs=None | 
+- scripts/quality/check_bys360_ai_everywhere_v1.py: lines=None | refs=None | 
+- scripts/quality/check_bys360_android_responsive_completion_v2.py: lines=None | refs=None | 
+- scripts/quality/check_cic_v4_6_celebrations_studio_pro_ui.py: lines=None | refs=None | 
+- scripts/quality/check_corporate_information_center_v3_0_phase3_dispatch.py: lines=None | refs=None | 
+- scripts/quality/check_corporate_information_center_v3_0_phase5_control_panel.py: lines=None | refs=None | 
+- scripts/quality/check_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: lines=None | refs=None | 
+- scripts/quality/check_corporate_information_center_v4_0_smart_celebrations.py: lines=None | refs=None | 
+- scripts/repair_bys360_portal_delete_route_dedupe_v2_10_1.py: lines=None | refs=None | 
+- scripts/repair_bys360_portal_profile_me_link_v2_10_4.py: lines=None | refs=None | 
+- scripts/security/build_bys360_secure_release_v1_1.py: lines=None | refs=None | 
+- scripts/security/build_bys360_secure_release_v1_2.py: lines=None | refs=None | 
+- scripts/security/check_bys360_logout_force_clear_v2_15_12.py: lines=None | refs=None | 
+- scripts/security/check_bys360_secure_release_secret_clean_v1_1.py: lines=None | refs=None | 
+- scripts/security/check_bys360_secure_release_secret_clean_v1_2.py: lines=None | refs=None | 
+
+## Safety
+- live_system_changed: False
+- files_moved: False
+- files_deleted: False
+- nginx_or_backup_created: False
+- database_touched: False
+
+## Decision
+- Bu rapor dosya tasimaz ve silmez.
+- Wave1, Wave2, Wave3 ve Wave4 temizlikleri sonrasi kalan aktif/fiziksel script adayi 273 olarak dogrulandi.
+- Kalan dosyalarin buyuk bolumu kod referansi, operasyon referansi veya risk marker nedeniyle korunmaktadir.
+- 1 adet archive_wave5_review adayi manuel inceleme icin ayrilmistir.
+- 68 adet keep_risk_review dosyasi otomatik tasinmamalidir.
+- Checklist item7 aktif runtime tanimina gore PASS durumundadir: strict active runtime script sayisi 48.
