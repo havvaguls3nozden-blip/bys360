@@ -36,18 +36,41 @@ CORE_MENU_VISIBILITY_POLICY: dict[str, set[str]] = {
 }
 
 
-def normalize_role_name(value: Any) -> str:
-    return str(value or "").strip().lower()
+# Phase4J V34C effective_menu bys360_context facade imports
+from app.services.settings.effective_menu_parts.bys360_context import (
+    _bys360_admin_period_reminder_is_admin_v1,
+    _bys360_admin_period_reminder_norm_v1,
+    _bys360_apply_general_category_visibility_fix_v1,
+    _bys360_apply_performance_main_switch,
+    _bys360_apply_performance_shortcut_gate_v4,
+    _bys360_exec_item_matches,
+    _bys360_exec_norm,
+    _bys360_force_home_menu_visible_v1,
+    _bys360_general_category_bool_v1,
+    _bys360_general_category_state_v1,
+    _bys360_is_exec_summary_menu_key,
+    _bys360_perf_rm_v8_apply_aliases,
+    _bys360_perf_rm_v8_apply_main_gate,
+    _bys360_perf_rm_v8_norm_role,
+    _bys360_perf_rm_v8_state_for_keys,
+    _bys360_performance_role_state,
+    _bys360_person_matrix_can_open_v1,
+    _bys360_person_matrix_user_is_admin_v1,
+    _bys360_portal_role_matrix_v2_12_apply,
+    _bys360_press_news_role,
+    _bys360_restore_general_section_v4,
+    _get_unit_name_for_authority,
+    _load_role_matrix_state,
+    _load_unit_profile_state,
+    _load_user_override_state,
+    _rollback,
+    _row_map_by_key,
+    _safe_query_all,
+    normalize_role_name,
+)
 
 
-def _rollback(rollback: RollbackHook | None) -> None:
-    if rollback is None:
-        return
-    try:
-        rollback()
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
+
 def _log_warning(logger: Any, message: str, *args: Any) -> None:
     if logger is None:
         return
@@ -357,12 +380,6 @@ def _apply_phase3_2_performance_menu_visibility(visibility: dict[str, bool], rol
 # Amaç: Rol matrisi / birim profili / kişi bazlı görünürlük kayıtları,
 # çekirdek menü savunmaları ve faz politikaları tarafından tekrar ezilmesin.
 # Sıra: Rol matrisi tabanı -> birim profili -> kişi özel ayarı -> teknik/rol güvenlik kapısı.
-def _safe_query_all(query: Any, *, rollback: RollbackHook | None = None) -> list[Any]:
-    try:
-        return list(query.all())
-    except Exception:
-        _rollback(rollback)
-        return []
 
 
 def _truthy_bool(value: Any) -> bool:
@@ -372,60 +389,14 @@ def _truthy_bool(value: Any) -> bool:
     return text in {"1", "true", "evet", "yes", "on", "aktif", "visible", "açık", "acik"}
 
 
-def _get_unit_name_for_authority(user: Any) -> str:
-    for attr in ("birim", "unit_name", "department", "organization_unit_name"):
-        value = getattr(user, attr, None)
-        if value:
-            return str(value or "").strip()
-    try:
-        unit = getattr(user, "organization_unit", None)
-        if unit is not None:
-            return str(getattr(unit, "name", "") or "").strip()
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return ""
-    return ""
 
 
-def _row_map_by_key(rows: list[Any]) -> dict[str, bool]:
-    result: dict[str, bool] = {}
-    for row in rows or []:
-        key = str(getattr(row, "menu_key", "") or "").strip()
-        if not key or is_removed_menu_key(key):
-            continue
-        result[key] = bool(getattr(row, "is_visible", False))
-    return result
 
 
-def _load_role_matrix_state(role_name: str, *, rollback: RollbackHook | None = None) -> dict[str, bool]:
-    normalized_role = normalize_role_name(role_name)
-    if not normalized_role:
-        return {}
-    rows = _safe_query_all(RoleMenuDefault.query.filter_by(role_name=normalized_role), rollback=rollback)
-    return _row_map_by_key(rows)
 
 
-def _load_unit_profile_state(user: Any, *, rollback: RollbackHook | None = None) -> dict[str, bool]:
-    unit_name = _get_unit_name_for_authority(user)
-    if not unit_name:
-        return {}
-    try:
-        from app.models import UnitMenuProfile
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return {}
-    rows = _safe_query_all(UnitMenuProfile.query.filter_by(unit_name=unit_name), rollback=rollback)
-    return _row_map_by_key(rows)
 
 
-def _load_user_override_state(user: Any, *, rollback: RollbackHook | None = None) -> dict[str, bool]:
-    user_id = getattr(user, "id", None)
-    if not user_id:
-        return {}
-    rows = _safe_query_all(UserMenuPermission.query.filter_by(user_id=user_id), rollback=rollback)
-    return _row_map_by_key(rows)
 
 
 def _menu_item_by_key(active_menu_items: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -453,14 +424,6 @@ def _settings_explicitly_controls_key(menu_key: str, role_state: dict[str, bool]
 
 
 # Compatibility guard.
-def _bys360_press_news_role(value: object) -> str:
-    text = str(value or "").strip().lower().replace("-", "_").replace(" ", "_")
-    return (text.replace("İ", "i").replace("I", "i").replace("ı", "i")
-                .replace("Ş", "s").replace("ş", "s")
-                .replace("Ğ", "g").replace("ğ", "g")
-                .replace("Ü", "u").replace("ü", "u")
-                .replace("Ö", "o").replace("ö", "o")
-                .replace("Ç", "c").replace("ç", "c"))
 
 
 def _apply_bys360_press_news_admin_only_policy(visibility: dict[str, bool], user: Any) -> dict[str, bool]:
@@ -1197,29 +1160,7 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
     elif isinstance(_target, list):
         _target.extend([_key for _key in _BYS360_PERFORMANCE_ALL_KEYS if _key not in _target])
 
-def _bys360_performance_role_state(role_name, *, rollback=None):
-    try:
-        return _load_role_matrix_state(normalize_role_name(role_name), rollback=rollback)
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return {}
 
-def _bys360_apply_performance_main_switch(visibility, user, role_name, *, rollback=None):
-    role_state = _bys360_performance_role_state(role_name, rollback=rollback)
-    main_has_explicit = any(_key in role_state for _key in _BYS360_PERFORMANCE_MAIN_KEYS)
-    if main_has_explicit:
-        main_enabled = any(bool(role_state.get(_key)) for _key in _BYS360_PERFORMANCE_MAIN_KEYS)
-    else:
-        main_enabled = any(bool(visibility.get(_key)) for _key in _BYS360_PERFORMANCE_CHILD_KEYS)
-    visibility["performance_module"] = bool(main_enabled)
-    visibility["performance_management"] = bool(main_enabled)
-    visibility["performans_yonetimi"] = bool(main_enabled)
-    if not main_enabled:
-        for _key in _BYS360_PERFORMANCE_CHILD_KEYS:
-            if _key in visibility:
-                visibility[_key] = False
-    return visibility
 
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_END
 
@@ -1237,22 +1178,7 @@ except Exception:
     logger.exception("BYS360 effective menu guvenli fallback isleminde hata yakalandi | line=1178")
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS = set(_BYS360_GENERAL_CORE_KEYS_V4 | _BYS360_PERFORMANCE_MAIN_KEYS_V4 | _BYS360_PERFORMANCE_CHILD_KEYS_V4)
 
-def _bys360_restore_general_section_v4(visibility, user):
-    # En az Anasayfa/Dashboard çekirdeği korunur. Genel bölüm kapatılmak istenirse ileride ayrı ana anahtar bilinçli kapatılır.
-    visibility.setdefault("general_section", True)
-    visibility.setdefault("home", True)
-    visibility.setdefault("dashboard", True)
-    if bool(visibility.get("general_section", True)):
-        visibility["home"] = bool(visibility.get("home", True))
-        visibility["dashboard"] = bool(visibility.get("dashboard", True))
-    return visibility
 
-def _bys360_apply_performance_shortcut_gate_v4(visibility):
-    main_enabled = any(bool(visibility.get(_key, True if _key == "performance_module" else False)) for _key in _BYS360_PERFORMANCE_MAIN_KEYS_V4)
-    if not main_enabled:
-        for _key in _BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4:
-            visibility[_key] = False
-    return visibility
 
 # BYS360_GENERAL_SECTION_RESTORE_V4_END
 
@@ -1434,74 +1360,12 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
         _target.extend([_key for _key in _BYS360_PERF_RM_V8_ALL_KEYS if _key not in _target])
 
 
-def _bys360_perf_rm_v8_norm_role(value):
-    return str(value or "").strip().lower()
 
 
-def _bys360_perf_rm_v8_state_for_keys(keys, role_state, unit_state, user_state):
-    """Rol > birim > kişi sıralamasıyla açık/kapat kararını döndürür.
-
-    Rol matrisi kapalıysa birim/kişi açamaz. Rol matrisi açık veya kayıt yoksa
-    birim ve kişi istisnaları çalışır.
-    """
-    keys = list(keys or [])
-    value = None
-    role_decision = None
-    for key in keys:
-        if key in role_state:
-            role_decision = bool(role_state[key])
-            value = role_decision
-            break
-    if role_decision is False:
-        return False
-    for key in keys:
-        if key in unit_state:
-            value = bool(unit_state[key])
-    for key in keys:
-        if key in user_state:
-            value = bool(user_state[key])
-    return value
 
 
-def _bys360_perf_rm_v8_apply_aliases(visibility, role_state, unit_state, user_state):
-    for canonical, aliases in _BYS360_PERF_RM_V8_ALIAS_GROUPS.items():
-        decision = _bys360_perf_rm_v8_state_for_keys([canonical] + [a for a in aliases if a != canonical], role_state, unit_state, user_state)
-        if decision is not None:
-            visibility[canonical] = bool(decision)
-            for alias in aliases:
-                visibility[alias] = bool(decision)
-        else:
-            # Eski aliaslardan biri farklı katmanda açık kaldıysa canonical sol menü anahtarına aktar.
-            if any(bool(visibility.get(alias)) for alias in aliases):
-                visibility[canonical] = True
-                for alias in aliases:
-                    visibility[alias] = True
-    return visibility
 
 
-def _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_state):
-    child_visible = any(bool(visibility.get(key)) for key in _BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS)
-    child_explicit_true = False
-    for canonical, aliases in _BYS360_PERF_RM_V8_ALIAS_GROUPS.items():
-        decision = _bys360_perf_rm_v8_state_for_keys([canonical] + [a for a in aliases if a != canonical], role_state, unit_state, user_state)
-        if decision is True:
-            child_explicit_true = True
-            break
-    main_decision = _bys360_perf_rm_v8_state_for_keys(list(_BYS360_PERF_RM_V8_MAIN_KEYS), role_state, unit_state, user_state)
-
-    if child_visible or child_explicit_true:
-        main_enabled = True
-    elif main_decision is not None:
-        main_enabled = bool(main_decision)
-    else:
-        main_enabled = False
-
-    for key in _BYS360_PERF_RM_V8_MAIN_KEYS:
-        visibility[key] = bool(main_enabled)
-    if not main_enabled:
-        for key in _BYS360_PERF_RM_V8_CHILD_KEYS | _BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS:
-            visibility[key] = False
-    return visibility
 
 # BYS360_PERFORMANCE_ROLE_MATRIX_PERSONNEL_V8_END
 
@@ -1512,30 +1376,8 @@ def _bys360_perf_rm_v8_apply_main_gate(visibility, role_state, unit_state, user_
 # istisnalar kişi bazlı, audit log'lu ve kontrollü biçimde yönetilebilsin.
 # Bu blok mevcut UserMenuPermission tablosunu kullanır; şema değiştirmez.
 
-def _bys360_person_matrix_user_is_admin_v1(user: Any) -> bool:
-    role = normalize_role_name(getattr(user, "role", ""))
-    return bool(
-        role in {"admin", "super_admin", "system_admin", "sistem_yoneticisi"}
-        or getattr(user, "is_admin", False)
-        or getattr(user, "is_superuser", False)
-    )
 
 
-def _bys360_person_matrix_can_open_v1(key: str, item: dict[str, Any] | None, user: Any) -> bool:
-    """Kişiye özel matrisin hangi menüleri açabileceğini denetler.
-
-    Kural:
-    - Kaldırılmış/kapsam dışı menüler hiçbir şekilde açılamaz.
-    - admin_only olarak işaretlenen çekirdek yönetim ekranları admin olmayan kişiye
-      menüde açılmaz; backend yetki koruması ayrıca devam eder.
-    - Bunun dışındaki canlı menüler kişi bazlı rol matrisiyle açılıp kapatılabilir.
-    """
-    if not key or is_removed_menu_key(key):
-        return False
-    item = item or {}
-    if item.get("admin_only") and not _bys360_person_matrix_user_is_admin_v1(user):
-        return False
-    return True
 
 
 def _apply_bys360_settings_live_authority_v1(
@@ -1637,77 +1479,16 @@ _BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1 = {
 }
 
 
-def _bys360_general_category_bool_v1(value):
-    return bool(value is True or str(value or "").strip().lower() in {"1", "true", "evet", "yes", "on", "aktif", "visible", "acik", "açık"})
 
 
-def _bys360_general_category_state_v1(user, role_name, *, rollback=None):
-    state = {}
-    try:
-        state.update(_load_role_matrix_state(role_name, rollback=rollback) or {})
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1668)")
-    try:
-        state.update(_load_unit_profile_state(user, rollback=rollback) or {})
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1672)")
-    try:
-        state.update(_load_user_override_state(user, rollback=rollback) or {})
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1676)")
-    return state
 
 
-def _bys360_apply_general_category_visibility_fix_v1(visibility, user, *, rollback=None):
-    visibility = dict(visibility or {})
-    try:
-        role_name = normalize_role_name(getattr(user, "role", "")) if user is not None else ""
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        role_name = str(getattr(user, "role", "") if user is not None else "").strip().lower()
-
-    state = _bys360_general_category_state_v1(user, role_name, rollback=rollback)
-    explicit_section_open = any(_bys360_general_category_bool_v1(state.get(key)) or _bys360_general_category_bool_v1(visibility.get(key)) for key in _BYS360_GENERAL_CATEGORY_SECTION_KEYS_V1)
-    child_open = any(_bys360_general_category_bool_v1(visibility.get(key)) for key in _BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1)
-
-    # Alt sekme aciksa eski general_section=false kaydi kategoriyi saklayamaz.
-    if child_open or explicit_section_open:
-        visibility["general_section"] = True
-        visibility["genel"] = True
-        visibility["general"] = True
-
-    # Genel kategori acik ama hic alt satir acik degilse bos kategori yerine guvenli giris satirlari acilir.
-    if explicit_section_open and not child_open:
-        if state.get("home") is not False:
-            visibility["home"] = True
-        if state.get("dashboard") is not False:
-            visibility["dashboard"] = True
-
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 
 # BYS360_GENERAL_CATEGORY_VISIBILITY_FIX_V1_END
 
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_BEGIN
 # Anasayfa ve çekirdek kullanıcı bağlantıları her kullanıcı için güvenli giriş kapısıdır.
 # Kişi/rol bazlı menü ayarları alt özellikleri kapatabilir; ancak Anasayfa kaybolmaz.
-def _bys360_force_home_menu_visible_v1(visibility, user):
-    visibility = dict(visibility or {})
-    visibility["general_section"] = True
-    visibility["genel"] = True
-    visibility["general"] = True
-    visibility["home"] = True
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 
 # BYS360_HOME_MENU_ALWAYS_VISIBLE_V1_END
 
@@ -1754,44 +1535,6 @@ except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 portal rol matrisi authority anahtarları eklenemedi")
 
 
-def _bys360_portal_role_matrix_v2_12_apply(visibility, user, *, rollback=None):
-    visibility = dict(visibility or {})
-    role_name = normalize_role_name(getattr(user, "role", "")) if user is not None else ""
-    try:
-        role_state = _load_role_matrix_state(role_name, rollback=rollback) or {}
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        role_state = {}
-    try:
-        unit_state = _load_unit_profile_state(user, rollback=rollback) or {}
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        unit_state = {}
-    try:
-        user_state = _load_user_override_state(user, rollback=rollback) or {}
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        user_state = {}
-    defaults = set(PORTAL_ROLE_MATRIX_V2_12_DEFAULTS.get(role_name, set()))
-    for key in PORTAL_ROLE_MATRIX_V2_12_KEYS:
-        if key in role_state:
-            visibility[key] = bool(role_state[key])
-        elif key not in visibility:
-            visibility[key] = key in defaults
-        if key in unit_state:
-            if role_state.get(key) is False:
-                visibility[key] = False
-            else:
-                visibility[key] = bool(unit_state[key])
-        if key in user_state:
-            if role_state.get(key) is False:
-                visibility[key] = False
-            else:
-                visibility[key] = bool(user_state[key])
-    return visibility
 
 
 # BYS360_PORTAL_SETTINGS_ROLE_MATRIX_V2_12_EFFECTIVE_MENU_END
@@ -1842,43 +1585,10 @@ _BYS360_EXEC_KNOWN_KEYS = {'daily_weather_mail', 'executive_summary_tasks', 'exe
 _BYS360_EXEC_URL_MARKERS = ('/dashboard/yonetici-ozeti', '/executive-summary', '/yonetici-ozeti')
 
 
-def _bys360_exec_norm(value: object) -> str:
-    try:
-        base = normalize_role_name(value)  # type: ignore[name-defined]
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu isleminde hata yakalandi")
-        base = str(value or "").strip().lower()
-    return str(base or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
-def _bys360_is_exec_summary_menu_key(key: object) -> bool:
-    k = str(key or "").strip().lower()
-    if not k:
-        return False
-    if k in _BYS360_EXEC_KNOWN_KEYS:
-        return True
-    if "executive_summary" in k or "executive-summary" in k:
-        return True
-    if "yonetici_ozeti" in k or "yonetici-ozeti" in k:
-        return True
-    if "daily_weather_mail" in k or "gunluk_hava_maili" in k or "gunluk_personel_bilgilendirme" in k:
-        return True
-    return False
 
 
-def _bys360_exec_item_matches(item: dict[str, object]) -> bool:
-    try:
-        key = item.get("key")
-        if _bys360_is_exec_summary_menu_key(key):
-            return True
-        hay = " ".join(str(item.get(name) or "") for name in ("label", "url", "endpoint"))
-        hay_l = hay.lower()
-        return any(marker in hay_l for marker in _BYS360_EXEC_URL_MARKERS) or "yönetici özeti" in hay_l or "yonetici ozeti" in hay_l
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return False
 
 
 # BYS360_EXECUTIVE_SUMMARY_V1_0_10_ADMIN_ONLY_MENU_LOCK_END
@@ -2083,39 +1793,7 @@ for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
 # rol matrisi veya kişi bazlı eski kapalı kayıtlar yüzünden gizlenmesin.
 _BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_visibility_map
 
-def _bys360_admin_period_reminder_norm_v1(value):
-    text = str(value or "").strip().lower()
-    return (text
-            .replace("İ", "i").replace("ı", "i")
-            .replace("ğ", "g").replace("ü", "u").replace("ş", "s")
-            .replace("ö", "o").replace("ç", "c")
-            .replace("-", "_").replace(" ", "_"))
 
-def _bys360_admin_period_reminder_is_admin_v1(user):
-    if not user:
-        return False
-    for attr in ("is_admin", "is_superuser", "is_system_admin", "is_sistem_yoneticisi"):
-        try:
-            if bool(getattr(user, attr, False)):
-                return True
-        except Exception:
-            pass
-    terms = set()
-    for attr in ("role", "role_name", "user_role", "authority_level", "title", "unvan", "position", "gorev", "username"):
-        try:
-            terms.add(_bys360_admin_period_reminder_norm_v1(getattr(user, attr, "")))
-        except Exception:
-            pass
-    try:
-        role_obj = getattr(user, "role", None)
-        terms.add(_bys360_admin_period_reminder_norm_v1(getattr(role_obj, "name", "")))
-        terms.add(_bys360_admin_period_reminder_norm_v1(getattr(role_obj, "role_name", "")))
-    except Exception:
-        pass
-    return bool(terms & {
-        "admin", "administrator", "super_admin", "system_admin",
-        "sistem_yoneticisi", "sistem_yöneticisi", "yonetici", "yönetici"
-    })
 
 def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
     visibility = dict(_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1(user, *args, **kwargs) or {})
