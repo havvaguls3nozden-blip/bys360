@@ -1,0 +1,29 @@
+{
+  "package": "BYS360_PHASE4A_OFFLINE_STABILIZATION_KICKOFF_V1",
+  "generated_at": "2026-06-25T07:50:19",
+  "branch": "phase4a-offline-stabilization-v1",
+  "head": "8989066",
+  "git_status_clean": false,
+  "tags_at_head": [
+    "phase3e-live-release-preflight-pass-20260625"
+  ],
+  "phase3e_closure_ok": true,
+  "frozen_release_tag": "phase3e-live-release-preflight-pass-20260625",
+  "frozen_release_zip": "C:\\bys360\\release\\BYS360_FINAL_RELEASE_phase3e-live-release-preflight-pass-20260625.zip",
+  "live_update_policy": "Canlıya güncelleme yapılmayacak; çalışmalar offline branch üzerinde sürdürülecek.",
+  "phase4a_objectives": [
+    "Canlıya dokunmadan yeni geliştirme/düzeltme fazını başlatmak",
+    "Önceki release paketini donmuş geri dönüş noktası olarak korumak",
+    "Öncelikli sorunları kontrollü sıraya almak",
+    "Yeni değişiklikleri ayrı branch ve raporlarla izlemek",
+    "Her düzeltme sonrası test ve güvenlik kapısı çalıştırmak"
+  ],
+  "candidate_work_items": [
+    "Portal mesaj beğeni/yorum AJAX ve migration kontrolü",
+    "Hafta sonu gün ortası destek hatırlatması mail kontrolü",
+    "Performans v2-1-4 category scope yavaşlık analizi",
+    "Asistan widget görünürlük/entegrasyon kontrolü",
+    "Mobil/PWA karanlık tema ve input görünürlük kontrolü"
+  ],
+  "phase4a_kickoff_ok": false
+}
