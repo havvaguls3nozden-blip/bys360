@@ -1,0 +1,344 @@
+# BYS360 Post Phase4J Script Retirement Plan V14
+- Generated at: 2026-06-25T16:53:38
+- Total active script candidates: 361
+
+## Bucket Counts
+- keep_review_operational: 76
+- keep_review_unknown: 101
+- retire_candidate_high: 147
+- retire_candidate_medium: 37
+
+## Target Projection
+- goal_active_script_count_under: 100
+- after_retire_high_only: 214
+- after_retire_high_and_medium: 177
+- high_retire_needed_to_reach_100: 261
+
+## Scripts Subdir Counts
+- scripts/admin: 2
+- scripts/apply_bys360_corporate_portal_v1.py: 1
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py: 1
+- scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py: 1
+- scripts/check_bys360_feedback_campaign_form_v2_13_2.py: 1
+- scripts/check_bys360_feedback_center_v2_13_0.py: 1
+- scripts/check_bys360_feedback_left_menu_fix_v2_13_1.py: 1
+- scripts/check_bys360_mobile_v2_8_74_android_release_ready_p0.py: 1
+- scripts/check_bys360_mobile_v2_8_75_app_maturity_p1.py: 1
+- scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py: 1
+- scripts/check_bys360_portal_instagram_hide_v2_11_7.py: 1
+- scripts/communication: 28
+- scripts/dashboard: 1
+- scripts/executive: 11
+- scripts/live: 4
+- scripts/live_readiness: 1
+- scripts/live_release: 2
+- scripts/local_check_cic_v4_0_user_columns.py: 1
+- scripts/local_emergency_cic_v4_0_schema_patch.py: 1
+- scripts/local_fix_cic_v4_0_schema_patch.py: 1
+- scripts/maintenance: 4
+- scripts/menu: 5
+- scripts/overlay: 1
+- scripts/performance: 24
+- scripts/performance_mail_automation_runner.py: 1
+- scripts/portal: 25
+- scripts/quality: 132
+- scripts/refactor: 6
+- scripts/release: 1
+- scripts/repair_bys360_portal_delete_route_dedupe_v2_10_1.py: 1
+- scripts/repair_bys360_portal_profile_me_link_v2_10_4.py: 1
+- scripts/repo_hygiene: 4
+- scripts/run_bys360_instagram_portal_sync_v2_11_0.py: 1
+- scripts/run_bys360_instagram_portal_sync_v2_11_2.py: 1
+- scripts/scheduled: 2
+- scripts/security: 28
+- scripts/windows: 60
+
+## Retire Candidate High Top 120
+- scripts/communication/repair_cic_v4_1b_force_pro_ui.py: 420 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_cic_v4_2c_active_passive_hard_patch.py: 2 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_cic_v4_6b_celebrations_template_final_fix.py: 89 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py: 666 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py: 557 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py: 168 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py: 151 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_11_template_compat_fix.py: 216 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: 236 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_3_flat_css_link_fix.py: 196 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_6_quality_script_repair.py: 320 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py: 54 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py: 80 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: 394 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_daily_weather_mail_v1_0.py: 251 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/repair_daily_weather_mail_v1_0_5_premium_exec_menu.py: 374 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/run_corporate_information_center_task_v3_0_phase2.py: 33 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py: 152 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/maintenance/repair_bys360_developer_comment_cleanup_v2_17_67.py: 293 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/maintenance/run_bys360_final_gate_v2_17_69.py: 556 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/maintenance/run_bys360_final_gate_v2_17_70.py: 372 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10a_phase_dev_debug_audit.py: 324 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10b_phase_dev_debug_precision_audit.py: 279 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10c_hard_ui_technical_language_plan.py: 110 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10f_cleanup_candidate_precision_plan.py: 283 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10i_remaining_runtime_rename_keep_plan.py: 229 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10k_remaining_low_risk_rename_plan.py: 133 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10p_compat_wrapper_rename_plan.py: 237 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10r2_final_tech_debt_clean_zip.py: 198 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10r3_canonical_evidence_manifest.py: 191 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a10r_final_tech_debt_evidence.py: 388 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a11a2_warning_audit_triage.py: 213 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a11a_warning_audit.py: 249 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a11b2_resource_warning_fix.py: 422 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a11b_resource_warning_fix.py: 364 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a11c_warning_zero_final_evidence.py: 424 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a12a_ui_technical_language_audit.py: 306 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a12b_ui_technical_language_precision_audit.py: 413 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a13b_ui_design_system_consolidation_plan.py: 401 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a85_contract_failure_and_mobile_route_diagnosis.py: 508 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_a85g_repo_cleanup_audit.py: 345 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_baseline_gate_p5a.py: 423 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py: 233 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_final_evidence_gate_p5f.py: 504 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_inventory_precision_gate_p6c.py: 312 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py: 450 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d_v2.py: 485 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py: 789 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b.py: 484 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b_v2.py: 497 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_visual_regression_gate_p6a.py: 430 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_android_responsive_visual_uat_evidence_gate_p5e.py: 453 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_architecture_scope_gate_p2e.py: 278 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_ci_active_architecture_gate_p2f.py: 271 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_claude_score_uplift_p0e_final_secret_gate.py: 338 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_claude_score_uplift_p0f_secret_gate_final.py: 81 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_handover_docs_gate_v1.py: 102 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py: 341 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py: 369 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py: 366 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py: 466 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py: 415 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py: 452 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py: 470 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py: 360 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py: 307 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_release_evidence_gate_p4e.py: 372 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py: 365 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py: 397 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py: 330 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py: 367 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py: 472 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py: 526 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_security_evidence_gate_p4d.py: 341 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py: 422 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py: 416 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py: 414 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_ops_audit.py: 309 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2_auth_smoke_gate_v1.py: 105 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py: 224 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py: 283 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py: 285 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2a_architecture_debt_map.py: 779 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2b_route_snapshot_contract.py: 733 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c1_wildcard_import_explicit_plan.py: 554 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c2_mobile_shared_wildcard_apply.py: 498 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c3_auth_explicit_import_apply.py: 327 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c3_final_closure_evidence.py: 314 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c4_facade_exception_closure_evidence.py: 274 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase2c4_mobile_routes_shared_facade_apply.py: 458 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3_route_density_gate_v1.py: 255 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py: 108 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py: 110 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py: 106 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py: 109 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py: 113 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3c_compact_route_service_gate_v1.py: 132 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3c_note_route_service_gate_v1.py: 132 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3c_score_route_service_gate_v1.py: 132 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3c_summary_risk_route_service_gate_v1.py: 134 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3c_task_detail_route_service_gate_v1.py: 131 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3d_full_gate_bundle_v1.py: 199 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py: 243 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_pytest_standard_gate_p2d.py: 280 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_quality9_ci_gate.py: 201 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0a_claude_findings_verification_audit.py: 789 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0b2_secret_risk_decision_matrix.py: 439 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0b_secret_signal_classification_audit.py: 442 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0c2_config_secretkey_exc_final_evidence.py: 464 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0f1_pip_audit_remediation_plan.py: 504 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0f2_pip_audit_wave1_runtime_verify.py: 422 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_s0g_old_venv_archive_cleanup.py: 501 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_score100_quality_gate_v1.py: 1340 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/bys360_secret_repo_gate.py: 354 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_bys360_android_responsive_completion_v2.py: 47 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_claude_phase7_final_gate.py: 33 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_corporate_information_center_v3_0_phase3_dispatch.py: 52 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_corporate_information_center_v3_0_phase5_control_panel.py: 59 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: 54 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_4_release_pro_ui.py: 82 lines | Kalite/audit/repair/overlay/phase/gate kanit scripti gibi gorunuyor.
+
+## Retire Candidate Medium Top 120
+- _post_phase4j_script_retirement_plan_v14.py: 325 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/admin/check_system_admin_email_v2_16_1_checkfix.py: 110 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/check_bys360_feedback_left_menu_fix_v2_13_1.py: 64 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/fix_executive_summary_blueprint_indent_v2_14_4.py: 79 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_2.py: 181 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/fix_send_daily_executive_summary_indent_v1_0_3.py: 288 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/patch_register_executive_summary.py: 55 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_2_force_template.py: 77 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py: 177 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/local_emergency_cic_v4_0_schema_patch.py: 33 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/local_fix_cic_v4_0_schema_patch.py: 17 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py: 102 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py: 200 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase12_final_gate.py: 189 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase1_rule_center.py: 134 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py: 229 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py: 213 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py: 208 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase5_scorecard_ui_center.py: 44 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase6_low_score_process_center.py: 54 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase7_scorecard_archive_center.py: 179 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase8_midterm_feedback_center.py: 185 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py: 192 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/repair_bys360_performance_completion_phase2_category_center.py: 61 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/repair_bys360_performance_completion_phase3_visibility_center.py: 149 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center.py: 166 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center_v1a_hotfix.py: 166 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/portal/check_bys360_portal_experience_v2d1_profile_visual_fix.py: 83 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/portal/check_bys360_portal_experience_v3b4_social_auto_flow_fix.py: 39 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/portal/check_portal_role_matrix_deep_v2_12_3.py: 70 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/portal/repair_bys360_portal_experience_v3a1_press_news_sidebar.py: 246 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/refactor/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_apply.py: 92 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/repair_bys360_portal_delete_route_dedupe_v2_10_1.py: 22 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/repair_bys360_portal_profile_me_link_v2_10_4.py: 22 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v1.py: 386 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v2.py: 370 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p19c_cic_template_contract_wiring_v3.py: 429 lines | Adinda gecmis donem onarim/analiz/gate isareti var.
+
+## Keep Review Top 120
+- run_server.py: 33 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/admin/check_system_admin_email_v2_16_0.py: 103 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/apply_bys360_corporate_portal_v1.py: 93 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py: 191 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py: 40 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_feedback_campaign_form_v2_13_2.py: 56 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_feedback_center_v2_13_0.py: 49 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_mobile_v2_8_74_android_release_ready_p0.py: 107 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_mobile_v2_8_75_app_maturity_p1.py: 92 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py: 84 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/check_bys360_portal_instagram_hide_v2_11_7.py: 66 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: 200 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py: 213 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/communication/run_corporate_information_center_task.py: 29 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/communication/run_corporate_information_task.py: 28 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/communication/run_executive_mail_center_v2.py: 16 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_1.py: 125 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_2.py: 111 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/communication/send_daily_evening_tomorrow_mail.py: 19 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/communication/send_daily_pulse_check_mail.py: 19 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/communication/send_daily_weather_personnel_mail.py: 36 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py: 161 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/executive/check_executive_summary_advanced_v2_14_20.py: 35 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/executive/check_executive_summary_advanced_v2_14_21.py: 61 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/executive/probe_exec_summary_routes_v1_3_3.py: 24 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/executive/seed_executive_summary_menu_v2_14_8.py: 17 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/executive/send_daily_executive_summary.py: 44 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: 382 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: 482 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: 547 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live/repair_bys360_live_full_overlay_v2_17_62.py: 293 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live_readiness/a7d_local_smoke_contract.py: 274 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.py: 71 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.py: 113 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/local_check_cic_v4_0_user_columns.py: 16 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/maintenance/ensure_message_comments_table_v1.py: 147 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/menu/check_emergency_restore_remove_exec_menu_v2_14_18.py: 61 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/menu/check_executive_summary_menu_v2_14_9.py: 57 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/menu/check_executive_summary_native_menu_v2_14_19.py: 88 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/menu/check_full_sidebar_restore_v2_14_12.py: 53 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/menu/emergency_restore_remove_exec_menu_v2_14_18.py: 166 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/overlay/bys360_live_full_overlay_v2_13_0.py: 706 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/performance/check_bys360_performance_v2_1_1_rule_engine_settings.py: 24 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_2_personnel_category.py: 22 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_3_personnel_category_card.py: 22 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_3a_personnel_category_sidebar.py: 60 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_4_category_scope_visibility.py: 19 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_5_category_period_scope.py: 19 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_6_category_period_integration.py: 11 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance/check_bys360_performance_v2_1_6a_corporate_ui_category_delete.py: 29 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/performance_mail_automation_runner.py: 62 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/portal/check_bys360_portal_experience_v1.py: 59 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v1b.py: 22 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2.py: 49 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2b_feed_first.py: 54 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2c_post_cards.py: 66 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2d_profile_area.py: 76 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v2f_news_left.py: 47 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3a1_press_news_sidebar.py: 51 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3a2_news_hardening.py: 49 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3a_press_news.py: 45 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b1_social_post_live.py: 46 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/portal/check_bys360_portal_experience_v3b2_social_auto_import.py: 31 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b3_social_import_center.py: 28 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b5_app_task_control.py: 30 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_bys360_portal_experience_v3b_social_posts.py: 32 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/check_portal_interaction_permissions_v2_12_2.py: 46 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/repair_bys360_portal_experience_v3b1_social_post_live.py: 282 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/portal/rollback_bys360_home_prestige_safe_v1a.py: 215 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/portal/run_bys360_press_news_scan_v3a.py: 25 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/portal/run_bys360_social_media_embed_scan_v3b.py: 27 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/portal/seed_portal_interaction_permissions_v2_12_2.py: 71 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/quality/bys360_a10d_hard_ui_precision_decision.py: 199 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_a10e_hard_ui_false_positive_close.py: 152 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_a10q_compat_wrapper_rename_apply.py: 336 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_claude_score_uplift_p0_security_repo_hygiene.py: 423 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_mobile_behavior_smoke_p2b.py: 431 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_mobile_domain_smoke_p1f.py: 309 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_mobile_request_level_smoke_p2c.py: 457 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/bys360_s0e_reports_quality_backup_archive_cleanup.py: 663 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/bys360_s0f3_pytest_isolated_update_verify.py: 487 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_bys360_ai_everywhere_v1.py: 52 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v2.py: 84 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v3.py: 75 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v4.py: 76 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_60.py: 28 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_61.py: 35 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_live_full_overlay_v2_17_62.py: 36 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_bys360_message_interactions_v1.py: 97 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_bys360_notification_email_v1.py: 40 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_bys360_portal_ajax_reactions_v1.py: 95 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_cic_v4_6_celebrations_studio_pro_ui.py: 31 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/check_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: 74 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/check_corporate_information_center_v4_0_smart_celebrations.py: 51 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/quality/restore_p14f4_source_aware_existing_assistant_v1.py: 269 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/restore_p14j2_performance_archive_corporate_template_v1.py: 120 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/quality/restore_p14j_performance_archive_template_v1.py: 136 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1c.py: 350 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_domain_split_p1d.py: 412 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_personnel_kpi_split_p1e.py: 381 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/refactor/bys360_mobile_routes_shared_split_p1b.py: 242 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/refactor/bys360_route_architecture_inventory_p1a.py: 366 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/release/build_bys360_safe_release.py: 127 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/repo_hygiene/repair_bys360_repo_hygiene_p8_cic_template_service_migration_v1.py: 126 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/run_bys360_instagram_portal_sync_v2_11_0.py: 11 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/run_bys360_instagram_portal_sync_v2_11_2.py: 9 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/scheduled/run_cic_auto_scheduler.py: 34 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/scheduled/run_cic_staff_noon.py: 58 lines | Calistirma/operasyon kelimeleri iceriyor.
+- scripts/security/build_bys360_secure_release_v1_1.py: 49 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/build_bys360_secure_release_v1_2.py: 110 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/build_bys360_secure_release_v1_3.py: 144 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/build_bys360_secure_release_v1_4.py: 130 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/build_bys360_secure_release_v1_5.py: 165 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/bys360_release_zip_preflight_v1.py: 127 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_3.py: 82 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/security/check_bys360_live_logout_force_clear_v2_13_4.py: 103 lines | Operasyon/deploy/live/backup/migration benzeri riskli dosya; otomatik arsivlenmemeli.
+- scripts/security/check_bys360_logout_force_clear_v2_15_12.py: 129 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/check_bys360_p0_security_observability_v1.py: 133 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/check_bys360_p0_sentry_dbssl_csp_v2.py: 183 lines | Net emekli adayi degil; manuel inceleme gerekir.
+- scripts/security/check_bys360_p1_risk_hardening_v1.py: 80 lines | Net emekli adayi degil; manuel inceleme gerekir.
+
+## Decision
+- Bu rapor sadece plan uretir; dosya tasimaz veya silmez.
+- retire_candidate_high grubu once arsivlenebilir adaydir.
+- retire_candidate_medium grubu ikinci dalga icin manuel gozden gecirilmelidir.
+- keep_review_operational grubunda deploy/live/backup/migration riski olabilir; otomatik tasinmamalidir.
+- Sonraki adim V14B ile retire_candidate_high listesini reports/architecture altindaki manifestten okuyup archive/scripts_retired_YYYYMMDD altina tasimaktir.
