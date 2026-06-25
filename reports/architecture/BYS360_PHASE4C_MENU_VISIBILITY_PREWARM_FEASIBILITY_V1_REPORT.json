@@ -1,0 +1,238 @@
+{
+  "package": "BYS360_PHASE4C_MENU_VISIBILITY_PREWARM_FEASIBILITY_V1",
+  "generated_at": "2026-06-25T10:24:01",
+  "branch": "phase4c-performance-category-scope-v1",
+  "head_before_report_commit": "4296321",
+  "meaningful_git_status_clean_before_report_write": true,
+  "variants": [
+    {
+      "variant": "baseline_inject_first",
+      "returncode": 0,
+      "stdout": "{\"variant\": \"baseline_inject_first\", \"ok\": true, \"measurements\": [{\"label\": \"inject_menu_visibility_baseline\", \"ok\": true, \"elapsed_ms\": 294.819, \"result_type\": \"dict\", \"result_size\": 1, \"keys\": [\"menu_visibility_map\"], \"error\": null}], \"error\": null}",
+      "stderr_tail": "[2026-06-25 10:24:02,730] WARNING in monitoring: Sentry DSN tanimli degil; hata izleme kapali.\n[2026-06-25 10:24:02,740] INFO in startup: Startup ozeti | env=development | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\n[2026-06-25 10:24:02,740] INFO in feedback_followup_scheduler: BYS360 eylem plan� takip zamanlay�c�s� kapal�. Harici script/G�rev Zamanlay�c� kullan�labilir.\n[2026-06-25 10:24:02,740] INFO in audit: Guvenlik ozeti | critical=0 warning=0 info=2\n[2026-06-25 10:24:02,740] INFO in startup_checks: Schema validation SQLite duman/test ortam�nda pas ge�ildi.\n[2026-06-25 10:24:02,740] INFO in notification_mailer: BYS360 Notification Mailer V1 aktif edildi.",
+      "parsed": {
+        "variant": "baseline_inject_first",
+        "ok": true,
+        "measurements": [
+          {
+            "label": "inject_menu_visibility_baseline",
+            "ok": true,
+            "elapsed_ms": 294.819,
+            "result_type": "dict",
+            "result_size": 1,
+            "keys": [
+              "menu_visibility_map"
+            ],
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "parse_error": null
+    },
+    {
+      "variant": "prewarm_app_context_then_inject",
+      "returncode": 0,
+      "stdout": "{\"variant\": \"prewarm_app_context_then_inject\", \"ok\": true, \"measurements\": [{\"label\": \"prewarm_build_menu_visibility_map_app_context\", \"ok\": true, \"elapsed_ms\": 304.158, \"result_type\": \"dict\", \"result_size\": 120, \"keys\": [\"account\", \"admin_users\", \"ai_agent_knowledge\", \"ai_agent_panel\", \"ai_agent_teaching_center\", \"ai_center\", \"ai_teaching_center\", \"announcements\", \"assignments\", \"assistant_module\", \"attendance\", \"criteria\", \"dashboard\", \"db_check\", \"delegation\", \"feedback_actions\", \"feedback_admin\", \"feedback_campaigns\", \"feedback_dashboard\", \"feedback_manager\", \"feedback_meetings\", \"feedback_pulse\", \"feedback_results\", \"genel\", \"general\", \"general_section\", \"hierarchy\", \"home\", \"hr_career_planning\", \"hr_leave_tracking\", \"hr_management\", \"hr_personnel_operations\", \"hr_reports\", \"hr_reward_discipline\", \"leave\", \"logout\", \"messages\", \"my_performance_comparison\", \"notifications\", \"org_units\", \"organization_unit_versions\", \"performance_archive\", \"performance_category_period_integration\", \"performance_category_period_scope\", \"performance_category_scope_visibility\", \"performance_competency_library\", \"performance_criteria\", \"performance_development_guidance\", \"performance_evaluation_live_tracking\", \"performance_evaluation_tasks\"], \"error\": null}, {\"label\": \"inject_menu_visibility_after_app_context_prewarm\", \"ok\": true, \"elapsed_ms\": 10.867, \"result_type\": \"dict\", \"result_size\": 1, \"keys\": [\"menu_visibility_map\"], \"error\": null}], \"error\": null}",
+      "stderr_tail": "[2026-06-25 10:24:04,731] WARNING in monitoring: Sentry DSN tanimli degil; hata izleme kapali.\n[2026-06-25 10:24:04,741] INFO in startup: Startup ozeti | env=development | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\n[2026-06-25 10:24:04,741] INFO in feedback_followup_scheduler: BYS360 eylem plan� takip zamanlay�c�s� kapal�. Harici script/G�rev Zamanlay�c� kullan�labilir.\n[2026-06-25 10:24:04,741] INFO in audit: Guvenlik ozeti | critical=0 warning=0 info=2\n[2026-06-25 10:24:04,741] INFO in startup_checks: Schema validation SQLite duman/test ortam�nda pas ge�ildi.\n[2026-06-25 10:24:04,741] INFO in notification_mailer: BYS360 Notification Mailer V1 aktif edildi.",
+      "parsed": {
+        "variant": "prewarm_app_context_then_inject",
+        "ok": true,
+        "measurements": [
+          {
+            "label": "prewarm_build_menu_visibility_map_app_context",
+            "ok": true,
+            "elapsed_ms": 304.158,
+            "result_type": "dict",
+            "result_size": 120,
+            "keys": [
+              "account",
+              "admin_users",
+              "ai_agent_knowledge",
+              "ai_agent_panel",
+              "ai_agent_teaching_center",
+              "ai_center",
+              "ai_teaching_center",
+              "announcements",
+              "assignments",
+              "assistant_module",
+              "attendance",
+              "criteria",
+              "dashboard",
+              "db_check",
+              "delegation",
+              "feedback_actions",
+              "feedback_admin",
+              "feedback_campaigns",
+              "feedback_dashboard",
+              "feedback_manager",
+              "feedback_meetings",
+              "feedback_pulse",
+              "feedback_results",
+              "genel",
+              "general",
+              "general_section",
+              "hierarchy",
+              "home",
+              "hr_career_planning",
+              "hr_leave_tracking",
+              "hr_management",
+              "hr_personnel_operations",
+              "hr_reports",
+              "hr_reward_discipline",
+              "leave",
+              "logout",
+              "messages",
+              "my_performance_comparison",
+              "notifications",
+              "org_units",
+              "organization_unit_versions",
+              "performance_archive",
+              "performance_category_period_integration",
+              "performance_category_period_scope",
+              "performance_category_scope_visibility",
+              "performance_competency_library",
+              "performance_criteria",
+              "performance_development_guidance",
+              "performance_evaluation_live_tracking",
+              "performance_evaluation_tasks"
+            ],
+            "error": null
+          },
+          {
+            "label": "inject_menu_visibility_after_app_context_prewarm",
+            "ok": true,
+            "elapsed_ms": 10.867,
+            "result_type": "dict",
+            "result_size": 1,
+            "keys": [
+              "menu_visibility_map"
+            ],
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "parse_error": null
+    },
+    {
+      "variant": "prewarm_request_context_then_inject",
+      "returncode": 0,
+      "stdout": "{\"variant\": \"prewarm_request_context_then_inject\", \"ok\": true, \"measurements\": [{\"label\": \"prewarm_build_menu_visibility_map_request_context\", \"ok\": true, \"elapsed_ms\": 295.968, \"result_type\": \"dict\", \"result_size\": 120, \"keys\": [\"account\", \"admin_users\", \"ai_agent_knowledge\", \"ai_agent_panel\", \"ai_agent_teaching_center\", \"ai_center\", \"ai_teaching_center\", \"announcements\", \"assignments\", \"assistant_module\", \"attendance\", \"criteria\", \"dashboard\", \"db_check\", \"delegation\", \"feedback_actions\", \"feedback_admin\", \"feedback_campaigns\", \"feedback_dashboard\", \"feedback_manager\", \"feedback_meetings\", \"feedback_pulse\", \"feedback_results\", \"genel\", \"general\", \"general_section\", \"hierarchy\", \"home\", \"hr_career_planning\", \"hr_leave_tracking\", \"hr_management\", \"hr_personnel_operations\", \"hr_reports\", \"hr_reward_discipline\", \"leave\", \"logout\", \"messages\", \"my_performance_comparison\", \"notifications\", \"org_units\", \"organization_unit_versions\", \"performance_archive\", \"performance_category_period_integration\", \"performance_category_period_scope\", \"performance_category_scope_visibility\", \"performance_competency_library\", \"performance_criteria\", \"performance_development_guidance\", \"performance_evaluation_live_tracking\", \"performance_evaluation_tasks\"], \"error\": null}, {\"label\": \"inject_menu_visibility_after_request_context_prewarm\", \"ok\": true, \"elapsed_ms\": 9.682, \"result_type\": \"dict\", \"result_size\": 1, \"keys\": [\"menu_visibility_map\"], \"error\": null}], \"error\": null}",
+      "stderr_tail": "[2026-06-25 10:24:06,736] WARNING in monitoring: Sentry DSN tanimli degil; hata izleme kapali.\n[2026-06-25 10:24:06,736] INFO in startup: Startup ozeti | env=development | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\n[2026-06-25 10:24:06,736] INFO in feedback_followup_scheduler: BYS360 eylem plan� takip zamanlay�c�s� kapal�. Harici script/G�rev Zamanlay�c� kullan�labilir.\n[2026-06-25 10:24:06,736] INFO in audit: Guvenlik ozeti | critical=0 warning=0 info=2\n[2026-06-25 10:24:06,736] INFO in startup_checks: Schema validation SQLite duman/test ortam�nda pas ge�ildi.\n[2026-06-25 10:24:06,736] INFO in notification_mailer: BYS360 Notification Mailer V1 aktif edildi.",
+      "parsed": {
+        "variant": "prewarm_request_context_then_inject",
+        "ok": true,
+        "measurements": [
+          {
+            "label": "prewarm_build_menu_visibility_map_request_context",
+            "ok": true,
+            "elapsed_ms": 295.968,
+            "result_type": "dict",
+            "result_size": 120,
+            "keys": [
+              "account",
+              "admin_users",
+              "ai_agent_knowledge",
+              "ai_agent_panel",
+              "ai_agent_teaching_center",
+              "ai_center",
+              "ai_teaching_center",
+              "announcements",
+              "assignments",
+              "assistant_module",
+              "attendance",
+              "criteria",
+              "dashboard",
+              "db_check",
+              "delegation",
+              "feedback_actions",
+              "feedback_admin",
+              "feedback_campaigns",
+              "feedback_dashboard",
+              "feedback_manager",
+              "feedback_meetings",
+              "feedback_pulse",
+              "feedback_results",
+              "genel",
+              "general",
+              "general_section",
+              "hierarchy",
+              "home",
+              "hr_career_planning",
+              "hr_leave_tracking",
+              "hr_management",
+              "hr_personnel_operations",
+              "hr_reports",
+              "hr_reward_discipline",
+              "leave",
+              "logout",
+              "messages",
+              "my_performance_comparison",
+              "notifications",
+              "org_units",
+              "organization_unit_versions",
+              "performance_archive",
+              "performance_category_period_integration",
+              "performance_category_period_scope",
+              "performance_category_scope_visibility",
+              "performance_competency_library",
+              "performance_criteria",
+              "performance_development_guidance",
+              "performance_evaluation_live_tracking",
+              "performance_evaluation_tasks"
+            ],
+            "error": null
+          },
+          {
+            "label": "inject_menu_visibility_after_request_context_prewarm",
+            "ok": true,
+            "elapsed_ms": 9.682,
+            "result_type": "dict",
+            "result_size": 1,
+            "keys": [
+              "menu_visibility_map"
+            ],
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "parse_error": null
+    },
+    {
+      "variant": "prewarm_no_context",
+      "returncode": 1,
+      "stdout": "{\"variant\": \"prewarm_no_context\", \"ok\": false, \"measurements\": [{\"label\": \"prewarm_build_menu_visibility_map_no_context\", \"ok\": false, \"elapsed_ms\": 0.008, \"result_type\": null, \"result_size\": null, \"keys\": [], \"error\": \"RuntimeError('Working outside of application context.\\\\n\\\\nThis typically means that you attempted to use functionality that needed\\\\nthe current application. To solve this, set up an application context\\\\nwith app.app_context(). See the documentation for more information.')\"}], \"error\": null}",
+      "stderr_tail": "[2026-06-25 10:24:08,725] WARNING in monitoring: Sentry DSN tanimli degil; hata izleme kapali.\n[2026-06-25 10:24:08,725] INFO in startup: Startup ozeti | env=development | db=sqlite | maintenance=off | route_count=6 | schema_errors=0 | core_scope=7 | removed_scope=3\n[2026-06-25 10:24:08,725] INFO in feedback_followup_scheduler: BYS360 eylem plan� takip zamanlay�c�s� kapal�. Harici script/G�rev Zamanlay�c� kullan�labilir.\n[2026-06-25 10:24:08,725] INFO in audit: Guvenlik ozeti | critical=0 warning=0 info=2\n[2026-06-25 10:24:08,725] INFO in startup_checks: Schema validation SQLite duman/test ortam�nda pas ge�ildi.\n[2026-06-25 10:24:08,735] INFO in notification_mailer: BYS360 Notification Mailer V1 aktif edildi.",
+      "parsed": {
+        "variant": "prewarm_no_context",
+        "ok": false,
+        "measurements": [
+          {
+            "label": "prewarm_build_menu_visibility_map_no_context",
+            "ok": false,
+            "elapsed_ms": 0.008,
+            "result_type": null,
+            "result_size": null,
+            "keys": [],
+            "error": "RuntimeError('Working outside of application context.\\n\\nThis typically means that you attempted to use functionality that needed\\nthe current application. To solve this, set up an application context\\nwith app.app_context(). See the documentation for more information.')"
+          }
+        ],
+        "error": null
+      },
+      "parse_error": null
+    }
+  ],
+  "classification": {
+    "baseline_over_100ms": true,
+    "app_context_prewarm_ok": true,
+    "request_context_prewarm_ok": true,
+    "no_context_prewarm_ok": false,
+    "app_context_prewarm_reduces_inject_under_50ms": true,
+    "request_context_prewarm_reduces_inject_under_50ms": true,
+    "safe_startup_prewarm_candidate": true
+  },
+  "profile_ok": true,
+  "error": null
+}
