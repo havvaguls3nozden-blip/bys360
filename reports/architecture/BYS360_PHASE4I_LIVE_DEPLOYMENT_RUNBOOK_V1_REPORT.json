@@ -1,0 +1,80 @@
+{
+  "package": "BYS360_PHASE4I_LIVE_DEPLOYMENT_RUNBOOK_V1",
+  "generated_at": "2026-06-25T12:46:05",
+  "branch": "phase4i-live-deployment-runbook-v1",
+  "head_before_report_commit": "9635fb3",
+  "status_clean_before_report": false,
+  "release_package": {
+    "zip_path": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip",
+    "exists": true,
+    "size_bytes": 17450218,
+    "sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+    "sha256_matches": true
+  },
+  "required_tags": {
+    "phase4f-release-freeze-clean-v2-pass-20260625": true,
+    "phase4g-release-manifest-v2-pass-20260625": true,
+    "phase4h-live-deployment-readiness-v2-pass-20260625": true
+  },
+  "live_deploy_status": "Canlıya dağıtım yapılmadı. Bu rapor sadece canlıya alma runbook dokümanıdır.",
+  "do_not_use": [
+    "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip"
+  ],
+  "runbook_steps": [
+    {
+      "step": 1,
+      "title": "Canlı yedek al",
+      "commands": [
+        "New-Item -ItemType Directory -Force C:\\bys360\\backups\\phase4i | Out-Null",
+        "Compress-Archive -Path C:\\bys360\\project\\* -DestinationPath C:\\bys360\\backups\\phase4i\\bys360_live_files_backup_$(Get-Date -Format yyyyMMdd_HHmmss).zip"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "PostgreSQL yedeği al",
+      "note": "Canlı DB adı/kullanıcısı .env üzerinden doğrulanmalı; pg_dump komutu canlı bağlantı bilgisine göre çalıştırılmalı."
+    },
+    {
+      "step": 3,
+      "title": "message_comments tablo kontrolü",
+      "note": "Phase4A portal yorum/beğeni için canlı PostgreSQL üzerinde message_comments tablosu yoksa migration uygulanmalı."
+    },
+    {
+      "step": 4,
+      "title": "Clean V2 zip doğrula",
+      "commands": [
+        "Get-FileHash C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip -Algorithm SHA256"
+      ],
+      "expected_sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573"
+    },
+    {
+      "step": 5,
+      "title": "Canlı dosyaları güncelle",
+      "note": "Canlı .env korunmalı. Zip içeriği uygulama koduna açılmalı; .env zipten gelmemelidir."
+    },
+    {
+      "step": 6,
+      "title": "Canlı görevi yeniden başlat",
+      "task_name": "BYS360 Live Waitress 80"
+    },
+    {
+      "step": 7,
+      "title": "Canlı smoke kontrolleri",
+      "urls": [
+        "http://127.0.0.1/login",
+        "https://bys360.canakkaletarihialan.gov.tr/login",
+        "https://bys360.canakkaletarihialan.gov.tr/portal",
+        "https://bys360.canakkaletarihialan.gov.tr/messages",
+        "https://bys360.canakkaletarihialan.gov.tr/performance/v2-1-4-category-scope"
+      ]
+    }
+  ],
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_report": false,
+    "required_tags_ok": true,
+    "release_zip_exists": true,
+    "release_zip_sha256_matches": true
+  },
+  "runbook_ok": false
+}
