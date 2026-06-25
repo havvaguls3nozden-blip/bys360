@@ -1,0 +1,60 @@
+{
+  "package": "BYS360_PHASE4H_LIVE_DEPLOYMENT_READINESS_V2",
+  "generated_at": "2026-06-25T12:44:22",
+  "branch": "phase4h-live-deployment-readiness-v1",
+  "head_before_report_commit": "2c22b8d",
+  "meaningful_git_status_clean_before_report": true,
+  "ignored_status": [
+    "?? _phase4h_live_deployment_readiness_v2.py"
+  ],
+  "release_zip": {
+    "exists": true,
+    "size_bytes": 17450218,
+    "sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+    "readable": true,
+    "entry_count": 3479,
+    "required_entries": {
+      "app/__init__.py": true,
+      "app/templates/errors/405.html": true,
+      "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_V2_REPORT.json": true,
+      "reports/architecture/BYS360_PHASE4F_RELEASE_FREEZE_V1_REPORT.json": true
+    },
+    "missing_required_entries": [],
+    "error": null
+  },
+  "expected_sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+  "required_tags": {
+    "phase4d-offline-integration-gate-pass-20260625": true,
+    "phase4e-release-preflight-pass-20260625": true,
+    "phase4f-release-freeze-clean-v2-pass-20260625": true,
+    "phase4g-release-manifest-v2-pass-20260625": true
+  },
+  "required_repo_reports": {
+    "reports/architecture/BYS360_PHASE4G_RELEASE_MANIFEST_V2_REPORT.json": true,
+    "reports/architecture/BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_REPORT.json": true,
+    "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_V2_REPORT.json": true
+  },
+  "live_deploy_status": "Canlıya dağıtım yapılmadı. Bu sadece hazırlık kontrolüdür.",
+  "deployment_package_to_use": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip",
+  "deployment_package_not_to_use": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+  "v1_correction_note": "Phase4H V1 raporu zip içinde Phase4G manifest aradığı için readiness_ok=false kalmıştır. Manifest raporu zip üretiminden sonra oluştuğundan bu kontrol V2'de repo raporu olarak doğrulanmıştır.",
+  "must_do_before_live": [
+    "Canlı uygulama klasörü yedeklenecek.",
+    "Canlı PostgreSQL veritabanı yedeklenecek.",
+    "Canlı .env dosyası korunacak; zip içinden .env gelmeyecek.",
+    "message_comments tablosu canlı PostgreSQL üzerinde kontrol edilecek; yoksa migration uygulanacak.",
+    "Windows Görev Zamanlayıcı görevi: BYS360 Live Waitress 80 doğrulanacak.",
+    "Yükleme sonrası /login, /portal, /messages, /performance/v2-1-4-category-scope smoke yapılacak."
+  ],
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_report": true,
+    "required_tags_ok": true,
+    "required_repo_reports_ok": true,
+    "zip_exists": true,
+    "zip_readable": true,
+    "zip_sha256_matches": true,
+    "zip_required_entries_ok": true
+  },
+  "readiness_ok": true
+}
