@@ -1,0 +1,686 @@
+{
+  "phase": "phase4j-final-ops-routes-inventory-v11",
+  "generated_at": "2026-06-25T14:37:39",
+  "target": "app/admin/ops_routes.py",
+  "target_lines": 291,
+  "target_kb": 10.0,
+  "function_count": 16,
+  "route_function_count": 15,
+  "helper_function_count": 1,
+  "largest_functions": [
+    {
+      "name": "personnel_toggle_active",
+      "line_start": 207,
+      "line_end": 224,
+      "line_count": 18,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])"
+      ],
+      "call_names": [
+        "bool",
+        "commit",
+        "flash",
+        "get",
+        "hasattr",
+        "menu_key_required",
+        "redirect",
+        "rollback",
+        "route",
+        "url_for"
+      ]
+    },
+    {
+      "name": "personnel_delete",
+      "line_start": 231,
+      "line_end": 245,
+      "line_count": 15,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "commit",
+        "flash",
+        "get",
+        "getattr",
+        "menu_key_required",
+        "redirect",
+        "rollback",
+        "route",
+        "safe_delete_user_by_id",
+        "url_for"
+      ]
+    },
+    {
+      "name": "ensure_not_self_target",
+      "line_start": 288,
+      "line_end": 290,
+      "line_count": 3,
+      "decorators": [],
+      "is_route": false,
+      "route_decorators": [],
+      "call_names": [
+        "ValueError",
+        "str"
+      ]
+    },
+    {
+      "name": "admin_user_change_photo",
+      "line_start": 112,
+      "line_end": 113,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_change_photo_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_toggle_active",
+      "line_start": 120,
+      "line_end": 121,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_toggle_active_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_archive",
+      "line_start": 128,
+      "line_end": 129,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_archive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_delete",
+      "line_start": 136,
+      "line_end": 137,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_delete_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_delete",
+      "line_start": 144,
+      "line_end": 145,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_delete_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_archive",
+      "line_start": 152,
+      "line_end": 153,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_archive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_passive",
+      "line_start": 160,
+      "line_end": 161,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_passive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_import",
+      "line_start": 168,
+      "line_end": 169,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])"
+      ],
+      "call_names": [
+        "admin_user_import_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_import_health_report",
+      "line_start": 176,
+      "line_end": 177,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/import-health-report')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/import-health-report')"
+      ],
+      "call_names": [
+        "admin_import_health_report_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_reset_all",
+      "line_start": 184,
+      "line_end": 185,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_reset_all_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "performance_hierarchy_bulk_assign",
+      "line_start": 191,
+      "line_end": 192,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])",
+        "login_required",
+        "admin_required"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])"
+      ],
+      "call_names": [
+        "performance_hierarchy_bulk_assign_impl",
+        "route"
+      ]
+    },
+    {
+      "name": "download_personnel_template",
+      "line_start": 199,
+      "line_end": 200,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/personnel/template/download')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/template/download')"
+      ],
+      "call_names": [
+        "download_personnel_template_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "personnel_profile",
+      "line_start": 252,
+      "line_end": 253,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')"
+      ],
+      "call_names": [
+        "menu_key_required",
+        "personnel_profile_impl",
+        "route"
+      ]
+    }
+  ],
+  "largest_routes": [
+    {
+      "name": "personnel_toggle_active",
+      "line_start": 207,
+      "line_end": 224,
+      "line_count": 18,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/toggle-active', methods=['POST'])"
+      ],
+      "call_names": [
+        "bool",
+        "commit",
+        "flash",
+        "get",
+        "hasattr",
+        "menu_key_required",
+        "redirect",
+        "rollback",
+        "route",
+        "url_for"
+      ]
+    },
+    {
+      "name": "personnel_delete",
+      "line_start": 231,
+      "line_end": 245,
+      "line_count": 15,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "commit",
+        "flash",
+        "get",
+        "getattr",
+        "menu_key_required",
+        "redirect",
+        "rollback",
+        "route",
+        "safe_delete_user_by_id",
+        "url_for"
+      ]
+    },
+    {
+      "name": "admin_user_change_photo",
+      "line_start": 112,
+      "line_end": 113,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/photo', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_change_photo_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_toggle_active",
+      "line_start": 120,
+      "line_end": 121,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/toggle-active', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_toggle_active_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_archive",
+      "line_start": 128,
+      "line_end": 129,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/archive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_archive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_delete",
+      "line_start": 136,
+      "line_end": 137,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_user_delete_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_delete",
+      "line_start": 144,
+      "line_end": 145,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-delete', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_delete_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_archive",
+      "line_start": 152,
+      "line_end": 153,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-archive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_archive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_bulk_passive",
+      "line_start": 160,
+      "line_end": 161,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/bulk-passive', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_bulk_passive_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_user_import",
+      "line_start": 168,
+      "line_end": 169,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/import', methods=['GET', 'POST'])"
+      ],
+      "call_names": [
+        "admin_user_import_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_import_health_report",
+      "line_start": 176,
+      "line_end": 177,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/import-health-report')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/import-health-report')"
+      ],
+      "call_names": [
+        "admin_import_health_report_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "admin_users_reset_all",
+      "line_start": 184,
+      "line_end": 185,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/admin/users/reset-all', methods=['POST'])"
+      ],
+      "call_names": [
+        "admin_users_reset_all_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "performance_hierarchy_bulk_assign",
+      "line_start": 191,
+      "line_end": 192,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])",
+        "login_required",
+        "admin_required"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/performance/hierarchy-settings/bulk-assign', methods=['POST'])"
+      ],
+      "call_names": [
+        "performance_hierarchy_bulk_assign_impl",
+        "route"
+      ]
+    },
+    {
+      "name": "download_personnel_template",
+      "line_start": 199,
+      "line_end": 200,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/personnel/template/download')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/template/download')"
+      ],
+      "call_names": [
+        "download_personnel_template_impl",
+        "menu_key_required",
+        "route"
+      ]
+    },
+    {
+      "name": "personnel_profile",
+      "line_start": 252,
+      "line_end": 253,
+      "line_count": 2,
+      "decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')",
+        "login_required",
+        "admin_required",
+        "menu_key_required('admin_users')"
+      ],
+      "is_route": true,
+      "route_decorators": [
+        "main_bp.route('/personnel/<int:user_id>/profile')"
+      ],
+      "call_names": [
+        "menu_key_required",
+        "personnel_profile_impl",
+        "route"
+      ]
+    }
+  ],
+  "completion_note": [
+    "ops_routes.py 1220 satirdan 291 satir seviyesine indirildi.",
+    "Agir route govdeleri helper/service dosyalarina ayrildi.",
+    "Kalan route fonksiyonlari buyuk olasilikla ince wrapper veya kucuk operasyon fonksiyonlaridir."
+  ]
+}
