@@ -1,0 +1,192 @@
+# BYS360 Post Phase4J Reference-Aware Script Retirement V14B
+- Generated at: 2026-06-25T17:01:44
+- Current total active script candidates: 361
+- Classified count: 277
+
+## Decision Counts
+- archive_wave1_safe: 47
+- archive_wave2_review: 18
+- keep_review_operational_risk: 12
+- keep_review_referenced: 150
+- keep_review_unknown: 50
+
+## Projection
+- after_wave1_safe: 314
+- after_wave1_all: 314
+- after_wave1_and_wave2_safe: 314
+- after_wave1_and_wave2_all: 296
+- goal_under_100: False
+
+## Archive Wave1 Safe
+- scripts/communication/repair_cic_v4_1b_force_pro_ui.py | 420 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_cic_v4_2c_active_passive_hard_patch.py | 2 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_cic_v4_6b_celebrations_template_final_fix.py | 89 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_11_template_compat_fix.py | 216 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_3_flat_css_link_fix.py | 196 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_daily_weather_mail_v1_0.py | 251 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/communication/repair_daily_weather_mail_v1_0_5_premium_exec_menu.py | 374 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/maintenance/repair_bys360_developer_comment_cleanup_v2_17_67.py | 293 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/maintenance/run_bys360_final_gate_v2_17_69.py | 556 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/maintenance/run_bys360_final_gate_v2_17_70.py | 372 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10a_phase_dev_debug_audit.py | 324 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10b_phase_dev_debug_precision_audit.py | 279 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10f_cleanup_candidate_precision_plan.py | 283 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10i_remaining_runtime_rename_keep_plan.py | 229 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10k_remaining_low_risk_rename_plan.py | 133 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10p_compat_wrapper_rename_plan.py | 237 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10r2_final_tech_debt_clean_zip.py | 198 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10r3_canonical_evidence_manifest.py | 191 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a10r_final_tech_debt_evidence.py | 388 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a11a2_warning_audit_triage.py | 213 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a11a_warning_audit.py | 249 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a11b2_resource_warning_fix.py | 422 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a11b_resource_warning_fix.py | 364 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a11c_warning_zero_final_evidence.py | 424 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a12a_ui_technical_language_audit.py | 306 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a12b_ui_technical_language_precision_audit.py | 413 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a13b_ui_design_system_consolidation_plan.py | 401 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_a85_contract_failure_and_mobile_route_diagnosis.py | 508 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_android_responsive_inventory_precision_gate_p6c.py | 312 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_ci_active_architecture_gate_p2f.py | 271 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_claude_score_uplift_p0e_final_secret_gate.py | 338 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_claude_score_uplift_p0f_secret_gate_final.py | 81 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_mobile_release_evidence_gate_p4e.py | 372 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2a_architecture_debt_map.py | 779 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2b_route_snapshot_contract.py | 733 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2c2_mobile_shared_wildcard_apply.py | 498 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2c3_auth_explicit_import_apply.py | 327 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2c3_final_closure_evidence.py | 314 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2c4_facade_exception_closure_evidence.py | 274 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase2c4_mobile_routes_shared_facade_apply.py | 458 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_phase3d_full_gate_bundle_v1.py | 199 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0b2_secret_risk_decision_matrix.py | 439 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0b_secret_signal_classification_audit.py | 442 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0c2_config_secretkey_exc_final_evidence.py | 464 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0f1_pip_audit_remediation_plan.py | 504 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0f2_pip_audit_wave1_runtime_verify.py | 422 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+- scripts/quality/bys360_s0g_old_venv_archive_cleanup.py | 501 lines | High retire adayi, guvenli script klasorunde ve referans bulunmadi.
+
+## Archive Wave1 Review
+- none
+
+## Keep / Review Referenced or Risky
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_6_quality_script_repair.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/communication/run_corporate_information_center_task_v3_0_phase2.py | decision=keep_review_referenced | refs=1 | risky=True
+- scripts/communication/seed_corporate_information_center_recipients_v3_0_phase2_1.py | decision=keep_review_operational_risk | refs=0 | risky=True
+- scripts/quality/bys360_a10c_hard_ui_technical_language_plan.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_a85g_repo_cleanup_audit.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_android_responsive_baseline_gate_p5a.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_android_responsive_final_evidence_gate_p5f.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d_v2.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b_v2.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_android_responsive_visual_regression_gate_p6a.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_android_responsive_visual_uat_evidence_gate_p5e.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_architecture_scope_gate_p2e.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_handover_docs_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py | decision=keep_review_referenced | refs=8 | risky=False
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py | decision=keep_review_referenced | refs=6 | risky=False
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py | decision=keep_review_referenced | refs=6 | risky=False
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/quality/bys360_mobile_security_evidence_gate_p4d.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_ops_audit.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_phase2_auth_smoke_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase2c1_wildcard_import_explicit_plan.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/quality/bys360_phase3_route_density_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py | decision=keep_review_referenced | refs=1 | risky=True
+- scripts/quality/bys360_phase3c_compact_route_service_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase3c_note_route_service_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase3c_score_route_service_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase3c_summary_risk_route_service_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_phase3c_task_detail_route_service_gate_v1.py | decision=keep_review_referenced | refs=2 | risky=True
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/bys360_pytest_standard_gate_p2d.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/bys360_quality9_ci_gate.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_s0a_claude_findings_verification_audit.py | decision=keep_review_referenced | refs=5 | risky=False
+- scripts/quality/bys360_score100_quality_gate_v1.py | decision=keep_review_referenced | refs=4 | risky=False
+- scripts/quality/bys360_secret_repo_gate.py | decision=keep_review_referenced | refs=48 | risky=False
+- scripts/quality/check_bys360_android_responsive_completion_v2.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/check_claude_phase7_final_gate.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/quality/check_corporate_information_center_v3_0_phase3_dispatch.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/check_corporate_information_center_v3_0_phase5_control_panel.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/check_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/quality/check_corporate_information_center_v3_0_phase7_4_release_pro_ui.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/executive/repair_exec_summary_daily_mail_tasks_v1_3_2_force_template.py | decision=keep_review_operational_risk | refs=0 | risky=True
+- scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py | decision=keep_review_operational_risk | refs=0 | risky=True
+- scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase1_rule_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase5_scorecard_ui_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase6_low_score_process_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase7_scorecard_archive_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase8_midterm_feedback_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/performance/repair_bys360_performance_completion_phase2_category_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/repair_bys360_performance_completion_phase3_visibility_center.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/performance/repair_bys360_performance_completion_phase9_development_guidance_center.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/portal/repair_bys360_portal_experience_v3a1_press_news_sidebar.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/repair_bys360_portal_delete_route_dedupe_v2_10_1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/repair_bys360_portal_profile_me_link_v2_10_4.py | decision=keep_review_referenced | refs=1 | risky=False
+- run_server.py | decision=keep_review_referenced | refs=2 | risky=False
+- scripts/admin/check_system_admin_email_v2_16_0.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/apply_bys360_corporate_portal_v1.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/bys360_mobile_v2_8_73_quality_router_fcm_tests.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/check_bys360_compileall_legacy_script_syntax_v2_13_3.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/check_bys360_feedback_campaign_form_v2_13_2.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/check_bys360_feedback_center_v2_13_0.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/check_bys360_mobile_v2_8_74_android_release_ready_p0.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/check_bys360_mobile_v2_8_75_app_maturity_p1.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/check_bys360_portal_instagram_full_hide_v2_11_8.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/check_bys360_portal_instagram_hide_v2_11_7.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py | decision=keep_review_referenced | refs=5 | risky=True
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py | decision=keep_review_referenced | refs=4 | risky=True
+- scripts/communication/run_corporate_information_center_task.py | decision=keep_review_referenced | refs=1 | risky=True
+- scripts/communication/run_corporate_information_task.py | decision=keep_review_referenced | refs=1 | risky=True
+- scripts/communication/run_executive_mail_center_v2.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_1.py | decision=keep_review_operational_risk | refs=0 | risky=True
+- scripts/communication/seed_daily_mail_pilot_recipients_v1_2.py | decision=keep_review_operational_risk | refs=0 | risky=True
+- scripts/communication/send_daily_evening_tomorrow_mail.py | decision=keep_review_referenced | refs=3 | risky=False
+- scripts/communication/send_daily_pulse_check_mail.py | decision=keep_review_referenced | refs=7 | risky=False
+- scripts/communication/send_daily_weather_personnel_mail.py | decision=keep_review_referenced | refs=9 | risky=False
+- scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py | decision=keep_review_referenced | refs=1 | risky=False
+- scripts/executive/check_executive_summary_advanced_v2_14_20.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/executive/check_executive_summary_advanced_v2_14_21.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/executive/probe_exec_summary_routes_v1_3_3.py | decision=keep_review_unknown | refs=0 | risky=False
+- scripts/executive/seed_executive_summary_menu_v2_14_8.py | decision=keep_review_referenced | refs=3 | risky=True
+- scripts/executive/send_daily_executive_summary.py | decision=keep_review_referenced | refs=6 | risky=False
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py | decision=keep_review_referenced | refs=2 | risky=True
