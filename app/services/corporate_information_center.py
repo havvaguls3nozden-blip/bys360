@@ -156,58 +156,34 @@ BYS360""",
 }
 
 
-def _now() -> datetime:
-    return datetime.now()
+# Phase4J V26E CIC config_context facade imports
+from app.services.cic.config_context import (
+    _clean_ids,
+    _clothing,
+    _dumps_json,
+    _ensure_defaults_base,
+    _format_weather,
+    _has_settings_table,
+    _loads_json,
+    _now,
+    _tomorrow_note,
+    _weather,
+    ensure_defaults,
+    get_config,
+    get_setting,
+    set_setting,
+)
 
 
-def _has_settings_table() -> bool:
-    try:
-        from sqlalchemy import inspect as sa_inspect
-        return bool(sa_inspect(db.engine).has_table("system_settings"))
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:168")
-        return False
 
 
-def get_setting(key: str, default: str = "") -> str:
-    if not _has_settings_table():
-        return default
-    row = SystemSetting.query.filter_by(setting_key=key).first()
-    if not row:
-        return default
-    return row.value_text if row.value_text is not None else default
 
 
-def set_setting(key: str, value: str, *, label: str | None = None, description: str | None = None, value_type: str = "string", actor_user_id: int | None = None) -> None:
-    if not _has_settings_table():
-        return
-    row = SystemSetting.query.filter_by(setting_key=key).first()
-    if not row:
-        row = SystemSetting(setting_key=key, group_key=GROUP_KEY, label=label or key, value_type=value_type, description=description or "")
-        db.session.add(row)
-    row.value_text = value
-    row.group_key = GROUP_KEY
-    row.label = label or row.label or key
-    row.value_type = value_type or row.value_type or "string"
-    if description is not None:
-        row.description = description
-    if actor_user_id is not None:
-        row.updated_by_user_id = actor_user_id
 
 
-def _loads_json(key: str, default: Any) -> Any:
-    raw = get_setting(key, "")
-    if not raw:
-        return default
-    try:
-        return json.loads(raw)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:204")
-        return default
 
 
-def _dumps_json(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, indent=2)
+
 
 
 def can_manage(user: Any) -> bool:
@@ -217,76 +193,10 @@ def can_manage(user: Any) -> bool:
     return role in ADMIN_ROLES
 
 
-def _ensure_defaults_base(actor_user_id: int | None = None) -> None:
-    tasks = _loads_json(f"{BASE_KEY}.tasks", None)
-    if not isinstance(tasks, dict):
-        tasks = {}
-    changed = False
-    for key, meta in TASK_DEFINITIONS.items():
-        if key not in tasks or not isinstance(tasks.get(key), dict):
-            tasks[key] = {
-                "enabled": True,
-                "hour": meta["default_hour"],
-                "minute": meta["default_minute"],
-                "recipient_group": meta["recipient_group"],
-                "last_status": "Henüz çalışmadı",
-                "last_run_at": "",
-            }
-            changed = True
-        else:
-            for f, default in (("enabled", True), ("hour", meta["default_hour"]), ("minute", meta["default_minute"]), ("recipient_group", meta["recipient_group"])):
-                if f not in tasks[key]:
-                    tasks[key][f] = default
-                    changed = True
-    if changed:
-        set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
-
-    if get_setting(f"{BASE_KEY}.staff_recipient_mode", "") == "":
-        set_setting(f"{BASE_KEY}.staff_recipient_mode", "manual", label="Personel alıcı modu", value_type="string", actor_user_id=actor_user_id)
-    if get_setting(f"{BASE_KEY}.manager_recipient_ids", "") == "":
-        set_setting(f"{BASE_KEY}.manager_recipient_ids", "[]", label="Yönetici alıcıları", value_type="json", actor_user_id=actor_user_id)
-    if get_setting(f"{BASE_KEY}.staff_recipient_ids", "") == "":
-        set_setting(f"{BASE_KEY}.staff_recipient_ids", "[]", label="Personel alıcıları", value_type="json", actor_user_id=actor_user_id)
-    if get_setting(f"{BASE_KEY}.location_name", "") == "":
-        set_setting(f"{BASE_KEY}.location_name", "Çanakkale", label="Hava durumu konumu", actor_user_id=actor_user_id)
-    if get_setting(f"{BASE_KEY}.latitude", "") == "":
-        set_setting(f"{BASE_KEY}.latitude", "40.1553", label="Enlem", actor_user_id=actor_user_id)
-    if get_setting(f"{BASE_KEY}.longitude", "") == "":
-        set_setting(f"{BASE_KEY}.longitude", "26.4142", label="Boylam", actor_user_id=actor_user_id)
-    for key, meta in TASK_DEFINITIONS.items():
-        s_key = f"{BASE_KEY}.template.{key}.subject"
-        b_key = f"{BASE_KEY}.template.{key}.body"
-        if get_setting(s_key, "") == "":
-            set_setting(s_key, meta["subject"], label=f"{meta['label']} konusu", actor_user_id=actor_user_id)
-        if get_setting(b_key, "") == "":
-            set_setting(b_key, meta["body"], label=f"{meta['label']} metni", value_type="text", actor_user_id=actor_user_id)
-    db.session.commit()
 
 
-def get_config() -> dict[str, Any]:
-    ensure_defaults()
-    return {
-        "tasks": _loads_json(f"{BASE_KEY}.tasks", {}),
-        "staff_recipient_mode": get_setting(f"{BASE_KEY}.staff_recipient_mode", "manual") or "manual",
-        "manager_recipient_ids": _clean_ids(_loads_json(f"{BASE_KEY}.manager_recipient_ids", [])),
-        "staff_recipient_ids": _clean_ids(_loads_json(f"{BASE_KEY}.staff_recipient_ids", [])),
-        "location_name": get_setting(f"{BASE_KEY}.location_name", "Çanakkale") or "Çanakkale",
-        "latitude": get_setting(f"{BASE_KEY}.latitude", "40.1553") or "40.1553",
-        "longitude": get_setting(f"{BASE_KEY}.longitude", "26.4142") or "26.4142",
-    }
 
 
-def _clean_ids(values: Any) -> list[int]:
-    out: list[int] = []
-    for v in values or []:
-        try:
-            iv = int(v)
-            if iv not in out:
-                out.append(iv)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:288")
-            pass
-    return out
 
 
 def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
@@ -394,64 +304,12 @@ def get_recipients() -> dict[str, Any]:
     return {"managers": managers, "staff": staff, "staff_mode": cfg["staff_recipient_mode"]}
 
 
-def _weather() -> dict[str, str]:
-    cfg = get_config()
-    lat = cfg["latitude"]
-    lon = cfg["longitude"]
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=auto&forecast_days=2"
-    try:
-        with urlopen(url, timeout=8, context=ssl.create_default_context()) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        cur = data.get("current_weather", {}) or {}
-        daily = data.get("daily", {}) or {}
-        today = _format_weather(cur.get("temperature"), daily, 0)
-        tomorrow = _format_weather(None, daily, 1)
-        temp = cur.get("temperature")
-        return {
-            "bugun_hava": today,
-            "yarin_hava": tomorrow,
-            "kiyafet_onerisi": _clothing(temp),
-            "yarin_oneri": _tomorrow_note(tomorrow),
-        }
-    except Exception as exc:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:426")
-        msg = f"Güncel hava durumu verisi şu anda alınamadı. Kontrol notu: {exc}"
-        return {"bugun_hava": msg, "yarin_hava": msg, "kiyafet_onerisi": "Hava değişimlerine karşı hazırlıklı olunması önerilir.", "yarin_oneri": "Sabah çıkmadan güncel hava durumunu kontrol ediniz."}
 
 
-def _format_weather(current_temp: Any, daily: dict[str, Any], idx: int) -> str:
-    mins = daily.get("temperature_2m_min") or []
-    maxs = daily.get("temperature_2m_max") or []
-    probs = daily.get("precipitation_probability_max") or []
-    parts = []
-    if current_temp is not None:
-        parts.append(f"Anlık sıcaklık: {current_temp}°C")
-    if idx < len(mins) and idx < len(maxs):
-        parts.append(f"Beklenen aralık: {mins[idx]}°C / {maxs[idx]}°C")
-    if idx < len(probs):
-        parts.append(f"Yağış olasılığı: %{probs[idx]}")
-    return "\n".join(parts) if parts else "Hava durumu verisi sınırlı olarak alınabildi."
 
 
-def _clothing(temp: Any) -> str:
-    try:
-        t = float(temp)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:448")
-        return "Katmanlı ve mevsime uygun kıyafet tercih edilmesi önerilir."
-    if t < 8:
-        return "Kalın mont, kapalı ayakkabı ve soğuğa karşı koruyucu kıyafet önerilir."
-    if t < 16:
-        return "Sabah saatleri için ceket veya hırka önerilir."
-    if t < 25:
-        return "Hafif bir üstlük bulundurmak yeterli olabilir."
-    return "Hafif, rahat ve hava alan kıyafet tercih edilebilir; su tüketimine dikkat edilmelidir."
 
 
-def _tomorrow_note(weather_text: str) -> str:
-    if "Yağış olasılığı" in weather_text:
-        return "Yarın için ulaşım ve dış görev planlarında hava durumunu dikkate alınız."
-    return "Yarınki mesai için planlamalarınızı güncel hava durumuna göre yapabilirsiniz."
 
 
 def _dashboard_counts() -> dict[str, str]:
@@ -1683,33 +1541,6 @@ def ensure_celebration_schema() -> dict[str, object]:
     return result
 
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_BEGIN
-def ensure_defaults(actor_user_id: int | None = None) -> None:
-    """Ensure CIC default settings through one explicit public layer."""
-    _ensure_defaults_base(actor_user_id=actor_user_id)
-
-    defaults = {
-        "celebrations_enabled": ("true", "Ak\u0131ll\u0131 kutlama motoru", "boolean"),
-        "birthday_enabled": ("true", "Do\u011fum g\u00fcn\u00fc kutlamalar\u0131", "boolean"),
-        "work_anniversary_enabled": ("true", "G\u00f6reve ba\u015flama y\u0131l d\u00f6n\u00fcm\u00fc kutlamalar\u0131", "boolean"),
-        "special_day_enabled": ("true", "\u00d6zel g\u00fcn bilgilendirmeleri", "boolean"),
-        "celebration_system_notifications_enabled": ("true", "Kutlamalar\u0131 sistem i\u00e7i bildirim olarak da olu\u015ftur", "boolean"),
-        "celebrations_include_weekend": ("false", "Hafta sonu kutlamalar\u0131 otomatik \u00e7al\u0131\u015fs\u0131n", "boolean"),
-        "special_day_recipient_mode": ("all_active", "\u00d6zel g\u00fcn hedef kitlesi", "string"),
-        "special_days": (_dumps_json(_CIC_V40_SPECIAL_DAY_DEFAULTS), "\u00d6zel g\u00fcn takvimi", "json"),
-    }
-
-    changed = False
-    for key, (value, label, value_type) in defaults.items():
-        full_key = f"{BASE_KEY}.{key}"
-        if get_setting(full_key, "") == "":
-            set_setting(full_key, value, label=label, value_type=value_type, actor_user_id=actor_user_id)
-            changed = True
-
-    if changed:
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_END
 
 def _cic_v40_special_days() -> list[dict[str, object]]:
