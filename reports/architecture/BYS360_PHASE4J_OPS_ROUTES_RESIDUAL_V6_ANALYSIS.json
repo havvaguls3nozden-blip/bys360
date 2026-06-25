@@ -1,6 +1,6 @@
 {
   "phase": "phase4j-ops-routes-residual-analysis-v6",
-  "generated_at": "2026-06-25T13:56:00",
+  "generated_at": "2026-06-25T14:01:06",
   "target": "app/admin/ops_routes.py",
   "target_lines": 614,
   "target_kb": 23.1,
