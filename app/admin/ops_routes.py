@@ -48,6 +48,7 @@ from .ops_helpers import (
 )
 from .ops_health_services import admin_import_health_report_impl
 from .ops_import_services import admin_user_import_impl
+from .ops_personnel_services import download_personnel_template_impl
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_modular_main_blueprint_routes"
@@ -403,73 +404,7 @@ def performance_hierarchy_bulk_assign():
 @admin_required
 @menu_key_required("admin_users")
 def download_personnel_template():
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Personel Şablonu"
-
-    headers = [
-        "Sicil No",
-        "Ad",
-        "Soyad",
-        "E-Posta",
-        "Unvan",
-        "Birim",
-        "Üst Birim",
-        "Rol (opsiyonel)",
-        "Yönetici Sicil (opsiyonel)",
-        "İkinci Yönetici Sicil (opsiyonel)",
-        "Üçüncü Yönetici Sicil (opsiyonel)",
-    ]
-    ws.append(headers)
-
-    example_rows = [
-        ["1001", "Ahmet", "Yılmaz", "ahmet.yilmaz@ktb.gov.tr", "Personel", "Eğitim ve Performans Çalışma Grubu", "Personel ve Destek Hizmetleri Grup Başkanlığı", "personel", "", "", ""],
-        ["1002", "Ayşe", "Demir", "ayse.demir@ktb.gov.tr", "Koordinatör", "Eğitim ve Performans Çalışma Grubu", "Personel ve Destek Hizmetleri Grup Başkanlığı", "koordinator", "", "", ""],
-    ]
-    for row in example_rows:
-        ws.append(row)
-
-    header_fill = PatternFill("solid", fgColor="8B0000")
-    header_font = Font(color="FFFFFF", bold=True)
-    thin = Side(style="thin", color="D1D5DB")
-
-    for cell in ws[1]:
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = Alignment(horizontal="center", vertical="center")
-        cell.border = Border(left=thin, right=thin, top=thin, bottom=thin)
-
-    for row in ws.iter_rows(min_row=2):
-        for cell in row:
-            cell.border = Border(left=thin, right=thin, top=thin, bottom=thin)
-            cell.alignment = Alignment(vertical="center", wrap_text=True)
-
-    widths = {
-        "A": 16,
-        "B": 18,
-        "C": 18,
-        "D": 30,
-        "E": 24,
-        "F": 34,
-        "G": 34,
-        "H": 20,
-        "I": 20,
-        "J": 24,
-        "K": 24,
-    }
-    for col, width in widths.items():
-        ws.column_dimensions[col].width = width
-
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-
-    return send_file(
-        output,
-        as_attachment=True,
-        download_name="bys360_personel_sablonu.xlsx",
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+    return download_personnel_template_impl()
 
 
 @main_bp.route("/personnel/<int:user_id>/toggle-active", methods=["POST"])

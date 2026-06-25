@@ -1,0 +1,23 @@
+{
+  "phase": "phase4j-download-personnel-template-service-split-v6b",
+  "generated_at": "2026-06-25T14:05:48",
+  "target": "app/admin/ops_routes.py",
+  "service": "app/admin/ops_personnel_services.py",
+  "route_function": "download_personnel_template",
+  "service_function": "download_personnel_template_impl",
+  "before": {
+    "target_lines": 614,
+    "target_kb": 23.1
+  },
+  "after": {
+    "target_lines": 549,
+    "target_kb": 21.2,
+    "service_lines": 115,
+    "service_kb": 4.6
+  },
+  "safety": [
+    "Route decorator satirlari ops_routes.py icinde korundu.",
+    "Route fonksiyonu ince wrapper haline getirildi.",
+    "Agir template indirme govdesi ops_personnel_services.py icindeki implementation fonksiyonuna tasindi."
+  ]
+}
