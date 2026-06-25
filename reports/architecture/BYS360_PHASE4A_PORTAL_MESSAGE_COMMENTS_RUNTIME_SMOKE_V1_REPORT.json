@@ -1,0 +1,495 @@
+{
+  "package": "BYS360_PHASE4A_PORTAL_MESSAGE_COMMENTS_RUNTIME_SMOKE_V1",
+  "generated_at": "2026-06-25T07:58:47",
+  "branch": "phase4a-offline-stabilization-v1",
+  "head_before_report_commit": "48fc88b",
+  "meaningful_git_status_clean_before_report_write": true,
+  "ignored_generation_status_lines": [
+    "?? _phase4a_message_comments_runtime_smoke.py"
+  ],
+  "app_factory_ok": true,
+  "db_inspect_ok": true,
+  "message_comments_table_exists": false,
+  "message_comments_columns": [],
+  "message_comments_required_columns": [
+    "id",
+    "message_id",
+    "user_id",
+    "body",
+    "is_deleted",
+    "edited_at",
+    "created_at",
+    "updated_at"
+  ],
+  "message_comments_missing_columns": [
+    "id",
+    "message_id",
+    "user_id",
+    "body",
+    "is_deleted",
+    "edited_at",
+    "created_at",
+    "updated_at"
+  ],
+  "message_related_models": [
+    {
+      "class": "MessageAttachment",
+      "table": "message_attachments",
+      "columns": [
+        "id",
+        "message_id",
+        "original_filename",
+        "stored_filename",
+        "file_path",
+        "file_ext",
+        "mime_type",
+        "file_size",
+        "uploaded_by_user_id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageReaction",
+      "table": "message_reactions",
+      "columns": [
+        "id",
+        "message_id",
+        "user_id",
+        "reaction_value",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageThreadParticipant",
+      "table": "message_thread_participants",
+      "columns": [
+        "id",
+        "thread_id",
+        "user_id",
+        "joined_at",
+        "left_at",
+        "is_muted",
+        "is_archived",
+        "is_pinned",
+        "last_read_message_id",
+        "last_read_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "SupportTicketMessage",
+      "table": "support_ticket_messages",
+      "columns": [
+        "id",
+        "ticket_id",
+        "user_id",
+        "message_type",
+        "message",
+        "is_internal",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageTypingState",
+      "table": "message_typing_states",
+      "columns": [
+        "id",
+        "thread_id",
+        "user_id",
+        "preview_text",
+        "expires_at",
+        "last_activity_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageThread",
+      "table": "message_threads",
+      "columns": [
+        "id",
+        "thread_type",
+        "subject",
+        "badge_label",
+        "icon_name",
+        "accent_color",
+        "created_by_user_id",
+        "is_active",
+        "last_message_at",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "Message",
+      "table": "messages",
+      "columns": [
+        "id",
+        "thread_id",
+        "sender_user_id",
+        "body",
+        "message_type",
+        "sent_at",
+        "edited_at",
+        "is_deleted",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  ],
+  "message_related_routes": [
+    {
+      "rule": "/messages",
+      "endpoint": "main.messages_inbox",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/messages/new",
+      "endpoint": "main.messages_new",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>",
+      "endpoint": "main.messages_thread",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/activity",
+      "endpoint": "main.messages_thread_activity",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/live",
+      "endpoint": "main.messages_thread_live",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/typing",
+      "endpoint": "main.messages_thread_typing",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/<int:message_id>/react",
+      "endpoint": "main.messages_react",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/send",
+      "endpoint": "main.messages_send",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/mark-read",
+      "endpoint": "main.messages_mark_read",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/mute-toggle",
+      "endpoint": "main.messages_toggle_mute",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/archive-toggle",
+      "endpoint": "main.messages_toggle_archive",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/thread/<int:thread_id>/pin-toggle",
+      "endpoint": "main.messages_toggle_pin",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/<int:message_id>/edit",
+      "endpoint": "main.messages_edit",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/<int:message_id>/delete",
+      "endpoint": "main.messages_delete",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/messages/attachments/<filename>",
+      "endpoint": "main.message_attachment_download",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal",
+      "endpoint": "main.portal_feed",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/posts",
+      "endpoint": "main.portal_post_create",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/react",
+      "endpoint": "main.portal_post_react",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/comments",
+      "endpoint": "main.portal_post_comment",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/save",
+      "endpoint": "main.portal_post_save",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/report",
+      "endpoint": "main.portal_post_report",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/mentions/users",
+      "endpoint": "main.portal_mention_users",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/people",
+      "endpoint": "main.portal_people",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/profile/me",
+      "endpoint": "main.portal_my_profile",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/profile/<int:user_id>",
+      "endpoint": "main.portal_profile",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/groups",
+      "endpoint": "main.portal_groups",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/groups",
+      "endpoint": "main.portal_group_create",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/groups/<int:group_id>",
+      "endpoint": "main.portal_group_detail",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/moderation",
+      "endpoint": "main.portal_moderation",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/moderate",
+      "endpoint": "main.portal_post_moderate",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/instagram/sync",
+      "endpoint": "main.portal_instagram_sync",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/posts/<int:post_id>/delete",
+      "endpoint": "main.portal_post_delete",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/press-news",
+      "endpoint": "main.portal_press_news_review",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/portal/press-news/scan",
+      "endpoint": "main.portal_press_news_scan_now",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/press-news/<candidate_id>/publish",
+      "endpoint": "main.portal_press_news_publish",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/portal/press-news/<candidate_id>/archive",
+      "endpoint": "main.portal_press_news_archive",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/api/mobile/communication/messages/threads/<int:thread_id>",
+      "endpoint": "mobile_api.mobile_b46_communication_thread_detail",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/api/mobile/communication/messages/threads/<int:thread_id>/send",
+      "endpoint": "mobile_api.mobile_b46_communication_send_message",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/api/mobile/communication/messages/create-thread",
+      "endpoint": "mobile_api.mobile_b46_communication_create_thread",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    },
+    {
+      "rule": "/api/mobile/communication/messages/threads",
+      "endpoint": "mobile_api.mobile_b46_communication_message_threads",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    {
+      "rule": "/api/mobile/communication/messages/users",
+      "endpoint": "mobile_api.mobile_b46_communication_users",
+      "methods": [
+        "GET",
+        "HEAD",
+        "OPTIONS"
+      ]
+    }
+  ],
+  "runtime_smoke_ok": false,
+  "error": null
+}
