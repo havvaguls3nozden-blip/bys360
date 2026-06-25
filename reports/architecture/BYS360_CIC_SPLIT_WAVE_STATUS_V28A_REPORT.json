@@ -1,7 +1,7 @@
 {
   "phase": "cic-split-wave-status-v28a",
-  "generated_at": "2026-06-25T20:38:59",
-  "git_head": "36e80b8",
+  "generated_at": "2026-06-25T20:39:56",
+  "git_head": "1515296",
   "git_branch": "phase4j-script-reduction-godobject-v1",
   "status": "READY_FOR_NEXT_SPLIT",
   "target": "app/services/corporate_information_center.py",
