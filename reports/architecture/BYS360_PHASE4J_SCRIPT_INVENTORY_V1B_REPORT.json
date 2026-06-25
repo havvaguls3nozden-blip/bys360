@@ -1,0 +1,126 @@
+{
+  "phase": "phase4j-script-reduction-godobject-v1b",
+  "generated_at": "2026-06-25T13:32:58",
+  "script_total_files_after_pyc_cleanup": 563,
+  "script_extension_counts_after_pyc_cleanup": {
+    ".py": 506,
+    ".md": 1,
+    ".txt": 1,
+    ".ps1": 52,
+    ".html": 1,
+    ".css": 1,
+    ".js": 1
+  },
+  "largest_app_admin_top20": [
+    {
+      "path": "app/admin/ai_routes.py",
+      "kb": 51.6,
+      "lines": 1202
+    },
+    {
+      "path": "app/admin/routes.py",
+      "kb": 51.6,
+      "lines": 1149
+    },
+    {
+      "path": "app/admin/ops_routes.py",
+      "kb": 51.1,
+      "lines": 1220
+    },
+    {
+      "path": "app/admin/ai_phase11_routes.py",
+      "kb": 11.5,
+      "lines": 301
+    },
+    {
+      "path": "app/admin/ai_phase8_routes.py",
+      "kb": 8.9,
+      "lines": 211
+    },
+    {
+      "path": "app/admin/ai_phase9_routes.py",
+      "kb": 7.7,
+      "lines": 184
+    },
+    {
+      "path": "app/admin/ai_phase10_routes.py",
+      "kb": 6.7,
+      "lines": 174
+    },
+    {
+      "path": "app/admin/ai_phase7_routes.py",
+      "kb": 6.4,
+      "lines": 147
+    },
+    {
+      "path": "app/admin/ai_phase12_routes.py",
+      "kb": 6.0,
+      "lines": 150
+    },
+    {
+      "path": "app/admin/ai_phase2_routes.py",
+      "kb": 5.4,
+      "lines": 148
+    },
+    {
+      "path": "app/admin/ai_phase5_routes.py",
+      "kb": 5.3,
+      "lines": 135
+    },
+    {
+      "path": "app/admin/hierarchy_governance_routes.py",
+      "kb": 3.2,
+      "lines": 83
+    },
+    {
+      "path": "app/admin/ai_phase6_routes.py",
+      "kb": 3.2,
+      "lines": 80
+    },
+    {
+      "path": "app/admin/go_live_routes.py",
+      "kb": 2.4,
+      "lines": 70
+    },
+    {
+      "path": "app/admin/ai_decision_advanced_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    },
+    {
+      "path": "app/admin/ai_decision_governance_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    },
+    {
+      "path": "app/admin/ai_decision_quality_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    },
+    {
+      "path": "app/admin/ai_decision_dashboard_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    },
+    {
+      "path": "app/admin/ai_decision_foundation_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    },
+    {
+      "path": "app/admin/ai_decision_logs_routes.py",
+      "kb": 1.0,
+      "lines": 35
+    }
+  ],
+  "closed": [
+    "scripts altindaki .pyc dosyalari temizlendi",
+    "scripts altindaki __pycache__ klasorleri temizlendi",
+    "script sayimi runtime cache dosyalari olmadan yeniden alindi"
+  ],
+  "next": [
+    "app/admin/ops_routes.py bolme plani",
+    "app/admin/ai_routes.py bolme plani",
+    "app/admin/routes.py bolme plani"
+  ]
+}
