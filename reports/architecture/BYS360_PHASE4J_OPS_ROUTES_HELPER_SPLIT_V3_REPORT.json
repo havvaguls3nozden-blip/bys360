@@ -1,0 +1,33 @@
+{
+  "phase": "phase4j-ops-routes-helper-split-v3",
+  "generated_at": "2026-06-25T13:38:39",
+  "target": "app/admin/ops_routes.py",
+  "helper": "app/admin/ops_helpers.py",
+  "moved_functions": [
+    "_profile_full_name",
+    "_safe_text",
+    "_resolve_user_by_sicil",
+    "_build_org_path",
+    "_serialize_manager_card",
+    "_resolve_personnel_profile_hierarchy",
+    "_canonicalize_import_headers",
+    "_collapse_spaces",
+    "_has_explicit_manager_columns",
+    "get_default_first_login_password"
+  ],
+  "before": {
+    "target_lines": 1220,
+    "target_kb": 51.1
+  },
+  "after": {
+    "target_lines": 1064,
+    "target_kb": 44.4,
+    "helper_lines": 234,
+    "helper_kb": 10.2
+  },
+  "safety": [
+    "Route decorator bulunan fonksiyonlar tasinmadi.",
+    "Blueprint/route registration davranisi korunarak sadece helper fonksiyonlar tasindi.",
+    "ops_routes.py helper fonksiyonlari yeni ops_helpers.py modulunden import ediyor."
+  ]
+}
