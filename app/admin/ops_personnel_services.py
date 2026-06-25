@@ -113,6 +113,3 @@ def download_personnel_template_impl():
         download_name="bys360_personel_sablonu.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-
-def download_personnel_template_impl():
-    return download_personnel_template_impl()
