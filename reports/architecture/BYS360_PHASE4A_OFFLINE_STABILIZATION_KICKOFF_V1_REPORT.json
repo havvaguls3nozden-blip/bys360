@@ -1,12 +1,13 @@
 {
   "package": "BYS360_PHASE4A_OFFLINE_STABILIZATION_KICKOFF_V1",
-  "generated_at": "2026-06-25T07:50:19",
+  "generated_at": "2026-06-25T07:52:11",
   "branch": "phase4a-offline-stabilization-v1",
-  "head": "8989066",
-  "git_status_clean": false,
-  "tags_at_head": [
-    "phase3e-live-release-preflight-pass-20260625"
+  "head_before_report_commit": "c95bbf7",
+  "meaningful_git_status_clean_before_report_write": true,
+  "ignored_generation_status_lines": [
+    "?? _phase4a_kickoff_fix.py"
   ],
+  "tags_at_head": [],
   "phase3e_closure_ok": true,
   "frozen_release_tag": "phase3e-live-release-preflight-pass-20260625",
   "frozen_release_zip": "C:\\bys360\\release\\BYS360_FINAL_RELEASE_phase3e-live-release-preflight-pass-20260625.zip",
@@ -25,5 +26,5 @@
     "Asistan widget görünürlük/entegrasyon kontrolü",
     "Mobil/PWA karanlık tema ve input görünürlük kontrolü"
   ],
-  "phase4a_kickoff_ok": false
+  "phase4a_kickoff_ok": true
 }
