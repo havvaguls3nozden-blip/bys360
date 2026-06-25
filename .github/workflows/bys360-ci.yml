@@ -26,7 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install -r requirements.txt
-          python -m pip install ruff pytest pytest-cov pip-audit
+          python -m pip install ruff pytest pytest-cov pip-audit mypy
 
       - name: BYS360 secret/repo gate
         run: python scripts/quality/bys360_secret_repo_gate.py --root .
@@ -45,8 +45,14 @@ jobs:
           mkdir -p reports/quality
           python scripts/release/build_bys360_safe_release.py --root . --output reports/quality/BYS360_SAFE_RELEASE_CI_AUDIT.zip --audit-only
 
-      - name: Run tests
+      - name: Run quality tests
         run: python -m pytest tests/quality -m "ci_safe" --tb=short -q
+
+      - name: Run integration and architecture tests
+        run: python -m pytest tests/integration tests/architecture --tb=short -q
+
+      - name: Type check service layer
+        run: python -m mypy app/services --ignore-missing-imports --no-error-summary
 
       - name: BYS360 operations audit
         run: |

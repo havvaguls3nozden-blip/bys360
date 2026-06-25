@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import datetime as dt
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 EXCLUDED_DIRS = {
     ".git", ".venv", "venv", "env", "__pycache__", ".pytest_cache", ".mypy_cache",
-    ".ruff_cache", "node_modules", "dist", "dist_secure", "_upload_parts", "uploads", "logs", "instance"
+    ".ruff_cache", "node_modules", "dist", "dist_secure", "_upload_parts", "uploads", "logs", "instance",
+    "backups", "backup", "archive", "payload", "overlay_payload", "_security_quarantine",
+    "_local_quarantine", "_cleanup_quarantine", "_local_secrets"
 }
 
 EXCLUDED_SUFFIXES = {
@@ -81,6 +83,16 @@ def validate_zip(zip_path: Path) -> list[str]:
         for info in zf.infolist():
             name = info.filename
             base = Path(name).name
+            parts = set(PurePosixPath(name).parts) if "PurePosixPath" in globals() else set(Path(name).parts)
+            blocked_dirs = {
+                ".git", ".venv", "venv", "env", "backups", "backup", "archive", "payload", "overlay_payload",
+                "logs", "instance", "uploads", "_upload_parts", "_security_quarantine", "_local_quarantine",
+                "_cleanup_quarantine", "_local_secrets"
+            }
+            bad_parts = sorted(parts & blocked_dirs)
+            if bad_parts:
+                errors.append(f"release içinde yasaklı klasör var ({bad_parts[0]}): {name}")
+                continue
             if base.startswith(".env"):
                 errors.append(f"release içinde env dosyası var: {name}")
                 continue
@@ -146,7 +158,7 @@ def main() -> int:
     print("BYS360_SECURE_RELEASE_BUILD_V1_5_OK")
     print(f" - zip: {zip_path}")
     print(f" - files: {included}")
-    print(" - not: .env/.env.example ve güvenlik bakım scriptleri release dışı bırakıldı")
+    print(" - not: .env/.env.example, .venv, .git, backups/archive ve güvenlik bakım scriptleri release dışı bırakıldı")
     return 0
 
 if __name__ == "__main__":
