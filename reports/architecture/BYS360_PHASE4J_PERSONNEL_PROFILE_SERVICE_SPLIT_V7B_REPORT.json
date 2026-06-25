@@ -1,0 +1,28 @@
+{
+  "phase": "phase4j-personnel-profile-service-split-v7b",
+  "generated_at": "2026-06-25T14:15:14",
+  "target": "app/admin/ops_routes.py",
+  "service": "app/admin/ops_personnel_services.py",
+  "route_function": "personnel_profile",
+  "service_function": "personnel_profile_impl",
+  "route_wrapper_count": 1,
+  "service_impl_count": 1,
+  "self_recursive_call_lines": [],
+  "before": {
+    "target_lines": 549,
+    "target_kb": 21.2
+  },
+  "after": {
+    "target_lines": 499,
+    "target_kb": 18.7,
+    "service_lines": 169,
+    "service_kb": 7.2
+  },
+  "safety": [
+    "Route decorator satirlari ops_routes.py icinde korundu.",
+    "Route fonksiyon imzasi korunarak ince wrapper haline getirildi.",
+    "Agir personnel_profile govdesi ops_personnel_services.py icindeki implementation fonksiyonuna tasindi.",
+    "Duplicate implementation ve self-recursive call kontrolleri yapildi."
+  ],
+  "ok": true
+}

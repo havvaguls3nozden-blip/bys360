@@ -49,6 +49,7 @@ from .ops_helpers import (
 from .ops_health_services import admin_import_health_report_impl
 from .ops_import_services import admin_user_import_impl
 from .ops_personnel_services import download_personnel_template_impl
+from .ops_personnel_services import personnel_profile_impl
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_modular_main_blueprint_routes"
@@ -457,58 +458,7 @@ def personnel_delete(user_id: int):
 @admin_required
 @menu_key_required("admin_users")
 def personnel_profile(user_id: int):
-    user = db.session.get(User, user_id)
-    if not user:
-        flash("Personel kaydı bulunamadı.", "danger")
-        return redirect(url_for("main.personnel_list"))
-
-    avatar_url = url_for("static", filename="img/default-avatar.svg")
-    if hasattr(user, "profile_photo") and getattr(user, "profile_photo", None):
-        avatar_url = url_for("static", filename=f"uploads/{user.profile_photo}")
-
-    role_text = ""
-    if hasattr(user, "role") and (getattr(user, "role", "") or "").strip():
-        role_text = user.role
-    elif hasattr(user, "role_label") and (getattr(user, "role_label", "") or "").strip():
-        role_text = user.role_label
-
-    resolved_hierarchy = _resolve_personnel_profile_hierarchy(user)
-
-    profile_data = {
-        "id": user.id,
-        "full_name": _profile_full_name(user),
-        "ad": getattr(user, "ad", "") or "-",
-        "soyad": getattr(user, "soyad", "") or "-",
-        "email": getattr(user, "email", "") or "-",
-        "sicil_no": getattr(user, "sicil_no", "") or "-",
-        "unvan": getattr(user, "unvan", "") or "-",
-        "birim": resolved_hierarchy["birim"],
-        "ust_birim": resolved_hierarchy["ust_birim"],
-        "org_path": resolved_hierarchy["org_path"],
-        "hierarchy_state": resolved_hierarchy["hierarchy_state"],
-        "role_text": role_text or "-",
-        "is_active": bool(getattr(user, "is_active", False)),
-        "must_change_password": bool(getattr(user, "must_change_password", False)) if hasattr(user, "must_change_password") else False,
-        "must_set_security_question": bool(getattr(user, "must_set_security_question", False)) if hasattr(user, "must_set_security_question") else False,
-        "is_first_login": bool(getattr(user, "is_first_login", False)) if hasattr(user, "is_first_login") else False,
-        "avatar_url": avatar_url,
-        "manager_1": resolved_hierarchy["manager_1"],
-        "manager_2": resolved_hierarchy["manager_2"],
-        "manager_3": resolved_hierarchy["manager_3"],
-        "yonetici_sicil": getattr(user, "yonetici_sicil", None),
-        "ikinci_yonetici_sicil": getattr(user, "ikinci_yonetici_sicil", None),
-        "ucuncu_yonetici_sicil": getattr(user, "ucuncu_yonetici_sicil", None),
-    }
-
-    from app.services.hr_operations_service import build_personnel_profile_hr_context
-
-    return safe_render(
-        "personnel_profile.html",
-        "<h3>Personel Profili</h3>",
-        profile=profile_data,
-        ai_personnel_chain_panel=build_personnel_profile_chain_ai_panel(profile_data),
-        hr_context=build_personnel_profile_hr_context(user),
-    )
+    return personnel_profile_impl(user_id)
 
 
 __all__ = [
