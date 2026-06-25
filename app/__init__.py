@@ -212,6 +212,25 @@ def _prewarm_menu_visibility(app):
             pass
 
 
+
+# BYS360_TEMPLATE_PREWARM_V1
+def _prewarm_core_templates(app):
+    """Warm heavy shared templates once during app startup.
+
+    base.html dominates the first render cost on large BYS360 pages.
+    Failure is intentionally non-fatal.
+    """
+    try:
+        with app.app_context():
+            app.jinja_env.get_template("base.html")
+            app.jinja_env.get_template("performance/v2_1_4_category_scope.html")
+    except Exception as exc:
+        try:
+            app.logger.info("BYS360 template prewarm skipped: %s", exc)
+        except Exception:
+            pass
+
+
 def create_app() -> Flask:
     app = create_bys360_application(__name__)
 
@@ -230,6 +249,7 @@ def create_app() -> Flask:
     from app.utils.url_map_dedupe import dedupe_identical_url_rules
     dedupe_identical_url_rules(app)
     _prewarm_menu_visibility(app)  # BYS360_MENU_VISIBILITY_PREWARM_V1
+    _prewarm_core_templates(app)  # BYS360_TEMPLATE_PREWARM_V1
     return app
 
 
