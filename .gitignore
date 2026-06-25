@@ -22,3 +22,21 @@ mobile_flutter/**/android/*.jks
 mobile_flutter/**/android/*.keystore
 
 dist_secure/
+
+# BYS360 release preflight hygiene
+/backups/
+/backup/
+/instance/
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+*.zip
+*.7z
+*.rar
+.env
+.env.*
+!.env.example
+!*.env.example
+mobile_flutter/**/Flutter/ephemeral/*.env
+reports/security/*.env
