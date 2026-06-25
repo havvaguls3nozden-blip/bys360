@@ -1,0 +1,2477 @@
+{
+  "package": "BYS360_PHASE4B_WEEKEND_MAIL_GUARD_INVENTORY_V1",
+  "generated_at": "2026-06-25T09:28:19",
+  "branch": "phase4b-weekend-mail-guard-v1",
+  "head_before_report_commit": "f84c7f6",
+  "meaningful_git_status_clean_before_report_write": true,
+  "hits": [
+    {
+      "file": "STATUS.md",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 146,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "- check_bys360_cic_v3_0_auto_mail_weekday_only_v1.py"
+        },
+        {
+          "line": 188,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "- check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py"
+        }
+      ]
+    },
+    {
+      "file": "_phase4b_weekend_mail_guard_inventory.py",
+      "hit_count": 17,
+      "hits": [
+        {
+          "line": 9,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "REPORT = ROOT / \"reports\" / \"architecture\" / \"BYS360_PHASE4B_WEEKEND_MAIL_GUARD_INVENTORY_V1_REPORT.json\""
+        },
+        {
+          "line": 10,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "TEMP_SCRIPT = \"_phase4b_weekend_mail_guard_inventory.py\""
+        },
+        {
+          "line": 13,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "destek hatırlatma"
+          ],
+          "text": "    \"Gün Ortası Destek Hatırlatması\","
+        },
+        {
+          "line": 14,
+          "matched_terms": [
+            "Gun Ortasi Destek Hatirlatmasi"
+          ],
+          "text": "    \"Gun Ortasi Destek Hatirlatmasi\","
+        },
+        {
+          "line": 15,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": "    \"midday\","
+        },
+        {
+          "line": 16,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"noon\","
+        },
+        {
+          "line": 17,
+          "matched_terms": [
+            "support reminder"
+          ],
+          "text": "    \"support reminder\","
+        },
+        {
+          "line": 18,
+          "matched_terms": [
+            "destek hatırlatma"
+          ],
+          "text": "    \"destek hatırlatma\","
+        },
+        {
+          "line": 19,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "    \"hafta sonu\","
+        },
+        {
+          "line": 20,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"weekend\","
+        },
+        {
+          "line": 21,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    \"weekday\","
+        },
+        {
+          "line": 22,
+          "matched_terms": [
+            "weekday",
+            "isoweekday"
+          ],
+          "text": "    \"isoweekday\","
+        },
+        {
+          "line": 23,
+          "matched_terms": [
+            "weekday",
+            "calendar.weekday"
+          ],
+          "text": "    \"calendar.weekday\","
+        },
+        {
+          "line": 24,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "    \"send_mail\","
+        },
+        {
+          "line": 25,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "    \"notification_mailer\","
+        },
+        {
+          "line": 91,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"package\": \"BYS360_PHASE4B_WEEKEND_MAIL_GUARD_INVENTORY_V1\","
+        },
+        {
+          "line": 124,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    branch == \"phase4b-weekend-mail-guard-v1\""
+        }
+      ]
+    },
+    {
+      "file": "app/__init__.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 39,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "    (\"app.services.notification_mailer\", \"register_notification_mailer\"),"
+        }
+      ]
+    },
+    {
+      "file": "docs/BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1_NOTES.md",
+      "hit_count": 4,
+      "hits": [
+        {
+          "line": 1,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "# BYS360 CIC V3.0 Auto Mail Weekday Only V1"
+        },
+        {
+          "line": 3,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "Bu overlay, Kurumsal Bilgilendirme Merkezi otomatik mail zamanlayıcısına hafta sonu güvenlik kilidi ekler."
+        },
+        {
+          "line": 7,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Görevler ekranında hafta sonu gönderim yapılmadığına dair bilgi notu görünür."
+        },
+        {
+          "line": 8,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Windows görevi çalışsa bile servis katmanı hafta sonu otomatik gönderimi engeller."
+        }
+      ]
+    },
+    {
+      "file": "docs/BYS360_CIC_V4_0_SMART_CELEBRATIONS_README.md",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 10,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Hafta sonu kutlama görevleri için ayrı ayar"
+        }
+      ]
+    },
+    {
+      "file": "docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE.md",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 1,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE"
+        },
+        {
+          "line": 3,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "Bu overlay, Kurumsal Bilgilendirme Merkezi içindeki `staff_noon` / Personel Öğlen Bilgilendirmesi mail metnini günceller."
+        }
+      ]
+    },
+    {
+      "file": "app/dashboard/executive_summary_routes.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 132,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "def executive_summary_send_mail():"
+        }
+      ]
+    },
+    {
+      "file": "app/institutional/hr_common.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 237,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "def _date_range_weekday_count(start: date, end: date) -> float:"
+        },
+        {
+          "line": 243,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        if cursor.weekday() < 5:"
+        },
+        {
+          "line": 257,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    days = _date_range_weekday_count(start, end)"
+        }
+      ]
+    },
+    {
+      "file": "app/institutional/hr_leave_attendance_routes.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 57,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        },
+        {
+          "line": 155,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        }
+      ]
+    },
+    {
+      "file": "app/institutional/hr_reports_routes.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 91,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        }
+      ]
+    },
+    {
+      "file": "app/institutional/hr_scope_helpers.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 57,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        }
+      ]
+    },
+    {
+      "file": "app/institutional/routes.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 98,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        },
+        {
+          "line": 328,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        },
+        {
+          "line": 456,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    _date_range_weekday_count,"
+        }
+      ]
+    },
+    {
+      "file": "app/performance/engagement_feedback_routes.py",
+      "hit_count": 6,
+      "hits": [
+        {
+          "line": 255,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "    send_mail = str(request.form.get(\"send_email\") or \"\").strip().lower() in {\"1\", \"true\", \"on\", \"yes\", \"evet\"}"
+        },
+        {
+          "line": 261,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "            send_mail=send_mail,"
+        },
+        {
+          "line": 275,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        if send_mail and result.get(\"email_failed_count\"):"
+        },
+        {
+          "line": 325,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "    send_mail = str(request.form.get(\"send_email\") or \"\").strip().lower() in {\"1\", \"true\", \"on\", \"yes\", \"evet\"}"
+        },
+        {
+          "line": 335,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "            send_mail=send_mail,"
+        },
+        {
+          "line": 354,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        if send_mail and result.get(\"mail_failed_count\"):"
+        }
+      ]
+    },
+    {
+      "file": "app/performance/engagement_mail_routes.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 261,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "def performance_send_mail_reminders(period_id):"
+        }
+      ]
+    },
+    {
+      "file": "app/services/availability_service.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 95,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    return [day for day in _date_range(start_date, end_date) if day.weekday() < 5]"
+        },
+        {
+          "line": 141,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    if exception.record_date.weekday() >= 5:"
+        }
+      ]
+    },
+    {
+      "file": "app/services/corporate_information_center.py",
+      "hit_count": 42,
+      "hits": [
+        {
+          "line": 54,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE"
+        },
+        {
+          "line": 55,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"staff_noon\": {"
+        },
+        {
+          "line": 64,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "destek hatırlatma"
+          ],
+          "text": "        \"subject\": \"BYS360 Gün Ortası Destek Hatırlatması\","
+        },
+        {
+          "line": 1289,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "# BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1"
+        },
+        {
+          "line": 1290,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "# Otomatik mail zamanlayicisi hafta sonu guvenlik kilidi."
+        },
+        {
+          "line": 1306,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "def _cic_is_weekend(dt: _cic_dt_datetime) -> bool:"
+        },
+        {
+          "line": 1307,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    # Python weekday: Monday=0 ... Sunday=6"
+        },
+        {
+          "line": 1308,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    return dt.weekday() >= 5"
+        },
+        {
+          "line": 1311,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "def _cic_weekday_name_tr(dt: _cic_dt_datetime) -> str:"
+        },
+        {
+          "line": 1314,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        return names[dt.weekday()]"
+        },
+        {
+          "line": 1322,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekdays_raw = get_setting(f\"{BASE_KEY}.auto_scheduler_weekdays_only\", \"true\") or \"true\""
+        },
+        {
+          "line": 1331,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"weekdays_only\": _cic_auto_bool(weekdays_raw, default=True),"
+        },
+        {
+          "line": 1336,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "        \"weekend_policy\": \"Cumartesi ve pazar günleri otomatik mail gönderilmez.\","
+        },
+        {
+          "line": 1342,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    if \"auto_scheduler_weekdays_only\" in payload:"
+        },
+        {
+          "line": 1343,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        weekdays_only = \"true\" if _cic_auto_bool(payload.get(\"auto_scheduler_weekdays_only\"), default=True) else \"false\""
+        },
+        {
+          "line": 1345,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        weekdays_only = str(get_setting(f\"{BASE_KEY}.auto_scheduler_weekdays_only\", \"true\") or \"true\").lower()"
+        },
+        {
+          "line": 1346,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        if weekdays_only not in {\"true\", \"false\"}:"
+        },
+        {
+          "line": 1347,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            weekdays_only = \"true\""
+        },
+        {
+          "line": 1356,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    set_setting(f\"{BASE_KEY}.auto_scheduler_weekdays_only\", weekdays_only, label=\"Otomatik mail yalnızca hafta içi\", value_type=\"boolean\", actor_user_id=actor_user_id)"
+        },
+        {
+          "line": 1405,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "    \"\"\"Zamanı gelen aktif mail görevlerini çalıştırır; hafta sonu otomatik gönderimi engeller.\"\"\""
+        },
+        {
+          "line": 1410,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_name = _cic_weekday_name_tr(current)"
+        },
+        {
+          "line": 1418,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekday\": weekday_name,"
+        },
+        {
+          "line": 1423,
+          "matched_terms": [
+            "weekend",
+            "weekday"
+          ],
+          "text": "    if bool(scheduler.get(\"weekdays_only\", True)) and _cic_is_weekend(current) and not force:"
+        },
+        {
+          "line": 1427,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekdays_only\": True,"
+        },
+        {
+          "line": 1428,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "            \"weekend_blocked\": True,"
+        },
+        {
+          "line": 1432,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekday\": weekday_name,"
+        },
+        {
+          "line": 1433,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "            \"message\": \"Bugün hafta sonu olduğu için otomatik mail gönderimi yapılmadı.\","
+        },
+        {
+          "line": 1436,
+          "matched_terms": [
+            "hafta sonu",
+            "weekday"
+          ],
+          "text": "            \"skipped\": [{\"action\": \"skipped\", \"reason\": \"Hafta sonu otomatik gönderim kapalı\", \"weekday\": weekday_name}],"
+        },
+        {
+          "line": 1467,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekday\": weekday_name,"
+        },
+        {
+          "line": 1496,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"weekdays_only\": bool(scheduler.get(\"weekdays_only\", True)),"
+        }
+      ]
+    },
+    {
+      "file": "app/services/corporate_information_center_engine.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 23,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"PERSONEL_NOON\": {\"title\": \"Personel Öğlen Bilgilendirmesi\", \"audience\": \"staff\", \"hour\": 12, \"minute\": 30},"
+        },
+        {
+          "line": 177,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"PERSONEL_NOON\": \"BYS360 Gün Ortası Bilgilendirme Notu\","
+        },
+        {
+          "line": 189,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    if task_key == \"PERSONEL_NOON\":"
+        }
+      ]
+    },
+    {
+      "file": "app/services/executive_mail_center.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 39,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": "        \"key\": \"midday_pulse\","
+        }
+      ]
+    },
+    {
+      "file": "app/services/executive_mail_center_v2.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 49,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": "    {\"key\":\"staff_midday\",\"audience\":\"staff\",\"period\":\"midday\",\"hour\":13,\"minute\":0,\"title\":\"Personel Gün Ortası Mesai Kontrolü\",\"description\":\"Personele gün ortası iyi dilek ve geri bildirim bağlantısı gönderir.\",\"subject\":\"BYS360 Gün Orta"
+        },
+        {
+          "line": 209,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": "    if task[\"period\"]==\"midday\":"
+        }
+      ]
+    },
+    {
+      "file": "app/services/notification_mailer.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 217,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "def register_notification_mailer(app: Any | None = None) -> None:  # noqa: ARG001"
+        },
+        {
+          "line": 229,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "__all__ = [\"MAIL_TYPE\", \"register_notification_mailer\"]"
+        }
+      ]
+    },
+    {
+      "file": "app/services/weather_service.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 25,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "_TURKISH_WEEKDAYS = ["
+        },
+        {
+          "line": 84,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_name = _TURKISH_WEEKDAYS[value.weekday()]"
+        },
+        {
+          "line": 85,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    return f\"{value.day} {month_name} {value.year} {weekday_name}\""
+        }
+      ]
+    },
+    {
+      "file": "app/templates/hr_leave.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 474,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "                <div class=\"inline-help\" data-role=\"leave-day-hint\">Sistem hafta sonunu otomatik düşer. Resmi tatil veya kurum kapalı gün varsa burada ayrıca düzeltme girebilirsiniz.</div>"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/performance_mail_reminders.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 115,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "   <form method=\"post\" action=\"{{ url_for('main.performance_send_mail_reminders', period_id=selected_period.id) }}\" class=\"inline-form\">"
+        }
+      ]
+    },
+    {
+      "file": "app/docs/performance/BYS360_PERFORMANCE_COMPLETION_PHASE10_REMINDER_NOTIFICATION_CENTER.md",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 8,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Hafta sonu gönderim kuralı tüm performans hatırlatma türleri için ortak uygulanır."
+        },
+        {
+          "line": 9,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Hafta sonu atlanan bildirimler başarısız sayılmaz; \"Hafta Sonu Kuralı Nedeniyle Gönderilmedi\" olarak loglanır."
+        }
+      ]
+    },
+    {
+      "file": "app/services/cic/celebration_service.py",
+      "hit_count": 4,
+      "hits": [
+        {
+          "line": 17,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"_cic_v40_run_weekend_celebrations\","
+        },
+        {
+          "line": 33,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "def _cic_v40_run_weekend_celebrations(*args: Any, **kwargs: Any) -> Any:"
+        },
+        {
+          "line": 34,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"\"\"Facade wrapper for legacy ``_cic_v40_run_weekend_celebrations``.\"\"\""
+        },
+        {
+          "line": 35,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    return _legacy._cic_v40_run_weekend_celebrations(*args, **kwargs)"
+        }
+      ]
+    },
+    {
+      "file": "app/services/cic/facade.py",
+      "hit_count": 5,
+      "hits": [
+        {
+          "line": 13,
+          "matched_terms": [
+            "weekend",
+            "weekday"
+          ],
+          "text": "from .repository import _cic_auto_bool, _cic_auto_last_run_key, _cic_is_weekend, _cic_phase3_actor_label, _cic_phase3_last_result, _cic_phase3_make_result, _cic_phase3_public_error, _cic_phase3_store_result, _cic_phase5_actor, _cic_phase5_a"
+        },
+        {
+          "line": 17,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "from .celebration_service import _cic_v40_anniversary_users, _cic_v40_birthday_users, _cic_v40_run_weekend_celebrations, _cic_v40_service_year, celebration_context, ensure_celebration_schema, import_celebration_dates_from_excel, save_celebr"
+        },
+        {
+          "line": 25,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"_cic_is_weekend\","
+        },
+        {
+          "line": 64,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"_cic_v40_run_weekend_celebrations\","
+        },
+        {
+          "line": 83,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    \"_cic_weekday_name_tr\","
+        }
+      ]
+    },
+    {
+      "file": "app/services/cic/mail_scheduler_service.py",
+      "hit_count": 5,
+      "hits": [
+        {
+          "line": 327,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        (\"auto_scheduler_weekdays_only\", \"true\", \"Otomatik mail yalnızca hafta içi\", \"boolean\"),"
+        },
+        {
+          "line": 334,
+          "matched_terms": [
+            "hafta sonu",
+            "weekend"
+          ],
+          "text": "        (\"celebrations_include_weekend\", \"false\", \"Hafta sonu kutlamaları otomatik çalışsın\", \"boolean\"),"
+        },
+        {
+          "line": 377,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekdays_raw = _p13_get_setting(f\"{_p13_BASE_KEY}.auto_scheduler_weekdays_only\", \"true\") or \"true\""
+        },
+        {
+          "line": 386,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"weekdays_only\": _p13_auto_bool(weekdays_raw, default=True),"
+        },
+        {
+          "line": 391,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "        \"weekend_policy\": \"Cumartesi ve pazar günleri otomatik mail gönderilmez.\","
+        }
+      ]
+    },
+    {
+      "file": "app/services/cic/repository.py",
+      "hit_count": 7,
+      "hits": [
+        {
+          "line": 17,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    \"_cic_is_weekend\","
+        },
+        {
+          "line": 59,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    \"_cic_weekday_name_tr\","
+        },
+        {
+          "line": 281,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "def _cic_is_weekend(dt: _cic_dt_datetime) -> bool:"
+        },
+        {
+          "line": 282,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    # Python weekday: Monday=0 ... Sunday=6"
+        },
+        {
+          "line": 283,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    return dt.weekday() >= 5"
+        },
+        {
+          "line": 285,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "def _cic_weekday_name_tr(dt: _cic_dt_datetime) -> str:"
+        },
+        {
+          "line": 288,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        return names[dt.weekday()]"
+        }
+      ]
+    },
+    {
+      "file": "app/services/cic/task_contract.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 38,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE"
+        },
+        {
+          "line": 39,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"staff_noon\": {"
+        },
+        {
+          "line": 48,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "destek hatırlatma"
+          ],
+          "text": "        \"subject\": \"BYS360 Gün Ortası Destek Hatırlatması\","
+        }
+      ]
+    },
+    {
+      "file": "app/services/performance/feedback_alert_service.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 238,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "    send_mail: bool = False,"
+        },
+        {
+          "line": 291,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "            if send_mail:"
+        },
+        {
+          "line": 359,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "            if send_mail:"
+        }
+      ]
+    },
+    {
+      "file": "app/services/performance/feedback_executive_summary_service.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 270,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "    send_mail: bool = False,"
+        },
+        {
+          "line": 324,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        if send_mail:"
+        }
+      ]
+    },
+    {
+      "file": "app/services/performance/phase10_reminder_notification_center.py",
+      "hit_count": 22,
+      "hits": [
+        {
+          "line": 10,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "- Hafta sonu gönderim kuralı merkezi ayardan okunur."
+        },
+        {
+          "line": 24,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "BYS360_PERFORMANCE_COMPLETION_PHASE10_WEEKDAY_ONLY = True"
+        },
+        {
+          "line": 54,
+          "matched_terms": [
+            "hafta sonu",
+            "weekend"
+          ],
+          "text": "    \"skipped_weekend\": \"Hafta Sonu Kuralı Nedeniyle Gönderilmedi\","
+        },
+        {
+          "line": 73,
+          "matched_terms": [
+            "hafta sonu",
+            "weekday"
+          ],
+          "text": "    (\"performance_phase10\", \"weekday_only_reminders\", \"Hafta sonu hatırlatma gönderilmesin\", \"bool\", \"true\", \"Cumartesi/Pazar günleri otomatik performans hatırlatmaları gönderilmez.\"),"
+        },
+        {
+          "line": 101,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_only: bool"
+        },
+        {
+          "line": 111,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekday_only\": self.weekday_only,"
+        },
+        {
+          "line": 236,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "def phase10_is_weekend(day: date | datetime | str | None = None) -> bool:"
+        },
+        {
+          "line": 238,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    return parsed.weekday() >= 5"
+        },
+        {
+          "line": 268,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_only = _as_bool(row.get(\"weekday_only\"), True)"
+        },
+        {
+          "line": 287,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"weekday_only\": weekday_only,"
+        },
+        {
+          "line": 313,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_only = _as_bool(normalized.get(\"weekday_only\"), True)"
+        },
+        {
+          "line": 316,
+          "matched_terms": [
+            "weekend",
+            "weekday"
+          ],
+          "text": "    if weekday_only and phase10_is_weekend(today):"
+        },
+        {
+          "line": 319,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "            status=\"skipped_weekend\","
+        },
+        {
+          "line": 320,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "            status_label=phase10_status_label(\"skipped_weekend\"),"
+        },
+        {
+          "line": 321,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "            reason=\"Hafta sonu gönderim kuralı aktif olduğu için otomatik hatırlatma gönderilmedi.\","
+        },
+        {
+          "line": 323,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            weekday_only=True,"
+        },
+        {
+          "line": 334,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            weekday_only=weekday_only,"
+        },
+        {
+          "line": 343,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        weekday_only=weekday_only,"
+        },
+        {
+          "line": 402,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            \"weekday_only\": BYS360_PERFORMANCE_COMPLETION_PHASE10_WEEKDAY_ONLY,"
+        },
+        {
+          "line": 415,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "            \"Hafta sonu gönderim kuralı tüm performans hatırlatma türleri için ortak uygulanır.\","
+        },
+        {
+          "line": 418,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "            \"Gönderilen veya hafta sonu nedeniyle atlanan bildirimler loglanır.\","
+        },
+        {
+          "line": 440,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "            weekday_only BOOLEAN NOT NULL DEFAULT TRUE,"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/corporate_information_center/celebrations.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 55,
+          "matched_terms": [
+            "hafta sonu",
+            "weekend"
+          ],
+          "text": "          <label class=\"cic-celeb-switch\"><input type=\"checkbox\" name=\"celebrations_include_weekend\" {% if _settings.include_weekend|default(false, true) %}checked{% endif %}><span><b>Hafta sonu kutlamaları</b><small>İstenirse sadece kutlam"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/corporate_information_center/system.html",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 38,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": " <input type=\"checkbox\" name=\"auto_scheduler_weekdays_only\" {% if auto_scheduler is not defined or auto_scheduler.weekdays_only %}checked{% endif %}>"
+        },
+        {
+          "line": 41,
+          "matched_terms": [
+            "hafta sonu",
+            "weekday"
+          ],
+          "text": " <div class=\"cic-weekday-policy\"><i class=\"fa-solid fa-calendar-check\"></i><strong>Hafta sonu koruması aktif:</strong> Otomatik görev açık olsa bile cumartesi ve pazar günleri mail gönderimi yapılmaz.</div>"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/corporate_information_center/tasks.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 18,
+          "matched_terms": [
+            "hafta sonu",
+            "weekday"
+          ],
+          "text": " <div class=\"cic-card span-12 cic-weekday-policy\"><i class=\"fa-solid fa-calendar-days\"></i><strong>Hafta sonu gönderim yapılmaz.</strong> Aktif/pasif ve saat ayarları bu ekrandan yönetilir; otomatik gönderim yalnızca hafta içi çalışır.</div"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/dashboard/executive_summary.html",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 96,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "      <form method=\"post\" action=\"{{ url_for('main.executive_summary_send_mail') }}\">"
+        },
+        {
+          "line": 101,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "      <form method=\"post\" action=\"{{ url_for('main.executive_summary_send_mail') }}\">"
+        }
+      ]
+    },
+    {
+      "file": "app/templates/performance/_phase10_reminder_notification_panel.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 13,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "      <span>Otomatik hatırlatmalar hafta sonu gönderilmez; kayıt loglanır.</span>"
+        }
+      ]
+    },
+    {
+      "file": "docs/api/openapi_draft.json",
+      "hit_count": 4,
+      "hits": [
+        {
+          "line": 5095,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"summary\": \"executive_summary_send_mail (app/dashboard/executive_summary_routes.py)\","
+        },
+        {
+          "line": 5096,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"operationId\": \"bp_executive_summary_send_mail\","
+        },
+        {
+          "line": 10362,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"summary\": \"performance_send_mail_reminders (app/performance/engagement_mail_routes.py)\","
+        },
+        {
+          "line": 10363,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"operationId\": \"main_bp_performance_send_mail_reminders\","
+        }
+      ]
+    },
+    {
+      "file": "reports/architecture/BYS360_PHASE2A_ARCHITECTURE_DEBT_MAP.json",
+      "hit_count": 4,
+      "hits": [
+        {
+          "line": 6131,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"function\": \"executive_summary_send_mail\","
+        },
+        {
+          "line": 8443,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "        \"function\": \"performance_send_mail_reminders\","
+        },
+        {
+          "line": 18025,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"file\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 18613,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"file\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/architecture/BYS360_PHASE2A_ARCHITECTURE_DEBT_MAP.md",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 1124,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"file\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 1712,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"file\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/architecture/BYS360_PHASE4A_OFFLINE_STABILIZATION_KICKOFF_V1_REPORT.json",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 24,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "destek hatırlatma",
+            "hafta sonu"
+          ],
+          "text": "    \"Hafta sonu gün ortası destek hatırlatması mail kontrolü\","
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10F_CLEANUP_CANDIDATE_PRECISION_PLAN.json",
+      "hit_count": 8,
+      "hits": [
+        {
+          "line": 442,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 443,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 454,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 456,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 462,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 468,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 474,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 480,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10F_CLEANUP_CANDIDATE_PRECISION_PLAN.md",
+      "hit_count": 8,
+      "hits": [
+        {
+          "line": 458,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 459,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 470,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 472,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 478,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 484,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 490,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 496,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10I_REMAINING_RUNTIME_RENAME_KEEP_PLAN.json",
+      "hit_count": 15,
+      "hits": [
+        {
+          "line": 754,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 755,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 766,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 768,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 774,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 780,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 786,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 792,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 800,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 802,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 808,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 814,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 820,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 826,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 830,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"suggested_new_path\": \"scripts/communication/maintenance_corporate_information_center_v3_0_module6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10I_REMAINING_RUNTIME_RENAME_KEEP_PLAN.md",
+      "hit_count": 15,
+      "hits": [
+        {
+          "line": 766,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 767,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 778,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 780,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 786,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 792,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 798,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 804,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 812,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 814,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 820,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 826,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 832,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 838,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 842,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"suggested_new_path\": \"scripts/communication/maintenance_corporate_information_center_v3_0_module6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10O_FINAL_KEEP_COMPAT_PLAN.json",
+      "hit_count": 15,
+      "hits": [
+        {
+          "line": 810,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 811,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 822,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 824,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 830,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 836,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 842,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 848,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 856,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 858,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 864,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 870,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 876,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 882,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 886,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "      \"suggested_new_path\": \"scripts/communication/maintenance_corporate_information_center_v3_0_module6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/quality/BYS360_A10O_FINAL_KEEP_COMPAT_PLAN.md",
+      "hit_count": 15,
+      "hits": [
+        {
+          "line": 821,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"path\": \"scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 822,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"name\": \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 833,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 835,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 841,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 847,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 853,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 859,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 867,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        \"path\": \"scripts/quality/check_corporate_information_center_v3_0_phase6_1_staff_noon_message.py\","
+        },
+        {
+          "line": 869,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 875,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 881,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 887,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 893,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "          \"repair_corporate_information_center_v3_0_phase6_1_staff_noon_message\""
+        },
+        {
+          "line": 897,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"suggested_new_path\": \"scripts/communication/maintenance_corporate_information_center_v3_0_module6_1_staff_noon_message.py\","
+        }
+      ]
+    },
+    {
+      "file": "reports/security/BYS360_A6D_RELEASE_LEAK_GATE.json",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 98,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    \"docs/BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1_NOTES.md\","
+        },
+        {
+          "line": 122,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"docs/BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE.md\","
+        }
+      ]
+    },
+    {
+      "file": "scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py",
+      "hit_count": 15,
+      "hits": [
+        {
+          "line": 10,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "VERSION = 'BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE'"
+        },
+        {
+          "line": 12,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "destek hatırlatma"
+          ],
+          "text": "NEW_SUBJECT = 'BYS360 Gün Ortası Destek Hatırlatması'"
+        },
+        {
+          "line": 30,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "def backup(path: Path, suffix: str = \".phase6_1_noon_message.bak\") -> None:"
+        },
+        {
+          "line": 38,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "def _replace_staff_noon_block(text: str) -> str:"
+        },
+        {
+          "line": 39,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    start = text.find('\"staff_noon\"')"
+        },
+        {
+          "line": 41,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        raise RuntimeError(\"staff_noon görev tanımı bulunamadı.\")"
+        },
+        {
+          "line": 44,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "        raise RuntimeError(\"staff_noon görev tanımı sonu bulunamadı.\")"
+        },
+        {
+          "line": 59,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    text = _replace_staff_noon_block(text)"
+        },
+        {
+          "line": 71,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            set_setting(f\"{BASE_KEY}.template.staff_noon.subject\", NEW_SUBJECT, label=\"Personel Öğlen Bilgilendirmesi konusu\", value_type=\"string\")"
+        },
+        {
+          "line": 72,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "            set_setting(f\"{BASE_KEY}.template.staff_noon.body\", NEW_BODY, label=\"Personel Öğlen Bilgilendirmesi metni\", value_type=\"text\")"
+        },
+        {
+          "line": 95,
+          "matched_terms": [
+            "Gün Ortası Destek Hatırlatması",
+            "noon",
+            "destek hatırlatma"
+          ],
+          "text": "        for needle in [VERSION, '\"staff_noon\"', \"Gününüz nasıl geçiyor?\", \"Sistemde destek ihtiyacı duyduğunuz bir konu var mı?\", \"BYS360 Gün Ortası Destek Hatırlatması\"]:"
+        },
+        {
+          "line": 108,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "                tmpl = get_template(\"staff_noon\")"
+        },
+        {
+          "line": 112,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "                    checks.append(\"Veritabanındaki staff_noon şablonu güncel görünmüyor.\")"
+        },
+        {
+          "line": 114,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "                    checks.append(\"Veritabanındaki staff_noon konusu güncel görünmüyor.\")"
+        },
+        {
+          "line": 146,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    print(\"Güncellenen görev: staff_noon / Personel Öğlen Bilgilendirmesi\")"
+        }
+      ]
+    },
+    {
+      "file": "scripts/communication/run_corporate_information_center_task.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 9,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    \"staff_noon\": \"PERSONEL_NOON\","
+        }
+      ]
+    },
+    {
+      "file": "scripts/communication/run_corporate_information_center_task_v3_0_phase2.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 15,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    parser.add_argument(\"--task-key\", required=True, choices=[\"PERSONEL_MORNING\", \"PERSONEL_NOON\", \"PERSONEL_EVENING\", \"MANAGER_MORNING\", \"MANAGER_EVENING\"])"
+        }
+      ]
+    },
+    {
+      "file": "scripts/executive/repair_executive_summary_daily_mail_tasks_v1_3.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 54,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": "        {'key':'midday_pulse','title':'Gün Ortası Kurumsal Yoklama','type':'pulse','enabled':True,'hour':'13','minute':'00','scope':'pilot','description':'Günün nasıl geçtiğini soran, geri bildirim merkezine yönlendiren kısa kontrol maili g"
+        }
+      ]
+    },
+    {
+      "file": "scripts/live/repair_bys360_live_full_overlay_v2_17_60.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 16,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    Path(\"scripts/scheduled/run_cic_staff_noon.py\"),"
+        }
+      ]
+    },
+    {
+      "file": "scripts/live/repair_bys360_live_full_overlay_v2_17_61.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 18,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    Path(\"scripts/scheduled/run_cic_staff_noon.py\"),"
+        }
+      ]
+    },
+    {
+      "file": "scripts/live/repair_bys360_live_full_overlay_v2_17_62.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 18,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    Path(\"scripts/scheduled/run_cic_staff_noon.py\"),"
+        }
+      ]
+    },
+    {
+      "file": "scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py",
+      "hit_count": 7,
+      "hits": [
+        {
+          "line": 19,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"BYS360_PERFORMANCE_COMPLETION_PHASE10_WEEKDAY_ONLY\","
+        },
+        {
+          "line": 23,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "        \"Hafta Sonu Kuralı Nedeniyle Gönderilmedi\","
+        },
+        {
+          "line": 47,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "    weekend_decision = center.phase10_reminder_decision({\"reminder_type\": \"due_today\", \"due_date\": \"2026-06-07\", \"channel\": \"mail\"}, today=date(2026, 6, 7))"
+        },
+        {
+          "line": 48,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "    weekday_decision = center.phase10_reminder_decision({\"reminder_type\": \"due_today\", \"due_date\": \"2026-06-08\", \"channel\": \"mail\"}, today=date(2026, 6, 8))"
+        },
+        {
+          "line": 59,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "        \"weekend_skip\": weekend_decision.status == \"skipped_weekend\" and weekend_decision.should_send is False,"
+        },
+        {
+          "line": 60,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "        \"weekday_ready\": weekday_decision.should_send is True and weekday_decision.status == \"ready\","
+        },
+        {
+          "line": 68,
+          "matched_terms": [
+            "weekend",
+            "weekday"
+          ],
+          "text": "    return {\"ok\": all(items.values()), \"items\": items, \"weekend_decision\": weekend_decision.as_dict(), \"weekday_decision\": weekday_decision.as_dict(), \"summary\": summary, \"contract\": contract}"
+        }
+      ]
+    },
+    {
+      "file": "scripts/quality/check_bys360_notification_email_v1.py",
+      "hit_count": 3,
+      "hits": [
+        {
+          "line": 7,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "REGISTRATION_LINE = '(\"app.services.notification_mailer\", \"register_notification_mailer\")'"
+        },
+        {
+          "line": 15,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "    service = root / \"app/services/notification_mailer.py\""
+        },
+        {
+          "line": 24,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "        \"servis kayıt fonksiyonu\": \"def register_notification_mailer\" in service_text,"
+        }
+      ]
+    },
+    {
+      "file": "scripts/quality/repair_bys360_notification_email_v1.py",
+      "hit_count": 4,
+      "hits": [
+        {
+          "line": 9,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "SERVICE_REL = Path(\"app/services/notification_mailer.py\")"
+        },
+        {
+          "line": 11,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "REGISTRATION_LINE = '    (\"app.services.notification_mailer\", \"register_notification_mailer\"),'"
+        },
+        {
+          "line": 13,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "SERVICE_CODE = 'from __future__ import annotations\\n\\nimport logging\\nfrom typing import Any\\n\\nfrom flask import current_app, has_app_context\\nfrom sqlalchemy import event, text\\nfrom sqlalchemy.orm import Session\\n\\nfrom app.core.datetime"
+        },
+        {
+          "line": 84,
+          "matched_terms": [
+            "notification_mailer"
+          ],
+          "text": "        \"register_notification_mailer\","
+        }
+      ]
+    },
+    {
+      "file": "scripts/scheduled/run_cic_auto_scheduler.py",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 23,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "        if result.get(\"weekend_blocked\"):"
+        },
+        {
+          "line": 24,
+          "matched_terms": [
+            "weekend"
+          ],
+          "text": "            print(\"BYS360_CIC_WEEKEND_MAIL_BLOCKED_OK\")"
+        }
+      ]
+    },
+    {
+      "file": "scripts/scheduled/run_cic_staff_noon.py",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 10,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "TASK_KEY = \"staff_noon\""
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/apply_bys360_cic_v3_0_live_final_release.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 50,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    @{Zip=\"BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE_OVERLAY.zip\"; Script=\"scripts\\windows\\repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.ps1\"; AllowFail=$false},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v2.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 63,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    @{Zip=\"BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE_OVERLAY.zip\"; Script=\"scripts\\windows\\repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.ps1\"; AllowFail=$false},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v3.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 68,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "    @{Zip=\"BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE_OVERLAY.zip\"; Script=\"scripts\\windows\\repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.ps1\"; AllowFail=$false},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/apply_bys360_cic_v3_0_live_final_release_resume_v4.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 87,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "Invoke-NestedOverlay \"BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_1_STAFF_NOON_MESSAGE_OVERLAY.zip\" \"scripts\\windows\\repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.ps1\""
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/install_bys360_cic_auto_mail_scheduler_task.ps1",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 10,
+          "matched_terms": [
+            "hafta sonu"
+          ],
+          "text": "# Görev 5 dakikada bir yoklama yapar. Servis tarafında ayrıca hafta sonu kilidi vardır."
+        },
+        {
+          "line": 15,
+          "matched_terms": [
+            "weekday"
+          ],
+          "text": "Write-Host \"BYS360_CIC_AUTO_MAIL_SCHEDULER_TASK_INSTALLED_WEEKDAY_SAFE\""
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/install_bys360_corporate_information_tasks_v3_0.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 9,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "  @{Name=\"BYS360 Corporate Info Staff Noon\"; Key=\"staff_noon\"; Time=\"12:30\"},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/install_bys360_executive_mail_center_v2_tasks.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 11,
+          "matched_terms": [
+            "midday"
+          ],
+          "text": " @{Name=\"BYS360 Mail Center Staff Midday\"; Hour=13; Minute=0; TaskKey=\"staff_midday\"},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/windows/install_corporate_information_center_tasks_v3_0_phase2.ps1",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 13,
+          "matched_terms": [
+            "noon"
+          ],
+          "text": "  @{Name=\"BYS360 CIC Personel Oglen\"; Key=\"PERSONEL_NOON\"; Hour=12; Minute=30},"
+        }
+      ]
+    },
+    {
+      "file": "scripts/communication/assets/celebrations.html",
+      "hit_count": 1,
+      "hits": [
+        {
+          "line": 55,
+          "matched_terms": [
+            "hafta sonu",
+            "weekend"
+          ],
+          "text": "          <label class=\"cic-celeb-switch\"><input type=\"checkbox\" name=\"celebrations_include_weekend\" {% if _settings.include_weekend|default(false, true) %}checked{% endif %}><span><b>Hafta sonu kutlamaları</b><small>İstenirse sadece kutlam"
+        }
+      ]
+    },
+    {
+      "file": "tests/architecture/snapshots/phase2b_route_snapshot_baseline.json",
+      "hit_count": 2,
+      "hits": [
+        {
+          "line": 5683,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "      \"function\": \"executive_summary_send_mail\","
+        },
+        {
+          "line": 9898,
+          "matched_terms": [
+            "send_mail"
+          ],
+          "text": "      \"function\": \"performance_send_mail_reminders\","
+        }
+      ]
+    }
+  ],
+  "files_with_hits": 70,
+  "inventory_ok": true,
+  "error": null
+}
