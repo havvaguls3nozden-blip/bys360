@@ -1,0 +1,219 @@
+{
+  "package": "BYS360_PHASE4D_OFFLINE_INTEGRATION_SMOKE_RERUN_V1",
+  "generated_at": "2026-06-25T12:18:02",
+  "branch": "phase4d-offline-integration-gate-v1",
+  "head_before_report_commit": "11734f7",
+  "meaningful_git_status_clean_before_report_write": true,
+  "compile": {
+    "app/__init__.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/__init__.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 47.932,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/route_support.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/route_support.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 48.231,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/performance/v2_1_4_category_scope_routes.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/performance/v2_1_4_category_scope_routes.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 45.306,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/corporate_information_center_engine.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/corporate_information_center_engine.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 53.961,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/executive_mail_center_v2.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/executive_mail_center_v2.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 51.708,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/error_handlers.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/error_handlers.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 58.767,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    }
+  },
+  "error_templates": {
+    "app/templates/errors/400.html": true,
+    "app/templates/errors/401.html": true,
+    "app/templates/errors/403.html": true,
+    "app/templates/errors/404.html": true,
+    "app/templates/errors/405.html": true,
+    "app/templates/errors/500.html": true,
+    "app/templates/errors/503.html": true
+  },
+  "create_app_timing": {
+    "ok": true,
+    "elapsed_ms": 1116.13
+  },
+  "route_map": {
+    "route_count": 941,
+    "has_category_scope_path": true,
+    "has_message_create_thread_path": true
+  },
+  "anonymous_smokes": [
+    {
+      "path": "/login",
+      "method": "GET",
+      "ok": true,
+      "status_code": 200,
+      "location": null,
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 17029,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/performance/v2-1-4-category-scope",
+      "method": "GET",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fperformance%2Fv2-1-4-category-scope",
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 287,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/api/mobile/communication/messages/create-thread",
+      "method": "GET",
+      "ok": true,
+      "status_code": 405,
+      "location": null,
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 1570,
+      "body_has_405_template_title": true,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/api/mobile/communication/messages/threads",
+      "method": "GET",
+      "ok": true,
+      "status_code": 401,
+      "location": null,
+      "content_type": "application/json",
+      "body_len": 67,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/api/mobile/communication/messages/users",
+      "method": "GET",
+      "ok": true,
+      "status_code": 401,
+      "location": null,
+      "content_type": "application/json",
+      "body_len": 67,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/messages",
+      "method": "GET",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fmessages",
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 233,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/messages/new",
+      "method": "GET",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fmessages%2Fnew",
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 245,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    },
+    {
+      "path": "/portal",
+      "method": "GET",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fportal",
+      "content_type": "text/html; charset=utf-8",
+      "body_len": 229,
+      "body_has_405_template_title": false,
+      "body_has_401_template_title": false,
+      "body_has_400_template_title": false
+    }
+  ],
+  "category_scope_authenticated_timing": {
+    "label": "category_scope_authenticated_render_phase4d_rerun",
+    "ok": true,
+    "elapsed_ms": 164.282,
+    "result_type": "str",
+    "result_size": 100851,
+    "error": null
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean": true,
+    "compile_ok": true,
+    "error_templates_present": true,
+    "create_app_ok": true,
+    "route_map_ok": true,
+    "anonymous_smokes_without_500": true,
+    "405_uses_template": true,
+    "category_scope_under_250ms": true,
+    "integration_smoke_rerun_ok": true
+  },
+  "smoke_ok": true,
+  "error": null
+}
