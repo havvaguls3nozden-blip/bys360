@@ -1,24 +1,41 @@
 {
   "package": "BYS360_PHASE4A_PORTAL_MESSAGE_COMMENT_CONTRACT_GATE_V1",
-  "generated_at": "2026-06-25T08:16:48",
+  "generated_at": "2026-06-25T08:46:30",
   "branch": "phase4a-offline-stabilization-v1",
-  "head_before_report_commit": "0a8fbd9",
+  "head_before_report_commit": "323ebfd",
   "meaningful_git_status_clean_before_report_write": true,
   "ignored_generation_status_lines": [
-    "?? _phase4a_portal_message_comment_contract_gate.py"
+    "?? _phase4a_portal_message_comment_contract_gate_pass.py"
   ],
   "compile_ok": true,
-  "app_factory_ok": false,
-  "model_import_ok": false,
-  "service_import_ok": false,
-  "serializer_import_ok": false,
+  "app_factory_ok": true,
+  "model_import_ok": true,
+  "service_import_ok": true,
+  "serializer_import_ok": true,
   "route_contract_ok": false,
   "template_contract_ok": false,
-  "db_contract_ok": false,
-  "message_comments_table_exists": false,
-  "message_comments_columns": [],
+  "db_contract_ok": true,
+  "message_comments_table_exists": true,
+  "message_comments_columns": [
+    "id",
+    "message_id",
+    "user_id",
+    "body",
+    "is_deleted",
+    "edited_at",
+    "created_at",
+    "updated_at"
+  ],
   "comment_route_matches": [],
-  "template_checks": {},
+  "template_checks": {
+    "has_interactions_block": false,
+    "has_comment_form": false,
+    "has_comment_route_url": false,
+    "has_comment_list": false,
+    "has_ajax_reaction_form": false,
+    "has_ajax_fetch": false,
+    "has_no_full_page_comment_only_flow": false
+  },
   "contract_gate_ok": false,
-  "error": "ImportError(\"cannot import name 'serialize_comment' from 'app.services.messages.serialization' (C:\\\\bys360\\\\project\\\\app\\\\services\\\\messages\\\\serialization.py)\")"
+  "error": null
 }
