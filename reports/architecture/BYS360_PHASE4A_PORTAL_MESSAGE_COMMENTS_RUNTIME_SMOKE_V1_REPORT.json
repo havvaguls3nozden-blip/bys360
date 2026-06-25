@@ -1,16 +1,26 @@
 {
   "package": "BYS360_PHASE4A_PORTAL_MESSAGE_COMMENTS_RUNTIME_SMOKE_V1",
-  "generated_at": "2026-06-25T07:58:47",
+  "generated_at": "2026-06-25T08:14:11",
   "branch": "phase4a-offline-stabilization-v1",
-  "head_before_report_commit": "48fc88b",
+  "head_before_report_commit": "8d0eb41",
   "meaningful_git_status_clean_before_report_write": true,
   "ignored_generation_status_lines": [
-    "?? _phase4a_message_comments_runtime_smoke.py"
+    "?? _phase4a_message_comments_runtime_smoke_pass.py"
   ],
   "app_factory_ok": true,
   "db_inspect_ok": true,
-  "message_comments_table_exists": false,
-  "message_comments_columns": [],
+  "message_comments_table_exists": true,
+  "message_comments_model_registered": true,
+  "message_comments_columns": [
+    "id",
+    "message_id",
+    "user_id",
+    "body",
+    "is_deleted",
+    "edited_at",
+    "created_at",
+    "updated_at"
+  ],
   "message_comments_required_columns": [
     "id",
     "message_id",
@@ -21,30 +31,34 @@
     "created_at",
     "updated_at"
   ],
-  "message_comments_missing_columns": [
-    "id",
-    "message_id",
-    "user_id",
-    "body",
-    "is_deleted",
-    "edited_at",
-    "created_at",
-    "updated_at"
-  ],
+  "message_comments_missing_columns": [],
   "message_related_models": [
     {
-      "class": "MessageAttachment",
-      "table": "message_attachments",
+      "class": "Message",
+      "table": "messages",
       "columns": [
         "id",
-        "message_id",
-        "original_filename",
-        "stored_filename",
-        "file_path",
-        "file_ext",
-        "mime_type",
-        "file_size",
-        "uploaded_by_user_id",
+        "thread_id",
+        "sender_user_id",
+        "body",
+        "message_type",
+        "sent_at",
+        "edited_at",
+        "is_deleted",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageTypingState",
+      "table": "message_typing_states",
+      "columns": [
+        "id",
+        "thread_id",
+        "user_id",
+        "preview_text",
+        "expires_at",
+        "last_activity_at",
         "created_at",
         "updated_at"
       ]
@@ -94,15 +108,32 @@
       ]
     },
     {
-      "class": "MessageTypingState",
-      "table": "message_typing_states",
+      "class": "MessageAttachment",
+      "table": "message_attachments",
       "columns": [
         "id",
-        "thread_id",
+        "message_id",
+        "original_filename",
+        "stored_filename",
+        "file_path",
+        "file_ext",
+        "mime_type",
+        "file_size",
+        "uploaded_by_user_id",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "class": "MessageComment",
+      "table": "message_comments",
+      "columns": [
+        "id",
+        "message_id",
         "user_id",
-        "preview_text",
-        "expires_at",
-        "last_activity_at",
+        "body",
+        "is_deleted",
+        "edited_at",
         "created_at",
         "updated_at"
       ]
@@ -120,22 +151,6 @@
         "created_by_user_id",
         "is_active",
         "last_message_at",
-        "created_at",
-        "updated_at"
-      ]
-    },
-    {
-      "class": "Message",
-      "table": "messages",
-      "columns": [
-        "id",
-        "thread_id",
-        "sender_user_id",
-        "body",
-        "message_type",
-        "sent_at",
-        "edited_at",
-        "is_deleted",
         "created_at",
         "updated_at"
       ]
@@ -490,6 +505,6 @@
       ]
     }
   ],
-  "runtime_smoke_ok": false,
+  "runtime_smoke_ok": true,
   "error": null
 }
