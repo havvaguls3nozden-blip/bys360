@@ -1,0 +1,196 @@
+# BYS360 Post Wave1 Referenced Script Source Classification V15C
+- Generated at: 2026-06-25T17:52:15
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD: 36cebac
+- Current active script candidates: 313
+- Referenced count: 200
+
+## Decision Counts
+- archive_wave2_referenced_by_scripts_safe: 18
+- archive_wave3_referenced_by_scripts_review: 10
+- keep_code_referenced: 63
+- keep_operational_referenced: 69
+- keep_review_other_reference: 35
+- keep_review_reference_unclear: 5
+
+## Projection
+- v15b_archive_wave2_safe: 5
+- v15b_archive_wave2_review: 17
+- v15b_archive_wave3_review: 13
+- archive_wave2_referenced_by_scripts_safe: 18
+- archive_wave3_referenced_by_scripts_review: 10
+- projected_after_safe_plus_script_safe: 290
+- projected_after_all_review_candidates: 250
+- goal_under_100_after_all_review_candidates: False
+
+## Archive Wave2 Referenced By Scripts Safe
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_6_quality_script_repair.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_a10c_hard_ui_technical_language_plan.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_baseline_gate_p5a.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_final_evidence_gate_p5f.py: refs=3 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d_v2.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_visual_regression_evidence_suite_gate_p6b.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_visual_regression_gate_p6a.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_android_responsive_visual_uat_evidence_gate_p5e.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/bys360_s0a_claude_findings_verification_audit.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_4_release_pro_ui.py: refs=3 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_5_quality_gate_fix.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_6_quality_script_repair.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/quality/check_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/security/repair_bys360_secure_release_secret_clean_v1.py: refs=10 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/security/repair_bys360_secure_release_secret_clean_v1_1.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/security/repair_bys360_secure_release_secret_clean_v1_2.py: refs=2 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/security/repair_bys360_secure_release_secret_clean_v1_3.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+- scripts/security/repair_bys360_secure_release_secret_clean_v1_4.py: refs=1 | Sadece dusuk degerli script referanslari var; dosya emekli markerli ve operasyon riski yok.
+
+## Archive Wave3 Referenced By Scripts Review
+- scripts/quality/bys360_a10d_hard_ui_precision_decision.py: refs=1 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/build_bys360_secure_release_v1_1.py: refs=3 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/build_bys360_secure_release_v1_2.py: refs=3 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/build_bys360_secure_release_v1_3.py: refs=2 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/build_bys360_secure_release_v1_4.py: refs=1 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/check_bys360_logout_force_clear_v2_15_12.py: refs=2 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_1.py: refs=2 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_2.py: refs=2 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_3.py: refs=1 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+- scripts/security/check_bys360_secure_release_secret_clean_v1_4.py: refs=2 | Sadece script referanslari var; manuel onayla arsivlenebilir.
+
+## Keep Code Or Operational Top 160
+- scripts/communication/repair_corporate_information_center_v3_0_phase2_3_csrf_recipient_ux.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase3_dispatch.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase5_control_panel.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_1_staff_noon_message.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase6_final_uat_live_ready.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_7_release_clean_ui.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_8_base_header_pro.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_9_base_real_newlines_fix.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/repair_corporate_information_center_v3_0_phase7_live_release_usage.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/communication/run_corporate_information_center_task.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/communication/run_corporate_information_center_task_v3_0_phase2.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/communication/run_corporate_information_task.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/communication/run_executive_mail_center_v2.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/communication/send_daily_evening_tomorrow_mail.py: decision=keep_code_referenced | classes={'code_reference': 1, 'operational_reference': 2}
+- scripts/communication/send_daily_pulse_check_mail.py: decision=keep_code_referenced | classes={'code_reference': 1, 'other_reference': 1, 'operational_reference': 5}
+- scripts/communication/send_daily_weather_personnel_mail.py: decision=keep_code_referenced | classes={'code_reference': 2, 'other_reference': 1, 'operational_reference': 4}
+- scripts/dashboard/emergency_rollback_executive_summary_v1_0_8.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/executive/seed_executive_summary_menu_v2_14_8.py: decision=keep_operational_referenced | classes={'operational_reference': 3}
+- scripts/executive/send_daily_executive_summary.py: decision=keep_operational_referenced | classes={'other_reference': 4, 'operational_reference': 2}
+- scripts/live/check_bys360_live_full_overlay_v2_17_61.py: decision=keep_operational_referenced | classes={'operational_reference': 2}
+- scripts/live/repair_bys360_live_full_overlay_v2_17_60.py: decision=keep_operational_referenced | classes={'script_reference': 1, 'operational_reference': 1}
+- scripts/live/repair_bys360_live_full_overlay_v2_17_61.py: decision=keep_operational_referenced | classes={'operational_reference': 2, 'script_reference': 1}
+- scripts/live_readiness/a7d_local_smoke_contract.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v5_direct_stable.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/live_release/apply_bys360_cic_v3_0_live_final_release_resume_v6_lock_safe.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/menu/check_emergency_restore_remove_exec_menu_v2_14_18.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/menu/check_full_sidebar_restore_v2_14_12.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/menu/emergency_restore_remove_exec_menu_v2_14_18.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/overlay/bys360_live_full_overlay_v2_13_0.py: decision=keep_operational_referenced | classes={'script_reference': 1, 'operational_reference': 2}
+- scripts/performance/check_bys360_performance_completion_phase10_reminder_notification_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase11_period_scope_assignment_final.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase1_rule_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase2_category_center.py: decision=keep_code_referenced | classes={'code_reference': 2, 'other_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase3_visibility_center.py: decision=keep_code_referenced | classes={'code_reference': 2, 'other_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase4_third_manager_center.py: decision=keep_code_referenced | classes={'code_reference': 2}
+- scripts/performance/check_bys360_performance_completion_phase5_scorecard_ui_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase6_low_score_process_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase7_scorecard_archive_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase8_midterm_feedback_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/check_bys360_performance_completion_phase9_development_guidance_center.py: decision=keep_code_referenced | classes={'code_reference': 1, 'other_reference': 2}
+- scripts/performance/repair_bys360_performance_completion_phase2_category_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance/repair_bys360_performance_completion_phase3_visibility_center.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/performance_mail_automation_runner.py: decision=keep_code_referenced | classes={'code_reference': 1, 'operational_reference': 3}
+- scripts/portal/rollback_bys360_home_prestige_safe_v1a.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/portal/run_bys360_press_news_scan_v3a.py: decision=keep_operational_referenced | classes={'other_reference': 3, 'operational_reference': 1}
+- scripts/portal/run_bys360_social_media_embed_scan_v3b.py: decision=keep_code_referenced | classes={'code_reference': 1, 'other_reference': 3, 'operational_reference': 1}
+- scripts/quality/bys360_android_responsive_core_styles_gate_p5b.py: decision=keep_code_referenced | classes={'script_reference': 2, 'code_reference': 1}
+- scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py: decision=keep_code_referenced | classes={'script_reference': 3, 'code_reference': 1}
+- scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py: decision=keep_code_referenced | classes={'script_reference': 2, 'code_reference': 1}
+- scripts/quality/bys360_handover_docs_gate_v1.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py: decision=keep_code_referenced | classes={'other_reference': 2, 'script_reference': 3, 'code_reference': 3}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py: decision=keep_code_referenced | classes={'other_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py: decision=keep_code_referenced | classes={'other_reference': 1, 'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_auth_guard_matrix_gate_p4a.py: decision=keep_code_referenced | classes={'script_reference': 4, 'code_reference': 1}
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py: decision=keep_code_referenced | classes={'other_reference': 2, 'script_reference': 2, 'code_reference': 2}
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py: decision=keep_code_referenced | classes={'other_reference': 2, 'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a.py: decision=keep_code_referenced | classes={'other_reference': 1, 'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_pytest_contract_gate_p2a_v3.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v2.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_request_scenario_gate_p3a.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_response_suite_gate_p3f.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py: decision=keep_code_referenced | classes={'other_reference': 1, 'script_reference': 4, 'code_reference': 1}
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py: decision=keep_code_referenced | classes={'other_reference': 1, 'script_reference': 3, 'code_reference': 1}
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py: decision=keep_code_referenced | classes={'script_reference': 2, 'code_reference': 2}
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_ops_audit.py: decision=keep_operational_referenced | classes={'other_reference': 2, 'operational_reference': 1}
+- scripts/quality/bys360_phase2_auth_smoke_gate_v1.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_mobile_role_token_matrix_gate_v1.py: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+- scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3_route_density_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_base_helpers_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_config_helpers_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_item_helpers_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_query_helpers_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3b_mobile_performance_task_helpers_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_compact_route_service_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_note_route_service_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_score_route_service_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_summary_risk_route_service_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3c_task_detail_route_service_gate_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_phase3d_import_route_smoke_v1.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_pytest_standard_gate_p2d.py: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/quality/bys360_quality9_ci_gate.py: decision=keep_code_referenced | classes={'operational_reference': 1, 'other_reference': 2, 'code_reference': 1}
+- scripts/quality/bys360_score100_quality_gate_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 2, 'other_reference': 2}
+- scripts/quality/bys360_secret_repo_gate.py: decision=keep_operational_referenced | classes={'other_reference': 8, 'operational_reference': 1, 'script_reference': 34}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v2.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v3.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_cic_v3_0_live_final_release_resume_v4.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_60.py: decision=keep_operational_referenced | classes={'operational_reference': 2}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_61.py: decision=keep_operational_referenced | classes={'operational_reference': 3}
+- scripts/quality/check_bys360_live_full_overlay_v2_17_62.py: decision=keep_operational_referenced | classes={'operational_reference': 2}
+- scripts/quality/check_bys360_message_interactions_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_notification_email_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_bys360_portal_ajax_reactions_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_claude_phase7_final_gate.py: decision=keep_code_referenced | classes={'operational_reference': 1, 'code_reference': 1}
+- scripts/quality/check_corporate_information_center_v3_0_phase7_12_all_template_macro_fix.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/check_critical_services_phase5_gate.py: decision=keep_code_referenced | classes={'code_reference': 2}
+- scripts/quality/check_sql_performance_phase6_gate.py: decision=keep_code_referenced | classes={'code_reference': 2}
+- scripts/quality/repair_bys360_message_interactions_v1.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/repair_bys360_notification_email_v1.py: decision=keep_operational_referenced | classes={'other_reference': 2, 'operational_reference': 1}
+- scripts/quality/repair_bys360_portal_ajax_reactions_v1.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 1}
+- scripts/quality/restore_p14f4_source_aware_existing_assistant_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/restore_p14j2_performance_archive_corporate_template_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/quality/restore_p14j_performance_archive_template_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/release/build_bys360_safe_release.py: decision=keep_operational_referenced | classes={'operational_reference': 1, 'other_reference': 2}
+- scripts/scheduled/run_cic_staff_noon.py: decision=keep_operational_referenced | classes={'operational_reference': 3}
+- scripts/security/build_bys360_secure_release_v1_5.py: decision=keep_operational_referenced | classes={'other_reference': 5, 'script_reference': 1, 'operational_reference': 1}
+- scripts/security/bys360_release_zip_preflight_v1.py: decision=keep_operational_referenced | classes={'other_reference': 3, 'operational_reference': 2}
+- scripts/security/repair_bys360_csrf_form_token_and_referrer_hotfix_v2_15_15.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_csrf_main_login_hotfix_v2_15_14.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_logout_base_client_hotfix_v2_15_13.py: decision=keep_operational_referenced | classes={'operational_reference': 4}
+- scripts/security/repair_bys360_logout_force_clear_v2_15_12.py: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 4}
+- scripts/security/validate_a6e_production_env_contract.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/apply_bys360_cic_v3_0_live_final_release.ps1: decision=keep_operational_referenced | classes={'other_reference': 1, 'operational_reference': 2}
+- scripts/windows/check_bys36043_restore_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_60.ps1: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_61.ps1: decision=keep_operational_referenced | classes={'operational_reference': 2}
+- scripts/windows/check_bys360_live_full_overlay_v2_17_62.ps1: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/claude_phase7_final_quality.ps1: decision=keep_code_referenced | classes={'script_reference': 2, 'code_reference': 1}
+- scripts/windows/install_bys360_social_auto_import_v3b2_task.ps1: decision=keep_code_referenced | classes={'code_reference': 1}
+- scripts/windows/pre_live_backup_plan.ps1: decision=keep_operational_referenced | classes={'script_reference': 1, 'operational_reference': 1}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1.py: decision=keep_operational_referenced | classes={'operational_reference': 3}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_2.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/repair_bys360_live_portal_db_after_bys36043_v1_3.py: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/repair_bys360_score100_quality_gate_v1.ps1: decision=keep_operational_referenced | classes={'operational_reference': 1, 'other_reference': 1}
+- scripts/windows/rollback_bys360_live_full_overlay_v2_17_60.ps1: decision=keep_operational_referenced | classes={'operational_reference': 1}
+- scripts/windows/run_bys360_tests.ps1: decision=keep_code_referenced | classes={'script_reference': 1, 'code_reference': 1}
+
+## Decision
+- Bu rapor dosya tasimaz.
+- keep_review_referenced grubundaki 200 dosyanin referans kaynaklarini siniflandirir.
+- app/tests/migrations veya operasyonel referansi olan dosyalar otomatik arsivlenmemelidir.
+- Sadece eski scriptler tarafindan referanslanan emekli markerli dosyalar sonraki guvenli dalga adayi olabilir.
