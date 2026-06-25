@@ -1,0 +1,218 @@
+{
+  "package": "BYS360_PHASE4D_OFFLINE_INTEGRATION_SMOKE_V1",
+  "generated_at": "2026-06-25T12:11:42",
+  "branch": "phase4d-offline-integration-gate-v1",
+  "head_before_report_commit": "90e13e3",
+  "meaningful_git_status_clean_before_report_write": true,
+  "compile": {
+    "app/__init__.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/__init__.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 55.434,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/route_support.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/route_support.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 52.208,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/performance/v2_1_4_category_scope_routes.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/performance/v2_1_4_category_scope_routes.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 57.363,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/corporate_information_center_engine.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/corporate_information_center_engine.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 48.347,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/executive_mail_center_v2.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/executive_mail_center_v2.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 53.116,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    }
+  },
+  "source_markers": {
+    "menu_prewarm_marker": true,
+    "template_prewarm_marker": true,
+    "weekend_guard_corporate_marker": true,
+    "weekend_guard_executive_marker": true,
+    "message_comments_source_marker": true
+  },
+  "create_app_timing": {
+    "ok": true,
+    "elapsed_ms": 1116.861
+  },
+  "route_map": {
+    "route_count": 941,
+    "duplicate_rule_count": 21,
+    "duplicate_rules_sample": [
+      "/api/mobile/kpi/target-management",
+      "/api/mobile/performance/in-period-notes/v2",
+      "/api/mobile/performance/tasks/<int:assignment_id>/score-form",
+      "/api/mobile/support/tickets",
+      "/dashboard/kurumsal-bilgilendirme/alicilar",
+      "/dashboard/kurumsal-bilgilendirme/gorevler",
+      "/dashboard/kurumsal-bilgilendirme/kutlamalar",
+      "/dashboard/kurumsal-bilgilendirme/sablonlar",
+      "/dashboard/kurumsal-bilgilendirme/sistem",
+      "/dashboard/kurumsal-bilgilendirme/test",
+      "/manifest.webmanifest",
+      "/performance/president-approvals/<int:approval_id>/scorecard",
+      "/performans/baskan-onaylari",
+      "/performans/baskan-onaylari/<int:approval_id>/karne",
+      "/performans/gorusme-sonrasi-notlar/yeni",
+      "/performans/stratejik/ai-kpi-analiz",
+      "/performans/stratejik/hedefler",
+      "/performans/stratejik/kpi-dashboard",
+      "/performans/stratejik/oz-degerlendirme",
+      "/performans/stratejik/yetkinlik-kutuphanesi"
+    ],
+    "has_category_scope_path": true,
+    "message_related_rules_sample": [
+      "/api/mobile/communication/messages/create-thread",
+      "/api/mobile/communication/messages/threads",
+      "/api/mobile/communication/messages/threads/<int:thread_id>",
+      "/api/mobile/communication/messages/threads/<int:thread_id>/send",
+      "/api/mobile/communication/messages/users",
+      "/messages",
+      "/messages/<int:message_id>/comment",
+      "/messages/<int:message_id>/delete",
+      "/messages/<int:message_id>/edit",
+      "/messages/<int:message_id>/react",
+      "/messages/attachments/<filename>",
+      "/messages/new",
+      "/messages/thread/<int:thread_id>",
+      "/messages/thread/<int:thread_id>/activity",
+      "/messages/thread/<int:thread_id>/archive-toggle",
+      "/messages/thread/<int:thread_id>/live",
+      "/messages/thread/<int:thread_id>/mark-read",
+      "/messages/thread/<int:thread_id>/mute-toggle",
+      "/messages/thread/<int:thread_id>/pin-toggle",
+      "/messages/thread/<int:thread_id>/send",
+      "/messages/thread/<int:thread_id>/typing",
+      "/portal",
+      "/portal/groups",
+      "/portal/groups",
+      "/portal/groups/<int:group_id>",
+      "/portal/instagram/sync",
+      "/portal/mentions/users",
+      "/portal/moderation",
+      "/portal/people",
+      "/portal/posts"
+    ]
+  },
+  "anonymous_smokes": [
+    {
+      "path": "/login",
+      "ok": true,
+      "status_code": 200,
+      "location": null,
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/performance/v2-1-4-category-scope",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fperformance%2Fv2-1-4-category-scope",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/api/mobile/communication/messages/create-thread",
+      "ok": true,
+      "status_code": 405,
+      "location": null,
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/api/mobile/communication/messages/threads",
+      "ok": true,
+      "status_code": 401,
+      "location": null,
+      "content_type": "application/json"
+    },
+    {
+      "path": "/api/mobile/communication/messages/users",
+      "ok": true,
+      "status_code": 401,
+      "location": null,
+      "content_type": "application/json"
+    },
+    {
+      "path": "/messages",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fmessages",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/messages/new",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fmessages%2Fnew",
+      "content_type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/portal",
+      "ok": true,
+      "status_code": 302,
+      "location": "/login?next=%2Fportal",
+      "content_type": "text/html; charset=utf-8"
+    }
+  ],
+  "category_scope_authenticated_timing": {
+    "label": "category_scope_authenticated_render_phase4d",
+    "ok": true,
+    "elapsed_ms": 162.534,
+    "result_type": "str",
+    "result_size": 100851,
+    "error": null
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean": true,
+    "compile_ok": true,
+    "source_markers_ok": true,
+    "create_app_ok": true,
+    "route_map_ok": true,
+    "anonymous_smokes_without_500": true,
+    "category_scope_under_250ms": true,
+    "integration_smoke_ok": true
+  },
+  "smoke_ok": true,
+  "error": null
+}
