@@ -1,0 +1,938 @@
+{
+  "package": "BYS360_PHASE4C_CATEGORY_SCOPE_BASE_RENDER_PROFILE_V1",
+  "generated_at": "2026-06-25T10:00:43",
+  "branch": "phase4c-performance-category-scope-v1",
+  "head_before_report_commit": "e93dcd1",
+  "meaningful_git_status_clean_before_report_write": true,
+  "base_analysis": {
+    "path": "app/templates/base.html",
+    "exists": true,
+    "line_count": 1126,
+    "char_count": 118562,
+    "extends": [],
+    "includes": [],
+    "refs": {
+      "url_for_count": 161,
+      "for_count": 4,
+      "if_count": 130,
+      "include_count": 0,
+      "script_tag_count": 25,
+      "link_tag_count": 55,
+      "ai_refs": 150,
+      "menu_refs": 311,
+      "notification_refs": 50,
+      "portal_refs": 109,
+      "performance_refs": 293
+    },
+    "interesting_lines": [
+      {
+        "line": 12,
+        "score": 2,
+        "text": "    <link rel=\"icon\" type=\"image/x-icon\" href=\"{{ url_for('static', filename='img/favicon.ico') }}\">"
+      },
+      {
+        "line": 13,
+        "score": 2,
+        "text": "    <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"{{ url_for('static', filename='img/favicon.png') }}\">"
+      },
+      {
+        "line": 14,
+        "score": 2,
+        "text": "    <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"{{ url_for('static', filename='img/apple-touch-icon.png') }}\">"
+      },
+      {
+        "line": 16,
+        "score": 1,
+        "text": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">"
+      },
+      {
+        "line": 17,
+        "score": 1,
+        "text": "    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>"
+      },
+      {
+        "line": 18,
+        "score": 1,
+        "text": "    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap\" rel=\"stylesheet\">"
+      },
+      {
+        "line": 19,
+        "score": 1,
+        "text": "    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css\">"
+      },
+      {
+        "line": 20,
+        "score": 1,
+        "text": "    <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">"
+      },
+      {
+        "line": 23,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/mobile_phase_m1.css') }}\">"
+      },
+      {
+        "line": 24,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/faz1_mobile_foundation.css') }}\">"
+      },
+      {
+        "line": 25,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/mobile_global_hardening.css') }}\">"
+      },
+      {
+        "line": 26,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/base_logo_refresh.css') }}\">"
+      },
+      {
+        "line": 27,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_live_hero_polish.css') }}?v=live-hero-polish-20260418\">"
+      },
+      {
+        "line": 28,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/phase5_5_scorecard_mobile.css') }}\">"
+      },
+      {
+        "line": 40,
+        "score": 1,
+        "text": "            --sidebar-w:318px;"
+      },
+      {
+        "line": 73,
+        "score": 1,
+        "text": "        .app-sidebar{"
+      },
+      {
+        "line": 74,
+        "score": 1,
+        "text": "            position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:var(--sidebar-w)!important;"
+      },
+      {
+        "line": 79,
+        "score": 1,
+        "text": "        .app-sidebar::-webkit-scrollbar{width:10px;}"
+      },
+      {
+        "line": 80,
+        "score": 1,
+        "text": "        .app-sidebar::-webkit-scrollbar-track{background:transparent;}"
+      },
+      {
+        "line": 81,
+        "score": 1,
+        "text": "        .app-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.20);border-radius:999px;border:2px solid transparent;background-clip:padding-box;}"
+      },
+      {
+        "line": 82,
+        "score": 2,
+        "text": "        .app-sidebar::before{content:\"\";position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background-image:url(\"{{ url_for('static', filename='img/ay_yildiz.png') }}\");background-repeat:no-repeat;background-position:center 255px;background-size:240px"
+      },
+      {
+        "line": 83,
+        "score": 1,
+        "text": "        .app-sidebar::after{content:\"\";position:fixed;left:0;top:0;bottom:0;width:12px;background:linear-gradient(180deg,#bc1f1f 0%,#8B0000 44%,#5b0000 100%);box-shadow:6px 0 18px rgba(15,23,42,.12);pointer-events:none;}"
+      },
+      {
+        "line": 84,
+        "score": 1,
+        "text": "        .sidebar-inner{position:relative;z-index:2;min-height:100%;display:flex;flex-direction:column;padding:0 14px 24px 22px;}"
+      },
+      {
+        "line": 87,
+        "score": 1,
+        "text": "        .sidebar-section{display:block;margin:0 0 14px;}"
+      },
+      {
+        "line": 88,
+        "score": 1,
+        "text": "        .sidebar-section-title{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:900;letter-spacing:.38px;text-transform:uppercase;color:rgba(255,255,255,.66);padding:6px 10px 10px 12px;border-left:3px solid rgba(255,255,255,.16);margin-left"
+      },
+      {
+        "line": 116,
+        "score": 1,
+        "text": "        .sidebar-footer{margin-top:auto;padding:18px 8px 8px;}"
+      },
+      {
+        "line": 117,
+        "score": 1,
+        "text": "        .sidebar-footer-card{border-radius:18px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.11);padding:14px;color:rgba(255,255,255,.78);font-size:.76rem;line-height:1.65;text-align:center;}"
+      },
+      {
+        "line": 119,
+        "score": 1,
+        "text": "        .app-main{position:relative!important;margin-left:var(--sidebar-w)!important;min-height:100vh!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;background:transparent;}"
+      },
+      {
+        "line": 122,
+        "score": 1,
+        "text": "        .menu-toggle{width:42px;height:42px;border:none;border-radius:14px;background:#fff;border:1px solid var(--bys-border);color:var(--bys-red);display:inline-flex!important;align-items:center;justify-content:center;box-shadow:0 8px 18px rgba(15,23,42,.05);"
+      },
+      {
+        "line": 133,
+        "score": 1,
+        "text": "        .user-menu{position:relative;}"
+      },
+      {
+        "line": 194,
+        "score": 1,
+        "text": "        body.sidebar-collapsed .app-sidebar{transform:translateX(-100%)!important;}"
+      },
+      {
+        "line": 195,
+        "score": 1,
+        "text": "        body.sidebar-collapsed .app-main{margin-left:0!important;}"
+      },
+      {
+        "line": 198,
+        "score": 1,
+        "text": "            :root{--sidebar-w:300px;--topbar-h:62px;}"
+      },
+      {
+        "line": 199,
+        "score": 1,
+        "text": "            .app-sidebar{top:var(--topbar-h)!important;height:calc(100vh - var(--topbar-h))!important;bottom:auto!important;transform:translateX(-100%);transition:transform .22s ease;}"
+      },
+      {
+        "line": 200,
+        "score": 1,
+        "text": "            .app-sidebar::before,.app-sidebar::after{top:var(--topbar-h)!important;height:calc(100vh - var(--topbar-h));bottom:auto;}"
+      },
+      {
+        "line": 201,
+        "score": 1,
+        "text": "            .app-sidebar.mobile-open{transform:translateX(0)!important;}"
+      },
+      {
+        "line": 203,
+        "score": 1,
+        "text": "            body.sidebar-collapsed .app-sidebar{transform:translateX(-100%)!important;}"
+      },
+      {
+        "line": 227,
+        "score": 1,
+        "text": "    <!-- BYS360_AI_EVERYWHERE_V1_CSS -->"
+      },
+      {
+        "line": 228,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_ai_everywhere_v1.css') }}?v=ai-everywhere-v1\">"
+      },
+      {
+        "line": 229,
+        "score": 1,
+        "text": "<!-- /BYS360_AI_EVERYWHERE_V1_CSS -->"
+      },
+      {
+        "line": 233,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_real_mobile_app_v9.css') }}?v=9\">"
+      },
+      {
+        "line": 237,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_mobile_emergency_visible_v8.css') }}?v=8\">"
+      },
+      {
+        "line": 240,
+        "score": 1,
+        "text": "    <!-- BYS360_ASISTANI_MODULU_CANONICAL_V1_CSS_INCLUDE -->"
+      },
+      {
+        "line": 241,
+        "score": 1,
+        "text": "<!-- /BYS360_ASISTANI_MODULU_CANONICAL_V1_CSS_INCLUDE -->"
+      },
+      {
+        "line": 242,
+        "score": 1,
+        "text": "                <!-- BYS360_ASSISTANT_MODULE_CANONICAL_CSS -->"
+      },
+      {
+        "line": 243,
+        "score": 1,
+        "text": "    <!-- /BYS360_ASSISTANT_MODULE_CANONICAL_CSS -->"
+      },
+      {
+        "line": 244,
+        "score": 1,
+        "text": "                                <!-- BYS360_ASISTANI_MODULU_CANONICAL_CSS_V7 -->"
+      },
+      {
+        "line": 245,
+        "score": 1,
+        "text": "    <!-- /BYS360_ASISTANI_MODULU_CANONICAL_CSS_V7 -->"
+      },
+      {
+        "line": 246,
+        "score": 1,
+        "text": "    <!-- BYS360_ASISTANI_PERFORMANCE_KB_V10_CSS -->"
+      },
+      {
+        "line": 247,
+        "score": 3,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_performance_kb_v10.css') }}?v=10\">"
+      },
+      {
+        "line": 248,
+        "score": 2,
+        "text": "    <!-- BYS360_ASISTANI_ROLE_REPORT_SUPPORT_AI_KB_V11_CSS -->"
+      },
+      {
+        "line": 249,
+        "score": 4,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_role_report_support_ai_kb_v11.css') }}?v=11\">"
+      },
+      {
+        "line": 256,
+        "score": 2,
+        "text": "    <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"{{ url_for('static', filename='img/pwa/bys360-icon-192.png') }}\">"
+      },
+      {
+        "line": 257,
+        "score": 2,
+        "text": "    <link rel=\"apple-touch-icon\" href=\"{{ url_for('static', filename='img/pwa/bys360-icon-192.png') }}\">"
+      },
+      {
+        "line": 262,
+        "score": 2,
+        "text": "  <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_mobile_webview_scroll_fix_v12.css') }}\">"
+      },
+      {
+        "line": 265,
+        "score": 1,
+        "text": "<link rel=\"manifest\" href=\"/manifest.webmanifest\">"
+      },
+      {
+        "line": 270,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-icon\" href=\"/static/pwa/icons/apple-touch-icon.png\">"
+      },
+      {
+        "line": 273,
+        "score": 1,
+        "text": "<link rel=\"manifest\" href=\"/manifest.webmanifest?v=ios-pwa-v2\">"
+      },
+      {
+        "line": 282,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/static/pwa/icons/apple-touch-icon.png?v=ios-pwa-v2\">"
+      },
+      {
+        "line": 283,
+        "score": 1,
+        "text": "<link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/static/pwa/icons/icon-192.png?v=ios-pwa-v2\">"
+      },
+      {
+        "line": 284,
+        "score": 1,
+        "text": "<link rel=\"icon\" type=\"image/png\" sizes=\"512x512\" href=\"/static/pwa/icons/icon-512.png?v=ios-pwa-v2\">"
+      },
+      {
+        "line": 285,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_ios_pwa_v2.css') }}?v=ios-pwa-v2\">"
+      },
+      {
+        "line": 286,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone5.png\" media=\"(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 287,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone8.png\" media=\"(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 288,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone11.png\" media=\"(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 289,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone14.png\" media=\"(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)\">"
+      },
+      {
+        "line": 290,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone14pro.png\" media=\"(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)\">"
+      },
+      {
+        "line": 291,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/iphone14promax.png\" media=\"(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)\">"
+      },
+      {
+        "line": 292,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/ipad_9_7.png\" media=\"(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 293,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/ipad_10_5.png\" media=\"(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 294,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/ipad_11.png\" media=\"(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 295,
+        "score": 1,
+        "text": "<link rel=\"apple-touch-startup-image\" href=\"/static/pwa/splash/ipad_12_9.png\" media=\"(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)\">"
+      },
+      {
+        "line": 296,
+        "score": 1,
+        "text": "<!-- BYS360_IOS_PWA_V2_TOPBAR_NOTIFICATION_FIX_BEGIN -->"
+      },
+      {
+        "line": 297,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_ios_pwa_v2_topbar_notification_fix.css') }}?v=ios-pwa-v2-topbar-fix\">"
+      },
+      {
+        "line": 298,
+        "score": 1,
+        "text": "<!-- BYS360_IOS_PWA_V2_TOPBAR_NOTIFICATION_FIX_END -->"
+      },
+      {
+        "line": 301,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='pwa/ios_pwa_performance_mobile_v3_1.css') }}\">"
+      },
+      {
+        "line": 304,
+        "score": 2,
+        "text": "<link rel=\"manifest\" href=\"{{ url_for('static', filename='pwa/manifest-ios-premium.webmanifest') }}\">"
+      },
+      {
+        "line": 310,
+        "score": 2,
+        "text": "<link rel=\"apple-touch-icon\" href=\"{{ url_for('static', filename='pwa/icons/icon-192.png') }}\">"
+      },
+      {
+        "line": 311,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='pwa/ios_pwa_premium.css') }}\">"
+      },
+      {
+        "line": 313,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_ios_assistant_clean_chat_v2.css') }}\">"
+      },
+      {
+        "line": 343,
+        "score": 1,
+        "text": ".sidebar-bys + .app-main, aside.sidebar-bys + main.app-main {"
+      },
+      {
+        "line": 351,
+        "score": 1,
+        "text": "{% if csrf_token is defined %}<meta name=\"csrf-token\" content=\"{{ csrf_token() }}\">{% endif %}"
+      },
+      {
+        "line": 352,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_live_full_v2_17_61.css') }}?v=2_17_61\">"
+      },
+      {
+        "line": 353,
+        "score": 1,
+        "text": "{% if request and request.path and ('kurumsal-bilgilendirme/alicilar' in request.path or 'kurumsal-bilgilendirme/alicilar' in request.path|lower) %}"
+      },
+      {
+        "line": 354,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_recipient_ux_v2_3.css') }}?v=2_17_61\">"
+      },
+      {
+        "line": 357,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_ios_responsive_completion_v1.css') }}?v=1\">"
+      },
+      {
+        "line": 360,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_android_responsive_completion_v1.css') }}?v=1\">"
+      },
+      {
+        "line": 363,
+        "score": 2,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_android_responsive_completion_v2.css') }}?v=2\">"
+      },
+      {
+        "line": 365,
+        "score": 2,
+        "text": "    <link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_android_responsive_core_p5b.css') }}\">"
+      },
+      {
+        "line": 367,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_chatgpt_like_v31.css') }}?v=31_1\">"
+      },
+      {
+        "line": 368,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_closed_label_fix.css') }}?v=original-v4\">"
+      },
+      {
+        "line": 369,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_module.css') }}?v=assistant-identity-intro-v5\">"
+      },
+      {
+        "line": 371,
+        "score": 1,
+        "text": "<!-- BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34_CSS -->"
+      },
+      {
+        "line": 372,
+        "score": 3,
+        "text": "<link rel=\"stylesheet\" href=\"{{ url_for('static', filename='css/bys360_assistant_no_chat_intro_open_fix_v34.css') }}?v=34\">"
+      },
+      {
+        "line": 378,
+        "score": 1,
+        "text": "        <img src=\"{{ url_for('static', filename='img/bys360.svg') }}\" alt=\"Yükleniyor\" class=\"page-loader-logo\" onerror=\"this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';\">"
+      },
+      {
+        "line": 384,
+        "score": 2,
+        "text": "{# BYS360_SETTINGS_LIVE_AUTHORITY_V2_BASE_GUARD: Sidebar bağlantıları yalnızca menu_map ile görünür; can_manage/admin_only ikinci kapısı menüyü gölgelemez. #}"
+      },
+      {
+        "line": 387,
+        "score": 1,
+        "text": "{% set menu_map = menu_visibility_map if menu_visibility_map is defined else {} %}"
+      },
+      {
+        "line": 388,
+        "score": 1,
+        "text": "{% set default_avatar = url_for('static', filename='img/default-avatar.svg') %}"
+      },
+      {
+        "line": 390,
+        "score": 1,
+        "text": "{% set unread_notification_count = unread_notification_count if unread_notification_count is defined else 0 %}"
+      },
+      {
+        "line": 391,
+        "score": 1,
+        "text": "{% set side_logo_src = url_for('static', filename='img/yan logo bys360.svg') %}"
+      },
+      {
+        "line": 392,
+        "score": 1,
+        "text": "{% set fallback_logo_src = url_for('static', filename='img/bys360.svg') %}"
+      },
+      {
+        "line": 399,
+        "score": 2,
+        "text": "{% set show_notifications_shortcut = menu_map.get('notifications', False) or current_ep == 'main.notifications_list' or current_ep.startswith('main.notifications_') or current_path.startswith('/notifications') %}"
+      },
+      {
+        "line": 400,
+        "score": 1,
+        "text": "{% set feedback_quick_visible = menu_map.get('feedback_quick', True) %}"
+      },
+      {
+        "line": 401,
+        "score": 1,
+        "text": "{% set performance_module_visible = menu_map.get('performance_module', menu_map.get('performance_management', menu_map.get('performans_yonetimi', True))) %}"
+      },
+      {
+        "line": 403,
+        "score": 1,
+        "text": "{% set general_category_visible = menu_map.get('general_section', menu_map.get('genel', menu_map.get('general', True))) %}"
+      },
+      {
+        "line": 404,
+        "score": 2,
+        "text": "{% set general_category_has_child = feedback_quick_visible or menu_map.get('home', False) or menu_map.get('dashboard', False) or menu_map.get('notifications', False) or menu_map.get('support_index', False) or menu_map.get('support_new', False) or menu_map.get("
+      },
+      {
+        "line": 406,
+        "score": 1,
+        "text": "{# BYS360_SETTINGS_ROLE_MATRIX_ALL_FEATURES_FINAL_FIX_V1: Genel bölüm performans kısayolları ana anahtara bağlıdır; marker: performance_module_visible and menu_map.get('performance_tasks' #}"
+      },
+      {
+        "line": 407,
+        "score": 4,
+        "text": "{% set show_genel_section = (general_category_visible or general_category_has_child) and (menu_map.get('home', True) or menu_map.get('dashboard', True) or menu_map.get('ai_agent_panel', False) or menu_map.get('assistant_module', False) or menu_map.get('support"
+      },
+      {
+        "line": 408,
+        "score": 1,
+        "text": "{% set show_ik_section = menu_map.get('admin_users', False) or menu_map.get('org_units', False) or menu_map.get('hr_management', False) or menu_map.get('hr_leave_tracking', False) or menu_map.get('hr_reports', False) %}"
+      },
+      {
+        "line": 409,
+        "score": 1,
+        "text": "{% set performance_subsection_visible = menu_map.get('scorecards', False) or menu_map.get('performance_dashboard', False) or menu_map.get('performance_criteria', False) or menu_map.get('criteria', False) or menu_map.get('performance_periods', False) or menu_ma"
+      },
+      {
+        "line": 411,
+        "score": 1,
+        "text": "{% set show_comms_section = menu_map.get('messages', False) or menu_map.get('surveys', False) or menu_map.get('survey_manage', False) or menu_map.get('survey_results', False) or menu_map.get('feedback_dashboard', False) or menu_map.get('feedback_pulse', False)"
+      },
+      {
+        "line": 412,
+        "score": 2,
+        "text": "{% set show_ai_section = menu_map.get('ai_center', False) or menu_map.get('analysis_center', False) or menu_map.get('ai_decision_support', False) or current_path.startswith('/ai/decision-support') or current_path.startswith('/admin/ai') %}"
+      },
+      {
+        "line": 413,
+        "score": 3,
+        "text": "{% set assistant_panel_visible = menu_map.get('ai_agent_panel', False) or menu_map.get('assistant_module', False) or menu_map.get('assistant_center', False) %}"
+      },
+      {
+        "line": 414,
+        "score": 3,
+        "text": "{% set assistant_knowledge_visible = menu_map.get('ai_agent_knowledge', False) or menu_map.get('ai_teaching_center', False) %}"
+      },
+      {
+        "line": 415,
+        "score": 3,
+        "text": "{% set assistant_teaching_visible = menu_map.get('ai_agent_teaching_center', False) %}"
+      },
+      {
+        "line": 416,
+        "score": 1,
+        "text": "{% set show_assistant_section = current_user.is_authenticated and (assistant_panel_visible or assistant_knowledge_visible or assistant_teaching_visible) %}"
+      },
+      {
+        "line": 417,
+        "score": 2,
+        "text": "{% set show_user_section = menu_map.get('account', True) or show_notifications_shortcut or menu_map.get('settings', False) or menu_map.get('db_check', False) or menu_map.get('logout', True) %}"
+      },
+      {
+        "line": 418,
+        "score": 1,
+        "text": "{# BYS360_CORPORATE_PORTAL_MENU_V1_2_VARS_BEGIN #}"
+      },
+      {
+        "line": 421,
+        "score": 1,
+        "text": "{% set portal_feed_visible = menu_map.get('portal_feed', menu_map.get('corporate_portal', menu_map.get('portal', portal_role_fallback))) or portal_role_fallback or current_path.startswith('/portal') %}"
+      },
+      {
+        "line": 422,
+        "score": 1,
+        "text": "{% set portal_people_visible = menu_map.get('portal_people', portal_feed_visible) or portal_feed_visible %}"
+      }
+    ]
+  },
+  "page_template_analysis": {
+    "path": "app/templates/performance/v2_1_4_category_scope.html",
+    "exists": true,
+    "line_count": 81,
+    "char_count": 9981,
+    "extends": [
+      "base.html"
+    ],
+    "includes": [],
+    "refs": {
+      "url_for_count": 0,
+      "for_count": 4,
+      "if_count": 6,
+      "include_count": 0,
+      "script_tag_count": 0,
+      "link_tag_count": 0,
+      "ai_refs": 0,
+      "menu_refs": 0,
+      "notification_refs": 0,
+      "portal_refs": 0,
+      "performance_refs": 3
+    },
+    "interesting_lines": [
+      {
+        "line": 23,
+        "score": 1,
+        "text": "        {% if csrf_token is defined %}<input type=\"hidden\" name=\"csrf_token\" value=\"{{ csrf_token() }}\">{% endif %}"
+      },
+      {
+        "line": 33,
+        "score": 1,
+        "text": "          {% for cat in all_categories %}"
+      },
+      {
+        "line": 39,
+        "score": 1,
+        "text": "                {% if cat.is_active %}"
+      },
+      {
+        "line": 40,
+        "score": 1,
+        "text": "                <form method=\"post\" onsubmit=\"return confirm('Bu kategori silinsin mi? Bağlı kayıt varsa kategori pasife alınır ve geçmiş korunur.');\">{% if csrf_token is defined %}<input type=\"hidden\" name=\"csrf_token\" value=\"{{ csrf_token() }}\">{% endif %}<i"
+      },
+      {
+        "line": 42,
+        "score": 1,
+        "text": "                <form method=\"post\">{% if csrf_token is defined %}<input type=\"hidden\" name=\"csrf_token\" value=\"{{ csrf_token() }}\">{% endif %}<input type=\"hidden\" name=\"action\" value=\"restore_category\"><input type=\"hidden\" name=\"category_key\" value=\"{{ cat.ca"
+      },
+      {
+        "line": 55,
+        "score": 1,
+        "text": "      {% for item in category_scopes %}"
+      },
+      {
+        "line": 60,
+        "score": 1,
+        "text": "          {% if csrf_token is defined %}<input type=\"hidden\" name=\"csrf_token\" value=\"{{ csrf_token() }}\">{% endif %}"
+      },
+      {
+        "line": 73,
+        "score": 2,
+        "text": "      <tbody>{% for draft in drafts %}<tr><td><strong>{{ draft.scope_name }}</strong></td><td>{{ draft.category_key }}</td><td>{{ label_status(draft.visibility_mode) }}</td><td><form method=\"post\">{% if csrf_token is defined %}<input type=\"hidden\" name=\"csrf_t"
+      },
+      {
+        "line": 78,
+        "score": 1,
+        "text": "    <table class=\"bys-table\"><thead><tr><th>Kontrol</th><th>Durum</th><th>Açıklama</th></tr></thead><tbody>{% for item in gate.checks %}<tr><td>{{ corporate_gate_label(item.name) }}</td><td><span class=\"bys-badge {{ 'ok' if item.ok else 'warn' }}\">{{ 'Geçti' i"
+      }
+    ]
+  },
+  "context_processors": [
+    {
+      "scope": null,
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_user_context_processor",
+      "module": "flask_login.utils",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask_login\\utils.py",
+      "line": 404,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "<lambda>",
+      "module": "flask_wtf.csrf",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask_wtf\\csrf.py",
+      "line": 204,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "inject_menu_visibility",
+      "module": "app.routes",
+      "source_file": "C:\\bys360\\project\\app\\routes.py",
+      "line": 162,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "inject_global_risk_banner",
+      "module": "app.routes",
+      "source_file": "C:\\bys360\\project\\app\\routes.py",
+      "line": 167,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "inject_route_helpers",
+      "module": "app.routes",
+      "source_file": "C:\\bys360\\project\\app\\routes.py",
+      "line": 172,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_v2_1_3_category_context_processor",
+      "module": "app.performance.v2_1_3_personnel_category_card_routes",
+      "source_file": "C:\\bys360\\project\\app\\performance\\v2_1_3_personnel_category_card_routes.py",
+      "line": 26,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "announcement_popup_runtime_context",
+      "module": "app.communication.announcement_popup_routes",
+      "source_file": "C:\\bys360\\project\\app\\communication\\announcement_popup_routes.py",
+      "line": 93,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "bys360_notification_context",
+      "module": "app.communication.routes",
+      "source_file": "C:\\bys360\\project\\app\\communication\\routes.py",
+      "line": 28,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "inject_about_modal_context",
+      "module": "app.template_safety",
+      "source_file": "C:\\bys360\\project\\app\\template_safety.py",
+      "line": 188,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "inject_csp_nonce_context",
+      "module": "app.bootstrap.response_hardening",
+      "source_file": "C:\\bys360\\project\\app\\bootstrap\\response_hardening.py",
+      "line": 22,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_assistant_module_master_context",
+      "module": "app.services.assistant_module_access",
+      "source_file": "C:\\bys360\\project\\app\\services\\assistant_module_access.py",
+      "line": 460,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_assistant_shortcut_visibility_context",
+      "module": "app.services.assistant_shortcut_visibility",
+      "source_file": "C:\\bys360\\project\\app\\services\\assistant_shortcut_visibility.py",
+      "line": 305,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_bys360_phase2_5_category_average_context",
+      "module": "app.template_helpers.category_average",
+      "source_file": "C:\\bys360\\project\\app\\template_helpers\\category_average.py",
+      "line": 16,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_bys360_phase11_development_guidance_context",
+      "module": "app.template_helpers.development_guidance",
+      "source_file": "C:\\bys360\\project\\app\\template_helpers\\development_guidance.py",
+      "line": 16,
+      "error": null
+    },
+    {
+      "scope": null,
+      "name": "_assistant_role_matrix_v10_context",
+      "module": "app.services.assistant_role_matrix_v10",
+      "source_file": "C:\\bys360\\project\\app\\services\\assistant_role_matrix_v10.py",
+      "line": 272,
+      "error": null
+    },
+    {
+      "scope": "main",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "health",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "strategic_performance",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "ai_agent",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "pwa",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "mobile_api",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    },
+    {
+      "scope": "executive_summary",
+      "name": "_default_template_ctx_processor",
+      "module": "flask.templating",
+      "source_file": "C:\\bys360\\project\\.venv\\Lib\\site-packages\\flask\\templating.py",
+      "line": 24,
+      "error": null
+    }
+  ],
+  "route_render_repeated": [
+    {
+      "ok": true,
+      "elapsed_ms": 586.613,
+      "result_type": "str",
+      "result_size": 100851,
+      "preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <l",
+      "iteration": 1
+    },
+    {
+      "ok": true,
+      "elapsed_ms": 162.851,
+      "result_type": "str",
+      "result_size": 100851,
+      "preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <l",
+      "iteration": 2
+    },
+    {
+      "ok": true,
+      "elapsed_ms": 152.07,
+      "result_type": "str",
+      "result_size": 100851,
+      "preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <l",
+      "iteration": 3
+    },
+    {
+      "ok": true,
+      "elapsed_ms": 157.599,
+      "result_type": "str",
+      "result_size": 100851,
+      "preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <l",
+      "iteration": 4
+    },
+    {
+      "ok": true,
+      "elapsed_ms": 168.447,
+      "result_type": "str",
+      "result_size": 100851,
+      "preview": "'\\n\\n\\n<!doctype html>\\n<html lang=\"tr\">\\n<head>\\n\\n<meta charset=\"utf-8\">\\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\\n    <title>Kategori ve Kapsam Yönetimi</title>\\n\\n    <link rel=\"icon\" type=\"image/x-icon\" href=\"/static/img/favicon.ico\">\\n    <l",
+      "iteration": 5
+    }
+  ],
+  "classification": {
+    "base_exists": true,
+    "page_extends_base": true,
+    "large_render_output": true,
+    "cold_or_template_render_cost_seen": true,
+    "repeated_route_under_250ms": true,
+    "base_has_many_dynamic_refs": true
+  },
+  "profile_ok": true,
+  "error": null
+}
