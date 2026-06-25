@@ -1,0 +1,82 @@
+{
+  "package": "BYS360_PHASE4D_OFFLINE_INTEGRATION_INVENTORY_V1",
+  "generated_at": "2026-06-25T12:05:50",
+  "branch": "phase4d-offline-integration-gate-v1",
+  "head": "94154b6",
+  "status_clean_before_report": false,
+  "tags": {
+    "phase4a": "phase4a-portal-message-interactions-pass-20260625",
+    "phase4b": "phase4b-weekend-mail-guard-pass-20260625",
+    "phase4c": "phase4c-category-scope-performance-pass-20260625"
+  },
+  "compile_results": {
+    "app/__init__.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/__init__.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 92.535,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/performance/v2_1_4_category_scope_routes.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/performance/v2_1_4_category_scope_routes.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 61.804,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/route_support.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/route_support.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 76.844,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/corporate_information_center_engine.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/corporate_information_center_engine.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 69.465,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    "app/services/executive_mail_center_v2.py": {
+      "cmd": [
+        "python",
+        "-m",
+        "py_compile",
+        "app/services/executive_mail_center_v2.py"
+      ],
+      "returncode": 0,
+      "elapsed_ms": 99.499,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    }
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_report": false,
+    "phase4b_tag_present": true,
+    "phase4c_tag_present": true,
+    "compile_ok": true
+  },
+  "inventory_ok": false
+}
