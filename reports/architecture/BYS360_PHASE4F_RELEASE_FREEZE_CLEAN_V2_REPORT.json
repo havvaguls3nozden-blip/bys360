@@ -1,0 +1,71 @@
+{
+  "package": "BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2",
+  "generated_at": "2026-06-25T12:33:28",
+  "branch": "phase4f-release-freeze-v1",
+  "head_before_report_commit": "64eef8e",
+  "meaningful_git_status_clean_before_zip": true,
+  "ignored_status": [
+    "?? _phase4f_release_freeze_clean_v2.py"
+  ],
+  "required_tags": {
+    "phase4e-release-preflight-pass-20260625": true,
+    "phase4d-offline-integration-gate-pass-20260625": true,
+    "phase4c-category-scope-performance-pass-20260625": true
+  },
+  "zip": {
+    "path": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip",
+    "name": "BYS360_PHASE4F_RELEASE_FREEZE_CLEAN_V2_20260625.zip",
+    "exists": true,
+    "size_bytes": 17450218,
+    "sha256": "C0342D475FC4822D720156793A7B5BB806D4BFE8C0D74721DB6C8AA440F53573",
+    "entry_count": 3479
+  },
+  "included_count": 3479,
+  "excluded_count": 3,
+  "excluded_sample": [
+    {
+      "path": "reports/security/a6b_backups/.gitignore",
+      "reason": "exclude_prefix"
+    },
+    {
+      "path": "reports/security/a6b_backups/.releaseignore",
+      "reason": "exclude_prefix"
+    },
+    {
+      "path": "reports/security/a6b_backups/500.html",
+      "reason": "exclude_prefix"
+    }
+  ],
+  "risk_scan_after": {
+    "risk_entry_count": 0,
+    "risk_entries": []
+  },
+  "required_entries": {
+    "checked": [
+      "app/__init__.py",
+      "app/templates/errors/400.html",
+      "app/templates/errors/401.html",
+      "app/templates/errors/405.html",
+      "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_V2_REPORT.json",
+      "reports/architecture/BYS360_PHASE4E_RELEASE_PREFLIGHT_CLOSURE_V1_REPORT.json",
+      "reports/architecture/BYS360_PHASE4F_RELEASE_FREEZE_V1_REPORT.json"
+    ],
+    "missing": []
+  },
+  "classification": {
+    "branch_ok": true,
+    "status_clean_before_zip": true,
+    "required_tags_ok": true,
+    "zip_exists": true,
+    "zip_nonempty": true,
+    "sha256_ok": true,
+    "risk_scan_clean": true,
+    "required_entries_ok": true
+  },
+  "freeze_clean_ok": true,
+  "live_deploy_status": "Canlıya dağıtım yapılmadı; sadece temiz release ZIP üretildi.",
+  "supersedes": {
+    "old_zip": "C:\\bys360\\release\\BYS360_PHASE4F_RELEASE_FREEZE_20260625.zip",
+    "old_tag_note": "phase4f-release-freeze-pass-20260625 V1 raporunda freeze_ok=false olduğu için canlı paket olarak kullanılmamalıdır."
+  }
+}
