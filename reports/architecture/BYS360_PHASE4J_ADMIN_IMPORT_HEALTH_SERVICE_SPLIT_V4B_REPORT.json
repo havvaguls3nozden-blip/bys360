@@ -1,0 +1,24 @@
+{
+  "phase": "phase4j-admin-import-health-report-service-split-v4b",
+  "generated_at": "2026-06-25T13:45:09",
+  "target": "app/admin/ops_routes.py",
+  "service": "app/admin/ops_health_services.py",
+  "route_function": "admin_import_health_report",
+  "service_function": "admin_import_health_report_impl",
+  "before": {
+    "target_lines": 1064,
+    "target_kb": 44.4
+  },
+  "after": {
+    "target_lines": 892,
+    "target_kb": 37.5,
+    "service_lines": 220,
+    "service_kb": 9.4
+  },
+  "safety": [
+    "Route decorator satirlari ops_routes.py icinde korundu.",
+    "Route fonksiyonu ince wrapper haline getirildi.",
+    "Agir fonksiyon govdesi ops_health_services.py icindeki implementation fonksiyonuna tasindi.",
+    "Fonksiyon ops_routes.py icindeki baska fonksiyonlara bagimliysa script islemi durduracak sekilde tasarlandi."
+  ]
+}
