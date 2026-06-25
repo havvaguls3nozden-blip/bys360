@@ -1,0 +1,70 @@
+{
+  "phase": "phase4j-admin-user-action-routes-service-split-v10b",
+  "generated_at": "2026-06-25T14:32:55",
+  "target": "app/admin/ops_routes.py",
+  "service": "app/admin/ops_user_action_services.py",
+  "target_functions": [
+    "admin_users_bulk_delete",
+    "admin_user_change_photo",
+    "admin_user_archive",
+    "admin_users_bulk_archive",
+    "admin_user_delete",
+    "admin_users_bulk_passive",
+    "admin_user_toggle_active",
+    "admin_users_reset_all"
+  ],
+  "helper_functions_copied": [
+    "ensure_not_self_target"
+  ],
+  "route_counts": {
+    "admin_users_bulk_delete": 1,
+    "admin_user_change_photo": 1,
+    "admin_user_archive": 1,
+    "admin_users_bulk_archive": 1,
+    "admin_user_delete": 1,
+    "admin_users_bulk_passive": 1,
+    "admin_user_toggle_active": 1,
+    "admin_users_reset_all": 1
+  },
+  "impl_counts": {
+    "admin_users_bulk_delete_impl": 1,
+    "admin_user_change_photo_impl": 1,
+    "admin_user_archive_impl": 1,
+    "admin_users_bulk_archive_impl": 1,
+    "admin_user_delete_impl": 1,
+    "admin_users_bulk_passive_impl": 1,
+    "admin_user_toggle_active_impl": 1,
+    "admin_users_reset_all_impl": 1
+  },
+  "helper_counts": {
+    "ensure_not_self_target": 1
+  },
+  "self_recursive_calls": {
+    "admin_users_bulk_delete_impl": [],
+    "admin_user_change_photo_impl": [],
+    "admin_user_archive_impl": [],
+    "admin_users_bulk_archive_impl": [],
+    "admin_user_delete_impl": [],
+    "admin_users_bulk_passive_impl": [],
+    "admin_user_toggle_active_impl": [],
+    "admin_users_reset_all_impl": []
+  },
+  "before": {
+    "target_lines": 455,
+    "target_kb": 16.5
+  },
+  "after": {
+    "target_lines": 291,
+    "target_kb": 10.0,
+    "service_lines": 242,
+    "service_kb": 10.3
+  },
+  "safety": [
+    "Route decorator satirlari ops_routes.py icinde korundu.",
+    "Route fonksiyon imzalari korunarak ince wrapper haline getirildi.",
+    "Admin kullanici islem govdeleri ops_user_action_services.py icindeki implementation fonksiyonlarina tasindi.",
+    "ensure_not_self_target helper'i circular import riskini onlemek icin servis dosyasina kopyalandi.",
+    "Duplicate implementation ve self-recursive call kontrolleri yapildi."
+  ],
+  "ok": true
+}
