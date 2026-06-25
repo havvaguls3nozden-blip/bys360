@@ -1,0 +1,26 @@
+{
+  "package": "BYS360_PHASE4A_MESSAGE_COMMENT_SERIALIZATION_FIX_V1",
+  "generated_at": "2026-06-25T08:20:53",
+  "branch": "phase4a-offline-stabilization-v1",
+  "head_before_report_commit": "4c69736",
+  "meaningful_git_status_clean_before_patch": true,
+  "ignored_generation_status_lines": [
+    "?? _phase4a_message_comment_serialization_fix.py"
+  ],
+  "patch": {
+    "changed": true,
+    "changes": [
+      "MessageComment import eklendi",
+      "serialize_comment bloğu serialize_message öncesine eklendi",
+      "serialize_message içine comments alanı eklendi"
+    ],
+    "has_serialize_comment": true,
+    "has_comments_for_message": true,
+    "has_current_user_import": true,
+    "has_message_comment_import": true
+  },
+  "compile_ok": true,
+  "import_ok": true,
+  "serialization_fix_ok": true,
+  "error": null
+}

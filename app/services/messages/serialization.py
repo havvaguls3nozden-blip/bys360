@@ -17,6 +17,7 @@ from app.services.message_service import (
 from .constants import REACTION_OPTIONS
 from .formatting import format_dt_label, message_sender_initials, message_sender_name
 import logging
+from app.models import MessageComment
 logger = logging.getLogger(__name__)
 
 
@@ -83,6 +84,58 @@ def _reactions_for_message(message: Any) -> list[dict[str, Any]]:
             item["mine"] = True
     return list(message_bucket.values())
 
+
+
+
+def _message_comment_dt_label(value: Any) -> str:
+    if not value:
+        return "-"
+    try:
+        return value.strftime("%d.%m.%Y %H:%M")
+    except Exception:
+        return "-"
+
+
+def serialize_comment(comment: Any) -> dict[str, Any]:
+    """Mesaj yorumu için güvenli JSON payload üretir."""
+
+    user = getattr(comment, "user", None)
+    full_name = getattr(user, "full_name", None)
+    fallback_name = " ".join([
+        str(getattr(user, "ad", "") or "").strip(),
+        str(getattr(user, "soyad", "") or "").strip(),
+    ]).strip() if user else ""
+
+    created_at = getattr(comment, "created_at", None)
+    edited_at = getattr(comment, "edited_at", None)
+
+    return {
+        "id": getattr(comment, "id", None),
+        "message_id": getattr(comment, "message_id", None),
+        "user_id": getattr(comment, "user_id", None),
+        "user_name": full_name or fallback_name or "Kullanıcı",
+        "body": getattr(comment, "body", "") or "",
+        "created_at": created_at.isoformat() if created_at else None,
+        "created_at_label": _message_comment_dt_label(created_at),
+        "edited_at": edited_at.isoformat() if edited_at else None,
+        "is_mine": getattr(comment, "user_id", None) == getattr(current_user, "id", None),
+    }
+
+
+def _comments_for_message(message: Any) -> list[dict[str, Any]]:
+    try:
+        rows = (
+            message.comments
+            .filter_by(is_deleted=False)
+            .order_by(MessageComment.id.asc())
+            .all()
+        )
+    except Exception:
+        rows = []
+
+    return [serialize_comment(row) for row in rows]
+
+# BYS360_PHASE4A_MESSAGE_COMMENT_SERIALIZATION
 
 def serialize_message(message: Any, reaction_map: dict[int, list[dict[str, Any]]] | None = None) -> dict[str, Any]:
     """Mesaj payload'unu eski route fonksiyonu ile uyumlu bicimde uretir."""
