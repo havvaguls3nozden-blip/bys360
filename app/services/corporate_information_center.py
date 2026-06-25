@@ -199,40 +199,21 @@ def can_manage(user: Any) -> bool:
 
 
 
-def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
-    cfg = get_config()
-    tasks = cfg["tasks"]
-    for key, meta in TASK_DEFINITIONS.items():
-        t = tasks.setdefault(key, {})
-        t["enabled"] = str(payload.get(f"enabled_{key}", "")).lower() in {"1", "true", "on", "yes"}
-        try:
-            t["hour"] = max(0, min(23, int(payload.get(f"hour_{key}", meta["default_hour"]))))
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:301")
-            t["hour"] = meta["default_hour"]
-        try:
-            t["minute"] = max(0, min(59, int(payload.get(f"minute_{key}", meta["default_minute"]))))
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:305")
-            t["minute"] = meta["default_minute"]
-        t["recipient_group"] = meta["recipient_group"]
-    set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
-    db.session.commit()
-
-def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
-    for key, meta in TASK_DEFINITIONS.items():
-        subject = (payload.get(f"subject_{key}") or meta["subject"]).strip()
-        body = (payload.get(f"body_{key}") or meta["body"]).strip()
-        set_setting(f"{BASE_KEY}.template.{key}.subject", subject, label=f"{meta['label']} konusu", actor_user_id=actor_user_id)
-        set_setting(f"{BASE_KEY}.template.{key}.body", body, label=f"{meta['label']} metni", value_type="text", actor_user_id=actor_user_id)
-    db.session.commit()
+# Phase4J V30C CIC save_context facade imports
+from app.services.cic.save_context import (
+    _save_system_base,
+    ensure_celebration_schema,
+    save_celebration_settings,
+    save_recipients,
+    save_system,
+    save_tasks,
+    save_templates,
+    set_auto_scheduler_config,
+)
 
 
-def _save_system_base(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
-    set_setting(f"{BASE_KEY}.location_name", (payload.get("location_name") or "Çanakkale").strip(), label="Hava durumu konumu", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.latitude", (payload.get("latitude") or "40.1553").strip(), label="Enlem", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.longitude", (payload.get("longitude") or "26.4142").strip(), label="Boylam", actor_user_id=actor_user_id)
-    db.session.commit()
+
+
 
 
 # Phase4J V28C CIC send_context facade imports
@@ -430,36 +411,6 @@ from app.services.cic.cic_context import (
 
 # BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2
 # Final robust recipient persistence override. Last definition wins at import time.
-def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -> None:  # noqa: F811
-    def getlist_all(*names: str) -> list[Any]:
-        values: list[Any] = []
-        for name in names:
-            try:
-                if hasattr(payload, "getlist"):
-                    part = payload.getlist(name)
-                else:
-                    raw = payload.get(name, []) if hasattr(payload, "get") else []
-                    part = raw if isinstance(raw, list) else ([raw] if raw else [])
-            except Exception:
-                __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1570")
-                part = []
-            for item in part or []:
-                if item not in values:
-                    values.append(item)
-        return values
-
-    manager_ids = _clean_ids(getlist_all("manager_ids", "manager_user_ids", "manager_recipient_ids", "selected_manager_ids"))
-    staff_ids = _clean_ids(getlist_all("staff_ids", "staff_user_ids", "staff_recipient_ids", "selected_staff_ids"))
-    mode = str(payload.get("staff_recipient_mode") or "manual").strip() if hasattr(payload, "get") else "manual"
-    if mode not in {"manual", "all_active"}:
-        mode = "manual"
-
-    set_setting(f"{BASE_KEY}.manager_recipient_ids", _dumps_json(manager_ids), label="Yönetici alıcıları", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.staff_recipient_ids", _dumps_json(staff_ids), label="Personel alıcıları", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.staff_recipient_mode", mode, label="Personel alıcı modu", value_type="string", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.last_recipient_save_summary", _dumps_json({"manager_count": len(manager_ids), "staff_count": len(staff_ids), "mode": mode}), label="Son alıcı kayıt özeti", value_type="json", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.last_recipient_save_at", _now().isoformat(timespec="seconds"), label="Son alıcı kayıt zamanı", value_type="string", actor_user_id=actor_user_id)
-    db.session.commit()
 
 
 # BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1
@@ -481,39 +432,8 @@ from typing import Any as _cic_typing_any
 
 
 
-def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:  # type: ignore[override]
-    enabled = "true" if _cic_auto_bool(payload.get("auto_scheduler_enabled"), default=False) else "false"
-    if "auto_scheduler_weekdays_only" in payload:
-        weekdays_only = "true" if _cic_auto_bool(payload.get("auto_scheduler_weekdays_only"), default=True) else "false"
-    else:
-        weekdays_only = str(get_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", "true") or "true").lower()
-        if weekdays_only not in {"true", "false"}:
-            weekdays_only = "true"
-    try:
-        late_window = int(payload.get("auto_scheduler_late_window_minutes") or 20)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1793")
-        late_window = 20
-    late_window = max(1, min(120, late_window))
-
-    set_setting(f"{BASE_KEY}.auto_scheduler_enabled", enabled, label="Otomatik mail zamanlayıcı", value_type="boolean", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", weekdays_only, label="Otomatik mail yalnızca hafta içi", value_type="boolean", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.auto_scheduler_late_window_minutes", str(late_window), label="Otomatik mail gecikme toleransı", value_type="integer", actor_user_id=actor_user_id)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
 
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_BEGIN
-def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:
-    """Persist CIC system settings through one explicit public layer.
-
-    Flattened legacy wrapper chain:
-    - Base weather/location settings are saved by _save_system_base.
-    - Auto scheduler settings are saved once by set_auto_scheduler_config.
-    """
-    _save_system_base(payload, actor_user_id=actor_user_id)
-    set_auto_scheduler_config(payload, actor_user_id=actor_user_id)
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_END
 
 # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
@@ -711,36 +631,6 @@ Nice başarılı yıllar dileriz.
 
 
 
-def ensure_celebration_schema() -> dict[str, object]:
-    """Kullanici tablosunda kutlama motoru icin gerekli tarih alanlarini guvenli sekilde olusturur."""
-    result: dict[str, object] = {"ok": True, "added": [], "warnings": []}
-    try:
-        from sqlalchemy import inspect as _sa_inspect, text as _sa_text
-        inspector = _sa_inspect(db.engine)
-        if not inspector.has_table("users"):
-            result["ok"] = False
-            result["warnings"] = ["users tablosu bulunamadı."]
-            return result
-        cols = {c.get("name") for c in inspector.get_columns("users")}
-        dialect = getattr(db.engine.dialect, "name", "")
-        needed = {
-            "birth_date": "DATE",
-            "hire_date": "DATE",
-            "celebration_opt_out": "BOOLEAN DEFAULT FALSE",
-        }
-        with db.engine.begin() as conn:
-            for col, sql_type in needed.items():
-                if col in cols:
-                    continue
-                if dialect == "postgresql":
-                    conn.execute(_sa_text(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col} {sql_type}"))
-                else:
-                    conn.execute(_sa_text(f"ALTER TABLE users ADD COLUMN {col} {sql_type}"))
-                result.setdefault("added", []).append(col)
-    except Exception as exc:
-        result["ok"] = False
-        result.setdefault("warnings", []).append(str(exc))
-    return result
 
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_BEGIN
 # PHASE3A_CIC_EXPLICIT_ENSURE_DEFAULTS_END
@@ -816,62 +706,6 @@ def celebration_context(search: str | None = None) -> dict[str, _cic_v40_Any]:
     return data
 
 
-def save_celebration_settings(payload: dict[str, object], actor_user_id: int | None = None) -> None:
-    ensure_celebration_schema()
-    bool_fields = [
-        "celebrations_enabled",
-        "birthday_enabled",
-        "work_anniversary_enabled",
-        "special_day_enabled",
-        "celebration_system_notifications_enabled",
-        "celebrations_include_weekend",
-    ]
-    for field in bool_fields:
-        set_setting(f"{BASE_KEY}.{field}", "true" if _cic_v40_bool(payload.get(field), False) else "false", label=field, value_type="boolean", actor_user_id=actor_user_id)
-    mode = str(payload.get("special_day_recipient_mode") or "all_active").strip()
-    if mode not in {"all_active", "manual"}:
-        mode = "all_active"
-    set_setting(f"{BASE_KEY}.special_day_recipient_mode", mode, label="Özel gün hedef kitlesi", value_type="string", actor_user_id=actor_user_id)
-
-    raw_days = str(payload.get("special_days_json") or "").strip()
-    if raw_days:
-        try:
-            parsed = json.loads(raw_days)
-            if isinstance(parsed, list):
-                set_setting(f"{BASE_KEY}.special_days", _dumps_json(parsed), label="Özel gün takvimi", value_type="json", actor_user_id=actor_user_id)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 CIC kontrollü geri dönüş bloğu çalıştı")
-            set_setting(f"{BASE_KEY}.special_days.last_error", "Özel gün JSON formatı geçerli değil; eski takvim korundu.", label="Özel gün son hata", value_type="text", actor_user_id=actor_user_id)
-
-    ids = []
-    try:
-        ids = payload.getlist("user_ids") if hasattr(payload, "getlist") else payload.get("user_ids", [])
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2452")
-        ids = []
-    for raw_id in ids or []:
-        try:
-            uid = int(raw_id)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2457")
-            continue
-        user = db.session.get(User, uid)
-        if not user:
-            continue
-        birth_value = str(payload.get(f"birth_date_{uid}") or "").strip()
-        hire_value = str(payload.get(f"hire_date_{uid}") or "").strip()
-        opt_out = _cic_v40_bool(payload.get(f"celebration_opt_out_{uid}"), False)
-        if hasattr(user, "birth_date"):
-            setattr(user, "birth_date", _cic_v40_parse_date(birth_value))
-        if hasattr(user, "hire_date"):
-            setattr(user, "hire_date", _cic_v40_parse_date(hire_value))
-        if hasattr(user, "celebration_opt_out"):
-            setattr(user, "celebration_opt_out", opt_out)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
 
 
 # PHASE3A_CIC_EXPLICIT_RUN_DUE_TASKS_BEGIN
