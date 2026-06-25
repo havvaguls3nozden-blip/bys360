@@ -37,6 +37,7 @@ from app.services.messages import (
     toggle_thread_pin_for_user as _svc_toggle_thread_pin_for_user,
     update_thread_typing_state as _svc_update_thread_typing_state,
     toggle_message_reaction as _svc_toggle_message_reaction,
+    create_message_comment as _svc_create_message_comment,  # BYS360_MESSAGE_INTERACTIONS_V1
     load_thread_detail_payload as _svc_load_thread_detail_payload,
     build_compose_user_cards as _svc_build_compose_user_cards,
     build_recent_message_users_for_compose as _svc_build_recent_message_users_for_compose,
@@ -321,6 +322,7 @@ def messages_thread_impl(thread_id):
     thread = detail_payload["thread"]
     participants = detail_payload["participants"]
     messages = detail_payload["messages"]
+    selected_reaction_map = _build_reaction_map(messages)  # BYS360_MESSAGE_INTERACTIONS_V1
 
     compose_submit_token = issue_form_token("messages_send", scope=f"{current_user.id}:{thread.id}")
     back_state = _current_message_view_state()
@@ -373,6 +375,20 @@ def messages_react_impl(message_id):
     reaction_value = request.form.get("reaction") or json_payload.get("reaction") or ""
     response_payload, status_code = _svc_toggle_message_reaction(message_id, reaction_value)
     return jsonify(response_payload), status_code
+
+
+def messages_comment_impl(message_id):
+    # BYS360_MESSAGE_INTERACTIONS_V1_COMMENT_ROUTE
+    json_payload = request.get_json(silent=True) or {}
+    body = _clean_message_body(request.form.get("body") or json_payload.get("body") or "", limit=1200)
+    response_payload, status_code = _svc_create_message_comment(message_id, body, now=_utcnow())
+    if _is_ajax_request():
+        return jsonify(response_payload), status_code
+    if response_payload.get("ok"):
+        flash(response_payload.get("message") or "Yorum eklendi.", "success")
+    else:
+        flash(response_payload.get("message") or "Yorum eklenemedi.", "warning")
+    return _redirect_messages_view()
 
 def messages_send_impl(thread_id):
     # BYS360_A5_P2D6_WRITE_CONTRACT: db.session.commit | db.session.rollback | _save_message_attachment | save_message_attachment | _notify_user
@@ -635,6 +651,15 @@ def messages_thread_typing(thread_id):
 @menu_key_required("messages")
 def messages_react(message_id):
     return messages_react_impl(message_id)
+
+
+@main_bp.route("/messages/<int:message_id>/comment", methods=["POST"])
+@login_required
+@menu_key_required("messages")
+def messages_comment(message_id):
+    return messages_comment_impl(message_id)
+
+# BYS360_MESSAGE_INTERACTIONS_V1_ROUTE
 
 
 @main_bp.route("/messages/thread/<int:thread_id>/send", methods=["POST"])

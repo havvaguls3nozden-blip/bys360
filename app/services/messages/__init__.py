@@ -43,6 +43,7 @@ from .inbox import (
 )
 from .presence import build_thread_presence
 from .reactions import normalize_reaction_value, toggle_message_reaction
+from .comments import MessageCommentResult, create_message_comment  # BYS360_MESSAGE_INTERACTIONS_V1
 from .repository import orm_entity, participant_for_thread, thread_for_user
 from .serialization import build_reaction_map, serialize_attachment, serialize_message
 from .state import (
@@ -87,6 +88,7 @@ __all__ = [
     "MessageLiveContract",
     "MessageStateChangeResult",
     "MessageSendResult",
+    "MessageCommentResult",  # BYS360_MESSAGE_INTERACTIONS_V1
     "resolve_message_attachment_download_for_user",
     "edit_message_for_user",
     "delete_message_for_user",
@@ -124,6 +126,7 @@ __all__ = [
     "message_sender_name",
     "normalize_reaction_value",
     "toggle_message_reaction",
+    "create_message_comment",  # BYS360_MESSAGE_INTERACTIONS_V1
     "normalize_typing_flag",
     "update_thread_typing_state",
     "normalize_incoming_message_files",

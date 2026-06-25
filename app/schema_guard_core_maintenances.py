@@ -114,6 +114,37 @@ TableRepair(
     ),
 ),
 TableRepair(
+    table="message_comments",
+    create_sql="""
+    CREATE TABLE IF NOT EXISTS message_comments (
+        id SERIAL PRIMARY KEY,
+        message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        body TEXT NOT NULL,
+        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        edited_at TIMESTAMP NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    )
+    """,
+    column_sql=(
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS message_id INTEGER",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS user_id INTEGER",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS body TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS edited_at TIMESTAMP NULL",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()",
+        "ALTER TABLE message_comments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP NOT NULL DEFAULT NOW()",
+    ),
+    index_sql=(
+        "CREATE INDEX IF NOT EXISTS ix_message_comments_message_id ON message_comments (message_id)",
+        "CREATE INDEX IF NOT EXISTS ix_message_comments_user_id ON message_comments (user_id)",
+        "CREATE INDEX IF NOT EXISTS ix_message_comments_is_deleted ON message_comments (is_deleted)",
+        "CREATE INDEX IF NOT EXISTS ix_message_comments_created_at ON message_comments (created_at)",
+    ),
+),
+# BYS360_MESSAGE_INTERACTIONS_V1_SCHEMA
+TableRepair(
     table="message_typing_states",
     create_sql="""
     CREATE TABLE IF NOT EXISTS message_typing_states (

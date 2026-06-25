@@ -8,7 +8,7 @@ korunmasini saglamaktir.
 """
 from __future__ import annotations
 
-REACTION_OPTIONS: list[str] = ["👍", "❤️", "👏", "✅", "👀", "🙏"]
+REACTION_OPTIONS: list[str] = ["👍", "👎", "❤️", "👏", "✅", "👀", "🙏"]  # BYS360_MESSAGE_INTERACTIONS_V1
 
 INBOX_THREAD_FETCH_LIMIT = 60
 INBOX_THREAD_FETCH_LIMIT_SEARCH = 180
@@ -23,6 +23,7 @@ MESSAGE_LIVE_ENDPOINTS: tuple[str, ...] = (
     "/messages/thread/<int:thread_id>/live",
     "/messages/thread/<int:thread_id>/typing",
     "/messages/<int:message_id>/react",
+    "/messages/<int:message_id>/comment",  # BYS360_MESSAGE_INTERACTIONS_V1
     "/messages/thread/<int:thread_id>/send",
     "/messages/thread/<int:thread_id>/mark-read",
     "/messages/thread/<int:thread_id>/mute-toggle",
@@ -37,6 +38,7 @@ MESSAGE_REQUIRED_MODEL_NAMES: tuple[str, ...] = (
     "Message",
     "MessageAttachment",
     "MessageReaction",
+    "MessageComment",  # BYS360_MESSAGE_INTERACTIONS_V1
     "MessageThread",
     "MessageThreadParticipant",
     "MessageTypingState",

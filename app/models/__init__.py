@@ -210,6 +210,7 @@ __all__ = [
     "MessageThreadParticipant",
     "Message",
     "MessageReaction",
+    "MessageComment",  # BYS360_MESSAGE_INTERACTIONS_V1
     "MessageTypingState",
     "Notification",
     "Survey",

@@ -1,15 +1,15 @@
 {
   "package": "BYS360_PHASE4A_PORTAL_MESSAGE_COMMENT_CONTRACT_GATE_V1",
-  "generated_at": "2026-06-25T08:50:46",
+  "generated_at": "2026-06-25T08:54:10",
   "branch": "phase4a-offline-stabilization-v1",
-  "head_before_report_commit": "2a350d9",
+  "head_before_report_commit": "1457523",
   "compile_ok": true,
   "app_factory_ok": true,
   "model_import_ok": true,
   "service_import_ok": true,
   "serializer_import_ok": true,
-  "route_contract_ok": false,
-  "template_contract_ok": false,
+  "route_contract_ok": true,
+  "template_contract_ok": true,
   "db_contract_ok": true,
   "message_comments_table_exists": true,
   "message_comments_columns": [
@@ -22,16 +22,31 @@
     "created_at",
     "updated_at"
   ],
-  "comment_route_matches": [],
+  "comment_route_matches": [
+    {
+      "rule": "/messages/<int:message_id>/comment",
+      "endpoint": "main.messages_comment",
+      "methods": [
+        "OPTIONS",
+        "POST"
+      ]
+    }
+  ],
   "template_checks": {
-    "has_interactions_block": false,
-    "has_comment_form": false,
-    "has_comment_route_url": false,
-    "has_comment_list": false,
-    "has_ajax_reaction_form": false,
-    "has_ajax_fetch": false,
-    "has_no_full_page_comment_only_flow": false
+    "has_interactions_block": true,
+    "has_comment_form": true,
+    "has_comment_route_url": true,
+    "has_comment_list": true,
+    "has_ajax_reaction_form": true
   },
-  "contract_gate_ok": false,
+  "js_checks": {
+    "has_fetch": true,
+    "has_ajax_header": true,
+    "has_accept_json_header": true,
+    "has_comment_form_handler": true,
+    "has_reaction_form_handler": true,
+    "has_comment_append": true
+  },
+  "contract_gate_ok": true,
   "error": null
 }

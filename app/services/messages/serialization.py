@@ -179,5 +179,7 @@ def serialize_message(message: Any, reaction_map: dict[int, list[dict[str, Any]]
         "is_deleted": bool(getattr(message, "is_deleted", False)),
         "attachments": attachments,
         "reactions": reactions,
+        "comments": _comments_for_message(message),
+        "comment_count": len(_comments_for_message(message)),
         "reaction_options": REACTION_OPTIONS,
     }

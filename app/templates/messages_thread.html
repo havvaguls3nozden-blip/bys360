@@ -6,7 +6,7 @@
 {% block page_subtitle %}Messenger benzeri sade konuşma ekranı{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/messages_messenger_mobile.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/messages_messenger_mobile.css') }}?v=message-interactions-v1">
 
 <div class="msg-thread-shell single-thread-view">
   <section class="messenger-panel standalone-thread-panel">
@@ -86,6 +86,55 @@
                   {% if message.edited_at %}<span>düzenlendi</span>{% endif %}
                 </div>
 
+                  {# BYS360_MESSAGE_INTERACTIONS_V1_BLOCK_START #}
+                  {% set reaction_items = (selected_reaction_map.get(message.id, []) if selected_reaction_map is defined and selected_reaction_map else []) %}
+                  {% set message_comments = (message.comments.all() if message.comments is defined and not message.is_deleted else []) %}
+                  <div class="msg-interactions" data-message-interactions data-message-id="{{ message.id }}">
+                    <div class="msg-reaction-summary" data-message-reactions>
+                      {% for reaction_item in reaction_items %}
+                        <span class="msg-reaction-pill {% if reaction_item.mine %}mine{% endif %}"><span>{{ reaction_item.emoji }}</span><strong>{{ reaction_item.count }}</strong></span>
+                      {% endfor %}
+                    </div>
+
+                    {% if not message.is_deleted %}
+                    <div class="msg-reaction-actions">
+                      {% for reaction_option in reaction_options %}
+                        <form method="POST" action="{{ url_for('main.messages_react', message_id=message.id) }}" class="js-message-reaction-form" data-message-id="{{ message.id }}">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <input type="hidden" name="reaction" value="{{ reaction_option }}">
+                          <button type="submit" class="msg-reaction-btn" title="Tepki ver">{{ reaction_option }}</button>
+                        </form>
+                      {% endfor %}
+                      <button type="button" class="msg-reaction-btn comment-toggle" data-message-comment-toggle data-message-id="{{ message.id }}">
+                        <i class="fa-regular fa-comment"></i> Yorum
+                      </button>
+                    </div>
+                    {% endif %}
+
+                    <div class="msg-comments" data-message-comments>
+                      {% for comment in message_comments %}
+                        {% if not comment.is_deleted %}
+                          {% set comment_name = comment.user.full_name if comment.user and comment.user.full_name else (((comment.user.ad or '') ~ ' ' ~ (comment.user.soyad or ''))|trim if comment.user else 'Kullanıcı') %}
+                          <div class="msg-comment-item" data-comment-id="{{ comment.id }}">
+                            <strong>{{ comment_name }}</strong>
+                            <span>{{ comment.body }}</span>
+                            <small>{{ comment.created_at.strftime('%d.%m.%Y %H:%M') if comment.created_at else '-' }}</small>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+
+                    {% if not message.is_deleted %}
+                    <form method="POST" action="{{ url_for('main.messages_comment', message_id=message.id) }}" class="msg-comment-form js-message-comment-form" data-message-id="{{ message.id }}" hidden>
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <input type="text" name="body" maxlength="1200" autocomplete="off" placeholder="Bu mesaja yorum yazın...">
+                      <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+                    {% endif %}
+                  </div>
+                  {# BYS360_MESSAGE_INTERACTIONS_V1_BLOCK_END #}
+
+
                 {% if message.sender_user_id == current_user.id and not message.is_deleted %}
                 <div class="msg-thread-actions msg-inline-actions">
                   <button type="button" class="msg-mini-btn" onclick="openEditModal('{{ message.id }}', {{ message.body|tojson }})">
@@ -163,5 +212,5 @@ function openEditModal(messageId, bodyText) {
   }
 }
 </script>
-<script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}"></script>
+<script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}?v=message-interactions-v1"></script>
 {% endblock %}
