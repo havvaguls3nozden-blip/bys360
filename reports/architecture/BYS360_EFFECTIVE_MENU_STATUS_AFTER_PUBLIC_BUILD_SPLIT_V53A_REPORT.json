@@ -1,0 +1,1193 @@
+{
+  "phase": "effective-menu-status-after-public-build-split-v53a",
+  "generated_at": "2026-06-26T15:55:59",
+  "git_head": "0d76764",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "status": "READY_FOR_FUNCTION_OR_BLOCK_REVIEW",
+  "target": "app/services/settings/effective_menu.py",
+  "target_analysis": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 823,
+    "line_count_ge_800": true,
+    "lines_to_go_under_800": 24,
+    "top_level_function_count": 3,
+    "all_function_count": 3,
+    "top_level_assignment_count": 11,
+    "top_level_block_count": 88,
+    "large_top_level_block_count_ge6": 38,
+    "safe_block_candidate_count": 35,
+    "duplicate_function_names": []
+  },
+  "runtime_smoke": {
+    "returncode": 0,
+    "stdout": "IMPORT_OK\ncore_policy_effective_dict=True\ncore_policy_part_dict=True\ncore_policy_same_object=True\nconstants_all_has_core_policy=True\ncore_callable=True\nalias_callable=True\npublic_callable=True\npublic_apply_callable=True\npublic_all_has_apply=True\nuser_effective_callable=True\nuser_part_callable=True\nuser_same_object=True\nbuild_context_core_callable=True\ndaily_block_callable=True\nauthority_block_callable=True\nnew_tab_block_callable=True\nprocess_block_callable=True\nreminders_block_callable=True\nperiod_center_block_callable=True\nblock_all_has_daily_block=True\nblock_all_has_authority_block=True\nblock_all_has_new_tab_block=True\nblock_all_has_process_block=True\nblock_all_has_reminders_block=True\nblock_all_has_period_center_block=True\napply_v213c_category_menu_wrapper_callable=True\nwrapper_all_has_apply_v213c_category_menu_wrapper=True\napply_v214_category_scope_wrapper_callable=True\nwrapper_all_has_apply_v214_category_scope_wrapper=True\napply_v215_category_period_scope_wrapper_callable=True\nwrapper_all_has_apply_v215_category_period_scope_wrapper=True\napply_v216_category_period_integration_wrapper_callable=True\nwrapper_all_has_apply_v216_category_period_integration_wrapper=True\n",
+    "stderr": "",
+    "import_ok_marker": true,
+    "core_policy_effective_dict": true,
+    "core_policy_part_dict": true,
+    "core_policy_same_object": true,
+    "constants_all_has_core_policy": true,
+    "core_callable": true,
+    "alias_callable": true,
+    "public_callable": true,
+    "public_apply_callable": true,
+    "public_all_has_apply": true,
+    "user_effective_callable": true,
+    "user_part_callable": true,
+    "user_same_object": true,
+    "build_context_core_callable": true,
+    "daily_block_callable": true,
+    "authority_block_callable": true,
+    "new_tab_block_callable": true,
+    "process_block_callable": true,
+    "reminders_block_callable": true,
+    "period_center_block_callable": true,
+    "block_all_has_daily_block": true,
+    "block_all_has_authority_block": true,
+    "block_all_has_new_tab_block": true,
+    "block_all_has_process_block": true,
+    "block_all_has_reminders_block": true,
+    "block_all_has_period_center_block": true,
+    "v213c_callable": true,
+    "v214_callable": true,
+    "v215_callable": true,
+    "v216_callable": true,
+    "all_has_v213c": true,
+    "all_has_v214": true,
+    "all_has_v215": true,
+    "all_has_v216": true,
+    "combined_contains_build_nameerror": false,
+    "combined_contains_force_failed": false,
+    "combined_contains_traceback": false
+  },
+  "parts_modules": [
+    {
+      "path": "app/services/settings/effective_menu_parts/__init__.py",
+      "line_count": 1,
+      "top_level_function_count": 0,
+      "all_function_count": 0,
+      "top_level_assignment_count": 0,
+      "top_level_functions": [],
+      "top_level_assignments": [],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/apply_context.py",
+      "line_count": 415,
+      "top_level_function_count": 15,
+      "all_function_count": 15,
+      "top_level_assignment_count": 5,
+      "top_level_functions": [
+        "_allowed_by_static_gate",
+        "_apply_bys360_press_news_admin_only_policy",
+        "_apply_bys360_settings_live_authority_v1",
+        "_apply_core_menu_visibility_policy",
+        "_apply_phase3_2_performance_menu_visibility",
+        "_apply_phase3_performance_menu_policy",
+        "_apply_role_gate",
+        "_apply_role_matrix_closed_guard",
+        "_get_role_matrix_closed_keys_for_role",
+        "_menu_item_by_key",
+        "_phase3_2_ascii_tr",
+        "_phase3_2_normalize_role_name",
+        "_role_allowed_for_menu",
+        "_role_matrix_runtime_closed",
+        "_settings_explicitly_controls_key"
+      ],
+      "top_level_assignments": [
+        "CORE_MENU_VISIBILITY_POLICY",
+        "PHASE3_2_PERFORMANCE_MENU_POLICY",
+        "PHASE3_PERFORMANCE_MENU_POLICY",
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/block_context.py",
+      "line_count": 145,
+      "top_level_function_count": 6,
+      "all_function_count": 6,
+      "top_level_assignment_count": 1,
+      "top_level_functions": [
+        "apply_daily_weather_policy_block",
+        "apply_performance_role_matrix_new_tab_policy_block",
+        "apply_period_center_key_roles_block",
+        "apply_process_menu_policy_block",
+        "apply_reminders_menu_policy_block",
+        "apply_role_matrix_runtime_authority_keys_block"
+      ],
+      "top_level_assignments": [
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/build_context.py",
+      "line_count": 305,
+      "top_level_function_count": 1,
+      "all_function_count": 1,
+      "top_level_assignment_count": 1,
+      "top_level_functions": [
+        "build_menu_visibility_map"
+      ],
+      "top_level_assignments": [
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/build_wrapper_context.py",
+      "line_count": 206,
+      "top_level_function_count": 4,
+      "all_function_count": 8,
+      "top_level_assignment_count": 1,
+      "top_level_functions": [
+        "apply_v213c_category_menu_wrapper",
+        "apply_v214_category_scope_wrapper",
+        "apply_v215_category_period_scope_wrapper",
+        "apply_v216_category_period_integration_wrapper"
+      ],
+      "top_level_assignments": [
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/bys360_constants.py",
+      "line_count": 457,
+      "top_level_function_count": 0,
+      "all_function_count": 0,
+      "top_level_assignment_count": 47,
+      "top_level_functions": [],
+      "top_level_assignments": [
+        "_BYS360_AG5E_AI_TEACHING_MENU_KEY",
+        "_BYS360_AG5E_AI_TEACHING_ROLES",
+        "_BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS",
+        "_BYS360_ALL_MENU_ROLE_MATRIX_POLICY",
+        "_BYS360_ASSISTANT_TAB_AUTHORITY_KEYS",
+        "_BYS360_ASSISTANT_TAB_POLICY",
+        "_BYS360_EXEC_ADMIN_ONLY_ROLES",
+        "_BYS360_EXEC_KNOWN_KEYS",
+        "_BYS360_EXEC_URL_MARKERS",
+        "_BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1",
+        "_BYS360_GENERAL_CATEGORY_SECTION_KEYS_V1",
+        "_BYS360_GENERAL_CORE_KEYS_V4",
+        "_BYS360_MANUAL_POLICY",
+        "_BYS360_MANUAL_ROLE_MENU_ADDITIONS",
+        "_BYS360_PERFORMANCE_ALL_KEYS",
+        "_BYS360_PERFORMANCE_CHILD_KEYS",
+        "_BYS360_PERFORMANCE_CHILD_KEYS_V4",
+        "_BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4",
+        "_BYS360_PERFORMANCE_MAIN_KEYS",
+        "_BYS360_PERFORMANCE_MAIN_KEYS_V4",
+        "_BYS360_PERFORMANCE_MAIN_SWITCH_POLICY",
+        "_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY",
+        "_BYS360_PERF_RM_V8_ALIAS_GROUPS",
+        "_BYS360_PERF_RM_V8_ALL_AUTH_ROLES",
+        "_BYS360_PERF_RM_V8_ALL_KEYS",
+        "_BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS",
+        "_BYS360_PERF_RM_V8_CHILD_KEYS",
+        "_BYS360_PERF_RM_V8_MAIN_KEYS",
+        "_BYS360_PERF_RM_V8_MANAGER_ROLES",
+        "_BYS360_PERF_RM_V8_ROLE_POLICY",
+        "_BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221",
+        "_BYS360_PERIOD_CENTER_MENU_KEY_V221",
+        "_BYS360_PERSONEL_ALLOWED_POLICY",
+        "_BYS360_PERSONEL_DISALLOWED_POLICY_KEYS",
+        "_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS",
+        "_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_MANAGER_ROLES",
+        "_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS",
+        "_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES",
+        "_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS",
+        "_BYS360_PROCESS_MENU_KEYS",
+        "_BYS360_PROCESS_MENU_ROLES",
+        "_BYS360_REMINDERS_ALLOWED_ROLES",
+        "_BYS360_REMINDERS_MENU_KEY",
+        "_BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS",
+        "_BYS360_ROLE_MATRIX_V12_POLICY",
+        "_BYS360_V223_PERIOD_CENTER_KEY_ROLES",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/bys360_context.py",
+      "line_count": 517,
+      "top_level_function_count": 29,
+      "all_function_count": 29,
+      "top_level_assignment_count": 15,
+      "top_level_functions": [
+        "_bys360_admin_period_reminder_is_admin_v1",
+        "_bys360_admin_period_reminder_norm_v1",
+        "_bys360_apply_general_category_visibility_fix_v1",
+        "_bys360_apply_performance_main_switch",
+        "_bys360_apply_performance_shortcut_gate_v4",
+        "_bys360_exec_item_matches",
+        "_bys360_exec_norm",
+        "_bys360_force_home_menu_visible_v1",
+        "_bys360_general_category_bool_v1",
+        "_bys360_general_category_state_v1",
+        "_bys360_is_exec_summary_menu_key",
+        "_bys360_perf_rm_v8_apply_aliases",
+        "_bys360_perf_rm_v8_apply_main_gate",
+        "_bys360_perf_rm_v8_norm_role",
+        "_bys360_perf_rm_v8_state_for_keys",
+        "_bys360_performance_role_state",
+        "_bys360_person_matrix_can_open_v1",
+        "_bys360_person_matrix_user_is_admin_v1",
+        "_bys360_portal_role_matrix_v2_12_apply",
+        "_bys360_press_news_role",
+        "_bys360_restore_general_section_v4",
+        "_get_unit_name_for_authority",
+        "_load_role_matrix_state",
+        "_load_unit_profile_state",
+        "_load_user_override_state",
+        "_rollback",
+        "_row_map_by_key",
+        "_safe_query_all",
+        "normalize_role_name"
+      ],
+      "top_level_assignments": [
+        "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+        "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+        "_BYS360_EXEC_KNOWN_KEYS",
+        "_BYS360_EXEC_URL_MARKERS",
+        "_BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1",
+        "_BYS360_GENERAL_CATEGORY_SECTION_KEYS_V1",
+        "_BYS360_PERFORMANCE_CHILD_KEYS",
+        "_BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4",
+        "_BYS360_PERFORMANCE_MAIN_KEYS",
+        "_BYS360_PERFORMANCE_MAIN_KEYS_V4",
+        "_BYS360_PERF_RM_V8_ALIAS_GROUPS",
+        "_BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS",
+        "_BYS360_PERF_RM_V8_CHILD_KEYS",
+        "_BYS360_PERF_RM_V8_MAIN_KEYS",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/core_policy_constants.py",
+      "line_count": 24,
+      "top_level_function_count": 0,
+      "all_function_count": 0,
+      "top_level_assignment_count": 2,
+      "top_level_functions": [],
+      "top_level_assignments": [
+        "CORE_MENU_VISIBILITY_POLICY",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/phase3_constants.py",
+      "line_count": 190,
+      "top_level_function_count": 0,
+      "all_function_count": 0,
+      "top_level_assignment_count": 7,
+      "top_level_functions": [],
+      "top_level_assignments": [
+        "PHASE3_2_GENERAL_VISIBLE_KEYS",
+        "PHASE3_2_MANAGER_VISIBLE_KEYS",
+        "PHASE3_2_MENU_VISIBILITY_MARKER",
+        "PHASE3_2_PERFORMANCE_MENU_POLICY",
+        "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+        "PHASE3_PERFORMANCE_MENU_POLICY",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/public_build_context.py",
+      "line_count": 32,
+      "top_level_function_count": 1,
+      "all_function_count": 2,
+      "top_level_assignment_count": 1,
+      "top_level_functions": [
+        "apply_admin_period_reminder_public_build_wrapper"
+      ],
+      "top_level_assignments": [
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/role_constants.py",
+      "line_count": 149,
+      "top_level_function_count": 0,
+      "all_function_count": 0,
+      "top_level_assignment_count": 2,
+      "top_level_functions": [],
+      "top_level_assignments": [
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+        "__all__"
+      ],
+      "syntax_ok": true
+    },
+    {
+      "path": "app/services/settings/effective_menu_parts/user_context.py",
+      "line_count": 74,
+      "top_level_function_count": 1,
+      "all_function_count": 1,
+      "top_level_assignment_count": 1,
+      "top_level_functions": [
+        "_user_has_any_assigned_survey"
+      ],
+      "top_level_assignments": [
+        "__all__"
+      ],
+      "syntax_ok": true
+    }
+  ],
+  "best_next_block_target": {
+    "kind": "For",
+    "line": 328,
+    "end_line": 338,
+    "length": 11,
+    "nested_function_count": 0,
+    "nested_functions": [],
+    "contains_build_menu_visibility_map": false,
+    "preview": "for _set_name in ["
+  },
+  "best_next_safe_block_target": {
+    "kind": "For",
+    "line": 328,
+    "end_line": 338,
+    "length": 11,
+    "nested_function_count": 0,
+    "nested_functions": [],
+    "contains_build_menu_visibility_map": false,
+    "preview": "for _set_name in ["
+  },
+  "best_next_function_target": {
+    "prefix": "_log",
+    "function_count": 1,
+    "total_lines": 8,
+    "functions": [
+      {
+        "name": "_log_warning",
+        "prefix": "_log",
+        "line": 62,
+        "end_line": 69,
+        "length": 8
+      }
+    ],
+    "projected_target_lines_after_split": 815,
+    "recommended_status": "GOOD_FUNCTION_REVIEW_CANDIDATE",
+    "suggested_module": "app/services/settings/effective_menu_parts/log_context.py"
+  },
+  "large_top_level_blocks_top30": [
+    {
+      "kind": "For",
+      "line": 328,
+      "end_line": 338,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "For",
+      "line": 406,
+      "end_line": 416,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 553,
+      "end_line": 563,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 281,
+      "end_line": 290,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "For",
+      "line": 305,
+      "end_line": 314,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "Assign",
+      "line": 674,
+      "end_line": 683,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS = {"
+    },
+    {
+      "kind": "For",
+      "line": 251,
+      "end_line": 259,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 349,
+      "end_line": 357,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 452,
+      "end_line": 460,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 483,
+      "end_line": 491,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 502,
+      "end_line": 510,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 588,
+      "end_line": 596,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "FunctionDef",
+      "line": 62,
+      "end_line": 69,
+      "length": 8,
+      "nested_function_count": 1,
+      "nested_functions": [
+        "_log_warning"
+      ],
+      "contains_build_menu_visibility_map": false,
+      "preview": "def _log_warning(logger: Any, message: str, *args: Any) -> None:"
+    },
+    {
+      "kind": "Try",
+      "line": 367,
+      "end_line": 374,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 386,
+      "end_line": 393,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 417,
+      "end_line": 424,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 539,
+      "end_line": 545,
+      "length": 7,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 546,
+      "end_line": 552,
+      "length": 7,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Expr",
+      "line": 4,
+      "end_line": 9,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "\"\"\"Ayarlar servis menü görünürlük çözümleyicisi."
+    },
+    {
+      "kind": "For",
+      "line": 261,
+      "end_line": 266,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 394,
+      "end_line": 399,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 429,
+      "end_line": 434,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 445,
+      "end_line": 450,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 462,
+      "end_line": 467,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 472,
+      "end_line": 477,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 496,
+      "end_line": 501,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 511,
+      "end_line": 516,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 525,
+      "end_line": 530,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 577,
+      "end_line": 582,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 597,
+      "end_line": 602,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    }
+  ],
+  "safe_block_candidates_top30": [
+    {
+      "kind": "For",
+      "line": 328,
+      "end_line": 338,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "For",
+      "line": 406,
+      "end_line": 416,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 553,
+      "end_line": 563,
+      "length": 11,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 281,
+      "end_line": 290,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "For",
+      "line": 305,
+      "end_line": 314,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in ["
+    },
+    {
+      "kind": "Assign",
+      "line": 674,
+      "end_line": 683,
+      "length": 10,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS = {"
+    },
+    {
+      "kind": "For",
+      "line": 251,
+      "end_line": 259,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 349,
+      "end_line": 357,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 452,
+      "end_line": 460,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 483,
+      "end_line": 491,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 502,
+      "end_line": 510,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 588,
+      "end_line": 596,
+      "length": 9,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 367,
+      "end_line": 374,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 386,
+      "end_line": 393,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _policy_name in [\"PHASE3_PERFORMANCE_MENU_POLICY\", \"PHASE3_2_PERFORMANCE_MENU_POLICY\", \"PERFORMANCE_MENU_POLICY\", \"ROLE_MENU_POLICY\", \"ROLE_MATRIX_POLICY\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 417,
+      "end_line": 424,
+      "length": 8,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 539,
+      "end_line": 545,
+      "length": 7,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 546,
+      "end_line": 552,
+      "length": 7,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 261,
+      "end_line": 266,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\"]:"
+    },
+    {
+      "kind": "For",
+      "line": 394,
+      "end_line": 399,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 429,
+      "end_line": 434,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 445,
+      "end_line": 450,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 462,
+      "end_line": 467,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 472,
+      "end_line": 477,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 496,
+      "end_line": 501,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 511,
+      "end_line": 516,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Try",
+      "line": 525,
+      "end_line": 530,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "Try",
+      "line": 577,
+      "end_line": 582,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    },
+    {
+      "kind": "For",
+      "line": 597,
+      "end_line": 602,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "for _set_name in [\"PHASE3_2_MANAGER_VISIBLE_KEYS\", \"PHASE3_2_GENERAL_VISIBLE_KEYS\", \"ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS\", \"PERFORMANCE_ROLE_MATRIX_KEYS\"]:"
+    },
+    {
+      "kind": "Assign",
+      "line": 650,
+      "end_line": 655,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "PORTAL_MENU_VISIBILITY_POLICY = {"
+    },
+    {
+      "kind": "Try",
+      "line": 657,
+      "end_line": 662,
+      "length": 6,
+      "nested_function_count": 0,
+      "nested_functions": [],
+      "contains_build_menu_visibility_map": false,
+      "preview": "try:"
+    }
+  ],
+  "top_level_functions": [
+    {
+      "name": "_log_warning",
+      "prefix": "_log",
+      "line": 62,
+      "end_line": 69,
+      "length": 8,
+      "preview": "def _log_warning(logger: Any, message: str, *args: Any) -> None:"
+    },
+    {
+      "name": "_truthy_bool",
+      "prefix": "_truthy",
+      "line": 155,
+      "end_line": 159,
+      "length": 5,
+      "preview": "def _truthy_bool(value: Any) -> bool:"
+    },
+    {
+      "name": "_active_menu_items",
+      "prefix": "_active",
+      "line": 103,
+      "end_line": 104,
+      "length": 2,
+      "preview": "def _active_menu_items() -> list[dict[str, Any]]:"
+    }
+  ],
+  "top_level_assignments_top30": [
+    {
+      "line": 674,
+      "end_line": 683,
+      "length": 10,
+      "targets": [
+        "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS"
+      ],
+      "preview": "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS = {"
+    },
+    {
+      "line": 650,
+      "end_line": 655,
+      "length": 6,
+      "targets": [
+        "PORTAL_MENU_VISIBILITY_POLICY"
+      ],
+      "preview": "PORTAL_MENU_VISIBILITY_POLICY = {"
+    },
+    {
+      "line": 726,
+      "end_line": 731,
+      "length": 6,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = apply_v213c_category_menu_wrapper("
+    },
+    {
+      "line": 739,
+      "end_line": 744,
+      "length": 6,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = apply_v214_category_scope_wrapper("
+    },
+    {
+      "line": 752,
+      "end_line": 757,
+      "length": 6,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = apply_v215_category_period_scope_wrapper("
+    },
+    {
+      "line": 765,
+      "end_line": 770,
+      "length": 6,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = apply_v216_category_period_integration_wrapper("
+    },
+    {
+      "line": 669,
+      "end_line": 673,
+      "length": 5,
+      "targets": [
+        "PORTAL_ROLE_MATRIX_V2_12_KEYS"
+      ],
+      "preview": "PORTAL_ROLE_MATRIX_V2_12_KEYS = {"
+    },
+    {
+      "line": 819,
+      "end_line": 822,
+      "length": 4,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = apply_admin_period_reminder_public_build_wrapper("
+    },
+    {
+      "line": 19,
+      "end_line": 19,
+      "length": 1,
+      "targets": [
+        "RollbackHook"
+      ],
+      "preview": "RollbackHook = Callable[[], None]"
+    },
+    {
+      "line": 192,
+      "end_line": 192,
+      "length": 1,
+      "targets": [
+        "build_menu_visibility_map"
+      ],
+      "preview": "build_menu_visibility_map = _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2"
+    },
+    {
+      "line": 811,
+      "end_line": 811,
+      "length": 1,
+      "targets": [
+        "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1"
+      ],
+      "preview": "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_visibility_map"
+    }
+  ],
+  "recommended_function_candidates_top30": [
+    {
+      "prefix": "_log",
+      "function_count": 1,
+      "total_lines": 8,
+      "functions": [
+        {
+          "name": "_log_warning",
+          "prefix": "_log",
+          "line": 62,
+          "end_line": 69,
+          "length": 8
+        }
+      ],
+      "projected_target_lines_after_split": 815,
+      "recommended_status": "GOOD_FUNCTION_REVIEW_CANDIDATE",
+      "suggested_module": "app/services/settings/effective_menu_parts/log_context.py"
+    }
+  ],
+  "all_function_groups": [
+    {
+      "prefix": "_log",
+      "function_count": 1,
+      "total_lines": 8,
+      "functions": [
+        {
+          "name": "_log_warning",
+          "prefix": "_log",
+          "line": 62,
+          "end_line": 69,
+          "length": 8
+        }
+      ],
+      "projected_target_lines_after_split": 815,
+      "recommended_status": "GOOD_FUNCTION_REVIEW_CANDIDATE",
+      "suggested_module": "app/services/settings/effective_menu_parts/log_context.py"
+    },
+    {
+      "prefix": "_truthy",
+      "function_count": 1,
+      "total_lines": 5,
+      "functions": [
+        {
+          "name": "_truthy_bool",
+          "prefix": "_truthy",
+          "line": 155,
+          "end_line": 159,
+          "length": 5
+        }
+      ],
+      "projected_target_lines_after_split": 818,
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/settings/effective_menu_parts/truthy_context.py"
+    },
+    {
+      "prefix": "_active",
+      "function_count": 1,
+      "total_lines": 2,
+      "functions": [
+        {
+          "name": "_active_menu_items",
+          "prefix": "_active",
+          "line": 103,
+          "end_line": 104,
+          "length": 2
+        }
+      ],
+      "projected_target_lines_after_split": 821,
+      "recommended_status": "LOW_VALUE",
+      "suggested_module": "app/services/settings/effective_menu_parts/active_context.py"
+    }
+  ],
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": false,
+    "new_files_created": false
+  },
+  "ok": true
+}
