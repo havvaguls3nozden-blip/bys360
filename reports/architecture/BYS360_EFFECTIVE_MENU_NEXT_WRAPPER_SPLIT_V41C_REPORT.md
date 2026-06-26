@@ -1,0 +1,24 @@
+# BYS360 Effective Menu Next Wrapper Split V41C
+- Generated at: 2026-06-26T11:24:26
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD before: 7b214f8
+- Target: app/services/settings/effective_menu.py
+- Wrapper module: app/services/settings/effective_menu_parts/build_wrapper_context.py
+- Moved block line: 859
+- Moved block length: 29
+- Before target lines: 979
+- After target lines: 960
+- Before wrapper lines: 78
+- After wrapper lines: 121
+- Removed line estimate: 19
+- Runtime returncode: 0
+- Runtime import OK: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: True
+- new_files_created: False

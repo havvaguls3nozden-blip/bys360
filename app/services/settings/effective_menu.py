@@ -856,35 +856,16 @@ except Exception:
 # BYS360_PERFORMANCE_V2_1_4_CATEGORY_SCOPE_EFFECTIVE_MENU_END
 
 # BYS360_PERFORMANCE_V2_1_5_CATEGORY_PERIOD_SCOPE_EFFECTIVE_MENU_BEGIN
-try:
-    _BYS360_V215_CATEGORY_PERIOD_SCOPE_KEY = "performance_category_period_scope"
-    _BYS360_V215_CATEGORY_PERIOD_SCOPE_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
-    _BYS360_V215_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map  # type: ignore[name-defined]
-    def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
-        visibility = dict(_BYS360_V215_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
-        try:
-            _role = normalize_role_name(getattr(user, "role", ""))
-        except Exception:
-            logger = __import__("logging").getLogger(__name__)
-            logger.exception("BYS360 effective menu isleminde hata yakalandi")
-            _role = str(getattr(user, "role", "") or "").strip().lower()
-        _is_admin_like = bool(_role in _BYS360_V215_CATEGORY_PERIOD_SCOPE_ROLES or getattr(user, "is_admin", False) or getattr(user, "is_superuser", False))
-        if _is_admin_like:
-            try:
-                _removed = is_removed_menu_key(_BYS360_V215_CATEGORY_PERIOD_SCOPE_KEY)
-            except Exception:
-                logger = __import__("logging").getLogger(__name__)
-                logger.exception("BYS360 effective menu isleminde hata yakalandi")
-                _removed = False
-            if not _removed:
-                visibility[_BYS360_V215_CATEGORY_PERIOD_SCOPE_KEY] = True
-                visibility["performance_module"] = True
-                visibility["performance_management"] = True
-                visibility["performans_yonetimi"] = True
-        return visibility
-except Exception:
-    import logging
-    logging.getLogger(__name__).exception("BYS360 V2.1.5 kategori dönem kapsam effective_menu force uygulanamadı")
+# Phase4J V41C effective_menu V215 wrapper block facade call
+from app.services.settings.effective_menu_parts.build_wrapper_context import (
+    apply_v215_category_period_scope_wrapper,
+)
+build_menu_visibility_map = apply_v215_category_period_scope_wrapper(
+    build_menu_visibility_map,
+    logging=logging,
+    normalize_role_name=normalize_role_name,
+    is_removed_menu_key=is_removed_menu_key,
+)
 # BYS360_PERFORMANCE_V2_1_5_CATEGORY_PERIOD_SCOPE_EFFECTIVE_MENU_END
 
 # BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_EFFECTIVE_MENU_BEGIN
