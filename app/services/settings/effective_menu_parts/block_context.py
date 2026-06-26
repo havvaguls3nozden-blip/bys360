@@ -180,6 +180,20 @@ def apply_personel_role_matrix_visibility_v7_block(policy_globals, _BYS360_PERSO
                     _current.extend([_role for _role in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES if _role not in _current])
 
 
+def apply_reminders_menu_key_sets_block(policy_globals, _BYS360_REMINDERS_MENU_KEY):
+    """Apply reminders menu key to related key sets."""
+    for _set_name in [
+        "PHASE3_2_MANAGER_VISIBLE_KEYS",
+        "PHASE3_2_GENERAL_VISIBLE_KEYS",
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+    ]:
+        _target = policy_globals.get(_set_name)
+        if isinstance(_target, set):
+            _target.add(_BYS360_REMINDERS_MENU_KEY)
+        elif isinstance(_target, list) and _BYS360_REMINDERS_MENU_KEY not in _target:
+            _target.append(_BYS360_REMINDERS_MENU_KEY)
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
     "apply_performance_role_matrix_new_tab_policy_block",
@@ -188,6 +202,7 @@ __all__ = [
     "apply_personel_allowed_policy_block",
     "apply_personel_role_matrix_visibility_v7_block",
     "apply_process_menu_policy_block",
+    "apply_reminders_menu_key_sets_block",
     "apply_reminders_menu_policy_block",
     "apply_role_matrix_runtime_authority_keys_block",
 ]

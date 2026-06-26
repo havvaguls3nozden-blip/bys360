@@ -278,16 +278,14 @@ apply_reminders_menu_policy_block(
     _BYS360_REMINDERS_ALLOWED_ROLES,
 )
 
-for _set_name in [
-    "PHASE3_2_MANAGER_VISIBLE_KEYS",
-    "PHASE3_2_GENERAL_VISIBLE_KEYS",
-    "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
-]:
-    _target = globals().get(_set_name)
-    if isinstance(_target, set):
-        _target.add(_BYS360_REMINDERS_MENU_KEY)
-    elif isinstance(_target, list) and _BYS360_REMINDERS_MENU_KEY not in _target:
-        _target.append(_BYS360_REMINDERS_MENU_KEY)
+# Phase4J V56C effective_menu reminders key sets block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_reminders_menu_key_sets_block,
+)
+apply_reminders_menu_key_sets_block(
+    globals(),
+    _BYS360_REMINDERS_MENU_KEY,
+)
 # BYS360_SETTINGS_MANUAL_V1_1_REMINDERS_POLICY_END
 
 # BYS360_PROCESS_TRACKING_REPORTS_EFFECTIVE_MENU_V1_BEGIN
