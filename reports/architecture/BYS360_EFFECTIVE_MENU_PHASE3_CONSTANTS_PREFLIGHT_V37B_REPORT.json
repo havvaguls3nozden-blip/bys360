@@ -1,0 +1,199 @@
+{
+  "phase": "effective-menu-phase3-constants-preflight-v37b",
+  "generated_at": "2026-06-26T09:07:32",
+  "git_head": "0f8e2d2",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_STATUS_AFTER_BYS360_CONSTANTS_V37A_REPORT.json",
+  "target": "app/services/settings/effective_menu.py",
+  "selected_prefix": "PHASE3",
+  "suggested_module": "app/services/settings/effective_menu_parts/phase3_constants.py",
+  "status": "READY_FOR_CONSTANT_SPLIT",
+  "ready_for_split": true,
+  "expected_assignment_count": 6,
+  "selected_assignment_count": 6,
+  "found_assignment_name_count": 6,
+  "selected_total_lines": 64,
+  "projected_target_lines_after_split": 1280,
+  "expected_assignment_names": [
+    "PHASE3_2_GENERAL_VISIBLE_KEYS",
+    "PHASE3_2_MANAGER_VISIBLE_KEYS",
+    "PHASE3_2_MENU_VISIBILITY_MARKER",
+    "PHASE3_2_PERFORMANCE_MENU_POLICY",
+    "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+    "PHASE3_PERFORMANCE_MENU_POLICY"
+  ],
+  "found_assignment_names": [
+    "PHASE3_2_GENERAL_VISIBLE_KEYS",
+    "PHASE3_2_MANAGER_VISIBLE_KEYS",
+    "PHASE3_2_MENU_VISIBILITY_MARKER",
+    "PHASE3_2_PERFORMANCE_MENU_POLICY",
+    "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+    "PHASE3_PERFORMANCE_MENU_POLICY"
+  ],
+  "missing_assignments": [],
+  "outside_assignment_refs": [],
+  "inside_assignment_refs": [],
+  "used_import_names": [],
+  "unknown_external_names": [],
+  "functions_using_selected_assignments": [],
+  "selected_assignments": [
+    {
+      "line": 178,
+      "end_line": 196,
+      "length": 19,
+      "matched_names": [
+        "PHASE3_PERFORMANCE_MENU_POLICY"
+      ],
+      "targets": [
+        "PHASE3_PERFORMANCE_MENU_POLICY"
+      ],
+      "load_names": [
+        "dict",
+        "set",
+        "str"
+      ],
+      "store_names": [
+        "PHASE3_PERFORMANCE_MENU_POLICY"
+      ],
+      "call_names": [],
+      "source": "PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {\n    # Personel: kendi karnesi ve kendi kıyas/ortalama görünümü.\n    \"performance_scorecard\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\", \"personel\"},\n    \"my_performance_comparison\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\", \"personel\"},\n\n    # Koordinatör/Grup Başkanı: kendi kapsamındaki personel ve ortalamalar.\n    \"performance_reports\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\"},\n    \"performance_team_compare\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\"},\n    \"team_performance_comparison_history\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\"},\n\n    # Yönetim ekranları: genel/teknik yönetim ailesi.\n    \"performance_criteria\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\"},\n    \"performance_periods\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\"},\n    \"performance_task_management\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\"},\n    \"performance_hierarchy_tree\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\", \"baskan_yardimcisi\", \"grup_baskani\", \"mali_musavir\", \"koordinator\", \"birim_sorumlusu\"},\n    \"performance_hierarchy_assignments\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\"},\n    \"performance_publish\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"baskan\"},\n    \"performance_history_import\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\"},\n}"
+    },
+    {
+      "line": 205,
+      "end_line": 205,
+      "length": 1,
+      "matched_names": [
+        "PHASE3_2_MENU_VISIBILITY_MARKER"
+      ],
+      "targets": [
+        "PHASE3_2_MENU_VISIBILITY_MARKER"
+      ],
+      "load_names": [],
+      "store_names": [
+        "PHASE3_2_MENU_VISIBILITY_MARKER"
+      ],
+      "call_names": [],
+      "source": "PHASE3_2_MENU_VISIBILITY_MARKER = \"BYS360_PHASE3_2_MENU_VISIBILITY\""
+    },
+    {
+      "line": 207,
+      "end_line": 242,
+      "length": 36,
+      "matched_names": [
+        "PHASE3_2_PERFORMANCE_MENU_POLICY"
+      ],
+      "targets": [
+        "PHASE3_2_PERFORMANCE_MENU_POLICY"
+      ],
+      "load_names": [
+        "dict",
+        "set",
+        "str"
+      ],
+      "store_names": [
+        "PHASE3_2_PERFORMANCE_MENU_POLICY"
+      ],
+      "call_names": [],
+      "source": "PHASE3_2_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {\n    # Personel: yalnızca kendi karnesi ve kendi grup/kategori ortalaması tarafı.\n    \"performance_scorecard\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\", \"personel\", \"user\", \"standart_personel\"},\n    \"my_performance_comparison\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\", \"personel\", \"user\", \"standart_personel\"},\n\n    # Koordinatör ve Grup Başkanı: yalnızca kendi kapsamındaki personel/ortalama ekranları.\n    \"performance_reports\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_team_compare\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"team_performance_comparison_history\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_evaluation_tasks\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_tasks\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_interim_notes\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_development_guidance\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_feedback_meetings\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n\n    # Başkan/Admin: genel yönetim görünümü.\n    \"performance_criteria\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\"},\n    \"performance_periods\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\"},\n    \"performance_hierarchy_tree\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_publish\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\"},\n    \"performance_president_approvals\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\"},\n    \"performance_personnel_support_publish_approval\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"grup_baskani\", \"grup_başkanı\"},\n\n    # Teknik yönetim: yalnızca Admin/Sistem Yöneticisi.\n    \"performance_task_management\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\"},\n    \"performance_hierarchy_assignments\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\"},\n    \"performance_history_import\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\"},\n    \"performance_mail_settings\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\"},\n\n    # Stratejik Performans — KPI, Hedef, Yetkinlik, Öz Değerlendirme\n    \"performance_kpi_dashboard\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\"},\n    \"performance_kpi_management\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\"},\n    \"performance_competency_library\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_self_assessment\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\", \"birim_sorumlusu\"},\n    \"performance_kpi_analysis\": {\"admin\", \"sistem_yoneticisi\", \"system_admin\", \"super_admin\", \"administrator\", \"baskan\", \"başkan\", \"president\", \"baskan_yardimcisi\", \"başkan_yardımcısı\", \"grup_baskani\", \"grup_başkanı\", \"mali_musavir\", \"mali_müşavir\", \"koordinator\", \"koordinatör\"},\n}"
+    },
+    {
+      "line": 244,
+      "end_line": 244,
+      "length": 1,
+      "matched_names": [
+        "PHASE3_2_PERSONNEL_VISIBLE_KEYS"
+      ],
+      "targets": [
+        "PHASE3_2_PERSONNEL_VISIBLE_KEYS"
+      ],
+      "load_names": [],
+      "store_names": [
+        "PHASE3_2_PERSONNEL_VISIBLE_KEYS"
+      ],
+      "call_names": [],
+      "source": "PHASE3_2_PERSONNEL_VISIBLE_KEYS = {\"performance_scorecard\", \"my_performance_comparison\"}"
+    },
+    {
+      "line": 245,
+      "end_line": 250,
+      "length": 6,
+      "matched_names": [
+        "PHASE3_2_MANAGER_VISIBLE_KEYS"
+      ],
+      "targets": [
+        "PHASE3_2_MANAGER_VISIBLE_KEYS"
+      ],
+      "load_names": [],
+      "store_names": [
+        "PHASE3_2_MANAGER_VISIBLE_KEYS"
+      ],
+      "call_names": [],
+      "source": "PHASE3_2_MANAGER_VISIBLE_KEYS = {\n    \"performance_scorecard\", \"my_performance_comparison\", \"performance_reports\",\n    \"performance_team_compare\", \"team_performance_comparison_history\",\n    \"performance_evaluation_tasks\", \"performance_tasks\", \"performance_interim_notes\",\n    \"performance_development_guidance\", \"performance_feedback_meetings\", \"performance_hierarchy_tree\",\n}"
+    },
+    {
+      "line": 251,
+      "end_line": 251,
+      "length": 1,
+      "matched_names": [
+        "PHASE3_2_GENERAL_VISIBLE_KEYS"
+      ],
+      "targets": [
+        "PHASE3_2_GENERAL_VISIBLE_KEYS"
+      ],
+      "load_names": [
+        "PHASE3_2_PERFORMANCE_MENU_POLICY",
+        "set"
+      ],
+      "store_names": [
+        "PHASE3_2_GENERAL_VISIBLE_KEYS"
+      ],
+      "call_names": [
+        "set"
+      ],
+      "source": "PHASE3_2_GENERAL_VISIBLE_KEYS = set(PHASE3_2_PERFORMANCE_MENU_POLICY.keys())"
+    }
+  ],
+  "best_target_from_v37a": {
+    "prefix": "PHASE3",
+    "assignment_count": 6,
+    "total_lines": 64,
+    "large_block_count": 1,
+    "large_blocks": [
+      {
+        "names": [
+          "PHASE3_2_PERFORMANCE_MENU_POLICY"
+        ],
+        "primary_name": "PHASE3_2_PERFORMANCE_MENU_POLICY",
+        "prefix": "PHASE3",
+        "line": 207,
+        "end_line": 242,
+        "length": 36,
+        "large_block": true
+      }
+    ],
+    "all_assignment_names": [
+      "PHASE3_PERFORMANCE_MENU_POLICY",
+      "PHASE3_2_MENU_VISIBILITY_MARKER",
+      "PHASE3_2_PERFORMANCE_MENU_POLICY",
+      "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+      "PHASE3_2_MANAGER_VISIBLE_KEYS",
+      "PHASE3_2_GENERAL_VISIBLE_KEYS"
+    ],
+    "projected_target_lines_after_split": 1280,
+    "recommended_status": "GOOD_CONSTANT_SPLIT_CANDIDATE",
+    "suggested_module": "app/services/settings/effective_menu_parts/phase3_constants.py"
+  },
+  "safety": {
+    "live_system_changed": false,
+    "files_moved": false,
+    "files_deleted": false,
+    "database_touched": false,
+    "source_files_modified": false
+  },
+  "decision": [
+    "Bu rapor kaynak kodu degistirmez.",
+    "PHASE3 prefix sabit/politika bloklari ve bagimliliklari incelendi.",
+    "ready_for_split True ise V37C ile sabitler facade import korunarak ayri module alinabilir."
+  ],
+  "ok": true
+}
