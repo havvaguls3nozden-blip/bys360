@@ -226,6 +226,9 @@ from app.services.settings.effective_menu_parts.build_context import (
     build_menu_visibility_map as _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2,
 )
 
+# Phase4J V39D: expose split core under original name during legacy wrapper registration
+build_menu_visibility_map = _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2
+
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
 # Phase4J V36C effective_menu BYS360 constants facade imports
@@ -1004,7 +1007,7 @@ for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
 # BYS360_ADMIN_PERIOD_REMINDER_ACCESS_FIX_V1_BEGIN
 # Admin/Sistem Yöneticisi için Dönem Yönetim Merkezi ve Amir Hatırlatma Merkezi
 # rol matrisi veya kişi bazlı eski kapalı kayıtlar yüzünden gizlenmesin.
-_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2
+_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_visibility_map
 
 
 
