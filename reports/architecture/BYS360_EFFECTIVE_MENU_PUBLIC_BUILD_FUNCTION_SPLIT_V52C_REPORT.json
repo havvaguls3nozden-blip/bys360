@@ -1,0 +1,147 @@
+{
+  "phase": "effective-menu-public-build-function-split-v52c",
+  "generated_at": "2026-06-26T15:54:09",
+  "git_head_before": "e7b8acb",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "target": "app/services/settings/effective_menu.py",
+  "new_module": "app/services/settings/effective_menu_parts/public_build_context.py",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_PUBLIC_BUILD_FUNCTION_PREFLIGHT_V52B_REPORT.json",
+  "moved_function": {
+    "name": "build_menu_visibility_map",
+    "line": 815,
+    "end_line": 826,
+    "length": 12,
+    "apply_function": "apply_admin_period_reminder_public_build_wrapper",
+    "used_import_names": [
+      "_bys360_admin_period_reminder_is_admin_v1"
+    ],
+    "used_assignment_names": [
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1"
+    ],
+    "purpose": "public_build_menu_visibility_map_admin_period_reminder_wrapper"
+  },
+  "before_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 827,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_assignment_count": 10,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "build_menu_visibility_map"
+    ],
+    "top_level_assignments": [
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "after_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 823,
+    "top_level_function_count": 3,
+    "all_function_count": 3,
+    "top_level_assignment_count": 11,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool"
+    ],
+    "top_level_assignments": [
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "after_new_module": {
+    "path": "app/services/settings/effective_menu_parts/public_build_context.py",
+    "line_count": 32,
+    "top_level_function_count": 1,
+    "all_function_count": 2,
+    "top_level_assignment_count": 1,
+    "top_level_functions": [
+      "apply_admin_period_reminder_public_build_wrapper"
+    ],
+    "top_level_assignments": [
+      "__all__"
+    ],
+    "syntax_ok": true
+  },
+  "removed_line_estimate": 4,
+  "runtime_smoke": {
+    "returncode": 0,
+    "stdout": "IMPORT_OK\ncore_policy_effective_dict=True\ncore_policy_part_dict=True\ncore_policy_same_object=True\nconstants_all_has_core_policy=True\ncore_callable=True\nalias_callable=True\npublic_callable=True\npublic_apply_callable=True\npublic_all_has_apply=True\nuser_effective_callable=True\nuser_part_callable=True\nuser_same_object=True\nbuild_context_core_callable=True\ndaily_block_callable=True\nauthority_block_callable=True\nnew_tab_block_callable=True\nprocess_block_callable=True\nreminders_block_callable=True\nperiod_center_block_callable=True\nblock_all_has_daily_block=True\nblock_all_has_authority_block=True\nblock_all_has_new_tab_block=True\nblock_all_has_process_block=True\nblock_all_has_reminders_block=True\nblock_all_has_period_center_block=True\napply_v213c_category_menu_wrapper_callable=True\nwrapper_all_has_apply_v213c_category_menu_wrapper=True\napply_v214_category_scope_wrapper_callable=True\nwrapper_all_has_apply_v214_category_scope_wrapper=True\napply_v215_category_period_scope_wrapper_callable=True\nwrapper_all_has_apply_v215_category_period_scope_wrapper=True\napply_v216_category_period_integration_wrapper_callable=True\nwrapper_all_has_apply_v216_category_period_integration_wrapper=True\n",
+    "stderr": "",
+    "import_ok_marker": true,
+    "core_policy_effective_dict": true,
+    "core_policy_part_dict": true,
+    "core_policy_same_object": true,
+    "constants_all_has_core_policy": true,
+    "core_callable": true,
+    "alias_callable": true,
+    "public_callable": true,
+    "public_apply_callable": true,
+    "public_all_has_apply": true,
+    "user_effective_callable": true,
+    "user_part_callable": true,
+    "user_same_object": true,
+    "build_context_core_callable": true,
+    "daily_block_callable": true,
+    "authority_block_callable": true,
+    "new_tab_block_callable": true,
+    "process_block_callable": true,
+    "reminders_block_callable": true,
+    "period_center_block_callable": true,
+    "block_all_has_daily_block": true,
+    "block_all_has_authority_block": true,
+    "block_all_has_new_tab_block": true,
+    "block_all_has_process_block": true,
+    "block_all_has_reminders_block": true,
+    "block_all_has_period_center_block": true,
+    "v213c_callable": true,
+    "v214_callable": true,
+    "v215_callable": true,
+    "v216_callable": true,
+    "all_has_v213c": true,
+    "all_has_v214": true,
+    "all_has_v215": true,
+    "all_has_v216": true,
+    "combined_contains_build_nameerror": false,
+    "combined_contains_force_failed": false,
+    "combined_contains_traceback": false
+  },
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": true,
+    "new_files_created": true
+  },
+  "decision": [
+    "Public build_menu_visibility_map fonksiyonu public_build_context.py icinde wrapper factory olarak ayrildi.",
+    "effective_menu.py tarafinda public build_menu_visibility_map ismi assignment ile korunuyor.",
+    "Onceki build fonksiyonu ve admin kontrol yardimcisi parametre olarak baglandi.",
+    "Runtime import smoke build_menu_visibility_map NameError, force uygulanamadi ve Traceback mesaji olmadan gecti.",
+    "Bu uygulama canli sisteme veya veritabanina dokunmaz."
+  ],
+  "ok": true
+}

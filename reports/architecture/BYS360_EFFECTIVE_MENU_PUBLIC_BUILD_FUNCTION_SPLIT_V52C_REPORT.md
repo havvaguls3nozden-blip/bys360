@@ -1,0 +1,27 @@
+# BYS360 Effective Menu Public Build Function Split V52C
+- Generated at: 2026-06-26T15:54:09
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD before: e7b8acb
+- Target: app/services/settings/effective_menu.py
+- New module: app/services/settings/effective_menu_parts/public_build_context.py
+- Moved function: build_menu_visibility_map
+- Moved function line: 815
+- Moved function length: 12
+- Before target lines: 827
+- After target lines: 823
+- New module lines: 32
+- Removed line estimate: 4
+- Runtime returncode: 0
+- Runtime import OK: True
+- Public callable: True
+- Public apply callable: True
+- Public __all__ has apply: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: True
+- new_files_created: True

@@ -812,16 +812,12 @@ _BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_vis
 
 
 
-def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
-    visibility = dict(_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1(user, *args, **kwargs) or {})
-    if _bys360_admin_period_reminder_is_admin_v1(user):
-        for key in (
-            "performance_period_management_center",
-            "performance_evaluator_reminder_center",
-            "performance_evaluation_live_tracking",
-        ):
-            visibility[key] = True
-        for parent in ("performance_module", "performance_management", "performans_yonetimi"):
-            visibility[parent] = True
-    return visibility
+# Phase4J V52C effective_menu public build function facade assignment
+from app.services.settings.effective_menu_parts.public_build_context import (
+    apply_admin_period_reminder_public_build_wrapper,
+)
+build_menu_visibility_map = apply_admin_period_reminder_public_build_wrapper(
+    _BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1,
+    _bys360_admin_period_reminder_is_admin_v1,
+)
 # BYS360_ADMIN_PERIOD_REMINDER_ACCESS_FIX_V1_END
