@@ -1,0 +1,70 @@
+# BYS360 Effective Menu Next Safe Block Preflight V54B
+- Generated at: 2026-06-26T16:11:12
+- Status: READY_FOR_NEXT_SAFE_BLOCK_SPLIT
+- Ready for split: True
+- Runtime OK: True
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD: 8fece12
+- Target: app/services/settings/effective_menu.py
+- Suggested module: app/services/settings/effective_menu_parts/block_context.py
+- Target block kind: For
+- Target block line: 403
+- Target block length: 11
+- Projected raw target lines after split: 809
+- Projected facade estimate: 815
+- Unknown external names: []
+- Used imports: ['_BYS360_PERSONEL_ALLOWED_POLICY', '_BYS360_PERSONEL_DISALLOWED_POLICY_KEYS']
+- Used assignments: []
+- Used top-level functions: []
+- Local assignments: ['_current', '_key', '_policy', '_policy_name', '_roles']
+- Calls: ['globals', 'isinstance', 'set']
+- Attribute calls: ['_BYS360_PERSONEL_ALLOWED_POLICY.items', '_current.extend', '_current.update', '_policy.pop', '_policy.setdefault']
+
+## Runtime Smoke
+- returncode: 0
+- import_ok_marker: True
+- core_policy_effective_dict: True
+- core_policy_part_dict: True
+- core_policy_same_object: True
+- constants_all_has_core_policy: True
+- core_callable: True
+- alias_callable: True
+- public_callable: True
+- public_apply_callable: True
+- public_all_has_apply: True
+- user_effective_callable: True
+- user_part_callable: True
+- user_same_object: True
+- build_context_core_callable: True
+- daily_block_callable: True
+- authority_block_callable: True
+- new_tab_block_callable: True
+- new_tab_sets_block_callable: True
+- process_block_callable: True
+- reminders_block_callable: True
+- period_center_block_callable: True
+- block_all_has_daily_block: True
+- block_all_has_authority_block: True
+- block_all_has_new_tab_block: True
+- block_all_has_new_tab_sets_block: True
+- block_all_has_process_block: True
+- block_all_has_reminders_block: True
+- block_all_has_period_center_block: True
+- v213c_callable: True
+- v214_callable: True
+- v215_callable: True
+- v216_callable: True
+- all_has_v213c: True
+- all_has_v214: True
+- all_has_v215: True
+- all_has_v216: True
+- combined_contains_build_nameerror: False
+- combined_contains_force_failed: False
+- combined_contains_traceback: False
+
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: False
+- new_files_created: False
