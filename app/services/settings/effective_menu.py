@@ -81,31 +81,11 @@ def _log_warning(logger: Any, message: str, *args: Any) -> None:
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
 # Ayarlar > Rol Matrisi ekranında kapatılan sekmeler, çekirdek menü savunması
 # veya kişi bazlı eski override nedeniyle yeniden açılmasın.
-ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS: set[str] = {
-    "messages",
-    "notifications",
-    "surveys",
-    "survey_manage",
-    "survey_results",
-    "feedback_dashboard",
-    "feedback_pulse",
-    "feedback_campaigns",
-    "feedback_results",
-    "feedback_actions",
-    "feedback_manager",
-    "feedback_admin",
-    "portal_press_news",
-    "announcements",
-    "assistant_center",
-    "assistant_my_reminders",
-    "assistant_scheduled_tasks",
-    "assistant_report_generate",
-    "assistant_report_share",
-    "assistant_ai_summary",
-    "assistant_process_alerts",
-    "assistant_logs",
-    "assistant_settings",
-}
+# Phase4J V38C effective_menu ROLE constants facade imports
+from app.services.settings.effective_menu_parts.role_constants import (
+    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS,
+)
+
 
 
 # Phase4J V35C effective_menu apply_context facade imports
