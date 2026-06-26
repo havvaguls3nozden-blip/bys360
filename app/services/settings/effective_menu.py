@@ -549,8 +549,56 @@ def build_menu_visibility_map(
     return visibility
 
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
-_BYS360_MANUAL_ROLE_MENU_ADDITIONS = {'admin': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'baskan': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'baskan_yardimcisi': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'grup_baskani': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'mali_musavir': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'koordinator': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'birim_sorumlusu': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'personel': ['performance_archive']}
-_BYS360_MANUAL_POLICY = {}
+# Phase4J V36C effective_menu BYS360 constants facade imports
+from app.services.settings.effective_menu_parts.bys360_constants import (
+    _BYS360_AG5E_AI_TEACHING_MENU_KEY,
+    _BYS360_AG5E_AI_TEACHING_ROLES,
+    _BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS,
+    _BYS360_ALL_MENU_ROLE_MATRIX_POLICY,
+    _BYS360_ASSISTANT_TAB_AUTHORITY_KEYS,
+    _BYS360_ASSISTANT_TAB_POLICY,
+    _BYS360_EXEC_ADMIN_ONLY_ROLES,
+    _BYS360_EXEC_KNOWN_KEYS,
+    _BYS360_EXEC_URL_MARKERS,
+    _BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1,
+    _BYS360_GENERAL_CATEGORY_SECTION_KEYS_V1,
+    _BYS360_GENERAL_CORE_KEYS_V4,
+    _BYS360_MANUAL_POLICY,
+    _BYS360_MANUAL_ROLE_MENU_ADDITIONS,
+    _BYS360_PERFORMANCE_ALL_KEYS,
+    _BYS360_PERFORMANCE_CHILD_KEYS,
+    _BYS360_PERFORMANCE_CHILD_KEYS_V4,
+    _BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4,
+    _BYS360_PERFORMANCE_MAIN_KEYS,
+    _BYS360_PERFORMANCE_MAIN_KEYS_V4,
+    _BYS360_PERFORMANCE_MAIN_SWITCH_POLICY,
+    _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY,
+    _BYS360_PERF_RM_V8_ALIAS_GROUPS,
+    _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
+    _BYS360_PERF_RM_V8_ALL_KEYS,
+    _BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS,
+    _BYS360_PERF_RM_V8_CHILD_KEYS,
+    _BYS360_PERF_RM_V8_MAIN_KEYS,
+    _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    _BYS360_PERF_RM_V8_ROLE_POLICY,
+    _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221,
+    _BYS360_PERIOD_CENTER_MENU_KEY_V221,
+    _BYS360_PERSONEL_ALLOWED_POLICY,
+    _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS,
+    _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS,
+    _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_MANAGER_ROLES,
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS,
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES,
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS,
+    _BYS360_PROCESS_MENU_KEYS,
+    _BYS360_PROCESS_MENU_ROLES,
+    _BYS360_REMINDERS_ALLOWED_ROLES,
+    _BYS360_REMINDERS_MENU_KEY,
+    _BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS,
+    _BYS360_ROLE_MATRIX_V12_POLICY,
+    _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
+)
+
 
 for _role, _keys in _BYS360_MANUAL_ROLE_MENU_ADDITIONS.items():
     for _key in _keys:
@@ -575,8 +623,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_END
 
 # BYS360_SETTINGS_MANUAL_V1_1_REMINDERS_POLICY_BEGIN
-_BYS360_REMINDERS_MENU_KEY = 'performance_meeting_p3_reminders'
-_BYS360_REMINDERS_ALLOWED_ROLES = set(['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'])
 
 for _policy_name in [
     "PHASE3_PERFORMANCE_MENU_POLICY",
@@ -605,8 +651,6 @@ for _set_name in [
 # BYS360_SETTINGS_MANUAL_V1_1_REMINDERS_POLICY_END
 
 # BYS360_PROCESS_TRACKING_REPORTS_EFFECTIVE_MENU_V1_BEGIN
-_BYS360_PROCESS_MENU_KEYS = ['performance_process_tracking', 'performance_process_reports']
-_BYS360_PROCESS_MENU_ROLES = set(['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'])
 
 for _policy_name in [
     "PHASE3_PERFORMANCE_MENU_POLICY",
@@ -636,7 +680,6 @@ for _set_name in [
 # BYS360_PROCESS_TRACKING_REPORTS_EFFECTIVE_MENU_V1_END
 
 # BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TABS_V1_EFFECTIVE_MENU_BEGIN
-_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY = {'performance_process_tracking': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_process_reports': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_interim_notes': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_development_guidance': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_p3_reminders': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_archive': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'], 'performance_personnel_support_publish_approval': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani'], 'performance_president_approvals': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan']}
 
 for _policy_name in [
     "PHASE3_PERFORMANCE_MENU_POLICY",
@@ -670,32 +713,11 @@ for _set_name in [
 
 # BYS360_SETTINGS_MODULE_ROLE_MATRIX_V12_EFFECTIVE_MENU_BEGIN
 # Modül Bazlı Rol Matrislerinde kapatılan yeni Yardım Merkezi, BYS360 Asistanı V9 ve performans satırları runtime'da da kapalı kalır.
-_BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS = {
-    "support_index", "support_new", "support_my_tickets", "support_assigned", "support_all",
-    "assistant_center", "assistant_quick_help", "assistant_my_summary", "assistant_support_routing",
-    "assistant_performance_guidance", "assistant_president_approval_guidance", "assistant_publish_preapproval_guidance",
-    "assistant_interim_notes_guidance", "assistant_development_guidance", "assistant_archive_guidance",
-    "assistant_process_alerts", "assistant_my_reminders", "assistant_scheduled_tasks", "assistant_report_generate",
-    "assistant_report_share", "assistant_ai_summary", "assistant_logs", "assistant_settings",
-    "performance_process_tracking", "performance_process_reports", "performance_personnel_support_publish_approval",
-    "performance_president_approvals", "performance_archive", "performance_interim_notes", "performance_development_guidance",
-    "performance_meeting_p3_reminders",
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS)
 except Exception:
     import logging
     logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/settings/effective_menu.py")
-_BYS360_ROLE_MATRIX_V12_POLICY = {
-    "support_index": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
-    "support_new": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
-    "support_my_tickets": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
-    "support_assigned": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "support_all": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "performance_process_tracking": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "performance_process_reports": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "performance_personnel_support_publish_approval": {"admin", "grup_baskani"},
-}
 for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY"]:
     _policy = globals().get(_policy_name)
     if isinstance(_policy, dict):
@@ -742,8 +764,6 @@ except Exception:
 # BYS360_AY1_AI_PERFORMANCE_SETTINGS_INTEGRATION_V1_END
 
 # BYS360_AG5E_AI_TEACHING_EFFECTIVE_MENU_START
-_BYS360_AG5E_AI_TEACHING_MENU_KEY = "ai_teaching_center"
-_BYS360_AG5E_AI_TEACHING_ROLES = {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan", "başkan", "ust_yonetim", "ai_yoneticisi"}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.add(_BYS360_AG5E_AI_TEACHING_MENU_KEY)
 except Exception:
@@ -772,21 +792,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 # BYS360_PERSONEL_LIVE_SCOPE_NARROW_V1_EFFECTIVE_MENU_BEGIN
 # Personel Yönetimi rol matrisi canlı kapsamı daraltıldı.
 # Rol matrisinde canlı tutulacak tek personel alt operasyon anahtarı: hr_leave_tracking.
-_BYS360_PERSONEL_ALLOWED_POLICY = {
-    "hr_leave_tracking": {
-        "admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator",
-        "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı",
-        "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir",
-        "koordinator", "koordinatör", "birim_sorumlusu",
-    },
-}
-_BYS360_PERSONEL_DISALLOWED_POLICY_KEYS = {
-    "hr_management",
-    "hr_reports",
-    "hr_personnel_operations",
-    "hr_career_planning",
-    "hr_reward_discipline",
-}
 for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
     _policy = globals().get(_policy_name)
     if isinstance(_policy, dict):
@@ -810,13 +815,6 @@ for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBL
 
 # BYS360_PERSONEL_ROLE_MATRIX_CURRENT_SCOPE_V1_EFFECTIVE_MENU_BEGIN
 # Ayarlar rol matrisi kaydı canlı menü kararına yansısın diye güncel personel anahtarları runtime yetki katmanına eklenir.
-_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS = {"admin_users", "org_units", "hr_leave_tracking"}
-_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_MANAGER_ROLES = {
-    "admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator",
-    "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı",
-    "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir",
-    "koordinator", "koordinatör", "birim_sorumlusu",
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS)
 except Exception:
@@ -833,66 +831,6 @@ except Exception:
 # BYS360_SETTINGS_MENU_ROLE_MATRIX_ALL_TABS_V1_BEGIN
 # Rol matrisi son karar katmanı: yeni eklenen tüm canlı sekmeler rol matrisi tarafından kapatılınca kapalı kalır;
 # rol matrisinden açılınca sidebar görünürlüğüne dahil olur.
-_BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS = {'home', 'dashboard', 'notifications', 'announcements', 'account', 'settings', 'db_check', 'logout', 'support_index', 'support_new', 'support_my_tickets', 'support_assigned', 'support_all', 'support_help_admin', 'admin_users', 'org_units', 'hr_leave_tracking', 'performance_scorecard', 'my_performance_comparison', 'performance_reports', 'performance_tasks', 'performance_criteria', 'performance_periods', 'performance_evaluation_tasks', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_performance_comparison_history', 'performance_feedback_meetings', 'performance_publish', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_process_tracking', 'performance_process_reports', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_archive', 'performance_history_import', 'performance_mail_settings', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'messages', 'surveys', 'survey_manage', 'survey_results', 'feedback_dashboard', 'feedback_pulse', 'feedback_campaigns', 'feedback_results', 'feedback_actions', 'feedback_manager', 'feedback_admin', 'ai_center', 'ai_agent_panel', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
-_BYS360_ALL_MENU_ROLE_MATRIX_POLICY = {
-    'performance_scorecard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'my_performance_comparison': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_reports': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_tasks': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_criteria': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'performance_periods': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'performance_evaluation_tasks': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_task_management': {'admin'},
-    'performance_hierarchy_tree': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_hierarchy_assignments': {'admin'},
-    'performance_team_compare': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'team_performance_comparison_history': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_feedback_meetings': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_publish': {'admin', 'baskan'},
-    'performance_president_approvals': {'admin', 'baskan'},
-    'performance_personnel_support_publish_approval': {'admin', 'grup_baskani', 'personel_ve_destek_hizmetleri_grup_baskani', 'personel_destek_hizmetleri_grup_baskani', 'personel_ve_idari_isler_grup_baskani', 'personel_idari_isler_grup_baskani'},
-    'performance_process_tracking': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_process_reports': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_interim_notes': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_meeting_p3_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_archive': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_history_import': {'admin'},
-    'performance_mail_settings': {'admin'},
-    'performance_kpi_dashboard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_kpi_management': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
-    'performance_competency_library': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_self_assessment': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_kpi_analysis': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
-    'support_index': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'support_new': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'support_my_tickets': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'support_assigned': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'support_all': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'ai_agent_panel': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'ai_teaching_center': {'admin', 'baskan'},
-    'assistant_center': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_quick_help': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_my_summary': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_support_routing': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_performance_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_president_approval_guidance': {'admin', 'baskan'},
-    'assistant_publish_preapproval_guidance': {'admin', 'grup_baskani', 'personel_ve_destek_hizmetleri_grup_baskani', 'personel_destek_hizmetleri_grup_baskani', 'personel_ve_idari_isler_grup_baskani', 'personel_idari_isler_grup_baskani'},
-    'assistant_interim_notes_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_archive_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_process_alerts': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_my_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'assistant_scheduled_tasks': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_report_generate': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_report_share': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assistant_ai_summary': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
-    'assistant_logs': {'admin', 'baskan'},
-    'assistant_settings': {'admin'},
-    'admin_users': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'org_units': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'hr_leave_tracking': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS)
 except Exception:
@@ -920,14 +858,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 
 # BYS360_ASSISTANT_TABS_ROLE_MATRIX_V2_BEGIN
 # BYS360 Asistanı gerçek sekmeleri rol matrisi runtime son karar katmanına eklendi.
-_BYS360_ASSISTANT_TAB_AUTHORITY_KEYS = {'assistant_module', 'ai_agent_panel', 'ai_agent_knowledge', 'ai_agent_teaching_center', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
-_BYS360_ASSISTANT_TAB_POLICY = {
-    'assistant_module': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'ai_agent_panel': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'ai_agent_knowledge': {'admin', 'baskan'},
-    'ai_agent_teaching_center': {'admin', 'baskan'},
-    'ai_teaching_center': {'admin', 'baskan'},
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_ASSISTANT_TAB_AUTHORITY_KEYS)
 except Exception:
@@ -952,51 +882,6 @@ for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MEN
 
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_BEGIN
 # Performans Yönetimi ana anahtarı runtime son karar katmanı.
-_BYS360_PERFORMANCE_MAIN_KEYS = {'performance_module', 'performance_management', 'performans_yonetimi'}
-_BYS360_PERFORMANCE_CHILD_KEYS = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}
-_BYS360_PERFORMANCE_ALL_KEYS = set(_BYS360_PERFORMANCE_MAIN_KEYS) | set(_BYS360_PERFORMANCE_CHILD_KEYS)
-_BYS360_PERFORMANCE_MAIN_SWITCH_POLICY = {
-    'performance_module': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_management': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performans_yonetimi': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_tasks': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_scorecard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'scorecards': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'my_performance_comparison': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_dashboard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_reports': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_criteria': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'criteria': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'performance_periods': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'periods': {'admin', 'baskan', 'baskan_yardimcisi'},
-    'performance_evaluation_tasks': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'assignments': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_task_management': {'admin'},
-    'performance_hierarchy_tree': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_hierarchy_assignments': {'admin'},
-    'performance_team_compare': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'team_analysis': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'team_performance_comparison_history': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_feedback_meetings': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'feedback_meetings': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_publish': {'admin', 'baskan'},
-    'publish': {'admin', 'baskan'},
-    'performance_process_tracking': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_process_reports': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_president_approvals': {'admin', 'baskan'},
-    'performance_personnel_support_publish_approval': {'admin', 'grup_baskani'},
-    'performance_archive': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_interim_notes': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_meeting_p3_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_kpi_dashboard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_kpi_management': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
-    'performance_competency_library': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
-    'performance_self_assessment': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
-    'performance_kpi_analysis': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
-    'performance_mail_settings': {'admin'},
-    'performance_mail': {'admin'},
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_PERFORMANCE_ALL_KEYS)
 except Exception:
@@ -1026,10 +911,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 # BYS360_GENERAL_SECTION_RESTORE_V4_BEGIN
 # Genel bölüm, Performans Yönetimi ana anahtarından bağımsızdır.
 # Performans ana anahtarı yalnızca performans bölümü ve performans kısayollarını kapatır.
-_BYS360_GENERAL_CORE_KEYS_V4 = {'general_section', 'home', 'dashboard', 'notifications', 'support_index', 'support_new', 'support_my_tickets'}
-_BYS360_PERFORMANCE_MAIN_KEYS_V4 = {'performance_module', 'performance_management', 'performans_yonetimi'}
-_BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4 = {'performance_tasks', 'performance_scorecard', 'performance_archive', 'my_performance_comparison', 'performance_reports'}
-_BYS360_PERFORMANCE_CHILD_KEYS_V4 = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'performance_feedback_aftercare', 'performance_feedback_aftercare_new', 'performance_feedback_meeting_guide', 'performance_feedback_followup'}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_GENERAL_CORE_KEYS_V4 | _BYS360_PERFORMANCE_MAIN_KEYS_V4 | _BYS360_PERFORMANCE_CHILD_KEYS_V4)
 except Exception:
@@ -1044,21 +925,6 @@ except Exception:
 # BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_EFFECTIVE_MENU_BEGIN
 # Personel Yönetimi rol matrisi runtime son karar düzeltmesi.
 # Rol matrisinde seçili Personel sekmeleri sol şeritte görünür; kapalı olanlar gizli kalır.
-_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS = {"admin_users", "org_units", "hr_management", "hr_leave_tracking", "hr_reports"}
-_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES = {
-    "admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator",
-    "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı",
-    "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir",
-    "koordinator", "koordinatör", "birim_sorumlusu",
-}
-_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS = {
-    "hr_personnel_operations", "hr_career_planning", "hr_reward_discipline",
-    "personnel_dashboard", "personnel_create", "personnel_edit", "organization_unit_versions", "hierarchy",
-    "leave", "attendance", "delegation", "personnel_reports",
-    "personnel_requests", "personnel_validity", "personnel_assets", "personnel_checklists",
-    "personnel_reminders", "personnel_lifecycle", "personnel_handover", "personnel_approvals",
-    "personnel_request_analytics", "personnel_request_tasks",
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS)
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.difference_update(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS)
@@ -1097,100 +963,6 @@ except Exception:
 # Rol matrisi düzeltmesi: Performans Yönetimi ana anahtarı ile alt sekme tikleri çakıştığında
 # seçili alt sekme menüde görünür; ana anahtar alt sekmelerden otomatik türetilir.
 # Ayrıca eski alias anahtarları canonical sol menü anahtarlarıyla eşitlenir.
-_BYS360_PERF_RM_V8_MAIN_KEYS = {"performance_module", "performance_management", "performans_yonetimi"}
-_BYS360_PERF_RM_V8_ALIAS_GROUPS = {
-    "performance_tasks": ["performance_tasks"],
-    "performance_scorecard": ["performance_scorecard", "scorecards"],
-    "my_performance_comparison": ["my_performance_comparison"],
-    "performance_reports": ["performance_reports"],
-    "performance_archive": ["performance_archive"],
-    "performance_dashboard": ["performance_dashboard"],
-    "performance_criteria": ["performance_criteria", "criteria"],
-    "performance_periods": ["performance_periods", "periods"],
-    "performance_evaluation_tasks": ["performance_evaluation_tasks", "assignments"],
-    "performance_task_management": ["performance_task_management"],
-    "performance_hierarchy_tree": ["performance_hierarchy_tree"],
-    "performance_hierarchy_assignments": ["performance_hierarchy_assignments"],
-    "performance_team_compare": ["performance_team_compare", "team_analysis"],
-    "team_performance_comparison_history": ["team_performance_comparison_history"],
-    "performance_feedback_meetings": ["performance_feedback_meetings", "feedback_meetings"],
-    "performance_publish": ["performance_publish", "publish"],
-    "performance_mail_settings": ["performance_mail_settings", "performance_mail"],
-    "performance_process_tracking": ["performance_process_tracking"],
-    "performance_process_reports": ["performance_process_reports"],
-    "performance_president_approvals": ["performance_president_approvals"],
-    "performance_personnel_support_publish_approval": ["performance_personnel_support_publish_approval"],
-    "performance_interim_notes": ["performance_interim_notes"],
-    "performance_development_guidance": ["performance_development_guidance"],
-    "performance_meeting_p3_reminders": ["performance_meeting_p3_reminders"],
-    "performance_feedback_aftercare": ["performance_feedback_aftercare"],
-    "performance_feedback_aftercare_new": ["performance_feedback_aftercare_new"],
-    "performance_feedback_meeting_guide": ["performance_feedback_meeting_guide"],
-    "performance_feedback_followup": ["performance_feedback_followup"],
-    "performance_kpi_dashboard": ["performance_kpi_dashboard"],
-    "performance_kpi_management": ["performance_kpi_management"],
-    "performance_competency_library": ["performance_competency_library"],
-    "performance_self_assessment": ["performance_self_assessment"],
-    "performance_kpi_analysis": ["performance_kpi_analysis"],
-    "performance_history_import": ["performance_history_import"],
-}
-_BYS360_PERF_RM_V8_CHILD_KEYS = {key for values in _BYS360_PERF_RM_V8_ALIAS_GROUPS.values() for key in values}
-_BYS360_PERF_RM_V8_CANONICAL_CHILD_KEYS = set(_BYS360_PERF_RM_V8_ALIAS_GROUPS.keys())
-_BYS360_PERF_RM_V8_ALL_KEYS = set(_BYS360_PERF_RM_V8_MAIN_KEYS) | set(_BYS360_PERF_RM_V8_CHILD_KEYS)
-_BYS360_PERF_RM_V8_MANAGER_ROLES = {
-    "admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator",
-    "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı",
-    "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir",
-    "koordinator", "koordinatör", "birim_sorumlusu",
-}
-_BYS360_PERF_RM_V8_ALL_AUTH_ROLES = set(_BYS360_PERF_RM_V8_MANAGER_ROLES) | {"personel", "user", "standart_personel"}
-_BYS360_PERF_RM_V8_ROLE_POLICY = {
-    "performance_module": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performance_management": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performans_yonetimi": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performance_tasks": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_scorecard": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "scorecards": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "my_performance_comparison": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performance_archive": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performance_self_assessment": _BYS360_PERF_RM_V8_ALL_AUTH_ROLES,
-    "performance_reports": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_dashboard": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_criteria": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "criteria": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "performance_periods": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "periods": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "performance_evaluation_tasks": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "assignments": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_task_management": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"},
-    "performance_hierarchy_tree": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_hierarchy_assignments": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"},
-    "performance_team_compare": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "team_analysis": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "team_performance_comparison_history": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_feedback_meetings": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "feedback_meetings": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_publish": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president"},
-    "publish": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president"},
-    "performance_mail_settings": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"},
-    "performance_mail": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"},
-    "performance_process_tracking": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_process_reports": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_president_approvals": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president"},
-    "performance_personnel_support_publish_approval": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "grup_baskani", "grup_başkanı", "personel_ve_destek_hizmetleri_grup_baskani", "personel_destek_hizmetleri_grup_baskani", "personel_ve_idari_isler_grup_baskani", "personel_idari_isler_grup_baskani"},
-    "performance_interim_notes": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_development_guidance": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_meeting_p3_reminders": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_feedback_aftercare": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_feedback_aftercare_new": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_feedback_meeting_guide": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_feedback_followup": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_kpi_dashboard": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_kpi_management": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör"},
-    "performance_competency_library": _BYS360_PERF_RM_V8_MANAGER_ROLES,
-    "performance_kpi_analysis": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör"},
-    "performance_history_import": {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"},
-}
 try:
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update(_BYS360_PERF_RM_V8_ALL_KEYS)
 except Exception:
@@ -1248,18 +1020,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 # Sorun: Rol matrisinde Genel alt sekmeleri acik olsa bile eski DB kaydi
 # general_section=false kaldiginda sol menude Genel basligi tamamen gizlenebiliyordu.
 # Kural: Genel altinda acik en az bir canli sekme varsa kategori basligi gorunur.
-_BYS360_GENERAL_CATEGORY_SECTION_KEYS_V1 = {"general_section", "genel", "general"}
-_BYS360_GENERAL_CATEGORY_CHILD_KEYS_V1 = {
-    "home",
-    "dashboard",
-    "notifications",
-    "support_index",
-    "support_new",
-    "support_my_tickets",
-    "support_assigned",
-    "support_all",
-    "support_help_admin",
-}
 
 
 
@@ -1363,9 +1123,6 @@ except Exception:
 # Yönetici Özeti modülü ve alt sekmeleri yalnızca Sistem Yöneticisi / teknik admin rollerinde görünür.
 # Bu son katman, rol matrisi/kişi bazlı eski açık kayıtlar veya önceki force-visible blokları tarafından ezilmesin diye
 # build_menu_visibility_map fonksiyonunun çıktısını en sonda temizler.
-_BYS360_EXEC_ADMIN_ONLY_ROLES = {'admin', 'administrator', 'sistem_yoneticisi', 'super_admin', 'system_admin'}
-_BYS360_EXEC_KNOWN_KEYS = {'daily_weather_mail', 'executive_summary_tasks', 'executive_summary_automatic_emails', 'executive_summary_auto_emails', 'executive_summary_logs', 'executive_summary_mail_logs', 'executive_summary_panel', 'executive_summary_test_send', 'executive_daily_weather_mail', 'executive_summary_scheduled_jobs', 'executive_summary_test', 'executive_summary', 'executive_summary_admin_panel', 'executive_summary_dashboard'}
-_BYS360_EXEC_URL_MARKERS = ('/dashboard/yonetici-ozeti', '/executive-summary', '/yonetici-ozeti')
 
 
 
@@ -1529,11 +1286,6 @@ except Exception:
 
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_AUTHORITY_BEGIN
 # Dönem Yönetim Merkezi görünürlüğü Ayarlar > Rol Matrisi / birim profili / kişi bazlı menü görünürlüğü kararına bağlanır.
-_BYS360_PERIOD_CENTER_MENU_KEY_V221 = "performance_period_management_center"
-_BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221 = {
-    "admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi",
-    "baskan", "president", "baskan_yardimcisi", "grup_baskani", "mali_musavir",
-}
 for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
     _policy = globals().get(_policy_name)
     if isinstance(_policy, dict):
@@ -1548,7 +1300,6 @@ for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBL
 # BYS360_PERFORMANCE_V2_1_23_SETTINGS_ROLE_MATRIX_FULL_AUTHORITY_BEGIN
 # Dönem Yönetim Merkezi, Canlı Takip ve Amir Hatırlatma menü anahtarları
 # Ayarlar > Rol Matrisi kararına tabi canlı otorite anahtarlarıdır.
-_BYS360_V223_PERIOD_CENTER_KEY_ROLES = {'performance_period_management_center': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir'], 'performance_evaluation_live_tracking': ['admin', 'baskan', 'baskan_yardimcisi', 'birim_sorumlusu', 'grup_baskani', 'koordinator', 'mali_musavir'], 'performance_evaluator_reminder_center': ['admin', 'baskan', 'baskan_yardimcisi', 'birim_sorumlusu', 'grup_baskani', 'koordinator', 'mali_musavir']}
 for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
     try:
         ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.add(_key)
