@@ -766,39 +766,11 @@ except Exception:
 
 
 # BYS360_DAILY_WEATHER_MAIL_EXEC_EFFECTIVE_MENU_V1_0_7_BEGIN
-try:
-    _BYS360_DAILY_WEATHER_SYSTEM_ADMIN_ROLES = {'admin', 'super_admin', 'system_admin', 'sistem_yoneticisi'}
-    _BYS360_DAILY_WEATHER_DISALLOWED_ROLES = {'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'performans_yetkilisi', 'personel', 'user', 'employee', 'ik', 'hr'}
-    for _policy_name in [
-        "PHASE3_PERFORMANCE_MENU_POLICY",
-        "PHASE3_2_PERFORMANCE_MENU_POLICY",
-        "PERFORMANCE_MENU_POLICY",
-        "ROLE_MENU_POLICY",
-        "ROLE_MATRIX_POLICY",
-    ]:
-        _policy = globals().get(_policy_name)
-        if isinstance(_policy, dict):
-            _policy["daily_weather_mail"] = set(_BYS360_DAILY_WEATHER_SYSTEM_ADMIN_ROLES)
-            _policy.setdefault("executive_summary", set())
-            if isinstance(_policy.get("executive_summary"), set):
-                _policy["executive_summary"].update(_BYS360_DAILY_WEATHER_SYSTEM_ADMIN_ROLES)
-            elif isinstance(_policy.get("executive_summary"), list):
-                for _r in _BYS360_DAILY_WEATHER_SYSTEM_ADMIN_ROLES:
-                    if _r not in _policy["executive_summary"]:
-                        _policy["executive_summary"].append(_r)
-    for _set_name in [
-        "PHASE3_2_MANAGER_VISIBLE_KEYS",
-        "PHASE3_2_GENERAL_VISIBLE_KEYS",
-        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
-        "PERFORMANCE_ROLE_MATRIX_KEYS",
-    ]:
-        _target = globals().get(_set_name)
-        if isinstance(_target, set):
-            _target.add("daily_weather_mail")
-except Exception:
-    import logging
-    logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-    pass
+# Phase4J V44C effective_menu daily weather policy block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_daily_weather_policy_block,
+)
+apply_daily_weather_policy_block(globals(), logging=logging)
 # BYS360_DAILY_WEATHER_MAIL_EXEC_EFFECTIVE_MENU_V1_0_7_END
 
 # BYS360_EXECUTIVE_SUMMARY_V1_0_10_ADMIN_ONLY_MENU_LOCK_BEGIN

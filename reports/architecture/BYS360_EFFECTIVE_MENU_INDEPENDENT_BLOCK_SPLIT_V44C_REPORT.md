@@ -1,0 +1,25 @@
+# BYS360 Effective Menu Independent Block Split V44C
+- Generated at: 2026-06-26T12:02:00
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD before: 414b620
+- Target: app/services/settings/effective_menu.py
+- Block module: app/services/settings/effective_menu_parts/block_context.py
+- Moved block line: 769
+- Moved block length: 33
+- Before target lines: 929
+- After target lines: 901
+- Before block lines: 0
+- After block lines: 43
+- Removed line estimate: 28
+- Runtime returncode: 0
+- Runtime import OK: True
+- Apply block callable: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: True
+- new_files_created: True
