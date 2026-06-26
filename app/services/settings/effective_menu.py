@@ -108,110 +108,38 @@ ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS: set[str] = {
 }
 
 
-def _get_role_matrix_closed_keys_for_role(
-    role_name: str,
-    *,
-    rollback: RollbackHook | None = None,
-) -> set[str]:
-    """RoleMenuDefault içinde manuel kapatılan kritik menüleri döndürür."""
-    normalized_role = normalize_role_name(role_name)
-    if not normalized_role:
-        return set()
-    try:
-        rows = (
-            RoleMenuDefault.query
-            .filter(RoleMenuDefault.role_name == normalized_role)
-            .filter(RoleMenuDefault.menu_key.in_(ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS))
-            .filter(RoleMenuDefault.is_visible.is_(False))
-            .all()
-        )
-        return {str(getattr(row, "menu_key", "") or "").strip() for row in rows if getattr(row, "menu_key", None)}
-    except Exception:
-        _rollback(rollback)
-        return set()
+# Phase4J V35C effective_menu apply_context facade imports
+from app.services.settings.effective_menu_parts.apply_context import (
+    _allowed_by_static_gate,
+    _apply_bys360_press_news_admin_only_policy,
+    _apply_bys360_settings_live_authority_v1,
+    _apply_core_menu_visibility_policy,
+    _apply_phase3_2_performance_menu_visibility,
+    _apply_phase3_performance_menu_policy,
+    _apply_role_gate,
+    _apply_role_matrix_closed_guard,
+    _get_role_matrix_closed_keys_for_role,
+    _menu_item_by_key,
+    _phase3_2_ascii_tr,
+    _phase3_2_normalize_role_name,
+    _role_allowed_for_menu,
+    _role_matrix_runtime_closed,
+    _settings_explicitly_controls_key,
+)
 
 
-def _apply_role_matrix_closed_guard(
-    visibility: dict[str, bool],
-    role_name: str,
-    *,
-    source_map: dict[str, str] | None = None,
-    rollback: RollbackHook | None = None,
-) -> dict[str, bool]:
-    """Rol matrisi kapattıysa runtime haritasında kapalı tutar.
-
-    Bu guard bilerek yalnızca ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS kapsamındaki
-    canlı iletişim/anket/geri bildirim anahtarlarını hedefler. Amaç; Ayarlar
-    ekranındaki tik kaldırma işleminin sidebar'da hemen karşılık bulmasıdır.
-    """
-    source_map = source_map or {}
-    for key in _get_role_matrix_closed_keys_for_role(role_name, rollback=rollback):
-        if key in visibility:
-            visibility[key] = False
-            source_map[key] = "role_matrix_closed"
-    return visibility
 
 
-def _role_matrix_runtime_closed(source_map: dict[str, str] | None, key: str) -> bool:
-    return (source_map or {}).get(key) == "role_matrix_closed"
+
 
 def _active_menu_items() -> list[dict[str, Any]]:
     return [item for item in flatten_menu_definitions() if not is_removed_menu_key(item.get("key"))]
 
 
-def _role_allowed_for_menu(item: dict[str, Any], role_name: str) -> bool:
-    if not item:
-        return False
-    if item.get("admin_only") and role_name != "admin":
-        return False
-    required_roles = {normalize_role_name(v) for v in (item.get("required_roles") or []) if str(v).strip()}
-    if required_roles and role_name not in required_roles:
-        return False
-    return True
 
 # BYS360_SETTINGS_ROLE_MATRIX_RUNTIME_V6_CORE_POLICY
 # Eski çekirdek canlı menü savunması, rol matrisinde kapatılan satırı artık
 # yeniden açamaz. Kullanıcı Ayarlar ekranında tik kaldırdıysa kapalı kalır.
-def _apply_core_menu_visibility_policy(
-    visibility: dict[str, bool],
-    role_name: str,
-    *,
-    source_map: dict[str, str] | None = None,
-) -> dict[str, bool]:
-    """Kritik canlı menüler DB senkron sorunu yaşasa bile kaybolmasın.
-
-    V6 notu: Rol matrisi tarafından açıkça kapatılan anahtarlar korunur.
-    """
-    normalized_role = normalize_role_name(role_name)
-    source_map = source_map or {}
-
-    for key in ("messages", "notifications", "surveys"):
-        if _role_matrix_runtime_closed(source_map, key):
-            visibility[key] = False
-            continue
-        if normalized_role in CORE_MENU_VISIBILITY_POLICY.get(key, set()):
-            visibility[key] = True
-
-    for key in (
-        "survey_manage",
-        "survey_results",
-        "feedback_dashboard",
-        "feedback_pulse",
-        "feedback_campaigns",
-        "feedback_results",
-        "feedback_actions",
-        "feedback_manager",
-        "feedback_admin",
-        "performance_reports",
-    ):
-        if _role_matrix_runtime_closed(source_map, key):
-            visibility[key] = False
-            continue
-        source = source_map.get(key, "")
-        if normalized_role in CORE_MENU_VISIBILITY_POLICY.get(key, set()) and source != "user_override":
-            visibility[key] = True
-
-    return visibility
 
 def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = None) -> bool:
     if not user or not getattr(user, "is_authenticated", False):
@@ -245,13 +173,6 @@ def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = 
     return False
 
 
-def _apply_role_gate(visibility: dict[str, bool], active_menu_items: list[dict[str, Any]], role_name: str) -> None:
-    for item in active_menu_items:
-        key = item.get("key")
-        if not key:
-            continue
-        if not _role_allowed_for_menu(item, role_name):
-            visibility[key] = False
 
 # BYS360_PHASE3_VISIBILITY_PERMISSION_MENU_MATRIX
 PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
@@ -275,13 +196,6 @@ PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
 }
 
 
-def _apply_phase3_performance_menu_policy(visibility: dict[str, bool], role_name: str) -> dict[str, bool]:
-    """Performans menülerinde Faz 3 rol matrisini son güvenlik katmanı olarak uygular."""
-    normalized_role = normalize_role_name(role_name)
-    for key, allowed_roles in PHASE3_PERFORMANCE_MENU_POLICY.items():
-        if key in visibility:
-            visibility[key] = normalized_role in allowed_roles
-    return visibility
 
 
 # BYS360_PHASE3_2_MENU_VISIBILITY_BEGIN
@@ -337,42 +251,10 @@ PHASE3_2_MANAGER_VISIBLE_KEYS = {
 PHASE3_2_GENERAL_VISIBLE_KEYS = set(PHASE3_2_PERFORMANCE_MENU_POLICY.keys())
 
 
-def _phase3_2_ascii_tr(value: str) -> str:
-    return (
-        str(value or "")
-        .replace("İ", "i").replace("I", "i").replace("ı", "i")
-        .replace("Ş", "s").replace("ş", "s")
-        .replace("Ğ", "g").replace("ğ", "g")
-        .replace("Ü", "u").replace("ü", "u")
-        .replace("Ö", "o").replace("ö", "o")
-        .replace("Ç", "c").replace("ç", "c")
-    )
 
 
-def _phase3_2_normalize_role_name(value: object) -> str:
-    try:
-        base = normalize_role_name(value)  # type: ignore[name-defined]
-    except Exception:
-        logger = __import__("logging").getLogger(__name__)
-        logger.exception("BYS360 effective menu guvenli fallback isleminde hata yakalandi | line=369")
-        base = str(value or "").strip().lower()
-    base = str(base or "").strip().lower().replace("-", "_").replace(" ", "_")
-    return _phase3_2_ascii_tr(base)
 
 
-def _apply_phase3_2_performance_menu_visibility(visibility: dict[str, bool], role_name: object) -> dict[str, bool]:
-    """Faz 3.2 rol matrisini performans menülerine uygular.
-
-    Bu fonksiyon bilinçli olarak yalnızca PHASE3_2_PERFORMANCE_MENU_POLICY içinde
-    yer alan anahtarlara dokunur. Böylece iletişim, anket, destek ve AI menüleri
-    bu fazdan etkilenmez.
-    """
-    normalized_role = _phase3_2_normalize_role_name(role_name)
-    for key, allowed_roles in PHASE3_2_PERFORMANCE_MENU_POLICY.items():
-        if key in visibility:
-            normalized_allowed = {_phase3_2_normalize_role_name(role) for role in allowed_roles}
-            visibility[key] = normalized_role in normalized_allowed
-    return visibility
 # BYS360_PHASE3_2_MENU_VISIBILITY_END
 
 # BYS360_SETTINGS_LIVE_AUTHORITY_V1_BEGIN
@@ -399,25 +281,10 @@ def _truthy_bool(value: Any) -> bool:
 
 
 
-def _menu_item_by_key(active_menu_items: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    return {str(item.get("key") or "").strip(): item for item in active_menu_items or [] if item.get("key")}
 
 
-def _allowed_by_static_gate(menu_key: str, role_name: str, active_item_map: dict[str, dict[str, Any]]) -> bool:
-    item = active_item_map.get(menu_key)
-    if not item:
-        return False
-    return _role_allowed_for_menu(item, role_name)
 
 
-def _settings_explicitly_controls_key(menu_key: str, role_state: dict[str, bool], unit_state: dict[str, bool], user_state: dict[str, bool]) -> bool:
-    """Ayar ekranlarından gelen açık kayıt var mı?
-
-    V2 ilkesi: Rol matrisi / birim profili / kişi bazlı kayıt varsa menü
-    görünürlüğünün son kararı bu kayıtlardır. Eski hard-coded required_roles,
-    admin_only ve faz politikaları sadece kayıt yoksa yedek kabul edilir.
-    """
-    return menu_key in role_state or menu_key in unit_state or menu_key in user_state
 
 
 # BYS360_SETTINGS_LIVE_AUTHORITY_V2_END
@@ -426,14 +293,6 @@ def _settings_explicitly_controls_key(menu_key: str, role_state: dict[str, bool]
 # Compatibility guard.
 
 
-def _apply_bys360_press_news_admin_only_policy(visibility: dict[str, bool], user: Any) -> dict[str, bool]:
-    """Basında Tarihi Alan runtime son kararı: yalnız admin/sistem yöneticisi."""
-    if "portal_press_news" not in visibility:
-        return visibility
-    is_admin_like = bool(getattr(user, "is_admin", False)) or bool(getattr(user, "is_superuser", False))
-    role = _bys360_press_news_role(getattr(user, "role", ""))
-    visibility["portal_press_news"] = bool(is_admin_like or role in {"admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"})
-    return visibility
 # Compatibility guard.
 
 def build_menu_visibility_map(
@@ -1380,82 +1239,6 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 
 
 
-def _apply_bys360_settings_live_authority_v1(
-    visibility: dict[str, bool],
-    user: Any,
-    role_name: str,
-    active_menu_items: list[dict[str, Any]],
-    *,
-    rollback: RollbackHook | None = None,
-) -> dict[str, bool]:
-    """Rol + birim + kişi bazlı görünürlük kararını canlı menüye uygular.
-
-    Öncelik sırası:
-    1. Rol/unvan varsayılanı
-    2. Birim profili
-    3. Kişi bazlı rol matrisi
-
-    Personel bazlı matris, unvan/rol varsayılanından farklı özel yetki verebilir
-    veya menüyü kapatabilir. Kaldırılmış menüler ve admin_only çekirdek
-    ekranlar için güvenlik sınırı korunur.
-    """
-    normalized_role = normalize_role_name(role_name)
-    item_map = _menu_item_by_key(active_menu_items)
-    all_keys = [key for key in item_map.keys() if key]
-    role_state = _load_role_matrix_state(normalized_role, rollback=rollback)
-    unit_state = _load_unit_profile_state(user, rollback=rollback)
-    user_state = _load_user_override_state(user, rollback=rollback)
-
-    # Rol matrisi tabanı.
-    for key in all_keys:
-        if key in role_state:
-            visibility[key] = bool(role_state[key])
-
-    # Birim profili rol/unvan katmanından sonra gelir; kişi istisnası değildir.
-    for key, is_visible in unit_state.items():
-        if key not in item_map:
-            continue
-        if role_state.get(key) is False and is_visible:
-            visibility[key] = False
-            continue
-        visibility[key] = bool(is_visible)
-
-    # Kişi bazlı rol matrisi son karar katmanıdır.
-    for key, is_visible in user_state.items():
-        if key not in item_map:
-            continue
-        if is_visible and not _bys360_person_matrix_can_open_v1(key, item_map.get(key), user):
-            visibility[key] = False
-            continue
-        visibility[key] = bool(is_visible)
-
-    # Rol matrisi kapalı satırları kapalı tut; ancak açık kişi bazlı istisna varsa
-    # ve güvenlik sınırını geçiyorsa kişiye özel kayıt son karar olur.
-    for key, is_visible in role_state.items():
-        if key not in visibility:
-            continue
-        user_has_open_override = user_state.get(key) is True and _bys360_person_matrix_can_open_v1(key, item_map.get(key), user)
-        if is_visible is False and not user_has_open_override:
-            visibility[key] = False
-
-    # Kaldırılmış/kapsam dışı anahtar hiçbir şekilde gösterilmez.
-    for key in list(visibility.keys()):
-        if is_removed_menu_key(key):
-            visibility[key] = False
-
-    # Statik rol kapısı sadece ayarlarda hiç açık kayıt yoksa yedek güvenliktir.
-    # Kişi bazlı rol matrisiyle açıkça yönetilen anahtarlar burada tekrar kapanmaz.
-    for key, current in list(visibility.items()):
-        if not current or key not in item_map:
-            continue
-        if _settings_explicitly_controls_key(key, role_state, unit_state, user_state):
-            continue
-        if not _allowed_by_static_gate(key, normalized_role, item_map):
-            visibility[key] = False
-
-    visibility["account"] = True
-    visibility["logout"] = True
-    return visibility
 # BYS360_PERSON_BASED_ROLE_MATRIX_V1_END
 
 # BYS360_PERSONNEL_FEATURE_MATRIX_V1_4_FINAL_USER_OVERRIDE_RUNTIME
