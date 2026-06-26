@@ -1,0 +1,89 @@
+{
+  "phase": "effective-menu-role-constants-preflight-v38b",
+  "generated_at": "2026-06-26T09:12:38",
+  "git_head": "6c6bab3",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_STATUS_AFTER_PHASE3_CONSTANTS_V38A_REPORT.json",
+  "target": "app/services/settings/effective_menu.py",
+  "selected_prefix": "ROLE",
+  "suggested_module": "app/services/settings/effective_menu_parts/role_constants.py",
+  "status": "READY_FOR_CONSTANT_SPLIT",
+  "ready_for_split": true,
+  "expected_assignment_count": 1,
+  "selected_assignment_count": 1,
+  "found_assignment_name_count": 1,
+  "selected_total_lines": 25,
+  "projected_target_lines_after_split": 1265,
+  "expected_assignment_names": [
+    "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+  ],
+  "found_assignment_names": [
+    "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+  ],
+  "missing_assignments": [],
+  "outside_assignment_refs": [],
+  "inside_assignment_refs": [],
+  "used_import_names": [],
+  "unknown_external_names": [],
+  "functions_using_selected_assignments": [],
+  "selected_assignments": [
+    {
+      "line": 84,
+      "end_line": 108,
+      "length": 25,
+      "matched_names": [
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+      ],
+      "targets": [
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+      ],
+      "load_names": [
+        "set",
+        "str"
+      ],
+      "store_names": [
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+      ],
+      "call_names": [],
+      "source": "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS: set[str] = {\n    \"messages\",\n    \"notifications\",\n    \"surveys\",\n    \"survey_manage\",\n    \"survey_results\",\n    \"feedback_dashboard\",\n    \"feedback_pulse\",\n    \"feedback_campaigns\",\n    \"feedback_results\",\n    \"feedback_actions\",\n    \"feedback_manager\",\n    \"feedback_admin\",\n    \"portal_press_news\",\n    \"announcements\",\n    \"assistant_center\",\n    \"assistant_my_reminders\",\n    \"assistant_scheduled_tasks\",\n    \"assistant_report_generate\",\n    \"assistant_report_share\",\n    \"assistant_ai_summary\",\n    \"assistant_process_alerts\",\n    \"assistant_logs\",\n    \"assistant_settings\",\n}"
+    }
+  ],
+  "best_target_from_v38a": {
+    "prefix": "ROLE",
+    "assignment_count": 1,
+    "total_lines": 25,
+    "large_block_count": 1,
+    "large_blocks": [
+      {
+        "names": [
+          "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+        ],
+        "primary_name": "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+        "prefix": "ROLE",
+        "line": 84,
+        "end_line": 108,
+        "length": 25,
+        "large_block": true
+      }
+    ],
+    "all_assignment_names": [
+      "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+    ],
+    "projected_target_lines_after_split": 1265,
+    "recommended_status": "GOOD_CONSTANT_SPLIT_CANDIDATE",
+    "suggested_module": "app/services/settings/effective_menu_parts/role_constants.py"
+  },
+  "safety": {
+    "live_system_changed": false,
+    "files_moved": false,
+    "files_deleted": false,
+    "database_touched": false,
+    "source_files_modified": false
+  },
+  "decision": [
+    "Bu rapor kaynak kodu degistirmez.",
+    "ROLE prefix sabit/politika bloklari ve bagimliliklari incelendi.",
+    "ready_for_split True ise V38C ile sabitler facade import korunarak ayri module alinabilir."
+  ],
+  "ok": true
+}
