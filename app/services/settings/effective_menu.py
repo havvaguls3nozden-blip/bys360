@@ -325,21 +325,14 @@ for _set_name in [
 
 # BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TABS_V1_EFFECTIVE_MENU_BEGIN
 
-for _policy_name in [
-    "PHASE3_PERFORMANCE_MENU_POLICY",
-    "PHASE3_2_PERFORMANCE_MENU_POLICY",
-    "PERFORMANCE_MENU_POLICY",
-    "ROLE_MENU_POLICY",
-    "ROLE_MATRIX_POLICY",
-]:
-    _policy = globals().get(_policy_name)
-    if isinstance(_policy, dict):
-        for _key, _roles in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.items():
-            _current = _policy.setdefault(_key, set())
-            if isinstance(_current, set):
-                _current.update(_roles)
-            elif isinstance(_current, list):
-                _current.extend([_r for _r in _roles if _r not in _current])
+# Phase4J V48C effective_menu performance role matrix new tab block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_performance_role_matrix_new_tab_policy_block,
+)
+apply_performance_role_matrix_new_tab_policy_block(
+    globals(),
+    _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY,
+)
 
 for _set_name in [
     "PHASE3_2_MANAGER_VISIBLE_KEYS",

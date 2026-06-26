@@ -64,7 +64,27 @@ def apply_role_matrix_runtime_authority_keys_block(ROLE_MATRIX_RUNTIME_AUTHORITY
         __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:822)")
 
 
+def apply_performance_role_matrix_new_tab_policy_block(policy_globals, _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY):
+    """Apply performance role-matrix new-tab policy mutations."""
+    for _policy_name in [
+        "PHASE3_PERFORMANCE_MENU_POLICY",
+        "PHASE3_2_PERFORMANCE_MENU_POLICY",
+        "PERFORMANCE_MENU_POLICY",
+        "ROLE_MENU_POLICY",
+        "ROLE_MATRIX_POLICY",
+    ]:
+        _policy = policy_globals.get(_policy_name)
+        if isinstance(_policy, dict):
+            for _key, _roles in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.items():
+                _current = _policy.setdefault(_key, set())
+                if isinstance(_current, set):
+                    _current.update(_roles)
+                elif isinstance(_current, list):
+                    _current.extend([_r for _r in _roles if _r not in _current])
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
+    "apply_performance_role_matrix_new_tab_policy_block",
     "apply_role_matrix_runtime_authority_keys_block",
 ]

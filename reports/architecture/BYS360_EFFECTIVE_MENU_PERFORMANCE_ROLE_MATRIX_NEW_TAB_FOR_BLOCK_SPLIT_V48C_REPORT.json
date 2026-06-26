@@ -1,0 +1,153 @@
+{
+  "phase": "effective-menu-performance-role-matrix-new-tab-for-block-split-v48c",
+  "generated_at": "2026-06-26T14:54:52",
+  "git_head_before": "531bad3",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "target": "app/services/settings/effective_menu.py",
+  "block_module": "app/services/settings/effective_menu_parts/block_context.py",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_NEXT_FOR_BLOCK_PREFLIGHT_V48B_REPORT.json",
+  "moved_block": {
+    "kind": "For",
+    "line": 328,
+    "end_line": 342,
+    "length": 15,
+    "apply_function": "apply_performance_role_matrix_new_tab_policy_block",
+    "used_import_names": [
+      "_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY"
+    ],
+    "globals_rewritten_to_parameter": true,
+    "purpose": "performance_role_matrix_new_tab_policy_block"
+  },
+  "before_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 846,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_assignment_count": 10,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "build_menu_visibility_map"
+    ],
+    "top_level_assignments": [
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "after_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 839,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_assignment_count": 10,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "build_menu_visibility_map"
+    ],
+    "top_level_assignments": [
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "before_block": {
+    "path": "app/services/settings/effective_menu_parts/block_context.py",
+    "line_count": 70,
+    "top_level_function_count": 2,
+    "all_function_count": 2,
+    "top_level_assignment_count": 1,
+    "top_level_functions": [
+      "apply_daily_weather_policy_block",
+      "apply_role_matrix_runtime_authority_keys_block"
+    ],
+    "top_level_assignments": [
+      "__all__"
+    ],
+    "syntax_ok": true
+  },
+  "after_block": {
+    "path": "app/services/settings/effective_menu_parts/block_context.py",
+    "line_count": 90,
+    "top_level_function_count": 3,
+    "all_function_count": 3,
+    "top_level_assignment_count": 1,
+    "top_level_functions": [
+      "apply_daily_weather_policy_block",
+      "apply_performance_role_matrix_new_tab_policy_block",
+      "apply_role_matrix_runtime_authority_keys_block"
+    ],
+    "top_level_assignments": [
+      "__all__"
+    ],
+    "syntax_ok": true
+  },
+  "removed_line_estimate": 7,
+  "runtime_smoke": {
+    "returncode": 0,
+    "stdout": "IMPORT_OK\ncore_policy_effective_dict=True\ncore_policy_part_dict=True\ncore_policy_same_object=True\nconstants_all_has_core_policy=True\npolicy_arg_dict=True\ncore_callable=True\nalias_callable=True\npublic_callable=True\nuser_effective_callable=True\nuser_part_callable=True\nuser_same_object=True\nbuild_context_core_callable=True\ndaily_block_callable=True\nauthority_block_callable=True\nnew_tab_block_callable=True\nblock_all_has_new_tab_block=True\napply_v213c_category_menu_wrapper_callable=True\nwrapper_all_has_apply_v213c_category_menu_wrapper=True\napply_v214_category_scope_wrapper_callable=True\nwrapper_all_has_apply_v214_category_scope_wrapper=True\napply_v215_category_period_scope_wrapper_callable=True\nwrapper_all_has_apply_v215_category_period_scope_wrapper=True\napply_v216_category_period_integration_wrapper_callable=True\nwrapper_all_has_apply_v216_category_period_integration_wrapper=True\n",
+    "stderr": "",
+    "import_ok_marker": true,
+    "core_policy_effective_dict": true,
+    "core_policy_part_dict": true,
+    "core_policy_same_object": true,
+    "constants_all_has_core_policy": true,
+    "policy_arg_dict": true,
+    "core_callable": true,
+    "alias_callable": true,
+    "public_callable": true,
+    "user_effective_callable": true,
+    "user_part_callable": true,
+    "user_same_object": true,
+    "build_context_core_callable": true,
+    "daily_block_callable": true,
+    "authority_block_callable": true,
+    "new_tab_block_callable": true,
+    "block_all_has_new_tab_block": true,
+    "v213c_callable": true,
+    "v214_callable": true,
+    "v215_callable": true,
+    "v216_callable": true,
+    "all_has_v213c": true,
+    "all_has_v214": true,
+    "all_has_v215": true,
+    "all_has_v216": true,
+    "combined_contains_build_nameerror": false,
+    "combined_contains_force_failed": false,
+    "combined_contains_traceback": false
+  },
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": true,
+    "new_files_created": false
+  },
+  "decision": [
+    "Performance role-matrix new tab policy update yapan top-level For blogu block_context.py modulune eklendi.",
+    "effective_menu.py tarafinda facade call birakildi.",
+    "Blok icindeki globals() kullanimi policy_globals parametresine cevrildi ve effective_menu.py tarafindan globals() aktarildi.",
+    "Runtime import smoke build_menu_visibility_map NameError, force uygulanamadi ve Traceback mesaji olmadan gecti.",
+    "Bu uygulama canli sisteme veya veritabanina dokunmaz."
+  ],
+  "ok": true
+}
