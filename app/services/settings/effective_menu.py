@@ -831,28 +831,16 @@ build_menu_visibility_map = apply_v213c_category_menu_wrapper(
 # BYS360_PERFORMANCE_V2_1_3C_EFFECTIVE_MENU_FORCE_END
 
 # BYS360_PERFORMANCE_V2_1_4_CATEGORY_SCOPE_EFFECTIVE_MENU_BEGIN
-try:
-    _BYS360_V214_CATEGORY_SCOPE_KEY = "performance_category_scope_visibility"
-    _BYS360_V214_CATEGORY_SCOPE_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
-    _BYS360_V214_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = build_menu_visibility_map  # type: ignore[name-defined]
-    def build_menu_visibility_map(user, *args, **kwargs):  # type: ignore[no-redef]
-        visibility = dict(_BYS360_V214_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
-        try:
-            _role = normalize_role_name(getattr(user, "role", ""))
-        except Exception:
-            logger = __import__("logging").getLogger(__name__)
-            logger.exception("BYS360 effective menu isleminde hata yakalandi")
-            _role = str(getattr(user, "role", "") or "").strip().lower()
-        _is_admin_like = bool(_role in _BYS360_V214_CATEGORY_SCOPE_ROLES or getattr(user, "is_admin", False) or getattr(user, "is_superuser", False))
-        if _is_admin_like and not is_removed_menu_key(_BYS360_V214_CATEGORY_SCOPE_KEY):
-            visibility[_BYS360_V214_CATEGORY_SCOPE_KEY] = True
-            visibility["performance_module"] = True
-            visibility["performance_management"] = True
-            visibility["performans_yonetimi"] = True
-        return visibility
-except Exception:
-    import logging
-    logging.getLogger(__name__).exception("BYS360 V2.1.4 kategori kapsam effective_menu force uygulanamadı")
+# Phase4J V43C effective_menu V214 final wrapper block facade call
+from app.services.settings.effective_menu_parts.build_wrapper_context import (
+    apply_v214_category_scope_wrapper,
+)
+build_menu_visibility_map = apply_v214_category_scope_wrapper(
+    build_menu_visibility_map,
+    logging=logging,
+    normalize_role_name=normalize_role_name,
+    is_removed_menu_key=is_removed_menu_key,
+)
 # BYS360_PERFORMANCE_V2_1_4_CATEGORY_SCOPE_EFFECTIVE_MENU_END
 
 # BYS360_PERFORMANCE_V2_1_5_CATEGORY_PERIOD_SCOPE_EFFECTIVE_MENU_BEGIN
