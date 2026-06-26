@@ -296,20 +296,15 @@ for _set_name in [
 
 # BYS360_PROCESS_TRACKING_REPORTS_EFFECTIVE_MENU_V1_BEGIN
 
-for _policy_name in [
-    "PHASE3_PERFORMANCE_MENU_POLICY",
-    "PHASE3_2_PERFORMANCE_MENU_POLICY",
-    "PERFORMANCE_MENU_POLICY",
-    "ROLE_MENU_POLICY",
-]:
-    _policy = globals().get(_policy_name)
-    if isinstance(_policy, dict):
-        for _key in _BYS360_PROCESS_MENU_KEYS:
-            _current = _policy.setdefault(_key, set())
-            if isinstance(_current, set):
-                _current.update(_BYS360_PROCESS_MENU_ROLES)
-            elif isinstance(_current, list):
-                _current.extend([_r for _r in _BYS360_PROCESS_MENU_ROLES if _r not in _current])
+# Phase4J V49C effective_menu process menu block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_process_menu_policy_block,
+)
+apply_process_menu_policy_block(
+    globals(),
+    _BYS360_PROCESS_MENU_KEYS,
+    _BYS360_PROCESS_MENU_ROLES,
+)
 
 for _set_name in [
     "PHASE3_2_MANAGER_VISIBLE_KEYS",
