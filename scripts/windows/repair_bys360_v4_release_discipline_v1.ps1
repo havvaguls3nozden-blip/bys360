@@ -1,3 +1,70 @@
+param(
+    [string]$ProjectRoot = "C:\bys360\project",
+    [string]$OutputRoot = "C:\bys360\releases",
+    [ValidateSet("all", "patch-only", "build-only")]
+    [string]$Mode = "all",
+    [switch]$RunCompile
+)
+
+$ErrorActionPreference = "Stop"
+
+function Write-Section([string]$Text) {
+    Write-Host ""
+    Write-Host "=== $Text ===" -ForegroundColor Cyan
+}
+
+function Write-Utf8NoBom([string]$Path, [string]$Content) {
+    $dir = Split-Path -Parent $Path
+    if ($dir) { New-Item -ItemType Directory -Force $dir | Out-Null }
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
+function Add-Or-ReplaceBlock([string]$Path, [string]$Begin, [string]$End, [string]$Block) {
+    if (Test-Path $Path) {
+        $content = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    } else {
+        $content = ""
+    }
+    $pattern = "(?s)`n?# $([regex]::Escape($Begin)).*?# $([regex]::Escape($End))`r?`n?"
+    if ($content -match "# $([regex]::Escape($Begin))") {
+        $content = [regex]::Replace($content, $pattern, "`r`n$Block`r`n")
+    } else {
+        if ($content.Trim().Length -gt 0) { $content = $content.TrimEnd() + "`r`n`r`n" }
+        $content = $content + $Block + "`r`n"
+    }
+    Write-Utf8NoBom -Path $Path -Content $content
+}
+
+if (-not (Test-Path $ProjectRoot)) {
+    throw "ProjectRoot bulunamadı: $ProjectRoot"
+}
+
+$ProjectRoot = (Resolve-Path $ProjectRoot).Path
+$BuilderPath = Join-Path $ProjectRoot "scripts\release\build_bys360_safe_release.py"
+$GitIgnorePath = Join-Path $ProjectRoot ".gitignore"
+$BackupRoot = Join-Path $ProjectRoot "backups\release_discipline_v1"
+$ReportRoot = Join-Path $ProjectRoot "reports\quality"
+New-Item -ItemType Directory -Force $BackupRoot, $ReportRoot, $OutputRoot | Out-Null
+
+$Python = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
+if (-not (Test-Path $Python)) { $Python = "python" }
+
+Write-Section "BYS360 V4 Release Discipline V1"
+Write-Host "ProjectRoot=$ProjectRoot"
+Write-Host "OutputRoot=$OutputRoot"
+Write-Host "Mode=$Mode"
+Write-Host "Python=$Python"
+
+if ($Mode -in @("all", "patch-only")) {
+    Write-Section "1) build_bys360_safe_release.py güvenli/filtreli sürüme alınıyor"
+
+    if (Test-Path $BuilderPath) {
+        $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+        Copy-Item -LiteralPath $BuilderPath -Destination (Join-Path $BackupRoot "build_bys360_safe_release.py.$stamp.bak") -Force
+    }
+
+    $BuilderCode = @'
 from __future__ import annotations
 
 import argparse
@@ -158,3 +225,109 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+'@
+
+    Write-Utf8NoBom -Path $BuilderPath -Content $BuilderCode
+
+    Write-Section "2) .gitignore release hijyen bloğu senkronize ediliyor"
+    $IgnoreBlock = @'
+# BYS360_RELEASE_DISCIPLINE_V1_BEGIN
+.env
+.env.*
+!.env.example
+!.env.*.example
+instance/
+logs/
+uploads/
+.venv/
+venv/
+env/
+node_modules/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backups/
+backup/
+archive/
+releases/
+payload/
+overlay_payload/
+_local_secrets/
+_security_quarantine/
+_cleanup_quarantine/
+*.sqlite3
+*.sqlite
+*.db
+*.dump
+*.log
+*.bak
+*.backup
+*.old
+*.orig
+*.key
+*.pem
+*.p12
+*.pfx
+*.ppk
+*.jks
+*.keystore
+# BYS360_RELEASE_DISCIPLINE_V1_END
+'@
+    Add-Or-ReplaceBlock -Path $GitIgnorePath -Begin "BYS360_RELEASE_DISCIPLINE_V1_BEGIN" -End "BYS360_RELEASE_DISCIPLINE_V1_END" -Block $IgnoreBlock
+}
+
+if ($Mode -in @("all", "build-only")) {
+    Write-Section "3) Temiz release zip üretiliyor"
+    $Stamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $OutputZip = Join-Path $OutputRoot "BYS360_RELEASE_SAFE_$Stamp.zip"
+    & $Python $BuilderPath --root $ProjectRoot --output $OutputZip
+    if ($LASTEXITCODE -ne 0) {
+        throw "Güvenli release üretimi başarısız. Raporu kontrol edin: $ReportRoot\BYS360_SAFE_RELEASE_BUILDER_PHASE1_REPORT.json"
+    }
+
+    Write-Section "4) Bağımsız zip kirlilik kontrolü"
+    $AuditCode = @'
+import json, re, sys, zipfile
+from pathlib import Path
+zip_path = Path(sys.argv[1])
+patterns = [
+    (re.compile(r"(^|/)\.env($|\.)", re.I), ".env/.env.*"),
+    (re.compile(r"(^|/)\.venv/", re.I), ".venv"),
+    (re.compile(r"(^|/)instance/", re.I), "instance"),
+    (re.compile(r"(^|/)logs/", re.I), "logs"),
+    (re.compile(r"(^|/)\.git/", re.I), ".git"),
+    (re.compile(r"\.(sqlite3?|db|dump|log|bak|backup|old|orig|key|pem|p12|pfx|ppk|jks|keystore)$", re.I), "forbidden_suffix"),
+]
+findings = []
+with zipfile.ZipFile(zip_path) as zf:
+    for name in zf.namelist():
+        n = name.replace("\\", "/")
+        for rx, label in patterns:
+            if rx.search(n):
+                findings.append({"path": n, "rule": label})
+                break
+print(json.dumps({"ok": not findings, "zip": str(zip_path), "finding_count": len(findings), "findings": findings[:100]}, ensure_ascii=False, indent=2))
+sys.exit(0 if not findings else 1)
+'@
+    $AuditTemp = Join-Path $env:TEMP "bys360_release_zip_audit_v1.py"
+    Write-Utf8NoBom -Path $AuditTemp -Content $AuditCode
+    & $Python $AuditTemp $OutputZip
+    if ($LASTEXITCODE -ne 0) {
+        throw "Bağımsız zip kirlilik kontrolü başarısız: $OutputZip"
+    }
+
+    if ($RunCompile) {
+        Write-Section "5) Compile kontrolü"
+        & $Python -m compileall -q (Join-Path $ProjectRoot "scripts") (Join-Path $ProjectRoot "app")
+        if ($LASTEXITCODE -ne 0) { throw "compileall başarısız." }
+    }
+
+    Write-Section "6) Git durumu"
+    git -C $ProjectRoot status --short
+
+    Write-Host ""
+    Write-Host "TEMİZ RELEASE HAZIR: $OutputZip" -ForegroundColor Green
+    Write-Host "RAPOR: $ReportRoot\BYS360_SAFE_RELEASE_BUILDER_PHASE1_REPORT.json" -ForegroundColor Green
+    Write-Host "MANIFEST: $ReportRoot\BYS360_SAFE_RELEASE_BUILDER_PHASE1_MANIFEST.json" -ForegroundColor Green
+}
