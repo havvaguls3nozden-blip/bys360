@@ -165,12 +165,28 @@ def apply_personel_allowed_policy_block(policy_globals, _BYS360_PERSONEL_ALLOWED
                     _current.extend([_role for _role in _roles if _role not in _current])
 
 
+def apply_personel_role_matrix_visibility_v7_block(policy_globals, _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS, _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES, _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS):
+    """Apply personel role matrix visibility V7 policy mutations."""
+    for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+        _policy = policy_globals.get(_policy_name)
+        if isinstance(_policy, dict):
+            for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS:
+                _policy.pop(_key, None)
+            for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS:
+                _current = _policy.setdefault(_key, set())
+                if isinstance(_current, set):
+                    _current.update(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES)
+                elif isinstance(_current, list):
+                    _current.extend([_role for _role in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES if _role not in _current])
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
     "apply_performance_role_matrix_new_tab_policy_block",
     "apply_performance_role_matrix_new_tab_sets_block",
     "apply_period_center_key_roles_block",
     "apply_personel_allowed_policy_block",
+    "apply_personel_role_matrix_visibility_v7_block",
     "apply_process_menu_policy_block",
     "apply_reminders_menu_policy_block",
     "apply_role_matrix_runtime_authority_keys_block",

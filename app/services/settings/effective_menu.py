@@ -545,17 +545,16 @@ try:
         CORE_MENU_VISIBILITY_POLICY.pop(_key, None)
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:1205)")
-for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
-    _policy = globals().get(_policy_name)
-    if isinstance(_policy, dict):
-        for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS:
-            _policy.pop(_key, None)
-        for _key in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS:
-            _current = _policy.setdefault(_key, set())
-            if isinstance(_current, set):
-                _current.update(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES)
-            elif isinstance(_current, list):
-                _current.extend([_role for _role in _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES if _role not in _current])
+# Phase4J V55C effective_menu personel role matrix visibility v7 block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_personel_role_matrix_visibility_v7_block,
+)
+apply_personel_role_matrix_visibility_v7_block(
+    globals(),
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS,
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES,
+    _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS,
+)
 try:
     _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS.difference_update({"hr_management", "hr_reports"})
     _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS.update(_BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS)
