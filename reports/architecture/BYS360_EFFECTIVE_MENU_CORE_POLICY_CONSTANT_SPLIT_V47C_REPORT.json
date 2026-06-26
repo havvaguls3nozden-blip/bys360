@@ -1,0 +1,128 @@
+{
+  "phase": "effective-menu-core-policy-constant-split-v47c",
+  "generated_at": "2026-06-26T14:47:59",
+  "git_head_before": "04d85df",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "target": "app/services/settings/effective_menu.py",
+  "const_module": "app/services/settings/effective_menu_parts/core_policy_constants.py",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_CORE_POLICY_CONSTANT_PREFLIGHT_V47B_REPORT.json",
+  "moved_constant": {
+    "name": "CORE_MENU_VISIBILITY_POLICY",
+    "kind": "AnnAssign",
+    "line": 21,
+    "end_line": 36,
+    "length": 16
+  },
+  "before_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 858,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_assignment_count": 11,
+    "top_level_assignments": [
+      "CORE_MENU_VISIBILITY_POLICY",
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true,
+    "exists": true
+  },
+  "after_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 846,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_assignment_count": 10,
+    "top_level_assignments": [
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true,
+    "exists": true
+  },
+  "before_const": {
+    "path": "app/services/settings/effective_menu_parts/core_policy_constants.py",
+    "line_count": 0,
+    "top_level_function_count": 0,
+    "all_function_count": 0,
+    "top_level_assignment_count": 0,
+    "top_level_assignments": [],
+    "syntax_ok": true,
+    "exists": false
+  },
+  "after_const": {
+    "path": "app/services/settings/effective_menu_parts/core_policy_constants.py",
+    "line_count": 24,
+    "top_level_function_count": 0,
+    "all_function_count": 0,
+    "top_level_assignment_count": 2,
+    "top_level_assignments": [
+      "CORE_MENU_VISIBILITY_POLICY",
+      "__all__"
+    ],
+    "syntax_ok": true,
+    "exists": true
+  },
+  "removed_line_estimate": 12,
+  "runtime_smoke": {
+    "returncode": 0,
+    "stdout": "IMPORT_OK\ncore_policy_effective_dict=True\ncore_policy_part_dict=True\ncore_policy_nonempty=True\ncore_policy_same_object=True\nconstants_all_has_core_policy=True\ncore_callable=True\nalias_callable=True\npublic_callable=True\nuser_effective_callable=True\nuser_part_callable=True\nuser_same_object=True\nbuild_context_core_callable=True\ndaily_block_callable=True\nauthority_block_callable=True\napply_v213c_category_menu_wrapper_callable=True\nwrapper_all_has_apply_v213c_category_menu_wrapper=True\napply_v214_category_scope_wrapper_callable=True\nwrapper_all_has_apply_v214_category_scope_wrapper=True\napply_v215_category_period_scope_wrapper_callable=True\nwrapper_all_has_apply_v215_category_period_scope_wrapper=True\napply_v216_category_period_integration_wrapper_callable=True\nwrapper_all_has_apply_v216_category_period_integration_wrapper=True\n",
+    "stderr": "",
+    "import_ok_marker": true,
+    "core_policy_effective_dict": true,
+    "core_policy_part_dict": true,
+    "core_policy_nonempty": true,
+    "core_policy_same_object": true,
+    "constants_all_has_core_policy": true,
+    "core_callable": true,
+    "alias_callable": true,
+    "public_callable": true,
+    "user_effective_callable": true,
+    "user_part_callable": true,
+    "user_same_object": true,
+    "build_context_core_callable": true,
+    "daily_block_callable": true,
+    "authority_block_callable": true,
+    "v213c_callable": true,
+    "v214_callable": true,
+    "v215_callable": true,
+    "v216_callable": true,
+    "all_has_v213c": true,
+    "all_has_v214": true,
+    "all_has_v215": true,
+    "all_has_v216": true,
+    "combined_contains_build_nameerror": false,
+    "combined_contains_force_failed": false,
+    "combined_contains_traceback": false
+  },
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": true,
+    "new_files_created": true
+  },
+  "decision": [
+    "CORE_MENU_VISIBILITY_POLICY sabiti core_policy_constants.py modulune tasindi.",
+    "effective_menu.py tarafinda facade import birakildi.",
+    "Runtime import smoke build_menu_visibility_map NameError, force uygulanamadi ve Traceback mesaji olmadan gecti.",
+    "Bu uygulama canli sisteme veya veritabanina dokunmaz."
+  ],
+  "ok": true
+}

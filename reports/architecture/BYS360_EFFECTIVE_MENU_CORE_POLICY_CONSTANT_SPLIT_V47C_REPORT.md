@@ -1,0 +1,26 @@
+# BYS360 Effective Menu Core Policy Constant Split V47C
+- Generated at: 2026-06-26T14:47:59
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD before: 04d85df
+- Target: app/services/settings/effective_menu.py
+- Const module: app/services/settings/effective_menu_parts/core_policy_constants.py
+- Moved constant: CORE_MENU_VISIBILITY_POLICY
+- Constant line: 21
+- Constant length: 16
+- Before target lines: 858
+- After target lines: 846
+- Before const lines: 0
+- After const lines: 24
+- Removed line estimate: 12
+- Runtime returncode: 0
+- Runtime import OK: True
+- Core policy same object: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: True
+- new_files_created: True
