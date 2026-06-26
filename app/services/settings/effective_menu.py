@@ -175,25 +175,16 @@ def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = 
 
 
 # BYS360_PHASE3_VISIBILITY_PERMISSION_MENU_MATRIX
-PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
-    # Personel: kendi karnesi ve kendi kıyas/ortalama görünümü.
-    "performance_scorecard": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
-    "my_performance_comparison": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
+# Phase4J V37C effective_menu PHASE3 constants facade imports
+from app.services.settings.effective_menu_parts.phase3_constants import (
+    PHASE3_2_GENERAL_VISIBLE_KEYS,
+    PHASE3_2_MANAGER_VISIBLE_KEYS,
+    PHASE3_2_MENU_VISIBILITY_MARKER,
+    PHASE3_2_PERFORMANCE_MENU_POLICY,
+    PHASE3_2_PERSONNEL_VISIBLE_KEYS,
+    PHASE3_PERFORMANCE_MENU_POLICY,
+)
 
-    # Koordinatör/Grup Başkanı: kendi kapsamındaki personel ve ortalamalar.
-    "performance_reports": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "performance_team_compare": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "team_performance_comparison_history": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-
-    # Yönetim ekranları: genel/teknik yönetim ailesi.
-    "performance_criteria": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi"},
-    "performance_periods": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi"},
-    "performance_task_management": {"admin", "sistem_yoneticisi", "system_admin", "super_admin"},
-    "performance_hierarchy_tree": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"},
-    "performance_hierarchy_assignments": {"admin", "sistem_yoneticisi", "system_admin", "super_admin"},
-    "performance_publish": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "baskan"},
-    "performance_history_import": {"admin", "sistem_yoneticisi", "system_admin", "super_admin"},
-}
 
 
 
@@ -202,53 +193,8 @@ PHASE3_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
 # Faz 3.2 — Performans menü görünürlüğü son güvenlik katmanı.
 # Menüde görünmemesi gereken kullanıcı, ilgili performans menüsünü hiç görmez.
 # Backend veri kilidi Faz 3.3 içinde ayrıca uygulanacaktır.
-PHASE3_2_MENU_VISIBILITY_MARKER = "BYS360_PHASE3_2_MENU_VISIBILITY"
 
-PHASE3_2_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
-    # Personel: yalnızca kendi karnesi ve kendi grup/kategori ortalaması tarafı.
-    "performance_scorecard": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu", "personel", "user", "standart_personel"},
-    "my_performance_comparison": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu", "personel", "user", "standart_personel"},
 
-    # Koordinatör ve Grup Başkanı: yalnızca kendi kapsamındaki personel/ortalama ekranları.
-    "performance_reports": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_team_compare": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "team_performance_comparison_history": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_evaluation_tasks": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_tasks": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_interim_notes": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_development_guidance": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_feedback_meetings": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-
-    # Başkan/Admin: genel yönetim görünümü.
-    "performance_criteria": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "performance_periods": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı"},
-    "performance_hierarchy_tree": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_publish": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president"},
-    "performance_president_approvals": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president"},
-    "performance_personnel_support_publish_approval": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "grup_baskani", "grup_başkanı"},
-
-    # Teknik yönetim: yalnızca Admin/Sistem Yöneticisi.
-    "performance_task_management": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator"},
-    "performance_hierarchy_assignments": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator"},
-    "performance_history_import": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator"},
-    "performance_mail_settings": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator"},
-
-    # Stratejik Performans — KPI, Hedef, Yetkinlik, Öz Değerlendirme
-    "performance_kpi_dashboard": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör"},
-    "performance_kpi_management": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör"},
-    "performance_competency_library": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_self_assessment": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
-    "performance_kpi_analysis": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör"},
-}
-
-PHASE3_2_PERSONNEL_VISIBLE_KEYS = {"performance_scorecard", "my_performance_comparison"}
-PHASE3_2_MANAGER_VISIBLE_KEYS = {
-    "performance_scorecard", "my_performance_comparison", "performance_reports",
-    "performance_team_compare", "team_performance_comparison_history",
-    "performance_evaluation_tasks", "performance_tasks", "performance_interim_notes",
-    "performance_development_guidance", "performance_feedback_meetings", "performance_hierarchy_tree",
-}
-PHASE3_2_GENERAL_VISIBLE_KEYS = set(PHASE3_2_PERFORMANCE_MENU_POLICY.keys())
 
 
 

@@ -1,0 +1,114 @@
+{
+  "phase": "effective-menu-phase3-constants-split-v37c",
+  "generated_at": "2026-06-26T09:09:15",
+  "git_head_before": "01e0dd2",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "target": "app/services/settings/effective_menu.py",
+  "new_module": "app/services/settings/effective_menu_parts/phase3_constants.py",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_PHASE3_CONSTANTS_PREFLIGHT_V37B_REPORT.json",
+  "moved_assignment_count": 6,
+  "moved_assignments": [
+    "PHASE3_2_GENERAL_VISIBLE_KEYS",
+    "PHASE3_2_MANAGER_VISIBLE_KEYS",
+    "PHASE3_2_MENU_VISIBILITY_MARKER",
+    "PHASE3_2_PERFORMANCE_MENU_POLICY",
+    "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+    "PHASE3_PERFORMANCE_MENU_POLICY"
+  ],
+  "before_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 1344,
+    "top_level_function_count": 6,
+    "top_level_assignment_count": 13,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "_user_has_any_assigned_survey",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "top_level_assignments": [
+      "CORE_MENU_VISIBILITY_POLICY",
+      "PHASE3_2_GENERAL_VISIBLE_KEYS",
+      "PHASE3_2_MANAGER_VISIBLE_KEYS",
+      "PHASE3_2_MENU_VISIBILITY_MARKER",
+      "PHASE3_2_PERFORMANCE_MENU_POLICY",
+      "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+      "PHASE3_PERFORMANCE_MENU_POLICY",
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1"
+    ],
+    "syntax_ok": true
+  },
+  "after_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 1290,
+    "top_level_function_count": 6,
+    "top_level_assignment_count": 7,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "_user_has_any_assigned_survey",
+      "build_menu_visibility_map",
+      "build_menu_visibility_map"
+    ],
+    "top_level_assignments": [
+      "CORE_MENU_VISIBILITY_POLICY",
+      "PORTAL_MENU_VISIBILITY_POLICY",
+      "PORTAL_ROLE_MATRIX_V2_12_DEFAULTS",
+      "PORTAL_ROLE_MATRIX_V2_12_KEYS",
+      "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+      "RollbackHook",
+      "_BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1"
+    ],
+    "syntax_ok": true
+  },
+  "new_module_analysis": {
+    "path": "app/services/settings/effective_menu_parts/phase3_constants.py",
+    "line_count": 190,
+    "top_level_function_count": 0,
+    "top_level_assignment_count": 7,
+    "top_level_functions": [],
+    "top_level_assignments": [
+      "PHASE3_2_GENERAL_VISIBLE_KEYS",
+      "PHASE3_2_MANAGER_VISIBLE_KEYS",
+      "PHASE3_2_MENU_VISIBILITY_MARKER",
+      "PHASE3_2_PERFORMANCE_MENU_POLICY",
+      "PHASE3_2_PERSONNEL_VISIBLE_KEYS",
+      "PHASE3_PERFORMANCE_MENU_POLICY",
+      "__all__"
+    ],
+    "syntax_ok": true
+  },
+  "removed_line_estimate": 54,
+  "runtime_validation": {
+    "new_module_import_ok": true,
+    "facade_import_ok": true,
+    "same_value_count": 6,
+    "missing_on_new_module": [],
+    "missing_on_facade": [],
+    "different_values": [],
+    "error": ""
+  },
+  "facade_marker": "# Phase4J V37C effective_menu PHASE3 constants facade imports",
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": true,
+    "new_module_created": true
+  },
+  "decision": [
+    "6 PHASE3 sabiti app/services/settings/effective_menu_parts/phase3_constants.py modulune alindi.",
+    "effective_menu.py dis import uyumlulugu icin facade import ile ayni sabitleri sunmaya devam eder.",
+    "Runtime validation gecmeden commit/tag yapilmaz.",
+    "Bu uygulama canli sisteme veya veritabanina dokunmaz."
+  ],
+  "ok": true
+}
