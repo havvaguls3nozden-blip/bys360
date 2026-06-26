@@ -1,0 +1,162 @@
+/* BYS360 UX-1 — Sade Ekran ve Kullanıcı Mantığı Temizliği */
+.bys360-ux1-quick-logic {
+  margin: 0 0 1rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(139, 0, 0, .14);
+  border-left: 4px solid #8B0000;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(139,0,0,.055), rgba(255,255,255,.92));
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .06);
+  color: #1f2937;
+}
+.bys360-ux1-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.bys360-ux1-kicker {
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #8B0000;
+  font-weight: 800;
+  margin-bottom: .2rem;
+}
+.bys360-ux1-quick-logic h2 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #111827;
+}
+.bys360-ux1-quick-logic p {
+  margin: .28rem 0 0 0;
+  font-size: .92rem;
+  line-height: 1.45;
+  color: #4b5563;
+}
+.bys360-ux1-actions {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.bys360-ux1-btn,
+.bys360-ux1-more {
+  appearance: none;
+  border: 1px solid rgba(139, 0, 0, .18);
+  background: #fff;
+  color: #8B0000;
+  border-radius: 999px;
+  padding: .45rem .75rem;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.bys360-ux1-btn:hover,
+.bys360-ux1-more:hover {
+  border-color: rgba(139, 0, 0, .35);
+  background: rgba(139, 0, 0, .06);
+}
+.bys360-ux1-btn-primary {
+  background: #8B0000;
+  color: #fff;
+}
+.bys360-ux1-btn-primary:hover {
+  background: #6f0000;
+  color: #fff;
+}
+.bys360-ux1-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  margin-top: .85rem;
+}
+.bys360-ux1-steps span {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+  border: 1px solid rgba(17, 24, 39, .08);
+  background: rgba(255,255,255,.78);
+  border-radius: 999px;
+  padding: .42rem .65rem;
+  font-size: .84rem;
+  color: #374151;
+}
+.bys360-ux1-steps b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: #8B0000;
+  color: #fff;
+  font-size: .7rem;
+}
+.bys360-ux1-warning {
+  margin-top: .75rem;
+  padding: .55rem .7rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, .12);
+  color: #7c4a03;
+  font-size: .82rem;
+  line-height: 1.42;
+}
+.bys360-ux1-long-text.is-collapsed:not(.is-expanded) {
+  max-height: 4.8em;
+  overflow: hidden;
+  position: relative;
+}
+.bys360-ux1-long-text.is-collapsed:not(.is-expanded)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.2em;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), var(--color-background-primary, #fff));
+  pointer-events: none;
+}
+.bys360-ux1-long-text.has-technical-noise::before {
+  content: "Teknik detay";
+  display: inline-block;
+  margin-right: .4rem;
+  padding: .08rem .42rem;
+  border-radius: 999px;
+  background: rgba(107, 114, 128, .12);
+  color: #6b7280;
+  font-size: .68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.bys360-ux1-more {
+  margin: .25rem 0 .85rem 0;
+  padding: .35rem .65rem;
+  font-size: .78rem;
+}
+.bys360-ux1-action-focus {
+  box-shadow: 0 0 0 3px rgba(139, 0, 0, .10) !important;
+}
+@media (max-width: 768px) {
+  .bys360-ux1-head { flex-direction: column; }
+  .bys360-ux1-actions { justify-content: flex-start; width: 100%; }
+  .bys360-ux1-btn { width: 100%; justify-content: center; }
+  .bys360-ux1-steps { flex-direction: column; }
+  .bys360-ux1-steps span { width: 100%; }
+}
+@media (prefers-color-scheme: dark) {
+  .bys360-ux1-quick-logic {
+    background: linear-gradient(135deg, rgba(139,0,0,.20), rgba(17,24,39,.92));
+    border-color: rgba(255,255,255,.12);
+    color: #f9fafb;
+  }
+  .bys360-ux1-quick-logic h2 { color: #fff; }
+  .bys360-ux1-quick-logic p { color: #d1d5db; }
+  .bys360-ux1-steps span { background: rgba(255,255,255,.08); color: #e5e7eb; border-color: rgba(255,255,255,.12); }
+  .bys360-ux1-btn, .bys360-ux1-more { background: rgba(255,255,255,.08); color: #fecaca; border-color: rgba(254,202,202,.20); }
+  .bys360-ux1-btn-primary { background: #b91c1c; color: #fff; }
+  .bys360-ux1-long-text.is-collapsed:not(.is-expanded)::after { background: linear-gradient(to bottom, rgba(17,24,39,0), var(--color-background-primary, #111827)); }
+}
