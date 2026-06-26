@@ -1,0 +1,74 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Geçmiş Puan Ekle - BYS360{% endblock %}
+{% block page_title %}Geçmiş Puan Ekle{% endblock %}
+{% block page_subtitle %}Geçmiş dönem performans puanını manuel olarak arşive ekleyin.{% endblock %}
+
+{% block content %}
+{% include "performance/archive/_premium_styles.html" %}
+
+<div class="archive-premium">
+  <section class="archive-hero-premium">
+    <div class="archive-kicker">Geçmiş Karne Arşivi</div>
+    <h1 class="archive-hero-title">Manuel Kayıt</h1>
+    <p class="archive-hero-text">Geçmiş dönem performans kaydını yetkili kullanıcı olarak manuel şekilde arşive ekleyin.</p>
+  </section>
+
+  <div class="archive-premium-card archive-premium-panel">
+    <form method="post" action="/performance/archive/new">
+      {% if csrf_token is defined %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% endif %}
+
+      <div class="archive-form-grid">
+        <div class="archive-field full">
+          <label class="archive-label">Personel</label>
+          <select class="archive-select" name="employee_id" required>
+            <option value="">Personel seçiniz</option>
+            {% for employee in employees or [] %}
+              <option value="{{ employee.id }}">
+                {% if display_name is defined %}
+                  {{ display_name(employee) }}
+                {% else %}
+                  {{ employee.email if employee.email is defined else employee.id }}
+                {% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="archive-field">
+          <label class="archive-label">Yıl</label>
+          <input class="archive-input" name="result_year" type="number" min="2000" max="2100" required>
+        </div>
+
+        <div class="archive-field">
+          <label class="archive-label">Dönem</label>
+          <input class="archive-input" name="period_label" type="text" required placeholder="2025 1. Dönem">
+        </div>
+
+        <div class="archive-field">
+          <label class="archive-label">Puan</label>
+          <input class="archive-input" name="score" type="number" min="0" max="100" step="0.01" required>
+        </div>
+
+        <div class="archive-field">
+          <label class="archive-label">Kaynak / Belge</label>
+          <input class="archive-input" name="source_document_name" type="text">
+          <input type="hidden" name="source_document" value="">
+        </div>
+
+        <div class="archive-field full">
+          <label class="archive-label">Açıklama</label>
+          <textarea class="archive-textarea" name="description"></textarea>
+        </div>
+      </div>
+
+      <div class="archive-actions end">
+        <a class="archive-btn" href="/performance/archive">Arşive Dön</a>
+        <button class="archive-btn primary" type="submit">Kaydet</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Geçmiş Karne Arşivi - BYS360{% endblock %}
+{% block page_title %}Geçmiş Karne Arşivi{% endblock %}
+{% block page_subtitle %}Geçmiş dönem performans puanlarını ve karne kayıtlarını görüntüleyin.{% endblock %}
+
+{% block content %}
+{% include "performance/archive/_premium_styles.html" %}
+
+<div class="archive-premium">
+  <section class="archive-hero-premium">
+    <div class="archive-kicker">Performans Yönetimi</div>
+    <h1 class="archive-hero-title">Geçmiş Karne Arşivi</h1>
+    <p class="archive-hero-text">Geçmiş yıl karne ve performans puanı kayıtlarını yetki kapsamınıza göre tek ekranda takip edin.</p>
+  </section>
+
+  <form method="get" class="archive-premium-card archive-premium-panel archive-premium-toolbar">
+    <div class="archive-field">
+      <label class="archive-label">Arama</label>
+      <input class="archive-input" type="text" name="q" value="{{ q or '' }}" placeholder="Personel, dönem veya açıklama ara">
+    </div>
+
+    <div class="archive-field">
+      <label class="archive-label">Yıl</label>
+      <select class="archive-select" name="year">
+        <option value="">Tüm yıllar</option>
+        {% for item in years or [] %}
+          <option value="{{ item }}" {% if selected_year == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button class="archive-btn primary" type="submit">Filtrele</button>
+  </form>
+
+  <div class="archive-stats">
+    <div class="archive-stat"><small>Listelenen Kayıt</small><strong>{{ rows|length if rows is defined else 0 }}</strong></div>
+    <div class="archive-stat"><small>Yıl Kapsamı</small><strong>{{ selected_year if selected_year else 'Tümü' }}</strong></div>
+    <div class="archive-stat"><small>Yönetim İşlemleri</small><strong>{{ 'Açık' if can_manage_archive else 'Kapalı' }}</strong></div>
+  </div>
+
+  {% if can_manage_archive %}
+  <div class="archive-premium-card archive-premium-panel">
+    <div class="archive-actions">
+      <a class="archive-btn primary" href="/performance/archive/import">Excel ile Aktar</a>
+      <a class="archive-btn" href="/performance/archive/template">Şablon İndir</a>
+      <a class="archive-btn" href="/performance/archive/new">Manuel Kayıt</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="archive-premium-card archive-premium-panel">
+    <div class="archive-table-wrap">
+      <table class="archive-table">
+        <thead>
+          <tr>
+            <th>Personel</th>
+            <th>Yıl</th>
+            <th>Dönem</th>
+            <th>Puan</th>
+            <th>Kaynak</th>
+            <th>Açıklama</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows or [] %}
+          <tr>
+            <td>
+              {% if display_name is defined and row.employee is defined and row.employee %}
+                {{ display_name(row.employee) }}
+              {% else %}
+                {{ row.employee_id }}
+              {% endif %}
+            </td>
+            <td>{{ row.result_year }}</td>
+            <td>{{ row.period_label }}</td>
+            <td><span class="archive-score">{{ row.score }}</span></td>
+            <td>{{ row.source_document_name or row.source_type or '-' }}</td>
+            <td>{{ row.description or '-' }}</td>
+            <td><a class="archive-btn" href="/performance/archive/{{ row.id }}">Detay</a></td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7"><div class="archive-empty">Yetki kapsamınızda gösterilecek geçmiş karne kaydı bulunamadı.</div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

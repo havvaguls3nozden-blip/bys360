@@ -1,0 +1,42 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Geçmiş Karne Detayı - BYS360{% endblock %}
+{% block page_title %}Geçmiş Karne Detayı{% endblock %}
+{% block page_subtitle %}Arşivlenmiş performans kaydının ayrıntıları.{% endblock %}
+
+{% block content %}
+{% include "performance/archive/_premium_styles.html" %}
+
+<div class="archive-premium">
+  <section class="archive-hero-premium">
+    <div class="archive-kicker">Geçmiş Karne Arşivi</div>
+    <h1 class="archive-hero-title">Karne Detayı</h1>
+    <p class="archive-hero-text">Seçili geçmiş performans arşiv kaydının temel bilgileri.</p>
+  </section>
+
+  <div class="archive-premium-card archive-premium-panel">
+    <div class="archive-detail-grid">
+      <div class="archive-detail-item">
+        <div class="archive-detail-label">Personel</div>
+        <div class="archive-detail-value">
+          {% if display_name is defined and result.employee is defined and result.employee %}
+            {{ display_name(result.employee) }}
+          {% else %}
+            {{ result.employee_id }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="archive-detail-item"><div class="archive-detail-label">Yıl</div><div class="archive-detail-value">{{ result.result_year }}</div></div>
+      <div class="archive-detail-item"><div class="archive-detail-label">Dönem</div><div class="archive-detail-value">{{ result.period_label }}</div></div>
+      <div class="archive-detail-item"><div class="archive-detail-label">Puan</div><div class="archive-detail-value">{{ result.score }}</div></div>
+      <div class="archive-detail-item"><div class="archive-detail-label">Kaynak</div><div class="archive-detail-value">{{ result.source_document_name or result.source_type or '-' }}</div></div>
+      <div class="archive-detail-item"><div class="archive-detail-label">Açıklama</div><div class="archive-detail-value">{{ result.description or '-' }}</div></div>
+    </div>
+
+    <div class="archive-actions end">
+      <a class="archive-btn" href="/performance/archive">Arşive Dön</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Geçmiş Karne Excel Yükleme - BYS360{% endblock %}
+{% block page_title %}Geçmiş Karne Excel Yükleme{% endblock %}
+{% block page_subtitle %}Geçmiş performans puanlarını Excel dosyasıyla arşive aktarın.{% endblock %}
+
+{% block content %}
+{% include "performance/archive/_premium_styles.html" %}
+
+<div class="archive-premium">
+  <section class="archive-hero-premium">
+    <div class="archive-kicker">Geçmiş Karne Arşivi</div>
+    <h1 class="archive-hero-title">Excel ile Aktar</h1>
+    <p class="archive-hero-text">Hazırlanan Excel şablonunu kullanarak geçmiş dönem performans kayıtlarını toplu şekilde arşive aktarın.</p>
+  </section>
+
+  <div class="archive-premium-card archive-premium-panel">
+    <div class="archive-note">
+      Excel dosyasını seçip yükleyin. Dosya alanı sistemde <strong>archive_excel</strong> adıyla gönderilir.
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="/performance/archive/import" style="margin-top:18px">
+      {% if csrf_token is defined %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% endif %}
+
+      <div class="archive-field">
+        <label class="archive-label">Excel dosyası</label>
+        <input class="archive-input" type="file" name="archive_excel" accept=".xlsx,.xls" required>
+      </div>
+
+      <div class="archive-actions end">
+        <a class="archive-btn" href="/performance/archive">Arşive Dön</a>
+        <a class="archive-btn" href="/performance/archive/template">Şablon İndir</a>
+        <button class="archive-btn primary" type="submit">Exceli Yükle</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
