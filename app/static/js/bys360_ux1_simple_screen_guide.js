@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const UX_VERSION = "UX1_SIMPLE_SCREEN_GUIDE_V1";
+  const UX_VERSION = "UX1_TOP_BANNER_REMOVE_V1";
   const TECHNICAL_WORDS = [
     "workflow", "phase", "sync", "gate", "endpoint", "json", "debug", "traceback",
     "exception", "unauthorized_scope", "raw error", "stack"
@@ -101,52 +101,17 @@
     }
   }
 
+  function removeGlobalQuickLogicCard() {
+    document.querySelectorAll(".bys360-ux1-quick-logic").forEach((card) => card.remove());
+  }
+
   function renderQuickLogicCard() {
-    if (document.querySelector(".bys360-ux1-quick-logic")) return;
-    const container = findMainContainer();
-    if (!container) return;
-    const context = resolveContext();
-
-    const card = document.createElement("section");
-    card.className = "bys360-ux1-quick-logic";
-    card.setAttribute("data-bys360-ux1", UX_VERSION);
-    card.innerHTML = `
-      <div class="bys360-ux1-head">
-        <div>
-          <div class="bys360-ux1-kicker">Kısa ekran mantığı</div>
-          <h2>${context.title}</h2>
-          <p>${context.summary}</p>
-        </div>
-        <div class="bys360-ux1-actions">
-          <button type="button" class="bys360-ux1-btn" data-ux1-toggle-details>Detayları göster/gizle</button>
-          <button type="button" class="bys360-ux1-btn bys360-ux1-btn-primary" data-ux1-ask-guide>Ekran rehberine sor</button>
-        </div>
-      </div>
-      <div class="bys360-ux1-steps" aria-label="Sıradaki işlem adımları">
-        ${context.steps.map((step, index) => `<span><b>${index + 1}</b>${step}</span>`).join("")}
-      </div>
-      <div class="bys360-ux1-warning">${context.warning}</div>
-    `;
-
-    if (container === document.body) {
-      document.body.insertBefore(card, document.body.firstChild);
-    } else {
-      container.insertBefore(card, container.firstChild);
-    }
-
-    card.querySelector("[data-ux1-toggle-details]")?.addEventListener("click", function () {
-      document.body.classList.toggle("bys360-ux1-show-details");
-      document.querySelectorAll(".bys360-ux1-long-text").forEach((el) => {
-        el.classList.toggle("is-expanded", document.body.classList.contains("bys360-ux1-show-details"));
-      });
-      document.querySelectorAll(".bys360-ux1-more").forEach((btn) => {
-        btn.textContent = document.body.classList.contains("bys360-ux1-show-details") ? "Detayı gizle" : "Detayı göster";
-      });
-    });
-
-    card.querySelector("[data-ux1-ask-guide]")?.addEventListener("click", function () {
-      askScreenGuide(context);
-    });
+    // UX-1 TOP BANNER REMOVE V1:
+    // Global top banner was visually too heavy and its toggle created confusion.
+    // Keep the useful UX-1 behavior (long text simplifier + primary action focus),
+    // but never inject a full-width "Kısa ekran mantığı" banner at the top.
+    removeGlobalQuickLogicCard();
+    return null;
   }
 
   function isExcludedElement(el) {
@@ -215,7 +180,7 @@
   function init() {
     if (!document.body) return;
     document.documentElement.classList.add("bys360-ux1-enabled");
-    renderQuickLogicCard();
+    removeGlobalQuickLogicCard();
     simplifyLongTextBlocks();
     addActionFocusToPrimaryButtons();
   }
@@ -228,6 +193,8 @@
 
   window.BYS360UX1SimpleScreenGuide = {
     version: UX_VERSION,
+    topBannerEnabled: false,
+    removeGlobalQuickLogicCard,
     init,
     resolveContext,
     simplifyLongTextBlocks

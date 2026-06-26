@@ -160,3 +160,10 @@
   .bys360-ux1-btn-primary { background: #b91c1c; color: #fff; }
   .bys360-ux1-long-text.is-collapsed:not(.is-expanded)::after { background: linear-gradient(to bottom, rgba(17,24,39,0), var(--color-background-primary, #111827)); }
 }
+
+
+/* BYS360_UX1_TOP_BANNER_REMOVE_V1
+   The global top banner is intentionally disabled. The smaller page-level AI guide remains. */
+.bys360-ux1-quick-logic {
+  display: none !important;
+}
