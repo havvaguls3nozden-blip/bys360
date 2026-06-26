@@ -116,6 +116,53 @@ def apply_v215_category_period_scope_wrapper(
             pass
         return current_build_menu_visibility_map
 
+
+def apply_v216_category_period_integration_wrapper(
+    current_build_menu_visibility_map,
+    *,
+    logging,
+    normalize_role_name,
+    is_removed_menu_key,
+):
+    """Apply the V2.1.6 category period integration wrapper while preserving legacy behavior."""
+    try:
+        _BYS360_V216_CATEGORY_PERIOD_INTEGRATION_KEY = "performance_category_period_integration"
+        _BYS360_V216_CATEGORY_PERIOD_INTEGRATION_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
+        _BYS360_V216_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = current_build_menu_visibility_map
+        def _bys360_v216_category_period_integration_build_menu_visibility_map_wrapper(user, *args, **kwargs):  # type: ignore[no-redef]
+                visibility = dict(_BYS360_V216_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
+                try:
+                    _role = normalize_role_name(getattr(user, "role", ""))
+                except Exception:
+                    logger = __import__("logging").getLogger(__name__)
+                    logger.exception("BYS360 effective menu isleminde hata yakalandi")
+                    _role = str(getattr(user, "role", "") or "").strip().lower()
+                _is_admin_like = bool(_role in _BYS360_V216_CATEGORY_PERIOD_INTEGRATION_ROLES or getattr(user, "is_admin", False) or getattr(user, "is_superuser", False))
+                if _is_admin_like:
+                    try:
+                        _removed = is_removed_menu_key(_BYS360_V216_CATEGORY_PERIOD_INTEGRATION_KEY)
+                    except Exception:
+                        logger = __import__("logging").getLogger(__name__)
+                        logger.exception("BYS360 effective menu isleminde hata yakalandi")
+                        _removed = False
+                    if not _removed:
+                        visibility[_BYS360_V216_CATEGORY_PERIOD_INTEGRATION_KEY] = True
+                        visibility["performance_module"] = True
+                        visibility["performance_management"] = True
+                        visibility["performans_yonetimi"] = True
+                return visibility
+
+        return _bys360_v216_category_period_integration_build_menu_visibility_map_wrapper
+    except Exception:
+        try:
+            logging.exception("BYS360 V2.1.6 kategori dönem entegrasyonu effective_menu force uygulanamadı")
+        except Exception:
+            pass
+        return current_build_menu_visibility_map
+
+
 __all__ = [
+    "apply_v213c_category_menu_wrapper",
     "apply_v215_category_period_scope_wrapper",
+    "apply_v216_category_period_integration_wrapper",
 ]
