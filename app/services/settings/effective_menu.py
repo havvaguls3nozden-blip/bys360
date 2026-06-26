@@ -268,19 +268,15 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 
 # BYS360_SETTINGS_MANUAL_V1_1_REMINDERS_POLICY_BEGIN
 
-for _policy_name in [
-    "PHASE3_PERFORMANCE_MENU_POLICY",
-    "PHASE3_2_PERFORMANCE_MENU_POLICY",
-    "PERFORMANCE_MENU_POLICY",
-    "ROLE_MENU_POLICY",
-]:
-    _policy = globals().get(_policy_name)
-    if isinstance(_policy, dict):
-        _current = _policy.setdefault(_BYS360_REMINDERS_MENU_KEY, set())
-        if isinstance(_current, set):
-            _current.update(_BYS360_REMINDERS_ALLOWED_ROLES)
-        elif isinstance(_current, list):
-            _current.extend([_r for _r in _BYS360_REMINDERS_ALLOWED_ROLES if _r not in _current])
+# Phase4J V50C effective_menu reminders menu block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_reminders_menu_policy_block,
+)
+apply_reminders_menu_policy_block(
+    globals(),
+    _BYS360_REMINDERS_MENU_KEY,
+    _BYS360_REMINDERS_ALLOWED_ROLES,
+)
 
 for _set_name in [
     "PHASE3_2_MANAGER_VISIBLE_KEYS",
