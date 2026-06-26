@@ -118,9 +118,27 @@ def apply_reminders_menu_policy_block(policy_globals, _BYS360_REMINDERS_MENU_KEY
                 _current.extend([_r for _r in _BYS360_REMINDERS_ALLOWED_ROLES if _r not in _current])
 
 
+def apply_period_center_key_roles_block(CORE_MENU_VISIBILITY_POLICY, ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS, _BYS360_V223_PERIOD_CENTER_KEY_ROLES, logging):
+    """Apply V2.2.3 period center key-role policy mutations."""
+    for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
+        try:
+            ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.add(_key)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+            pass
+        try:
+            CORE_MENU_VISIBILITY_POLICY.setdefault(_key, set()).update(set(_roles))
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+            pass
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
     "apply_performance_role_matrix_new_tab_policy_block",
+    "apply_period_center_key_roles_block",
     "apply_process_menu_policy_block",
     "apply_reminders_menu_policy_block",
     "apply_role_matrix_runtime_authority_keys_block",

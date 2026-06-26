@@ -786,19 +786,16 @@ for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBL
 # BYS360_PERFORMANCE_V2_1_23_SETTINGS_ROLE_MATRIX_FULL_AUTHORITY_BEGIN
 # Dönem Yönetim Merkezi, Canlı Takip ve Amir Hatırlatma menü anahtarları
 # Ayarlar > Rol Matrisi kararına tabi canlı otorite anahtarlarıdır.
-for _key, _roles in _BYS360_V223_PERIOD_CENTER_KEY_ROLES.items():
-    try:
-        ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.add(_key)
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        pass
-    try:
-        CORE_MENU_VISIBILITY_POLICY.setdefault(_key, set()).update(set(_roles))
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        pass
+# Phase4J V51C effective_menu period center block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_period_center_key_roles_block,
+)
+apply_period_center_key_roles_block(
+    CORE_MENU_VISIBILITY_POLICY,
+    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS,
+    _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
+    logging,
+)
 # BYS360_PERFORMANCE_V2_1_23_SETTINGS_ROLE_MATRIX_FULL_AUTHORITY_END
 
 
