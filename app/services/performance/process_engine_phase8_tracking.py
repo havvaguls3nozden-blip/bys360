@@ -63,51 +63,99 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
 
 
 def table_exists(table_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
+    """Return whether a table exists for the active SQLAlchemy database.
+
+    Local development may run on SQLite, while live commonly runs on PostgreSQL.
+    The old implementation used PostgreSQL information_schema directly and caused
+    500 errors on SQLite pages such as /performance/process-tracking.
+    """
+    try:
+        bind = db.session.get_bind()
+        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
+
+        if dialect_name == "sqlite":
+            return bool(
+                _scalar(
+                    """
+                    SELECT 1
+                    FROM sqlite_master
+                    WHERE type = 'table'
+                      AND name = :table_name
+                    LIMIT 1
+                    """,
+                    {"table_name": table_name},
+                )
             )
-            """,
-            {"table_name": table_name},
+
+        return bool(
+            _scalar(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                      AND table_name = :table_name
+                )
+                """,
+                {"table_name": table_name},
+            )
         )
-    )
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "BYS360 process tracking table_exists guvenli fallback | table=%s",
+            table_name,
+        )
+        return False
 
 
 def column_exists(table_name: str, column_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                  AND column_name = :column_name
-            )
-            """,
-            {"table_name": table_name, "column_name": column_name},
+    """Return whether a column exists on the active database backend."""
+    try:
+        return column_name in _table_columns(table_name)
+    except Exception:
+        logger.exception(
+            "BYS360 process tracking column_exists guvenli fallback | table=%s column=%s",
+            table_name,
+            column_name,
         )
-    )
+        return False
 
 
 def _table_columns(table_name: str) -> set[str]:
-    return {
-        row["column_name"]
-        for row in _rows(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = :table_name
-            """,
-            {"table_name": table_name},
+    """Return table column names for SQLite and PostgreSQL safely."""
+    try:
+        bind = db.session.get_bind()
+        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
+
+        if dialect_name == "sqlite":
+            safe_table = "\"" + str(table_name).replace("\"", "\"\"") + "\""
+            columns: set[str] = set()
+            for row in _rows(f"PRAGMA table_info({safe_table})"):
+                row_data = dict(row)
+                name = row_data.get("name")
+                if name:
+                    columns.add(str(name))
+            return columns
+
+        return {
+            row["column_name"]
+            for row in _rows(
+                """
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = :table_name
+                """,
+                {"table_name": table_name},
+            )
+        }
+    except Exception:
+        logger.exception(
+            "BYS360 process tracking _table_columns guvenli fallback | table=%s",
+            table_name,
         )
-    }
+        return set()
+
 
 def _qident(name: str) -> str:
     return '"' + str(name).replace('\"', '\"\"') + '"'

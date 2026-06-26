@@ -38,12 +38,49 @@ def _bys360_process_reports_advanced_context(viewer=None, status_filter=None):
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return default
 
-    table_exists = _scalar("""
-        SELECT COUNT(*)
-        FROM information_schema.tables
-        WHERE table_schema = current_schema()
-          AND table_name = 'performance_process_flows'
-    """)
+    def _dialect_name():
+        try:
+            bind = db.session.get_bind()
+            return getattr(getattr(bind, "dialect", None), "name", "") or ""
+        except Exception:
+            logger.exception("BYS360 process reports dialect tespiti yapilamadi.")
+            return ""
+
+    def _table_exists(table_name):
+        try:
+            if _dialect_name() == "sqlite":
+                return bool(_scalar(
+                    """
+                    SELECT 1
+                    FROM sqlite_master
+                    WHERE type = 'table'
+                      AND name = :table_name
+                    LIMIT 1
+                    """,
+                    {"table_name": table_name},
+                    default=0,
+                ))
+
+            return bool(_scalar(
+                """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = current_schema()
+                      AND table_name = :table_name
+                )
+                """,
+                {"table_name": table_name},
+                default=False,
+            ))
+        except Exception:
+            logger.exception(
+                "BYS360 process reports table_exists guvenli fallback | table=%s",
+                table_name,
+            )
+            return False
+
+    table_exists = _table_exists("performance_process_flows")
 
     if not table_exists:
         return {
