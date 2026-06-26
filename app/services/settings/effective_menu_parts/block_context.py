@@ -135,9 +135,25 @@ def apply_period_center_key_roles_block(CORE_MENU_VISIBILITY_POLICY, ROLE_MATRIX
             pass
 
 
+def apply_performance_role_matrix_new_tab_sets_block(policy_globals, _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY):
+    """Apply performance role matrix new-tab set mutations."""
+    for _set_name in [
+        "PHASE3_2_MANAGER_VISIBLE_KEYS",
+        "PHASE3_2_GENERAL_VISIBLE_KEYS",
+        "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS",
+        "PERFORMANCE_ROLE_MATRIX_KEYS",
+    ]:
+        _target = policy_globals.get(_set_name)
+        if isinstance(_target, set):
+            _target.update(_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.keys())
+        elif isinstance(_target, list):
+            _target.extend([_k for _k in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.keys() if _k not in _target])
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
     "apply_performance_role_matrix_new_tab_policy_block",
+    "apply_performance_role_matrix_new_tab_sets_block",
     "apply_period_center_key_roles_block",
     "apply_process_menu_policy_block",
     "apply_reminders_menu_policy_block",
