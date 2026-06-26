@@ -1,0 +1,111 @@
+{
+  "phase": "effective-menu-role-matrix-authority-try-block-split-v46c",
+  "generated_at": "2026-06-26T12:36:04",
+  "git_head_before": "70bc012",
+  "git_branch": "phase4j-script-reduction-godobject-v1",
+  "target": "app/services/settings/effective_menu.py",
+  "block_module": "app/services/settings/effective_menu_parts/block_context.py",
+  "source_report": "reports/architecture/BYS360_EFFECTIVE_MENU_NEXT_TRY_BLOCK_PREFLIGHT_V46B_REPORT.json",
+  "moved_block": {
+    "kind": "Try",
+    "line": 389,
+    "end_line": 410,
+    "length": 22,
+    "apply_function": "apply_role_matrix_runtime_authority_keys_block",
+    "used_import_names": [
+      "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"
+    ],
+    "purpose": "role_matrix_runtime_authority_keys_block"
+  },
+  "before_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 875,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "after_target": {
+    "path": "app/services/settings/effective_menu.py",
+    "line_count": 858,
+    "top_level_function_count": 4,
+    "all_function_count": 4,
+    "top_level_functions": [
+      "_active_menu_items",
+      "_log_warning",
+      "_truthy_bool",
+      "build_menu_visibility_map"
+    ],
+    "syntax_ok": true
+  },
+  "before_block": {
+    "path": "app/services/settings/effective_menu_parts/block_context.py",
+    "line_count": 43,
+    "top_level_function_count": 1,
+    "all_function_count": 1,
+    "top_level_functions": [
+      "apply_daily_weather_policy_block"
+    ],
+    "syntax_ok": true
+  },
+  "after_block": {
+    "path": "app/services/settings/effective_menu_parts/block_context.py",
+    "line_count": 70,
+    "top_level_function_count": 2,
+    "all_function_count": 2,
+    "top_level_functions": [
+      "apply_daily_weather_policy_block",
+      "apply_role_matrix_runtime_authority_keys_block"
+    ],
+    "syntax_ok": true
+  },
+  "removed_line_estimate": 17,
+  "runtime_smoke": {
+    "returncode": 0,
+    "stdout": "IMPORT_OK\ncore_callable=True\nalias_callable=True\npublic_callable=True\nuser_effective_callable=True\nuser_part_callable=True\nuser_same_object=True\nuser_all_has_func=True\nbuild_context_core_callable=True\ndaily_block_callable=True\nauthority_block_callable=True\nblock_all_has_daily_block=True\nblock_all_has_authority_block=True\napply_v213c_category_menu_wrapper_callable=True\nwrapper_all_has_apply_v213c_category_menu_wrapper=True\napply_v214_category_scope_wrapper_callable=True\nwrapper_all_has_apply_v214_category_scope_wrapper=True\napply_v215_category_period_scope_wrapper_callable=True\nwrapper_all_has_apply_v215_category_period_scope_wrapper=True\napply_v216_category_period_integration_wrapper_callable=True\nwrapper_all_has_apply_v216_category_period_integration_wrapper=True\n",
+    "stderr": "",
+    "import_ok_marker": true,
+    "core_callable": true,
+    "alias_callable": true,
+    "public_callable": true,
+    "user_effective_callable": true,
+    "user_part_callable": true,
+    "user_same_object": true,
+    "user_all_has_func": true,
+    "build_context_core_callable": true,
+    "daily_block_callable": true,
+    "authority_block_callable": true,
+    "block_all_has_daily_block": true,
+    "block_all_has_authority_block": true,
+    "v213c_callable": true,
+    "v214_callable": true,
+    "v215_callable": true,
+    "v216_callable": true,
+    "all_has_v213c": true,
+    "all_has_v214": true,
+    "all_has_v215": true,
+    "all_has_v216": true,
+    "combined_contains_build_nameerror": false,
+    "combined_contains_force_failed": false,
+    "combined_contains_traceback": false
+  },
+  "safety": {
+    "live_system_changed": false,
+    "database_touched": false,
+    "nginx_or_backup_created": false,
+    "source_files_modified": true,
+    "new_files_created": false
+  },
+  "decision": [
+    "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS update yapan top-level Try blogu block_context.py modulune eklendi.",
+    "effective_menu.py tarafinda facade call birakildi.",
+    "Runtime import smoke build_menu_visibility_map NameError, force uygulanamadi ve Traceback mesaji olmadan gecti.",
+    "Bu uygulama canli sisteme veya veritabanina dokunmaz."
+  ],
+  "ok": true
+}

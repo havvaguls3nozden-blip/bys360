@@ -38,6 +38,33 @@ def apply_daily_weather_policy_block(globals_dict, *, logging):
         pass
 
 
+def apply_role_matrix_runtime_authority_keys_block(ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS):
+    """Apply role-matrix runtime authority key mutations."""
+    try:
+        ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update({
+            "ai_agent_panel",
+            "performance_president_approvals",
+            "performance_personnel_support_publish_approval",
+            "performance_process_tracking",
+            "performance_process_reports",
+            "performance_interim_notes",
+            "performance_development_guidance",
+            "performance_meeting_p3_reminders",
+            "performance_archive",
+            "performance_kpi_dashboard",
+            "performance_kpi_management",
+            "performance_competency_library",
+            "performance_self_assessment",
+            "performance_kpi_analysis",
+            "performance_team_compare",
+            "performance_feedback_meetings",
+            "team_performance_comparison_history",
+        })
+    except Exception:
+        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:822)")
+
+
 __all__ = [
     "apply_daily_weather_policy_block",
+    "apply_role_matrix_runtime_authority_keys_block",
 ]

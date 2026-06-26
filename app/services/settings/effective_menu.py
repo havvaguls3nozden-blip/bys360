@@ -386,28 +386,11 @@ for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MEN
 # BYS360_SETTINGS_MODULE_ROLE_MATRIX_V12_EFFECTIVE_MENU_END
 # BYS360_AY1_AI_PERFORMANCE_SETTINGS_INTEGRATION_V1_BEGIN
 # Rol Matrisi kapattığında BYS360 Asistanı ve yeni performans sekmeleri runtime'da kapalı kalır.
-try:
-    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.update({
-        "ai_agent_panel",
-        "performance_president_approvals",
-        "performance_personnel_support_publish_approval",
-        "performance_process_tracking",
-        "performance_process_reports",
-        "performance_interim_notes",
-        "performance_development_guidance",
-        "performance_meeting_p3_reminders",
-        "performance_archive",
-        "performance_kpi_dashboard",
-        "performance_kpi_management",
-        "performance_competency_library",
-        "performance_self_assessment",
-        "performance_kpi_analysis",
-        "performance_team_compare",
-        "performance_feedback_meetings",
-        "team_performance_comparison_history",
-    })
-except Exception:
-    __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/settings/effective_menu.py:822)")
+# Phase4J V46C effective_menu role matrix authority keys block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_role_matrix_runtime_authority_keys_block,
+)
+apply_role_matrix_runtime_authority_keys_block(ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS)
 
 try:
     CORE_MENU_VISIBILITY_POLICY.setdefault("ai_agent_panel", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"})
