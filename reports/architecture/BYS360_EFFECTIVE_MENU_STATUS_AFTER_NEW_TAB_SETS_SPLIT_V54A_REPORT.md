@@ -1,0 +1,59 @@
+# BYS360 Effective Menu Status After New Tab Sets Split V54A
+- Generated at: 2026-06-26T16:08:47
+- Status: READY_FOR_FUNCTION_OR_BLOCK_REVIEW
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD: 067ce74
+- Target: app/services/settings/effective_menu.py
+- Lines: 820
+- Lines to go under 800: 21
+- Top-level functions: 3
+- All functions: 3
+- Top-level assignments: 11
+- Top-level blocks: 89
+- Large top-level blocks >=6: 37
+- Safe block candidates: 34
+- Duplicate function names: []
+- Runtime returncode: 0
+- Runtime import OK: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+
+## Best Next Safe Block Target
+- kind: For
+- line: 403
+- length: 11
+- nested functions: []
+- preview: for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+
+## Safe Block Candidates Top 30
+- kind=For | line=403 | length=11 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=550 | length=11 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=281 | length=10 | nested_funcs=0 | preview=for _set_name in [
+- kind=For | line=305 | length=10 | nested_funcs=0 | preview=for _set_name in [
+- kind=Assign | line=671 | length=10 | nested_funcs=0 | preview=PORTAL_ROLE_MATRIX_V2_12_DEFAULTS = {
+- kind=For | line=251 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY"]:
+- kind=For | line=346 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY"]:
+- kind=For | line=449 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=480 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=499 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=585 | length=9 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=Try | line=364 | length=8 | nested_funcs=0 | preview=try:
+- kind=For | line=383 | length=8 | nested_funcs=0 | preview=for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
+- kind=For | line=414 | length=8 | nested_funcs=0 | preview=for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
+- kind=Try | line=536 | length=7 | nested_funcs=0 | preview=try:
+- kind=Try | line=543 | length=7 | nested_funcs=0 | preview=try:
+- kind=For | line=261 | length=6 | nested_funcs=0 | preview=for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"]:
+- kind=For | line=391 | length=6 | nested_funcs=0 | preview=for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
+- kind=Try | line=426 | length=6 | nested_funcs=0 | preview=try:
+- kind=Try | line=442 | length=6 | nested_funcs=0 | preview=try:
+- kind=For | line=459 | length=6 | nested_funcs=0 | preview=for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
+- kind=Try | line=469 | length=6 | nested_funcs=0 | preview=try:
+- kind=Try | line=493 | length=6 | nested_funcs=0 | preview=try:
+- kind=For | line=508 | length=6 | nested_funcs=0 | preview=for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
+- kind=Try | line=522 | length=6 | nested_funcs=0 | preview=try:
+- kind=Try | line=574 | length=6 | nested_funcs=0 | preview=try:
+- kind=For | line=594 | length=6 | nested_funcs=0 | preview=for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
+- kind=Assign | line=647 | length=6 | nested_funcs=0 | preview=PORTAL_MENU_VISIBILITY_POLICY = {
+- kind=Try | line=654 | length=6 | nested_funcs=0 | preview=try:
+- kind=Try | line=681 | length=6 | nested_funcs=0 | preview=try:
