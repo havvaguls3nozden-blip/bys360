@@ -400,17 +400,15 @@ for _set_name in ["PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEY
 # BYS360_PERSONEL_LIVE_SCOPE_NARROW_V1_EFFECTIVE_MENU_BEGIN
 # Personel Yönetimi rol matrisi canlı kapsamı daraltıldı.
 # Rol matrisinde canlı tutulacak tek personel alt operasyon anahtarı: hr_leave_tracking.
-for _policy_name in ["PHASE3_PERFORMANCE_MENU_POLICY", "PHASE3_2_PERFORMANCE_MENU_POLICY", "PERFORMANCE_MENU_POLICY", "ROLE_MENU_POLICY", "ROLE_MATRIX_POLICY"]:
-    _policy = globals().get(_policy_name)
-    if isinstance(_policy, dict):
-        for _key in _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS:
-            _policy.pop(_key, None)
-        for _key, _roles in _BYS360_PERSONEL_ALLOWED_POLICY.items():
-            _current = _policy.setdefault(_key, set())
-            if isinstance(_current, set):
-                _current.update(_roles)
-            elif isinstance(_current, list):
-                _current.extend([_role for _role in _roles if _role not in _current])
+# Phase4J V54C effective_menu personel policy block facade call
+from app.services.settings.effective_menu_parts.block_context import (
+    apply_personel_allowed_policy_block,
+)
+apply_personel_allowed_policy_block(
+    globals(),
+    _BYS360_PERSONEL_ALLOWED_POLICY,
+    _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS,
+)
 for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBLE_KEYS", "PHASE3_2_GENERAL_VISIBLE_KEYS", "PERFORMANCE_ROLE_MATRIX_KEYS"]:
     _target = globals().get(_set_name)
     if isinstance(_target, set):

@@ -1,0 +1,26 @@
+# BYS360 Effective Menu Personel Policy Block Split V54C
+- Generated at: 2026-06-26T16:13:08
+- Branch: phase4j-script-reduction-godobject-v1
+- HEAD before: 2f135ef
+- Target: app/services/settings/effective_menu.py
+- Block module: app/services/settings/effective_menu_parts/block_context.py
+- Moved block line: 403
+- Moved block length: 11
+- Before target lines: 820
+- After target lines: 818
+- Before block lines: 161
+- After block lines: 177
+- Removed line estimate: 2
+- Runtime returncode: 0
+- Runtime import OK: True
+- Personel policy block callable: True
+- Block __all__ has personel policy block: True
+- Build NameError seen: False
+- Force failed message seen: False
+- Traceback seen: False
+## Safety
+- live_system_changed: False
+- database_touched: False
+- nginx_or_backup_created: False
+- source_files_modified: True
+- new_files_created: False
