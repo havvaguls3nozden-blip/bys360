@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Güvenlik ve Karantina | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}
+ .fc-hero{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:28px;color:#fff}
+ .fc-nav a{text-decoration:none}.fc-stat{background:#fff;border:1px solid rgba(139,0,0,.12);border-radius:22px;padding:1.15rem;min-height:112px}.fc-stat strong{font-size:1.7rem;color:#8B0000}
+ .fc-soft{background:#f8f9fa;border:1px solid #eee;border-radius:18px}.fc-action{background:#8B0000;border-color:#8B0000}.fc-action:hover{background:#6f0000;border-color:#6f0000}
+ .fc-table td{vertical-align:middle}.fc-badge{border-radius:999px;padding:.42rem .68rem;font-weight:700}.fc-danger-soft{background:#fff4f4;border:1px solid rgba(139,0,0,.14);border-radius:18px}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+   <div>
+    <h1 class="h3 fw-bold mb-2">Dosya Merkezi Güvenlik ve Karantina</h1>
+    <p class="mb-0 opacity-75">Dosya türü denetimi, güvenlik tarama kuyruğu, karantina ve manuel inceleme işlemlerini yönetin.</p>
+   </div>
+   <div class="text-end"><div class="small opacity-75">Kurumsal güvenlik</div><div class="fw-bold">Tarama · Karantina · Denetim</div></div>
+  </div>
+ </div>
+
+ {% if not clamav_enabled() %}
+ <div class="alert alert-warning border-0 shadow-sm mb-4" style="border-radius:18px;">
+  <div class="fw-bold mb-1">Gerçek antivirüs taraması etkin değil</div>
+  <div class="small">Bu ekrandaki mevcut kontrol; uzantı, MIME ipucu, çift uzantı ve temel dosya güvenliği ön taramasıdır. Üretim ortamında <code>FILE_CENTER_CLAMAV_ENABLED=true</code> ve ClamAV/EDR entegrasyonu önerilir.</div>
+ </div>
+ {% else %}
+ <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius:18px;">
+  <div class="fw-bold mb-1">ClamAV taraması etkin</div>
+  <div class="small">Dosyalar temel ön kontrolden sonra yapılandırılmış antivirüs komutu ile taranır.</div>
+ </div>
+ {% endif %}
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>
+  <a class="btn btn-danger" href="{{ url_for('main.file_center_security') }}">Güvenlik Taraması</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_maintenance') }}">Bakım İşleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+ </div>
+
+ <div class="row g-3 mb-4">
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Toplam dosya</span><strong class="d-block">{{ summary.total }}</strong><div class="small text-muted">Aktif kayıt</div></div></div>
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Bekleyen</span><strong class="d-block">{{ summary.pending }}</strong><div class="small text-muted">Tarama kuyruğu</div></div></div>
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Güvenli</span><strong class="d-block">{{ summary.clean }}</strong><div class="small text-muted">İndirilebilir</div></div></div>
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Karantina</span><strong class="d-block">{{ summary.quarantined }}</strong><div class="small text-muted">İnceleme gerekli</div></div></div>
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Engelli</span><strong class="d-block">{{ summary.blocked }}</strong><div class="small text-muted">Paylaşım kapalı</div></div></div>
+  <div class="col-md-2"><div class="fc-stat"><span class="text-muted small">Başarısız</span><strong class="d-block">{{ summary.failed }}</strong><div class="small text-muted">Tekrar kontrol</div></div></div>
+ </div>
+
+ <div class="row g-4">
+  <div class="col-xl-5">
+   <div class="card fc-card"><div class="card-body p-4">
+    <div class="d-flex justify-content-between gap-3 align-items-center mb-3 flex-wrap">
+     <div><h2 class="h5 fw-bold mb-1">Güvenlik Tarama Kuyruğu</h2><div class="small text-muted">Bekleyen dosyaları toplu veya tek tek tarayın.</div></div>
+     <form method="post" action="{{ url_for('main.file_center_security_scan_pending') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn fc-action text-white">Bekleyenleri Tara</button>
+     </form>
+    </div>
+    {% if pending_files %}
+    <div class="vstack gap-2">
+     {% for item in pending_files %}
+     <div class="fc-soft p-3">
+      <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+       <div>
+        <div class="fw-bold">{{ item.original_filename }}</div>
+        <div class="small text-muted">#{{ item.id }} · {{ item.extension or 'uzantısız' }} · {{ format_bytes(item.size_bytes) }}</div>
+       </div>
+       <form method="post" action="{{ url_for('main.file_center_security_scan_file', file_id=item.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-sm btn-outline-danger">Tara</button>
+       </form>
+      </div>
+     </div>
+     {% endfor %}
+    </div>
+    {% else %}<div class="fc-soft p-4 text-center text-muted">Bekleyen dosya yok.</div>{% endif %}
+   </div></div>
+  </div>
+
+  <div class="col-xl-7">
+   <div class="card fc-card"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Karantina ve Manuel İnceleme</h2>
+    {% if quarantine_files %}
+    <div class="table-responsive"><table class="table fc-table align-middle"><thead><tr><th>Dosya</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>
+     {% for item in quarantine_files %}
+     <tr>
+      <td><div class="fw-semibold">{{ item.original_filename }}</div><div class="small text-muted">#{{ item.id }} · {{ item.extension or 'uzantısız' }} · {{ format_bytes(item.size_bytes) }}</div></td>
+      <td><span class="badge text-bg-light border fc-badge">{{ file_security_status_label(item.scan_status) }}</span></td>
+      <td>
+       <div class="d-flex gap-2 flex-wrap">
+        <form method="post" action="{{ url_for('main.file_center_security_scan_file', file_id=item.id) }}">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+         <button class="btn btn-sm btn-outline-secondary">Tekrar Tara</button>
+        </form>
+        <form method="post" action="{{ url_for('main.file_center_security_release_file', file_id=item.id) }}">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+         <button class="btn btn-sm btn-outline-success">Güvenli Kabul Et</button>
+        </form>
+        <form method="post" action="{{ url_for('main.file_center_security_block_file', file_id=item.id) }}">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+         <button class="btn btn-sm btn-outline-danger">Engelle</button>
+        </form>
+       </div>
+      </td>
+     </tr>
+     {% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="fc-soft p-4 text-center text-muted">Karantinada veya engelli dosya yok.</div>{% endif %}
+   </div></div>
+  </div>
+ </div>
+
+ <div class="card fc-card mt-4"><div class="card-body p-4">
+  <h2 class="h5 fw-bold mb-3">Son Tarama Kayıtları</h2>
+  {% if recent_scans %}
+  <div class="table-responsive"><table class="table fc-table align-middle"><thead><tr><th>Dosya</th><th>Durum</th><th>Tarayıcı</th><th>Açıklama</th><th>Tarih</th></tr></thead><tbody>
+   {% for scan in recent_scans %}
+   <tr>
+    <td>{{ scan.file.original_filename if scan.file else '-' }}</td>
+    <td><span class="badge text-bg-light border fc-badge">{{ file_security_status_label(scan.status) }}</span></td>
+    <td>{{ scan.scanner or '-' }}</td>
+    <td class="small text-muted">{{ scan.result_message or '-' }}</td>
+    <td class="small text-muted">{{ scan.created_at.strftime('%d.%m.%Y %H:%M') if scan.created_at else '-' }}</td>
+   </tr>
+   {% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="fc-soft p-4 text-center text-muted">Henüz tarama kaydı yok.</div>{% endif %}
+ </div></div>
+
+ <div class="fc-danger-soft p-3 mt-4 small text-muted">
+  Karantinaya alınan veya engellenen dosyalar indirilemez ve aktif misafir bağlantıları kapatılır. Canlıya geçişte bu ön tarama gerçek antivirüs/EDR entegrasyonu ile genişletilebilir.
+ </div>
+</div>
+{% endblock %}

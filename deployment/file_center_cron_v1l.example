@@ -1,0 +1,8 @@
+# BYS360 Dosya Merkezi canlı bakım cron örneği
+# Linux sunucuda proje yolu ve sanal ortam yolunu kendi ortama göre uyarlayın.
+# Öneri: 15 dakikada bir süresi dolan link/istek kapatma + kota + bekleyen tarama + disk alarm kontrolü.
+
+*/15 * * * * cd /opt/bys360/project && /opt/bys360/project/.venv/bin/python scripts/local/file_center_ops_tick_v1l.py >> /var/log/bys360/file_center_ops_tick.log 2>&1
+
+# Günlük secret hygiene kontrolü: .env/backups sızıntısı release öncesi yakalansın.
+15 2 * * * cd /opt/bys360/project && /opt/bys360/project/.venv/bin/python scripts/local/audit_file_center_secret_hygiene_v1l.py >> /var/log/bys360/file_center_secret_hygiene.log 2>&1

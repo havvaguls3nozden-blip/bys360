@@ -155,6 +155,12 @@ def _register_no_store_auth_html(app: Flask) -> None:
         return response
 
 
+def _register_api_rate_limit(app: Flask) -> None:
+    from app.security.api_rate_limit import init_api_rate_limit
+
+    init_api_rate_limit(app)
+
+
 def _register_mobile_api(app: Flask) -> None:
     from app.api.mobile import register_mobile_api_real_v1
 
@@ -243,6 +249,7 @@ def create_app() -> Flask:
     _run_optional_startup(app, "PWA/iOS no-store auth HTML headers", lambda: _register_no_store_auth_html(app))
     _run_optional_startup(app, "Mobile real API routes", lambda: _register_mobile_api(app))
     _run_optional_startup(app, "iOS PWA V2 routes", lambda: _register_pwa_routes(app))
+    _run_optional_startup(app, "API and File Center rate limit", lambda: _register_api_rate_limit(app))
 
     # BYS360_APP_INIT_HARD_REPAIR_V2_15_5: removed broken executive_summary_bp direct blueprint registration
     _run_optional_startup(app, "Executive Summary routes", lambda: _register_executive_summary_module(app))
