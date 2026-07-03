@@ -418,6 +418,16 @@ html, body { min-height: 100% !important; }
 {% set assistant_teaching_visible = menu_map.get('ai_agent_teaching_center', False) %}
 {% set show_assistant_section = current_user.is_authenticated and (assistant_panel_visible or assistant_knowledge_visible or assistant_teaching_visible) %}
 {% set show_user_section = menu_map.get('account', True) or show_notifications_shortcut or menu_map.get('settings', False) or menu_map.get('db_check', False) or menu_map.get('logout', True) %}
+{# BYS360_FILE_CENTER_SIDEBAR_V1N_VARS_BEGIN #}
+{% set file_center_role_fallback = current_user.is_authenticated and role_name in ['admin','administrator','super_admin','system_admin','sistem_yoneticisi','baskan','baskan_yardimcisi','grup_baskani','mali_musavir','koordinator','birim_sorumlusu','yonetici','manager','performans_yetkilisi','personel'] %}
+{% set file_center_visible = menu_map.get('file_center', menu_map.get('file_center_home', file_center_role_fallback)) or file_center_role_fallback or current_path.startswith('/file-center') or current_ep.startswith('main.file_center_') %}
+{% set file_center_admin_visible = menu_map.get('file_center_admin', can_top) or can_top %}
+{% set file_center_security_visible = menu_map.get('file_center_security', file_center_admin_visible) or file_center_admin_visible %}
+{% set file_center_maintenance_visible = menu_map.get('file_center_maintenance', file_center_admin_visible) or file_center_admin_visible %}
+{% set file_center_quota_visible = menu_map.get('file_center_quota', file_center_admin_visible) or file_center_admin_visible %}
+{% set file_center_settings_visible = menu_map.get('file_center_settings', file_center_admin_visible) or file_center_admin_visible %}
+{% set show_file_center_section = current_user.is_authenticated and (file_center_visible or file_center_admin_visible or current_path.startswith('/file-center') or current_ep.startswith('main.file_center_')) %}
+{# BYS360_FILE_CENTER_SIDEBAR_V1N_VARS_END #}
 {# BYS360_CORPORATE_PORTAL_MENU_V1_2_VARS_BEGIN #}
 {# V3B8C: Portal görünürlüğü, menü registry/DB izin satırı geçici eksilse bile yetkili kullanıcıda kaybolmasın. #}
 {% set portal_role_fallback = current_user.is_authenticated and role_name in ['admin','super_admin','system_admin','sistem_yoneticisi','baskan','baskan_yardimcisi','grup_baskani','mali_musavir','koordinator','birim_sorumlusu','personel','yonetici','manager','performans_yetkilisi'] %}
@@ -430,7 +440,7 @@ html, body { min-height: 100% !important; }
 {% set portal_moderation_visible = menu_map.get('portal_moderation', can_top) or can_top %}
 {% set show_portal_section = current_user.is_authenticated and (portal_feed_visible or portal_people_visible or portal_profiles_visible or portal_groups_visible or portal_press_news_visible or portal_moderation_visible or current_path.startswith('/portal') or current_ep.startswith('main.portal_')) %}
 {# BYS360_CORPORATE_PORTAL_MENU_V1_2_VARS_END #}
-{% set show_menu_section = show_genel_section or show_ik_section or show_perf_section or show_comms_section or show_portal_section or show_ai_section or show_assistant_section %}
+{% set show_menu_section = show_genel_section or show_ik_section or show_perf_section or show_comms_section or show_file_center_section or show_portal_section or show_ai_section or show_assistant_section %}
 
 {% set is_tasks_active = current_ep in ['main.performance_tasks','main.performance_evaluate','main.performance_v2_phase3_dashboard','main.performance_v2_phase3_board','main.performance_v2_phase3_assignment','main.performance_v2_phase4_dashboard','main.performance_v2_phase4_board','main.performance_v2_phase4_assignment','main.performance_v2_phase8_dashboard','main.performance_v2_phase8_assignment'] or current_ep.startswith('main.performance_task') or current_ep.startswith('main.performance_assignment') or current_path.startswith('/performance/tasks') or current_path.startswith('/performance/assignments') or current_path.startswith('/performance/evaluate') or current_path.startswith('/performance/v2/faz') or current_path.startswith('/performans/v2/faz') %}
 {% set is_scorecard_active = current_ep in ['main.performance_scorecard','main.performance_v2_phase5_scorecard','main.performance_v2_phase5_dashboard'] or current_ep.startswith('main.performance_scorecard_') or current_ep.startswith('main.scorecard_') or current_path.startswith('/performance/scorecard') or current_path.startswith('/performance/v2/faz5') or current_path.startswith('/performans/v2/faz5') or current_path.startswith('/scorecard') or current_path.startswith('/performance/report-card') %}
@@ -440,6 +450,7 @@ html, body { min-height: 100% !important; }
 {% set is_ik_open = current_ep in ['main.admin_users','main.admin_user_create','main.admin_user_edit','main.personnel_list','main.personnel_add','main.personnel_edit','main.hr_management','main.hr_leave_management','main.hr_attendance_management','main.hr_self_service','main.hr_reports','main.hr_career_planning','main.hr_reward_discipline'] or current_path.startswith('/admin/users') or current_path.startswith('/personnel') or is_org_units_active or current_path.startswith('/hr-management') %}
 {% set is_perf_open = current_ep.startswith('main.performance_criteria') or current_ep.startswith('main.performance_period') or current_ep.startswith('main.performance_task_management') or current_ep.startswith('main.performance_hierarchy') or current_ep.startswith('main.performance_v2_phase5') or current_ep.startswith('main.performance_feedback') or current_ep.startswith('main.feedback_') or is_publish_active or current_path.startswith('/performance/hierarchy') or current_path.startswith('/performance/task-management') or current_path.startswith('/performance/feedback') or current_path.startswith('/performans/gorusme') or current_path.startswith('/performance/process') or current_path.startswith('/performance/president-approvals') or current_path.startswith('/performance/meeting-development') or current_path.startswith('/performans/toplanti') or current_path.startswith('/performans/stratejik') %}
 {% set is_comms_open = current_ep.startswith('main.messages_') or current_ep.startswith('main.survey_') or current_ep == 'main.surveys_list' or current_ep.startswith('main.announcements_') or current_ep == 'main.announcements_list' or current_path.startswith('/announcements') or current_path.startswith('/messages') or current_path.startswith('/survey') or current_path.startswith('/feedback') %}
+{% set is_file_center_open = current_ep.startswith('main.file_center_') or current_path.startswith('/file-center') or current_path.startswith('/guest/files') or current_path.startswith('/guest/upload') %}
 {% set is_portal_open = current_ep.startswith('main.portal_') or current_path.startswith('/portal') %}
 {% set is_ai_open = current_path.startswith('/admin/ai') or current_path.startswith('/ai/decision-support') or current_ep.startswith('admin_ai.') or current_ep in ['main.admin_ai_center','main.admin_ai_module_health','main.admin_ai_operations_report','main.admin_ai_preflight','main.admin_ai_smoke','main.admin_ai_feedback'] %}
 {% set is_assistant_open = current_path.startswith('/ai-agent') or current_ep in ['ai_agent.ai_agent_panel','ai_agent.ag5_knowledge_center','ai_agent.assistant_teaching_center'] %}
@@ -591,6 +602,38 @@ html, body { min-height: 100% !important; }
                     </details>
                 </div>
                 {% endif %}
+
+{# BYS360_FILE_CENTER_SIDEBAR_V1N_BEGIN #}
+                {% if show_file_center_section %}
+                <div class="accordion-nav bys360-file-center-nav" data-module-section="file-center">
+                    <details class="bys-accordion {% if is_file_center_open %}has-active{% endif %}" data-accordion-key="dosya-merkezi" data-has-active="{{ 'true' if is_file_center_open else 'false' }}" {% if is_file_center_open %}open{% endif %}>
+                        <summary>
+                            <div class="accordion-left">
+                                <i class="fa-solid fa-folder-tree"></i>
+                                <span>Dosya Merkezi</span>
+                            </div>
+                            <div class="accordion-right">
+                                <span class="accordion-current-pill" data-accordion-current hidden></span>
+                                <i class="fa-solid fa-chevron-down accordion-chevron"></i>
+                            </div>
+                        </summary>
+                        <div class="accordion-panel">
+                            {% if file_center_visible %}{{ nav_item(safe_url_for('main.file_center_home', fallback='/file-center'), 'fa-folder-open', 'Dosyalarım', current_ep == 'main.file_center_home' or current_path == '/file-center', none, 'data-nav-key="file_center_home" data-menu-key="file_center"') }}{% endif %}
+                            {% if file_center_visible %}{{ nav_item(safe_url_for('main.file_center_transfers', fallback='/file-center/transfers'), 'fa-share-nodes', 'Transfer Paketleri', current_ep.startswith('main.file_center_transfer') or current_path.startswith('/file-center/transfers'), none, 'data-nav-key="file_center_transfers" data-menu-key="file_center_transfers"') }}{% endif %}
+                            {% if file_center_visible %}{{ nav_item(safe_url_for('main.file_center_requests', fallback='/file-center/requests'), 'fa-file-circle-plus', 'Dosya Talepleri', current_ep.startswith('main.file_center_request') or current_path.startswith('/file-center/requests'), none, 'data-nav-key="file_center_requests" data-menu-key="file_center_requests"') }}{% endif %}
+                            {% if file_center_visible %}{{ nav_item(safe_url_for('main.file_center_chunk_upload', fallback='/file-center/chunk-upload'), 'fa-cloud-arrow-up', 'Büyük Dosya Yükleme', current_ep.startswith('main.file_center_chunk_upload') or current_path.startswith('/file-center/chunk-upload'), none, 'data-nav-key="file_center_chunk_upload" data-menu-key="file_center_chunk_upload"') }}{% endif %}
+                            {% if file_center_admin_visible %}{{ nav_item(safe_url_for('main.file_center_admin_dashboard', fallback='/file-center/admin'), 'fa-gauge-high', 'Dosya Merkezi Yönetimi', current_ep == 'main.file_center_admin_dashboard' or current_path.startswith('/file-center/admin'), none, 'data-nav-key="file_center_admin" data-menu-key="file_center_admin"') }}{% endif %}
+                            {% if file_center_security_visible %}{{ nav_item(safe_url_for('main.file_center_security', fallback='/file-center/security'), 'fa-shield-halved', 'Güvenlik Taraması', current_ep.startswith('main.file_center_security') or current_path.startswith('/file-center/security'), none, 'data-nav-key="file_center_security" data-menu-key="file_center_security"') }}{% endif %}
+                            {% if file_center_quota_visible %}{{ nav_item(safe_url_for('main.file_center_quota', fallback='/file-center/quota'), 'fa-chart-pie', 'Kota Yönetimi', current_ep.startswith('main.file_center_quota') or current_path.startswith('/file-center/quota'), none, 'data-nav-key="file_center_quota" data-menu-key="file_center_quota"') }}{% endif %}
+                            {% if file_center_maintenance_visible %}{{ nav_item(safe_url_for('main.file_center_maintenance', fallback='/file-center/maintenance'), 'fa-screwdriver-wrench', 'Bakım Merkezi', current_ep.startswith('main.file_center_maintenance') or current_path.startswith('/file-center/maintenance'), none, 'data-nav-key="file_center_maintenance" data-menu-key="file_center_maintenance"') }}{% endif %}
+                            {% if file_center_settings_visible %}{{ nav_item(safe_url_for('main.file_center_settings', fallback='/file-center/settings'), 'fa-sliders', 'Dosya Merkezi Ayarları', current_ep in ['main.file_center_settings','main.file_center_settings_save','main.file_center_settings_defaults'] or current_path == '/file-center/settings', none, 'data-nav-key="file_center_settings" data-menu-key="file_center_settings"') }}{% endif %}
+                            {% if file_center_settings_visible %}{{ nav_item(safe_url_for('main.file_center_role_matrix', fallback='/file-center/settings/roles'), 'fa-user-shield', 'Rol Matrisi', current_ep.startswith('main.file_center_role_matrix') or current_path.startswith('/file-center/settings/roles'), none, 'data-nav-key="file_center_role_matrix" data-menu-key="file_center_role_matrix"') }}{% endif %}
+                        </div>
+                    </details>
+                </div>
+                {% endif %}
+{# BYS360_FILE_CENTER_SIDEBAR_V1N_END #}
+
 {# BYS360_CORPORATE_PORTAL_MENU_V1_2_BEGIN #}
                 {% if show_portal_section %}
                 <div class="accordion-nav bys360-corporate-portal-nav bys360-corporate-portal-nav-v3b8c" data-module-section="corporate-portal">
