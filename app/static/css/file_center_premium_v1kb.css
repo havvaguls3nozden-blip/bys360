@@ -1,0 +1,284 @@
+/* BYS360 Dosya Merkezi - Premium Kurumsal Görünüm V1K-B */
+:root{
+  --fc-primary:#8B0000;
+  --fc-primary-dark:#560000;
+  --fc-primary-soft:#fff3f3;
+  --fc-ink:#151821;
+  --fc-muted:#64748b;
+  --fc-line:rgba(139,0,0,.13);
+  --fc-shadow:0 18px 55px rgba(15,23,42,.10);
+  --fc-shadow-strong:0 28px 78px rgba(80,0,0,.20);
+  --fc-radius:26px;
+}
+
+/* Dosya Merkezi sayfalarında genel zemin */
+body:has(.fc-hero),
+body:has(.fc-hero-mini),
+body:has(.fc-settings-shell),
+body:has(.fc-premium-guest){
+  background:
+    radial-gradient(circle at 12% 6%, rgba(139,0,0,.08), transparent 30%),
+    linear-gradient(180deg,#fbfbfd 0%,#f4f6fa 100%) !important;
+}
+
+/* Sol şerit / BYS360 menü düzeltmeleri */
+.bys360-file-center-nav .accordion-left span,
+.bys360-file-center-nav .nav-label,
+.bys360-file-center-nav a,
+.bys360-file-center-nav summary{
+  letter-spacing:0 !important;
+  text-rendering:geometricPrecision;
+}
+.bys360-file-center-nav details,
+.bys360-file-center-nav .bys-accordion{
+  border-radius:18px !important;
+}
+.bys360-file-center-nav summary{
+  background:linear-gradient(135deg,rgba(139,0,0,.10),rgba(139,0,0,.03)) !important;
+  border:1px solid rgba(139,0,0,.13) !important;
+}
+.bys360-file-center-nav .has-active summary{
+  background:linear-gradient(135deg,var(--fc-primary),#a5141f) !important;
+  color:#fff !important;
+  box-shadow:0 16px 32px rgba(139,0,0,.20);
+}
+.bys360-file-center-nav .accordion-panel a,
+.bys360-file-center-nav .nav-item{
+  border-radius:14px !important;
+}
+
+/* Ortak kart, hero ve navigation */
+.fc-hero,
+.fc-hero-mini{
+  border-radius:32px !important;
+  background:
+    radial-gradient(circle at 86% 18%,rgba(255,255,255,.20),transparent 22%),
+    linear-gradient(135deg,#7b0000 0%,#a60f1b 48%,#2b0708 100%) !important;
+  box-shadow:var(--fc-shadow-strong) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  position:relative;
+  overflow:hidden;
+}
+.fc-hero:before,
+.fc-hero-mini:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,rgba(255,255,255,.13),transparent 38%,rgba(255,255,255,.05));
+  pointer-events:none;
+}
+.fc-hero > *,
+.fc-hero-mini > *{position:relative;z-index:1;}
+.fc-hero h1,
+.fc-hero-mini h1,
+.fc-settings-shell .fc-hero h1{
+  letter-spacing:-.03em !important;
+  line-height:1.08 !important;
+}
+.fc-hero p,
+.fc-hero-mini p,
+.fc-settings-shell .fc-hero p{
+  color:rgba(255,255,255,.90) !important;
+}
+.fc-pill,
+.fc-hero .eyebrow,
+.fc-hero-mini .eyebrow{
+  border-radius:999px !important;
+  background:rgba(255,255,255,.14) !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  padding:.48rem .82rem !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  width:max-content !important;
+}
+.fc-card,
+.fc-stat,
+.fc-linkbox,
+.fc-empty,
+.fc-soft,
+.fc-upload-card,
+.fc-file-choice,
+.fc-settings-shell .fc-card{
+  border:1px solid rgba(15,23,42,.07) !important;
+  border-radius:var(--fc-radius) !important;
+  box-shadow:var(--fc-shadow) !important;
+  background:rgba(255,255,255,.94) !important;
+  backdrop-filter:blur(12px);
+}
+.fc-card .card-body{
+  border-radius:inherit;
+}
+.fc-card:hover,
+.fc-file-choice:hover,
+.fc-linkbox:hover{
+  transform:translateY(-1px);
+  box-shadow:0 24px 68px rgba(15,23,42,.13) !important;
+  transition:.18s ease;
+}
+.fc-stat strong{
+  color:var(--fc-primary) !important;
+  font-weight:900 !important;
+  letter-spacing:-.03em;
+}
+.fc-stat small,
+.fc-muted,
+.text-muted{
+  color:var(--fc-muted) !important;
+}
+.fc-action,
+.btn-danger,
+.fc-btn-primary{
+  background:linear-gradient(135deg,var(--fc-primary),#b51a26) !important;
+  border-color:transparent !important;
+  box-shadow:0 14px 30px rgba(139,0,0,.22) !important;
+  border-radius:15px !important;
+  font-weight:800 !important;
+}
+.fc-action:hover,
+.btn-danger:hover,
+.fc-btn-primary:hover{
+  filter:brightness(.94);
+  transform:translateY(-1px);
+}
+.btn-outline-danger,
+.fc-danger-outline,
+.fc-btn-secondary{
+  color:var(--fc-primary) !important;
+  border-color:rgba(139,0,0,.28) !important;
+  background:#fff !important;
+  border-radius:15px !important;
+  font-weight:800 !important;
+}
+.btn-outline-danger:hover,
+.fc-danger-outline:hover,
+.fc-btn-secondary:hover{
+  background:var(--fc-primary) !important;
+  color:#fff !important;
+}
+.fc-nav{
+  gap:.65rem !important;
+}
+.fc-nav .btn,
+.fc-nav a{
+  border-radius:999px !important;
+  background:rgba(255,255,255,.86) !important;
+  border:1px solid rgba(139,0,0,.14) !important;
+  color:#6f0000 !important;
+  font-weight:800 !important;
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+.fc-nav .btn:hover,
+.fc-nav a:hover{
+  background:var(--fc-primary) !important;
+  color:#fff !important;
+}
+.table.fc-table,
+.fc-table{
+  --bs-table-bg:transparent;
+}
+.fc-table thead th,
+.fc-table th{
+  font-size:.74rem !important;
+  text-transform:uppercase !important;
+  letter-spacing:.055em !important;
+  color:#7b8494 !important;
+  border-bottom:1px solid rgba(15,23,42,.09) !important;
+}
+.fc-table td{
+  border-color:rgba(15,23,42,.06) !important;
+}
+.fc-badge,
+.badge{
+  border-radius:999px !important;
+  font-weight:800 !important;
+}
+.fc-drop{
+  border:2px dashed rgba(139,0,0,.25) !important;
+  background:linear-gradient(180deg,#fff,#fff8f8) !important;
+  border-radius:24px !important;
+}
+.fc-file-icon{
+  background:linear-gradient(135deg,#fff2f2,#ffe5e5) !important;
+  color:var(--fc-primary) !important;
+  box-shadow:inset 0 0 0 1px rgba(139,0,0,.10);
+}
+.form-control,
+.form-select,
+.fc-input,
+.fc-textarea,
+.input{
+  border-radius:15px !important;
+  border-color:#d8dee9 !important;
+  box-shadow:none !important;
+}
+.form-control:focus,
+.form-select:focus,
+.fc-input:focus,
+.fc-textarea:focus,
+.input:focus{
+  border-color:rgba(139,0,0,.45) !important;
+  box-shadow:0 0 0 .22rem rgba(139,0,0,.10) !important;
+}
+.input-group .form-control{border-radius:15px 0 0 15px !important;}
+.input-group .btn{border-radius:0 15px 15px 0 !important;}
+.progress,
+.fc-progress{
+  border-radius:999px !important;
+  background:#eef1f6 !important;
+  overflow:hidden;
+}
+.progress-bar,
+.fc-progress div{
+  background:linear-gradient(90deg,var(--fc-primary),#d92f3a) !important;
+}
+
+/* Ayarlar ekranı */
+.fc-settings-shell{
+  max-width:1360px !important;
+  padding:28px 16px 56px !important;
+}
+.fc-settings-shell .fc-grid{
+  gap:22px !important;
+}
+.fc-settings-shell .fc-card-header{
+  background:linear-gradient(180deg,#fff,#fff7f7) !important;
+  border-bottom:1px solid rgba(139,0,0,.09) !important;
+}
+.fc-settings-shell .fc-card-header h2{
+  color:#6f0000 !important;
+}
+.fc-settings-shell .fc-field{
+  border-bottom:1px solid rgba(15,23,42,.065) !important;
+}
+.fc-settings-shell .fc-actions{
+  border-radius:24px !important;
+  box-shadow:0 18px 52px rgba(15,23,42,.12) !important;
+}
+
+/* Misafir sayfaları */
+.fc-premium-guest,
+body:has(.wrap .card .head){
+  background:
+    radial-gradient(circle at 18% 8%,rgba(139,0,0,.10),transparent 28%),
+    linear-gradient(180deg,#fbfbfd,#eef2f7) !important;
+}
+.wrap .card{
+  border:1px solid rgba(15,23,42,.07) !important;
+  border-radius:32px !important;
+  box-shadow:0 28px 78px rgba(15,23,42,.16) !important;
+}
+.wrap .head{
+  background:
+    radial-gradient(circle at 90% 10%,rgba(255,255,255,.18),transparent 20%),
+    linear-gradient(135deg,#7b0000,#a60f1b 48%,#2b0708) !important;
+}
+.wrap .btn{
+  background:linear-gradient(135deg,var(--fc-primary),#b51a26) !important;
+  border-radius:16px !important;
+}
+
+@media(max-width:900px){
+  .fc-hero,.fc-hero-mini{border-radius:24px !important;}
+  .fc-card,.fc-stat,.fc-linkbox,.fc-empty,.fc-soft{border-radius:20px !important;}
+  .fc-settings-shell .fc-grid{grid-template-columns:1fr !important;}
+}

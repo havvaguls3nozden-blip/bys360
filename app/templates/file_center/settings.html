@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Ayarları{% endblock %}
+{% block content %}
+<style>
+.fc-settings-shell{max-width:1280px;margin:0 auto;padding:22px 12px 44px;}
+.fc-hero{border-radius:28px;background:linear-gradient(135deg,#7b0000 0%,#9f111b 44%,#c81e2b 100%);color:#fff;padding:28px 30px;box-shadow:0 22px 60px rgba(80,0,0,.18);position:relative;overflow:hidden;}
+.fc-hero:after{content:"";position:absolute;right:-60px;top:-60px;width:230px;height:230px;border-radius:999px;background:rgba(255,255,255,.09);}
+.fc-hero .eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.86;margin-bottom:8px;}
+.fc-hero h1{font-size:30px;font-weight:900;margin:0 0 8px;}
+.fc-hero p{max-width:820px;margin:0;opacity:.92;line-height:1.65;}
+.fc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px;}
+.fc-card{background:rgba(255,255,255,.96);border:1px solid rgba(139,0,0,.12);border-radius:22px;box-shadow:0 16px 42px rgba(15,23,42,.08);overflow:hidden;}
+.fc-card-header{padding:18px 20px;border-bottom:1px solid rgba(139,0,0,.09);display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#fff,#fff8f8);}
+.fc-card-header h2{font-size:18px;margin:0;font-weight:900;color:#6f0000;}
+.fc-card-body{padding:18px 20px;}
+.fc-field{padding:14px 0;border-bottom:1px solid rgba(15,23,42,.07);}
+.fc-field:last-child{border-bottom:none;}
+.fc-label{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-weight:800;color:#1f2937;margin-bottom:6px;}
+.fc-desc{font-size:13px;color:#64748b;line-height:1.5;margin-bottom:9px;}
+.fc-input,.fc-textarea{width:100%;border:1px solid #d6dde8;border-radius:12px;padding:10px 12px;font-size:14px;background:#fff;}
+.fc-textarea{min-height:70px;resize:vertical;}
+.fc-switch{display:flex;align-items:center;gap:10px;}
+.fc-switch input{width:20px;height:20px;}
+.fc-actions{position:sticky;bottom:0;margin-top:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:1px solid rgba(139,0,0,.12);border-radius:20px;padding:14px;display:flex;gap:10px;justify-content:flex-end;box-shadow:0 18px 45px rgba(15,23,42,.10);}
+.fc-btn{border:0;border-radius:999px;padding:11px 18px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.fc-btn-primary{background:#8b0000;color:#fff;}
+.fc-btn-secondary{background:#fff;color:#8b0000;border:1px solid rgba(139,0,0,.24);}
+.fc-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.fc-nav a{border-radius:999px;padding:8px 12px;background:#fff;color:#8b0000;text-decoration:none;border:1px solid rgba(139,0,0,.18);font-weight:800;font-size:13px;}
+@media(max-width:900px){.fc-grid{grid-template-columns:1fr}.fc-hero{padding:24px 20px}.fc-actions{position:static;justify-content:stretch;flex-direction:column}.fc-btn{justify-content:center}}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="fc-settings-shell">
+ <section class="fc-hero">
+  <div class="eyebrow">BYS360 Sistem Ayarları</div>
+  <h1>Dosya Merkezi Ayarları</h1>
+  <p>Dosya Merkezi’nin modül durumu, dış paylaşım, güvenlik taraması, kota politikası, e-posta hatırlatma ve büyük dosya yükleme ayarları buradan yönetilir. Değişiklikler denetim kaydına düşer.</p>
+  <div class="fc-nav">
+   <a href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+   <a href="{{ url_for('main.file_center_requests') }}">Dosya İstekleri</a>
+   <a href="{{ url_for('main.file_center_quota') }}">Kota</a>
+   {% if menu.can_security %}<a href="{{ url_for('main.file_center_security') }}">Güvenlik</a>{% endif %}
+   {% if menu.can_admin %}<a href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>{% endif %}
+  </div>
+ <div class="fc-nav">{% if menu.can_role_matrix %}<a href="{{ url_for('main.file_center_role_matrix') }}">Rol Matrisi</a>{% endif %}</div>
+</section>
+
+ <form method="post" action="{{ url_for('main.file_center_settings_save') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="fc-grid">
+   {% for group, rows in grouped.items() %}
+   <section class="fc-card">
+    <div class="fc-card-header"><h2>{{ group }}</h2><span class="badge bg-light text-dark">{{ rows|length }} ayar</span></div>
+    <div class="fc-card-body">
+     {% for row in rows %}
+     <div class="fc-field">
+      <div class="fc-label"><span>{{ row.label }}</span><small class="text-muted">{{ row.key }}</small></div>
+      {% if row.description %}<div class="fc-desc">{{ row.description }}</div>{% endif %}
+      {% if row.value_type == 'bool' %}
+       <label class="fc-switch">
+        <input type="checkbox" name="{{ row.key }}" {% if row.value in ['true','1','yes','on','evet','açık','acik'] %}checked{% endif %}>
+        <span>{{ setting_to_display_value(row) }}</span>
+       </label>
+      {% elif row.value_type in ['int','float'] %}
+       <input class="fc-input" type="number" step="{% if row.value_type == 'float' %}0.1{% else %}1{% endif %}" name="{{ row.key }}" value="{{ row.value or '' }}">
+      {% else %}
+       {% if (row.value or '')|length > 80 or 'extensions' in row.key %}
+        <textarea class="fc-textarea" name="{{ row.key }}">{{ row.value or '' }}</textarea>
+       {% else %}
+        <input class="fc-input" type="text" name="{{ row.key }}" value="{{ row.value or '' }}">
+       {% endif %}
+      {% endif %}
+     </div>
+     {% endfor %}
+    </div>
+   </section>
+   {% endfor %}
+  </div>
+  <div class="fc-actions">
+   <button class="fc-btn fc-btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Ayarları Kaydet</button>
+   <a class="fc-btn fc-btn-secondary" href="{{ url_for('main.file_center_admin_dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Yönetici Paneli</a>
+  </div>
+ </form>
+ <form method="post" action="{{ url_for('main.file_center_settings_defaults') }}" class="mt-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="fc-btn fc-btn-secondary" type="submit"><i class="fa-solid fa-rotate"></i> Varsayılan Ayarları Kontrol Et</button>
+ </form>
+</div>
+{% endblock %}

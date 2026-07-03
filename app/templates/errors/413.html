@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dosya Boyutu Sınırı Aşıldı | BYS360</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #f7f1f1 0%, #ffffff 45%, #f4e7e7 100%);
+            color: #2b2b2b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
+        }
+        .card {
+            width: min(760px, 100%);
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid rgba(139, 0, 0, .16);
+            border-radius: 24px;
+            box-shadow: 0 24px 70px rgba(80, 0, 0, .14);
+            overflow: hidden;
+        }
+        .hero {
+            background: linear-gradient(135deg, #7b0000, #b5121b);
+            color: #fff;
+            padding: 30px 34px;
+        }
+        .eyebrow {
+            font-size: 13px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            opacity: .85;
+            margin-bottom: 8px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.25;
+        }
+        .body {
+            padding: 30px 34px;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+        .notice {
+            background: #fff7f7;
+            border: 1px solid rgba(139, 0, 0, .14);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin: 18px 0;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+        a {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 11px 18px;
+            font-weight: 700;
+        }
+        .primary {
+            background: #8b0000;
+            color: #fff;
+        }
+        .secondary {
+            border: 1px solid #8b0000;
+            color: #8b0000;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <section class="hero">
+            <div class="eyebrow">BYS360 Dosya Merkezi</div>
+            <h1>Dosya boyutu sınırı aşıldı</h1>
+        </section>
+        <section class="body">
+            <p>Yüklemeye çalıştığınız dosya, sistemin bu işlem için izin verdiği sınırı aştığı için kabul edilmedi.</p>
+            <div class="notice">
+                Büyük dosya yüklemeleri için Dosya Merkezi ayarlarında tanımlı sınır ve sunucu çalışma limiti birlikte uygun olmalıdır.
+            </div>
+            <p>Dosya boyutu uygun olduğu halde bu ekranı görüyorsanız, local büyük dosya çalıştırma komutunun 5 GB destekli açıldığını kontrol edin.</p>
+            <div class="actions">
+                <a class="primary" href="/file-center">Dosya Merkezi’ne dön</a>
+                <a class="secondary" href="javascript:history.back()">Önceki sayfaya dön</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

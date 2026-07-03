@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Logları | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}.fc-hero-mini{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:26px;color:#fff}.fc-nav a{text-decoration:none}.fc-muted{color:#6c757d}.fc-table th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#7a7a7a}.fc-empty{border:1px dashed #d6d6d6;border-radius:22px;background:#fbfbfb}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero-mini p-4 mb-4">
+  <h1 class="h3 fw-bold mb-2">Güvenlik ve İşlem Logları</h1>
+  <p class="mb-0 opacity-75">Dosya yükleme, indirme, misafir bağlantı ve erişim hareketleri izlenebilir şekilde kaydedilir.</p>
+ </div>
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_transfers') }}">Transferler</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_requests') }}">Dosya İstekleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+ </div>
+
+ <div class="card fc-card mb-4">
+  <div class="card-body p-0">
+   <div class="p-4 border-bottom"><h2 class="h5 fw-bold mb-0">İndirme Kayıtları</h2></div>
+   {% if downloads %}
+   <div class="table-responsive">
+    <table class="table align-middle mb-0 fc-table"><thead class="table-light"><tr><th>Tarih</th><th>Dosya</th><th>Durum</th><th>IP</th><th>Kaynak</th></tr></thead><tbody>
+    {% for row in downloads %}<tr><td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td><td>{{ row.file.original_filename if row.file else '-' }}</td><td>{{ row.status }}</td><td>{{ row.ip_address or '-' }}</td><td>{{ row.guest_label or ('Kullanıcı #' ~ row.downloaded_by_user_id if row.downloaded_by_user_id else '-') }}</td></tr>{% endfor %}
+    </tbody></table>
+   </div>
+   {% else %}<div class="p-4 fc-muted">Henüz indirme kaydı yok.</div>{% endif %}
+  </div>
+ </div>
+
+ <div class="card fc-card mb-4">
+  <div class="card-body p-0">
+   <div class="p-4 border-bottom"><h2 class="h5 fw-bold mb-0">Denetim Kayıtları</h2></div>
+   {% if audits %}
+   <div class="table-responsive">
+    <table class="table align-middle mb-0 fc-table"><thead class="table-light"><tr><th>Tarih</th><th>İşlem</th><th>Dosya</th><th>Açıklama</th><th>IP</th></tr></thead><tbody>
+    {% for row in audits %}<tr><td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td><td>{{ row.action }}</td><td>{{ row.file_id or '-' }}</td><td>{{ row.message or '-' }}</td><td>{{ row.ip_address or '-' }}</td></tr>{% endfor %}
+    </tbody></table>
+   </div>
+   {% else %}<div class="p-4 fc-muted">Henüz denetim kaydı yok.</div>{% endif %}
+  </div>
+ </div>
+
+ <div class="card fc-card">
+  <div class="card-body p-0">
+   <div class="p-4 border-bottom"><h2 class="h5 fw-bold mb-0">Erişim Kayıtları</h2></div>
+   {% if accesses %}
+   <div class="table-responsive">
+    <table class="table align-middle mb-0 fc-table"><thead class="table-light"><tr><th>Tarih</th><th>İşlem</th><th>Dosya</th><th>Detay</th><th>IP</th></tr></thead><tbody>
+    {% for row in accesses %}<tr><td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td><td>{{ row.action }}</td><td>{{ row.file_id or '-' }}</td><td>{{ row.detail or '-' }}</td><td>{{ row.ip_address or '-' }}</td></tr>{% endfor %}
+    </tbody></table>
+   </div>
+   {% else %}<div class="p-4 fc-muted">Henüz erişim kaydı yok.</div>{% endif %}
+  </div>
+ </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Transferler | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}.fc-action{background:#8B0000;border-color:#8B0000}.fc-action:hover{background:#6f0000;border-color:#6f0000}.fc-nav a{text-decoration:none}.fc-muted{color:#6c757d}.fc-file-choice{border:1px solid #eee;border-radius:16px;padding:.8rem;background:#fff}.fc-file-choice:hover{border-color:#8B0000;background:#fff8f8}.fc-hero-mini{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:26px;color:#fff}.fc-empty{border:1px dashed #d6d6d6;border-radius:22px;background:#fbfbfb}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero-mini p-4 mb-4">
+  <h1 class="h3 fw-bold mb-2">Transferler</h1>
+  <p class="mb-0 opacity-75">Bir veya birden fazla dosyayı tek kayıt altında toplayarak alıcı bilgisi ve açıklama ile takip edin.</p>
+ </div>
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_transfers') }}">Transferler</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_requests') }}">Dosya İstekleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+ </div>
+
+ <div class="row g-4">
+  <div class="col-xl-5">
+   <div class="card fc-card">
+    <div class="card-body p-4">
+     <h2 class="h5 fw-bold mb-3">Yeni Transfer Paketi</h2>
+     {% if files %}
+     <form method="post" action="{{ url_for('main.file_center_create_transfer') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+       <label class="form-label fw-semibold">Transfer başlığı</label>
+       <input name="title" class="form-control form-control-lg" placeholder="Örn. Kurumsal görsel arşivi" required>
+      </div>
+      <div class="mb-3">
+       <label class="form-label fw-semibold">Alıcı e-posta adresleri</label>
+       <input name="recipient_emails" class="form-control" placeholder="virgül ile ayırın">
+       <div class="form-text">Bu aşamada kayıt ve takip oluşturulur. Misafir bağlantısıleri dosya kartından ayrıca üretilebilir.</div>
+      </div>
+      <div class="mb-3">
+       <label class="form-label fw-semibold">Mesaj</label>
+       <textarea name="message" class="form-control" rows="3" placeholder="Alıcıya iletilecek kısa not"></textarea>
+      </div>
+      <div class="mb-3">
+       <label class="form-label fw-semibold">Dosyalar</label>
+       <div class="vstack gap-2" style="max-height:360px;overflow:auto;">
+        {% for file in files %}
+        <label class="fc-file-choice d-flex align-items-start gap-2">
+         <input type="checkbox" name="file_ids" value="{{ file.id }}" class="form-check-input mt-1">
+         <span>
+          <span class="fw-bold d-block">{{ file.original_filename }}</span>
+          <span class="small text-muted">{{ format_bytes(file.size_bytes) }}</span>
+         </span>
+        </label>
+        {% endfor %}
+       </div>
+      </div>
+      <button class="btn fc-action text-white fw-bold btn-lg w-100">Transfer Paketini Oluştur</button>
+     </form>
+     {% else %}
+     <div class="fc-empty p-4 text-center">
+      <h3 class="h6 fw-bold">Önce dosya yükleyin</h3>
+      <p class="fc-muted mb-3">Transfer paketi oluşturmak için Dosyalarım ekranından en az bir dosya yüklenmelidir.</p>
+      <a class="btn btn-outline-danger" href="{{ url_for('main.file_center_home') }}">Dosya Yükleme Ekranına Git</a>
+     </div>
+     {% endif %}
+    </div>
+   </div>
+  </div>
+
+  <div class="col-xl-7">
+   <div class="card fc-card">
+    <div class="card-body p-4">
+     <h2 class="h5 fw-bold mb-3">Oluşturulan Transferler</h2>
+     {% if transfers %}
+     <div class="vstack gap-3">
+      {% for transfer in transfers %}
+      <div class="border rounded-4 p-3 bg-white">
+       <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div>
+         <h3 class="h6 fw-bold mb-1">{{ transfer.title }}</h3>
+         <div class="small text-muted">{{ transfer.created_at.strftime('%d.%m.%Y %H:%M') if transfer.created_at else '-' }} · Durum: {{ transfer.status }}</div>
+        </div>
+        <span class="badge text-bg-light border">{{ (transfer_items.get(transfer.id) or [])|length }} dosya</span>
+       </div>
+       {% if transfer.message %}<p class="mb-2 mt-3">{{ transfer.message }}</p>{% endif %}
+       {% set items = transfer_items.get(transfer.id) or [] %}
+       {% if items %}
+       <div class="small text-muted mt-2">
+        {% for file in items %}
+         <div>• {{ file.original_filename }} — {{ format_bytes(file.size_bytes) }}</div>
+        {% endfor %}
+       </div>
+       {% endif %}
+      </div>
+      {% endfor %}
+     </div>
+     {% else %}
+     <div class="fc-empty p-5 text-center">
+      <h3 class="h6 fw-bold">Henüz transfer paketi oluşturulmadı</h3>
+      <p class="fc-muted mb-0">Birden fazla dosyayı tek başlık altında topladığınızda burada görünecek.</p>
+     </div>
+     {% endif %}
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock %}

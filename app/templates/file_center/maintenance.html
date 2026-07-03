@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Bakım İşleri | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}.fc-hero{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:28px;color:#fff}.fc-nav a{text-decoration:none}.fc-action{background:#8B0000;border-color:#8B0000}.fc-action:hover{background:#6f0000;border-color:#6f0000}.fc-soft{background:#f8f9fa;border:1px solid #eee;border-radius:18px}.fc-warning{background:#fff8e1;border:1px solid rgba(255,193,7,.35);border-radius:18px}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero p-4 mb-4">
+  <h1 class="h3 fw-bold mb-2">Dosya Merkezi Bakım İşleri</h1>
+  <p class="mb-0 opacity-75">Kota yeniden hesaplama, süresi dolan link/istek kapatma ve bakım kontrol işlemlerini güvenli şekilde çalıştırın.</p>
+ </div>
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>
+  <a class="btn btn-danger" href="{{ url_for('main.file_center_maintenance') }}">Bakım İşleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+  <a class="btn btn-outline-danger" href="{{ url_for('main.file_center_security') }}">Güvenlik Taraması</a>
+ </div>
+
+ <div class="row g-4">
+  <div class="col-xl-5">
+   <div class="card fc-card"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Bakım Durumu</h2>
+    <div class="vstack gap-2">
+     {% for item in checklist %}
+     <div class="fc-soft p-3"><div class="fw-bold">{{ item.title }}</div><div class="small text-muted">{{ item.detail }}</div></div>
+     {% endfor %}
+    </div>
+   </div></div>
+  </div>
+  <div class="col-xl-7">
+   <div class="card fc-card"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Manuel Bakım İşlemleri</h2>
+    <div class="fc-warning p-3 mb-3 small">Bu işlemler geliştirme ortamında test amaçlıdır. Canlıya geçişte zamanlanmış görev, rol yetkisi ve yedekleme prosedürüyle birlikte kullanılmalıdır.</div>
+    <div class="vstack gap-3">
+     <form method="post" action="{{ url_for('main.file_center_maintenance_recalculate_quotas') }}" class="fc-soft p-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap"><div><div class="fw-bold">Kota Kullanımını Yeniden Hesapla</div><div class="small text-muted">Aktif dosyalara göre kullanıcı kota kayıtlarını günceller.</div></div><button class="btn fc-action text-white">Çalıştır</button></div>
+     </form>
+     <form method="post" action="{{ url_for('main.file_center_maintenance_expire') }}" class="fc-soft p-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap"><div><div class="fw-bold">Süresi Dolan Link ve İstekleri Kapat</div><div class="small text-muted">Süresi geçmiş aktif misafir bağlantısıleri ve açık dosya isteklerini kapatır.</div></div><button class="btn btn-outline-danger">Kapat</button></div>
+     </form>
+    </div>
+   </div></div>
+   <div class="card fc-card mt-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Özet</h2>
+    <div class="row g-3">
+     <div class="col-md-4"><div class="fc-soft p-3"><div class="small text-muted">Aktif dosya</div><div class="h4 fw-bold">{{ summary.total_files }}</div></div></div>
+     <div class="col-md-4"><div class="fc-soft p-3"><div class="small text-muted">Süresi dolmuş link</div><div class="h4 fw-bold">{{ summary.expired_active_links }}</div></div></div>
+     <div class="col-md-4"><div class="fc-soft p-3"><div class="small text-muted">Süresi dolmuş istek</div><div class="h4 fw-bold">{{ summary.expired_open_requests }}</div></div></div>
+    </div>
+   </div></div>
+  </div>
+ </div>
+</div>
+{% endblock %}

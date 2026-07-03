@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Dosya İstekleri | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}.fc-action{background:#8B0000;border-color:#8B0000}.fc-action:hover{background:#6f0000;border-color:#6f0000}.fc-nav a{text-decoration:none}.fc-muted{color:#6c757d}.fc-hero-mini{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:26px;color:#fff}.fc-empty{border:1px dashed #d6d6d6;border-radius:22px;background:#fbfbfb}.fc-linkbox{border:1px solid #eee;border-radius:18px;background:#fff}.fc-badge{border-radius:999px;padding:.42rem .68rem;font-weight:700}.fc-upload-card{background:#fff;border:1px solid #eee;border-radius:16px;padding:.85rem}.fc-message{background:#fffafa;border:1px solid rgba(139,0,0,.12);border-radius:16px}.fc-copyarea{font-size:.88rem;line-height:1.45;min-height:128px;white-space:pre-wrap}.fc-soft{background:#f8f9fa;border-radius:16px;border:1px solid #eee}.fc-mini-stat{border:1px solid rgba(139,0,0,.10);border-radius:18px;background:#fff;padding:1rem}.fc-mini-stat strong{display:block;font-size:1.4rem;color:#8B0000}.fc-due{font-size:.78rem;border-radius:999px;padding:.35rem .55rem;font-weight:700}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero-mini p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+   <div>
+    <h1 class="h3 fw-bold mb-2">Dosya İstekleri</h1>
+    <p class="mb-0 opacity-75">BYS360 kullanıcısı olmayan kişilerden süreli ve şifreli bağlantı ile dosya talep edin; gelen yüklemeleri, bağlantıları ve hatırlatma metinlerini tek ekranda yönetin.</p>
+   </div>
+   <div class="text-end">
+    <div class="small opacity-75">Kurumsal süreç</div>
+    <div class="fw-bold">İstek · Bağlantı · Yükleme · Kayıt</div>
+   </div>
+  </div>
+ </div>
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_transfers') }}">Transferler</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_requests') }}">Dosya İstekleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>
+ </div>
+
+ <div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="fc-mini-stat"><span class="text-muted small">Toplam istek</span><strong>{{ requests|length }}</strong></div></div>
+  <div class="col-md-4"><div class="fc-mini-stat"><span class="text-muted small">Açık istek</span><strong>{{ requests|selectattr('status','equalto','open')|list|length }}</strong></div></div>
+  <div class="col-md-4"><div class="fc-mini-stat"><span class="text-muted small">Gelen yükleme</span><strong>{{ uploads_by_request.values()|map('length')|sum if uploads_by_request else 0 }}</strong></div></div>
+ </div>
+
+ <div class="row g-4">
+  <div class="col-xl-5">
+   <div class="card fc-card">
+    <div class="card-body p-4">
+     <h2 class="h5 fw-bold mb-3">Yeni Dosya İsteği</h2>
+     <form method="post" action="{{ url_for('main.file_center_create_request') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+       <label class="form-label fw-semibold">Talep başlığı</label>
+       <input name="title" class="form-control form-control-lg" placeholder="Örn. Proje görselleri" required>
+      </div>
+      <div class="row g-3">
+       <div class="col-md-6"><label class="form-label fw-semibold">Alıcı adı</label><input name="recipient_name" class="form-control" placeholder="Ad Soyad"></div>
+       <div class="col-md-6"><label class="form-label fw-semibold">Alıcı e-posta</label><input name="recipient_email" type="email" class="form-control" placeholder="ornek@alan.gov.tr"></div>
+      </div>
+      <div class="mb-3 mt-3">
+       <label class="form-label fw-semibold">Açıklama</label>
+       <textarea name="description" class="form-control" rows="3" placeholder="Yüklenecek dosyayla ilgili kısa bilgi"></textarea>
+      </div>
+      <div class="row g-3">
+       <div class="col-md-4"><label class="form-label fw-semibold">Süre</label><select name="days" class="form-select"><option value="7">7 gün</option><option value="15">15 gün</option><option value="30">30 gün</option></select></div>
+       <div class="col-md-4"><label class="form-label fw-semibold">Dosya sınırı</label><select name="max_file_gb" class="form-select"><option value="1">1 GB</option><option value="2">2 GB</option><option value="5" selected>5 GB</option></select></div>
+       <div class="col-md-4"><label class="form-label fw-semibold">Şifre</label><input name="password" class="form-control" minlength="6" required placeholder="En az 6 karakter"></div>
+      </div>
+      <div class="mb-3 mt-3">
+       <label class="form-label fw-semibold">Kabul edilen dosya türleri</label>
+       <input name="allowed_extensions" class="form-control" placeholder="Örn. .pdf,.docx,.xlsx,.jpg,.zip">
+       <div class="form-text">Boş bırakılırsa güvenlik nedeniyle engellenen dosya türleri dışındaki türlere izin verilir.</div>
+      </div>
+      <button class="btn fc-action text-white fw-bold btn-lg w-100">Dosya İsteği Oluştur</button>
+     </form>
+    </div>
+   </div>
+   <div class="fc-soft p-3 mt-3 small text-muted">
+    <strong class="text-dark">Paylaşım önerisi:</strong> Alıcı e-posta alanı doluysa sistem üzerinden gerçek e-posta gönderimi yapılabilir. Şifreyi bağlantıdan ayrı bir kanal üzerinden paylaşın.
+   </div>
+  </div>
+
+  <div class="col-xl-7">
+   <div class="card fc-card">
+    <div class="card-body p-4">
+     <h2 class="h5 fw-bold mb-3">Oluşturulan İstekler</h2>
+     {% if requests %}
+     <div class="vstack gap-3">
+      {% for req in requests %}
+      {% set status = request_status_label(req) %}
+      {% set upload_url = url_for('main.file_center_guest_upload', token=req.public_token, _external=True) if req.public_token else '' %}
+      {% set message_text %}Sayın {{ req.recipient_name or 'İlgili kişi' }},
+
+BYS360 Dosya Merkezi üzerinden tarafınızdan dosya yüklemeniz istenmektedir.
+
+Talep başlığı: {{ req.title }}{% if req.description %}
+
+Açıklama: {{ req.description }}{% endif %}
+
+Yükleme bağlantısı: {{ upload_url }}
+Son yükleme tarihi: {{ req.expires_at.strftime('%d.%m.%Y %H:%M') }}
+Kabul edilen dosya türleri: {{ req.allowed_extensions or 'Güvenlik nedeniyle engellenen dosya türleri dışındaki dosyalar' }}
+
+Lütfen yükleme şifresini bu bağlantıdan ayrı olarak size iletilen kanaldan kullanınız.
+Bağlantı süreli ve kayıtlıdır; yüklenen dosya BYS360 Dosya Merkezi’ne güvenli şekilde alınacaktır.
+
+İyi çalışmalar.{% endset %}
+      <div class="fc-linkbox p-3">
+       <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+        <div>
+         <h3 class="h6 fw-bold mb-1">{{ req.title }}</h3>
+         <div class="small text-muted">{{ req.recipient_name or 'Alıcı adı belirtilmedi' }}{% if req.recipient_email %} · {{ req.recipient_email }}{% endif %}</div>
+         <div class="small text-muted">Son tarih: {{ req.expires_at.strftime('%d.%m.%Y %H:%M') }} · Yükleme sayısı: {{ req.upload_count }}</div>
+        </div>
+        <div class="text-end">
+         <span class="badge {{ 'text-bg-success' if status == 'Yüklendi' else ('text-bg-warning' if status == 'Bekliyor' else 'text-bg-secondary') }} fc-badge">{{ status }}</span>
+         {% if req.status == 'open' %}<div class="text-muted mt-2"><span class="fc-due bg-light border">Süreli bağlantı</span></div>{% endif %}
+        </div>
+       </div>
+       {% if req.description %}<p class="mt-3 mb-2">{{ req.description }}</p>{% endif %}
+       {% if req.public_token %}
+       <div class="mt-3">
+        <label class="small fw-bold text-muted mb-1">Misafir yükleme bağlantısı</label>
+        <div class="input-group input-group-sm">
+         <input class="form-control" readonly value="{{ upload_url }}">
+         <a class="btn btn-outline-secondary" target="_blank" href="{{ upload_url }}">Aç</a>
+         <a class="btn btn-outline-secondary" target="_blank" href="{{ url_for('main.file_center_request_message', request_id=req.id) }}">Metni Aç</a>
+        </div>
+        <div class="small text-muted mt-1">Şifreyi bağlantıdan ayrı bir kanaldan paylaşın.</div>
+       </div>
+       <div class="fc-message p-3 mt-3">
+        <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
+         <div class="fw-bold">Hazır bilgilendirme / hatırlatma metni</div>
+         {% if req.status == 'open' %}
+         <div class="d-flex gap-2 flex-wrap">
+          {% if req.recipient_email %}
+          <form method="post" action="{{ url_for('main.file_center_send_request_email_route', request_id=req.id) }}">
+           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+           <input type="hidden" name="purpose" value="request_invitation">
+           <button class="btn btn-sm btn-danger">E-posta Gönder</button>
+          </form>
+          <form method="post" action="{{ url_for('main.file_center_send_request_email_route', request_id=req.id) }}">
+           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+           <input type="hidden" name="purpose" value="manual_reminder">
+           <button class="btn btn-sm btn-outline-danger">Hatırlatma Maili Gönder</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('main.file_center_prepare_request_reminder', request_id=req.id) }}">
+           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+           <button class="btn btn-sm btn-outline-secondary">Hatırlatma Kaydı Oluştur</button>
+          </form>
+         </div>
+         {% endif %}
+        </div>
+        <textarea class="form-control fc-copyarea" readonly>{{ message_text }}</textarea>
+        <div class="small text-muted mt-2">Bu metni e-posta veya mesaj olarak paylaşabilirsiniz. Şifre ayrı kanaldan iletilmelidir.</div>
+       </div>
+       {% endif %}
+       {% set mail_logs = mail_logs_by_request.get(req.id) or [] %}
+       {% if mail_logs %}
+       <div class="fc-soft p-3 mt-3">
+        <div class="fw-bold mb-2">Mail logları</div>
+        <div class="vstack gap-2">
+         {% for mail in mail_logs[:4] %}
+         <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap small">
+          <div>
+           <div class="fw-semibold">{{ mail_purpose_label(mail.purpose) }} · {{ mail.recipient_email }}</div>
+           <div class="text-muted">{{ mail.subject }}</div>
+           {% if mail.error_message %}<div class="text-danger">{{ mail.error_message }}</div>{% endif %}
+          </div>
+          <div class="text-end">
+           <span class="badge {{ 'text-bg-success' if mail.status == 'sent' else ('text-bg-warning' if mail.status == 'skipped' else 'text-bg-danger') }}">{{ mail_status_label(mail.status) }}</span>
+           <div class="text-muted mt-1">{{ mail.sent_at.strftime('%d.%m.%Y %H:%M') if mail.sent_at else (mail.created_at.strftime('%d.%m.%Y %H:%M') if mail.created_at else '-') }}</div>
+          </div>
+         </div>
+         {% endfor %}
+        </div>
+       </div>
+       {% endif %}
+
+       {% set uploads = uploads_by_request.get(req.id) or [] %}
+       {% if uploads %}
+       <div class="mt-3 vstack gap-2">
+        {% for up in uploads %}
+        <div class="fc-upload-card d-flex justify-content-between align-items-center gap-3 flex-wrap">
+         <div>
+          <div class="fw-semibold">{{ up.file.original_filename if up.file else '-' }}</div>
+          <div class="small text-muted">{{ up.guest_name or 'Misafir' }}{% if up.guest_email %} · {{ up.guest_email }}{% endif %} · {{ up.created_at.strftime('%d.%m.%Y %H:%M') if up.created_at else '-' }}</div>
+         </div>
+         {% if up.file %}<a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.file_center_download', file_id=up.file.id) }}">İndir</a>{% endif %}
+        </div>
+        {% endfor %}
+       </div>
+       {% endif %}
+       {% if req.status == 'open' %}
+       <div class="d-flex gap-2 mt-3">
+        <form method="post" action="{{ url_for('main.file_center_close_request', request_id=req.id) }}">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+         <button class="btn btn-sm btn-outline-secondary">Kapat</button>
+        </form>
+        <form method="post" action="{{ url_for('main.file_center_revoke_request', request_id=req.id) }}" onsubmit="return confirm('Bu dosya isteği iptal edilsin mi? Misafir yükleme bağlantısı kapanır.');">
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+         <button class="btn btn-sm btn-outline-danger">İptal Et</button>
+        </form>
+       </div>
+       {% endif %}
+      </div>
+      {% endfor %}
+     </div>
+     {% else %}
+     <div class="fc-empty p-5 text-center">
+      <h3 class="h6 fw-bold">Henüz dosya isteği oluşturulmadı</h3>
+      <p class="fc-muted mb-0">Bir kişi veya dış paydaş için yükleme bağlantısı oluşturduğunuzda burada takip edilecek.</p>
+     </div>
+     {% endif %}
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Yönetimi | BYS360{% endblock %}
+{% block content %}
+<style>
+ .fc-card{border:0;border-radius:24px;box-shadow:0 14px 40px rgba(20,20,20,.08)}.fc-hero{background:linear-gradient(135deg,#8B0000,#2b0b0b);border-radius:28px;color:#fff}.fc-nav a{text-decoration:none}.fc-stat{background:#fff;border:1px solid rgba(139,0,0,.12);border-radius:22px;padding:1.15rem;min-height:112px}.fc-stat strong{font-size:1.7rem;color:#8B0000}.fc-soft{background:#f8f9fa;border:1px solid #eee;border-radius:18px}.fc-action{background:#8B0000;border-color:#8B0000}.fc-action:hover{background:#6f0000;border-color:#6f0000}.fc-table td{vertical-align:middle}.fc-badge{border-radius:999px;padding:.42rem .68rem;font-weight:700}
+</style>
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_BEGIN #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+{# BYS360_FILE_CENTER_PREMIUM_V1KB_ASSET_END #}
+
+<div class="container-fluid py-4">
+ <div class="fc-hero p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+   <div>
+    <h1 class="h3 fw-bold mb-2">Dosya Merkezi Yönetimi</h1>
+    <p class="mb-0 opacity-75">Kullanım, kota, bağlantı, dosya isteği, e-posta ve güvenlik kayıtlarını tek yönetici ekranında izleyin.</p>
+   </div>
+   <div class="text-end"><div class="small opacity-75">Kurumsal kontrol</div><div class="fw-bold">Kota · Link · Talep · Log</div></div>
+  </div>
+ </div>
+
+ <div class="fc-nav d-flex flex-wrap gap-2 mb-4">
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_requests') }}">Dosya İstekleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_logs') }}">Denetim Kayıtları</a>
+  <a class="btn btn-outline-danger" href="{{ url_for('main.file_center_security') }}">Güvenlik Taraması</a>
+  <a class="btn btn-danger" href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>
+  <a class="btn btn-outline-danger" href="{{ url_for('main.file_center_maintenance') }}">Bakım İşleri</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_quota') }}">Kota ve Kullanım</a>
+  <a class="btn btn-light border" href="{{ url_for('main.file_center_chunk_upload') }}">Büyük Dosya Yükleme</a>
+ </div>
+
+ <div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="fc-stat"><span class="text-muted small">Aktif dosya</span><strong class="d-block">{{ summary.total_files }}</strong><div class="small text-muted">Toplam {{ format_bytes(summary.total_bytes) }}</div></div></div>
+  <div class="col-md-3"><div class="fc-stat"><span class="text-muted small">Aktif misafir bağlantısı</span><strong class="d-block">{{ summary.active_links }}</strong><div class="small text-muted">Süresi dolmuş aktif: {{ summary.expired_active_links }}</div></div></div>
+  <div class="col-md-3"><div class="fc-stat"><span class="text-muted small">Açık dosya isteği</span><strong class="d-block">{{ summary.open_requests }}</strong><div class="small text-muted">Süresi dolmuş: {{ summary.expired_open_requests }}</div></div></div>
+  <div class="col-md-3"><div class="fc-stat"><span class="text-muted small">Mail durumu</span><strong class="d-block">{{ summary.mail_sent }}</strong><div class="small text-muted">Başarısız: {{ summary.mail_failed }} · Atlandı: {{ summary.mail_skipped }}</div></div></div>
+ </div>
+
+ <div class="row g-4">
+  <div class="col-xl-5">
+   <div class="card fc-card"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Bakım Uyarıları</h2>
+    <div class="vstack gap-2">
+     {% for item in checklist %}
+     <div class="fc-soft p-3">
+      <div class="fw-bold text-{{ 'danger' if item.level == 'danger' else ('warning' if item.level == 'warning' else ('success' if item.level == 'success' else 'primary')) }}">{{ item.title }}</div>
+      <div class="small text-muted">{{ item.detail }}</div>
+     </div>
+     {% endfor %}
+    </div>
+   </div></div>
+   <div class="card fc-card mt-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Depolama Konumu</h2>
+    <div class="fc-soft p-3 small"><code>{{ summary.storage_root }}</code></div>
+    <div class="small text-muted mt-2">Canlıya geçişte bu alan NAS/object storage ile değiştirilebilir.</div>
+   </div></div>
+  </div>
+  <div class="col-xl-7">
+   <div class="card fc-card"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">En Büyük Dosyalar</h2>
+    {% if summary.top_files %}
+    <div class="table-responsive"><table class="table fc-table align-middle"><thead><tr><th>Dosya</th><th>Boyut</th><th>Durum</th></tr></thead><tbody>
+     {% for item in summary.top_files %}
+     <tr><td><div class="fw-semibold">{{ item.original_filename }}</div><div class="small text-muted">#{{ item.id }} · {{ item.extension or '-' }}</div></td><td>{{ format_bytes(item.size_bytes) }}</td><td><span class="badge text-bg-light border fc-badge">{{ item.scan_status }}</span></td></tr>
+     {% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="fc-soft p-4 text-center text-muted">Henüz dosya yok.</div>{% endif %}
+   </div></div>
+   <div class="card fc-card mt-4"><div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">Son Denetim Kayıtları</h2>
+    {% if summary.recent_audits %}
+    <div class="vstack gap-2">
+     {% for row in summary.recent_audits[:10] %}
+     <div class="d-flex justify-content-between gap-3 flex-wrap border-bottom pb-2"><div><div class="fw-semibold">{{ row.action }}</div><div class="small text-muted">{{ row.message or '-' }}</div></div><div class="small text-muted">{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div></div>
+     {% endfor %}
+    </div>
+    {% else %}<div class="fc-soft p-4 text-center text-muted">Denetim kaydı yok.</div>{% endif %}
+   </div></div>
+  </div>
+ </div>
+</div>
+{% endblock %}

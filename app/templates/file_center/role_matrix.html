@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Dosya Merkezi Rol Matrisi{% endblock %}
+{% block content %}
+<style>
+.fc-role-shell{max-width:1380px;margin:0 auto;padding:22px 12px 44px;}
+.fc-hero{border-radius:28px;background:linear-gradient(135deg,#7b0000 0%,#9f111b 46%,#c81e2b 100%);color:#fff;padding:28px 30px;box-shadow:0 22px 60px rgba(80,0,0,.18);position:relative;overflow:hidden;}
+.fc-hero:after{content:"";position:absolute;right:-70px;top:-70px;width:250px;height:250px;border-radius:999px;background:rgba(255,255,255,.09);}
+.fc-hero .eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.86;margin-bottom:8px;}
+.fc-hero h1{font-size:30px;font-weight:950;margin:0 0 8px;}
+.fc-hero p{max-width:860px;margin:0;opacity:.92;line-height:1.65;}
+.fc-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.fc-nav a{border-radius:999px;padding:8px 12px;background:#fff;color:#8b0000;text-decoration:none;border:1px solid rgba(139,0,0,.18);font-weight:850;font-size:13px;}
+.fc-card{margin-top:18px;background:rgba(255,255,255,.98);border:1px solid rgba(139,0,0,.12);border-radius:24px;box-shadow:0 18px 50px rgba(15,23,42,.09);overflow:hidden;}
+.fc-card-head{padding:18px 20px;border-bottom:1px solid rgba(139,0,0,.09);background:linear-gradient(180deg,#fff,#fff8f8);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.fc-card-head h2{font-size:18px;margin:0;font-weight:950;color:#6f0000;}
+.fc-table-wrap{overflow:auto;}
+.fc-role-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1320px;}
+.fc-role-table th{position:sticky;top:0;background:#fff8f8;color:#6f0000;font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:12px 10px;border-bottom:1px solid rgba(139,0,0,.12);z-index:1;}
+.fc-role-table td{padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.07);vertical-align:middle;}
+.fc-role-table tr:hover td{background:#fffafa;}
+.fc-key{font-weight:900;color:#111827;white-space:nowrap;}
+.fc-muted{font-size:12px;color:#64748b;line-height:1.45;}
+.fc-input,.fc-textarea{width:100%;border:1px solid #d6dde8;border-radius:12px;padding:9px 11px;font-size:13px;background:#fff;}
+.fc-textarea{min-height:58px;resize:vertical;}
+.fc-check{width:20px;height:20px;accent-color:#8b0000;}
+.fc-perm-cell{text-align:center;}
+.fc-actions{position:sticky;bottom:0;margin-top:18px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border:1px solid rgba(139,0,0,.12);border-radius:20px;padding:14px;display:flex;gap:10px;justify-content:flex-end;box-shadow:0 18px 45px rgba(15,23,42,.10);}
+.fc-btn{border:0;border-radius:999px;padding:11px 18px;font-weight:950;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.fc-btn-primary{background:#8b0000;color:#fff;}
+.fc-btn-secondary{background:#fff;color:#8b0000;border:1px solid rgba(139,0,0,.24);}
+.fc-add-grid{display:grid;grid-template-columns:1fr 1fr 2fr;gap:12px;padding:18px 20px;}
+.fc-help{margin-top:14px;padding:14px 16px;border-radius:18px;background:#f8fafc;color:#334155;border:1px solid #e2e8f0;line-height:1.55;font-size:13px;}
+@media(max-width:900px){.fc-hero{padding:24px 20px}.fc-add-grid{grid-template-columns:1fr}.fc-actions{position:static;flex-direction:column}.fc-btn{justify-content:center}}
+</style>
+<div class="fc-role-shell">
+  <section class="fc-hero">
+    <div class="eyebrow">BYS360 Sistem Ayarları</div>
+    <h1>Dosya Merkezi Rol Matrisi</h1>
+    <p>Dosya Merkezi’nde kimlerin dosya yükleyebileceği, dış bağlantı oluşturabileceği, güvenlik taraması yapabileceği, kota ve bakım ekranlarını yönetebileceği buradan belirlenir. Menü görünürlüğü ve route güvenliği aynı matrise göre çalışır.</p>
+    <div class="fc-nav">
+      <a href="{{ url_for('main.file_center_settings') }}">Dosya Merkezi Ayarları</a>
+      <a href="{{ url_for('main.file_center_home') }}">Dosyalarım</a>
+      <a href="{{ url_for('main.file_center_admin_dashboard') }}">Yönetici Paneli</a>
+      {% if menu.can_security %}<a href="{{ url_for('main.file_center_security') }}">Güvenlik Taraması</a>{% endif %}
+    </div>
+  </section>
+
+  <form method="post" action="{{ url_for('main.file_center_role_matrix_save') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="fc-card">
+      <div class="fc-card-head">
+        <h2>Rol Bazlı Yetkiler</h2>
+        <span class="badge bg-light text-dark">{{ rows|length }} rol</span>
+      </div>
+      <div class="fc-table-wrap">
+        <table class="fc-role-table">
+          <thead>
+            <tr>
+              <th>Rol</th>
+              <th>Açıklama</th>
+              <th>Aktif</th>
+              <th>Kullan</th>
+              <th>Yükle</th>
+              <th>İndir</th>
+              <th>Misafir İndirme</th>
+              <th>Misafir Yükleme</th>
+              <th>Transfer</th>
+              <th>Dosya İsteği</th>
+              <th>Parçalı Yükleme</th>
+              <th>Log</th>
+              <th>Güvenlik</th>
+              <th>Yönetici</th>
+              <th>Bakım</th>
+              <th>Ayar</th>
+              <th>Kota</th>
+              <th>Rol Matrisi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            {% set prefix = 'role_' ~ row.id ~ '_' %}
+            <tr>
+              <td style="min-width:210px">
+                <div class="fc-key">{{ row.role_key }}</div>
+                <input class="fc-input mt-2" name="{{ prefix }}role_label" value="{{ row.role_label or '' }}">
+              </td>
+              <td style="min-width:260px"><textarea class="fc-textarea" name="{{ prefix }}description">{{ row.description or '' }}</textarea></td>
+              <td class="fc-perm-cell"><input class="fc-check" type="checkbox" name="{{ prefix }}is_active" {% if row.is_active %}checked{% endif %}></td>
+              {% for field in permission_fields %}
+              <td class="fc-perm-cell"><input class="fc-check" type="checkbox" name="{{ prefix }}{{ field }}" {% if row|attr(field) %}checked{% endif %}></td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fc-card">
+      <div class="fc-card-head"><h2>Yeni Rol Satırı Ekle</h2><span class="fc-muted">İsteğe bağlı</span></div>
+      <div class="fc-add-grid">
+        <div><label class="fc-muted">Rol anahtarı</label><input class="fc-input" name="new_role_key" placeholder="ornek_rol"></div>
+        <div><label class="fc-muted">Rol adı</label><input class="fc-input" name="new_role_label" placeholder="Örnek Rol"></div>
+        <div><label class="fc-muted">Açıklama</label><input class="fc-input" name="new_role_description" placeholder="Bu role ait kısa açıklama"></div>
+      </div>
+    </section>
+
+    <div class="fc-help">
+      <strong>Not:</strong> Sistem Yöneticisi ve Admin satırlarında “Ayar”, “Bakım” ve “Rol Matrisi” yetkilerini kapatmadan önce ikinci bir yönetici hesabında bu ekranın açıldığını test etmek güvenli olur.
+    </div>
+
+    <div class="fc-actions">
+      <a class="fc-btn fc-btn-secondary" href="{{ url_for('main.file_center_settings') }}"><i class="fa-solid fa-arrow-left"></i> Ayarlara Dön</a>
+      <button class="fc-btn fc-btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Rol Matrisini Kaydet</button>
+    </div>
+  </form>
+
+  <form method="post" action="{{ url_for('main.file_center_role_matrix_defaults') }}" class="mt-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="fc-btn fc-btn-secondary" type="submit"><i class="fa-solid fa-rotate"></i> Varsayılan Rol Matrisini Kontrol Et</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+ <meta charset="utf-8">
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>BYS360 Misafir Yükleme</title>
+ <style>
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f7f8fb,#eef2f7);min-height:100vh;color:#212529}.wrap{max-width:720px;margin:0 auto;padding:56px 20px}.card{background:#fff;border-radius:28px;box-shadow:0 24px 60px rgba(20,20,20,.12);overflow:hidden}.head{background:linear-gradient(135deg,#8B0000,#2b0b0b);color:#fff;padding:32px}.head .eyebrow{font-size:13px;opacity:.8;font-weight:700;letter-spacing:.04em;text-transform:uppercase}.head h1{margin:8px 0 0;font-size:30px}.body{padding:32px}.muted{color:#6c757d;line-height:1.55}.box{border:1px solid #eee;border-radius:18px;padding:18px;background:#fafafa;margin:20px 0}.title{font-weight:800;font-size:20px}.meta{font-size:13px;color:#6c757d;margin-top:6px}.label{font-weight:800;display:block;margin-bottom:8px}.input{width:100%;box-sizing:border-box;border:1px solid #ccc;border-radius:14px;padding:13px;font-size:16px}.btn{border:0;border-radius:14px;background:#8B0000;color:#fff;font-weight:800;padding:15px 18px;font-size:16px;width:100%;margin-top:14px;cursor:pointer}.alert{border-radius:16px;padding:14px 16px;margin-bottom:18px;background:#fff4e5;border:1px solid #ffdca8}.danger{background:#fff0f0;border-color:#f4baba;color:#7b0000}.success{background:#f0fff4;border-color:#b8e8c4;color:#0b5e20}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:680px){.grid{grid-template-columns:1fr}}.foot{text-align:center;color:#7a7a7a;font-size:12px;margin-top:22px}
+ </style>
+
+  {# BYS360_FILE_CENTER_PREMIUM_V1KB_GUEST_ASSET_BEGIN #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/file_center_premium_v1kb.css') }}">
+  {# BYS360_FILE_CENTER_PREMIUM_V1KB_GUEST_ASSET_END #}
+</head>
+<body class="fc-premium-guest">
+ <main class="wrap">
+  <section class="card">
+   <div class="head">
+    <div class="eyebrow">Güvenli Misafir Yükleme Bağlantısı</div>
+    <h1>BYS360 Dosya Yükleme</h1>
+   </div>
+   <div class="body">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+     {% if messages %}
+      {% for category, message in messages %}
+       <div class="alert {{ 'danger' if category == 'danger' else ('success' if category == 'success' else '') }}">{{ message }}</div>
+      {% endfor %}
+     {% endif %}
+    {% endwith %}
+    {% if error %}
+     <div class="alert danger">{{ error }}</div>
+    {% elif request_row %}
+     {% if uploaded %}<div class="alert success">Dosyanız alınmıştır. Teşekkür ederiz.</div>{% endif %}
+     <p class="muted">Bu bağlantı süreli ve şifre korumalıdır. Yüklediğiniz dosya, talebi oluşturan BYS360 kullanıcısının Dosya Merkezi’ne kaydedilir.</p>
+     <div class="box">
+      <div class="title">{{ request_row.title }}</div>
+      {% if request_row.description %}<p class="muted" style="margin-bottom:0;">{{ request_row.description }}</p>{% endif %}
+      <div class="meta">Son tarih: {{ request_row.expires_at.strftime('%d.%m.%Y %H:%M') }} · Dosya sınırı: {{ format_bytes(request_max_bytes(request_row)) }}</div>
+      {% if request_row.allowed_extensions %}<div class="meta">Kabul edilen türler: {{ request_row.allowed_extensions }}</div>{% endif %}
+     </div>
+     <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="grid">
+       <div><label class="label">Ad Soyad</label><input name="guest_name" class="input" placeholder="Adınız soyadınız"></div>
+       <div><label class="label">E-posta</label><input name="guest_email" type="email" class="input" placeholder="E-posta adresiniz"></div>
+      </div>
+      <div style="margin-top:14px;"><label class="label">Yükleme şifresi</label><input type="password" name="password" class="input" required></div>
+      <div style="margin-top:14px;"><label class="label">Dosya</label><input type="file" name="file" class="input" required></div>
+      <button class="btn">Dosyayı Yükle</button>
+     </form>
+    {% endif %}
+   </div>
+  </section>
+  <div class="foot">BYS360 güvenli dosya yükleme bağlantısı</div>
+ </main>
+</body>
+</html>
