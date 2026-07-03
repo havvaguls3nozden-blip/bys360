@@ -1,4 +1,4 @@
-
+﻿
 """BYS360 ana blueprint omurgası.
 
 Faz 8 ile bu dosya artık gerçek bir toplayıcı/omurga dosyası oldu: ana
@@ -285,4 +285,7 @@ except Exception:
 # Static contract anchor: /portal
 # Portal prefix canl? kapsam/karantina s?zle?mesinde a??k?a izlenir.
 # BYS360_A5_P2D4_LIVE_SCOPE_PORTAL_PREFIX_ANCHOR_END
+# BYS360 Dosya Merkezi route kayıtları
+# Bu import, app/file_center/routes.py içindeki main_bp route dekoratörlerini uygulamaya bağlar.
+from app.file_center import routes as _file_center_routes  # noqa: F401,E402
 
