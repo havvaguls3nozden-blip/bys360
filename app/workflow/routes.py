@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -561,7 +561,8 @@ def workflow_dashboard():
 def workflow_timeline(workflow_id):
     if not _can_view():
         return _deny()
-    ensure_tables(); refresh_delay_states()
+    ensure_tables()
+    refresh_delay_states()
     workflow = db.session.execute(text(f"""
         SELECT wi.*, {_full_name_expr('u')} employee_name, COALESCE(p.title,'-') period_title
         FROM workflow_instances wi
@@ -716,7 +717,7 @@ def _executive_dashboard_payload():
     ensure_tables()
     refresh_delay_states()
 
-    performance_map_raw = db.session.execute(text(f"""
+    performance_map_raw = db.session.execute(text("""
         SELECT COALESCE(NULLIF(TRIM(u.birim),''),'Birim belirtilmemiş') AS unit_name,
                COUNT(e.id) AS total,
                COUNT(e.id) FILTER (
@@ -1037,7 +1038,8 @@ def sync_cross_module_workflows() -> dict[str, int]:
 def workflow_modules_dashboard():
     if not _can_view():
         return _deny()
-    ensure_tables(); refresh_delay_states()
+    ensure_tables()
+    refresh_delay_states()
     rows = db.session.execute(text("""
         SELECT module,
                workflow_family,
@@ -1063,3 +1065,4 @@ def workflow_sync_modules():
     total = sum(results.values())
     flash(f'Modüller arası iş akışı taraması tamamlandı. Yeni kayıt: {total}', 'success')
     return redirect(url_for('main.workflow_modules_dashboard'))
+

@@ -36,7 +36,7 @@ def _replace_rules_by_endpoint(url_map: Any, kept_rules: list[Any]) -> None:
         current.update(rules_by_endpoint)
         return
 
-    setattr(url_map, "_rules_by_endpoint", dict(rules_by_endpoint))
+    url_map._rules_by_endpoint = dict(rules_by_endpoint)
 
 
 def _rebuild_matcher_if_supported(url_map: Any, kept_rules: list[Any]) -> None:
@@ -58,7 +58,7 @@ def _rebuild_matcher_if_supported(url_map: Any, kept_rules: list[Any]) -> None:
         for rule in kept_rules:
             matcher.add(rule)
         matcher.update()
-        setattr(url_map, "_matcher", matcher)
+        url_map._matcher = matcher
     except (AttributeError, TypeError, ValueError):
         return
 
@@ -94,6 +94,6 @@ def dedupe_identical_url_rules(app: Any) -> int:
     _rebuild_matcher_if_supported(url_map, kept_rules)
 
     if hasattr(url_map, "_remap"):
-        setattr(url_map, "_remap", True)
+        url_map._remap = True
 
     return removed_count

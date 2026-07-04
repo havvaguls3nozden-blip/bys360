@@ -6,7 +6,7 @@ Ağır işler HTTP isteğinin içinde büyümesin diye servis fonksiyonları bur
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 import json
 import os
 from pathlib import Path
@@ -50,7 +50,7 @@ def run_core_health_snapshot() -> dict[str, Any]:
             payload = build_core_health_payload()
         except Exception as exc:
             payload = {"ok": False, "error": str(exc), "note": "core_health_panel okunamadı."}
-        payload["generated_at"] = datetime.now(timezone.utc).isoformat()
+        payload["generated_at"] = datetime.now(UTC).isoformat()
         path = _write_json_report("core_health_snapshot.json", payload)
         return {"ok": True, "path": path, "payload_ok": bool(payload.get("ok", True))}
     finally:
@@ -66,7 +66,7 @@ def run_module_maturity_snapshot() -> dict[str, Any]:
             payload = build_module_maturity_report()
         except Exception as exc:
             payload = {"ok": False, "error": str(exc), "note": "module_maturity okunamadı."}
-        payload["generated_at"] = datetime.now(timezone.utc).isoformat()
+        payload["generated_at"] = datetime.now(UTC).isoformat()
         path = _write_json_report("module_maturity_snapshot.json", payload)
         return {"ok": True, "path": path, "payload_ok": bool(payload.get("ok", True))}
     finally:
@@ -98,7 +98,7 @@ def run_nightly_maintenance_bundle() -> dict[str, Any]:
     results = {
         "core_health": run_core_health_snapshot(),
         "module_maturity": run_module_maturity_snapshot(),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
     }
     path = _write_json_report("nightly_maintenance_bundle.json", results)
     return {"ok": True, "path": path, "results": results}
