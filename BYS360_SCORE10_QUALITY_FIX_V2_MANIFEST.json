@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-07-04T08:11:27",
+  "files": [
+    ".github/workflows/bys360-ci.yml",
+    "README_SCORE10_QUALITY_FIX_V2.md",
+    "docs/quality/BYS360_SCORE10_QUALITY_FIX_V2.md",
+    "reports/architecture/BYS360_ANDROID_RESPONSIVE_BASELINE_GATE_P5A_REPORT.json",
+    "reports/architecture/BYS360_ANDROID_RESPONSIVE_HARDENING_P5B_REPORT.json",
+    "reports/architecture/BYS360_MOBILE_AUTH_GUARD_MATRIX_GATE_P4A_REPORT.json",
+    "reports/architecture/BYS360_PHASE2_AUTH_SMOKE_GATE_V1_REPORT.json",
+    "reports/architecture/BYS360_PHASE2_AUTH_SUCCESS_FLOW_GATE_V1_REPORT.json",
+    "reports/architecture/BYS360_PHASE2_MOBILE_ROLE_TOKEN_MATRIX_GATE_V1_REPORT.json",
+    "scripts/quality/bys360_android_responsive_release_suite_gate_p5d.py",
+    "scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b.py",
+    "scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v2.py",
+    "scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py",
+    "scripts/quality/bys360_mobile_performance_response_gate_p3e.py",
+    "scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py",
+    "scripts/quality/bys360_mobile_request_level_smoke_p2c.py",
+    "scripts/quality/bys360_mobile_response_suite_gate_p3f.py",
+    "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b.py",
+    "scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py",
+    "scripts/quality/bys360_mobile_security_suite_gate_p4c.py",
+    "scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py",
+    "scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py",
+    "scripts/quality/bys360_phase2_test_coverage_evidence_gate_v1.py",
+    "scripts/windows/repair_bys360_score10_quality_v2.ps1",
+    "tests/architecture/snapshots/phase2b_route_snapshot_baseline.json"
+  ]
+}

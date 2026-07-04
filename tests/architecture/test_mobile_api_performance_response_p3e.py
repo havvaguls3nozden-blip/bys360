@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from pathlib import Path
 
@@ -19,4 +19,5 @@ def test_mobile_performance_response_gate_p3e() -> None:
     assert result["runtime_route_map_ok"] is True
     assert result["response_code_smoke_ok"] is True
     assert result["routes_py_lines"] <= 300
-    assert result["total_mobile_route_decorator_count"] == 24
+    assert result["total_mobile_route_decorator_count"] == 28
+

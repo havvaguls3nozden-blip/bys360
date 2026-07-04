@@ -1,7 +1,12 @@
-"""User-related effective-menu helper functions."""
+﻿"""User-related effective-menu helper functions."""
 
 from __future__ import annotations
 
+
+from collections.abc import Callable
+from typing import Any
+
+RollbackHook = Callable[[], None]
 import logging
 
 from app.services.settings.effective_menu_parts.bys360_context import (
@@ -72,3 +77,4 @@ def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = 
 __all__ = [
     "_user_has_any_assigned_survey",
 ]
+

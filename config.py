@@ -152,6 +152,32 @@ def _is_sqlite_url(db_url: str) -> bool:
     return (db_url or '').strip().lower().startswith('sqlite:')
 
 
+def _portable_sqlite_url(filename: str = "bys360_local_dev.sqlite3") -> str:
+    """Yerel/CI ortamı için platform bağımsız SQLite URL'i üretir."""
+    db_path = (Path(BASE_DIR) / "instance" / filename).resolve()
+    return "sqlite:///" + db_path.as_posix()
+
+
+def _normalize_database_url(raw_url: str | None, app_env: str) -> str:
+    """DATABASE_URL değerini test/CI ve farklı işletim sistemleri için güvenli hale getir.
+
+    Teslim paketlerinde eski Windows mutlak SQLite yolları kalabildiğinde Linux/CI
+    ortamında testler taşınamaz hale geliyordu. Production/staging için değer
+    olduğu gibi korunur; sadece development/test tarafında Windows'a bağlı
+    SQLite yolu platform bağımsız instance veritabanına çevrilir.
+    """
+    raw = (raw_url or "").strip()
+    if not raw:
+        return "sqlite:///:memory:" if app_env in {"test", "testing"} else _portable_sqlite_url()
+
+    normalized = raw.replace("\\", "/")
+    lowered = normalized.lower()
+    is_windows_sqlite = lowered.startswith("sqlite:///c:/") or lowered.startswith("sqlite:////c:/")
+    if _is_sqlite_url(normalized) and is_windows_sqlite and os.name != "nt":
+        return _portable_sqlite_url()
+    return raw
+
+
 class Config:
     APP_ENV = os.getenv('APP_ENV', 'development').strip().lower()
     APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:8000').strip()
@@ -198,8 +224,9 @@ class Config:
         )
 
 
-    _raw_database_url = (os.getenv("DATABASE_URL") or "").strip() or 'sqlite:///:memory:'
-    SQLALCHEMY_DATABASE_URI = _append_db_sslmode(_raw_database_url, APP_ENV)
+    _raw_database_url = (os.getenv("DATABASE_URL") or "").strip()
+    _normalized_database_url = _normalize_database_url(_raw_database_url, APP_ENV)
+    SQLALCHEMY_DATABASE_URI = _append_db_sslmode(_normalized_database_url, APP_ENV)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     _is_prod_like = APP_ENV in {'production', 'staging'}

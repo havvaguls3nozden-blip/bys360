@@ -1,48 +1,5 @@
 {
-  "package": "BYS360_PHASE2_AUTH_SMOKE_GATE_V1",
-  "generated_at": "2026-06-24T16:13:11",
-  "root": "C:\\bys360\\project",
+  "ok": true,
   "auth_smoke_ok": true,
-  "responses": [
-    {
-      "name": "mobile_login_empty_payload",
-      "method": "POST",
-      "path": "/api/mobile/auth/login",
-      "status_code": 400,
-      "forbidden_statuses": [
-        404,
-        405,
-        500
-      ],
-      "ok": true
-    },
-    {
-      "name": "mobile_refresh_empty_payload",
-      "method": "POST",
-      "path": "/api/mobile/auth/refresh",
-      "status_code": 401,
-      "forbidden_statuses": [
-        404,
-        405,
-        500
-      ],
-      "ok": true
-    },
-    {
-      "name": "mobile_me_without_token",
-      "method": "GET",
-      "path": "/api/mobile/me",
-      "status_code": 401,
-      "forbidden_statuses": [
-        404,
-        405,
-        500
-      ],
-      "ok": true
-    }
-  ],
-  "next_actions": [
-    "Faz 2C'de gerçek test kullanıcısı ile başarılı login/refresh/me akışı fixture üzerinden genişletilebilir.",
-    "Faz 2D'de rol bazlı mobil endpoint erişim matrisi test_client ile kalıcı hale getirilebilir."
-  ]
+  "generated_at": "2026-07-04T08:09:28"
 }

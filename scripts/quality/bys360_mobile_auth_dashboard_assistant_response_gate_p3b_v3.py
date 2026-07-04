@@ -12,7 +12,7 @@ from typing import Any
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE_V3"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE_P3B_V3_REPORT.json")
-EXPECTED_CONTRACT_ROUTE_COUNT = 24
+EXPECTED_CONTRACT_ROUTE_COUNT = 28
 EXPECTED_TARGET_ENDPOINTS = [
     {"feature": "auth", "method": "POST", "suffix": "/api/mobile/auth/login", "status_ok": [200, 400, 401, 403, 422, 500]},
     {"feature": "auth", "method": "POST", "suffix": "/api/mobile/auth/refresh", "status_ok": [200, 400, 401, 403, 422, 500]},

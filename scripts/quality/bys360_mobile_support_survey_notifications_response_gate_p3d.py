@@ -13,7 +13,7 @@ from typing import Any
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3D_MOBILE_SUPPORT_SURVEY_NOTIFICATIONS_RESPONSE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_SUPPORT_SURVEY_NOTIFICATIONS_RESPONSE_GATE_P3D_REPORT.json")
 TEST_NAME = "test_mobile_api_support_survey_notifications_response_p3d.py"
-EXPECTED_CONTRACT_ROUTE_COUNT = 24
+EXPECTED_CONTRACT_ROUTE_COUNT = 28
 
 TARGET_SCENARIOS = [
     {"feature": "support", "method": "POST", "suffix": "/support/tickets", "concrete": "/api/mobile/support/tickets", "json": {"subject": "", "message": ""}},

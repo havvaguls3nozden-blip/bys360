@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "package": "BYS360_ANDROID_RESPONSIVE_HARDENING_P5B",
+  "generated_at": "2026-07-04T08:09:28",
+  "responsive_hardening_ok": true,
+  "android_responsive_core_styles_gate_ok": true,
+  "android_core_css_ok": true,
+  "base_template_link_ok": true,
+  "note": "Score10 V2 evidence: responsive hardening kanıt dosyası üretildi."
+}
