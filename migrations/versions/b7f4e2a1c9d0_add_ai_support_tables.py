@@ -13,6 +13,20 @@ branch_labels = None
 depends_on = None
 
 
+
+def _bys360_sqlite_compatible_sql(stmt):
+    """SQLite lokal geliştirme için PostgreSQL DDL ifadelerini güvenli dönüştürür.
+
+    PostgreSQL ortamında migration davranışı değişmez.
+    """
+    sql = stmt
+    sql = sql.replace("id SERIAL PRIMARY KEY", "id INTEGER PRIMARY KEY AUTOINCREMENT")
+    sql = sql.replace("DEFAULT NOW()", "DEFAULT CURRENT_TIMESTAMP")
+    sql = sql.replace("DEFAULT TRUE", "DEFAULT 1")
+    sql = sql.replace("DEFAULT FALSE", "DEFAULT 0")
+    return sql
+
+
 def upgrade():
     statements = [
         """
@@ -132,6 +146,8 @@ def upgrade():
         "CREATE INDEX IF NOT EXISTS ix_ai_summary_cache_expires_at ON ai_summary_cache(expires_at)",
     ]
     for stmt in statements:
+        if op.get_bind().dialect.name == "sqlite":
+            stmt = _bys360_sqlite_compatible_sql(stmt)
         op.execute(stmt)
 
 
@@ -143,4 +159,6 @@ def downgrade():
         "DROP TABLE IF EXISTS ai_recommendations",
         "DROP TABLE IF EXISTS ai_request_logs",
     ]:
+        if op.get_bind().dialect.name == "sqlite":
+            stmt = _bys360_sqlite_compatible_sql(stmt)
         op.execute(stmt)
