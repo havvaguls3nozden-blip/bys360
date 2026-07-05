@@ -1,3 +1,4 @@
+import os
 """Dijital Arşiv route iskeleti.
 
 DA-1B:
@@ -10,6 +11,7 @@ DA-1B:
 from flask import Blueprint, current_app, render_template
 from flask_login import login_required
 from flask import flash, redirect, request
+from app.digital_archive.models import DigitalArchiveCategory
 from app.digital_archive.write_service import build_digital_archive_write_intent
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -380,18 +382,65 @@ def security_status():
 
     return render_template("digital_archive/security_status.html", **context)
 
-
 @digital_archive_bp.route("/categories", methods=["POST"])
 @login_required
 def category_create_guard_only_post():
-    """DA-12C guard-only kategori POST route. DB yazmaz."""
+    """DA-14A local SQLite kategori yazma kapısı.
+
+    Canlıda yazmaz. Sadece TESTING=True + SQLite + BYS360_DIGITAL_ARCHIVE_LOCAL_WRITE_TEST=1
+    koşulları birlikte sağlanırsa kategori oluşturur.
+    """
 
     intent = build_digital_archive_write_intent("category_create", request.form.to_dict(flat=True))
 
-    if not intent.write_allowed:
+    local_write_enabled = (
+        current_app.config.get("TESTING") is True
+        and os.getenv("BYS360_DIGITAL_ARCHIVE_LOCAL_WRITE_TEST") == "1"
+        and str(db.engine.url.drivername).startswith("sqlite")
+    )
+
+    if not intent.write_allowed and not local_write_enabled:
         flash("Dijital Arşiv kategori oluşturma işlemi şu anda güvenlik kapısı nedeniyle kapalıdır.", "warning")
         return redirect("/digital-archive/categories")
 
-    flash("Dijital Arşiv kategori oluşturma işlemi henüz guard-only aşamasındadır.", "warning")
+    if not intent.is_valid:
+        flash("Dijital Arşiv kategori bilgileri doğrulanamadı. Lütfen zorunlu alanları kontrol edin.", "danger")
+        return redirect("/digital-archive/categories")
+
+    if not local_write_enabled:
+        flash("Dijital Arşiv kategori oluşturma işlemi henüz guard-only aşamasındadır.", "warning")
+        return redirect("/digital-archive/categories")
+
+    payload = intent.payload
+
+    parent_id_raw = payload.get("parent_id")
+    parent_id = int(parent_id_raw) if parent_id_raw not in (None, "") else None
+
+    sort_order_raw = payload.get("sort_order")
+    try:
+        sort_order = int(sort_order_raw) if sort_order_raw not in (None, "") else 0
+    except (TypeError, ValueError):
+        sort_order = 0
+
+    is_active_raw = str(payload.get("is_active", "true")).strip().lower()
+    is_active = is_active_raw in {"1", "true", "on", "yes", "evet"}
+
+    try:
+        category = DigitalArchiveCategory(
+            parent_id=parent_id,
+            code=payload.get("code"),
+            name=payload.get("name"),
+            description=payload.get("description"),
+            is_active=is_active,
+            sort_order=sort_order,
+        )
+        db.session.add(category)
+        db.session.commit()
+        flash("Dijital Arşiv kategorisi lokal test ortamında kaydedildi.", "success")
+    except SQLAlchemyError:
+        db.session.rollback()
+        current_app.logger.exception("DA-14A local SQLite kategori yazma testi başarısız oldu.")
+        flash("Dijital Arşiv kategori kaydı sırasında geçici bir hata oluştu.", "danger")
+
     return redirect("/digital-archive/categories")
 
