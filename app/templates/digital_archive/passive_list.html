@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="da4b-shell">
+    <section class="da4b-hero">
+        <div>
+            <p class="da4b-kicker">BYS360 Dijital Arşiv ve Belge Yönetimi</p>
+            <h1>{{ page_title }}</h1>
+            <p>{{ page_subtitle }}</p>
+        </div>
+        <div class="da4b-status">
+            <strong>{{ module_status }}</strong>
+            <span>Salt-okunur / DB yazma işlemi yok</span>
+        </div>
+    </section>
+
+    <section class="da4b-toolbar">
+        <a href="{{ back_url }}">← Yönetim Merkezine Dön</a>
+        <span>{{ table_name }}</span>
+    </section>
+
+    <section class="da4b-panel">
+        <div class="da4b-panel-header">
+            <div>
+                <h2>Liste</h2>
+                <p>Bu ekran yalnızca mevcut kayıtları gösterir. Ekleme, silme veya güncelleme işlemi yapılmaz.</p>
+            </div>
+            <span class="da4b-count">{{ row_count }} kayıt</span>
+        </div>
+
+        {% if error_message %}
+            <div class="da4b-alert">{{ error_message }}</div>
+        {% elif rows %}
+            <div class="da4b-table-wrap">
+                <table class="da4b-table">
+                    <thead>
+                        <tr>
+                            {% for column in columns %}
+                                <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                {% for column in columns %}
+                                    <td>{{ row.get(column) if row.get(column) is not none else "—" }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="da4b-empty">
+                <strong>Kayıt bulunmuyor.</strong>
+                <p>Altyapı hazır; bu aşamada veri girişi ekranı özellikle kapalı tutulmuştur.</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+
+<style>
+.da4b-shell { display: flex; flex-direction: column; gap: 1rem; }
+.da4b-hero {
+    display: flex; justify-content: space-between; gap: 1.5rem;
+    padding: 1.5rem; border-radius: 1.25rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, .96), rgba(30, 64, 175, .88));
+    color: #fff; box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
+}
+.da4b-kicker { margin: 0 0 .5rem; opacity: .82; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; }
+.da4b-hero h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; }
+.da4b-hero p { margin: .75rem 0 0; max-width: 760px; color: rgba(255, 255, 255, .84); line-height: 1.65; }
+.da4b-status {
+    min-width: 230px; padding: 1rem; border-radius: 1rem;
+    background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .22);
+    display: flex; flex-direction: column; gap: .25rem;
+}
+.da4b-status span { color: rgba(255, 255, 255, .74); font-size: .85rem; }
+.da4b-toolbar, .da4b-panel {
+    background: #fff; border: 1px solid rgba(148, 163, 184, .28);
+    border-radius: 1rem; box-shadow: 0 10px 28px rgba(15, 23, 42, .06);
+}
+.da4b-toolbar {
+    padding: .9rem 1rem; display: flex; justify-content: space-between; gap: 1rem; color: #64748b;
+}
+.da4b-toolbar a { color: #1d4ed8; text-decoration: none; font-weight: 700; }
+.da4b-panel { padding: 1.25rem; }
+.da4b-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+.da4b-panel-header h2 { margin: 0 0 .35rem; color: #0f172a; }
+.da4b-panel-header p { margin: 0; color: #64748b; line-height: 1.55; }
+.da4b-count {
+    white-space: nowrap; border-radius: 999px; padding: .4rem .75rem;
+    background: #eff6ff; color: #1d4ed8; font-size: .85rem; font-weight: 700;
+}
+.da4b-alert, .da4b-empty {
+    padding: 1rem; border-radius: .9rem; background: #f8fafc;
+    border: 1px dashed rgba(148, 163, 184, .6); color: #475569;
+}
+.da4b-empty strong { color: #0f172a; }
+.da4b-empty p { margin: .35rem 0 0; }
+.da4b-table-wrap { overflow-x: auto; }
+.da4b-table { width: 100%; border-collapse: collapse; }
+.da4b-table th, .da4b-table td {
+    padding: .75rem; border-bottom: 1px solid rgba(148, 163, 184, .24);
+    text-align: left; vertical-align: top;
+}
+.da4b-table th { color: #334155; background: #f8fafc; font-size: .84rem; }
+.da4b-table td { color: #475569; font-size: .92rem; }
+@media (max-width: 800px) {
+    .da4b-hero, .da4b-panel-header, .da4b-toolbar { flex-direction: column; }
+}
+</style>
+{% endblock %}

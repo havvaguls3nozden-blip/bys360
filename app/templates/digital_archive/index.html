@@ -73,6 +73,33 @@
         </div>
     </section>
 
+
+    <!-- DA-4B passive list links -->
+    <section class="da3b-panel">
+        <div class="da3b-panel-header">
+            <div>
+                <h2>Yönetim Listeleri</h2>
+                <p>İlk aşamada kategori, fiziksel konum ve saklama politikası ekranları salt-okunur çalışır.</p>
+            </div>
+            <span class="da3b-badge">Pasif liste</span>
+        </div>
+
+        <div class="da3b-link-grid">
+            <a class="da3b-link-card" href="/digital-archive/categories">
+                <strong>Arşiv Kategorileri</strong>
+                <span>Kurumsal sınıflandırma hazırlığı</span>
+            </a>
+            <a class="da3b-link-card" href="/digital-archive/physical-locations">
+                <strong>Fiziksel Konumlar</strong>
+                <span>Depo, raf, kutu ve yerleşim takibi</span>
+            </a>
+            <a class="da3b-link-card" href="/digital-archive/retention-policies">
+                <strong>Saklama Politikaları</strong>
+                <span>Süre, imha ve transfer kuralı hazırlığı</span>
+            </a>
+        </div>
+    </section>
+
     <section class="da3b-note">
         <h2>Bu ekran ne yapar?</h2>
         <p>
@@ -263,9 +290,40 @@
     padding: 1.25rem;
 }
 
+
+
+.da3b-link-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.da3b-link-card {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    padding: 1rem;
+    border: 1px solid rgba(148, 163, 184, .28);
+    border-radius: .9rem;
+    background: #f8fafc;
+    text-decoration: none;
+    color: #0f172a;
+}
+
+.da3b-link-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
+}
+
+.da3b-link-card span {
+    color: #64748b;
+    line-height: 1.45;
+}
+
 @media (max-width: 1100px) {
     .da3b-summary-grid,
-    .da3b-table-grid {
+    .da3b-table-grid,
+    .da3b-link-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -276,7 +334,8 @@
 
 @media (max-width: 700px) {
     .da3b-summary-grid,
-    .da3b-table-grid {
+    .da3b-table-grid,
+    .da3b-link-grid {
         grid-template-columns: 1fr;
     }
 }
