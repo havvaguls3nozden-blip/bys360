@@ -182,7 +182,7 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
     app = create_app()
     app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
 
-    password = "BYS360-Phase2D-Test-123!"
+    password=os.getenv("BYS360_TEST_PASSWORD", "test-password-not-secret")
 
     result: dict[str, Any] = {
         "package": PACKAGE,
