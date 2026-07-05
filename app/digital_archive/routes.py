@@ -9,6 +9,8 @@ DA-1B:
 
 from flask import Blueprint, current_app, render_template
 from flask_login import login_required
+from flask import flash, redirect, request
+from app.digital_archive.write_service import build_digital_archive_write_intent
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -377,4 +379,19 @@ def security_status():
     }
 
     return render_template("digital_archive/security_status.html", **context)
+
+
+@digital_archive_bp.route("/categories", methods=["POST"])
+@login_required
+def category_create_guard_only_post():
+    """DA-12C guard-only kategori POST route. DB yazmaz."""
+
+    intent = build_digital_archive_write_intent("category_create", request.form.to_dict(flat=True))
+
+    if not intent.write_allowed:
+        flash("Dijital Arşiv kategori oluşturma işlemi şu anda güvenlik kapısı nedeniyle kapalıdır.", "warning")
+        return redirect("/digital-archive/categories")
+
+    flash("Dijital Arşiv kategori oluşturma işlemi henüz guard-only aşamasındadır.", "warning")
+    return redirect("/digital-archive/categories")
 
