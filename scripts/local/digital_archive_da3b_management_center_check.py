@@ -1,5 +1,4 @@
-
-from pathlib import Path
+﻿from pathlib import Path
 
 from app import create_app
 from app.digital_archive.model_contract import get_digital_archive_table_names
@@ -22,10 +21,12 @@ routes_text = ROUTES.read_text(encoding="utf-8-sig") if ROUTES.exists() else ""
 template_text = INDEX_TEMPLATE.read_text(encoding="utf-8-sig") if INDEX_TEMPLATE.exists() else ""
 
 required_route_tokens = [
-    "digital_archive/index.html",
+    'render_template("digital_archive/index.html"',
     "_digital_archive_dashboard_context",
     "_safe_table_count",
     "SQLAlchemyError",
+    '"page_title": "Dijital Arşiv Yönetim Merkezi"',
+    '"module_status": "Pasif güvenli ekran"',
 ]
 
 for token in required_route_tokens:
@@ -33,10 +34,13 @@ for token in required_route_tokens:
         errors.append(f"routes.py içinde beklenen ifade yok: {token}")
 
 required_template_tokens = [
-    "Dijital Arşiv Yönetim Merkezi",
+    "{{ page_title }}",
+    "{{ module_status }}",
     "Altyapı Durumu",
     "Canlı işlem yok",
     "table_cards",
+    "summary.ready_table_count",
+    "summary.table_count",
 ]
 
 for token in required_template_tokens:
@@ -44,6 +48,7 @@ for token in required_template_tokens:
         errors.append(f"index.html içinde beklenen ifade yok: {token}")
 
 app = create_app()
+
 with app.app_context():
     route_found = False
     endpoint_found = False
@@ -63,6 +68,7 @@ with app.app_context():
     metadata_tables = set(app.extensions["sqlalchemy"].metadata.tables.keys())
     expected_tables = set(get_digital_archive_table_names())
     missing_metadata = sorted(expected_tables.difference(metadata_tables))
+
     if missing_metadata:
         errors.append("Metadata eksik: " + ", ".join(missing_metadata))
 
