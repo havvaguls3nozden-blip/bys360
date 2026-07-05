@@ -1,6 +1,6 @@
 ﻿"""BYS360 Dijital Arşiv yazma güvenliği mimari sözleşmesi.
 
-DA-6B aşaması veri yazma açmaz.
+DA-6B/DA-7B aşaması veri yazma açmaz.
 Bu modül yalnızca ileride açılacak yazma işlemleri için güvenlik sözleşmesini
 kod seviyesinde tanımlar.
 """
@@ -56,30 +56,41 @@ DIGITAL_ARCHIVE_WRITE_OPERATIONS: Mapping[str, DigitalArchiveWriteOperation] = {
 
 DIGITAL_ARCHIVE_FIELD_WHITELISTS: Mapping[str, tuple[str, ...]] = {
     "category_create": (
+        "parent_id",
         "code",
         "name",
-        "title",
         "description",
         "is_active",
+        "sort_order",
     ),
     "physical_location_create": (
-        "code",
-        "name",
-        "building",
-        "room",
-        "shelf",
-        "box",
-        "description",
-        "is_active",
+        "archive_room",
+        "cabinet_no",
+        "shelf_no",
+        "box_no",
+        "folder_no",
+        "file_no",
+        "physical_status",
     ),
     "retention_policy_create": (
-        "code",
         "name",
         "retention_years",
         "action",
+        "requires_approval",
         "description",
         "is_active",
     ),
+}
+
+
+DIGITAL_ARCHIVE_FIELD_WRITE_EXCLUSIONS: Mapping[str, tuple[str, ...]] = {
+    "category_create": (),
+    "physical_location_create": (
+        "delivered_to_user_id",
+        "delivered_at",
+        "returned_at",
+    ),
+    "retention_policy_create": (),
 }
 
 
@@ -96,7 +107,7 @@ DIGITAL_ARCHIVE_WRITE_SECURITY_REQUIREMENTS: tuple[str, ...] = (
 
 
 def digital_archive_write_is_enabled() -> bool:
-    """DA-6B aşamasında yazma kapalıdır."""
+    """DA-7B aşamasında yazma kapalıdır."""
 
     return DIGITAL_ARCHIVE_WRITE_ENABLED
 
@@ -111,6 +122,12 @@ def get_digital_archive_field_whitelist(operation_key: str) -> tuple[str, ...]:
     """Operasyon bazlı güvenli alan listesini döndürür."""
 
     return DIGITAL_ARCHIVE_FIELD_WHITELISTS.get(operation_key, ())
+
+
+def get_digital_archive_field_write_exclusions(operation_key: str) -> tuple[str, ...]:
+    """Operasyon bazlı özellikle yazma dışı bırakılan alanları döndürür."""
+
+    return DIGITAL_ARCHIVE_FIELD_WRITE_EXCLUSIONS.get(operation_key, ())
 
 
 def get_digital_archive_write_security_requirements() -> tuple[str, ...]:
