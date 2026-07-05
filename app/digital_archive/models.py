@@ -1,4 +1,4 @@
-﻿"""Dijital Arşiv SQLAlchemy model taslakları.
+"""Dijital Arşiv SQLAlchemy model taslakları.
 
 DA-2B:
 - Yalnızca digital_archive_* tablo ailesini tanımlar.
@@ -18,7 +18,7 @@ class DigitalArchiveCategory(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("digital_archive_categories.id"), nullable=True)
-    code = db.Column(db.String(80), nullable=False, index=True)
+    code = db.Column(db.String(80), nullable=False, unique=True, index=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
