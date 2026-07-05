@@ -425,10 +425,18 @@ def category_create_guard_only_post():
     is_active_raw = str(payload.get("is_active", "true")).strip().lower()
     is_active = is_active_raw in {"1", "true", "on", "yes", "evet"}
 
+    code_value = str(payload.get("code") or "").strip()
+    existing_category = DigitalArchiveCategory.query.filter_by(code=code_value).first()
+
+    if existing_category:
+        # DA-15B proaktif duplicate code kontrolü: mükerrer kategori kodu DB yazmadan engellenir.
+        flash("Bu kategori kodu zaten kayıtlıdır. Lütfen farklı bir kod kullanın.", "warning")
+        return redirect("/digital-archive/categories")
+
     try:
         category = DigitalArchiveCategory(
             parent_id=parent_id,
-            code=payload.get("code"),
+            code=code_value,
             name=payload.get("name"),
             description=payload.get("description"),
             is_active=is_active,
