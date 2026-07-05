@@ -13,9 +13,43 @@ branch_labels = None
 depends_on = None
 
 
+def _sqlite_column_exists(table_name, column_name):
+    bind = op.get_bind()
+    rows = bind.exec_driver_sql(f"PRAGMA table_info({table_name})").fetchall()
+    return any(row[1] == column_name for row in rows)
+
+
+def _bys360_sqlite_compatible_statements(stmt):
+    """SQLite lokal geliştirme için F103 DDL ifadelerini güvenli dönüştürür.
+
+    PostgreSQL ortamında migration davranışı değişmez.
+    """
+    normalized = " ".join(stmt.strip().split()).upper()
+
+    if normalized.startswith(
+        "ALTER TABLE USER_MENU_PERMISSIONS ADD COLUMN IF NOT EXISTS SOURCE_TYPE "
+    ):
+        if _sqlite_column_exists("user_menu_permissions", "source_type"):
+            return []
+        return [stmt.replace("ADD COLUMN IF NOT EXISTS", "ADD COLUMN")]
+
+    if normalized.startswith(
+        "ALTER TABLE USER_MENU_PERMISSIONS DROP COLUMN IF EXISTS SOURCE_TYPE"
+    ):
+        if not _sqlite_column_exists("user_menu_permissions", "source_type"):
+            return []
+        return [stmt.replace("DROP COLUMN IF EXISTS", "DROP COLUMN")]
+
+    return [stmt]
+
+
 def _exec_many(statements):
     for stmt in statements:
-        op.execute(stmt)
+        if op.get_bind().dialect.name == "sqlite":
+            for sqlite_stmt in _bys360_sqlite_compatible_statements(stmt):
+                op.execute(sqlite_stmt)
+        else:
+            op.execute(stmt)
 
 
 def upgrade():
