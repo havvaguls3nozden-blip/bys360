@@ -13,6 +13,12 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
+from app.digital_archive.security_contract import (
+    digital_archive_write_is_enabled,
+    get_digital_archive_field_whitelist,
+    get_digital_archive_write_operations,
+    get_digital_archive_write_security_requirements,
+)
 
 from .permissions import is_digital_archive_enabled
 from .model_contract import get_digital_archive_table_names
@@ -335,4 +341,40 @@ def retention_policy_draft_form():
 
     context = _digital_archive_passive_form_context("retention_policies")
     return render_template("digital_archive/passive_form.html", **context)
+
+# DA-6C: Dijital Arşiv güvenlik durumu ekranı
+@digital_archive_bp.get("/security")
+@login_required
+def security_status():
+    if not _digital_archive_config_enabled():
+        return render_template("digital_archive/disabled.html")
+
+    operations = []
+    for operation in get_digital_archive_write_operations().values():
+        operations.append(
+            {
+                "key": operation.key,
+                "table_name": operation.table_name,
+                "draft_route": operation.draft_route,
+                "required_permission": operation.required_permission,
+                "audit_action": operation.audit_action,
+                "csrf_required": operation.csrf_required,
+                "transaction_required": operation.transaction_required,
+                "whitelist_required": operation.whitelist_required,
+                "soft_delete_required": operation.soft_delete_required,
+                "field_whitelist": get_digital_archive_field_whitelist(operation.key),
+            }
+        )
+
+    context = {
+        "page_title": "Dijital Arşiv Güvenlik Durumu",
+        "page_subtitle": "Bu ekran veri yazma açmadan güvenlik sözleşmesini ve planlanan operasyonları gösterir.",
+        "write_enabled": digital_archive_write_is_enabled(),
+        "operations": operations,
+        "operation_count": len(operations),
+        "security_requirements": get_digital_archive_write_security_requirements(),
+        "back_url": "/digital-archive/",
+    }
+
+    return render_template("digital_archive/security_status.html", **context)
 
