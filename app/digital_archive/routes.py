@@ -452,3 +452,50 @@ def category_create_guard_only_post():
 
     return redirect("/digital-archive/categories")
 
+# DA-21D physical location guard-only POST route
+@digital_archive_bp.route("/physical-locations", methods=["POST"])
+@login_required
+def digital_archive_physical_locations_guard_only_post():
+    """DA-21D: Fiziksel lokasyon guard-only POST.
+
+    Bu aşama DB yazmaz. Sadece write_service intent üretir ve kapalı
+    yazma durumunda kullanıcıyı liste ekranına geri yönlendirir.
+    """
+    from flask import flash as _da21d_flash
+    from flask import redirect as _da21d_redirect
+    from flask import request as _da21d_request
+
+    from app.digital_archive.write_service import (
+        build_digital_archive_write_intent as _da21d_build_write_intent,
+    )
+
+    try:
+        from flask_login import current_user as _da21d_current_user
+
+        user_id = getattr(_da21d_current_user, "id", None)
+    except Exception:
+        user_id = None
+
+    intent = _da21d_build_write_intent(
+        "physical_location_create",
+        _da21d_request.form.to_dict(flat=True),
+        user_id=user_id,
+    )
+
+    if not getattr(intent, "is_valid", False):
+        _da21d_flash("Fiziksel lokasyon bilgileri eksik veya hatalı.", "warning")
+        return _da21d_redirect("/digital-archive/physical-locations")
+
+    if not getattr(intent, "write_allowed", False):
+        _da21d_flash(
+            "Fiziksel lokasyon kayıt akışı güvenlik gereği henüz kapalıdır.",
+            "warning",
+        )
+        return _da21d_redirect("/digital-archive/physical-locations")
+
+    _da21d_flash(
+        "Fiziksel lokasyon kayıt akışı henüz guard-only aşamasındadır.",
+        "warning",
+    )
+    return _da21d_redirect("/digital-archive/physical-locations")
+
