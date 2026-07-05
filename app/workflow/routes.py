@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required

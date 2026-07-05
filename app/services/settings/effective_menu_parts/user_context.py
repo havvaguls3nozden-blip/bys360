@@ -1,4 +1,4 @@
-﻿"""User-related effective-menu helper functions."""
+"""User-related effective-menu helper functions."""
 
 from __future__ import annotations
 
