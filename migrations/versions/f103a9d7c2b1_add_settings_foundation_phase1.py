@@ -19,11 +19,22 @@ def _sqlite_column_exists(table_name, column_name):
     return any(row[1] == column_name for row in rows)
 
 
-def _bys360_sqlite_compatible_statements(stmt):
-    """SQLite lokal geliştirme için F103 DDL ifadelerini güvenli dönüştürür.
+def _bys360_sqlite_ddl_sql(stmt):
+    """SQLite lokal geliştirme için PostgreSQL DDL ifadelerini güvenli dönüştürür.
 
     PostgreSQL ortamında migration davranışı değişmez.
     """
+    sql = stmt
+    sql = sql.replace("id SERIAL PRIMARY KEY", "id INTEGER PRIMARY KEY AUTOINCREMENT")
+    sql = sql.replace("BOOLEAN NOT NULL DEFAULT FALSE", "INTEGER NOT NULL DEFAULT 0")
+    sql = sql.replace("BOOLEAN NOT NULL DEFAULT TRUE", "INTEGER NOT NULL DEFAULT 1")
+    sql = sql.replace("BOOLEAN DEFAULT FALSE", "INTEGER DEFAULT 0")
+    sql = sql.replace("BOOLEAN DEFAULT TRUE", "INTEGER DEFAULT 1")
+    sql = sql.replace("DEFAULT NOW()", "DEFAULT CURRENT_TIMESTAMP")
+    return sql
+
+
+def _bys360_sqlite_compatible_statements(stmt):
     normalized = " ".join(stmt.strip().split()).upper()
 
     if normalized.startswith(
@@ -31,16 +42,16 @@ def _bys360_sqlite_compatible_statements(stmt):
     ):
         if _sqlite_column_exists("user_menu_permissions", "source_type"):
             return []
-        return [stmt.replace("ADD COLUMN IF NOT EXISTS", "ADD COLUMN")]
+        return [_bys360_sqlite_ddl_sql(stmt.replace("ADD COLUMN IF NOT EXISTS", "ADD COLUMN"))]
 
     if normalized.startswith(
         "ALTER TABLE USER_MENU_PERMISSIONS DROP COLUMN IF EXISTS SOURCE_TYPE"
     ):
         if not _sqlite_column_exists("user_menu_permissions", "source_type"):
             return []
-        return [stmt.replace("DROP COLUMN IF EXISTS", "DROP COLUMN")]
+        return [_bys360_sqlite_ddl_sql(stmt.replace("DROP COLUMN IF EXISTS", "DROP COLUMN"))]
 
-    return [stmt]
+    return [_bys360_sqlite_ddl_sql(stmt)]
 
 
 def _exec_many(statements):

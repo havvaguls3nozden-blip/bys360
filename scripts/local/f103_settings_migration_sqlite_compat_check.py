@@ -10,12 +10,17 @@ py_compile.compile(str(MIGRATION_PATH), doraise=True)
 
 required_markers = [
     "_sqlite_column_exists",
+    "_bys360_sqlite_ddl_sql",
     "_bys360_sqlite_compatible_statements",
     'op.get_bind().dialect.name == "sqlite"',
     "ADD COLUMN IF NOT EXISTS",
     "DROP COLUMN IF EXISTS",
     'stmt.replace("ADD COLUMN IF NOT EXISTS", "ADD COLUMN")',
     'stmt.replace("DROP COLUMN IF EXISTS", "DROP COLUMN")',
+    'sql.replace("id SERIAL PRIMARY KEY", "id INTEGER PRIMARY KEY AUTOINCREMENT")',
+    'sql.replace("BOOLEAN NOT NULL DEFAULT FALSE", "INTEGER NOT NULL DEFAULT 0")',
+    'sql.replace("BOOLEAN NOT NULL DEFAULT TRUE", "INTEGER NOT NULL DEFAULT 1")',
+    'sql.replace("DEFAULT NOW()", "DEFAULT CURRENT_TIMESTAMP")',
 ]
 
 missing_markers = [marker for marker in required_markers if marker not in text]
@@ -89,6 +94,36 @@ if len(converted_drop_existing) != 1 or "IF EXISTS" in converted_drop_existing[0
 converted_drop_missing = _convert(drop_stmt, ["id", "user_id"])
 if converted_drop_missing != []:
     raise SystemExit("F103 SQLITE COMPAT FAIL: Eksik kolon için DROP skip edilmeliydi.")
+
+create_stmt = """
+CREATE TABLE IF NOT EXISTS role_menu_defaults (
+    id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL,
+    menu_key VARCHAR(100) NOT NULL,
+    is_visible BOOLEAN NOT NULL DEFAULT FALSE,
+    source_type VARCHAR(30) NOT NULL DEFAULT 'seed',
+    updated_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    note VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_role_menu_default_role_menu UNIQUE (role_name, menu_key)
+)
+"""
+
+converted_create = _convert(create_stmt, ["id"])
+
+if len(converted_create) != 1:
+    raise SystemExit("F103 SQLITE COMPAT FAIL: CREATE TABLE dönüşümü tek SQL üretmeliydi.")
+
+sqlite_create = converted_create[0]
+
+for forbidden in ["SERIAL PRIMARY KEY", "BOOLEAN NOT NULL DEFAULT FALSE", "DEFAULT NOW()"]:
+    if forbidden in sqlite_create:
+        raise SystemExit(f"F103 SQLITE COMPAT FAIL: CREATE içinde PostgreSQL ifade kaldı: {forbidden}")
+
+for expected in ["INTEGER PRIMARY KEY AUTOINCREMENT", "INTEGER NOT NULL DEFAULT 0", "DEFAULT CURRENT_TIMESTAMP"]:
+    if expected not in sqlite_create:
+        raise SystemExit(f"F103 SQLITE COMPAT FAIL: CREATE içinde SQLite ifade eksik: {expected}")
 
 print("OK: F103 settings migration SQLite uyumluluk kontrolü geçti.")
 print(f"MIGRATION={MIGRATION_PATH}")
