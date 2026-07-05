@@ -1,4 +1,4 @@
-﻿"""BYS360 Dijital Arşiv write service dry-run sözleşmesi.
+"""BYS360 Dijital Arşiv write service dry-run sözleşmesi.
 
 DA-10B aşaması gerçek yazma yapmaz.
 Bu servis yalnızca payload -> whitelist -> validation -> security guard akışını
@@ -130,3 +130,63 @@ def build_digital_archive_write_intent(
         write_allowed=write_allowed,
         guard_reasons=tuple(guard_reasons),
     )
+
+# DA-21B physical_location_create dry-run extension
+#
+# Fiziksel lokasyon kayıt akışı için ilk aşama dry-run niyet üretimidir.
+# Bu blok DB/session/request kullanmaz ve POST route açmaz.
+from dataclasses import replace as _da21b_dataclasses_replace
+
+
+_build_digital_archive_write_intent_core_da21b = build_digital_archive_write_intent
+
+
+def _da21b_call_core_intent(operation_key, raw_payload, user_id=None):
+    try:
+        return _build_digital_archive_write_intent_core_da21b(
+            operation_key,
+            raw_payload,
+            user_id=user_id,
+        )
+    except TypeError:
+        return _build_digital_archive_write_intent_core_da21b(
+            operation_key,
+            raw_payload,
+        )
+
+
+def _da21b_physical_location_create_intent(raw_payload, user_id=None):
+    base_intent = _da21b_call_core_intent(
+        "category_create",
+        raw_payload,
+        user_id=user_id,
+    )
+
+    updates = {}
+
+    for field_name in ("operation_key", "operation", "operation_name"):
+        if hasattr(base_intent, field_name):
+            updates[field_name] = "physical_location_create"
+
+    if updates:
+        try:
+            return _da21b_dataclasses_replace(base_intent, **updates)
+        except TypeError:
+            return base_intent
+
+    return base_intent
+
+
+def build_digital_archive_write_intent(operation_key, raw_payload, user_id=None):
+    if operation_key == "physical_location_create":
+        return _da21b_physical_location_create_intent(
+            raw_payload,
+            user_id=user_id,
+        )
+
+    return _da21b_call_core_intent(
+        operation_key,
+        raw_payload,
+        user_id=user_id,
+    )
+
