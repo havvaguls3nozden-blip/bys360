@@ -122,18 +122,21 @@ _DIGITAL_ARCHIVE_PASSIVE_LIST_SPECS = {
         "title": "Arşiv Kategorileri",
         "subtitle": "Belgelerin kurumsal arşiv sınıflandırmasına göre izlenmesi için pasif liste ekranı.",
         "preferred_columns": ["id", "code", "name", "title", "description", "is_active", "created_at", "updated_at"],
+        "new_route": "/digital-archive/categories/new",
     },
     "physical_locations": {
         "table": "digital_archive_physical_locations",
         "title": "Fiziksel Konumlar",
         "subtitle": "Depo, raf, kutu ve fiziksel arşiv yerleşim bilgisinin pasif izleme ekranı.",
         "preferred_columns": ["id", "name", "code", "building", "room", "shelf", "box", "is_active", "created_at"],
+        "new_route": "/digital-archive/physical-locations/new",
     },
     "retention_policies": {
         "table": "digital_archive_retention_policies",
         "title": "Saklama Politikaları",
         "subtitle": "Belge saklama süresi, imha/transfer kuralı ve arşiv mevzuatı hazırlığı için pasif liste ekranı.",
         "preferred_columns": ["id", "name", "code", "retention_years", "action", "description", "is_active", "created_at"],
+        "new_route": "/digital-archive/retention-policies/new",
     },
 }
 
@@ -204,6 +207,7 @@ def _digital_archive_passive_list_context(list_key: str) -> dict:
         "error_message": error_message,
         "module_status": "Pasif liste ekranı",
         "back_url": "/digital-archive/",
+        "draft_form_url": spec.get("new_route"),
     }
 
 
@@ -235,4 +239,100 @@ def retention_policies():
 
     context = _digital_archive_passive_list_context("retention_policies")
     return render_template("digital_archive/passive_list.html", **context)
+
+# DA-5B: Dijital Arşiv GET-only taslak form ekranları
+_DIGITAL_ARCHIVE_FORM_EXCLUDED_FIELDS = {
+    "id",
+    "created_at",
+    "updated_at",
+    "deleted_at",
+    "created_by_id",
+    "updated_by_id",
+    "deleted_by_id",
+    "is_deleted",
+}
+
+
+def _field_input_type(column) -> str:
+    column_type = column.type.__class__.__name__.lower()
+
+    if "bool" in column_type:
+        return "checkbox"
+    if "integer" in column_type or "numeric" in column_type or "float" in column_type or "decimal" in column_type:
+        return "number"
+    if "date" in column_type:
+        return "date"
+    if "text" in column_type:
+        return "textarea"
+
+    return "text"
+
+
+def _digital_archive_passive_form_context(list_key: str) -> dict:
+    """GET-only taslak form context'i üretir; DB yazma işlemi yapmaz."""
+    spec = _DIGITAL_ARCHIVE_PASSIVE_LIST_SPECS[list_key]
+    table_name = spec["table"]
+    table = db.metadata.tables.get(table_name)
+
+    fields = []
+    if table is not None:
+        for column in table.columns:
+            if column.name in _DIGITAL_ARCHIVE_FORM_EXCLUDED_FIELDS:
+                continue
+
+            fields.append(
+                {
+                    "name": column.name,
+                    "label": column.name.replace("_", " ").title(),
+                    "type": _field_input_type(column),
+                    "required": (
+                        not column.nullable
+                        and column.default is None
+                        and column.server_default is None
+                    ),
+                    "nullable": column.nullable,
+                    "readonly_note": "Taslak alan - veri yazma kapalı",
+                }
+            )
+
+    return {
+        "page_title": f"{spec['title']} Taslak Formu",
+        "page_subtitle": "Bu ekran yalnızca form taslağını gösterir. Kayıt işlemi henüz açılmamıştır.",
+        "module_status": "GET-only taslak form",
+        "table_name": table_name,
+        "fields": fields,
+        "field_count": len(fields),
+        "list_url": spec.get("route", "/digital-archive/"),
+        "back_url": "/digital-archive/",
+    }
+
+
+@digital_archive_bp.get("/categories/new")
+@login_required
+def category_draft_form():
+    if not _digital_archive_config_enabled():
+        return render_template("digital_archive/disabled.html")
+
+    context = _digital_archive_passive_form_context("categories")
+    return render_template("digital_archive/passive_form.html", **context)
+
+
+@digital_archive_bp.get("/physical-locations/new")
+@login_required
+def physical_location_draft_form():
+    if not _digital_archive_config_enabled():
+        return render_template("digital_archive/disabled.html")
+
+    context = _digital_archive_passive_form_context("physical_locations")
+    return render_template("digital_archive/passive_form.html", **context)
+
+
+@digital_archive_bp.get("/retention-policies/new")
+@login_required
+def retention_policy_draft_form():
+    if not _digital_archive_config_enabled():
+        return render_template("digital_archive/disabled.html")
+
+    context = _digital_archive_passive_form_context("retention_policies")
+    return render_template("digital_archive/passive_form.html", **context)
 

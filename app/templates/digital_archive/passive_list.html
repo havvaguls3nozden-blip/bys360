@@ -15,7 +15,12 @@
     </section>
 
     <section class="da4b-toolbar">
-        <a href="{{ back_url }}">← Yönetim Merkezine Dön</a>
+        <div class="da4b-toolbar-links">
+            <a href="{{ back_url }}">← Yönetim Merkezine Dön</a>
+            {% if draft_form_url %}
+                <a href="{{ draft_form_url }}">Taslak Formu Gör</a>
+            {% endif %}
+        </div>
         <span>{{ table_name }}</span>
     </section>
 
@@ -84,6 +89,13 @@
 .da4b-toolbar {
     padding: .9rem 1rem; display: flex; justify-content: space-between; gap: 1rem; color: #64748b;
 }
+
+.da4b-toolbar-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+}
+
 .da4b-toolbar a { color: var(--bys-red-dark, #690000); text-decoration: none; font-weight: 700; }
 .da4b-panel { padding: 1.25rem; }
 .da4b-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
@@ -143,6 +155,13 @@
     background: var(--bys-red-soft, #f8eded) !important;
     color: var(--bys-red-dark, #690000) !important;
     border: 1px solid rgba(139, 0, 0, .14) !important;
+}
+
+
+.da4b-toolbar-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
 }
 
 .da4b-toolbar a {
