@@ -16,8 +16,27 @@ branch_labels = None
 depends_on = None
 
 
+def _sqlite_table_exists(table_name):
+    bind = op.get_bind()
+    row = bind.exec_driver_sql(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?",
+        (table_name,),
+    ).fetchone()
+    return row is not None
+
+
+def _create_table_if_missing(table_name, *columns, **kwargs):
+    """SQLite lokal geliştirmede mevcut tabloları tekrar oluşturmadan geçer.
+
+    PostgreSQL ortamında migration davranışı değişmez.
+    """
+    if op.get_bind().dialect.name == "sqlite" and _sqlite_table_exists(table_name):
+        return None
+    return op.create_table(table_name, *columns, **kwargs)
+
+
 def upgrade():
-    op.create_table(
+    _create_table_if_missing(
         "communication_bulletins",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=255), nullable=False),
@@ -48,7 +67,7 @@ def upgrade():
     op.create_index(op.f("ix_communication_bulletins_created_by_user_id"), "communication_bulletins", ["created_by_user_id"], unique=False)
     op.create_index(op.f("ix_communication_bulletins_published_by_user_id"), "communication_bulletins", ["published_by_user_id"], unique=False)
 
-    op.create_table(
+    _create_table_if_missing(
         "communication_bulletin_audiences",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("bulletin_id", sa.Integer(), nullable=False),
@@ -64,7 +83,7 @@ def upgrade():
     op.create_index(op.f("ix_communication_bulletin_audiences_target_value"), "communication_bulletin_audiences", ["target_value"], unique=False)
     op.create_index("ix_comm_bulletin_audience_type_value", "communication_bulletin_audiences", ["target_type", "target_value"], unique=False)
 
-    op.create_table(
+    _create_table_if_missing(
         "communication_bulletin_receipts",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("bulletin_id", sa.Integer(), nullable=False),
