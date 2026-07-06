@@ -3258,6 +3258,71 @@ def document_full_detail(document_id: int):
         return redirect("/digital-archive/documents")
 
 
+
+# DA-36A: Belge durumları rehberi
+@digital_archive_bp.get("/document-status-guide")
+@login_required
+def document_status_guide():
+    """Belge durumlarını sade Türkçe açıklamalarla gösterir."""
+    from flask import render_template
+
+    statuses = [
+        {
+            "order": "1",
+            "name": "Taslak",
+            "description": "Belge hazırlık aşamasındadır. Bilgiler tamamlanmadan arşiv sürecine alınmaz.",
+            "usage": "Yeni oluşturulan veya bilgileri henüz eksik olan kayıtlar için kullanılır.",
+        },
+        {
+            "order": "2",
+            "name": "Kayıtlı",
+            "description": "Belge sisteme alınmıştır ve temel bilgileri tamamlanmıştır.",
+            "usage": "Belge kaydı tamamlandığında kullanılır.",
+        },
+        {
+            "order": "3",
+            "name": "Arşivde",
+            "description": "Belge arşiv düzenine alınmış ve konum bilgisiyle takip edilir hale gelmiştir.",
+            "usage": "Kutu, klasör, raf veya dijital malzeme bağlantısı yapılmış kayıtlar için kullanılır.",
+        },
+        {
+            "order": "4",
+            "name": "İncelemede",
+            "description": "Belge üzerinde kontrol, tamamlama veya değerlendirme işlemi devam etmektedir.",
+            "usage": "Eksik bilgi, kontrol veya onay bekleyen kayıtlar için kullanılır.",
+        },
+        {
+            "order": "5",
+            "name": "Saklama Süresi Doluyor",
+            "description": "Belgenin saklama süresi yaklaşmaktadır. Kurum tarafından kontrol edilmesi gerekir.",
+            "usage": "Yaklaşan arşiv süresi takibi için kullanılır.",
+        },
+        {
+            "order": "6",
+            "name": "Saklama Süresi Doldu",
+            "description": "Belgenin belirlenen saklama süresi tamamlanmıştır.",
+            "usage": "Devretme, uzatma veya imha değerlendirmesi yapılacak kayıtlar için kullanılır.",
+        },
+        {
+            "order": "7",
+            "name": "Devredildi",
+            "description": "Belge ilgili arşiv, birim veya kuruma devredilmiştir.",
+            "usage": "Kurum içi veya kurum dışı devri tamamlanan kayıtlar için kullanılır.",
+        },
+        {
+            "order": "8",
+            "name": "İmha Edildi",
+            "description": "Belge, mevzuata ve kurum kararına uygun şekilde imha sürecinden geçirilmiştir.",
+            "usage": "İmha işlemi tamamlanan kayıtlar için kullanılır.",
+        },
+    ]
+
+    return render_template(
+        "digital_archive/document_status_guide.html",
+        statuses=statuses,
+    )
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
