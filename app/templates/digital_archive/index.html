@@ -4,123 +4,297 @@
 
 {% block content %}
 <style>
-    .da-shell { max-width: 1180px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 30px 18px 48px;
+    }
+
     .da-hero {
+        background:
+            radial-gradient(circle at top left, rgba(139, 0, 0, .11), transparent 32%),
+            linear-gradient(135deg, #ffffff 0%, #fff8f6 100%);
+        border: 1px solid rgba(139, 0, 0, .12);
         border-radius: 28px;
-        padding: 34px;
-        background: radial-gradient(circle at top right, rgba(139,0,0,.15), transparent 34%),
-                    linear-gradient(135deg, #ffffff 0%, #fff7f7 52%, #f8eded 100%);
-        border: 1px solid rgba(139,0,0,.12);
-        box-shadow: 0 18px 44px rgba(15,23,42,.08);
+        padding: 28px;
+        box-shadow: 0 20px 46px rgba(15, 23, 42, .08);
+        margin-bottom: 20px;
     }
-    .da-eyebrow {
+
+    .da-kicker {
         display: inline-flex;
-        padding: 8px 13px;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
         border-radius: 999px;
-        background: rgba(139,0,0,.08);
+        background: #f8eded;
         color: #8B0000;
-        font-weight: 700;
-        font-size: 13px;
-        margin-bottom: 16px;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 14px;
     }
+
     .da-title {
         margin: 0;
         color: #111827;
-        font-size: clamp(30px, 4vw, 48px);
-        line-height: 1.08;
-        font-weight: 850;
+        font-size: clamp(28px, 3.3vw, 42px);
+        font-weight: 900;
         letter-spacing: -0.04em;
     }
+
     .da-subtitle {
-        margin: 16px 0 0;
-        max-width: 780px;
+        margin: 12px 0 0;
         color: #667085;
-        font-size: 16px;
-        line-height: 1.75;
+        line-height: 1.7;
+        max-width: 900px;
+        font-size: 15px;
     }
-    .da-grid {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 16px;
+
+    .da-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
         margin-top: 22px;
     }
-    .da-card {
-        display: block;
+
+    .da-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 16px;
+        border-radius: 14px;
         text-decoration: none;
-        color: #111827;
-        padding: 20px;
-        border-radius: 22px;
-        border: 1px solid rgba(15,23,42,.09);
-        background: #ffffff;
-        box-shadow: 0 18px 44px rgba(15,23,42,.08);
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        font-weight: 800;
+        border: 1px solid rgba(139, 0, 0, .16);
+        color: #8B0000;
+        background: #fff;
     }
+
+    .da-button-primary {
+        color: #fff;
+        background: #8B0000;
+        border-color: #8B0000;
+    }
+
+    .da-section {
+        margin-top: 22px;
+    }
+
+    .da-section-title {
+        margin: 0 0 12px;
+        color: #111827;
+        font-size: 22px;
+        font-weight: 850;
+        letter-spacing: -0.02em;
+    }
+
+    .da-section-note {
+        margin: -4px 0 16px;
+        color: #667085;
+        line-height: 1.6;
+    }
+
+    .da-flow {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .da-card {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        border-radius: 24px;
+        padding: 20px;
+        text-decoration: none;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, .07);
+        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+        min-height: 160px;
+    }
+
     .da-card:hover {
         transform: translateY(-2px);
-        border-color: rgba(139,0,0,.22);
-        box-shadow: 0 22px 52px rgba(15,23,42,.11);
+        box-shadow: 0 18px 44px rgba(15, 23, 42, .10);
+        border-color: rgba(139, 0, 0, .22);
     }
+
+    .da-step {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #8B0000;
+        color: #fff;
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+
     .da-card strong {
         display: block;
-        color: #8B0000;
-        font-size: 16px;
+        color: #111827;
+        font-size: 18px;
         margin-bottom: 8px;
     }
+
     .da-card span {
         display: block;
         color: #667085;
-        font-size: 13px;
-        line-height: 1.55;
+        line-height: 1.58;
+        font-size: 14px;
     }
-    .da-note {
-        margin-top: 22px;
-        padding: 18px 20px;
-        border-radius: 20px;
+
+    .da-quick {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .da-quick a {
         background: #fff;
-        border: 1px solid rgba(139,0,0,.12);
-        color: #667085;
-        line-height: 1.65;
+        border: 1px solid rgba(15, 23, 42, .09);
+        border-radius: 20px;
+        padding: 16px;
+        text-decoration: none;
+        color: #111827;
+        font-weight: 800;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
-    .da-note b { color: #8B0000; }
-    @media (max-width: 980px) { .da-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 640px) { .da-grid { grid-template-columns: 1fr; } .da-hero { padding: 24px; } }
+
+    .da-quick a small {
+        display: block;
+        margin-top: 6px;
+        color: #667085;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .da-info {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+        color: #475467;
+        line-height: 1.7;
+    }
+
+    .da-info strong {
+        color: #111827;
+    }
+
+    @media (max-width: 980px) {
+        .da-flow {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .da-quick {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .da-hero {
+            padding: 22px;
+        }
+
+        .da-flow,
+        .da-quick {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
-<div class="da-shell">
+<div class="da-page">
     <section class="da-hero">
-        <div class="da-eyebrow">BYS360 Dijital Arşiv</div>
+        <div class="da-kicker">BYS360 Dijital Arşiv</div>
         <h1 class="da-title">Dijital Arşiv ve Belge Yönetimi</h1>
         <p class="da-subtitle">
-            Kurum arşivindeki belgeler; dosya planı, fiziksel konum, saklama süresi,
-            erişim yetkileri ve işlem geçmişiyle birlikte düzenli şekilde takip edilir.
+            Belgeleri kaydetmek, arşiv malzemeleriyle ilişkilendirmek, ek bilgileri düzenlemek ve belge içeriğini
+            daha kolay bulunabilir hale getirmek için hazırlanmış sade kurum içi çalışma alanıdır.
         </p>
 
-        <div class="da-grid">
+        <div class="da-actions">
+            <a class="da-button da-button-primary" href="/digital-archive/documents/new">Yeni Belge</a>
+            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
+            <a class="da-button" href="/digital-archive/document-material-links">Arşiv Malzemesi Bağlantıları</a>
+            <a class="da-button" href="/digital-archive/metadata-fields">Özel Alan Tanımları</a>
+        </div>
+    </section>
+
+    <section class="da-section">
+        <h2 class="da-section-title">Kullanım Sırası</h2>
+        <p class="da-section-note">
+            Yeni bir arşiv kaydı oluştururken aşağıdaki sırayı izlemek yeterlidir.
+        </p>
+
+        <div class="da-flow">
+            <a class="da-card" href="/digital-archive/documents/new">
+                <div class="da-step">1</div>
+                <strong>Belgeyi Kaydet</strong>
+                <span>Belgeye ait başlık, konu, arşiv kodu ve temel açıklama bilgileri girilir.</span>
+            </a>
+
             <a class="da-card" href="/digital-archive/documents">
-                <strong>Belgeler</strong>
-                <span>Taranacak veya dijitale aktarılacak belgeler.</span>
+                <div class="da-step">2</div>
+                <strong>Belgeleri Listele</strong>
+                <span>Kayıtlı belgeler aranır, filtrelenir ve belge detayına geçilir.</span>
             </a>
-            <a class="da-card" href="/digital-archive/categories">
-                <strong>Kategoriler</strong>
-                <span>Belgelerin arşiv sınıflandırma başlıkları.</span>
+
+            <a class="da-card" href="/digital-archive/document-material-links">
+                <div class="da-step">3</div>
+                <strong>Arşiv Malzemesini Bağla</strong>
+                <span>Belge; kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme ile ilişkilendirilir.</span>
             </a>
-            <a class="da-card" href="/digital-archive/physical-locations">
-                <strong>Fiziksel Arşiv Konumları</strong>
-                <span>Oda, dolap, raf, kutu, klasör ve dosya konumu.</span>
+
+            <a class="da-card" href="/digital-archive/material-types">
+                <div class="da-step">4</div>
+                <strong>Malzeme Türlerini Yönet</strong>
+                <span>Kurumda kullanılan arşiv malzemesi türleri düzenli bir liste halinde tutulur.</span>
             </a>
-            <a class="da-card" href="/digital-archive/retention-policies">
-                <strong>Saklama Süreleri</strong>
-                <span>Belge türlerine göre saklama ve izleme bilgileri.</span>
+
+            <a class="da-card" href="/digital-archive/metadata-fields">
+                <div class="da-step">5</div>
+                <strong>Ek Bilgileri Tanımla</strong>
+                <span>Belgelerde ihtiyaç duyulan özel bilgi alanları sade şekilde tanımlanır.</span>
             </a>
-            <a class="da-card" href="/digital-archive/security-status">
-                <strong>Güvenlik ve Yetki Durumu</strong>
-                <span>Erişim, kayıt ve işlem takip düzeni.</span>
+
+            <a class="da-card" href="/digital-archive/metadata-field-set">
+                <div class="da-step">6</div>
+                <strong>Tarihi Alan Bilgilerini Ekle</strong>
+                <span>Muharebe alanı, cephe, şehitlik, anıt, kaynak ve tarihsel not gibi bilgiler hazır alan setiyle eklenir.</span>
             </a>
         </div>
+    </section>
 
-        <div class="da-note">
-            <b>Modül amacı:</b>
-            Arşiv belgelerinin kurumsal düzen içinde bulunabilir, izlenebilir ve sürdürülebilir şekilde yönetilmesini sağlamak.
+    <section class="da-section">
+        <h2 class="da-section-title">Sık Kullanılan İşlemler</h2>
+        <div class="da-quick">
+            <a href="/digital-archive/documents">
+                Belgeler
+                <small>Kayıtlı belgeleri görüntüle.</small>
+            </a>
+            <a href="/digital-archive/documents/new">
+                Yeni Belge
+                <small>Yeni belge kaydı oluştur.</small>
+            </a>
+            <a href="/digital-archive/document-material-links">
+                Arşiv Bağlantıları
+                <small>Belge ve arşiv malzemesini eşleştir.</small>
+            </a>
+            <a href="/digital-archive/metadata-fields">
+                Özel Alanlar
+                <small>Belgeye eklenecek bilgileri yönet.</small>
+            </a>
+        </div>
+    </section>
+
+    <section class="da-section">
+        <div class="da-info">
+            <strong>Kullanım notu:</strong>
+            Bu bölüm, kurumsal arşiv düzeninin sade şekilde takip edilmesi için hazırlanmıştır.
+            Önce belge kaydı oluşturulur, ardından arşiv malzemesi bağlantısı ve ek bilgiler tamamlanır.
+            Belge detayından bağlı dosyalar, okunan metinler, işlem geçmişi ve arşiv malzemeleri birlikte izlenebilir.
         </div>
     </section>
 </div>
