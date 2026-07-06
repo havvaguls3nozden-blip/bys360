@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Rapor Merkezi - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Saklama Süresi Takip Raporu - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -80,12 +80,18 @@
         margin-top: 18px;
     }
 
-    .da-summary-card {
+    .da-summary-card,
+    .da-report-card,
+    .da-table-wrap,
+    .da-note {
         background: #fff;
         border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    .da-summary-card {
         border-radius: 20px;
         padding: 16px;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-summary-card strong {
@@ -102,62 +108,82 @@
 
     .da-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 14px;
         margin-top: 18px;
     }
 
-    .da-card {
-        background: #fff;
-        border: 1px solid rgba(15, 23, 42, .09);
+    .da-report-card {
         border-radius: 24px;
         padding: 20px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
-        text-decoration: none;
-        display: block;
     }
 
-    .da-card-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-
-    .da-card h2 {
-        margin: 0;
+    .da-report-card h2 {
+        margin: 0 0 8px;
         color: #111827;
         font-size: 20px;
         font-weight: 850;
     }
 
-    .da-pill {
+    .da-report-value {
         display: inline-flex;
-        padding: 7px 10px;
+        padding: 8px 12px;
         border-radius: 999px;
         background: #f8eded;
         color: #8B0000;
-        font-weight: 850;
-        font-size: 12px;
-        white-space: nowrap;
+        font-weight: 900;
+        margin-bottom: 10px;
     }
 
-    .da-card p {
-        margin: 0;
+    .da-report-card p,
+    .da-note {
         color: #667085;
         line-height: 1.65;
     }
 
+    .da-table-wrap {
+        margin-top: 18px;
+        border-radius: 24px;
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    .da-table-wrap h2 {
+        margin: 0 0 12px;
+        color: #111827;
+        font-size: 20px;
+        font-weight: 850;
+    }
+
+    .da-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .da-table th,
+    .da-table td {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid rgba(15, 23, 42, .08);
+        color: #475467;
+        vertical-align: top;
+    }
+
+    .da-table th {
+        color: #111827;
+        font-weight: 850;
+        background: #fafafa;
+    }
+
+    .da-empty {
+        color: #667085;
+        line-height: 1.7;
+    }
+
     .da-note {
         margin-top: 18px;
-        background: #fff;
-        border: 1px solid rgba(15, 23, 42, .09);
         border-radius: 22px;
         padding: 18px;
-        color: #475467;
-        line-height: 1.7;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-note strong {
@@ -179,20 +205,17 @@
 <div class="da-page">
     <section class="da-hero">
         <div class="da-kicker">BYS360 Dijital Arşiv</div>
-        <h1 class="da-title">Rapor Merkezi</h1>
+        <h1 class="da-title">Saklama Süresi Takip Raporu</h1>
         <p class="da-subtitle">
-            Dijital Arşiv bölümündeki belge, durum, arama, yetki ve çıktı başlıkları bu ekranda tek merkezde toplanır.
-            Amaç, yöneticinin ve kullanıcının rapor başlıklarına kolay ulaşmasıdır.
+            Belgelerin saklama süresi açısından takip edilmesi gereken durumlarını gösterir.
+            Bu ekran mevcut kayıtları okur ve işlem önceliğini sade şekilde özetler.
         </p>
 
         <div class="da-actions">
-            <a class="da-button da-button-primary" href="/digital-archive/">Dijital Arşiv</a>
+            <a class="da-button da-button-primary" href="/digital-archive/report-center">Rapor Merkezi</a>
             <a class="da-button" href="/digital-archive/documents">Belgeler</a>
-            <a class="da-button" href="/digital-archive/module-status">Genel Durum</a>
-            <a class="da-button" href="/digital-archive/reports/document-status">Belge Durum Raporu</a>
-            <a class="da-button" href="/digital-archive/reports/archive-links">Arşiv Bağlantı Raporu</a>
-            <a class="da-button" href="/digital-archive/reports/retention">Saklama Süresi Raporu</a>
-            <a class="da-button" href="/digital-archive/permission-guide">Kullanıcı Yetkileri</a>
+            <a class="da-button" href="/digital-archive/document-status-guide">Belge Durumları</a>
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
         </div>
     </section>
 
@@ -206,20 +229,47 @@
     </section>
 
     <section class="da-grid">
-        {% for item in report_cards %}
-            <a class="da-card" href="{{ item.link }}">
-                <div class="da-card-head">
-                    <h2>{{ item.title }}</h2>
-                    <span class="da-pill">{{ item.status }}</span>
-                </div>
+        {% for item in report_items %}
+            <article class="da-report-card">
+                <h2>{{ item.title }}</h2>
+                <div class="da-report-value">{{ item.value }}</div>
                 <p>{{ item.description }}</p>
-            </a>
+            </article>
         {% endfor %}
+    </section>
+
+    <section class="da-table-wrap">
+        <h2>Takip Listesi</h2>
+
+        {% if latest_items %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        <th>Belge</th>
+                        <th>Başlık</th>
+                        <th>Saklama Tarihi</th>
+                        <th>Saklama Kuralı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in latest_items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.date }}</td>
+                            <td>{{ item.rule }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="da-empty">Saklama süresi takibine yansıyacak belge bulunmuyor.</div>
+        {% endif %}
     </section>
 
     <div class="da-note">
         <strong>Kullanım notu:</strong>
-        Rapor Merkezi, mevcut ekranlara hızlı erişim sağlar ve ileride hazırlanacak rapor başlıkları için ana giriş noktası olur.
+        Bu rapor sadece mevcut belge kayıtlarını okur. Kayıt ekleme veya değiştirme işlemi yapmaz.
     </div>
 </div>
 {% endblock %}

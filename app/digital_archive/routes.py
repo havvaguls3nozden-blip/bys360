@@ -3275,6 +3275,158 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-42D: Saklama süresi takip raporu
+def _da42d_parse_date(value):
+    from datetime import datetime
+
+    if value is None:
+        return None
+
+    if hasattr(value, "date"):
+        try:
+            return value.date()
+        except Exception:
+            return value
+
+    text_value = str(value).strip()
+    if not text_value:
+        return None
+
+    formats = [
+        "%Y-%m-%d",
+        "%Y-%m-%d %H:%M:%S",
+        "%d.%m.%Y",
+        "%d.%m.%Y %H:%M",
+        "%d/%m/%Y",
+        "%d/%m/%Y %H:%M",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(text_value[:19], fmt).date()
+        except Exception:
+            continue
+
+    return None
+
+
+def _da42d_retention_date(row: dict):
+    date_keys = [
+        "retention_until",
+        "retention_end_date",
+        "retention_date",
+        "retention_expires_at",
+        "expires_at",
+        "archive_until",
+        "destroy_after_date",
+        "disposal_date",
+        "review_date",
+        "due_date",
+    ]
+
+    for key in date_keys:
+        if key in row:
+            parsed = _da42d_parse_date(row.get(key))
+            if parsed:
+                return parsed
+
+    return None
+
+
+def _da42d_document_title(row: dict) -> str:
+    for key in ["title", "name", "subject", "document_title", "archive_code", "file_code"]:
+        value = row.get(key)
+        if value:
+            return str(value).strip()
+
+    return "Belge"
+
+
+@digital_archive_bp.get("/reports/retention")
+@login_required
+def retention_report():
+    """Saklama süresi durumunu sade rapor ekranında gösterir."""
+    from datetime import date
+
+    from flask import render_template
+    from sqlalchemy import select
+
+    table = _da23_document_table()
+
+    statement = select(table)
+    if "created_at" in table.c:
+        statement = statement.order_by(table.c.created_at.desc())
+    elif "id" in table.c:
+        statement = statement.order_by(table.c.id.desc())
+
+    today = date.today()
+
+    rows = []
+    for row in db.session.execute(statement.limit(500)).all():
+        data = dict(row._mapping)
+        rows.append(data)
+
+    expired = []
+    upcoming = []
+    no_date = []
+
+    for row in rows:
+        target_date = _da42d_retention_date(row)
+        item = {
+            "id": row.get("id") or "-",
+            "title": _da42d_document_title(row),
+            "date": target_date.strftime("%d.%m.%Y") if target_date else "-",
+            "rule": str(row.get("retention_policy_id") or row.get("retention_rule") or "Belirtilmedi"),
+        }
+
+        if not target_date:
+            no_date.append(item)
+            continue
+
+        days_left = (target_date - today).days
+        item["days_left"] = days_left
+
+        if days_left < 0:
+            expired.append(item)
+        elif days_left <= 90:
+            upcoming.append(item)
+
+    summary_cards = [
+        {"label": "Toplam Belge", "value": len(rows)},
+        {"label": "Süresi Dolan", "value": len(expired)},
+        {"label": "Yaklaşan", "value": len(upcoming)},
+        {"label": "Tarih Bekleyen", "value": len(no_date)},
+    ]
+
+    report_items = [
+        {
+            "title": "Süresi Dolan Belgeler",
+            "value": len(expired),
+            "description": "Saklama süresi geçmiş görünen ve işlem kararı bekleyen belge kayıtları.",
+        },
+        {
+            "title": "Süresi Yaklaşan Belgeler",
+            "value": len(upcoming),
+            "description": "Önümüzdeki 90 gün içinde takip edilmesi gereken belge kayıtları.",
+        },
+        {
+            "title": "Tarih Bilgisi Bekleyen Belgeler",
+            "value": len(no_date),
+            "description": "Saklama süresi hesabı için tarih bilgisi bulunmayan belge kayıtları.",
+        },
+    ]
+
+    latest_items = expired[:10] + upcoming[:10] + no_date[:10]
+
+    return render_template(
+        "digital_archive/retention_report.html",
+        summary_cards=summary_cards,
+        report_items=report_items,
+        latest_items=latest_items[:20],
+    )
+
+
 # DA-42C: Arşiv bağlantı raporu
 def _da42c_table_count(table_names: list[str]) -> int:
     from sqlalchemy import MetaData, Table, func, inspect, select
@@ -3543,8 +3695,8 @@ def report_center():
         {
             "title": "Saklama Süresi Takibi",
             "description": "Saklama süresi yaklaşan veya dolan belgelerin ayrıca raporlanması için hazırlanacak başlık.",
-            "status": "Planlandı",
-            "link": "/digital-archive/module-status",
+            "status": "Hazır",
+            "link": "/digital-archive/reports/retention",
         },
         {
             "title": "Arşiv Bağlantı Raporu",
