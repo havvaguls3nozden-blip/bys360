@@ -99,6 +99,41 @@
     </div>
 
 
+
+    <div class="da-card">
+        <h2 style="margin:0 0 14px; color:#111827;">Özel Alanlar</h2>
+
+        {% if metadata_rows and metadata_columns %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in metadata_columns %}
+                            <th>{{ metadata_labels.get(column, 'Bilgi') }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in metadata_rows %}
+                        <tr>
+                            {% for column in metadata_columns %}
+                                <td>{{ row.get(column, '') }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="da-empty">
+                Bu belge kartı için özel alan değeri bulunmuyor.
+            </div>
+        {% endif %}
+
+        <div class="da-actions">
+            <a class="da-button da-button-primary" href="/digital-archive/documents/{{ document.get('id') }}/metadata">Özel Alanları Düzenle</a>
+            <a class="da-button" href="/digital-archive/metadata-fields">Özel Alan Tanımları</a>
+        </div>
+    </div>
+
     <div class="da-card">
         <h2 style="margin:0 0 14px; color:#111827;">İşlem Geçmişi</h2>
 

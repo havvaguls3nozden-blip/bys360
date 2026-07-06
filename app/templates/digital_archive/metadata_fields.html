@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Özel Alan Tanımları - BYS360 Dijital Arşiv{% endblock %}
+
+{% block content %}
+<style>
+    .da-page { max-width: 1120px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-title { margin: 0; color: #111827; font-size: clamp(26px, 3vw, 38px); font-weight: 850; letter-spacing: -0.03em; }
+    .da-subtitle { margin: 10px 0 22px; color: #667085; line-height: 1.65; max-width: 760px; }
+    .da-card { background:#fff; border:1px solid rgba(15,23,42,.09); border-radius:24px; padding:22px; box-shadow:0 18px 44px rgba(15,23,42,.08); margin-bottom:18px; }
+    .da-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:14px; }
+    .da-field label { display:block; color:#111827; font-weight:800; margin-bottom:8px; }
+    .da-field input, .da-field select { width:100%; border:1px solid rgba(15,23,42,.14); border-radius:14px; padding:11px 12px; color:#111827; background:#fff; }
+    .da-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .da-button { display:inline-flex; align-items:center; justify-content:center; padding:11px 15px; border-radius:14px; text-decoration:none; font-weight:700; border:1px solid rgba(139,0,0,.16); color:#8B0000; background:#fff; cursor:pointer; }
+    .da-button-primary { color:#fff; background:#8B0000; border-color:#8B0000; }
+    .da-table { width:100%; border-collapse:collapse; }
+    .da-table th { text-align:left; padding:14px 16px; font-size:13px; color:#8B0000; background:#f8eded; border-bottom:1px solid rgba(15,23,42,.08); }
+    .da-table td { padding:14px 16px; color:#111827; border-bottom:1px solid rgba(15,23,42,.07); vertical-align:top; }
+    .da-empty { padding:22px; color:#667085; line-height:1.65; }
+    @media (max-width: 860px) { .da-grid { grid-template-columns:1fr; } }
+</style>
+
+<div class="da-page">
+    <h1 class="da-title">Özel Alan Tanımları</h1>
+    <p class="da-subtitle">
+        Belge kartlarına kurum ihtiyacına göre ek bilgi alanları tanımlanır. Böylece her belge türü için daha ayrıntılı arşiv kaydı tutulabilir.
+    </p>
+
+    <form class="da-card" method="post" action="/digital-archive/metadata-fields">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+
+        <div class="da-grid">
+            <div class="da-field">
+                <label for="label">Alan Adı</label>
+                <input id="label" name="label" type="text" placeholder="Örn. Muharebe Alanı">
+            </div>
+
+            <div class="da-field">
+                <label for="field_type">Alan Türü</label>
+                <select id="field_type" name="field_type">
+                    <option value="Metin">Metin</option>
+                    <option value="Uzun Metin">Uzun Metin</option>
+                    <option value="Tarih">Tarih</option>
+                    <option value="Sayı">Sayı</option>
+                    <option value="Seçim">Seçim</option>
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="applies_to">Kullanım Yeri</label>
+                <input id="applies_to" name="applies_to" type="text" value="Belge Kartı">
+            </div>
+
+            <div class="da-field">
+                <label for="sort_order">Sıra</label>
+                <input id="sort_order" name="sort_order" type="number" value="0">
+            </div>
+        </div>
+
+        <div class="da-actions">
+            <button class="da-button da-button-primary" type="submit">Alanı Kaydet</button>
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
+            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+        </div>
+    </form>
+
+    <div class="da-card">
+        <h2 style="margin:0 0 14px; color:#111827;">Tanımlı Alanlar</h2>
+
+        {% if rows and display_columns %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in display_columns %}
+                            <th>{{ labels.get(column, column) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for column in display_columns %}
+                                <td>
+                                    {% if column == 'is_active' %}
+                                        {% if row.get(column) %}Aktif{% else %}Pasif{% endif %}
+                                    {% else %}
+                                        {{ row.get(column, '') }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="da-empty">Henüz özel alan tanımı bulunmuyor.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

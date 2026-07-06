@@ -805,6 +805,10 @@ def documents():
                 if readable_text_document_ids:
                     text_conditions.append(table.c.id.in_(readable_text_document_ids))
 
+            metadata_document_ids = _da29_document_ids_for_metadata(q)
+            if metadata_document_ids:
+                text_conditions.append(table.c.id.in_(metadata_document_ids))
+
             if text_conditions:
                 conditions.append(or_(*text_conditions))
 
@@ -1278,6 +1282,7 @@ def document_detail(document_id: int):
 
         file_rows, file_columns, file_labels = _da24_document_files(document_id)
         history_rows, history_columns, history_labels = _da28_history_rows(document_id)
+        metadata_rows, metadata_columns, metadata_labels = _da29_metadata_rows(document_id)
 
         return render_template(
             "digital_archive/document_detail.html",
@@ -1290,6 +1295,9 @@ def document_detail(document_id: int):
             history_rows=history_rows,
             history_columns=history_columns,
             history_labels=history_labels,
+            metadata_rows=metadata_rows,
+            metadata_columns=metadata_columns,
+            metadata_labels=metadata_labels,
         )
     except Exception:
         current_app.logger.exception("Belge kartı detayı açılamadı.")
@@ -2097,6 +2105,327 @@ def _da28_write_history(document_id: int, action: str, description: str, related
         db.session.execute(table.insert().values(**payload))
     except Exception:
         current_app.logger.exception("Belge işlem geçmişi yazılamadı.")
+
+
+
+# DA-29B: Dinamik özel alanlar
+def _da29_create_metadata_tables() -> None:
+    from sqlalchemy import text
+
+    db.session.execute(text("""
+        CREATE TABLE IF NOT EXISTS digital_archive_metadata_fields (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(150) NOT NULL,
+            label VARCHAR(150) NOT NULL,
+            field_type VARCHAR(50) NOT NULL DEFAULT 'Metin',
+            applies_to VARCHAR(100) NOT NULL DEFAULT 'Belge Kartı',
+            is_required INTEGER NOT NULL DEFAULT 0,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME
+        )
+    """))
+
+    db.session.execute(text("""
+        CREATE TABLE IF NOT EXISTS digital_archive_metadata_values (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            document_id INTEGER NOT NULL,
+            field_id INTEGER NOT NULL,
+            value_text TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME
+        )
+    """))
+
+    db.session.commit()
+
+
+def _da29_metadata_tables(create_if_missing: bool = False):
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = set(inspector.get_table_names())
+
+    required = {"digital_archive_metadata_fields", "digital_archive_metadata_values"}
+    if not required.issubset(table_names):
+        if not create_if_missing:
+            raise RuntimeError("Özel alan tabloları bulunamadı.")
+
+        _da29_create_metadata_tables()
+
+    metadata = MetaData()
+    fields_table = Table("digital_archive_metadata_fields", metadata, autoload_with=db.engine)
+    values_table = Table("digital_archive_metadata_values", metadata, autoload_with=db.engine)
+
+    return fields_table, values_table
+
+
+def _da29_slug(value: str) -> str:
+    import re
+    import unicodedata
+
+    normalized = unicodedata.normalize("NFKD", value or "")
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-zA-Z0-9]+", "_", ascii_value).strip("_").lower()
+
+    return slug or "ozel_alan"
+
+
+def _da29_active_fields() -> list[dict]:
+    from sqlalchemy import select
+
+    try:
+        fields_table, _values_table = _da29_metadata_tables(create_if_missing=False)
+    except RuntimeError:
+        return []
+
+    query = select(fields_table)
+    if "is_active" in fields_table.c:
+        query = query.where(fields_table.c.is_active == 1)
+
+    if "sort_order" in fields_table.c:
+        query = query.order_by(fields_table.c.sort_order, fields_table.c.id)
+    elif "id" in fields_table.c:
+        query = query.order_by(fields_table.c.id)
+
+    return [dict(row._mapping) for row in db.session.execute(query.limit(200)).all()]
+
+
+def _da29_metadata_rows(document_id: int):
+    from sqlalchemy import text
+
+    try:
+        _fields_table, _values_table = _da29_metadata_tables(create_if_missing=False)
+    except RuntimeError:
+        return [], [], {}
+
+    rows = db.session.execute(
+        text("""
+            SELECT
+                v.id,
+                f.label,
+                f.field_type,
+                v.value_text,
+                v.created_at,
+                v.updated_at
+            FROM digital_archive_metadata_values v
+            JOIN digital_archive_metadata_fields f ON f.id = v.field_id
+            WHERE v.document_id = :document_id
+            ORDER BY f.sort_order, f.label, v.id
+        """),
+        {"document_id": document_id},
+    ).mappings().all()
+
+    display_rows = [dict(row) for row in rows]
+    display_columns = ["label", "field_type", "value_text", "created_at"]
+
+    labels = {
+        "label": "Alan",
+        "field_type": "Tür",
+        "value_text": "Değer",
+        "created_at": "Kayıt Tarihi",
+        "updated_at": "Güncelleme Tarihi",
+    }
+
+    return display_rows, display_columns, labels
+
+
+def _da29_existing_values(document_id: int) -> dict[int, dict]:
+    from sqlalchemy import select
+
+    try:
+        _fields_table, values_table = _da29_metadata_tables(create_if_missing=False)
+    except RuntimeError:
+        return {}
+
+    rows = db.session.execute(
+        select(values_table).where(values_table.c.document_id == document_id)
+    ).all()
+
+    result = {}
+    for row in rows:
+        item = dict(row._mapping)
+        field_id = item.get("field_id")
+        if field_id is not None:
+            result[int(field_id)] = item
+
+    return result
+
+
+def _da29_document_ids_for_metadata(search_text: str) -> list[int]:
+    from sqlalchemy import String, cast, select
+
+    try:
+        _fields_table, values_table = _da29_metadata_tables(create_if_missing=False)
+    except RuntimeError:
+        return []
+
+    if "document_id" not in values_table.c or "value_text" not in values_table.c:
+        return []
+
+    rows = db.session.execute(
+        select(values_table.c.document_id)
+        .where(cast(values_table.c.value_text, String).ilike(f"%{search_text}%"))
+        .distinct()
+        .limit(500)
+    ).all()
+
+    return sorted({int(row[0]) for row in rows if row[0]})
+
+
+@digital_archive_bp.route("/metadata-fields", methods=["GET", "POST"])
+@login_required
+def metadata_fields():
+    """Belge kartları için özel alan tanımları."""
+    from datetime import datetime
+
+    from flask import request
+    from sqlalchemy import desc, select
+
+    try:
+        fields_table, _values_table = _da29_metadata_tables(create_if_missing=True)
+
+        if request.method == "POST":
+            label = request.form.get("label", "").strip()
+            field_type = request.form.get("field_type", "Metin").strip() or "Metin"
+            applies_to = request.form.get("applies_to", "Belge Kartı").strip() or "Belge Kartı"
+            sort_order_raw = request.form.get("sort_order", "0").strip()
+
+            if not label:
+                flash("Alan adı boş bırakılamaz.", "warning")
+                return redirect("/digital-archive/metadata-fields")
+
+            try:
+                sort_order = int(sort_order_raw)
+            except ValueError:
+                sort_order = 0
+
+            name = _da29_slug(label)
+
+            payload = {
+                "name": name,
+                "label": label,
+                "field_type": field_type,
+                "applies_to": applies_to,
+                "is_required": 0,
+                "is_active": 1,
+                "sort_order": sort_order,
+                "created_at": datetime.now(),
+            }
+
+            db.session.execute(fields_table.insert().values(**payload))
+            db.session.commit()
+
+            flash("Özel alan tanımı oluşturuldu.", "success")
+            return redirect("/digital-archive/metadata-fields")
+
+        rows = [dict(row._mapping) for row in db.session.execute(
+            select(fields_table).order_by(desc(fields_table.c.id)).limit(200)
+        ).all()]
+
+        display_columns = ["id", "label", "field_type", "applies_to", "is_active", "created_at"]
+        display_columns = [column for column in display_columns if column in fields_table.c]
+
+        labels = {
+            "id": "No",
+            "label": "Alan",
+            "field_type": "Tür",
+            "applies_to": "Kullanım Yeri",
+            "is_active": "Durum",
+            "created_at": "Kayıt Tarihi",
+        }
+
+        return render_template(
+            "digital_archive/metadata_fields.html",
+            rows=rows,
+            display_columns=display_columns,
+            labels=labels,
+        )
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Özel alan tanımları açılamadı.")
+        flash("Özel alan tanımları açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/")
+
+
+@digital_archive_bp.route("/documents/<int:document_id>/metadata", methods=["GET", "POST"])
+@login_required
+def document_metadata(document_id: int):
+    """Belge kartına özel alan değerleri bağlar."""
+    from datetime import datetime
+
+    from flask import request
+    from sqlalchemy import select, update
+
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        fields_table, values_table = _da29_metadata_tables(create_if_missing=True)
+
+        fields = _da29_active_fields()
+
+        if request.method == "POST":
+            existing_values = _da29_existing_values(document_id)
+
+            for field in fields:
+                field_id = int(field.get("id"))
+                form_key = f"field_{field_id}"
+                value_text = request.form.get(form_key, "").strip()
+
+                if not value_text:
+                    continue
+
+                if field_id in existing_values:
+                    db.session.execute(
+                        update(values_table)
+                        .where(values_table.c.id == existing_values[field_id]["id"])
+                        .values(value_text=value_text, updated_at=datetime.now())
+                    )
+                else:
+                    db.session.execute(
+                        values_table.insert().values(
+                            document_id=document_id,
+                            field_id=field_id,
+                            value_text=value_text,
+                            created_at=datetime.now(),
+                        )
+                    )
+
+            try:
+                _da28_write_history(
+                    document_id,
+                    "Özel alanlar güncellendi",
+                    "Belge kartı özel alanları güncellendi.",
+                )
+            except Exception:
+                current_app.logger.exception("Özel alan işlem geçmişi yazılamadı.")
+
+            db.session.commit()
+            flash("Özel alanlar belge kartına kaydedildi.", "success")
+            return redirect(f"/digital-archive/documents/{document_id}/metadata")
+
+        existing_values = _da29_existing_values(document_id)
+        readable_rows, readable_columns, readable_labels = _da29_metadata_rows(document_id)
+
+        return render_template(
+            "digital_archive/document_metadata.html",
+            document=dict(document),
+            document_id=document_id,
+            fields=fields,
+            existing_values=existing_values,
+            readable_rows=readable_rows,
+            readable_columns=readable_columns,
+            readable_labels=readable_labels,
+        )
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge kartı özel alan ekranı açılamadı.")
+        flash("Belge kartı özel alanları açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
 
 
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
