@@ -2428,6 +2428,93 @@ def document_metadata(document_id: int):
         return redirect(f"/digital-archive/documents/{document_id}")
 
 
+
+# DA-30A: Tarihi Alan hazır özel alan seti
+def _da30_historical_field_set() -> list[dict]:
+    return [
+        {"label": "Muharebe Alanı", "field_type": "Metin", "sort_order": 10},
+        {"label": "Cephe / Sektör", "field_type": "Metin", "sort_order": 20},
+        {"label": "Tarihsel Dönem", "field_type": "Metin", "sort_order": 30},
+        {"label": "İlgili Şehitlik / Anıt", "field_type": "Metin", "sort_order": 40},
+        {"label": "İlgili Köy / Mevki", "field_type": "Metin", "sort_order": 50},
+        {"label": "Birlik / Alay", "field_type": "Metin", "sort_order": 60},
+        {"label": "Komutan / Şahıs", "field_type": "Metin", "sort_order": 70},
+        {"label": "Belge Dili", "field_type": "Metin", "sort_order": 80},
+        {"label": "Kaynak / Koleksiyon", "field_type": "Metin", "sort_order": 90},
+        {"label": "Envanter No", "field_type": "Metin", "sort_order": 100},
+        {"label": "Koruma Durumu", "field_type": "Metin", "sort_order": 110},
+        {"label": "Açıklama / Tarihsel Not", "field_type": "Uzun Metin", "sort_order": 120},
+    ]
+
+
+@digital_archive_bp.route("/metadata-field-set", methods=["GET", "POST"])
+@login_required
+def metadata_field_set():
+    """Tarihi Alan hazır özel alan seti."""
+    from datetime import datetime
+
+    from sqlalchemy import select
+
+    try:
+        fields_table, _values_table = _da29_metadata_tables(create_if_missing=True)
+        field_set = _da30_historical_field_set()
+
+        existing_rows = db.session.execute(
+            select(fields_table.c.label)
+        ).all()
+        existing_labels = {row[0] for row in existing_rows if row[0]}
+
+        if request.method == "POST":
+            added_count = 0
+
+            for item in field_set:
+                label = item["label"]
+
+                if label in existing_labels:
+                    continue
+
+                payload = {
+                    "name": _da29_slug(label),
+                    "label": label,
+                    "field_type": item.get("field_type", "Metin"),
+                    "applies_to": "Belge Kartı",
+                    "is_required": 0,
+                    "is_active": 1,
+                    "sort_order": item.get("sort_order", 0),
+                    "created_at": datetime.now(),
+                }
+
+                db.session.execute(fields_table.insert().values(**payload))
+                added_count += 1
+
+            db.session.commit()
+
+            if added_count:
+                flash(f"{added_count} özel alan tanımı eklendi.", "success")
+            else:
+                flash("Hazır özel alanlar zaten tanımlı.", "info")
+
+            return redirect("/digital-archive/metadata-field-set")
+
+        preview_rows = []
+        for item in field_set:
+            preview_rows.append({
+                "label": item["label"],
+                "field_type": item.get("field_type", "Metin"),
+                "status": "Tanımlı" if item["label"] in existing_labels else "Eklenecek",
+            })
+
+        return render_template(
+            "digital_archive/metadata_field_set.html",
+            rows=preview_rows,
+        )
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Hazır özel alan seti açılamadı.")
+        flash("Hazır özel alan seti açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/metadata-fields")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
