@@ -368,6 +368,133 @@ def retention_policy_draft_form():
     context = _digital_archive_passive_form_context("retention_policies")
     return render_template("digital_archive/passive_form.html", **context)
 
+
+
+@digital_archive_bp.route("/retention-policies", methods=["POST"])
+@login_required
+def retention_policy_create_post():
+    """Saklama süresi kaydı oluşturur."""
+    from datetime import datetime
+
+    from flask import current_app, flash, redirect, request
+    from sqlalchemy import MetaData, Table
+
+    from app import db
+
+    metadata = MetaData()
+    table = Table("digital_archive_retention_policies", metadata, autoload_with=db.engine)
+
+    form_data = request.form.to_dict(flat=True)
+    now = datetime.now()
+    payload = {}
+
+    def varsayilan_deger(column):
+        name = column.name
+        lower_name = name.lower()
+        lower_type = str(column.type).lower()
+
+        if name in {"created_at", "updated_at"}:
+            return now
+
+        if "bool" in lower_type:
+            return True if name == "is_active" else False
+
+        if "int" in lower_type:
+            if lower_name in {"retention_years", "retention_period", "duration_years", "year_count"}:
+                return 5
+            if lower_name.endswith("_id"):
+                return None
+            return 0
+
+        if "date" in lower_type or "time" in lower_type:
+            return None
+
+        if lower_name in {"code", "policy_code"}:
+            return "SK-" + now.strftime("%Y%m%d%H%M%S")
+        if lower_name in {"name", "title", "document_type", "policy_name"}:
+            return "Genel Saklama Süresi"
+        if lower_name in {"action", "disposal_action", "final_action"}:
+            return "Süre sonunda değerlendir"
+        if lower_name in {"description", "notes"}:
+            return "Arşiv belgeleri için saklama süresi kaydı."
+        if lower_name in {"legal_basis", "basis"}:
+            return "Kurum arşiv düzeni"
+
+        return None
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"}:
+            continue
+
+        raw_value = str(form_data.get(name, "")).strip()
+
+        if not raw_value:
+            value = varsayilan_deger(column)
+            if value is not None:
+                payload[name] = value
+            continue
+
+        lower_type = str(column.type).lower()
+
+        if "int" in lower_type:
+            try:
+                payload[name] = int(raw_value)
+            except ValueError:
+                flash("Sayısal alanlar yalnızca rakam içermelidir.", "warning")
+                return redirect("/digital-archive/retention-policies/new")
+        elif "bool" in lower_type:
+            payload[name] = raw_value.lower() in {"1", "true", "on", "yes", "evet", "aktif"}
+        elif "date" in lower_type or "time" in lower_type:
+            parsed_value = None
+            for pattern in ("%Y-%m-%d", "%d.%m.%Y", "%Y-%m-%dT%H:%M"):
+                try:
+                    parsed_value = datetime.strptime(raw_value, pattern)
+                    break
+                except ValueError:
+                    continue
+            payload[name] = parsed_value
+        else:
+            payload[name] = raw_value
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"} or name in payload:
+            continue
+
+        nullable = getattr(column, "nullable", True)
+        has_default = column.default is not None or column.server_default is not None
+
+        if not nullable and not has_default:
+            value = varsayilan_deger(column)
+            if value is not None:
+                payload[name] = value
+
+    meaningful_payload = {
+        key: value
+        for key, value in payload.items()
+        if key not in {"created_at", "updated_at", "is_active"} and value not in (None, "")
+    }
+
+    if not meaningful_payload:
+        flash("Saklama süresi bilgisi girilmelidir.", "warning")
+        return redirect("/digital-archive/retention-policies/new")
+
+    try:
+        db.session.execute(table.insert().values(**payload))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Saklama süresi kaydı oluşturulamadı.")
+        flash("Kayıt oluşturulurken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/retention-policies/new")
+
+    flash("Saklama süresi kaydedildi.", "success")
+    return redirect("/digital-archive/retention-policies")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
