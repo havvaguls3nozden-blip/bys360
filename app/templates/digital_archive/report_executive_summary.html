@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Rapor Merkezi - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Yönetici Özeti - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -47,6 +47,13 @@
         max-width: 880px;
     }
 
+    .da-print-help {
+        margin-top: 10px;
+        color: #667085;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
     .da-actions {
         display: flex;
         flex-wrap: wrap;
@@ -65,6 +72,7 @@
         border: 1px solid rgba(139, 0, 0, .16);
         color: #8B0000;
         background: #fff;
+        cursor: pointer;
     }
 
     .da-button-primary {
@@ -80,12 +88,19 @@
         margin-top: 18px;
     }
 
-    .da-summary-card {
+    .da-summary-card,
+    .da-overview-card,
+    .da-attention-card,
+    .da-status-card,
+    .da-note {
         background: #fff;
         border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    .da-summary-card {
         border-radius: 20px;
         padding: 16px;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-summary-card strong {
@@ -100,19 +115,31 @@
         line-height: 1.5;
     }
 
+    .da-section {
+        margin-top: 22px;
+    }
+
+    .da-section h2 {
+        margin: 0 0 12px;
+        color: #111827;
+        font-size: 22px;
+        font-weight: 850;
+    }
+
     .da-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px;
-        margin-top: 18px;
     }
 
-    .da-card {
-        background: #fff;
-        border: 1px solid rgba(15, 23, 42, .09);
+    .da-overview-card,
+    .da-attention-card,
+    .da-status-card {
         border-radius: 24px;
         padding: 20px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+    }
+
+    .da-overview-card {
         text-decoration: none;
         display: block;
     }
@@ -125,39 +152,63 @@
         margin-bottom: 10px;
     }
 
-    .da-card h2 {
+    .da-overview-card h3,
+    .da-attention-card h3,
+    .da-status-card h3 {
         margin: 0;
         color: #111827;
         font-size: 20px;
         font-weight: 850;
     }
 
-    .da-pill {
+    .da-value {
         display: inline-flex;
-        padding: 7px 10px;
+        padding: 8px 12px;
         border-radius: 999px;
         background: #f8eded;
         color: #8B0000;
-        font-weight: 850;
-        font-size: 12px;
+        font-weight: 900;
         white-space: nowrap;
     }
 
-    .da-card p {
-        margin: 0;
+    .da-overview-card p,
+    .da-attention-card p,
+    .da-status-card p,
+    .da-note {
         color: #667085;
         line-height: 1.65;
     }
 
-    .da-note {
-        margin-top: 18px;
+    .da-link-text {
+        display: inline-flex;
+        margin-top: 12px;
+        color: #8B0000;
+        font-weight: 850;
+    }
+
+    .da-status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .da-status-card {
+        border-radius: 20px;
+    }
+
+    .da-empty {
+        padding: 18px;
+        border-radius: 20px;
         background: #fff;
         border: 1px solid rgba(15, 23, 42, .09);
+        color: #667085;
+        line-height: 1.7;
+    }
+
+    .da-note {
+        margin-top: 18px;
         border-radius: 22px;
         padding: 18px;
-        color: #475467;
-        line-height: 1.7;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-note strong {
@@ -166,20 +217,14 @@
 
     @media (max-width: 900px) {
         .da-summary-grid,
-        .da-grid {
+        .da-grid,
+        .da-status-grid {
             grid-template-columns: 1fr;
         }
 
         .da-hero {
             padding: 22px;
         }
-    }
-
-    .da-print-help {
-        margin-top: 10px;
-        color: #667085;
-        line-height: 1.6;
-        font-size: 14px;
     }
 
     @media print {
@@ -198,9 +243,9 @@
 
         .da-hero,
         .da-summary-card,
-        .da-card,
-        .da-report-card,
-        .da-table-wrap,
+        .da-overview-card,
+        .da-attention-card,
+        .da-status-card,
         .da-note {
             box-shadow: none !important;
             break-inside: avoid;
@@ -217,35 +262,25 @@
             color: inherit !important;
             text-decoration: none !important;
         }
-
-        .da-table th,
-        .da-table td {
-            font-size: 12px;
-        }
     }
-
 </style>
 
 <div class="da-page">
     <section class="da-hero">
         <div class="da-kicker">BYS360 Dijital Arşiv</div>
-        <h1 class="da-title">Rapor Merkezi</h1>
+        <h1 class="da-title">Yönetici Özeti</h1>
         <p class="da-subtitle">
-            Dijital Arşiv bölümündeki belge, durum, arama, yetki ve çıktı başlıkları bu ekranda tek merkezde toplanır.
-            Amaç, yöneticinin ve kullanıcının rapor başlıklarına kolay ulaşmasıdır.
+            Dijital Arşiv bölümündeki belge, durum, arşiv bağlantısı ve saklama süresi başlıklarını
+            tek yönetici ekranında sade şekilde gösterir.
         </p>
         <div class="da-print-help">Bu ekran yazdırmaya uygun hazırlanmıştır.</div>
 
         <div class="da-actions">
             <button class="da-button da-button-primary" type="button" onclick="window.print()">Yazdır</button>
-            <a class="da-button da-button-primary" href="/digital-archive/">Dijital Arşiv</a>
-            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
-            <a class="da-button" href="/digital-archive/module-status">Genel Durum</a>
-            <a class="da-button" href="/digital-archive/reports/executive-summary">Yönetici Özeti</a>
+            <a class="da-button" href="/digital-archive/report-center">Rapor Merkezi</a>
             <a class="da-button" href="/digital-archive/reports/document-status">Belge Durum Raporu</a>
             <a class="da-button" href="/digital-archive/reports/archive-links">Arşiv Bağlantı Raporu</a>
             <a class="da-button" href="/digital-archive/reports/retention">Saklama Süresi Raporu</a>
-            <a class="da-button" href="/digital-archive/permission-guide">Kullanıcı Yetkileri</a>
         </div>
     </section>
 
@@ -258,21 +293,59 @@
         {% endfor %}
     </section>
 
-    <section class="da-grid">
-        {% for item in report_cards %}
-            <a class="da-card" href="{{ item.link }}">
-                <div class="da-card-head">
-                    <h2>{{ item.title }}</h2>
-                    <span class="da-pill">{{ item.status }}</span>
-                </div>
-                <p>{{ item.description }}</p>
-            </a>
-        {% endfor %}
+    <section class="da-section">
+        <h2>Genel Görünüm</h2>
+        <div class="da-grid">
+            {% for item in overview_cards %}
+                <a class="da-overview-card" href="{{ item.link }}">
+                    <div class="da-card-head">
+                        <h3>{{ item.title }}</h3>
+                        <span class="da-value">{{ item.value }}</span>
+                    </div>
+                    <p>{{ item.description }}</p>
+                    <span class="da-link-text">{{ item.link_text }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="da-section">
+        <h2>Dikkat Edilecek Başlıklar</h2>
+        <div class="da-grid">
+            {% for item in attention_items %}
+                <article class="da-attention-card">
+                    <div class="da-card-head">
+                        <h3>{{ item.title }}</h3>
+                        <span class="da-value">{{ item.value }}</span>
+                    </div>
+                    <p>{{ item.description }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="da-section">
+        <h2>Belge Durumları</h2>
+        {% if status_cards %}
+            <div class="da-status-grid">
+                {% for item in status_cards %}
+                    <article class="da-status-card">
+                        <div class="da-card-head">
+                            <h3>{{ item.name }}</h3>
+                            <span class="da-value">{{ item.count }}</span>
+                        </div>
+                        <p>Bu durumdaki belge kayıtları raporlarda izlenir.</p>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="da-empty">Henüz durum özeti oluşturulacak belge bulunmuyor.</div>
+        {% endif %}
     </section>
 
     <div class="da-note">
         <strong>Kullanım notu:</strong>
-        Rapor Merkezi, mevcut ekranlara hızlı erişim sağlar ve ileride hazırlanacak rapor başlıkları için ana giriş noktası olur.
+        Yönetici Özeti mevcut kayıtları okur ve genel görünüm sunar. Kayıt ekleme veya değiştirme işlemi yapmaz.
     </div>
 </div>
 {% endblock %}

@@ -3276,6 +3276,261 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-43B: Rapor merkezi yönetici özeti
+def _da43b_table_count(table_names: list[str]) -> int:
+    from sqlalchemy import MetaData, Table, func, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+        return int(db.session.execute(select(func.count()).select_from(table)).scalar() or 0)
+
+    return 0
+
+
+def _da43b_distinct_document_count(table_names: list[str]) -> int:
+    from sqlalchemy import MetaData, Table, func, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+        if "document_id" not in table.c:
+            continue
+
+        return int(
+            db.session.execute(
+                select(func.count(func.distinct(table.c.document_id))).select_from(table)
+            ).scalar()
+            or 0
+        )
+
+    return 0
+
+
+def _da43b_parse_date(value):
+    from datetime import datetime
+
+    if value is None:
+        return None
+
+    if hasattr(value, "date"):
+        try:
+            return value.date()
+        except Exception:
+            return value
+
+    text_value = str(value).strip()
+    if not text_value:
+        return None
+
+    formats = [
+        "%Y-%m-%d",
+        "%Y-%m-%d %H:%M:%S",
+        "%d.%m.%Y",
+        "%d.%m.%Y %H:%M",
+        "%d/%m/%Y",
+        "%d/%m/%Y %H:%M",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(text_value[:19], fmt).date()
+        except Exception:
+            continue
+
+    return None
+
+
+def _da43b_retention_date(row: dict):
+    date_keys = [
+        "retention_until",
+        "retention_end_date",
+        "retention_date",
+        "retention_expires_at",
+        "expires_at",
+        "archive_until",
+        "destroy_after_date",
+        "disposal_date",
+        "review_date",
+        "due_date",
+    ]
+
+    for key in date_keys:
+        if key in row:
+            parsed = _da43b_parse_date(row.get(key))
+            if parsed:
+                return parsed
+
+    return None
+
+
+def _da43b_document_rows(limit: int = 500) -> list[dict]:
+    from sqlalchemy import select
+
+    table = _da23_document_table()
+
+    statement = select(table)
+    if "created_at" in table.c:
+        statement = statement.order_by(table.c.created_at.desc())
+    elif "id" in table.c:
+        statement = statement.order_by(table.c.id.desc())
+
+    rows = []
+    for row in db.session.execute(statement.limit(limit)).all():
+        rows.append(dict(row._mapping))
+
+    return rows
+
+
+@digital_archive_bp.get("/reports/executive-summary")
+@login_required
+def report_executive_summary():
+    """Dijital Arşiv raporları için sade yönetici özet ekranı."""
+    from datetime import date
+
+    from flask import render_template
+
+    document_rows = _da43b_document_rows()
+    enriched_rows = [_da36b_enrich_document_row(row) for row in document_rows]
+    status_summary = _da36b_status_summary(enriched_rows)
+
+    document_total = len(document_rows)
+    link_total = _da43b_table_count(
+        [
+            "digital_archive_document_material_links",
+            "digital_archive_material_links",
+            "digital_archive_document_archive_links",
+        ]
+    )
+    linked_document_total = _da43b_distinct_document_count(
+        [
+            "digital_archive_document_material_links",
+            "digital_archive_material_links",
+            "digital_archive_document_archive_links",
+        ]
+    )
+    material_type_total = _da43b_table_count(
+        [
+            "digital_archive_material_types",
+            "digital_archive_archive_materials",
+            "digital_archive_materials",
+        ]
+    )
+
+    today = date.today()
+    expired_count = 0
+    upcoming_count = 0
+    waiting_date_count = 0
+
+    for row in document_rows:
+        target_date = _da43b_retention_date(row)
+        if not target_date:
+            waiting_date_count += 1
+            continue
+
+        days_left = (target_date - today).days
+        if days_left < 0:
+            expired_count += 1
+        elif days_left <= 90:
+            upcoming_count += 1
+
+    attention_total = expired_count + upcoming_count
+    unlinked_document_total = max(document_total - linked_document_total, 0)
+
+    summary_cards = [
+        {"label": "Toplam Belge", "value": document_total},
+        {"label": "Bağlantı Kaydı", "value": link_total},
+        {"label": "Takip Gereken", "value": attention_total},
+        {"label": "Durum Başlığı", "value": len(status_summary)},
+    ]
+
+    overview_cards = [
+        {
+            "title": "Belge Yönetimi",
+            "value": document_total,
+            "description": "Dijital Arşiv bölümünde izlenen toplam belge sayısı.",
+            "link": "/digital-archive/documents",
+            "link_text": "Belgeleri Aç",
+        },
+        {
+            "title": "Belge Durumları",
+            "value": len(status_summary),
+            "description": "Belgelerin arşiv sürecindeki durum başlıkları.",
+            "link": "/digital-archive/reports/document-status",
+            "link_text": "Durum Raporu",
+        },
+        {
+            "title": "Arşiv Bağlantıları",
+            "value": link_total,
+            "description": "Belge ile arşiv malzemeleri arasında kurulan bağlantı kayıtları.",
+            "link": "/digital-archive/reports/archive-links",
+            "link_text": "Bağlantı Raporu",
+        },
+        {
+            "title": "Saklama Süresi",
+            "value": attention_total,
+            "description": "Süresi dolan veya yaklaşan takip başlıkları.",
+            "link": "/digital-archive/reports/retention",
+            "link_text": "Saklama Raporu",
+        },
+    ]
+
+    attention_items = [
+        {
+            "title": "Süresi Dolan Belgeler",
+            "value": expired_count,
+            "description": "İşlem kararı bekleyebilecek belge kayıtları.",
+        },
+        {
+            "title": "Süresi Yaklaşan Belgeler",
+            "value": upcoming_count,
+            "description": "Önümüzdeki 90 gün içinde takip edilmesi gereken belge kayıtları.",
+        },
+        {
+            "title": "Tarih Bilgisi Bekleyen Belgeler",
+            "value": waiting_date_count,
+            "description": "Saklama süresi hesabı için tarih bilgisi bulunmayan belge kayıtları.",
+        },
+        {
+            "title": "Bağlantısız Belgeler",
+            "value": unlinked_document_total,
+            "description": "Henüz arşiv malzemesi bağlantısı görünmeyen belge kayıtları.",
+        },
+        {
+            "title": "Tanımlı Malzeme Türü",
+            "value": material_type_total,
+            "description": "Sistemde izlenen arşiv malzemesi türü sayısı.",
+        },
+    ]
+
+    status_cards = [
+        {
+            "name": str(item.get("name") or "Kayıtlı"),
+            "count": int(item.get("count") or 0),
+        }
+        for item in status_summary
+    ]
+
+    return render_template(
+        "digital_archive/report_executive_summary.html",
+        summary_cards=summary_cards,
+        overview_cards=overview_cards,
+        attention_items=attention_items,
+        status_cards=status_cards,
+    )
+
+
 # DA-42D: Saklama süresi takip raporu
 def _da42d_parse_date(value):
     from datetime import datetime
@@ -3656,6 +3911,12 @@ def report_center():
     from flask import render_template
 
     report_cards = [
+        {
+            "title": "Yönetici Özeti",
+            "description": "Belge, durum, arşiv bağlantısı ve saklama süresi başlıklarının tek yönetici ekranında özetlenmesi.",
+            "status": "Hazır",
+            "link": "/digital-archive/reports/executive-summary",
+        },
         {
             "title": "Belge Durum Özeti",
             "description": "Belgelerin Taslak, Kayıtlı, Arşivde, İncelemede ve diğer durumlara göre izlenmesi.",
