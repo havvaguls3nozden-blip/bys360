@@ -3271,6 +3271,86 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-41A: Dijital Arşiv genel durum özeti
+@digital_archive_bp.get("/module-status")
+@login_required
+def module_status():
+    """Dijital Arşiv bölümünün genel durumunu sade Türkçe açıklar."""
+    from flask import render_template
+
+    completed_items = [
+        {
+            "title": "Ekran Dili Temizliği",
+            "description": "Dijital Arşiv ekranlarında kullanıcıya görünen teknik ve hatalı ifadeler temizlendi.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Kullanıcı Akışı",
+            "description": "Ana ekran, kullanıcıların belge kaydı ve arşiv bağlantısı adımlarını anlayacağı sıraya getirildi.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Belge Durumları",
+            "description": "Taslak, Kayıtlı, Arşivde, İncelemede, Devredildi ve İmha Edildi gibi durumlar sade şekilde açıklandı.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Arama Rehberi",
+            "description": "Belge adı, arşiv kodu, fiziksel konum, arşiv malzemesi, okunan metin ve tarihi alan bilgileriyle arama yaklaşımı açıklandı.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Belge Detay Özeti",
+            "description": "Belge detay ekranında ilgili işlemlere tek yerden ulaşılabilecek kurumsal özet alanı hazırlandı.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Yazdırılabilir Özet",
+            "description": "Belgeye ait temel bilgilerin yazdırılabilir sade özet ekranı eklendi.",
+            "result": "Tamamlandı",
+        },
+        {
+            "title": "Kullanıcı Yetkileri",
+            "description": "Kullanıcıların hangi işlemleri yapabileceğini açıklayan sade yetki rehberi hazırlandı.",
+            "result": "Tamamlandı",
+        },
+    ]
+
+    next_items = [
+        {
+            "title": "Gerçek Yetki Bağlantısı",
+            "description": "Rehberde açıklanan yetkilerin rol matrisiyle daha sıkı bağlanması.",
+        },
+        {
+            "title": "Gelişmiş Arama",
+            "description": "Belgeler sayfasındaki arama alanlarının daha kapsamlı filtrelerle güçlendirilmesi.",
+        },
+        {
+            "title": "Rapor Merkezi",
+            "description": "Arşiv, saklama süresi, belge durumu ve bağlantı özetlerinin ayrı rapor ekranlarında toplanması.",
+        },
+        {
+            "title": "Kullanım Kontrolü",
+            "description": "Kurum personelinin ekranları test ederek eksik veya anlaşılmayan alanları bildirmesi.",
+        },
+    ]
+
+    summary_cards = [
+        {"label": "Tamamlanan Başlık", "value": len(completed_items)},
+        {"label": "Sıradaki Başlık", "value": len(next_items)},
+        {"label": "Ekran Dili", "value": "Temiz"},
+        {"label": "Kullanım Durumu", "value": "Yerel Kontrol"},
+    ]
+
+    return render_template(
+        "digital_archive/module_status.html",
+        completed_items=completed_items,
+        next_items=next_items,
+        summary_cards=summary_cards,
+    )
+
+
 # DA-40A: Kullanıcı yetki rehberi
 @digital_archive_bp.get("/permission-guide")
 @login_required
