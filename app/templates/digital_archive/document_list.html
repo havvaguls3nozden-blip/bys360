@@ -76,6 +76,67 @@
         font-weight: 800;
         font-size: 13px;
     }
+
+    .da-search-panel {
+        margin: 16px 0;
+        padding: 18px;
+        border-radius: 22px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    .da-search-panel strong {
+        display: block;
+        color: #111827;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .da-search-panel p {
+        margin: 0;
+        color: #667085;
+        line-height: 1.65;
+    }
+
+    .da-search-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .da-search-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: #f8eded;
+        color: #8B0000;
+        font-weight: 800;
+        font-size: 13px;
+    }
+
+    .da-search-help {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .da-search-help a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 13px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 800;
+        color: #8B0000;
+        background: #fff;
+        border: 1px solid rgba(139, 0, 0, .16);
+    }
+
 </style>
 
 {% set filtre = filter_values|default({}) %}
@@ -97,6 +158,30 @@
             <a class="da-button" href="/digital-archive/document-search-guide">Arama Rehberi</a>
             <a class="da-button da-button-primary" href="/digital-archive/documents/new">Yeni Belge</a>
         </div>
+
+        <div class="da-search-panel">
+            <strong>Belgelerde Arama</strong>
+            <p>
+                Aradığınız belgeyi bulmak için belge adı, arşiv kodu, fiziksel konum, arşiv malzemesi,
+                belge durumu, okunan metin veya tarihi alan bilgisinden yararlanabilirsiniz.
+            </p>
+
+            <div class="da-search-chips">
+                <span class="da-search-chip">Belge adı</span>
+                <span class="da-search-chip">Arşiv kodu</span>
+                <span class="da-search-chip">Fiziksel konum</span>
+                <span class="da-search-chip">Arşiv malzemesi</span>
+                <span class="da-search-chip">Belge durumu</span>
+                <span class="da-search-chip">Okunan metin</span>
+                <span class="da-search-chip">Tarihi alan bilgisi</span>
+            </div>
+
+            <div class="da-search-help">
+                <a href="/digital-archive/document-search-guide">Arama Rehberini Aç</a>
+                <a href="/digital-archive/document-status-guide">Belge Durumlarını Gör</a>
+            </div>
+        </div>
+
     </div>
 
     <form class="da-search" method="get" action="/digital-archive/documents">
