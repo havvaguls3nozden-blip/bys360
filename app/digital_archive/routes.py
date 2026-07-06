@@ -3268,6 +3268,65 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-37A: Arama rehberi
+@digital_archive_bp.get("/document-search-guide")
+@login_required
+def document_search_guide():
+    """Belge arama yöntemlerini sade Türkçe açıklamalarla gösterir."""
+    from flask import render_template
+
+    search_steps = [
+        {
+            "order": "1",
+            "title": "Belge Adı ile Ara",
+            "description": "Belgenin başlığı, konusu veya bilinen kısa adı yazılarak kayıt bulunabilir.",
+            "example": "Örn. toplantı tutanağı, karar yazısı, fotoğraf listesi",
+        },
+        {
+            "order": "2",
+            "title": "Arşiv Kodu ile Ara",
+            "description": "Kurumun verdiği arşiv kodu veya dosya numarası biliniyorsa doğrudan bu bilgiyle arama yapılabilir.",
+            "example": "Örn. kutu, klasör veya dosya numarası",
+        },
+        {
+            "order": "3",
+            "title": "Fiziksel Konum ile Ara",
+            "description": "Belgenin bulunduğu oda, raf, kutu, klasör veya dosya bilgisiyle kayıt daraltılabilir.",
+            "example": "Örn. Arşiv Odası A, Raf 2, Kutu 4",
+        },
+        {
+            "order": "4",
+            "title": "Arşiv Malzemesi ile Ara",
+            "description": "Belgenin bağlı olduğu kutu, klasör, fotoğraf, harita, defter veya dijital dosya türü üzerinden ilerlenebilir.",
+            "example": "Örn. fotoğraf, harita, klasör, dijital dosya",
+        },
+        {
+            "order": "5",
+            "title": "Belge Durumu ile Ara",
+            "description": "Taslak, Kayıtlı, Arşivde, İncelemede veya saklama süresiyle ilgili durumlar izlenebilir.",
+            "example": "Örn. Arşivde, İncelemede, Saklama Süresi Doluyor",
+        },
+        {
+            "order": "6",
+            "title": "Okunan Metin ile Ara",
+            "description": "Taranmış belgeden elde edilen okunan metin içinde geçen kelimelerle belgeye ulaşılabilir.",
+            "example": "Örn. kişi adı, yer adı, karar konusu",
+        },
+        {
+            "order": "7",
+            "title": "Tarihi Alan Bilgileri ile Ara",
+            "description": "Muharebe alanı, cephe, şehitlik, anıt, kaynak veya tarihsel not gibi kuruma özel bilgiler kullanılabilir.",
+            "example": "Örn. Conkbayırı, Anafartalar, şehitlik adı",
+        },
+    ]
+
+    return render_template(
+        "digital_archive/document_search_guide.html",
+        search_steps=search_steps,
+    )
+
+
 # DA-36B: Belge durumu görünür etiketleri
 _DA36B_STATUS_LABELS = {
     "": "Kayıtlı",
