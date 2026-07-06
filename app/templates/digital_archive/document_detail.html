@@ -70,6 +70,65 @@
         text-decoration: none;
     }
 
+
+    .da-overview {
+        margin: 16px 0;
+        padding: 18px;
+        border-radius: 22px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    .da-overview h2 {
+        margin: 0;
+        color: #111827;
+        font-size: 20px;
+        font-weight: 850;
+    }
+
+    .da-overview p {
+        margin: 8px 0 0;
+        color: #667085;
+        line-height: 1.65;
+    }
+
+    .da-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .da-overview-card {
+        display: block;
+        padding: 14px;
+        border-radius: 18px;
+        background: #fafafa;
+        border: 1px solid rgba(15, 23, 42, .07);
+        text-decoration: none;
+    }
+
+    .da-overview-card strong {
+        display: block;
+        color: #111827;
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+    .da-overview-card span {
+        display: block;
+        color: #667085;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 860px) {
+        .da-overview-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 </style>
 
 <div class="da-page">
@@ -83,6 +142,47 @@
         <strong>Belge Durumu</strong>
         <span>{{ document.get('status_label') or document.get('status') or 'Kayıtlı' }}</span>
         <a href="/digital-archive/document-status-guide">Durumları Gör</a>
+    </div>
+
+
+    <div class="da-overview">
+        <h2>Kurumsal Özet</h2>
+        <p>
+            Bu bölüm belgeye ait temel bilgileri, arşiv bağlantılarını, ek bilgileri ve metin okuma işlemlerini
+            tek yerden izlemek için hazırlanmıştır.
+        </p>
+
+        <div class="da-overview-grid">
+            <a class="da-overview-card" href="/digital-archive/documents/{{ document.get('id') }}">
+                <strong>Belge Bilgileri</strong>
+                <span>Belge başlığı, konusu, arşiv kodu ve temel kayıt bilgileri.</span>
+            </a>
+
+            <a class="da-overview-card" href="/digital-archive/documents/{{ document.get('id') }}/material-summary">
+                <strong>Arşiv Bağlantıları</strong>
+                <span>Kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme bağlantıları.</span>
+            </a>
+
+            <a class="da-overview-card" href="/digital-archive/documents/{{ document.get('id') }}/metadata">
+                <strong>Ek Bilgiler</strong>
+                <span>Kurum ihtiyacına göre belgeye eklenen açıklayıcı bilgiler.</span>
+            </a>
+
+            <a class="da-overview-card" href="/digital-archive/documents/{{ document.get('id') }}/ocr">
+                <strong>Metin Okuma</strong>
+                <span>Taranmış belgeden elde edilen metinlerin izlenmesi.</span>
+            </a>
+
+            <a class="da-overview-card" href="/digital-archive/documents/{{ document.get('id') }}/full-detail">
+                <strong>Birlikte Görünüm</strong>
+                <span>Belgeye ait tüm bölümlerin aynı sayfada izlenmesi.</span>
+            </a>
+
+            <a class="da-overview-card" href="/digital-archive/document-status-guide">
+                <strong>Belge Durumları</strong>
+                <span>Belgenin arşiv sürecindeki durumlarının açıklaması.</span>
+            </a>
+        </div>
     </div>
 
     <div class="da-card">
