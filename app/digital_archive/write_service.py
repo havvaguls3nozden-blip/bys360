@@ -190,3 +190,194 @@ def build_digital_archive_write_intent(operation_key, raw_payload, user_id=None)
         user_id=user_id,
     )
 
+# DA-21F physical_location_create real-schema dry-run extension
+#
+# DA-21E1 ile physical location tablosunun code/name değil gerçek konum
+# kolonlarıyla çalıştığı doğrulandı. Bu blok POST route açmaz ve DB yazmaz.
+from dataclasses import fields as _da21f_dataclass_fields
+from dataclasses import is_dataclass as _da21f_is_dataclass
+from dataclasses import replace as _da21f_dataclasses_replace
+
+
+_DA21F_PHYSICAL_LOCATION_ALLOWED_FIELDS = frozenset(
+    {
+        "archive_room",
+        "cabinet_no",
+        "shelf_no",
+        "box_no",
+        "folder_no",
+        "file_no",
+        "physical_status",
+        "delivered_to_user_id",
+        "delivered_at",
+        "returned_at",
+    }
+)
+
+_DA21F_PHYSICAL_LOCATION_POSITION_FIELDS = (
+    "archive_room",
+    "cabinet_no",
+    "shelf_no",
+    "box_no",
+    "folder_no",
+    "file_no",
+)
+
+_build_digital_archive_write_intent_core_da21f = build_digital_archive_write_intent
+
+
+def _da21f_sequence_like(current_value, values):
+    if isinstance(current_value, list):
+        return list(values)
+    if isinstance(current_value, set):
+        return set(values)
+    return tuple(values)
+
+
+def digital_archive_physical_location_clean_payload_da21f(raw_payload):
+    """Physical location payload'unu gerçek DB kolonlarına göre temizler.
+
+    Dönüş: accepted_payload, rejected_fields, diagnostics, is_valid
+    """
+    payload = dict(raw_payload or {})
+    accepted_payload = {}
+    rejected_fields = []
+    diagnostics = []
+
+    for key, value in payload.items():
+        normalized_key = str(key or "").strip()
+
+        if not normalized_key:
+            continue
+
+        if normalized_key not in _DA21F_PHYSICAL_LOCATION_ALLOWED_FIELDS:
+            rejected_fields.append(normalized_key)
+            continue
+
+        cleaned_value = "" if value is None else str(value).strip()
+
+        if cleaned_value:
+            accepted_payload[normalized_key] = cleaned_value
+
+    if rejected_fields:
+        diagnostics.append(
+            "Fiziksel lokasyon payload içinde şemada olmayan alan var: "
+            + ", ".join(sorted(set(rejected_fields)))
+        )
+
+    if not any(field in accepted_payload for field in _DA21F_PHYSICAL_LOCATION_POSITION_FIELDS):
+        diagnostics.append(
+            "Fiziksel lokasyon için en az bir konum alanı girilmelidir: "
+            + ", ".join(_DA21F_PHYSICAL_LOCATION_POSITION_FIELDS)
+        )
+
+    delivered_to_user_id = accepted_payload.get("delivered_to_user_id")
+    if delivered_to_user_id and not delivered_to_user_id.isdigit():
+        diagnostics.append("delivered_to_user_id sayısal olmalıdır.")
+
+    is_valid = not diagnostics and bool(accepted_payload)
+
+    return accepted_payload, tuple(sorted(set(rejected_fields))), tuple(diagnostics), is_valid
+
+
+def _da21f_call_previous_intent(operation_key, raw_payload, user_id=None):
+    try:
+        return _build_digital_archive_write_intent_core_da21f(
+            operation_key,
+            raw_payload,
+            user_id=user_id,
+        )
+    except TypeError:
+        return _build_digital_archive_write_intent_core_da21f(
+            operation_key,
+            raw_payload,
+        )
+
+
+def _da21f_replace_intent(base_intent, *, accepted_payload, rejected_fields, diagnostics, is_valid):
+    if not _da21f_is_dataclass(base_intent):
+        return base_intent
+
+    updates = {}
+
+    field_map = {field.name: field for field in _da21f_dataclass_fields(base_intent)}
+
+    for field_name in ("operation_key", "operation", "operation_name"):
+        if field_name in field_map:
+            updates[field_name] = "physical_location_create"
+
+    for field_name in (
+        "payload",
+        "raw_payload",
+        "clean_payload",
+        "sanitized_payload",
+        "validated_payload",
+        "accepted_payload",
+        "data",
+    ):
+        if field_name in field_map:
+            updates[field_name] = dict(accepted_payload)
+
+    for field_name in ("rejected_fields", "unknown_fields"):
+        if field_name in field_map:
+            current_value = getattr(base_intent, field_name, ())
+            updates[field_name] = _da21f_sequence_like(current_value, rejected_fields)
+
+    for field_name in ("diagnostics", "validation_errors", "errors"):
+        if field_name in field_map:
+            current_value = getattr(base_intent, field_name, ())
+            updates[field_name] = _da21f_sequence_like(current_value, diagnostics)
+
+    for field_name in ("is_valid", "valid"):
+        if field_name in field_map:
+            updates[field_name] = bool(is_valid)
+
+    for field_name in ("write_allowed", "allowed"):
+        if field_name in field_map:
+            updates[field_name] = False
+
+    try:
+        return _da21f_dataclasses_replace(base_intent, **updates)
+    except TypeError:
+        return base_intent
+
+
+def _da21f_physical_location_create_intent(raw_payload, user_id=None):
+    accepted_payload, rejected_fields, diagnostics, is_valid = (
+        digital_archive_physical_location_clean_payload_da21f(raw_payload)
+    )
+
+    base_intent = _da21f_call_previous_intent(
+        "category_create",
+        {
+            "code": "DA21F-SYNTHETIC",
+            "name": "DA-21F Synthetic Intent",
+            "description": "Synthetic base intent for physical location dry-run.",
+            "is_active": "true",
+            "sort_order": "21",
+        },
+        user_id=user_id,
+    )
+
+    return _da21f_replace_intent(
+        base_intent,
+        accepted_payload=accepted_payload,
+        rejected_fields=rejected_fields,
+        diagnostics=diagnostics,
+        is_valid=is_valid,
+    )
+
+
+def build_digital_archive_write_intent(operation_key, raw_payload, user_id=None):
+    if operation_key == "physical_location_create":
+        return _da21f_physical_location_create_intent(
+            raw_payload,
+            user_id=user_id,
+        )
+
+    return _da21f_call_previous_intent(
+        operation_key,
+        raw_payload,
+        user_id=user_id,
+    )
+
