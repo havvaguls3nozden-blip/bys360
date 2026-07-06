@@ -2957,6 +2957,306 @@ def document_material_summary(document_id: int):
         return redirect("/digital-archive/document-material-links")
 
 
+
+# DA-34A: Belge kartı birleşik detay görünümü
+def _da34_optional_table(table_names: list[str]):
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    existing = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name in existing:
+            metadata = MetaData()
+            return Table(table_name, metadata, autoload_with=db.engine)
+
+    return None
+
+
+def _da34_document_filter_column(table):
+    candidates = [
+        "document_id",
+        "archive_document_id",
+        "digital_archive_document_id",
+        "doc_id",
+    ]
+
+    for candidate in candidates:
+        if candidate in table.c:
+            return table.c[candidate]
+
+    return None
+
+
+def _da34_rows_for_document(table, document_id: int, limit: int = 100) -> list[dict]:
+    from sqlalchemy import desc, select
+
+    if table is None:
+        return []
+
+    document_column = _da34_document_filter_column(table)
+    if document_column is None:
+        return []
+
+    query = select(table).where(document_column == document_id)
+
+    if "id" in table.c:
+        query = query.order_by(desc(table.c.id))
+
+    rows = db.session.execute(query.limit(limit)).all()
+    return [dict(row._mapping) for row in rows]
+
+
+def _da34_public_columns(row: dict) -> list[tuple[str, str]]:
+    hidden = {
+        "password",
+        "password_hash",
+        "secret",
+        "token",
+        "csrf_token",
+        "file_path",
+        "storage_path",
+        "absolute_path",
+    }
+
+    labels = {
+        "id": "No",
+        "document_id": "Belge No",
+        "archive_document_id": "Belge No",
+        "digital_archive_document_id": "Belge No",
+        "title": "Başlık",
+        "document_title": "Başlık",
+        "subject": "Konu",
+        "name": "Ad",
+        "document_name": "Belge Adı",
+        "file_name": "Dosya Adı",
+        "original_filename": "Dosya Adı",
+        "archive_code": "Arşiv Kodu",
+        "reference_no": "Referans No",
+        "reference_number": "Referans No",
+        "document_type": "Belge Türü",
+        "category_id": "Kategori No",
+        "physical_location_id": "Fiziksel Konum No",
+        "retention_policy_id": "Saklama Politikası No",
+        "confidentiality_level": "Gizlilik Seviyesi",
+        "status": "Durum",
+        "is_active": "Aktif",
+        "created_at": "Kayıt Tarihi",
+        "updated_at": "Güncelleme Tarihi",
+        "created_by": "Oluşturan",
+        "action": "İşlem",
+        "event_type": "İşlem Türü",
+        "description": "Açıklama",
+        "note": "Not",
+        "readable_text": "Okunabilir Metin",
+        "ocr_text": "OCR Metni",
+        "extracted_text": "Çıkarılan Metin",
+        "field_key": "Alan Anahtarı",
+        "field_name": "Alan Adı",
+        "field_value": "Alan Değeri",
+        "value": "Değer",
+        "material_type_id": "Malzeme Türü No",
+        "material_quantity": "Adet",
+        "material_code": "Kod",
+        "physical_location_note": "Fiziksel Konum",
+    }
+
+    pairs = []
+    for key, value in row.items():
+        lowered = str(key).lower()
+        if lowered in hidden:
+            continue
+        if value in (None, ""):
+            continue
+        pairs.append((labels.get(key, key.replace("_", " ").title()), str(value)))
+
+    return pairs
+
+
+def _da34_document_fields(document: dict) -> list[tuple[str, str]]:
+    priority = [
+        "id",
+        "archive_code",
+        "title",
+        "document_title",
+        "subject",
+        "name",
+        "document_name",
+        "file_name",
+        "original_filename",
+        "reference_no",
+        "reference_number",
+        "document_type",
+        "confidentiality_level",
+        "status",
+        "created_at",
+        "updated_at",
+    ]
+
+    labels = dict(_da34_public_columns(document))
+    fields = []
+
+    for key in priority:
+        if key in document and document.get(key) not in (None, ""):
+            label = dict(_da34_public_columns({key: document.get(key)})).get(key, key)
+            fields.append((label, str(document.get(key))))
+
+    used_labels = {label for label, _ in fields}
+
+    for label, value in _da34_public_columns(document):
+        if label not in used_labels:
+            fields.append((label, value))
+
+    return fields
+
+
+@digital_archive_bp.route("/documents/<int:document_id>/full-detail", methods=["GET"])
+@login_required
+def document_full_detail(document_id: int):
+    """Belge kartı için birleşik kurumsal detay ekranı."""
+    from flask import current_app, flash, redirect, render_template
+    from sqlalchemy import select
+
+    try:
+        documents_table = _da32_required_table("digital_archive_documents")
+
+        document_row = db.session.execute(
+            select(documents_table).where(documents_table.c.id == document_id)
+        ).first()
+
+        if not document_row:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        document = dict(document_row._mapping)
+        document_columns = set(documents_table.c.keys())
+
+        document_label = _da32_row_label(
+            document,
+            document_columns,
+            [
+                "title",
+                "document_title",
+                "subject",
+                "name",
+                "document_name",
+                "file_name",
+                "original_filename",
+                "reference_no",
+                "reference_number",
+                "archive_code",
+            ],
+            "Belge",
+        )
+
+        material_links_table = _da34_optional_table(["digital_archive_document_material_links"])
+        material_types_table = _da34_optional_table(["digital_archive_material_types"])
+        material_rows = _da34_rows_for_document(material_links_table, document_id, limit=300)
+
+        material_map = {}
+        if material_types_table is not None and material_rows:
+            material_type_rows = [
+                dict(row._mapping)
+                for row in db.session.execute(select(material_types_table).limit(500)).all()
+            ]
+            material_columns = set(material_types_table.c.keys())
+            material_map = {
+                int(row.get("id")): _da32_row_label(
+                    row,
+                    material_columns,
+                    ["name", "title", "material_type", "description"],
+                    "Malzeme Türü",
+                )
+                for row in material_type_rows
+                if row.get("id") is not None
+            }
+
+        material_cards = []
+        for row in material_rows:
+            display = dict(row)
+            material_type_id = row.get("material_type_id")
+            if material_type_id is not None:
+                try:
+                    display["material_type_label"] = material_map.get(int(material_type_id), f"Malzeme Türü #{material_type_id}")
+                except (TypeError, ValueError):
+                    display["material_type_label"] = f"Malzeme Türü #{material_type_id}"
+            material_cards.append(_da34_public_columns(display))
+
+        history_table = _da34_optional_table([
+            "digital_archive_document_history",
+            "digital_archive_document_histories",
+            "digital_archive_document_audit_events",
+            "digital_archive_audit_events",
+            "digital_archive_history_events",
+        ])
+
+        readable_text_table = _da34_optional_table([
+            "digital_archive_document_readable_texts",
+            "digital_archive_readable_texts",
+            "digital_archive_readable_text_links",
+            "digital_archive_ocr_texts",
+            "digital_archive_ocr_results",
+        ])
+
+        metadata_table = _da34_optional_table([
+            "digital_archive_document_metadata_values",
+            "digital_archive_dynamic_metadata_values",
+            "digital_archive_metadata_values",
+            "digital_archive_document_custom_fields",
+            "digital_archive_custom_field_values",
+        ])
+
+        history_rows = _da34_rows_for_document(history_table, document_id, limit=100)
+        readable_text_rows = _da34_rows_for_document(readable_text_table, document_id, limit=50)
+        metadata_rows = _da34_rows_for_document(metadata_table, document_id, limit=100)
+
+        sections = [
+            {
+                "title": "Arşiv Malzemeleri",
+                "description": "Belge kartına bağlı kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme kayıtları.",
+                "rows": material_cards,
+                "empty": "Bu belge kartına bağlı arşiv malzemesi bulunmuyor.",
+            },
+            {
+                "title": "İşlem Geçmişi",
+                "description": "Belge üzerinde yapılan kayıt, güncelleme, görüntüleme, indirme, revizyon veya arşiv işlemleri.",
+                "rows": [_da34_public_columns(row) for row in history_rows],
+                "empty": "Bu belge kartı için işlem geçmişi kaydı bulunmuyor.",
+            },
+            {
+                "title": "Okunabilir Metin / OCR",
+                "description": "Taranmış belge veya dosyadan çıkarılan okunabilir metin kayıtları.",
+                "rows": [_da34_public_columns(row) for row in readable_text_rows],
+                "empty": "Bu belge kartı için okunabilir metin veya OCR kaydı bulunmuyor.",
+            },
+            {
+                "title": "Dinamik Üstveri",
+                "description": "Belgeye sonradan eklenen özel alan, tarihi alan, lokasyon, envanter veya sınıflandırma bilgileri.",
+                "rows": [_da34_public_columns(row) for row in metadata_rows],
+                "empty": "Bu belge kartı için dinamik üstveri kaydı bulunmuyor.",
+            },
+        ]
+
+        return render_template(
+            "digital_archive/document_full_detail.html",
+            document=document,
+            document_id=document_id,
+            document_label=document_label,
+            document_fields=_da34_document_fields(document),
+            sections=sections,
+            material_count=len(material_rows),
+            history_count=len(history_rows),
+            readable_text_count=len(readable_text_rows),
+            metadata_count=len(metadata_rows),
+        )
+
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge birleşik detay ekranı açılamadı.")
+        flash("Belge birleşik detay ekranı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/documents")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required

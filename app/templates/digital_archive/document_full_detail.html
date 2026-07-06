@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Belge Birleşik Detay - BYS360 Dijital Arşiv{% endblock %}
+
+{% block content %}
+<style>
+    .da-page { max-width: 1200px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-title { margin: 0; color: #111827; font-size: clamp(26px, 3vw, 38px); font-weight: 850; letter-spacing: -0.03em; }
+    .da-subtitle { margin: 10px 0 22px; color: #667085; line-height: 1.65; max-width: 900px; }
+    .da-card { background:#fff; border:1px solid rgba(15,23,42,.09); border-radius:24px; padding:22px; box-shadow:0 18px 44px rgba(15,23,42,.08); margin-bottom:18px; }
+    .da-stat-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap:14px; margin-bottom:18px; }
+    .da-stat { background:#fff; border:1px solid rgba(139,0,0,.12); border-radius:22px; padding:18px; box-shadow:0 12px 28px rgba(15,23,42,.06); }
+    .da-stat span { display:block; color:#667085; font-size:13px; font-weight:700; }
+    .da-stat strong { display:block; color:#8B0000; font-size:30px; margin-top:8px; }
+    .da-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .da-button { display:inline-flex; align-items:center; justify-content:center; padding:11px 15px; border-radius:14px; text-decoration:none; font-weight:700; border:1px solid rgba(139,0,0,.16); color:#8B0000; background:#fff; }
+    .da-button-primary { color:#fff; background:#8B0000; border-color:#8B0000; }
+    .da-fields { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px; margin-top:16px; }
+    .da-field { border:1px solid rgba(15,23,42,.08); border-radius:18px; padding:13px 14px; background:#fafafa; }
+    .da-field span { display:block; color:#667085; font-size:12px; font-weight:800; margin-bottom:5px; }
+    .da-field strong { display:block; color:#111827; font-size:14px; line-height:1.45; overflow-wrap:anywhere; }
+    .da-section-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+    .da-section-head h2 { margin:0; color:#111827; font-size:22px; }
+    .da-section-head p { margin:6px 0 0; color:#667085; line-height:1.55; }
+    .da-pill { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#f8eded; color:#8B0000; font-weight:800; font-size:12px; white-space:nowrap; }
+    .da-empty { padding:18px; color:#667085; line-height:1.65; background:#fafafa; border-radius:18px; }
+    .da-record { border:1px solid rgba(15,23,42,.08); border-radius:18px; padding:14px; margin-top:10px; background:#fff; }
+    .da-record-grid { display:grid; grid-template-columns: 180px 1fr; gap:8px 12px; }
+    .da-record-label { color:#667085; font-size:12px; font-weight:800; }
+    .da-record-value { color:#111827; font-size:14px; line-height:1.48; overflow-wrap:anywhere; white-space:pre-wrap; }
+    @media (max-width: 900px) {
+        .da-stat-grid { grid-template-columns:1fr 1fr; }
+        .da-fields { grid-template-columns:1fr; }
+        .da-record-grid { grid-template-columns:1fr; }
+    }
+    @media (max-width: 560px) {
+        .da-stat-grid { grid-template-columns:1fr; }
+        .da-section-head { display:block; }
+    }
+</style>
+
+<div class="da-page">
+    <h1 class="da-title">Belge Birleşik Detay</h1>
+    <p class="da-subtitle">
+        Bu ekran belge kartını; arşiv malzemeleri, işlem geçmişi, okunabilir metin ve dinamik üstveri kayıtlarıyla birlikte tek kurumsal görünümde toplar.
+    </p>
+
+    <div class="da-card">
+        <h2 style="margin:0; color:#111827;">{{ document_label }}</h2>
+
+        <div class="da-actions">
+            <a class="da-button da-button-primary" href="/digital-archive/document-material-links">Malzeme Bağlantıları</a>
+            <a class="da-button" href="/digital-archive/documents/{{ document_id }}/material-summary">Malzeme Özeti</a>
+            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
+        </div>
+
+        <div class="da-fields">
+            {% for label, value in document_fields %}
+                <div class="da-field">
+                    <span>{{ label }}</span>
+                    <strong>{{ value }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="da-stat-grid">
+        <div class="da-stat">
+            <span>Arşiv Malzemesi</span>
+            <strong>{{ material_count }}</strong>
+        </div>
+        <div class="da-stat">
+            <span>İşlem Geçmişi</span>
+            <strong>{{ history_count }}</strong>
+        </div>
+        <div class="da-stat">
+            <span>Okunabilir Metin</span>
+            <strong>{{ readable_text_count }}</strong>
+        </div>
+        <div class="da-stat">
+            <span>Dinamik Üstveri</span>
+            <strong>{{ metadata_count }}</strong>
+        </div>
+    </div>
+
+    {% for section in sections %}
+        <div class="da-card">
+            <div class="da-section-head">
+                <div>
+                    <h2>{{ section.title }}</h2>
+                    <p>{{ section.description }}</p>
+                </div>
+                <span class="da-pill">{{ section.rows|length }} kayıt</span>
+            </div>
+
+            {% if section.rows %}
+                {% for row in section.rows %}
+                    <div class="da-record">
+                        <div class="da-record-grid">
+                            {% for label, value in row %}
+                                <div class="da-record-label">{{ label }}</div>
+                                <div class="da-record-value">{{ value }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="da-empty">{{ section.empty }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
