@@ -35,13 +35,35 @@ digital_archive_bp = Blueprint(
 
 
 def _digital_archive_config_enabled() -> bool:
-    """Config üzerinden geçici modül açık/kapalı durumunu okur.
+    """Dijital Arşiv UI erişim kapısı.
 
-    DA-1B'de DB ayarı okunmaz. Varsayılan kapalıdır.
-    DA-2/DA-3 aşamasında module_settings entegrasyonu eklenecektir.
+    Local önizleme için env değişkenleri desteklenir.
+    DB yazma bu helper ile açılmaz; sadece GET ekranlarının disabled.html'e düşmesini engeller.
     """
-    value = current_app.config.get("DIGITAL_ARCHIVE_ENABLED", False)
-    return is_digital_archive_enabled(value)
+    import os
+
+    truthy_values = {"1", "true", "yes", "on", "enabled", "preview", "local"}
+
+    for env_key in (
+        "DIGITAL_ARCHIVE_ENABLED",
+        "BYS360_DIGITAL_ARCHIVE_ENABLED",
+        "BYS360_DIGITAL_ARCHIVE_LOCAL_UI_PREVIEW",
+    ):
+        env_value = str(os.environ.get(env_key, "")).strip().lower()
+        if env_value in truthy_values:
+            return True
+
+    try:
+        from flask import current_app
+
+        config_value = current_app.config.get("DIGITAL_ARCHIVE_ENABLED")
+        if isinstance(config_value, str):
+            return config_value.strip().lower() in truthy_values
+
+        return bool(config_value)
+    except Exception:
+        return False
+
 
 # DA-3B: Dijital Arşiv Yönetim Merkezi pasif dashboard yardımcıları
 _DIGITAL_ARCHIVE_TABLE_LABELS = {
