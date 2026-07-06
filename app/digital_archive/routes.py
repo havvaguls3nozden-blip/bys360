@@ -3274,6 +3274,156 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-42C: Arşiv bağlantı raporu
+def _da42c_table_count(table_names: list[str]) -> int:
+    from sqlalchemy import MetaData, Table, func, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+        return int(db.session.execute(select(func.count()).select_from(table)).scalar() or 0)
+
+    return 0
+
+
+def _da42c_distinct_document_count(table_names: list[str]) -> int:
+    from sqlalchemy import MetaData, Table, func, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+        if "document_id" not in table.c:
+            continue
+
+        return int(
+            db.session.execute(
+                select(func.count(func.distinct(table.c.document_id))).select_from(table)
+            ).scalar()
+            or 0
+        )
+
+    return 0
+
+
+def _da42c_latest_link_rows(table_names: list[str], limit: int = 20) -> list[dict[str, str]]:
+    from sqlalchemy import MetaData, Table, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+
+        statement = select(table)
+        if "created_at" in table.c:
+            statement = statement.order_by(table.c.created_at.desc())
+        elif "id" in table.c:
+            statement = statement.order_by(table.c.id.desc())
+
+        rows = []
+        for row in db.session.execute(statement.limit(limit)).all():
+            data = dict(row._mapping)
+            rows.append(
+                {
+                    "document_id": str(data.get("document_id") or "-"),
+                    "material_id": str(
+                        data.get("material_id")
+                        or data.get("archive_material_id")
+                        or data.get("material_type_id")
+                        or "-"
+                    ),
+                    "description": str(
+                        data.get("description")
+                        or data.get("notes")
+                        or data.get("relation_note")
+                        or "Bağlantı kaydı"
+                    ),
+                }
+            )
+
+        return rows
+
+    return []
+
+
+@digital_archive_bp.get("/reports/archive-links")
+@login_required
+def archive_link_report():
+    """Arşiv malzemesi bağlantılarını sade rapor ekranında gösterir."""
+    from flask import render_template
+
+    link_tables = [
+        "digital_archive_document_material_links",
+        "digital_archive_material_links",
+        "digital_archive_document_archive_links",
+    ]
+
+    material_tables = [
+        "digital_archive_material_types",
+        "digital_archive_archive_materials",
+        "digital_archive_materials",
+    ]
+
+    document_total = _da42c_table_count(["digital_archive_documents"])
+    link_total = _da42c_table_count(link_tables)
+    material_total = _da42c_table_count(material_tables)
+    linked_document_total = _da42c_distinct_document_count(link_tables)
+    latest_links = _da42c_latest_link_rows(link_tables)
+
+    unlinked_document_total = max(document_total - linked_document_total, 0)
+
+    summary_cards = [
+        {"label": "Toplam Belge", "value": document_total},
+        {"label": "Bağlantı Kaydı", "value": link_total},
+        {"label": "Malzeme Türü", "value": material_total},
+        {"label": "Bağlantılı Belge", "value": linked_document_total},
+    ]
+
+    report_items = [
+        {
+            "title": "Bağlantılı Belgeler",
+            "value": linked_document_total,
+            "description": "Arşiv malzemesiyle ilişkilendirilmiş belge sayısı.",
+        },
+        {
+            "title": "Bağlantısız Belgeler",
+            "value": unlinked_document_total,
+            "description": "Henüz arşiv malzemesi bağlantısı görünmeyen belge sayısı.",
+        },
+        {
+            "title": "Toplam Bağlantı Kaydı",
+            "value": link_total,
+            "description": "Belge ile kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme arasında kurulan bağlantı sayısı.",
+        },
+        {
+            "title": "Tanımlı Malzeme Türü",
+            "value": material_total,
+            "description": "Sistemde izlenen arşiv malzemesi türü sayısı.",
+        },
+    ]
+
+    return render_template(
+        "digital_archive/archive_link_report.html",
+        summary_cards=summary_cards,
+        report_items=report_items,
+        latest_links=latest_links,
+    )
+
+
 # DA-42B: Belge durum raporu
 def _da42b_status_description(status_name: str) -> str:
     descriptions = {
@@ -3399,8 +3549,8 @@ def report_center():
         {
             "title": "Arşiv Bağlantı Raporu",
             "description": "Kutu, klasör, dosya, fotoğraf, harita ve dijital malzeme bağlantılarının raporlanması için hazırlanacak başlık.",
-            "status": "Planlandı",
-            "link": "/digital-archive/document-material-links",
+            "status": "Hazır",
+            "link": "/digital-archive/reports/archive-links",
         },
     ]
 
