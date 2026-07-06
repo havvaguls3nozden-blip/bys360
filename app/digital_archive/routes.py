@@ -3270,6 +3270,65 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-40A: Kullanıcı yetki rehberi
+@digital_archive_bp.get("/permission-guide")
+@login_required
+def permission_guide():
+    """Dijital Arşiv kullanıcı yetkilerini sade Türkçe açıklamalarla gösterir."""
+    from flask import render_template
+
+    permission_groups = [
+        {
+            "order": "1",
+            "title": "Görüntüleme",
+            "description": "Belgeleri, belge detayını, arşiv bağlantılarını ve yazdırılabilir özeti görüntüleyebilir.",
+            "examples": ["Belgeleri listeleme", "Belge detayını açma", "Yazdırılabilir özeti görüntüleme"],
+        },
+        {
+            "order": "2",
+            "title": "Belge Ekleme",
+            "description": "Yeni belge kaydı oluşturabilir ve belgeye ait temel bilgileri girebilir.",
+            "examples": ["Yeni belge oluşturma", "Başlık ve açıklama bilgisi girme", "Arşiv kodu ekleme"],
+        },
+        {
+            "order": "3",
+            "title": "Belge Düzenleme",
+            "description": "Kayıtlı belgenin bilgilerini kurum ihtiyacına göre güncelleyebilir.",
+            "examples": ["Belge bilgisini düzeltme", "Belge durumunu takip etme", "Eksik bilgileri tamamlama"],
+        },
+        {
+            "order": "4",
+            "title": "Arşiv Bağlantısı",
+            "description": "Belgeyi kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme ile ilişkilendirebilir.",
+            "examples": ["Arşiv malzemesi bağlama", "Malzeme türlerini izleme", "Bağlı bilgileri kontrol etme"],
+        },
+        {
+            "order": "5",
+            "title": "Ek Bilgi Yönetimi",
+            "description": "Belgelere kurum ihtiyacına göre ek bilgi alanları tanımlayabilir ve bu bilgileri takip edebilir.",
+            "examples": ["Özel alan tanımlama", "Tarihi alan bilgilerini ekleme", "Belgeye açıklayıcı bilgi girme"],
+        },
+        {
+            "order": "6",
+            "title": "Rapor ve Çıktı",
+            "description": "Belge özetlerini, yazdırılabilir sayfaları ve arşiv kontrol çıktısını kullanabilir.",
+            "examples": ["Yazdırılabilir belge özeti", "Belge durumu kontrolü", "Arşiv bağlantı özeti"],
+        },
+        {
+            "order": "7",
+            "title": "Yönetim",
+            "description": "Dijital Arşiv çalışma düzenini, kullanıcı erişimlerini ve kurum içi kullanım kurallarını yönetir.",
+            "examples": ["Kullanıcı erişim düzeni", "İşlem sorumluluğu", "Kurum içi kullanım takibi"],
+        },
+    ]
+
+    return render_template(
+        "digital_archive/permission_guide.html",
+        permission_groups=permission_groups,
+    )
+
+
 # DA-39A: Yazdırılabilir belge özeti
 def _da39a_print_text(value) -> str:
     if value is None:
