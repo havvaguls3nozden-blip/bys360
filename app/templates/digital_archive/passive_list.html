@@ -1,177 +1,123 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="da4b-shell">
-    <section class="da4b-hero">
-        <div>
-            <p class="da4b-kicker">BYS360 Dijital Arşiv ve Belge Yönetimi</p>
-            <h1>{{ page_title }}</h1>
-            <p>{{ page_subtitle }}</p>
-        </div>
-        <div class="da4b-status">
-            <strong>{{ module_status }}</strong>
-            <span>Salt-okunur / DB yazma işlemi yok</span>
-        </div>
-    </section>
+{% set sayfa_basligi = "Dijital Arşiv" %}
+{% set sayfa_aciklamasi = "Arşiv kayıtları düzenli şekilde takip edilir." %}
 
-    <section class="da4b-toolbar">
-        <div class="da4b-toolbar-links">
-            <a href="{{ back_url }}">← Yönetim Merkezine Dön</a>
+{% if request.path.startswith("/digital-archive/categories") %}
+    {% set sayfa_basligi = "Arşiv Kategorileri" %}
+    {% set sayfa_aciklamasi = "Belgelerin arşiv sınıflandırma başlıkları bu bölümde takip edilir." %}
+{% elif request.path.startswith("/digital-archive/physical-locations") %}
+    {% set sayfa_basligi = "Fiziksel Arşiv Konumları" %}
+    {% set sayfa_aciklamasi = "Belgelerin oda, dolap, raf, kutu, klasör ve dosya konumları bu bölümde takip edilir." %}
+{% elif request.path.startswith("/digital-archive/retention-policies") %}
+    {% set sayfa_basligi = "Saklama Süreleri" %}
+    {% set sayfa_aciklamasi = "Belge türlerine göre saklama ve izleme bilgileri bu bölümde takip edilir." %}
+{% endif %}
+
+{% set alan_etiketleri = {
+    "id": "No",
+    "code": "Kod",
+    "name": "Ad",
+    "title": "Başlık",
+    "description": "Açıklama",
+    "is_active": "Durum",
+    "created_at": "Oluşturma Tarihi",
+    "updated_at": "Güncelleme Tarihi",
+    "archive_room": "Arşiv Odası",
+    "cabinet_no": "Dolap No",
+    "shelf_no": "Raf No",
+    "box_no": "Kutu No",
+    "folder_no": "Klasör No",
+    "file_no": "Dosya No",
+    "physical_status": "Fiziksel Durum",
+    "delivered_to_user_id": "Teslim Edilen Kişi",
+    "delivered_at": "Teslim Tarihi",
+    "returned_at": "İade Tarihi",
+    "retention_years": "Saklama Yılı",
+    "retention_period": "Saklama Süresi",
+    "disposal_action": "Son İşlem",
+    "legal_basis": "Dayanak",
+    "notes": "Notlar"
+} %}
+
+{% block title %}{{ sayfa_basligi }} - BYS360{% endblock %}
+
+{% block content %}
+<style>
+    .da-page { max-width: 1180px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+    .da-title { margin: 0; color: #111827; font-size: clamp(26px, 3vw, 38px); font-weight: 850; letter-spacing: -0.03em; }
+    .da-subtitle { margin: 10px 0 0; max-width: 720px; color: #667085; line-height: 1.65; }
+    .da-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .da-button {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 11px 15px; border-radius: 14px; text-decoration: none; font-weight: 700;
+        border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff;
+    }
+    .da-button-primary { color: #fff; background: #8B0000; border-color: #8B0000; }
+    .da-card {
+        background: #fff; border: 1px solid rgba(15,23,42,.09); border-radius: 24px;
+        box-shadow: 0 18px 44px rgba(15,23,42,.08); overflow: hidden;
+    }
+    .da-table { width: 100%; border-collapse: collapse; }
+    .da-table th {
+        text-align: left; padding: 14px 16px; font-size: 13px; color: #8B0000;
+        background: #f8eded; border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .da-table td { padding: 14px 16px; color: #111827; border-bottom: 1px solid rgba(15,23,42,.07); vertical-align: top; }
+    .da-empty { padding: 30px; color: #667085; line-height: 1.65; }
+    .da-meta { margin-top: 14px; color: #667085; font-size: 13px; }
+    @media (max-width: 760px) {
+        .da-header { display: block; }
+        .da-actions { justify-content: flex-start; margin-top: 14px; }
+        .da-card { overflow-x: auto; }
+    }
+</style>
+
+{% set liste_sutunlari = display_columns|default(columns|default([])) %}
+{% set kayitlar = rows|default([]) %}
+
+<div class="da-page">
+    <div class="da-header">
+        <div>
+            <h1 class="da-title">{{ sayfa_basligi }}</h1>
+            <p class="da-subtitle">{{ sayfa_aciklamasi }}</p>
+            <div class="da-meta">Kayıt sayısı: {{ row_count|default(kayitlar|length) }}</div>
+        </div>
+
+        <div class="da-actions">
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
             {% if draft_form_url %}
-                <a href="{{ draft_form_url }}">Taslak Formu Gör</a>
+                <a class="da-button da-button-primary" href="{{ draft_form_url }}">Yeni Kayıt</a>
             {% endif %}
         </div>
-        <span>{{ table_name }}</span>
-    </section>
+    </div>
 
-    <section class="da4b-panel">
-        <div class="da4b-panel-header">
-            <div>
-                <h2>Liste</h2>
-                <p>Bu ekran yalnızca mevcut kayıtları gösterir. Ekleme, silme veya güncelleme işlemi yapılmaz.</p>
-            </div>
-            <span class="da4b-count">{{ row_count }} kayıt</span>
-        </div>
-
-        {% if error_message %}
-            <div class="da4b-alert">{{ error_message }}</div>
-        {% elif rows %}
-            <div class="da4b-table-wrap">
-                <table class="da4b-table">
-                    <thead>
+    <div class="da-card">
+        {% if kayitlar and liste_sutunlari %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in liste_sutunlari %}
+                            <th>{{ alan_etiketleri.get(column, column|replace('_', ' ')|title) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in kayitlar %}
                         <tr>
-                            {% for column in columns %}
-                                <th>{{ column }}</th>
+                            {% for column in liste_sutunlari %}
+                                <td>{{ row.get(column, '') }}</td>
                             {% endfor %}
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in rows %}
-                            <tr>
-                                {% for column in columns %}
-                                    <td>{{ row.get(column) if row.get(column) is not none else "—" }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-            <div class="da4b-empty">
-                <strong>Kayıt bulunmuyor.</strong>
-                <p>Altyapı hazır; bu aşamada veri girişi ekranı özellikle kapalı tutulmuştur.</p>
+            <div class="da-empty">
+                Bu bölümde henüz kayıt bulunmuyor. Yeni kayıt ekleyerek arşiv düzenini oluşturmaya başlayabilirsiniz.
             </div>
         {% endif %}
-    </section>
+    </div>
 </div>
-
-<style>
-.da4b-shell { display: flex; flex-direction: column; gap: 1rem; }
-.da4b-hero {
-    display: flex; justify-content: space-between; gap: 1.5rem;
-    padding: 1.5rem; border-radius: 1.25rem;
-    background: radial-gradient(circle at 96% -20%, rgba(139, 0, 0, .075), transparent 34%), linear-gradient(135deg, rgba(255,255,255,.99) 0%, rgba(255,253,253,.98) 58%, rgba(248,237,237,.88) 100%);
-    color: #fff; box-shadow: 0 18px 45px rgba(15, 23, 42, .18);
-}
-.da4b-kicker { margin: 0 0 .5rem; opacity: .82; font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; }
-.da4b-hero h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; }
-.da4b-hero p { margin: .75rem 0 0; max-width: 760px; color: rgba(255, 255, 255, .84); line-height: 1.65; }
-.da4b-status {
-    min-width: 230px; padding: 1rem; border-radius: 1rem;
-    background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .22);
-    display: flex; flex-direction: column; gap: .25rem;
-}
-.da4b-status span { color: rgba(255, 255, 255, .74); font-size: .85rem; }
-.da4b-toolbar, .da4b-panel {
-    background: #fff; border: 1px solid rgba(148, 163, 184, .28);
-    border-radius: 1rem; box-shadow: 0 10px 28px rgba(15, 23, 42, .06);
-}
-.da4b-toolbar {
-    padding: .9rem 1rem; display: flex; justify-content: space-between; gap: 1rem; color: #64748b;
-}
-
-.da4b-toolbar-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .75rem;
-}
-
-.da4b-toolbar a { color: var(--bys-red-dark, #690000); text-decoration: none; font-weight: 700; }
-.da4b-panel { padding: 1.25rem; }
-.da4b-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
-.da4b-panel-header h2 { margin: 0 0 .35rem; color: #0f172a; }
-.da4b-panel-header p { margin: 0; color: #64748b; line-height: 1.55; }
-.da4b-count {
-    white-space: nowrap; border-radius: 999px; padding: .4rem .75rem;
-    background: var(--bys-red-soft, #f8eded); color: var(--bys-red-dark, #690000); font-size: .85rem; font-weight: 700;
-}
-.da4b-alert, .da4b-empty {
-    padding: 1rem; border-radius: .9rem; background: #f8fafc;
-    border: 1px dashed rgba(148, 163, 184, .6); color: #475569;
-}
-.da4b-empty strong { color: #0f172a; }
-.da4b-empty p { margin: .35rem 0 0; }
-.da4b-table-wrap { overflow-x: auto; }
-.da4b-table { width: 100%; border-collapse: collapse; }
-.da4b-table th, .da4b-table td {
-    padding: .75rem; border-bottom: 1px solid rgba(148, 163, 184, .24);
-    text-align: left; vertical-align: top;
-}
-.da4b-table th { color: #334155; background: #f8fafc; font-size: .84rem; }
-.da4b-table td { color: #475569; font-size: .92rem; }
-@media (max-width: 800px) {
-    .da4b-hero, .da4b-panel-header, .da4b-toolbar { flex-direction: column; }
-}
-
-
-/* DA-4C BYS360 passive list brand alignment */
-.da4b-hero {
-    color: var(--bys-text, #111827) !important;
-    border: 1px solid rgba(139, 0, 0, .14) !important;
-    border-left: 6px solid var(--bys-red, #8B0000) !important;
-    box-shadow: var(--bys-shadow, 0 18px 44px rgba(15,23,42,.08)) !important;
-}
-
-.da4b-kicker {
-    color: var(--bys-red, #8B0000) !important;
-    opacity: 1 !important;
-}
-
-.da4b-hero p {
-    color: var(--bys-muted, #667085) !important;
-}
-
-.da4b-status {
-    background: #fff !important;
-    color: var(--bys-text, #111827) !important;
-    border: 1px solid var(--bys-border, rgba(15,23,42,.09)) !important;
-}
-
-.da4b-status span {
-    color: var(--bys-muted, #667085) !important;
-}
-
-.da4b-count {
-    background: var(--bys-red-soft, #f8eded) !important;
-    color: var(--bys-red-dark, #690000) !important;
-    border: 1px solid rgba(139, 0, 0, .14) !important;
-}
-
-
-.da4b-toolbar-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .75rem;
-}
-
-.da4b-toolbar a {
-    color: var(--bys-red, #8B0000) !important;
-}
-
-.da4b-table th {
-    background: linear-gradient(180deg, #fff 0%, var(--bys-red-soft, #f8eded) 100%) !important;
-    color: var(--bys-text, #111827) !important;
-}
-
-</style>
 {% endblock %}

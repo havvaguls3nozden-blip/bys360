@@ -1,151 +1,96 @@
 {% extends "base.html" %}
-{# DA-10A1: Bu taslak form GET-only çalışır; POST yoktur, DB yazma yoktur. #}
+
+{% set sayfa_basligi = "Yeni Kayıt" %}
+{% set sayfa_aciklamasi = "Arşiv kaydına ait bilgileri doldurun." %}
+
+{% if request.path.startswith("/digital-archive/categories") %}
+    {% set sayfa_basligi = "Yeni Arşiv Kategorisi" %}
+    {% set sayfa_aciklamasi = "Arşiv sınıflandırması için kategori bilgilerini doldurun." %}
+{% elif request.path.startswith("/digital-archive/physical-locations") %}
+    {% set sayfa_basligi = "Yeni Fiziksel Arşiv Konumu" %}
+    {% set sayfa_aciklamasi = "Belgenin fiziksel arşivde bulunduğu konumu doldurun." %}
+{% elif request.path.startswith("/digital-archive/retention-policies") %}
+    {% set sayfa_basligi = "Yeni Saklama Süresi" %}
+    {% set sayfa_aciklamasi = "Belge türü için saklama bilgilerini doldurun." %}
+{% endif %}
+
+{% set alan_etiketleri = {
+    "code": "Kod",
+    "name": "Ad",
+    "title": "Başlık",
+    "description": "Açıklama",
+    "archive_room": "Arşiv Odası",
+    "cabinet_no": "Dolap No",
+    "shelf_no": "Raf No",
+    "box_no": "Kutu No",
+    "folder_no": "Klasör No",
+    "file_no": "Dosya No",
+    "physical_status": "Fiziksel Durum",
+    "delivered_to_user_id": "Teslim Edilen Kişi",
+    "delivered_at": "Teslim Tarihi",
+    "returned_at": "İade Tarihi",
+    "retention_years": "Saklama Yılı",
+    "retention_period": "Saklama Süresi",
+    "disposal_action": "Son İşlem",
+    "legal_basis": "Dayanak",
+    "notes": "Notlar"
+} %}
+
+{% block title %}{{ sayfa_basligi }} - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
-<div class="da5b-shell">
-    <section class="da5b-hero">
-        <div>
-            <p class="da5b-kicker">BYS360 Dijital Arşiv ve Belge Yönetimi</p>
-            <h1>{{ page_title }}</h1>
-            <p>{{ page_subtitle }}</p>
-        </div>
-        <div class="da5b-status">
-            <strong>{{ module_status }}</strong>
-            <span>POST yok / DB yazma kapalı</span>
-        </div>
-    </section>
-
-    <section class="da5b-toolbar">
-        <div class="da5b-toolbar-links">
-            <a href="{{ back_url }}">← Yönetim Merkezine Dön</a>
-            <a href="{{ list_url }}">Listeye Dön</a>
-        </div>
-        <span>{{ table_name }}</span>
-    </section>
-
-    <section class="da5b-panel">
-        <div class="da5b-panel-header">
-            <div>
-                <h2>Taslak Form</h2>
-                <p>Bu alanlar yalnızca form tasarımı ve alan doğrulama hazırlığı içindir. Kayıt düğmesi bilinçli olarak kapalıdır.</p>
-            </div>
-            <span class="da5b-count">{{ field_count }} alan</span>
-        </div>
-
-        <div class="da5b-warning">
-            <strong>Veri yazma kapalı.</strong>
-            <span>Yetki, CSRF, audit ve transaction kontrolleri tamamlanmadan kayıt işlemi açılmayacaktır.</span>
-        </div>
-
-        {% if fields %}
-            <div class="da5b-form-grid" role="form" aria-label="{{ page_title }}">
-                {% for field in fields %}
-                    <div class="da5b-field">
-                        <label>
-                            {{ field.label }}
-                            {% if field.required %}
-                                <span>Zorunlu</span>
-                            {% endif %}
-                        </label>
-
-                        {% if field.type == "textarea" %}
-                            <textarea disabled placeholder="{{ field.name }}"></textarea>
-                        {% elif field.type == "checkbox" %}
-                            <div class="da5b-check">
-                                <input type="checkbox" disabled>
-                                <em>Pasif boolean alan</em>
-                            </div>
-                        {% else %}
-                            <input type="{{ field.type }}" disabled placeholder="{{ field.name }}">
-                        {% endif %}
-
-                        <small>{{ field.readonly_note }}</small>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="da5b-empty">
-                <strong>Form alanı bulunamadı.</strong>
-                <p>Tablo metadata üzerinden güvenli alan üretilemedi.</p>
-            </div>
-        {% endif %}
-    </section>
-</div>
-
 <style>
-.da5b-shell { display: flex; flex-direction: column; gap: 1rem; }
-.da5b-hero {
-    display: flex; justify-content: space-between; gap: 1.5rem;
-    padding: 1.5rem; border-radius: 1.25rem;
-    background: radial-gradient(circle at 96% -20%, rgba(139, 0, 0, .075), transparent 34%), linear-gradient(135deg, rgba(255,255,255,.99) 0%, rgba(255,253,253,.98) 58%, rgba(248,237,237,.88) 100%);
-    color: var(--bys-text, #111827);
-    border: 1px solid rgba(139, 0, 0, .14);
-    border-left: 6px solid var(--bys-red, #8B0000);
-    box-shadow: var(--bys-shadow, 0 18px 44px rgba(15,23,42,.08));
-}
-.da5b-kicker { margin: 0 0 .5rem; color: var(--bys-red, #8B0000); font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; }
-.da5b-hero h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; }
-.da5b-hero p { margin: .75rem 0 0; max-width: 760px; color: var(--bys-muted, #667085); line-height: 1.65; }
-.da5b-status {
-    min-width: 230px; padding: 1rem; border-radius: 1rem;
-    background: #fff; border: 1px solid var(--bys-border, rgba(15,23,42,.09));
-    display: flex; flex-direction: column; gap: .25rem;
-}
-.da5b-status span { color: var(--bys-muted, #667085); font-size: .85rem; }
-.da5b-toolbar, .da5b-panel {
-    background: #fff; border: 1px solid rgba(148, 163, 184, .28);
-    border-radius: 1rem; box-shadow: 0 10px 28px rgba(15, 23, 42, .06);
-}
-.da5b-toolbar {
-    padding: .9rem 1rem; display: flex; justify-content: space-between; gap: 1rem; color: #64748b;
-}
-.da5b-toolbar-links { display: flex; flex-wrap: wrap; gap: .75rem; }
-.da5b-toolbar a { color: var(--bys-red, #8B0000); text-decoration: none; font-weight: 700; }
-.da5b-panel { padding: 1.25rem; }
-.da5b-panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
-.da5b-panel-header h2 { margin: 0 0 .35rem; color: #0f172a; }
-.da5b-panel-header p { margin: 0; color: #64748b; line-height: 1.55; }
-.da5b-count {
-    white-space: nowrap; border-radius: 999px; padding: .4rem .75rem;
-    background: var(--bys-red-soft, #f8eded); color: var(--bys-red-dark, #690000);
-    border: 1px solid rgba(139, 0, 0, .14); font-size: .85rem; font-weight: 700;
-}
-.da5b-warning {
-    display: flex; flex-direction: column; gap: .25rem;
-    padding: 1rem; margin-bottom: 1rem; border-radius: .9rem;
-    background: #fffbeb; border: 1px solid rgba(180, 83, 9, .22); color: #92400e;
-}
-.da5b-form-grid {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;
-}
-.da5b-field {
-    padding: 1rem; border-radius: .9rem; background: #f8fafc;
-    border: 1px solid rgba(148, 163, 184, .28);
-}
-.da5b-field label {
-    display: flex; justify-content: space-between; gap: .75rem;
-    margin-bottom: .5rem; color: #0f172a; font-weight: 700;
-}
-.da5b-field label span {
-    border-radius: 999px; padding: .15rem .5rem;
-    background: var(--bys-red-soft, #f8eded); color: var(--bys-red-dark, #690000);
-    font-size: .72rem;
-}
-.da5b-field input,
-.da5b-field textarea {
-    width: 100%; border: 1px solid rgba(148, 163, 184, .38);
-    border-radius: .75rem; padding: .75rem; background: #fff; color: #64748b;
-}
-.da5b-field textarea { min-height: 92px; resize: vertical; }
-.da5b-field small { display: block; margin-top: .45rem; color: #64748b; }
-.da5b-check { display: flex; align-items: center; gap: .5rem; color: #64748b; }
-.da5b-empty {
-    padding: 1rem; border-radius: .9rem; background: #f8fafc;
-    border: 1px dashed rgba(148, 163, 184, .6); color: #475569;
-}
-@media (max-width: 800px) {
-    .da5b-hero, .da5b-panel-header, .da5b-toolbar { flex-direction: column; }
-    .da5b-form-grid { grid-template-columns: 1fr; }
-}
+    .da-page { max-width: 920px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-title { margin: 0; color: #111827; font-size: clamp(26px, 3vw, 38px); font-weight: 850; letter-spacing: -0.03em; }
+    .da-subtitle { margin: 10px 0 22px; color: #667085; line-height: 1.65; }
+    .da-card {
+        background: #fff; border: 1px solid rgba(15,23,42,.09); border-radius: 24px;
+        padding: 22px; box-shadow: 0 18px 44px rgba(15,23,42,.08);
+    }
+    .da-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .da-field label { display: block; color: #111827; font-weight: 700; margin-bottom: 7px; }
+    .da-field input, .da-field textarea, .da-field select {
+        width: 100%; border: 1px solid rgba(15,23,42,.14); border-radius: 14px;
+        padding: 11px 12px; color: #111827; background: #fff;
+    }
+    .da-field textarea { min-height: 96px; resize: vertical; }
+    .da-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .da-button {
+        display: inline-flex; align-items: center; justify-content: center; padding: 11px 15px;
+        border-radius: 14px; text-decoration: none; font-weight: 700;
+        border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff; cursor: pointer;
+    }
+    .da-button-primary { color: #fff; background: #8B0000; border-color: #8B0000; }
+    @media (max-width: 760px) { .da-grid { grid-template-columns: 1fr; } }
 </style>
+
+{% set alanlar = fields|default([]) %}
+
+<div class="da-page">
+    <h1 class="da-title">{{ sayfa_basligi }}</h1>
+    <p class="da-subtitle">{{ sayfa_aciklamasi }}</p>
+
+    <form class="da-card" method="post" action="{{ list_url|default(request.path|replace('/new', '')) }}">
+        <div class="da-grid">
+            {% for field in alanlar %}
+                {% set field_name = field.name if field.name is defined else field %}
+                {% set field_label = alan_etiketleri.get(field_name, field.label if field.label is defined else field_name|replace('_', ' ')|title) %}
+                {% set field_type = field.input_type if field.input_type is defined else 'text' %}
+                <div class="da-field">
+                    <label for="{{ field_name }}">{{ field_label }}</label>
+                    {% if field_type == "textarea" %}
+                        <textarea id="{{ field_name }}" name="{{ field_name }}"></textarea>
+                    {% else %}
+                        <input id="{{ field_name }}" name="{{ field_name }}" type="{{ field_type }}">
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="da-actions">
+            <button class="da-button da-button-primary" type="submit">Kaydet</button>
+            <a class="da-button" href="{{ list_url|default('/digital-archive/') }}">Vazgeç</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

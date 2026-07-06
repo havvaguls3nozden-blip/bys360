@@ -130,7 +130,7 @@ def _digital_archive_dashboard_context() -> dict:
 
     return {
         "page_title": "Dijital Arşiv Yönetim Merkezi",
-        "module_status": "Pasif güvenli ekran",
+        "module_status": "Dijital Arşiv Merkezi",
         "summary": summary,
         "table_cards": table_cards,
     }
@@ -152,7 +152,7 @@ _DIGITAL_ARCHIVE_PASSIVE_LIST_SPECS = {
     "categories": {
         "table": "digital_archive_categories",
         "title": "Arşiv Kategorileri",
-        "subtitle": "Belgelerin kurumsal arşiv sınıflandırmasına göre izlenmesi için pasif liste ekranı.",
+        "subtitle": "Belgelerin kurumsal arşiv sınıflandırmasına göre düzenli şekilde takip edildiği bölüm.",
         "preferred_columns": ["id", "code", "name", "title", "description", "is_active", "created_at", "updated_at"],
         "new_route": "/digital-archive/categories/new",
     },
@@ -165,7 +165,7 @@ _DIGITAL_ARCHIVE_PASSIVE_LIST_SPECS = {
     },
     "retention_policies": {
         "table": "digital_archive_retention_policies",
-        "title": "Saklama Politikaları",
+        "title": "Saklama Süreleri",
         "subtitle": "Belge saklama süresi, imha/transfer kuralı ve arşiv mevzuatı hazırlığı için pasif liste ekranı.",
         "preferred_columns": ["id", "name", "code", "retention_years", "action", "description", "is_active", "created_at"],
         "new_route": "/digital-archive/retention-policies/new",
@@ -237,7 +237,7 @@ def _digital_archive_passive_list_context(list_key: str) -> dict:
         "rows": rows,
         "row_count": len(rows),
         "error_message": error_message,
-        "module_status": "Pasif liste ekranı",
+        "module_status": "Kayıt Listesi",
         "back_url": "/digital-archive/",
         "draft_form_url": spec.get("new_route"),
     }
