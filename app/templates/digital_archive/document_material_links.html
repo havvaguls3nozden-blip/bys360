@@ -22,6 +22,8 @@
     .da-table td { padding:14px 16px; color:#111827; border-bottom:1px solid rgba(15,23,42,.07); vertical-align:top; }
     .da-empty { padding:22px; color:#667085; line-height:1.65; background:#fafafa; border-radius:18px; }
     .da-pill { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#f8eded; color:#8B0000; font-weight:800; font-size:12px; }
+    .da-link { color:#8B0000; font-weight:800; text-decoration:none; }
+    .da-link:hover { text-decoration:underline; }
     @media (max-width: 900px) { .da-grid, .da-grid-note { grid-template-columns:1fr; } }
 </style>
 
@@ -115,7 +117,7 @@
                     {% for row in rows %}
                         <tr>
                             <td>{{ row.get('id') }}</td>
-                            <td>{{ document_map.get(row.get('document_id'), 'Belge #' ~ row.get('document_id')) }}</td>
+                            <td><a class="da-link" href="/digital-archive/documents/{{ row.get('document_id') }}/material-summary">{{ document_map.get(row.get('document_id'), 'Belge #' ~ row.get('document_id')) }}</a></td>
                             <td>{{ material_map.get(row.get('material_type_id'), 'Malzeme Türü #' ~ row.get('material_type_id')) }}</td>
                             <td>{{ row.get('material_quantity', 1) }}</td>
                             <td>{{ row.get('material_code', '') }}</td>

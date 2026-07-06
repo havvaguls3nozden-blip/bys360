@@ -2858,6 +2858,105 @@ def document_material_links():
         return redirect("/digital-archive/")
 
 
+
+# DA-33A: Belge kartı malzeme bağlantıları özeti
+@digital_archive_bp.route("/documents/<int:document_id>/material-summary", methods=["GET"])
+@login_required
+def document_material_summary(document_id: int):
+    """Belge kartı özelinde arşiv malzemesi bağlantıları özeti."""
+    from flask import current_app, flash, redirect, render_template
+    from sqlalchemy import desc, select
+
+    try:
+        documents_table = _da32_required_table("digital_archive_documents")
+        links_table = _da32_document_material_links_table(create_if_missing=True)
+
+        if "_da31_material_type_table" in globals():
+            material_types_table = _da31_material_type_table(create_if_missing=True)
+        else:
+            material_types_table = _da32_required_table("digital_archive_material_types")
+
+        document_row = db.session.execute(
+            select(documents_table).where(documents_table.c.id == document_id)
+        ).first()
+
+        if not document_row:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        document = dict(document_row._mapping)
+        document_columns = set(documents_table.c.keys())
+
+        document_label = _da32_row_label(
+            document,
+            document_columns,
+            [
+                "title",
+                "document_title",
+                "subject",
+                "name",
+                "document_name",
+                "file_name",
+                "original_filename",
+                "reference_no",
+                "reference_number",
+                "archive_code",
+            ],
+            "Belge",
+        )
+
+        link_rows = [
+            dict(row._mapping)
+            for row in db.session.execute(
+                select(links_table)
+                .where(links_table.c.document_id == document_id)
+                .order_by(desc(links_table.c.id))
+                .limit(300)
+            ).all()
+        ]
+
+        material_rows = [
+            dict(row._mapping)
+            for row in db.session.execute(
+                select(material_types_table).limit(500)
+            ).all()
+        ]
+
+        material_columns = set(material_types_table.c.keys())
+        material_map = {
+            int(row.get("id")): _da32_row_label(
+                row,
+                material_columns,
+                ["name", "title", "material_type", "description"],
+                "Malzeme Türü",
+            )
+            for row in material_rows
+            if row.get("id") is not None
+        }
+
+        active_count = sum(1 for row in link_rows if row.get("is_active"))
+        passive_count = len(link_rows) - active_count
+        total_quantity = sum(int(row.get("material_quantity") or 0) for row in link_rows)
+
+        return render_template(
+            "digital_archive/document_material_summary.html",
+            document=document,
+            document_id=document_id,
+            document_label=document_label,
+            rows=link_rows,
+            material_map=material_map,
+            active_count=active_count,
+            passive_count=passive_count,
+            total_quantity=total_quantity,
+        )
+
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge malzeme özeti açılamadı.")
+        flash("Belge malzeme özeti açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/document-material-links")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
