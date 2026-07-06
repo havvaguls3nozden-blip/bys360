@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Belge Birleşik Detay - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Belge Detayı - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -40,9 +40,9 @@
 </style>
 
 <div class="da-page">
-    <h1 class="da-title">Belge Birleşik Detay</h1>
+    <h1 class="da-title">Belge Detayı</h1>
     <p class="da-subtitle">
-        Bu ekran belge kartını; arşiv malzemeleri, işlem geçmişi, okunabilir metin ve dinamik üstveri kayıtlarıyla birlikte tek kurumsal görünümde toplar.
+        Bu sayfada belgeye ait arşiv malzemeleri, işlem geçmişi, okunan metin ve ek bilgiler birlikte gösterilir.
     </p>
 
     <div class="da-card">
@@ -51,7 +51,7 @@
         <div class="da-actions">
             <a class="da-button da-button-primary" href="/digital-archive/document-material-links">Malzeme Bağlantıları</a>
             <a class="da-button" href="/digital-archive/documents/{{ document_id }}/material-summary">Malzeme Özeti</a>
-            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
             <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
         </div>
 
@@ -75,11 +75,11 @@
             <strong>{{ history_count }}</strong>
         </div>
         <div class="da-stat">
-            <span>Okunabilir Metin</span>
+            <span>Okunan Metin</span>
             <strong>{{ readable_text_count }}</strong>
         </div>
         <div class="da-stat">
-            <span>Dinamik Üstveri</span>
+            <span>Ek Bilgiler</span>
             <strong>{{ metadata_count }}</strong>
         </div>
     </div>

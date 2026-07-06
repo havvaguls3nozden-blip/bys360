@@ -3035,27 +3035,28 @@ def _da34_public_columns(row: dict) -> list[tuple[str, str]]:
         "reference_no": "Referans No",
         "reference_number": "Referans No",
         "document_type": "Belge Türü",
-        "category_id": "Kategori No",
-        "physical_location_id": "Fiziksel Konum No",
-        "retention_policy_id": "Saklama Politikası No",
+        "category_id": "Kategori",
+        "physical_location_id": "Fiziksel Konum",
+        "retention_policy_id": "Saklama Kuralı",
         "confidentiality_level": "Gizlilik Seviyesi",
         "status": "Durum",
         "is_active": "Aktif",
         "created_at": "Kayıt Tarihi",
         "updated_at": "Güncelleme Tarihi",
-        "created_by": "Oluşturan",
+        "created_by": "Kaydı Oluşturan",
         "action": "İşlem",
         "event_type": "İşlem Türü",
         "description": "Açıklama",
         "note": "Not",
-        "readable_text": "Okunabilir Metin",
-        "ocr_text": "OCR Metni",
-        "extracted_text": "Çıkarılan Metin",
-        "field_key": "Alan Anahtarı",
+        "readable_text": "Okunan Metin",
+        "ocr_text": "Okunan Metin",
+        "extracted_text": "Okunan Metin",
+        "field_key": "Alan",
         "field_name": "Alan Adı",
-        "field_value": "Alan Değeri",
+        "field_value": "Değer",
         "value": "Değer",
-        "material_type_id": "Malzeme Türü No",
+        "material_type_id": "Malzeme Türü",
+        "material_type_label": "Malzeme Türü",
         "material_quantity": "Adet",
         "material_code": "Kod",
         "physical_location_note": "Fiziksel Konum",
@@ -3224,16 +3225,16 @@ def document_full_detail(document_id: int):
                 "empty": "Bu belge kartı için işlem geçmişi kaydı bulunmuyor.",
             },
             {
-                "title": "Okunabilir Metin / OCR",
-                "description": "Taranmış belge veya dosyadan çıkarılan okunabilir metin kayıtları.",
+                "title": "Okunan Metin",
+                "description": "Belgeden çıkarılan okunan metin kayıtları.",
                 "rows": [_da34_public_columns(row) for row in readable_text_rows],
-                "empty": "Bu belge kartı için okunabilir metin veya OCR kaydı bulunmuyor.",
+                "empty": "Bu belge için okunan metin kaydı bulunmuyor.",
             },
             {
-                "title": "Dinamik Üstveri",
-                "description": "Belgeye sonradan eklenen özel alan, tarihi alan, lokasyon, envanter veya sınıflandırma bilgileri.",
+                "title": "Ek Bilgiler",
+                "description": "Belgeye eklenen özel alan, tarihi alan, konum, envanter ve sınıflandırma bilgileri.",
                 "rows": [_da34_public_columns(row) for row in metadata_rows],
-                "empty": "Bu belge kartı için dinamik üstveri kaydı bulunmuyor.",
+                "empty": "Bu belge için ek bilgi kaydı bulunmuyor.",
             },
         ]
 
@@ -3252,8 +3253,8 @@ def document_full_detail(document_id: int):
 
     except Exception:
         db.session.rollback()
-        current_app.logger.exception("Belge birleşik detay ekranı açılamadı.")
-        flash("Belge birleşik detay ekranı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        current_app.logger.exception("Belge detay ekranı açılamadı.")
+        flash("Belge detay ekranı açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/documents")
 
 

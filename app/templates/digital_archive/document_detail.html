@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Belge Kartı Detayı - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Belge Detayı - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -40,7 +40,7 @@
 </style>
 
 <div class="da-page">
-    <h1 class="da-title">Belge Kartı Detayı</h1>
+    <h1 class="da-title">Belge Detayı</h1>
     <p class="da-subtitle">
         Belge kartı, fiziksel arşivdeki konum bilgisi ve dijital dosya bağlantılarıyla birlikte takip edilir.
     </p>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="da-actions">
-            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
             <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
             <a class="da-button" href="/digital-archive/documents/{{ document.get('id') }}/ocr">Metin Okuma Hazırlığı</a>
         </div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Belge Malzeme Özeti - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Belge Arşiv Malzemesi Özeti - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -32,15 +32,15 @@
 </style>
 
 <div class="da-page">
-    <h1 class="da-title">Belge Malzeme Özeti</h1>
+    <h1 class="da-title">Belge Arşiv Malzemesi Özeti</h1>
     <p class="da-subtitle">
-        Bu ekran, seçili belge kartının fiziksel veya dijital arşiv malzemeleriyle kurulan bağlantılarını gösterir. Böylece belgenin hangi kutu, klasör, dosya veya medya türüyle ilişkilendirildiği tek ekranda izlenebilir.
+        Bu sayfa, seçili belgenin fiziksel veya dijital arşiv malzemeleriyle kurulan bağlantılarını gösterir. Böylece belgenin hangi kutu, klasör, dosya veya medya türüyle ilişkilendirildiği tek ekranda izlenebilir.
     </p>
 
     <div class="da-card">
         <h2 style="margin:0 0 8px; color:#111827;">{{ document_label }}</h2>
         <div class="da-meta">
-            <strong>Belge No</strong>
+            <strong>Belge Numarası</strong>
             <span>{{ document_id }}</span>
 
             {% if document.get('archive_code') %}
@@ -60,9 +60,9 @@
         </div>
 
         <div class="da-actions">
-            <a class="da-button da-button-primary" href="/digital-archive/documents/{{ document_id }}/full-detail">Birleşik Detay</a>
-            <a class="da-button da-button-primary" href="/digital-archive/document-material-links">Yeni Bağlantı / Liste</a>
-            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+            <a class="da-button da-button-primary" href="/digital-archive/documents/{{ document_id }}/full-detail">Belge Detayı</a>
+            <a class="da-button da-button-primary" href="/digital-archive/document-material-links">Yeni Bağlantı ve Liste</a>
+            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
             <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
         </div>
     </div>

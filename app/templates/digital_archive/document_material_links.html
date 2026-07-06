@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Belge Malzeme Bağlantıları - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Belge Arşiv Malzemesi Bağlantıları - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -28,7 +28,7 @@
 </style>
 
 <div class="da-page">
-    <h1 class="da-title">Belge Malzeme Bağlantıları</h1>
+    <h1 class="da-title">Belge Arşiv Malzemesi Bağlantıları</h1>
     <p class="da-subtitle">
         Belge kartlarını arşiv kutusu, klasör, evrak dosyası, fotoğraf, harita, defter veya dijital dosya gibi malzeme türleriyle ilişkilendirin. Bu ekran fiziksel arşiv sınıflandırmasını belge kartına bağlar.
     </p>
@@ -46,7 +46,7 @@
 
         <div class="da-grid">
             <div class="da-field">
-                <label for="document_id">Belge Kartı</label>
+                <label for="document_id">Belge</label>
                 <select id="document_id" name="document_id" {% if not documents %}disabled{% endif %}>
                     <option value="">Belge seçin</option>
                     {% for document in documents %}
@@ -78,7 +78,7 @@
             </div>
 
             <div class="da-field">
-                <label for="physical_location_note">Fiziksel Konum Notu</label>
+                <label for="physical_location_note">Fiziksel Konumtu</label>
                 <input id="physical_location_note" name="physical_location_note" type="text" placeholder="Örn. Arşiv Odası A / Raf 2 / Kutu 4">
             </div>
         </div>
@@ -91,13 +91,13 @@
         <div class="da-actions">
             <button class="da-button da-button-primary" type="submit" {% if not documents or not material_types %}disabled{% endif %}>Bağlantıyı Kaydet</button>
             <a class="da-button" href="/digital-archive/material-types">Malzeme Türleri</a>
-            <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
+            <a class="da-button" href="/digital-archive/documents">Belgeler</a>
             <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
         </div>
     </form>
 
     <div class="da-card">
-        <h2 style="margin:0 0 14px; color:#111827;">Kayıtlı Belge Malzeme Bağlantıları</h2>
+        <h2 style="margin:0 0 14px; color:#111827;">Kayıtlı Belge Arşiv Malzemesi Bağlantıları</h2>
 
         {% if rows %}
             <table class="da-table">
