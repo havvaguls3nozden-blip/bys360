@@ -197,6 +197,56 @@
             padding: 22px;
         }
     }
+
+    .da-print-help {
+        margin-top: 10px;
+        color: #667085;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    @media print {
+        body {
+            background: #fff !important;
+        }
+
+        .da-page {
+            max-width: none !important;
+            padding: 0 !important;
+        }
+
+        .da-actions {
+            display: none !important;
+        }
+
+        .da-hero,
+        .da-summary-card,
+        .da-card,
+        .da-report-card,
+        .da-table-wrap,
+        .da-note {
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+
+        .da-hero {
+            border-radius: 0 !important;
+            border-left: 0 !important;
+            border-right: 0 !important;
+            border-top: 0 !important;
+        }
+
+        a {
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        .da-table th,
+        .da-table td {
+            font-size: 12px;
+        }
+    }
+
 </style>
 
 <div class="da-page">
@@ -207,8 +257,10 @@
             Belgelerin mevcut durumlarına göre dağılımını gösterir. Bu ekran belge kayıtlarının arşiv sürecinde
             hangi aşamada olduğunu hızlıca izlemek için hazırlanmıştır.
         </p>
+        <div class="da-print-help">Bu ekran yazdırmaya uygun hazırlanmıştır.</div>
 
         <div class="da-actions">
+            <button class="da-button da-button-primary" type="button" onclick="window.print()">Yazdır</button>
             <a class="da-button da-button-primary" href="/digital-archive/report-center">Rapor Merkezi</a>
             <a class="da-button" href="/digital-archive/documents">Belgeler</a>
             <a class="da-button" href="/digital-archive/document-status-guide">Belge Durumları</a>
