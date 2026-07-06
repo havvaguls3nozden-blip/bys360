@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Metin Okuma Hazırlığı - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Metin Okuma - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -29,13 +29,17 @@
         border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff; cursor: pointer;
     }
     .da-button-primary { color: #fff; background: #8B0000; border-color: #8B0000; }
+    .da-field label { display:block; color:#111827; font-weight:800; margin-bottom:8px; }
+    .da-field textarea {
+        width:100%; min-height:180px; border:1px solid rgba(15,23,42,.14);
+        border-radius:16px; padding:14px; color:#111827; line-height:1.6; resize:vertical;
+    }
 </style>
 
 <div class="da-page">
-    <h1 class="da-title">Metin Okuma Hazırlığı</h1>
+    <h1 class="da-title">Metin Okuma</h1>
     <p class="da-subtitle">
-        Taranmış belgelerin ilerleyen aşamada metne dönüştürülmesi, aranabilir hale getirilmesi
-        ve belge kartı içinde görüntülenmesi için hazırlık ekranıdır.
+        Taranmış belgeden elde edilen metin belge kartına bağlanır. Böylece belge içerikleri arama ekranında bulunabilir hale gelir.
     </p>
 
     <div class="da-card">
@@ -44,13 +48,56 @@
             <span>Belge kartına bağlı taranmış dosya kontrol edilir.</span>
         </div>
         <div class="da-step">
-            <strong>2. Metin okuma hazırlığı</strong>
-            <span>PDF veya görsel dosyanın metin okuma sürecine alınabilmesi için dosya bilgileri hazır tutulur.</span>
+            <strong>2. Okunan metin</strong>
+            <span>Belgeden elde edilen metin bu alana kaydedilir.</span>
         </div>
         <div class="da-step">
             <strong>3. Aranabilir arşiv</strong>
-            <span>Sonraki aşamada okunan metin belge kartına bağlanacak ve arama altyapısında kullanılacaktır.</span>
+            <span>Kaydedilen metin belge aramasına dahil edilir.</span>
         </div>
+    </div>
+
+    <form class="da-card" method="post" action="/digital-archive/documents/{{ document_id }}/ocr">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+
+        <div class="da-field">
+            <label for="recognized_text">Okunan Metin</label>
+            <textarea id="recognized_text" name="recognized_text" placeholder="Belgeden okunan metni buraya yazın."></textarea>
+        </div>
+
+        <div class="da-actions">
+            <button class="da-button da-button-primary" type="submit">Metni Kaydet</button>
+            <a class="da-button" href="/digital-archive/documents/{{ document_id }}">Belge Kartına Dön</a>
+        </div>
+    </form>
+
+    <div class="da-card">
+        <h2 style="margin:0 0 14px; color:#111827;">Kayıtlı Okunan Metinler</h2>
+
+        {% if readable_rows and readable_columns %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in readable_columns %}
+                            <th>{{ readable_labels.get(column, column) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in readable_rows %}
+                        <tr>
+                            {% for column in readable_columns %}
+                                <td>{{ row.get(column, '') }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color:#667085;">Bu belge kartına kayıtlı okunan metin bulunmuyor.</p>
+        {% endif %}
     </div>
 
     <div class="da-card">

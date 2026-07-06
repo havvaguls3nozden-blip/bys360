@@ -784,6 +784,8 @@ def documents():
         conditions = []
 
         if q:
+            text_conditions = []
+
             text_columns = [
                 column.name
                 for column in table.columns
@@ -791,12 +793,20 @@ def documents():
             ]
 
             if text_columns:
-                conditions.append(
+                text_conditions.append(
                     or_(*[
                         cast(table.c[column], String).ilike(f"%{q}%")
                         for column in text_columns
                     ])
                 )
+
+            if "id" in table.c:
+                readable_text_document_ids = _da27_document_ids_for_text(q)
+                if readable_text_document_ids:
+                    text_conditions.append(table.c.id.in_(readable_text_document_ids))
+
+            if text_conditions:
+                conditions.append(or_(*text_conditions))
 
         exact_filters = {
             "category_id": category_id,
@@ -1458,6 +1468,7 @@ def document_ocr_ready(document_id: int):
             return redirect("/digital-archive/documents")
 
         file_rows, file_columns, file_labels = _da24_document_files(document_id)
+        readable_rows, readable_columns, readable_labels = _da27_ocr_rows(document_id)
 
         return render_template(
             "digital_archive/document_ocr_ready.html",
@@ -1465,12 +1476,369 @@ def document_ocr_ready(document_id: int):
             file_rows=file_rows,
             file_columns=file_columns,
             file_labels=file_labels,
+            readable_rows=readable_rows,
+            readable_columns=readable_columns,
+            readable_labels=readable_labels,
             document_id=document_id,
         )
     except Exception:
         current_app.logger.exception("Metin okuma hazırlık ekranı açılamadı.")
         flash("Metin okuma hazırlığı açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect(f"/digital-archive/documents/{document_id}")
+
+
+# DA-27B: Okunan metin belge bağlantısı
+def _da27_ocr_table():
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = inspector.get_table_names()
+
+    candidates = []
+    if "digital_archive_ocr_jobs" in table_names:
+        candidates.append("digital_archive_ocr_jobs")
+
+    for table_name in table_names:
+        lower_name = table_name.lower()
+        if table_name.startswith("digital_archive") and table_name not in candidates:
+            if any(token in lower_name for token in ("ocr", "text", "content", "search")):
+                candidates.append(table_name)
+
+    if not candidates:
+        raise RuntimeError("Metin okuma tablosu bulunamadı.")
+
+    metadata = MetaData()
+    return Table(candidates[0], metadata, autoload_with=db.engine)
+
+
+def _da27_text_columns(table) -> list[str]:
+    result = []
+
+    preferred = [
+        "recognized_text",
+        "extracted_text",
+        "ocr_text",
+        "text_content",
+        "content",
+        "result_text",
+        "raw_text",
+        "search_text",
+        "plain_text",
+    ]
+
+    existing = [column.name for column in table.columns]
+
+    for name in preferred:
+        if name in existing:
+            result.append(name)
+
+    if result:
+        return result
+
+    excluded = {
+        "status",
+        "state",
+        "language",
+        "lang",
+        "engine",
+        "method",
+        "source",
+        "file_name",
+        "mime_type",
+        "content_type",
+        "error",
+        "error_message",
+    }
+
+    for column in table.columns:
+        name = column.name
+        lower_type = str(column.type).lower()
+
+        if name in excluded or name.endswith("_path"):
+            continue
+
+        if any(token in lower_type for token in ("char", "text", "varchar", "string")):
+            result.append(name)
+
+    return result
+
+
+def _da27_latest_file_id(document_id: int):
+    from sqlalchemy import desc, select
+
+    try:
+        table = _da24_file_table()
+    except RuntimeError:
+        return None
+
+    if "id" not in table.c or "document_id" not in table.c:
+        return None
+
+    return db.session.execute(
+        select(table.c.id)
+        .where(table.c.document_id == document_id)
+        .order_by(desc(table.c.id))
+        .limit(1)
+    ).scalar_one_or_none()
+
+
+def _da27_ocr_rows(document_id: int) -> tuple[list[dict], list[str], dict]:
+    from sqlalchemy import desc, select
+
+    try:
+        table = _da27_ocr_table()
+    except RuntimeError:
+        return [], [], {}
+
+    available_columns = [column.name for column in table.columns]
+    text_columns = _da27_text_columns(table)
+    file_id = _da27_latest_file_id(document_id)
+
+    query = select(table)
+
+    if "document_id" in table.c:
+        query = query.where(table.c.document_id == document_id)
+    elif file_id and "document_version_id" in table.c:
+        query = query.where(table.c.document_version_id == file_id)
+    elif file_id and "file_id" in table.c:
+        query = query.where(table.c.file_id == file_id)
+    elif file_id and "version_id" in table.c:
+        query = query.where(table.c.version_id == file_id)
+    else:
+        return [], [], {}
+
+    if "id" in table.c:
+        query = query.order_by(desc(table.c.id))
+
+    rows = [dict(row._mapping) for row in db.session.execute(query.limit(50)).all()]
+
+    preferred_columns = [
+        "id",
+        "status",
+        "state",
+        "language",
+        "lang",
+        *text_columns,
+        "created_at",
+        "updated_at",
+        "completed_at",
+        "finished_at",
+    ]
+
+    display_columns = []
+    for column in preferred_columns:
+        if column in available_columns and column not in display_columns:
+            display_columns.append(column)
+
+    display_columns = display_columns[:8]
+
+    labels = {
+        "id": "No",
+        "status": "Durum",
+        "state": "Durum",
+        "language": "Dil",
+        "lang": "Dil",
+        "recognized_text": "Okunan Metin",
+        "extracted_text": "Okunan Metin",
+        "ocr_text": "Okunan Metin",
+        "text_content": "Okunan Metin",
+        "content": "Okunan Metin",
+        "result_text": "Okunan Metin",
+        "raw_text": "Okunan Metin",
+        "search_text": "Okunan Metin",
+        "plain_text": "Okunan Metin",
+        "created_at": "Kayıt Tarihi",
+        "updated_at": "Güncelleme Tarihi",
+        "completed_at": "Tamamlanma Tarihi",
+        "finished_at": "Tamamlanma Tarihi",
+    }
+
+    return rows, display_columns, labels
+
+
+def _da27_ocr_payload(document_id: int, text_value: str):
+    from datetime import datetime
+
+    table = _da27_ocr_table()
+    now = datetime.now()
+    file_id = _da27_latest_file_id(document_id)
+    text_columns = _da27_text_columns(table)
+
+    def default_for(column):
+        name = column.name
+        lower_name = name.lower()
+        lower_type = str(column.type).lower()
+
+        if name == "document_id":
+            return document_id
+
+        if lower_name in {"document_version_id", "file_id", "version_id"}:
+            return file_id or 0
+
+        if lower_name in set(text_columns):
+            return text_value
+
+        if lower_name in {"status", "state"}:
+            return "Tamamlandı"
+
+        if lower_name in {"language", "lang"}:
+            return "tr"
+
+        if lower_name in {"engine", "method", "source"}:
+            return "Kullanıcı girişi"
+
+        if lower_name in {"error", "error_message"}:
+            return ""
+
+        if lower_name in {"confidence", "confidence_score", "score"}:
+            return 100
+
+        if lower_name in {"created_at", "updated_at", "started_at", "completed_at", "finished_at"}:
+            return now
+
+        if "bool" in lower_type:
+            return True if lower_name in {"is_active", "is_completed", "is_success"} else False
+
+        if "int" in lower_type:
+            if lower_name.endswith("_id"):
+                return 0
+            return 0
+
+        if "float" in lower_type or "numeric" in lower_type or "decimal" in lower_type:
+            return 100
+
+        if "date" in lower_type and "time" not in lower_type:
+            return now.date()
+
+        if "time" in lower_type:
+            return now
+
+        if any(token in lower_type for token in ("char", "text", "varchar", "string")):
+            return text_value[:500]
+
+        return None
+
+    payload = {}
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"}:
+            continue
+
+        value = default_for(column)
+        if value is not None:
+            payload[name] = value
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"} or name in payload:
+            continue
+
+        nullable = getattr(column, "nullable", True)
+        has_default = column.default is not None or column.server_default is not None
+
+        if not nullable and not has_default:
+            value = default_for(column)
+            if value is not None:
+                payload[name] = value
+
+    return payload
+
+
+def _da27_document_ids_for_text(search_text: str) -> list[int]:
+    from sqlalchemy import String, cast, or_, select
+
+    try:
+        table = _da27_ocr_table()
+    except RuntimeError:
+        return []
+
+    text_columns = _da27_text_columns(table)
+    if not text_columns:
+        return []
+
+    text_condition = or_(*[
+        cast(table.c[column], String).ilike(f"%{search_text}%")
+        for column in text_columns
+        if column in table.c
+    ])
+
+    document_ids = set()
+
+    if "document_id" in table.c:
+        rows = db.session.execute(
+            select(table.c.document_id).where(text_condition).distinct().limit(500)
+        ).all()
+
+        for row in rows:
+            if row[0]:
+                document_ids.add(int(row[0]))
+
+    else:
+        file_id_column = None
+        for candidate in ("document_version_id", "file_id", "version_id"):
+            if candidate in table.c:
+                file_id_column = candidate
+                break
+
+        if file_id_column:
+            file_ids = [
+                row[0]
+                for row in db.session.execute(
+                    select(table.c[file_id_column]).where(text_condition).distinct().limit(500)
+                ).all()
+                if row[0]
+            ]
+
+            if file_ids:
+                try:
+                    file_table = _da24_file_table()
+                    if "id" in file_table.c and "document_id" in file_table.c:
+                        rows = db.session.execute(
+                            select(file_table.c.document_id).where(file_table.c.id.in_(file_ids)).distinct().limit(500)
+                        ).all()
+
+                        for row in rows:
+                            if row[0]:
+                                document_ids.add(int(row[0]))
+                except RuntimeError:
+                    pass
+
+    return sorted(document_ids)
+
+
+@digital_archive_bp.route("/documents/<int:document_id>/ocr", methods=["POST"])
+@login_required
+def document_ocr_text_post(document_id: int):
+    """Okunan metni belge kartına bağlar."""
+    from flask import request
+
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        text_value = request.form.get("recognized_text", "").strip()
+        if not text_value:
+            flash("Okunan metin alanı boş bırakılamaz.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}/ocr")
+
+        table = _da27_ocr_table()
+        payload = _da27_ocr_payload(document_id, text_value)
+
+        db.session.execute(table.insert().values(**payload))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Okunan metin belge kartına bağlanamadı.")
+        flash("Okunan metin kaydedilirken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}/ocr")
+
+    flash("Okunan metin belge kartına bağlandı.", "success")
+    return redirect(f"/digital-archive/documents/{document_id}/ocr")
 
 
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
