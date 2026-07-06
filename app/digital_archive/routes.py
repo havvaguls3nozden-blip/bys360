@@ -536,7 +536,8 @@ def _da23_column_label(column_name: str) -> str:
         "location_id": "Fiziksel Konum",
         "retention_policy_id": "Saklama Süresi",
         "retention_id": "Saklama Süresi",
-        "status": "Durum",
+        "status": "Belge Durumu",
+        "status_label": "Belge Durumu",
         "confidentiality_level": "Gizlilik Düzeyi",
         "access_level": "Erişim Düzeyi",
         "description": "Açıklama",
@@ -908,6 +909,9 @@ def documents():
             "date_to": date_to,
         }
 
+        rows = [_da36b_enrich_document_row(row) for row in rows]
+        status_summary = _da36b_status_summary(rows)
+
         return render_template(
             "digital_archive/document_list.html",
             title="Belgeler",
@@ -918,6 +922,7 @@ def documents():
             row_count=len(rows),
             filter_values=filter_values,
             filter_options=filter_options,
+            status_summary=status_summary,
         )
     except Exception:
         current_app.logger.exception("Belgeler listelenemedi.")
@@ -1052,7 +1057,7 @@ def _da24_file_label(column_name: str) -> str:
         "checksum_sha256": "Kontrol Kodu",
         "sha256": "Kontrol Kodu",
         "hash": "Kontrol Kodu",
-        "status": "Durum",
+        "status": "Belge Durumu",
         "description": "Açıklama",
         "notes": "Notlar",
         "is_current": "Güncel",
@@ -1259,6 +1264,8 @@ def document_detail(document_id: int):
         if not document:
             flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
+
+        document = _da36b_enrich_document_row(document)
 
         table = _da23_document_table()
         document_columns = [column.name for column in table.columns]
@@ -1672,7 +1679,7 @@ def _da27_ocr_rows(document_id: int) -> tuple[list[dict], list[str], dict]:
 
     labels = {
         "id": "No",
-        "status": "Durum",
+        "status": "Belge Durumu",
         "state": "Durum",
         "language": "Dil",
         "lang": "Dil",
@@ -1924,7 +1931,7 @@ def _da28_label(column_name: str) -> str:
         "message": "Açıklama",
         "note": "Not",
         "notes": "Not",
-        "status": "Durum",
+        "status": "Belge Durumu",
         "state": "Durum",
         "created_at": "Tarih",
         "updated_at": "Güncelleme Tarihi",
@@ -3039,7 +3046,7 @@ def _da34_public_columns(row: dict) -> list[tuple[str, str]]:
         "physical_location_id": "Fiziksel Konum",
         "retention_policy_id": "Saklama Kuralı",
         "confidentiality_level": "Gizlilik Seviyesi",
-        "status": "Durum",
+        "status": "Belge Durumu",
         "is_active": "Aktif",
         "created_at": "Kayıt Tarihi",
         "updated_at": "Güncelleme Tarihi",
@@ -3130,6 +3137,7 @@ def document_full_detail(document_id: int):
             return redirect("/digital-archive/documents")
 
         document = dict(document_row._mapping)
+        document = _da36b_enrich_document_row(document)
         document_columns = set(documents_table.c.keys())
 
         document_label = _da32_row_label(
@@ -3256,6 +3264,108 @@ def document_full_detail(document_id: int):
         current_app.logger.exception("Belge detay ekranı açılamadı.")
         flash("Belge detay ekranı açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/documents")
+
+
+
+
+# DA-36B: Belge durumu görünür etiketleri
+_DA36B_STATUS_LABELS = {
+    "": "Kayıtlı",
+    "draft": "Taslak",
+    "taslak": "Taslak",
+    "new": "Taslak",
+    "registered": "Kayıtlı",
+    "kayitli": "Kayıtlı",
+    "kayıtlı": "Kayıtlı",
+    "saved": "Kayıtlı",
+    "active": "Kayıtlı",
+    "aktif": "Kayıtlı",
+    "archived": "Arşivde",
+    "arsivde": "Arşivde",
+    "arşivde": "Arşivde",
+    "review": "İncelemede",
+    "in_review": "İncelemede",
+    "incelemede": "İncelemede",
+    "expiring": "Saklama Süresi Doluyor",
+    "saklama_suresi_doluyor": "Saklama Süresi Doluyor",
+    "saklama süresi doluyor": "Saklama Süresi Doluyor",
+    "expired": "Saklama Süresi Doldu",
+    "saklama_suresi_doldu": "Saklama Süresi Doldu",
+    "saklama süresi doldu": "Saklama Süresi Doldu",
+    "transferred": "Devredildi",
+    "devredildi": "Devredildi",
+    "destroyed": "İmha Edildi",
+    "imha_edildi": "İmha Edildi",
+    "imha edildi": "İmha Edildi",
+}
+
+
+def _da36b_status_label(value) -> str:
+    raw = str(value or "").strip()
+    key = raw.lower().replace("-", " ").replace("_", " ")
+    compact_key = raw.lower().replace("-", "_").replace(" ", "_")
+    return _DA36B_STATUS_LABELS.get(key) or _DA36B_STATUS_LABELS.get(compact_key) or raw or "Kayıtlı"
+
+
+def _da36b_status_source(row: dict):
+    for key in ("status", "document_status", "state", "archive_status"):
+        if key in row:
+            return row.get(key)
+    return ""
+
+
+def _da36b_enrich_document_row(row):
+    if row is None:
+        return row
+
+    if isinstance(row, dict):
+        data = dict(row)
+    elif hasattr(row, "_mapping"):
+        data = dict(row._mapping)
+    else:
+        try:
+            data = dict(row)
+        except Exception:
+            return row
+
+    label = _da36b_status_label(_da36b_status_source(data))
+    data["status_label"] = label
+
+    for key in ("status", "document_status", "state", "archive_status"):
+        if key in data:
+            data[key] = label
+
+    return data
+
+
+def _da36b_status_summary(rows) -> list[dict[str, object]]:
+    counts: dict[str, int] = {}
+
+    for row in rows or []:
+        data = row if isinstance(row, dict) else {}
+        label = data.get("status_label") or _da36b_status_label(_da36b_status_source(data))
+        counts[str(label)] = counts.get(str(label), 0) + 1
+
+    order = [
+        "Taslak",
+        "Kayıtlı",
+        "Arşivde",
+        "İncelemede",
+        "Saklama Süresi Doluyor",
+        "Saklama Süresi Doldu",
+        "Devredildi",
+        "İmha Edildi",
+    ]
+
+    ordered = []
+    for name in order:
+        if name in counts:
+            ordered.append({"name": name, "count": counts.pop(name)})
+
+    for name, count in sorted(counts.items()):
+        ordered.append({"name": name, "count": count})
+
+    return ordered
 
 
 

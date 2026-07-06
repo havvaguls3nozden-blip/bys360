@@ -46,6 +46,36 @@
         .da-card { overflow-x: auto; }
         .da-filter-grid { grid-template-columns: 1fr; }
     }
+
+    .da-status-summary {
+        margin: 16px 0;
+        padding: 16px;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+        color: #475467;
+        line-height: 1.6;
+    }
+
+    .da-status-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .da-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: #f8eded;
+        color: #8B0000;
+        font-weight: 800;
+        font-size: 13px;
+    }
 </style>
 
 {% set filtre = filter_values|default({}) %}

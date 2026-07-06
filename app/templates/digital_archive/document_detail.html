@@ -37,6 +37,39 @@
         padding: 11px 12px; color: #111827; background: #fff;
     }
     @media (max-width: 760px) { .da-grid { grid-template-columns: 1fr; } .da-card { overflow-x: auto; } }
+
+    .da-status-summary {
+        margin: 16px 0;
+        padding: 16px 18px;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .da-status-summary strong {
+        color: #111827;
+    }
+
+    .da-status-summary span {
+        display: inline-flex;
+        padding: 8px 11px;
+        border-radius: 999px;
+        background: #f8eded;
+        color: #8B0000;
+        font-weight: 850;
+    }
+
+    .da-status-summary a {
+        color: #8B0000;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
 </style>
 
 <div class="da-page">
@@ -44,6 +77,13 @@
     <p class="da-subtitle">
         Belge, fiziksel arşivdeki konum bilgisi ve dijital dosya bağlantılarıyla birlikte takip edilir.
     </p>
+
+
+    <div class="da-status-summary">
+        <strong>Belge Durumu</strong>
+        <span>{{ document.get('status_label') or document.get('status') or 'Kayıtlı' }}</span>
+        <a href="/digital-archive/document-status-guide">Durumları Gör</a>
+    </div>
 
     <div class="da-card">
         <div class="da-grid">
