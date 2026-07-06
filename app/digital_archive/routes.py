@@ -762,44 +762,148 @@ def _da23_document_payload(form_data: dict):
 @digital_archive_bp.get("/documents")
 @login_required
 def documents():
-    """Belge kartları listesi."""
-    from sqlalchemy import select, desc
+    """Belge kartları arama ve filtreleme ekranı."""
+    from datetime import datetime
+
+    from flask import request
+    from sqlalchemy import String, cast, desc, or_, select
 
     try:
         table = _da23_document_table()
+        available_columns = [column.name for column in table.columns]
+
+        q = request.args.get("q", "").strip()
+        category_id = request.args.get("category_id", "").strip()
+        physical_location_id = request.args.get("physical_location_id", "").strip()
+        retention_policy_id = request.args.get("retention_policy_id", "").strip()
+        status = request.args.get("status", "").strip()
+        document_type = request.args.get("document_type", "").strip()
+        date_from = request.args.get("date_from", "").strip()
+        date_to = request.args.get("date_to", "").strip()
+
+        conditions = []
+
+        if q:
+            text_columns = [
+                column.name
+                for column in table.columns
+                if any(token in str(column.type).lower() for token in ("char", "text", "varchar", "string"))
+            ]
+
+            if text_columns:
+                conditions.append(
+                    or_(*[
+                        cast(table.c[column], String).ilike(f"%{q}%")
+                        for column in text_columns
+                    ])
+                )
+
+        exact_filters = {
+            "category_id": category_id,
+            "physical_location_id": physical_location_id,
+            "retention_policy_id": retention_policy_id,
+            "status": status,
+            "document_type": document_type,
+        }
+
+        for column_name, value in exact_filters.items():
+            if value and column_name in table.c:
+                conditions.append(table.c[column_name] == value)
+
+        if "document_date" in table.c:
+            if date_from:
+                try:
+                    parsed_from = datetime.strptime(date_from, "%Y-%m-%d").date()
+                    conditions.append(table.c.document_date >= parsed_from)
+                except ValueError:
+                    flash("Başlangıç tarihi uygun formatta değil.", "warning")
+
+            if date_to:
+                try:
+                    parsed_to = datetime.strptime(date_to, "%Y-%m-%d").date()
+                    conditions.append(table.c.document_date <= parsed_to)
+                except ValueError:
+                    flash("Bitiş tarihi uygun formatta değil.", "warning")
+
+        query = select(table)
+
+        if conditions:
+            query = query.where(*conditions)
+
+        if "id" in table.c:
+            query = query.order_by(desc(table.c.id))
+
+        query = query.limit(200)
+
+        rows = [dict(row._mapping) for row in db.session.execute(query).all()]
+
         preferred_columns = [
             "id",
-            "document_code",
-            "code",
             "document_no",
-            "document_number",
             "title",
-            "name",
-            "document_title",
-            "subject",
             "document_type",
+            "document_date",
+            "subject",
             "category_id",
             "physical_location_id",
             "retention_policy_id",
             "status",
             "created_at",
         ]
-        available_columns = [column.name for column in table.columns]
+
         display_columns = [column for column in preferred_columns if column in available_columns][:10]
         if not display_columns:
             display_columns = available_columns[:10]
 
-        query = select(table).order_by(desc(table.c.id)).limit(100)
-        rows = [dict(row._mapping) for row in db.session.execute(query).all()]
+        filter_options = {
+            "category_id": _da23_options_for("category_id"),
+            "physical_location_id": _da23_options_for("physical_location_id"),
+            "retention_policy_id": _da23_options_for("retention_policy_id"),
+            "status": [],
+            "document_type": [],
+        }
+
+        if "status" in table.c:
+            status_rows = db.session.execute(
+                select(table.c.status).where(table.c.status.is_not(None)).distinct().order_by(table.c.status).limit(100)
+            ).all()
+            filter_options["status"] = [
+                {"value": row[0], "label": row[0]}
+                for row in status_rows
+                if row[0]
+            ]
+
+        if "document_type" in table.c:
+            type_rows = db.session.execute(
+                select(table.c.document_type).where(table.c.document_type.is_not(None)).distinct().order_by(table.c.document_type).limit(100)
+            ).all()
+            filter_options["document_type"] = [
+                {"value": row[0], "label": row[0]}
+                for row in type_rows
+                if row[0]
+            ]
+
+        filter_values = {
+            "q": q,
+            "category_id": category_id,
+            "physical_location_id": physical_location_id,
+            "retention_policy_id": retention_policy_id,
+            "status": status,
+            "document_type": document_type,
+            "date_from": date_from,
+            "date_to": date_to,
+        }
 
         return render_template(
             "digital_archive/document_list.html",
             title="Belge Kartları",
-            subtitle="Fiziksel arşivden dijital arşive aktarılacak belgeler bu bölümde takip edilir.",
+            subtitle="Fiziksel arşivden dijital arşive aktarılacak belgeler bu bölümde aranır ve filtrelenir.",
             rows=rows,
             display_columns=display_columns,
             column_labels={column: _da23_column_label(column) for column in display_columns},
             row_count=len(rows),
+            filter_values=filter_values,
+            filter_options=filter_options,
         )
     except Exception:
         current_app.logger.exception("Belge kartları listelenemedi.")

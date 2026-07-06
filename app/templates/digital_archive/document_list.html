@@ -12,13 +12,25 @@
     .da-button {
         display: inline-flex; align-items: center; justify-content: center;
         padding: 11px 15px; border-radius: 14px; text-decoration: none; font-weight: 700;
-        border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff;
+        border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff; cursor: pointer;
     }
     .da-button-primary { color: #fff; background: #8B0000; border-color: #8B0000; }
     .da-card {
         background: #fff; border: 1px solid rgba(15,23,42,.09); border-radius: 24px;
         box-shadow: 0 18px 44px rgba(15,23,42,.08); overflow: hidden;
     }
+    .da-search {
+        background: #fff; border: 1px solid rgba(15,23,42,.09); border-radius: 24px;
+        padding: 18px; box-shadow: 0 18px 44px rgba(15,23,42,.06); margin-bottom: 18px;
+    }
+    .da-search-title { margin: 0 0 14px; color: #111827; font-size: 18px; font-weight: 850; }
+    .da-filter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .da-field label { display: block; color: #111827; font-weight: 700; margin-bottom: 7px; }
+    .da-field input, .da-field select {
+        width: 100%; border: 1px solid rgba(15,23,42,.14); border-radius: 14px;
+        padding: 11px 12px; color: #111827; background: #fff;
+    }
+    .da-filter-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
     .da-table { width: 100%; border-collapse: collapse; }
     .da-table th {
         text-align: left; padding: 14px 16px; font-size: 13px; color: #8B0000;
@@ -27,12 +39,17 @@
     .da-table td { padding: 14px 16px; color: #111827; border-bottom: 1px solid rgba(15,23,42,.07); vertical-align: top; }
     .da-empty { padding: 30px; color: #667085; line-height: 1.65; }
     .da-meta { margin-top: 14px; color: #667085; font-size: 13px; }
+    @media (max-width: 980px) { .da-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 760px) {
         .da-header { display: block; }
         .da-actions { justify-content: flex-start; margin-top: 14px; }
         .da-card { overflow-x: auto; }
+        .da-filter-grid { grid-template-columns: 1fr; }
     }
 </style>
+
+{% set filtre = filter_values|default({}) %}
+{% set secenek = filter_options|default({}) %}
 
 <div class="da-page">
     <div class="da-header">
@@ -40,9 +57,9 @@
             <h1 class="da-title">Belge Kartları</h1>
             <p class="da-subtitle">
                 Fiziksel arşivden taranacak veya dijital arşive aktarılacak belgeler;
-                kategori, fiziksel konum ve saklama süresi bilgileriyle birlikte takip edilir.
+                kategori, fiziksel konum ve saklama süresi bilgileriyle birlikte aranır ve filtrelenir.
             </p>
-            <div class="da-meta">Kayıt sayısı: {{ row_count|default(rows|length) }}</div>
+            <div class="da-meta">Sonuç sayısı: {{ row_count|default(rows|length) }}</div>
         </div>
 
         <div class="da-actions">
@@ -50,6 +67,82 @@
             <a class="da-button da-button-primary" href="/digital-archive/documents/new">Yeni Belge Kartı</a>
         </div>
     </div>
+
+    <form class="da-search" method="get" action="/digital-archive/documents">
+        <h2 class="da-search-title">Arama ve Filtreleme</h2>
+
+        <div class="da-filter-grid">
+            <div class="da-field">
+                <label for="q">Arama</label>
+                <input id="q" name="q" type="text" value="{{ filtre.get('q', '') }}" placeholder="Belge adı, konu veya sayı">
+            </div>
+
+            <div class="da-field">
+                <label for="category_id">Kategori</label>
+                <select id="category_id" name="category_id">
+                    <option value="">Tümü</option>
+                    {% for option in secenek.get('category_id', []) %}
+                        <option value="{{ option.value }}" {% if filtre.get('category_id') == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="physical_location_id">Fiziksel Konum</label>
+                <select id="physical_location_id" name="physical_location_id">
+                    <option value="">Tümü</option>
+                    {% for option in secenek.get('physical_location_id', []) %}
+                        <option value="{{ option.value }}" {% if filtre.get('physical_location_id') == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="retention_policy_id">Saklama Süresi</label>
+                <select id="retention_policy_id" name="retention_policy_id">
+                    <option value="">Tümü</option>
+                    {% for option in secenek.get('retention_policy_id', []) %}
+                        <option value="{{ option.value }}" {% if filtre.get('retention_policy_id') == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="document_type">Belge Türü</label>
+                <select id="document_type" name="document_type">
+                    <option value="">Tümü</option>
+                    {% for option in secenek.get('document_type', []) %}
+                        <option value="{{ option.value }}" {% if filtre.get('document_type') == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="status">Durum</label>
+                <select id="status" name="status">
+                    <option value="">Tümü</option>
+                    {% for option in secenek.get('status', []) %}
+                        <option value="{{ option.value }}" {% if filtre.get('status') == option.value|string %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="da-field">
+                <label for="date_from">Başlangıç Tarihi</label>
+                <input id="date_from" name="date_from" type="date" value="{{ filtre.get('date_from', '') }}">
+            </div>
+
+            <div class="da-field">
+                <label for="date_to">Bitiş Tarihi</label>
+                <input id="date_to" name="date_to" type="date" value="{{ filtre.get('date_to', '') }}">
+            </div>
+        </div>
+
+        <div class="da-filter-actions">
+            <button class="da-button da-button-primary" type="submit">Filtrele</button>
+            <a class="da-button" href="/digital-archive/documents">Temizle</a>
+        </div>
+    </form>
 
     <div class="da-card">
         {% if rows and display_columns %}
@@ -75,7 +168,7 @@
             </table>
         {% else %}
             <div class="da-empty">
-                Henüz belge kartı bulunmuyor. Yeni belge kartı oluşturarak tarama ve dijital arşiv sürecini başlatabilirsiniz.
+                Arama kriterlerine uygun belge kartı bulunamadı.
             </div>
         {% endif %}
     </div>
