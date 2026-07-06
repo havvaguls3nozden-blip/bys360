@@ -2619,6 +2619,245 @@ def material_types():
         return redirect("/digital-archive/")
 
 
+
+# DA-32A: Belge kartı arşiv malzemesi bağlantısı
+def _da32_create_document_material_links_table() -> None:
+    from sqlalchemy import text
+
+    db.session.execute(text("""
+        CREATE TABLE IF NOT EXISTS digital_archive_document_material_links (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            document_id INTEGER NOT NULL,
+            material_type_id INTEGER NOT NULL,
+            material_quantity INTEGER NOT NULL DEFAULT 1,
+            material_code VARCHAR(120),
+            physical_location_note TEXT,
+            description TEXT,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            created_by INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME
+        )
+    """))
+
+    db.session.commit()
+
+
+def _da32_document_material_links_table(create_if_missing: bool = False):
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = set(inspector.get_table_names())
+
+    if "digital_archive_document_material_links" not in table_names:
+        if not create_if_missing:
+            raise RuntimeError("Belge malzeme bağlantı tablosu bulunamadı.")
+
+        _da32_create_document_material_links_table()
+
+    metadata = MetaData()
+    return Table("digital_archive_document_material_links", metadata, autoload_with=db.engine)
+
+
+def _da32_required_table(table_name: str):
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = set(inspector.get_table_names())
+
+    if table_name not in table_names:
+        raise RuntimeError(f"Gerekli tablo bulunamadı: {table_name}")
+
+    metadata = MetaData()
+    return Table(table_name, metadata, autoload_with=db.engine)
+
+
+def _da32_row_label(row: dict, columns: set[str], candidates: list[str], fallback: str) -> str:
+    for column in candidates:
+        if column in columns:
+            value = row.get(column)
+            if value not in (None, ""):
+                return str(value)
+
+    row_id = row.get("id", "")
+    return f"{fallback} #{row_id}"
+
+
+@digital_archive_bp.route("/document-material-links", methods=["GET", "POST"])
+@login_required
+def document_material_links():
+    """Belge kartı ile arşiv malzemesi türü bağlantısı."""
+    from datetime import datetime
+
+    from flask import current_app, flash, redirect, render_template, request
+    from flask_login import current_user
+    from sqlalchemy import desc, func, select
+
+    try:
+        links_table = _da32_document_material_links_table(create_if_missing=True)
+        documents_table = _da32_required_table("digital_archive_documents")
+
+        if "_da31_material_type_table" in globals():
+            material_types_table = _da31_material_type_table(create_if_missing=True)
+        else:
+            material_types_table = _da32_required_table("digital_archive_material_types")
+
+        material_count = db.session.execute(
+            select(func.count()).select_from(material_types_table)
+        ).scalar_one()
+
+        if material_count == 0:
+            db.session.execute(
+                material_types_table.insert().values(
+                    name="Arşiv Kutusu",
+                    description="Fiziksel arşivde kutu bazlı saklama ve takip için kullanılır.",
+                    is_active=1,
+                    sort_order=10,
+                    created_at=datetime.now(),
+                )
+            )
+            db.session.commit()
+
+        document_columns = set(documents_table.c.keys())
+        material_columns = set(material_types_table.c.keys())
+
+        document_rows = [
+            dict(row._mapping)
+            for row in db.session.execute(
+                select(documents_table).order_by(desc(documents_table.c.id)).limit(250)
+            ).all()
+        ]
+
+        material_order = material_types_table.c.sort_order if "sort_order" in material_types_table.c else material_types_table.c.id
+        material_rows = [
+            dict(row._mapping)
+            for row in db.session.execute(
+                select(material_types_table).order_by(material_order, material_types_table.c.id).limit(250)
+            ).all()
+        ]
+
+        document_options = [
+            {
+                "id": row.get("id"),
+                "label": _da32_row_label(
+                    row,
+                    document_columns,
+                    [
+                        "title",
+                        "document_title",
+                        "subject",
+                        "name",
+                        "document_name",
+                        "file_name",
+                        "original_filename",
+                        "reference_no",
+                        "reference_number",
+                        "archive_code",
+                    ],
+                    "Belge",
+                ),
+            }
+            for row in document_rows
+        ]
+
+        material_options = [
+            {
+                "id": row.get("id"),
+                "label": _da32_row_label(
+                    row,
+                    material_columns,
+                    ["name", "title", "material_type", "description"],
+                    "Malzeme Türü",
+                ),
+            }
+            for row in material_rows
+        ]
+
+        if request.method == "POST":
+            document_id_raw = request.form.get("document_id", "").strip()
+            material_type_id_raw = request.form.get("material_type_id", "").strip()
+            quantity_raw = request.form.get("material_quantity", "1").strip()
+            material_code = request.form.get("material_code", "").strip()
+            physical_location_note = request.form.get("physical_location_note", "").strip()
+            description = request.form.get("description", "").strip()
+
+            try:
+                document_id = int(document_id_raw)
+                material_type_id = int(material_type_id_raw)
+            except ValueError:
+                flash("Belge ve malzeme türü seçimi zorunludur.", "warning")
+                return redirect("/digital-archive/document-material-links")
+
+            try:
+                material_quantity = int(quantity_raw)
+            except ValueError:
+                material_quantity = 1
+
+            if material_quantity < 1:
+                material_quantity = 1
+
+            document_exists = db.session.execute(
+                select(func.count()).select_from(documents_table).where(documents_table.c.id == document_id)
+            ).scalar_one()
+
+            material_exists = db.session.execute(
+                select(func.count()).select_from(material_types_table).where(material_types_table.c.id == material_type_id)
+            ).scalar_one()
+
+            if not document_exists:
+                flash("Seçilen belge kartı bulunamadı.", "warning")
+                return redirect("/digital-archive/document-material-links")
+
+            if not material_exists:
+                flash("Seçilen arşiv malzemesi türü bulunamadı.", "warning")
+                return redirect("/digital-archive/document-material-links")
+
+            created_by = getattr(current_user, "id", None)
+
+            db.session.execute(
+                links_table.insert().values(
+                    document_id=document_id,
+                    material_type_id=material_type_id,
+                    material_quantity=material_quantity,
+                    material_code=material_code,
+                    physical_location_note=physical_location_note,
+                    description=description,
+                    is_active=1,
+                    created_by=created_by,
+                    created_at=datetime.now(),
+                )
+            )
+            db.session.commit()
+
+            flash("Belge kartı ile arşiv malzemesi türü bağlantısı oluşturuldu.", "success")
+            return redirect("/digital-archive/document-material-links")
+
+        link_rows = [
+            dict(row._mapping)
+            for row in db.session.execute(
+                select(links_table).order_by(desc(links_table.c.id)).limit(200)
+            ).all()
+        ]
+
+        document_map = {int(option["id"]): option["label"] for option in document_options if option.get("id") is not None}
+        material_map = {int(option["id"]): option["label"] for option in material_options if option.get("id") is not None}
+
+        return render_template(
+            "digital_archive/document_material_links.html",
+            documents=document_options,
+            material_types=material_options,
+            rows=link_rows,
+            document_map=document_map,
+            material_map=material_map,
+        )
+
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge malzeme bağlantısı açılamadı.")
+        flash("Belge malzeme bağlantısı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
