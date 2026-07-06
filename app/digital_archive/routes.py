@@ -495,6 +495,372 @@ def retention_policy_create_post():
     return redirect("/digital-archive/retention-policies")
 
 
+
+# DA-23B: Belge Kartı local kayıt ekranları
+def _da23_table_exists(table_name: str) -> bool:
+    from sqlalchemy import inspect
+
+    return table_name in inspect(db.engine).get_table_names()
+
+
+def _da23_document_table():
+    from sqlalchemy import MetaData, Table
+
+    table_name = "digital_archive_documents"
+    if not _da23_table_exists(table_name):
+        raise RuntimeError("Belge kartı tablosu bulunamadı.")
+
+    metadata = MetaData()
+    return Table(table_name, metadata, autoload_with=db.engine)
+
+
+def _da23_column_label(column_name: str) -> str:
+    labels = {
+        "id": "No",
+        "code": "Kod",
+        "document_code": "Belge Kodu",
+        "document_no": "Belge Sayısı",
+        "document_number": "Belge Sayısı",
+        "reference_no": "Referans No",
+        "registry_no": "Kayıt No",
+        "name": "Belge Adı",
+        "title": "Belge Adı",
+        "document_title": "Belge Adı",
+        "subject": "Konu",
+        "document_type": "Belge Türü",
+        "type": "Belge Türü",
+        "document_date": "Belge Tarihi",
+        "date": "Belge Tarihi",
+        "category_id": "Kategori",
+        "physical_location_id": "Fiziksel Konum",
+        "location_id": "Fiziksel Konum",
+        "retention_policy_id": "Saklama Süresi",
+        "retention_id": "Saklama Süresi",
+        "status": "Durum",
+        "confidentiality_level": "Gizlilik Düzeyi",
+        "access_level": "Erişim Düzeyi",
+        "description": "Açıklama",
+        "notes": "Notlar",
+        "is_active": "Durum",
+        "created_at": "Oluşturma Tarihi",
+        "updated_at": "Güncelleme Tarihi",
+    }
+    return labels.get(column_name, column_name.replace("_", " ").title())
+
+
+def _da23_input_type(column) -> str:
+    column_name = column.name.lower()
+    column_type = str(column.type).lower()
+
+    if "date" in column_name or "date" in column_type:
+        return "date"
+
+    if "time" in column_type:
+        return "datetime-local"
+
+    if "int" in column_type:
+        return "number"
+
+    if column_name in {"description", "notes", "subject"}:
+        return "textarea"
+
+    return "text"
+
+
+def _da23_latest_id(table_name: str):
+    from sqlalchemy import text
+
+    if not _da23_table_exists(table_name):
+        return None
+
+    return db.session.execute(text(f"SELECT id FROM {table_name} ORDER BY id DESC LIMIT 1")).scalar_one_or_none()
+
+
+def _da23_options_for(column_name: str) -> list[dict]:
+    from sqlalchemy import inspect, text
+
+    mapping = {
+        "category_id": ("digital_archive_categories", ["name", "title", "code"]),
+        "physical_location_id": ("digital_archive_physical_locations", ["archive_room", "cabinet_no", "box_no"]),
+        "location_id": ("digital_archive_physical_locations", ["archive_room", "cabinet_no", "box_no"]),
+        "retention_policy_id": ("digital_archive_retention_policies", ["name", "title", "action"]),
+        "retention_id": ("digital_archive_retention_policies", ["name", "title", "action"]),
+    }
+
+    if column_name not in mapping:
+        return []
+
+    table_name, preferred_labels = mapping[column_name]
+    if not _da23_table_exists(table_name):
+        return []
+
+    inspector = inspect(db.engine)
+    columns = [column["name"] for column in inspector.get_columns(table_name)]
+
+    label_column = next((item for item in preferred_labels if item in columns), "id")
+
+    rows = db.session.execute(
+        text(f"SELECT id, {label_column} AS label FROM {table_name} ORDER BY id DESC LIMIT 100")
+    ).mappings().all()
+
+    return [{"value": row["id"], "label": row["label"] or f"Kayıt {row['id']}"} for row in rows]
+
+
+def _da23_document_fields() -> list[dict]:
+    excluded = {
+        "id",
+        "created_at",
+        "updated_at",
+        "deleted_at",
+        "created_by_id",
+        "updated_by_id",
+        "deleted_by_id",
+        "file_path",
+        "file_size",
+        "mime_type",
+        "original_filename",
+        "stored_filename",
+        "ocr_text",
+        "search_text",
+    }
+
+    table = _da23_document_table()
+    fields = []
+
+    for column in table.columns:
+        if column.name in excluded:
+            continue
+
+        options = _da23_options_for(column.name)
+
+        fields.append(
+            {
+                "name": column.name,
+                "label": _da23_column_label(column.name),
+                "input_type": "select" if options else _da23_input_type(column),
+                "options": options,
+                "required": not bool(column.nullable) and column.default is None and column.server_default is None,
+            }
+        )
+
+    return fields
+
+
+def _da23_document_payload(form_data: dict):
+    from datetime import datetime
+
+    table = _da23_document_table()
+    now = datetime.now()
+    payload = {}
+
+    def default_for(column):
+        name = column.name
+        lower_name = name.lower()
+        lower_type = str(column.type).lower()
+
+        if name in {"created_at", "updated_at"}:
+            return now
+
+        if "bool" in lower_type:
+            return True if name == "is_active" else False
+
+        if lower_name in {"category_id"}:
+            return _da23_latest_id("digital_archive_categories")
+
+        if lower_name in {"physical_location_id", "location_id"}:
+            return _da23_latest_id("digital_archive_physical_locations")
+
+        if lower_name in {"retention_policy_id", "retention_id"}:
+            return _da23_latest_id("digital_archive_retention_policies")
+
+        if "int" in lower_type:
+            if lower_name.endswith("_id"):
+                return None
+            return 0
+
+        if "date" in lower_type or "time" in lower_type:
+            return now if not lower_name.endswith("_date") else None
+
+        if lower_name in {"code", "document_code"}:
+            return "BLG-" + now.strftime("%Y%m%d%H%M%S")
+
+        if lower_name in {"document_no", "document_number", "reference_no", "registry_no"}:
+            return now.strftime("%Y/%m/%d-%H%M%S")
+
+        if lower_name in {"name", "title", "document_title"}:
+            return "Taranmış Arşiv Belgesi"
+
+        if lower_name in {"subject"}:
+            return "Fiziksel arşivden dijital arşive aktarılacak belge"
+
+        if lower_name in {"document_type", "type"}:
+            return "Taranmış Belge"
+
+        if lower_name in {"status"}:
+            return "Hazırlanıyor"
+
+        if lower_name in {"confidentiality_level", "access_level"}:
+            return "Kurum İçi"
+
+        if lower_name in {"description", "notes"}:
+            return "Belge kartı local geliştirme kaydı."
+
+        return None
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"}:
+            continue
+
+        raw_value = str(form_data.get(name, "")).strip()
+
+        if not raw_value:
+            value = default_for(column)
+            if value is not None:
+                payload[name] = value
+            continue
+
+        lower_type = str(column.type).lower()
+
+        if "int" in lower_type:
+            try:
+                payload[name] = int(raw_value)
+            except ValueError:
+                raise ValueError(f"{_da23_column_label(name)} sayısal olmalıdır.")
+        elif "bool" in lower_type:
+            payload[name] = raw_value.lower() in {"1", "true", "on", "yes", "evet", "aktif"}
+        elif "date" in lower_type or "time" in lower_type:
+            parsed_value = None
+            for pattern in ("%Y-%m-%d", "%d.%m.%Y", "%Y-%m-%dT%H:%M"):
+                try:
+                    parsed_value = datetime.strptime(raw_value, pattern)
+                    break
+                except ValueError:
+                    continue
+            payload[name] = parsed_value
+        else:
+            payload[name] = raw_value
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"} or name in payload:
+            continue
+
+        nullable = getattr(column, "nullable", True)
+        has_default = column.default is not None or column.server_default is not None
+
+        if not nullable and not has_default:
+            value = default_for(column)
+            if value is not None:
+                payload[name] = value
+
+    return payload
+
+
+@digital_archive_bp.get("/documents")
+@login_required
+def documents():
+    """Belge kartları listesi."""
+    from sqlalchemy import select, desc
+
+    try:
+        table = _da23_document_table()
+        preferred_columns = [
+            "id",
+            "document_code",
+            "code",
+            "document_no",
+            "document_number",
+            "title",
+            "name",
+            "document_title",
+            "subject",
+            "document_type",
+            "category_id",
+            "physical_location_id",
+            "retention_policy_id",
+            "status",
+            "created_at",
+        ]
+        available_columns = [column.name for column in table.columns]
+        display_columns = [column for column in preferred_columns if column in available_columns][:10]
+        if not display_columns:
+            display_columns = available_columns[:10]
+
+        query = select(table).order_by(desc(table.c.id)).limit(100)
+        rows = [dict(row._mapping) for row in db.session.execute(query).all()]
+
+        return render_template(
+            "digital_archive/document_list.html",
+            title="Belge Kartları",
+            subtitle="Fiziksel arşivden dijital arşive aktarılacak belgeler bu bölümde takip edilir.",
+            rows=rows,
+            display_columns=display_columns,
+            column_labels={column: _da23_column_label(column) for column in display_columns},
+            row_count=len(rows),
+        )
+    except Exception:
+        current_app.logger.exception("Belge kartları listelenemedi.")
+        flash("Belge kartları açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/")
+
+
+@digital_archive_bp.get("/documents/new")
+@login_required
+def document_new():
+    """Yeni belge kartı formu."""
+    try:
+        return render_template(
+            "digital_archive/document_form.html",
+            title="Yeni Belge Kartı",
+            subtitle="Taranacak veya dijital arşive aktarılacak belgeye ait temel bilgileri doldurun.",
+            fields=_da23_document_fields(),
+            list_url="/digital-archive/documents",
+        )
+    except Exception:
+        current_app.logger.exception("Belge kartı formu açılamadı.")
+        flash("Belge kartı formu açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/documents")
+
+
+@digital_archive_bp.route("/documents", methods=["POST"])
+@login_required
+def document_create_post():
+    """Belge kartı kaydı oluşturur."""
+    from flask import request
+
+    try:
+        table = _da23_document_table()
+        payload = _da23_document_payload(request.form.to_dict(flat=True))
+
+        meaningful_payload = {
+            key: value
+            for key, value in payload.items()
+            if key not in {"created_at", "updated_at", "is_active"} and value not in (None, "")
+        }
+
+        if not meaningful_payload:
+            flash("Belge kartı bilgisi girilmelidir.", "warning")
+            return redirect("/digital-archive/documents/new")
+
+        db.session.execute(table.insert().values(**payload))
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        flash(str(exc), "warning")
+        return redirect("/digital-archive/documents/new")
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge kartı kaydı oluşturulamadı.")
+        flash("Kayıt oluşturulurken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/documents/new")
+
+    flash("Belge kartı kaydedildi.", "success")
+    return redirect("/digital-archive/documents")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required

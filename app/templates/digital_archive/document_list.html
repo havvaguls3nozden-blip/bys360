@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Belge Kartları - BYS360 Dijital Arşiv{% endblock %}
+
+{% block content %}
+<style>
+    .da-page { max-width: 1180px; margin: 0 auto; padding: 28px 18px 44px; }
+    .da-header { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+    .da-title { margin: 0; color: #111827; font-size: clamp(26px, 3vw, 38px); font-weight: 850; letter-spacing: -0.03em; }
+    .da-subtitle { margin: 10px 0 0; max-width: 760px; color: #667085; line-height: 1.65; }
+    .da-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .da-button {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 11px 15px; border-radius: 14px; text-decoration: none; font-weight: 700;
+        border: 1px solid rgba(139,0,0,.16); color: #8B0000; background: #fff;
+    }
+    .da-button-primary { color: #fff; background: #8B0000; border-color: #8B0000; }
+    .da-card {
+        background: #fff; border: 1px solid rgba(15,23,42,.09); border-radius: 24px;
+        box-shadow: 0 18px 44px rgba(15,23,42,.08); overflow: hidden;
+    }
+    .da-table { width: 100%; border-collapse: collapse; }
+    .da-table th {
+        text-align: left; padding: 14px 16px; font-size: 13px; color: #8B0000;
+        background: #f8eded; border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .da-table td { padding: 14px 16px; color: #111827; border-bottom: 1px solid rgba(15,23,42,.07); vertical-align: top; }
+    .da-empty { padding: 30px; color: #667085; line-height: 1.65; }
+    .da-meta { margin-top: 14px; color: #667085; font-size: 13px; }
+    @media (max-width: 760px) {
+        .da-header { display: block; }
+        .da-actions { justify-content: flex-start; margin-top: 14px; }
+        .da-card { overflow-x: auto; }
+    }
+</style>
+
+<div class="da-page">
+    <div class="da-header">
+        <div>
+            <h1 class="da-title">Belge Kartları</h1>
+            <p class="da-subtitle">
+                Fiziksel arşivden taranacak veya dijital arşive aktarılacak belgeler;
+                kategori, fiziksel konum ve saklama süresi bilgileriyle birlikte takip edilir.
+            </p>
+            <div class="da-meta">Kayıt sayısı: {{ row_count|default(rows|length) }}</div>
+        </div>
+
+        <div class="da-actions">
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
+            <a class="da-button da-button-primary" href="/digital-archive/documents/new">Yeni Belge Kartı</a>
+        </div>
+    </div>
+
+    <div class="da-card">
+        {% if rows and display_columns %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in display_columns %}
+                            <th>{{ column_labels.get(column, column|replace('_', ' ')|title) }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for column in display_columns %}
+                                <td>{{ row.get(column, '') }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="da-empty">
+                Henüz belge kartı bulunmuyor. Yeni belge kartı oluşturarak tarama ve dijital arşiv sürecini başlatabilirsiniz.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
