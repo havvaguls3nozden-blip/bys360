@@ -496,7 +496,7 @@ def retention_policy_create_post():
 
 
 
-# DA-23B: Belge Kartı local kayıt ekranları
+# DA-23B: Belge local kayıt ekranları
 def _da23_table_exists(table_name: str) -> bool:
     from sqlalchemy import inspect
 
@@ -508,7 +508,7 @@ def _da23_document_table():
 
     table_name = "digital_archive_documents"
     if not _da23_table_exists(table_name):
-        raise RuntimeError("Belge kartı tablosu bulunamadı.")
+        raise RuntimeError("Belge tablosu bulunamadı.")
 
     metadata = MetaData()
     return Table(table_name, metadata, autoload_with=db.engine)
@@ -703,7 +703,7 @@ def _da23_document_payload(form_data: dict):
             return "Kurum İçi"
 
         if lower_name in {"description", "notes"}:
-            return "Belge kartı local geliştirme kaydı."
+            return "Belge local geliştirme kaydı."
 
         return None
 
@@ -762,7 +762,7 @@ def _da23_document_payload(form_data: dict):
 @digital_archive_bp.get("/documents")
 @login_required
 def documents():
-    """Belge kartları arama ve filtreleme ekranı."""
+    """Belgeler arama ve filtreleme ekranı."""
     from datetime import datetime
 
     from flask import request
@@ -910,7 +910,7 @@ def documents():
 
         return render_template(
             "digital_archive/document_list.html",
-            title="Belge Kartları",
+            title="Belgeler",
             subtitle="Fiziksel arşivden dijital arşive aktarılacak belgeler bu bölümde aranır ve filtrelenir.",
             rows=rows,
             display_columns=display_columns,
@@ -920,33 +920,33 @@ def documents():
             filter_options=filter_options,
         )
     except Exception:
-        current_app.logger.exception("Belge kartları listelenemedi.")
-        flash("Belge kartları açılırken beklenmeyen bir sorun oluştu.", "danger")
+        current_app.logger.exception("Belgeler listelenemedi.")
+        flash("Belgeler açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/")
 
 
 @digital_archive_bp.get("/documents/new")
 @login_required
 def document_new():
-    """Yeni belge kartı formu."""
+    """Yeni belge formu."""
     try:
         return render_template(
             "digital_archive/document_form.html",
-            title="Yeni Belge Kartı",
+            title="Yeni Belge",
             subtitle="Taranacak veya dijital arşive aktarılacak belgeye ait temel bilgileri doldurun.",
             fields=_da23_document_fields(),
             list_url="/digital-archive/documents",
         )
     except Exception:
-        current_app.logger.exception("Belge kartı formu açılamadı.")
-        flash("Belge kartı formu açılırken beklenmeyen bir sorun oluştu.", "danger")
+        current_app.logger.exception("Belge formu açılamadı.")
+        flash("Belge formu açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/documents")
 
 
 @digital_archive_bp.route("/documents", methods=["POST"])
 @login_required
 def document_create_post():
-    """Belge kartı kaydı oluşturur."""
+    """Belge kaydı oluşturur."""
     from flask import request
 
     try:
@@ -960,7 +960,7 @@ def document_create_post():
         }
 
         if not meaningful_payload:
-            flash("Belge kartı bilgisi girilmelidir.", "warning")
+            flash("Belge bilgisi girilmelidir.", "warning")
             return redirect("/digital-archive/documents/new")
 
         result = db.session.execute(table.insert().values(**payload))
@@ -973,8 +973,8 @@ def document_create_post():
         if created_document_id:
             _da28_write_history(
                 int(created_document_id),
-                "Belge kartı oluşturuldu",
-                "Belge kartı oluşturuldu.",
+                "Belge oluşturuldu",
+                "Belge oluşturuldu.",
             )
 
         db.session.commit()
@@ -984,11 +984,11 @@ def document_create_post():
         return redirect("/digital-archive/documents/new")
     except Exception:
         db.session.rollback()
-        current_app.logger.exception("Belge kartı kaydı oluşturulamadı.")
+        current_app.logger.exception("Belge kaydı oluşturulamadı.")
         flash("Kayıt oluşturulurken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/documents/new")
 
-    flash("Belge kartı kaydedildi.", "success")
+    flash("Belge kaydedildi.", "success")
     return redirect("/digital-archive/documents")
 
 
@@ -1034,7 +1034,7 @@ def _da24_file_table():
 def _da24_file_label(column_name: str) -> str:
     labels = {
         "id": "No",
-        "document_id": "Belge Kartı",
+        "document_id": "Belge",
         "version_no": "Sürüm",
         "version_number": "Sürüm",
         "original_filename": "Dosya Adı",
@@ -1253,11 +1253,11 @@ def _da24_file_payload(table, document_id: int, file_storage, file_bytes: bytes,
 @digital_archive_bp.get("/documents/<int:document_id>")
 @login_required
 def document_detail(document_id: int):
-    """Belge kartı detay ekranı."""
+    """Belge detay ekranı."""
     try:
         document = _da24_document_row(document_id)
         if not document:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         table = _da23_document_table()
@@ -1300,15 +1300,15 @@ def document_detail(document_id: int):
             metadata_labels=metadata_labels,
         )
     except Exception:
-        current_app.logger.exception("Belge kartı detayı açılamadı.")
-        flash("Belge kartı detayı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        current_app.logger.exception("Belge detayı açılamadı.")
+        flash("Belge detayı açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect("/digital-archive/documents")
 
 
 @digital_archive_bp.route("/documents/<int:document_id>/files", methods=["POST"])
 @login_required
 def document_file_upload_post(document_id: int):
-    """Taranmış belge dosyasını belge kartına bağlar."""
+    """Taranmış belge dosyasını belgeye bağlar."""
     from pathlib import Path
 
     from flask import request
@@ -1318,7 +1318,7 @@ def document_file_upload_post(document_id: int):
     try:
         document = _da24_document_row(document_id)
         if not document:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         upload_file = request.files.get("file")
@@ -1354,7 +1354,7 @@ def document_file_upload_post(document_id: int):
         _da28_write_history(
             document_id,
             "Taranmış dosya yüklendi",
-            f"{upload_file.filename} dosyası belge kartına bağlandı.",
+            f"{upload_file.filename} dosyası belgeye bağlandı.",
             related_id=related_id,
         )
 
@@ -1365,7 +1365,7 @@ def document_file_upload_post(document_id: int):
         flash("Dosya yüklenirken beklenmeyen bir sorun oluştu.", "danger")
         return redirect(f"/digital-archive/documents/{document_id}")
 
-    flash("Taranmış belge dosyası belge kartına bağlandı.", "success")
+    flash("Taranmış belge dosyası belgeye bağlandı.", "success")
     return redirect(f"/digital-archive/documents/{document_id}")
 
 
@@ -1498,11 +1498,11 @@ def document_file_download(document_id: int, file_id: int):
 @digital_archive_bp.get("/documents/<int:document_id>/ocr")
 @login_required
 def document_ocr_ready(document_id: int):
-    """Belge kartı için metin okuma hazırlık ekranı."""
+    """Belge için metin okuma hazırlık ekranı."""
     try:
         document = _da24_document_row(document_id)
         if not document:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         file_rows, file_columns, file_labels = _da24_document_files(document_id)
@@ -1850,13 +1850,13 @@ def _da27_document_ids_for_text(search_text: str) -> list[int]:
 @digital_archive_bp.route("/documents/<int:document_id>/ocr", methods=["POST"])
 @login_required
 def document_ocr_text_post(document_id: int):
-    """Okunan metni belge kartına bağlar."""
+    """Okunan metni belgeye bağlar."""
     from flask import request
 
     try:
         document = _da24_document_row(document_id)
         if not document:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         text_value = request.form.get("recognized_text", "").strip()
@@ -1877,18 +1877,18 @@ def document_ocr_text_post(document_id: int):
         _da28_write_history(
             document_id,
             "Okunan metin kaydedildi",
-            "Okunan metin belge kartına bağlandı.",
+            "Okunan metin belgeye bağlandı.",
             related_id=related_id,
         )
 
         db.session.commit()
     except Exception:
         db.session.rollback()
-        current_app.logger.exception("Okunan metin belge kartına bağlanamadı.")
+        current_app.logger.exception("Okunan metin belgeye bağlanamadı.")
         flash("Okunan metin kaydedilirken beklenmeyen bir sorun oluştu.", "danger")
         return redirect(f"/digital-archive/documents/{document_id}/ocr")
 
-    flash("Okunan metin belge kartına bağlandı.", "success")
+    flash("Okunan metin belgeye bağlandı.", "success")
     return redirect(f"/digital-archive/documents/{document_id}/ocr")
 
 
@@ -2026,7 +2026,7 @@ def _da28_history_payload(document_id: int, action: str, description: str, relat
             return description
 
         if lower_name in {"entity_type", "object_type", "target_type", "resource_type", "record_type"}:
-            return "Belge Kartı"
+            return "Belge"
 
         if lower_name in {"entity_table", "table_name", "target_table", "resource_table"}:
             return "digital_archive_documents"
@@ -2118,7 +2118,7 @@ def _da29_create_metadata_tables() -> None:
             name VARCHAR(150) NOT NULL,
             label VARCHAR(150) NOT NULL,
             field_type VARCHAR(50) NOT NULL DEFAULT 'Metin',
-            applies_to VARCHAR(100) NOT NULL DEFAULT 'Belge Kartı',
+            applies_to VARCHAR(100) NOT NULL DEFAULT 'Belge',
             is_required INTEGER NOT NULL DEFAULT 0,
             is_active INTEGER NOT NULL DEFAULT 1,
             sort_order INTEGER NOT NULL DEFAULT 0,
@@ -2277,7 +2277,7 @@ def _da29_document_ids_for_metadata(search_text: str) -> list[int]:
 @digital_archive_bp.route("/metadata-fields", methods=["GET", "POST"])
 @login_required
 def metadata_fields():
-    """Belge kartları için özel alan tanımları."""
+    """Belgeler için özel alan tanımları."""
     from datetime import datetime
 
     from flask import request
@@ -2289,7 +2289,7 @@ def metadata_fields():
         if request.method == "POST":
             label = request.form.get("label", "").strip()
             field_type = request.form.get("field_type", "Metin").strip() or "Metin"
-            applies_to = request.form.get("applies_to", "Belge Kartı").strip() or "Belge Kartı"
+            applies_to = request.form.get("applies_to", "Belge").strip() or "Belge"
             sort_order_raw = request.form.get("sort_order", "0").strip()
 
             if not label:
@@ -2352,7 +2352,7 @@ def metadata_fields():
 @digital_archive_bp.route("/documents/<int:document_id>/metadata", methods=["GET", "POST"])
 @login_required
 def document_metadata(document_id: int):
-    """Belge kartına özel alan değerleri bağlar."""
+    """Belgeye özel alan değerleri bağlar."""
     from datetime import datetime
 
     from flask import request
@@ -2361,7 +2361,7 @@ def document_metadata(document_id: int):
     try:
         document = _da24_document_row(document_id)
         if not document:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         fields_table, values_table = _da29_metadata_tables(create_if_missing=True)
@@ -2399,13 +2399,13 @@ def document_metadata(document_id: int):
                 _da28_write_history(
                     document_id,
                     "Özel alanlar güncellendi",
-                    "Belge kartı özel alanları güncellendi.",
+                    "Belge özel alanları güncellendi.",
                 )
             except Exception:
                 current_app.logger.exception("Özel alan işlem geçmişi yazılamadı.")
 
             db.session.commit()
-            flash("Özel alanlar belge kartına kaydedildi.", "success")
+            flash("Özel alanlar belgeye kaydedildi.", "success")
             return redirect(f"/digital-archive/documents/{document_id}/metadata")
 
         existing_values = _da29_existing_values(document_id)
@@ -2423,8 +2423,8 @@ def document_metadata(document_id: int):
         )
     except Exception:
         db.session.rollback()
-        current_app.logger.exception("Belge kartı özel alan ekranı açılamadı.")
-        flash("Belge kartı özel alanları açılırken beklenmeyen bir sorun oluştu.", "danger")
+        current_app.logger.exception("Belge özel alan ekranı açılamadı.")
+        flash("Belge özel alanları açılırken beklenmeyen bir sorun oluştu.", "danger")
         return redirect(f"/digital-archive/documents/{document_id}")
 
 
@@ -2477,7 +2477,7 @@ def metadata_field_set():
                     "name": _da29_slug(label),
                     "label": label,
                     "field_type": item.get("field_type", "Metin"),
-                    "applies_to": "Belge Kartı",
+                    "applies_to": "Belge",
                     "is_required": 0,
                     "is_active": 1,
                     "sort_order": item.get("sort_order", 0),
@@ -2620,7 +2620,7 @@ def material_types():
 
 
 
-# DA-32A: Belge kartı arşiv malzemesi bağlantısı
+# DA-32A: Belge arşiv malzemesi bağlantısı
 def _da32_create_document_material_links_table() -> None:
     from sqlalchemy import text
 
@@ -2686,7 +2686,7 @@ def _da32_row_label(row: dict, columns: set[str], candidates: list[str], fallbac
 @digital_archive_bp.route("/document-material-links", methods=["GET", "POST"])
 @login_required
 def document_material_links():
-    """Belge kartı ile arşiv malzemesi türü bağlantısı."""
+    """Belge ile arşiv malzemesi türü bağlantısı."""
     from datetime import datetime
 
     from flask import current_app, flash, redirect, render_template, request
@@ -2805,7 +2805,7 @@ def document_material_links():
             ).scalar_one()
 
             if not document_exists:
-                flash("Seçilen belge kartı bulunamadı.", "warning")
+                flash("Seçilen belge bulunamadı.", "warning")
                 return redirect("/digital-archive/document-material-links")
 
             if not material_exists:
@@ -2829,7 +2829,7 @@ def document_material_links():
             )
             db.session.commit()
 
-            flash("Belge kartı ile arşiv malzemesi türü bağlantısı oluşturuldu.", "success")
+            flash("Belge ile arşiv malzemesi türü bağlantısı oluşturuldu.", "success")
             return redirect("/digital-archive/document-material-links")
 
         link_rows = [
@@ -2859,11 +2859,11 @@ def document_material_links():
 
 
 
-# DA-33A: Belge kartı malzeme bağlantıları özeti
+# DA-33A: Belge malzeme bağlantıları özeti
 @digital_archive_bp.route("/documents/<int:document_id>/material-summary", methods=["GET"])
 @login_required
 def document_material_summary(document_id: int):
-    """Belge kartı özelinde arşiv malzemesi bağlantıları özeti."""
+    """Belge özelinde arşiv malzemesi bağlantıları özeti."""
     from flask import current_app, flash, redirect, render_template
     from sqlalchemy import desc, select
 
@@ -2881,7 +2881,7 @@ def document_material_summary(document_id: int):
         ).first()
 
         if not document_row:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         document = dict(document_row._mapping)
@@ -2958,7 +2958,7 @@ def document_material_summary(document_id: int):
 
 
 
-# DA-34A: Belge kartı birleşik detay görünümü
+# DA-34A: Belge birleşik detay görünümü
 def _da34_optional_table(table_names: list[str]):
     from sqlalchemy import MetaData, Table, inspect
 
@@ -3114,7 +3114,7 @@ def _da34_document_fields(document: dict) -> list[tuple[str, str]]:
 @digital_archive_bp.route("/documents/<int:document_id>/full-detail", methods=["GET"])
 @login_required
 def document_full_detail(document_id: int):
-    """Belge kartı için birleşik kurumsal detay ekranı."""
+    """Belge için birleşik kurumsal detay ekranı."""
     from flask import current_app, flash, redirect, render_template
     from sqlalchemy import select
 
@@ -3126,7 +3126,7 @@ def document_full_detail(document_id: int):
         ).first()
 
         if not document_row:
-            flash("Belge kartı bulunamadı.", "warning")
+            flash("Belge bulunamadı.", "warning")
             return redirect("/digital-archive/documents")
 
         document = dict(document_row._mapping)
@@ -3214,15 +3214,15 @@ def document_full_detail(document_id: int):
         sections = [
             {
                 "title": "Arşiv Malzemeleri",
-                "description": "Belge kartına bağlı kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme kayıtları.",
+                "description": "Belgeye bağlı kutu, klasör, dosya, fotoğraf, harita veya dijital malzeme kayıtları.",
                 "rows": material_cards,
-                "empty": "Bu belge kartına bağlı arşiv malzemesi bulunmuyor.",
+                "empty": "Bu belgeye bağlı arşiv malzemesi bulunmuyor.",
             },
             {
                 "title": "İşlem Geçmişi",
                 "description": "Belge üzerinde yapılan kayıt, güncelleme, görüntüleme, indirme, revizyon veya arşiv işlemleri.",
                 "rows": [_da34_public_columns(row) for row in history_rows],
-                "empty": "Bu belge kartı için işlem geçmişi kaydı bulunmuyor.",
+                "empty": "Bu belge için işlem geçmişi kaydı bulunmuyor.",
             },
             {
                 "title": "Okunan Metin",
