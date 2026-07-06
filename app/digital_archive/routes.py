@@ -959,7 +959,20 @@ def document_create_post():
             flash("Belge kartı bilgisi girilmelidir.", "warning")
             return redirect("/digital-archive/documents/new")
 
-        db.session.execute(table.insert().values(**payload))
+        result = db.session.execute(table.insert().values(**payload))
+        created_document_id = None
+        try:
+            created_document_id = result.inserted_primary_key[0]
+        except Exception:
+            created_document_id = None
+
+        if created_document_id:
+            _da28_write_history(
+                int(created_document_id),
+                "Belge kartı oluşturuldu",
+                "Belge kartı oluşturuldu.",
+            )
+
         db.session.commit()
     except ValueError as exc:
         db.session.rollback()
@@ -1264,6 +1277,7 @@ def document_detail(document_id: int):
         ]
 
         file_rows, file_columns, file_labels = _da24_document_files(document_id)
+        history_rows, history_columns, history_labels = _da28_history_rows(document_id)
 
         return render_template(
             "digital_archive/document_detail.html",
@@ -1273,6 +1287,9 @@ def document_detail(document_id: int):
             file_rows=file_rows,
             file_columns=file_columns,
             file_labels=file_labels,
+            history_rows=history_rows,
+            history_columns=history_columns,
+            history_labels=history_labels,
         )
     except Exception:
         current_app.logger.exception("Belge kartı detayı açılamadı.")
@@ -1319,7 +1336,20 @@ def document_file_upload_post(document_id: int):
         table = _da24_file_table()
         payload = _da24_file_payload(table, document_id, upload_file, file_bytes, stored_filename, relative_path)
 
-        db.session.execute(table.insert().values(**payload))
+        result = db.session.execute(table.insert().values(**payload))
+        related_id = None
+        try:
+            related_id = result.inserted_primary_key[0]
+        except Exception:
+            related_id = None
+
+        _da28_write_history(
+            document_id,
+            "Taranmış dosya yüklendi",
+            f"{upload_file.filename} dosyası belge kartına bağlandı.",
+            related_id=related_id,
+        )
+
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -1829,7 +1859,20 @@ def document_ocr_text_post(document_id: int):
         table = _da27_ocr_table()
         payload = _da27_ocr_payload(document_id, text_value)
 
-        db.session.execute(table.insert().values(**payload))
+        result = db.session.execute(table.insert().values(**payload))
+        related_id = None
+        try:
+            related_id = result.inserted_primary_key[0]
+        except Exception:
+            related_id = None
+
+        _da28_write_history(
+            document_id,
+            "Okunan metin kaydedildi",
+            "Okunan metin belge kartına bağlandı.",
+            related_id=related_id,
+        )
+
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -1839,6 +1882,221 @@ def document_ocr_text_post(document_id: int):
 
     flash("Okunan metin belge kartına bağlandı.", "success")
     return redirect(f"/digital-archive/documents/{document_id}/ocr")
+
+
+
+# DA-28B: Belge işlem geçmişi
+def _da28_history_table():
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = inspector.get_table_names()
+
+    if "digital_archive_audit_events" not in table_names:
+        raise RuntimeError("İşlem geçmişi tablosu bulunamadı.")
+
+    metadata = MetaData()
+    return Table("digital_archive_audit_events", metadata, autoload_with=db.engine)
+
+
+def _da28_label(column_name: str) -> str:
+    labels = {
+        "id": "No",
+        "action": "İşlem",
+        "event": "İşlem",
+        "event_type": "İşlem",
+        "operation": "İşlem",
+        "activity_type": "İşlem",
+        "title": "Başlık",
+        "name": "Başlık",
+        "summary": "Özet",
+        "description": "Açıklama",
+        "detail": "Açıklama",
+        "details": "Açıklama",
+        "message": "Açıklama",
+        "note": "Not",
+        "notes": "Not",
+        "status": "Durum",
+        "state": "Durum",
+        "created_at": "Tarih",
+        "updated_at": "Güncelleme Tarihi",
+        "event_at": "Tarih",
+        "performed_at": "Tarih",
+        "timestamp": "Tarih",
+    }
+    return labels.get(column_name, "Bilgi")
+
+
+def _da28_document_id_column(table):
+    for candidate in ("document_id", "record_id", "entity_id", "object_id", "target_id", "resource_id"):
+        if candidate in table.c:
+            return candidate
+    return None
+
+
+def _da28_history_rows(document_id: int) -> tuple[list[dict], list[str], dict]:
+    from sqlalchemy import desc, select
+
+    try:
+        table = _da28_history_table()
+    except RuntimeError:
+        return [], [], {}
+
+    available_columns = [column.name for column in table.columns]
+    document_id_column = _da28_document_id_column(table)
+
+    query = select(table)
+
+    if document_id_column:
+        query = query.where(table.c[document_id_column] == document_id)
+
+    if "id" in table.c:
+        query = query.order_by(desc(table.c.id))
+    elif "created_at" in table.c:
+        query = query.order_by(desc(table.c.created_at))
+
+    rows = [dict(row._mapping) for row in db.session.execute(query.limit(50)).all()]
+
+    preferred_columns = [
+        "id",
+        "action",
+        "event",
+        "event_type",
+        "operation",
+        "activity_type",
+        "title",
+        "summary",
+        "description",
+        "detail",
+        "details",
+        "message",
+        "status",
+        "state",
+        "created_at",
+        "event_at",
+        "performed_at",
+        "timestamp",
+    ]
+
+    display_columns = []
+    for column in preferred_columns:
+        if column in available_columns and column not in display_columns:
+            display_columns.append(column)
+
+    display_columns = display_columns[:7]
+
+    return rows, display_columns, {column: _da28_label(column) for column in display_columns}
+
+
+def _da28_history_payload(document_id: int, action: str, description: str, related_id=None):
+    from datetime import datetime
+
+    table = _da28_history_table()
+    now = datetime.now()
+
+    def default_for(column):
+        name = column.name
+        lower_name = name.lower()
+        lower_type = str(column.type).lower()
+
+        if name in {"document_id", "record_id", "entity_id", "object_id", "target_id", "resource_id"}:
+            return document_id
+
+        if lower_name in {"document_version_id", "file_id", "version_id", "related_id", "related_record_id"}:
+            return related_id or 0
+
+        if lower_name in {"user_id", "actor_id", "created_by_id", "performed_by_id", "updated_by_id"}:
+            return 0
+
+        if lower_name in {"action", "event", "event_type", "operation", "activity_type"}:
+            return action
+
+        if lower_name in {"title", "name", "summary"}:
+            return action
+
+        if lower_name in {"description", "detail", "details", "message", "note", "notes"}:
+            return description
+
+        if lower_name in {"entity_type", "object_type", "target_type", "resource_type", "record_type"}:
+            return "Belge Kartı"
+
+        if lower_name in {"entity_table", "table_name", "target_table", "resource_table"}:
+            return "digital_archive_documents"
+
+        if lower_name in {"module", "module_name", "scope"}:
+            return "Dijital Arşiv"
+
+        if lower_name in {"status", "state"}:
+            return "Tamamlandı"
+
+        if lower_name in {"ip_address", "user_agent", "session_id"}:
+            return ""
+
+        if lower_name in {"payload", "payload_json", "metadata", "metadata_json", "extra", "extra_json"}:
+            return "{}"
+
+        if lower_name in {"created_at", "updated_at", "event_at", "performed_at", "timestamp"}:
+            return now
+
+        if "bool" in lower_type:
+            return True if lower_name in {"is_active", "success", "is_success"} else False
+
+        if "int" in lower_type:
+            return 0
+
+        if "float" in lower_type or "numeric" in lower_type or "decimal" in lower_type:
+            return 0
+
+        if "date" in lower_type and "time" not in lower_type:
+            return now.date()
+
+        if "time" in lower_type:
+            return now
+
+        if "json" in lower_type:
+            return "{}"
+
+        if any(token in lower_type for token in ("char", "text", "varchar", "string")):
+            return description[:500]
+
+        return None
+
+    payload = {}
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"}:
+            continue
+
+        value = default_for(column)
+        if value is not None:
+            payload[name] = value
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"} or name in payload:
+            continue
+
+        nullable = getattr(column, "nullable", True)
+        has_default = column.default is not None or column.server_default is not None
+
+        if not nullable and not has_default:
+            value = default_for(column)
+            if value is not None:
+                payload[name] = value
+
+    return payload
+
+
+def _da28_write_history(document_id: int, action: str, description: str, related_id=None) -> None:
+    try:
+        table = _da28_history_table()
+        payload = _da28_history_payload(document_id, action, description, related_id=related_id)
+        db.session.execute(table.insert().values(**payload))
+    except Exception:
+        current_app.logger.exception("Belge işlem geçmişi yazılamadı.")
 
 
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı

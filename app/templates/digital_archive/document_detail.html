@@ -98,6 +98,36 @@
         {% endif %}
     </div>
 
+
+    <div class="da-card">
+        <h2 style="margin:0 0 14px; color:#111827;">İşlem Geçmişi</h2>
+
+        {% if history_rows and history_columns %}
+            <table class="da-table">
+                <thead>
+                    <tr>
+                        {% for column in history_columns %}
+                            <th>{{ history_labels.get(column, 'Bilgi') }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in history_rows %}
+                        <tr>
+                            {% for column in history_columns %}
+                                <td>{{ row.get(column, '') }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="da-empty">
+                Bu belge kartı için işlem geçmişi kaydı bulunmuyor.
+            </div>
+        {% endif %}
+    </div>
+
     <form class="da-card" method="post" action="/digital-archive/documents/{{ document.get('id') }}/files" enctype="multipart/form-data">
         {% if csrf_token is defined %}
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
