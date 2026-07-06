@@ -3272,6 +3272,79 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-42A: Rapor merkezi ana ekranı
+@digital_archive_bp.get("/report-center")
+@login_required
+def report_center():
+    """Dijital Arşiv rapor başlıklarını sade bir merkez ekranda gösterir."""
+    from flask import render_template
+
+    report_cards = [
+        {
+            "title": "Belge Durum Özeti",
+            "description": "Belgelerin Taslak, Kayıtlı, Arşivde, İncelemede ve diğer durumlara göre izlenmesi.",
+            "status": "Hazır",
+            "link": "/digital-archive/document-status-guide",
+        },
+        {
+            "title": "Arama ve Bulma Özeti",
+            "description": "Belge adı, arşiv kodu, fiziksel konum, arşiv malzemesi ve tarihi alan bilgileriyle arama yaklaşımı.",
+            "status": "Hazır",
+            "link": "/digital-archive/document-search-guide",
+        },
+        {
+            "title": "Genel Durum Özeti",
+            "description": "Dijital Arşiv bölümünde tamamlanan ve sıradaki başlıkların tek ekranda izlenmesi.",
+            "status": "Hazır",
+            "link": "/digital-archive/module-status",
+        },
+        {
+            "title": "Kullanıcı Yetki Özeti",
+            "description": "Kullanıcıların görüntüleme, belge ekleme, düzenleme, rapor ve yönetim sorumluluklarının açıklaması.",
+            "status": "Hazır",
+            "link": "/digital-archive/permission-guide",
+        },
+        {
+            "title": "Belge Listesi",
+            "description": "Kayıtlı belgelerin liste, arama, durum ve işlem bağlantılarıyla izlenmesi.",
+            "status": "Hazır",
+            "link": "/digital-archive/documents",
+        },
+        {
+            "title": "Yazdırılabilir Belge Özeti",
+            "description": "Belge detayından açılan sade çıktı ekranı ile belge bilgilerinin yazdırılması.",
+            "status": "Belge içinden açılır",
+            "link": "/digital-archive/documents",
+        },
+        {
+            "title": "Saklama Süresi Takibi",
+            "description": "Saklama süresi yaklaşan veya dolan belgelerin ayrıca raporlanması için hazırlanacak başlık.",
+            "status": "Planlandı",
+            "link": "/digital-archive/module-status",
+        },
+        {
+            "title": "Arşiv Bağlantı Raporu",
+            "description": "Kutu, klasör, dosya, fotoğraf, harita ve dijital malzeme bağlantılarının raporlanması için hazırlanacak başlık.",
+            "status": "Planlandı",
+            "link": "/digital-archive/document-material-links",
+        },
+    ]
+
+    summary_cards = [
+        {"label": "Hazır Rapor Başlığı", "value": "6"},
+        {"label": "Planlanan Rapor Başlığı", "value": "2"},
+        {"label": "Rapor Merkezi", "value": "Açık"},
+        {"label": "Kullanım Dili", "value": "Sade"},
+    ]
+
+    return render_template(
+        "digital_archive/report_center.html",
+        report_cards=report_cards,
+        summary_cards=summary_cards,
+    )
+
+
 # DA-41A: Dijital Arşiv genel durum özeti
 @digital_archive_bp.get("/module-status")
 @login_required
