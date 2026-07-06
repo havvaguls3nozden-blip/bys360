@@ -3269,6 +3269,188 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-39A: Yazdırılabilir belge özeti
+def _da39a_print_text(value) -> str:
+    if value is None:
+        return "-"
+
+    if isinstance(value, bool):
+        return "Evet" if value else "Hayır"
+
+    if hasattr(value, "strftime"):
+        try:
+            return value.strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            return value.strftime("%d.%m.%Y")
+
+    text_value = str(value).strip()
+    return text_value if text_value else "-"
+
+
+def _da39a_document_print_fields(document: dict) -> list[dict[str, str]]:
+    preferred_keys = [
+        "title",
+        "name",
+        "subject",
+        "archive_code",
+        "file_code",
+        "document_no",
+        "category_id",
+        "physical_location_id",
+        "retention_policy_id",
+        "status_label",
+        "confidentiality_level",
+        "access_level",
+        "created_at",
+        "updated_at",
+        "description",
+        "notes",
+    ]
+
+    fields: list[dict[str, str]] = []
+    used = set()
+
+    for key in preferred_keys:
+        if key not in document:
+            continue
+
+        value = _da39a_print_text(document.get(key))
+        if value == "-":
+            continue
+
+        fields.append(
+            {
+                "label": _da23_column_label(key),
+                "value": value,
+            }
+        )
+        used.add(key)
+
+    if not fields:
+        for key, value in document.items():
+            if key in {"id", "status_label"}:
+                continue
+
+            clean_value = _da39a_print_text(value)
+            if clean_value == "-":
+                continue
+
+            fields.append(
+                {
+                    "label": _da23_column_label(key),
+                    "value": clean_value,
+                }
+            )
+
+            if len(fields) >= 10:
+                break
+
+    return fields
+
+
+def _da39a_count_by_document(table_names: list[str], document_id: int) -> int:
+    from sqlalchemy import MetaData, Table, func, inspect, select
+
+    inspector = inspect(db.engine)
+    existing_tables = set(inspector.get_table_names())
+
+    for table_name in table_names:
+        if table_name not in existing_tables:
+            continue
+
+        table = Table(table_name, MetaData(), autoload_with=db.engine)
+        if "document_id" not in table.c:
+            continue
+
+        try:
+            return int(
+                db.session.execute(
+                    select(func.count()).select_from(table).where(table.c.document_id == document_id)
+                ).scalar()
+                or 0
+            )
+        except Exception:
+            current_app.logger.exception("Yazdırılabilir özet sayım bilgisi alınamadı: %s", table_name)
+            return 0
+
+    return 0
+
+
+@digital_archive_bp.get("/documents/<int:document_id>/print-summary")
+@login_required
+def document_print_summary(document_id: int):
+    """Belge için yazdırılabilir kurumsal özet ekranı."""
+    from datetime import datetime
+
+    from flask import current_app, flash, redirect, render_template
+
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        document = _da36b_enrich_document_row(document)
+        document_fields = _da39a_document_print_fields(document)
+
+        summary_counts = [
+            {
+                "title": "Arşiv Bağlantıları",
+                "count": _da39a_count_by_document(
+                    ["digital_archive_document_material_links"],
+                    document_id,
+                ),
+                "description": "Belgeye bağlı arşiv malzemesi kayıtları.",
+            },
+            {
+                "title": "Dosyalar",
+                "count": _da39a_count_by_document(
+                    ["digital_archive_document_files", "digital_archive_files"],
+                    document_id,
+                ),
+                "description": "Belgeye bağlı taranmış veya dijital dosyalar.",
+            },
+            {
+                "title": "Ek Bilgiler",
+                "count": _da39a_count_by_document(
+                    [
+                        "digital_archive_document_metadata_values",
+                        "digital_archive_metadata_values",
+                        "digital_archive_document_field_values",
+                    ],
+                    document_id,
+                ),
+                "description": "Belgeye eklenen kuruma özel açıklayıcı bilgiler.",
+            },
+            {
+                "title": "Metin Okuma",
+                "count": _da39a_count_by_document(
+                    [
+                        "digital_archive_document_ocr_texts",
+                        "digital_archive_ocr_texts",
+                        "digital_archive_document_texts",
+                        "digital_archive_recognized_texts",
+                    ],
+                    document_id,
+                ),
+                "description": "Belge içeriğinden elde edilen okunan metin kayıtları.",
+            },
+        ]
+
+        return render_template(
+            "digital_archive/document_print_summary.html",
+            document=document,
+            document_fields=document_fields,
+            summary_counts=summary_counts,
+            prepared_at=datetime.now().strftime("%d.%m.%Y %H:%M"),
+        )
+    except Exception:
+        current_app.logger.exception("Yazdırılabilir belge özeti açılamadı.")
+        flash("Yazdırılabilir belge özeti açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
+
+
 # DA-37A: Arama rehberi
 @digital_archive_bp.get("/document-search-guide")
 @login_required
