@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Rapor Merkezi - BYS360 Dijital Arşiv{% endblock %}
+{% block title %}Belge Durum Raporu - BYS360 Dijital Arşiv{% endblock %}
 
 {% block content %}
 <style>
@@ -80,12 +80,17 @@
         margin-top: 18px;
     }
 
-    .da-summary-card {
+    .da-summary-card,
+    .da-report-card,
+    .da-note {
         background: #fff;
         border: 1px solid rgba(15, 23, 42, .09);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+
+    .da-summary-card {
         border-radius: 20px;
         padding: 16px;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-summary-card strong {
@@ -107,17 +112,12 @@
         margin-top: 18px;
     }
 
-    .da-card {
-        background: #fff;
-        border: 1px solid rgba(15, 23, 42, .09);
+    .da-report-card {
         border-radius: 24px;
         padding: 20px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
-        text-decoration: none;
-        display: block;
     }
 
-    .da-card-head {
+    .da-report-head {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -125,7 +125,7 @@
         margin-bottom: 10px;
     }
 
-    .da-card h2 {
+    .da-report-card h2 {
         margin: 0;
         color: #111827;
         font-size: 20px;
@@ -143,21 +143,44 @@
         white-space: nowrap;
     }
 
-    .da-card p {
+    .da-report-card p {
         margin: 0;
         color: #667085;
         line-height: 1.65;
     }
 
-    .da-note {
+    .da-bar {
+        margin-top: 14px;
+        height: 10px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        overflow: hidden;
+    }
+
+    .da-bar span {
+        display: block;
+        height: 100%;
+        width: var(--percent);
+        background: #8B0000;
+        border-radius: 999px;
+    }
+
+    .da-empty {
         margin-top: 18px;
+        padding: 20px;
+        border-radius: 22px;
         background: #fff;
         border: 1px solid rgba(15, 23, 42, .09);
+        color: #667085;
+        line-height: 1.7;
+    }
+
+    .da-note {
+        margin-top: 18px;
         border-radius: 22px;
         padding: 18px;
         color: #475467;
         line-height: 1.7;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
     }
 
     .da-note strong {
@@ -179,18 +202,17 @@
 <div class="da-page">
     <section class="da-hero">
         <div class="da-kicker">BYS360 Dijital Arşiv</div>
-        <h1 class="da-title">Rapor Merkezi</h1>
+        <h1 class="da-title">Belge Durum Raporu</h1>
         <p class="da-subtitle">
-            Dijital Arşiv bölümündeki belge, durum, arama, yetki ve çıktı başlıkları bu ekranda tek merkezde toplanır.
-            Amaç, yöneticinin ve kullanıcının rapor başlıklarına kolay ulaşmasıdır.
+            Belgelerin mevcut durumlarına göre dağılımını gösterir. Bu ekran belge kayıtlarının arşiv sürecinde
+            hangi aşamada olduğunu hızlıca izlemek için hazırlanmıştır.
         </p>
 
         <div class="da-actions">
-            <a class="da-button da-button-primary" href="/digital-archive/">Dijital Arşiv</a>
+            <a class="da-button da-button-primary" href="/digital-archive/report-center">Rapor Merkezi</a>
             <a class="da-button" href="/digital-archive/documents">Belgeler</a>
-            <a class="da-button" href="/digital-archive/module-status">Genel Durum</a>
-            <a class="da-button" href="/digital-archive/reports/document-status">Belge Durum Raporu</a>
-            <a class="da-button" href="/digital-archive/permission-guide">Kullanıcı Yetkileri</a>
+            <a class="da-button" href="/digital-archive/document-status-guide">Belge Durumları</a>
+            <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
         </div>
     </section>
 
@@ -203,21 +225,31 @@
         {% endfor %}
     </section>
 
-    <section class="da-grid">
-        {% for item in report_cards %}
-            <a class="da-card" href="{{ item.link }}">
-                <div class="da-card-head">
-                    <h2>{{ item.title }}</h2>
-                    <span class="da-pill">{{ item.status }}</span>
-                </div>
-                <p>{{ item.description }}</p>
-            </a>
-        {% endfor %}
-    </section>
+    {% if report_items %}
+        <section class="da-grid">
+            {% for item in report_items %}
+                <article class="da-report-card">
+                    <div class="da-report-head">
+                        <h2>{{ item.name }}</h2>
+                        <span class="da-pill">{{ item.count }} belge</span>
+                    </div>
+                    <p>{{ item.description }}</p>
+                    <div class="da-bar" aria-label="{{ item.name }} oranı">
+                        <span style="--percent: {{ item.percent }}%;"></span>
+                    </div>
+                    <p style="margin-top:10px;">Toplam belge içindeki oran: {{ item.percent }}%</p>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <div class="da-empty">
+            Henüz durum raporuna yansıyacak belge bulunmuyor.
+        </div>
+    {% endif %}
 
     <div class="da-note">
         <strong>Kullanım notu:</strong>
-        Rapor Merkezi, mevcut ekranlara hızlı erişim sağlar ve ileride hazırlanacak rapor başlıkları için ana giriş noktası olur.
+        Bu rapor mevcut kayıtları okur ve durumlara göre özetler. Kayıt ekleme veya değiştirme işlemi yapmaz.
     </div>
 </div>
 {% endblock %}

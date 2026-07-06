@@ -3273,6 +3273,79 @@ def document_full_detail(document_id: int):
 
 
 
+
+# DA-42B: Belge durum raporu
+def _da42b_status_description(status_name: str) -> str:
+    descriptions = {
+        "Taslak": "Henüz hazırlık aşamasında olan belge kayıtları.",
+        "Kayıtlı": "Sisteme alınmış ve temel bilgileri kayıtlı belgeler.",
+        "Arşivde": "Arşiv sürecinde izlenen ve korunacak belge kayıtları.",
+        "İncelemede": "Kontrol veya değerlendirme sürecindeki belge kayıtları.",
+        "Saklama Süresi Doluyor": "Saklama süresi yaklaşan ve takip edilmesi gereken belge kayıtları.",
+        "Saklama Süresi Doldu": "Saklama süresi dolmuş ve işlem kararı bekleyen belge kayıtları.",
+        "Devredildi": "İlgili birime veya arşiv sürecine devredilmiş belge kayıtları.",
+        "İmha Edildi": "İmha süreci tamamlanmış belge kayıtları.",
+    }
+    return descriptions.get(status_name, "Bu durumdaki belge kayıtları raporda izlenir.")
+
+
+@digital_archive_bp.get("/reports/document-status")
+@login_required
+def document_status_report():
+    """Belgeleri durumlarına göre sade rapor ekranında gösterir."""
+    from flask import render_template
+    from sqlalchemy import select
+
+    table = _da23_document_table()
+
+    statement = select(table)
+    if "created_at" in table.c:
+        statement = statement.order_by(table.c.created_at.desc())
+    elif "id" in table.c:
+        statement = statement.order_by(table.c.id.desc())
+
+    rows = []
+    for row in db.session.execute(statement.limit(500)).all():
+        try:
+            data = dict(row._mapping)
+        except Exception:
+            data = dict(row)
+
+        rows.append(_da36b_enrich_document_row(data))
+
+    status_summary = _da36b_status_summary(rows)
+    total_count = len(rows)
+
+    report_items = []
+    for item in status_summary:
+        name = str(item.get("name") or "Kayıtlı")
+        count = int(item.get("count") or 0)
+        percent = round((count / total_count) * 100, 1) if total_count else 0
+
+        report_items.append(
+            {
+                "name": name,
+                "count": count,
+                "percent": percent,
+                "description": _da42b_status_description(name),
+            }
+        )
+
+    summary_cards = [
+        {"label": "Toplam Belge", "value": total_count},
+        {"label": "Durum Başlığı", "value": len(report_items)},
+        {"label": "Rapor Türü", "value": "Durum"},
+        {"label": "Kayıt Limiti", "value": "500"},
+    ]
+
+    return render_template(
+        "digital_archive/document_status_report.html",
+        report_items=report_items,
+        summary_cards=summary_cards,
+        total_count=total_count,
+    )
+
+
 # DA-42A: Rapor merkezi ana ekranı
 @digital_archive_bp.get("/report-center")
 @login_required
