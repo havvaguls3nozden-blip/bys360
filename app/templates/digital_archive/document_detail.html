@@ -58,6 +58,7 @@
         <div class="da-actions">
             <a class="da-button" href="/digital-archive/documents">Belge Kartları</a>
             <a class="da-button" href="/digital-archive/">Dijital Arşiv</a>
+            <a class="da-button" href="/digital-archive/documents/{{ document.get('id') }}/ocr">Metin Okuma Hazırlığı</a>
         </div>
     </div>
 
@@ -71,6 +72,7 @@
                         {% for column in file_columns %}
                             <th>{{ file_labels.get(column, column) }}</th>
                         {% endfor %}
+                            <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,6 +81,12 @@
                             {% for column in file_columns %}
                                 <td>{{ row.get(column, '') }}</td>
                             {% endfor %}
+                                <td>
+                                    {% if row.get('id') %}
+                                        <a class="da-button" href="/digital-archive/documents/{{ document.get('id') }}/files/{{ row.get('id') }}/preview" target="_blank">Önizle</a>
+                                        <a class="da-button" href="/digital-archive/documents/{{ document.get('id') }}/files/{{ row.get('id') }}/download">İndir</a>
+                                    {% endif %}
+                                </td>
                         </tr>
                     {% endfor %}
                 </tbody>

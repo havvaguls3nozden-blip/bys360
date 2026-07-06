@@ -1217,6 +1217,158 @@ def document_file_upload_post(document_id: int):
     return redirect(f"/digital-archive/documents/{document_id}")
 
 
+
+# DA-25A: Belge dosyası önizleme ve indirme
+def _da25_file_row(document_id: int, file_id: int):
+    from sqlalchemy import select
+
+    table = _da24_file_table()
+
+    if "id" not in table.c:
+        return None
+
+    return db.session.execute(
+        select(table).where(
+            table.c.id == file_id,
+            table.c.document_id == document_id,
+        )
+    ).mappings().first()
+
+
+def _da25_file_display_name(file_row: dict) -> str:
+    for key in ("original_filename", "source_filename", "file_name", "name", "stored_filename"):
+        value = file_row.get(key)
+        if value:
+            return str(value)
+
+    return "taranmis-belge"
+
+
+def _da25_file_mime_type(file_row: dict) -> str:
+    for key in ("mime_type", "content_type"):
+        value = file_row.get(key)
+        if value:
+            return str(value)
+
+    return "application/octet-stream"
+
+
+def _da25_file_absolute_path(file_row: dict):
+    from pathlib import Path
+
+    from flask import current_app
+
+    raw_value = (
+        file_row.get("storage_path")
+        or file_row.get("file_path")
+        or file_row.get("path")
+    )
+
+    if not raw_value:
+        return None
+
+    raw_path = Path(str(raw_value))
+    if raw_path.is_absolute():
+        return raw_path
+
+    project_root = Path(current_app.root_path).parent
+
+    candidates = [
+        project_root / "var" / raw_path,
+        project_root / raw_path,
+    ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+
+    return candidates[0]
+
+
+@digital_archive_bp.get("/documents/<int:document_id>/files/<int:file_id>/preview")
+@login_required
+def document_file_preview(document_id: int, file_id: int):
+    """Taranmış belge dosyasını tarayıcıda gösterir."""
+    from flask import flash, redirect, send_file
+
+    try:
+        file_row = _da25_file_row(document_id, file_id)
+        if not file_row:
+            flash("Dosya kaydı bulunamadı.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        absolute_path = _da25_file_absolute_path(file_row)
+        if not absolute_path or not absolute_path.exists():
+            flash("Dosya klasörde bulunamadı.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        return send_file(
+            absolute_path,
+            mimetype=_da25_file_mime_type(file_row),
+            as_attachment=False,
+            download_name=_da25_file_display_name(file_row),
+        )
+    except Exception:
+        current_app.logger.exception("Belge dosyası önizlenemedi.")
+        flash("Dosya önizleme sırasında beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
+
+
+@digital_archive_bp.get("/documents/<int:document_id>/files/<int:file_id>/download")
+@login_required
+def document_file_download(document_id: int, file_id: int):
+    """Taranmış belge dosyasını indirir."""
+    from flask import flash, redirect, send_file
+
+    try:
+        file_row = _da25_file_row(document_id, file_id)
+        if not file_row:
+            flash("Dosya kaydı bulunamadı.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        absolute_path = _da25_file_absolute_path(file_row)
+        if not absolute_path or not absolute_path.exists():
+            flash("Dosya klasörde bulunamadı.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        return send_file(
+            absolute_path,
+            mimetype=_da25_file_mime_type(file_row),
+            as_attachment=True,
+            download_name=_da25_file_display_name(file_row),
+        )
+    except Exception:
+        current_app.logger.exception("Belge dosyası indirilemedi.")
+        flash("Dosya indirme sırasında beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
+
+
+@digital_archive_bp.get("/documents/<int:document_id>/ocr")
+@login_required
+def document_ocr_ready(document_id: int):
+    """Belge kartı için metin okuma hazırlık ekranı."""
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        file_rows, file_columns, file_labels = _da24_document_files(document_id)
+
+        return render_template(
+            "digital_archive/document_ocr_ready.html",
+            document=dict(document),
+            file_rows=file_rows,
+            file_columns=file_columns,
+            file_labels=file_labels,
+            document_id=document_id,
+        )
+    except Exception:
+        current_app.logger.exception("Metin okuma hazırlık ekranı açılamadı.")
+        flash("Metin okuma hazırlığı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
