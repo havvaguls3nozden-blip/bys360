@@ -2515,6 +2515,110 @@ def metadata_field_set():
         return redirect("/digital-archive/metadata-fields")
 
 
+
+# DA-31A: Arşiv malzemesi türleri
+def _da31_create_material_type_table() -> None:
+    from sqlalchemy import text
+
+    db.session.execute(text("""
+        CREATE TABLE IF NOT EXISTS digital_archive_material_types (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(150) NOT NULL,
+            description TEXT,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME
+        )
+    """))
+
+    db.session.commit()
+
+
+def _da31_material_type_table(create_if_missing: bool = False):
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = set(inspector.get_table_names())
+
+    if "digital_archive_material_types" not in table_names:
+        if not create_if_missing:
+            raise RuntimeError("Arşiv malzemesi türleri tablosu bulunamadı.")
+
+        _da31_create_material_type_table()
+
+    metadata = MetaData()
+    return Table("digital_archive_material_types", metadata, autoload_with=db.engine)
+
+
+@digital_archive_bp.route("/material-types", methods=["GET", "POST"])
+@login_required
+def material_types():
+    """Arşiv malzemesi türleri."""
+    from datetime import datetime
+
+    from flask import request
+    from sqlalchemy import desc, select
+
+    try:
+        table = _da31_material_type_table(create_if_missing=True)
+
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            description = request.form.get("description", "").strip()
+            sort_order_raw = request.form.get("sort_order", "0").strip()
+
+            if not name:
+                flash("Malzeme türü adı boş bırakılamaz.", "warning")
+                return redirect("/digital-archive/material-types")
+
+            try:
+                sort_order = int(sort_order_raw)
+            except ValueError:
+                sort_order = 0
+
+            payload = {
+                "name": name,
+                "description": description,
+                "is_active": 1,
+                "sort_order": sort_order,
+                "created_at": datetime.now(),
+            }
+
+            db.session.execute(table.insert().values(**payload))
+            db.session.commit()
+
+            flash("Arşiv malzemesi türü oluşturuldu.", "success")
+            return redirect("/digital-archive/material-types")
+
+        rows = [dict(row._mapping) for row in db.session.execute(
+            select(table).order_by(desc(table.c.id)).limit(200)
+        ).all()]
+
+        display_columns = ["id", "name", "description", "is_active", "created_at"]
+        display_columns = [column for column in display_columns if column in table.c]
+
+        labels = {
+            "id": "No",
+            "name": "Malzeme Türü",
+            "description": "Açıklama",
+            "is_active": "Durum",
+            "created_at": "Kayıt Tarihi",
+        }
+
+        return render_template(
+            "digital_archive/material_types.html",
+            rows=rows,
+            display_columns=display_columns,
+            labels=labels,
+        )
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Arşiv malzemesi türleri açılamadı.")
+        flash("Arşiv malzemesi türleri açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
