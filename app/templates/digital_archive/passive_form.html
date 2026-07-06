@@ -71,6 +71,9 @@
     <p class="da-subtitle">{{ sayfa_aciklamasi }}</p>
 
     <form class="da-card" method="post" action="{{ list_url|default(request.path|replace('/new', '')) }}">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
         <div class="da-grid">
             {% for field in alanlar %}
                 {% set field_name = field.name if field.name is defined else field %}

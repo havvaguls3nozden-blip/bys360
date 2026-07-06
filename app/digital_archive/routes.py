@@ -407,120 +407,120 @@ def security_status():
 @digital_archive_bp.route("/categories", methods=["POST"])
 @login_required
 def category_create_guard_only_post():
-    """DA-14A local SQLite kategori yazma kapısı.
+    """Arşiv kategorisi kaydı oluşturur."""
+    from flask import flash, redirect, request
+    from sqlalchemy.exc import IntegrityError
 
-    Canlıda yazmaz. Sadece TESTING=True + SQLite + BYS360_DIGITAL_ARCHIVE_LOCAL_WRITE_TEST=1
-    koşulları birlikte sağlanırsa kategori oluşturur.
-    """
+    from app import db
+    from app.digital_archive.models import DigitalArchiveCategory
 
-    intent = build_digital_archive_write_intent("category_create", request.form.to_dict(flat=True))
+    kod = request.form.get("code", "").strip()
+    ad = request.form.get("name", "").strip()
+    aciklama = request.form.get("description", "").strip()
 
-    local_write_enabled = (
-        current_app.config.get("TESTING") is True
-        and os.getenv("BYS360_DIGITAL_ARCHIVE_LOCAL_WRITE_TEST") == "1"
-        and str(db.engine.url.drivername).startswith("sqlite")
+    if not kod or not ad:
+        flash("Kod ve ad alanları zorunludur.", "warning")
+        return redirect("/digital-archive/categories/new")
+
+    mevcut = DigitalArchiveCategory.query.filter_by(code=kod).first()
+    if mevcut:
+        flash("Bu kodla kayıtlı bir arşiv kategorisi zaten var.", "warning")
+        return redirect("/digital-archive/categories/new")
+
+    kayit = DigitalArchiveCategory(
+        code=kod,
+        name=ad,
+        description=aciklama or None,
+        is_active=True,
     )
 
-    if not intent.write_allowed and not local_write_enabled:
-        flash("Dijital Arşiv kategori oluşturma işlemi şu anda güvenlik kapısı nedeniyle kapalıdır.", "warning")
-        return redirect("/digital-archive/categories")
-
-    if not intent.is_valid:
-        flash("Dijital Arşiv kategori bilgileri doğrulanamadı. Lütfen zorunlu alanları kontrol edin.", "danger")
-        return redirect("/digital-archive/categories")
-
-    if not local_write_enabled:
-        flash("Dijital Arşiv kategori oluşturma işlemi henüz guard-only aşamasındadır.", "warning")
-        return redirect("/digital-archive/categories")
-
-    payload = intent.payload
-
-    parent_id_raw = payload.get("parent_id")
-    parent_id = int(parent_id_raw) if parent_id_raw not in (None, "") else None
-
-    sort_order_raw = payload.get("sort_order")
-    try:
-        sort_order = int(sort_order_raw) if sort_order_raw not in (None, "") else 0
-    except (TypeError, ValueError):
-        sort_order = 0
-
-    is_active_raw = str(payload.get("is_active", "true")).strip().lower()
-    is_active = is_active_raw in {"1", "true", "on", "yes", "evet"}
-
-    code_value = str(payload.get("code") or "").strip()
-    existing_category = DigitalArchiveCategory.query.filter_by(code=code_value).first()
-
-    if existing_category:
-        # DA-15B proaktif duplicate code kontrolü: mükerrer kategori kodu DB yazmadan engellenir.
-        flash("Bu kategori kodu zaten kayıtlıdır. Lütfen farklı bir kod kullanın.", "warning")
-        return redirect("/digital-archive/categories")
+    db.session.add(kayit)
 
     try:
-        category = DigitalArchiveCategory(
-            parent_id=parent_id,
-            code=code_value,
-            name=payload.get("name"),
-            description=payload.get("description"),
-            is_active=is_active,
-            sort_order=sort_order,
-        )
-        db.session.add(category)
         db.session.commit()
-        flash("Dijital Arşiv kategorisi lokal test ortamında kaydedildi.", "success")
-    except SQLAlchemyError:
+    except IntegrityError:
         db.session.rollback()
-        current_app.logger.exception("DA-14A local SQLite kategori yazma testi başarısız oldu.")
-        flash("Dijital Arşiv kategori kaydı sırasında geçici bir hata oluştu.", "danger")
+        flash("Bu kodla kayıtlı bir arşiv kategorisi zaten var.", "warning")
+        return redirect("/digital-archive/categories/new")
+    except Exception:
+        db.session.rollback()
+        flash("Kayıt oluşturulurken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/categories/new")
 
+    flash("Arşiv kategorisi kaydedildi.", "success")
     return redirect("/digital-archive/categories")
 
 # DA-21D physical location guard-only POST route
 @digital_archive_bp.route("/physical-locations", methods=["POST"])
 @login_required
 def digital_archive_physical_locations_guard_only_post():
-    """DA-21D: Fiziksel lokasyon guard-only POST.
+    """Fiziksel arşiv konumu kaydı oluşturur."""
+    from datetime import datetime
 
-    Bu aşama DB yazmaz. Sadece write_service intent üretir ve kapalı
-    yazma durumunda kullanıcıyı liste ekranına geri yönlendirir.
-    """
-    from flask import flash as _da21d_flash
-    from flask import redirect as _da21d_redirect
-    from flask import request as _da21d_request
+    from flask import flash, redirect, request
 
-    from app.digital_archive.write_service import (
-        build_digital_archive_write_intent as _da21d_build_write_intent,
-    )
+    from app import db
+    from app.digital_archive.models import DigitalArchivePhysicalLocation
+
+    def temiz_deger(alan: str) -> str | None:
+        deger = request.form.get(alan, "").strip()
+        return deger or None
+
+    def temiz_sayi(alan: str) -> int | None:
+        deger = request.form.get(alan, "").strip()
+        if not deger:
+            return None
+        try:
+            return int(deger)
+        except ValueError:
+            return None
+
+    def temiz_tarih(alan: str):
+        deger = request.form.get(alan, "").strip()
+        if not deger:
+            return None
+
+        for bicim in ("%Y-%m-%d", "%d.%m.%Y", "%Y-%m-%dT%H:%M"):
+            try:
+                return datetime.strptime(deger, bicim)
+            except ValueError:
+                continue
+
+        return None
+
+    model_payload = {
+        "archive_room": temiz_deger("archive_room"),
+        "cabinet_no": temiz_deger("cabinet_no"),
+        "shelf_no": temiz_deger("shelf_no"),
+        "box_no": temiz_deger("box_no"),
+        "folder_no": temiz_deger("folder_no"),
+        "file_no": temiz_deger("file_no"),
+        "physical_status": temiz_deger("physical_status") or "Arşivde",
+        "delivered_to_user_id": temiz_sayi("delivered_to_user_id"),
+        "delivered_at": temiz_tarih("delivered_at"),
+        "returned_at": temiz_tarih("returned_at"),
+    }
+
+    if not any(
+        model_payload.get(alan)
+        for alan in ("archive_room", "cabinet_no", "shelf_no", "box_no", "folder_no", "file_no")
+    ):
+        flash("En az bir fiziksel konum bilgisi girilmelidir.", "warning")
+        return redirect("/digital-archive/physical-locations/new")
+
+    kayit = DigitalArchivePhysicalLocation(**model_payload)
+
+    db.session.add(kayit)
 
     try:
-        from flask_login import current_user as _da21d_current_user
-
-        user_id = getattr(_da21d_current_user, "id", None)
+        db.session.commit()
     except Exception:
-        user_id = None
+        db.session.rollback()
+        flash("Kayıt oluşturulurken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/physical-locations/new")
 
-    intent = _da21d_build_write_intent(
-        "physical_location_create",
-        _da21d_request.form.to_dict(flat=True),
-        user_id=user_id,
-    )
-
-    if not getattr(intent, "is_valid", False):
-        _da21d_flash("Fiziksel lokasyon bilgileri eksik veya hatalı.", "warning")
-        return _da21d_redirect("/digital-archive/physical-locations")
-
-    if not getattr(intent, "write_allowed", False):
-        _da21d_flash(
-            "Fiziksel lokasyon kayıt akışı güvenlik gereği henüz kapalıdır.",
-            "warning",
-        )
-        return _da21d_redirect("/digital-archive/physical-locations")
-
-    _da21d_flash(
-        "Fiziksel lokasyon kayıt akışı henüz guard-only aşamasındadır.",
-        "warning",
-    )
-    return _da21d_redirect("/digital-archive/physical-locations")
-
+    flash("Fiziksel arşiv konumu kaydedildi.", "success")
+    return redirect("/digital-archive/physical-locations")
 
 # DA-21H2B security-status compatibility alias
 @digital_archive_bp.route("/security-status")
