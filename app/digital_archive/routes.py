@@ -499,3 +499,10 @@ def digital_archive_physical_locations_guard_only_post():
     )
     return _da21d_redirect("/digital-archive/physical-locations")
 
+
+# DA-21H2B security-status compatibility alias
+@digital_archive_bp.route("/security-status")
+@login_required
+def security_status_alias_da21h2b():
+    """Compatibility alias for /digital-archive/security-status."""
+    return security_status()
