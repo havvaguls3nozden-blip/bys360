@@ -59,6 +59,7 @@
                         {% for column in display_columns %}
                             <th>{{ column_labels.get(column, column|replace('_', ' ')|title) }}</th>
                         {% endfor %}
+                        <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,6 +68,7 @@
                             {% for column in display_columns %}
                                 <td>{{ row.get(column, '') }}</td>
                             {% endfor %}
+                            <td><a class="da-button" href="/digital-archive/documents/{{ row.get('id') }}">Aç</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

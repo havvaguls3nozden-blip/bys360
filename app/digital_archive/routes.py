@@ -861,6 +861,362 @@ def document_create_post():
     return redirect("/digital-archive/documents")
 
 
+
+# DA-24A: Taranmış belge dosyası yükleme
+def _da24_file_table():
+    from sqlalchemy import MetaData, Table, inspect
+
+    inspector = inspect(db.engine)
+    table_names = inspector.get_table_names()
+
+    preferred = [
+        "digital_archive_document_versions",
+        "digital_archive_document_files",
+        "digital_archive_files",
+        "digital_archive_attachments",
+    ]
+
+    candidates = []
+
+    for table_name in preferred:
+        if table_name in table_names:
+            candidates.append(table_name)
+
+    for table_name in table_names:
+        lower_name = table_name.lower()
+        if (
+            table_name.startswith("digital_archive")
+            and table_name not in candidates
+            and ("version" in lower_name or "file" in lower_name or "attachment" in lower_name)
+        ):
+            candidates.append(table_name)
+
+    for table_name in candidates:
+        columns = [column["name"] for column in inspector.get_columns(table_name)]
+        if "document_id" in columns:
+            metadata = MetaData()
+            return Table(table_name, metadata, autoload_with=db.engine)
+
+    raise RuntimeError("Belge dosyası bağlantı alanı bulunamadı.")
+
+
+def _da24_file_label(column_name: str) -> str:
+    labels = {
+        "id": "No",
+        "document_id": "Belge Kartı",
+        "version_no": "Sürüm",
+        "version_number": "Sürüm",
+        "original_filename": "Dosya Adı",
+        "source_filename": "Dosya Adı",
+        "file_name": "Dosya Adı",
+        "name": "Dosya Adı",
+        "stored_filename": "Kayıtlı Dosya",
+        "file_path": "Dosya Yolu",
+        "path": "Dosya Yolu",
+        "storage_path": "Dosya Yolu",
+        "mime_type": "Dosya Türü",
+        "content_type": "Dosya Türü",
+        "file_size": "Boyut",
+        "size_bytes": "Boyut",
+        "checksum_sha256": "Kontrol Kodu",
+        "sha256": "Kontrol Kodu",
+        "hash": "Kontrol Kodu",
+        "status": "Durum",
+        "description": "Açıklama",
+        "notes": "Notlar",
+        "is_current": "Güncel",
+        "is_active": "Durum",
+        "created_at": "Yükleme Tarihi",
+        "uploaded_at": "Yükleme Tarihi",
+        "updated_at": "Güncelleme Tarihi",
+    }
+    return labels.get(column_name, column_name.replace("_", " ").title())
+
+
+def _da24_document_row(document_id: int):
+    from sqlalchemy import select
+
+    table = _da23_document_table()
+    return db.session.execute(select(table).where(table.c.id == document_id)).mappings().first()
+
+
+def _da24_document_files(document_id: int) -> tuple[list[dict], list[str], dict]:
+    from sqlalchemy import desc, select
+
+    try:
+        table = _da24_file_table()
+    except RuntimeError:
+        return [], [], {}
+
+    preferred_columns = [
+        "id",
+        "version_no",
+        "version_number",
+        "original_filename",
+        "source_filename",
+        "file_name",
+        "name",
+        "mime_type",
+        "content_type",
+        "file_size",
+        "size_bytes",
+        "status",
+        "created_at",
+        "uploaded_at",
+    ]
+
+    available_columns = [column.name for column in table.columns]
+    display_columns = [column for column in preferred_columns if column in available_columns][:8]
+    if not display_columns:
+        display_columns = available_columns[:8]
+
+    query = select(table).where(table.c.document_id == document_id)
+
+    if "id" in available_columns:
+        query = query.order_by(desc(table.c.id))
+
+    rows = [dict(row._mapping) for row in db.session.execute(query).all()]
+    labels = {column: _da24_file_label(column) for column in display_columns}
+
+    return rows, display_columns, labels
+
+
+def _da24_next_version_no(table, document_id: int) -> int:
+    from sqlalchemy import func, select
+
+    for column_name in ("version_no", "version_number"):
+        if column_name in table.c:
+            current = db.session.execute(
+                select(func.max(table.c[column_name])).where(table.c.document_id == document_id)
+            ).scalar_one_or_none()
+            return int(current or 0) + 1
+
+    return 1
+
+
+def _da24_safe_upload_path(document_id: int, filename: str) -> tuple[str, str]:
+    from datetime import datetime
+    from pathlib import Path
+
+    from flask import current_app
+    from werkzeug.utils import secure_filename
+
+    safe_name = secure_filename(filename or "taranmis-belge.pdf")
+    if not safe_name:
+        safe_name = "taranmis-belge.pdf"
+
+    stored_name = datetime.now().strftime("%Y%m%d_%H%M%S_") + safe_name
+
+    upload_root = current_app.config.get("DIGITAL_ARCHIVE_UPLOAD_ROOT")
+    if not upload_root:
+        upload_root = str(Path(current_app.root_path).parent / "var" / "digital_archive" / "uploads")
+
+    target_dir = Path(upload_root) / str(document_id)
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    absolute_path = target_dir / stored_name
+    relative_path = str(Path("digital_archive") / "uploads" / str(document_id) / stored_name).replace("\\", "/")
+
+    return str(absolute_path), relative_path
+
+
+def _da24_file_payload(table, document_id: int, file_storage, file_bytes: bytes, stored_filename: str, relative_path: str):
+    from datetime import datetime
+    import hashlib
+
+    now = datetime.now()
+    original_filename = file_storage.filename or "taranmis-belge.pdf"
+    mime_type = file_storage.mimetype or "application/octet-stream"
+    checksum = hashlib.sha256(file_bytes).hexdigest()
+    version_no = _da24_next_version_no(table, document_id)
+
+    def default_for(column):
+        name = column.name
+        lower_name = name.lower()
+        lower_type = str(column.type).lower()
+
+        if name == "document_id":
+            return document_id
+
+        if lower_name in {"version_no", "version_number"}:
+            return version_no
+
+        if lower_name in {"original_filename", "source_filename", "file_name", "name"}:
+            return original_filename
+
+        if lower_name in {"stored_filename", "stored_name"}:
+            return stored_filename
+
+        if lower_name in {"file_path", "path", "storage_path"}:
+            return relative_path
+
+        if lower_name in {"mime_type", "content_type"}:
+            return mime_type
+
+        if lower_name in {"file_size", "size_bytes", "size"}:
+            return len(file_bytes)
+
+        if lower_name in {"checksum_sha256", "sha256", "sha256_hash", "file_hash", "file_checksum", "checksum", "hash"}:
+            return checksum
+
+        if lower_name in {"status"}:
+            return "Yüklendi"
+
+        if lower_name in {"description", "notes", "version_note"}:
+            return "Taranmış belge dosyası yüklendi."
+
+        if lower_name in {"storage_backend", "storage_type"}:
+            return "local"
+
+        if lower_name in {"created_at", "uploaded_at", "updated_at"}:
+            return now
+
+        if "bool" in lower_type:
+            return True if lower_name in {"is_current", "is_active"} else False
+
+        if "int" in lower_type:
+            if lower_name.endswith("_id"):
+                return 0
+            return 0
+
+        if "date" in lower_type and "time" not in lower_type:
+            return now.date()
+
+        if "time" in lower_type:
+            return now
+
+        if any(token in lower_type for token in ("char", "text", "varchar", "string")):
+            return original_filename
+
+        return None
+
+    payload = {}
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"}:
+            continue
+
+        value = default_for(column)
+        if value is not None:
+            payload[name] = value
+
+    for column in table.columns:
+        name = column.name
+
+        if name in {"id", "deleted_at"} or name in payload:
+            continue
+
+        nullable = getattr(column, "nullable", True)
+        has_default = column.default is not None or column.server_default is not None
+
+        if not nullable and not has_default:
+            value = default_for(column)
+            if value is not None:
+                payload[name] = value
+
+    return payload
+
+
+@digital_archive_bp.get("/documents/<int:document_id>")
+@login_required
+def document_detail(document_id: int):
+    """Belge kartı detay ekranı."""
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        table = _da23_document_table()
+        document_columns = [column.name for column in table.columns]
+        visible_document_columns = [
+            column for column in [
+                "id",
+                "document_no",
+                "title",
+                "document_type",
+                "document_date",
+                "subject",
+                "category_id",
+                "physical_location_id",
+                "retention_policy_id",
+                "confidentiality_level",
+                "status",
+                "created_at",
+            ]
+            if column in document_columns
+        ]
+
+        file_rows, file_columns, file_labels = _da24_document_files(document_id)
+
+        return render_template(
+            "digital_archive/document_detail.html",
+            document=dict(document),
+            document_columns=visible_document_columns,
+            document_labels={column: _da23_column_label(column) for column in visible_document_columns},
+            file_rows=file_rows,
+            file_columns=file_columns,
+            file_labels=file_labels,
+        )
+    except Exception:
+        current_app.logger.exception("Belge kartı detayı açılamadı.")
+        flash("Belge kartı detayı açılırken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect("/digital-archive/documents")
+
+
+@digital_archive_bp.route("/documents/<int:document_id>/files", methods=["POST"])
+@login_required
+def document_file_upload_post(document_id: int):
+    """Taranmış belge dosyasını belge kartına bağlar."""
+    from pathlib import Path
+
+    from flask import request
+
+    allowed_extensions = {"pdf", "jpg", "jpeg", "png", "tif", "tiff"}
+
+    try:
+        document = _da24_document_row(document_id)
+        if not document:
+            flash("Belge kartı bulunamadı.", "warning")
+            return redirect("/digital-archive/documents")
+
+        upload_file = request.files.get("file")
+        if not upload_file or not upload_file.filename:
+            flash("Yüklenecek dosya seçilmelidir.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        extension = upload_file.filename.rsplit(".", 1)[-1].lower() if "." in upload_file.filename else ""
+        if extension not in allowed_extensions:
+            flash("Yalnızca PDF, JPG, PNG veya TIF dosyası yüklenebilir.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        file_bytes = upload_file.read()
+        if not file_bytes:
+            flash("Boş dosya yüklenemez.", "warning")
+            return redirect(f"/digital-archive/documents/{document_id}")
+
+        absolute_path, relative_path = _da24_safe_upload_path(document_id, upload_file.filename)
+        stored_filename = Path(absolute_path).name
+
+        Path(absolute_path).write_bytes(file_bytes)
+
+        table = _da24_file_table()
+        payload = _da24_file_payload(table, document_id, upload_file, file_bytes, stored_filename, relative_path)
+
+        db.session.execute(table.insert().values(**payload))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Belge dosyası yüklenemedi.")
+        flash("Dosya yüklenirken beklenmeyen bir sorun oluştu.", "danger")
+        return redirect(f"/digital-archive/documents/{document_id}")
+
+    flash("Taranmış belge dosyası belge kartına bağlandı.", "success")
+    return redirect(f"/digital-archive/documents/{document_id}")
+
+
 # DA-6C: Dijital Arşiv güvenlik durumu ekranı
 @digital_archive_bp.get("/security")
 @login_required
