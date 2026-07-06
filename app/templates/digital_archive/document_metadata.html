@@ -24,7 +24,7 @@
 <div class="da-page">
     <h1 class="da-title">Belge Özel Alanları</h1>
     <p class="da-subtitle">
-        Belge kartına kurum ihtiyacına göre ek bilgiler bağlanır. Bu bilgiler arama ekranında da bulunabilir hale gelir.
+        Belgena kurum ihtiyacına göre ek bilgiler bağlanır. Bu bilgiler arama ekranında da bulunabilir hale gelir.
     </p>
 
     <form class="da-card" method="post" action="/digital-archive/documents/{{ document_id }}/metadata">
@@ -56,7 +56,7 @@
                 <button class="da-button da-button-primary" type="submit">Özel Alanları Kaydet</button>
             {% endif %}
             <a class="da-button" href="/digital-archive/metadata-fields">Özel Alan Tanımları</a>
-            <a class="da-button" href="/digital-archive/documents/{{ document_id }}">Belgena Dön</a>
+            <a class="da-button" href="/digital-archive/documents/{{ document_id }}">Belgeye Dön</a>
         </div>
     </form>
 
@@ -83,7 +83,7 @@
                 </tbody>
             </table>
         {% else %}
-            <div class="da-empty">Bu belge kartı için kayıtlı özel alan değeri bulunmuyor.</div>
+            <div class="da-empty">Bu belge için kayıtlı özel alan değeri bulunmuyor.</div>
         {% endif %}
     </div>
 </div>
