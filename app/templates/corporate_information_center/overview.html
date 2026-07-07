@@ -78,7 +78,7 @@
  <div><span>Mail servisi</span><b>{{ 'Yüklü' if phase5.mail_health.service_loaded else 'Yüklenemedi' }}</b></div>
  <div><span>Gönderim durumu</span><b>{{ 'Bastırılmış' if phase5.mail_health.suppressed else 'Açık' }}</b></div>
  </div>
- {% if phase5.mail_health.problems %}<div class="cic-warning-box"><strong>Kontrol gerekli:</strong><br>{{ phase5.mail_health.problems|join('<br>')|safe }}</div>{% else %}<div class="cic-help-v4"><strong>Hazır:</strong> Mail altyapısı gerçek gönderim için uygun görünüyor.</div>{% endif %}
+ {% if phase5.mail_health.problems %}<div class="cic-warning-box"><strong>Kontrol gerekli:</strong><br>{% for problem in phase5.mail_health.problems %}{{ problem }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>{% else %}<div class="cic-help-v4"><strong>Hazır:</strong> Mail altyapısı gerçek gönderim için uygun görünüyor.</div>{% endif %}
  </aside>
 
  <section class="cic-card-v4 span-12">

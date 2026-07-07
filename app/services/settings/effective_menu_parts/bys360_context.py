@@ -9,12 +9,12 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from typing import Any
-
-RollbackHook = Callable[[], None]
 from app.config import is_removed_menu_key
 from app.menu_registry import flatten_menu_definitions
 from app.models import UserMenuPermission, RoleMenuDefault
 from app.services.settings_service import build_effective_user_menu_context, get_role_default_menu_keys
+
+RollbackHook = Callable[[], None]
 
 _BYS360_PERFORMANCE_MAIN_KEYS = {'performance_module', 'performance_management', 'performans_yonetimi'}
 
@@ -517,4 +517,3 @@ __all__ = [
     "_safe_query_all",
     "normalize_role_name",
 ]
-

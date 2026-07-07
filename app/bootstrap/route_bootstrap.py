@@ -53,12 +53,6 @@ CORE_BLUEPRINT_SEQUENCE: tuple[BlueprintRegistration, ...] = (
         attribute_name="ai_agent_bp",
         required=False,
     ),  # BYS360_AG1_AI_AGENT_ROUTE_BOOTSTRAP
-    BlueprintRegistration(
-        key="digital_archive",
-        module_path="app.digital_archive.routes",
-        attribute_name="digital_archive_bp",
-        required=False,
-    ),  # BYS360_DA1B_DIGITAL_ARCHIVE_ROUTE_BOOTSTRAP
 
 )
 

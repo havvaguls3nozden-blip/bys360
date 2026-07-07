@@ -79,7 +79,7 @@
   </header>
 
   {% if post.title %}<h3 class="portal-post-title">{{ post.title }}</h3>{% endif %}
-  <div class="portal-post-body">{{ post.body|replace('\n','<br>')|safe }}</div>
+  <div class="portal-post-body" style="white-space: pre-wrap;">{{ post.body }}</div>
 
   {% if is_instagram %}
     {% set ig_visual_url = ig.thumbnail_url or ig.media_url %}
@@ -117,7 +117,7 @@
       {# BYS360_PORTAL_EXPERIENCE_V3B_SOCIAL_EMBED_RENDER #}
       {% if attachment.mime_type == 'text/x-portal-social-embed' %}
         <div class="portal-social-embed-v3b" aria-label="Sosyal medya paylaşımı">
-          {{ attachment.stored_path|safe }}
+          {{ attachment.stored_path|safe_social_embed }}
         </div>
       {% endif %}
         {% if attachment.mime_type == 'text/x-portal-video' %}

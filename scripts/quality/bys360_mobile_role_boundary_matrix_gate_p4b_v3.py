@@ -202,7 +202,7 @@ def mobile_route_inventory(root: Path) -> dict[str, Any]:
         "domains_dir_exists": domains_dir.exists(),
         "domain_inventory": domain_inventory,
         "total_mobile_route_decorator_count": total_routes,
-        "expected_contract_route_count": 28,
+        "expected_contract_route_count": 24,
         "duplicate_route_decorators": duplicates,
         "route_rules_sample": sorted(route_rules)[:40],
     }

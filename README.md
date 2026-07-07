@@ -1,27 +1,27 @@
-# BYS360 A5 P1 Archive/Marker SAFE V1
+# BYS360 10/10 Red Gate V1 Overlay
 
-Güvenli P1 test kapsam temizliği.
+Bu overlay ilk kırmızı güvenlik ve paket hijyeni kapısını kapatmak için hazırlandı.
 
-<!-- BYS360_HANDOVER_DOCS_START -->
-## Devir ve Operasyon Dokümanları
+## Uygulama
 
-BYS360 projesinin kurulum, canlıya alma, bakım, güvenlik, modül envanteri ve süreklilik dokümanları `docs/handover/` klasöründe tutulur.
+```powershell
+cd C:\bys360\project
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\BYS360_10_10_RED_GATE_V1_OVERLAY.zip" -DestinationPath "C:\bys360\project" -Force
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_10_10_red_gate_v1.ps1 -ProjectRoot "C:\bys360\project"
+```
 
-Başlangıç dokümanı:
+CI workflow genişletmesini şimdilik istemezsen:
 
-- `docs/handover/README.md`
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\repair_bys360_10_10_red_gate_v1.ps1 -ProjectRoot "C:\bys360\project" -NoCi
+```
 
-Temel devir paketi:
+## Kapsam
 
-- `docs/handover/BYS360_DEVIR_PAKETI_V1.md`
-- `docs/handover/BYS360_KURULUM_REHBERI.md`
-- `docs/handover/BYS360_CANLIYA_ALMA_REHBERI.md`
-- `docs/handover/BYS360_BAKIM_RUNBOOK.md`
-- `docs/handover/BYS360_GUVENLIK_KVKK_NOTLARI.md`
-- `docs/handover/BYS360_MODUL_ENVANTERI.md`
-- `docs/handover/BYS360_RISK_VE_SUREKLILIK_PLANI.md`
-
-Temiz kaynak etiketi:
-
-- `local-clean-ai-traces-complete-20260624`
-<!-- BYS360_HANDOVER_DOCS_END -->
+- `post.body|safe` kaldırılır.
+- Sosyal embed için `safe_social_embed` filtresi eklenir.
+- `attrs|safe` yerine kontrollü `safe_nav_attrs` filtresi kullanılır.
+- Kurumsal Bilgilendirme Merkezi `join('<br>')|safe` kaldırılır.
+- SECRET_KEY bloğu sadeleşir.
+- Paket şişiren klasörler `.gitignore` içine güçlendirilmiş olarak eklenir.
+- XSS regresyon testi eklenir.

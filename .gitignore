@@ -83,3 +83,13 @@ _cleanup_quarantine/
 *.jks
 *.keystore
 # BYS360_RELEASE_DISCIPLINE_V1_END
+# BYS360_10_10_RED_GATE_V1_PACKAGE_HYGIENE_BEGIN
+.dart_tool/
+mobile_flutter/**/.dart_tool/
+mobile_flutter/**/build/
+build/
+project/
+**/project/.venv/
+**/project/.dart_tool/
+**/__pycache__/
+# BYS360_10_10_RED_GATE_V1_PACKAGE_HYGIENE_END

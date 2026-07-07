@@ -13,27 +13,9 @@ branch_labels = None
 depends_on = None
 
 
-def _bys360_sqlite_ddl_sql(stmt):
-    """SQLite lokal geliştirme için PostgreSQL DDL ifadelerini güvenli dönüştürür.
-
-    PostgreSQL ortamında migration davranışı değişmez.
-    """
-    sql = stmt
-    sql = sql.replace("id SERIAL PRIMARY KEY", "id INTEGER PRIMARY KEY AUTOINCREMENT")
-    sql = sql.replace("BOOLEAN NOT NULL DEFAULT FALSE", "INTEGER NOT NULL DEFAULT 0")
-    sql = sql.replace("BOOLEAN NOT NULL DEFAULT TRUE", "INTEGER NOT NULL DEFAULT 1")
-    sql = sql.replace("BOOLEAN DEFAULT FALSE", "INTEGER DEFAULT 0")
-    sql = sql.replace("BOOLEAN DEFAULT TRUE", "INTEGER DEFAULT 1")
-    sql = sql.replace("DEFAULT NOW()", "DEFAULT CURRENT_TIMESTAMP")
-    return sql
-
-
 def _exec_many(statements):
     for stmt in statements:
-        if op.get_bind().dialect.name == "sqlite":
-            op.execute(_bys360_sqlite_ddl_sql(stmt))
-        else:
-            op.execute(stmt)
+        op.execute(stmt)
 
 
 def upgrade():

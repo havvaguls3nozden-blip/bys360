@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-
+import logging
 from collections.abc import Callable
 from typing import Any
 
 RollbackHook = Callable[[], None]
-import logging
 
 from app.services.settings.effective_menu_parts.bys360_context import (
     _bys360_admin_period_reminder_is_admin_v1,
@@ -77,4 +76,3 @@ def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = 
 __all__ = [
     "_user_has_any_assigned_survey",
 ]
-

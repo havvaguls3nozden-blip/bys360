@@ -1,4 +1,4 @@
-
+﻿
 """BYS360 ana blueprint omurgası.
 
 Faz 8 ile bu dosya artık gerçek bir toplayıcı/omurga dosyası oldu: ana

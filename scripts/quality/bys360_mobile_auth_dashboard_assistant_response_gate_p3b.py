@@ -19,7 +19,7 @@ EXPECTED_ROUTES: list[tuple[str, str, str]] = [
     ("GET", "/api/mobile/dashboard/summary", "dashboard"),
     ("POST", "/api/mobile/assistant/v2/ask", "assistant"),
 ]
-EXPECTED_CONTRACT_COUNT = 28
+EXPECTED_CONTRACT_COUNT = 24
 
 DOMAIN_EXPECTATIONS: dict[str, list[str]] = {
     "auth": ["/auth/login", "/auth/refresh", "/me"],

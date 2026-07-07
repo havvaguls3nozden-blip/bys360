@@ -15,12 +15,6 @@ from urllib.request import urlopen
 from flask import current_app
 from sqlalchemy import or_
 from app.extensions import db
-
-# BYS360_SCORE10_F821_CREATE_MAIL_LOG_IMPORT
-try:
-    from app.services.mail_core import create_mail_log
-except Exception:
-    create_mail_log = None
 from app.models import SystemSetting, User
 from app.services.cic.config_context import (
     _clean_ids,
@@ -38,6 +32,12 @@ from app.services.cic.config_context import (
     get_setting,
     set_setting,
 )
+
+try:
+    from app.services.mail_core import create_mail_log
+except Exception:
+    create_mail_log = None  # type: ignore[assignment]
+
 from app.services.cic.misc_context import (
     _active_staff_users,
     _cic_auto_bool,
@@ -687,4 +687,3 @@ __all__ = [
     "_send_task_base",
     "_user_name",
 ]
-

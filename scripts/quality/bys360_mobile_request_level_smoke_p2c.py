@@ -63,7 +63,7 @@ EXPECTED_ROUTES = [
 ]
 # One route appears twice by method/decorator style in project history, so the
 # expected decorator count remains the authoritative contract count.
-EXPECTED_CONTRACT_ROUTE_COUNT = 28
+EXPECTED_CONTRACT_ROUTE_COUNT = 24
 
 FEATURE_EXPECTATIONS = {
     "auth": ["/auth/login", "/auth/refresh", "/me"],

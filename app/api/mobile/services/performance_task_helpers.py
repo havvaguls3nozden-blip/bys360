@@ -12,21 +12,7 @@ from app.api.mobile.services.performance_base_helpers import _date_text, _label,
 
 logger = logging.getLogger(__name__)
 
-
-# Mobil performans görevlerinde tamamlandı sayılan statüler.
-# Bu sabit daha önce route dosyasında kalmıştı; helper modülü tek başına
-# yüklendiğinde F821/NameError riski doğuruyordu.
-_DONE = {
-    "tamamlandi",
-    "tamamlandı",
-    "completed",
-    "done",
-    "closed",
-    "kapandi",
-    "kapandı",
-    "yayınlandı",
-    "published",
-}
+_DONE = {"tamamlandi", "tamamlandı", "completed", "done", "closed", "kapandi", "kapandı", "yayınlandı", "published"}
 
 
 def _task_helpers_rollback_quietly() -> None:

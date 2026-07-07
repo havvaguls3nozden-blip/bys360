@@ -9,12 +9,12 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from typing import Any
-
-RollbackHook = Callable[[], None]
 from app.config import is_removed_menu_key
 from app.menu_registry import flatten_menu_definitions
 from app.models import UserMenuPermission, RoleMenuDefault
 from app.services.settings_service import build_effective_user_menu_context, get_role_default_menu_keys
+
+RollbackHook = Callable[[], None]
 from app.services.settings.effective_menu_parts.bys360_context import (
     _bys360_admin_period_reminder_is_admin_v1,
     _bys360_admin_period_reminder_norm_v1,
@@ -415,4 +415,3 @@ __all__ = [
     "_role_matrix_runtime_closed",
     "_settings_explicitly_controls_key",
 ]
-

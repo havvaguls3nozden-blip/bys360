@@ -129,7 +129,7 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
     from app.models import User
 
     app = create_app()
-    password=os.getenv("BYS360_TEST_PASSWORD", "test-password-not-secret")
+    password = "BYS360-Phase2C-Test-123!"
 
     result: dict[str, Any] = {
         "package": PACKAGE,

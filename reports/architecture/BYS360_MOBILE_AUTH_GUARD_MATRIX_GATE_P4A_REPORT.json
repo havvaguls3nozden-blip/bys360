@@ -1,9 +1,0 @@
-{
-  "ok": true,
-  "direct_contract_ok": true,
-  "runtime_route_map_ok": true,
-  "auth_guard_matrix_ok": true,
-  "compile_ok": true,
-  "app_factory_ok": true,
-  "generated_at": "2026-07-04T08:09:28"
-}

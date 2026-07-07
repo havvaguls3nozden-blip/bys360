@@ -464,7 +464,7 @@ html, body { min-height: 100% !important; }
 {% set ai_feedback_url = safe_url_for('admin_ai.ai_feedback', fallback=safe_url_for('main.admin_ai_feedback', fallback='#')) %}
 
 {% macro nav_item(url, icon, label, active=false, badge=none, attrs='') -%}
-<a href="{{ url }}" class="nav-link-bys {% if active %}active{% endif %}" {% if active %}aria-current="page"{% endif %} {{ attrs|safe }}>
+<a href="{{ url }}" class="nav-link-bys {% if active %}active{% endif %}" {% if active %}aria-current="page"{% endif %} {{ attrs|safe_nav_attrs }}>
     <i class="fa-solid {{ icon }}"></i>
     <span>{{ label }}</span>
     {% if badge is not none %}<span class="mini-badge" {% if badge|int <= 0 %}style="display:none;"{% endif %}>{{ badge }}</span>{% endif %}
@@ -746,7 +746,7 @@ html, body { min-height: 100% !important; }
                 <a href="{{ safe_url_for('main.home') }}" class="topbar-brand" aria-label="BYS360 Ana Sayfa"><img src="{{ side_logo_src }}" alt="BYS360 Logo" class="topbar-brand-logo" onerror="this.onerror=null;this.src='{{ fallback_logo_src }}';"></a>
                 <div class="page-meta">
                     <div class="page-kicker">{% block page_kicker %}BYS360{% endblock %}</div>
-                    <h1 class="page-title">{% block page_title %}Kontrol Paneli{% endblock %}</h1>
+                    <h1 class="page-title">{% block page_title %}{% if request.path.startswith('/file-center') or request.path.startswith('/guest/files') or request.path.startswith('/guest/upload') %}Dosya Merkezi{% else %}Kontrol Paneli{% endif %}{% endblock %}</h1>
                     <p class="page-subtitle">{% block page_subtitle %}Kurumsal yönetim ekranı{% endblock %}</p>
                 </div>
             </div>
@@ -1171,6 +1171,56 @@ function submitLogoutForm(event){
 <!-- BYS360_UX1_SIMPLE_SCREEN_GUIDE_JS -->
 <script src="{{ url_for('static', filename='js/bys360_ux1_simple_screen_guide.js') }}?v=ux1-top-banner-remove-v1" defer></script>
 <!-- /BYS360_UX1_SIMPLE_SCREEN_GUIDE_JS -->
+
+{# BYS360_FILE_CENTER_HEADER_TITLE_LIVE_FIX_V1_BEGIN #}
+<script>
+(function () {
+  function isFileCenterPath(path) {
+    return path.indexOf("/file-center") === 0 ||
+           path.indexOf("/guest/files") === 0 ||
+           path.indexOf("/guest/upload") === 0;
+  }
+
+  function fixFileCenterTitle() {
+    if (!isFileCenterPath(window.location.pathname)) {
+      return;
+    }
+
+    var selectors = [
+      "h1",
+      "h2",
+      ".page-title",
+      ".topbar-title",
+      ".header-title",
+      ".content-title",
+      ".content-header-title",
+      ".dashboard-title",
+      ".layout-title",
+      ".navbar-title",
+      ".app-page-title"
+    ];
+
+    document.querySelectorAll(selectors.join(",")).forEach(function (el) {
+      var text = (el.textContent || "").trim();
+      if (text === "Kontrol Paneli") {
+        el.textContent = "Dosya Merkezi";
+      }
+    });
+
+    if (document.title && document.title.indexOf("Kontrol Paneli") !== -1) {
+      document.title = document.title.replace("Kontrol Paneli", "Dosya Merkezi");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fixFileCenterTitle);
+  } else {
+    fixFileCenterTitle();
+  }
+})();
+</script>
+{# BYS360_FILE_CENTER_HEADER_TITLE_LIVE_FIX_V1_END #}
+
 </body>
 </html>
 

@@ -1,31 +1,5 @@
 from __future__ import annotations
 
-
-
-# BYS360_SCORE10_F821_PERIOD_CENTER_IMPORT_V3
-try:
-    from app.services.settings.effective_menu_parts.bys360_constants import (
-        _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221,
-        _BYS360_PERIOD_CENTER_MENU_KEY_V221,
-        _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
-    )
-except Exception:
-    _BYS360_PERIOD_CENTER_MENU_KEY_V221 = "performance_period_center"
-    _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221 = {
-        "admin",
-        "sistem_yoneticisi",
-        "baskan",
-        "baskan_yardimcisi",
-        "grup_baskani",
-    }
-    _BYS360_V223_PERIOD_CENTER_KEY_ROLES = {
-        _BYS360_PERIOD_CENTER_MENU_KEY_V221: set(_BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221)
-    }
-from app.services.settings.effective_menu_parts.bys360_constants import (
-    _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221,
-    _BYS360_PERIOD_CENTER_MENU_KEY_V221,
-    _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
-)
 import logging
 """Ayarlar servis menü görünürlük çözümleyicisi.
 
@@ -45,6 +19,13 @@ from app.services.settings_service import build_effective_user_menu_context, get
 RollbackHook = Callable[[], None]
 
 # Phase4J V47C effective_menu core policy constant facade import
+
+from app.services.settings.effective_menu_parts.bys360_constants import (
+    _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221,
+    _BYS360_PERIOD_CENTER_MENU_KEY_V221,
+    _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
+)
+
 from app.services.settings.effective_menu_parts.core_policy_constants import (
     CORE_MENU_VISIBILITY_POLICY,
 )
@@ -330,5 +311,3 @@ build_menu_visibility_map = apply_admin_period_reminder_public_build_wrapper(
     _bys360_admin_period_reminder_is_admin_v1,
 )
 # BYS360_ADMIN_PERIOD_REMINDER_ACCESS_FIX_V1_END
-
-

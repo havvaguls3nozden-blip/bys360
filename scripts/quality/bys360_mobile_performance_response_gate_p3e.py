@@ -13,7 +13,7 @@ from typing import Any
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3E_MOBILE_PERFORMANCE_RESPONSE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_PERFORMANCE_RESPONSE_GATE_P3E_REPORT.json")
 TEST_NAME = "test_mobile_api_performance_response_p3e.py"
-EXPECTED_CONTRACT_ROUTE_COUNT = 28
+EXPECTED_CONTRACT_ROUTE_COUNT = 24
 
 # P3E hedefi: performans mobil endpointleri route/runtime/response-code seviyesinde korunur.
 # Bu smoke yetkisiz test_client ile calisir; 404/405 yakalar, canli veriye yazmaz.

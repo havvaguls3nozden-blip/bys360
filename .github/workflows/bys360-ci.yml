@@ -35,7 +35,7 @@ jobs:
         run: python scripts/release/build_bys360_safe_release.py --root . --output /tmp/bys360-ci-safe-release.zip --audit-only
 
       - name: Ruff F821 hard gate
-        run: python -m ruff check app --select F821
+        run: python -m ruff check app config.py wsgi.py run.py scripts tests
 
       - name: Compile Python source
         run: python -m compileall -q app config.py wsgi.py run.py scripts
@@ -49,10 +49,10 @@ jobs:
         run: python -m pytest tests/quality -m "ci_safe" --tb=short -q
 
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical --tb=short -q
 
       - name: Type check service layer
-        run: python -m mypy app/services --ignore-missing-imports --no-error-summary
+        run: python -m mypy app tests scripts --ignore-missing-imports --no-error-summary
 
       - name: BYS360 operations audit
         run: |

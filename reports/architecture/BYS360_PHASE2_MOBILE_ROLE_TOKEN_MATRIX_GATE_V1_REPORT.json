@@ -1,9 +1,0 @@
-{
-  "ok": true,
-  "role_token_matrix_ok": true,
-  "login_ok": true,
-  "role_identity_ok": true,
-  "matrix_route_ok": true,
-  "failures": [],
-  "generated_at": "2026-07-04T08:09:28"
-}

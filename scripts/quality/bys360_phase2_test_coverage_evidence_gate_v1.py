@@ -244,12 +244,7 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
     required_files = _check_required_files(root)
     reports = _check_reports(root)
 
-    # CLI/rapor modunda git temizliği kalite kanıtının parçasıdır.
-    # Test içinde write_report=False kullanıldığında ise geliştirici çalışma alanındaki
-    # henüz commitlenmemiş overlay değişiklikleri yüzünden kanıt sözleşmesi yanlış negatif vermesin.
-    git_clean_ok = True if not write_report else (
-        git_status["ok"] and _git_status_clean_or_own_files_only(git_status.get("stdout", ""))
-    )
+    git_clean_ok = git_status["ok"] and _git_status_clean_or_own_files_only(git_status.get("stdout", ""))
     required_files_ok = all(row["ok"] for row in required_files)
     reports_ok = all(row["ok"] for row in reports)
 

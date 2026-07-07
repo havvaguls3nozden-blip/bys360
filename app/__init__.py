@@ -240,6 +240,11 @@ def _prewarm_core_templates(app):
 def create_app() -> Flask:
     app = create_bys360_application(__name__)
 
+    from app.security.html_sanitizer import safe_nav_attrs, safe_social_embed
+
+    app.jinja_env.filters["safe_social_embed"] = safe_social_embed
+    app.jinja_env.filters["safe_nav_attrs"] = safe_nav_attrs
+
     for module_path, function_name in OPTIONAL_STARTUP_REGISTRATIONS:
         _register_optional_import_call(app, module_path, function_name)
 
