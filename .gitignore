@@ -93,3 +93,19 @@ project/
 **/project/.dart_tool/
 **/__pycache__/
 # BYS360_10_10_RED_GATE_V1_PACKAGE_HYGIENE_END
+
+# BYS360 local/runtime noise - handover cleanup 2026-07-08
+.env
+.env.*
+!.env.example
+!.env.production.example
+!.env.docker.example
+env
+logs/
+backups/
+instance/*.sqlite
+instance/*.sqlite3
+*.bak
+project/
+reports/local/
+cleanup_manifest/
