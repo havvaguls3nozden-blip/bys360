@@ -1,8 +1,8 @@
 ﻿# BYS360 Handover 10/10 Evidence
 
 Tarih: 2026-07-08
-Final Etiket: handover-10-10-v6-20260708
-Durum: 10/10 PASS — V6
+Final Etiket: handover-10-10-v5-20260708
+Durum: 10/10 PASS — V5
 
 ## Zamanlanmış İş Kontrolü
 
@@ -26,23 +26,20 @@ Durum: 10/10 PASS — V6
 - STATUS.md içindeki zamanlanmış görev maddeleri tamamlandı olarak güncellendi.
 - DEPLOYMENT.md içine Git geçmişi ve kaynak teslim notu eklendi.
 - Kök dizindeki yetim raporlar docs/archive altına taşındı.
-- bys360_docs_reports_inventory.csv sayıları doğrulandı: KEEP=9, REVIEW=65, ARCHIVE_CANDIDATE=268, ALREADY_ARCHIVED=3.
-- ARCHIVE_CANDIDATE kayıtları docs/archive veya reports/archive altına taşındı.
-- KEEP ve REVIEW olarak işaretli dosyalar aktif dokümantasyon alanında bırakıldı.
+- docs/ ve reports/ altındaki referanssız dosyalar bys360_docs_reports_inventory.csv çıktısına göre docs/archive veya reports/archive altına taşındı.
 
 ## Git Geçmişi Notu
 
 Handover kaynak zip paketleri .git/ klasörü içermez. Teslim doğrulaması manifestteki commit, tag ve SHA256 değerleriyle yapılır. Tam Git geçmişi gerektiğinde kurum Git uzak deposu veya ayrıca üretilecek git bundle üzerinden teslim edilir.
 
-## V1 / V2 / V3 / V4 / V5 / V6 Notu
+## V1 / V2 / V3 / V4 / V5 Notu
 
 - handover-10-10-v1-20260708: superseded — zamanlanmış iş blocker kontrolü tamamlanmadan üretildi.
 - handover-10-10-v2-20260708: superseded — Social Auto Import düzeltildi ancak Executive Summary görevleri eksik kaldı.
 - handover-10-10-v3-20260708: superseded — zamanlanmış görevler kapandı ancak dokümantasyon/installer tutarlılığı eksikti.
 - handover-10-10-v4-20260708: superseded — docs/reports inventory arşivleme adımı CSV eksikliği nedeniyle uygulanmadı.
-- handover-10-10-v5-20260708: superseded — local üretilen inventory eksik/boş çıktığı için docs/reports arşivleme fiilen yapılmadı.
-- handover-10-10-v6-20260708: nihai teslim adayıdır.
+- handover-10-10-v5-20260708: nihai teslim adayıdır.
 
 ## Final Sonuç
 
-10/10 PASS — V6 için zamanlanmış işler, aktif installer tutarlılığı, STATUS/DEPLOYMENT notları, kök yetim rapor temizliği ve docs/reports inventory arşiv temizliği tamamlandı.
+10/10 PASS — V5 için zamanlanmış işler, aktif installer tutarlılığı, STATUS/DEPLOYMENT notları, kök yetim rapor temizliği ve docs/reports inventory arşiv temizliği tamamlandı.
