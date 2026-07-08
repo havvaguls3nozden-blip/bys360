@@ -1,0 +1,3 @@
+﻿"TaskName","State","Execute","Arguments","RunnerPath","RunnerExists","Triggers"
+"BYS360 Executive Summary 0001","Ready","powershell.exe","-NoProfile -ExecutionPolicy Bypass -File ""C:\bys360\project\scripts\windows\run_executive_summary_0001.ps1""","C:\bys360\project\scripts\windows\run_executive_summary_0001.ps1","False","Enabled=True; StartBoundary=2026-06-03T00:01:00+03:00; DaysInterval=1"
+"BYS360 Executive Summary 0830","Ready","powershell.exe","-NoProfile -ExecutionPolicy Bypass -File ""C:\bys360\project\scripts\windows\run_executive_summary_0830.ps1""","C:\bys360\project\scripts\windows\run_executive_summary_0830.ps1","False","Enabled=True; StartBoundary=2026-06-03T08:30:00+03:00; DaysInterval=1"
