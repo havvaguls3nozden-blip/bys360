@@ -1,4 +1,4 @@
-﻿# STATUS.md GÃ¼ncelleme TaslaÄŸÄ±
+# BYS360 STATUS.md
 
 ## 2026-07-08 â€” Devredilebilirlik TemizliÄŸi ve Kaynak Paket StandardÄ±
 
