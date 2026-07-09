@@ -30,3 +30,26 @@ BYS360 kaynak aÄŸacÄ±nda devredilebilirliÄŸi dÃ¼ÅŸÃ¼ren tek kullanÄ
 4. README ve STATUS deÄŸiÅŸikliklerini normal commit olarak iÅŸle.
 5. CI ve temel smoke testleri Ã§alÄ±ÅŸtÄ±r.
 
+## 2026-07-08 - Faz 2A SQL Identifier Trace
+
+Kapsam:
+- app/routes_president_scorecard_v2.py
+- app/services/menu_visibility.py
+- app/services/assistant_role_matrix_v10.py
+- app/services/executive_mail_center.py
+- app/schema_guard_engine.py
+
+Sonuc:
+- Kritik dosyalarda dis kullanici girdisine dogrudan bagli SQL identifier kullanimi tespit edilmedi.
+- routes_president_scorecard_v2.py icinde tablo ve siralama alanlari sabit aday listeleri ve kolon kontrolu uzerinden geliyor.
+- menu_visibility.py icinde tablo secimi candidate table listeleri uzerinden yapiliyor; kullanici/rol degerleri params ile baglaniyor.
+- assistant_role_matrix_v10.py icinde request.form yalnizca checkbox gorunurluk degeri icin kullaniliyor; SQL kolonlari role_menu_defaults kolon kontrolu ve sabit aday kolon listeleriyle belirleniyor.
+- executive_mail_center.py icinde tablo secimi sabit mail log aday listesi uzerinden yapiliyor.
+- schema_guard_engine.py icinde tablo bilgisi ic schema repair/patch tanimlarindan geliyor.
+
+Karar:
+- Faz 2A kapsamindaki bes kritik dosyada acil kod degisikligi gerektiren SQL injection bulgusu yok.
+- Proje genelinde dinamik SQL kullanimi yaygin oldugu icin genel SQL envanteri Faz 2A disinda ayri teknik borc basligi olarak izlenecek.
+
+Test:
+- Faz 2A read-only trace sonrasi git calisma agaci temizdi.
