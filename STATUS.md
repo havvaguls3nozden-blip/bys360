@@ -611,3 +611,40 @@ Sonraki onerilen is:
 - Faz 4E icin role_menu_defaults ve user_menu_permissions modellerinin nerede tanimlandigi bulunmalidir.
 - Test app/db bootstrap akisi incelenmelidir.
 - Mumkunse once test bootstrap tarafinda minimal tablo olusturma yaklasimi tercih edilmelidir.
+
+## 2026-07-09 - Faz 4E Model ve Test Bootstrap Envanteri
+
+Kapsam:
+- Faz 4D sonrasi role_menu_defaults ve user_menu_permissions tablo/model kaynaklarinin bulunmasi
+- Test bootstrap akisi ve db.create_all kullanim noktalarinin incelenmesi
+- Kod degisikligi yapmadan duzeltme yonunun netlestirilmesi
+
+Bulgular:
+- Aktif branch: phase4-test-coverage-baseline-v1.
+- app/models/settings_models.py icinde RoleMenuDefault modeli vardir.
+- RoleMenuDefault tablosu: role_menu_defaults.
+- app/models/core_models.py icinde UserMenuPermission modeli vardir.
+- UserMenuPermission tablosu: user_menu_permissions.
+- app.models import sonrasi db.metadata icinde 120 tablo goruldu.
+- metadata_has_role_menu_defaults: True.
+- metadata_has_user_menu_permissions: True.
+- Metadata icindeki ilgili tablolar: role_menu_defaults, unit_menu_profiles, user_menu_permissions.
+- tests/conftest.py icinde session scope app fixture vardir.
+- tests/conftest.py icinde test sqlite DB yolu hazirlanmakta ve db.create_all() cagrilmaktadir.
+- Buna ragmen legacy architecture run_checks akisi bu fixture bootstrap yolunu kullanmadigi icin 3 testte tablolar runtime SQLite DB icinde olusmadan sozlesme kontrolu yapiliyor gibi gorunmektedir.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+- Git durumu temiz.
+- Uygulama kodu degistirilmedi.
+
+Karar:
+- Faz 4E bulgu uretimli PASS.
+- Kok neden model tanimi eksikligi degildir.
+- Sorun test calisma akisi / SQLite schema bootstrap eksikligi yonundedir.
+- Runtime uygulama koduna ilk etapta dokunmak gerekmemektedir.
+- En guvenli sonraki adim, legacy architecture run_checks tarafinda veya ilgili test yardimci akisi icinde minimal test DB create_all/bootstrap hazirligi saglamaktir.
+
+Sonraki onerilen is:
+- Faz 4F icin 3 fail testi calistiran run_checks kaynaklari bulunmalidir.
+- Bu kaynaklarda create_app / test client / SQLite DB hazirligi nerede yapiliyor incelenmelidir.
+- Sonra sadece test/architecture yardimci katmaninda minimal bootstrap duzeltmesi uygulanmalidir.
