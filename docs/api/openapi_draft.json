@@ -16187,6 +16187,1087 @@
         },
         "security": []
       }
+    },
+    "/api/mobile/notifications": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil bildirim listesi",
+        "description": "Mobil kullanici bildirimlerini listeler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/notifications/{notification_id}/read": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil bildirim okundu",
+        "description": "Belirli bir bildirimi okundu olarak isaretler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/notifications/read-all": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Tum mobil bildirimleri okundu",
+        "description": "Mobil kullanicinin tum bildirimlerini okundu olarak isaretler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/notifications/fcm-token": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil FCM token kaydi",
+        "description": "Mobil cihaz FCM token bilgisini kaydeder veya gunceller.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/surveys": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil anket listesi",
+        "description": "Mobil kullanici icin anket listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/surveys/{survey_id}/submit": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil anket cevap gonderimi",
+        "description": "Belirli bir anket icin mobil cevaplari gonderir.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "answers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "survey_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/personnel/all": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil tum personel listesi",
+        "description": "Yetkiye gore tum personel listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/personnel/create": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil personel olusturma",
+        "description": "Mobil API uzerinden personel olusturma istegini karsilar.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/personnel/add": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil personel ekleme",
+        "description": "Mobil API uzerinden personel ekleme istegini karsilar.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/support/tickets/{ticket_id}/reply": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil destek talebi yaniti",
+        "description": "Belirli bir destek talebine mobil yanit ekler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ticket_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/ai/insights": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil AI icgoruleri",
+        "description": "Mobil ekranlar icin AI icgoru ozetlerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/assistant/suggestions": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil asistan onerileri",
+        "description": "Mobil asistan icin oneri listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/assistant/v2/ask": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil asistan soru sorma",
+        "description": "Mobil asistan V2 icin kullanici sorusunu isler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "context": {
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/settings/summary": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil ayar ozeti",
+        "description": "Mobil uygulama icin temel ayar ozetini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/push/register-token": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil push token kaydi",
+        "description": "Mobil push bildirim token bilgisini kaydeder.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/push/unregister-token": {
+      "post": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil push token silme",
+        "description": "Mobil push bildirim token bilgisini siler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/push/status": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil push durumu",
+        "description": "Mobil push bildirim durumunu dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/kpi/goals": {
+      "get": {
+        "tags": [
+          "Mobile API"
+        ],
+        "summary": "Mobil KPI hedefleri",
+        "description": "Mobil kullanici icin KPI hedeflerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
