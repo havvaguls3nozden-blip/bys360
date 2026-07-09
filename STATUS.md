@@ -53,3 +53,31 @@ Karar:
 
 Test:
 - Faz 2A read-only trace sonrasi git calisma agaci temizdi.
+
+## 2026-07-09 - Faz 2B Login Rate Limit Trace
+
+Kapsam:
+- app/security/api_rate_limit.py
+- app/security/request_guard.py
+- app/auth/routes.py
+- app/main_handlers/auth_handlers.py
+- app/api/mobile/domains/auth.py
+- app/api/mobile/services/auth_service.py
+
+Sonuc:
+- Web /login route'u app/auth/routes.py uzerinden app.main_handlers.auth_handlers.login fonksiyonuna baglidir.
+- Web login akisi get_auth_throttle_state, record_auth_failure ve clear_auth_failures cagrilariyla IP/kimlik bazli throttle katmanina baglidir.
+- Basarisiz girislerde CAPTCHA ve oturum bazli basarisiz giris sayaci da devrededir.
+- Mobil /api/mobile/auth/login endpoint'inde ozel auth throttle gorunmedi.
+- Mobil login, uygulama seviyesinde flask-limiter ile kurulan genel API rate limit katmani aktif oldugunda varsayilan uygulama limiti altinda kalir.
+- app/security/api_rate_limit.py icinde varsayilan limit RATELIMIT_DEFAULT, yoksa 200 per minute olarak tanimlidir.
+- App factory onceki smoke ciktisinda BYS360 API rate limit aktif logu gorulmustur.
+
+Karar:
+- Faz 2B kapsaminda acil kod degisikligi gerektiren login rate limit acigi tespit edilmedi.
+- Web login PASS.
+- Mobil login icin ozel throttle bulunmasa da genel API rate limit katmani nedeniyle Faz 2B kabul edilebilir PASS olarak kapatildi.
+- Ileride guvenlik sertlestirme fazinda mobil auth login icin web login benzeri IP/kimlik bazli ozel throttle eklenmesi opsiyonel iyilestirme olarak izlenebilir.
+
+Test:
+- Faz 2B read-only trace sonrasi git calisma agaci temizdi.
