@@ -339,3 +339,39 @@ Sonraki onerilen is:
 - Faz 3D icin kucuk ve dusuk riskli ikinci mobil OpenAPI paketi eklenmelidir.
 - Onerilen Faz 3D kapsam: notifications, surveys, personnel ek endpointleri, support reply, ai/assistant/settings hafif okuma endpointleri.
 - Performance endpointleri ayri ve daha buyuk paket olarak sonraya birakilmalidir.
+
+## 2026-07-09 - Faz 3E Mobile OpenAPI Coverage Recheck
+
+Kapsam:
+- Faz 3D sonrasi mobil API OpenAPI kapsam tekrar olcumu
+- Exact /api/mobile path eslesmesi ile kontrol
+- Kalan eksik mobil endpoint gruplarinin belirlenmesi
+- Kod degisikligi yapmadan okuma modu dogrulama
+
+Bulgular:
+- OpenAPI path sayisi: 847.
+- Mobil route decorator sayisi: 72.
+- Exact OpenAPI kapsanan mobil route sayisi: 28.
+- Exact OpenAPI eksik mobil route sayisi: 44.
+- Faz 3D sonrasi kapsanan mobil route sayisi 10'dan 28'e yukseldi.
+- Eksik mobil route sayisi 62'den 44'e dustu.
+- Kalan eksikler artik 3 ana grupta toplandi: performance, communication, kpi.
+- components mevcut.
+- security mevcut.
+- bearerAuth security scheme mevcut.
+- Calisma agaci temiz kaldi.
+
+Kalan eksik grup ozeti:
+- performance: 30
+- communication: 11
+- kpi: 3
+
+Karar:
+- Faz 3E PASS.
+- Faz 3D eklemeleri OpenAPI kapsaminda dogrulandi.
+- Hafif mobil endpointlerin buyuk kismi OpenAPI kapsamına alindi.
+- Kalan OpenAPI borcu artik performance, communication ve kpi gruplarina indirgenmistir.
+
+Sonraki onerilen is:
+- Faz 3F icin communication ve kpi endpointleri birlikte kapatilabilir.
+- Performance endpointleri daha buyuk oldugu icin ayri Faz 3G paketi olarak ele alinmalidir.
