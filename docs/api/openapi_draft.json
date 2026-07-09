@@ -18168,6 +18168,2248 @@
           }
         ]
       }
+    },
+    "/api/mobile/performance/manager-view": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans yonetici gorunumu",
+        "description": "Mobil performans yonetici ekran verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/periods": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans donemleri",
+        "description": "Mobil performans donem listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/weights": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans agirliklari",
+        "description": "Performans degerlendirme agirlik bilgilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/tasks": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans gorevleri",
+        "description": "Mobil kullanicinin performans gorev listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/manager-tasks": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil yonetici performans gorevleri",
+        "description": "Yonetici icin performans gorev listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/categories": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans kategorileri",
+        "description": "Performans kategori listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/reminders": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans hatirlaticilari",
+        "description": "Performans sureci hatirlatici bilgilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/in-period-note-options": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil donem ici not secenekleri",
+        "description": "Donem ici notlar icin secenek listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/summary": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans ozeti",
+        "description": "Mobil performans ana ozet verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/periods/{period_id}": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans donem detayi",
+        "description": "Belirli bir performans doneminin detayini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "period_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/performance/approvals": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans onaylari",
+        "description": "Performans onay bekleyen isleri dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/scorecards": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans scorecard listesi",
+        "description": "Performans scorecard listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/rules-summary": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans kural ozeti",
+        "description": "Performans kurallarinin mobil ozetini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/criteria": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans kriterleri",
+        "description": "Performans kriter listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/third-manager": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil ucuncu amir bilgisi",
+        "description": "Ucuncu amir performans sureci bilgisini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/tasks/{assignment_id}": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans gorev detayi",
+        "description": "Belirli bir performans gorevinin detayini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/performance/tasks/{assignment_id}/score-form": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans puan formu",
+        "description": "Belirli bir gorev icin performans puanlama formunu dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans puan formu kaydi",
+        "description": "Belirli bir gorev icin performans puanlama formunu kaydeder.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scores": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "comment": {
+                    "type": "string"
+                  },
+                  "final_note": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/performance/tasks/{assignment_id}/score-action": {
+      "post": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans puan aksiyonu",
+        "description": "Belirli bir performans gorevi icin aksiyon istegini isler.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/mobile/performance/full-feature-summary": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans tam ozellik ozeti",
+        "description": "Mobil performans modulu tam ozellik ozetini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/president-approvals": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil baskan onaylari",
+        "description": "Baskan onayi gerektiren performans sureci verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/publish-preapproval": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil yayin on onaylari",
+        "description": "Performans yayinlama on onay verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/history-archive": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans gecmis arsivi",
+        "description": "Performans gecmis/arsiv verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/in-period-notes": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil donem ici notlar",
+        "description": "Donem ici performans notlarini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/development-suggestions": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil gelisim onerileri",
+        "description": "Performans gelisim onerilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/reports": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans raporlari",
+        "description": "Performans rapor listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/risk-analysis": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil performans risk analizi",
+        "description": "Performans risk analizi verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/in-period-notes/v2": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil donem ici notlar V2",
+        "description": "Donem ici performans notlari V2 listesini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil donem ici not V2 kaydi",
+        "description": "Donem ici performans notu V2 kaydeder veya gunceller.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "note": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "scorecard_id": {
+                    "type": "integer"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mobile/performance/note-scorecard": {
+      "get": {
+        "tags": [
+          "Mobile Performance API"
+        ],
+        "summary": "Mobil not scorecard",
+        "description": "Donem ici not/scorecard iliskili performans verilerini dondurur.",
+        "responses": {
+          "200": {
+            "description": "Basarili yanit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gecersiz istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kimlik dogrulama gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Yetki gerekli",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Kayit bulunamadi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Cok fazla istek",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "servers": [
