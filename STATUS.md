@@ -170,3 +170,34 @@ Sonraki onerilen is:
 - Coverage hedefi icin once kritik modul bazli test kapsami artirilmali.
 - Ilk hedefler: auth, security, performance core services, mobile auth, API rate limit, file/security guard modulleri.
 - Tum app icin dogrudan 80 coverage hedefi mevcut test yapisiyla gercekci degildir.
+
+## 2026-07-09 - Faz 2E API Documentation Verification
+
+Kapsam:
+- app/api klasoru envanteri
+- docs/api/openapi_draft.json kontrolu
+- OpenAPI / Swagger / API referans aramasi
+- Mobil API route decorator kontrolu
+
+Bulgular:
+- docs/api/openapi_draft.json mevcut.
+- OpenAPI surumu: 3.0.3.
+- OpenAPI basligi: BYS360 API Taslak Envanteri.
+- OpenAPI versiyonu: p1a-inventory.
+- OpenAPI path sayisi: 820.
+- OpenAPI icinde mobile path sayisi: 0.
+- app/api/mobile altinda cok sayida aktif mobil API route decorator mevcut.
+- Ornek mobil endpointler: /auth/login, /auth/refresh, /me, /dashboard/summary, /personnel/list, /support/tickets, /surveys ve performance endpointleri.
+- API dokuman izi vardir fakat mobil API kapsam eslesmesi eksiktir.
+- git calisma agaci temiz kalmistir.
+
+Karar:
+- Faz 2E kismi PASS.
+- OpenAPI taslak dokumani mevcuttur.
+- Mobil API endpointleri OpenAPI taslagina dahil edilmedigi icin API dokumantasyon kapsami tam PASS degildir.
+- Mobil API OpenAPI coverage eksigi teknik borc olarak izlenmelidir.
+
+Sonraki onerilen is:
+- Mobil API endpointleri icin OpenAPI kapsam haritasi cikarilmali.
+- En kritik ilk kapsama alinacak endpointler: auth, refresh, me, dashboard, personnel, performance, support, survey.
+- API dokumani guncellenmeden once route listesi ile OpenAPI path listesi karsilastirilmalidir.
