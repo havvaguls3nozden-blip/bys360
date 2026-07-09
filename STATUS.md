@@ -201,3 +201,31 @@ Sonraki onerilen is:
 - Mobil API endpointleri icin OpenAPI kapsam haritasi cikarilmali.
 - En kritik ilk kapsama alinacak endpointler: auth, refresh, me, dashboard, personnel, performance, support, survey.
 - API dokumani guncellenmeden once route listesi ile OpenAPI path listesi karsilastirilmalidir.
+
+## 2026-07-09 - Faz 2F Secret Rotation / History Verification
+
+Kapsam:
+- Secret/history dokuman adaylari
+- .gitignore env/secret/sqlite/instance/backups kurallari
+- Git history dosya adi bazli .env izi
+- Calisma agacinda takip edilmeyen env/secret/sqlite/db adaylari
+
+Bulgular:
+- docs/security/BYS360_SECRET_ROTATION_AND_HISTORY_CLEANUP_RUNBOOK.md mevcut.
+- Arsivde secret release, secret sanitizer ve git history cleanup dokumanlari mevcut.
+- .gitignore icinde .env, .env.*, sqlite, sqlite3, instance ve backups kurallari mevcut.
+- Git history dosya adi bazli .env kontrolunde sadece .env.example ve overlay .env.example gorundu.
+- Gercek .env dosyasi git history dosya adi kontrolunde gorunmedi.
+- Calisma agacinda takip edilmeyen env/secret/sqlite/db adayi bulunmadi.
+- git calisma agaci temiz kaldi.
+
+Karar:
+- Faz 2F kismi PASS.
+- Repo hijyeni ve dokuman varligi PASS.
+- Gercek secret rotation islemi bu dogrulama kapsaminda yapilmadi.
+- Secret rotation canli/kurumsal sistemlerde yetki ve onay gerektiren ayri operasyon olarak kalmalidir.
+- .gitignore icinde tekrar eden env/secret kurallari zararli degil, fakat ileride repo hijyeni kapsaminda sadelestirilebilir.
+
+Sonraki onerilen is:
+- Gercek secret rotation icin kurum yetkilisi/onayi ile DB, Flask secret key, mail, entegrasyon ve token anahtarlari ayri runbook uzerinden yenilenmelidir.
+- Rotation yapilmadan once mevcut servis/env envanteri cikarilmalidir.
