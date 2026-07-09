@@ -375,3 +375,37 @@ Karar:
 Sonraki onerilen is:
 - Faz 3F icin communication ve kpi endpointleri birlikte kapatilabilir.
 - Performance endpointleri daha buyuk oldugu icin ayri Faz 3G paketi olarak ele alinmalidir.
+
+## 2026-07-09 - Faz 3G Mobile OpenAPI Coverage Recheck
+
+Kapsam:
+- Faz 3F sonrasi mobil API OpenAPI kapsam tekrar olcumu
+- Communication ve KPI endpointlerinin OpenAPI kapsaminda dogrulanmasi
+- Exact /api/mobile path eslesmesi ile kontrol
+- Kod degisikligi yapmadan okuma modu dogrulama
+
+Bulgular:
+- OpenAPI path sayisi: 860.
+- Mobil route decorator sayisi: 72.
+- Exact OpenAPI kapsanan mobil route sayisi: 42.
+- Exact OpenAPI eksik mobil route sayisi: 30.
+- Kalan eksik grup sadece performance olarak goruldu.
+- Communication endpointleri kapsandi.
+- KPI endpointleri kapsandi.
+- components mevcut.
+- security mevcut.
+- bearerAuth security scheme mevcut.
+- Calisma agaci temiz kaldi.
+
+Kalan eksik grup ozeti:
+- performance: 30
+
+Karar:
+- Faz 3G PASS.
+- Faz 3F eklemeleri OpenAPI kapsaminda dogrulandi.
+- Mobil OpenAPI borcu tek gruba indirildi: performance.
+- Bir sonraki adimda performance endpointleri ayri paket olarak ele alinmalidir.
+
+Sonraki onerilen is:
+- Faz 3H icin performance mobil OpenAPI paketi eklenmelidir.
+- Performance paketi buyuk oldugu icin sadece dokumantasyon degisikligi yapilmali, uygulama koduna dokunulmamalidir.
