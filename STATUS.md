@@ -142,3 +142,31 @@ Sonraki onerilen is:
 - pytest-cov ve coverage paketleri kontrollu sekilde dependency dosyasina eklenmeli.
 - python -m pytest --cov=app --cov-report=term-missing --cov-fail-under=80 komutu ile gercek coverage gate calistirilmalidir.
 - Legacy testlerin ayri kosumda calistirilip calistirilmamasi icin karar verilmelidir.
+
+## 2026-07-09 - Faz 2D Coverage Gate Follow-up
+
+Kapsam:
+- pytest-cov ile gercek coverage gate denemesi
+- coverage fail_under=80 esiginin uygulanabilirligi
+
+Sonuc:
+- pytest-cov ve coverage sanal ortamda kuruldu.
+- Coverage komutu calistirildi:
+  python -m pytest --rootdir C:\bys360\project --cov=app --cov-report=term-missing --cov-fail-under=80
+- Test toplami: 857 item collected.
+- Coverage gate sonucu FAIL.
+- Toplam coverage: 18%.
+- Hedef coverage: 80%.
+- Hata: Coverage failure: total of 18 is less than fail-under=80.
+- Bu nedenle Faz 2D tam PASS olarak kapatilamaz.
+
+Karar:
+- Faz 2D mevcut durumda kismi PASS / coverage FAIL.
+- Aktif pytest kosumu calisiyor fakat test kapsami yetersiz.
+- requirements.txt degisikligi coverage basarisiz oldugu icin commitlenmedi.
+- Coverage artirma isi ayri teknik borc / test sertlestirme fazi olarak ele alinmalidir.
+
+Sonraki onerilen is:
+- Coverage hedefi icin once kritik modul bazli test kapsami artirilmali.
+- Ilk hedefler: auth, security, performance core services, mobile auth, API rate limit, file/security guard modulleri.
+- Tum app icin dogrudan 80 coverage hedefi mevcut test yapisiyla gercekci degildir.
