@@ -264,3 +264,35 @@ Kalan teknik borclar:
 Sonraki onerilen is:
 - Faz 3'e gecmeden once teknik borc onceligi secilmeli.
 - En mantikli ilk adaylar: coverage artirma, mobil OpenAPI kapsam haritasi veya Phase 3 mimari refactor baslangici.
+
+## 2026-07-09 - Faz 3A Mobile API OpenAPI Coverage Map
+
+Kapsam:
+- app/api/mobile altindaki mobil API route decorator envanteri
+- docs/api/openapi_draft.json path listesi
+- Mobil route ile OpenAPI path karsilastirmasi
+- Kod degisikligi yapmadan okuma modu kontrol
+
+Bulgular:
+- Phase 2 kapanis tag'i HEAD uzerinde dogrulandi: phase2-verification-closed-20260709.
+- docs/api/openapi_draft.json mevcut.
+- OpenAPI path sayisi: 820.
+- Mobil route decorator sayisi: 72.
+- OpenAPI tarafindan kapsanan mobil route sayisi: 11.
+- OpenAPI tarafinda eksik mobil route sayisi: 61.
+- En buyuk eksik grup: performance, 25 route.
+- Diger eksik gruplar: communication 11, kpi 4, support 4, personnel 3, push 3, assistant 2, auth 2, notifications 2.
+- Kritik eksik ornekler: /api/mobile/auth/login, /api/mobile/auth/refresh, /api/mobile/me, /api/mobile/dashboard/summary, /api/mobile/personnel/list, /api/mobile/support/tickets ve cok sayida performance endpointi.
+- Calisma agaci temiz kaldi.
+
+Karar:
+- Faz 3A kismi PASS.
+- Mobil API OpenAPI kapsam haritasi cikarildi.
+- OpenAPI dokumani var fakat mobil API kapsami yeterli degil.
+- Mobil OpenAPI coverage eksigi Faz 3 teknik borcu olarak izlenmelidir.
+
+Sonraki onerilen is:
+- Mobil API OpenAPI guncellemesi tek seferde degil, kritik gruplara bolunerek yapilmalidir.
+- Ilk sira: auth, me, dashboard, health, personnel, support/survey.
+- Ikinci sira: performance endpointleri.
+- Ucuncu sira: communication, push, notifications ve kpi endpointleri.
