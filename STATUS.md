@@ -81,3 +81,30 @@ Karar:
 
 Test:
 - Faz 2B read-only trace sonrasi git calisma agaci temizdi.
+
+## 2026-07-09 - Faz 2C Dependency Vulnerability Audit
+
+Kapsam:
+- pip-audit dependency vulnerability kontrolu
+- Sanal ortam paket guvenlik taramasi
+- pytest guvenlik guncellemesi dogrulamasi
+
+Bulgular:
+- Ilk fallback audit sonucunda pytest 8.4.2 icin PYSEC-2026-1845 acigi goruldu.
+- Onerilen fix surumu pytest 9.0.3 olarak raporlandi.
+- pytest sanal ortamda 9.0.3 surumune guncellendi.
+- requirements.txt icinde pytest satiri bulunmadigi icin proje dependency dosyasinda degisiklik yapilmadi.
+- Windows kullanici yolundaki Turkce karakter / kisa yol farki nedeniyle requirements isolated audit ilk denemede saglikli ilerlemedi; TEMP/TMP C:\bys360\tmp olarak ASCII yola alindi.
+- Son pip-audit kontrolunde bilinen acik bulunmadi.
+
+Test:
+- python -m compileall app: PASS
+- PYTHONPATH proje kokune alinarak app ve scripts import kontrolu: PASS
+- python -m pytest -q --rootdir C:\bys360\project: 13 passed, 844 skipped
+- python -m pip_audit --path .\.venv\Lib\site-packages --progress-spinner off: No known vulnerabilities found
+- git calisma agaci temiz.
+
+Karar:
+- Faz 2C PASS.
+- Kod dosyasi degisikligi yoktur.
+- pytest guncellemesi sanal ortam guvenlik sertlestirmesi olarak uygulanmistir.
