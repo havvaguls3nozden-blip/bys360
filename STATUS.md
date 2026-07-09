@@ -108,3 +108,37 @@ Karar:
 - Faz 2C PASS.
 - Kod dosyasi degisikligi yoktur.
 - pytest guncellemesi sanal ortam guvenlik sertlestirmesi olarak uygulanmistir.
+
+## 2026-07-09 - Faz 2D Pytest / Coverage / Skip Verification
+
+Kapsam:
+- Pytest konfigurasyonu
+- Coverage esigi
+- Skip nedenleri
+- Full pytest calistirma
+
+Bulgular:
+- pytest.ini mevcut ve testpaths=tests olarak tanimli.
+- pyproject.toml icinde coverage ayari mevcut.
+- coverage fail_under = 80 olarak tanimli.
+- requirements.txt icinde pytest, pytest-cov veya coverage satiri bulunmadi.
+- Sanal ortamda pytest 9.0.3 mevcut.
+- Sanal ortamda pytest-cov paketi bulunmadi.
+- Sanal ortamda coverage paketi bulunmadi.
+- PYTHONPATH proje kokune alindiginda app ve scripts import kontrolu PASS.
+- python -m pytest -q --rootdir C:\bys360\project sonucu: 13 passed, 844 skipped.
+- Skip nedenlerinin buyuk bolumu eski mimari sozlesme testlerinin arsiv kapsaminda olmasina bagli.
+- Eski mimari sozlesme testleri BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 ile ayrica calistirilabilecek sekilde devre disi birakilmis.
+- git calisma agaci temiz.
+
+Karar:
+- Faz 2D kismi PASS.
+- Aktif pytest seti hatasiz geciyor.
+- Coverage esigi tanimli fakat pytest-cov/coverage paketi olmadigi icin 80 coverage gate fiilen uygulanmiyor.
+- 844 skipped yuksek oldugu icin test guven seviyesi tam PASS olarak degerlendirilemez.
+- Coverage gate ve skip politikasinin ayrica sertlestirilmesi teknik borc olarak izlenmelidir.
+
+Sonraki onerilen is:
+- pytest-cov ve coverage paketleri kontrollu sekilde dependency dosyasina eklenmeli.
+- python -m pytest --cov=app --cov-report=term-missing --cov-fail-under=80 komutu ile gercek coverage gate calistirilmalidir.
+- Legacy testlerin ayri kosumda calistirilip calistirilmamasi icin karar verilmelidir.
