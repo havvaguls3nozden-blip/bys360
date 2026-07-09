@@ -296,3 +296,46 @@ Sonraki onerilen is:
 - Ilk sira: auth, me, dashboard, health, personnel, support/survey.
 - Ikinci sira: performance endpointleri.
 - Ucuncu sira: communication, push, notifications ve kpi endpointleri.
+
+## 2026-07-09 - Faz 3C Mobile OpenAPI Coverage Recheck
+
+Kapsam:
+- Faz 3B sonrasi mobil API OpenAPI kapsam tekrar olcumu
+- Exact /api/mobile path eslesmesi ile kontrol
+- components, security ve bearerAuth varlik kontrolu
+- Kod degisikligi yapmadan okuma modu dogrulama
+
+Bulgular:
+- OpenAPI path sayisi: 829.
+- Mobil route decorator sayisi: 72.
+- Exact OpenAPI kapsanan mobil route sayisi: 10.
+- Exact OpenAPI eksik mobil route sayisi: 62.
+- components mevcut.
+- security mevcut.
+- bearerAuth security scheme mevcut.
+- /api/mobile/support/tickets path'i GET ve POST route'larini birlikte kapsadigi icin 9 path eklemesi 10 route kapsami uretmistir.
+- Calisma agaci temiz kaldi.
+
+Eksik grup ozeti:
+- performance: 30
+- communication: 11
+- kpi: 4
+- notifications: 4
+- personnel: 3
+- push: 3
+- assistant: 2
+- surveys: 2
+- ai: 1
+- settings: 1
+- support: 1
+
+Karar:
+- Faz 3C PASS.
+- Faz 3B eklemeleri OpenAPI icinde dogrulandi.
+- Mobil OpenAPI kapsam borcu devam ediyor.
+- En buyuk kalan borc performance endpointleri uzerindedir.
+
+Sonraki onerilen is:
+- Faz 3D icin kucuk ve dusuk riskli ikinci mobil OpenAPI paketi eklenmelidir.
+- Onerilen Faz 3D kapsam: notifications, surveys, personnel ek endpointleri, support reply, ai/assistant/settings hafif okuma endpointleri.
+- Performance endpointleri ayri ve daha buyuk paket olarak sonraya birakilmalidir.
