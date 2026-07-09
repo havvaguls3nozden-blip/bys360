@@ -572,3 +572,42 @@ Karar:
 Sonraki onerilen is:
 - Faz 4D icin bu 3 testin hangi run_checks sozlesme anahtarinda dustugu ayrintili izole edilmelidir.
 - Ardindan test ortaminda gerekli tablo bootstrap'i mi, test beklentisi guncellemesi mi, yoksa guarded fallback iyilestirmesi mi gerektigi karar altina alinmalidir.
+
+## 2026-07-09 - Faz 4D Mobil API Fail Izolasyon
+
+Kapsam:
+- Faz 4C sonucunda fail olan 3 mobil API legacy testinin tek tek calistirilmasi
+- Ortak kok nedenin ayrintili izole edilmesi
+- Kod degisikligi yapmadan test ortami/schema borcunun teyit edilmesi
+
+Tekil test sonuclari:
+- test_mobile_api_support_survey_notifications_response_p3d.py: FAIL.
+- p3d_exit_code: 1.
+- test_mobile_api_performance_response_p3e.py: FAIL.
+- p3e_exit_code: 1.
+- test_mobile_api_response_suite_p3f.py: FAIL.
+- p3f_exit_code: 1.
+
+Bulgular:
+- Uc testte de ortak hata izi menu_profile_access.py icindedir.
+- testing/sqlite ortaminda role_menu_defaults tablosu yoktur.
+- testing/sqlite ortaminda user_menu_permissions tablosu yoktur.
+- role_menu_defaults eksikligi get_role_default_menu_keys_handler icinde OperationalError uretmektedir.
+- user_menu_permissions eksikligi build_effective_user_menu_context_handler icinde OperationalError uretmektedir.
+- Testlerde direct_contract_ok veya p3_suite_ok False donmektedir.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+- Git durumu temiz.
+- Uygulama kodu degistirilmedi.
+
+Karar:
+- Faz 4D bulgu uretimli PASS.
+- 3 fail testin kok nedeni farkli endpoint sozlesmeleri degil, ortak testing/sqlite schema/bootstrap eksikligidir.
+- Sorun mobil OpenAPI dokumantasyonu degil, legacy testlerin calistigi test veritabani hazirlik katmanidir.
+- Bir sonraki adimda once model/tablo adlari ve test bootstrap akisi incelenmelidir.
+- Duzeltme test tarafinda schema/bootstrap ekleme ile mi, yoksa servis fallback davranisini sessiz ve tablo-yok uyumlu hale getirme ile mi yapilacak karar altina alinmalidir.
+
+Sonraki onerilen is:
+- Faz 4E icin role_menu_defaults ve user_menu_permissions modellerinin nerede tanimlandigi bulunmalidir.
+- Test app/db bootstrap akisi incelenmelidir.
+- Mumkunse once test bootstrap tarafinda minimal tablo olusturma yaklasimi tercih edilmelidir.
