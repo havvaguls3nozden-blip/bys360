@@ -526,3 +526,49 @@ Karar:
 Sonraki onerilen is:
 - Faz 4C icin sadece kucuk bir test grubu BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 ile calistirilmalidir.
 - Ilk aday grup mobil API mimari testleridir; Faz 3 OpenAPI calismasiyla dogrudan iliskilidir.
+
+## 2026-07-09 - Faz 4C Mobil API Legacy Test Kontrollu Calistirma
+
+Kapsam:
+- Faz 4B sonrasi kucuk mobil API mimari test paketinin kontrollu calistirilmasi
+- BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 ile skip edilen testlerin gercek calisma davranisinin olculmesi
+- Normal mod skip davranisi ile legacy env acik davranisin karsilastirilmasi
+- Kod degisikligi yapmadan test borcu kok nedeninin belirlenmesi
+
+Test seti:
+- tests/architecture/test_mobile_api_contract_p2a.py
+- tests/architecture/test_mobile_api_behavior_smoke_p2b.py
+- tests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py
+- tests/architecture/test_mobile_api_personnel_kpi_communication_response_p3c_v2.py
+- tests/architecture/test_mobile_api_support_survey_notifications_response_p3d.py
+- tests/architecture/test_mobile_api_performance_response_p3e.py
+- tests/architecture/test_mobile_api_response_suite_p3f.py
+
+Bulgular:
+- Legacy env acik collection exit code: 0.
+- Legacy env acik pytest sonucu: 7 passed, 3 failed.
+- faz4c_pytest_exit_code: 1.
+- Normal modda ayni test seti sonucu: 7 passed, 3 skipped.
+- faz4c_normal_pytest_exit_code: 0.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+- Git durumu temiz.
+- Basarisiz testler:
+  - test_mobile_api_support_survey_notifications_response_p3d.py
+  - test_mobile_api_performance_response_p3e.py
+  - test_mobile_api_response_suite_p3f.py
+- Basarisiz testlerde direct_contract_ok veya p3_suite_ok False donmektedir.
+- Ortak hata izi testing/sqlite ortaminda role_menu_defaults ve user_menu_permissions tablolarinin bulunmamasidir.
+- menu_profile_access.py guarded exception uretmektedir.
+- Normal modda bu testler skip edildigi icin borc daha once gorunmuyordu.
+
+Karar:
+- Faz 4C bulgu uretimli PASS.
+- Mobil API legacy testleri kontrollu sekilde acilinca gercek test borcu gorunur hale geldi.
+- Sorun mobil OpenAPI coverage borcu degil; test ortaminda eksik SQLite/schema/bootstrap bagimliligi gibi gorunmektedir.
+- Tum legacy testleri topluca acmak yerine once bu 3 fail kok nedeni izole edilmelidir.
+- Uygulama kodu degistirilmedi.
+
+Sonraki onerilen is:
+- Faz 4D icin bu 3 testin hangi run_checks sozlesme anahtarinda dustugu ayrintili izole edilmelidir.
+- Ardindan test ortaminda gerekli tablo bootstrap'i mi, test beklentisi guncellemesi mi, yoksa guarded fallback iyilestirmesi mi gerektigi karar altina alinmalidir.
