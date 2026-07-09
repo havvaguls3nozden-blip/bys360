@@ -490,3 +490,39 @@ Sonraki onerilen is:
 - Faz 4B icin skip mekanizmasi envanteri cikarilmalidir.
 - Hangi conftest/marker/env degiskeni ile 844 testin skip edildigi netlestirilmelidir.
 - Sonra kucuk bir test grubu kontrollu sekilde aktive edilmelidir.
+
+## 2026-07-09 - Faz 4B Skip Mekanizmasi Envanteri
+
+Kapsam:
+- Faz 4A coverage baseline sonrasi skip mekanizmasi envanteri
+- pytest/conftest/marker/env etkilerinin incelenmesi
+- Normal collection ile legacy env collection karsilastirmasi
+- Kod degisikligi yapmadan test borcu kaynaginin netlestirilmesi
+
+Bulgular:
+- Aktif branch: phase4-test-coverage-baseline-v1.
+- Git durumu temiz.
+- Test Python dosyasi sayisi: 158.
+- Normal collection: 857 test collected.
+- Legacy env collection: 857 test collected.
+- normal_collect_exit_code: 0.
+- legacy_collect_exit_code: 0.
+- BYS360_RUN_LEGACY_ARCHITECTURE_TESTS kullanimi 2 dosyada goruldu.
+- pytest.skip kullanimi 4 dosyada goruldu.
+- skipif kullanimi gorulmedi.
+- pytestmark kullanimi 13 dosyada goruldu.
+- Ana skip mekanizmasi tests/architecture/conftest.py icindedir.
+- tests/architecture/conftest.py, BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 yoksa legacy mimari testlerine skip marker eklemektedir.
+- Collection sayisi degismedigi icin mekanizma test toplamayi engellemiyor; testleri collected halde skip ediyor.
+- PowerShell Select-String -Recurse parametresi bu ortamda desteklenmedigi icin ilk arama blogu hata verdi; Python envanter blogu basariyla tamamlandi.
+- Uygulama kodu degistirilmedi.
+
+Karar:
+- Faz 4B PASS.
+- Skip borcunun ana kaynagi netlesti.
+- 844 skipped testin ana sebebi collection dislama degil, conftest tabanli skip marker mekanizmasidir.
+- Bir sonraki adimda tum legacy testleri birden acmak yerine kucuk ve guvenli bir test paketi secilmelidir.
+
+Sonraki onerilen is:
+- Faz 4C icin sadece kucuk bir test grubu BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 ile calistirilmalidir.
+- Ilk aday grup mobil API mimari testleridir; Faz 3 OpenAPI calismasiyla dogrudan iliskilidir.
