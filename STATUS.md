@@ -455,3 +455,38 @@ Karar:
 Sonraki onerilen is:
 - Faz 3 final kapanis commit'i yapilmalidir.
 - Ardindan branch uzerinde tag alinabilir.
+
+## 2026-07-09 - Faz 4A Test Coverage Baseline
+
+Kapsam:
+- Faz 3 final mobil OpenAPI 72/72 kapanisi sonrasi test borcu olcumu
+- pytest aktif test durumu kontrolu
+- skip reason ozeti kontrolu
+- coverage baseline olcumu
+- Kod degisikligi yapmadan mevcut test kalitesi tespiti
+
+Bulgular:
+- pyproject.toml coverage hedefi fail_under = 80.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+- pytest normal run: 13 passed, 844 skipped.
+- pytest_exit_code: 0.
+- pytest -rs run: 13 passed, 844 skipped.
+- pytest_skip_exit_code: 0.
+- Skip gerekcesi agirlikli olarak eski mimari sozlesme testlerinin arsiv kapsaminda tutulmasidir.
+- coverage total: 18.
+- coverage gate sonucu: FAIL.
+- coverage fail nedeni: total 18, fail-under 80 altinda.
+- Uygulama kodu degistirilmedi.
+
+Karar:
+- Faz 4A Kismi PASS.
+- Compile ve aktif pytest saglikli.
+- Coverage gate FAIL durumu teknik borc olarak teyit edildi.
+- En buyuk test borcu 844 skipped test ve dusuk coverage oranidir.
+- Coverage hedefi dusurulmemeli; borc test aktivasyonu ve hedefli smoke/unit testlerle kapatilmalidir.
+
+Sonraki onerilen is:
+- Faz 4B icin skip mekanizmasi envanteri cikarilmalidir.
+- Hangi conftest/marker/env degiskeni ile 844 testin skip edildigi netlestirilmelidir.
+- Sonra kucuk bir test grubu kontrollu sekilde aktive edilmelidir.
