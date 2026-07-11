@@ -940,3 +940,19 @@ Yeni gate baseline:
 Karar:
 - Faz 4R PASS.
 - Coverage regression kapisi, Faz 4P/4Q sonrasi yeni seviyeye yukseltilmis oldu.
+
+## 2026-07-11 - Faz 4T Low Score Process Helper Coverage Tests
+
+Kapsam:
+- app/services/performance/low_score_process_service.py icin ilk helper ve karar fonksiyonu testleri eklendi.
+- Testler DB sorgularina girmeden safe helper, tamamlanma guard, dusuk skor tespiti, status humanizer, summary as_dict, row builder ve publish block kararlarini kapsar.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4t_v4_target_unit_test_exit_code: 0
+- phase4t_v4_target_coverage_exit_code: 0
+- phase4t_v4_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4T PASS.
+- En buyuk coverage borcu olan low_score_process_service.py icin kontrollu coverage artisi baslatildi.
