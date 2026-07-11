@@ -166,3 +166,104 @@ def test_phase4p_trend_polyline_and_decision_note_outputs_are_stable() -> None:
         overdue_count=0,
         pending_president=0,
     )
+
+
+def _phase4q_contains_value(value, expected) -> bool:
+    if value == expected:
+        return True
+    if isinstance(value, dict):
+        return any(_phase4q_contains_value(item, expected) for item in value.values())
+    if isinstance(value, (list, tuple, set)):
+        return any(_phase4q_contains_value(item, expected) for item in value)
+    return False
+
+
+def test_phase4q_build_live_performance_dashboard_context_uses_safe_aggregators(monkeypatch: pytest.MonkeyPatch) -> None:
+    period = SimpleNamespace(
+        id=33,
+        title="2026 Canlı Performans",
+        name=None,
+        start_date=date(2026, 7, 1),
+        end_date=date(2026, 7, 31),
+    )
+    user = SimpleNamespace(id=77)
+
+    monkeypatch.setattr(svc, "_active_period", lambda: period)
+    monkeypatch.setattr(svc, "_scope_ids", lambda user, base_context: [77, 88])
+
+    monkeypatch.setattr(svc, "_total_evaluations", lambda period_id, scope_user_ids, base_context: 12)
+    monkeypatch.setattr(svc, "_completed_evaluations", lambda period_id, scope_user_ids, base_context: 9)
+    monkeypatch.setattr(svc, "_low_score_count", lambda period_id, scope_user_ids: 2)
+    monkeypatch.setattr(svc, "_published_count", lambda period_id, scope_user_ids: 6)
+    monkeypatch.setattr(svc, "_president_pending_count", lambda period_id, scope_user_ids: 3)
+    monkeypatch.setattr(svc, "_returned_count", lambda period_id, scope_user_ids: 1)
+
+    trend_points = [
+        {"label": "01.07", "value": 3, "x": 1, "y": 90},
+        {"label": "31.07", "value": 9, "x": 99, "y": 10},
+    ]
+
+    monkeypatch.setattr(svc, "_completion_trend", lambda period, scope_user_ids, total: trend_points)
+    monkeypatch.setattr(
+        svc,
+        "_category_averages",
+        lambda period_id, scope_user_ids: [
+            {"label": "Teknik", "average": 86.5},
+        ],
+    )
+    monkeypatch.setattr(
+        svc,
+        "_overdue_managers",
+        lambda period_id, scope_user_ids: [
+            {"name": "Geciken Amir", "count": 2},
+        ],
+    )
+    monkeypatch.setattr(
+        svc,
+        "_risk_matrix",
+        lambda period_id, scope_user_ids: {
+            "total": 4,
+            "rows": [{"label": "Risk", "count": 4}],
+        },
+    )
+    monkeypatch.setattr(
+        svc,
+        "_low_score_density",
+        lambda period_id, scope_user_ids: [
+            {"label": "Birim A", "low": 2, "percent": 25.0},
+        ],
+    )
+    monkeypatch.setattr(
+        svc,
+        "_recent_activity",
+        lambda user_id, period_id, scope_user_ids: [
+            {"title": "Son aktivite", "time": "Bugün 09:30"},
+        ],
+    )
+
+    result = svc.build_live_performance_dashboard_context(
+        user,
+        {
+            "dashboard_scope": {
+                "scope_user_ids": [77, 88],
+            }
+        },
+    )
+
+    assert isinstance(result, dict)
+    assert result
+
+    # Ana toplayıcı fonksiyonun güvenli değerleri bağladığını doğrula.
+    assert _phase4q_contains_value(result, "2026 Canlı Performans")
+    assert _phase4q_contains_value(result, "01.07.2026 – 31.07.2026")
+    assert _phase4q_contains_value(result, 12)
+    assert _phase4q_contains_value(result, 9)
+    assert _phase4q_contains_value(result, 75.0)
+    assert _phase4q_contains_value(result, 2)
+    assert _phase4q_contains_value(result, 3)
+    assert _phase4q_contains_value(result, 1)
+    assert _phase4q_contains_value(result, "1,90 99,10")
+    assert _phase4q_contains_value(result, "Geciken Amir")
+    assert _phase4q_contains_value(result, "Birim A")
+    assert _phase4q_contains_value(result, "Son aktivite")
+    assert _phase4q_contains_value(result, "2 düşük performans kaydı var; Başkan/üst onay ve gelişim takibi birlikte izlenmeli.")

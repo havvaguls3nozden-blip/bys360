@@ -896,3 +896,19 @@ Karar:
 - Faz 4P PASS.
 - Coverage artisi kontrollu sekilde servis helper katmanindan baslatildi.
 - Siradaki adimda ayni servis icin monkeypatch ile build_live_performance_dashboard_context aggregator testi eklenebilir.
+
+## 2026-07-11 - Faz 4Q Performance Dashboard Live Aggregator Test
+
+Kapsam:
+- app/services/performance_dashboard_live_service.py icin ana aggregator fonksiyon testi eklendi.
+- build_live_performance_dashboard_context monkeypatch ile DB sorgusu calistirmadan dogrulandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4q_target_unit_test_exit_code: 0
+- phase4q_target_coverage_exit_code: 0
+- phase4q_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4Q PASS.
+- Performance dashboard live service coverage artisi helper katmanindan ana context toplama katmanina genisletildi.
