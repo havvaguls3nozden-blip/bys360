@@ -799,3 +799,24 @@ Dogrulama:
 Karar:
 - Faz 4J PASS.
 - Faz 4I taramasinda kalan tek cluster fail giderildi.
+
+## 2026-07-11 - Faz 4K Architecture Closure Recheck
+
+Kapsam:
+- Faz 4F, 4H ve 4J sonrasi architecture test kapanis kontrolu yapildi.
+- Normal architecture mode tekrar dogrulandi.
+- Mobile API legacy test grubu tekrar dogrulandi.
+- Android responsive legacy test grubu tekrar dogrulandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4k_normal_architecture_exit_code: 0
+- phase4k_mobile_api_legacy_exit_code: 0
+- phase4k_android_responsive_legacy_exit_code: 0
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+
+Karar:
+- Faz 4K PASS.
+- Architecture legacy borcunda mobil ve android responsive kaynakli bilinen fail kalmadi.
+- Kalan ana kalite borcu coverage orani ve daha genis CI sertlestirme alanlaridir.
