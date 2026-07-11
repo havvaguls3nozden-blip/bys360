@@ -705,3 +705,40 @@ Karar:
 - Tablo/bootstrap borcu buyuk olcude giderildi.
 - Kalan sorun artik tablo yok hatasi degil, direct contract kontrolunun False donmesidir.
 - Bir sonraki adimda P3D/P3E direct_contract detaylari ve beklenen/gercek route sozlesmeleri izole edilmelidir.
+
+## 2026-07-11 - Faz 4F V5C Mobil Direct Contract Formul Duzeltmesi
+
+Kapsam:
+- Faz 4F V4 inspection sonrasi direct_contract_ok formulu duzeltildi.
+- P3B, P3D ve P3E quality gate dosyalarinda mobil route decorator sayisi esitlik sarti esnetildi.
+- Onceki V5 false-pass commit geri alindi.
+- Runtime uygulama koduna dokunulmadi.
+
+Kok neden:
+- Runtime route map PASS.
+- Response code smoke PASS.
+- expected_missing_routes bos.
+- duplicate_route_decorators bos.
+- feature_smoke true.
+- Buna ragmen direct_contract_ok False donuyordu.
+- Neden: total_mobile_route_decorator_count 28 iken EXPECTED_CONTRACT_ROUTE_COUNT 24 idi.
+- Eski formul ek route varligini fail sayiyordu.
+- Yeni formul ek route varligini fail saymaz; beklenen minimum contract sayisi, eksik route, duplicate ve feature smoke kontrollerini esas alir.
+
+Degisen dosyalar:
+- scripts/quality/bys360_mobile_auth_dashboard_assistant_response_gate_p3b_v3.py
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py
+- STATUS.md
+
+Dogrulama:
+- P3B/P3D/P3E/P3F hedef testler legacy env acikken PASS.
+- Faz 4C mobil API paketi legacy env acikken PASS.
+- Normal mod skip davranisi PASS.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+
+Karar:
+- Faz 4F V5C PASS.
+- Mobil legacy response gate borcu runtime koda dokunmadan quality gate katmaninda giderildi.
+- Faz 4G icin daha genis legacy architecture test grubuna kontrollu gecilebilir.

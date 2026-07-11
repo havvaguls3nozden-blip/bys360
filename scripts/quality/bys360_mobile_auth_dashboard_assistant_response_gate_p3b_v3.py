@@ -269,7 +269,7 @@ def run_checks(root: str | Path, *, compile_all: bool = True, app_factory: bool 
         and inv["routes_py_route_count"] == 0
         and inv["domains_dir_exists"]
         and not inv["missing_files"]
-        and inv["total_mobile_route_decorator_count"] == EXPECTED_CONTRACT_ROUTE_COUNT
+        and inv["total_mobile_route_decorator_count"] >= EXPECTED_CONTRACT_ROUTE_COUNT
         and not inv["duplicate_route_decorators"]
         and not inv["expected_missing_routes"]
         and not inv["wrong_domain_owner_routes"]

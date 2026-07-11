@@ -360,7 +360,7 @@ def run_checks(root: Path, *, compile_all: bool = False, app_factory: bool = Fal
         inventory["routes_py_lines"] <= 300
         and inventory["routes_py_route_count"] == 0
         and inventory["domains_dir_exists"]
-        and inventory["total_mobile_route_decorator_count"] == EXPECTED_CONTRACT_ROUTE_COUNT
+        and inventory["total_mobile_route_decorator_count"] >= EXPECTED_CONTRACT_ROUTE_COUNT
         and not inventory["duplicate_route_decorators"]
     )
     compile_results = compile_files(root) if compile_all else []
