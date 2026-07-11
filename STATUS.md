@@ -912,3 +912,31 @@ Dogrulama:
 Karar:
 - Faz 4Q PASS.
 - Performance dashboard live service coverage artisi helper katmanindan ana context toplama katmanina genisletildi.
+
+## 2026-07-11 - Faz 4R Coverage Baseline Refresh
+
+Kapsam:
+- Faz 4P ve Faz 4Q sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4r_target_test_exit_code: 0
+- phase4r_full_coverage_exit_code: 0
+- phase4r_baseline_refresh_exit_code: 0
+- phase4r_regression_gate_test_exit_code: 0
+- phase4r_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.062890424600898
+- Actual branch coverage: 3.555045871559633
+- Covered lines: 22888
+- Missing lines: 80012
+
+Yeni gate baseline:
+- min_total_percent: 18.06
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4R PASS.
+- Coverage regression kapisi, Faz 4P/4Q sonrasi yeni seviyeye yukseltilmis oldu.
