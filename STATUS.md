@@ -879,3 +879,20 @@ Dogrulama:
 Karar:
 - Faz 4N PASS.
 - Coverage hedefi artik once regression korumasi, sonra moduler artis olarak yonetilecek.
+
+## 2026-07-11 - Faz 4P Performance Dashboard Live Service Coverage Tests
+
+Kapsam:
+- app/services/performance_dashboard_live_service.py icin ilk unit test seti eklendi.
+- Testler DB sorgularina girmeden helper, formatter, scope fallback ve base_context shortcut davranislarini kapsar.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4p_target_unit_test_exit_code: 0
+- phase4p_target_coverage_exit_code: 0
+- phase4p_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4P PASS.
+- Coverage artisi kontrollu sekilde servis helper katmanindan baslatildi.
+- Siradaki adimda ayni servis icin monkeypatch ile build_live_performance_dashboard_context aggregator testi eklenebilir.
