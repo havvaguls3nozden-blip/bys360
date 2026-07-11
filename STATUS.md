@@ -777,3 +777,25 @@ Karar:
 - Faz 4H PASS.
 - Faz 4G'de kalan mobil legacy gate borclari quality gate katmaninda giderildi.
 - Bir sonraki adimda genis architecture legacy gruplari moduler olarak ele alinabilir.
+
+## 2026-07-11 - Faz 4J Android Responsive P5C Gate Tamamlama
+
+Kapsam:
+- Faz 4I legacy architecture cluster taramasinda tek kalan fail android_responsive/P5C olarak belirlendi.
+- Eksik scripts/quality/bys360_android_responsive_targeted_templates_gate_p5c.py dosyasi tamamlandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Kok neden:
+- test_android_responsive_targeted_templates_p5c.py kalite script dosyasinin varligini bekliyordu.
+- P5B ve P5D geciyordu; P6B/P6B_V2 visual regression evidence testleri mevcut kapsamda skip durumundaydi.
+- Fail sebebi runtime degil, eksik quality gate script dosyasiydi.
+
+Dogrulama:
+- P5C script smoke PASS.
+- Android responsive cluster legacy env acikken PASS.
+- Normal architecture mode skip davranisi PASS.
+- Recovery sirasinda P5C target test tekrar PASS.
+
+Karar:
+- Faz 4J PASS.
+- Faz 4I taramasinda kalan tek cluster fail giderildi.
