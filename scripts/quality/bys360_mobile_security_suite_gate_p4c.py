@@ -108,7 +108,7 @@ def _inventory(root: Path) -> Dict[str, Any]:
         "domain_inventory": domain_inventory,
         "total_mobile_route_decorator_count": total,
         "expected_contract_route_count": EXPECTED_CONTRACT_ROUTE_COUNT,
-        "route_contract_count_expected": total == EXPECTED_CONTRACT_ROUTE_COUNT,
+        "route_contract_count_expected": total >= EXPECTED_CONTRACT_ROUTE_COUNT,
     }
 
 

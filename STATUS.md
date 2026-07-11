@@ -742,3 +742,38 @@ Karar:
 - Faz 4F V5C PASS.
 - Mobil legacy response gate borcu runtime koda dokunmadan quality gate katmaninda giderildi.
 - Faz 4G icin daha genis legacy architecture test grubuna kontrollu gecilebilir.
+
+## 2026-07-11 - Faz 4H Mobil Legacy Additive Route Contract Duzeltmesi
+
+Kapsam:
+- Faz 4G genis mobil legacy taramada kalan 4 fail izole edildi.
+- Faz 4H read-only izolasyonunda P3C ve P4B V3 fail kok nedeni dogrulandi.
+- P3C, P3C V2, P4B V3, P4C ve P4C V2 quality gate contract sayim mantigi additive route uyumlu hale getirildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Kok neden:
+- Mobil domainlerde toplam route decorator sayisi 28.
+- Eski gate sozlesmeleri 24 route bekleyen exact equality kullaniyordu.
+- Runtime route map PASS.
+- Role boundary matrix PASS.
+- Fail sebebi ek mobil route varligini regression kabul eden eski gate formulu idi.
+
+Degisen dosyalar:
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c.py
+- scripts/quality/bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2.py
+- scripts/quality/bys360_mobile_role_boundary_matrix_gate_p4b_v3.py
+- scripts/quality/bys360_mobile_security_suite_gate_p4c.py
+- scripts/quality/bys360_mobile_security_suite_gate_p4c_v2.py
+- STATUS.md
+
+Dogrulama:
+- Hedef 6 test legacy env acikken PASS.
+- Tum mobile_api architecture testleri legacy env acikken PASS.
+- Normal architecture mode skip davranisi PASS.
+- docs/api/openapi_draft.json JSON validasyon PASS.
+- python -m compileall app PASS.
+
+Karar:
+- Faz 4H PASS.
+- Faz 4G'de kalan mobil legacy gate borclari quality gate katmaninda giderildi.
+- Bir sonraki adimda genis architecture legacy gruplari moduler olarak ele alinabilir.

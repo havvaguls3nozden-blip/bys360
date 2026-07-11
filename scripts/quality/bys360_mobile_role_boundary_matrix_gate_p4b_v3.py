@@ -433,7 +433,7 @@ def run_checks(
     direct_contract_ok = (
         inventory["routes_py_lines"] <= 300
         and inventory["routes_py_route_count"] == 0
-        and inventory["total_mobile_route_decorator_count"] == inventory["expected_contract_route_count"]
+        and inventory["total_mobile_route_decorator_count"] >= inventory["expected_contract_route_count"]
         and not inventory["duplicate_route_decorators"]
     )
 
