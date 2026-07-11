@@ -123,14 +123,40 @@ def build_inventory(root: Path) -> dict[str, Any]:
     }
 
 
+def _phase4f_sqlite_url() -> str:
+    db_dir = Path.cwd() / "reports" / "local" / "phase4f_sqlite"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    db_path = db_dir / f"{Path(__file__).stem}.sqlite"
+    return "sqlite:///" + db_path.as_posix()
+
+
 def _prepare_env() -> None:
     os.environ.setdefault("APP_ENV", "testing")
     os.environ.setdefault("FLASK_ENV", "testing")
     os.environ.setdefault("TESTING", "1")
     os.environ.setdefault("SECRET_KEY", "local-test-key")
-    os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+    db_url = _phase4f_sqlite_url()
+    os.environ["DATABASE_URL"] = db_url
+    os.environ["SQLALCHEMY_DATABASE_URI"] = db_url
     os.environ.setdefault("WTF_CSRF_ENABLED", "0")
     os.environ.setdefault("SENTRY_DSN", "")
+
+
+def _ensure_sqlite_test_schema(flask_app) -> None:
+    """SQLite test gate ak???nda SQLAlchemy metadata tablolar?n? haz?rlar.
+
+    Bu helper yaln?zca quality/architecture test gate dosyalar?nda kullan?l?r.
+    Runtime uygulama ak???na ba?l? de?ildir ve sqlite d??? veritabanlar?nda DDL ?al??t?rmaz.
+    """
+    import importlib
+
+    importlib.import_module("app.models")
+    from app.extensions import db  # type: ignore
+
+    with flask_app.app_context():
+        dialect_name = str(getattr(getattr(db.engine, "dialect", None), "name", "") or "").lower()
+        if dialect_name == "sqlite":
+            db.create_all()
 
 
 def _build_app(root: Path):
@@ -141,6 +167,7 @@ def _build_app(root: Path):
     from app import create_app  # type: ignore
     app = create_app()
     app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
+    _ensure_sqlite_test_schema(app)
     return app
 
 
@@ -248,7 +275,9 @@ def run_subprocess(cmd: list[str], root: Path) -> dict[str, Any]:
     env.setdefault("FLASK_ENV", "testing")
     env.setdefault("TESTING", "1")
     env.setdefault("SECRET_KEY", "local-test-key")
-    env.setdefault("DATABASE_URL", "sqlite:///:memory:")
+    db_url = _phase4f_sqlite_url()
+    env["DATABASE_URL"] = db_url
+    env["SQLALCHEMY_DATABASE_URI"] = db_url
     env.setdefault("SENTRY_DSN", "")
     proc = subprocess.run(cmd, cwd=str(root), text=True, capture_output=True, env=env)
     return {

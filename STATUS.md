@@ -648,3 +648,60 @@ Sonraki onerilen is:
 - Faz 4F icin 3 fail testi calistiran run_checks kaynaklari bulunmalidir.
 - Bu kaynaklarda create_app / test client / SQLite DB hazirligi nerede yapiliyor incelenmelidir.
 - Sonra sadece test/architecture yardimci katmaninda minimal bootstrap duzeltmesi uygulanmalidir.
+
+## 2026-07-11 - Faz 4F Mobil Legacy SQLite Bootstrap Denemesi V2
+
+Kapsam:
+- P3D/P3E mobil response quality gate dosyalarinda SQLite test schema hazirligi denendi.
+- Ilk denemede db.create_all helper eklendi.
+- Ikinci denemede file-based SQLite URL kullanimi eklendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Degisen dosyalar:
+- scripts/quality/bys360_mobile_support_survey_notifications_response_gate_p3d.py
+- scripts/quality/bys360_mobile_performance_response_gate_p3e.py
+- STATUS.md
+
+Dogrulama sonucu:
+- P3D/P3E/P3F hedef 3 test legacy env acikken halen FAIL.
+- faz4f_v2_target_3_exit_code: 1.
+- Hata izi halen role_menu_defaults ve user_menu_permissions tablolarinin test calisma aninda bulunmadigini gosteriyor.
+- Faz 4C mobil API paketi sonraki adimda 7 passed, 3 skipped verdi; bu sonuc legacy env temizlendigi icin hedef 3 testin PASS kaniti sayilmaz.
+- Dolayisiyla Faz 4F V2 PASS degildir.
+
+Karar:
+- Faz 4F V2 bulgu uretimli FAIL.
+- Mevcut duzeltme tek basina yeterli olmadi.
+- Sorun artik sadece sqlite memory kaliciligi olmayabilir.
+- Bir sonraki adimda _build_app / _ensure_sqlite_test_schema icinde gercek engine URL, metadata tablo varligi ve sqlite_master tablo varligi dogrudan olculmelidir.
+- PASS kaniti alinmadan yeni faza gecilmemelidir.
+
+## 2026-07-11 - Faz 4F Mobil Legacy SQLite Bootstrap V3
+
+Kapsam:
+- Faz 4F V2 sonrasi helper icindeki import shadow sorunu duzeltildi.
+- _ensure_sqlite_test_schema parametresi flask_app olarak netlestirildi.
+- import app.models yerine importlib.import_module("app.models") kullanildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Kok neden / duzelen kisim:
+- import app.models satiri helper icindeki app parametresini module app ile eziyordu.
+- Bu nedenle with app.app_context() Flask app yerine app modulu uzerinde calisiyordu.
+- V3 ile bu shadow sorunu giderildi.
+- P3D/P3E metadata role_menu_defaults ve user_menu_permissions tablolarini gordu.
+- P3D/P3E sqlite_master role_menu_defaults ve user_menu_permissions tablolarini gordu.
+
+Dogrulama sonucu:
+- SQLite schema/bootstrap kismi PASS.
+- P3D/P3E/P3F hedef 3 test legacy env acikken halen FAIL.
+- faz4f_v3_target_3_exit_code: 1.
+- P3D/P3E direct_contract_ok False donmektedir.
+- P3F p3_suite_ok False donmektedir.
+- Bu nedenle Faz 4F V3 genel PASS degildir.
+- Faz 4C mobil API paketinin 7 passed, 3 skipped sonucu legacy env temizlendigi icin hedef 3 test icin PASS kaniti sayilmaz.
+
+Karar:
+- Faz 4F V3 bulgu uretimli PARTIAL.
+- Tablo/bootstrap borcu buyuk olcude giderildi.
+- Kalan sorun artik tablo yok hatasi degil, direct contract kontrolunun False donmesidir.
+- Bir sonraki adimda P3D/P3E direct_contract detaylari ve beklenen/gercek route sozlesmeleri izole edilmelidir.
