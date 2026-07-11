@@ -820,3 +820,43 @@ Karar:
 - Faz 4K PASS.
 - Architecture legacy borcunda mobil ve android responsive kaynakli bilinen fail kalmadi.
 - Kalan ana kalite borcu coverage orani ve daha genis CI sertlestirme alanlaridir.
+
+## 2026-07-11 - Faz 4M Coverage Baseline Closure
+
+Kapsam:
+- Faz 4L V2 coverage envanteri tamamlandi.
+- .venv testleri envanter disina alindi.
+- Coverage fail-under=0 ile olcum modu dogrulandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- Toplam proje test dosyasi: 151
+- Test bucket dagilimi:
+  - architecture: 60
+  - performance: 17
+  - security: 9
+  - communication_survey: 7
+  - mobile: 1
+  - settings_admin: 5
+  - other: 52
+- Coverage toplam statement: 102900
+- Covered lines: 22845
+- Missing lines: 80055
+- Total coverage: 18.03%
+- Branch coverage: 3.55%
+- Project tests coverage run: 13 passed, 844 skipped
+- Coverage HTML/JSON raporlari reports/local altinda uretildi.
+
+En buyuk coverage borclari:
+- app/services/performance/low_score_process_service.py -> 990 missing lines
+- app/file_center/services.py -> 696 missing lines
+- app/institutional/hr_personnel_operations_routes.py -> 667 missing lines
+- app/file_center/routes.py -> 593 missing lines
+- app/support/routes.py -> 547 missing lines
+- app/portal/routes.py -> 520 missing lines
+
+Karar:
+- Faz 4M PASS.
+- Coverage 80% hedefi kisa vadeli gate degil, uzun vadeli kalite hedefi olarak ele alinacak.
+- Mevcut dogru baseline 18.03% olarak kaydedildi.
+- Siradaki onerilen is: coverage regression gate; mevcut baseline altina dususu engellemek.
