@@ -956,3 +956,31 @@ Dogrulama:
 Karar:
 - Faz 4T PASS.
 - En buyuk coverage borcu olan low_score_process_service.py icin kontrollu coverage artisi baslatildi.
+
+## 2026-07-11 - Faz 4U Coverage Baseline Refresh After Low Score Tests
+
+Kapsam:
+- Faz 4T sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4u_low_score_test_exit_code: 0
+- phase4u_full_coverage_exit_code: 0
+- phase4u_baseline_refresh_exit_code: 0
+- phase4u_regression_gate_test_exit_code: 0
+- phase4u_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.062890424600898
+- Actual branch coverage: 3.555045871559633
+- Covered lines: 22888
+- Missing lines: 80012
+
+Yeni gate baseline:
+- min_total_percent: 18.06
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4U PASS.
+- Coverage regression kapisi, Faz 4T sonrasi yeni seviyeye yukseltilmis oldu.
