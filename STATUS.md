@@ -860,3 +860,22 @@ Karar:
 - Coverage 80% hedefi kisa vadeli gate degil, uzun vadeli kalite hedefi olarak ele alinacak.
 - Mevcut dogru baseline 18.03% olarak kaydedildi.
 - Siradaki onerilen is: coverage regression gate; mevcut baseline altina dususu engellemek.
+
+## 2026-07-11 - Faz 4N Coverage Regression Gate
+
+Kapsam:
+- Coverage baseline altina dususu engelleyen regression gate eklendi.
+- Mevcut baseline degerleri:
+  - total coverage: 18.03%
+  - branch coverage: 3.55%
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4n_gate_unit_test_exit_code: 0
+- phase4n_existing_coverage_smoke_exit_code: 0
+- Gate mevcut baseline'i kabul ediyor.
+- Total coverage veya branch coverage baseline altina duserse gate fail ediyor.
+
+Karar:
+- Faz 4N PASS.
+- Coverage hedefi artik once regression korumasi, sonra moduler artis olarak yonetilecek.
