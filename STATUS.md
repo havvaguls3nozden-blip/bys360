@@ -1612,3 +1612,35 @@ Karar:
 - Faz 4BA PASS.
 - Flask ilk request sonrasinda route ekleme test siralama borcu kapatildi.
 - XSS escaping davranisi ve mevcut guvenlik sozlesmesi korundu.
+
+## 2026-07-13 - Faz 4BD P5B Hermetic Test ve Phase2 Evidence Closure
+
+Kapsam:
+- P5B kalite kapisina rapor yazmadan calisma secenegi eklendi.
+- P5B pytest testi izlenen mimari raporu degistirmeyecek sekilde izole edildi.
+- Test, P5B raporunun onceki ve sonraki SHA256 icerigini karsilastirarak yan etki regresyonunu kilitledi.
+- Phase2 evidence JSON ve Markdown raporlari temiz Git agacinda yeniden uretildi.
+- Runtime uygulama koduna ve canli veriye dokunulmadi.
+
+Dogrulama:
+- phase4bd_patch_exit_code: 0
+- phase4bd_compile_exit_code: 0
+- phase4bd_ruff_f821_exit_code: 0
+- phase4bd_p5b_test_exit_code: 0
+- phase4bd_commit_a_exit_code: 0
+- phase4bd_evidence_generation_exit_code: 0
+- phase4bd_evidence_test_exit_code: 0
+- phase4bd_full_suite_exit_code: 0
+- phase4bd_junit_exit_code: 0
+- phase4bd_final_evidence_exit_code: 0
+- Toplanan test: 935
+- Gecen test: 933
+- Bilincli skip: 2
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4BD PASS.
+- P5B izlenen rapor yan etkisi teknik borcu kapatildi.
+- Phase2 test coverage evidence kapisi kapatildi.
+- Zorunlu tam test paketi failure ve error olmadan tamamlandi.
