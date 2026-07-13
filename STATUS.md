@@ -1451,3 +1451,32 @@ Dogrulama:
 Karar:
 - Faz 4AR PASS.
 - Mobil split manifest coverage ve sozlesme borcu kapatildi.
+
+## 2026-07-13 - Faz 4AS Coverage Baseline Refresh After Split Manifest Tests
+
+Kapsam:
+- Faz 4AR sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Regression gate negatif test senaryolari yeni baseline ile uyumlu tutuldu.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4as_split_manifest_test_exit_code: 0
+- phase4as_full_coverage_exit_code: 0
+- phase4as_baseline_refresh_exit_code: 0
+- phase4as_regression_gate_test_exit_code: 0
+- phase4as_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.186619187011498
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23051
+- Missing lines: 79849
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AS PASS.
+- Coverage regression kapisi, Faz 4AR sonrasi yeni seviyeye gore dogrulandi.
