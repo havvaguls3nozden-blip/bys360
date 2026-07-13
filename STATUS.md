@@ -1180,3 +1180,33 @@ Dogrulama:
 Karar:
 - Faz 4AF PASS.
 - Mobil communication servisinde dusuk riskli coverage borcu azaltildi.
+
+## 2026-07-13 - Faz 4AG Coverage Baseline Refresh After Communication Service Tests
+
+Kapsam:
+- Faz 4AF sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ag_communication_test_exit_code: 0
+- phase4ag_full_coverage_exit_code: 0
+- phase4ag_baseline_refresh_exit_code: 0
+- phase4ag_regression_gate_test_exit_code: 0
+- phase4ag_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.17303920089326
+- Actual branch coverage: 3.558418780356179
+- Covered lines: 23033
+- Missing lines: 79867
+- Covered branches: 1055
+- Missing branches: 28593
+
+Yeni gate baseline:
+- min_total_percent: 18.17
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AG PASS.
+- Coverage regression kapisi, Faz 4AF sonrasi yeni seviyeye yukseltilmis oldu.
