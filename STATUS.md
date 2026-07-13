@@ -1480,3 +1480,21 @@ Yeni gate baseline:
 Karar:
 - Faz 4AS PASS.
 - Coverage regression kapisi, Faz 4AR sonrasi yeni seviyeye gore dogrulandi.
+
+## 2026-07-13 - Faz 4AT Mobile Service Base Helper Tests
+
+Kapsam:
+- Mobil servis base helper fonksiyonlari icin unit testler eklendi.
+- ok_payload basarili cevap sozlesmesi dogrulandi.
+- error_payload hata cevap sozlesmesi dogrulandi.
+- Data, extra, default code/status ve custom code/status dallari test edildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4at_target_unit_test_exit_code: 0
+- phase4at_target_coverage_exit_code: 0
+- phase4at_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4AT PASS.
+- Mobil service base helper coverage ve branch borcu kapatildi.
