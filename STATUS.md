@@ -1001,3 +1001,31 @@ Dogrulama:
 Karar:
 - Faz 4W PASS.
 - Yuzde 0 coverage olan AI Excel Preview servisinde kontrollu coverage artisi baslatildi.
+
+## 2026-07-11 - Faz 4X Coverage Baseline Refresh After AI Excel Preview Tests
+
+Kapsam:
+- Faz 4W sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4x_excel_preview_test_exit_code: 0
+- phase4x_full_coverage_exit_code: 0
+- phase4x_baseline_refresh_exit_code: 0
+- phase4x_regression_gate_test_exit_code: 0
+- phase4x_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.138334791924436
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 22987
+- Missing lines: 79913
+
+Yeni gate baseline:
+- min_total_percent: 18.13
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4X PASS.
+- Coverage regression kapisi, Faz 4W sonrasi yeni seviyeye yukseltilmis oldu.
