@@ -1254,3 +1254,19 @@ Yeni gate baseline:
 Karar:
 - Faz 4AI PASS.
 - Coverage regression kapisi, Faz 4AH sonrasi yeni seviyeye yukseltilmis oldu.
+
+## 2026-07-13 - Faz 4AJ Mobile Personnel Service Delegate Tests
+
+Kapsam:
+- Mobil personnel servis delegate shim katmani icin unit test eklendi.
+- Routes ve personnel domain legacy delegasyonlari dogrulandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4aj_target_unit_test_exit_code: 0
+- phase4aj_target_coverage_exit_code: 0
+- phase4aj_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4AJ PASS.
+- Mobil personnel servisindeki dusuk riskli coverage borcu azaltildi.
