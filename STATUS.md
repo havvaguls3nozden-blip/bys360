@@ -1315,3 +1315,32 @@ Dogrulama:
 Karar:
 - Faz 4AL PASS.
 - Mobil assistant servisindeki dusuk riskli coverage borcu azaltildi.
+
+## 2026-07-13 - Faz 4AM Coverage Baseline Refresh After Assistant Service Tests
+
+Kapsam:
+- Faz 4AL sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Regression gate negatif test senaryolari yeni baseline ile uyumlu tutuldu.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4am_assistant_test_exit_code: 0
+- phase4am_full_coverage_exit_code: 0
+- phase4am_baseline_refresh_exit_code: 0
+- phase4am_regression_gate_test_exit_code: 0
+- phase4am_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.183601412318556
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23047
+- Missing lines: 79853
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AM PASS.
+- Coverage regression kapisi, Faz 4AL sonrasi yeni seviyeye gore dogrulandi.
