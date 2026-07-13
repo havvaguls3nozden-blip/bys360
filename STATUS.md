@@ -984,3 +984,20 @@ Yeni gate baseline:
 Karar:
 - Faz 4U PASS.
 - Coverage regression kapisi, Faz 4T sonrasi yeni seviyeye yukseltilmis oldu.
+
+## 2026-07-11 - Faz 4W AI Excel Preview Helper Coverage Tests
+
+Kapsam:
+- app/services/ai/excel_preview.py icin helper, dataclass, CSV okuma ve guvenli onizleme testleri eklendi.
+- Testler gercek ice aktarim yapmaz, dosyayi diske yazmaz ve veritabanina kayit atmaz.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4w_import_smoke_exit_code: 0
+- phase4w_v3_target_unit_test_exit_code: 0
+- phase4w_v3_target_coverage_exit_code: 0
+- phase4w_v3_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4W PASS.
+- Yuzde 0 coverage olan AI Excel Preview servisinde kontrollu coverage artisi baslatildi.
