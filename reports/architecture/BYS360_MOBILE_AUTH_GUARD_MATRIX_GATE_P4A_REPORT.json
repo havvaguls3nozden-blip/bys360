@@ -1,0 +1,1234 @@
+{
+  "ok": true,
+  "package": "BYS360_MAINTENANCE_SCORE_UPLIFT_P4A_MOBILE_AUTH_GUARD_MATRIX_GATE",
+  "generated_at": "2026-07-13T16:10:23",
+  "root": "C:\\bys360\\project",
+  "active_scope": {
+    "path": "C:\\bys360\\project\\tests\\architecture\\conftest.py",
+    "changed": false,
+    "reason": "already_present"
+  },
+  "routes_py_lines": 195,
+  "total_mobile_route_decorator_count": 28,
+  "expected_contract_route_count": 28,
+  "direct_contract_ok": true,
+  "runtime_route_map_ok": true,
+  "auth_guard_matrix_ok": true,
+  "compile_ok": true,
+  "app_factory_ok": true,
+  "secret_gate_ok": true,
+  "secret_gate_finding_count": 0,
+  "pytest_ok": true,
+  "pytest_mode": "not_requested",
+  "inventory": {
+    "routes_py_lines": 195,
+    "routes_py_route_count": 0,
+    "domains_dir_exists": true,
+    "domain_inventory": [
+      {
+        "path": "app/api/mobile/routes.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 195
+      },
+      {
+        "path": "app/api/mobile/domains/__init__.py",
+        "exists": true,
+        "route_count": 0,
+        "lines": 3
+      },
+      {
+        "path": "app/api/mobile/domains/assistant_chat.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 247
+      },
+      {
+        "path": "app/api/mobile/domains/auth.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 142
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v1_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 344
+      },
+      {
+        "path": "app/api/mobile/domains/communication_v2_write.py",
+        "exists": true,
+        "route_count": 4,
+        "lines": 421
+      },
+      {
+        "path": "app/api/mobile/domains/dashboard.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 199
+      },
+      {
+        "path": "app/api/mobile/domains/kpi_target_management.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 335
+      },
+      {
+        "path": "app/api/mobile/domains/notifications.py",
+        "exists": true,
+        "route_count": 2,
+        "lines": 146
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_read.py",
+        "exists": true,
+        "route_count": 1,
+        "lines": 60
+      },
+      {
+        "path": "app/api/mobile/domains/personnel_write_all.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 307
+      },
+      {
+        "path": "app/api/mobile/domains/push_notifications.py",
+        "exists": true,
+        "route_count": 4,
+        "lines": 201
+      },
+      {
+        "path": "app/api/mobile/domains/support_survey_write.py",
+        "exists": true,
+        "route_count": 3,
+        "lines": 295
+      }
+    ],
+    "total_mobile_route_decorator_count": 28,
+    "expected_contract_route_count": 28,
+    "duplicate_route_decorators": [],
+    "route_rules_sample": [
+      "get(\"/communication/messages/threads/<int:thread_id>\")",
+      "get(\"/communication/v2/threads/<int:thread_id>\")",
+      "get(\"/communication/v2/users\")",
+      "get(\"/dashboard/summary\")",
+      "get(\"/me\")",
+      "get(\"/personnel/all\")",
+      "get(\"/personnel/list\")",
+      "get(\"/push/status\")",
+      "get('/kpi/target-management')",
+      "post(\"/auth/login\")",
+      "post(\"/auth/refresh\")",
+      "post(\"/communication/messages/create-thread\")",
+      "post(\"/communication/messages/threads/<int:thread_id>/send\")",
+      "post(\"/communication/v2/create-thread\")",
+      "post(\"/communication/v2/threads/<int:thread_id>/send\")",
+      "post(\"/notifications/fcm-token\")",
+      "post(\"/personnel/add\")",
+      "post(\"/personnel/create\")",
+      "post(\"/push/register-token\")",
+      "post(\"/push/unregister-token\")",
+      "post(\"/support/tickets\")",
+      "post(\"/support/tickets/<int:ticket_id>/reply\")",
+      "post(\"/surveys/<int:survey_id>/submit\")",
+      "post('/assistant/v2/ask')",
+      "post('/kpi/target-management')",
+      "post('/kpi/target-management/<int:target_id>/progress')",
+      "post('/notifications/<int:notification_id>/read')",
+      "post('/notifications/read-all')"
+    ]
+  },
+  "runtime_route_map": {
+    "ok": true,
+    "app_build_ok": true,
+    "runtime_route_count": 985,
+    "mobile_runtime_route_count": 72,
+    "missing_runtime_suffixes": [],
+    "runtime_method_mismatches": [],
+    "sample_mobile_routes": [
+      {
+        "rule": "/api/mobile/assistant/v2/ask",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_b49_assistant_v2_ask"
+      },
+      {
+        "rule": "/api/mobile/auth/login",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_login"
+      },
+      {
+        "rule": "/api/mobile/auth/refresh",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_refresh"
+      },
+      {
+        "rule": "/api/mobile/me",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_me"
+      },
+      {
+        "rule": "/api/mobile/communication/messages/threads/<int:thread_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b46_communication_thread_detail"
+      },
+      {
+        "rule": "/api/mobile/communication/messages/threads/<int:thread_id>/send",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_b46_communication_send_message"
+      },
+      {
+        "rule": "/api/mobile/communication/messages/create-thread",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_b46_communication_create_thread"
+      },
+      {
+        "rule": "/api/mobile/communication/v2/threads/<int:thread_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b48_communication_v2_thread_detail"
+      },
+      {
+        "rule": "/api/mobile/communication/v2/threads/<int:thread_id>/send",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_b48_communication_v2_send"
+      },
+      {
+        "rule": "/api/mobile/communication/v2/users",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b48_communication_v2_users"
+      },
+      {
+        "rule": "/api/mobile/communication/v2/create-thread",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_b48_communication_v2_create_thread"
+      },
+      {
+        "rule": "/api/mobile/dashboard/summary",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_dashboard_summary"
+      },
+      {
+        "rule": "/api/mobile/kpi/target-management",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_kpi_target_management_v2853"
+      },
+      {
+        "rule": "/api/mobile/kpi/target-management",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_kpi_target_create_v2853"
+      },
+      {
+        "rule": "/api/mobile/kpi/target-management/<int:target_id>/progress",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_kpi_target_progress_v2853"
+      },
+      {
+        "rule": "/api/mobile/notifications/<int:notification_id>/read",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_notification_mark_read_v2864"
+      },
+      {
+        "rule": "/api/mobile/notifications/read-all",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_notifications_mark_all_read_v2864"
+      },
+      {
+        "rule": "/api/mobile/personnel/list",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_personnel_list"
+      },
+      {
+        "rule": "/api/mobile/personnel/all",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_personnel_all"
+      },
+      {
+        "rule": "/api/mobile/personnel/create",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_personnel_create"
+      },
+      {
+        "rule": "/api/mobile/personnel/add",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_personnel_add_alias"
+      },
+      {
+        "rule": "/api/mobile/push/register-token",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_push_register_token"
+      },
+      {
+        "rule": "/api/mobile/notifications/fcm-token",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_push_register_token_legacy_alias"
+      },
+      {
+        "rule": "/api/mobile/push/unregister-token",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_push_unregister_token"
+      },
+      {
+        "rule": "/api/mobile/push/status",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_push_status"
+      },
+      {
+        "rule": "/api/mobile/support/tickets",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_support_ticket_create"
+      },
+      {
+        "rule": "/api/mobile/support/tickets/<int:ticket_id>/reply",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_support_ticket_reply"
+      },
+      {
+        "rule": "/api/mobile/surveys/<int:survey_id>/submit",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_survey_submit"
+      },
+      {
+        "rule": "/api/mobile/health",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_health"
+      },
+      {
+        "rule": "/api/mobile/kpi/goals",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_kpi_goals"
+      },
+      {
+        "rule": "/api/mobile/ai/insights",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_ai_insights"
+      },
+      {
+        "rule": "/api/mobile/assistant/suggestions",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_assistant_suggestions"
+      },
+      {
+        "rule": "/api/mobile/settings/summary",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_settings_summary"
+      },
+      {
+        "rule": "/api/mobile/support/tickets/<int:ticket_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_support_ticket_detail"
+      },
+      {
+        "rule": "/api/mobile/surveys/<int:survey_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_survey_detail"
+      },
+      {
+        "rule": "/api/mobile/communication/threads",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_communication_threads"
+      },
+      {
+        "rule": "/api/mobile/support/tickets",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_support_tickets"
+      },
+      {
+        "rule": "/api/mobile/surveys",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_surveys"
+      },
+      {
+        "rule": "/api/mobile/notifications",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_notifications"
+      },
+      {
+        "rule": "/api/mobile/communication/messages/threads",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b46_communication_message_threads"
+      },
+      {
+        "rule": "/api/mobile/communication/messages/users",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b46_communication_users"
+      },
+      {
+        "rule": "/api/mobile/communication/v2/threads",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_b48_communication_v2_threads"
+      },
+      {
+        "rule": "/api/mobile/performance/summary",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_summary"
+      },
+      {
+        "rule": "/api/mobile/performance/periods/<int:period_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_period_detail"
+      },
+      {
+        "rule": "/api/mobile/performance/approvals",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_approvals"
+      },
+      {
+        "rule": "/api/mobile/performance/scorecards",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_scorecards"
+      },
+      {
+        "rule": "/api/mobile/performance/rules-summary",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_rules_summary"
+      },
+      {
+        "rule": "/api/mobile/performance/criteria",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_criteria"
+      },
+      {
+        "rule": "/api/mobile/performance/third-manager",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_third_manager"
+      },
+      {
+        "rule": "/api/mobile/performance/tasks/<int:assignment_id>",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_task_detail"
+      },
+      {
+        "rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_task_score_form"
+      },
+      {
+        "rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-form",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_performance_task_score_submit"
+      },
+      {
+        "rule": "/api/mobile/performance/tasks/<int:assignment_id>/score-action",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_performance_task_score_action"
+      },
+      {
+        "rule": "/api/mobile/performance/full-feature-summary",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_legacy_mobile_performance_full_feature_summary"
+      },
+      {
+        "rule": "/api/mobile/performance/president-approvals",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_prev_mobile_performance_president_approvals_alias_v21748"
+      },
+      {
+        "rule": "/api/mobile/performance/publish-preapproval",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_publish_preapproval"
+      },
+      {
+        "rule": "/api/mobile/performance/history-archive",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_prev_mobile_performance_history_archive_v21748"
+      },
+      {
+        "rule": "/api/mobile/performance/in-period-notes",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_legacy_mobile_performance_in_period_notes"
+      },
+      {
+        "rule": "/api/mobile/performance/development-suggestions",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_development_suggestions"
+      },
+      {
+        "rule": "/api/mobile/performance/reports",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_reports"
+      },
+      {
+        "rule": "/api/mobile/performance/risk-analysis",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_legacy_mobile_performance_risk_analysis_v2852"
+      },
+      {
+        "rule": "/api/mobile/performance/in-period-notes/v2",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_legacy_mobile_performance_in_period_notes_v2853"
+      },
+      {
+        "rule": "/api/mobile/performance/in-period-notes/v2",
+        "methods": [
+          "POST"
+        ],
+        "endpoint": "mobile_api.mobile_performance_create_in_period_note_v2853"
+      },
+      {
+        "rule": "/api/mobile/performance/note-scorecard",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api._bys360_legacy_mobile_performance_note_scorecard_v2863a"
+      },
+      {
+        "rule": "/api/mobile/performance/manager-view",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_manager_view_v2852"
+      },
+      {
+        "rule": "/api/mobile/performance/periods",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_periods"
+      },
+      {
+        "rule": "/api/mobile/performance/weights",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_weights"
+      },
+      {
+        "rule": "/api/mobile/performance/tasks",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_tasks"
+      },
+      {
+        "rule": "/api/mobile/performance/manager-tasks",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_manager_tasks"
+      },
+      {
+        "rule": "/api/mobile/performance/categories",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_categories"
+      },
+      {
+        "rule": "/api/mobile/performance/reminders",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_reminders"
+      },
+      {
+        "rule": "/api/mobile/performance/in-period-note-options",
+        "methods": [
+          "GET"
+        ],
+        "endpoint": "mobile_api.mobile_performance_in_period_note_options_v2853"
+      }
+    ],
+    "error": ""
+  },
+  "auth_guard_matrix": {
+    "ok": true,
+    "mode": "flask_test_client_auth_guard_matrix_no_404_405_no_5xx_no_open_2xx",
+    "case_count": 18,
+    "probe_count": 35,
+    "responses": [
+      {
+        "feature": "auth",
+        "method": "POST",
+        "path": "/api/mobile/auth/login",
+        "kind": "public_invalid_payload",
+        "scenario": "no_authorization",
+        "status_code": 400,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "auth",
+        "method": "POST",
+        "path": "/api/mobile/auth/refresh",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "auth",
+        "method": "POST",
+        "path": "/api/mobile/auth/refresh",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "identity",
+        "method": "GET",
+        "path": "/api/mobile/me",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "identity",
+        "method": "GET",
+        "path": "/api/mobile/me",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "dashboard",
+        "method": "GET",
+        "path": "/api/mobile/dashboard/summary",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "dashboard",
+        "method": "GET",
+        "path": "/api/mobile/dashboard/summary",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "assistant",
+        "method": "POST",
+        "path": "/api/mobile/assistant/v2/ask",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "assistant",
+        "method": "POST",
+        "path": "/api/mobile/assistant/v2/ask",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "personnel",
+        "method": "GET",
+        "path": "/api/mobile/personnel/list",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "personnel",
+        "method": "GET",
+        "path": "/api/mobile/personnel/list",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "personnel",
+        "method": "GET",
+        "path": "/api/mobile/personnel/all",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "personnel",
+        "method": "GET",
+        "path": "/api/mobile/personnel/all",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "kpi",
+        "method": "GET",
+        "path": "/api/mobile/kpi/target-management",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "kpi",
+        "method": "GET",
+        "path": "/api/mobile/kpi/target-management",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "communication",
+        "method": "GET",
+        "path": "/api/mobile/communication/v2/users",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "communication",
+        "method": "GET",
+        "path": "/api/mobile/communication/v2/users",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "support",
+        "method": "GET",
+        "path": "/api/mobile/support/tickets",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "support",
+        "method": "GET",
+        "path": "/api/mobile/support/tickets",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "survey",
+        "method": "GET",
+        "path": "/api/mobile/surveys",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "survey",
+        "method": "GET",
+        "path": "/api/mobile/surveys",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "notifications",
+        "method": "GET",
+        "path": "/api/mobile/notifications",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "notifications",
+        "method": "GET",
+        "path": "/api/mobile/notifications",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "performance",
+        "method": "GET",
+        "path": "/api/mobile/performance/summary",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "performance",
+        "method": "GET",
+        "path": "/api/mobile/performance/summary",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "performance",
+        "method": "GET",
+        "path": "/api/mobile/performance/tasks",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "performance",
+        "method": "GET",
+        "path": "/api/mobile/performance/tasks",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/push/register-token",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/push/register-token",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/notifications/fcm-token",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/notifications/fcm-token",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/push/unregister-token",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "POST",
+        "path": "/api/mobile/push/unregister-token",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "GET",
+        "path": "/api/mobile/push/status",
+        "kind": "protected",
+        "scenario": "no_authorization",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      },
+      {
+        "feature": "push",
+        "method": "GET",
+        "path": "/api/mobile/push/status",
+        "kind": "protected",
+        "scenario": "malformed_bearer",
+        "status_code": 401,
+        "ok": true,
+        "expected_statuses": [
+          400,
+          401,
+          403,
+          422
+        ]
+      }
+    ],
+    "failures": [],
+    "error": ""
+  },
+  "compile_results": [
+    {
+      "file": "C:\\bys360\\project\\scripts\\quality\\bys360_mobile_auth_guard_matrix_gate_p4a.py",
+      "ok": true,
+      "error": ""
+    },
+    {
+      "file": "C:\\bys360\\project\\tests\\architecture\\test_mobile_api_auth_guard_matrix_p4a.py",
+      "ok": true,
+      "error": ""
+    },
+    {
+      "file": "C:\\bys360\\project\\tests\\architecture\\conftest.py",
+      "ok": true,
+      "error": ""
+    }
+  ],
+  "app_factory_smoke": {
+    "returncode": 0,
+    "stdout_tail": "APP_FACTORY_OK\n",
+    "stderr_tail": "b\\site-packages\\sqlalchemy\\engine\\default.py\", line 941, in do_execute\n    cursor.execute(statement, parameters)\nsqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: role_menu_defaults\n[SQL: SELECT role_menu_defaults.id AS role_menu_defaults_id, role_menu_defaults.role_name AS role_menu_defaults_role_name, role_menu_defaults.menu_key AS role_menu_defaults_menu_key, role_menu_defaults.is_visible AS role_menu_defaults_is_visible, role_menu_defaults.source_type AS role_menu_defaults_source_type, role_menu_defaults.updated_by_user_id AS role_menu_defaults_updated_by_user_id, role_menu_defaults.note AS role_menu_defaults_note, role_menu_defaults.created_at AS role_menu_defaults_created_at, role_menu_defaults.updated_at AS role_menu_defaults_updated_at \nFROM role_menu_defaults \nWHERE role_menu_defaults.role_name = ? AND role_menu_defaults.is_visible = 1]\n[parameters: ('admin',)]\n(Background on this error at: https://sqlalche.me/e/20/e3q8)\n[2026-07-13 16:10:22,733] ERROR in menu_profile_access: BYS360 V6B guarded exception | file=app/services/settings/menu_profile_access.py | line=190\nTraceback (most recent call last):\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1967, in _exec_single_context\n    self.dialect.do_execute(\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\default.py\", line 941, in do_execute\n    cursor.execute(statement, parameters)\nsqlite3.OperationalError: no such table: user_menu_permissions\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"C:\\bys360\\project\\app\\services\\settings\\menu_profile_access.py\", line 193, in build_effective_user_menu_context_handler\n    override_rows = filter_live_menu_rows_func(user_menu_permission_model.query.filter_by(user_id=user.id).all())\n                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\query.py\", line 2673, in all\n    return self._iter().all()  # type: ignore\n           ^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\query.py\", line 2827, in _iter\n    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(\n                                                  ^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2362, in execute\n    return self._execute_internal(\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\session.py\", line 2247, in _execute_internal\n    result: Result[Any] = compile_state_cls.orm_execute_statement(\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\orm\\context.py\", line 305, in orm_execute_statement\n    result = conn.execute(\n             ^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1418, in execute\n    return meth(\n           ^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\sql\\elements.py\", line 515, in _execute_on_connection\n    return connection._execute_clauseelement(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1640, in _execute_clauseelement\n    ret = self._execute_context(\n          ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1846, in _execute_context\n    return self._exec_single_context(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1986, in _exec_single_context\n    self._handle_dbapi_exception(\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 2355, in _handle_dbapi_exception\n    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\base.py\", line 1967, in _exec_single_context\n    self.dialect.do_execute(\n  File \"C:\\bys360\\project\\.venv\\Lib\\site-packages\\sqlalchemy\\engine\\default.py\", line 941, in do_execute\n    cursor.execute(statement, parameters)\nsqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: user_menu_permissions\n[SQL: SELECT user_menu_permissions.id AS user_menu_permissions_id, user_menu_permissions.user_id AS user_menu_permissions_user_id, user_menu_permissions.menu_key AS user_menu_permissions_menu_key, user_menu_permissions.is_visible AS user_menu_permissions_is_visible, user_menu_permissions.source_type AS user_menu_permissions_source_type, user_menu_permissions.created_at AS user_menu_permissions_created_at, user_menu_permissions.updated_at AS user_menu_permissions_updated_at \nFROM user_menu_permissions \nWHERE user_menu_permissions.user_id = ?]\n[parameters: (0,)]\n(Background on this error at: https://sqlalche.me/e/20/e3q8)\n",
+    "ok": true,
+    "cmd": [
+      "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
+      "-c",
+      "from app import create_app; app=create_app(); print('APP_FACTORY_OK')"
+    ]
+  },
+  "secret_gate": {
+    "ok": true,
+    "skipped": true,
+    "parsed": {}
+  },
+  "pytest": {
+    "ok": true,
+    "skipped": true,
+    "mode": "not_requested"
+  },
+  "report": "C:\\bys360\\project\\reports\\architecture\\BYS360_MOBILE_AUTH_GUARD_MATRIX_GATE_P4A_REPORT.json",
+  "next_actions": [
+    "P4A temizse mobil API yetkisiz/malformed token koruma matrisi standart kalite kapisina alinmis kabul edilebilir.",
+    "P4B'de gerçek test kullanıcısı ile rol bazlı auth senaryoları, canlı veriye dokunmadan fixture üzerinden genişletilebilir."
+  ]
+}
