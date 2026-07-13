@@ -1590,3 +1590,25 @@ Karar:
 - Faz 4AZ PASS.
 - P3B ve P3B V2 eski exact-count false-positive teknik borcu kapatildi.
 - P3B V1 runtime route-map truncation borcu kapatildi.
+
+## 2026-07-13 - Faz 4BA XSS Test Application Isolation
+
+Kapsam:
+- XSS testinin session kapsamli ortak Flask app/client fixture bagimliligi kaldirildi.
+- Test kendi minimal Flask uygulamasini route kaydindan once olusturacak sekilde izole edildi.
+- Ayni testi yeniden uretebilen repair scripti de birlikte guncellendi.
+- Runtime uygulama ve XSS guvenlik filtreleri degistirilmedi.
+
+Dogrulama:
+- phase4ba_precheck_exit_code: 0
+- phase4ba_patch_exit_code: 0
+- phase4ba_compile_exit_code: 0
+- phase4ba_ruff_f821_exit_code: 0
+- phase4ba_xss_target_exit_code: 0
+- phase4ba_order_independence_exit_code: 0
+- phase4ba_combined_exit_code: 0
+
+Karar:
+- Faz 4BA PASS.
+- Flask ilk request sonrasinda route ekleme test siralama borcu kapatildi.
+- XSS escaping davranisi ve mevcut guvenlik sozlesmesi korundu.
