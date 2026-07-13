@@ -32,6 +32,8 @@ def _set_if_column(user: Any, columns: set[str], name: str, value: Any) -> None:
 
 
 def _fill_required_defaults(user: Any) -> None:
+    columns = set(user.__table__.columns.keys())
+
     for column in user.__table__.columns:
         if column.primary_key or column.nullable:
             continue

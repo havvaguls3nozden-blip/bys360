@@ -1498,3 +1498,28 @@ Dogrulama:
 Karar:
 - Faz 4AT PASS.
 - Mobil service base helper coverage ve branch borcu kapatildi.
+
+## 2026-07-13 - Statik Teknik Borc F821 Columns Duzeltmesi
+
+Kapsam:
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py icindeki
+  _fill_required_defaults yardimcisinda tanimsiz columns degiskeninin giderilmesi.
+- Ruff F821 hard gate kontrolunun yerel sanal ortamda dogrulanmasi.
+- Hedef auth success flow legacy testi ve varsayilan pytest regresyon kontrolu.
+- Runtime uygulama koduna dokunulmadi.
+
+Degisen dosyalar:
+- scripts/quality/bys360_phase2_auth_success_flow_gate_v1.py
+- STATUS.md
+
+Dogrulama:
+- target_py_compile_exit_code: 0
+- target_legacy_test_exit_code: 0
+- ruff_f821_after_exit_code: 0
+- compileall_exit_code: 0
+- pytest_default_exit_code: 0
+
+Karar:
+- Tanimsiz columns F821 teknik borcu kapatildi.
+- Ruff F821 hard gate PASS.
+- Bir sonraki ana adim Faz 4AU coverage baseline refresh.
