@@ -1434,3 +1434,20 @@ Yeni gate baseline:
 Karar:
 - Faz 4AQ PASS.
 - Coverage regression kapisi, Faz 4AP sonrasi yeni seviyeye gore dogrulandi.
+
+## 2026-07-13 - Faz 4AR Mobile Split Manifest Contract Tests
+
+Kapsam:
+- Mobil route split manifest sabiti icin contract testleri eklendi.
+- Ana mobile route ve performance route hedef gruplari dogrulandi.
+- Route path, endpoint ve blueprint davranisini koruyan manifest kurallari test altina alindi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ar_target_unit_test_exit_code: 0
+- phase4ar_target_coverage_exit_code: 0
+- phase4ar_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4AR PASS.
+- Mobil split manifest coverage ve sozlesme borcu kapatildi.
