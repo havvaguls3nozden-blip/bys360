@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MIN_TOTAL = 18.13
+DEFAULT_MIN_TOTAL = 18.15
 DEFAULT_MIN_BRANCH = 3.55
 
 
