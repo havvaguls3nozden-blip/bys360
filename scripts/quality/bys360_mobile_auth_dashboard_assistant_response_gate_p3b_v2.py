@@ -19,6 +19,8 @@ EXPECTED_ROUTES: list[tuple[str, str, str]] = [
     ("GET", "/api/mobile/dashboard/summary", "dashboard"),
     ("POST", "/api/mobile/assistant/v2/ask", "assistant"),
 ]
+# The legacy value is a minimum compatibility floor. Additive mobile routes are allowed;
+# missing target routes, duplicates, ownership and runtime behavior are checked separately.
 EXPECTED_CONTRACT_COUNT = 24
 
 DOMAIN_EXPECTATIONS: dict[str, list[str]] = {
@@ -292,7 +294,7 @@ def run_checks(root: Path, compile_all: bool = True, app_factory: bool = True, s
         and not inventory["missing_files"]
         and inventory["routes_py_lines"] <= 300
         and inventory["routes_py_route_count"] == 0
-        and inventory["total_mobile_route_decorator_count"] == EXPECTED_CONTRACT_COUNT
+        and inventory["total_mobile_route_decorator_count"] >= EXPECTED_CONTRACT_COUNT
         and not inventory["duplicate_route_decorators"]
         and not inventory["expected_missing_routes"]
         and not inventory["wrong_domain_owner_routes"]

@@ -1561,3 +1561,32 @@ Karar:
 - Faz 4AU PASS.
 - Coverage regression kapisi, Faz 4AT sonrasi yeni seviyeye gore yenilendi.
 - Statik F821 teknik borc kapanisi korunmustur.
+
+## 2026-07-13 - Faz 4AZ P3B Additive Mobile Route ve Runtime Parser Duzeltmesi
+
+Kapsam:
+- P3B ve P3B V2 mobil route contract kontrolu additive route gelisimine uygun hale getirildi.
+- Legacy 24 route degeri minimum uyumluluk tabani olarak korundu.
+- Eksik hedef route, duplicate route ve yanlis domain sahipligi kontrolleri korunmustur.
+- P3B V1 buyuk Flask route-map JSON'unu tail yerine tam stdout uzerinden ayrıştıracak sekilde duzeltildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Kok neden:
+- Gercek mobil decorator sayisi: 28
+- Legacy minimum route tabani: 24
+- Eksik hedef route: 0
+- Duplicate route: 0
+- Yanlis domain sahipligi: 0
+
+Dogrulama:
+- phase4az_precheck_exit_code: 0
+- phase4az_patch_exit_code: 0
+- phase4az_compile_exit_code: 0
+- phase4az_ruff_f821_exit_code: 0
+- phase4az_post_gate_exit_code: 0
+- phase4az_target_tests_exit_code: 0
+
+Karar:
+- Faz 4AZ PASS.
+- P3B ve P3B V2 eski exact-count false-positive teknik borcu kapatildi.
+- P3B V1 runtime route-map truncation borcu kapatildi.
