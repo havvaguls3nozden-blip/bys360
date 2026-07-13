@@ -1226,3 +1226,31 @@ Dogrulama:
 Karar:
 - Faz 4AH PASS.
 - Mobil survey servisindeki dusuk riskli coverage borcu azaltildi.
+
+## 2026-07-13 - Faz 4AI Coverage Baseline Refresh After Mobile Survey Service Tests
+
+Kapsam:
+- Faz 4AH sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ai_mobile_survey_test_exit_code: 0
+- phase4ai_full_coverage_exit_code: 0
+- phase4ai_baseline_refresh_exit_code: 0
+- phase4ai_regression_gate_test_exit_code: 0
+- phase4ai_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.177565862932674
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23039
+- Missing lines: 79861
+
+Yeni gate baseline:
+- min_total_percent: 18.17
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AI PASS.
+- Coverage regression kapisi, Faz 4AH sonrasi yeni seviyeye yukseltilmis oldu.
