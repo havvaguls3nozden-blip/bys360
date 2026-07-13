@@ -28,7 +28,7 @@ def _write_coverage(path: Path, total: float, branch: float) -> None:
 
 def test_coverage_regression_gate_accepts_current_baseline(tmp_path: Path) -> None:
     coverage_json = tmp_path / "coverage.json"
-    _write_coverage(coverage_json, total=18.15342366538914, branch=3.5584187803561793)
+    _write_coverage(coverage_json, total=18.157950327428555, branch=3.5584187803561793)
 
     report = build_report(coverage_json)
 
