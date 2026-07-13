@@ -1029,3 +1029,20 @@ Yeni gate baseline:
 Karar:
 - Faz 4X PASS.
 - Coverage regression kapisi, Faz 4W sonrasi yeni seviyeye yukseltilmis oldu.
+
+## 2026-07-13 - Faz 4Z Mobile Service Helper Delegate Coverage Tests
+
+Kapsam:
+- app/api/mobile/services/base.py helper payload testleri eklendi.
+- app/api/mobile/services/profile_service.py delegate testleri eklendi.
+- app/api/mobile/services/dashboard_service.py delegate testleri eklendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4z_v2_target_unit_test_exit_code: 0
+- phase4z_v2_target_coverage_exit_code: 0
+- phase4z_v2_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4Z PASS.
+- Mobil servis helper/delegate coverage borcu dusuk riskli testlerle azaltildi.
