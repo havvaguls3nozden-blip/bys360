@@ -1118,3 +1118,19 @@ Yeni gate baseline:
 Karar:
 - Faz 4AC PASS.
 - Coverage regression kapisi, Faz 4AB sonrasi yeni seviyeye yukseltilmis oldu.
+
+## 2026-07-13 - Faz 4AD Mobile Performance Period Service Delegate Tests
+
+Kapsam:
+- app/api/mobile/services/performance_period_service.py delegate testleri eklendi.
+- Legacy performance_routes bagimliligi fake module ile izole edildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ad_target_unit_test_exit_code: 0
+- phase4ad_target_coverage_exit_code: 0
+- phase4ad_regression_gate_unit_test_exit_code: 0
+
+Karar:
+- Faz 4AD PASS.
+- Mobil performance period servisinde dusuk riskli coverage borcu azaltildi.
