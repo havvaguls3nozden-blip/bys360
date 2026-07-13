@@ -1270,3 +1270,32 @@ Dogrulama:
 Karar:
 - Faz 4AJ PASS.
 - Mobil personnel servisindeki dusuk riskli coverage borcu azaltildi.
+
+## 2026-07-13 - Faz 4AK Coverage Baseline Refresh After Personnel Service Tests
+
+Kapsam:
+- Faz 4AJ sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Regression gate negatif test senaryolari yeni baseline ile uyumlu hale getirildi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ak_personnel_test_exit_code: 0
+- phase4ak_full_coverage_exit_code: 0
+- phase4ak_fix_negative_tests_exit_code: 0
+- phase4ak_regression_gate_test_exit_code: 0
+- phase4ak_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.182092524972084
+- Actual branch coverage: 3.558418780356179
+- Covered lines: 23045
+- Missing lines: 79855
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AK PASS.
+- Coverage regression kapisi, Faz 4AJ sonrasi yeni seviyeye yukseltilmis oldu.
