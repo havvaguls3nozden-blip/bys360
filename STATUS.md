@@ -1360,3 +1360,32 @@ Dogrulama:
 Karar:
 - Faz 4AN PASS.
 - Mobil performance evaluation servisindeki scaffold coverage borcu kapatildi.
+
+## 2026-07-13 - Faz 4AO Coverage Baseline Refresh After Performance Evaluation Service Tests
+
+Kapsam:
+- Faz 4AN sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Regression gate negatif test senaryolari yeni baseline ile uyumlu tutuldu.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4ao_performance_evaluation_test_exit_code: 0
+- phase4ao_full_coverage_exit_code: 0
+- phase4ao_baseline_refresh_exit_code: 0
+- phase4ao_regression_gate_test_exit_code: 0
+- phase4ao_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.184355855991793
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23048
+- Missing lines: 79852
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AO PASS.
+- Coverage regression kapisi, Faz 4AN sonrasi yeni seviyeye gore dogrulandi.
