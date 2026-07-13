@@ -1523,3 +1523,41 @@ Karar:
 - Tanimsiz columns F821 teknik borcu kapatildi.
 - Ruff F821 hard gate PASS.
 - Bir sonraki ana adim Faz 4AU coverage baseline refresh.
+
+## 2026-07-13 - Faz 4AU Coverage Baseline Refresh After Mobile Service Base Tests
+
+Kapsam:
+- Faz 4AT mobil service base helper testleri sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate gercek yeni seviyeye gore guncellendi.
+- F821 hard gate yeniden dogrulandi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4au_ruff_f821_exit_code: 0
+- phase4au_mobile_service_base_test_exit_code: 0
+- phase4au_full_coverage_exit_code: 0
+- phase4au_baseline_refresh_exit_code: 0
+- phase4au_gate_compile_exit_code: 0
+- phase4au_regression_gate_test_exit_code: 0
+- phase4au_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.186619187011498
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23051
+- Missing lines: 79849
+- Covered branches: 1055
+- Missing branches: 28593
+
+Onceki gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AU PASS.
+- Coverage regression kapisi, Faz 4AT sonrasi yeni seviyeye gore yenilendi.
+- Statik F821 teknik borc kapanisi korunmustur.

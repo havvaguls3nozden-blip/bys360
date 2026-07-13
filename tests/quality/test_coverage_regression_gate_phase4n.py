@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -39,7 +39,7 @@ def test_coverage_regression_gate_accepts_current_baseline(tmp_path: Path) -> No
 
 def test_coverage_regression_gate_rejects_total_regression(tmp_path: Path) -> None:
     coverage_json = tmp_path / "coverage.json"
-    _write_coverage(coverage_json, total=18.17, branch=3.5584187803561793)
+    _write_coverage(coverage_json, total=18.169999999999998, branch=3.5584187803561793)
 
     report = build_report(coverage_json)
 

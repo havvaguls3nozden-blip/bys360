@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
@@ -8,8 +8,6 @@ from typing import Any
 
 DEFAULT_MIN_TOTAL = 18.18
 DEFAULT_MIN_BRANCH = 3.55
-
-
 def _load_coverage(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"coverage json not found: {path}")
