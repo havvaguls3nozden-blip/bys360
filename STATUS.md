@@ -1405,3 +1405,32 @@ Dogrulama:
 Karar:
 - Faz 4AP PASS.
 - Mobil performance scorecard servisindeki scaffold coverage borcu kapatildi.
+
+## 2026-07-13 - Faz 4AQ Coverage Baseline Refresh After Performance Scorecard Service Tests
+
+Kapsam:
+- Faz 4AP sonrasi proje genel coverage yeniden olculdu.
+- Coverage regression gate mevcut yeni seviyeye gore guncellendi.
+- Regression gate negatif test senaryolari yeni baseline ile uyumlu tutuldu.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4aq_performance_scorecard_test_exit_code: 0
+- phase4aq_full_coverage_exit_code: 0
+- phase4aq_baseline_refresh_exit_code: 0
+- phase4aq_regression_gate_test_exit_code: 0
+- phase4aq_regression_gate_smoke_exit_code: 0
+
+Coverage:
+- Actual total coverage: 18.185110299665027
+- Actual branch coverage: 3.5584187803561793
+- Covered lines: 23049
+- Missing lines: 79851
+
+Yeni gate baseline:
+- min_total_percent: 18.18
+- min_branch_percent: 3.55
+
+Karar:
+- Faz 4AQ PASS.
+- Coverage regression kapisi, Faz 4AP sonrasi yeni seviyeye gore dogrulandi.
