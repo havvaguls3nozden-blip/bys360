@@ -143,7 +143,7 @@ def _app_factory_ok(root: Path) -> bool:
         return False
 
 
-def build_report(root: Path) -> dict:
+def build_report(root: Path, write_report: bool = True) -> dict:
     css_hits = _css_files(root)
     template_hits = _template_files(root)
     media_count = _count_media_queries(root)
@@ -210,9 +210,14 @@ def build_report(root: Path) -> dict:
     }
 
     report_path = root / "reports" / "architecture" / "BYS360_ANDROID_RESPONSIVE_CORE_STYLES_GATE_P5B_REPORT.json"
-    report_path.parent.mkdir(parents=True, exist_ok=True)
     report["report"] = str(report_path)
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if write_report:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
 
     return report
 
@@ -220,10 +225,18 @@ def build_report(root: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
+    parser.add_argument(
+        "--no-write-report",
+        action="store_true",
+        help="Gate sonucunu diske yazmadan hesapla.",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
-    report = build_report(root)
+    report = build_report(
+        root,
+        write_report=not args.no_write_report,
+    )
 
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["ok"] else 1
