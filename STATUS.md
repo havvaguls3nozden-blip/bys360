@@ -2109,3 +2109,35 @@ Dogrulama:
 Karar:
 - Faz 4CB PASS.
 - Settings bootstrap yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CD Coverage Baseline Refresh After Settings Bootstrap
+
+Kapsam:
+- Faz 4CC genel coverage sonucu kullanildi.
+- Coverage regression gate Settings Bootstrap artisindan sonraki seviyeye yukseltildi.
+- Pozitif ve negatif regression gate testleri yeni baseline ile yenilendi.
+- Runtime uygulama koduna ve yerel veritabanina dokunulmadi.
+- pyproject.toml genel fail_under degeri degistirilmedi.
+
+Coverage:
+- Total coverage: 21.073253062885215
+- Statement coverage: 25.214446514516382
+- Branch coverage: 6.685321286494505
+- Total statements: 103056
+- Covered lines: 25985
+- Missing lines: 77071
+- Total branches: 29662
+- Covered branches: 1983
+- Missing branches: 27679
+- Measured files: 954
+
+Yeni regression baseline:
+- min_total_percent: 21.07
+- min_branch_percent: 6.68
+
+Korunan genel ayar:
+- pyproject fail_under: 80
+
+Karar:
+- Faz 4CD PASS.
+- Settings Bootstrap coverage kazanimi regression kapisina dahil edildi.
