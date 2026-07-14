@@ -2256,3 +2256,32 @@ Dogrulama:
 Karar:
 - Faz 4CN PASS.
 - Public build context admin ve non-admin davranislari coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CQ Effective Menu Helpers Coverage
+
+Kapsam:
+- effective_menu.py icindeki _log_warning, _active_menu_items ve _truthy_bool yardimci fonksiyonlari unit testlerle kapsandi.
+- Logger verilmediginde erken cikis davranisi dogrulandi.
+- Warning mesaji ve argumanlarinin aynen iletildigi dogrulandi.
+- Warning hatasinin standart exception logger ile kaydedildigi dogrulandi.
+- Kaldirilmis menu anahtarlarinin aktif menu listesinden filtrelendigi dogrulandi.
+- Aktif menu kayitlarinin sirasi ve nesne kimligi korunarak donduruldugu dogrulandi.
+- Boolean degerlerin dogrudan korundugu dogrulandi.
+- Metinsel true ve false degerlerinin normalize edildigi dogrulandi.
+- Runtime uygulama kodunda degisiklik yapilmadi.
+
+Dogrulama:
+- Target test: 5 passed
+- effective_menu.py: 57 / 57 satir
+- effective_menu.py: 12 / 12 branch
+- effective_menu.py coverage: 100 percent
+- Default paket: 1006 collected, 901 passed, 105 architecture skip
+- Forced paket: 1006 collected, 1004 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+- pyproject fail_under: 80
+- Regression baseline: 21.08 total, 6.69 branch
+
+Karar:
+- Faz 4CQ PASS.
+- Effective menu yardimci davranislari coverage acisindan kilitlendi.
