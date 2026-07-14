@@ -2059,3 +2059,27 @@ Dogrulama:
 Karar:
 - Faz 4BX PASS.
 - Settings snapshots yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4BZ Coverage Baseline Refresh After Settings Snapshots
+
+Kapsam:
+- Faz 4BY genel coverage sonucu kullanildi.
+- Coverage regression gate yeni seviyeye yukseltildi.
+- Pozitif ve negatif gate testleri yeni baseline ile yenilendi.
+- Runtime uygulama koduna ve yerel veritabanina dokunulmadi.
+
+Coverage:
+- Total coverage: 21.043867448273783
+- Statement coverage: 25.18824716658904
+- Branch coverage: 6.644865484458229
+- Covered lines: 25958
+- Missing lines: 77098
+- Covered branches: 1971
+- Missing branches: 27691
+
+Yeni baseline:
+- min_total_percent: 21.04
+- min_branch_percent: 6.64
+
+Karar:
+- Faz 4BZ PASS.
