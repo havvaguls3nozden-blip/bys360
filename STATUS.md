@@ -2447,3 +2447,30 @@ Yeni baseline:
 Karar:
 - Faz 4DC PASS.
 - User context test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
+
+## 2026-07-15 - Faz 4DE Reusable Coverage Campaign Framework
+
+Kapsam:
+- Commit ve faza ozel coverage degerlerini hardcode etme ihtiyacini azaltan genel campaign runner eklendi.
+- Runner iki coverage.py JSON raporunu dinamik olarak karsilastirir.
+- Total, statement ve branch coverage gerilemelerini tespit eder.
+- Covered line, missing line, covered branch ve missing branch deltalarini otomatik hesaplar.
+- Birden fazla hedef dosya icin coverage ilerlemesini ve tam kapsama durumunu raporlar.
+- Mevcut regression gate baseline degerlerini dogrudan gate scriptinden okur.
+- Sonraki guvenli baseline degerlerini iki ondalik asagi yuvarlama ile onerir.
+- JSON ve Markdown kampanya raporu uretebilir.
+- Test sayisi, global coverage degeri ve beklenen delta artik her kampanya scriptinde elle sabitlenmek zorunda degildir.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- Framework unit testleri: 7 passed
+- Gercek 4DB coverage JSON smoke: PASS
+- Gate baseline smoke: 21.13 total, 6.74 branch
+- Default paket: 1026 collected, 921 passed, 105 architecture skip
+- Forced paket: 1026 collected, 1024 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4DE PASS.
+- Sonraki coverage calismalari tek dosyalik mikro fazlar yerine coklu hedef campaign modeliyle yurutulecek.
