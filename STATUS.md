@@ -2384,3 +2384,30 @@ Yeni baseline:
 Karar:
 - Faz 4CX PASS.
 - Final hardening test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
+
+## 2026-07-14 - Faz 4DA User Context Coverage
+
+Kapsam:
+- effective_menu_parts/user_context.py icindeki kullaniciya atanmis anket kontrolu kalici unit testlerle kapsandi.
+- Eksik veya kimlik dogrulamasi olmayan kullanici yollari dogrulandi.
+- Bos anket sorgusu ve atama kaydi bulunmayan durumlar dogrulandi.
+- Atama eslesmesi olmayan ve eslesen kullanici yollari dogrulandi.
+- Atama sorgusu hata fallback davranisi ve loglama yolu dogrulandi.
+- Dis sorgu hatasinda rollback ve False donus yolu dogrulandi.
+- Uygulama kaynak kodunda degisiklik yapilmadi.
+
+Dogrulama:
+- Target test: 6 passed
+- user_context.py: 30 / 30 satir
+- user_context.py: 8 / 8 branch
+- user_context.py coverage: 100 percent
+- Default paket: 1019 collected, 914 passed, 105 architecture skip
+- Forced paket: 1019 collected, 1017 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+- pyproject fail_under: 80
+- Regression baseline: 21.11 total, 6.71 branch
+
+Karar:
+- Faz 4DA PASS.
+- Settings user context davranislari coverage acisindan kilitlendi.
