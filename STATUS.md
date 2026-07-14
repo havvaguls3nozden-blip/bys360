@@ -2229,3 +2229,30 @@ Korunan genel ayar:
 Karar:
 - Faz 4CL PASS.
 - Settings Catalog coverage kazanimi regression kapisina dahil edildi.
+
+## 2026-07-14 - Faz 4CN Public Build Context Coverage
+
+Kapsam:
+- public_build_context.py icindeki yonetici ve yonetici olmayan menu gorunurlugu yollari iki unit test ile kapsandi.
+- Yonetici kullanicida uc performans merkezi ve uc ana menu anahtarinin True yapildigi dogrulandi.
+- Yonetici olmayan kullanicida onceki gorunurluk haritasinin korundugu dogrulandi.
+- Onceki gorunurluk haritasinin kopyalandigi ve kaynak sozlugun degistirilmedigi dogrulandi.
+- Kullanici, pozisyonel arguman ve keyword argumanlarinin onceki builder fonksiyonuna aynen iletildigi dogrulandi.
+- Runtime uygulama kodunda degisiklik yapilmadi.
+- Flask context, veritabani, dosya sistemi yazimi, dis ag ve canli veri kullanilmadi.
+
+Dogrulama:
+- Target test: 2 passed
+- public_build_context.py: 14 / 14 satir
+- public_build_context.py: 6 / 6 branch
+- public_build_context.py coverage: 100 percent
+- Default paket: 1001 collected, 896 passed, 105 architecture skip
+- Forced paket: 1001 collected, 999 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+- pyproject fail_under: 80
+- Regression baseline: 21.08 total, 6.69 branch
+
+Karar:
+- Faz 4CN PASS.
+- Public build context admin ve non-admin davranislari coverage acisindan kilitlendi.
