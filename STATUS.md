@@ -2141,3 +2141,29 @@ Korunan genel ayar:
 Karar:
 - Faz 4CD PASS.
 - Settings Bootstrap coverage kazanimi regression kapisina dahil edildi.
+
+## 2026-07-14 - Faz 4CF Settings Package Init Coverage
+
+Kapsam:
+- app/services/settings/__init__.py icindeki build_change_payload davranisi iki unit test ile kapsandi.
+- Hassas ayar degerlerinin maskelenmesi dogrulandi.
+- Hassas olmayan ayar degerlerinin korunmasi dogrulandi.
+- changed_at ISO tarih donusumu ve None yolu test edildi.
+- meta sozlugunun guvenli kopyasi ve bos meta yolu test edildi.
+- Dinamik __all__ uyumluluk dongusundeki normal calismada ulasilamayan kismi branch coverage aciklamasi ile isaretlendi.
+- Eklenen pragma yalniz coverage metadata yorumudur; runtime davranisini degistirmez.
+- Flask context, veritabani, dosya sistemi, dis ag ve canli veri kullanilmadi.
+
+Dogrulama:
+- Target test: 2 passed
+- settings/__init__.py: 25 / 25 satir
+- settings/__init__.py: 4 / 4 branch
+- settings/__init__.py coverage: 100 percent
+- Default paket: 995 collected, 890 passed, 105 architecture skip
+- Forced paket: 995 collected, 993 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4CF PASS.
+- Settings paket public contract payload davranisi ve coverage acisindan kilitlendi.
