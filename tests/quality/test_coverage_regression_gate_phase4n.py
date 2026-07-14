@@ -28,7 +28,7 @@ def _write_coverage(path: Path, total: float, branch: float) -> None:
 
 def test_coverage_regression_gate_accepts_current_baseline(tmp_path: Path) -> None:
     coverage_json = tmp_path / "coverage.json"
-    _write_coverage(coverage_json, total=21.112433882367124, branch=6.719034454858068)
+    _write_coverage(coverage_json, total=21.135038201298993, branch=6.746004989548918)
 
     report = build_report(coverage_json)
 
@@ -39,7 +39,7 @@ def test_coverage_regression_gate_accepts_current_baseline(tmp_path: Path) -> No
 
 def test_coverage_regression_gate_rejects_total_regression(tmp_path: Path) -> None:
     coverage_json = tmp_path / "coverage.json"
-    _write_coverage(coverage_json, total=21.1, branch=6.719034454858068)
+    _write_coverage(coverage_json, total=21.12, branch=6.746004989548918)
 
     report = build_report(coverage_json)
 
@@ -49,7 +49,7 @@ def test_coverage_regression_gate_rejects_total_regression(tmp_path: Path) -> No
 
 def test_coverage_regression_gate_rejects_branch_regression(tmp_path: Path) -> None:
     coverage_json = tmp_path / "coverage.json"
-    _write_coverage(coverage_json, total=21.112433882367124, branch=6.7)
+    _write_coverage(coverage_json, total=21.135038201298993, branch=6.73)
 
     report = build_report(coverage_json)
 

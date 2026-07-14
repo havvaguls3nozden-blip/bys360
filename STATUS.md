@@ -2411,3 +2411,39 @@ Dogrulama:
 Karar:
 - Faz 4DA PASS.
 - Settings user context davranislari coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4DC Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4DB salt okunur coverage olcumu basariyla tamamlandi.
+- User context testleri sonrasi yeni coverage seviyesi regression gate ile kilitlendi.
+- Coverage.py birlesik baseline 21.11 seviyesinden 21.13 seviyesine yukseltildi.
+- Branch baseline 6.71 seviyesinden 6.74 seviyesine yukseltildi.
+- Regression gate kabul ve negatif test fixture degerleri yeni baseline ile uyumlu hale getirildi.
+- pyproject.toml fail_under 80 olarak korundu.
+- Runtime uygulama koduna dokunulmadi.
+
+Olcum:
+- Toplanan test: 1019
+- Gecen test: 914
+- Legacy architecture skip: 105
+- Failure: 0
+- Error: 0
+- Coverage.py birlesik oran: 21.135038201298993
+- Statement coverage: 25.276548672566374
+- Branch coverage: 6.746004989548918
+- Covered lines: 26049 / 103056
+- Covered branches: 2001 / 29662
+- User context coverage: 100 percent
+
+Onceki baseline:
+- Total: 21.11
+- Branch: 6.71
+
+Yeni baseline:
+- Total: 21.13
+- Branch: 6.74
+
+Karar:
+- Faz 4DC PASS.
+- User context test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
