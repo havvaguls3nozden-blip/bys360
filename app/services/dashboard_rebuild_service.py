@@ -351,7 +351,7 @@ def _unit_average(reader: _Reader, period_id: int | None, scope_ids: list[int] |
     label_expr = "COALESCE(" + ", ".join(label_parts + ["'Birim bilgisi yok'"]) + ")"
     rows = reader.rows(
         f"""
-        SELECT {label_expr} AS label, ROUND(AVG(pe.final_total_100)::numeric, 1) AS avg_score, COUNT(*) AS row_count
+        SELECT {label_expr} AS label, ROUND(AVG(pe.final_total_100), 1) AS avg_score, COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id
         {where}
@@ -381,7 +381,7 @@ def _category_average(reader: _Reader, period_id: int | None, scope_ids: list[in
     rows = reader.rows(
         f"""
         SELECT COALESCE(NULLIF(u.personnel_category,''), 'Diğer') AS label,
-               ROUND(AVG(pe.final_total_100)::numeric, 1) AS avg_score,
+               ROUND(AVG(pe.final_total_100), 1) AS avg_score,
                COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id
@@ -412,13 +412,13 @@ def _low_score_trend(reader: _Reader, scope_ids: list[int] | None) -> dict[str, 
     params.update(scope_params)
     if not reader.has_col("performance_evaluations", "period_id"):
         return _chart("low_score_trend", "Düşük Performans Trendi", ["Dönem"], [_int(reader.scalar(f"SELECT COUNT(*) FROM performance_evaluations pe {where}", params))], "line")
-    period_label = "('Dönem ' || pe.period_id::text)"
+    period_label = "('Dönem ' || CAST(pe.period_id AS TEXT))"
     join_period = ""
     group_cols = "pe.period_id"
     order_cols = "pe.period_id"
     if reader.has_table("performance_periods"):
         label_col = reader.first_col("performance_periods", ["title", "name", "period_name"], "id")
-        period_label = f"COALESCE(p.{label_col}::text, 'Dönem ' || pe.period_id::text)"
+        period_label = f"COALESCE(CAST(p.{label_col} AS TEXT), 'Dönem ' || CAST(pe.period_id AS TEXT))"
         join_period = "LEFT JOIN performance_periods p ON p.id = pe.period_id"
         group_cols = f"pe.period_id, {period_label}"
         order_cols = "pe.period_id"
