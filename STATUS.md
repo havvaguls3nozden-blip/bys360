@@ -1740,3 +1740,37 @@ Dogrulama:
 Karar:
 - Faz 4BH PASS.
 - Settings menu rule yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4BJ Settings Value Codec Coverage
+
+Kapsam:
+- app/services/settings/value_codec.py yedi yan etkisiz unit test ile kapsandi.
+- Desteklenen ve reddedilen boolean degerleri kilitlendi.
+- Boolean, integer ve metin degerlerinin storage donusumleri test edildi.
+- Boolean, integer ve metin degerlerinin Python donusumleri test edildi.
+- Gecersiz integer girdilerinin sifira dusmesi mevcut runtime davranisina uygun olarak kilitlendi.
+- Flask context, veritabani, dosya sistemi, dis ag ve canli veri kullanilmadi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4bj_precheck_exit_code: 0
+- phase4bj_create_exit_code: 0
+- phase4bj_compile_exit_code: 0
+- phase4bj_ruff_exit_code: 0
+- phase4bj_target_exit_code: 0
+- phase4bj_coverage_test_exit_code: 0
+- phase4bj_coverage_json_exit_code: 0
+- phase4bj_coverage_parse_exit_code: 0
+- phase4bj_cached_diff_exit_code: 0
+- phase4bj_commit_a_exit_code: 0
+- Target test: 7 passed
+- value_codec.py: 25 / 25 satir ve 8 / 8 branch
+- value_codec.py coverage: 100 percent
+- Default paket: 953 collected, 848 passed, 105 architecture skip
+- Forced paket: 953 collected, 951 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4BJ PASS.
+- Settings value codec yardimcilari davranis ve coverage acisindan kilitlendi.
