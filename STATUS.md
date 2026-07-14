@@ -1671,3 +1671,39 @@ Karar:
 - Faz 4BE PASS.
 - Architecture conftest global skip teknik borcu kapatildi.
 - Mimari legacy secimi korunurken proje testlerinin yanlislikla skip edilmesi engellendi.
+
+## 2026-07-14 - Faz 4BG Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4BE sonrasinda varsayilan test paketiyle olculen coverage sonucu regression baseline olarak kilitlendi.
+- Coverage.py birlesik baseline 18.18 seviyesinden 20.70 seviyesine yukseltildi.
+- Branch baseline 3.55 seviyesinden 6.17 seviyesine yukseltildi.
+- Regression gate kabul, total regression ve branch regression test fixture degerleri yeni olcume gore yenilendi.
+- pyproject.toml fail_under = 80 kalite hedefi degistirilmedi.
+- Runtime uygulama koduna dokunulmadi.
+
+Olcum:
+- Toplanan test: 938
+- Gecen test: 833
+- Mimari legacy skip: 105
+- Failure: 0
+- Error: 0
+- Coverage.py birlesik oran: 20.704802664295723
+- Statement coverage: 24.88743983853439
+- Branch coverage: 6.17288112736835
+- Covered lines: 25648 / 103056
+- Covered branches: 1831 / 29662
+
+Dogrulama:
+- phase4bg_plan_exit_code: 0
+- phase4bg_patch_exit_code: 0
+- phase4bg_compile_exit_code: 0
+- phase4bg_ruff_f821_exit_code: 0
+- phase4bg_gate_test_exit_code: 0
+- phase4bg_gate_smoke_exit_code: 0
+- phase4bg_gate_validation_exit_code: 0
+
+Karar:
+- Faz 4BG PASS.
+- Varsayilan test paketinin yeni coverage seviyesi regresyona karsi kilitlendi.
+- Coverage tabani dusurulmedi; 18.18 / 3.55 seviyesinden 20.70 / 6.17 seviyesine yukseltildi.
