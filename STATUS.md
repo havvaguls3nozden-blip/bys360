@@ -1808,3 +1808,37 @@ Dogrulama:
 Karar:
 - Faz 4BK PASS.
 - Settings definition yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4BM Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4BL kapsam yeniden olcumu iki kez ayni sonucu uretti.
+- Default paket 959 test topladi; 854 test gecti ve 105 legacy architecture testi atlandi.
+- Failure ve error bulunmadi.
+- menu_rules.py, value_codec.py ve definitions.py tam pakette satir ve branch olarak 100 percent kaldi.
+- Coverage.py birlesik oran 20.80124775840504 olarak olculdu.
+- Statement orani 24.971859959633598 olarak olculdu.
+- Branch orani 6.311105117658958 olarak olculdu.
+- Regression tabani asagi yuvarlama kuraliyla 20.80 / 6.31 seviyesine yukseltildi.
+- pyproject.toml fail_under = 80 kalite hedefi korunmustur.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4bm_plan_exit_code: 0
+- phase4bm_patch_exit_code: 0
+- phase4bm_content_exit_code: 0
+- phase4bm_compile_exit_code: 0
+- phase4bm_ruff_exit_code: 0
+- phase4bm_gate_test_exit_code: 0
+- Gate testleri: 3 passed
+- phase4bm_gate_smoke_exit_code: 0
+- phase4bm_gate_validation_exit_code: 0
+- Actual total coverage: 20.80124775840504
+- Actual branch coverage: 6.311105117658958
+- Yeni total baseline: 20.80
+- Yeni branch baseline: 6.31
+- pyproject fail_under: 80
+
+Karar:
+- Faz 4BM PASS.
+- Settings helper test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
