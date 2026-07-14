@@ -2197,3 +2197,35 @@ Dogrulama:
 Karar:
 - Faz 4CJ PASS.
 - Settings katalog koruyucu ve tekrar kayit engelleme davranislari coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CL Coverage Baseline Refresh After Settings Catalog
+
+Kapsam:
+- Faz 4CK genel coverage sonucu kullanildi.
+- Coverage regression gate Settings Catalog artisindan sonraki seviyeye yukseltildi.
+- Pozitif ve negatif regression gate testleri yeni baseline ile yenilendi.
+- Runtime uygulama koduna ve yerel veritabanina dokunulmadi.
+- pyproject.toml genel fail_under degeri degistirilmedi.
+
+Coverage:
+- Total coverage: 21.080034358564777
+- Statement coverage: 25.220268591833566
+- Branch coverage: 6.695435237003573
+- Total statements: 103056
+- Covered lines: 25991
+- Missing lines: 77065
+- Total branches: 29662
+- Covered branches: 1986
+- Missing branches: 27676
+- Measured files: 954
+
+Yeni regression baseline:
+- min_total_percent: 21.08
+- min_branch_percent: 6.69
+
+Korunan genel ayar:
+- pyproject fail_under: 80
+
+Karar:
+- Faz 4CL PASS.
+- Settings Catalog coverage kazanimi regression kapisina dahil edildi.
