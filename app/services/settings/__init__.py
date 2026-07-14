@@ -129,5 +129,5 @@ for _name in [
     "normalize_setting_key",
     "to_bool",
 ]:
-    if _name not in __all__:
+    if _name not in __all__:  # pragma: no branch
         __all__.append(_name)
