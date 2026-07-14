@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MIN_TOTAL = 21.09
+DEFAULT_MIN_TOTAL = 21.11
 DEFAULT_MIN_BRANCH = 6.71
 def _load_coverage(path: Path) -> dict[str, Any]:
     if not path.exists():

@@ -2348,3 +2348,39 @@ Dogrulama:
 Karar:
 - Faz 4CV PASS.
 - Settings final hardening davranislari coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CX Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4CW salt okunur coverage olcumu basariyla tamamlandi.
+- Final hardening testleri sonrasi yeni coverage seviyesi regression gate ile kilitlendi.
+- Coverage.py birlesik baseline 21.09 seviyesinden 21.11 seviyesine yukseltildi.
+- Branch baseline 6.71 seviyesinde korundu.
+- Regression gate kabul ve negatif test fixture degerleri yeni baseline ile uyumlu hale getirildi.
+- pyproject.toml fail_under 80 olarak korundu.
+- Runtime uygulama koduna dokunulmadi.
+
+Olcum:
+- Toplanan test: 1013
+- Gecen test: 908
+- Legacy architecture skip: 105
+- Failure: 0
+- Error: 0
+- Coverage.py birlesik oran: 21.112433882367124
+- Statement coverage: 25.255201055736688
+- Branch coverage: 6.719034454858068
+- Covered lines: 26027 / 103056
+- Covered branches: 1993 / 29662
+- Final hardening coverage: 100 percent
+
+Onceki baseline:
+- Total: 21.09
+- Branch: 6.71
+
+Yeni baseline:
+- Total: 21.11
+- Branch: 6.71
+
+Karar:
+- Faz 4CX PASS.
+- Final hardening test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
