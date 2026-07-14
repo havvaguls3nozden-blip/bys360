@@ -41,10 +41,26 @@ def pytest_collection_modifyitems(config, items):
         )
     )
 
+    architecture_root = Path(__file__).resolve().parent
+
     for item in items:
         path_obj = getattr(item, "path", None) or getattr(item, "fspath", None)
-        file_name = Path(str(path_obj)).name if path_obj is not None else ""
-        if file_name.startswith("test_") and file_name not in ACTIVE_ARCHITECTURE_TEST_FILES:
+
+        if path_obj is None:
+            continue
+
+        try:
+            item_path = Path(str(path_obj)).resolve()
+            item_path.relative_to(architecture_root)
+        except (OSError, ValueError):
+            continue
+
+        file_name = item_path.name
+
+        if (
+            file_name.startswith("test_")
+            and file_name not in ACTIVE_ARCHITECTURE_TEST_FILES
+        ):
             item.add_marker(skip_legacy)
 
 # BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE: active architecture test -> test_mobile_auth_dashboard_assistant_response_p3b.py
