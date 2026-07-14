@@ -2083,3 +2083,29 @@ Yeni baseline:
 
 Karar:
 - Faz 4BZ PASS.
+
+## 2026-07-14 - Faz 4CB Settings Bootstrap Coverage
+
+Kapsam:
+- app/services/settings/bootstrap.py dort yan etkisiz unit test ile kapsandi.
+- Runtime snapshot bos anahtar atlama davranisi test edildi.
+- Hassas deger maskeleme acik ve kapali yollari test edildi.
+- Tanimli hassas, tanimli hassas olmayan ve tanimsiz ayar yollari kapsandi.
+- Default ve override birlestirme, anahtar kirpma ve bos anahtar atlama davranislari test edildi.
+- Bos defaults ve overrides yollari kapsandi.
+- Flask context, veritabani, dosya sistemi, dis ag ve canli veri kullanilmadi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- Target test: 4 passed
+- bootstrap.py: 27 / 27 satir
+- bootstrap.py: 12 / 12 branch
+- bootstrap.py coverage: 100 percent
+- Default paket: 993 collected, 888 passed, 105 architecture skip
+- Forced paket: 993 collected, 991 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4CB PASS.
+- Settings bootstrap yardimcilari davranis ve coverage acisindan kilitlendi.
