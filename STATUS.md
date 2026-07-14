@@ -1914,3 +1914,38 @@ Dogrulama:
 Karar:
 - Faz 4BP PASS.
 - Settings serialization yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4BR Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4BQ salt okunur kapsam yeniden olcumu basariyla tamamlandi.
+- Default paket 974 test topladi; 869 test gecti ve 105 legacy architecture testi atlandi.
+- Failure ve error bulunmadi.
+- Bes settings hedefi tam pakette satir ve branch olarak 100 percent kaldi.
+- Coverage.py birlesik oran 20.86227941952109 olarak olculdu.
+- Statement orani 25.026199347927342 olarak olculdu.
+- Branch orani 6.395388038567865 olarak olculdu.
+- Covered line sayisi 25791 ve covered branch sayisi 1897 oldu.
+- Regression tabani asagi yuvarlama kuraliyla 20.86 / 6.39 seviyesine yukseltildi.
+- pyproject.toml fail_under = 80 kalite hedefi korunmustur.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4br_plan_exit_code: 0
+- phase4br_patch_exit_code: 0
+- phase4br_content_exit_code: 0
+- phase4br_compile_exit_code: 0
+- phase4br_ruff_exit_code: 0
+- phase4br_gate_test_exit_code: 0
+- Gate testleri: 3 passed
+- phase4br_gate_smoke_exit_code: 0
+- phase4br_gate_validation_exit_code: 0
+- Actual total coverage: 20.86227941952109
+- Actual branch coverage: 6.395388038567865
+- Yeni total baseline: 20.86
+- Yeni branch baseline: 6.39
+- pyproject fail_under: 80
+
+Karar:
+- Faz 4BR PASS.
+- Quality gate ve serialization test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
