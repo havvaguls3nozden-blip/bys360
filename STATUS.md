@@ -2285,3 +2285,39 @@ Dogrulama:
 Karar:
 - Faz 4CQ PASS.
 - Effective menu yardimci davranislari coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CS Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4CR salt okunur coverage olcumu basariyla tamamlandi.
+- Effective menu helper testleri sonrasi yeni coverage seviyesi regression gate ile kilitlendi.
+- Coverage.py birlesik baseline 21.08 seviyesinden 21.09 seviyesine yukseltildi.
+- Branch baseline 6.69 seviyesinden 6.71 seviyesine yukseltildi.
+- Regression gate kabul ve negatif test fixture degerleri yeni baseline ile uyumlu hale getirildi.
+- pyproject.toml fail_under 80 olarak korundu.
+- Runtime uygulama koduna dokunulmadi.
+
+Olcum:
+- Toplanan test: 1006
+- Gecen test: 901
+- Legacy architecture skip: 105
+- Failure: 0
+- Error: 0
+- Coverage.py birlesik oran: 21.09208999532844
+- Statement coverage: 25.230942400248406
+- Branch coverage: 6.712291821185355
+- Covered lines: 26002 / 103056
+- Covered branches: 1991 / 29662
+- Effective menu coverage: 100 percent
+
+Onceki baseline:
+- Total: 21.08
+- Branch: 6.69
+
+Yeni baseline:
+- Total: 21.09
+- Branch: 6.71
+
+Karar:
+- Faz 4CS PASS.
+- Effective menu test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
