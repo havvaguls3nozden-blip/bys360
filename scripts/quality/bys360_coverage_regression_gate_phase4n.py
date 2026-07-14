@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MIN_TOTAL = 20.86
-DEFAULT_MIN_BRANCH = 6.39
+DEFAULT_MIN_TOTAL = 20.97
+DEFAULT_MIN_BRANCH = 6.57
 def _load_coverage(path: Path) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"coverage json not found: {path}")

@@ -1986,3 +1986,38 @@ Dogrulama:
 Karar:
 - Faz 4BT PASS.
 - Settings validation defaults yardimcilari davranis ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4BV Coverage Regression Baseline Refresh
+
+Kapsam:
+- Faz 4BU salt okunur coverage yeniden olcumu basariyla tamamlandi.
+- Default paket 982 test topladi; 877 test gecti ve 105 legacy architecture testi atlandi.
+- Failure ve error bulunmadi.
+- Alti settings hedefi tam pakette satir ve branch olarak 100 percent kaldi.
+- Coverage.py birlesik oran 20.979821877966817 olarak olculdu.
+- Statement orani 25.12711535475858 olarak olculdu.
+- Branch orani 6.570696514058391 olarak olculdu.
+- Covered line sayisi 25895 ve covered branch sayisi 1949 oldu.
+- Regression tabani asagi yuvarlama kuraliyla 20.97 / 6.57 seviyesine yukseltildi.
+- pyproject.toml fail_under = 80 kalite hedefi korunmustur.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4bv_plan_exit_code: 0
+- phase4bv_patch_exit_code: 0
+- phase4bv_content_exit_code: 0
+- phase4bv_compile_exit_code: 0
+- phase4bv_ruff_exit_code: 0
+- phase4bv_gate_test_exit_code: 0
+- Gate testleri: 3 passed
+- phase4bv_gate_smoke_exit_code: 0
+- phase4bv_gate_validation_exit_code: 0
+- Actual total coverage: 20.979821877966817
+- Actual branch coverage: 6.570696514058391
+- Yeni total baseline: 20.97
+- Yeni branch baseline: 6.57
+- pyproject fail_under: 80
+
+Karar:
+- Faz 4BV PASS.
+- Validation defaults test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
