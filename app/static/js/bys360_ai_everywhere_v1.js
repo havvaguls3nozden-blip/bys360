@@ -264,14 +264,92 @@
     }).join('') + '</div>';
   }
 
+  /* BYS360_AI_GUIDE_FORCE_COLLAPSED_V3 */
+  function ensureAiGuideCollapsedStyleV3(){
+    var styleId = 'bys360-ai-guide-force-collapsed-v3';
+
+    if(document.getElementById(styleId)) return;
+
+    var style = document.createElement('style');
+    style.id = styleId;
+
+    style.textContent = ''
+      + '.bys360-ai-everywhere[data-collapsed="true"]{'
+      + 'margin:0 0 .75rem 0!important;'
+      + 'min-height:0!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-inner{'
+      + 'padding:.6rem .85rem!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-head{'
+      + 'display:flex!important;'
+      + 'align-items:center!important;'
+      + 'justify-content:space-between!important;'
+      + 'gap:.75rem!important;'
+      + 'margin:0!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-titlebox{'
+      + 'min-width:0!important;'
+      + 'margin:0!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-kicker{'
+      + 'display:block!important;'
+      + 'margin:0!important;'
+      + 'white-space:nowrap!important;'
+      + 'overflow:hidden!important;'
+      + 'text-overflow:ellipsis!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-titlebox h2,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-titlebox p,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-grid,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-questions,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-answer,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-links,'
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '[data-ai-everywhere-ask]{'
+      + 'display:none!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '.bys360-ai-everywhere-actions{'
+      + 'display:flex!important;'
+      + 'margin:0!important;'
+      + 'flex:0 0 auto!important;'
+      + '}'
+
+      + '.bys360-ai-everywhere[data-collapsed="true"] '
+      + '[data-ai-everywhere-toggle]{'
+      + 'display:inline-flex!important;'
+      + 'margin:0!important;'
+      + 'padding:.38rem .7rem!important;'
+      + '}';
+
+    document.head.appendChild(style);
+  }
+
   function render(){
+    ensureAiGuideCollapsedStyleV3();
     if(shouldSkip()) return;
     var mount = findMount();
     if(!mount) return;
     var rule = getRule();
     var displayTitle = rule.screen || pageTitle();
-    var collapsed = false;
-    try{ collapsed = sessionStorage.getItem(COLLAPSE_KEY) === '1'; }catch(e){}
+    var collapsed = true;
     var card = document.createElement('section');
     card.id = CARD_ID;
     card.className = 'bys360-ai-everywhere';
@@ -279,7 +357,7 @@
     card.setAttribute('data-module', rule.module || 'BYS360');
     card.setAttribute('data-screen-rule', rule.id || 'default');
     card.setAttribute('aria-label','AI destekli ekran rehberi');
-    if(collapsed) card.setAttribute('data-collapsed','true');
+    card.setAttribute('data-collapsed','true');
     card.innerHTML = ''+
       '<div class="bys360-ai-everywhere-inner">'+
         '<div class="bys360-ai-everywhere-head">'+
@@ -321,8 +399,8 @@
       var card = document.getElementById(CARD_ID);
       if(!card) return;
       var collapsed = card.getAttribute('data-collapsed') === 'true';
-      if(collapsed){ card.removeAttribute('data-collapsed'); toggle.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Daralt'; try{sessionStorage.setItem(COLLAPSE_KEY,'0');}catch(e){} }
-      else{ card.setAttribute('data-collapsed','true'); toggle.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Aç'; try{sessionStorage.setItem(COLLAPSE_KEY,'1');}catch(e){} }
+      if(collapsed){ card.removeAttribute('data-collapsed'); toggle.setAttribute('aria-expanded','true'); toggle.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Daralt'; }
+      else{ card.setAttribute('data-collapsed','true'); toggle.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Aç'; }
     }
   }, true);
 
