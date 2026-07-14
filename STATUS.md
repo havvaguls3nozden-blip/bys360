@@ -1644,3 +1644,30 @@ Karar:
 - P5B izlenen rapor yan etkisi teknik borcu kapatildi.
 - Phase2 test coverage evidence kapisi kapatildi.
 - Zorunlu tam test paketi failure ve error olmadan tamamlandi.
+
+## 2026-07-13 - Faz 4BE Architecture Skip Scope Closure
+
+Kapsam:
+- tests/architecture/conftest.py legacy skip hook'u yalnizca tests/architecture altindaki testlerle sinirlandi.
+- Services, quality, security, integration, performance ve diger test klasorlerinin mimari legacy skip'inden etkilenmesi engellendi.
+- Kapsam davranisi uc regresyon testiyle kilitlendi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4be_precheck_exit_code: 0
+- phase4be_patch_exit_code: 0
+- phase4be_compile_exit_code: 0
+- phase4be_ruff_f821_exit_code: 0
+- phase4be_target_exit_code: 0
+- phase4be_commit_a_exit_code: 0
+- phase4be_default_suite_exit_code: 0
+- phase4be_default_parse_exit_code: 0
+- Default paket: 938 collected, 833 passed, 105 architecture skip
+- phase4be_forced_suite_exit_code: 0
+- phase4be_forced_parse_exit_code: 0
+- Forced paket: 938 collected, 936 passed, 2 bilincli skip
+
+Karar:
+- Faz 4BE PASS.
+- Architecture conftest global skip teknik borcu kapatildi.
+- Mimari legacy secimi korunurken proje testlerinin yanlislikla skip edilmesi engellendi.
