@@ -2167,3 +2167,33 @@ Dogrulama:
 Karar:
 - Faz 4CF PASS.
 - Settings paket public contract payload davranisi ve coverage acisindan kilitlendi.
+
+## 2026-07-14 - Faz 4CJ Settings Catalog Coverage
+
+Kapsam:
+- app/services/settings/catalog.py icindeki eksik koruyucu ve tekrar kayit engelleme yollari dort unit test ile kapsandi.
+- MODULE_SETTING_DEFINITIONS tanimsiz oldugunda calisan NameError fallback yolu test edildi.
+- Manuel modul ayari cifti zaten mevcutsa tekrar eklenmedigi dogrulandi.
+- AY1 ayar cifti zaten mevcutsa tekrar eklenmedigi dogrulandi.
+- AY1 katalog birlestirme hatasinin loglandigi yol test edildi.
+- Testler katalog kaynak bloklarini ayri namespace icinde calistirdi.
+- Gercek MODULE_SETTING_DEFINITIONS ve SYSTEM_SETTING_DEFINITIONS listeleri degistirilmedi.
+- Runtime uygulama kodunda degisiklik yapilmadi.
+- Flask context, veritabani, dosya sistemi yazimi, dis ag ve canli veri kullanilmadi.
+
+Dogrulama:
+- Target test: 4 passed
+- catalog.py: 27 / 27 satir
+- catalog.py: 8 / 8 branch
+- catalog.py coverage: 100 percent
+- Runtime katalog uzunluklari: 78 modul, 79 sistem
+- Default paket: 999 collected, 894 passed, 105 architecture skip
+- Forced paket: 999 collected, 997 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+- pyproject fail_under: 80
+- Regression baseline: 21.07 total, 6.68 branch
+
+Karar:
+- Faz 4CJ PASS.
+- Settings katalog koruyucu ve tekrar kayit engelleme davranislari coverage acisindan kilitlendi.
