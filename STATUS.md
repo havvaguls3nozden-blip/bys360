@@ -1707,3 +1707,36 @@ Karar:
 - Faz 4BG PASS.
 - Varsayilan test paketinin yeni coverage seviyesi regresyona karsi kilitlendi.
 - Coverage tabani dusurulmedi; 18.18 / 3.55 seviyesinden 20.70 / 6.17 seviyesine yukseltildi.
+
+## 2026-07-14 - Faz 4BH Settings Menu Rules Coverage
+
+Kapsam:
+- app/services/settings/menu_rules.py yardimcilari sekiz yan etkisiz unit test ile kapsandi.
+- Menu rule olusturma, guvenli tam sayi donusumu, varsayilan alanlar, normalizasyon, tekrarli kural ezme ve siralama davranislari kilitlendi.
+- Enabled menu anahtarlari ile kaldirilmis menu anahtari ve menu satiri filtreleri test edildi.
+- Test fixture karakter kodlama sorunu ASCII guvenli veriyle giderildi.
+- Falsey sifir menu anahtarinin filtrelenmesi mevcut runtime davranisina uygun olarak kilitlendi.
+- Flask context, veritabani, dis ag ve canli veri kullanilmadi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4bh_r1_rewrite_exit_code: 0
+- phase4bh_r1_compile_exit_code: 0
+- phase4bh_r1_ruff_exit_code: 0
+- phase4bh_r1_target_exit_code: 0
+- phase4bh_r1_coverage_test_exit_code: 0
+- phase4bh_r1_coverage_json_exit_code: 0
+- phase4bh_r1_coverage_parse_exit_code: 0
+- phase4bh_r1_cached_diff_check_exit_code: 0
+- phase4bh_r1_commit_a_exit_code: 0
+- Target test: 8 passed
+- menu_rules.py: 42 / 42 satir ve 16 / 16 branch
+- menu_rules.py coverage: 100 percent
+- Default paket: 946 collected, 841 passed, 105 architecture skip
+- Forced paket: 946 collected, 944 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4BH PASS.
+- Settings menu rule yardimcilari davranis ve coverage acisindan kilitlendi.
