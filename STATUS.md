@@ -2021,3 +2021,41 @@ Dogrulama:
 Karar:
 - Faz 4BV PASS.
 - Validation defaults test dalgasindan sonraki yeni coverage seviyesi regresyona karsi kilitlendi.
+
+## 2026-07-14 - Faz 4BX Settings Snapshots Coverage
+
+Kapsam:
+- app/services/settings/snapshots.py yedi yan etkisiz unit test ile kapsandi.
+- Menu visibility map bosluk, tekrar, gorunur ve gorunmez anahtar yollari test edildi.
+- Sistem ve modul snapshot fonksiyonlarinda mevcut satir ve varsayilan deger yollari test edildi.
+- Bos sistem, modul ve menu anahtarlari icin atlama davranislari kilitlendi.
+- Kullanici menu override true, false, bos ve tekrar eden anahtar davranislari test edildi.
+- Rol snapshot normalizasyon, tekillestirme, siralama ve coverage ratio davranislari test edildi.
+- Birim profil gruplama, gorunur sayisi ve coverage ratio davranislari test edildi.
+- Setting group sirasi, ilk grup metadata korumasi, mevcut satir ve default current value yollari test edildi.
+- Flask context, veritabani, model, dosya sistemi, dis ag ve canli veri kullanilmadi.
+- Runtime uygulama koduna dokunulmadi.
+
+Dogrulama:
+- phase4bx_precheck_exit_code: 0
+- phase4bx_create_exit_code: 0
+- phase4bx_compile_exit_code: 0
+- phase4bx_ruff_exit_code: 0
+- phase4bx_target_exit_code: 0
+- phase4bx_coverage_test_exit_code: 0
+- phase4bx_coverage_json_exit_code: 0
+- phase4bx_coverage_parse_exit_code: 0
+- phase4bx_cached_diff_exit_code: 0
+- phase4bx_commit_a_exit_code: 0
+- Target test: 7 passed
+- snapshots.py: 63 / 63 satir
+- snapshots.py: 22 / 22 branch
+- snapshots.py coverage: 100 percent
+- Default paket: 989 collected, 884 passed, 105 architecture skip
+- Forced paket: 989 collected, 987 passed, 2 bilincli P6B skip
+- Failure: 0
+- Error: 0
+
+Karar:
+- Faz 4BX PASS.
+- Settings snapshots yardimcilari davranis ve coverage acisindan kilitlendi.
