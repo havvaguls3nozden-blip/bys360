@@ -10,8 +10,8 @@ from scripts.quality.bys360_coverage_regression_gate_phase4n import (
 )
 
 
-CURRENT_TOTAL = 21.419099142542837
-CURRENT_BRANCH = 7.049423504820982
+CURRENT_TOTAL = 21.852348588737023
+CURRENT_BRANCH = 7.716944238419527
 
 
 def _write_coverage(
@@ -25,11 +25,11 @@ def _write_coverage(
                 "totals": {
                     "percent_covered": total,
                     "percent_branches_covered": branch,
-                    "covered_lines": 26336,
+                    "covered_lines": 26713,
                     "num_statements": 103056,
-                    "missing_lines": 76720,
-                    "covered_branches": 2091,
-                    "missing_branches": 27571,
+                    "missing_lines": 76343,
+                    "covered_branches": 2289,
+                    "missing_branches": 27373,
                 }
             },
             ensure_ascii=False,
@@ -39,8 +39,8 @@ def _write_coverage(
 
 
 def test_coverage_gate_defaults_match_campaign1_baseline():
-    assert DEFAULT_MIN_TOTAL == 21.41
-    assert DEFAULT_MIN_BRANCH == 7.04
+    assert DEFAULT_MIN_TOTAL == 21.85
+    assert DEFAULT_MIN_BRANCH == 7.71
 
 
 def test_coverage_gate_accepts_campaign1_measurement(
@@ -62,8 +62,8 @@ def test_coverage_gate_accepts_campaign1_measurement(
     assert report["checks"]["total_ok"] is True
     assert report["checks"]["branch_ok"] is True
     assert report["baseline"] == {
-        "min_total_percent": 21.41,
-        "min_branch_percent": 7.04,
+        "min_total_percent": 21.85,
+        "min_branch_percent": 7.71,
     }
 
 
@@ -74,8 +74,8 @@ def test_coverage_gate_accepts_exact_new_floor(
 
     _write_coverage(
         coverage_json,
-        total=21.41,
-        branch=7.04,
+        total=21.85,
+        branch=7.71,
     )
 
     report = build_report(
@@ -94,7 +94,7 @@ def test_coverage_gate_rejects_total_regression(
 
     _write_coverage(
         coverage_json,
-        total=21.40,
+        total=21.84,
         branch=CURRENT_BRANCH,
     )
 
@@ -115,7 +115,7 @@ def test_coverage_gate_rejects_branch_regression(
     _write_coverage(
         coverage_json,
         total=CURRENT_TOTAL,
-        branch=7.03,
+        branch=7.70,
     )
 
     report = build_report(
