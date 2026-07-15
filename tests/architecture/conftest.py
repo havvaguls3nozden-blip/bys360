@@ -30,38 +30,8 @@ def _legacy_architecture_enabled() -> bool:
 
 
 def pytest_collection_modifyitems(config, items):
-    if _legacy_architecture_enabled():
-        return
-
-    skip_legacy = pytest.mark.skip(
-        reason=(
-            "BYS360 eski mimari sözleşme testi arşiv kapsamındadır. "
-            "Tüm eski testleri ayrıca çalıştırmak için "
-            "BYS360_RUN_LEGACY_ARCHITECTURE_TESTS=1 kullanın."
-        )
-    )
-
-    architecture_root = Path(__file__).resolve().parent
-
-    for item in items:
-        path_obj = getattr(item, "path", None) or getattr(item, "fspath", None)
-
-        if path_obj is None:
-            continue
-
-        try:
-            item_path = Path(str(path_obj)).resolve()
-            item_path.relative_to(architecture_root)
-        except (OSError, ValueError):
-            continue
-
-        file_name = item_path.name
-
-        if (
-            file_name.startswith("test_")
-            and file_name not in ACTIVE_ARCHITECTURE_TEST_FILES
-        ):
-            item.add_marker(skip_legacy)
+    # BYS360_P2E_ZERO_SKIP_ARCHITECTURE_SCOPE: all architecture tests run by default.
+    return
 
 # BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE: active architecture test -> test_mobile_auth_dashboard_assistant_response_p3b.py
 

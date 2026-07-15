@@ -13,6 +13,7 @@ def test_architecture_scope_conftest_exists_and_documents_active_gate() -> None:
     assert "BYS360_P2E_ACTIVE_ARCHITECTURE_SCOPE" in text
     assert "BYS360_RUN_LEGACY_ARCHITECTURE_TESTS" in text
     assert "ACTIVE_ARCHITECTURE_TEST_FILES" in text
+    assert "BYS360_P2E_ZERO_SKIP_ARCHITECTURE_SCOPE" in text
 
 
 def test_architecture_scope_keeps_current_mobile_gates_active() -> None:
@@ -64,7 +65,7 @@ def test_architecture_skip_does_not_touch_service_tests(monkeypatch) -> None:
     assert item.markers == []
 
 
-def test_architecture_skip_marks_only_legacy_architecture_test(
+def test_architecture_zero_skip_keeps_legacy_architecture_test_running(
     monkeypatch,
 ) -> None:
     from pathlib import Path
@@ -82,7 +83,7 @@ def test_architecture_skip_marks_only_legacy_architecture_test(
 
     namespace["pytest_collection_modifyitems"](None, [item])
 
-    assert len(item.markers) == 1
+    assert item.markers == []
 
 
 def test_architecture_skip_keeps_active_architecture_test_running(
