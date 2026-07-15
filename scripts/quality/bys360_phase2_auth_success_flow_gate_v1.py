@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import secrets
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -131,7 +132,7 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
     from app.models import User
 
     app = create_app()
-    password = "BYS360-Phase2C-Test-123!"
+    password = secrets.token_urlsafe(24)
 
     result: dict[str, Any] = {
         "package": PACKAGE,
