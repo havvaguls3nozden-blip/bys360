@@ -137,7 +137,7 @@ def ensure_settings_phase1_seeded_handler(
     except Exception as exc:
         logger.exception("BYS360 V6B guarded exception | file=app/services/settings/foundation_access.py | line=137")
         safe_rollback()
-        return {"ok": False, "error": str(exc), **summary}
+        return {**summary, "ok": False, "error": str(exc)}
 
 
 def build_settings_foundation_context_handler(
