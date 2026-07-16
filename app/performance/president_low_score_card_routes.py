@@ -10,6 +10,11 @@ from flask_login import current_user, login_required
 from sqlalchemy import text
 
 from app.extensions import db
+from app.security.sql_identifiers import (
+    quote_sql_identifier,
+    validate_sql_identifier,
+)
+
 from app.routes import main
 logger = logging.getLogger(__name__)
 
@@ -123,28 +128,171 @@ def _fetch_one_approval(approval_id: int) -> dict[str, Any] | None:
     return None
 
 
-def _fetch_history(table_name: str, evaluation_id: Any, order_col: str = "action_at") -> list[dict[str, Any]]:
-    if not evaluation_id or not _table_exists(table_name):
+_HISTORY_TABLES = frozenset(
+    {
+        "performance_process_flow_steps",
+        "performance_scoring_history",
+    }
+)
+
+_HISTORY_SELECT_COLUMNS = (
+    "id",
+    "flow_id",
+    "evaluation_id",
+    "period_id",
+    "employee_id",
+    "event_key",
+    "step_key",
+    "step_code",
+    "step_title",
+    "description",
+    "status",
+    "owner_user_id",
+    "actor_user_id",
+    "scorer_user_id",
+    "scorer_name",
+    "manager_level",
+    "score_value",
+    "action_status",
+    "next_stage",
+    "next_owner_name",
+    "tracking_label",
+    "tracking_group",
+    "action_at",
+    "created_at",
+)
+
+_HISTORY_ORDER_COLUMNS = frozenset(
+    {
+        "action_at",
+        "created_at",
+        "id",
+    }
+)
+
+
+def _fetch_history(
+    table_name: str,
+    evaluation_id: Any,
+    order_col: str = "action_at",
+) -> list[dict[str, Any]]:
+    safe_table_name = validate_sql_identifier(
+        table_name,
+        allowed=_HISTORY_TABLES,
+    )
+    safe_requested_order = validate_sql_identifier(
+        order_col,
+        allowed=_HISTORY_ORDER_COLUMNS,
+    )
+
+    if (
+        not evaluation_id
+        or not _table_exists(
+            safe_table_name
+        )
+    ):
         return []
-    cols = _columns(table_name)
+
+    cols = _columns(
+        safe_table_name
+    )
+
     if "evaluation_id" not in cols:
         return []
-    safe_cols = [c for c in (
-        "id", "flow_id", "evaluation_id", "period_id", "employee_id", "event_key", "step_key",
-        "step_code", "step_title", "description", "status", "owner_user_id", "actor_user_id",
-        "scorer_user_id", "scorer_name", "manager_level", "score_value", "action_status",
-        "next_stage", "next_owner_name", "tracking_label", "tracking_group", "action_at", "created_at",
-    ) if c in cols]
-    if not safe_cols:
+
+    selected_columns = [
+        column_name
+        for column_name in _HISTORY_SELECT_COLUMNS
+        if column_name in cols
+    ]
+
+    if not selected_columns:
         return []
-    actual_order = order_col if order_col in cols else ("created_at" if "created_at" in cols else "id")
+
+    if safe_requested_order in cols:
+        actual_order = safe_requested_order
+    elif "created_at" in cols:
+        actual_order = "created_at"
+    elif "id" in cols:
+        actual_order = "id"
+    else:
+        return []
+
+    quoted_table_name = quote_sql_identifier(
+        safe_table_name,
+        dialect=db.engine.dialect,
+        allowed=_HISTORY_TABLES,
+    )
+
+    quoted_columns = [
+        quote_sql_identifier(
+            column_name,
+            dialect=db.engine.dialect,
+            allowed=cols,
+        )
+        for column_name in selected_columns
+    ]
+
+    quoted_evaluation_id = quote_sql_identifier(
+        "evaluation_id",
+        dialect=db.engine.dialect,
+        allowed=cols,
+    )
+
+    quoted_order = quote_sql_identifier(
+        actual_order,
+        dialect=db.engine.dialect,
+        allowed=cols,
+    )
+
+    order_clause = (
+        f"{quoted_order} ASC NULLS LAST"
+    )
+
+    if (
+        "id" in cols
+        and actual_order != "id"
+    ):
+        quoted_id = quote_sql_identifier(
+            "id",
+            dialect=db.engine.dialect,
+            allowed=cols,
+        )
+        order_clause += (
+            f", {quoted_id} ASC"
+        )
+
+    sql = (
+        f"SELECT {', '.join(quoted_columns)} "
+        f"FROM {quoted_table_name} "
+        f"WHERE {quoted_evaluation_id} = :evaluation_id "
+        f"ORDER BY {order_clause} "
+        "LIMIT 200"
+    )
+
     try:
-        return [dict(r) for r in db.session.execute(
-            text(f"SELECT {', '.join(safe_cols)} FROM {table_name} WHERE evaluation_id = :evaluation_id ORDER BY {actual_order} ASC NULLS LAST, id ASC LIMIT 200"),
-            {"evaluation_id": evaluation_id},
-        ).mappings().all()]
+        rows = db.session.execute(
+            text(
+                sql
+            ),
+            {
+                "evaluation_id": (
+                    evaluation_id
+                )
+            },
+        ).mappings().all()
+
+        return [
+            dict(
+                row
+            )
+            for row in rows
+        ]
     except Exception:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception(
+            "BYS360 performans mod??l??nde "
+            "beklenmeyen hata yakaland??."
+        )
         db.session.rollback()
         return []
 
