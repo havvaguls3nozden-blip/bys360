@@ -16,6 +16,11 @@ from typing import Any, Mapping
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+from app.security.sql_identifiers import (
+    quote_sql_identifier,
+    validate_sql_identifier,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -71,25 +76,94 @@ def _event_key(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:40]
 
 
-def _insert_if_columns(table_name: str, payload: dict[str, Any], unique_key: str | None = None) -> bool:
-    if not _table_exists(table_name):
+def _insert_if_columns(
+    table_name: str,
+    payload: dict[str, Any],
+    unique_key: str | None = None,
+) -> bool:
+    allowed_tables = {
+        SCORING_HISTORY_TABLE,
+        FLOW_STEPS_TABLE,
+    }
+
+    safe_table_name = validate_sql_identifier(
+        table_name,
+        allowed=allowed_tables,
+    )
+    quoted_table_name = quote_sql_identifier(
+        safe_table_name,
+        dialect=db.engine.dialect,
+        allowed=allowed_tables,
+    )
+
+    if not _table_exists(safe_table_name):
         return False
-    cols = _columns(table_name)
-    clean_payload = {k: v for k, v in payload.items() if k in cols}
+
+    cols = _columns(safe_table_name)
+
+    safe_unique_key = None
+    quoted_unique_key = None
+    if unique_key is not None:
+        safe_unique_key = validate_sql_identifier(
+            unique_key,
+            allowed=cols,
+        )
+        quoted_unique_key = quote_sql_identifier(
+            safe_unique_key,
+            dialect=db.engine.dialect,
+            allowed=cols,
+        )
+
+    clean_payload = {
+        key: value
+        for key, value in payload.items()
+        if key in cols
+    }
     if not clean_payload:
         return False
 
-    if unique_key and unique_key in cols and clean_payload.get(unique_key):
+    if (
+        safe_unique_key
+        and quoted_unique_key
+        and clean_payload.get(safe_unique_key)
+    ):
         exists = db.session.execute(
-            text(f"SELECT 1 FROM {table_name} WHERE {unique_key} = :event_key LIMIT 1"),
-            {"event_key": clean_payload[unique_key]},
+            text(
+                f"SELECT 1 FROM {quoted_table_name} "
+                f"WHERE {quoted_unique_key} = :event_key LIMIT 1"
+            ),
+            {"event_key": clean_payload[safe_unique_key]},
         ).scalar()
         if exists:
             return False
 
     keys = list(clean_payload.keys())
-    sql = f"INSERT INTO {table_name} ({', '.join(keys)}) VALUES ({', '.join(':' + k for k in keys)})"
-    db.session.execute(text(sql), clean_payload)
+    quoted_keys = [
+        quote_sql_identifier(
+            key,
+            dialect=db.engine.dialect,
+            allowed=cols,
+        )
+        for key in keys
+    ]
+    parameter_names = [
+        f"value_{index}"
+        for index in range(len(keys))
+    ]
+    parameters = {
+        parameter_name: clean_payload[key]
+        for key, parameter_name in zip(
+            keys,
+            parameter_names,
+            strict=True,
+        )
+    }
+    sql = (
+        f"INSERT INTO {quoted_table_name} "
+        f"({', '.join(quoted_keys)}) "
+        f"VALUES ({', '.join(':' + name for name in parameter_names)})"
+    )
+    db.session.execute(text(sql), parameters)
     return True
 
 
