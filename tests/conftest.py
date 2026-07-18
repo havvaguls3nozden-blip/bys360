@@ -80,8 +80,6 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 import os
 from pathlib import Path
 
-import pytest
-
 
 @pytest.fixture(scope="session")
 def app():
