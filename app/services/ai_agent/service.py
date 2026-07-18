@@ -284,7 +284,7 @@ def build_ai_agent_panel_context(user: Any) -> dict[str, Any]:
     }
 
 
-def build_ai_agent_reply(user: Any, question: str) -> dict[str, Any]:
+def _legacy_build_ai_agent_reply_v0(user: Any, question: str) -> dict[str, Any]:
     safe_question = redact_sensitive_text(question)
     intent = _detect_intent(safe_question)
     counts = collect_safe_counts_for_user(_user_id(user))
@@ -429,7 +429,7 @@ def _ag3_answer_and_actions(intent: str, counts: dict[str, Any], performance_sum
     return answer, build_ai_agent_action_cards(None)
 
 
-def build_ai_agent_reply(user: Any, question: str) -> dict[str, Any]:
+def _legacy_build_ai_agent_reply_ag3(user: Any, question: str) -> dict[str, Any]:
     safe_question = redact_sensitive_text(question or "")
     if not safe_question.strip():
         return {
@@ -901,7 +901,7 @@ def _ag3c_answer_and_actions(intent, counts, performance_summary, dashboard_kpi_
     )
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_ag3c(user, question):
     safe_question = _ag3c_redact(question or "")
     if not safe_question.strip():
         return {
@@ -965,10 +965,10 @@ def build_ai_agent_reply(user, question):
 # BYS360_AG3C_ASSISTANT_PERFORMANCE_CONVERSATION_END
 
 # BYS360_AG5_AI_TEACHING_CENTER_SERVICE_START
-_AG5_PREVIOUS_BUILD_AI_AGENT_REPLY = globals().get('build_ai_agent_reply')
+_AG5_PREVIOUS_BUILD_AI_AGENT_REPLY = _legacy_build_ai_agent_reply_ag3c
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_ag5(user, question):
     try:
         from app.services.ai_agent.knowledge import build_knowledge_reply
         learned_reply = build_knowledge_reply(user, question or '')
@@ -986,10 +986,10 @@ def build_ai_agent_reply(user, question):
 
 
 # BYS360_ASSISTANT_CANONICAL_GUIDE_V1_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_V1 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_V1 = _legacy_build_ai_agent_reply_ag5
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_guide(user, question):
     """BYS360 Asistanı için önce adım adım kullanım rehberini dener."""
     try:
         from app.services.ai_agent.assistant_step_guide import build_bys360_assistant_step_reply
@@ -1013,10 +1013,10 @@ def build_ai_agent_reply(user, question):
 
 
 # BYS360_ASSISTANT_KNOWLEDGE_BANK_V1_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_KB_V1 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_KB_V1 = _legacy_build_ai_agent_reply_guide
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_kb(user, question):
     """BYS360 Asistanı Bilgi Bankası V1: önce rol bazlı kullanım rehberini dener."""
     try:
         from app.services.ai_agent.assistant_knowledge_bank_v1 import build_bys360_assistant_knowledge_reply
@@ -1045,10 +1045,10 @@ def build_ai_agent_reply(user, question):
 
 
 # BYS360_ASSISTANT_FULL_LIVE_USAGE_GUIDE_V2_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_GUIDE_V2 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_GUIDE_V2 = _legacy_build_ai_agent_reply_kb
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_fullguide(user, question):
     # BYS360 Asistanı V2: önce tam canlı kullanım rehberini dener.
     try:
         from app.services.ai_agent.assistant_full_live_usage_guide_v2 import build_bys360_assistant_full_live_usage_reply
@@ -1076,10 +1076,10 @@ def build_ai_agent_reply(user, question):
 # BYS360_ASSISTANT_FULL_LIVE_USAGE_GUIDE_V2_END
 
 # BYS360_ASSISTANT_MASTER_KNOWLEDGE_V3_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_MASTER_KNOWLEDGE_V3 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_MASTER_KNOWLEDGE_V3 = _legacy_build_ai_agent_reply_fullguide
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_master(user, question):
     """BYS360 Asistanı V3: kaynak dosya tabanlı proje hafızasını önce dener."""
     try:
         from app.services.ai_agent.assistant_project_master_knowledge_v3 import build_bys360_assistant_master_reply
@@ -1107,10 +1107,10 @@ def build_ai_agent_reply(user, question):
 # BYS360_ASSISTANT_MASTER_KNOWLEDGE_V3_END
 
 # BYS360_ASSISTANT_STEPWISE_TUTOR_V4_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_STEPWISE_TUTOR_V4 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_STEPWISE_TUTOR_V4 = _legacy_build_ai_agent_reply_master
 
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_stepwise(user, question):
     # BYS360 Asistanı V4: doğal dilde sorulan kullanım sorularını adım adım öğretir.
     try:
         from app.services.ai_agent.assistant_stepwise_tutor_v4 import build_bys360_assistant_stepwise_reply
@@ -1226,9 +1226,9 @@ BYS360_VISIBLE_TUTOR_V6_1_SERVICE_BRIDGE = True
 # BYS360_VISIBLE_TUTOR_V6_1_SERVICE_BRIDGE_END
 
 # BYS360_ASSISTANT_FULL_STEPWISE_TUTOR_V5_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_TUTOR_V5 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_TUTOR_V5 = _legacy_build_ai_agent_reply_stepwise
 
-def build_ai_agent_reply(user, question):
+def _legacy_build_ai_agent_reply_fulltutor(user, question):
     try:
         from .assistant_full_stepwise_tutor_v5 import build_bys360_assistant_full_tutor_reply_v5
         return build_bys360_assistant_full_tutor_reply_v5(
@@ -1262,9 +1262,9 @@ def build_ai_agent_reply(user, question):
 
 
 # BYS360_ASSISTANT_ASSISTANT_LIKE_V31_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31 = _legacy_build_ai_agent_reply_fulltutor
 
-def build_ai_agent_reply(user, question, context=None):
+def _legacy_build_ai_agent_reply_assistantlike(user, question, context=None):
     # V31.2 final answer bridge: server-first, BYS360-only, home/dashboard ayrımı korunur.
     try:
         from .assistant_chatgpt_like_v31 import build_bys360_assistant_chatgpt_like_reply_v31
@@ -1294,7 +1294,7 @@ def build_ai_agent_reply(user, question, context=None):
 
 
 # BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32_START
-_BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32 = globals().get("build_ai_agent_reply")
+_BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32 = _legacy_build_ai_agent_reply_assistantlike
 
 
 def build_ai_agent_reply(user, question, context=None):
