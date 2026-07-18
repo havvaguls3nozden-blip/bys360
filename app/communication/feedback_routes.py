@@ -70,9 +70,6 @@ def feedback_dashboard():
 @menu_key_required('feedback_pulse')
 def feedback_pulse():
     # Compatibility guard.
-    ai_results_support = None
-    ai_analytics_support = None
-    ai_manager_support = None
     ai_pulse_guidance = None
 
     if request.method == 'POST':
@@ -146,10 +143,6 @@ def feedback_pulse_analytics():
 @manager_required
 def feedback_admin_pulse_analytics():
     # Compatibility guard.
-    ai_results_support = None
-    ai_analytics_support = None
-    ai_manager_support = None
-    ai_pulse_guidance = None
 
     return _render_feedback_pulse_analytics()
 
@@ -160,9 +153,6 @@ def feedback_admin_pulse_analytics():
 def feedback_campaigns():
     # Compatibility guard.
     ai_results_support = None
-    ai_analytics_support = None
-    ai_manager_support = None
-    ai_pulse_guidance = None
 
     campaigns = list_visible_campaigns_for_user(current_user)
     return safe_render(
@@ -207,17 +197,13 @@ def feedback_campaign_detail(campaign_id: int):
 @manager_required
 def feedback_results():
     # Compatibility guard.
-    ai_results_support = None
-    ai_analytics_support = None
-    ai_manager_support = None
-    ai_pulse_guidance = None
 
     campaign_id = request.args.get('campaign_id', type=int)
     campaigns = list_manageable_campaigns()
     selected_campaign = next((row for row in campaigns if row.id == campaign_id), campaigns[0] if campaigns else None)
     results = build_campaign_results(selected_campaign) if selected_campaign else []
     pulse_context = build_campaign_pulse_context(selected_campaign) if selected_campaign else None
-    ai_results_support = build_results_decision_support(selected_campaign, results, pulse_context)
+    build_results_decision_support(selected_campaign, results, pulse_context)
     return safe_render(
         'feedback/results.html',
         '<h3>Sonuç ekranı yüklenemedi</h3>',
@@ -274,10 +260,7 @@ def feedback_action_new():
 @manager_required
 def feedback_manager():
     # Compatibility guard.
-    ai_results_support = None
-    ai_analytics_support = None
     ai_manager_support = None
-    ai_pulse_guidance = None
 
     summary = build_manager_summary(current_user)
     ai_manager_support = build_manager_decision_support(summary)
