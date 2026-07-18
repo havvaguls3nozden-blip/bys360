@@ -211,7 +211,7 @@ def build_all_manager_chains(users: Optional[List[Any]] = None, period: Any = No
 def analyze_hierarchy_rows(period_id: Optional[int] = None) -> List[Dict[str, Any]]:
     users = fetch_active_users()
     rows = []
-    for user, chain in zip(users, build_all_manager_chains(users, period_id)):
+    for user, chain in zip(users, build_all_manager_chains(users, period_id), strict=False):
         rows.append(
             {
                 'employee_id': chain.employee_id,

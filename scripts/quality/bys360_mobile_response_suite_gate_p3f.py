@@ -280,7 +280,7 @@ def run_checks(
     pytest_result = run_pytest(root) if pytest_gate else {"ok": True, "mode": "not_requested"}
 
     feature_coverage: dict[str, bool] = {}
-    for gate, result in zip(P3_GATES, gate_results):
+    for gate, result in zip(P3_GATES, gate_results, strict=False):
         for feature in gate.get("features", []):
             feature_coverage[feature] = bool(result.get("ok"))
 

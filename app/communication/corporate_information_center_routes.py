@@ -229,7 +229,7 @@ def corporate_information_center_celebration_excel_template():
     thin = Side(style="thin", color="E8D7D7")
     for cell in ws[1]:
         cell.fill = red; cell.font = white; cell.alignment = Alignment(horizontal="center"); cell.border = Border(bottom=thin)
-    for col, width in zip("ABCDEFG", [14, 26, 34, 18, 22, 16, 30]):
+    for col, width in zip("ABCDEFG", [14, 26, 34, 18, 22, 16, 30], strict=False):
         ws.column_dimensions[col].width = width
     ws.freeze_panes = "A2"
     info = wb.create_sheet("Açıklama")
