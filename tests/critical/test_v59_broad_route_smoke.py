@@ -10,7 +10,6 @@ Flask bağımlılıkları yüklü değilse test atlanır; canlı/proje ortamınd
 from __future__ import annotations
 
 import os
-from typing import Iterable
 
 import pytest
 

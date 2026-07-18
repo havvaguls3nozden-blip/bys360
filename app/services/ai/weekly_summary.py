@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
-from datetime import datetime
 from typing import Any
 
 from app.services.ai.governance import build_ai_governance_snapshot

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
 import os
-from datetime import datetime
 from uuid import uuid4
 
 from flask import current_app

@@ -13,7 +13,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import and_

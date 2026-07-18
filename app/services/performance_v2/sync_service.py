@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from app.core.datetime_utils import utc_now
-from datetime import datetime
 from uuid import uuid4
 
 from app.extensions import db

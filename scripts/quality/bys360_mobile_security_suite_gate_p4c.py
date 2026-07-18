@@ -10,7 +10,6 @@ compile/app factory/secret/pytest kapılarını doğrular.
 from __future__ import annotations
 
 import argparse
-import ast
 import json
 import os
 import re

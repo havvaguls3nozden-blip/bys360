@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
-import re
 import logging
 logger = logging.getLogger(__name__)
 

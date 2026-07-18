@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from flask import current_app
 from sqlalchemy import inspect
 

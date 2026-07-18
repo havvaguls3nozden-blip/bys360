@@ -2,7 +2,6 @@
 """BYS360 Başkan Onayları Karne İncelemesi V2 compatibility routes."""
 from __future__ import annotations
 
-from datetime import datetime
 
 from flask import Blueprint, abort, render_template, render_template_string, request
 from flask_login import current_user, login_required

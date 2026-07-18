@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from app.core.datetime_utils import utc_now
 from app.models import MessageThreadParticipant, MessageAttachment

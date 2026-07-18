@@ -5,7 +5,7 @@ import logging
 
 from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from typing import Any, Dict, Optional
 
 from app.extensions import db

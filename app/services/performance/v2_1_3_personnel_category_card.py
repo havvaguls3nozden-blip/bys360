@@ -12,7 +12,6 @@ kademeli ve canlı güvenli entegrasyon sağlar.
 """
 
 from dataclasses import dataclass
-from datetime import datetime
 import re
 from typing import Any
 

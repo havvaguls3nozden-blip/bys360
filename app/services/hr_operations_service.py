@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 # --- BYS360 third-manager Excel import compatibility patch ---
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
 THIRD_MANAGER_HEADER_ALIASES = [

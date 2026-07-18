@@ -5,7 +5,7 @@ import logging
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Iterable, Optional
 
 from sqlalchemy import text
 

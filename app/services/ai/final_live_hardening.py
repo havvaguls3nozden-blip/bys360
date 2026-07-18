@@ -8,7 +8,7 @@ Bu servis kapanış raporu, kalite kapısı ve canlı güvenlik duruşunu salt-o
 yapmaz, ham AI istem/yanıt metnini panelde veya export içinde açmaz.
 """
 
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any

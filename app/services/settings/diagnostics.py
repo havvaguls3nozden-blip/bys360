@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 """Ayarlar servisi tanılama ve sağlık özeti yardımcıları.
 
 Bu modül yalnızca okuma/tanılama amacıyla kullanılır. Ayar kayıt davranışını,
