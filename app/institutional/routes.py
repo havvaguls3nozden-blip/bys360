@@ -6,35 +6,12 @@ ve alt route modüllerinin geriye dönük import uyumluluğunu korur.
 """
 from __future__ import annotations
 
-from app.institutional.hr_common import Any, date, login_required, main_bp, manager_required, menu_key_required, or_, safe_db_rollback, safe_render, timedelta
 from app.institutional.hr_common import PerformanceEvaluation
 from app.institutional.hr_form_helpers import (
-    Any,
     AttendanceException,
     DelegationAssignment,
     LeaveBalance,
     PersonnelLeave,
-    _active_delegation_exists,
-    _attendance_overlaps,
-    _bool_from_form,
-    _calculate_leave_day_count,
-    _current_user_id,
-    _leave_overlaps,
-    _model_ready,
-    _parse_date,
-    _resolve_period_id_from_form,
-    _safe_commit,
-    _safe_float,
-    _safe_int,
-    _safe_text,
-    consume_form_token,
-    date,
-    db,
-    flash,
-    redirect,
-    request,
-    url_for,
-    utc_now,
     _create_delegation_from_form,
     _handle_leave_post,
     _handle_leave_balance_post,
