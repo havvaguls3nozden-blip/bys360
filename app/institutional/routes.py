@@ -255,22 +255,37 @@ def hr_management():
     )
 
 # Alt HR route ailelerini yükle ve eski app.institutional.routes import uyumluluğunu koru.
-from app.institutional.org_unit_routes import (
-    LEGACY_SHIM,
-    LEGACY_RUNTIME_STATUS,
-    LEGACY_ROUTE_FAMILY,
-    LEGACY_NOTE,
-    admin_org_units,
-    admin_org_unit_create,
-    admin_org_unit_edit,
-    admin_org_unit_toggle_active,
-    org_units_list,
-    org_unit_add,
-    org_unit_edit,
-    org_unit_delete,
-    admin_org_unit_delete,
-)
-from app.institutional.hr_personnel_operations_routes import login_required, main_bp, manager_required, menu_key_required, safe_db_rollback, safe_render, timedelta
+def _reexport_module(module, names):
+    for name in names:
+        globals()[name] = getattr(module, name)
+
+
+_org_unit_routes = import_module("app.institutional.org_unit_routes")
+_reexport_module(_org_unit_routes, [
+    "LEGACY_SHIM",
+    "LEGACY_RUNTIME_STATUS",
+    "LEGACY_ROUTE_FAMILY",
+    "LEGACY_NOTE",
+    "admin_org_units",
+    "admin_org_unit_create",
+    "admin_org_unit_edit",
+    "admin_org_unit_toggle_active",
+    "org_units_list",
+    "org_unit_add",
+    "org_unit_edit",
+    "org_unit_delete",
+    "admin_org_unit_delete",
+])
+_hr_personnel_operations_routes = import_module("app.institutional.hr_personnel_operations_routes")
+_reexport_module(_hr_personnel_operations_routes, [
+    "login_required",
+    "main_bp",
+    "manager_required",
+    "menu_key_required",
+    "safe_db_rollback",
+    "safe_render",
+    "timedelta",
+])
 from app.institutional.hr_leave_attendance_routes import (
     utc_now,
     date,
@@ -494,8 +509,10 @@ from app.institutional.hr_reports_routes import (
     hr_reports_smoke_check,
     hr_reports_go_live_approval,
     _fallback_personnel_operations,
-    LOADED_CHILD_ROUTE_MODULES,
+LOADED_CHILD_ROUTE_MODULES,
 )
 
+
+del _org_unit_routes, _hr_personnel_operations_routes, _reexport_module
 
 __all__ = [name for name in globals() if not name.startswith("__")]
