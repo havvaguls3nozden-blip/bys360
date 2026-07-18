@@ -123,7 +123,6 @@ def build_inventory(root: Path) -> Dict[str, Any]:
             duplicate_route_decorators.append({"route": key, "first": seen[key], "second": route})
         else:
             seen[key] = route
-    expected_keys = {(m, r) for m, r, _feature, _owner in EXPECTED_ROUTES}
     actual_keys = {(r["method"], r["rule"]) for r in all_routes}
     expected_missing_routes = [
         {"method": m, "rule": r, "feature": f, "expected_owner": owner}

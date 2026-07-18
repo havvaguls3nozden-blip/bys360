@@ -152,7 +152,6 @@ def build_feedback_executive_summary(
         preset = "daily"
 
     alert_dashboard = build_feedback_alert_dashboard(requests_list, meetings, today=now.date(), now=now)
-    open_requests = [req for req in requests_list if _request_is_open(req)]
     active_meetings = [meeting for meeting in meetings if _meeting_is_active(meeting)]
 
     request_age_buckets = {"0_1": 0, "2_4": 0, "5_plus": 0}
