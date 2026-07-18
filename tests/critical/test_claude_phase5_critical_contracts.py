@@ -108,8 +108,16 @@ def test_security_and_mail_contracts_are_covered():
     assert any(path.exists() for path in security_candidates)
 
     mail_defs = _defs("app/services/mail_service.py")
-    for name in ["get_smtp_settings", "send_email", "send_bulk_assignment_reminders", "build_mail_system_health_snapshot"]:
-        assert name in mail_defs
+    for name in [
+        "get_smtp_settings",
+        "send_email",
+        "send_bulk_assignment_reminders",
+        "build_mail_system_health_snapshot",
+    ]:
+        assert name not in mail_defs, (
+            f"{name} must come from its canonical mail module; "
+            "local facade stubs are forbidden"
+        )
 
 
 def test_phase5_quality_gate_exists():
