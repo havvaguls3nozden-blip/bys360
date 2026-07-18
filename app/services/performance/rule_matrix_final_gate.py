@@ -128,14 +128,9 @@ REQUIRED_TOKENS: dict[str, tuple[str, ...]] = {
         "ensure_assignment",
         "apply_effective_chain",
     ),
-    "app/services/performance/publish_preflight_rules.py": (
-        "is_president_exempt",
-        "period_requires_level_3",
-        "level_3_comment_missing",
-    ),
 }
 
-# Second dict entries overwrite duplicate keys in Python, so extend manually here.
+# Preserve the complete publish-preflight token contract in one explicit tuple.
 REQUIRED_TOKENS["app/services/performance/publish_preflight_rules.py"] = (
     "LOW_SCORE_THRESHOLD = 70.0",
     "HIGH_SCORE_THRESHOLD = 90.0",

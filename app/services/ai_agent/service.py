@@ -281,7 +281,6 @@ def build_ai_agent_panel_context(user: Any) -> dict[str, Any]:
         "dashboard_kpi_notice": AI_AGENT_DASHBOARD_KPI_NOTICE,
         "assistant_panel_notice": AI_AGENT_ASSISTANT_PANEL_NOTICE,
         "action_queue_notice": AI_AGENT_ACTION_QUEUE_NOTICE,
-        "security_notice": AI_AGENT_SECURITY_NOTICE,
     }
 
 
@@ -322,7 +321,6 @@ def build_ai_agent_reply(user: Any, question: str) -> dict[str, Any]:
         "dashboard_kpi_notice": AI_AGENT_DASHBOARD_KPI_NOTICE,
         "assistant_panel_notice": AI_AGENT_ASSISTANT_PANEL_NOTICE,
         "action_queue_notice": AI_AGENT_ACTION_QUEUE_NOTICE,
-        "security_notice": AI_AGENT_SECURITY_NOTICE,
     }
 
 # BYS360_AG3_ASSISTANT_CONVERSATION_RUNTIME_START

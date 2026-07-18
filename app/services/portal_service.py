@@ -353,7 +353,6 @@ def enrich_posts(posts: list[PortalPost], user: Any) -> list[dict[str, Any]]:
             "post": post,
             "wall_owner_label": wall_owner_label,
             "can_delete": can_user_delete_post(user, post),
-            "wall_owner_label": wall_owner_label,
             "reaction_counts": counts,
             "total_reactions": total_reactions,
             "user_reaction": user_reaction_for_post(post, user),
