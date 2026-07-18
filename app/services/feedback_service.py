@@ -467,7 +467,7 @@ def _daily_average_buckets(rows, start_date: date, end_date: date):
         values.append(round(sum(buckets[cursor]) / len(buckets[cursor]), 2) if buckets.get(cursor) else None)
         cursor += timedelta(days=1)
     max_value = max([value for value in values if value is not None] or [5])
-    for label, value in zip(labels, values):
+    for label, value in zip(labels, values, strict=False):
         if value is None:
             spark_points.append({"label": label, "value": None, "height": 8})
         else:

@@ -12,7 +12,7 @@ def export_pulse_analytics_csv(a, days):
     a = a or {}; rows = [['BYS360 Nabız Analitiği'], ['Pencere', f'Son {days} gün'], ['Katılımcı', a.get('participant_count',0)], ['Ortalama', a.get('average','')], ['Delta', a.get('delta','')], ['Kapsama', a.get('coverage_rate','')], [], ['Dağılım'], ['Puan','Etiket','Kayıt']]
     for x in a.get('distribution',[]) or []: rows.append([x.get('value'), x.get('label'), x.get('count')])
     rows += [[], ['Günlük Ortalama'], ['Tarih','Ortalama']]
-    for l,v in zip(a.get('daily_labels',[]) or [], a.get('daily_values',[]) or []): rows.append([l,v])
+    for l,v in zip(a.get('daily_labels',[]) or [], a.get('daily_values',[]) or [], strict=False): rows.append([l,v])
     return _csv(rows)
 
 def export_manager_summary_csv(s):
