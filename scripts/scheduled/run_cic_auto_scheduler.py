@@ -31,4 +31,4 @@ if __name__ == "__main__":
     except Exception:
         print("UNHANDLED_EXCEPTION")
         traceback.print_exc()
-        raise SystemExit(1)
+        raise SystemExit(1) from None
