@@ -56,7 +56,6 @@ from app.services.cic.misc_context import (
     _cic_phase6_template_quality,
     _context_base,
     _users_by_ids,
-    context,
     get_auto_scheduler_config,
     get_recent_logs,
     get_recipients,
