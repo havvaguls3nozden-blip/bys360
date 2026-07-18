@@ -6,7 +6,7 @@ nabiz / geri bildirim / aksiyon omurgasi kurmak icin eklendi.
 """
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import date
 
 from app.core.datetime_utils import utc_now
 

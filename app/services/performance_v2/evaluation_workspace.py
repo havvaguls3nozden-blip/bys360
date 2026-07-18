@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 
 from app.core.datetime_utils import utc_now
-from datetime import datetime
 
 from app.extensions import db
 from app.services.performance.low_score_process_service import ensure_low_score_process_for_evaluation

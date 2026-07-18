@@ -10,7 +10,7 @@ BYS360_AI_DECISION_FAZ10_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from app.services.ai_decision.interim_feedback_policy import build_interim_feedback_decision_support
 import logging

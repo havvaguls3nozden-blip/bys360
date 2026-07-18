@@ -14,7 +14,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 def _safe(value: Any) -> str:

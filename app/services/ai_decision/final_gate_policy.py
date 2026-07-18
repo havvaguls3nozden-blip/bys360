@@ -13,8 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import json
-import re
-from typing import Any, Iterable
+from typing import Any
 
 PHASES = tuple(range(1, 12))
 FINAL_OK_MARKER = "BYS360_AI_DECISION_FAZ12_FINAL_GATE_READY"

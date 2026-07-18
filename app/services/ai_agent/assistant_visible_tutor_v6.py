@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Iterable
 
 
 import logging

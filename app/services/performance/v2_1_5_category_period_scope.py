@@ -11,8 +11,7 @@ Bu servis gerçek dönem/görev üretimi yapmaz. Kategori bazlı kapsam planı v
 V2.1.6 dönem/görev entegrasyonuna zemin hazırlar.
 """
 
-from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from typing import Any
 import re
 

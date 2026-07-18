@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from app.services.safe_user_delete_service import safe_delete_user_by_id
 from app.core.datetime_utils import utc_now
-from datetime import datetime
 from io import BytesIO
 from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required

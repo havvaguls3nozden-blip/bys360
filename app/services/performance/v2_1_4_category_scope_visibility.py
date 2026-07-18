@@ -11,7 +11,6 @@ hazırlık katmanı oluşturur. V2.1.5 ile dönem kapsam motoru bu yapı üzerin
 ilerleyebilir.
 """
 
-from dataclasses import dataclass
 from typing import Any
 from sqlalchemy import inspect, text
 

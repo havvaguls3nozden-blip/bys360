@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
 import csv
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, datetime, timedelta
 from io import StringIO
 from typing import Any

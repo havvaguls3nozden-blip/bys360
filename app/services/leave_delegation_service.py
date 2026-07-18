@@ -3,7 +3,7 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import inspect, or_
 from sqlalchemy.orm import joinedload
