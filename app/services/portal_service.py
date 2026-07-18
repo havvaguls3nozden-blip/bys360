@@ -119,7 +119,7 @@ def get_or_create_profile(user: Any) -> PortalProfile | None:
     return profile
 
 # BYS360_PORTAL_PROFILE_WALL_V2_8_CAN_POST_TO_WALL
-def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | None = None) -> bool:
+def _legacy_can_user_post_to_wall_v28(actor: Any, wall_owner: Any, profile: PortalProfile | None = None) -> bool:
     # Profil duvarına paylaşım bırakma iznini güvenli şekilde kontrol eder.
     if not actor or not getattr(actor, "is_authenticated", False):
         return False

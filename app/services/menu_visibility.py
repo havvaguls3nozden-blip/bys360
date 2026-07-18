@@ -192,7 +192,7 @@ def _bys360_assistant_collect_from_db(user, menu_map):
             _bys360_assistant_apply_key(menu_map, raw_key, raw_value)
 
 
-def build_menu_visibility_map(user=None):
+def _legacy_build_menu_visibility_map_v1(user=None):
     if user is None:
         try:
             from flask_login import current_user
