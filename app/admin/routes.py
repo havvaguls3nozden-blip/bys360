@@ -654,17 +654,8 @@ def personnel_add():
             payload = read_personnel_form_payload(request.form)
             form_context = build_personnel_create_form_context(role_values=role_values, managers=managers, payload=payload)
             required_validation = validate_required_personnel_payload(payload)
-            ad = payload.ad
-            soyad = payload.soyad
             sicil_no = payload.sicil_no
             email = payload.email
-            unvan = payload.unvan
-            role_value = payload.role_value
-            birim = payload.birim
-            ust_birim = payload.ust_birim
-            manager_1_id = payload.manager_1_id
-            manager_2_id = payload.manager_2_id
-            manager_3_id = payload.manager_3_id
 
             if not required_validation.ok:
                 flash("Zorunlu alanları eksiksiz doldurunuz.", "warning")
@@ -758,14 +749,8 @@ def personnel_edit(user_id):
         try:
             payload = read_personnel_form_payload(request.form, include_password_fields=True)
             required_validation = validate_required_personnel_payload(payload)
-            ad = payload.ad
-            soyad = payload.soyad
             sicil_no = payload.sicil_no
             email = payload.email
-            unvan = payload.unvan
-            role_value = payload.role_value
-            birim = payload.birim
-            ust_birim = payload.ust_birim
             new_password = payload.new_password
             new_password_repeat = payload.new_password_repeat
             new_manager_1_id = payload.manager_1_id
@@ -1103,7 +1088,7 @@ def personnel_excel_upload():
                     f"Aktif dönem için görevler otomatik yenilendi. Oluşturulan: {assignment_result.get('created', 0)}, atlanan/muaf kalan: {assignment_result.get('skipped', 0)}.",
                     "success",
                 )
-                info_notes = assignment_result.get("info_notes", []) or []
+                assignment_result.get("info_notes", []) or []
                 blocking_warnings = assignment_result.get("warnings", []) or []
                 # Bilgi notlari teknik/kurala bagli istisnalardir; kullaniciya ham metin olarak gosterilmez.
                 # Gerekirse coverage log kayitlarindan veya yonetici ekranlarindan incelenebilir.
