@@ -602,19 +602,6 @@ def start_second_repeat_admin_process(process, *, actor=None, note=None):
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
-def auto_start_second_low_score_process(process, *, actor=None, note=None, user_or_id=None):
-    # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
-    # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
-    # Başkan/Üst Onay sonrası ikinci süreç otomatik tetikleniyor.
-    if process is None:
-        return None
-    if not getattr(process, "is_second_or_later", False):
-        return process
-    if not getattr(process, "president_approved_at", None):
-        return process
-    if getattr(process, "administrative_process_started_at", None):
-        return process
-    return start_second_repeat_admin_process(process, actor=actor if actor is not None else user_or_id, note=note)
 class LowScorePeriodSummary:
     total: int
     pending_president: int
