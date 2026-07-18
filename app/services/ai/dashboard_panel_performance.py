@@ -708,7 +708,7 @@ def build_feedback_schedule_ai_panel(req: Any, *, actor: Any | None = None) -> d
 def build_feedback_meetings_ai_panel(meetings: list[Any] | None, *, current_user: Any | None = None, next_meeting: Any | None = None) -> dict[str, Any]:
     rows = list(meetings or [])
     total = len(rows)
-    upcoming = sum(1 for row in rows if (_get(row, "meeting_date") is not None))
+    sum(1 for row in rows if (_get(row, "meeting_date") is not None))
     planned = sum(1 for row in rows if (_get(row, "status", "") or "") == "planlandi")
     completed = sum(1 for row in rows if (_get(row, "status", "") or "") == "tamamlandi")
     delayed = sum(1 for row in rows if (_get(row, "status", "") or "") == "ertelendi")

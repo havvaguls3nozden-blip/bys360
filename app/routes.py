@@ -234,7 +234,7 @@ def kunye():
 # BYS360_PHASE10_REPORTS_ROUTE_IMPORT_AFTER_MAIN
 try:
     from app.performance import process_engine_phase10_reports_routes as _phase10_reports_routes  # noqa: F401,E402
-except ImportError as exc:  # route import should never break app startup silently
+except ImportError:  # route import should never break app startup silently
     raise
 
 # BYS360_PHASE12_PRESIDENT_APPROVALS_CARD_ROUTE_IMPORT

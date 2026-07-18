@@ -174,7 +174,7 @@ def summarize_development_inputs(
 
 
 def build_development_guidance_cards(summary: Mapping[str, Any]) -> List[Dict[str, str]]:
-    score = _to_float(summary.get("score"))
+    _to_float(summary.get("score"))
     band = _normalize(summary.get("score_band"))
     negative_total = _to_int(summary.get("negative_note_total"))
     positive_total = _to_int(summary.get("positive_note_total"))

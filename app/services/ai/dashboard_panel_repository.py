@@ -661,7 +661,7 @@ def build_strategy_action_ai_panel(*, action: Any, indicators: Iterable[Any] | N
 def build_repository_showcase_ai_panel(*, module_heading_label: str | None = None, display_mode: str | None = None, showcase_items: Iterable[Any] | None = None, can_manage_repository: bool = False) -> dict[str, Any]:
     showcase_items = list(showcase_items or [])
     total = len(showcase_items)
-    approved = sum(1 for item in showcase_items if str(_get(_get(item, 'album'), 'showcase_status') or '').strip().lower() == 'approved')
+    sum(1 for item in showcase_items if str(_get(_get(item, 'album'), 'showcase_status') or '').strip().lower() == 'approved')
     pending = sum(1 for item in showcase_items if str(_get(_get(item, 'album'), 'showcase_status') or '').strip().lower() in {'unit_pending', 'corporate_pending'})
     preview_missing = sum(1 for item in showcase_items if not list(_get(item, 'preview_media', []) or []))
     institution_visible = sum(1 for item in showcase_items if str(_get(_get(item, 'album'), 'visibility_level') or '').strip().lower() == 'institution')

@@ -64,7 +64,7 @@ def _json_setting(key: str, default: Any) -> Any:
 
 
 def ensure_defaults(actor_user_id: int | None = None) -> dict[str, Any]:
-    cfg = current_config()
+    current_config()
     if not _setting("cic.v3.initialized", ""):
         for key, meta in TASKS.items():
             _set(f"cic.task.{key}.enabled", "1", actor_user_id)

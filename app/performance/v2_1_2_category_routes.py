@@ -28,7 +28,7 @@ def performance_v2_1_2_categories():
     if request.method == "POST":
         action = request.form.get("action") or "seed"
         if action == "seed":
-            schema = ensure_category_schema()
+            ensure_category_schema()
             result = seed_default_categories(overwrite=False)
             flash(f"V2.1.2 kategori altyapısı işlendi. Yeni: {result.get('created', 0)}, mevcut: {result.get('unchanged', 0)}", "success")
         elif action == "assign_user_category":

@@ -278,7 +278,7 @@ def performance_v2_1_7_period_management_center():
                 selected_plan = request.form.get("plan_key") or ""
                 result = prepare_period_center_notifications(selected_plan, actor_user_id=getattr(current_user, "id", None))
                 flash(result.get("message") or "Bildirim hazırlığı tamamlandı.", "success" if result.get("ok") else "warning")
-        except Exception as exc:
+        except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             flash("Dönem yönetim işlemi tamamlanamadı. Lütfen kayıtları kontrol edip tekrar deneyin.", "danger")
         return redirect(url_for("main.performance_v2_1_7_period_management_center", plan=selected_plan, category=selected_category))
@@ -300,7 +300,7 @@ def performance_v2_1_7_period_management_center():
     if selected_plan and show_process:
         try:
             process_state = build_period_center_process_state(selected_plan)
-        except Exception as exc:
+        except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             try:
                 from app.extensions import db

@@ -86,7 +86,7 @@ def _make_panel(*, module_type: str, feature_type: str, title: str, badge: str, 
         provider = result.provider_name
         model = result.model_name
         latency = result.latency_ms
-    except Exception as exc:  # canlı ekran patlamasın
+    except Exception:  # canlı ekran patlamasın
         text = (
             "Karar Destek Paneli:\n"
             "- AI kural motoru paneli şu anda güvenli yedek görünümde açıldı.\n"
