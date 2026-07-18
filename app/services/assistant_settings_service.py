@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 """BYS360 Asistan ayar okuma servisi.
 
 Bu servis, Asistan davranışını mevcut module_settings tablosundan okur.
