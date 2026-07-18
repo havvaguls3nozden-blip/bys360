@@ -400,7 +400,7 @@ def save_or_submit_survey(survey_id: int, user: Any, form_data: Any, complete: b
                 try:
                     number = float(raw)
                 except ValueError:
-                    raise CommunicationPhase3Error(f"'{question.question_text}' için sayısal değer giriniz.")
+                    raise CommunicationPhase3Error(f"'{question.question_text}' için sayısal değer giriniz.") from None
                 _upsert_answer(response, question, answer_number=number)
             elif required and complete:
                 missing_required.append(question.question_text)
