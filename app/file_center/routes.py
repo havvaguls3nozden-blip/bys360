@@ -496,7 +496,7 @@ def file_center_prepare_request_reminder(request_id: int):
     if row.status != "open":
         flash("Kapalı veya iptal edilmiş dosya isteği için hatırlatma hazırlanamaz.", "warning")
         return redirect(url_for("main.file_center_requests"))
-    message = _build_file_request_message(row)
+    _build_file_request_message(row)
     log_audit("file_request_reminder_prepared", message=f"Dosya isteği hatırlatma metni hazırlandı: {row.title}")
     db.session.commit()
     flash("Dosya isteği hatırlatma metni hazırlandı. Metni açıp e-posta veya mesaj olarak paylaşabilirsiniz.", "success")

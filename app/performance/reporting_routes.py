@@ -406,7 +406,7 @@ def performance_reports_export_pdf():
     selected_period_id = request.args.get("period_id", type=int)
     q = (request.args.get("q") or "").strip()
 
-    periods = (
+    (
         PerformancePeriod.query
         .order_by(PerformancePeriod.start_date.desc(), PerformancePeriod.id.desc())
         .all()

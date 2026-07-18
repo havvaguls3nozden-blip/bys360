@@ -251,7 +251,7 @@ def bys360_feedback_new():
         except UploadValidationError as exc:
             safe_db_rollback()
             flash(str(exc), "danger")
-        except Exception as exc:
+        except Exception:
             logger.exception("BYS360 V6C guarded exception | file=app/communication/user_feedback_routes.py | line=251")
             safe_db_rollback()
             flash("Geri bildirim kaydedilemedi. Lütfen zorunlu alanları ve ek dosya türünü kontrol edip tekrar deneyin.", "danger")

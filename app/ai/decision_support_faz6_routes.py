@@ -93,7 +93,7 @@ def _load_settings() -> dict[str, Any]:
 def _prior_low_count_same_year(evaluation: Any) -> int:
     try:
         from sqlalchemy import and_
-        score_value = getattr(evaluation, "final_score", None) or getattr(evaluation, "weighted_score", None) or getattr(evaluation, "score", None)
+        getattr(evaluation, "final_score", None) or getattr(evaluation, "weighted_score", None) or getattr(evaluation, "score", None)
         user_id = getattr(evaluation, "user_id", None) or getattr(evaluation, "personnel_id", None)
         if user_id is None:
             return 0

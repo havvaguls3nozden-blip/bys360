@@ -300,7 +300,7 @@ def assistant_teaching_center():
 # BYS360 Asistanı alt sekmeleri için URL düzeyi rol matrisi koruması.
 @ai_agent_bp.before_request
 def _bys360_assistant_tabs_role_matrix_v2_before_request():
-    endpoint = request.endpoint or ""
+    request.endpoint or ""
     path = request.path or ""
     if path.endswith("/healthz") or path.endswith("/health"):
         return None

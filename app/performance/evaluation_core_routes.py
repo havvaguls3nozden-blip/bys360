@@ -162,7 +162,7 @@ def performance_scorecard_acknowledge(evaluation_id):
         selected_scope=request.args.get("scope"),
         selected_period_id=request.args.get("period_id", type=int),
     )
-    scope_ctx = detail_ctx["scope_ctx"]
+    detail_ctx["scope_ctx"]
     visibility = detail_ctx["visibility"]
     redirect_params = detail_ctx["redirect_params"]
     if evaluation.employee_id != current_user.id:
@@ -196,7 +196,7 @@ def performance_scorecard_pdf(evaluation_id):
         selected_scope=request.args.get("scope"),
         selected_period_id=request.args.get("period_id", type=int),
     )
-    scope_ctx = detail_ctx["scope_ctx"]
+    detail_ctx["scope_ctx"]
     visibility = detail_ctx["visibility"]
     redirect_params = detail_ctx["redirect_params"]
 

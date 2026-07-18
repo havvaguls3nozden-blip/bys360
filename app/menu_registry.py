@@ -191,7 +191,7 @@ def _resolve_badge(item: dict[str, Any], runtime_context: dict[str, Any]) -> Any
 def _build_sidebar_menu_sections_base(menu_visibility_map: dict[str, bool], current_endpoint: str, current_path: str, runtime_context: dict[str, Any] | None = None, user=None) -> list[dict[str, Any]]:
     runtime_context = runtime_context or {}
     user = user or current_user
-    role_name = (getattr(user, "role", "") or "").strip().lower()
+    (getattr(user, "role", "") or "").strip().lower()
     sections: list[dict[str, Any]] = []
 
     for section in MENU_SECTIONS:  # noqa: F821 - dynamic menu registry global

@@ -280,7 +280,7 @@ def messages_new_impl():
             flash("Alıcı bulunamadı.", "danger")
             return _render_message_new(users=users, recent_users=recent_users, body=body, badge_label=badge_label, icon_name=icon_name, accent_color=accent_color)
 
-        is_self_message = recipient.id == current_user.id
+        recipient.id == current_user.id
 
         if not body and not attachment_files:
             flash("Boş mesaj gönderilemez.", "warning")
@@ -322,7 +322,7 @@ def messages_thread_impl(thread_id):
     thread = detail_payload["thread"]
     participants = detail_payload["participants"]
     messages = detail_payload["messages"]
-    selected_reaction_map = _build_reaction_map(messages)  # BYS360_MESSAGE_INTERACTIONS_V1
+    _build_reaction_map(messages)  # BYS360_MESSAGE_INTERACTIONS_V1
 
     compose_submit_token = issue_form_token("messages_send", scope=f"{current_user.id}:{thread.id}")
     back_state = _current_message_view_state()

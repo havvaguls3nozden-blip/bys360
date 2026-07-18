@@ -21,11 +21,11 @@ def phase3c_mobile_performance_full_feature_summary_service(user: Any, deps: dic
     logger = deps['logger']
 
     try:
-        assignment_q = _assignment_query_for(user)
+        _assignment_query_for(user)
         snapshot_q = _snapshot_query_for(user)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        assignment_q = EvaluationAssignment.query
+        EvaluationAssignment.query
         snapshot_q = PerformanceResultSnapshot.query
     active_periods = _mobile_perf_safe_count(PerformancePeriod.query.filter_by(is_active=True)) if hasattr(PerformancePeriod, 'is_active') else _mobile_perf_safe_count(PerformancePeriod.query)
     pending = len(_v2852_pending_assignments(user, 1000))
