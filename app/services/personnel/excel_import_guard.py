@@ -140,7 +140,7 @@ def validate_personnel_import_rows_for_commit(rows: Iterable[Sequence[Any]], *, 
     column_index: dict[str, int] = {}
     duplicate_headers: dict[str, list[str]] = {}
 
-    for idx, (raw, canonical) in enumerate(zip(raw_headers, canonical_headers)):
+    for idx, (raw, canonical) in enumerate(zip(raw_headers, canonical_headers, strict=False)):
         if _looks_like_mojibake(raw):
             errors.append(f"Başlıkta bozuk karakter/encoding tespit edildi: {raw!r}")
         if not canonical:
