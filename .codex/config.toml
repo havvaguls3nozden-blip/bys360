@@ -2,3 +2,5 @@
 max_threads = 4
 max_depth = 1
 interrupt_message = true
+[windows]
+sandbox = "unelevated"
