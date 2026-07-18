@@ -11,4 +11,9 @@ Collection sonucunu test geçişi olarak kabul etme.
 Beklenmeyen dosya değişikliği, skip, fail, error veya coverage gerilemesi varsa kapıyı PASS verme.
 Sonucu PASS, FAIL veya OPEN olarak ve kesin kanıtlarla bildir.
 Canlıya, veritabanına, ana çalışma alanına veya gizli dosyalara erişme.
+Tüm Ruff komutlarını --no-cache seçeneğiyle çalıştır.
+Tüm pytest komutlarını -p no:cacheprovider seçeneğiyle çalıştır.
+py_compile veya __pycache__ yazımı gerektiren doğrulamalarda yalnız C:/bys360/tmp/codex-pycache dizinini PYTHONPYCACHEPREFIX olarak kullan.
+PYTHONPYCACHEPREFIX değerini yalnız ilgili komutun kapsamı için ayarla; doğrulama tamamlandığında veya hata verdiğinde ortam değişkenini mutlaka kaldır.
+Sandbox veya dosya sistemi izin engellerini kod ya da test hatası olarak sınıflandırma; doğrulama çalıştırılamadıysa sonucu kesin kanıtla OPEN bildir.
 """
