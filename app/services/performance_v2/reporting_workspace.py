@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from app.core.datetime_utils import utc_now
 from collections import defaultdict
-from datetime import datetime
 from typing import Any, Iterable
 
 from sqlalchemy.orm import joinedload

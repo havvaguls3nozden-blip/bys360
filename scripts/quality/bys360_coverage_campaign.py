@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from decimal import Decimal, ROUND_DOWN
 from pathlib import Path
 from typing import Any

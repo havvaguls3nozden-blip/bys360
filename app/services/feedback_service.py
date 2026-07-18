@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from app.core.datetime_utils import utc_now
 """BYS360 feedback service.
 

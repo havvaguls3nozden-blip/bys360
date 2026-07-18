@@ -13,7 +13,6 @@ kademeli ve güvenli biçimde bağlanabilir.
 """
 
 from dataclasses import dataclass
-from datetime import date
 import re
 from typing import Any
 

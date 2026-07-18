@@ -2,7 +2,6 @@
 """Rapor/PDF dışa aktarımında zaman aşımı riskini azaltan koruma."""
 from __future__ import annotations
 
-from typing import Any
 
 from flask import current_app
 

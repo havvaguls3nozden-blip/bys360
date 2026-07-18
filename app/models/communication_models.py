@@ -1,6 +1,5 @@
 """Mesajlasma, anket ve geri bildirim akisi modelleri."""
 
-from datetime import datetime
 
 from app.core.datetime_utils import utc_now
 

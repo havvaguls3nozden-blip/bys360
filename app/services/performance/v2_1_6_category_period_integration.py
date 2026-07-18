@@ -13,7 +13,7 @@ kaydıyla bağlar ve görev üretimi ön entegrasyon raporu üretir. Bu faz doğ
 """
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from typing import Any
 import json
 

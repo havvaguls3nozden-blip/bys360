@@ -7,7 +7,7 @@ Personel – saat 00:12.
 Bu katmanin olayi su: ekrana bakinca sadece veri degil, neye bakman gerektigi de gorunsun.
 """
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Iterable
 
 from app.models import EvaluationAssignment, FeedbackMeeting, PerformanceEvaluation, PerformancePeriod, User

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from app.core.datetime_utils import utc_now
 import re
 import uuid
@@ -9,7 +8,6 @@ try:
     import pymupdf
 except Exception:  # pragma: no cover
     pymupdf = None
-from datetime import datetime
 from pathlib import Path
 
 from flask import abort, current_app

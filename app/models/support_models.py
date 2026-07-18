@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 
-from datetime import datetime
 
 from app.core.datetime_utils import utc_now
 

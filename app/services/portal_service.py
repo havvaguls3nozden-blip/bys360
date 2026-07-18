@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from datetime import timedelta
 from typing import Any
 
 from sqlalchemy.exc import SQLAlchemyError

@@ -7,7 +7,6 @@ import subprocess
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
 
 PACKAGE = "BYS360_SAFE_RELEASE_BUILDER_PHASE1_V2_FILTERED"
 

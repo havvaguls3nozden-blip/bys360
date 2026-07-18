@@ -6,7 +6,7 @@ bildirim talebi varsa görüşme kaydı oluşturur. Amaç ekranın kullanımın�
 """
 from __future__ import annotations
 
-from datetime import date, time
+from datetime import date
 from typing import Any
 
 from sqlalchemy import inspect, text
