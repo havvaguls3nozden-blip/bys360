@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import logging
 """BYS360 personel kategori servisleri.
 
 Faz 2 kalıcı sözleşme:
