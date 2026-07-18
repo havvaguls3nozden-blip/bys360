@@ -152,7 +152,7 @@ def build_period_center_executive_view(
     scope_control: dict[str, Any] | None = None,
     reminder_approval: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    st = state or {}
+    state or {}
     summary = embedded_summary or {}
     flow = period_flow or {}
     scope = scope_control or {}

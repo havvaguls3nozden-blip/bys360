@@ -71,7 +71,7 @@ def _is_windows() -> bool:
 def get_social_auto_task_status() -> dict[str, Any]:
     """Otomatik sosyal medya kontrol görevinin durumunu döndürür."""
     state = _read_state()
-    root = _project_root()
+    _project_root()
     base = {
         "ok": True,
         "supported": _is_windows(),

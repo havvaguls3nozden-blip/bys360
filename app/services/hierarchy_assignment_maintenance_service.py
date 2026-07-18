@@ -213,7 +213,7 @@ def repair_hierarchy_and_assignments(*, apply: bool = False) -> RepairSummary:
             created += 1
             details.append(RepairDetail(_safe(getattr(user, 'sicil_no', '')), _full_name(user), 'assignment_created', f'{level}. seviye eksik görev oluşturuldu.'))
 
-        desired_levels = set(desired_by_level.keys())
+        set(desired_by_level.keys())
         for row in list(existing_rows):
             level = int(getattr(row, 'manager_level', 0) or 0)
             if level not in {1, 2, 3}:

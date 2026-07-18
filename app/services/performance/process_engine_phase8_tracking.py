@@ -578,7 +578,7 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
 def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
     if not flow_ids:
         return {}
-    available = _table_columns("performance_process_flow_steps")
+    _table_columns("performance_process_flow_steps")
     order_expr = "COALESCE(step_order, 0), COALESCE(action_at, created_at, CURRENT_TIMESTAMP), id"
     rows = _rows(
         f"""

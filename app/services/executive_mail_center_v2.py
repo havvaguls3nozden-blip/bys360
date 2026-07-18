@@ -146,7 +146,7 @@ def list_users(search: str|None=None, limit: int=500) -> list[Any]:
             col=getattr(User, attr, None)
             if col is not None: filters.append(col.ilike(s))
         if filters: q=q.filter(or_(*filters))
-    order=getattr(User,"full_name",None) or getattr(User,"name",None) or getattr(User,"id")
+    getattr(User,"full_name",None) or getattr(User,"name",None) or getattr(User,"id")
     return q.order_by(User.id.asc()).limit(limit).all()
 
 def user_display_name(u: Any) -> str: return (getattr(u,"full_name",None) or getattr(u,"name",None) or getattr(u,"username",None) or f"Kullanıcı #{getattr(u,'id','-')}")

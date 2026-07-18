@@ -32,7 +32,7 @@ def _check(name: str, ok: bool, message: str) -> dict[str, Any]:
 def run_v2_1_4_category_scope_visibility_gate(create_probe: bool = False) -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
     try:
-        schema = ensure_category_scope_schema()
+        ensure_category_scope_schema()
         inspector = inspect(_db().engine)
         checks.append(_check("v2_1_2_tables", inspector.has_table(CATEGORY_TABLE) and inspector.has_table(ASSIGNMENT_TABLE), "V2.1.2 kategori tabloları mevcut."))
         checks.append(_check("scope_draft_table", inspector.has_table(SCOPE_DRAFT_TABLE), "V2.1.4 kapsam taslak tablosu mevcut."))

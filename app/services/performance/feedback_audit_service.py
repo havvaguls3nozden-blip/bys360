@@ -261,7 +261,7 @@ def build_feedback_audit_dashboard(requests_list: list[Any], meetings: list[Any]
 
     for req in requests_list:
         request_created_at = getattr(req, "requested_at", None)
-        linked_manager_ids = [
+        [
             getattr(req, "level_1_manager_id", None),
             getattr(req, "level_2_manager_id", None),
             getattr(req, "level_3_manager_id", None),

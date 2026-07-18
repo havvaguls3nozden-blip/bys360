@@ -65,7 +65,7 @@ def build_health_issues_from_slots(row: Dict[str, Any]) -> List[str]:
     slots = slot_map_from_row(row)
     role = _role_key(row.get("role"))
     birim = _safe_str(row.get("birim")).upper()
-    ust_birim = _safe_str(row.get("ust_birim")).upper()
+    _safe_str(row.get("ust_birim")).upper()
 
     # info istisnaları
     if row.get("exception_rule") in {"special_presidency_single_manager", "top_office_node_exception"}:

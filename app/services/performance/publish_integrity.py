@@ -128,7 +128,7 @@ def find_evaluation_integrity_issues(evaluation: PerformanceEvaluation | None, p
         return ["Değerlendirme kaydı bulunamadı."]
 
     period = period or getattr(evaluation, "period", None)
-    level_3_flags = get_period_level_3_flags(period)
+    get_period_level_3_flags(period)
     issues: list[str] = []
 
     for level in (1, 2, 3):
