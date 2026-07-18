@@ -376,7 +376,7 @@ def ensure_low_score_processes_for_period(period: PerformancePeriod | None, *, a
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V2: Başkan onayı
 
     # Yayın blokajı Başkan onayı şartını koruyor.
-def get_low_score_publish_block_reason(evaluation, *, ensure: bool = False) -> str:
+def _legacy_get_low_score_publish_block_reason_phase1(evaluation, *, ensure: bool = False) -> str:
     # Faz 6.3 gate sözleşmesi: Başkan onayı şartı korunur.
     # BYS360_PHASE6_3_DIRECT_PRESIDENT_APPROVAL
     # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_6_LOW_SCORE_STABILIZED
@@ -414,11 +414,11 @@ def get_low_score_publish_block_reason(evaluation, *, ensure: bool = False) -> s
     if (not bool(getattr(process, "is_second_or_later", False))) and not getattr(process, "warning_recorded_at", None):
         return "İlk 70 altı sonucu için personel uyarı/süreç kaydı oluşmadan yayın yapılamaz."
     return ""
-def get_low_score_employee_publish_lock_reason(evaluation, *, ensure: bool = False) -> str:
+def _legacy_get_low_score_employee_publish_lock_reason_phase1(evaluation, *, ensure: bool = False) -> str:
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     return get_low_score_publish_block_reason(evaluation, ensure=ensure)
 
-def is_low_score_employee_publish_released(evaluation, *, ensure: bool = False) -> bool:
+def _legacy_is_low_score_employee_publish_released_phase1(evaluation, *, ensure: bool = False) -> bool:
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     return not bool(get_low_score_publish_block_reason(evaluation, ensure=ensure))
 
@@ -468,7 +468,7 @@ def hr_precheck_process(process: PerformanceLowScoreProcess, *, actor: Any = Non
     return process
 
 
-def president_approve_process(process, *, actor=None, note=None, user_or_id=None):
+def _legacy_president_approve_process_phase1(process, *, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
@@ -507,7 +507,7 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
-def add_low_score_process_note(process_id=None, actor=None, note=None, process=None):
+def _legacy_add_low_score_process_note_phase1(process_id=None, actor=None, note=None, process=None):
     from datetime import datetime
     try:
         from app.extensions import db
@@ -535,7 +535,7 @@ def add_low_score_process_note(process_id=None, actor=None, note=None, process=N
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             db.session.rollback()
     return target
-def record_first_warning(process: PerformanceLowScoreProcess, *, actor: Any = None, note: str | None = None) -> PerformanceLowScoreProcess:
+def _legacy_record_first_warning_phase1(process: PerformanceLowScoreProcess, *, actor: Any = None, note: str | None = None) -> PerformanceLowScoreProcess:
     actor_user_id = _actor_id(actor)
     process.warning_recorded_at = process.warning_recorded_at or utc_now()
     process.warning_recorded_by_id = actor_user_id
@@ -549,7 +549,7 @@ def record_first_warning(process: PerformanceLowScoreProcess, *, actor: Any = No
     return process
 
 
-def auto_record_first_low_score_warning(process: PerformanceLowScoreProcess, *, actor: Any = None, note: str | None = None) -> PerformanceLowScoreProcess:
+def _legacy_auto_record_first_low_score_warning_phase1(process: PerformanceLowScoreProcess, *, actor: Any = None, note: str | None = None) -> PerformanceLowScoreProcess:
     """BYS360_PHASE6_5_FIRST_LOW_SCORE_WARNING | Başkan/Üst Onay sonrası ilk 70 altı için uyarı kaydı oluşturur.
 
     Bu yardımcı yalnızca aynı takvim yılındaki ilk 70 altı süreç için çalışır.
@@ -567,7 +567,7 @@ def auto_record_first_low_score_warning(process: PerformanceLowScoreProcess, *, 
     return record_first_warning(process, actor=actor, note=warning_note)
 
 
-def start_second_repeat_admin_process(process, *, actor=None, note=None):
+def _legacy_start_second_repeat_admin_process_phase1(process, *, actor=None, note=None):
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
     actor_user_id = _actor_id(actor)
@@ -666,7 +666,7 @@ def build_low_score_process_rows(processes=None):
             "process_note": getattr(process, "process_note", None),
         })
     return rows
-def president_reject_process(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
+def _legacy_president_reject_process_phase1(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN_REJECT
     # İade işlemi yayın kilidini sürdürüyor / publish_release engellenir.
     target = process
@@ -733,7 +733,7 @@ def _phase1_5_user_id(user_or_id=None):
 
 # BYS360_PHASE6_DIRECT_PRESIDENT_CONTRACT_V3_DUPLICATE_REMOVED: is_low_score_evaluation eski uyumluluk kopyası kaldırıldı.
 
-def humanize_process_status(status=None):
+def _legacy_humanize_process_status_phase1(status=None):
     # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
     # Başkan onayı bekliyor
     text = str(status or "").strip()
@@ -755,7 +755,7 @@ def humanize_process_status(status=None):
         "administrative_process_started": "Tekrarlayan Düşük Performans Süreci",
     }
     return mapping.get(text, text.replace("_", " ").title() if text else "Başkan onayı bekliyor")
-def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=True, *args, **kwargs):
+def _legacy_get_low_score_publish_block_reason_phase2(process=None, evaluation=None, ensure=True, *args, **kwargs):
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
     # BYS360_LIVE_HARDENING_PHASE1_12_PHASE6_RUNTIME_ALIGNMENT
@@ -801,9 +801,9 @@ def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=Tru
     if not getattr(target, "is_second_or_later", False) and not getattr(target, "warning_recorded_at", None):
         return "İlk düşük performans uyarı kaydı oluşmadan karne yayınlanamaz."
     return None
-def is_low_score_employee_publish_released(evaluation=None):
+def _legacy_is_low_score_employee_publish_released_phase2(evaluation=None):
     return not bool(get_low_score_employee_publish_lock_reason(evaluation, ensure=False))
-def record_first_low_score_warning(process_or_id, user_or_id=None, note=None):
+def _legacy_record_first_low_score_warning_phase2(process_or_id, user_or_id=None, note=None):
     process = _phase1_5_get_process(process_or_id)
     if process is None:
         return None
@@ -822,7 +822,7 @@ def record_first_low_score_warning(process_or_id, user_or_id=None, note=None):
     return process
 
 
-def start_second_repeat_admin_process(process, *, actor=None, note=None):
+def _legacy_start_second_repeat_admin_process_phase2(process, *, actor=None, note=None):
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
     actor_user_id = _actor_id(actor)
@@ -857,7 +857,7 @@ def start_second_repeat_admin_process(process, *, actor=None, note=None):
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
-def auto_start_second_low_score_process(process, *, actor=None, note=None, user_or_id=None):
+def _legacy_auto_start_second_low_score_process_phase2(process, *, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
     # Başkan/Üst Onay sonrası ikinci süreç otomatik tetikleniyor.
@@ -870,7 +870,7 @@ def auto_start_second_low_score_process(process, *, actor=None, note=None, user_
     if getattr(process, "administrative_process_started_at", None):
         return process
     return start_second_repeat_admin_process(process, actor=actor if actor is not None else user_or_id, note=note)
-def president_approve_process(process, *, actor=None, note=None, user_or_id=None):
+def _legacy_president_approve_process_phase2(process, *, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN
     # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
     # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V5
@@ -909,7 +909,7 @@ def president_approve_process(process, *, actor=None, note=None, user_or_id=None
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
-def president_reject_process(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
+def _legacy_president_reject_process_phase2(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN_REJECT
     # İade işlemi yayın kilidini sürdürüyor / publish_release engellenir.
     target = process
@@ -1085,7 +1085,7 @@ def _phase1_7_find_low_score_process(value=None, *, evaluation=None, ensure=Fals
         return None
 
 
-def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=True, *args, **kwargs):
+def _legacy_get_low_score_publish_block_reason_phase3(process=None, evaluation=None, ensure=True, *args, **kwargs):
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
     # BYS360_LIVE_HARDENING_PHASE1_12_PHASE6_RUNTIME_ALIGNMENT
@@ -1131,14 +1131,14 @@ def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=Tru
     if not getattr(target, "is_second_or_later", False) and not getattr(target, "warning_recorded_at", None):
         return "İlk düşük performans uyarı kaydı oluşmadan karne yayınlanamaz."
     return None
-def get_low_score_employee_publish_lock_reason(evaluation=None, *, ensure=False):
+def _legacy_get_low_score_employee_publish_lock_reason_phase3(evaluation=None, *, ensure=False):
     # BYS360_PHASE6_2_LOW_SCORE_EMPLOYEE_VISIBILITY_LOCK
     return get_low_score_publish_block_reason(evaluation, ensure=ensure)
-def is_low_score_employee_publish_released(evaluation=None, *, ensure: bool = False, **kwargs) -> bool:
+def _legacy_is_low_score_employee_publish_released_phase3(evaluation=None, *, ensure: bool = False, **kwargs) -> bool:
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     return not bool(get_low_score_employee_publish_lock_reason(evaluation, ensure=ensure))
 
-def record_first_warning(process, *, actor=None, note=None):
+def _legacy_record_first_warning_phase3(process, *, actor=None, note=None):
     # BYS360_PHASE6_5_FIRST_LOW_SCORE_WARNING
     actor_user_id = _actor_id(actor)
     if process is None:
@@ -1172,7 +1172,7 @@ def record_first_warning(process, *, actor=None, note=None):
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
 
-def auto_record_first_low_score_warning(process, *, actor=None, note=None):
+def _legacy_auto_record_first_low_score_warning_phase3(process, *, actor=None, note=None):
     # BYS360_PHASE6_5_FIRST_LOW_SCORE_WARNING
     if process is None:
         return None
@@ -1184,7 +1184,7 @@ def auto_record_first_low_score_warning(process, *, actor=None, note=None):
         return process
     return record_first_warning(process, actor=actor, note=note)
 
-record_first_low_score_warning = record_first_warning
+_legacy_record_first_low_score_warning_phase3 = _legacy_record_first_warning_phase3
 
 
 # BYS360_CANLI_SAGLAMLASTIRMA_PHASE1_13_PHASE6_GATE_CONTRACT
