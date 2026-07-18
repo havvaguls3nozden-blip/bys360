@@ -837,9 +837,6 @@ def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=Tru
     if not getattr(target, "is_second_or_later", False) and not getattr(target, "warning_recorded_at", None):
         return "İlk düşük performans uyarı kaydı oluşmadan karne yayınlanamaz."
     return None
-def get_low_score_employee_publish_lock_reason(evaluation=None, *, ensure=False):
-    # BYS360_PHASE6_2_LOW_SCORE_EMPLOYEE_VISIBILITY_LOCK
-    return get_low_score_publish_block_reason(evaluation, ensure=ensure)
 def is_low_score_employee_publish_released(evaluation=None):
     return not bool(get_low_score_employee_publish_lock_reason(evaluation, ensure=False))
 def record_first_low_score_warning(process_or_id, user_or_id=None, note=None):
