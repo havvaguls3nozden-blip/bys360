@@ -230,7 +230,6 @@ from datetime import datetime as _cic_dt_datetime
 from datetime import datetime as _cic_v40_datetime
 from datetime import datetime as _cic_v45_datetime
 from datetime import timedelta as _cic_v45_timedelta
-from typing import Any
 
 def _now() -> datetime:
     return datetime.now()
@@ -417,8 +416,6 @@ def _cic_v45_header_key(value: object) -> str | None:
 # --- BYS360 P7 migrated CIC settings repository helpers: start ---
 # These settings repository helpers were migrated from app.services.corporate_information_center.
 # The legacy module keeps import aliases for backwards compatibility.
-import json
-from typing import Any
 
 from sqlalchemy import inspect as sa_inspect
 
