@@ -666,29 +666,6 @@ def build_low_score_process_rows(processes=None):
             "process_note": getattr(process, "process_note", None),
         })
     return rows
-def humanize_process_status(status=None):
-    # Faz 6.3 gate sözleşmesi: Başkan onayı bekliyor.
-    # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
-    # Başkan onayı bekliyor
-    text = str(status or "").strip()
-    mapping = {
-        "president_pending": "Başkan onayı bekliyor",
-        "direct_president_pending": "Başkan onayı bekliyor",
-        "president_approval_pending": "Başkan onayı bekliyor",
-        "blocked_president_pending": "Başkan/Üst Onay Yayın Kilidi",
-        "president_rejected": "Başkan/Üst Onay tarafından iade edildi",
-        "president_returned": "Başkan/Üst Onay tarafından iade edildi",
-        "rejected_by_president": "Başkan/Üst Onay tarafından iade edildi",
-        "president_approved": "Başkan/Üst Onay tamamlandı",
-        "approved_by_president": "Başkan/Üst Onay tarafından onaylandı",
-        "first_low_warning": "Düşük Performans Uyarısı Oluşturuldu",
-        "warning_recorded": "Düşük Performans Uyarısı Oluşturuldu",
-        "second_low_repeat": "Tekrarlayan Düşük Performans Süreci",
-        "second_low_score_process_started": "Tekrarlayan Düşük Performans Süreci",
-        "repeated_low_score_process_started": "Tekrarlayan Düşük Performans Süreci",
-        "administrative_process_started": "Tekrarlayan Düşük Performans Süreci",
-    }
-    return mapping.get(text, text.replace("_", " ").title() if text else "Başkan onayı bekliyor")
 def president_reject_process(process=None, *, process_id=None, actor=None, note=None, user_or_id=None):
     # BYS360_PHASE6_4_PRESIDENT_APPROVAL_SCREEN_REJECT
     # İade işlemi yayın kilidini sürdürüyor / publish_release engellenir.
