@@ -124,32 +124,6 @@ def safe_render(template_name: str, fallback_html: str = "", **context: Any):
 PHASE3_ACCESS_DENIED_MESSAGE = "Bu sayfaya erişim yetkiniz bulunmamaktadır."
 
 
-def render_access_denied(message: str | None = None, *, status_code: int = 403):
-    """Yetkisiz erişimde beyaz ekran/ham traceback yerine kurumsal 403 sayfası döndürür."""
-    message = (message or PHASE3_ACCESS_DENIED_MESSAGE).strip() or PHASE3_ACCESS_DENIED_MESSAGE
-    try:
-        return flask_render_template(
-            "errors/403.html",
-            title="Erişim Yetkisi Bulunmamaktadır",
-            message=message,
-        ), status_code
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/route_support.py | line=138")
-        return (
-            f"""
-            <html>
-              <head><title>403 - Erişim Yetkisi Bulunmamaktadır</title></head>
-              <body style="font-family: Arial, sans-serif; padding: 40px; background:#fafafa; color:#222;">
-                <main style="max-width:760px;margin:auto;background:#fff;border-radius:18px;padding:32px;box-shadow:0 16px 40px rgba(0,0,0,.08);">
-                  <h2 style="color:#8B0000;margin-top:0;">Erişim Yetkisi Bulunmamaktadır</h2>
-                  <p>{message}</p>
-                </main>
-              </body>
-            </html>
-            """,
-            status_code,
-        )
-
 BYS360_PHASE3_4_CORPORATE_ACCESS_DENIED_MESSAGE = "Bu sayfaya erişim yetkiniz bulunmamaktadır."
 BYS360_PHASE3_4_CORPORATE_ACCESS_DENIED_TITLE = "Erişim Yetkisi Bulunmamaktadır"
 

@@ -331,7 +331,7 @@ def _matrix_export_rows() -> tuple[dict[str, object], ...]:
     return tuple(export_rows)
 
 
-def build_role_matrix_ui_context(selected_module: str = "tum") -> dict:
+def _build_role_matrix_ui_context_base(selected_module: str = "tum") -> dict:
     visible_groups = _filter_groups(selected_module)
     row_count = sum(len(group.rows) for group in GROUPS)
     visible_row_count = sum(len(group.rows) for group in visible_groups)
@@ -414,7 +414,7 @@ GROUPS = tuple(
 if not any(getattr(group, "key", "") == "personel_yonetimi" for group in GROUPS):
     GROUPS = (_BYS360_PERSONEL_ROLE_MATRIX_GROUP,) + tuple(GROUPS)
 
-_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT = globals().get("build_role_matrix_ui_context")
+_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT = _build_role_matrix_ui_context_base
 
 def build_role_matrix_ui_context(active_group_key: str | None = None):
     if callable(_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT):
