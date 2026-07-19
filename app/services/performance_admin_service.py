@@ -22,8 +22,7 @@ from app.models import (
     User,
 )
 
-from app.services.performance.assignments import generate_assignments_for_active_period
-from app.services.performance.common import fetch_active_users, get_period
+from app.services.performance.common import fetch_active_users
 from app.services.performance.hierarchy import build_manager_chain_for_user
 
 

@@ -15,8 +15,6 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
-    CATEGORY_TABLE,
-    ASSIGNMENT_TABLE,
     canonical_category_key,
     ensure_category_schema,
     list_categories,

@@ -18,8 +18,6 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
-    ASSIGNMENT_TABLE,
-    CATEGORY_TABLE,
     RULE_VERSION as V212_RULE_VERSION,
     assign_user_category,
     canonical_category_key,

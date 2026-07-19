@@ -16,8 +16,6 @@ from collections import defaultdict
 from datetime import date
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import and_
-
 from app import db
 from app.models import (
     EmployeeOrgAssignmentHistory,
@@ -25,7 +23,6 @@ from app.models import (
     PerformanceEvaluation,
     PerformanceEvaluationItem,
     PerformancePeriod,
-    PerformancePublishLog,
     PerformanceResultSnapshot,
     User,
 )

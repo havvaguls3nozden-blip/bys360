@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 from app.extensions import db
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem, PerformancePeriod
 from .assignments import _dedupe_item_rows, ensure_evaluation_record
-from .common import _safe_float, _safe_str, calculate_effective_weights, get_active_weight_config, get_base_weight_map, get_period, get_period_level_3_flags, is_single_manager_case
+from .common import _safe_float, _safe_str, calculate_effective_weights, get_base_weight_map, get_period_level_3_flags, is_single_manager_case
 from .criteria import level_1_gave_any_three, score_to_100
 from app.services.performance_v2.policy_flags import score_requires_criterion_comment
 from .policy_flags import is_level_2_comment_required_when_level_1_score_is_three
