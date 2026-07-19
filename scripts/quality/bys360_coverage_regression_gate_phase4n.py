@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 DEFAULT_MIN_TOTAL = 21.85
 DEFAULT_MIN_BRANCH = 7.71
 def _load_coverage(path: Path) -> dict[str, Any]:

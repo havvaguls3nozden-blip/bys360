@@ -7,7 +7,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P5B_ANDROID_RESPONSIVE_CORE_STYLES_GATE"
 
 

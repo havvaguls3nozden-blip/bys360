@@ -6,7 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-
 PACKAGE = "BYS360_PHASE2_TEST_COVERAGE_EVIDENCE_GATE_V1"
 REPORT_JSON_REL = Path("reports/architecture/BYS360_PHASE2_TEST_COVERAGE_EVIDENCE_GATE_V1_REPORT.json")
 REPORT_MD_REL = Path("reports/architecture/BYS360_PHASE2_TEST_COVERAGE_EVIDENCE_GATE_V1_REPORT.md")

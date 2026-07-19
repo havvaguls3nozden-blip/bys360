@@ -10,7 +10,6 @@ from uuid import uuid4
 
 from sqlalchemy import Boolean, Date, DateTime, Float, Integer, String, Text
 
-
 PACKAGE = "BYS360_PHASE2_AUTH_SUCCESS_FLOW_GATE_V1"
 REPORT_REL = Path("reports/architecture/BYS360_PHASE2_AUTH_SUCCESS_FLOW_GATE_V1_REPORT.json")
 
