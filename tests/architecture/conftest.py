@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import os
 
-import pytest
-
 # BYS360_P2E_ACTIVE_ARCHITECTURE_SCOPE
 # Varsayılan mimari test kapısı yalnızca güncel ve canlı omurgayla uyumlu
 # aktif kalite testlerini çalıştırır. Eski Faz/Faz10/portal/anket/mesaj
