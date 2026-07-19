@@ -11,7 +11,7 @@ BYS360_AI_DECISION_FAZ11_POLICY_OK
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional
+from typing import Any
 from collections.abc import Mapping, Sequence
 
 
