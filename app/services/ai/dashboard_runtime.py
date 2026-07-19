@@ -8,6 +8,7 @@ from .guardrails import ensure_ai_access, sanitize_output_text
 from .prompts import get_prompt_definition
 from .redaction import redact_payload
 
+
 def _build_dashboard_context(*args, **kwargs):
     from app.services.ui_context.dashboard import build_dashboard_context as _impl
     return _impl(*args, **kwargs)

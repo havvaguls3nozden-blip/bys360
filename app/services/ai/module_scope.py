@@ -11,7 +11,6 @@ from typing import Any, Iterable
 
 from sqlalchemy import func
 
-
 LIVE_AI_MODULES: tuple[str, ...] = (
     "dashboard",
     "performance",

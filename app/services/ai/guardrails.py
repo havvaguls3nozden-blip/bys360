@@ -7,9 +7,9 @@ from flask import current_app
 from flask_login import current_user
 
 from app.route_support import user_has_any_role
+
 from .client import get_provider_snapshot
 from .module_scope import is_live_ai_module
-
 
 DEFAULT_ALLOWED_MANAGER_ROLES = {
     "admin",

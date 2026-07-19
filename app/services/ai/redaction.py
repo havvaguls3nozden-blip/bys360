@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-
 EMAIL_RE = re.compile(r"([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 LONG_NUMBER_RE = re.compile(r"\b\d{8,11}\b")
 

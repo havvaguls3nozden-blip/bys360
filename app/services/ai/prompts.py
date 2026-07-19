@@ -8,7 +8,6 @@ from flask import current_app
 
 from .module_scope import is_visible_ai_module
 
-
 DEFAULT_PROMPTS: dict[tuple[str, str], dict[str, str]] = {
     ("performance", "summary"): {
         "version": "performance_summary_v5_bys360",
