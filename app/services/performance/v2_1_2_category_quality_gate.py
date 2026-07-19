@@ -16,7 +16,6 @@ from app.services.performance.v2_1_2_category_engine import (
     canonical_category_key,
     category_scope_summary,
     ensure_category_schema,
-    has_category_tables,
     infer_category_from_import_row,
 )
 logger = logging.getLogger(__name__)

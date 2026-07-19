@@ -12,7 +12,7 @@ okumalıdır. Slot sırası ile işlem sırası bilinçli olarak ayrıdır:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping
 
 from app.services.hierarchy_rulebook_service import build_lookup, desired_manager_sicils
 from app.services.explicit_manager_chain_service import current_manager_tuple, has_explicit_manager_fields

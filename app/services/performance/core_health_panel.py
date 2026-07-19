@@ -11,7 +11,6 @@ güvenlik ve canlı omurga durumunu tek sözleşmede raporlar.
 """
 
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Any, Iterable
 
 from flask import current_app, has_app_context

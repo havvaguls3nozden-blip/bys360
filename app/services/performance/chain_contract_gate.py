@@ -10,7 +10,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
-from typing import Iterable
 
 CHAIN_CONTRACT_GATE_VERSION = "2026-04-20-performance-chain-contract-gate-faz1"
 

@@ -10,7 +10,7 @@ aynı sözleşmede birleştirip operasyon ekranlarının zincir sağlığı, gö
 ve ekip kıyas durumunu tek bakışta okuyabilmesini sağlamaktır.
 """
 
-from collections import Counter, defaultdict
+from collections import Counter
 from typing import Any, Iterable
 
 from app.models import EvaluationAssignment, PerformanceEvaluation
