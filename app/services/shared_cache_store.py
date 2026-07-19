@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 """Shared JSON cache adapter for BYS360.
 
 Redis is used when configured.  If Redis is missing or temporarily unavailable,
