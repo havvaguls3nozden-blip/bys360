@@ -17,7 +17,7 @@ PerformancePeriod = getattr(models, "PerformancePeriod", None) if models else No
 EvaluationAssignment = getattr(models, "EvaluationAssignment", None) if models else None
 
 
-SPECIAL_PRESIDENCY_UNITS: Set[str] = {
+SPECIAL_PRESIDENCY_UNITS: set[str] = {
     "BAŞKANLIK",
     "HUKUK MÜŞAVİRLİĞİ",
     "İÇ DENETİM",
@@ -27,7 +27,7 @@ SPECIAL_PRESIDENCY_UNITS: Set[str] = {
 
 @dataclass
 class ChainWarningRecord:
-    employee_id: Optional[int]
+    employee_id: int | None
     sicil_no: str
     full_name: str
     birim: str
@@ -36,9 +36,9 @@ class ChainWarningRecord:
     severity: str
     reason: str
     resolved_by_assignment: bool = False
-    manager_levels_present: Optional[List[int]] = None
+    manager_levels_present: list[int] | None = None
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "employee_id": self.employee_id,
             "sicil_no": self.sicil_no,
@@ -68,7 +68,7 @@ def _full_name(user: Any) -> str:
     return f"{ad} {soyad}".strip()
 
 
-def get_active_period() -> Optional[Any]:
+def get_active_period() -> Any | None:
     if not PerformancePeriod:
         return None
     return (
@@ -78,18 +78,18 @@ def get_active_period() -> Optional[Any]:
     )
 
 
-def get_users_by_name() -> Dict[str, Any]:
+def get_users_by_name() -> dict[str, Any]:
     if not User:
         return {}
     users = User.query.filter_by(is_active=True).all() if hasattr(User, "is_active") else User.query.all()
-    mapping: Dict[str, Any] = {}
+    mapping: dict[str, Any] = {}
     for user in users:
         mapping[_full_name(user).casefold()] = user
     return mapping
 
 
-def get_assignment_levels_by_employee(period_id: int) -> Dict[int, Set[int]]:
-    levels: Dict[int, Set[int]] = {}
+def get_assignment_levels_by_employee(period_id: int) -> dict[int, set[int]]:
+    levels: dict[int, set[int]] = {}
     if not EvaluationAssignment:
         return levels
     rows = EvaluationAssignment.query.filter_by(period_id=period_id).all()
@@ -98,7 +98,7 @@ def get_assignment_levels_by_employee(period_id: int) -> Dict[int, Set[int]]:
     return levels
 
 
-def parse_hidden_warning_log(raw_message: str) -> List[str]:
+def parse_hidden_warning_log(raw_message: str) -> list[str]:
     marker = "Otomatik zincir ham uyarıları gizlendi:"
     payload = raw_message.split(marker, 1)[-1].strip() if marker in raw_message else raw_message.strip()
     if not payload:
@@ -106,7 +106,7 @@ def parse_hidden_warning_log(raw_message: str) -> List[str]:
     return [part.strip() for part in payload.split("|") if part.strip()]
 
 
-def classify_hidden_chain_warning(entry: str, users_by_name: Dict[str, Any], assignment_levels: Dict[int, Set[int]]) -> ChainWarningRecord:
+def classify_hidden_chain_warning(entry: str, users_by_name: dict[str, Any], assignment_levels: dict[int, set[int]]) -> ChainWarningRecord:
     name, sep, warning_text = entry.partition(":")
     person_name = name.strip()
     warning_text = warning_text.strip() if sep else entry.strip()
@@ -152,7 +152,7 @@ def classify_hidden_chain_warning(entry: str, users_by_name: Dict[str, Any], ass
     )
 
 
-def audit_hidden_chain_warning_log(raw_message: str) -> Dict[str, Any]:
+def audit_hidden_chain_warning_log(raw_message: str) -> dict[str, Any]:
     period = get_active_period()
     users_by_name = get_users_by_name()
     assignment_levels = get_assignment_levels_by_employee(int(period.id)) if period else {}

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -9,7 +8,8 @@ ayar izin veriyorsa alan gösterilebilir; böylece yetkili kullanıcı gerektiğ
 ataması yapabilir.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE4_4_THIRD_SUPERVISOR_SCREEN_COLUMN

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Görüşme Sonrası Notlar ve Eylem Planı servisi.
 
 Bu servis mevcut feedback_meetings tablosunu bozmadan üç tamamlayıcı kayıt alanı ekler:

@@ -5,7 +5,8 @@ import logging
 
 from app.core.datetime_utils import utc_now
 from datetime import datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from sqlalchemy import desc
 

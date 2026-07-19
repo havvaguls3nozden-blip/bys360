@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -14,7 +13,8 @@ migration ve repair scriptleriyle ayrıca güvenceye alınır.
 """
 
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 PHASE2_CATEGORY_CENTER_VERSION = "performance-completion-phase2-category-center-v1"

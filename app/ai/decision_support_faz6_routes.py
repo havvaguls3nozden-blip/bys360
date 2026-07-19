@@ -12,7 +12,8 @@ Başkan/Üst Onay ve 70 altı düşük performans süreçlerini karar destek mer
 BYS360_AI_DECISION_FAZ6_ROUTES
 """
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from flask import jsonify
 from flask_login import current_user, login_required

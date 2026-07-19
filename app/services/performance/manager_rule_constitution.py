@@ -9,7 +9,7 @@ referans alarak eski yanlış kuralların tekrar koda sızmasını engeller.
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from typing import Mapping
+from collections.abc import Mapping
 
 CONSTITUTION_VERSION = "2026-04-20-claude-faz4-performance-manager-rules"
 

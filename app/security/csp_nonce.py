@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 CSP nonce desteği.
 
 Şablonlarda kullanılabilecek yardımcı: {{ csp_nonce() }}

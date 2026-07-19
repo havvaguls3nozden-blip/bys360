@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Small HTML safety filters for BYS360 templates."""
 from __future__ import annotations
 

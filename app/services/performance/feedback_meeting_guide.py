@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Geri Bildirim Görüşmesi Faz 2 rehber veri servisi.
 
 Bu dosya veritabanı bağımlılığı taşımaz. Faz 2'nin amacı; yöneticinin görüşmeye

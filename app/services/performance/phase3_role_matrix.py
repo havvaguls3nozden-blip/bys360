@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Faz 3.1 — Performans görünürlük rol matrisi.
 

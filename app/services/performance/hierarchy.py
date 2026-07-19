@@ -17,7 +17,8 @@ THIRD_MANAGER_HEADER_ALIASES = [
 
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+from collections.abc import Iterable
 
 try:
     import app.models as models  # type: ignore
@@ -53,19 +54,19 @@ SPECIAL_SINGLE_MANAGER_UNITS = {
 
 @dataclass
 class ChainResult:
-    employee_id: Optional[int]
+    employee_id: int | None
     employee_name: str
-    manager_1_id: Optional[int]
-    manager_2_id: Optional[int]
-    manager_3_id: Optional[int]
+    manager_1_id: int | None
+    manager_2_id: int | None
+    manager_3_id: int | None
     manager_1_sicil: str = ""
     manager_2_sicil: str = ""
     manager_3_sicil: str = ""
     manager_1_name: str = ""
     manager_2_name: str = ""
     manager_3_name: str = ""
-    warnings: Optional[List[str]] = None
-    flow_order: Optional[List[int]] = None
+    warnings: list[str] | None = None
+    flow_order: list[int] | None = None
     is_single_manager_case: bool = False
 
 
@@ -107,7 +108,7 @@ def _full_name(user: Any) -> str:
     return f"{_s(getattr(user, 'ad', ''))} {_s(getattr(user, 'soyad', ''))}".strip()
 
 
-def _ensure_iterable(value: Any) -> List[Any]:
+def _ensure_iterable(value: Any) -> list[Any]:
     if value is None:
         return []
     if isinstance(value, (list, tuple, set)):
@@ -123,7 +124,7 @@ def _effective_level_3_mode(subject: Any, level_mode: str) -> str:
     return normalized or 'comment_only'
 
 
-def fetch_active_users() -> List[Any]:
+def fetch_active_users() -> list[Any]:
     if not User:
         return []
     query = User.query
@@ -140,9 +141,9 @@ def fetch_active_users() -> List[Any]:
     return rows
 
 
-def build_user_maps(users: List[Any]) -> Tuple[Dict[int, Any], Dict[str, Any]]:
-    by_id: Dict[int, Any] = {}
-    by_sicil: Dict[str, Any] = {}
+def build_user_maps(users: list[Any]) -> tuple[dict[int, Any], dict[str, Any]]:
+    by_id: dict[int, Any] = {}
+    by_sicil: dict[str, Any] = {}
     for user in users:
         user_id = _get(user, "id", None)
         if user_id is not None:
@@ -174,7 +175,7 @@ def is_single_manager_case(user: Any) -> bool:
     return False
 
 
-def flow_order_for(user: Any, has_third: bool = False) -> List[int]:
+def flow_order_for(user: Any, has_third: bool = False) -> list[int]:
     """
     Slot != işlem sırası.
     1. amir slotu kurumsal amirdir.
@@ -197,8 +198,8 @@ def flow_order_for(user: Any, has_third: bool = False) -> List[int]:
     return [2, 1]
 
 
-def resolve_manager_chain(user: Any, by_sicil: Dict[str, Any]) -> ChainResult:
-    warnings: List[str] = []
+def resolve_manager_chain(user: Any, by_sicil: dict[str, Any]) -> ChainResult:
+    warnings: list[str] = []
     single_case = is_single_manager_case(user)
     role = _role(_get(user, "role", ""))
 
@@ -253,7 +254,7 @@ def resolve_manager_chain(user: Any, by_sicil: Dict[str, Any]) -> ChainResult:
     )
 
 
-def build_manager_chain_for_user(user: Any = None, users_by_sicil: Dict[str, Any] | None = None, period: Any = None, employee: Any = None):
+def build_manager_chain_for_user(user: Any = None, users_by_sicil: dict[str, Any] | None = None, period: Any = None, employee: Any = None):
     """
     Geriye dönük uyumluluk katmanı.
 
@@ -347,13 +348,13 @@ def build_manager_chain_for_user(user: Any = None, users_by_sicil: Dict[str, Any
         )
 
 
-def build_all_manager_chains(users: Optional[List[Any]] = None) -> List[ChainResult]:
+def build_all_manager_chains(users: list[Any] | None = None) -> list[ChainResult]:
     users = users or fetch_active_users()
     _, by_sicil = build_user_maps(users)
     return [resolve_manager_chain(user, by_sicil) for user in users]
 
 
-def build_org_tree_from_units(users: Optional[List[Any]] = None) -> Dict[str, Any]:
+def build_org_tree_from_units(users: list[Any] | None = None) -> dict[str, Any]:
     users = users or fetch_active_users()
     normalized = []
     for user in users:
@@ -375,10 +376,10 @@ def build_org_tree_from_units(users: Optional[List[Any]] = None) -> Dict[str, An
     grup_baskanlari = [u for u in normalized if u["role"] == "grup_baskani"]
     digerleri = [u for u in normalized if u["role"] not in {"baskan", "baskan_yardimcisi", "grup_baskani"}]
 
-    def sort_people(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def sort_people(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return sorted(items, key=lambda x: (ROLE_ORDER.get(x["role"], 50), x["name"].lower(), x["sicil_no"]))
 
-    group_map: Dict[str, Dict[str, Any]] = {}
+    group_map: dict[str, dict[str, Any]] = {}
     for gb in grup_baskanlari:
         grup_name = gb["birim"] or gb["ust_birim"] or "Belirsiz Grup Başkanlığı"
         group_map.setdefault(grup_name, {"manager": gb, "work_groups": {}})
@@ -412,10 +413,10 @@ def build_org_tree_from_units(users: Optional[List[Any]] = None) -> Dict[str, An
     }
 
 
-def build_assignment_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[str, Any]]:
+def build_assignment_rows(users: Iterable[Any] | None = None) -> list[dict[str, Any]]:
     source_users = list(_ensure_iterable(users)) if users is not None else fetch_active_users()
     _, by_sicil = build_user_maps(source_users if users is None else fetch_active_users())
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for user in source_users:
         chain = resolve_manager_chain(user, by_sicil)
         rows.append(
@@ -440,7 +441,7 @@ def build_assignment_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[st
     return rows
 
 
-def _coerce_user_source(source: Optional[Iterable[Any]] = None) -> Optional[List[Any]]:
+def _coerce_user_source(source: Iterable[Any] | None = None) -> list[Any] | None:
     """`analyze_hierarchy_rows(period_id)` gibi hatalı/eski çağrıları tolere et."""
     if source is None:
         return None
@@ -459,8 +460,8 @@ def _coerce_user_source(source: Optional[Iterable[Any]] = None) -> Optional[List
     return None
 
 
-def _real_issue_messages(chain: Any) -> List[str]:
-    messages: List[str] = []
+def _real_issue_messages(chain: Any) -> list[str]:
+    messages: list[str] = []
     issue_items = list(getattr(chain, 'issue_items', []) or [])
     if issue_items:
         for raw in issue_items:
@@ -480,7 +481,7 @@ def _real_issue_messages(chain: Any) -> List[str]:
     return messages
 
 
-def analyze_hierarchy_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[str, Any]]:
+def analyze_hierarchy_rows(users: Iterable[Any] | None = None) -> list[dict[str, Any]]:
     """Seçili kullanıcı kümesi için yönetici zinciri analiz satırlarını üretir.
 
     Dönen her kayıt; kullanıcı nesnesi, çözülmüş zincir, gerçek aksiyon gerektiren
@@ -489,7 +490,7 @@ def analyze_hierarchy_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[s
     bırakmayan ana okuma sözleşmesidir.
     """
     source_users = _coerce_user_source(users) or fetch_active_users()
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for user in source_users:
         chain = build_manager_chain_for_user(user=user)
         real_issues = _real_issue_messages(chain)
@@ -524,7 +525,7 @@ def analyze_hierarchy_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[s
     return rows
 
 
-def analyze_hierarchy_gaps(users: Optional[Iterable[Any]] = None) -> List[Dict[str, Any]]:
+def analyze_hierarchy_gaps(users: Iterable[Any] | None = None) -> list[dict[str, Any]]:
     """Yalnızca aksiyon gerektiren zincir boşluklarını döndürür.
 
     Bilgi notları ve özel tek amir senaryoları bu filtreye dahil edilmez; sonuç
@@ -534,5 +535,5 @@ def analyze_hierarchy_gaps(users: Optional[Iterable[Any]] = None) -> List[Dict[s
     return [row for row in analyze_hierarchy_rows(users) if list(row.get('issues') or [])]
 
 
-def get_hierarchy_assignment_rows(users: Optional[Iterable[Any]] = None) -> List[Dict[str, Any]]:
+def get_hierarchy_assignment_rows(users: Iterable[Any] | None = None) -> list[dict[str, Any]]:
     return analyze_hierarchy_rows(users)

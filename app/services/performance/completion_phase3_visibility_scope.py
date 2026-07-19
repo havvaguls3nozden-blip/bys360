@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -15,7 +14,8 @@ Bu servis Faz 3'ün ana sözleşmesidir:
 """
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Sequence
+from typing import Any
+from collections.abc import Iterable, Sequence
 
 logger = logging.getLogger(__name__)
 

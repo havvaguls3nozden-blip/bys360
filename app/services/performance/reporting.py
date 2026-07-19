@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
 
 from app.models import OrganizationUnit, PerformanceEvaluation, User
 from .common import _full_name, _safe_float, _safe_str
@@ -45,12 +46,12 @@ def attach_report_scores(evaluations: Iterable[Any]):
         setattr(evaluation, "report_final_score", resolve_report_score(evaluation))
     return items
 
-def build_team_compare_rows(period_id: Optional[int] = None, manager_id: Optional[int] = None) -> List[Dict[str, Any]]:
+def build_team_compare_rows(period_id: int | None = None, manager_id: int | None = None) -> list[dict[str, Any]]:
     query = PerformanceEvaluation.query.join(User, User.id == PerformanceEvaluation.employee_id)
     if period_id is not None:
         query = query.filter(PerformanceEvaluation.period_id == period_id)
 
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
 
     for row in query.all():
         if bool(getattr(row, "evaluation_exempted", False)):
@@ -74,7 +75,7 @@ def build_team_compare_rows(period_id: Optional[int] = None, manager_id: Optiona
     rows.sort(key=lambda item: (-item["score"], item["name"].lower()))
     return rows
 
-def build_org_tree_from_units() -> List[Dict[str, Any]]:
+def build_org_tree_from_units() -> list[dict[str, Any]]:
     units = (
         OrganizationUnit.query
         .order_by(
@@ -85,11 +86,11 @@ def build_org_tree_from_units() -> List[Dict[str, Any]]:
         .all()
     )
 
-    children_map: Dict[Optional[int], List[OrganizationUnit]] = {}
+    children_map: dict[int | None, list[OrganizationUnit]] = {}
     for unit in units:
         children_map.setdefault(unit.parent_id, []).append(unit)
 
-    def _build(node: OrganizationUnit) -> Dict[str, Any]:
+    def _build(node: OrganizationUnit) -> dict[str, Any]:
         return {
             "id": node.id,
             "name": getattr(node, "name", "-"),

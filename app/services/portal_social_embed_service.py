@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Portal V3B5 Kurumsal sosyal medya otomatik takip, normal portal paylaşımı ve uygulama içi otomatik görev durumu servisi.
 
 Canlı ilke:

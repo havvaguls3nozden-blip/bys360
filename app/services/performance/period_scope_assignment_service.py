@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
 """BYS360 Faz 11 dönem/kapsam/görev üretimi servis köprüsü."""
 from __future__ import annotations
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from app.services.performance.phase11_period_scope_assignment_center import (
     BYS360_PERFORMANCE_COMPLETION_PHASE11_VERSION,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Maintenance Faz 6 - statik sorgu sagligi tarayicisi.
 

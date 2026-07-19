@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 11 entegrasyon servisi.
 
@@ -10,7 +9,8 @@ BYS360_AI_DECISION_FAZ11_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Mapping, Sequence
 
 from app.services.ai_decision.development_guidance_policy import build_development_guidance_context
 
@@ -28,8 +28,8 @@ RECOMMENDATION_TABLE_CANDIDATES = (
 )
 
 
-def _rows_as_dicts(result: Any) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+def _rows_as_dicts(result: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     if result is None:
         return rows
     for row in result:
@@ -60,7 +60,7 @@ def _table_exists(db_session: Any, table_name: str) -> bool:
         return False
 
 
-def fetch_evaluation_summary(db_session: Any, evaluation_id: Optional[int] = None) -> Dict[str, Any]:
+def fetch_evaluation_summary(db_session: Any, evaluation_id: int | None = None) -> dict[str, Any]:
     if text is None or db_session is None or not evaluation_id:
         return {}
     if not _table_exists(db_session, "performance_evaluations"):
@@ -86,7 +86,7 @@ def fetch_evaluation_summary(db_session: Any, evaluation_id: Optional[int] = Non
         return {}
 
 
-def fetch_criteria_results(db_session: Any, evaluation_id: Optional[int] = None) -> List[Dict[str, Any]]:
+def fetch_criteria_results(db_session: Any, evaluation_id: int | None = None) -> list[dict[str, Any]]:
     if text is None or db_session is None or not evaluation_id:
         return []
     if not _table_exists(db_session, "performance_evaluation_items"):
@@ -113,13 +113,13 @@ def fetch_criteria_results(db_session: Any, evaluation_id: Optional[int] = None)
 def fetch_previous_scores(
     db_session: Any,
     *,
-    personnel_id: Optional[int] = None,
-    current_evaluation_id: Optional[int] = None,
+    personnel_id: int | None = None,
+    current_evaluation_id: int | None = None,
     limit: int = 6,
-) -> List[float]:
+) -> list[float]:
     if text is None or db_session is None or not personnel_id:
         return []
-    scores: List[float] = []
+    scores: list[float] = []
     try:
         if _table_exists(db_session, "performance_archived_results"):
             result = db_session.execute(text("""
@@ -163,11 +163,11 @@ def fetch_previous_scores(
 def fetch_existing_recommendations(
     db_session: Any,
     *,
-    personnel_id: Optional[int] = None,
-    period_id: Optional[int] = None,
-    evaluation_id: Optional[int] = None,
+    personnel_id: int | None = None,
+    period_id: int | None = None,
+    evaluation_id: int | None = None,
     limit: int = 20,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     if text is None or db_session is None:
         return []
     table_name = next((t for t in RECOMMENDATION_TABLE_CANDIDATES if _table_exists(db_session, t)), None)
@@ -228,10 +228,10 @@ def fetch_existing_recommendations(
 def fetch_interim_summary(
     db_session: Any,
     *,
-    personnel_id: Optional[int] = None,
-    period_id: Optional[int] = None,
-    evaluation_id: Optional[int] = None,
-) -> Dict[str, Any]:
+    personnel_id: int | None = None,
+    period_id: int | None = None,
+    evaluation_id: int | None = None,
+) -> dict[str, Any]:
     if text is None or db_session is None:
         return {}
     if _table_exists(db_session, "ai_decision_interim_feedback_snapshots"):
@@ -269,12 +269,12 @@ def fetch_interim_summary(
 def build_development_guidance_from_db(
     db_session: Any,
     *,
-    evaluation_id: Optional[int] = None,
-    personnel_id: Optional[int] = None,
-    period_id: Optional[int] = None,
-    score: Optional[float] = None,
+    evaluation_id: int | None = None,
+    personnel_id: int | None = None,
+    period_id: int | None = None,
+    score: float | None = None,
     viewer_role: str = "",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     evaluation = fetch_evaluation_summary(db_session, evaluation_id)
     personnel_id = personnel_id or evaluation.get("personnel_id")
     period_id = period_id or evaluation.get("period_id")
@@ -311,9 +311,9 @@ def build_development_guidance_from_db(
 def persist_development_guidance_snapshot(
     db_session: Any,
     *,
-    period_id: Optional[int],
-    personnel_id: Optional[int],
-    evaluation_id: Optional[int],
+    period_id: int | None,
+    personnel_id: int | None,
+    evaluation_id: int | None,
     context: Mapping[str, Any],
 ) -> bool:
     if text is None or db_session is None:

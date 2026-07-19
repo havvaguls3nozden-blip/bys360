@@ -16,7 +16,8 @@ kategori ortalaması üretir. Eski ve yeni çağrı şekillerini birlikte destek
 sözleşmesi korunur.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 PRIVACY_NOTE = "Kategori ortalaması kişi detayı göstermeden hesaplanır; kişi detayı gösterilmez."

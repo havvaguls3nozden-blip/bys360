@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 8: Dönem içi notlar ve ara geri bildirim merkezi.
 
 Bu merkez, dönem içinde oluşan olumlu/olumsuz gözlem, başarı, gelişim ihtiyacı
@@ -12,7 +11,8 @@ import logging
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE8_MIDTERM_FEEDBACK_CENTER = True

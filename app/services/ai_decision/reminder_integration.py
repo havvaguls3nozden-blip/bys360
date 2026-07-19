@@ -9,7 +9,8 @@ BYS360_AI_DECISION_FAZ9_REMINDER_INTEGRATION
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from .reminder_policy import (
     ReminderPolicy,

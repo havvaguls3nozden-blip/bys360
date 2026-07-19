@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 8
 Çoklu Dönem ve Özel Grup Dönemleri Politika Merkezi
@@ -14,7 +13,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping, Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class PeriodOverlapDecision:
     conflicting_period_ids: tuple[Any, ...]
 
 
-def _parse_date(value: Any) -> Optional[date]:
+def _parse_date(value: Any) -> date | None:
     if isinstance(value, date) and not isinstance(value, datetime):
         return value
     if isinstance(value, datetime):
@@ -140,12 +140,12 @@ def resolve_period_scope(
     period_type: Any = "annual",
     scope_type: Any = "all",
     scope_value: Any = None,
-    selected_personnel_ids: Optional[Sequence[Any]] = None,
+    selected_personnel_ids: Sequence[Any] | None = None,
     start_date: Any = None,
     end_date: Any = None,
     special_reason: Any = None,
 ) -> PeriodScopeDecision:
-    errors: List[str] = []
+    errors: list[str] = []
 
     ptype = normalize_period_type(period_type)
     stype = normalize_scope_type(scope_type)
@@ -191,7 +191,7 @@ def resolve_period_scope(
     )
 
 
-def _period_dates(period: Mapping[str, Any]) -> tuple[Optional[date], Optional[date]]:
+def _period_dates(period: Mapping[str, Any]) -> tuple[date | None, date | None]:
     return (
         _parse_date(period.get("start_date") or period.get("start") or period.get("baslangic_tarihi")),
         _parse_date(period.get("end_date") or period.get("end") or period.get("bitis_tarihi")),
@@ -208,7 +208,7 @@ def detect_period_overlap(
     employee_raw = str(employee_id or "").strip()
     new_start = _parse_date(new_start_date)
     new_end = _parse_date(new_end_date)
-    conflicts: List[Any] = []
+    conflicts: list[Any] = []
 
     if not employee_raw or not new_start or not new_end:
         return PeriodOverlapDecision(False, "none", "Çakışma kontrolü için yeterli veri yok.", tuple())
@@ -246,13 +246,13 @@ def filter_personnel_for_period_scope(
     *,
     scope_type: Any = "all",
     scope_value: Any = None,
-    selected_personnel_ids: Optional[Sequence[Any]] = None,
-) -> List[Dict[str, Any]]:
+    selected_personnel_ids: Sequence[Any] | None = None,
+) -> list[dict[str, Any]]:
     stype = normalize_scope_type(scope_type)
     selected = {str(x) for x in (selected_personnel_ids or []) if str(x or "").strip()}
     scope_raw = str(scope_value or "").strip().lower()
 
-    filtered: List[Dict[str, Any]] = []
+    filtered: list[dict[str, Any]] = []
     for row in personnel_rows or []:
         item = dict(row)
         if stype == "all":
@@ -292,11 +292,11 @@ def build_assignment_scope_payload(
     period_type: Any,
     scope_type: Any,
     scope_value: Any = None,
-    selected_personnel_ids: Optional[Sequence[Any]] = None,
+    selected_personnel_ids: Sequence[Any] | None = None,
     start_date: Any = None,
     end_date: Any = None,
     special_reason: Any = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     decision = resolve_period_scope(
         period_type=period_type,
         scope_type=scope_type,
@@ -327,7 +327,7 @@ def build_assignment_scope_payload(
     }
 
 
-def phase8_period_scope_contract() -> Dict[str, Any]:
+def phase8_period_scope_contract() -> dict[str, Any]:
     return {
         "multiple_periods_same_year": True,
         "period_types": sorted(PERIOD_TYPES.keys()),

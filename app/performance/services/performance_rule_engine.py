@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 
@@ -14,7 +13,8 @@ Faz 1.4'te yayın öncesi kontrol ve ekranlar bu servise bağlanacaktır.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 logger = logging.getLogger(__name__)
 
 LOW_SCORE_THRESHOLD = 70.0

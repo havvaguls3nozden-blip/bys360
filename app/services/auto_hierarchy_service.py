@@ -12,7 +12,8 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from app.extensions import db
 from app.models import User

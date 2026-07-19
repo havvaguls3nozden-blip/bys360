@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 P5C targeted Android responsive templates gate.
 """

@@ -31,7 +31,7 @@ def complete_level_3(evaluation: PerformanceEvaluation, level_3_assignment: Eval
 def submit_to_level_2(
     evaluation: PerformanceEvaluation,
     level_1_assignment: EvaluationAssignment,
-    level_2_assignment: Optional[EvaluationAssignment],
+    level_2_assignment: EvaluationAssignment | None,
 ) -> None:
     # Uyum katmanı adı korunuyor. Güncel akışta bu işlem 2. amirden 1. amire gönderimdir.
     now = utc_now()
@@ -58,7 +58,7 @@ def submit_to_level_2(
 def withdraw_from_level_2(
     evaluation: PerformanceEvaluation,
     level_1_assignment: EvaluationAssignment,
-    level_2_assignment: Optional[EvaluationAssignment],
+    level_2_assignment: EvaluationAssignment | None,
 ) -> None:
     if not can_level_1_withdraw(evaluation):
         raise ValueError('1. amir değerlendirmeyi gördüğü için geri çekme yapılamaz.')

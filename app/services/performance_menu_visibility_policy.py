@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 
 from dataclasses import dataclass
-from typing import Iterable, Set
+from typing import Set
+from collections.abc import Iterable
 
 @dataclass(frozen=True)
 class PerformanceMenuItem:
@@ -44,7 +44,7 @@ PERFORMANCE_MENU_REGISTRY = [
     PerformanceMenuItem("performance.ai_agent", "BYS360 Asistanı Yönetimi", False, True, "BYS360 Asistanı yönetim ve takip ekranları"),
 ]
 
-KPI_MENU_KEYS: Set[str] = {
+KPI_MENU_KEYS: set[str] = {
     "performance.kpi_dashboard",
     "performance.kpi_management",
     "performance.competency_library",
@@ -53,9 +53,9 @@ KPI_MENU_KEYS: Set[str] = {
     "performance.kpi_goals",
 }
 
-DEFAULT_PERSONNEL_ALLOWED: Set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY if item.default_for_personnel}
-DEFAULT_PERSONNEL_BLOCKED: Set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY if not item.default_for_personnel}
-ALL_PERFORMANCE_MENU_KEYS: Set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY}
+DEFAULT_PERSONNEL_ALLOWED: set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY if item.default_for_personnel}
+DEFAULT_PERSONNEL_BLOCKED: set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY if not item.default_for_personnel}
+ALL_PERFORMANCE_MENU_KEYS: set[str] = {item.key for item in PERFORMANCE_MENU_REGISTRY}
 
 ROLE_DEFAULTS = {
     "personel": set(DEFAULT_PERSONNEL_ALLOWED),
@@ -71,10 +71,10 @@ ROLE_DEFAULTS = {
     "sistem_yoneticisi": set(ALL_PERFORMANCE_MENU_KEYS),
 }
 
-def normalize_keys(keys: Iterable[str] | None) -> Set[str]:
+def normalize_keys(keys: Iterable[str] | None) -> set[str]:
     return {str(k).strip() for k in (keys or []) if str(k).strip()}
 
-def allowed_for_personnel(mode: str = "safe_default", custom_allowed: Iterable[str] | None = None) -> Set[str]:
+def allowed_for_personnel(mode: str = "safe_default", custom_allowed: Iterable[str] | None = None) -> set[str]:
     mode = (mode or "safe_default").strip()
     if mode == "full_access":
         return set(ALL_PERFORMANCE_MENU_KEYS)
@@ -87,6 +87,6 @@ def allowed_for_personnel(mode: str = "safe_default", custom_allowed: Iterable[s
 def is_personnel_allowed(menu_key: str, mode: str = "safe_default", custom_allowed: Iterable[str] | None = None) -> bool:
     return menu_key in allowed_for_personnel(mode, custom_allowed)
 
-def role_default_allowed(role_name: str) -> Set[str]:
+def role_default_allowed(role_name: str) -> set[str]:
     key = (role_name or "").strip().lower()
     return set(ROLE_DEFAULTS.get(key, set()))

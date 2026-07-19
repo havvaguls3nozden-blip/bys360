@@ -48,19 +48,19 @@ class ManagerChain:
     employee_id: int
     employee_name: str
     employee_sicil: str
-    manager_1_id: Optional[int] = None
-    manager_2_id: Optional[int] = None
-    manager_3_id: Optional[int] = None
+    manager_1_id: int | None = None
+    manager_2_id: int | None = None
+    manager_3_id: int | None = None
     manager_1_name: str = "-"
     manager_2_name: str = "-"
     manager_3_name: str = "-"
-    info_notes: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    issues: List[str] = field(default_factory=list)
+    info_notes: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    issues: list[str] = field(default_factory=list)
     is_single_manager_case: bool = False
     level_3_enabled: bool = False
     level_3_scoring_enabled: bool = False
-    effective_weights: Dict[str, float] = field(default_factory=dict)
+    effective_weights: dict[str, float] = field(default_factory=dict)
 
 
 def _safe_str(value: Any) -> str:
@@ -112,7 +112,7 @@ def _full_name(user: Any) -> str:
     return f"{ad} {soyad}".strip() or "-"
 
 
-def is_performance_scope_user(user: Optional[User]) -> bool:
+def is_performance_scope_user(user: User | None) -> bool:
     if not user:
         return False
     try:
@@ -128,7 +128,7 @@ def is_performance_scope_user(user: Optional[User]) -> bool:
     return bool(getattr(user, "is_active", True))
 
 
-def is_president(user: Optional[User]) -> bool:
+def is_president(user: User | None) -> bool:
     if not user:
         return False
     role_key = _normalize_text(getattr(user, "role", ""))
@@ -137,7 +137,7 @@ def is_president(user: Optional[User]) -> bool:
     return role_key in PRESIDENT_ROLE_KEYS or title_key in PRESIDENT_TITLE_KEYS or role_label_key in PRESIDENT_TITLE_KEYS
 
 
-def is_hukuk_context(user: Optional[User]) -> bool:
+def is_hukuk_context(user: User | None) -> bool:
     if not user:
         return False
     birim_key = _normalize_text(getattr(user, "birim", ""))
@@ -146,7 +146,7 @@ def is_hukuk_context(user: Optional[User]) -> bool:
     return any(token in title_key for token in HUKUK_TITLE_KEYS) or any(token in birim_key for token in HUKUK_UNIT_KEYS) or any(token in ust_birim_key for token in HUKUK_UNIT_KEYS)
 
 
-def is_hukuk_single_manager_case(user: Optional[User]) -> bool:
+def is_hukuk_single_manager_case(user: User | None) -> bool:
     if not user or not is_hukuk_context(user):
         return False
 
@@ -173,7 +173,7 @@ def is_hukuk_single_manager_case(user: Optional[User]) -> bool:
     return False
 
 
-def is_single_manager_case(user: Optional[User]) -> bool:
+def is_single_manager_case(user: User | None) -> bool:
     if not user or is_president(user):
         return False
     if is_hukuk_single_manager_case(user):
@@ -189,7 +189,7 @@ def is_single_manager_case(user: Optional[User]) -> bool:
     return bool(manager_1 and is_president(manager_1))
 
 
-def get_period(period_id: Optional[int] = None) -> Optional[PerformancePeriod]:
+def get_period(period_id: int | None = None) -> PerformancePeriod | None:
     try:
         if period_id:
             return db.session.get(PerformancePeriod, int(period_id))
@@ -202,7 +202,7 @@ def get_period(period_id: Optional[int] = None) -> Optional[PerformancePeriod]:
     )
 
 
-def get_active_period() -> Optional[PerformancePeriod]:
+def get_active_period() -> PerformancePeriod | None:
     return (
         PerformancePeriod.query.filter_by(is_active=True)
         .order_by(PerformancePeriod.start_date.desc(), PerformancePeriod.id.desc())
@@ -210,7 +210,7 @@ def get_active_period() -> Optional[PerformancePeriod]:
     )
 
 
-def get_active_weight_config(period_id: Optional[int] = None) -> Optional[PerformanceWeightConfig]:
+def get_active_weight_config(period_id: int | None = None) -> PerformanceWeightConfig | None:
     query = PerformanceWeightConfig.query.filter_by(is_active=True)
     if period_id is not None:
         row = query.filter_by(period_id=period_id).order_by(PerformanceWeightConfig.id.desc()).first()
@@ -219,7 +219,7 @@ def get_active_weight_config(period_id: Optional[int] = None) -> Optional[Perfor
     return query.order_by(PerformanceWeightConfig.id.desc()).first()
 
 
-def get_base_weight_map(period_id: Optional[int] = None) -> Dict[str, float]:
+def get_base_weight_map(period_id: int | None = None) -> dict[str, float]:
     period = get_period(period_id)
     config = get_active_weight_config((period.id if period else None) or period_id)
     if config:
@@ -237,7 +237,7 @@ def get_base_weight_map(period_id: Optional[int] = None) -> Dict[str, float]:
     return {"evaluator_1_weight": 50.0, "evaluator_2_weight": 50.0, "evaluator_3_weight": 0.0}
 
 
-def fetch_active_non_admin_users(include_president: bool = True) -> List[User]:
+def fetch_active_non_admin_users(include_president: bool = True) -> list[User]:
     users = (
         User.query.filter(User.is_active == True)
         .order_by(User.ust_birim.asc(), User.birim.asc(), User.ad.asc(), User.soyad.asc())
@@ -249,11 +249,11 @@ def fetch_active_non_admin_users(include_president: bool = True) -> List[User]:
     return [u for u in users if not is_president(u)]
 
 
-def fetch_active_users() -> List[User]:
+def fetch_active_users() -> list[User]:
     return fetch_active_non_admin_users(include_president=False)
 
 
-def _resolve_manager(sicil_no: str, users_by_sicil: Dict[str, User]) -> Optional[User]:
+def _resolve_manager(sicil_no: str, users_by_sicil: dict[str, User]) -> User | None:
     if not sicil_no:
         return None
     sicil_no = _safe_str(sicil_no)
@@ -379,17 +379,17 @@ def get_president_user(users_by_sicil=None):
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/common.py")
     return None
 
-def get_evaluation_window_start(period: Optional[PerformancePeriod]) -> Optional[date]:
+def get_evaluation_window_start(period: PerformancePeriod | None) -> date | None:
     if not period:
         return None
     return getattr(period, "evaluation_start_date", None) or getattr(period, "start_date", None)
 
-def get_evaluation_window_end(period: Optional[PerformancePeriod]) -> Optional[date]:
+def get_evaluation_window_end(period: PerformancePeriod | None) -> date | None:
     if not period:
         return None
     return getattr(period, "evaluation_end_date", None) or getattr(period, "end_date", None)
 
-def get_evaluation_due_days(period: Optional[PerformancePeriod]) -> Optional[int]:
+def get_evaluation_due_days(period: PerformancePeriod | None) -> int | None:
     if not period:
         return None
     raw = getattr(period, "evaluation_due_days", None)
@@ -399,7 +399,7 @@ def get_evaluation_due_days(period: Optional[PerformancePeriod]) -> Optional[int
         return None
     return value if value > 0 else None
 
-def get_evaluation_window_state(period: Optional[PerformancePeriod], check_date: Optional[date] = None) -> Dict[str, Any]:
+def get_evaluation_window_state(period: PerformancePeriod | None, check_date: date | None = None) -> dict[str, Any]:
     target = check_date or date.today()
     start = get_evaluation_window_start(period)
     end = get_evaluation_window_end(period)
@@ -418,7 +418,7 @@ def get_evaluation_window_state(period: Optional[PerformancePeriod], check_date:
         "can_submit": is_open,
     }
 
-def build_assignment_due_date(period: Optional[PerformancePeriod], assigned_at: Optional[datetime] = None):
+def build_assignment_due_date(period: PerformancePeriod | None, assigned_at: datetime | None = None):
     if not period:
         return None
     builder = getattr(period, "build_due_datetime", None)
@@ -430,7 +430,7 @@ def build_assignment_due_date(period: Optional[PerformancePeriod], assigned_at: 
     return datetime.combine(end, datetime.max.time().replace(microsecond=0))
 
 # BYS360_PHASE4_5_COMMON_WEIGHT_OVERRIDE
-def get_period_level_3_flags(period=None, weight_config=None) -> Dict[str, Any]:  # type: ignore[override]
+def get_period_level_3_flags(period=None, weight_config=None) -> dict[str, Any]:  # type: ignore[override]
     period = period or get_active_period()
     weight_config = weight_config or get_active_weight_config(getattr(period, "id", None) if period else None)
 
@@ -485,7 +485,7 @@ def normalize_weight_inputs(  # type: ignore[override]
     evaluator_3_weight: float,
     level_3_enabled: bool,
     level_3_scoring_enabled: bool,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     mode = "scoring" if bool(level_3_enabled and level_3_scoring_enabled) else (LEVEL_3_DEFAULT_MODE if level_3_enabled else "off")
     try:
         from app.services.performance.third_supervisor_policy import normalize_third_supervisor_weights
@@ -535,7 +535,7 @@ def calculate_effective_weights(  # type: ignore[override]
     manager_1_id,
     manager_2_id,
     manager_3_id,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     base = get_base_weight_map(getattr(period, "id", None) if period else None)
     single_manager = is_single_manager_case(employee)
     try:
@@ -550,7 +550,7 @@ def calculate_effective_weights(  # type: ignore[override]
         )
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        active_levels: Dict[int, float] = {}
+        active_levels: dict[int, float] = {}
         if manager_1_id:
             active_levels[1] = base["evaluator_1_weight"]
         if not single_manager and manager_2_id:

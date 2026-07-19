@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 7: Geçmiş yıl karne / puan arşivi merkezi.
 
 Bu modül idari karar üretmez. Eski dönem puanlarını, kaynak notlarını ve
@@ -11,7 +10,8 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_CENTER = True

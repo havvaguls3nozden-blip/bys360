@@ -59,9 +59,9 @@ def _normalize_reason_text(value: Any) -> str:
 
 
 def is_informational_special_case(
-    reason: Optional[str] = None,
-    event_type: Optional[str] = None,
-    manager_level: Optional[int] = None,
+    reason: str | None = None,
+    event_type: str | None = None,
+    manager_level: int | None = None,
 ) -> bool:
     """Return True for non-actionable informational rows.
 
@@ -114,7 +114,7 @@ def is_informational_special_case(
     return any(token in reason_text for token in info_tokens)
 
 
-def _split_chain_issues(issue_list: Optional[List[str]]) -> tuple[List[str], List[str]]:
+def _split_chain_issues(issue_list: list[str] | None) -> tuple[list[str], list[str]]:
     issues = [item for item in (issue_list or []) if _safe_str(item)]
     fatal_issue_keys = {
         WARNING_REASON_MANAGER_1_MISSING.lower(),
@@ -125,8 +125,8 @@ def _split_chain_issues(issue_list: Optional[List[str]]) -> tuple[List[str], Lis
         WARNING_REASON_PRESIDENT_MISSING.lower(),
     }
 
-    fatal: List[str] = []
-    nonfatal: List[str] = []
+    fatal: list[str] = []
+    nonfatal: list[str] = []
 
     for raw_issue in issues:
         issue_key = _safe_str(raw_issue).lower()
@@ -138,7 +138,7 @@ def _split_chain_issues(issue_list: Optional[List[str]]) -> tuple[List[str], Lis
     return fatal, nonfatal
 
 
-def _enforce_required_chain_levels(chain: ManagerChain, fatal_issues: Optional[List[str]], nonfatal_issues: Optional[List[str]]) -> tuple[List[str], List[str]]:
+def _enforce_required_chain_levels(chain: ManagerChain, fatal_issues: list[str] | None, nonfatal_issues: list[str] | None) -> tuple[list[str], list[str]]:
     """Enforce the expected 3→2→1 / 2→1 / 1 chain semantics.
 
     - 2. amir eksikliği yalnızca gerçek tek-amir özel kuralında nonfatal kalır.
@@ -220,7 +220,7 @@ def _dedupe_item_rows(evaluation_id: int, criteria_id: int, manager_level: int) 
 def ensure_evaluation_record(
     period_id: int,
     employee_id: int,
-    chain: Optional[ManagerChain] = None,
+    chain: ManagerChain | None = None,
 ) -> PerformanceEvaluation:
     evaluation = PerformanceEvaluation.query.filter_by(
         period_id=period_id,
@@ -256,7 +256,7 @@ def ensure_evaluation_record(
 def apply_effective_chain_to_evaluation(
     evaluation: PerformanceEvaluation,
     chain: ManagerChain,
-    coverage_resolutions: Optional[Dict[int, DelegationResolution]] = None,
+    coverage_resolutions: dict[int, DelegationResolution] | None = None,
 ) -> PerformanceEvaluation:
     coverage_resolutions = coverage_resolutions or {}
     evaluation.level_1_evaluator_id = (coverage_resolutions.get(1).acting_manager_id if coverage_resolutions.get(1) else chain.manager_1_id)
@@ -268,14 +268,14 @@ def apply_effective_chain_to_evaluation(
 def ensure_assignment(
     period_id: int,
     employee_id: int,
-    evaluator_id: Optional[int],
+    evaluator_id: int | None,
     manager_level: int,
     period=None,
-    original_evaluator_id: Optional[int] = None,
-    delegation_id: Optional[int] = None,
+    original_evaluator_id: int | None = None,
+    delegation_id: int | None = None,
     assignment_source: str = "direct",
-    coverage_note: Optional[str] = None,
-) -> Optional[EvaluationAssignment]:
+    coverage_note: str | None = None,
+) -> EvaluationAssignment | None:
     if not evaluator_id:
         return None
 
@@ -343,15 +343,15 @@ def create_assignment_coverage_log(
     period_id: int,
     employee_id: int,
     event_type: str,
-    reason: Optional[str] = None,
-    manager_level: Optional[int] = None,
+    reason: str | None = None,
+    manager_level: int | None = None,
     event_scope: str = "generation",
     severity: str = "warning",
-    run_key: Optional[str] = None,
-    original_evaluator_id: Optional[int] = None,
-    acting_evaluator_id: Optional[int] = None,
-    delegation_id: Optional[int] = None,
-    created_by_user_id: Optional[int] = None,
+    run_key: str | None = None,
+    original_evaluator_id: int | None = None,
+    acting_evaluator_id: int | None = None,
+    delegation_id: int | None = None,
+    created_by_user_id: int | None = None,
 ) -> AssignmentCoverageLog:
     row = AssignmentCoverageLog(
         period_id=period_id,
@@ -370,7 +370,7 @@ def create_assignment_coverage_log(
     db.session.add(row)
     return row
 
-def build_assignment_log_severity_summary(log_rows: List[AssignmentCoverageLog]) -> Dict[str, int]:
+def build_assignment_log_severity_summary(log_rows: list[AssignmentCoverageLog]) -> dict[str, int]:
     summary = {'info': 0, 'warning': 0, 'error': 0}
     for row in log_rows:
         severity = _safe_str(getattr(row, 'severity', None)).lower() or 'warning'
@@ -380,7 +380,7 @@ def build_assignment_log_severity_summary(log_rows: List[AssignmentCoverageLog])
     return summary
 
 
-def build_assignment_log_summary(log_rows: List[AssignmentCoverageLog]) -> Dict[str, int]:
+def build_assignment_log_summary(log_rows: list[AssignmentCoverageLog]) -> dict[str, int]:
     summary = {
         "delegated": 0,
         "uncovered": 0,
@@ -403,8 +403,8 @@ def build_assignment_log_summary(log_rows: List[AssignmentCoverageLog]) -> Dict[
 def get_latest_assignment_generation_logs(
     period_id: int,
     limit: int = 200,
-    employee_ids: Optional[List[int]] = None,
-) -> Dict[str, Any]:
+    employee_ids: list[int] | None = None,
+) -> dict[str, Any]:
     latest = (
         AssignmentCoverageLog.query
         .filter_by(period_id=period_id, event_scope="generation")
@@ -444,10 +444,10 @@ def get_latest_assignment_generation_logs(
     }
 
 def build_assignment_unit_summary(
-    log_rows: List[AssignmentCoverageLog],
-    top_n: Optional[int] = 10,
-) -> List[Dict[str, Any]]:
-    buckets: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
+    log_rows: list[AssignmentCoverageLog],
+    top_n: int | None = 10,
+) -> list[dict[str, Any]]:
+    buckets: dict[str, dict[str, Any]] = defaultdict(lambda: {
         "unit_name": "Tanımsız",
         "log_count": 0,
         "delegated": 0,
@@ -506,7 +506,7 @@ def sync_assignments_for_employee(
     period_id: int,
     employee: User,
     chain: ManagerChain,
-    coverage_resolutions: Optional[Dict[int, DelegationResolution]] = None,
+    coverage_resolutions: dict[int, DelegationResolution] | None = None,
 ) -> int:
     created = 0
     coverage_resolutions = coverage_resolutions or {}
@@ -547,7 +547,7 @@ def sync_assignments_for_employee(
 
     return created
 
-def generate_assignments_for_active_period(period_id: Optional[int] = None, actor_user_id: Optional[int] = None) -> Dict[str, Any]:
+def generate_assignments_for_active_period(period_id: int | None = None, actor_user_id: int | None = None) -> dict[str, Any]:
     """Legacy public entrypoint backed by the V2 assignment synchronizer.
 
     Bu import bilerek fonksiyon icine alindi. Uygulama acilisinda

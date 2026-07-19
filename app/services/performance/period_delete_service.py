@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Performans dönemi silme servisi.
 
@@ -11,7 +10,8 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 import sqlalchemy as sa
 from sqlalchemy import inspect

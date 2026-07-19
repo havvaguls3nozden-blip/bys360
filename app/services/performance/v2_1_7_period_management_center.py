@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 
@@ -11,7 +10,8 @@ ağır personel/amir ön kontrol listeleri yalnızca kullanıcı plan seçtiğin
 üretilir. Böylece Dönem Yönetim Merkezi ekranda dönerek kalmaz.
 """
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import seed_default_categories

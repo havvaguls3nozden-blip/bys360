@@ -30,14 +30,14 @@ class PeriodAvailabilityImpact:
     available_days: float = 0.0
     exempted: bool = False
     reason: str = ""
-    notes: List[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
 
 
 @dataclass
 class DelegationResolution:
-    original_manager_id: Optional[int]
-    acting_manager_id: Optional[int]
-    delegation_id: Optional[int] = None
+    original_manager_id: int | None
+    acting_manager_id: int | None
+    delegation_id: int | None = None
     source: str = "direct"
     note: str = ""
 
@@ -45,7 +45,7 @@ class DelegationResolution:
 @dataclass
 class AssignmentCoverageRefreshResult:
     updated_count: int = 0
-    notes: List[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
 
 
 def _safe_float(value, default: float = 0.0) -> float:
@@ -57,11 +57,11 @@ def _safe_float(value, default: float = 0.0) -> float:
         return default
 
 
-def _normalize_status(value: Optional[str]) -> str:
+def _normalize_status(value: str | None) -> str:
     return (value or "").strip().lower()
 
 
-def _is_approved(value: Optional[str]) -> bool:
+def _is_approved(value: str | None) -> bool:
     return _normalize_status(value) in APPROVED_STATUSES
 
 
@@ -73,7 +73,7 @@ def _normalize_performance_mode(row: Any, *, default_blocking: bool = True) -> s
     return PERFORMANCE_MODE_DEFAULT if blocks else "informational"
 
 
-def get_assignment_reference_date(period: Optional[PerformancePeriod], on_date: Optional[date] = None) -> date:
+def get_assignment_reference_date(period: PerformancePeriod | None, on_date: date | None = None) -> date:
     candidate = on_date or date.today()
     if not period:
         return candidate
@@ -91,11 +91,11 @@ def _date_range(start_date: date, end_date: date):
         current += timedelta(days=1)
 
 
-def _business_days_in_range(start_date: date, end_date: date) -> List[date]:
+def _business_days_in_range(start_date: date, end_date: date) -> list[date]:
     return [day for day in _date_range(start_date, end_date) if day.weekday() < 5]
 
 
-def _overlap_range(start_a: date, end_a: date, start_b: date, end_b: date) -> Optional[tuple[date, date]]:
+def _overlap_range(start_a: date, end_a: date, start_b: date, end_b: date) -> tuple[date, date] | None:
     start = max(start_a, start_b)
     end = min(end_a, end_b)
     if start > end:
@@ -103,7 +103,7 @@ def _overlap_range(start_a: date, end_a: date, start_b: date, end_b: date) -> Op
     return start, end
 
 
-def _leave_overlap_map(leave: PersonnelLeave, range_start: date, range_end: date) -> Dict[date, float]:
+def _leave_overlap_map(leave: PersonnelLeave, range_start: date, range_end: date) -> dict[date, float]:
     overlap = _overlap_range(leave.start_date, leave.end_date, range_start, range_end)
     if not overlap:
         return {}
@@ -135,7 +135,7 @@ def _leave_overlap_map(leave: PersonnelLeave, range_start: date, range_end: date
     return fractions
 
 
-def _attendance_overlap_map(exception: AttendanceException, range_start: date, range_end: date) -> Dict[date, float]:
+def _attendance_overlap_map(exception: AttendanceException, range_start: date, range_end: date) -> dict[date, float]:
     if exception.record_date < range_start or exception.record_date > range_end:
         return {}
     if exception.record_date.weekday() >= 5:
@@ -160,10 +160,10 @@ def get_period_employee_availability(employee: User, period: PerformancePeriod) 
         impact.notes.append("Seçilen dönem hafta içi iş günü üretmediği için değerlendirme oluşturulmadı.")
         return impact
 
-    blocked_map: Dict[date, float] = {}
+    blocked_map: dict[date, float] = {}
     leave_total = 0.0
     absence_total = 0.0
-    forced_exclusion_reasons: List[str] = []
+    forced_exclusion_reasons: list[str] = []
 
     leave_rows = (
         PersonnelLeave.query
@@ -238,7 +238,7 @@ def get_period_employee_availability(employee: User, period: PerformancePeriod) 
     absence_skip = getattr(period, "absence_skip_threshold_days", None)
     auto_skip_full = bool(getattr(period, "auto_skip_if_fully_absent", True))
 
-    reasons: List[str] = []
+    reasons: list[str] = []
     exempted = False
 
     if forced_exclusion_reasons:
@@ -273,7 +273,7 @@ def get_period_employee_availability(employee: User, period: PerformancePeriod) 
     return impact
 
 
-def is_user_currently_unavailable(user_id: Optional[int], on_date: Optional[date] = None) -> tuple[bool, str]:
+def is_user_currently_unavailable(user_id: int | None, on_date: date | None = None) -> tuple[bool, str]:
     if not user_id:
         return False, ""
 
@@ -299,7 +299,7 @@ def is_user_currently_unavailable(user_id: Optional[int], on_date: Optional[date
     return False, ""
 
 
-def resolve_effective_manager(manager_id: Optional[int], manager_level: int, on_date: Optional[date] = None) -> DelegationResolution:
+def resolve_effective_manager(manager_id: int | None, manager_level: int, on_date: date | None = None) -> DelegationResolution:
     if not manager_id:
         return DelegationResolution(original_manager_id=None, acting_manager_id=None, source="missing")
 
@@ -373,7 +373,7 @@ def apply_availability_snapshot_to_evaluation(evaluation: PerformanceEvaluation,
     db.session.add(evaluation)
 
 
-def refresh_assignment_live_coverages(period_id: Optional[int] = None, on_date: Optional[date] = None) -> AssignmentCoverageRefreshResult:
+def refresh_assignment_live_coverages(period_id: int | None = None, on_date: date | None = None) -> AssignmentCoverageRefreshResult:
     """Açık görevlerin etkin amir/vekil kapsamasını güncel tarihe göre yeniler.
 
     Her görev için orijinal değerlendirici, aktif vekâlet ve kullanılabilirlik

@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
+from collections.abc import Iterable
 
 from sqlalchemy import text
 
@@ -18,23 +19,23 @@ REPORT_URL = "/performans/surec-raporlari"
 @dataclass(frozen=True)
 class ProcessReportRow:
     flow_id: int
-    evaluation_id: Optional[int]
-    period_id: Optional[int]
-    employee_id: Optional[int]
-    final_score: Optional[float]
+    evaluation_id: int | None
+    period_id: int | None
+    employee_id: int | None
+    final_score: float | None
     current_status: str
     current_stage: str
     current_owner_name: str
     president_status: str
     publish_lock_status: str
-    publish_allowed: Optional[bool]
+    publish_allowed: bool | None
     is_overdue: bool
     overdue_days: int
     tracking_bucket: str
     tracking_priority: int
     tracking_label: str
     last_visible_action: str
-    tracking_updated_at: Optional[datetime]
+    tracking_updated_at: datetime | None
 
 
 def _table_exists(table_name: str) -> bool:
@@ -75,7 +76,7 @@ def _safe_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def _safe_float(value: Any) -> Optional[float]:
+def _safe_float(value: Any) -> float | None:
     try:
         if value is None:
             return None

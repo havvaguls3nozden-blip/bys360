@@ -14,7 +14,8 @@ BYS360_AI_DECISION_FAZ5_SCORECARD_UI_POLICY
 """
 
 from dataclasses import dataclass, asdict
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 import re
 logger = logging.getLogger(__name__)
 

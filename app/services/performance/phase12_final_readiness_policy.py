@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 12
 Final Gate, 10 Senaryo Testi ve Canlı Hazırlık Politika Merkezi
@@ -12,7 +11,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ def _float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def scenario_low_score_publish_lock(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_low_score_publish_lock(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"final_score": 65, "approval_status": "president_pending", "published": False})
     score = _float(row.get("final_score"), 0)
     approved = str(row.get("approval_status") or "").lower() in {"approved_by_president", "approved"}
@@ -97,7 +97,7 @@ def scenario_low_score_publish_lock(row: Optional[Mapping[str, Any]] = None) -> 
     )
 
 
-def scenario_no_fake_president_approval(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_no_fake_president_approval(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"final_score": 82, "approval_record_created": False})
     score = _float(row.get("final_score"), 0)
     created = _bool(row.get("approval_record_created"), False)
@@ -110,7 +110,7 @@ def scenario_no_fake_president_approval(row: Optional[Mapping[str, Any]] = None)
     )
 
 
-def scenario_third_manager_optional(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_third_manager_optional(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"third_manager_id": None, "third_task_created": False, "third_column_visible": False})
     passed = not row.get("third_manager_id") and not _bool(row.get("third_task_created")) and not _bool(row.get("third_column_visible"))
     return FinalScenarioResult(
@@ -121,7 +121,7 @@ def scenario_third_manager_optional(row: Optional[Mapping[str, Any]] = None) -> 
     )
 
 
-def scenario_third_manager_comment_no_score(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_third_manager_comment_no_score(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"third_manager_id": 10, "third_manager_mode": "comment", "score_required": False, "score_weight": 0})
     mode = str(row.get("third_manager_mode") or "").lower()
     passed = bool(row.get("third_manager_id")) and mode == "comment" and not _bool(row.get("score_required")) and _float(row.get("score_weight"), 0) == 0
@@ -133,7 +133,7 @@ def scenario_third_manager_comment_no_score(row: Optional[Mapping[str, Any]] = N
     )
 
 
-def scenario_personnel_self_visibility(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_personnel_self_visibility(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"viewer_id": 5, "employee_id": 5, "can_view_other": False})
     passed = row.get("viewer_id") == row.get("employee_id") and not _bool(row.get("can_view_other"))
     return FinalScenarioResult(
@@ -144,7 +144,7 @@ def scenario_personnel_self_visibility(row: Optional[Mapping[str, Any]] = None) 
     )
 
 
-def scenario_category_average_privacy(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_category_average_privacy(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"group_size": 1, "person_detail_visible": False, "average_visible": False})
     group_size = int(row.get("group_size") or 0)
     passed = group_size < 2 and not _bool(row.get("person_detail_visible")) and not _bool(row.get("average_visible"))
@@ -156,7 +156,7 @@ def scenario_category_average_privacy(row: Optional[Mapping[str, Any]] = None) -
     )
 
 
-def scenario_guidance_publish_visibility(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_guidance_publish_visibility(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"scorecard_published": True, "group_head_approved": True, "low_score_blocked": False, "visible_to_personnel": True})
     passed = _bool(row.get("scorecard_published")) and _bool(row.get("group_head_approved")) and not _bool(row.get("low_score_blocked")) and _bool(row.get("visible_to_personnel"))
     return FinalScenarioResult(
@@ -167,7 +167,7 @@ def scenario_guidance_publish_visibility(row: Optional[Mapping[str, Any]] = None
     )
 
 
-def scenario_overdue_manager_reminder(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_overdue_manager_reminder(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"task_status": "pending", "overdue_days": 3, "reminder_created": True, "delayed_manager_flag": True})
     passed = str(row.get("task_status")) == "pending" and int(row.get("overdue_days") or 0) > 0 and _bool(row.get("reminder_created")) and _bool(row.get("delayed_manager_flag"))
     return FinalScenarioResult(
@@ -178,7 +178,7 @@ def scenario_overdue_manager_reminder(row: Optional[Mapping[str, Any]] = None) -
     )
 
 
-def scenario_archive_self_visibility(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_archive_self_visibility(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"viewer_id": 11, "archive_employee_id": 11, "other_archive_visible": False})
     passed = row.get("viewer_id") == row.get("archive_employee_id") and not _bool(row.get("other_archive_visible"))
     return FinalScenarioResult(
@@ -189,7 +189,7 @@ def scenario_archive_self_visibility(row: Optional[Mapping[str, Any]] = None) ->
     )
 
 
-def scenario_period_scope_assignment(row: Optional[Mapping[str, Any]] = None) -> FinalScenarioResult:
+def scenario_period_scope_assignment(row: Mapping[str, Any] | None = None) -> FinalScenarioResult:
     row = dict(row or {"scope_type": "category", "scope_value": "Güvenlik", "assignment_outside_scope": False, "assignment_count": 2})
     passed = str(row.get("scope_type")) in {"category", "selected_personnel", "unit", "parent_unit", "all"} and not _bool(row.get("assignment_outside_scope")) and int(row.get("assignment_count") or 0) > 0
     return FinalScenarioResult(
@@ -214,9 +214,9 @@ SCENARIO_FUNCTIONS = {
 }
 
 
-def run_final_scenarios(overrides: Optional[Mapping[str, Mapping[str, Any]]] = None) -> List[FinalScenarioResult]:
+def run_final_scenarios(overrides: Mapping[str, Mapping[str, Any]] | None = None) -> list[FinalScenarioResult]:
     overrides = overrides or {}
-    results: List[FinalScenarioResult] = []
+    results: list[FinalScenarioResult] = []
     for key in FINAL_SCENARIO_KEYS:
         fn = SCENARIO_FUNCTIONS[key]
         results.append(fn(overrides.get(key)))
@@ -242,7 +242,7 @@ def summarize_final_results(results: Iterable[FinalScenarioResult]) -> FinalRead
     )
 
 
-def build_live_readiness_report(results: Optional[Iterable[FinalScenarioResult]] = None) -> Dict[str, Any]:
+def build_live_readiness_report(results: Iterable[FinalScenarioResult] | None = None) -> dict[str, Any]:
     scenario_results = list(results or run_final_scenarios())
     summary = summarize_final_results(scenario_results)
     return {
@@ -268,7 +268,7 @@ def build_live_readiness_report(results: Optional[Iterable[FinalScenarioResult]]
     }
 
 
-def phase12_final_contract() -> Dict[str, Any]:
+def phase12_final_contract() -> dict[str, Any]:
     return {
         "final_gate": True,
         "ten_scenario_test": True,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Faz 10 hatırlatma servis köprüsü."""
 from __future__ import annotations
 

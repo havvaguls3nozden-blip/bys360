@@ -29,7 +29,7 @@ EXPECTED_DOMAIN_FILES = [
     "app/api/mobile/domains/assistant_chat.py",
 ]
 
-EXPECTED_ROUTES: List[Tuple[str, str, str, str]] = [
+EXPECTED_ROUTES: list[tuple[str, str, str, str]] = [
     ("POST", "/auth/login", "auth", "app/api/mobile/domains/auth.py"),
     ("POST", "/auth/refresh", "auth", "app/api/mobile/domains/auth.py"),
     ("GET", "/me", "auth", "app/api/mobile/domains/auth.py"),
@@ -78,7 +78,7 @@ def _function_count(path: Path) -> int:
     except SyntaxError:
         return 0
 
-def _extract_routes(root: Path, rel: str) -> List[Dict[str, str]]:
+def _extract_routes(root: Path, rel: str) -> list[dict[str, str]]:
     path = root / rel
     if not path.exists():
         return []
@@ -95,12 +95,12 @@ def _extract_routes(root: Path, rel: str) -> List[Dict[str, str]]:
             })
     return routes
 
-def build_inventory(root: Path) -> Dict[str, Any]:
+def build_inventory(root: Path) -> dict[str, Any]:
     routes_file = "app/api/mobile/routes.py"
     domain_files = EXPECTED_DOMAIN_FILES
     files = [routes_file] + domain_files
     domain_inventory = []
-    all_routes: List[Dict[str, str]] = []
+    all_routes: list[dict[str, str]] = []
     missing_files = []
     for rel in files:
         path = root / rel
@@ -158,7 +158,7 @@ def build_inventory(root: Path) -> Dict[str, Any]:
         "route_rules_sample": [r["decorator"] for r in all_routes[:40]],
     }
 
-def evaluate_static_gates(root: Path) -> Dict[str, Any]:
+def evaluate_static_gates(root: Path) -> dict[str, Any]:
     inv = build_inventory(root)
     checks = {
         "domain_dir_exists": bool(inv["domains_dir_exists"]),
@@ -184,19 +184,19 @@ def evaluate_static_gates(root: Path) -> Dict[str, Any]:
     behavior_smoke_ok = direct_contract_ok and checks["feature_smoke_all_ok"]
     return {"inventory": inv, "checks": checks, "direct_contract_ok": direct_contract_ok, "behavior_smoke_ok": behavior_smoke_ok}
 
-def _compile_file(path: Path) -> Dict[str, Any]:
+def _compile_file(path: Path) -> dict[str, Any]:
     try:
         compile(_read(path), str(path), "exec")
         return {"file": str(path), "ok": True, "error": ""}
     except Exception as exc:
         return {"file": str(path), "ok": False, "error": repr(exc)}
 
-def compile_targets(root: Path) -> Dict[str, Any]:
+def compile_targets(root: Path) -> dict[str, Any]:
     rels = ["app/api/mobile/routes.py", *EXPECTED_DOMAIN_FILES, "scripts/quality/bys360_mobile_request_level_smoke_gate_p2c_v3.py", "tests/architecture/test_mobile_api_request_level_smoke_p2c_v3.py"]
     results = [_compile_file(root / rel) for rel in rels if (root / rel).exists()]
     return {"ok": all(item["ok"] for item in results), "results": results}
 
-def run_app_factory_smoke(root: Path) -> Dict[str, Any]:
+def run_app_factory_smoke(root: Path) -> dict[str, Any]:
     env = os.environ.copy()
     env.setdefault("APP_ENV", "development")
     env.setdefault("SECRET_KEY", "bys360-local-smoke-only")
@@ -207,12 +207,12 @@ def run_app_factory_smoke(root: Path) -> Dict[str, Any]:
     proc = subprocess.run(cmd, cwd=str(root), env=env, capture_output=True, text=True, timeout=45)
     return {"returncode": proc.returncode, "stdout_tail": proc.stdout[-2500:], "stderr_tail": proc.stderr[-2500:], "ok": proc.returncode == 0 and "APP_FACTORY_OK" in proc.stdout}
 
-def run_secret_gate(root: Path) -> Dict[str, Any]:
+def run_secret_gate(root: Path) -> dict[str, Any]:
     script = root / "scripts/quality/bys360_secret_repo_gate.py"
     if not script.exists():
         return {"ok": True, "skipped": True, "reason": "secret gate script not found"}
     proc = subprocess.run([sys.executable, str(script), "--root", str(root)], cwd=str(root), capture_output=True, text=True, timeout=60)
-    parsed: Dict[str, Any] = {}
+    parsed: dict[str, Any] = {}
     # find the last JSON object in stdout robustly
     text = proc.stdout.strip()
     for idx in range(len(text)):
@@ -227,7 +227,7 @@ def run_secret_gate(root: Path) -> Dict[str, Any]:
     ok = proc.returncode == 0 and bool(parsed.get("ok")) and int(parsed.get("finding_count", 0) or 0) == 0
     return {"returncode": proc.returncode, "stdout_tail": proc.stdout[-2500:], "stderr_tail": proc.stderr[-1500:], "parsed": parsed, "ok": ok}
 
-def run_request_level_smoke(root: Path, static_ok: bool) -> Dict[str, Any]:
+def run_request_level_smoke(root: Path, static_ok: bool) -> dict[str, Any]:
     env = os.environ.copy()
     env.setdefault("APP_ENV", "development")
     env.setdefault("SECRET_KEY", "bys360-local-smoke-only")
@@ -266,7 +266,7 @@ def run_request_level_smoke(root: Path, static_ok: bool) -> Dict[str, Any]:
         except Exception:
             pass
 
-def run_pytest_or_fallback(root: Path, fallback_ok: bool) -> Dict[str, Any]:
+def run_pytest_or_fallback(root: Path, fallback_ok: bool) -> dict[str, Any]:
     """Run pytest when available, but do not let a local pytest/plugin issue hide a clean contract gate.
 
     The source-of-truth checks for this stage are the direct static/domain contract,
@@ -305,7 +305,7 @@ def run_pytest_or_fallback(root: Path, fallback_ok: bool) -> Dict[str, Any]:
         "note": "pytest subprocess failed, but direct contract + behavior + request-level smoke gates passed" if fallback_ok else "pytest and direct fallback gates failed",
     }
 
-def run_gate(root: Path, mode: str = "all", compile_all: bool = False, run_app_factory: bool = False, run_secret: bool = False, run_pytest_flag: bool = False, write_report: bool = True) -> Dict[str, Any]:
+def run_gate(root: Path, mode: str = "all", compile_all: bool = False, run_app_factory: bool = False, run_secret: bool = False, run_pytest_flag: bool = False, write_report: bool = True) -> dict[str, Any]:
     root = root.resolve()
     static = evaluate_static_gates(root)
     request_smoke = run_request_level_smoke(root, static["direct_contract_ok"] and static["behavior_smoke_ok"])
@@ -313,7 +313,7 @@ def run_gate(root: Path, mode: str = "all", compile_all: bool = False, run_app_f
     app_factory = run_app_factory_smoke(root) if run_app_factory else {"ok": True, "skipped": True}
     secret_gate = run_secret_gate(root) if run_secret else {"ok": True, "skipped": True}
     pytest_info = run_pytest_or_fallback(root, request_smoke["ok"] and static["direct_contract_ok"] and static["behavior_smoke_ok"]) if run_pytest_flag else {"ok": True, "mode": "skipped"}
-    result: Dict[str, Any] = {
+    result: dict[str, Any] = {
         "ok": False,
         "package": PACKAGE,
         "generated_at": datetime.now().isoformat(timespec="seconds"),

@@ -11,7 +11,8 @@ from __future__ import annotations
 import csv
 import datetime as _dt
 import io
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from .repository import (
     safe_completed_response_count,

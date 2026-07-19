@@ -11,7 +11,8 @@ BYS360_AI_DECISION_FAZ3_VISIBILITY_SCOPE
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 import re
 
 

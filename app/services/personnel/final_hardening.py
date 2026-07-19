@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 PHASE10_REQUIRED_SERVICE_MODULES: tuple[str, ...] = (
     "live_scope",

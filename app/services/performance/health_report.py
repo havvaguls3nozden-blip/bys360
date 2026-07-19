@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable
+from collections.abc import Iterable
 
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
 from app.services.hierarchy_health_service import build_hierarchy_health_rows, summarize_hierarchy_health

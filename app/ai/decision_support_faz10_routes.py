@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 10 route katmanı.
 
@@ -49,7 +48,7 @@ else:  # pragma: no cover
     ai_decision_faz10_bp = None  # type: ignore
 
 
-def _int_arg(name: str) -> Optional[int]:
+def _int_arg(name: str) -> int | None:
     try:
         value = request.args.get(name) if request is not None else None
         if value in (None, ""):

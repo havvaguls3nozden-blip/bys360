@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
 
 from app.models import User
 
@@ -16,7 +17,7 @@ def _full_name(user: Any) -> str:
     return f"{_safe(getattr(user, 'ad', ''))} {_safe(getattr(user, 'soyad', ''))}".strip() or "-"
 
 
-def suggest_manager_candidates_for_user(user: Optional[User], manager_candidates: Optional[Iterable[User]] = None, limit: int = 3) -> List[Dict[str, Any]]:
+def suggest_manager_candidates_for_user(user: User | None, manager_candidates: Iterable[User] | None = None, limit: int = 3) -> list[dict[str, Any]]:
     # saat 22:10 – burada amaç fal bakmak değil, ilk mantıklı düzenleme adayını görünür yapmak
     if not user:
         return []
@@ -29,14 +30,14 @@ def suggest_manager_candidates_for_user(user: Optional[User], manager_candidates
         )
     unit = _safe(getattr(user, 'birim', ''))
     parent = _safe(getattr(user, 'ust_birim', ''))
-    scored: List[Dict[str, Any]] = []
+    scored: list[dict[str, Any]] = []
     for candidate in manager_candidates:
         if not candidate or getattr(candidate, 'id', None) == getattr(user, 'id', None):
             continue
         if not bool(getattr(candidate, 'is_active', False)):
             continue
         score = 0
-        reasons: List[str] = []
+        reasons: list[str] = []
         c_unit = _safe(getattr(candidate, 'birim', ''))
         c_parent = _safe(getattr(candidate, 'ust_birim', ''))
         c_title = _safe(getattr(candidate, 'unvan', '')).lower()
@@ -69,8 +70,8 @@ def suggest_manager_candidates_for_user(user: Optional[User], manager_candidates
     return scored[:max(1, limit)]
 
 
-def build_dashboard_focus_hints(context: Dict[str, Any]) -> List[Dict[str, Any]]:
-    hints: List[Dict[str, Any]] = []
+def build_dashboard_focus_hints(context: dict[str, Any]) -> list[dict[str, Any]]:
+    hints: list[dict[str, Any]] = []
     pending = int(context.get('my_pending_tasks') or 0)
     feedback = int(context.get('pending_feedback_requests') or 0)
     meetings = int(context.get('upcoming_meetings_count') or 0)
@@ -88,8 +89,8 @@ def build_dashboard_focus_hints(context: Dict[str, Any]) -> List[Dict[str, Any]]
     return hints[:3]
 
 
-def build_task_focus_hints(stats: Dict[str, Any], hierarchy_alerts: List[Dict[str, Any]], selected_period: Any = None) -> List[Dict[str, Any]]:
-    hints: List[Dict[str, Any]] = []
+def build_task_focus_hints(stats: dict[str, Any], hierarchy_alerts: list[dict[str, Any]], selected_period: Any = None) -> list[dict[str, Any]]:
+    hints: list[dict[str, Any]] = []
     pending = int((stats or {}).get('pending') or 0)
     partial = int((stats or {}).get('partial') or 0)
     completed = int((stats or {}).get('completed') or 0)
@@ -105,8 +106,8 @@ def build_task_focus_hints(stats: Dict[str, Any], hierarchy_alerts: List[Dict[st
     return hints[:3]
 
 
-def build_personnel_action_hints(users: List[Any]) -> List[Dict[str, Any]]:
-    hints: List[Dict[str, Any]] = []
+def build_personnel_action_hints(users: list[Any]) -> list[dict[str, Any]]:
+    hints: list[dict[str, Any]] = []
     total = len(users or [])
     inactive = sum(1 for user in users or [] if not bool(getattr(user, 'is_active', False)))
     missing_unit = sum(1 for user in users or [] if not _safe(getattr(user, 'birim', '')))
@@ -120,8 +121,8 @@ def build_personnel_action_hints(users: List[Any]) -> List[Dict[str, Any]]:
     return hints[:3]
 
 
-def build_hierarchy_fix_hints(analysis_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    hints: List[Dict[str, Any]] = []
+def build_hierarchy_fix_hints(analysis_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    hints: list[dict[str, Any]] = []
     problematic = [row for row in (analysis_rows or []) if row.get('issues')]
     if not problematic:
         return hints

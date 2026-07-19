@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Dönem içi notların değerlendirme ve karne ekranlarında güvenli gösterimi.
 
 Kaynak ekran: /performance/interim-notes

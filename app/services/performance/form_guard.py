@@ -10,15 +10,15 @@ def build_form_guard_state(
     manager_level: int,
     requires_level_2_comment: bool,
     level_3_scoring_enabled: bool,
-    evaluation_window: Dict[str, Any] | None,
+    evaluation_window: dict[str, Any] | None,
     workflow_status_label: str,
     saved: bool,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     level_label = {1: '1. Amir', 2: '2. Amir', 3: '3. Amir'}.get(manager_level, 'Amir')
     window = evaluation_window or {}
     can_submit = bool(window.get('can_submit', True))
 
-    rule_cards: List[Dict[str, str]] = [
+    rule_cards: list[dict[str, str]] = [
         {
             'title': 'Uç puan açıklaması',
             'body': '1 ve 5 puan verilen her kriterde açıklama zorunludur.',
@@ -56,7 +56,7 @@ def build_form_guard_state(
                 'tone': 'info',
             })
 
-    blockers: List[str] = []
+    blockers: list[str] = []
     if not can_submit:
         if window.get('not_started'):
             blockers.append('Puanlama takvimi henüz başlamadığı için kayıt gönderilemez.')
@@ -81,10 +81,10 @@ def build_form_actions(
     can_withdraw_level_1: bool,
     can_return_to_level_1: bool,
     level_3_scoring_enabled: bool,
-    evaluation_window: Dict[str, Any] | None,
-) -> List[Dict[str, Any]]:
+    evaluation_window: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
     can_submit = bool((evaluation_window or {}).get('can_submit', True))
-    actions: List[Dict[str, Any]] = [
+    actions: list[dict[str, Any]] = [
         {
             'type': 'link',
             'kind': 'secondary',

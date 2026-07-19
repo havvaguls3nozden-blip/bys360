@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Sanal Asistan Rol Matrisi V10
 

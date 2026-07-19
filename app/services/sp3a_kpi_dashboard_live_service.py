@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 SP-3A KPI Dashboard Live Service V2
 
@@ -124,7 +123,7 @@ def _build_ai_notes(total: int, average: float, risky: list[dict], watch: list[d
     return notes[:4]
 
 
-def _empty_context(message: str) -> Dict[str, Any]:
+def _empty_context(message: str) -> dict[str, Any]:
     return {
         "page_title": "KPI Dashboardu",
         "summary": {
@@ -150,7 +149,7 @@ def _empty_context(message: str) -> Dict[str, Any]:
     }
 
 
-def build_sp3a_kpi_dashboard_context(current_user=None) -> Dict[str, Any]:
+def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     target_table = _first_existing_table(TARGET_TABLE_CANDIDATES)
     if not target_table:
         return _empty_context("KPI/Hedef veri tablosu henüz canlı veriye bağlanmamış.")
@@ -195,7 +194,7 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> Dict[str, Any]:
     except Exception as exc:
         return _empty_context(f"KPI verisi okunurken sorun oluştu: {exc}")
 
-    targets: List[Dict[str, Any]] = []
+    targets: list[dict[str, Any]] = []
     total_rate = 0.0
     weighted_sum = 0.0
     weight_total = 0.0

@@ -16,7 +16,7 @@ from pathlib import Path
 import py_compile
 import re
 import sys
-from typing import Iterable
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 GUARD_VERSION = "2026-04-20-claude-faz4-performance-manager-rule-guard"

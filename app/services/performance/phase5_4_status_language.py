@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Faz 5.4 — Performans teknik durum dili temizliği.
 
 Bu servis kullanıcı ekranına teknik statü/kod sızmasını engellemek için Jinja filtreleri sağlar.

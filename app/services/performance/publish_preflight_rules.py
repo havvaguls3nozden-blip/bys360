@@ -21,7 +21,8 @@ Kilit kurallar:
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from app.performance.services import performance_rule_engine as _rule_engine
 from app.services.performance.low_score_process_service import get_low_score_publish_block_reason

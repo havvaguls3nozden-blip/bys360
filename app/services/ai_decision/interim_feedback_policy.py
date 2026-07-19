@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 10
 Performans içi ara not / geri bildirim karar destek politikası.
@@ -14,10 +13,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, asdict
 from datetime import date, datetime
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Mapping, Sequence
 
 
-NOTE_TYPE_LABELS: Dict[str, str] = {
+NOTE_TYPE_LABELS: dict[str, str] = {
     "positive_event": "Olumlu olay",
     "negative_event": "Olumsuz olay",
     "success": "Başarı",
@@ -27,7 +27,7 @@ NOTE_TYPE_LABELS: Dict[str, str] = {
     "other": "Diğer",
 }
 
-NOTE_TYPE_ALIASES: Dict[str, str] = {
+NOTE_TYPE_ALIASES: dict[str, str] = {
     "olumlu": "positive_event",
     "olumlu olay": "positive_event",
     "pozitif": "positive_event",
@@ -52,7 +52,7 @@ SENSITIVE_FIELD_HINTS = (
     "iban", "hesap", "saglik", "sağlık", "rapor no",
 )
 
-TECHNICAL_STATUS_LABELS: Dict[str, str] = {
+TECHNICAL_STATUS_LABELS: dict[str, str] = {
     "draft": "Taslak",
     "pending": "İşlem Bekliyor",
     "submitted": "Gönderildi",
@@ -72,7 +72,7 @@ class InterimFeedbackSignal:
     severity: str = "info"  # info | attention | risk | success
     action_label: str = "İncele"
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return asdict(self)
 
 
@@ -123,7 +123,7 @@ def note_type_label(note_type: Any) -> str:
     return NOTE_TYPE_LABELS.get(normalize_note_type(note_type), NOTE_TYPE_LABELS["other"])
 
 
-def _parse_date(value: Any) -> Optional[date]:
+def _parse_date(value: Any) -> date | None:
     if value is None:
         return None
     if isinstance(value, datetime):
@@ -149,10 +149,10 @@ def summarize_interim_notes(
     period_end: Any = None,
     include_examples: bool = True,
     max_examples: int = 3,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Dönem içi notları kişi mahremiyetini zorlamadan özetler."""
-    counts: Dict[str, int] = {key: 0 for key in NOTE_TYPE_LABELS}
-    examples: List[Dict[str, str]] = []
+    counts: dict[str, int] = {key: 0 for key in NOTE_TYPE_LABELS}
+    examples: list[dict[str, str]] = []
     out_of_period_count = 0
     start = _parse_date(period_start)
     end = _parse_date(period_end)
@@ -203,14 +203,14 @@ def summarize_interim_notes(
     }
 
 
-def build_interim_feedback_signals(summary: Mapping[str, Any]) -> List[Dict[str, str]]:
+def build_interim_feedback_signals(summary: Mapping[str, Any]) -> list[dict[str, str]]:
     total = int(summary.get("total_notes") or 0)
     positive_total = int(summary.get("positive_total") or 0)
     negative_total = int(summary.get("negative_total") or 0)
     development_total = int(summary.get("development_need_total") or 0)
     out_of_period_count = int(summary.get("out_of_period_count") or 0)
 
-    signals: List[InterimFeedbackSignal] = []
+    signals: list[InterimFeedbackSignal] = []
     if total == 0:
         signals.append(InterimFeedbackSignal(
             code="no_interim_note",
@@ -260,7 +260,7 @@ def build_interim_feedback_decision_support(
     period_start: Any = None,
     period_end: Any = None,
     viewer_role: str = "",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     summary = summarize_interim_notes(notes, period_start=period_start, period_end=period_end)
     signals = build_interim_feedback_signals(summary)
     return {

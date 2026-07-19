@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 
-def safe_team_compare_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def safe_team_compare_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     safe_rows = []
     for row in rows or []:
         item = {
@@ -18,7 +18,7 @@ def safe_team_compare_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return safe_rows
 
 
-def safe_summary(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+def safe_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     rows = safe_team_compare_rows(rows)
     total = len(rows)
     completed = len([r for r in rows if r["status"] in {"tamamlandi", "completed", "yayinlandi", "published"}])

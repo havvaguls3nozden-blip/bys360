@@ -10,7 +10,8 @@ import json
 import os
 import time
 from threading import RLock
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 try:
     from flask import current_app, has_app_context

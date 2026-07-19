@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 geri bildirim süreç hattı durum makinesi.
 
 Maintenance'un orta/uzun vadeli önerisindeki P0 -> P1 -> P2 -> P3 -> P4 -> Final

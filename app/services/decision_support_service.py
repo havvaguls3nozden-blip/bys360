@@ -8,7 +8,7 @@ Bu katmanin olayi su: ekrana bakinca sadece veri degil, neye bakman gerektigi de
 """
 
 from datetime import timedelta
-from typing import Iterable
+from collections.abc import Iterable
 
 from app.models import EvaluationAssignment, FeedbackMeeting, PerformanceEvaluation, PerformancePeriod, User
 from app.services.hierarchy_health_service import build_hierarchy_health_rows, summarize_hierarchy_health

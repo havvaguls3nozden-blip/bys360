@@ -9,7 +9,8 @@ Faz 6 kapsamı:
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from .form_payload import PersonnelFormPayload
 

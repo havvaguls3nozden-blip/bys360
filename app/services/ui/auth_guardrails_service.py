@@ -15,7 +15,7 @@ def _scan_file(path: Path) -> str:
         return ''
 
 
-def build_auth_guardrails_snapshot(project_root: str) -> Dict[str, object]:
+def build_auth_guardrails_snapshot(project_root: str) -> dict[str, object]:
     root = Path(project_root)
     candidate_files = [
         root / 'app/__init__.py',

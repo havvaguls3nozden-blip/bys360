@@ -10,7 +10,7 @@ app.add_url_rule ile güvenli fallback ekler. Mevcut gerçek endpoint varsa doku
 """
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 from flask import render_template, url_for
 

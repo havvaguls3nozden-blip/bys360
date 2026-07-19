@@ -11,7 +11,8 @@ Faz 8 kapsamı:
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any
+from collections.abc import Callable, Mapping, Sequence
 
 NormalizeFunc = Callable[[Any], str]
 

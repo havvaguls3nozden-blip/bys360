@@ -9,7 +9,8 @@ bildirim üretimini yönetir.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from flask import url_for
 from flask_login import current_user

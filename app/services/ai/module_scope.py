@@ -7,7 +7,8 @@ vitrinine ve operasyon raporlarına karışmasını engeller.
 """
 from __future__ import annotations
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from sqlalchemy import func
 

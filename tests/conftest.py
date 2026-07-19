@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 test ortamı güvenli başlangıç ve CI-safe kapsam disiplini.
 
 Bu dosya yalnızca pytest çalışırken devreye girer. Canlı uygulama ayarlarını

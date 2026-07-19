@@ -12,7 +12,8 @@ BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_INTEGRATION
 """
 
 from datetime import date, datetime
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from .low_performance_approval_policy import (
     LowPerformanceApprovalPolicy,

@@ -65,7 +65,7 @@ def _is_mapping_row(row: Any) -> bool:
     return isinstance(row, dict)
 
 
-def _legacy_assignment_log_summary(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+def _legacy_assignment_log_summary(rows: list[dict[str, Any]]) -> dict[str, int]:
     summary = {
         "delegated": 0,
         "uncovered": 0,
@@ -95,12 +95,12 @@ def _legacy_assignment_log_summary(rows: List[Dict[str, Any]]) -> Dict[str, int]
 
 
 def _legacy_assignment_unit_summary(
-    rows: Optional[List[Dict[str, Any]]] = None,
+    rows: list[dict[str, Any]] | None = None,
     *,
-    top_n: Optional[int] = None,
-) -> List[Dict[str, Any]]:
+    top_n: int | None = None,
+) -> list[dict[str, Any]]:
     rows = rows or []
-    grouped: Dict[Tuple[str, str], Dict[str, Any]] = defaultdict(
+    grouped: dict[tuple[str, str], dict[str, Any]] = defaultdict(
         lambda: {
             "ust_birim": "",
             "birim": "",
@@ -142,9 +142,9 @@ def _legacy_assignment_unit_summary(
 
 
 def get_period_level_3_flags(
-    period: Optional[Any] = None,
-    weight_config: Optional[Any] = None,
-) -> Dict[str, Any]:
+    period: Any | None = None,
+    weight_config: Any | None = None,
+) -> dict[str, Any]:
     """Eski çağrılar için güvenli köprü.
 
     Bazı route'lar ikinci argüman olarak weight_config nesnesi gönderiyor.
@@ -157,7 +157,7 @@ def is_informational_special_case(*args: Any, **kwargs: Any) -> bool:
     return _is_informational_special_case_mod(*args, **kwargs)
 
 
-def build_assignment_log_summary(result: Optional[Any] = None) -> Dict[str, Any]:
+def build_assignment_log_summary(result: Any | None = None) -> dict[str, Any]:
     if isinstance(result, list):
         if result and _is_mapping_row(result[0]):
             return _legacy_assignment_log_summary(result)
@@ -168,17 +168,17 @@ def build_assignment_log_summary(result: Optional[Any] = None) -> Dict[str, Any]
 
 
 def build_assignment_unit_summary(
-    rows: Optional[List[Any]] = None,
+    rows: list[Any] | None = None,
     *,
-    top_n: Optional[int] = None,
-) -> List[Dict[str, Any]]:
+    top_n: int | None = None,
+) -> list[dict[str, Any]]:
     rows = rows or []
     if rows and _is_mapping_row(rows[0]):
         return _legacy_assignment_unit_summary(rows, top_n=top_n)
     return _build_assignment_unit_summary_mod(rows, top_n=top_n)
 
 
-def get_latest_assignment_generation_logs(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+def get_latest_assignment_generation_logs(*args: Any, **kwargs: Any) -> dict[str, Any]:
     period_id = None
     limit = kwargs.pop("limit", 200)
     employee_ids = kwargs.pop("employee_ids", None)
@@ -209,10 +209,10 @@ def get_latest_assignment_generation_logs(*args: Any, **kwargs: Any) -> Dict[str
 
 
 def generate_assignments_for_active_period(
-    period_id: Optional[int] = None,
+    period_id: int | None = None,
     *args: Any,
     **kwargs: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Tek yetkili görev üretim girişi.
 
     Böylece eski route'lar da güncel V2 senkronuna düşer:

@@ -3,7 +3,8 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from app.models import FeedbackMeeting, FeedbackRequest, Notification, User
 from app.services.mail_service import send_email

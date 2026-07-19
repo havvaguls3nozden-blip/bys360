@@ -11,7 +11,8 @@ BYS360_AI_DECISION_FAZ4_THIRD_SUPERVISOR_POLICY
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 import re
 
 

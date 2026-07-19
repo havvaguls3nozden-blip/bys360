@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 iOS Safari PWA routes.
 
 This module exposes root-level PWA assets so iOS/iPadOS Safari can treat

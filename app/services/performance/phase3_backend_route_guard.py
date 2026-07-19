@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 
@@ -11,7 +10,8 @@ query seviyesinde burada yapılır. Bu servis, URL elle yazılsa bile kapsam dı
 performans verisinin dönmemesini sağlar.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from flask import current_app, render_template
 

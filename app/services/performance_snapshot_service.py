@@ -28,7 +28,7 @@ from app.models import (
 )
 
 
-def _full_name(user: Optional[User]) -> str:
+def _full_name(user: User | None) -> str:
     if not user:
         return ""
     if getattr(user, "full_name", None):
@@ -36,17 +36,17 @@ def _full_name(user: Optional[User]) -> str:
     return f"{getattr(user, 'ad', '')} {getattr(user, 'soyad', '')}".strip()
 
 
-def _manager_by_sicil(sicil_no: Optional[str]) -> Optional[User]:
+def _manager_by_sicil(sicil_no: str | None) -> User | None:
     sicil_no = (sicil_no or "").strip()
     if not sicil_no:
         return None
     return User.query.filter_by(sicil_no=sicil_no).first()
 
 
-def build_org_path(unit: Optional[OrganizationUnit]) -> str:
+def build_org_path(unit: OrganizationUnit | None) -> str:
     if not unit:
         return ""
-    parts: List[str] = []
+    parts: list[str] = []
     current = unit
     guard = 0
     while current is not None and guard < 50:
@@ -58,7 +58,7 @@ def build_org_path(unit: Optional[OrganizationUnit]) -> str:
     return " > ".join(reversed(parts))
 
 
-def get_effective_assignment(employee_id: int, ref_date: Optional[date]) -> Optional[EmployeeOrgAssignmentHistory]:
+def get_effective_assignment(employee_id: int, ref_date: date | None) -> EmployeeOrgAssignmentHistory | None:
     if not ref_date:
         ref_date = date.today()
 
@@ -84,7 +84,7 @@ def _visible_total_for_evaluation(evaluation: PerformanceEvaluation) -> float:
     return float(getattr(evaluation, "level_1_total_100", 0) or 0)
 
 
-def build_snapshot_payload(evaluation: PerformanceEvaluation) -> Dict[str, Any]:
+def build_snapshot_payload(evaluation: PerformanceEvaluation) -> dict[str, Any]:
     items = (
         PerformanceEvaluationItem.query
         .filter_by(evaluation_id=evaluation.id)
@@ -92,7 +92,7 @@ def build_snapshot_payload(evaluation: PerformanceEvaluation) -> Dict[str, Any]:
         .all()
     )
 
-    grouped: Dict[int, Dict[str, Any]] = {}
+    grouped: dict[int, dict[str, Any]] = {}
     for item in items:
         criteria = item.criteria
         if not criteria:
@@ -162,7 +162,7 @@ def _deactivate_current_snapshots(period_id: int, employee_id: int) -> None:
     )
 
 
-def create_snapshot_for_evaluation(evaluation_id: int, actor_user_id: Optional[int] = None) -> PerformanceResultSnapshot:
+def create_snapshot_for_evaluation(evaluation_id: int, actor_user_id: int | None = None) -> PerformanceResultSnapshot:
     evaluation = db.session.get(PerformanceEvaluation, evaluation_id)
     if not evaluation:
         raise ValueError("Değerlendirme bulunamadı.")
@@ -263,7 +263,7 @@ def _recalculate_period_rankings(period_id: int) -> None:
         .all()
     )
 
-    unit_groups: Dict[str, List[PerformanceResultSnapshot]] = defaultdict(list)
+    unit_groups: dict[str, list[PerformanceResultSnapshot]] = defaultdict(list)
     for idx, row in enumerate(current_rows, start=1):
         row.ranking_in_scope = idx
         unit_key = (row.birim_snapshot or "__none__").strip().lower()
@@ -275,7 +275,7 @@ def _recalculate_period_rankings(period_id: int) -> None:
             row.ranking_in_unit = idx
 
 
-def create_snapshots_for_period(period_id: int, actor_user_id: Optional[int] = None) -> Dict[str, int]:
+def create_snapshots_for_period(period_id: int, actor_user_id: int | None = None) -> dict[str, int]:
     period = db.session.get(PerformancePeriod, period_id)
     if not period:
         raise ValueError("Dönem bulunamadı.")
@@ -301,7 +301,7 @@ def create_snapshots_for_period(period_id: int, actor_user_id: Optional[int] = N
     return {"created": created}
 
 
-def backfill_snapshots_for_published_periods(actor_user_id: Optional[int] = None) -> Dict[str, int]:
+def backfill_snapshots_for_published_periods(actor_user_id: int | None = None) -> dict[str, int]:
     periods = (
         PerformancePeriod.query
         .filter(

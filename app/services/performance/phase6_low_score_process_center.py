@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 6 Başkan/Üst Onay ve Düşük Performans Merkezi."""
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, Iterable, Mapping, Optional
+from typing import Any, Dict, Optional
+from collections.abc import Iterable, Mapping
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE6_VERSION = "performance-completion-phase6-low-score-process-center-v1"
@@ -14,7 +14,7 @@ BYS360_PERFORMANCE_COMPLETION_PHASE6_PUBLISH_LOCK = True
 BYS360_PERFORMANCE_COMPLETION_PHASE6_FIRST_SECOND_TRACKING = True
 BYS360_PERFORMANCE_COMPLETION_PHASE6_PROCESS_RECORD_REQUIRED = True
 LOW_SCORE_THRESHOLD = 70.0
-STATUS_LABELS: Dict[str, str] = {
+STATUS_LABELS: dict[str, str] = {
     "not_required": "Üst Onay Gerekmiyor",
     "president_pending": "Başkan/Üst Onay Bekliyor",
     "president_approval_pending": "Başkan/Üst Onay Bekliyor",
@@ -65,9 +65,9 @@ class Phase6Decision:
     can_publish: bool
     next_action: str
     block_reason: str = ""
-    def as_dict(self) -> Dict[str, Any]: return asdict(self)
+    def as_dict(self) -> dict[str, Any]: return asdict(self)
 
-def _safe_float(value: Any, default: Optional[float] = None) -> Optional[float]:
+def _safe_float(value: Any, default: float | None = None) -> float | None:
     try:
         if value is None or value == "": return default
         return float(value)
@@ -84,7 +84,7 @@ def phase6_status_label(status: Any) -> str:
     return "Süreç Durumu" if not raw else STATUS_LABELS.get(_normalize(raw), raw)
 def is_phase6_low_score(score: Any, threshold: float = LOW_SCORE_THRESHOLD) -> bool:
     value=_safe_float(score); return bool(value is not None and value < threshold)
-def score_from_evaluation(evaluation: Any) -> Optional[float]:
+def score_from_evaluation(evaluation: Any) -> float | None:
     for name in ("final_score","score","total_score","average_score","nihai_puan","final_point"):
         value=_safe_float(getattr(evaluation,name,None))
         if value is not None: return value

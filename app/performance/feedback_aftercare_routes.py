@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from sqlalchemy.exc import SQLAlchemyError

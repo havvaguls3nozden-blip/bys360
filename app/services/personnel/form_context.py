@@ -7,7 +7,8 @@ aynı kalır.
 """
 from __future__ import annotations
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from .form_payload import PersonnelFormPayload
 from .categories import PERSONNEL_CATEGORY_OPTIONS

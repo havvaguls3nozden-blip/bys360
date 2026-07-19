@@ -11,7 +11,8 @@ Dış AI sağlayıcısı çağırmaz.
 BYS360_AI_DECISION_FAZ1_PERFORMANCE_INTEGRATION
 """
 
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from flask import current_app
 from flask_login import current_user

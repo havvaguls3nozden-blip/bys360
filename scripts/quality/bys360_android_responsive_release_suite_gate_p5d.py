@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 P5D Android Responsive Release Suite Gate.
 
 Combines P5A baseline, P5B core styles and P5C targeted templates into one
@@ -16,7 +15,8 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Sequence
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P5D_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE_P5D_REPORT.json")
@@ -56,7 +56,7 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def _read_json(path: Path) -> Dict[str, Any]:
+def _read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"_exists": False, "_path": str(path)}
     try:
@@ -85,11 +85,11 @@ def _line_count(path: Path) -> int:
     return len(_read_text(path).splitlines()) if path.exists() else 0
 
 
-def _mobile_inventory(root: Path) -> Dict[str, Any]:
+def _mobile_inventory(root: Path) -> dict[str, Any]:
     mobile_dir = root / "app" / "api" / "mobile"
     routes_py = mobile_dir / "routes.py"
     domains_dir = mobile_dir / "domains"
-    files: List[Path] = []
+    files: list[Path] = []
     if routes_py.exists():
         files.append(routes_py)
     if domains_dir.exists():
@@ -118,7 +118,7 @@ def _mobile_inventory(root: Path) -> Dict[str, Any]:
     }
 
 
-def _ensure_active_scope_marker(root: Path) -> Dict[str, Any]:
+def _ensure_active_scope_marker(root: Path) -> dict[str, Any]:
     conftest = root / "tests" / "architecture" / "conftest.py"
     marker = "BYS360_ACTIVE_ARCHITECTURE_TEST_P5D_ANDROID_RESPONSIVE_RELEASE_SUITE"
     if not conftest.exists():
@@ -139,8 +139,8 @@ def _ensure_active_scope_marker(root: Path) -> Dict[str, Any]:
         return {"path": str(conftest), "changed": changed, "reason": reason, "compile_ok": False, "compile_error": str(exc)}
 
 
-def _compile_files(files: Sequence[Path]) -> List[Dict[str, str | bool]]:
-    results: List[Dict[str, str | bool]] = []
+def _compile_files(files: Sequence[Path]) -> list[dict[str, str | bool]]:
+    results: list[dict[str, str | bool]] = []
     for file_path in files:
         if not file_path.exists():
             results.append({"file": str(file_path), "ok": False, "error": "missing"})
@@ -153,7 +153,7 @@ def _compile_files(files: Sequence[Path]) -> List[Dict[str, str | bool]]:
     return results
 
 
-def _run(cmd: Sequence[str], cwd: Path, env_extra: Optional[Dict[str, str]] = None, timeout: int = 120) -> Dict[str, Any]:
+def _run(cmd: Sequence[str], cwd: Path, env_extra: dict[str, str] | None = None, timeout: int = 120) -> dict[str, Any]:
     env = os.environ.copy()
     env.update({
         "FLASK_ENV": "testing",
@@ -172,16 +172,16 @@ def _run(cmd: Sequence[str], cwd: Path, env_extra: Optional[Dict[str, str]] = No
         return {"returncode": -1, "stdout_tail": "", "stderr_tail": str(exc), "ok": False, "cmd": list(cmd)}
 
 
-def _app_factory_smoke(root: Path) -> Dict[str, Any]:
+def _app_factory_smoke(root: Path) -> dict[str, Any]:
     return _run([sys.executable, "-c", "from app import create_app; app=create_app(); print('APP_FACTORY_OK')"], root)
 
 
-def _secret_gate(root: Path) -> Dict[str, Any]:
+def _secret_gate(root: Path) -> dict[str, Any]:
     script = root / "scripts" / "quality" / "bys360_secret_repo_gate.py"
     if not script.exists():
         return {"ok": False, "returncode": 127, "stdout_tail": "", "stderr_tail": "secret gate script missing", "parsed": {}}
     result = _run([sys.executable, str(script), "--root", str(root)], root)
-    parsed: Dict[str, Any] = {}
+    parsed: dict[str, Any] = {}
     try:
         match = re.search(r"\{[\s\S]*\}", result.get("stdout_tail", ""))
         if match:
@@ -193,7 +193,7 @@ def _secret_gate(root: Path) -> Dict[str, Any]:
     return result
 
 
-def _pytest_gate(root: Path) -> Dict[str, Any]:
+def _pytest_gate(root: Path) -> dict[str, Any]:
     test_file = root / "tests" / "architecture" / "test_android_responsive_release_suite_p5d.py"
     if not test_file.exists():
         return {"ok": False, "returncode": 127, "stdout_tail": "", "stderr_tail": "P5D pytest file missing", "mode": "pytest_targeted_android_responsive_release_suite_p5d"}
@@ -202,7 +202,7 @@ def _pytest_gate(root: Path) -> Dict[str, Any]:
     return result
 
 
-def _css_evidence(root: Path) -> Dict[str, Any]:
+def _css_evidence(root: Path) -> dict[str, Any]:
     p5b_css = root / P5B_CSS_REL
     p5c_css = root / P5C_CSS_REL
     base = root / BASE_REL
@@ -233,7 +233,7 @@ def _css_evidence(root: Path) -> Dict[str, Any]:
     }
 
 
-def _surface_evidence(p5a: Dict[str, Any], p5b: Dict[str, Any], p5c: Dict[str, Any]) -> Dict[str, Any]:
+def _surface_evidence(p5a: dict[str, Any], p5b: dict[str, Any], p5c: dict[str, Any]) -> dict[str, Any]:
     p5a_device = p5a.get("android_device_matrix") if isinstance(p5a.get("android_device_matrix"), dict) else {}
     p5a_scan = p5a.get("responsive_surface_scan") if isinstance(p5a.get("responsive_surface_scan"), dict) else {}
     p5b_surface = p5b.get("surface_priority") if isinstance(p5b.get("surface_priority"), dict) else {}
@@ -271,7 +271,7 @@ def _surface_evidence(p5a: Dict[str, Any], p5b: Dict[str, Any], p5c: Dict[str, A
     }
 
 
-def run_gate(args: argparse.Namespace) -> Dict[str, Any]:
+def run_gate(args: argparse.Namespace) -> dict[str, Any]:
     root = Path(args.root).resolve()
     report_path = root / REPORT_REL
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -299,7 +299,7 @@ def run_gate(args: argparse.Namespace) -> Dict[str, Any]:
         and surface.get("expected_surface_coverage_ok")
     )
 
-    compile_results: List[Dict[str, Any]] = []
+    compile_results: list[dict[str, Any]] = []
     if args.compile_all:
         compile_results = _compile_files([
             root / "scripts" / "quality" / "bys360_android_responsive_release_suite_gate_p5d.py",
@@ -322,7 +322,7 @@ def run_gate(args: argparse.Namespace) -> Dict[str, Any]:
     )
     ok = bool(release_suite_ok and direct_contract_ok and compile_ok and app_factory.get("ok") and secret.get("ok") and secret_count == 0 and pytest.get("ok"))
 
-    output: Dict[str, Any] = {
+    output: dict[str, Any] = {
         "ok": ok,
         "package": PACKAGE,
         "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -407,7 +407,7 @@ def run_gate(args: argparse.Namespace) -> Dict[str, Any]:
     return output
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=PACKAGE)
     parser.add_argument("--root", default=".")
     parser.add_argument("--compile-all", action="store_true")

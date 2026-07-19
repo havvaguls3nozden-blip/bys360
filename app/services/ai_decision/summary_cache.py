@@ -20,7 +20,8 @@ from datetime import datetime, timedelta
 import hashlib
 import json
 import re
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from .live_scope import LIVE_AI_DOMAIN_KEYS, LIVE_AI_TABLE_NAMES
 from .logging_bridge import normalize_ai_feature_type, normalize_ai_module_type, truncate_ai_log_text

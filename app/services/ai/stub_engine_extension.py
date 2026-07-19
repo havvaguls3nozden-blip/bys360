@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Stub Engine — Genişletilmiş Senaryo Kütüphanesi
 Eksik 8 modül için tam kural tabanlı yanıt üretici.

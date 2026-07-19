@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Faz 12 final gate köprü servisi."""
 from __future__ import annotations
 

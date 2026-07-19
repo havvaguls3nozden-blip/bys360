@@ -3,7 +3,8 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from app.extensions import db
 from app.models import (

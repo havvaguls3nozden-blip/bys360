@@ -10,7 +10,8 @@ BYS360_AI_DECISION_FAZ7_HISTORICAL_ARCHIVE_POLICY
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 
 def safe_attr(obj: Any, *names: str, default: Any = None) -> Any:

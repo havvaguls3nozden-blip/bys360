@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 11 route katmanı.
 
@@ -49,7 +48,7 @@ else:  # pragma: no cover
     ai_decision_faz11_bp = None  # type: ignore
 
 
-def _int_arg(name: str) -> Optional[int]:
+def _int_arg(name: str) -> int | None:
     try:
         value = request.args.get(name) if request is not None else None
         if value in (None, ""):
@@ -60,7 +59,7 @@ def _int_arg(name: str) -> Optional[int]:
         return None
 
 
-def _float_arg(name: str) -> Optional[float]:
+def _float_arg(name: str) -> float | None:
     try:
         value = request.args.get(name) if request is not None else None
         if value in (None, ""):

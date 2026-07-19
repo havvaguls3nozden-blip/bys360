@@ -12,7 +12,7 @@ hiçbir zaman tüm kurum anlamına gelmez.
 
 import re
 import unicodedata
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 logger = logging.getLogger(__name__)
 

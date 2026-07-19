@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 eylem planı takip bildirimleri zamanlayıcısı.
 
 APScheduler kuruluysa uygulama içinde güvenli şekilde tetiklenebilir. Kurulu değilse

@@ -20,7 +20,7 @@ class DashboardSummary:
     average_completion: float = 0.0
 
 
-def _safe_query_targets() -> List[Dict[str, Any]]:
+def _safe_query_targets() -> list[dict[str, Any]]:
     if db is None:
         return []
     try:
@@ -46,7 +46,7 @@ def _safe_query_targets() -> List[Dict[str, Any]]:
         return []
 
 
-def _calculate_summary(targets: List[Dict[str, Any]]) -> DashboardSummary:
+def _calculate_summary(targets: list[dict[str, Any]]) -> DashboardSummary:
     total = len(targets)
     if total == 0:
         return DashboardSummary()
@@ -57,7 +57,7 @@ def _calculate_summary(targets: List[Dict[str, Any]]) -> DashboardSummary:
     return DashboardSummary(total, completed, risk, critical, round(avg, 2))
 
 
-def build_sp1c_kpi_dashboard_context(current_user: Any) -> Dict[str, Any]:
+def build_sp1c_kpi_dashboard_context(current_user: Any) -> dict[str, Any]:
     targets = _safe_query_targets()
     summary = _calculate_summary(targets)
     ai_notes = []

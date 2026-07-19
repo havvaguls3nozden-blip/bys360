@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Portal V3A2 Basında Tarihi Alan haber takip sağlamlaştırma servisi.
 
 Tasarım ilkesi:

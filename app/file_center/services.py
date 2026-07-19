@@ -13,7 +13,7 @@ from datetime import timedelta
 from pathlib import Path
 from secrets import token_urlsafe
 import shutil
-from typing import Iterable
+from collections.abc import Iterable
 
 from flask import current_app, request
 from flask_login import current_user

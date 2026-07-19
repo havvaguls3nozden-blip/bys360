@@ -11,7 +11,8 @@ from __future__ import annotations
 
 
 from collections import OrderedDict
-from typing import Any, Callable, Iterable
+from typing import Any
+from collections.abc import Callable, Iterable
 import logging
 logger = logging.getLogger(__name__)
 

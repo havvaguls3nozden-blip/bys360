@@ -12,7 +12,8 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 import unicodedata
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """P5D Android responsive release suite gate."""
 
 from pathlib import Path

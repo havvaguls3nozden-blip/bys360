@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Görüşme Takip Faz 4 servisi.
 
 Bu servis Faz 1'de eklenen görüşme sonrası eylem planlarını takip eder:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Geri Bildirim Hattı Kurumsal Son Kontrol servisi.
 
 Bu servis canlıya yakın kullanım için görüşme ekranlarında teknik dil, güvenli

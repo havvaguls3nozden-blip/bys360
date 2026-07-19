@@ -12,7 +12,8 @@ routes.py dosyasını ezmeden Faz 3 uçlarını main_bp üzerine kaydeder.
 BYS360_AI_DECISION_FAZ3_ROUTES
 """
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from flask import jsonify
 from flask_login import current_user, login_required

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 10: Otomatik hatırlatma, aksatan amir ve süreç bildirimleri merkezi.
 
 Bu merkez, performans değerlendirme dönemlerinde bekleyen görevleri, son tarih
@@ -15,7 +14,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 logger = logging.getLogger(__name__)
 

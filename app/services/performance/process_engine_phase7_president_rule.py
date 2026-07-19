@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from sqlalchemy import text
 

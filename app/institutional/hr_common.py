@@ -15,7 +15,8 @@ alt route modülü uygulamayı düşürmez, güvenli ve boş veriyle çalışan 
 from datetime import date, datetime, timedelta
 from importlib import import_module
 from types import SimpleNamespace
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 import csv
 import io
 

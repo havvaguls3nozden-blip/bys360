@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Maintenance 10E - SP route smoke testi.
 
 Amaç: SP kritik route'larında 500/beyaz ekran regresyonunu yakalamak.

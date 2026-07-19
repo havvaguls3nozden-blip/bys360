@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Görüşme Entegrasyonu Faz 3 servisi.
 
 Bu servis; Not Karnesi, Dönem İçi Notlar ve Görüşme Sonrası Notlar kayıtlarını

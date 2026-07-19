@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 4
 3. Amir Opsiyonelliği ve Akış Temizliği Politika Merkezi
@@ -10,7 +9,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,7 @@ def resolve_third_manager_policy(
     *,
     third_manager_id: Any = None,
     third_manager_name: Any = None,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
     completed: bool = False,
 ) -> ThirdManagerDecision:
     """
@@ -150,7 +150,7 @@ def resolve_third_manager_policy(
     )
 
 
-def normalize_manager_weights(weights: Optional[Mapping[str, Any]] = None, third_manager_mode: str = THIRD_MANAGER_MODE_COMMENT) -> Dict[str, float]:
+def normalize_manager_weights(weights: Mapping[str, Any] | None = None, third_manager_mode: str = THIRD_MANAGER_MODE_COMMENT) -> dict[str, float]:
     """
     Amir ağırlıklarını her durumda %100'e normalize eder.
     Yorum modunda 3. amir ağırlığı 0'dır.
@@ -175,11 +175,11 @@ def normalize_manager_weights(weights: Optional[Mapping[str, Any]] = None, third
     }
 
 
-def filter_fake_third_manager_tasks(tasks: Iterable[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+def filter_fake_third_manager_tasks(tasks: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """
     3. amir olmayan kayıtlarda sahte 3. amir görevinin UI/akışa düşmesini engeller.
     """
-    cleaned: List[Dict[str, Any]] = []
+    cleaned: list[dict[str, Any]] = []
     for task in tasks or []:
         row = dict(task)
         level = str(row.get("manager_level") or row.get("level") or row.get("amir_seviyesi") or "").strip()
@@ -199,7 +199,7 @@ def filter_fake_third_manager_tasks(tasks: Iterable[Mapping[str, Any]]) -> List[
     return cleaned
 
 
-def should_show_third_manager_column(rows: Iterable[Mapping[str, Any]], settings: Optional[Mapping[str, Any]] = None) -> bool:
+def should_show_third_manager_column(rows: Iterable[Mapping[str, Any]], settings: Mapping[str, Any] | None = None) -> bool:
     """
     Tablo/formlarda 3. amir kolonu sadece gerçekten kullanılacaksa görünür.
     """

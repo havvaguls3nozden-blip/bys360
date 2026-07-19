@@ -29,16 +29,16 @@ _INACTIVE_STATUSES = {"pasif", "muaf", "iptal", "cancelled", "canceled", "silind
 class AssignmentRuleIssue:
     employee_id: int
     employee_name: str
-    level: Optional[int]
+    level: int | None
     issue_type: str
     severity: str
     message: str
-    expected_evaluator_id: Optional[int] = None
-    current_evaluator_id: Optional[int] = None
-    assignment_id: Optional[int] = None
+    expected_evaluator_id: int | None = None
+    current_evaluator_id: int | None = None
+    assignment_id: int | None = None
     completed: bool = False
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "employee_id": self.employee_id,
             "employee_name": self.employee_name,
@@ -56,7 +56,7 @@ class AssignmentRuleIssue:
 @dataclass(slots=True)
 class AssignmentRuleAuditResult:
     ok: bool
-    period_id: Optional[int]
+    period_id: int | None
     period_title: str = ""
     employee_count: int = 0
     issue_count: int = 0
@@ -68,14 +68,14 @@ class AssignmentRuleAuditResult:
     wrong_slot_count: int = 0
     president_lookup_available: bool = False
     president_excluded_from_subjects: bool = True
-    issues: List[AssignmentRuleIssue] = field(default_factory=list)
+    issues: list[AssignmentRuleIssue] = field(default_factory=list)
     message: str = ""
 
     @property
     def can_auto_repair(self) -> bool:
         return self.blocking_issue_count == 0 and self.completed_conflict_count == 0
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "ok": self.ok,
             "period_id": self.period_id,
@@ -116,7 +116,7 @@ def _is_inactive(row: Any) -> bool:
     return _status(row) in _INACTIVE_STATUSES
 
 
-def _active_period(period_id: Optional[int] = None) -> Optional[PerformancePeriod]:
+def _active_period(period_id: int | None = None) -> PerformancePeriod | None:
     if period_id:
         return db.session.get(PerformancePeriod, period_id)
     return PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc()).first()
@@ -140,13 +140,13 @@ def _scored_subject_users_for_period(period: PerformancePeriod, subject_users: l
     return scored, assessor_only
 
 
-def _assignment_current_evaluator(row: EvaluationAssignment) -> Optional[int]:
+def _assignment_current_evaluator(row: EvaluationAssignment) -> int | None:
     return getattr(row, "original_evaluator_id", None) or getattr(row, "evaluator_id", None)
 
 
-def _expected_level_map(employee: User, lookup) -> Dict[int, Optional[int]]:
+def _expected_level_map(employee: User, lookup) -> dict[int, int | None]:
     desired = resolve_authoritative_desired_chain(employee, lookup, preserve_explicit_level3=True)
-    expected: Dict[int, Optional[int]] = {}
+    expected: dict[int, int | None] = {}
     for level, sicil in ((1, desired.manager_1_sicil), (2, desired.manager_2_sicil), (3, desired.manager_3_sicil)):
         sicil_text = _text(sicil)
         if not sicil_text:
@@ -156,11 +156,11 @@ def _expected_level_map(employee: User, lookup) -> Dict[int, Optional[int]]:
     return expected
 
 
-def build_assignment_generation_preflight(period_id: Optional[int] = None, *, limit: int = 500) -> Dict[str, Any]:
+def build_assignment_generation_preflight(period_id: int | None = None, *, limit: int = 500) -> dict[str, Any]:
     return audit_assignment_rule_alignment(period_id=period_id, limit=limit).as_dict()
 
 
-def audit_assignment_rule_alignment(period_id: Optional[int] = None, *, limit: int = 500) -> AssignmentRuleAuditResult:
+def audit_assignment_rule_alignment(period_id: int | None = None, *, limit: int = 500) -> AssignmentRuleAuditResult:
     period = _active_period(period_id)
     if period is None:
         return AssignmentRuleAuditResult(ok=False, period_id=None, message="Aktif/geçerli performans dönemi bulunamadı.", blocking_issue_count=1)
@@ -201,7 +201,7 @@ def audit_assignment_rule_alignment(period_id: Optional[int] = None, *, limit: i
         expected = _expected_level_map(employee, lookup)
         rows = EvaluationAssignment.query.filter_by(period_id=period.id, employee_id=employee.id).order_by(EvaluationAssignment.manager_level.asc(), EvaluationAssignment.id.desc()).all()
         active_rows = [row for row in rows if not _is_inactive(row)]
-        by_level: Dict[int, List[EvaluationAssignment]] = {}
+        by_level: dict[int, list[EvaluationAssignment]] = {}
         for row in active_rows:
             by_level.setdefault(int(getattr(row, "manager_level", 0) or 0), []).append(row)
 

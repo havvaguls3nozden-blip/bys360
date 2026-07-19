@@ -9,7 +9,8 @@ Faz 2 kapsamı:
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 from sqlalchemy import or_
 

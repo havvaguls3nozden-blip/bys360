@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 9
 Otomatik Hatırlatma ve Aksatan Amir Bildirimi Politika Merkezi
@@ -15,7 +14,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 import logging
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class ReminderDecision:
     label: str
     overdue: bool
     overdue_days: int
-    days_left: Optional[int]
+    days_left: int | None
     channel: str
     channel_label: str
     message: str
@@ -66,7 +66,7 @@ class ManagerDelaySummary:
     status_label: str
 
 
-def _parse_date(value: Any) -> Optional[date]:
+def _parse_date(value: Any) -> date | None:
     if isinstance(value, date) and not isinstance(value, datetime):
         return value
     if isinstance(value, datetime):
@@ -116,9 +116,9 @@ def is_pending_task(task: Mapping[str, Any]) -> bool:
 def resolve_reminder_decision(
     *,
     due_date: Any,
-    today: Optional[date] = None,
+    today: date | None = None,
     task_status: Any = TASK_STATUS_PENDING,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> ReminderDecision:
     settings = settings or {}
     today = today or date.today()
@@ -187,7 +187,7 @@ def resolve_reminder_decision(
     )
 
 
-def build_reminder_payload(task: Mapping[str, Any], *, today: Optional[date] = None, settings: Optional[Mapping[str, Any]] = None) -> Optional[Dict[str, Any]]:
+def build_reminder_payload(task: Mapping[str, Any], *, today: date | None = None, settings: Mapping[str, Any] | None = None) -> dict[str, Any] | None:
     if not is_pending_task(task):
         return None
 
@@ -224,8 +224,8 @@ def build_reminder_payload(task: Mapping[str, Any], *, today: Optional[date] = N
     }
 
 
-def collect_reminder_payloads(tasks: Iterable[Mapping[str, Any]], *, today: Optional[date] = None, settings: Optional[Mapping[str, Any]] = None) -> List[Dict[str, Any]]:
-    payloads: List[Dict[str, Any]] = []
+def collect_reminder_payloads(tasks: Iterable[Mapping[str, Any]], *, today: date | None = None, settings: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
+    payloads: list[dict[str, Any]] = []
     seen_task_ids = set()
 
     for task in tasks or []:
@@ -242,9 +242,9 @@ def collect_reminder_payloads(tasks: Iterable[Mapping[str, Any]], *, today: Opti
     return payloads
 
 
-def summarize_delayed_managers(tasks: Iterable[Mapping[str, Any]], *, today: Optional[date] = None) -> List[ManagerDelaySummary]:
+def summarize_delayed_managers(tasks: Iterable[Mapping[str, Any]], *, today: date | None = None) -> list[ManagerDelaySummary]:
     today = today or date.today()
-    bucket: Dict[Any, Dict[str, Any]] = {}
+    bucket: dict[Any, dict[str, Any]] = {}
 
     for task in tasks or []:
         if not is_pending_task(task):
@@ -274,7 +274,7 @@ def summarize_delayed_managers(tasks: Iterable[Mapping[str, Any]], *, today: Opt
             row["overdue_count"] += 1
             row["max_overdue_days"] = max(row["max_overdue_days"], overdue_days)
 
-    result: List[ManagerDelaySummary] = []
+    result: list[ManagerDelaySummary] = []
     for row in bucket.values():
         status = "Aksatan Amir" if row["overdue_count"] else "Bekleyen Görev Var"
         result.append(
@@ -291,7 +291,7 @@ def summarize_delayed_managers(tasks: Iterable[Mapping[str, Any]], *, today: Opt
     return sorted(result, key=lambda x: (x.overdue_count, x.max_overdue_days, x.pending_count), reverse=True)
 
 
-def build_notification_log_entry(payload: Mapping[str, Any]) -> Dict[str, Any]:
+def build_notification_log_entry(payload: Mapping[str, Any]) -> dict[str, Any]:
     """
     Bildirim/mail log için teknik olmayan, izlenebilir kayıt sözleşmesi.
     """
@@ -308,7 +308,7 @@ def build_notification_log_entry(payload: Mapping[str, Any]) -> Dict[str, Any]:
     }
 
 
-def phase9_reminder_contract() -> Dict[str, Any]:
+def phase9_reminder_contract() -> dict[str, Any]:
     return {
         "pending_tasks_tracked": True,
         "due_soon_reminders": True,

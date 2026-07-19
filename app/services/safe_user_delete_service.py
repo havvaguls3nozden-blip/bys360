@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 güvenli kullanıcı/personel silme servisi.
 

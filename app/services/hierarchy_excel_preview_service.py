@@ -25,12 +25,12 @@ from .hierarchy_rule_engine_service import HierarchyRuleEngineService, UserRow
 
 
 class HierarchyExcelPreviewService:
-    def __init__(self, report_dir: Optional[str | Path] = None, config_path: Optional[str | Path] = None):
+    def __init__(self, report_dir: str | Path | None = None, config_path: str | Path | None = None):
         self.engine = HierarchyRuleEngineService(config_path=config_path)
         self.report_dir = Path(report_dir or (Path.cwd() / "reports" / "faz3_6"))
         self.report_dir.mkdir(parents=True, exist_ok=True)
 
-    def preview_excel(self, excel_path: str | Path) -> Dict[str, Any]:
+    def preview_excel(self, excel_path: str | Path) -> dict[str, Any]:
         users = self._read_excel(excel_path)
         resolved = self.engine.resolve_many(users)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -53,11 +53,11 @@ class HierarchyExcelPreviewService:
         summary.update({"json_path": str(json_path), "csv_path": str(csv_path), "txt_path": str(txt_path)})
         return summary
 
-    def _read_excel(self, excel_path: str | Path) -> List[UserRow]:
+    def _read_excel(self, excel_path: str | Path) -> list[UserRow]:
         wb = load_workbook(filename=str(excel_path), data_only=True)
         ws = wb.active
         headers = [self._norm(h) for h in next(ws.iter_rows(min_row=1, max_row=1, values_only=True))]
-        rows: List[UserRow] = []
+        rows: list[UserRow] = []
         for values in ws.iter_rows(min_row=2, values_only=True):
             payload = {headers[i]: values[i] for i in range(min(len(headers), len(values)))}
             if not str(payload.get("sicil_no") or "").strip():
@@ -89,7 +89,7 @@ class HierarchyExcelPreviewService:
         return str(value or "").strip().lower().replace(" ", "_")
 
     @staticmethod
-    def _write_csv(path: Path, rows: List[Dict[str, Any]]) -> None:
+    def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         fieldnames = [
             "sicil_no", "full_name", "role", "unvan", "birim", "ust_birim",
             "rule_key", "chain_type", "order",
@@ -108,7 +108,7 @@ class HierarchyExcelPreviewService:
                 writer.writerow(out)
 
     @staticmethod
-    def _build_txt(summary: Dict[str, Any]) -> str:
+    def _build_txt(summary: dict[str, Any]) -> str:
         lines = [
             "BYS360 Faz 3.6 - Amir Zinciri Ayar Paneli / Excel Önizleme",
             "=" * 72,

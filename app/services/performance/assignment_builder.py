@@ -19,7 +19,7 @@ def sync_evaluation_summary(evaluation, evaluator_id, level):
         evaluation["level_3_evaluator_id"] = evaluator_id
     return evaluation
 
-def build_assignments(period_id:int, chains:List[Dict[str,Any]]):
+def build_assignments(period_id:int, chains:list[dict[str,Any]]):
     assignments = []
     existing_keys = set()
 

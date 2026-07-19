@@ -8,7 +8,8 @@ eşler. Böylece personel düzenleme ekranındaki amir dropdownları seçili gel
 """
 from __future__ import annotations
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 
 def _safe_sicil(value: Any) -> str:

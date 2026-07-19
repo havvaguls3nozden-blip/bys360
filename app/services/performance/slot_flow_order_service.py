@@ -24,7 +24,7 @@ def _role_key(value: Any) -> str:
     return _safe_str(value).lower()
 
 
-def slot_map_from_row(row: Dict[str, Any]) -> Dict[str, str]:
+def slot_map_from_row(row: dict[str, Any]) -> dict[str, str]:
     """
     Slot = kurumsal amir alanı
     manager_1 -> 1. amir
@@ -38,7 +38,7 @@ def slot_map_from_row(row: Dict[str, Any]) -> Dict[str, str]:
     }
 
 
-def flow_order_for_row(row: Dict[str, Any]) -> List[int]:
+def flow_order_for_row(row: dict[str, Any]) -> list[int]:
     """
     Akış sırası slot numarası değildir.
     Başkanlık: 2 -> 1
@@ -57,7 +57,7 @@ def flow_order_for_row(row: Dict[str, Any]) -> List[int]:
     return [2, 1]
 
 
-def build_health_issues_from_slots(row: Dict[str, Any]) -> List[str]:
+def build_health_issues_from_slots(row: dict[str, Any]) -> list[str]:
     """
     Sağlık kartı slot doluluğunu kontrol eder.
     Akış sırasını '1. amir yok' diye ters yorumlamaz.
@@ -83,7 +83,7 @@ def build_health_issues_from_slots(row: Dict[str, Any]) -> List[str]:
         if role == "personel":
             return [] if slots["manager_1"] else ["1. amir eksik veya pasif"]
 
-    issues: List[str] = []
+    issues: list[str] = []
     if not slots["manager_1"]:
         issues.append("1. amir eksik veya pasif")
     if not slots["manager_2"]:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """BYS360 P4A Mobile Auth Guard Matrix Gate.
 
 Güvenli, yazmasız kalite kapısıdır. Mobil API'nin ana korumalı endpointlerinde

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Faz 1.3 uyumluluk köprüsü.
 

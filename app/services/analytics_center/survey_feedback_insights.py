@@ -15,7 +15,8 @@ oncelik ve egilim sinyallerine donusturmektir.
 """
 
 from dataclasses import asdict, dataclass
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card

@@ -29,7 +29,7 @@ def resolve_kpi_status(rate: Any) -> str:
     return classify_kpi_status(rate)["status_label"]
 
 
-def build_dashboard_summary(db_session: Any = None, current_user: Any = None) -> Dict[str, Any]:
+def build_dashboard_summary(db_session: Any = None, current_user: Any = None) -> dict[str, Any]:
     return {
         "total_targets": 0,
         "completed_targets": 0,

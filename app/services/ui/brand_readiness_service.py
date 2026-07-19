@@ -18,9 +18,9 @@ def _file_exists(root: Path, relative: str) -> bool:
     return (root / relative).exists()
 
 
-def build_brand_readiness_snapshot(project_root: str) -> Dict[str, object]:
+def build_brand_readiness_snapshot(project_root: str) -> dict[str, object]:
     root = Path(project_root)
-    base_candidates: List[str] = [
+    base_candidates: list[str] = [
         'app/templates/base.html',
         'templates/base.html',
     ]

@@ -22,7 +22,7 @@ def list_performance_periods() -> list[PerformancePeriod]:
     )
 
 
-def coerce_period_id(source: Any, key: str = "period_id") -> Optional[int]:
+def coerce_period_id(source: Any, key: str = "period_id") -> int | None:
     raw = source
     if isinstance(source, Mapping):
         getter = getattr(source, 'get', None)
@@ -45,7 +45,7 @@ def coerce_period_id(source: Any, key: str = "period_id") -> Optional[int]:
         return None
 
 
-def get_selected_period(period_id: Optional[int] = None, *, fallback_to_active: bool = True) -> Optional[PerformancePeriod]:
+def get_selected_period(period_id: int | None = None, *, fallback_to_active: bool = True) -> PerformancePeriod | None:
     selected = db.session.get(PerformancePeriod, period_id) if period_id else None
     if selected or not fallback_to_active:
         return selected
@@ -57,7 +57,7 @@ def get_selected_period(period_id: Optional[int] = None, *, fallback_to_active: 
     )
 
 
-def get_weight_config_for_period(period: Optional[PerformancePeriod]) -> Optional[PerformanceWeightConfig]:
+def get_weight_config_for_period(period: PerformancePeriod | None) -> PerformanceWeightConfig | None:
     if period:
         row = (
             PerformanceWeightConfig.query
@@ -75,7 +75,7 @@ def get_weight_config_for_period(period: Optional[PerformancePeriod]) -> Optiona
     )
 
 
-def build_period_weight_context(source: Any = None, *, period_id: Optional[int] = None, fallback_to_active: bool = True) -> dict[str, Any]:
+def build_period_weight_context(source: Any = None, *, period_id: int | None = None, fallback_to_active: bool = True) -> dict[str, Any]:
     resolved_period_id = period_id if period_id is not None else coerce_period_id(source)
     selected_period = get_selected_period(resolved_period_id, fallback_to_active=fallback_to_active)
     if selected_period and not resolved_period_id:

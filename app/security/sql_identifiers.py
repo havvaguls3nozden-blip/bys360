@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Central SQL identifier validation and quoting policy for BYS360."""
 
 from __future__ import annotations

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 SP-2F Stratejik Performans görünür sekme route uyumluluğu
 

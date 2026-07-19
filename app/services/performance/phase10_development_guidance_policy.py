@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 10
 Dönem İçi Notlar + Gelişim Önerisi Bağı Politika Merkezi
@@ -14,7 +13,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -75,10 +75,10 @@ class GuidanceVisibilityDecision:
 
 @dataclass(frozen=True)
 class GuidanceRecordNormalized:
-    employee_id: Optional[int]
-    period_id: Optional[int]
-    scorecard_id: Optional[int]
-    interim_note_id: Optional[int]
+    employee_id: int | None
+    period_id: int | None
+    scorecard_id: int | None
+    interim_note_id: int | None
     guidance_text: str
     source_summary: str
     status: str
@@ -87,7 +87,7 @@ class GuidanceRecordNormalized:
     errors: tuple[str, ...]
 
 
-def _to_int(value: Any, default: Optional[int] = None) -> Optional[int]:
+def _to_int(value: Any, default: int | None = None) -> int | None:
     try:
         if value is None or value == "":
             return default
@@ -152,7 +152,7 @@ def empty_guidance_message() -> str:
 
 
 def normalize_guidance_record(row: Mapping[str, Any]) -> GuidanceRecordNormalized:
-    errors: List[str] = []
+    errors: list[str] = []
 
     employee_id = _to_int(row.get("employee_id") or row.get("personel_id") or row.get("user_id"))
     period_id = _to_int(row.get("period_id") or row.get("donem_id"))
@@ -216,7 +216,7 @@ def resolve_guidance_visibility(
     group_head_approved: Any = False,
     low_score_publish_blocked: Any = False,
     viewer_is_personnel: Any = False,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> GuidanceVisibilityDecision:
     settings = settings or {}
     approval_required = _bool(settings.get("performance.phase10.group_head_approval_required", True), True)
@@ -272,9 +272,9 @@ def resolve_guidance_visibility(
     )
 
 
-def filter_guidance_for_personnel(rows: Iterable[Mapping[str, Any]], *, employee_id: Any) -> List[Dict[str, Any]]:
+def filter_guidance_for_personnel(rows: Iterable[Mapping[str, Any]], *, employee_id: Any) -> list[dict[str, Any]]:
     target = _to_int(employee_id)
-    result: List[Dict[str, Any]] = []
+    result: list[dict[str, Any]] = []
     for row in rows or []:
         item = dict(row)
         row_employee = _to_int(item.get("employee_id") or item.get("personel_id") or item.get("user_id"))
@@ -292,7 +292,7 @@ def build_scorecard_guidance_payload(
     scorecard_published: Any,
     group_head_approved: Any,
     low_score_publish_blocked: Any = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     rows = filter_guidance_for_personnel(guidance_rows, employee_id=employee_id)
     visibility = resolve_guidance_visibility(
         scorecard_published=scorecard_published,
@@ -317,7 +317,7 @@ def build_scorecard_guidance_payload(
     }
 
 
-def phase10_guidance_contract() -> Dict[str, Any]:
+def phase10_guidance_contract() -> dict[str, Any]:
     return {
         "interim_notes_to_guidance_link": True,
         "guidance_write_area_required": True,

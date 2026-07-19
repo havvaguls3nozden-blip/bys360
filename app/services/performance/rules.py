@@ -53,7 +53,7 @@ class AuthoritativePerformanceRules:
     level_3_default_mode: str = LEVEL_3_DEFAULT_MODE
     blind_review_allowed: bool = BLIND_REVIEW_ALLOWED
 
-    def as_dict(self) -> Dict[str, object]:
+    def as_dict(self) -> dict[str, object]:
         return {
             "version": self.version,
             "default_weights": {
@@ -82,7 +82,7 @@ class AuthoritativePerformanceRules:
         }
 
 
-def get_authoritative_performance_rules_snapshot() -> Dict[str, object]:
+def get_authoritative_performance_rules_snapshot() -> dict[str, object]:
     return AuthoritativePerformanceRules().as_dict()
 
 

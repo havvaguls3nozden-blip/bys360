@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Süreç Akışı Motoru - Faz 3 Puanlama Geçmişi Servisi.
 
 Bu servis mevcut puanlama ekranlarına doğrudan müdahale etmez. Faz 3 amacı,
@@ -11,7 +10,8 @@ import logging
 
 import hashlib
 from datetime import datetime
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 from sqlalchemy import inspect, text
 

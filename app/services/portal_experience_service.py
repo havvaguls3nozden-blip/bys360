@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Portal Deneyimi V1B güvenli servis katmanı.
 
 V1B amacı: Portal ana sayfası ilgi çekici kalsın; ancak local geliştirme,
@@ -10,7 +9,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from importlib import import_module
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 try:
     from sqlalchemy import and_, inspect, or_

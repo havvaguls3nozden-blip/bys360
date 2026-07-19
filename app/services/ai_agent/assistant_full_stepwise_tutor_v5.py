@@ -3,7 +3,8 @@ from __future__ import annotations
 # BYS360_ASSISTANT_FULL_STEPWISE_TUTOR_V5
 
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 import re
 
 ASSISTANT_NAME = "BYS360 Asistanı"

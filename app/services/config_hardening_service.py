@@ -34,8 +34,8 @@ _PLACEHOLDER_TOKENS = {
 }
 
 
-def _load_env(env_path: Path) -> Dict[str, str]:
-    values: Dict[str, str] = {}
+def _load_env(env_path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
     if not env_path.exists():
         return values
     for raw in env_path.read_text(encoding="utf-8", errors="ignore").splitlines():
@@ -59,7 +59,7 @@ def _looks_placeholder(value: str) -> bool:
 def _upsert_env_line(text: str, key: str, value: str) -> str:
     lines = text.splitlines()
     replaced = False
-    new_lines: List[str] = []
+    new_lines: list[str] = []
     for line in lines:
         stripped = line.strip()
         if stripped.startswith(f"{key}="):
@@ -74,9 +74,9 @@ def _upsert_env_line(text: str, key: str, value: str) -> str:
     return "\n".join(new_lines) + "\n"
 
 
-def build_safe_env_patch(env_path: Path, *, apply_safe_env: bool = False) -> Tuple[List[Finding], Dict[str, str]]:
-    findings: List[Finding] = []
-    suggestions: Dict[str, str] = {}
+def build_safe_env_patch(env_path: Path, *, apply_safe_env: bool = False) -> tuple[list[Finding], dict[str, str]]:
+    findings: list[Finding] = []
+    suggestions: dict[str, str] = {}
     env = _load_env(env_path)
 
     strict_env = env.get("STRICT_ENV_VALIDATION", "")
@@ -118,7 +118,7 @@ def build_safe_env_patch(env_path: Path, *, apply_safe_env: bool = False) -> Tup
     return findings, suggestions
 
 
-def write_env_recommendation_file(project_root: Path, suggestions: Dict[str, str]) -> Optional[Path]:
+def write_env_recommendation_file(project_root: Path, suggestions: dict[str, str]) -> Path | None:
     if not suggestions:
         return None
     out_dir = project_root / "reports" / "faz3_1"
@@ -136,7 +136,7 @@ def write_env_recommendation_file(project_root: Path, suggestions: Dict[str, str
     return out_path
 
 
-def export_findings_json(findings: List[Finding], path: Path, extra: Optional[dict] = None) -> None:
+def export_findings_json(findings: list[Finding], path: Path, extra: dict | None = None) -> None:
     payload = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "finding_count": len(findings),

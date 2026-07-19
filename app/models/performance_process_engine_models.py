@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Süreç Akışı Motoru veri modelleri.
 
 Faz 2 yalnızca veri modeli altyapısını tanımlar. Bu dosya mevcut akışa

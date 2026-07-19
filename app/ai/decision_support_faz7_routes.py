@@ -12,7 +12,8 @@ JSON çıktılarıyla sunar.
 BYS360_AI_DECISION_FAZ7_ROUTES
 """
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from flask import jsonify, request
 from flask_login import current_user, login_required

@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 from app.core.datetime_utils import utc_now
 from collections import defaultdict
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from sqlalchemy.orm import joinedload
 

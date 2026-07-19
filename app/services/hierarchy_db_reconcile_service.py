@@ -26,12 +26,12 @@ from .hierarchy_rule_engine_service_v2 import HierarchyRuleEngineServiceV2, User
 
 
 class HierarchyDbReconcileService:
-    def __init__(self, report_dir: Optional[str | Path] = None):
+    def __init__(self, report_dir: str | Path | None = None):
         self.report_dir = Path(report_dir or (Path.cwd() / 'reports' / 'faz3_9'))
         self.report_dir.mkdir(parents=True, exist_ok=True)
         self.engine = HierarchyRuleEngineServiceV2()
 
-    def preview_and_optionally_apply(self, apply_changes: bool = False) -> Dict[str, object]:
+    def preview_and_optionally_apply(self, apply_changes: bool = False) -> dict[str, object]:
         users = self._fetch_users()
         resolved = self.engine.resolve_many(users)
         rows = []
@@ -75,7 +75,7 @@ class HierarchyDbReconcileService:
         summary.update({'json_path': str(json_path), 'csv_path': str(csv_path), 'txt_path': str(txt_path)})
         return summary
 
-    def _fetch_users(self) -> List[UserRow]:
+    def _fetch_users(self) -> list[UserRow]:
         cols = self._table_columns('users')
         full_name_expr = "trim(coalesce(ad,'') || ' ' || coalesce(soyad,''))"
         if 'full_name' in cols:
@@ -116,7 +116,7 @@ class HierarchyDbReconcileService:
             ))
         return out
 
-    def _diff(self, row: Dict[str, object]) -> Dict[str, object]:
+    def _diff(self, row: dict[str, object]) -> dict[str, object]:
         cur1 = str(row.get('yonetici_sicil') or '').strip()
         cur2 = str(row.get('ikinci_yonetici_sicil') or '').strip()
         cur3 = str(row.get('ucuncu_yonetici_sicil') or '').strip()
@@ -134,7 +134,7 @@ class HierarchyDbReconcileService:
             'user_updated': False,
         }
 
-    def _apply_user_chain(self, row: Dict[str, object]) -> None:
+    def _apply_user_chain(self, row: dict[str, object]) -> None:
         db.session.execute(text('''
             UPDATE users
             SET yonetici_sicil = :m1,
@@ -148,13 +148,13 @@ class HierarchyDbReconcileService:
             'user_id': row.get('id'),
         })
 
-    def _active_period_id(self) -> Optional[int]:
+    def _active_period_id(self) -> int | None:
         if 'performance_periods' not in self._all_tables():
             return None
         row = db.session.execute(text("SELECT id FROM performance_periods WHERE is_active = true ORDER BY id DESC LIMIT 1")).first()
         return int(row[0]) if row else None
 
-    def _sync_open_assignments(self, period_id: int, row: Dict[str, object]) -> tuple[int, int]:
+    def _sync_open_assignments(self, period_id: int, row: dict[str, object]) -> tuple[int, int]:
         if 'evaluation_assignments' not in self._all_tables():
             return 0, 0
         open_updates = 0
@@ -188,7 +188,7 @@ class HierarchyDbReconcileService:
             locked += int(cnt[0]) if cnt else 0
         return open_updates, locked
 
-    def _build_txt(self, summary: Dict[str, object]) -> str:
+    def _build_txt(self, summary: dict[str, object]) -> str:
         return (
             'BYS360 Faz 3.9 - Pozisyon Bazlı Kalıcı Amir Motoru\n'
             '=====================================================\n'
@@ -203,7 +203,7 @@ class HierarchyDbReconcileService:
             f"- Kilitli görev: {summary['locked_assignments']}\n"
         )
 
-    def _write_csv(self, path: Path, rows: List[Dict[str, object]]) -> None:
+    def _write_csv(self, path: Path, rows: list[dict[str, object]]) -> None:
         fields = [
             'id','sicil_no','full_name','role','birim','ust_birim','rule_key','chain_type',
             'manager_1_sicil','manager_2_sicil','manager_3_sicil','warnings','info',
@@ -240,11 +240,11 @@ class HierarchyDbReconcileService:
                 })
 
     @staticmethod
-    def _table_columns(table_name: str) -> List[str]:
+    def _table_columns(table_name: str) -> list[str]:
         rows = db.session.execute(text("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = :t"), {'t': table_name}).fetchall()
         return [str(r[0]) for r in rows]
 
     @staticmethod
-    def _all_tables() -> List[str]:
+    def _all_tables() -> list[str]:
         rows = db.session.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" )).fetchall()
         return [str(r[0]) for r in rows]

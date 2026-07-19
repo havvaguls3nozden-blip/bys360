@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 BYS360 P4C Mobile Security Suite Gate
 
@@ -36,7 +35,7 @@ COMPILE_FILES = [
 ]
 
 
-def _read_json(path: Path) -> Dict[str, Any]:
+def _read_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"ok": False, "error": f"missing_report:{path}"}
     try:
@@ -45,12 +44,12 @@ def _read_json(path: Path) -> Dict[str, Any]:
         return {"ok": False, "error": f"invalid_json:{path}:{exc}"}
 
 
-def _write_json(path: Path, payload: Dict[str, Any]) -> None:
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def _run(cmd: List[str], cwd: Path, env: Dict[str, str] | None = None) -> Dict[str, Any]:
+def _run(cmd: list[str], cwd: Path, env: dict[str, str] | None = None) -> dict[str, Any]:
     merged_env = os.environ.copy()
     if env:
         merged_env.update(env)
@@ -78,12 +77,12 @@ def _count_routes_in_file(path: Path) -> int:
     return len(re.findall(r"@\s*mobile_api_bp\s*\.\s*(?:get|post|put|delete|patch)\s*\(", text))
 
 
-def _inventory(root: Path) -> Dict[str, Any]:
+def _inventory(root: Path) -> dict[str, Any]:
     mobile_dir = root / "app" / "api" / "mobile"
     domains_dir = mobile_dir / "domains"
     routes_py = mobile_dir / "routes.py"
     routes_py_lines = len(routes_py.read_text(encoding="utf-8", errors="ignore").splitlines()) if routes_py.exists() else 0
-    domain_inventory: List[Dict[str, Any]] = []
+    domain_inventory: list[dict[str, Any]] = []
     total = 0
     files = []
     if routes_py.exists():
@@ -111,7 +110,7 @@ def _inventory(root: Path) -> Dict[str, Any]:
     }
 
 
-def _safe_get(d: Dict[str, Any], *keys: str, default: Any = None) -> Any:
+def _safe_get(d: dict[str, Any], *keys: str, default: Any = None) -> Any:
     cur: Any = d
     for key in keys:
         if not isinstance(cur, dict) or key not in cur:
@@ -120,13 +119,13 @@ def _safe_get(d: Dict[str, Any], *keys: str, default: Any = None) -> Any:
     return cur
 
 
-def _extract_probe_summary(report: Dict[str, Any], matrix_key: str) -> Dict[str, Any]:
+def _extract_probe_summary(report: dict[str, Any], matrix_key: str) -> dict[str, Any]:
     matrix = report.get(matrix_key) if isinstance(report.get(matrix_key), dict) else {}
     responses = matrix.get("responses") if isinstance(matrix.get("responses"), list) else []
     failures = matrix.get("failures") if isinstance(matrix.get("failures"), list) else []
-    status_counts: Dict[str, int] = {}
-    scenario_counts: Dict[str, int] = {}
-    feature_counts: Dict[str, int] = {}
+    status_counts: dict[str, int] = {}
+    scenario_counts: dict[str, int] = {}
+    feature_counts: dict[str, int] = {}
     for response in responses:
         status = str(response.get("status_code", "unknown"))
         scenario = str(response.get("scenario", response.get("kind", "unknown")))
@@ -148,7 +147,7 @@ def _extract_probe_summary(report: Dict[str, Any], matrix_key: str) -> Dict[str,
     }
 
 
-def _security_suite(root: Path) -> Dict[str, Any]:
+def _security_suite(root: Path) -> dict[str, Any]:
     p4a = _read_json(root / P4A_REPORT_REL)
     p4b = _read_json(root / P4B_REPORT_REL)
     p4a_summary = _extract_probe_summary(p4a, "auth_guard_matrix")
@@ -202,8 +201,8 @@ def _security_suite(root: Path) -> Dict[str, Any]:
     }
 
 
-def _compile_all(root: Path, python: str) -> Tuple[bool, List[Dict[str, Any]]]:
-    results: List[Dict[str, Any]] = []
+def _compile_all(root: Path, python: str) -> tuple[bool, list[dict[str, Any]]]:
+    results: list[dict[str, Any]] = []
     ok = True
     for rel in COMPILE_FILES:
         path = root / rel
@@ -217,7 +216,7 @@ def _compile_all(root: Path, python: str) -> Tuple[bool, List[Dict[str, Any]]]:
     return ok, results
 
 
-def _app_factory(root: Path, python: str) -> Dict[str, Any]:
+def _app_factory(root: Path, python: str) -> dict[str, Any]:
     env = {
         "FLASK_ENV": "testing",
         "APP_ENV": "testing",
@@ -229,12 +228,12 @@ def _app_factory(root: Path, python: str) -> Dict[str, Any]:
     return _run([python, "-c", "from app import create_app; app=create_app(); print('APP_FACTORY_OK')"], root, env)
 
 
-def _secret_gate(root: Path, python: str) -> Dict[str, Any]:
+def _secret_gate(root: Path, python: str) -> dict[str, Any]:
     script = root / "scripts" / "quality" / "bys360_secret_repo_gate.py"
     if not script.exists():
         return {"ok": False, "returncode": 1, "stdout_tail": "", "stderr_tail": f"missing:{script}", "parsed": {}}
     result = _run([python, str(script), "--root", str(root)], root)
-    parsed: Dict[str, Any] = {}
+    parsed: dict[str, Any] = {}
     try:
         # Secret gate stdout generally ends with a JSON object.
         text = result.get("stdout_tail", "")
@@ -248,7 +247,7 @@ def _secret_gate(root: Path, python: str) -> Dict[str, Any]:
     return result
 
 
-def _pytest_gate(root: Path, python: str) -> Dict[str, Any]:
+def _pytest_gate(root: Path, python: str) -> dict[str, Any]:
     test_path = root / "tests" / "architecture" / "test_mobile_api_security_suite_p4c.py"
     if not test_path.exists():
         return {"ok": False, "returncode": 1, "stdout_tail": "", "stderr_tail": f"missing:{test_path}", "mode": "pytest_targeted_mobile_security_suite_p4c"}
@@ -257,13 +256,13 @@ def _pytest_gate(root: Path, python: str) -> Dict[str, Any]:
     return result
 
 
-def build_report(root: Path, args: argparse.Namespace) -> Dict[str, Any]:
+def build_report(root: Path, args: argparse.Namespace) -> dict[str, Any]:
     python = _python_exe(root)
     inventory = _inventory(root)
     security_suite = _security_suite(root)
 
     compile_ok = True
-    compile_results: List[Dict[str, Any]] = []
+    compile_results: list[dict[str, Any]] = []
     if args.compile_all:
         compile_ok, compile_results = _compile_all(root, python)
 
@@ -288,7 +287,7 @@ def build_report(root: Path, args: argparse.Namespace) -> Dict[str, Any]:
         and secret_gate.get("ok")
         and pytest.get("ok")
     )
-    report: Dict[str, Any] = {
+    report: dict[str, Any] = {
         "ok": ok,
         "package": PACKAGE,
         "generated_at": datetime.now().isoformat(timespec="seconds"),

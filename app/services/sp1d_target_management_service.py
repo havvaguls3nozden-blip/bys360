@@ -2,7 +2,8 @@ from __future__ import annotations
 
 # BYS360 SP-1D KPI/Hedef Kayıt ve Listeleme Servisi
 
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, List, Tuple
+from collections.abc import Iterable
 
 try:
     from sqlalchemy import text
@@ -15,7 +16,7 @@ except Exception:  # pragma: no cover
     db = None
 
 
-def _execute(statement: str, params: Dict[str, Any] | None = None):
+def _execute(statement: str, params: dict[str, Any] | None = None):
     if db is None:
         raise RuntimeError("Veritabanı bağlantısı kullanılamıyor.")
     if text:
@@ -32,7 +33,7 @@ def _to_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def _normalize_status_and_risk(completion_rate: float) -> Tuple[str, str]:
+def _normalize_status_and_risk(completion_rate: float) -> tuple[str, str]:
     if completion_rate >= 90:
         return "tamamlandi", "dusuk"
     if completion_rate >= 70:
@@ -73,7 +74,7 @@ def _is_global_role(current_user: Any) -> bool:
     return any(item in role for item in ["admin", "sistem", "başkan", "baskan", "performans", "ik"])
 
 
-def _dict_rows(rows: Iterable[Any]) -> List[Dict[str, Any]]:
+def _dict_rows(rows: Iterable[Any]) -> list[dict[str, Any]]:
     output = []
     for row in rows:
         try:
@@ -83,7 +84,7 @@ def _dict_rows(rows: Iterable[Any]) -> List[Dict[str, Any]]:
     return output
 
 
-def build_target_form_context(current_user: Any) -> Dict[str, Any]:
+def build_target_form_context(current_user: Any) -> dict[str, Any]:
     periods = []
     if db is not None:
         try:
@@ -114,10 +115,10 @@ def build_target_form_context(current_user: Any) -> Dict[str, Any]:
     }
 
 
-def list_targets_for_user(current_user: Any) -> List[Dict[str, Any]]:
+def list_targets_for_user(current_user: Any) -> list[dict[str, Any]]:
     if db is None:
         return []
-    params: Dict[str, Any] = {}
+    params: dict[str, Any] = {}
     where = "1=1"
     if not _is_global_role(current_user):
         where = "(owner_user_id = :user_id OR owner_unit_id = :unit_id)"
@@ -153,10 +154,10 @@ def list_targets_for_user(current_user: Any) -> List[Dict[str, Any]]:
         return []
 
 
-def get_target_for_edit(target_id: int, current_user: Any) -> Dict[str, Any] | None:
+def get_target_for_edit(target_id: int, current_user: Any) -> dict[str, Any] | None:
     if db is None:
         return None
-    params: Dict[str, Any] = {"id": target_id}
+    params: dict[str, Any] = {"id": target_id}
     where = "id = :id"
     if not _is_global_role(current_user):
         where += " AND (owner_user_id = :user_id OR owner_unit_id = :unit_id)"
@@ -178,7 +179,7 @@ def get_target_for_edit(target_id: int, current_user: Any) -> Dict[str, Any] | N
         return None
 
 
-def _form_payload(form: Any, current_user: Any) -> Dict[str, Any]:
+def _form_payload(form: Any, current_user: Any) -> dict[str, Any]:
     target_value = _to_float(form.get("target_value"))
     current_value = _to_float(form.get("current_value"))
     completion_rate = 0.0
@@ -204,7 +205,7 @@ def _form_payload(form: Any, current_user: Any) -> Dict[str, Any]:
     }
 
 
-def _validate_payload(payload: Dict[str, Any]) -> List[str]:
+def _validate_payload(payload: dict[str, Any]) -> list[str]:
     errors = []
     if not payload["target_code"]:
         errors.append("Hedef kodu zorunludur.")
@@ -217,7 +218,7 @@ def _validate_payload(payload: Dict[str, Any]) -> List[str]:
     return errors
 
 
-def create_target_from_form(form: Any, current_user: Any) -> Tuple[bool, str]:
+def create_target_from_form(form: Any, current_user: Any) -> tuple[bool, str]:
     if db is None:
         return False, "Veritabanı bağlantısı kullanılamıyor."
     payload = _form_payload(form, current_user)
@@ -246,7 +247,7 @@ def create_target_from_form(form: Any, current_user: Any) -> Tuple[bool, str]:
         return False, f"Kayıt oluşturulamadı: {exc}"
 
 
-def update_target_from_form(target_id: int, form: Any, current_user: Any) -> Tuple[bool, str]:
+def update_target_from_form(target_id: int, form: Any, current_user: Any) -> tuple[bool, str]:
     if db is None:
         return False, "Veritabanı bağlantısı kullanılamıyor."
     existing = get_target_for_edit(target_id, current_user)

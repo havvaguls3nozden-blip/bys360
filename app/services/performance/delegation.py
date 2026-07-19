@@ -38,8 +38,8 @@ REASON_EVENT_MAP = {
 @dataclass
 class EffectiveEvaluatorResult:
     manager_level: int
-    original_evaluator_id: Optional[int]
-    effective_evaluator_id: Optional[int]
+    original_evaluator_id: int | None
+    effective_evaluator_id: int | None
     reason_type: str
     note: str = ""
     warning_level: str = "info"
@@ -54,7 +54,7 @@ def _normalize_text(value: Any) -> str:
     return str(value).strip().lower() if value is not None else ""
 
 
-def _date_in_range(check_date: date, start_date: Optional[date], end_date: Optional[date]) -> bool:
+def _date_in_range(check_date: date, start_date: date | None, end_date: date | None) -> bool:
     if start_date and check_date < start_date:
         return False
     if end_date and check_date > end_date:
@@ -90,7 +90,7 @@ def _record_performance_mode(row: Any) -> str:
     return "partial" if bool(getattr(row, "blocks_performance_evaluation", False)) else DEFAULT_PERFORMANCE_MODE
 
 
-def get_active_leave_for_user(user_id: Optional[int], check_date: Optional[date] = None) -> Optional[Any]:
+def get_active_leave_for_user(user_id: int | None, check_date: date | None = None) -> Any | None:
     if not PersonnelLeave or not user_id:
         return None
 
@@ -111,7 +111,7 @@ def get_active_leave_for_user(user_id: Optional[int], check_date: Optional[date]
     return None
 
 
-def get_active_attendance_for_user(user_id: Optional[int], check_date: Optional[date] = None) -> Optional[Any]:
+def get_active_attendance_for_user(user_id: int | None, check_date: date | None = None) -> Any | None:
     if not AttendanceException or not user_id:
         return None
 
@@ -131,11 +131,11 @@ def get_active_attendance_for_user(user_id: Optional[int], check_date: Optional[
     return None
 
 
-def get_leave_performance_mode(leave_row: Optional[Any]) -> str:
+def get_leave_performance_mode(leave_row: Any | None) -> str:
     return _record_performance_mode(leave_row)
 
 
-def get_active_delegate(principal_user_id: Optional[int], manager_level: int, check_date: Optional[date] = None) -> Optional[Any]:
+def get_active_delegate(principal_user_id: int | None, manager_level: int, check_date: date | None = None) -> Any | None:
     if not DelegationAssignment or not principal_user_id:
         return None
 
@@ -161,9 +161,9 @@ def get_active_delegate(principal_user_id: Optional[int], manager_level: int, ch
 
 
 def resolve_effective_evaluator(
-    evaluator_id: Optional[int],
+    evaluator_id: int | None,
     manager_level: int,
-    check_date: Optional[date] = None,
+    check_date: date | None = None,
 ) -> EffectiveEvaluatorResult:
     if not evaluator_id:
         return EffectiveEvaluatorResult(
@@ -212,7 +212,7 @@ def resolve_effective_evaluator(
     )
 
 
-def resolve_employee_performance_mode(employee_id: Optional[int], check_date: Optional[date] = None) -> Dict[str, Any]:
+def resolve_employee_performance_mode(employee_id: int | None, check_date: date | None = None) -> dict[str, Any]:
     check_date = check_date or _today()
     leave_row = get_active_leave_for_user(employee_id, check_date=check_date)
     attendance_row = get_active_attendance_for_user(employee_id, check_date=check_date)
@@ -233,13 +233,13 @@ def classify_reason_type(reason_type: str) -> tuple[str, str]:
 
 def log_assignment_decision(
     *,
-    period_id: Optional[int],
-    employee_id: Optional[int],
+    period_id: int | None,
+    employee_id: int | None,
     manager_level: int,
-    original_evaluator_id: Optional[int],
-    effective_evaluator_id: Optional[int],
+    original_evaluator_id: int | None,
+    effective_evaluator_id: int | None,
     reason_type: str,
-    details: Optional[Dict[str, Any]] = None,
+    details: dict[str, Any] | None = None,
 ) -> None:
     if AssignmentCoverageLog:
         event_type, severity = classify_reason_type(reason_type)

@@ -10,7 +10,8 @@ BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_INTEGRATION
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from .period_scope_policy import (
     build_period_decision,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 v59.4 — assistant shortcut context contract testi.
 
 Bu test, context processor DB/servis hatası yaşasa bile şablonun ihtiyaç duyduğu

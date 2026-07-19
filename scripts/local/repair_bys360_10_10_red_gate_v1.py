@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 10/10 Red Gate V1 repair."""
 from __future__ import annotations
 

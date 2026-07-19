@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Maintenance 10E - Geçmiş karne arşivi görünürlük sözleşmesi."""
 from __future__ import annotations
 

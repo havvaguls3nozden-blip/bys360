@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """BYS360 P4B V3 Mobile Role Boundary Matrix Gate.
 
 Canlı veriye dokunmadan mobil API üzerinde rol/kimlik sınırlarını yoklar.

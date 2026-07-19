@@ -43,7 +43,8 @@ def is_evaluation_publishable(*args, **kwargs):
 
 from collections import Counter
 from datetime import datetime
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
+from collections.abc import Iterable
 
 from app.extensions import db
 from app.models import PerformanceEvaluation, PerformancePeriod
@@ -61,7 +62,7 @@ def summarize_skip_reasons(rows: Iterable[dict[str, Any]] | None) -> list[tuple[
     return sorted(counter.items(), key=lambda item: (-item[1], item[0].lower()))
 
 
-def get_period(period_id: Optional[int] = None) -> Optional[PerformancePeriod]:
+def get_period(period_id: int | None = None) -> PerformancePeriod | None:
     try:
         if period_id:
             return db.session.get(PerformancePeriod, int(period_id))

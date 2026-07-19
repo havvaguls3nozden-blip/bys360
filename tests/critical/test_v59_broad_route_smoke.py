@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 v59 geniş canlı rota smoke testi.
 
 BYS360_V59_1_SQLITE_SMOKE_SCHEMA_SAFETY

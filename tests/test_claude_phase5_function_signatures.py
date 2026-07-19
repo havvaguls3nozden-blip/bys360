@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Maintenance Faz 5 - Kritik fonksiyon imzası ve tanım testi.
 

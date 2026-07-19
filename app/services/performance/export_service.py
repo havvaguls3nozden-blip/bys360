@@ -10,7 +10,8 @@ Faz D notu:
 """
 
 from io import BytesIO
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from flask import Response, send_file
 from openpyxl import Workbook

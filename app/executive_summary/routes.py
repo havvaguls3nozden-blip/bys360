@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash

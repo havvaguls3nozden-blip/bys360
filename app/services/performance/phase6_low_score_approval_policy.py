@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 6
 Başkan/Üst Onayları ve Düşük Performans Süreci Politika Merkezi
@@ -14,7 +13,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class LowScoreDecision:
     next_action: str
 
 
-def _float(value: Any, default: Optional[float] = None) -> Optional[float]:
+def _float(value: Any, default: float | None = None) -> float | None:
     try:
         return float(value)
     except Exception:
@@ -109,7 +109,7 @@ def resolve_low_score_approval(
     approval_status: Any = None,
     process_record_exists: bool = False,
     previous_low_count_in_year: Any = 0,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> LowScoreDecision:
     settings = settings or {}
     threshold = _float(settings.get("performance.phase6.low_score_threshold"), LOW_SCORE_THRESHOLD) or LOW_SCORE_THRESHOLD
@@ -204,11 +204,11 @@ def should_create_president_approval_record(final_score: Any, existing_record: b
     return is_low_score(final_score) and not bool(existing_record)
 
 
-def filter_real_low_score_approvals(rows: Iterable[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+def filter_real_low_score_approvals(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """
     Başkan Onayları ekranına yalnızca gerçek düşük performans kayıtlarını taşır.
     """
-    clean: List[Dict[str, Any]] = []
+    clean: list[dict[str, Any]] = []
     for row in rows or []:
         final_score = row.get("final_score") or row.get("score") or row.get("nihai_puan")
         if not is_low_score(final_score):
@@ -220,8 +220,8 @@ def filter_real_low_score_approvals(rows: Iterable[Mapping[str, Any]]) -> List[D
     return clean
 
 
-def build_low_score_process_steps(decision: LowScoreDecision) -> List[Dict[str, Any]]:
-    steps: List[Dict[str, Any]] = []
+def build_low_score_process_steps(decision: LowScoreDecision) -> list[dict[str, Any]]:
+    steps: list[dict[str, Any]] = []
     for index, title in enumerate(PROCESS_STEPS, start=1):
         state = "pending"
         if index == 1:
@@ -252,7 +252,7 @@ def build_low_score_process_steps(decision: LowScoreDecision) -> List[Dict[str, 
     return steps
 
 
-def phase6_approval_contract() -> Dict[str, Any]:
+def phase6_approval_contract() -> dict[str, Any]:
     return {
         "low_score_threshold": LOW_SCORE_THRESHOLD,
         "low_score_requires_upper_approval": True,

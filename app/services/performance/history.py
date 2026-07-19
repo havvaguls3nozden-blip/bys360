@@ -34,7 +34,7 @@ ACTOR_LEVEL_LABELS = {
 }
 
 
-def build_score_snapshot(evaluation: PerformanceEvaluation) -> Dict[str, Any]:
+def build_score_snapshot(evaluation: PerformanceEvaluation) -> dict[str, Any]:
     return {
         "level_1_total_100": float(getattr(evaluation, "level_1_total_100", 0) or 0),
         "level_2_total_100": float(getattr(evaluation, "level_2_total_100", 0) or 0),
@@ -45,19 +45,19 @@ def build_score_snapshot(evaluation: PerformanceEvaluation) -> Dict[str, Any]:
     }
 
 
-def humanize_workflow_status(status: Optional[str]) -> str:
+def humanize_workflow_status(status: str | None) -> str:
     clean = (status or "").strip()
     if not clean:
         return "-"
     return STATUS_LABELS.get(clean, clean.replace("_", " ").strip())
 
-def humanize_action_type(action_type: Optional[str]) -> str:
+def humanize_action_type(action_type: str | None) -> str:
     clean = (action_type or "").strip()
     if not clean:
         return "-"
     return ACTION_LABELS.get(clean, clean.replace("_", " ").title())
 
-def humanize_actor_level(level: Optional[int]) -> str:
+def humanize_actor_level(level: int | None) -> str:
     if level is None:
         return "-"
     return ACTOR_LEVEL_LABELS.get(level, f"Seviye {level}")
@@ -66,10 +66,10 @@ def log_evaluation_action(
     evaluation: PerformanceEvaluation,
     *,
     action_type: str,
-    actor_user_id: Optional[int] = None,
-    actor_level: Optional[int] = None,
-    from_status: Optional[str] = None,
-    to_status: Optional[str] = None,
+    actor_user_id: int | None = None,
+    actor_level: int | None = None,
+    from_status: str | None = None,
+    to_status: str | None = None,
     note: str = "",
 ) -> PerformanceEvaluationHistory:
     row = PerformanceEvaluationHistory(
@@ -115,9 +115,9 @@ def build_history_rows(evaluation_id: int):
         )
     return rows
 
-def build_history_summary(history_rows) -> Dict[str, Any]:
-    action_counts: Dict[str, int] = {}
-    actor_counts: Dict[str, int] = {}
+def build_history_summary(history_rows) -> dict[str, Any]:
+    action_counts: dict[str, int] = {}
+    actor_counts: dict[str, int] = {}
     for row in history_rows:
         action_label = getattr(row, "action_label", None) or humanize_action_type(getattr(row, "action_type", None))
         action_counts[action_label] = action_counts.get(action_label, 0) + 1

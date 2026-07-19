@@ -16,7 +16,8 @@ Genel/Tüm Kurum döneminde mevcut davranışa dokunulmaz.
 personel kapsamına yazılmadıkça puanlanacak kişi listesine girmez.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 BYS360_SELECTED_SCOPE_ASSESSOR_FIX_MARKER = "BYS360_PERFORMANCE_SELECTED_SCOPE_ASSESSOR_FIX_V2"

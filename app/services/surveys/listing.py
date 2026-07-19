@@ -5,7 +5,8 @@ sorguları route dışına taşındı. Bu dosya salt-okuma ağırlıklıdır.
 """
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 import logging
 logger = logging.getLogger(__name__)
 

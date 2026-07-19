@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 SP-4B Gerçek Eksik Kapatma Servisi
 
@@ -38,7 +37,7 @@ def create_system_notification(
     category: str = "GENEL",
     related_url: str | None = None,
     channel: str = "system",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Kullanıcıya sistem içi bildirim kaydı oluşturur."""
     if db is None or not _has_table("bys360_notifications"):
         return {"ok": False, "reason": "notification_table_missing"}
@@ -63,7 +62,7 @@ def create_system_notification(
     return {"ok": True, "notification_id": notification_id}
 
 
-def mark_notification_read(notification_id: int, user_id: int | None = None) -> Dict[str, Any]:
+def mark_notification_read(notification_id: int, user_id: int | None = None) -> dict[str, Any]:
     """Bildirim kaydını okundu işaretler."""
     if db is None or not _has_table("bys360_notifications"):
         return {"ok": False, "reason": "notification_table_missing"}
@@ -88,7 +87,7 @@ def mark_notification_read(notification_id: int, user_id: int | None = None) -> 
     return {"ok": True, "updated": result.rowcount}
 
 
-def list_user_notifications(user_id: int, limit: int = 20) -> List[Dict[str, Any]]:
+def list_user_notifications(user_id: int, limit: int = 20) -> list[dict[str, Any]]:
     """Kullanıcı bildirimlerini listeler."""
     if db is None or not _has_table("bys360_notifications"):
         return []
@@ -111,7 +110,7 @@ def register_export_event(
     file_path: str | None = None,
     row_count: int | None = None,
     note: str | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """PDF/Excel/CSV dışa aktarım olayını kayıt altına alır."""
     if db is None or not _has_table("bys360_export_events"):
         return {"ok": False, "reason": "export_event_table_missing"}
@@ -136,7 +135,7 @@ def register_export_event(
     return {"ok": True, "export_id": export_id}
 
 
-def build_delivery_status_summary() -> Dict[str, Any]:
+def build_delivery_status_summary() -> dict[str, Any]:
     """SP-4 teslim hazırlık tabloları üzerinden özet üretir."""
     summary = {
         "notification_table": _has_table("bys360_notifications"),

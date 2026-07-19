@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import re
 import unicodedata
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+from collections.abc import Callable
 
 V31_MARKER = "BYS360_ASSISTANT_ASSISTANT_LIKE_V31"
 V31_2_HOME_DASHBOARD_SPLIT = "BYS360_ASSISTANT_HOME_DASHBOARD_SPLIT_V31_2"
@@ -39,7 +39,7 @@ def _display_name(user: Any) -> str:
     return ""
 
 
-CANONICAL_UI_REPLACEMENTS_V31_4: Tuple[Tuple[str, str], ...] = (
+CANONICAL_UI_REPLACEMENTS_V31_4: tuple[tuple[str, str], ...] = (
     ("Dönemler", "Dönemler"),
     ("Dönemler", "Dönemler"),
     ("Dönemler", "Dönemler"),
@@ -70,18 +70,18 @@ class Topic:
     key: str
     module: str
     title: str
-    keywords: Tuple[str, ...]
+    keywords: tuple[str, ...]
     menu_path: str
-    roles: Tuple[str, ...]
-    steps: Tuple[str, ...]
-    warnings: Tuple[str, ...] = ()
-    checks: Tuple[str, ...] = ()
-    actions: Tuple[Tuple[str, str], ...] = ()
-    aliases: Tuple[str, ...] = ()
+    roles: tuple[str, ...]
+    steps: tuple[str, ...]
+    warnings: tuple[str, ...] = ()
+    checks: tuple[str, ...] = ()
+    actions: tuple[tuple[str, str], ...] = ()
+    aliases: tuple[str, ...] = ()
     score_boost: int = 0
 
 
-TOPICS: Tuple[Topic, ...] = (
+TOPICS: tuple[Topic, ...] = (
 
     Topic(
         key="home_page",
@@ -567,7 +567,7 @@ def _question_universe_answer_v31_5() -> str:
         "Sınırım şudur: performans puanı, amir görüşü, mesaj metni, anket cevabı veya yetkisiz kişisel veri göstermem; sizi ilgili yetkili ekrana yönlendiririm."
     )
 
-def _smalltalk(normalized: str, name: str) -> Optional[str]:
+def _smalltalk(normalized: str, name: str) -> str | None:
     if re.search(r"\b(hangi sorular|hangi sorulari|hangi soruları|ne sorabilirim|neler sorabilirim|soru listesi|ornek sorular|örnek sorular|insan ne sorar|hangi konular|soru havuzu|bys360da ne sorulur|bys360 da ne sorulur)\b", normalized):
         return _question_universe_answer_v31_5()
     if not normalized:
@@ -605,14 +605,14 @@ def _score_topic(topic: Topic, normalized: str) -> int:
     return score
 
 
-def _best_topics(normalized: str, limit: int = 3) -> List[Tuple[int, Topic]]:
+def _best_topics(normalized: str, limit: int = 3) -> list[tuple[int, Topic]]:
     scored = [(_score_topic(topic, normalized), topic) for topic in TOPICS]
     scored = [(score, topic) for score, topic in scored if score > 0]
     scored.sort(key=lambda item: item[0], reverse=True)
     return scored[:limit]
 
 
-def _format_topic_answer(topic: Topic, user: Any, question: str, alternates: List[Topic]) -> Dict[str, Any]:
+def _format_topic_answer(topic: Topic, user: Any, question: str, alternates: list[Topic]) -> dict[str, Any]:
     role = _role_name(user)
     topic_module = _canonical_ui_text_v31_4(topic.module)
     topic_title = _canonical_ui_text_v31_4(topic.title)
@@ -649,7 +649,7 @@ def _format_topic_answer(topic: Topic, user: Any, question: str, alternates: Lis
     }
 
 
-def _safe_block_answer(reason: str) -> Dict[str, Any]:
+def _safe_block_answer(reason: str) -> dict[str, Any]:
     if reason == "sensitive":
         answer = (
             "Bu bilgiyi doğrudan gösteremem. BYS360 Asistanı; performans puanı, amir görüşü, mesaj içeriği, anket cevabı, "
@@ -665,14 +665,14 @@ def _safe_block_answer(reason: str) -> Dict[str, Any]:
         )
     return {"ok": True, "marker": V31_MARKER, "engine": "bys360-assistant-chatgpt-like-v31", "mode": "safe_boundary", "answer": answer, "actions": [], "quick_replies": ["Personel ekleme", "Performans dönemi açma", "Rol matrisi", "Başkan Onayı"], "notice": "Güvenli sınır uygulandı."}
 
-def _topic_by_key(key: str) -> Optional[Topic]:
+def _topic_by_key(key: str) -> Topic | None:
     for topic in TOPICS:
         if topic.key == key:
             return topic
     return None
 
 
-def _context_path(context: Optional[Dict[str, Any]]) -> str:
+def _context_path(context: dict[str, Any] | None) -> str:
     if not isinstance(context, dict):
         return ""
     for key in ("path", "pathOnly", "pathname", "href", "url"):
@@ -686,7 +686,7 @@ def _is_page_help_intent(normalized: str) -> bool:
     return bool(re.search(r"\b(bu sayfa|bu ekran|burada ne|ne yapilir|ne yapilir|ne yapılır|hangi ekran|neredeyim|sayfayi tanit|sayfayı tanıt)\b", normalized or ""))
 
 
-def _contextual_page_topic(normalized: str, context: Optional[Dict[str, Any]]) -> Optional[Topic]:
+def _contextual_page_topic(normalized: str, context: dict[str, Any] | None) -> Topic | None:
     path = _context_path(context)
     if not _is_page_help_intent(normalized) and normalized not in ("ana sayfa", "anasayfa", "dashboard", "genel dashboard"):
         return None
@@ -700,7 +700,7 @@ def _contextual_page_topic(normalized: str, context: Optional[Dict[str, Any]]) -
     return None
 
 
-PAGE_TOPIC_PREFIXES_V32: Tuple[Tuple[str, str], ...] = (
+PAGE_TOPIC_PREFIXES_V32: tuple[tuple[str, str], ...] = (
     ("/performance/dashboard", "reports_dashboard"),
     ("/performans/dashboard", "reports_dashboard"),
     ("/performance/periods", "period_create"),
@@ -737,8 +737,8 @@ PAGE_TOPIC_PREFIXES_V32: Tuple[Tuple[str, str], ...] = (
 )
 
 
-def _normalize_actions_v32(actions: Any) -> List[Dict[str, str]]:
-    safe: List[Dict[str, str]] = []
+def _normalize_actions_v32(actions: Any) -> list[dict[str, str]]:
+    safe: list[dict[str, str]] = []
     if not isinstance(actions, list):
         return safe
     for item in actions[:4]:
@@ -752,7 +752,7 @@ def _normalize_actions_v32(actions: Any) -> List[Dict[str, str]]:
     return safe
 
 
-def _knowledge_reply_v32(user: Any, raw: str) -> Optional[Dict[str, Any]]:
+def _knowledge_reply_v32(user: Any, raw: str) -> dict[str, Any] | None:
     if not raw or len(_tr(raw)) < 3:
         return None
     try:
@@ -779,7 +779,7 @@ def _knowledge_reply_v32(user: Any, raw: str) -> Optional[Dict[str, Any]]:
     }
 
 
-def _fallback_answer(user: Any, question: str, legacy_builder: Optional[Callable[..., Any]] = None) -> Dict[str, Any]:
+def _fallback_answer(user: Any, question: str, legacy_builder: Callable[..., Any] | None = None) -> dict[str, Any]:
     if callable(legacy_builder):
         try:
             legacy = legacy_builder(user, question)
@@ -811,9 +811,9 @@ def build_bys360_assistant_chatgpt_like_reply_v31(
     user: Any,
     question: str,
     *,
-    legacy_builder: Optional[Callable[..., Any]] = None,
-    context: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    legacy_builder: Callable[..., Any] | None = None,
+    context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     raw = (question or "").strip()
     normalized = _tr(raw)
     name = _display_name(user).split(" ")[0] if _display_name(user) else ""
@@ -846,7 +846,7 @@ def build_bys360_assistant_chatgpt_like_reply_v31(
     return _fallback_answer(user, raw, legacy_builder)
 
 
-def self_test() -> Dict[str, Any]:
+def self_test() -> dict[str, Any]:
     class U:
         role = "Admin"
         full_name = "Test Kullanıcı"

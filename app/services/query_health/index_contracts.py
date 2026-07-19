@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Maintenance Faz 6 - SQL / performans indeks sozlesmeleri.
 
@@ -10,7 +9,7 @@ manuel calistirilmalidir.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Iterable
+from collections.abc import Iterable
 
 
 @dataclass(frozen=True)

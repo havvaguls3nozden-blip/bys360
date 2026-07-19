@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from flask import jsonify, render_template, request
 from flask_login import current_user, login_required

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Prometheus metrikleri.
 
 Opsiyonel bağımlılık mantığıyla yazılmıştır: prometheus_client yoksa uygulama açılışını kırmaz.

@@ -14,7 +14,8 @@ from dataclasses import dataclass, asdict
 import importlib
 import logging
 import os
-from typing import Any, Callable, Mapping
+from typing import Any
+from collections.abc import Callable, Mapping
 
 logger = logging.getLogger(__name__)
 

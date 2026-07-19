@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 mobile survey service delegates.
 
 Bu dosya mobil survey handler delegasyonu için güvenli shim katmanıdır.

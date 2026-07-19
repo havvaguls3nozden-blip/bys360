@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Aşama 10 gelişim rehberini karne şablonlarında güvenli kullanmak için context processor."""
 from __future__ import annotations
 

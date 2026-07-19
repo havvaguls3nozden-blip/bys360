@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 """BYS360 Asistanı - Güncel Kullanım Kılavuzu Beyni V32.
@@ -15,7 +14,8 @@ Kritik sınır:
 import re
 import unicodedata
 from dataclasses import dataclass
-from typing import Any, Callable, Iterable
+from typing import Any
+from collections.abc import Callable, Iterable
 
 VERSION = "BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32"
 SOURCE_LABEL = "BYS360 Kullanım Kılavuzu Güncel v1.1 · Haziran 2026"

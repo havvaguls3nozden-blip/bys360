@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Gelişim Rehberi - gelişmiş gelişim planı, karne yayın onayı ve karne görünürlüğü yardımcıları.
 
 v8:

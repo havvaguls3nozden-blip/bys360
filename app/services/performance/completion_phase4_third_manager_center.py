@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import logging
@@ -14,7 +13,8 @@ module_settings tablosundaki ayarları güvenli şekilde okur/seed eder.
 """
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,7 @@ def _read_module_setting(module_key: str, setting_key: str, default: Any) -> Any
         return default
 
 
-def _setting(settings: Optional[Mapping[str, Any]], key: str, default: Any) -> Any:
+def _setting(settings: Mapping[str, Any] | None, key: str, default: Any) -> Any:
     settings = settings or {}
     if key in settings:
         return settings[key]
@@ -202,7 +202,7 @@ def _setting(settings: Optional[Mapping[str, Any]], key: str, default: Any) -> A
     return _read_module_setting("performance", key, default)
 
 
-def phase4_policy_snapshot(period: Any | None = None, settings: Optional[Mapping[str, Any]] = None) -> dict[str, Any]:
+def phase4_policy_snapshot(period: Any | None = None, settings: Mapping[str, Any] | None = None) -> dict[str, Any]:
     enabled = _bool(_setting(settings, "third_supervisor_enabled", "true"), True)
     raw_mode = _setting(settings, "third_supervisor_mode", MODE_COMMENT)
     mode = normalize_third_manager_mode(raw_mode, MODE_COMMENT)
@@ -267,7 +267,7 @@ def resolve_phase4_third_manager_decision(
     third_manager_name: Any = None,
     row: Any | None = None,
     period: Any | None = None,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
     completed: bool = False,
 ) -> Phase4ThirdManagerDecision:
     if row is not None:
@@ -300,7 +300,7 @@ def phase4_should_create_third_manager_task(
     manager_level: Any = 3,
     evaluator_id: Any | None = None,
     row: Any | None = None,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> bool:
     try:
         level = int(manager_level or 0)
@@ -318,7 +318,7 @@ def phase4_should_create_third_manager_task(
     return bool(decision.create_task)
 
 
-def phase4_status_label_for_third_manager(*, period: Any | None = None, completed: bool = False, settings: Optional[Mapping[str, Any]] = None, row: Any | None = None) -> str:
+def phase4_status_label_for_third_manager(*, period: Any | None = None, completed: bool = False, settings: Mapping[str, Any] | None = None, row: Any | None = None) -> str:
     return resolve_phase4_third_manager_decision(row=row, period=period, settings=settings, completed=completed).status_label
 
 
@@ -342,7 +342,7 @@ def phase4_humanize_assignment_status(assignment: Any | None = None, period: Any
     return str(raw_status or "-")
 
 
-def phase4_filter_third_manager_tasks(tasks: Iterable[Any] | None, *, period: Any | None = None, settings: Optional[Mapping[str, Any]] = None) -> list[dict[str, Any]]:
+def phase4_filter_third_manager_tasks(tasks: Iterable[Any] | None, *, period: Any | None = None, settings: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
     cleaned: list[dict[str, Any]] = []
     for task in tasks or []:
         row = dict(task) if isinstance(task, Mapping) else dict(getattr(task, "__dict__", {}) or {})
@@ -377,7 +377,7 @@ def phase4_should_show_third_manager_column(
     period: Any | None = None,
     selected_value: Any | None = None,
     allow_setting: bool = False,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> bool:
     if _has_value(selected_value):
         return True
@@ -403,14 +403,14 @@ def phase4_should_show_third_manager_column(
 
 
 def normalize_phase4_manager_weights(
-    raw_weights: Optional[Mapping[Any, Any]] = None,
+    raw_weights: Mapping[Any, Any] | None = None,
     *,
     period: Any | None = None,
     manager_1_id: Any | None = None,
     manager_2_id: Any | None = None,
     manager_3_id: Any | None = None,
     single_manager: bool = False,
-    settings: Optional[Mapping[str, Any]] = None,
+    settings: Mapping[str, Any] | None = None,
 ) -> dict[str, float]:
     raw_weights = raw_weights or {}
     if single_manager:
@@ -456,7 +456,7 @@ def normalize_phase4_manager_weights(
     }
 
 
-def phase4_legacy_policy_snapshot(period: Any | None = None, settings: Optional[Mapping[str, Any]] = None) -> dict[str, Any]:
+def phase4_legacy_policy_snapshot(period: Any | None = None, settings: Mapping[str, Any] | None = None) -> dict[str, Any]:
     snapshot = phase4_policy_snapshot(period=period, settings=settings)
     return {
         "enabled": bool(snapshot.get("enabled")),

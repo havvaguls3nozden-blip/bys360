@@ -12,7 +12,8 @@ Faz 4 kapsamı:
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 PhotoSaver = Callable[[Any, Any], Any]
 

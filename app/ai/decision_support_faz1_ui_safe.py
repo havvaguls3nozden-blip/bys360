@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Karar Destek Merkezi Faz 1 bağımsız kurumsal ekranı."""
 from __future__ import annotations
 

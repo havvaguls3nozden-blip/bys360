@@ -11,7 +11,7 @@ from app.services.performance_v2.policy_flags import score_requires_criterion_co
 from .policy_flags import is_level_2_comment_required_when_level_1_score_is_three
 
 
-def calculate_preview_total_100(item_payloads: Optional[List[Dict[str, Any]]], criteria_weight_map: Dict[int, float]) -> float:
+def calculate_preview_total_100(item_payloads: list[dict[str, Any]] | None, criteria_weight_map: dict[int, float]) -> float:
     total = 0.0
     for payload in item_payloads or []:
         try:
@@ -25,7 +25,7 @@ def calculate_preview_total_100(item_payloads: Optional[List[Dict[str, Any]]], c
     return round(total, 2)
 
 
-def requires_general_comment(level_total_100: float, raw_scores: Optional[List[float]] = None) -> bool:
+def requires_general_comment(level_total_100: float, raw_scores: list[float] | None = None) -> bool:
     raw_scores = raw_scores or []
     if level_total_100 < 70 or level_total_100 > 90:
         return True
@@ -44,7 +44,7 @@ def validate_general_comment_requirements(
     manager_level: int,
     general_comment: str,
     level_total_100: float,
-    raw_scores: Optional[List[float]] = None,
+    raw_scores: list[float] | None = None,
     requires_level_2_comment: bool = False,
 ) -> None:
     comment = _safe_str(general_comment)
@@ -59,7 +59,7 @@ def validate_general_comment_requirements(
         raise ValueError("70 altı / 90 üstü sonuçlarda genel değerlendirme zorunludur. 1 ve 5 puan açıklaması sistem ayarından yönetilir.")
 
 
-def validate_item_comment_requirements(item_payloads: Optional[List[Dict[str, Any]]]) -> None:
+def validate_item_comment_requirements(item_payloads: list[dict[str, Any]] | None) -> None:
     for payload in item_payloads or []:
         score = validate_score_value(payload.get("score"))
         comment = _safe_str(payload.get("comment"))
@@ -76,7 +76,7 @@ def requires_level_2_comment_for_evaluation(evaluation_or_id: Union[int, Perform
     return level_1_gave_any_three(evaluation_or_id)
 
 
-def validate_weight_distribution(weights: Dict[str, float], scoring_level_3: bool = False) -> bool:
+def validate_weight_distribution(weights: dict[str, float], scoring_level_3: bool = False) -> bool:
     expected = (
         _safe_float(weights.get("evaluator_1_weight"), 0.0)
         + _safe_float(weights.get("evaluator_2_weight"), 0.0)
@@ -108,8 +108,8 @@ def calculate_level_total_100(evaluation_id: int, manager_level: int) -> float:
 
 def calculate_final_total(
     evaluation_or_period: Union[PerformanceEvaluation, PerformancePeriod, Any],
-    level_1_total: Optional[float] = None,
-    level_2_total: Optional[float] = None,
+    level_1_total: float | None = None,
+    level_2_total: float | None = None,
     level_3_total: float = 0.0,
 ) -> float:
     if hasattr(evaluation_or_period, "employee_id") and hasattr(evaluation_or_period, "period_id"):
@@ -142,8 +142,8 @@ def calculate_final_total(
     return round(final_total, 2)
 
 
-def _required_completion_levels(evaluation: PerformanceEvaluation) -> List[int]:
-    levels: List[int] = []
+def _required_completion_levels(evaluation: PerformanceEvaluation) -> list[int]:
+    levels: list[int] = []
     employee = evaluation.employee
     period = evaluation.period
     flags = get_period_level_3_flags(period)
@@ -185,7 +185,7 @@ def recalculate_evaluation_totals(evaluation: PerformanceEvaluation) -> Performa
     return evaluation
 
 
-def recalculate_all_evaluations(period_id: Optional[int] = None) -> int:
+def recalculate_all_evaluations(period_id: int | None = None) -> int:
     query = PerformanceEvaluation.query
     if period_id is not None:
         query = query.filter_by(period_id=period_id)
@@ -228,7 +228,7 @@ def create_or_update_item(
     return item
 
 
-def _delete_missing_level_items(evaluation_id: int, manager_level: int, keep_criteria_ids: List[int]) -> int:
+def _delete_missing_level_items(evaluation_id: int, manager_level: int, keep_criteria_ids: list[int]) -> int:
     keep_ids = {int(criteria_id) for criteria_id in keep_criteria_ids if criteria_id is not None}
     rows = PerformanceEvaluationItem.query.filter_by(
         evaluation_id=evaluation_id,
@@ -246,12 +246,12 @@ def _delete_missing_level_items(evaluation_id: int, manager_level: int, keep_cri
 
 def save_evaluation_level(
     *,
-    period_id: Optional[int] = None,
-    employee_id: Optional[int] = None,
-    evaluation_id: Optional[int] = None,
+    period_id: int | None = None,
+    employee_id: int | None = None,
+    evaluation_id: int | None = None,
     manager_level: int,
-    evaluator_id: Optional[int] = None,
-    item_payloads: Optional[List[Dict[str, Any]]] = None,
+    evaluator_id: int | None = None,
+    item_payloads: list[dict[str, Any]] | None = None,
     general_comment: str = "",
     completed: bool = False,
     **_: Any,
@@ -265,7 +265,7 @@ def save_evaluation_level(
     if manager_level not in {1, 2, 3}:
         raise ValueError("Geçersiz amir seviyesi.")
 
-    evaluation: Optional[PerformanceEvaluation] = None
+    evaluation: PerformanceEvaluation | None = None
     if evaluation_id:
         evaluation = db.session.get(PerformanceEvaluation, evaluation_id)
 
@@ -284,7 +284,7 @@ def save_evaluation_level(
     completed_field = f"level_{manager_level}_completed"
     setattr(evaluation, completed_field, bool(completed))
 
-    clean_payloads: List[Dict[str, Any]] = []
+    clean_payloads: list[dict[str, Any]] = []
     seen_criteria_ids = set()
     for payload in item_payloads or []:
         try:

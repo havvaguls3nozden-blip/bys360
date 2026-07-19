@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Iterable
+from collections.abc import Iterable
 import unicodedata
 
 from .dto import ChainType, LevelMode, SubjectType

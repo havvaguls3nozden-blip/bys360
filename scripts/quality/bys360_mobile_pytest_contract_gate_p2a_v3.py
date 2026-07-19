@@ -45,9 +45,9 @@ def _line_count(path: Path) -> int:
     return len(_read(path).splitlines())
 
 
-def _extract_route_decorators(path: Path) -> List[Dict[str, Any]]:
+def _extract_route_decorators(path: Path) -> list[dict[str, Any]]:
     text = _read(path)
-    items: List[Dict[str, Any]] = []
+    items: list[dict[str, Any]] = []
     for match in ROUTE_DECORATOR_RE.finditer(text):
         line = text.count("\n", 0, match.start()) + 1
         method = match.group(1).lower()
@@ -75,8 +75,8 @@ def _function_count(path: Path) -> int:
     return sum(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) for node in ast.walk(tree))
 
 
-def _compile(paths: List[Path]) -> Tuple[bool, List[Dict[str, str]]]:
-    results: List[Dict[str, str]] = []
+def _compile(paths: list[Path]) -> tuple[bool, list[dict[str, str]]]:
+    results: list[dict[str, str]] = []
     ok = True
     for path in paths:
         if not path.exists():
@@ -92,7 +92,7 @@ def _compile(paths: List[Path]) -> Tuple[bool, List[Dict[str, str]]]:
     return ok, results
 
 
-def _subprocess_tail(cmd: List[str], root: Path, env: Dict[str, str] | None = None) -> Dict[str, Any]:
+def _subprocess_tail(cmd: list[str], root: Path, env: dict[str, str] | None = None) -> dict[str, Any]:
     merged_env = os.environ.copy()
     if env:
         merged_env.update(env)
@@ -113,9 +113,9 @@ def _subprocess_tail(cmd: List[str], root: Path, env: Dict[str, str] | None = No
     }
 
 
-def _parse_last_json(text: str) -> Dict[str, Any]:
+def _parse_last_json(text: str) -> dict[str, Any]:
     decoder = json.JSONDecoder()
-    candidates: List[Dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
     for idx, ch in enumerate(text):
         if ch != "{":
             continue
@@ -128,7 +128,7 @@ def _parse_last_json(text: str) -> Dict[str, Any]:
     return candidates[-1] if candidates else {}
 
 
-def _run_app_factory(root: Path) -> Dict[str, Any]:
+def _run_app_factory(root: Path) -> dict[str, Any]:
     env = {
         "APP_ENV": os.environ.get("APP_ENV", "development"),
         "FLASK_ENV": os.environ.get("FLASK_ENV", "development"),
@@ -140,7 +140,7 @@ def _run_app_factory(root: Path) -> Dict[str, Any]:
     return _subprocess_tail([sys.executable, "-c", "from app import create_app; app=create_app(); print('APP_FACTORY_OK')"], root, env)
 
 
-def _run_secret_gate(root: Path) -> Dict[str, Any]:
+def _run_secret_gate(root: Path) -> dict[str, Any]:
     gate = root / "scripts" / "quality" / "bys360_secret_repo_gate.py"
     if not gate.exists():
         return {"ok": False, "skipped": True, "reason": "secret_gate_script_missing"}
@@ -161,14 +161,14 @@ def _write_pytest(root: Path) -> Path:
     return test_path
 
 
-def build_inventory(root: Path) -> Dict[str, Any]:
+def build_inventory(root: Path) -> dict[str, Any]:
     mobile_root = root / "app" / "api" / "mobile"
     routes_py = mobile_root / "routes.py"
     domains_dir = mobile_root / "domains"
     domain_paths = [domains_dir / name for name in EXPECTED_DOMAIN_FILES]
     all_paths = [routes_py] + domain_paths
-    decorators: List[Dict[str, Any]] = []
-    domain_inventory: List[Dict[str, Any]] = []
+    decorators: list[dict[str, Any]] = []
+    domain_inventory: list[dict[str, Any]] = []
     for path in all_paths:
         route_items = _extract_route_decorators(path)
         decorators.extend(route_items)
@@ -180,7 +180,7 @@ def build_inventory(root: Path) -> Dict[str, Any]:
             "function_count": _function_count(path) if path.exists() else 0,
             "lines": _line_count(path),
         })
-    seen: Dict[Tuple[str, str | None], List[Dict[str, Any]]] = {}
+    seen: dict[tuple[str, str | None], list[dict[str, Any]]] = {}
     for item in decorators:
         key = (item.get("method") or "", item.get("rule"))
         seen.setdefault(key, []).append(item)
@@ -200,7 +200,7 @@ def build_inventory(root: Path) -> Dict[str, Any]:
     }
 
 
-def build_contract_checks(inventory: Dict[str, Any]) -> Dict[str, bool]:
+def build_contract_checks(inventory: dict[str, Any]) -> dict[str, bool]:
     return {
         "domain_dir_exists": bool(inventory["domains_dir_exists"]),
         "expected_domain_files_exist": not inventory["missing_files"],
@@ -219,7 +219,7 @@ def _pytest_available() -> bool:
         return False
 
 
-def _run_pytest(root: Path, test_path: Path) -> Dict[str, Any]:
+def _run_pytest(root: Path, test_path: Path) -> dict[str, Any]:
     if not _pytest_available():
         return {"ok": True, "mode": "fallback_internal_no_pytest", "returncode": 0, "stdout_tail": "pytest not installed; direct contract gate used\n", "stderr_tail": ""}
     result = _subprocess_tail([sys.executable, "-m", "pytest", str(test_path), "-q"], root)
@@ -227,7 +227,7 @@ def _run_pytest(root: Path, test_path: Path) -> Dict[str, Any]:
     return result
 
 
-def run(root: Path, mode: str, compile_all: bool, run_app_factory: bool, run_secret_gate: bool, run_pytest: bool) -> Dict[str, Any]:
+def run(root: Path, mode: str, compile_all: bool, run_app_factory: bool, run_secret_gate: bool, run_pytest: bool) -> dict[str, Any]:
     report_path = root / REPORT_REL
     report_path.parent.mkdir(parents=True, exist_ok=True)
     test_path = _write_pytest(root)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Maintenance 10E - SP servis unit testleri."""
 from __future__ import annotations
 

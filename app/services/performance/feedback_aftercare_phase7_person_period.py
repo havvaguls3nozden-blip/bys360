@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Görüşme Sonrası Notlar Faz 7.1 personel ve dönem görüşmesi servisi.
 
 Bu servis, açık geri bildirim talebi oluşmamış durumlarda da personel + dönem seçilerek

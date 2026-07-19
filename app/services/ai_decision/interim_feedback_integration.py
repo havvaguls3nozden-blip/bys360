@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 10 entegrasyon servisi.
 
@@ -10,7 +9,8 @@ BYS360_AI_DECISION_FAZ10_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Mapping
 
 from app.services.ai_decision.interim_feedback_policy import build_interim_feedback_decision_support
 import logging
@@ -30,8 +30,8 @@ INTERIM_NOTE_TABLE_CANDIDATES = (
 )
 
 
-def _rows_as_dicts(result: Any) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+def _rows_as_dicts(result: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     if result is None:
         return rows
     for row in result:
@@ -61,11 +61,11 @@ def _table_exists(db_session: Any, table_name: str) -> bool:
 def fetch_interim_notes(
     db_session: Any,
     *,
-    personnel_id: Optional[int] = None,
-    period_id: Optional[int] = None,
-    evaluation_id: Optional[int] = None,
+    personnel_id: int | None = None,
+    period_id: int | None = None,
+    evaluation_id: int | None = None,
     limit: int = 200,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Canlı şemaya göre bulunabilen ara not tablosundan kayıt döndürür."""
     if text is None or db_session is None:
         return []
@@ -142,11 +142,11 @@ def fetch_interim_notes(
 def build_interim_feedback_context(
     db_session: Any,
     *,
-    personnel_id: Optional[int] = None,
-    period_id: Optional[int] = None,
-    evaluation_id: Optional[int] = None,
+    personnel_id: int | None = None,
+    period_id: int | None = None,
+    evaluation_id: int | None = None,
     viewer_role: str = "",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     notes = fetch_interim_notes(
         db_session,
         personnel_id=personnel_id,
@@ -159,9 +159,9 @@ def build_interim_feedback_context(
 def persist_interim_feedback_snapshot(
     db_session: Any,
     *,
-    period_id: Optional[int],
-    personnel_id: Optional[int],
-    evaluation_id: Optional[int],
+    period_id: int | None,
+    personnel_id: int | None,
+    evaluation_id: int | None,
     context: Mapping[str, Any],
 ) -> bool:
     if text is None or db_session is None:

@@ -5,7 +5,7 @@ from typing import Dict, List, Union
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem
 from .common import _safe_float
 
-def get_active_criteria() -> List[PerformanceCriteria]:
+def get_active_criteria() -> list[PerformanceCriteria]:
     return (
         PerformanceCriteria.query
         .filter_by(is_active=True)
@@ -13,7 +13,7 @@ def get_active_criteria() -> List[PerformanceCriteria]:
         .all()
     )
 
-def get_level_items_map(evaluation_id: int, manager_level: int) -> Dict[int, PerformanceEvaluationItem]:
+def get_level_items_map(evaluation_id: int, manager_level: int) -> dict[int, PerformanceEvaluationItem]:
     rows = (
         PerformanceEvaluationItem.query.filter_by(
             evaluation_id=evaluation_id,
@@ -22,7 +22,7 @@ def get_level_items_map(evaluation_id: int, manager_level: int) -> Dict[int, Per
         .order_by(PerformanceEvaluationItem.criteria_id.asc(), PerformanceEvaluationItem.id.desc())
         .all()
     )
-    result: Dict[int, PerformanceEvaluationItem] = {}
+    result: dict[int, PerformanceEvaluationItem] = {}
     for row in rows:
         criteria_id = int(getattr(row, "criteria_id", 0) or 0)
         if criteria_id and criteria_id not in result:

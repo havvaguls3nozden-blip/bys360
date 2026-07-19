@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 9: Gelişim önerisi ve rehber alanı merkezi.
 
 Bu merkez, performans sürecinde oluşan gelişim önerisi, güçlü yön, eğitim/takip
@@ -12,7 +11,8 @@ import logging
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE9_DEVELOPMENT_GUIDANCE_CENTER = True

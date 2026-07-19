@@ -16,7 +16,8 @@ THIRD_MANAGER_HEADER_ALIASES = [
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
 
 from flask import current_app
 
@@ -42,7 +43,7 @@ ROLE_ALIASES = {
 
 @dataclass
 class UserRow:
-    id: Optional[int]
+    id: int | None
     sicil_no: str
     full_name: str
     role: str
@@ -57,7 +58,7 @@ class UserRow:
     override_manager_3_sicil: str = ""
     is_active: bool = True
     source: str = "db"
-    raw: Dict[str, Any] = field(default_factory=dict)
+    raw: dict[str, Any] = field(default_factory=dict)
 
     @property
     def normalized_role(self) -> str:
@@ -69,17 +70,17 @@ class UserRow:
 class ChainResolution:
     rule_key: str
     chain_type: str
-    order: List[int]
+    order: list[int]
     manager_1_sicil: str = ""
     manager_2_sicil: str = ""
     manager_3_sicil: str = ""
     manager_1_name: str = ""
     manager_2_name: str = ""
     manager_3_name: str = ""
-    warnings: List[str] = field(default_factory=list)
-    info: List[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    info: list[str] = field(default_factory=list)
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "rule_key": self.rule_key,
             "chain_type": self.chain_type,
@@ -96,7 +97,7 @@ class ChainResolution:
 
 
 class HierarchyRuleEngineServiceV2:
-    def __init__(self, config_path: Optional[str | Path] = None, registry_relative_path: str = "config/hierarchy_position_registry_v1.json"):
+    def __init__(self, config_path: str | Path | None = None, registry_relative_path: str = "config/hierarchy_position_registry_v1.json"):
         self.config_path = Path(config_path) if config_path else self._default_config_path()
         self.registry_service = HierarchyPositionRegistryService(config_relative_path=registry_relative_path)
         self.config = json.loads(self.config_path.read_text(encoding="utf-8"))
@@ -106,7 +107,7 @@ class HierarchyRuleEngineServiceV2:
         root = Path(current_app.root_path).parent if current_app else Path.cwd()
         return root / DEFAULT_CONFIG_RELATIVE
 
-    def resolve_many(self, users: Iterable[UserRow]) -> List[Dict[str, Any]]:
+    def resolve_many(self, users: Iterable[UserRow]) -> list[dict[str, Any]]:
         user_list = [u for u in users if u.is_active]
         by_sicil = {u.sicil_no: u for u in user_list if u.sicil_no}
         rows = []
@@ -115,7 +116,7 @@ class HierarchyRuleEngineServiceV2:
             rows.append({**user.raw, **chain.as_dict()})
         return rows
 
-    def resolve_user(self, user: UserRow, users: List[UserRow], by_sicil: Dict[str, UserRow]) -> ChainResolution:
+    def resolve_user(self, user: UserRow, users: list[UserRow], by_sicil: dict[str, UserRow]) -> ChainResolution:
         rule = self._match_rule(user)
         if not rule:
             return ChainResolution(rule_key="unmatched", chain_type="none", order=[], warnings=["Uygun zincir kuralı bulunamadı."])
@@ -154,13 +155,13 @@ class HierarchyRuleEngineServiceV2:
             result.info.append(f"3. amir modu: {mode}")
         return result
 
-    def _match_rule(self, user: UserRow) -> Optional[Dict[str, Any]]:
+    def _match_rule(self, user: UserRow) -> dict[str, Any] | None:
         for rule in self.config.get("rules", []):
             if self._matches(rule.get("match", {}), user):
                 return rule
         return None
 
-    def _matches(self, match: Dict[str, Any], user: UserRow) -> bool:
+    def _matches(self, match: dict[str, Any], user: UserRow) -> bool:
         norm = lambda v: (v or "").strip().upper()
         role = norm(user.normalized_role)
         unvan = norm(user.unvan)
@@ -175,7 +176,7 @@ class HierarchyRuleEngineServiceV2:
             return False
         return True
 
-    def _resolve_level(self, level_config: Dict[str, Any], user: UserRow, users: List[UserRow], by_sicil: Dict[str, UserRow]) -> Optional[UserRow]:
+    def _resolve_level(self, level_config: dict[str, Any], user: UserRow, users: list[UserRow], by_sicil: dict[str, UserRow]) -> UserRow | None:
         source = level_config.get("source")
         if source == "fixed_role":
             wanted_role = ROLE_ALIASES.get((level_config.get("role") or "").strip().lower(), (level_config.get("role") or "").strip().lower())
@@ -207,7 +208,7 @@ class HierarchyRuleEngineServiceV2:
         return None
 
     @staticmethod
-    def _first(users: List[UserRow], predicate) -> Optional[UserRow]:
+    def _first(users: list[UserRow], predicate) -> UserRow | None:
         for row in users:
             if predicate(row):
                 return row

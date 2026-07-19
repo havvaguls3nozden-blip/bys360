@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Görüşme Sonrası Notlar Faz 7 kullanım netleştirme servisi.
 
 Bu servis ana feedback_aftercare servisini bozmadan ek bağlam üretir ve açık geri

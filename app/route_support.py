@@ -15,7 +15,8 @@ import random
 import uuid
 from urllib.parse import urlparse
 from functools import wraps
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from flask import (
     current_app,

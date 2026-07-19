@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Faz 10 aksatan amir raporu servis köprüsü."""
 from __future__ import annotations
 

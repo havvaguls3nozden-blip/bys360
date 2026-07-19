@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
 
 INFO_EXCEPTION_RULES = {
     "special_presidency_single_manager",
@@ -18,7 +19,7 @@ def _get(row: Any, key: str, default: Any = None) -> Any:
     return getattr(row, key, default)
 
 
-def _extract_row(row: Any) -> Dict[str, Any]:
+def _extract_row(row: Any) -> dict[str, Any]:
     return {
         "full_name": _get(row, "full_name"),
         "ad": _get(row, "ad"),
@@ -37,13 +38,13 @@ def _extract_row(row: Any) -> Dict[str, Any]:
     }
 
 
-def normalize_hierarchy_row(row: Any) -> Dict[str, Any]:
+def normalize_hierarchy_row(row: Any) -> dict[str, Any]:
     item = _extract_row(row)
     if item["exception_rule"] in INFO_EXCEPTION_RULES:
         item["effective_severity"] = "info"
         item["slot_issues"] = []
     else:
-        issues: List[str] = []
+        issues: list[str] = []
         if not item["manager_1"]:
             issues.append("1. amir eksik veya pasif")
         if not item["manager_2"] and _s(item["role"]).lower() != "baskan_yardimcisi":
@@ -58,8 +59,8 @@ def normalize_hierarchy_row(row: Any) -> Dict[str, Any]:
     return item
 
 
-def build_hierarchy_health_rows(rows: Optional[Iterable[Any]] = None) -> List[Dict[str, Any]]:
-    result: List[Dict[str, Any]] = []
+def build_hierarchy_health_rows(rows: Iterable[Any] | None = None) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
     for row in (rows or []):
         item = normalize_hierarchy_row(row)
         if item["effective_severity"] in {"critical", "warning"}:
@@ -68,7 +69,7 @@ def build_hierarchy_health_rows(rows: Optional[Iterable[Any]] = None) -> List[Di
     return result
 
 
-def summarize_hierarchy_health(rows: Optional[Iterable[Any]] = None) -> Dict[str, int]:
+def summarize_hierarchy_health(rows: Iterable[Any] | None = None) -> dict[str, int]:
     normalized = [normalize_hierarchy_row(r) for r in (rows or [])]
     return {
         "total": len(normalized),

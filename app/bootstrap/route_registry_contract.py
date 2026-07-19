@@ -9,7 +9,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
 import json
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 IGNORED_METHODS = {"HEAD", "OPTIONS"}
 

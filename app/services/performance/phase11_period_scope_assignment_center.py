@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 11: Çoklu dönem, özel kapsam ve görev üretimi final merkezi.
 
 Bu merkez, performans dönemlerinin yıllık/6 aylık/3 aylık/aylık/özel dönem
@@ -18,7 +17,8 @@ import logging
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE11_PERIOD_SCOPE_ASSIGNMENT_FINAL = True

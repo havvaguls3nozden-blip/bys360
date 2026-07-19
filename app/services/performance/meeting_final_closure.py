@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """BYS360 Toplantı İstekleri Final Kapanış Gate servisi."""
 from __future__ import annotations

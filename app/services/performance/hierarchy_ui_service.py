@@ -27,7 +27,7 @@ Bağımlı olduğu:
 """
 
 from collections import OrderedDict
-from typing import Iterable
+from collections.abc import Iterable
 
 SPECIAL_SINGLE_MANAGER_UNITS = {"HUKUK MÜŞAVİRLİĞİ", "DANIŞMANLIK", "İÇ DENETİM", "ÖZEL KALEM"}
 SPECIAL_TOP_ROLES = {"baskan", "baskan_yardimcisi"}

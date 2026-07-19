@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 7
 Geçmiş Yıl Karne ve Puan Arşivi Politika Merkezi
@@ -15,7 +14,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class ArchiveVisibilityDecision:
 
 @dataclass(frozen=True)
 class ArchiveRecordNormalized:
-    employee_id: Optional[int]
+    employee_id: int | None
     year: int
     period_title: str
     score: float
@@ -63,7 +63,7 @@ class ArchiveRecordNormalized:
     errors: tuple[str, ...]
 
 
-def _to_int(value: Any, default: Optional[int] = None) -> Optional[int]:
+def _to_int(value: Any, default: int | None = None) -> int | None:
     try:
         if value is None or value == "":
             return default
@@ -73,7 +73,7 @@ def _to_int(value: Any, default: Optional[int] = None) -> Optional[int]:
         return default
 
 
-def _to_float(value: Any, default: Optional[float] = None) -> Optional[float]:
+def _to_float(value: Any, default: float | None = None) -> float | None:
     try:
         if value is None or value == "":
             return default
@@ -124,7 +124,7 @@ def resolve_archive_visibility(
     *,
     viewer: Any,
     employee_id: Any,
-    scope_employee_ids: Optional[Iterable[Any]] = None,
+    scope_employee_ids: Iterable[Any] | None = None,
     allow_source_document_for_scope: bool = False,
 ) -> ArchiveVisibilityDecision:
     viewer_id = _to_int(getattr(viewer, "id", None))
@@ -181,7 +181,7 @@ def normalize_archive_source(value: Any) -> str:
 
 
 def normalize_archive_record(row: Mapping[str, Any]) -> ArchiveRecordNormalized:
-    errors: List[str] = []
+    errors: list[str] = []
 
     employee_id = _to_int(row.get("employee_id") or row.get("personel_id") or row.get("user_id"))
     if employee_id is None:
@@ -222,8 +222,8 @@ def normalize_archive_record(row: Mapping[str, Any]) -> ArchiveRecordNormalized:
     )
 
 
-def sanitize_archive_import_rows(rows: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
-    normalized: List[ArchiveRecordNormalized] = []
+def sanitize_archive_import_rows(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    normalized: list[ArchiveRecordNormalized] = []
     valid_count = 0
     error_count = 0
 
@@ -253,8 +253,8 @@ def archive_score_band(score: Any) -> str:
     return "Beklenen Düzey"
 
 
-def build_archive_summary(rows: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
-    scores: List[float] = []
+def build_archive_summary(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    scores: list[float] = []
     years: set[int] = set()
     low_count = 0
     high_count = 0
@@ -281,7 +281,7 @@ def build_archive_summary(rows: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def phase7_archive_contract() -> Dict[str, Any]:
+def phase7_archive_contract() -> dict[str, Any]:
     return {
         "historical_score_archive": True,
         "manual_old_score_entry": True,

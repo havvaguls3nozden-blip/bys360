@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Tamamlama Faz 12: Final Gate ve %100 kapanış merkezi.
 
 Bu merkez, Performans Yönetimi tamamlama programında Faz 1-11 arasında kurulan

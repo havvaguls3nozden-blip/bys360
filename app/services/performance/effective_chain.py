@@ -40,8 +40,8 @@ AssignmentAuditLog = getattr(models, "AssignmentAuditLog", None) if models else 
 @dataclass
 class EffectiveEvaluator:
     manager_level: int
-    original_evaluator_id: Optional[int]
-    effective_evaluator_id: Optional[int]
+    original_evaluator_id: int | None
+    effective_evaluator_id: int | None
     resolution_type: str
     message: str = ""
 
@@ -49,15 +49,15 @@ class EffectiveEvaluator:
 @dataclass
 class EffectiveChainResult:
     employee_id: int
-    evaluators: List[EffectiveEvaluator] = field(default_factory=list)
-    issues: List[str] = field(default_factory=list)
+    evaluators: list[EffectiveEvaluator] = field(default_factory=list)
+    issues: list[str] = field(default_factory=list)
 
 
 def _safe_str(value: Any) -> str:
     return str(value).strip() if value is not None else ""
 
 
-def _get_id(value: Any) -> Optional[int]:
+def _get_id(value: Any) -> int | None:
     if value is None:
         return None
     return getattr(value, "id", value)
@@ -75,7 +75,7 @@ def _today():
     return date.today()
 
 
-def is_user_on_leave(user_id: int, on_date: Optional[date] = None) -> bool:
+def is_user_on_leave(user_id: int, on_date: date | None = None) -> bool:
     if not LeaveRecord or not user_id:
         return False
 
@@ -101,7 +101,7 @@ def is_user_on_leave(user_id: int, on_date: Optional[date] = None) -> bool:
     return False
 
 
-def get_delegate_for_user(user_id: int, manager_level: Optional[int] = None, on_date: Optional[date] = None):
+def get_delegate_for_user(user_id: int, manager_level: int | None = None, on_date: date | None = None):
     if not DelegationAssignment or not user_id:
         return None
 
@@ -130,7 +130,7 @@ def get_delegate_for_user(user_id: int, manager_level: Optional[int] = None, on_
     return None
 
 
-def resolve_effective_evaluator(evaluator_id: Optional[int], manager_level: int, on_date: Optional[date] = None) -> EffectiveEvaluator:
+def resolve_effective_evaluator(evaluator_id: int | None, manager_level: int, on_date: date | None = None) -> EffectiveEvaluator:
     evaluator_id = _get_id(evaluator_id)
     on_date = on_date or _today()
 
@@ -171,7 +171,7 @@ def resolve_effective_evaluator(evaluator_id: Optional[int], manager_level: int,
     )
 
 
-def build_effective_chain(employee_id: int, manager_1_id: Optional[int], manager_2_id: Optional[int], manager_3_id: Optional[int] = None, on_date: Optional[date] = None) -> EffectiveChainResult:
+def build_effective_chain(employee_id: int, manager_1_id: int | None, manager_2_id: int | None, manager_3_id: int | None = None, on_date: date | None = None) -> EffectiveChainResult:
     result = EffectiveChainResult(employee_id=employee_id)
 
     levels = []
@@ -275,12 +275,12 @@ def sync_evaluation_summary(period_id: int, employee_id: int, effective_chain: E
     return row
 
 
-def generate_effective_assignments(period_id: int, chains: List[Dict[str, Any]], on_date: Optional[date] = None) -> Dict[str, Any]:
+def generate_effective_assignments(period_id: int, chains: list[dict[str, Any]], on_date: date | None = None) -> dict[str, Any]:
     if not db:
         return {"ok": False, "message": "db bağlantısı yok", "created": 0, "issues": []}
 
     created = 0
-    issues: List[str] = []
+    issues: list[str] = []
 
     for chain in chains:
         employee_id = _get_id(chain.get("employee_id"))

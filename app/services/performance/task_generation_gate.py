@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
-from typing import Iterable
+from collections.abc import Iterable
 
 TASK_GENERATION_GATE_VERSION = "2026-04-20-performance-task-generation-gate-faz2"
 

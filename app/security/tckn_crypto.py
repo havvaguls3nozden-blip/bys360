@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 TCKN alan bazlı şifreleme yardımcıları.
 Bu modül tek başına migration yapmaz ve mevcut veriyi dönüştürmez.

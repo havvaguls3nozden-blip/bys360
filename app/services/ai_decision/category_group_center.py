@@ -10,7 +10,8 @@ from app import db
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 
 DEFAULT_CATEGORY_LABELS: tuple[str, ...] = (

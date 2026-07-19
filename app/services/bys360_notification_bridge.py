@@ -12,7 +12,8 @@ ve güvenli biçimde yönetir. Bildirim üretimi ana işlemi düşürmemelidir;
 bu yüzden tüm yardımcılar kontrollü çalışır ve commit çağırmaz.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 from flask import url_for
 

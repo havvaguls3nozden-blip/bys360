@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 11
 Raporlama, Dashboard ve Risk Analizi Politika Merkezi
@@ -14,7 +13,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable, Mapping, Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ def resolve_report_visibility(
     *,
     viewer: Any,
     target_employee_id: Any = None,
-    scope_employee_ids: Optional[Sequence[Any]] = None,
+    scope_employee_ids: Sequence[Any] | None = None,
     report_type: str = "dashboard",
 ) -> ReportVisibilityDecision:
     viewer_id = _to_int(getattr(viewer, "id", None), 0)
@@ -203,7 +203,7 @@ def classify_risk(row: Mapping[str, Any]) -> RiskDecision:
     overdue_days = _to_int(row.get("max_overdue_days") or row.get("overdue_days"), 0)
     score_spread = _to_float(row.get("manager_score_spread") or row.get("score_spread"), 0.0)
 
-    reasons: List[str] = []
+    reasons: list[str] = []
     risk_type = RISK_NONE
     level = "none"
     risk_score = 0.0
@@ -251,8 +251,8 @@ def classify_risk(row: Mapping[str, Any]) -> RiskDecision:
     )
 
 
-def build_risk_rows(rows: Iterable[Mapping[str, Any]], *, include_none: bool = False) -> List[Dict[str, Any]]:
-    result: List[Dict[str, Any]] = []
+def build_risk_rows(rows: Iterable[Mapping[str, Any]], *, include_none: bool = False) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
     for row in rows or []:
         decision = classify_risk(row)
         if decision.risk_type == RISK_NONE and not include_none:
@@ -273,9 +273,9 @@ def build_risk_rows(rows: Iterable[Mapping[str, Any]], *, include_none: bool = F
     return sorted(result, key=lambda x: x.get("risk_score", 0), reverse=True)
 
 
-def summarize_dashboard(rows: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
+def summarize_dashboard(rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
     rows = list(rows or [])
-    scores: List[float] = []
+    scores: list[float] = []
     low_count = 0
     high_count = 0
     missing_count = 0
@@ -308,19 +308,19 @@ def summarize_dashboard(rows: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def summarize_category_averages(rows: Iterable[Mapping[str, Any]], *, min_group_size: int = 2) -> List[Dict[str, Any]]:
+def summarize_category_averages(rows: Iterable[Mapping[str, Any]], *, min_group_size: int = 2) -> list[dict[str, Any]]:
     """
     Kategori ortalamaları kişi detayı sızdırmadan hesaplanır.
     min_group_size altındaki gruplar anonimleştirilir.
     """
-    bucket: Dict[str, List[float]] = {}
+    bucket: dict[str, list[float]] = {}
     for row in rows or []:
         category = str(row.get("category") or row.get("personnel_category") or row.get("kategori") or "Diğer").strip() or "Diğer"
         score = _to_float(row.get("final_score") or row.get("score"), 0.0)
         if score:
             bucket.setdefault(category, []).append(score)
 
-    result: List[Dict[str, Any]] = []
+    result: list[dict[str, Any]] = []
     for category, scores in bucket.items():
         if len(scores) < min_group_size:
             result.append(
@@ -343,8 +343,8 @@ def summarize_category_averages(rows: Iterable[Mapping[str, Any]], *, min_group_
     return sorted(result, key=lambda x: (x["average_score"] is not None, x["average_score"] or 0), reverse=True)
 
 
-def build_delayed_manager_summary(rows: Iterable[Mapping[str, Any]]) -> List[Dict[str, Any]]:
-    result: List[Dict[str, Any]] = []
+def build_delayed_manager_summary(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    result: list[dict[str, Any]] = []
     for row in rows or []:
         pending = _to_int(row.get("pending_count"), 0)
         overdue = _to_int(row.get("overdue_count"), 0)
@@ -364,7 +364,7 @@ def build_delayed_manager_summary(rows: Iterable[Mapping[str, Any]]) -> List[Dic
     return sorted(result, key=lambda x: (x["overdue_count"], x["max_overdue_days"], x["pending_count"]), reverse=True)
 
 
-def build_report_export_contract(*, visibility: ReportVisibilityDecision, report_type: str = "dashboard") -> Dict[str, Any]:
+def build_report_export_contract(*, visibility: ReportVisibilityDecision, report_type: str = "dashboard") -> dict[str, Any]:
     return {
         "allowed": visibility.allowed and visibility.can_export,
         "scope": visibility.scope,
@@ -376,7 +376,7 @@ def build_report_export_contract(*, visibility: ReportVisibilityDecision, report
     }
 
 
-def phase11_reporting_contract() -> Dict[str, Any]:
+def phase11_reporting_contract() -> dict[str, Any]:
     return {
         "executive_dashboard": True,
         "risk_analysis": True,

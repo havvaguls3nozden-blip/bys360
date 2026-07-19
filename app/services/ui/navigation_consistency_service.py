@@ -14,7 +14,7 @@ def _read_text(path: Path) -> str:
         return ''
 
 
-def build_navigation_consistency_snapshot(project_root: str) -> Dict[str, object]:
+def build_navigation_consistency_snapshot(project_root: str) -> dict[str, object]:
     root = Path(project_root)
     base_candidates = [
         root / 'app/templates/base.html',
@@ -23,7 +23,7 @@ def build_navigation_consistency_snapshot(project_root: str) -> Dict[str, object
     base_path = next((p for p in base_candidates if p.exists()), None)
     content = _read_text(base_path) if base_path else ''
 
-    sections: List[str] = [
+    sections: list[str] = [
         'Genel',
         'Personel Yönetimi',
         'Performans Yönetimi',

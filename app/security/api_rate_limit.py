@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 API ve ağır işlem rate limit altyapısı.
 
 flask-limiter yoksa uygulamayı kırmadan devreden çıkar.

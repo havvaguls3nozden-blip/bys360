@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformancePeriod
 from app.services.performance.health_report import build_performance_task_health_report

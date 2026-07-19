@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Başkan Onayları Karne İncelemesi V2 compatibility routes."""
 from __future__ import annotations
 

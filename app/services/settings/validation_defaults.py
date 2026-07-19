@@ -10,7 +10,8 @@ from __future__ import annotations
 
 
 from collections import OrderedDict
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 
 ALLOWED_VALUE_TYPES: set[str] = {"string", "bool", "int"}

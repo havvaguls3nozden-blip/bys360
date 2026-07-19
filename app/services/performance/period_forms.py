@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from .common import _safe_float, _safe_int
 from .period_scope_contract import ALLOWED_PERIOD_SCOPE_TYPES, normalize_period_scope_type

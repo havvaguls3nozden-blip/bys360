@@ -16,7 +16,8 @@ THIRD_MANAGER_HEADER_ALIASES = [
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
 
 from flask import current_app
 
@@ -26,7 +27,7 @@ DEFAULT_CONFIG_RELATIVE = Path("config") / "hierarchy_templates_v1.json"
 
 @dataclass
 class UserRow:
-    id: Optional[int]
+    id: int | None
     sicil_no: str
     full_name: str
     role: str
@@ -38,24 +39,24 @@ class UserRow:
     ucuncu_yonetici_sicil: str = ""
     is_active: bool = True
     source: str = "db"
-    raw: Dict[str, Any] = field(default_factory=dict)
+    raw: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class ChainResolution:
     rule_key: str
     chain_type: str
-    order: List[int]
+    order: list[int]
     manager_1_sicil: str = ""
     manager_2_sicil: str = ""
     manager_3_sicil: str = ""
     manager_1_name: str = ""
     manager_2_name: str = ""
     manager_3_name: str = ""
-    warnings: List[str] = field(default_factory=list)
-    info: List[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    info: list[str] = field(default_factory=list)
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "rule_key": self.rule_key,
             "chain_type": self.chain_type,
@@ -72,7 +73,7 @@ class ChainResolution:
 
 
 class HierarchyRuleEngineService:
-    def __init__(self, config_path: Optional[str | Path] = None):
+    def __init__(self, config_path: str | Path | None = None):
         self.config_path = Path(config_path) if config_path else self._default_config_path()
         self.config = self._load_config()
 
@@ -81,17 +82,17 @@ class HierarchyRuleEngineService:
         root = Path(current_app.root_path).parent if current_app else Path.cwd()
         return root / DEFAULT_CONFIG_RELATIVE
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         if not self.config_path.exists():
             raise FileNotFoundError(f"Hierarchy config not found: {self.config_path}")
         return json.loads(self.config_path.read_text(encoding="utf-8"))
 
-    def save_config(self, payload: Dict[str, Any]) -> None:
+    def save_config(self, payload: dict[str, Any]) -> None:
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
         self.config_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         self.config = payload
 
-    def resolve_many(self, users: Iterable[UserRow]) -> List[Dict[str, Any]]:
+    def resolve_many(self, users: Iterable[UserRow]) -> list[dict[str, Any]]:
         user_list = [u for u in users if u.is_active]
         index_by_sicil = {u.sicil_no: u for u in user_list if u.sicil_no}
         rows = []
@@ -100,7 +101,7 @@ class HierarchyRuleEngineService:
             rows.append({**user.raw, **chain.as_dict()})
         return rows
 
-    def resolve_user(self, user: UserRow, users: List[UserRow], by_sicil: Dict[str, UserRow]) -> ChainResolution:
+    def resolve_user(self, user: UserRow, users: list[UserRow], by_sicil: dict[str, UserRow]) -> ChainResolution:
         rule = self._match_rule(user)
         if not rule:
             return ChainResolution(rule_key="unmatched", chain_type="none", order=[], warnings=["Uygun zincir kuralı bulunamadı."])
@@ -143,7 +144,7 @@ class HierarchyRuleEngineService:
 
         return res
 
-    def _match_rule(self, user: UserRow) -> Optional[Dict[str, Any]]:
+    def _match_rule(self, user: UserRow) -> dict[str, Any] | None:
         for rule in self.config.get("rules", []):
             match = rule.get("match", {})
             if self._matches(match, user):
@@ -151,7 +152,7 @@ class HierarchyRuleEngineService:
         return None
 
     @staticmethod
-    def _matches(match: Dict[str, Any], user: UserRow) -> bool:
+    def _matches(match: dict[str, Any], user: UserRow) -> bool:
         def norm(value: str) -> str:
             return (value or "").strip().upper()
 
@@ -170,11 +171,11 @@ class HierarchyRuleEngineService:
 
     def _resolve_level(
         self,
-        level_config: Optional[Dict[str, Any]],
+        level_config: dict[str, Any] | None,
         user: UserRow,
-        users: List[UserRow],
-        by_sicil: Dict[str, UserRow],
-    ) -> Optional[UserRow]:
+        users: list[UserRow],
+        by_sicil: dict[str, UserRow],
+    ) -> UserRow | None:
         if not level_config:
             return None
         source = level_config.get("source")
@@ -205,7 +206,7 @@ class HierarchyRuleEngineService:
         return None
 
     @staticmethod
-    def _first(users: List[UserRow], predicate) -> Optional[UserRow]:
+    def _first(users: list[UserRow], predicate) -> UserRow | None:
         for row in users:
             if predicate(row):
                 return row

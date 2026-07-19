@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 
-def build_ai_safe_summary(dashboard_summary: Dict[str, Any]) -> List[str]:
+def build_ai_safe_summary(dashboard_summary: dict[str, Any]) -> list[str]:
     total = dashboard_summary.get("total_targets", 0)
     risky = dashboard_summary.get("risky_targets", 0)
     critical = dashboard_summary.get("critical_targets", 0)

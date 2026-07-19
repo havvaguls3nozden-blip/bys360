@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable
+from collections.abc import Iterable
 
 AI_AGENT_AG1_VERSION = "AG-1 V1"
 AI_AGENT_AG2_VERSION = "AG-2 V1"

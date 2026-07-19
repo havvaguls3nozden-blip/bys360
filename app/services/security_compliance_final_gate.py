@@ -7,7 +7,7 @@ import ast
 import json
 import os
 import re
-from typing import Iterable
+from collections.abc import Iterable
 import logging
 logger = logging.getLogger(__name__)
 

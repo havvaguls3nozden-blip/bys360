@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Asistanı Visible Tutor V6.1
 
@@ -16,7 +15,8 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Any, Dict, Iterable
+from typing import Any, Dict
+from collections.abc import Iterable
 
 
 import logging
@@ -49,7 +49,7 @@ def _has_any(normalized_text: str, keywords: Iterable[str]) -> bool:
     return any(_normalize(k) in normalized_text for k in keywords)
 
 
-INTENT_KEYWORDS: Dict[str, tuple[str, ...]] = {
+INTENT_KEYWORDS: dict[str, tuple[str, ...]] = {
     "PERFORMANS_DONEMI_OLUSTURMA": (
         "performans donemi", "dönem aç", "donem ac", "degerlendirme donemi",
         "yeni donem", "performans baslat", "donem olustur", "dönem oluştur",

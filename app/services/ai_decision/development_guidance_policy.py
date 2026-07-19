@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 AI Karar Destek Faz 11
 Gelişim önerisi ve rehber alanı karar destek politikası.
@@ -12,10 +11,11 @@ BYS360_AI_DECISION_FAZ11_POLICY_OK
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Optional
+from collections.abc import Mapping, Sequence
 
 
-GUIDANCE_TYPE_LABELS: Dict[str, str] = {
+GUIDANCE_TYPE_LABELS: dict[str, str] = {
     "low_score_recovery": "Düşük performans gelişim takibi",
     "high_score_sustain": "Yüksek başarıyı sürdürme",
     "criteria_focus": "Kriter bazlı gelişim odağı",
@@ -30,7 +30,7 @@ SENSITIVE_FIELD_HINTS = (
     "iban", "hesap", "sağlık", "saglik", "rapor no", "şifre", "sifre", "parola",
 )
 
-TECHNICAL_STATUS_LABELS: Dict[str, str] = {
+TECHNICAL_STATUS_LABELS: dict[str, str] = {
     "draft": "Hazırlık kaydı",
     "authorized_scope": "Yetkili kapsam",
     "workflow_state": "Süreç durumu",
@@ -53,7 +53,7 @@ class DevelopmentGuidanceCard:
     visibility: str = "yetkili_kapsam"
     followup_label: str = "Takip et"
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return asdict(self)
 
 
@@ -76,7 +76,7 @@ def _get(obj: Any, *names: str, default: Any = None) -> Any:
     return default
 
 
-def _to_float(value: Any, default: Optional[float] = None) -> Optional[float]:
+def _to_float(value: Any, default: float | None = None) -> float | None:
     if value is None or value == "":
         return default
     try:
@@ -108,7 +108,7 @@ def _safe_text(text: Any, limit: int = 260) -> str:
     return raw[:limit] + ("…" if len(raw) > limit else "")
 
 
-def _score_band(score: Optional[float]) -> str:
+def _score_band(score: float | None) -> str:
     if score is None:
         return "puan_yok"
     if score < 70:
@@ -126,7 +126,7 @@ def summarize_development_inputs(
     criteria_results: Sequence[Any] | None = None,
     general_comment: Any = None,
     existing_recommendations: Sequence[Any] | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Gelişim önerisi üretmek için gerekli veriyi güvenli özetler."""
     numeric_score = _to_float(score)
     band = _score_band(numeric_score)
@@ -141,8 +141,8 @@ def summarize_development_inputs(
         else:
             trend_label = "Geçmiş puanlar dengeli seyrediyor"
 
-    low_criteria: List[Dict[str, Any]] = []
-    strong_criteria: List[Dict[str, Any]] = []
+    low_criteria: list[dict[str, Any]] = []
+    strong_criteria: list[dict[str, Any]] = []
     for item in criteria_results or []:
         label = _safe_text(_get(item, "criterion_name", "name", "label", "title", default="Değerlendirme kriteri"), 120)
         point = _to_float(_get(item, "score", "point", "value", "score_value", default=None))
@@ -172,7 +172,7 @@ def summarize_development_inputs(
     }
 
 
-def build_development_guidance_cards(summary: Mapping[str, Any]) -> List[Dict[str, str]]:
+def build_development_guidance_cards(summary: Mapping[str, Any]) -> list[dict[str, str]]:
     _to_float(summary.get("score"))
     band = _normalize(summary.get("score_band"))
     negative_total = _to_int(summary.get("negative_note_total"))
@@ -182,7 +182,7 @@ def build_development_guidance_cards(summary: Mapping[str, Any]) -> List[Dict[st
     existing_count = _to_int(summary.get("existing_recommendation_count"))
     trend_label = _normalize(summary.get("trend_label"))
 
-    cards: List[DevelopmentGuidanceCard] = []
+    cards: list[DevelopmentGuidanceCard] = []
 
     if band == "dusuk":
         cards.append(DevelopmentGuidanceCard(
@@ -283,7 +283,7 @@ def build_development_guidance_context(
     general_comment: Any = None,
     existing_recommendations: Sequence[Any] | None = None,
     viewer_role: str = "",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     summary = summarize_development_inputs(
         score=score,
         previous_scores=previous_scores,

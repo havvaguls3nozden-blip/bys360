@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
-from typing import Iterable
+from collections.abc import Iterable
 
 UI_REPORT_LANGUAGE_GATE_VERSION = "2026-04-20-performance-ui-report-language-gate-faz6"
 

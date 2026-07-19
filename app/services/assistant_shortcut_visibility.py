@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Sanal Asistan kısa yol görünürlüğü.
 
 Bu dosya yalnızca asistan kısa yollarının rol matrisine göre görünürlüğünü sağlar.

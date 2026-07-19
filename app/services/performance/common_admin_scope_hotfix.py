@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 A10Q_COMPATIBILITY_WRAPPER
 

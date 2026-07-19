@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 v60 Stub AI ekran panel köprüsü.
 
 Bu dosya dış AI sağlayıcısına ihtiyaç duymadan mevcut StubAIClient üzerinden

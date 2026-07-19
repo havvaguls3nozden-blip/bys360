@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 BYS360 Performans Tamamlama Faz 5
 Karne ve Puanlama Ekranı Kurumsal UI Politika Merkezi
@@ -12,14 +11,15 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Mapping
+from typing import Any, Dict, List
+from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 
 
 PHASE5_POLICY_MARKER = "BYS360_PERFORMANCE_COMPLETION_PHASE5_SCORECARD_UI_POLICY"
 
-TECHNICAL_STATUS_LABELS: Dict[str, str] = {
+TECHNICAL_STATUS_LABELS: dict[str, str] = {
     "draft": "Taslak",
     "authorized_scope": "Yetkili Kapsam",
     "president_pending": "Başkan Onayı Bekliyor",
@@ -39,7 +39,7 @@ TECHNICAL_STATUS_LABELS: Dict[str, str] = {
     "pending": "Bekliyor",
 }
 
-TECHNICAL_REPLACEMENTS: Dict[str, str] = {
+TECHNICAL_REPLACEMENTS: dict[str, str] = {
     "authorized_scope": "Yetkili Kapsam",
     "workflow state": "süreç durumu",
     "workflow_state": "Süreç Durumu",
@@ -154,8 +154,8 @@ def manager_level_label(level: Any) -> str:
     return mapping.get(raw, str(level or "Amir"))
 
 
-def build_manager_opinion_cards(rows: Iterable[Mapping[str, Any]]) -> List[Dict[str, Any]]:
-    cards: List[Dict[str, Any]] = []
+def build_manager_opinion_cards(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    cards: list[dict[str, Any]] = []
     for row in rows or []:
         level = manager_level_label(row.get("manager_level") or row.get("level") or row.get("amir_seviyesi"))
         opinion = sanitize_technical_text(row.get("opinion") or row.get("comment") or row.get("general_comment") or "")
@@ -180,7 +180,7 @@ def phase5_empty_history_message(kind: str = "scoring") -> str:
     return "Puanlama geçmişi henüz oluşmamış. Değerlendirme kaydı tamamlandığında bu alanda gösterilecektir."
 
 
-def phase5_scorecard_contract() -> Dict[str, Any]:
+def phase5_scorecard_contract() -> dict[str, Any]:
     return {
         "technical_language_hidden": True,
         "large_score_surface": True,

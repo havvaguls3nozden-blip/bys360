@@ -33,16 +33,16 @@ class EffectiveChainResult:
     period_id: int
     performance_mode: str
     created_assignments: int = 0
-    infos: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    errors: List[str] = field(default_factory=list)
+    infos: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
 
-def _safe_list(value: Any) -> List[Any]:
+def _safe_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
-def ensure_evaluation_summary(period_id: int, employee_id: int, chain_map: Dict[int, Optional[int]]) -> Any:
+def ensure_evaluation_summary(period_id: int, employee_id: int, chain_map: dict[int, int | None]) -> Any:
     row = PerformanceEvaluation.query.filter_by(period_id=period_id, employee_id=employee_id).first()
     if row:
         row.level_1_evaluator_id = chain_map.get(1)
@@ -65,7 +65,7 @@ def ensure_evaluation_summary(period_id: int, employee_id: int, chain_map: Dict[
     return row
 
 
-def ensure_assignment(period_id: int, employee_id: int, evaluator_id: Optional[int], manager_level: int) -> bool:
+def ensure_assignment(period_id: int, employee_id: int, evaluator_id: int | None, manager_level: int) -> bool:
     if not evaluator_id:
         return False
 
@@ -106,7 +106,7 @@ def apply_effective_chain(
     *,
     period_id: int,
     employee_id: int,
-    manager_chain: Dict[int, Optional[int]],
+    manager_chain: dict[int, int | None],
     check_date=None,
 ) -> EffectiveChainResult:
     result = EffectiveChainResult(
@@ -137,7 +137,7 @@ def apply_effective_chain(
             )
         return result
 
-    effective_chain: Dict[int, Optional[int]] = {}
+    effective_chain: dict[int, int | None] = {}
     for level in sorted(manager_chain.keys()):
         original_evaluator_id = manager_chain.get(level)
         resolved = resolve_effective_evaluator(original_evaluator_id, level, check_date=check_date)

@@ -59,7 +59,7 @@ class ChainSlots:
     manager_3: str = ""
 
 
-def get_chain_slots(row: Dict[str, Any]) -> ChainSlots:
+def get_chain_slots(row: dict[str, Any]) -> ChainSlots:
     """
     Kurumsal slotlar:
     1. amir = Grup Başkanı / Başkan
@@ -73,7 +73,7 @@ def get_chain_slots(row: Dict[str, Any]) -> ChainSlots:
     )
 
 
-def get_flow_order(row: Dict[str, Any]) -> List[int]:
+def get_flow_order(row: dict[str, Any]) -> list[int]:
     """
     İşlem sırası slot değildir.
     Başkanlık: 2 -> 1
@@ -95,7 +95,7 @@ def get_flow_order(row: Dict[str, Any]) -> List[int]:
     return [2, 1]
 
 
-def is_info_exception(row: Dict[str, Any]) -> bool:
+def is_info_exception(row: dict[str, Any]) -> bool:
     rule = _s(row.get("exception_rule"))
     if rule in INFO_EXCEPTION_RULES:
         return True
@@ -110,7 +110,7 @@ def is_info_exception(row: Dict[str, Any]) -> bool:
     return False
 
 
-def validate_chain_slots(row: Dict[str, Any]) -> List[str]:
+def validate_chain_slots(row: dict[str, Any]) -> list[str]:
     """
     Slot doğrulaması:
     - 1. amir slotu dolu mu?
@@ -122,7 +122,7 @@ def validate_chain_slots(row: Dict[str, Any]) -> List[str]:
 
     role = _role(row.get("role"))
     slots = get_chain_slots(row)
-    issues: List[str] = []
+    issues: list[str] = []
 
     if not slots.manager_1:
         issues.append("1. amir eksik veya pasif")
@@ -139,7 +139,7 @@ def validate_chain_slots(row: Dict[str, Any]) -> List[str]:
     return issues
 
 
-def normalize_row(row: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
     item = dict(row or {})
     slots = get_chain_slots(item)
     item["manager_1"] = slots.manager_1
@@ -161,7 +161,7 @@ def normalize_row(row: Dict[str, Any]) -> Dict[str, Any]:
     return item
 
 
-def ensure_iterable_users(value: Any) -> List[Any]:
+def ensure_iterable_users(value: Any) -> list[Any]:
     """
     'User' object is not iterable kırığını kapatır.
     Tek user gelirse listeye sarar, None gelirse boş döner.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """BYS360 Performans Geri Bildirim Süreci Final Kontrol servisi.
 
 Bu servis görüşme sonrası notlar, görüşme rehberi, karne entegrasyonu ve

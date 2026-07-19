@@ -10,7 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import re
 import unicodedata
-from typing import Any, Iterable, Sequence
+from typing import Any
+from collections.abc import Iterable, Sequence
 
 MOJIBAKE_MARKERS = ("\u00c3", "\u00c4", "\u00c5", "\ufffd", "\u00d0", "\u00f0", "\u00fe", "\u00de", "\u00dd", "\u00fd")
 

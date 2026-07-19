@@ -14,7 +14,7 @@ Bağımlı olduğu:
 from __future__ import annotations
 
 from io import BytesIO
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 from openpyxl import Workbook
 

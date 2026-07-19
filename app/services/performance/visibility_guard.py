@@ -34,7 +34,8 @@ kesin biçimde ayırmaktır:
    İK/yayın kilidi açılmadan göremez.
 """
 
-from typing import Any, Iterable
+from typing import Any
+from collections.abc import Iterable
 
 try:
     from app.services.performance.low_score_process_service import get_low_score_employee_publish_lock_reason

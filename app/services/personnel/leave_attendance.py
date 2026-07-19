@@ -10,7 +10,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import date, datetime
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 from sqlalchemy import inspect, or_
 from sqlalchemy.orm import joinedload

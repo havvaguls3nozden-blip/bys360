@@ -115,8 +115,8 @@ def reason_message(item: Any, default: str = "") -> str:
 def reason_code(
     item: Any = None,
     *,
-    event_type: Optional[str] = None,
-    manager_level: Optional[int] = None,
+    event_type: str | None = None,
+    manager_level: int | None = None,
 ) -> str:
     if isinstance(item, dict):
         explicit = _safe_str(item.get("code") or item.get("reason_code"))
@@ -156,9 +156,9 @@ def reason_code(
 def reason_payload(
     item: Any = None,
     *,
-    event_type: Optional[str] = None,
-    manager_level: Optional[int] = None,
-) -> Dict[str, Any]:
+    event_type: str | None = None,
+    manager_level: int | None = None,
+) -> dict[str, Any]:
     if isinstance(item, dict):
         level = _safe_str(item.get("level") or item.get("severity"))
     else:
@@ -174,8 +174,8 @@ def reason_payload(
 def is_informational_reason(
     item: Any = None,
     *,
-    event_type: Optional[str] = None,
-    manager_level: Optional[int] = None,
+    event_type: str | None = None,
+    manager_level: int | None = None,
 ) -> bool:
     code = reason_code(item, event_type=event_type, manager_level=manager_level)
     if code in INFO_REASON_CODES:

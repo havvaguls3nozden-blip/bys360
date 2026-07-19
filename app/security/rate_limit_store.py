@@ -19,7 +19,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 from flask import current_app
 logger = logging.getLogger(__name__)

@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import asdict, dataclass
-from typing import Any, Iterable, Mapping
+from typing import Any
+from collections.abc import Iterable, Mapping
 
 from .security_contract import SENSITIVE_FIELD_NAMES, redact_mapping_for_ai, should_redact_field
 

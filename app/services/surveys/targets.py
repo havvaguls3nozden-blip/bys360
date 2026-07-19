@@ -7,7 +7,8 @@ Faz 6 amacı:
 """
 from __future__ import annotations
 
-from typing import Any, Callable, Iterable
+from typing import Any
+from collections.abc import Callable, Iterable
 
 from .contracts import SurveyTargetDraft
 from .normalizers import clean_target_values, normalize_choice, safe_text, SURVEY_ALLOWED_TARGET_TYPES, SURVEY_TARGET_TYPES

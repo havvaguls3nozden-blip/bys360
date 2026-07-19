@@ -8,7 +8,7 @@ modüllerini sıralı ve güvenli biçimde yükler.
 from __future__ import annotations
 
 from importlib import import_module
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def _normalize_module_name(module_name: str) -> str:

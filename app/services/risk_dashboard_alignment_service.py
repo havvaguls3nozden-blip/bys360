@@ -5,7 +5,8 @@ import json
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict
+from collections.abc import Iterable
 
 
 SPECIAL_INFO_PATTERNS = (
@@ -78,7 +79,7 @@ def normalize_issue(person_name: str, unit_name: str, raw_label: str, message: s
         should_display_red=sev == "critical",
     )
 
-def export_dashboard_alignment_report(project_root: Path, issues: Iterable[DashboardIssue]) -> Dict[str, Path]:
+def export_dashboard_alignment_report(project_root: Path, issues: Iterable[DashboardIssue]) -> dict[str, Path]:
     out_dir = project_root / "reports" / "faz3_1"
     out_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -61,14 +61,14 @@ class HierarchyIssue:
 class StableManagerChain:
     employee_id: int
     employee_name: str
-    manager_1_id: Optional[int] = None
-    manager_2_id: Optional[int] = None
-    manager_3_id: Optional[int] = None
+    manager_1_id: int | None = None
+    manager_2_id: int | None = None
+    manager_3_id: int | None = None
     manager_1_name: str = ''
     manager_2_name: str = ''
     manager_3_name: str = ''
-    flow_order: Tuple[int, ...] = field(default_factory=tuple)
-    issues: List[HierarchyIssue] = field(default_factory=list)
+    flow_order: tuple[int, ...] = field(default_factory=tuple)
+    issues: list[HierarchyIssue] = field(default_factory=list)
 
 
 def _safe_str(value: Any) -> str:
@@ -94,7 +94,7 @@ def _user_name(user: Any) -> str:
     return f"{_safe_str(getattr(user, 'ad', ''))} {_safe_str(getattr(user, 'soyad', ''))}".strip()
 
 
-def _get_user_id(value: Any) -> Optional[int]:
+def _get_user_id(value: Any) -> int | None:
     if value is None:
         return None
     return getattr(value, 'id', value)
@@ -108,7 +108,7 @@ def _log(level: str, message: str):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/hierarchy_stable.py")
-def fetch_active_users() -> List[Any]:
+def fetch_active_users() -> list[Any]:
     if not User:
         return []
     query = User.query
@@ -118,9 +118,9 @@ def fetch_active_users() -> List[Any]:
     return [row for row in rows if not is_system_user(row)]
 
 
-def build_user_maps(users: List[Any]) -> Tuple[Dict[int, Any], Dict[str, Any]]:
-    by_id: Dict[int, Any] = {}
-    by_sicil: Dict[str, Any] = {}
+def build_user_maps(users: list[Any]) -> tuple[dict[int, Any], dict[str, Any]]:
+    by_id: dict[int, Any] = {}
+    by_sicil: dict[str, Any] = {}
     for user in users:
         by_id[user.id] = user
         sicil = _safe_str(getattr(user, 'sicil_no', ''))
@@ -129,7 +129,7 @@ def build_user_maps(users: List[Any]) -> Tuple[Dict[int, Any], Dict[str, Any]]:
     return by_id, by_sicil
 
 
-def _find_user_by_sicil(by_sicil: Dict[str, Any], sicil: str):
+def _find_user_by_sicil(by_sicil: dict[str, Any], sicil: str):
     return by_sicil.get(_safe_str(sicil))
 
 
@@ -141,7 +141,7 @@ def _current_chain_tuple(user: Any) -> tuple[str | None, str | None, str | None]
     )
 
 
-def build_manager_chain_for_user(user: Any, users_by_sicil: Dict[str, Any], period: Any = None) -> StableManagerChain:
+def build_manager_chain_for_user(user: Any, users_by_sicil: dict[str, Any], period: Any = None) -> StableManagerChain:
     desired = resolve_authoritative_chain(user, users_by_sicil.values(), preserve_explicit_level3=True)
 
     chain = StableManagerChain(
@@ -202,13 +202,13 @@ def build_manager_chain_for_user(user: Any, users_by_sicil: Dict[str, Any], peri
     return chain
 
 
-def build_all_manager_chains(users: Optional[List[Any]] = None, period: Any = None) -> List[StableManagerChain]:
+def build_all_manager_chains(users: list[Any] | None = None, period: Any = None) -> list[StableManagerChain]:
     users = users or fetch_active_users()
     _, users_by_sicil = build_user_maps(users)
     return [build_manager_chain_for_user(user, users_by_sicil, period) for user in users]
 
 
-def analyze_hierarchy_rows(period_id: Optional[int] = None) -> List[Dict[str, Any]]:
+def analyze_hierarchy_rows(period_id: int | None = None) -> list[dict[str, Any]]:
     users = fetch_active_users()
     rows = []
     for user, chain in zip(users, build_all_manager_chains(users, period_id), strict=False):
@@ -229,7 +229,7 @@ def analyze_hierarchy_rows(period_id: Optional[int] = None) -> List[Dict[str, An
     return rows
 
 
-def analyze_hierarchy_gaps(period_id: Optional[int] = None) -> List[Dict[str, Any]]:
+def analyze_hierarchy_gaps(period_id: int | None = None) -> list[dict[str, Any]]:
     return [row for row in analyze_hierarchy_rows(period_id) if row['issues']]
 
 
@@ -255,7 +255,7 @@ def ensure_evaluation(period_id: int, employee_id: int, chain: StableManagerChai
     return row
 
 
-def ensure_assignment(period_id: int, employee_id: int, evaluator_id: Optional[int], manager_level: int):
+def ensure_assignment(period_id: int, employee_id: int, evaluator_id: int | None, manager_level: int):
     if not evaluator_id or not EvaluationAssignment:
         return None
     period = db.session.get(PerformancePeriod, period_id) if db and PerformancePeriod else None
@@ -285,11 +285,11 @@ def ensure_assignment(period_id: int, employee_id: int, evaluator_id: Optional[i
     return row
 
 
-def generate_stable_assignments(period_id: int) -> Dict[str, Any]:
+def generate_stable_assignments(period_id: int) -> dict[str, Any]:
     if not db:
         return {'ok': False, 'message': 'db bağlantısı yok', 'created': 0, 'issues': []}
     created = 0
-    issues: List[str] = []
+    issues: list[str] = []
     users = fetch_active_users()
     chains = build_all_manager_chains(users, period_id)
     for chain in chains:
