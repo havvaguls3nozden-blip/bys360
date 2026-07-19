@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Karar Destek Dashboard veri yüzeyi servisleri.
 
 Faz 3 notu:

@@ -6,7 +6,6 @@ ve kalite kapılarında doğrulamak için kullanılır.
 """
 from __future__ import annotations
 
-
 PUBLIC_MODEL_ENTRYPOINT = "app.models"
 LEGACY_SINGLE_FILE_MODEL_PATH = "app/models.py"
 MODEL_PACKAGE_PATH = "app/models"

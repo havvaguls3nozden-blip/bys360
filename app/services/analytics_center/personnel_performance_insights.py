@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-
 import logging
 
 from app.core.datetime_utils import utc_now
+
 """Personel / performans icgoru motoru servis koprusu.
 
 Faz 4 canli davranis degistirmez. Veritabanina yazmaz, commit yapmaz,
@@ -16,6 +16,7 @@ kullanilabilecek personel / performans icgoru yuzeyi uretmektir.
 
 from dataclasses import asdict, dataclass
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 try:

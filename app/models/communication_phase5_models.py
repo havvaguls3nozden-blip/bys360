@@ -1,5 +1,4 @@
 from app.core.datetime_utils import utc_now
-
 from app.extensions import db
 
 

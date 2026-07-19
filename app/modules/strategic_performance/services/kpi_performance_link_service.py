@@ -2,6 +2,7 @@
 İlk fazda KPI verisi nihai performans puanını otomatik değiştirmez; analiz ve karar destek katkısı üretir.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
 def calculate_kpi_completion(target_value, current_value):

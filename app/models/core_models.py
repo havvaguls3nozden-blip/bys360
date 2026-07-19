@@ -305,6 +305,7 @@ class User(UserMixin, TimestampMixin, db.Model):
         # Portal, üst bar ve personel kartlarında kırık görsel oluşmaması için
         # legacy ve yeni yollar tek merkezden güvenli biçimde normalize edilir.
         from pathlib import Path
+
         from flask import current_app, url_for
 
         default_avatar = url_for("static", filename="img/default-avatar.svg")

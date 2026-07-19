@@ -6,7 +6,6 @@ otomatik bağlanmaz; sonraki fazlarda servis ve ekranlar bu modelleri kullanır.
 """
 from __future__ import annotations
 
-
 from datetime import datetime
 
 from app.extensions import db

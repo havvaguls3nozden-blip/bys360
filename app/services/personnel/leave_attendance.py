@@ -18,7 +18,6 @@ from sqlalchemy.orm import joinedload
 from app.extensions import db
 from app.models import AttendanceException, DelegationAssignment, LeaveBalance, PersonnelLeave
 
-
 LEAVE_ATTENDANCE_REQUIRED_TABLES: tuple[str, ...] = (
     "leave_balances",
     "personnel_leaves",
