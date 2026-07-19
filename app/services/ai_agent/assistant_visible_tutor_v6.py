@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Any, Dict
+from typing import Any
 from collections.abc import Iterable
 
 
