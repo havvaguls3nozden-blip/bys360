@@ -2,7 +2,6 @@
 """Planned BYS360 mobile route split manifest."""
 from __future__ import annotations
 
-
 MOBILE_ROUTE_SPLIT_MANIFEST: dict[str, dict[str, object]] = {
     "app/api/mobile/routes.py": {
         "target_groups": {

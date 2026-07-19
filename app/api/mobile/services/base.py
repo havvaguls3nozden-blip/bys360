@@ -6,7 +6,6 @@ files until P1.3+ micro-refactor packages move them one group at a time.
 """
 from __future__ import annotations
 
-
 from typing import Any, Mapping
 
 
