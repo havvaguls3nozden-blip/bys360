@@ -9,7 +9,7 @@ BYS360_AI_DECISION_FAZ11_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 from collections.abc import Mapping, Sequence
 
 from app.services.ai_decision.development_guidance_policy import build_development_guidance_context
