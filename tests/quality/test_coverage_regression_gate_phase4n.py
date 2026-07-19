@@ -9,7 +9,6 @@ from scripts.quality.bys360_coverage_regression_gate_phase4n import (
     build_report,
 )
 
-
 CURRENT_TOTAL = 21.852348588737023
 CURRENT_BRANCH = 7.716944238419527
 

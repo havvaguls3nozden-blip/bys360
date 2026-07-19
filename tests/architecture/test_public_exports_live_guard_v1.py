@@ -1,6 +1,5 @@
 from importlib import import_module
 
-
 PUBLIC_EXPORTS = {
     "app.services.mail_service": [
         "send_email",

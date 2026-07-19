@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from cryptography.fernet import Fernet
 
+
 def test_tckn_crypto_roundtrip():
     from app.security.tckn_crypto import decrypt_tckn, encrypt_tckn, mask_tckn
 

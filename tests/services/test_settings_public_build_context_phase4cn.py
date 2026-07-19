@@ -4,7 +4,6 @@ from app.services.settings.effective_menu_parts.public_build_context import (
     apply_admin_period_reminder_public_build_wrapper,
 )
 
-
 ADMIN_VISIBILITY_KEYS = {
     "performance_period_management_center",
     "performance_evaluator_reminder_center",

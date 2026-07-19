@@ -5,7 +5,6 @@ from pathlib import Path
 
 import app.services.settings.catalog as catalog
 
-
 CATALOG_PATH = Path(
     catalog.__file__
 ).resolve()

@@ -9,7 +9,6 @@ import pytest
 import app.api.mobile as mobile_package
 from app.api.mobile.services import communication_service as svc
 
-
 DELEGATES = [
     (
         "mobile_b48_communication_v2_create_thread_delegate",
