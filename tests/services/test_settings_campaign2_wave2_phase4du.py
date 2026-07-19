@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import logging
 import sys
 import types
 from pathlib import Path
