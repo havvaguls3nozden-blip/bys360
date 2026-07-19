@@ -26,7 +26,6 @@ def _utcnow():
         return utc_now()
     except Exception:  # pragma: no cover
         logger.exception("BYS360 V6C guarded exception | file=app/communication/shared.py | line=27")
-        from datetime import datetime as _legacy_datetime
         return utc_now()
 
 
