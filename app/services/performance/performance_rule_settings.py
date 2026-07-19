@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Performans Faz 1.2 - ayar anahtarları ve okuma katmanı.
 
 Bu dosya Faz 1.3 kural motorunun kullanacağı ayar sözleşmesini tek yerde
@@ -11,6 +12,7 @@ okur. DB erişimi yoksa güvenli varsayılanlara döner.
 
 from dataclasses import dataclass
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 

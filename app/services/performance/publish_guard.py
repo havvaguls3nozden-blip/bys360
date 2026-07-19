@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from app.models import PerformanceEvaluation
+
 logger = logging.getLogger(__name__)
 # BYS360_PHASE6_2_PUBLISH_PREFLIGHT_LAZY_IMPORT
 # publish_guard uygulama açılışında publish_preflight_rules import etmez.

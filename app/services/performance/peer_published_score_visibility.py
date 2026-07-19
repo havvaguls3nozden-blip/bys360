@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Faz 3.6 — Yayın sonrası aynı seviye puan görünürlüğü.
@@ -17,6 +16,7 @@ Güvenlik sınırı:
 """
 
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 BYS360_PHASE3_6_PEER_PUBLISHED_SCORE_VISIBILITY_MARKER = "BYS360_PHASE3_6_PEER_PUBLISHED_SCORE_VISIBILITY"
