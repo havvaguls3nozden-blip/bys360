@@ -11,7 +11,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-
 IGNORED_DIRS = {
     ".git", ".venv", "venv", "env", "__pycache__", ".pytest_cache", ".pytest_runtime",
     ".mypy_cache", ".ruff_cache", "archive", "release", "overlay", "_overlay_backups",

@@ -10,7 +10,6 @@ from app.services.evaluation_workflow_service import get_workflow_state
 
 from .constants import WORKFLOW_BADGE_CLASS_MAP, WORKFLOW_FILTER_ORDER
 
-
 DEFAULT_WORKFLOW_KEY = "taslak_1_amir"
 DEFAULT_WORKFLOW_LABEL = "1. amirde taslak"
 
