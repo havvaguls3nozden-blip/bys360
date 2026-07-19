@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pytest
 
-
 CRITICAL_ROUTES = [
     "/dashboard",
     "/dashboard/heavy-panels",

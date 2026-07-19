@@ -11,7 +11,6 @@ import os
 
 import pytest
 
-
 CRITICAL_SP_ROUTES = [
     "/performans/stratejik/kpi-dashboard",
     "/performans/stratejik/hedefler",

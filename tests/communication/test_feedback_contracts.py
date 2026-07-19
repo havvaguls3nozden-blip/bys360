@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FEEDBACK_ROUTES = PROJECT_ROOT / "app" / "communication" / "feedback_routes.py"
 FEEDBACK_SERVICE = PROJECT_ROOT / "app" / "services" / "feedback_service.py"

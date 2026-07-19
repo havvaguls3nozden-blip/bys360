@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import pytest
 
 # BYS360_SPRINT2_LEGACY_INTEGRATION_SCOPE_V8

@@ -14,7 +14,6 @@ from pathlib import Path
 import pytest
 from jinja2 import Environment, FileSystemLoader
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_ROOT = PROJECT_ROOT / "app" / "templates"
 

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 ROOT = Path(__file__).resolve().parents[2]
 def test_admin_path_guard_exists():
     text=(ROOT/'app/bootstrap/operational_guards.py').read_text(encoding='utf-8')
