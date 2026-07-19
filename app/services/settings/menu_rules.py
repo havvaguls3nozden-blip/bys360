@@ -1,7 +1,6 @@
 """Menü izin kuralları için yan etkisiz yardımcılar."""
 from __future__ import annotations
 
-
 from collections.abc import Iterable, Mapping
 from typing import Any
 

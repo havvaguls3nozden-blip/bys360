@@ -4,7 +4,6 @@ Faz 1'de pasiftir; mevcut settings_service.py bu modülü çağırmaz.
 """
 from __future__ import annotations
 
-
 from collections.abc import Iterable, Mapping
 from typing import Any
 

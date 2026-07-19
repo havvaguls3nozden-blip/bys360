@@ -7,7 +7,6 @@ Faz 1 notu:
 """
 from __future__ import annotations
 
-
 SETTINGS_DOMAIN = "settings"
 SYSTEM_SETTINGS_TABLE = "system_settings"
 MODULE_SETTINGS_TABLE = "module_settings"

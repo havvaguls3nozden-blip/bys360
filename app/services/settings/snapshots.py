@@ -7,7 +7,6 @@ Faz 3 kapsamı:
 """
 from __future__ import annotations
 
-
 from collections import OrderedDict
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any

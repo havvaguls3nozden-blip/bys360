@@ -13,7 +13,6 @@ bilinçli olarak gösterilmez.
 """
 from __future__ import annotations
 
-
 SYSTEM_SETTING_DEFINITIONS = [
     {
         "setting_key": "general.system_name",

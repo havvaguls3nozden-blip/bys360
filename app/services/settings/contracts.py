@@ -4,7 +4,6 @@ Bu modül dataclass sözleşmeleri içerir; Flask uygulamasını veya veritaban�
 """
 from __future__ import annotations
 
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Mapping
