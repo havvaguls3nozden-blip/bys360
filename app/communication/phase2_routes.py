@@ -7,7 +7,6 @@ from __future__ import annotations
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
-from app.models import Survey
 from app.models.communication_phase1_models import CommunicationBulletin
 from app.models.communication_phase2_models import CommunicationSurveyTemplate
 from app.route_registry import main_bp

@@ -3,7 +3,6 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 import csv
 import io
-from datetime import datetime
 
 from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -16,12 +15,10 @@ from app.route_support import admin_required, menu_key_required, safe_render
 from app.services.ai.audit import mark_recommendation
 from app.services.ai.client import get_provider_snapshot
 from app.services.ai.module_scope import (
-    AI_MODULE_LABELS,
     REMOVED_AI_MODULES,
     ai_module_focus,
     ai_module_label,
     ai_module_tables,
-    filter_visible_values,
     hidden_ai_modules,
     is_live_ai_module,
     live_ai_modules,

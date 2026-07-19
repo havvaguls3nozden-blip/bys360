@@ -7,7 +7,6 @@ from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.services.cic.facade import (
-    TASK_DEFINITIONS,
     can_manage,
     context,
     ensure_defaults,

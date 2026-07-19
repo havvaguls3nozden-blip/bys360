@@ -28,7 +28,6 @@ from app.services.communication_phase1_service import (
     is_manager,
     manager_filter_options,
     publish_bulletin,
-    safe_str,
     support_center_snapshot,
     survey_center_snapshot,
 )

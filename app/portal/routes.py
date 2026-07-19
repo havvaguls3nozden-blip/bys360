@@ -32,8 +32,6 @@ from app.services.portal_permission_matrix import portal_permission_allowed
 from app.services.instagram_portal_sync import sync_instagram_to_portal
 from app.services.bys360_notification_bridge import notify_portal_comment_added, notify_portal_post_created, notify_portal_reaction, notify_portal_report_created
 from app.services.portal_experience_service import portal_experience_context
-from app.services.portal_social_embed_service import publish_social_url_to_portal, queue_social_urls, run_social_embed_scan, social_import_context
-from app.services.portal_notification_habit_service import portal_notification_habit_context
 from app.services.portal_experience_v2_service import portal_experience_v2_context
 from app.services.portal_press_news_service import (
     archive_press_news_candidate,
@@ -60,8 +58,6 @@ from app.services.portal_service import (
     list_active_groups_for_user,
     normalize_post_type,
     normalize_visibility,
-    portal_home_context,
-    portal_instagram_story_items,
     reaction_counts,
     toggle_reaction,
     toggle_save,

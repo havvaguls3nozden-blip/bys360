@@ -8,7 +8,7 @@ from app.extensions import db
 from app.models import Notification
 from app.route_registry import main_bp
 from app.route_support import menu_key_required
-from app.services.runtime_cache import get_or_set as _cache_get_or_set, invalidate as _cache_invalidate
+from app.services.runtime_cache import invalidate as _cache_invalidate
 
 from .shared import (
     _empty_notification_counts,

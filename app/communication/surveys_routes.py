@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import func
 
 from app.extensions import db
-from app.models import Survey, SurveyAssignment, SurveyQuestion, SurveyQuestionOption, SurveyResponse, User
+from app.models import Survey, SurveyAssignment, SurveyQuestion, SurveyResponse, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, menu_key_required, safe_render
 from app.services.message_service import notify_user as _notify_user

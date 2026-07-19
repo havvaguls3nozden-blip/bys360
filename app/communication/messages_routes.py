@@ -9,9 +9,6 @@ from app.route_registry import main_bp
 from app.route_support import consume_form_token, issue_form_token, menu_key_required, safe_render
 from app.services.ai import build_message_thread_ai_panel, build_message_inbox_ai_panel
 from app.services.message_service import (
-    find_or_create_direct_thread as _find_or_create_direct_thread,
-    get_direct_thread_between as _get_direct_thread_between,
-    message_placeholder_bodies as _message_placeholder_bodies,
     normalize_incoming_message_files as _normalize_incoming_message_files,
 )
 

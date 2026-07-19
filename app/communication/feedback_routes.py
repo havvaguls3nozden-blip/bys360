@@ -3,8 +3,6 @@ from __future__ import annotations
 from flask import Response, flash, redirect, request, session, url_for
 from flask_login import current_user, login_required
 
-from app.extensions import db
-
 # BYS360_FEEDBACK_10_AI_IMPORTS
 from app.services.ai.feedback_decision_support import (
     build_manager_decision_support,
