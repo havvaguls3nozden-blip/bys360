@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 AI Karar Destek Faz 8 dönem ve kapsam politikası.
@@ -15,6 +14,7 @@ BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_POLICY
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Iterable, Mapping
+
 logger = logging.getLogger(__name__)
 
 

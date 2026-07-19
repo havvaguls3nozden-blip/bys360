@@ -22,7 +22,6 @@ from app.services.ai_decision.category_group_center import (
     slugify_category_label,
 )
 
-
 _SETTING_ALIASES: dict[str, tuple[str, ...]] = {
     "enabled": (
         "ai_decision.category_group_enabled",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360_ASSISTANT_KNOWLEDGE_BANK_V1
-
 from dataclasses import dataclass
 from typing import Any
 

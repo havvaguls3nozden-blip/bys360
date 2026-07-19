@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360_ASSISTANT_CANONICAL_STEP_GUIDE_V1
-
 from typing import Any
 
 VERSION = "BYS360 Asistanı Kullanım Rehberi V1"

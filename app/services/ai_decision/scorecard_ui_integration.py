@@ -22,6 +22,7 @@ from .scorecard_ui_policy import (
     score_to_float,
 )
 
+
 def _person_name(evaluation: Any) -> str:
     person = safe_attr(evaluation, "user", "employee", "personnel", default=None)
     full = safe_attr(person, "full_name", "name", "display_name", default=None)

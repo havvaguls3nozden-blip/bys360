@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360_ASSISTANT_STEPWISE_TUTOR_V4
-
 from typing import Any
 
 VERSION = "BYS360 Asistanı Öğretici Rehber Motoru V4"

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360_ASSISTANT_FULL_LIVE_USAGE_GUIDE_V2
-
 from dataclasses import dataclass
 from typing import Any
 

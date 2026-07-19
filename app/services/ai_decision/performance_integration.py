@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 AI Karar Destek Faz 1 performans entegrasyonu.
@@ -25,6 +24,7 @@ from app.services.ai.query_adapters import get_performance_evaluation_payload
 from app.services.ai.schema_guard import ai_schema_ready
 from app.services.ai_decision.decision_support_engine import DecisionPolicy, DecisionSupportEngine
 from app.services.ai_decision.logging_bridge import build_ai_safe_log_excerpt
+
 logger = logging.getLogger(__name__)
 
 

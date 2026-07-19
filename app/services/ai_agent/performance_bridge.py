@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from .repository import count_table, insert_agent_audit_log, table_columns, table_exists
+
 logger = logging.getLogger(__name__)
 
 PRIVILEGED_ROLE_KEYWORDS = (
