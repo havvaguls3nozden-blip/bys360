@@ -28,7 +28,6 @@ from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from app.models import EvaluationAssignment, FeedbackMeeting, FeedbackRequest, User
-from app.services.feedback_service import get_feedback_response_text
 from app.services.message_service import notify_user
 from app.services.performance.common import get_period
 from app.services.performance.feedback_audit_service import record_feedback_audit_event
