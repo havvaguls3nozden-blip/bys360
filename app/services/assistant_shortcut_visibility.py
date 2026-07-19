@@ -11,7 +11,7 @@ import re
 import unicodedata
 from typing import Any
 
-from sqlalchemy import bindparam, inspect, text
+from sqlalchemy import bindparam, text
 
 try:
     from flask_login import current_user

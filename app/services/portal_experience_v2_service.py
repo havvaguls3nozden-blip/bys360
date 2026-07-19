@@ -13,8 +13,6 @@ from collections import Counter
 from datetime import timedelta
 from typing import Any, Callable
 
-from sqlalchemy.exc import SQLAlchemyError
-
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import PortalPost, PortalPostComment, PortalPostReaction, PortalProfile, User

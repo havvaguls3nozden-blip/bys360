@@ -19,7 +19,6 @@ from .period_scope_policy import (
     normalize_period,
     safe_attr,
     summarize_periods,
-    to_int,
 )
 
 

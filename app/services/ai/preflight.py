@@ -3,7 +3,6 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 import importlib
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Any
 
 from flask import current_app

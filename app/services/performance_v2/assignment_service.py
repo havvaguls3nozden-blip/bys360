@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from sqlalchemy import or_
-
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
 # BYS360_PHASE8_4_PREVIEW_IMPORT_START
 from app.services.performance.period_scope_assignment import filter_period_scope_employees

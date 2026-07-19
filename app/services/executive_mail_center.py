@@ -6,7 +6,6 @@ import subprocess
 from typing import Any
 
 from flask import current_app
-from flask_login import current_user
 import logging
 logger = logging.getLogger(__name__)
 

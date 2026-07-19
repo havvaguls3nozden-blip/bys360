@@ -19,7 +19,7 @@ from sqlalchemy import func
 
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
 from app.security_audit import build_security_audit_summary
-from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module, scope_visible_modules
+from app.services.ai.module_scope import is_visible_ai_module, scope_visible_modules
 from app.services.ai.schema_guard import get_ai_schema_status
 try:
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot

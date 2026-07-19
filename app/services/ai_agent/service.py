@@ -25,7 +25,6 @@ from .security_bridge import (
     build_ai_agent_security_self_check as build_ai_agent_security_self_check_payload,
 )
 from .policy import (
-    AI_AGENT_AG5_VERSION,
     AI_AGENT_AG6_VERSION,
     AI_AGENT_ACTION_QUEUE_NOTICE,
     AI_AGENT_ASSISTANT_PANEL_NOTICE,

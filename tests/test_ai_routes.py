@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from flask import Blueprint
-
 from app.ai.routes import _run_json_service
 from app.services.ai.guardrails import AIAccessDenied, AIServiceDisabled
 

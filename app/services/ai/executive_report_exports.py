@@ -17,7 +17,6 @@ import re
 
 from sqlalchemy import func
 
-from app.extensions import db
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
 from app.services.ai.module_scope import is_visible_ai_module
 try:  # Faz 10 overlay uygulanmışsa güvenli export politikası oradan okunur.

@@ -14,7 +14,7 @@ from .visibility import build_previous_level_comment_snapshot
 from .weights import resolve_weight_plan
 from .workflow import current_actionable_levels
 from .scoring import raw_score_to_100, compute_final_score
-from .rules import is_comment_required, normalize_level_mode, resolve_chain_policy
+from .rules import normalize_level_mode, resolve_chain_policy
 from app.services.performance.visibility_guard import build_evaluation_form_visibility_context
 from app.services.performance.interim_notes_runtime import build_interim_notes_context
 from app.services.performance.period_state_guard import ensure_scoring_window_open

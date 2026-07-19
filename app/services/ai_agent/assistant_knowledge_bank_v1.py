@@ -3,7 +3,7 @@ from __future__ import annotations
 # BYS360_ASSISTANT_KNOWLEDGE_BANK_V1
 
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any
 
 VERSION = "BYS360 Asistanı Bilgi Bankası V1"
 MODE = "Rol bazlı adım adım kullanım rehberi"

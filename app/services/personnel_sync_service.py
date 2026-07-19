@@ -4,8 +4,6 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import or_
-
 from app.extensions import db
 from app.models import OrganizationUnit, User
 from app.route_support import bool_from_form

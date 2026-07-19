@@ -21,7 +21,6 @@ from app.services.ai.localization import (
     ai_feedback_label,
     ai_module_label,
     ai_recommendation_label,
-    ai_severity_label,
     ai_status_label,
     ai_target_label,
 )
