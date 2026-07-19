@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.1 merkezi kural motoru.
@@ -13,6 +12,7 @@ BYS360'ın güvenli kurumsal varsayılanlarına döner.
 
 from dataclasses import dataclass
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_1_rule_engine_settings"
@@ -114,6 +114,7 @@ def _default_text(setting_key: str) -> str | None:
 def _has_module_settings_table() -> bool:
     try:
         from sqlalchemy import inspect
+
         from app.extensions import db
         return bool(inspect(db.engine).has_table("module_settings"))
     except Exception:
@@ -130,6 +131,7 @@ def get_setting_text(setting_key: str, default: Any | None = None) -> str | None
         return fallback
     try:
         from sqlalchemy import text
+
         from app.extensions import db
         row = db.session.execute(
             text(

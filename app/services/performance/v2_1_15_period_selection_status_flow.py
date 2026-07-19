@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.15 dönem seçimi ve durum akışı.
@@ -11,6 +10,7 @@ Veritabanına yazmaz, görev üretmez, bildirim göndermez.
 """
 
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_15_period_selection_status_flow"

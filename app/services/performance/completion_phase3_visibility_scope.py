@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Performans Tamamlama Faz 3 — Görünürlük ve yetki kapsam merkezi.
 
 Bu servis Faz 3'ün ana sözleşmesidir:
@@ -15,6 +16,7 @@ Bu servis Faz 3'ün ana sözleşmesidir:
 
 from dataclasses import dataclass
 from typing import Any, Iterable, Sequence
+
 logger = logging.getLogger(__name__)
 
 try:  # Flask yoksa birim testleri yine çalışabilsin.

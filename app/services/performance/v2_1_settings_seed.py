@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.1 varsayılan ayar seed servisi."""
@@ -11,6 +10,7 @@ from typing import Any
 from app.extensions import db
 from app.models import ModuleSetting, SettingsChangeLog
 from app.services.performance.v2_1_rule_engine import DEFAULT_SETTINGS, MODULE_KEY, RULE_VERSION
+
 logger = logging.getLogger(__name__)
 
 

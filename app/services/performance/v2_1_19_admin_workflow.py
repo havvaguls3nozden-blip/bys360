@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.19 Admin / Performans Yetkilisi işlem akışı.
@@ -13,6 +12,7 @@ okunabilir iş akışı üretir.
 """
 
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_19_admin_workflow"

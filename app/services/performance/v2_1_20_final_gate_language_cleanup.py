@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.20 Sistem Kontrol Özeti.
@@ -13,6 +12,7 @@ merkez ekrandaki durumunu sade kontrol kartlarına dönüştürür.
 """
 
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_20_final_gate_language_cleanup"

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.16 kapsam ve amir zinciri kontrol paneli.
@@ -21,6 +20,7 @@ from app.services.performance.v2_1_6_category_period_integration import (
     ensure_category_period_integration_schema,
     list_preintegration_rows,
 )
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_16_scope_chain_control_panel"

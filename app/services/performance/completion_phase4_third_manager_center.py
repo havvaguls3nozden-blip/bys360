@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Tamamlama Faz 4 - 3. Amir Opsiyonelliği ve Akış Temizliği.
@@ -16,6 +15,7 @@ module_settings tablosundaki ayarları güvenli şekilde okur/seed eder.
 
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Optional
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE4_THIRD_MANAGER_CENTER = True

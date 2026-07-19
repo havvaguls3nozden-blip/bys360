@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from sqlalchemy import inspect, text
@@ -18,6 +16,7 @@ from app.services.performance.v2_1_2_category_engine import (
     ensure_category_schema,
     infer_category_from_import_row,
 )
+
 logger = logging.getLogger(__name__)
 
 

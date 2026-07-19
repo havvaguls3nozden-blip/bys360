@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.14 dönem merkezi gerçek özet verileri.
@@ -15,6 +14,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import inspect, text
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_14_period_center_real_summary"
