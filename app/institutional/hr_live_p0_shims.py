@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Callable
 
-from flask import redirect, render_template, url_for
+from flask import render_template, url_for
 
 
 def _safe_target() -> str:
