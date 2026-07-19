@@ -17,8 +17,6 @@ import shutil
 import os
 from typing import Any
 
-from flask import current_app
-
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.file_center_models import (

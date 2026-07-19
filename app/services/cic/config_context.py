@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Any
 from urllib.request import urlopen
 from app.extensions import db
-from app.models import SystemSetting, User
+from app.models import SystemSetting
 
 GROUP_KEY = "corporate_information_center"
 

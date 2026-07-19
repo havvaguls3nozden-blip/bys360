@@ -26,7 +26,6 @@ def build_menu_visibility_map(
     """
     # Phase4J V39C2: lazy facade dependency imports avoid circular import during module load
     from app.services.settings.effective_menu import (
-        Any,
         PORTAL_MENU_VISIBILITY_POLICY,
         UserMenuPermission,
         _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS,

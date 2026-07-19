@@ -43,7 +43,6 @@ MENU_KEY_ALIASES = {
 
 # BYS360 P11-D3: menü section veri blokları bridge import ile ayrıldı.
 from app.menu_registry_data_sections import (
-    ANNOUNCEMENT_TOOL_ROLES,
     MENU_SECTIONS,  # noqa: F821 - dynamic menu registry global
 )
 

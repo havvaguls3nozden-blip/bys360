@@ -18,7 +18,6 @@ from app.models import (
     SurveyAnswer,
     SurveyAssignment,
     SurveyQuestion,
-    SurveyQuestionOption,
     SurveyResponse,
     User,
 )

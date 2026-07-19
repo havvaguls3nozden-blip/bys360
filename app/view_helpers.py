@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 
-from flask import current_app, redirect, request, url_for
+from flask import redirect, request, url_for
 from flask_login import current_user
 
-from app.route_support import ALLOWED_BYPASS_ENDPOINTS, build_menu_visibility_map, safe_db_rollback
+from app.route_support import ALLOWED_BYPASS_ENDPOINTS, build_menu_visibility_map
 from app.services.message_service import get_unread_notification_count
-from app.services.performance.assignments import build_assignment_unit_summary, get_latest_assignment_generation_logs
 from app.services.performance.assignments import build_assignment_log_summary
-from app.services.query_health_service import build_dashboard_meeting_query
 from app.services.ui_context import (
     build_dashboard_context,
     build_db_check_context,

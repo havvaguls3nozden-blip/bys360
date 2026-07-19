@@ -3,16 +3,14 @@ from __future__ import annotations
 from typing import Any
 
 from sqlalchemy import inspect
-from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.config import is_removed_menu_key
 from app.menu_registry import ROLE_MENU_DEFAULTS, flatten_menu_definitions, get_role_default_menu_keys as static_role_default_menu_keys
-from app.models import ModuleSetting, RoleMenuDefault, SettingsChangeLog, SystemSetting, UnitMenuProfile, UserMenuPermission
+from app.models import ModuleSetting, RoleMenuDefault, SystemSetting, UnitMenuProfile, UserMenuPermission
 from app.live_scope import is_live_settings_module_key
 from app.services.settings.catalog import MODULE_SETTING_DEFINITIONS, SYSTEM_SETTING_DEFINITIONS
 from app.services.settings.value_codec import (
-    normalize_bool as _normalize_bool,
     value_to_python as _value_to_python,
     value_to_storage as _value_to_storage,
 )
@@ -45,7 +43,6 @@ from app.services.settings.change_logs import (
     create_settings_change_log as _create_settings_change_log,
     deserialize_settings_state as _deserialize_state,
     list_recent_settings_change_logs,
-    serialize_settings_state as _serialize_state,
 )
 from app.services.settings.menu_permissions import (
     build_complete_visibility_map as _build_complete_visibility_map,

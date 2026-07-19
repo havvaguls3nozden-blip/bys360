@@ -7,7 +7,7 @@ from typing import Any
 from flask import request
 from sqlalchemy import or_
 
-from app.models import AssignmentCoverageLog, DelegationAssignment, EvaluationAssignment, FeedbackMeeting, FeedbackRequest, Notification, PerformancePeriod
+from app.models import DelegationAssignment, EvaluationAssignment, FeedbackRequest, Notification, PerformancePeriod
 from app.route_support import safe_all, safe_count, safe_db_rollback
 from app.services.decision_support_service import build_dashboard_signal_context
 from app.services.performance.assignments import (

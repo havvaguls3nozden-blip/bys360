@@ -8,11 +8,9 @@ from typing import Any
 from flask import current_app
 
 from app.extensions import db
-from app.models import Notification, SupportTicket, Survey, SurveyAssignment
+from app.models import Survey, SurveyAssignment
 from app.models.communication_phase5_models import CommunicationAutomationLog
 from app.services.communication_phase5_service import (
-    OPEN_TICKET_STATUSES,
-    audit_logs_snapshot,
     automation_center_snapshot,
     escalation_snapshot,
     health_snapshot,

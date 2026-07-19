@@ -18,7 +18,6 @@ from app.models import (
     PortalCommentMention,
     PortalProfile,
     PortalSavedPost,
-    User,
 )
 from app.route_support import normalize_role_name, sanitize_free_text, user_has_any_role
 
