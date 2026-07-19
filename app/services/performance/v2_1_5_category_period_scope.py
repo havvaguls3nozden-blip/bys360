@@ -18,8 +18,6 @@ import re
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
-    CATEGORY_TABLE,
-    ASSIGNMENT_TABLE,
     canonical_category_key,
     ensure_category_schema,
     list_categories,
@@ -30,7 +28,6 @@ from app.services.performance.v2_1_3_personnel_category_card import (
     get_personnel_category_rows,
 )
 from app.services.performance.v2_1_4_category_scope_visibility import (
-    SCOPE_DRAFT_TABLE as V214_SCOPE_DRAFT_TABLE,
     ensure_category_scope_schema,
 )
 logger = logging.getLogger(__name__)

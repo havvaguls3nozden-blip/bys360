@@ -24,7 +24,6 @@ from app.services.performance.period_scope_assignment import employee_matches_pe
 from app.services.performance.v2_1_2_category_engine import canonical_category_key, list_categories
 from app.services.performance.v2_1_5_category_period_scope import (
     PLAN_TABLE,
-    PLAN_ITEM_TABLE,
     ensure_category_period_scope_schema,
     list_category_period_scope_plans,
     list_plan_items,

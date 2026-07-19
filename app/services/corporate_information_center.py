@@ -1,17 +1,8 @@
 from __future__ import annotations
 
-import json
-import ssl
-import time
-from datetime import datetime
 from typing import Any
-from urllib.request import urlopen
-
-from flask import current_app
-from sqlalchemy import or_
 
 from app.extensions import db
-from app.models import SystemSetting, User
 
 try:
     from app.services.mail_core import send_email, create_mail_log

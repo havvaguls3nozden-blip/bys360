@@ -2,10 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
-from uuid import uuid4
 import unicodedata
-
-from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 from app.models import (
@@ -18,20 +15,14 @@ from app.models import (
 from app.services.availability_service import (
     DelegationResolution,
     apply_availability_snapshot_to_evaluation,
-    get_assignment_reference_date,
-    get_period_employee_availability,
     resolve_effective_manager,
 )
 from .common import (
     ManagerChain,
     _safe_str,
     build_assignment_due_date,
-    fetch_active_non_admin_users,
-    fetch_active_users,
     get_period,
-    is_president,
 )
-from .hierarchy import build_manager_chain_for_user
 from .rules import (
     WARNING_REASON_DUPLICATE_MANAGER,
     WARNING_REASON_MANAGER_1_MISSING,
