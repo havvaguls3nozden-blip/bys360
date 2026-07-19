@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 from typing import Any
+
+
 def mobile_b48_communication_v2_create_thread_delegate(*args: Any, **kwargs: Any) -> Any:
     from app.api.mobile import routes as mobile_routes
     legacy = getattr(mobile_routes, "_bys360_legacy_mobile_b48_communication_v2_create_thread", None)

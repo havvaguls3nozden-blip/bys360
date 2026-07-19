@@ -6,6 +6,7 @@ No active route code is moved in P1.2.
 """
 from __future__ import annotations
 
+
 def _run_legacy_route(legacy_fn, *args, **kwargs):
     """Run an extracted legacy route implementation without changing endpoint behavior."""
     return legacy_fn(*args, **kwargs)

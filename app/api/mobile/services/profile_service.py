@@ -2,6 +2,7 @@
 """Profile service extraction target for mobile routes."""
 from __future__ import annotations
 
+
 def _run_legacy_route(legacy_fn, *args, **kwargs):
     """Run an extracted legacy route implementation without changing endpoint behavior."""
     return legacy_fn(*args, **kwargs)

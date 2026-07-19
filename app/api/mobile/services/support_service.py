@@ -2,6 +2,7 @@
 """Support ticket service extraction target for mobile routes."""
 from __future__ import annotations
 
+
 def mobile_support_ticket_create(user, legacy_handler):
     """Delegated mobile support ticket creation handler."""
     return legacy_handler(user)
