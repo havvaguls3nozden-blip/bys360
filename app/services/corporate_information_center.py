@@ -420,9 +420,6 @@ from app.services.cic.cic_context import (
 # Otomatik mail zamanlayicisi hafta sonu guvenlik kilidi.
 # Cumartesi ve pazar gunleri otomatik mail gonderimi yapilmaz.
 
-from datetime import datetime as _cic_dt_datetime
-from typing import Any as _cic_typing_any
-
 
 
 
@@ -452,7 +449,6 @@ from app.services.cic.run_context import (
 # Akilli Kutlama ve Otomatik Ozel Gun Bilgilendirme Motoru.
 # Bu blok mevcut Kurumsal Bilgilendirme motorunu bozmadan genisletir.
 
-from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 from typing import Any as _cic_v40_Any
 
 _CIC_V40_CELEBRATION_TASKS = {"staff_birthday", "work_anniversary", "special_day"}
@@ -618,9 +614,6 @@ def celebration_context(search: str | None = None) -> dict[str, _cic_v40_Any]:
 
 # BYS360_CIC_V4_5_CELEBRATION_EXCEL_IMPORT_BEGIN
 # Kutlama tarihleri için güvenli Excel ön kontrol ve uygulama motoru.
-from datetime import date as _cic_v45_date, datetime as _cic_v45_datetime, timedelta as _cic_v45_timedelta
-import re as _cic_v45_re
-import unicodedata as _cic_v45_unicodedata
 
 
 

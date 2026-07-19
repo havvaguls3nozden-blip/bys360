@@ -130,9 +130,6 @@ from datetime import datetime as _cic_dt_datetime
 from typing import Any as _cic_typing_any
 from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 from typing import Any as _cic_v40_Any
-from datetime import date as _cic_v45_date, datetime as _cic_v45_datetime, timedelta as _cic_v45_timedelta
-import re as _cic_v45_re
-import unicodedata as _cic_v45_unicodedata
 
 TASK_DEFINITIONS: dict[str, dict[str, Any]] = {
     "staff_morning": {
