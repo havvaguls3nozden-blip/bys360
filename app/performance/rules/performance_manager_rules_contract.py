@@ -25,7 +25,7 @@ Kural özeti:
 - 3. amir zorunlu değildir; yorum veya puan modu sistem ayarıyla yönetilir.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Iterable
 
 
