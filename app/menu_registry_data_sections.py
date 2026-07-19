@@ -7,7 +7,6 @@ menu_key değerleri, sıralama mantığı ve veri içeriği değiştirilmemelidi
 """
 from __future__ import annotations
 
-
 ANNOUNCEMENT_TOOL_ROLES = {
     "admin",
     "baskan",

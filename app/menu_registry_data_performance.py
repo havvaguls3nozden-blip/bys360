@@ -9,6 +9,7 @@ menu_key değerleri ve veri içerikleri değiştirilmemelidir.
 from __future__ import annotations
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global

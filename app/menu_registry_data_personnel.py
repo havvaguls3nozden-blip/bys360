@@ -8,7 +8,6 @@ menu_key değerleri ve veri içerikleri değiştirilmemelidir.
 """
 from __future__ import annotations
 
-
 _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_DISALLOWED_KEYS = {
     "hr_management", "hr_reports", "hr_personnel_operations", "hr_career_planning", "hr_reward_discipline",
     "personnel_dashboard", "personnel_create", "personnel_edit", "organization_unit_versions", "hierarchy",
