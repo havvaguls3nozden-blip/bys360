@@ -10,7 +10,6 @@ from app.models import (
     Notification,
     OrganizationUnit,
     Survey,
-    SurveyAnswer,
     SurveyAssignment,
     SurveyQuestion,
     SurveyQuestionOption,

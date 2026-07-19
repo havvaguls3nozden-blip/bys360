@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any, Iterable
 
 from app.extensions import db
-from app.models import Notification, OrganizationUnit, SupportHelpArticle, SupportTicket, Survey, SurveyAssignment, SurveyResponse, User
+from app.models import Notification, OrganizationUnit, SupportHelpArticle, SupportTicket, Survey, User
 from app.models.communication_phase1_models import (
     CommunicationBulletin,
     CommunicationBulletinAudience,

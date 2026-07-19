@@ -42,7 +42,6 @@ from app.models import (
     SurveyQuestion,
     SurveyQuestionOption,
     SurveyResponse,
-    SupportCategory,
     SupportFeedbackRating,
     SupportHelpArticle,
     SupportTicket,

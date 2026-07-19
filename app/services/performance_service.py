@@ -17,7 +17,6 @@ Amaç:
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-from app.models import PerformancePeriod
 from app.services.performance.assignments import (
     build_assignment_log_summary as _build_assignment_log_summary_mod,
     build_assignment_unit_summary as _build_assignment_unit_summary_mod,

@@ -6,7 +6,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from app.models import EvaluationAssignment, FeedbackMeeting, FeedbackRequest, PerformanceEvaluation, PerformancePeriod
+from app.models import EvaluationAssignment, FeedbackMeeting, PerformanceEvaluation, PerformancePeriod
 from app.services.performance_v2.reporting_workspace import build_publish_workspace_context
 
 OPEN_ASSIGNMENT_STATUSES = {"bekliyor", "atandi", "devam_ediyor", "iade"}
