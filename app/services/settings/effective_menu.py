@@ -13,7 +13,7 @@ from typing import Any
 
 from app.config import is_removed_menu_key
 from app.menu_registry import flatten_menu_definitions
-from app.models import UserMenuPermission, RoleMenuDefault
+from app.models import UserMenuPermission
 from app.services.settings_service import build_effective_user_menu_context, get_role_default_menu_keys
 
 RollbackHook = Callable[[], None]
@@ -34,33 +34,22 @@ from app.services.settings.effective_menu_parts.core_policy_constants import (
 # Phase4J V34C effective_menu bys360_context facade imports
 from app.services.settings.effective_menu_parts.bys360_context import (
     _bys360_admin_period_reminder_is_admin_v1,
-    _bys360_admin_period_reminder_norm_v1,
     _bys360_apply_general_category_visibility_fix_v1,
     _bys360_apply_performance_main_switch,
     _bys360_apply_performance_shortcut_gate_v4,
     _bys360_exec_item_matches,
     _bys360_exec_norm,
     _bys360_force_home_menu_visible_v1,
-    _bys360_general_category_bool_v1,
-    _bys360_general_category_state_v1,
     _bys360_is_exec_summary_menu_key,
     _bys360_perf_rm_v8_apply_aliases,
     _bys360_perf_rm_v8_apply_main_gate,
     _bys360_perf_rm_v8_norm_role,
-    _bys360_perf_rm_v8_state_for_keys,
-    _bys360_performance_role_state,
-    _bys360_person_matrix_can_open_v1,
-    _bys360_person_matrix_user_is_admin_v1,
     _bys360_portal_role_matrix_v2_12_apply,
-    _bys360_press_news_role,
     _bys360_restore_general_section_v4,
-    _get_unit_name_for_authority,
     _load_role_matrix_state,
     _load_unit_profile_state,
     _load_user_override_state,
     _rollback,
-    _row_map_by_key,
-    _safe_query_all,
     normalize_role_name,
 )
 
@@ -85,7 +74,6 @@ from app.services.settings.effective_menu_parts.role_constants import (
 
 # Phase4J V35C effective_menu apply_context facade imports
 from app.services.settings.effective_menu_parts.apply_context import (
-    _allowed_by_static_gate,
     _apply_bys360_press_news_admin_only_policy,
     _apply_bys360_settings_live_authority_v1,
     _apply_core_menu_visibility_policy,
@@ -93,13 +81,8 @@ from app.services.settings.effective_menu_parts.apply_context import (
     _apply_phase3_performance_menu_policy,
     _apply_role_gate,
     _apply_role_matrix_closed_guard,
-    _get_role_matrix_closed_keys_for_role,
-    _menu_item_by_key,
-    _phase3_2_ascii_tr,
     _phase3_2_normalize_role_name,
     _role_allowed_for_menu,
-    _role_matrix_runtime_closed,
-    _settings_explicitly_controls_key,
 )
 
 
