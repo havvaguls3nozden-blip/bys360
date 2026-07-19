@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Aşama 10 — gelişim önerisi ve rehberlik servisi.
@@ -22,6 +21,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 P4_DEVELOPMENT_GUIDANCE_VERSION = "2026-05-01-phase10-development-guidance-binding-v2"

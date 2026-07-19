@@ -13,10 +13,10 @@ Kritik sınırlar:
 from __future__ import annotations
 
 import logging
-
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Iterable
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE10_REMINDER_NOTIFICATION_CENTER = True

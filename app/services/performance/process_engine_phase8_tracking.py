@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -11,6 +9,7 @@ from typing import Any
 from sqlalchemy import text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 # PHASE8_TRACKING_PRIORITY_NUMERIC_COMPAT

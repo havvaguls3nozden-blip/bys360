@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Faz 8.4 — dönem kapsamına göre görev üretimi filtresi.
 
 Bu servis görev üretimi sırasında hangi personelin ilgili performans dönemine
@@ -12,6 +13,7 @@ hiçbir zaman tüm kurum anlamına gelmez.
 import re
 import unicodedata
 from typing import Iterable, Sequence
+
 logger = logging.getLogger(__name__)
 
 TR_ASCII_MAP = str.maketrans({

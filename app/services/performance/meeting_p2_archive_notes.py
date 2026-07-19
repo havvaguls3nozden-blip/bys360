@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Toplantı Kararları — Faz 8 P2 arşiv ve ara not servisi.
@@ -21,6 +20,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 P2_ARCHIVE_NOTES_VERSION = "2026-04-30-meeting-p2-faz8"

@@ -10,7 +10,6 @@ Notlar otomatik puan üretmez ve değerlendirme formundan yeni not kaydedilmez.
 from __future__ import annotations
 
 import logging
-
 from datetime import datetime
 from typing import Any
 
@@ -19,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformanceEvaluation
+
 logger = logging.getLogger(__name__)
 
 # BYS360_INTERIM_NOTES_FROM_MANAGER_PAGE_RUNTIME

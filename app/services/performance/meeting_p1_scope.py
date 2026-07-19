@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Toplantı Kararları — Faz 7 P1 geliştirme servisi."""
@@ -13,6 +12,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 P1_SCOPE_VERSION = "2026-04-30-meeting-p1-faz7"

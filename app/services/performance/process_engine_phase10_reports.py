@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Iterable, Optional
@@ -10,6 +8,7 @@ from typing import Any, Iterable, Optional
 from sqlalchemy import text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 PHASE10_VERSION = "2026-04-30-process-reports-phase10"

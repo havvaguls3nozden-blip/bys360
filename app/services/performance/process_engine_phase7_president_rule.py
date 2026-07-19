@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any, Iterable
@@ -10,6 +8,7 @@ from typing import Any, Iterable
 from sqlalchemy import text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 PHASE7_VERSION = "2026-04-29-performance-process-engine-phase7"

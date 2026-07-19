@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 SETTING_EDGE_COMMENT = "require_criterion_comment_for_score_1_5"

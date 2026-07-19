@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """Performans servis katmanını tek merkezden okuyan güvenli orkestrasyon yardımcıları.
@@ -14,6 +13,7 @@ from collections import Counter
 from typing import Any, Iterable
 
 from app.models import EvaluationAssignment, PerformanceEvaluation
+
 from .assignments import (
     build_assignment_log_summary,
     generate_assignments_for_active_period,
@@ -22,6 +22,7 @@ from .assignments import (
 from .common import get_active_period, get_period
 from .hierarchy import analyze_hierarchy_rows, build_assignment_rows
 from .reporting import build_team_compare_rows
+
 logger = logging.getLogger(__name__)
 
 
