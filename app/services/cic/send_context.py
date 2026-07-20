@@ -31,10 +31,7 @@ from app.services.cic.misc_context import (
     get_recipients,
     get_template,
 )
-from app.services.cic.query_service import (
-    _cic_v40_active_staff_candidates,
-    _cic_v40_special_day_users,
-)
+from app.services.cic.query_service import _cic_v40_special_day_users
 from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 
 BASE_KEY = "corporate_information_center"
@@ -541,46 +538,22 @@ def _cic_v40_special_days_today(now: object = None) -> list[dict[str, object]]:
     return [d for d in _cic_v40_special_days() if d.get("enabled") and str(d.get("date")) == today_key]
 
 
-def _cic_v40_birthday_users(now: object = None) -> list[User]:
-    if not _cic_v40_setting_bool("celebrations_enabled", True) or not _cic_v40_setting_bool("birthday_enabled", True):
-        return []
-    today_key = _cic_v40_mmdd(_cic_v40_today(now))
-    users: list[User] = []
-    for user in _cic_v40_active_staff_candidates():
-        birth = _cic_v40_user_date(user, "birth_date", "dogum_tarihi", "date_of_birth")
-        if birth and _cic_v40_mmdd(birth) == today_key:
-            users.append(user)
-    return users
 
-def _cic_v40_service_year(user: object, now: object = None) -> int:
-    today = _cic_v40_today(now)
-    hire = _cic_v40_user_date(user, "hire_date", "goreve_baslama_tarihi", "ise_baslama_tarihi", "start_date")
-    if not hire:
-        return 0
-    years = today.year - hire.year
-    if (today.month, today.day) < (hire.month, hire.day):
-        years -= 1
-    return max(0, years)
 
-def _cic_v40_anniversary_users(now: object = None) -> list[User]:
-    if not _cic_v40_setting_bool("celebrations_enabled", True) or not _cic_v40_setting_bool("work_anniversary_enabled", True):
-        return []
-    today_key = _cic_v40_mmdd(_cic_v40_today(now))
-    users: list[User] = []
-    for user in _cic_v40_active_staff_candidates():
-        hire = _cic_v40_user_date(user, "hire_date", "goreve_baslama_tarihi", "ise_baslama_tarihi", "start_date")
-        if hire and _cic_v40_mmdd(hire) == today_key and _cic_v40_service_year(user, now) > 0:
-            users.append(user)
-    return users
 
 
 def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
     """Resolve CIC task recipients through one explicit public layer."""
     if override_users is not None:
         return override_users
-    if task_key == "staff_birthday":
-        return _cic_v40_birthday_users()
-    if task_key == "work_anniversary":
+    if task_key in {"staff_birthday", "work_anniversary"}:
+        from app.services.cic.celebration_service import (
+            _cic_v40_anniversary_users,
+            _cic_v40_birthday_users,
+        )
+
+        if task_key == "staff_birthday":
+            return _cic_v40_birthday_users()
         return _cic_v40_anniversary_users()
     if task_key == "special_day":
         return _cic_v40_special_day_users()
@@ -590,7 +563,14 @@ def _render_template_text(text: str, user: User | None, task_key: str) -> str:
     """Render CIC mail template text through one explicit public layer."""
     rendered = _render_template_text_base(text, user, task_key)
     special_names = ", ".join(str(d.get("name")) for d in _cic_v40_special_days_today()) or "\u00d6zel G\u00fcn"
-    service_year = _cic_v40_service_year(user) if user is not None else 0
+    if user is not None:
+        from app.services.cic.celebration_service import (
+            _cic_v40_service_year,
+        )
+
+        service_year = _cic_v40_service_year(user)
+    else:
+        service_year = 0
     extra = {
         "ozel_gun_adi": special_names,
         "hizmet_yili": service_year or "de\u011ferli",
@@ -607,12 +587,9 @@ __all__ = [
     "_cic_v11_mail_settings",
     "_cic_v11_normalize_email",
     "_cic_v11_send_email_direct",
-    "_cic_v40_anniversary_users",
-    "_cic_v40_birthday_users",
     "_cic_v40_bool",
     "_cic_v40_mmdd",
     "_cic_v40_parse_date",
-    "_cic_v40_service_year",
     "_cic_v40_setting_bool",
     "_cic_v40_special_days",
     "_cic_v40_special_days_today",

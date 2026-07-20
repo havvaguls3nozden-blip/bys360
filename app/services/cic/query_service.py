@@ -104,10 +104,12 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
 
 
 def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]]:
+    from app.services.cic.celebration_service import (
+        _cic_v40_service_year,
+    )
     from app.services.cic.cic_context import _cic_v40_days_until
     from app.services.cic.send_context import (
         _cic_v40_mmdd,
-        _cic_v40_service_year,
         _cic_v40_today,
         _cic_v40_user_date,
     )

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.extensions import db
 
 try:
     from app.services.mail_core import send_email, create_mail_log
@@ -151,7 +150,6 @@ BYS360""",
 from app.services.cic.config_context import (
     _clean_ids,
     _clothing,
-    _dumps_json,
     _ensure_defaults_base,
     _format_weather,
     _has_settings_table,
@@ -159,9 +157,7 @@ from app.services.cic.config_context import (
     _now,
     _tomorrow_note,
     _weather,
-    ensure_defaults,
     get_config,
-    get_setting,
     set_setting,
 )
 
@@ -193,8 +189,6 @@ def can_manage(user: Any) -> bool:
 # Phase4J V30C CIC save_context facade imports
 from app.services.cic.save_context import (
     _save_system_base,
-    ensure_celebration_schema,
-    save_celebration_settings,
     save_recipients,
     save_system,
     save_tasks,
@@ -215,15 +209,9 @@ from app.services.cic.send_context import (
     _cic_v11_mail_settings,
     _cic_v11_normalize_email,
     _cic_v11_send_email_direct,
-    _cic_v40_anniversary_users,
-    _cic_v40_birthday_users,
     _cic_v40_bool,
     _cic_v40_mmdd,
     _cic_v40_parse_date,
-    _cic_v40_service_year,
-    _cic_v40_setting_bool,
-    _cic_v40_special_days,
-    _cic_v40_special_days_today,
     _cic_v40_today,
     _cic_v40_user_date,
     _dashboard_counts,
@@ -254,7 +242,6 @@ from app.services.cic.misc_context import (
     _cic_phase6_status,
     _cic_phase6_template_quality,
     _context_base,
-    context,
     get_auto_scheduler_config,
     get_recent_logs,
     get_recipients,
@@ -304,17 +291,7 @@ from app.services.cic.cic_context import (
     _cic_v40_create_system_notifications,
     _cic_v40_date_input,
     _cic_v40_days_until,
-    _cic_v40_run_weekend_celebrations,
-    _cic_v40_upcoming_special_days,
-    _cic_v45_bool,
-    _cic_v45_build_user_indexes,
-    _cic_v45_ensure_schema,
-    _cic_v45_existing_user_rows,
-    _cic_v45_header_key,
     _cic_v45_norm,
-    _cic_v45_norm_name,
-    _cic_v45_parse_date,
-    _cic_v45_text,
     _cic_weekday_name_tr,
     send_task,
 )
@@ -434,7 +411,6 @@ from app.services.cic.run_context import (
 # Akilli Kutlama ve Otomatik Ozel Gun Bilgilendirme Motoru.
 # Bu blok mevcut Kurumsal Bilgilendirme motorunu bozmadan genisletir.
 
-from typing import Any as _cic_v40_Any
 
 _CIC_V40_CELEBRATION_TASKS = {"staff_birthday", "work_anniversary", "special_day"}
 _CIC_V40_SPECIAL_DAY_DEFAULTS = [
@@ -547,51 +523,6 @@ Nice başarılı yıllar dileriz.
 
 
 
-def celebration_context(search: str | None = None) -> dict[str, _cic_v40_Any]:
-    from app.services.cic.query_service import (
-        _cic_v40_upcoming_users,
-        list_users,
-    )
-
-    ensure_defaults()
-    schema = ensure_celebration_schema()
-    data = context(search)
-    users = list_users(search=search, limit=1000)
-    today_birthdays = _cic_v40_birthday_users()
-    today_anniversaries = _cic_v40_anniversary_users()
-    today_specials = _cic_v40_special_days_today()
-    data.update({
-        "active_tab": "celebrations",
-        "celebration": {
-            "schema": schema,
-            "settings": {
-                "celebrations_enabled": _cic_v40_setting_bool("celebrations_enabled", True),
-                "birthday_enabled": _cic_v40_setting_bool("birthday_enabled", True),
-                "work_anniversary_enabled": _cic_v40_setting_bool("work_anniversary_enabled", True),
-                "special_day_enabled": _cic_v40_setting_bool("special_day_enabled", True),
-                "system_notifications_enabled": _cic_v40_setting_bool("celebration_system_notifications_enabled", True),
-                "include_weekend": _cic_v40_setting_bool("celebrations_include_weekend", False),
-                "special_day_recipient_mode": get_setting(f"{BASE_KEY}.special_day_recipient_mode", "all_active") or "all_active",
-            },
-            "special_days": _cic_v40_special_days(),
-            "special_days_json": _dumps_json(_cic_v40_special_days()),
-            "today_birthdays": today_birthdays,
-            "today_anniversaries": today_anniversaries,
-            "today_specials": today_specials,
-            "upcoming_birthdays": _cic_v40_upcoming_users("birthday", 30),
-            "upcoming_anniversaries": _cic_v40_upcoming_users("anniversary", 30),
-            "upcoming_special_days": _cic_v40_upcoming_special_days(45),
-            "users": users,
-            "stats": {
-                "today_total": len(today_birthdays) + len(today_anniversaries) + len(today_specials),
-                "birthday_count": len(today_birthdays),
-                "anniversary_count": len(today_anniversaries),
-                "special_day_count": len(today_specials),
-                "upcoming_total": len(_cic_v40_upcoming_users("birthday", 30)) + len(_cic_v40_upcoming_users("anniversary", 30)) + len(_cic_v40_upcoming_special_days(45)),
-            },
-        },
-    })
-    return data
 
 
 
@@ -624,123 +555,4 @@ def celebration_context(search: str | None = None) -> dict[str, _cic_v40_Any]:
 
 
 
-def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = False, actor_user_id: int | None = None) -> dict[str, object]:
-    _cic_v45_ensure_schema()
-    result: dict[str, object] = {"ok": True, "mode": "apply" if apply else "preview", "total_rows": 0, "matched": 0, "updated": 0, "unmatched": 0, "skipped": 0, "errors": [], "warnings": [], "preview_rows": []}
-    if file_storage is None or not getattr(file_storage, "filename", ""):
-        result["ok"] = False
-        result["errors"].append("Excel dosyası seçilmedi.")
-        return result
-    filename = str(getattr(file_storage, "filename", ""))
-    if not filename.lower().endswith((".xlsx", ".xlsm")):
-        result["ok"] = False
-        result["errors"].append("Sadece .xlsx veya .xlsm dosyası yüklenebilir.")
-        return result
-    try:
-        from openpyxl import load_workbook as _cic_v45_load_workbook
-    except Exception:
-        result["ok"] = False
-        result["errors"].append("Excel okuma kütüphanesi bulunamadı. openpyxl kurulumu gerekiyor.")
-        return result
-    try:
-        stream = getattr(file_storage, "stream", file_storage)
-        try:
-            stream.seek(0)
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2682")
-            pass
-        wb = _cic_v45_load_workbook(stream, data_only=True, read_only=True)
-        ws = wb.active
-        rows_iter = ws.iter_rows(values_only=True)
-        headers = next(rows_iter, None)
-    except Exception as exc:
-        result["ok"] = False
-        result["errors"].append("Excel dosyası okunamadı: " + str(exc))
-        return result
-    if not headers:
-        result["ok"] = False
-        result["errors"].append("Excel dosyasında başlık satırı bulunamadı.")
-        return result
-    header_map: dict[int, str] = {}
-    for idx, h in enumerate(headers):
-        key = _cic_v45_header_key(h)
-        if key and key not in header_map.values():
-            header_map[idx] = key
-    if "sicil_no" not in header_map.values() and "email" not in header_map.values() and "ad_soyad" not in header_map.values():
-        result["ok"] = False
-        result["errors"].append("Eşleştirme için Sicil No, E-posta veya Ad Soyad başlığı bulunmalı.")
-        return result
-    if "birth_date" not in header_map.values() and "hire_date" not in header_map.values() and "celebration_opt_out" not in header_map.values():
-        result["ok"] = False
-        result["errors"].append("Güncellenecek alan bulunamadı. Doğum Tarihi, İşe Başlama Tarihi veya Kutlama Dışı başlığı gerekli.")
-        return result
-    indexes = _cic_v45_build_user_indexes(_cic_v45_existing_user_rows())
-    updates: list[dict[str, object]] = []
-    from sqlalchemy import text as _sa_text
-    for excel_row_no, row in enumerate(rows_iter, start=2):
-        values = {key: row[idx] if idx < len(row) else None for idx, key in header_map.items()}
-        if not any(_cic_v45_text(v) for v in values.values()):
-            continue
-        result["total_rows"] = int(result["total_rows"]) + 1
-        sicil = _cic_v45_text(values.get("sicil_no"))
-        email = _cic_v45_text(values.get("email")).lower()
-        name = _cic_v45_text(values.get("ad_soyad")) or (_cic_v45_text(values.get("ad")) + " " + _cic_v45_text(values.get("soyad"))).strip()
-        user = None
-        match_by = ""
-        if sicil and sicil in indexes["sicil"]:
-            user = indexes["sicil"][sicil]; match_by = "Sicil No"
-        elif email and email in indexes["email"]:
-            user = indexes["email"][email]; match_by = "E-posta"
-        else:
-            n = _cic_v45_norm_name(name)
-            if n and n in indexes["name"]:
-                user = indexes["name"][n]; match_by = "Ad Soyad"
-        if not user:
-            result["unmatched"] = int(result["unmatched"]) + 1
-            if len(result["warnings"]) < 25:
-                result["warnings"].append(f"Satır {excel_row_no}: Personel eşleşmedi ({sicil or email or name or 'tanımsız'}).")
-            continue
-        birth_date = _cic_v45_parse_date(values.get("birth_date")) if "birth_date" in values else None
-        hire_date = _cic_v45_parse_date(values.get("hire_date")) if "hire_date" in values else None
-        opt_raw = values.get("celebration_opt_out") if "celebration_opt_out" in values else None
-        opt_out = _cic_v45_bool(opt_raw)
-        fields: dict[str, object] = {}
-        if "birth_date" in values and values.get("birth_date") not in (None, ""):
-            if birth_date:
-                fields["birth_date"] = birth_date
-            else:
-                result["warnings"].append(f"Satır {excel_row_no}: Doğum tarihi okunamadı.")
-        if "hire_date" in values and values.get("hire_date") not in (None, ""):
-            if hire_date:
-                fields["hire_date"] = hire_date
-            else:
-                result["warnings"].append(f"Satır {excel_row_no}: İşe başlama tarihi okunamadı.")
-        if opt_raw not in (None, "") and opt_out is not None:
-            fields["celebration_opt_out"] = bool(opt_out)
-        if not fields:
-            result["skipped"] = int(result["skipped"]) + 1
-            continue
-        result["matched"] = int(result["matched"]) + 1
-        preview = {"row": excel_row_no, "user_id": user.get("id"), "match_by": match_by, "sicil_no": sicil or _cic_v45_text(user.get("sicil_no")), "ad_soyad": name or ((_cic_v45_text(user.get("ad")) + " " + _cic_v45_text(user.get("soyad"))).strip()), "birth_date": str(fields.get("birth_date") or ""), "hire_date": str(fields.get("hire_date") or ""), "celebration_opt_out": fields.get("celebration_opt_out") if "celebration_opt_out" in fields else ""}
-        if len(result["preview_rows"]) < 30:
-            result["preview_rows"].append(preview)
-        if apply:
-            updates.append({"id": int(user["id"]), "fields": fields})
-    if apply and updates:
-        with db.engine.begin() as conn:
-            for item in updates:
-                fields = item["fields"]
-                set_sql = []
-                params: dict[str, object] = {"id": item["id"]}
-                for col, val in fields.items():
-                    set_sql.append(f"{col} = :{col}")
-                    params[col] = val
-                if set_sql:
-                    conn.execute(_sa_text("UPDATE users SET " + ", ".join(set_sql) + " WHERE id = :id"), params)
-                    result["updated"] = int(result["updated"]) + 1
-    if not apply:
-        result["warnings"].insert(0, "Ön kontrol yapıldı; veritabanına kayıt yazılmadı.")
-    else:
-        result["warnings"].insert(0, f"Uygulama tamamlandı; {result['updated']} personel kaydı güncellendi.")
-    return result
 # BYS360_CIC_V4_5_CELEBRATION_EXCEL_IMPORT_END

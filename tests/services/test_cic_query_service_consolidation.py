@@ -6,7 +6,13 @@ from types import SimpleNamespace
 from typing import Any
 
 from app.services import corporate_information_center
-from app.services.cic import cic_context, misc_context, query_service, send_context
+from app.services.cic import (
+    celebration_service,
+    cic_context,
+    misc_context,
+    query_service,
+    send_context,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 MOVED_QUERY_FUNCTIONS = {
@@ -117,10 +123,7 @@ def test_existing_modules_use_the_canonical_query_functions() -> None:
     assert misc_context.list_users is query_service.list_users
     assert misc_context._users_by_ids is query_service._users_by_ids
     assert misc_context._active_staff_users is query_service._active_staff_users
-    assert (
-        send_context._cic_v40_active_staff_candidates
-        is query_service._cic_v40_active_staff_candidates
-    )
+    assert not hasattr(send_context, "_cic_v40_active_staff_candidates")
     assert (
         send_context._cic_v40_special_day_users
         is query_service._cic_v40_special_day_users
@@ -244,7 +247,7 @@ def test_upcoming_users_preserve_sorting_and_anniversary_filter(monkeypatch) -> 
         lambda value, _today: {1: 5, 2: 1}[int(value.rsplit("-", 1)[-1])],
     )
     monkeypatch.setattr(
-        send_context,
+        celebration_service,
         "_cic_v40_service_year",
         lambda user, _today: {1: 3, 2: 0}[user.id],
     )

@@ -18,10 +18,12 @@ from app.services.cic.config_context import (
 from app.services.cic.misc_context import (
     get_auto_scheduler_config,
 )
+from app.services.cic.celebration_service import (
+    _cic_v40_run_weekend_celebrations,
+)
 from app.services.cic.cic_context import (
     _cic_auto_last_run_key,
     _cic_is_weekend,
-    _cic_v40_run_weekend_celebrations,
     _cic_weekday_name_tr,
     send_task,
 )

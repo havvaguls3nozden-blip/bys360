@@ -15,8 +15,6 @@ from app.services.cic.config_context import (
     _dumps_json,
     _loads_json,
     _now,
-    get_config,
-    get_setting,
     set_setting,
 )
 from app.services.cic.send_context import (
@@ -31,11 +29,10 @@ from app.services.cic.send_context import (
 )
 from app.services.cic.misc_context import (
     _cic_phase5_audit_list,
-    get_auto_scheduler_config,
     get_template,
 )
 from datetime import datetime as _cic_dt_datetime
-from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
+from datetime import date as _cic_v40_date
 from typing import Any as _cic_v40_Any
 from datetime import date as _cic_v45_date, datetime as _cic_v45_datetime, timedelta as _cic_v45_timedelta
 import re as _cic_v45_re
@@ -398,35 +395,6 @@ def _cic_v40_upcoming_special_days(days: int = 45) -> list[dict[str, object]]:
         rows.append({**item, "days_left": left})
     return sorted(rows, key=lambda x: int(x.get("days_left") or 0))
 
-def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
-    if not _cic_v40_setting_bool("celebrations_include_weekend", False):
-        return []
-    cfg = get_config()
-    tasks_cfg = cfg.get("tasks", {}) if isinstance(cfg, dict) else {}
-    results: list[dict[str, object]] = []
-    today = current.strftime("%Y-%m-%d")
-    late_window = int(get_auto_scheduler_config().get("late_window_minutes") or 20)
-    for task_key in _CIC_V40_CELEBRATION_TASKS:
-        task_cfg = tasks_cfg.get(task_key, {}) if isinstance(tasks_cfg, dict) else {}
-        if not task_cfg.get("enabled", False):
-            continue
-        hour = int(task_cfg.get("hour", TASK_DEFINITIONS[task_key].get("default_hour", 9)))
-        minute = int(task_cfg.get("minute", TASK_DEFINITIONS[task_key].get("default_minute", 0)))
-        scheduled = current.replace(hour=max(0, min(23, hour)), minute=max(0, min(59, minute)), second=0, microsecond=0)
-        diff_minutes = (current - scheduled).total_seconds() / 60.0
-        last_run = get_setting(_cic_auto_last_run_key(task_key), "") or ""
-        if last_run.startswith(today):
-            continue
-        if not (0 <= diff_minutes <= late_window):
-            continue
-        result = send_task(task_key, dry_run=dry_run, actor_user_id=actor_user_id)
-        set_setting(_cic_auto_last_run_key(task_key), current.strftime("%Y-%m-%d %H:%M:%S"), label=f"{TASK_DEFINITIONS[task_key].get('label', task_key)} son otomatik çalışma", actor_user_id=actor_user_id)
-        results.append({"task_key": task_key, "action": "ran", "result": result})
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-    return results
 
 def _cic_v45_text(value: object) -> str:
     return "" if value is None else str(value).strip()
@@ -558,7 +526,6 @@ __all__ = [
     "_cic_v40_create_system_notifications",
     "_cic_v40_date_input",
     "_cic_v40_days_until",
-    "_cic_v40_run_weekend_celebrations",
     "_cic_v40_upcoming_special_days",
     "_cic_v45_bool",
     "_cic_v45_build_user_indexes",
