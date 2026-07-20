@@ -12,7 +12,6 @@ from app.services.cic import (
     config_context,
     facade,
     misc_context,
-    repository,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -54,38 +53,52 @@ CANONICAL_OWNERS = {
 }
 
 
-def test_repository_no_longer_imports_or_calls_legacy_module() -> None:
-    source = REPOSITORY_PATH.read_text(encoding="utf-8")
-    tree = ast.parse(source)
+def _imports_repository(path: Path) -> bool:
+    tree = ast.parse(path.read_text(encoding="utf-8-sig"), filename=str(path))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module == "app.services.cic.repository":
+                return True
+            if node.module == "app.services.cic" and any(
+                alias.name == "repository" for alias in node.names
+            ):
+                return True
+            relative = path.relative_to(ROOT).as_posix()
+            in_cic_package = relative.startswith("app/services/cic/")
+            if in_cic_package and node.level and node.module == "repository":
+                return True
+            if (
+                in_cic_package
+                and node.level
+                and node.module is None
+                and any(alias.name == "repository" for alias in node.names)
+            ):
+                return True
+        elif isinstance(node, ast.Import) and any(
+            alias.name == "app.services.cic.repository" for alias in node.names
+        ):
+            return True
+    return False
 
-    assert not any(
-        isinstance(node, ast.ImportFrom)
-        and node.module == "app.services"
-        and any(
-            alias.name == "corporate_information_center"
-            for alias in node.names
-        )
-        for node in tree.body
-    )
-    assert not any(
-        isinstance(node, ast.Import)
-        and any(
-            alias.name == "app.services.corporate_information_center"
-            for alias in node.names
-        )
-        for node in tree.body
-    )
-    assert not any(
-        isinstance(node, ast.Name) and node.id == "_legacy"
-        for node in ast.walk(tree)
-    )
+
+def test_repository_compatibility_module_is_deleted() -> None:
+    assert not REPOSITORY_PATH.exists()
 
 
-def test_repository_legacy_names_resolve_to_canonical_owners() -> None:
+def test_active_python_files_do_not_import_repository_module() -> None:
+    offenders = []
+    for base in (ROOT / "app", ROOT / "scripts", ROOT / "tests"):
+        for path in base.rglob("*.py"):
+            if path == Path(__file__).resolve():
+                continue
+            if _imports_repository(path):
+                offenders.append(path.relative_to(ROOT).as_posix())
+    assert offenders == []
+
+
+def test_facade_legacy_names_resolve_to_canonical_owners() -> None:
     for name, owner in CANONICAL_OWNERS.items():
-        expected = getattr(owner, name)
-        assert getattr(repository, name) is expected, name
-        assert getattr(facade, name) is expected, name
+        assert getattr(facade, name) is getattr(owner, name), name
 
 
 def test_legacy_entry_point_uses_canonical_access_policy() -> None:
@@ -110,7 +123,7 @@ def test_can_manage_policy_preserves_role_contract() -> None:
     )
 
 
-def test_repository_is_removed_from_legacy_import_allowlist() -> None:
+def test_repository_is_absent_from_legacy_import_allowlist() -> None:
     guard_path = ROOT / "tests/architecture/test_cic_consolidation_guardrails_v1.py"
     source = guard_path.read_text(encoding="utf-8")
     assert '"app/services/cic/repository.py"' not in source

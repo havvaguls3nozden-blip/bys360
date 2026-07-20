@@ -13,7 +13,6 @@ from app.services.cic import (
     facade,
     mail_service,
     misc_context,
-    repository,
     save_context,
     template_service,
 )
@@ -52,7 +51,6 @@ def test_template_functions_have_one_canonical_definition() -> None:
         "app/services/cic/misc_context.py",
         "app/services/cic/save_context.py",
         "app/services/cic/cic_context.py",
-        "app/services/cic/repository.py",
         "app/services/corporate_information_center.py",
     ):
         assert not (
@@ -83,8 +81,7 @@ def test_existing_entry_points_use_canonical_template_functions() -> None:
         misc_context,
         save_context,
         cic_context,
-        repository,
-        corporate_information_center,
+            corporate_information_center,
     ):
         for name in MOVED_TEMPLATE_FUNCTIONS:
             assert not hasattr(module, name), (module.__name__, name)
