@@ -7,11 +7,12 @@ from typing import Any
 
 from app.services import corporate_information_center
 from app.services.cic import (
+    celebration_dates,
     celebration_service,
     cic_context,
+    mail_service,
     misc_context,
     query_service,
-    send_context,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -105,7 +106,6 @@ def test_query_functions_have_one_canonical_definition() -> None:
 
     for relative in (
         "app/services/cic/misc_context.py",
-        "app/services/cic/send_context.py",
         "app/services/cic/cic_context.py",
     ):
         assert not (
@@ -121,13 +121,10 @@ def test_query_functions_have_one_canonical_definition() -> None:
 
 def test_existing_modules_use_the_canonical_query_functions() -> None:
     assert misc_context.list_users is query_service.list_users
-    assert misc_context._users_by_ids is query_service._users_by_ids
-    assert misc_context._active_staff_users is query_service._active_staff_users
-    assert not hasattr(send_context, "_cic_v40_active_staff_candidates")
-    assert (
-        send_context._cic_v40_special_day_users
-        is query_service._cic_v40_special_day_users
-    )
+    assert not hasattr(misc_context, "_users_by_ids")
+    assert not hasattr(misc_context, "_active_staff_users")
+    assert not (ROOT / "app/services/cic/send_context.py").exists()
+    assert not hasattr(mail_service, "_cic_v40_special_day_users")
     assert not hasattr(cic_context, "_cic_v40_upcoming_users")
     assert not hasattr(corporate_information_center, "list_users")
     assert not hasattr(
@@ -192,17 +189,17 @@ def test_celebration_candidates_and_special_day_modes(monkeypatch) -> None:
     ] == [1]
 
     monkeypatch.setattr(
-        send_context,
+        celebration_dates,
         "_cic_v40_setting_bool",
         lambda _key, _default: True,
     )
     monkeypatch.setattr(
-        send_context,
+        celebration_dates,
         "_cic_v40_special_days_today",
         lambda _now=None: [{"date": "01-01"}],
     )
     monkeypatch.setattr(
-        misc_context,
+        mail_service,
         "get_recipients",
         lambda: {"staff": ["manual-user"]},
     )
@@ -234,13 +231,13 @@ def test_upcoming_users_preserve_sorting_and_anniversary_filter(monkeypatch) -> 
         "_cic_v40_active_staff_candidates",
         lambda: users,
     )
-    monkeypatch.setattr(send_context, "_cic_v40_today", lambda: "today")
+    monkeypatch.setattr(celebration_dates, "_cic_v40_today", lambda: "today")
     monkeypatch.setattr(
-        send_context,
+        celebration_dates,
         "_cic_v40_user_date",
         lambda user, *_attributes: f"date-{user.id}",
     )
-    monkeypatch.setattr(send_context, "_cic_v40_mmdd", lambda value: value)
+    monkeypatch.setattr(celebration_dates, "_cic_v40_mmdd", lambda value: value)
     monkeypatch.setattr(
         cic_context,
         "_cic_v40_days_until",

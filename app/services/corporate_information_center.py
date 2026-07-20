@@ -192,7 +192,6 @@ from app.services.cic.save_context import (
     save_recipients,
     save_system,
     save_tasks,
-    set_auto_scheduler_config,
 )
 
 
@@ -200,22 +199,28 @@ from app.services.cic.save_context import (
 
 
 
-# Phase4J V28C CIC send_context facade imports
-from app.services.cic.send_context import (
+# Phase4J V28C CIC canonical mail service compatibility imports
+from app.services.cic.celebration_dates import (
+    _cic_v40_bool,
+    _cic_v40_mmdd,
+    _cic_v40_parse_date,
+    _cic_v40_today,
+    _cic_v40_user_date,
+)
+from app.services.cic.mail_service import (
     _cic_v11_bool,
     _cic_v11_clean_header,
     _cic_v11_get_setting_value,
     _cic_v11_mail_settings,
     _cic_v11_normalize_email,
     _cic_v11_send_email_direct,
-    _cic_v40_bool,
-    _cic_v40_mmdd,
-    _cic_v40_parse_date,
-    _cic_v40_today,
-    _cic_v40_user_date,
+    _cic_phase5_mail_health,
+    _cic_phase6_missing_email_count,
     _recipients_for_task,
     _recipients_for_task_base,
     _send_task_base,
+    get_recipients,
+    send_task,
 )
 
 
@@ -226,17 +231,13 @@ from app.services.cic.misc_context import (
     _cic_phase5_audit_list,
     _cic_phase5_last_result,
     _cic_phase5_log_metrics,
-    _cic_phase5_mail_health,
     _cic_phase5_readiness,
     _cic_phase5_safe_int,
     _cic_phase5_task_preview,
     _cic_phase6_build,
     _cic_phase6_log_quality,
-    _cic_phase6_missing_email_count,
     _context_base,
-    get_auto_scheduler_config,
     get_recent_logs,
-    get_recipients,
 )
 
 
@@ -284,7 +285,6 @@ from app.services.cic.cic_context import (
     _cic_v40_days_until,
     _cic_v45_norm,
     _cic_weekday_name_tr,
-    send_task,
 )
 
 
@@ -391,10 +391,12 @@ from app.services.cic.cic_context import (
 
 
 
-# Phase4J V31C CIC run_context facade imports
-from app.services.cic.run_context import (
+# Phase4J V31C CIC canonical scheduler service compatibility imports
+from app.services.cic.scheduler_service import (
     _run_due_tasks_base,
+    get_auto_scheduler_config,
     run_due_tasks,
+    set_auto_scheduler_config,
 )
 
 

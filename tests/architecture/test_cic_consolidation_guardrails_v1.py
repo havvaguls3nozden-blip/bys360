@@ -71,7 +71,6 @@ TASK_KEYS = {
 }
 
 LEGACY_IMPORT_ALLOWLIST = {
-    "app/services/cic/mail_scheduler_service.py",
     "app/services/cic/repository.py",
     "scripts/communication/run_corporate_information_task.py",
 }

@@ -19,7 +19,6 @@ from app.services.cic.cic_context import (
     _cic_v45_norm_name,
     _cic_v45_parse_date,
     _cic_v45_text,
-    send_task,
 )
 from app.services.cic.config_context import (
     _dumps_json,
@@ -28,13 +27,13 @@ from app.services.cic.config_context import (
     get_setting,
     set_setting,
 )
-from app.services.cic.misc_context import context, get_auto_scheduler_config
+from app.services.cic.misc_context import context
 from app.services.cic.query_service import (
     _cic_v40_active_staff_candidates,
     _cic_v40_upcoming_users,
     list_users,
 )
-from app.services.cic.send_context import (
+from app.services.cic.celebration_dates import (
     _cic_v40_bool,
     _cic_v40_mmdd,
     _cic_v40_parse_date,
@@ -109,6 +108,9 @@ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool 
     tasks_cfg = cfg.get("tasks", {}) if isinstance(cfg, dict) else {}
     results: list[dict[str, object]] = []
     today = current.strftime("%Y-%m-%d")
+    from app.services.cic.mail_service import send_task
+    from app.services.cic.scheduler_service import get_auto_scheduler_config
+
     late_window = int(get_auto_scheduler_config().get("late_window_minutes") or 20)
     for task_key in _CIC_V40_CELEBRATION_TASKS:
         task_cfg = tasks_cfg.get(task_key, {}) if isinstance(tasks_cfg, dict) else {}

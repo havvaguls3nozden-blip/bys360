@@ -112,7 +112,7 @@ def _render_template_text(
     task_key: str,
 ) -> str:
     from app.services.cic.celebration_service import _cic_v40_service_year
-    from app.services.cic.send_context import _cic_v40_special_days_today
+    from app.services.cic.celebration_dates import _cic_v40_special_days_today
 
     rendered = _render_template_text_base(text, user, task_key)
     special_names = ", ".join(

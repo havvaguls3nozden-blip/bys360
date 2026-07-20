@@ -14,9 +14,9 @@ from app.services.cic import (
     celebration_service,
     cic_context,
     facade,
-    run_context,
+    mail_service,
     save_context,
-    send_context,
+    scheduler_service,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,7 +46,6 @@ def test_celebration_functions_have_one_canonical_definition() -> None:
     assert _top_level_definitions(canonical) >= MOVED_CELEBRATION_FUNCTIONS
 
     for relative in (
-        "app/services/cic/send_context.py",
         "app/services/cic/cic_context.py",
         "app/services/cic/save_context.py",
         "app/services/corporate_information_center.py",
@@ -67,13 +66,11 @@ def test_existing_entry_points_use_canonical_celebration_functions() -> None:
         assert getattr(facade, name) is canonical
         assert not hasattr(corporate_information_center, name)
 
-    assert (
-        run_context._cic_v40_run_weekend_celebrations
-        is celebration_service._cic_v40_run_weekend_celebrations
-    )
-    assert not hasattr(send_context, "_cic_v40_birthday_users")
-    assert not hasattr(send_context, "_cic_v40_anniversary_users")
-    assert not hasattr(send_context, "_cic_v40_service_year")
+    assert not (ROOT / "app/services/cic/send_context.py").exists()
+    assert not (ROOT / "app/services/cic/run_context.py").exists()
+    assert not hasattr(mail_service, "_cic_v40_birthday_users")
+    assert not hasattr(mail_service, "_cic_v40_anniversary_users")
+    assert not hasattr(mail_service, "_cic_v40_service_year")
     assert not hasattr(cic_context, "_cic_v40_run_weekend_celebrations")
     assert not hasattr(save_context, "ensure_celebration_schema")
     assert not hasattr(save_context, "save_celebration_settings")
@@ -130,7 +127,7 @@ def test_disabled_celebration_switches_return_no_recipients(monkeypatch) -> None
     assert celebration_service._cic_v40_anniversary_users() == []
 
 
-def test_send_context_resolves_canonical_celebration_recipients(
+def test_mail_service_resolves_canonical_celebration_recipients(
     monkeypatch,
 ) -> None:
     monkeypatch.setattr(
@@ -144,10 +141,10 @@ def test_send_context_resolves_canonical_celebration_recipients(
         lambda: ["anniversary-user"],
     )
 
-    assert send_context._recipients_for_task("staff_birthday") == [
+    assert mail_service._recipients_for_task("staff_birthday") == [
         "birthday-user"
     ]
-    assert send_context._recipients_for_task("work_anniversary") == [
+    assert mail_service._recipients_for_task("work_anniversary") == [
         "anniversary-user"
     ]
 
@@ -182,7 +179,7 @@ def test_weekend_scheduler_runs_due_enabled_celebration(monkeypatch) -> None:
         },
     )
     monkeypatch.setattr(
-        celebration_service,
+        scheduler_service,
         "get_auto_scheduler_config",
         lambda: {"late_window_minutes": 20},
     )
@@ -192,7 +189,7 @@ def test_weekend_scheduler_runs_due_enabled_celebration(monkeypatch) -> None:
         lambda _key, _default="": "",
     )
     monkeypatch.setattr(
-        celebration_service,
+        mail_service,
         "send_task",
         lambda task_key, **kwargs: {
             "task_key": task_key,

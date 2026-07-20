@@ -10,10 +10,9 @@ from app.services.cic.config_context import (
     _dumps_json,
     _now,
     get_config,
-    get_setting,
     set_setting,
 )
-from app.services.cic.misc_context import _cic_auto_bool
+from app.services.cic.scheduler_service import set_auto_scheduler_config
 
 BASE_KEY = "corporate_information_center"
 
@@ -205,29 +204,6 @@ def save_recipients(payload: dict[str, Any], actor_user_id: int | None = None) -
     set_setting(f"{BASE_KEY}.last_recipient_save_at", _now().isoformat(timespec="seconds"), label="Son alıcı kayıt zamanı", value_type="string", actor_user_id=actor_user_id)
     db.session.commit()
 
-def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:  # type: ignore[override]
-    enabled = "true" if _cic_auto_bool(payload.get("auto_scheduler_enabled"), default=False) else "false"
-    if "auto_scheduler_weekdays_only" in payload:
-        weekdays_only = "true" if _cic_auto_bool(payload.get("auto_scheduler_weekdays_only"), default=True) else "false"
-    else:
-        weekdays_only = str(get_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", "true") or "true").lower()
-        if weekdays_only not in {"true", "false"}:
-            weekdays_only = "true"
-    try:
-        late_window = int(payload.get("auto_scheduler_late_window_minutes") or 20)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1793")
-        late_window = 20
-    late_window = max(1, min(120, late_window))
-
-    set_setting(f"{BASE_KEY}.auto_scheduler_enabled", enabled, label="Otomatik mail zamanlayıcı", value_type="boolean", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", weekdays_only, label="Otomatik mail yalnızca hafta içi", value_type="boolean", actor_user_id=actor_user_id)
-    set_setting(f"{BASE_KEY}.auto_scheduler_late_window_minutes", str(late_window), label="Otomatik mail gecikme toleransı", value_type="integer", actor_user_id=actor_user_id)
-    try:
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-
 def save_system(payload: dict[str, object], actor_user_id: int | None = None) -> None:
     """Persist CIC system settings through one explicit public layer.
 
@@ -245,5 +221,4 @@ __all__ = [
     "save_recipients",
     "save_system",
     "save_tasks",
-    "set_auto_scheduler_config",
 ]

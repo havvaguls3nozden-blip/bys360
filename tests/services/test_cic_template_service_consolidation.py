@@ -11,9 +11,10 @@ from app.services.cic import (
     cic_context,
     facade,
     misc_context,
+    celebration_dates,
+    mail_service,
     repository,
     save_context,
-    send_context,
     template_service,
 )
 
@@ -48,7 +49,6 @@ def test_template_functions_have_one_canonical_definition() -> None:
     assert _top_level_definitions(canonical) >= MOVED_TEMPLATE_FUNCTIONS
 
     for relative in (
-        "app/services/cic/send_context.py",
         "app/services/cic/misc_context.py",
         "app/services/cic/save_context.py",
         "app/services/cic/cic_context.py",
@@ -74,12 +74,12 @@ def test_existing_entry_points_use_canonical_template_functions() -> None:
     for name in FACADE_TEMPLATE_FUNCTIONS:
         assert getattr(facade, name) is getattr(template_service, name)
 
-    assert send_context._template_service is template_service
+    assert mail_service._template_service is template_service
     assert misc_context._template_service is template_service
     assert cic_context._template_service is template_service
 
     for module in (
-        send_context,
+        mail_service,
         misc_context,
         save_context,
         cic_context,
@@ -276,7 +276,7 @@ def test_render_template_adds_celebration_placeholders(monkeypatch) -> None:
         lambda text, _user, _task_key: text.replace("{ad_soyad}", "Ada"),
     )
     monkeypatch.setattr(
-        send_context,
+        celebration_dates,
         "_cic_v40_special_days_today",
         lambda: [{"name": "Zafer Bayramı"}, {"name": "Kurum Günü"}],
     )

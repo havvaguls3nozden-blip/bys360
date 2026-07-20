@@ -5,7 +5,7 @@ from typing import Any
 
 # BYS360 CIC task contract extracted from legacy corporate_information_center.py.
 # This module is intentionally data-only; it must not send mail, query recipients,
-# or import facade/mail_scheduler_service. P19A keeps runtime behavior unchanged.
+# or import facade/scheduler_service. P19A keeps runtime behavior unchanged.
 
 BASE_KEY = "corporate_information_center"
 
