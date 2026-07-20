@@ -58,6 +58,11 @@ from app.services.cic.config_context import (
     _tomorrow_note,
     get_setting,  # noqa: F401 - historical repository compatibility attribute
 )
+from app.services.cic.mail_service import (
+    _cic_v11_bool,
+    _cic_v11_clean_header,
+    _cic_v11_normalize_email,  # noqa: F401 - historical repository compatibility attribute
+)
 from app.services.cic.misc_context import (
     _cic_auto_bool,
     _cic_phase5_audit_list,
@@ -130,29 +135,6 @@ __all__ = [
 # --- BYS360 P6 migrated low-risk helpers: start ---
 # These helpers were migrated from app.services.corporate_information_center.
 # The legacy module keeps import aliases for backwards compatibility.
-
-
-
-def _cic_v11_bool(value, default=False):
-    if value is None or value == "":
-        return bool(default)
-    if isinstance(value, bool):
-        return value
-    normalized = str(value).strip().lower()
-    if normalized in {"1", "true", "on", "yes", "evet", "tls", "ssl"}:
-        return True
-    if normalized in {"0", "false", "off", "no", "hayir", "hayır", "none", "null"}:
-        return False
-    return bool(default)
-
-def _cic_v11_clean_header(value):
-    return str(value or "").replace("\r", " ").replace("\n", " ").strip()
-
-def _cic_v11_normalize_email(value):
-    email = _cic_v11_clean_header(value).strip().strip(",;")
-    if not email or "@" not in email or " " in email:
-        return ""
-    return email
 
 
 
