@@ -38,3 +38,57 @@ def test_archive_direct_detail_access_uses_allowed_ids(monkeypatch):
 
     assert svc.can_view_archived_result(personel, record) is False
     assert svc.can_view_archived_result(personel, own_record) is True
+
+
+def test_phase7_archive_policy_keeps_group_heads_scope_limited():
+    from app.services.performance.phase7_scorecard_archive_policy import (
+        resolve_archive_visibility,
+    )
+
+    for role in (
+        "grup baskani",
+        "grup_baskani",
+        "grup başkanı",
+        "personel_ve_destek_hizmetleri_grup_baskani",
+    ):
+        in_scope = resolve_archive_visibility(
+            viewer=_user(7, role),
+            employee_id=11,
+            scope_employee_ids=[11, 12],
+        )
+        assert in_scope.allowed is True
+        assert in_scope.scope == "scope"
+        assert in_scope.can_view_source_document is False
+
+        out_of_scope = resolve_archive_visibility(
+            viewer=_user(7, role),
+            employee_id=99,
+            scope_employee_ids=[11, 12],
+        )
+        assert out_of_scope.allowed is False
+        assert out_of_scope.scope == "denied"
+        assert out_of_scope.can_view_source_document is False
+
+    for role in (
+        "baskan",
+        "baskan_yardimcisi",
+        "Admin",
+        "SİSTEM_YÖNETİCİSİ",
+    ):
+        global_view = resolve_archive_visibility(
+            viewer=_user(7, role),
+            employee_id=99,
+            scope_employee_ids=[],
+        )
+        assert global_view.allowed is True
+        assert global_view.scope == "all"
+        assert global_view.can_view_source_document is True
+
+    similar_title = resolve_archive_visibility(
+        viewer=_user(7, "baskan_danismani"),
+        employee_id=99,
+        scope_employee_ids=[],
+    )
+    assert similar_title.allowed is False
+    assert similar_title.scope == "denied"
+    assert similar_title.can_view_source_document is False

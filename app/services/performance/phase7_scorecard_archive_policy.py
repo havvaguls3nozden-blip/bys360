@@ -108,16 +108,49 @@ def _role_names(user: Any) -> set[str]:
     return names
 
 
+def _normalize_role_name(value: Any) -> str:
+    text = str(value or "").strip().lower().replace("\u0307", "")
+    return " ".join(
+        text.replace("_", " ").replace("-", " ").split()
+    )
+
+
 def _is_admin_or_president(user: Any) -> bool:
-    roles = _role_names(user)
-    joined = " ".join(roles)
-    return any(token in joined for token in ["admin", "sistem yöneticisi", "sistem yoneticisi", "başkan", "baskan"])
+    global_roles = {
+        "admin",
+        "administrator",
+        "super admin",
+        "system admin",
+        "admin sistem yöneticisi",
+        "admin sistem yoneticisi",
+        "sistem yöneticisi",
+        "sistem yoneticisi",
+        "başkan",
+        "baskan",
+        "başkanlık",
+        "baskanlik",
+        "president",
+        "başkan yardımcısı",
+        "baskan yardimcisi",
+    }
+    return any(
+        _normalize_role_name(role) in global_roles
+        for role in _role_names(user)
+    )
 
 
 def _is_scope_manager(user: Any) -> bool:
-    roles = _role_names(user)
-    joined = " ".join(roles)
-    return any(token in joined for token in ["grup başkanı", "grup baskani", "koordinatör", "koordinator", "personel ve destek"])
+    manager_roles = {
+        "grup başkanı",
+        "grup baskani",
+        "koordinatör",
+        "koordinator",
+    }
+    normalized_roles = {_normalize_role_name(role) for role in _role_names(user)}
+    return any(
+        role in manager_roles or role.startswith("personel ve destek")
+        for role in normalized_roles
+    )
 
 
 def resolve_archive_visibility(
