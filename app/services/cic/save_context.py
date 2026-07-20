@@ -167,13 +167,6 @@ def save_tasks(payload: dict[str, Any], actor_user_id: int | None = None) -> Non
     set_setting(f"{BASE_KEY}.tasks", _dumps_json(tasks), label="Kurumsal bilgilendirme görevleri", value_type="json", actor_user_id=actor_user_id)
     db.session.commit()
 
-def save_templates(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
-    for key, meta in TASK_DEFINITIONS.items():
-        subject = (payload.get(f"subject_{key}") or meta["subject"]).strip()
-        body = (payload.get(f"body_{key}") or meta["body"]).strip()
-        set_setting(f"{BASE_KEY}.template.{key}.subject", subject, label=f"{meta['label']} konusu", actor_user_id=actor_user_id)
-        set_setting(f"{BASE_KEY}.template.{key}.body", body, label=f"{meta['label']} metni", value_type="text", actor_user_id=actor_user_id)
-    db.session.commit()
 
 def _save_system_base(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
     set_setting(f"{BASE_KEY}.location_name", (payload.get("location_name") or "Çanakkale").strip(), label="Hava durumu konumu", actor_user_id=actor_user_id)
@@ -252,6 +245,5 @@ __all__ = [
     "save_recipients",
     "save_system",
     "save_tasks",
-    "save_templates",
     "set_auto_scheduler_config",
 ]

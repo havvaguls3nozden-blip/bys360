@@ -20,6 +20,7 @@ from app.services.cic.query_service import (
     _users_by_ids,
     list_users,
 )
+import app.services.cic.template_service as _template_service
 
 
 try:
@@ -171,12 +172,6 @@ def get_recipients() -> dict[str, Any]:
         staff = _users_by_ids(cfg["staff_recipient_ids"])
     return {"managers": managers, "staff": staff, "staff_mode": cfg["staff_recipient_mode"]}
 
-def get_template(task_key: str) -> dict[str, str]:
-    meta = TASK_DEFINITIONS[task_key]
-    return {
-        "subject": get_setting(f"{BASE_KEY}.template.{task_key}.subject", meta["subject"]) or meta["subject"],
-        "body": get_setting(f"{BASE_KEY}.template.{task_key}.body", meta["body"]) or meta["body"],
-    }
 
 def get_recent_logs(limit: int = 120) -> list[Any]:
     try:
@@ -346,7 +341,7 @@ def _context_base(search: str | None = None) -> dict[str, Any]:
     tasks: list[dict[str, Any]] = []
     for key, meta in TASK_DEFINITIONS.items():
         tcfg = cfg.get("tasks", {}).get(key, {})
-        tmpl = get_template(key)
+        tmpl = _template_service.get_template(key)
         tasks.append({"key": key, **meta, **tcfg, "subject": tmpl.get("subject", ""), "body": tmpl.get("body", "")})
     try:
         logs = get_recent_logs(300)
@@ -392,20 +387,7 @@ def _context_base(search: str | None = None) -> dict[str, Any]:
         },
     }
 
-def _cic_phase6_status(ok: bool, warn: bool = False) -> str:
-    if ok:
-        return "ok"
-    return "warn" if warn else "danger"
 
-def _cic_phase6_item(title: str, ok: bool, detail: str, warn: bool = False) -> dict[str, Any]:
-    status = _cic_phase6_status(ok, warn)
-    return {
-        "title": title,
-        "detail": detail,
-        "status": status,
-        "label": "Geçti" if status == "ok" else ("Kontrol" if status == "warn" else "Engel"),
-        "icon": "fa-circle-check" if status == "ok" else ("fa-triangle-exclamation" if status == "warn" else "fa-circle-xmark"),
-    }
 
 def _cic_phase6_missing_email_count(users: list[Any]) -> int:
     total = 0
@@ -419,31 +401,15 @@ def _cic_phase6_missing_email_count(users: list[Any]) -> int:
             total += 1
     return total
 
-def _cic_phase6_template_quality(tasks: list[dict[str, Any]]) -> dict[str, Any]:
-    empty_subject = sum(1 for t in tasks if not (t.get("subject") or "").strip())
-    short_body = sum(1 for t in tasks if len((t.get("body") or "").strip()) < 60)
-    technical_terms = ["traceback", "exception", "endpoint", "csrf", "debug", "workflow", "sync", "phase"]
-    technical = 0
-    for t in tasks:
-        body = ((t.get("subject") or "") + " " + (t.get("body") or "")).lower()
-        if any(term in body for term in technical_terms):
-            technical += 1
-    items = [
-        _cic_phase6_item("Konu kontrolü", empty_subject == 0, f"{empty_subject} görevde konu eksik.", warn=True),
-        _cic_phase6_item("Metin uzunluğu", short_body == 0, f"{short_body} şablon çok kısa görünüyor.", warn=True),
-        _cic_phase6_item("Teknik dil", technical == 0, f"{technical} şablonda teknik ifade riski var.", warn=True),
-    ]
-    problems = empty_subject + short_body + technical
-    return {"status": "ok" if problems == 0 else "warn", "label": "Şablonlar hazır" if problems == 0 else "Şablonları kontrol et", "items": items, "problem_count": problems}
 
 def _cic_phase6_log_quality(logs: list[Any], metrics: dict[str, Any]) -> dict[str, Any]:
     has_logs = len(logs or []) > 0
     has_dry = int(metrics.get("dry_run") or 0) > 0
     has_error_visibility = int(metrics.get("fail") or 0) >= 0
     items = [
-        _cic_phase6_item("Log kaydı", has_logs, f"{len(logs or [])} kayıt izleniyor.", warn=True),
-        _cic_phase6_item("Kuru çalışma izi", has_dry, "Kuru çalışma logu var." if has_dry else "Önce kuru çalışma yapın.", warn=True),
-        _cic_phase6_item("Hata görünürlüğü", has_error_visibility, "Hatalı kayıtlar filtrelenebilir.", warn=True),
+        _template_service._cic_phase6_item("Log kaydı", has_logs, f"{len(logs or [])} kayıt izleniyor.", warn=True),
+        _template_service._cic_phase6_item("Kuru çalışma izi", has_dry, "Kuru çalışma logu var." if has_dry else "Önce kuru çalışma yapın.", warn=True),
+        _template_service._cic_phase6_item("Hata görünürlüğü", has_error_visibility, "Hatalı kayıtlar filtrelenebilir.", warn=True),
     ]
     return {"status": "ok" if has_logs and has_dry else "warn", "label": "İzlenebilir" if has_logs and has_dry else "Kayıt bekleniyor", "items": items}
 
@@ -470,16 +436,16 @@ def _cic_phase6_build(data: dict[str, Any]) -> dict[str, Any]:
         has_csrf_safe = False
 
     scenarios = [
-        _cic_phase6_item("Kuru çalışma testi", bool(last), "Son test/gönderim özeti oluşmuş." if last else "Test Merkezi’nde kuru çalışma yapılmalı.", warn=True),
-        _cic_phase6_item("Gerçek gönderim uyarısı", True, "Gerçek gönderim öncesi onay uyarısı aktif."),
-        _cic_phase6_item("E-postası olmayan personel", missing_email == 0, f"{missing_email} seçili alıcıda e-posta eksikliği var.", warn=True),
-        _cic_phase6_item("Pasif personel kontrolü", True, "Alıcı listesi yetkili seçimle yönetiliyor."),
-        _cic_phase6_item("Boş şablon kontrolü", has_templates, "Aktif görevlerde konu ve metin kontrol edildi." if has_templates else "Aktif görevlerde konu/metin kontrol edilmeli.", warn=True),
-        _cic_phase6_item("Eksik konu kontrolü", _cic_phase6_template_quality(tasks).get("problem_count", 0) == 0, "Şablon kalite kontrolü tamam.", warn=True),
-        _cic_phase6_item("Büyük alıcı grubu", True, "Alıcı sayısı ve risk seviyesi ön izleme panelinde gösteriliyor."),
-        _cic_phase6_item("SMTP ayarı", mail.get("status") == "ok", "; ".join(mail.get("problems") or ["Mail altyapısı hazır."]), warn=True),
-        _cic_phase6_item("Başarılı gönderim logu", int(metrics.get("success") or 0) > 0, "Başarılı log kaydı var." if int(metrics.get("success") or 0) > 0 else "Henüz başarılı log kaydı yok.", warn=True),
-        _cic_phase6_item("Başarısız gönderim logu", True, "Hatalı kayıtlar log ekranında filtrelenebilir."),
+        _template_service._cic_phase6_item("Kuru çalışma testi", bool(last), "Son test/gönderim özeti oluşmuş." if last else "Test Merkezi’nde kuru çalışma yapılmalı.", warn=True),
+        _template_service._cic_phase6_item("Gerçek gönderim uyarısı", True, "Gerçek gönderim öncesi onay uyarısı aktif."),
+        _template_service._cic_phase6_item("E-postası olmayan personel", missing_email == 0, f"{missing_email} seçili alıcıda e-posta eksikliği var.", warn=True),
+        _template_service._cic_phase6_item("Pasif personel kontrolü", True, "Alıcı listesi yetkili seçimle yönetiliyor."),
+        _template_service._cic_phase6_item("Boş şablon kontrolü", has_templates, "Aktif görevlerde konu ve metin kontrol edildi." if has_templates else "Aktif görevlerde konu/metin kontrol edilmeli.", warn=True),
+        _template_service._cic_phase6_item("Eksik konu kontrolü", _template_service._cic_phase6_template_quality(tasks).get("problem_count", 0) == 0, "Şablon kalite kontrolü tamam.", warn=True),
+        _template_service._cic_phase6_item("Büyük alıcı grubu", True, "Alıcı sayısı ve risk seviyesi ön izleme panelinde gösteriliyor."),
+        _template_service._cic_phase6_item("SMTP ayarı", mail.get("status") == "ok", "; ".join(mail.get("problems") or ["Mail altyapısı hazır."]), warn=True),
+        _template_service._cic_phase6_item("Başarılı gönderim logu", int(metrics.get("success") or 0) > 0, "Başarılı log kaydı var." if int(metrics.get("success") or 0) > 0 else "Henüz başarılı log kaydı yok.", warn=True),
+        _template_service._cic_phase6_item("Başarısız gönderim logu", True, "Hatalı kayıtlar log ekranında filtrelenebilir."),
     ]
     passed = sum(1 for s in scenarios if s.get("status") == "ok")
     warn_count = sum(1 for s in scenarios if s.get("status") == "warn")
@@ -508,18 +474,18 @@ def _cic_phase6_build(data: dict[str, Any]) -> dict[str, Any]:
         live_label = "Pilot test önerilir"
         live_note = "Temel yapı çalışıyor; canlı öncesi kuru çalışma ve log kontrolünü tekrarlayın."
 
-    template_quality = _cic_phase6_template_quality(tasks)
+    template_quality = _template_service._cic_phase6_template_quality(tasks)
     log_quality = _cic_phase6_log_quality(logs, metrics)
     final_send_checks = [
-        _cic_phase6_item("Görev seçimi", active_tasks > 0, f"{active_tasks} aktif görev var.", warn=True),
-        _cic_phase6_item("Alıcı sayısı", (len(managers) + len(staff)) > 0, f"{len(managers) + len(staff)} seçili alıcı var.", warn=True),
-        _cic_phase6_item("Mail altyapısı", mail.get("status") == "ok", mail.get("label") or "Mail altyapısı kontrol edilmeli.", warn=True),
-        _cic_phase6_item("Kuru çalışma", bool(last), "Son kuru çalışma/gönderim özeti var." if last else "Önce kuru çalışma yapın.", warn=True),
+        _template_service._cic_phase6_item("Görev seçimi", active_tasks > 0, f"{active_tasks} aktif görev var.", warn=True),
+        _template_service._cic_phase6_item("Alıcı sayısı", (len(managers) + len(staff)) > 0, f"{len(managers) + len(staff)} seçili alıcı var.", warn=True),
+        _template_service._cic_phase6_item("Mail altyapısı", mail.get("status") == "ok", mail.get("label") or "Mail altyapısı kontrol edilmeli.", warn=True),
+        _template_service._cic_phase6_item("Kuru çalışma", bool(last), "Son kuru çalışma/gönderim özeti var." if last else "Önce kuru çalışma yapın.", warn=True),
     ]
     top_checks = [
-        _cic_phase6_item("CSRF formları", has_csrf_safe, "Form güvenlik token kontrolü aktif."),
-        _cic_phase6_item("Alıcı özeti", (len(managers) + len(staff)) > 0, "Alıcı grupları tanımlı.", warn=True),
-        _cic_phase6_item("Denetim izi", bool(phase5.get("audit")), "İşlem kayıtları izleniyor." if phase5.get("audit") else "İlk işlem sonrası denetim izi oluşacak.", warn=True),
+        _template_service._cic_phase6_item("CSRF formları", has_csrf_safe, "Form güvenlik token kontrolü aktif."),
+        _template_service._cic_phase6_item("Alıcı özeti", (len(managers) + len(staff)) > 0, "Alıcı grupları tanımlı.", warn=True),
+        _template_service._cic_phase6_item("Denetim izi", bool(phase5.get("audit")), "İşlem kayıtları izleniyor." if phase5.get("audit") else "İlk işlem sonrası denetim izi oluşacak.", warn=True),
     ]
     return {
         "version": "BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY",
@@ -598,15 +564,11 @@ __all__ = [
     "_cic_phase5_safe_int",
     "_cic_phase5_task_preview",
     "_cic_phase6_build",
-    "_cic_phase6_item",
     "_cic_phase6_log_quality",
     "_cic_phase6_missing_email_count",
-    "_cic_phase6_status",
-    "_cic_phase6_template_quality",
     "_context_base",
     "context",
     "get_auto_scheduler_config",
     "get_recent_logs",
     "get_recipients",
-    "get_template",
 ]

@@ -192,7 +192,6 @@ from app.services.cic.save_context import (
     save_recipients,
     save_system,
     save_tasks,
-    save_templates,
     set_auto_scheduler_config,
 )
 
@@ -214,13 +213,9 @@ from app.services.cic.send_context import (
     _cic_v40_parse_date,
     _cic_v40_today,
     _cic_v40_user_date,
-    _dashboard_counts,
     _recipients_for_task,
     _recipients_for_task_base,
-    _render_template_text,
-    _render_template_text_base,
     _send_task_base,
-    _user_name,
 )
 
 
@@ -236,16 +231,12 @@ from app.services.cic.misc_context import (
     _cic_phase5_safe_int,
     _cic_phase5_task_preview,
     _cic_phase6_build,
-    _cic_phase6_item,
     _cic_phase6_log_quality,
     _cic_phase6_missing_email_count,
-    _cic_phase6_status,
-    _cic_phase6_template_quality,
     _context_base,
     get_auto_scheduler_config,
     get_recent_logs,
     get_recipients,
-    get_template,
 )
 
 

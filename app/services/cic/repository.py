@@ -30,9 +30,7 @@ __all__ = [
     "_cic_phase5_store_audit",
     "_cic_phase6_bool",
     "_cic_phase6_build",
-    "_cic_phase6_item",
     "_cic_phase6_log_quality",
-    "_cic_phase6_status",
     "_cic_v11_bool",
     "_cic_v11_clean_header",
     "_cic_v40_bool",
@@ -59,13 +57,11 @@ __all__ = [
     "_cic_weekday_name_tr",
     "_clean_ids",
     "_clothing",
-    "_dashboard_counts",
     "_dumps_json",
     "_has_settings_table",
     "_loads_json",
     "_now",
     "_tomorrow_note",
-    "_user_name",
     "can_manage",
     "context",
     "get_recent_logs",
@@ -135,17 +131,11 @@ def _cic_phase6_build(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``_cic_phase6_build``."""
     return _legacy._cic_phase6_build(*args, **kwargs)
 
-def _cic_phase6_item(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase6_item``."""
-    return _legacy._cic_phase6_item(*args, **kwargs)
 
 def _cic_phase6_log_quality(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``_cic_phase6_log_quality``."""
     return _legacy._cic_phase6_log_quality(*args, **kwargs)
 
-def _cic_phase6_status(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase6_status``."""
-    return _legacy._cic_phase6_status(*args, **kwargs)
 
 def _cic_v40_create_system_notifications(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``_cic_v40_create_system_notifications``."""
@@ -191,17 +181,11 @@ def _clothing(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``_clothing``."""
     return _legacy._clothing(*args, **kwargs)
 
-def _dashboard_counts(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_dashboard_counts``."""
-    return _legacy._dashboard_counts(*args, **kwargs)
 
 def _tomorrow_note(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``_tomorrow_note``."""
     return _legacy._tomorrow_note(*args, **kwargs)
 
-def _user_name(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_user_name``."""
-    return _legacy._user_name(*args, **kwargs)
 
 def can_manage(*args: Any, **kwargs: Any) -> Any:
     """Facade wrapper for legacy ``can_manage``."""

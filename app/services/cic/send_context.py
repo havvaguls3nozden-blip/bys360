@@ -27,10 +27,8 @@ try:
 except Exception:
     create_mail_log = None  # type: ignore[assignment]
 
-from app.services.cic.misc_context import (
-    get_recipients,
-    get_template,
-)
+import app.services.cic.template_service as _template_service
+from app.services.cic.misc_context import get_recipients
 from app.services.cic.query_service import _cic_v40_special_day_users
 from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 
@@ -175,46 +173,8 @@ _CIC_V40_SPECIAL_DAY_DEFAULTS = [
     {"date": "12-01", "name": "Seyit Onbaşı Anma Günü", "enabled": True, "target": "all_staff"},
 ]
 
-def _user_name(user: User | None) -> str:
-    if not user:
-        return "-"
-    return (f"{getattr(user, 'ad', '') or ''} {getattr(user, 'soyad', '') or ''}".strip()
-            or getattr(user, "full_name_cache", None)
-            or getattr(user, "email", None)
-            or f"Kullanıcı #{getattr(user, 'id', '-')}")
 
-def _dashboard_counts() -> dict[str, str]:
-    try:
-        active_count = User.query.filter(User.is_active.is_(True)).count() if hasattr(User, "is_active") else User.query.count()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:468")
-        active_count = "-"
-    return {
-        "aktif_personel_sayisi": active_count,
-        "son_gonderim_durumu": get_setting(f"{BASE_KEY}.last_status", "Henüz gönderim yapılmadı") or "Henüz gönderim yapılmadı",
-        "gunun_notu": "BYS360 süreçlerinin gün içinde düzenli izlenmesi önerilir.",
-        "yarin_yonetici_notu": "Ertesi gün için bekleyen görev ve geri bildirimlerin kontrol edilmesi önerilir.",
-    }
 
-def _render_template_text_base(text: str, user: User | None, task_key: str) -> str:
-    cfg = get_config()
-    w = _weather() if task_key.startswith("staff_") else {"bugun_hava": "-", "yarin_hava": "-", "kiyafet_onerisi": "-", "yarin_oneri": "-"}
-    counts = _dashboard_counts()
-    context = {
-        "ad_soyad": _user_name(user),
-        "email": getattr(user, "email", "") if user else "",
-        "tarih": _now().strftime("%d.%m.%Y"),
-        "saat": _now().strftime("%H:%M"),
-        "konum": cfg["location_name"],
-        "bys360_baglanti": "https://bys360.canakkaletarihialan.gov.tr/",
-        "geri_bildirim_baglantisi": "https://bys360.canakkaletarihialan.gov.tr/feedback",
-        **w,
-        **counts,
-    }
-    rendered = text or ""
-    for k, v in context.items():
-        rendered = rendered.replace("{" + k + "}", str(v))
-    return rendered
 
 def _recipients_for_task_base(task_key: str, override_users: list[User] | None = None) -> list[User]:
     if override_users is not None:
@@ -371,7 +331,7 @@ def _send_task_base(task_key: str, *, dry_run: bool = False, override_users=None
     raw_users = _recipients_for_task(task_key, override_users)
     users = [u for u in raw_users if _cic_v11_normalize_email(getattr(u, "email", None))]
     missing_mail = max(0, len(raw_users) - len(users))
-    tmpl = get_template(task_key)
+    tmpl = _template_service.get_template(task_key)
     started = time.time()
     ok_count = 0
     fail_count = 0
@@ -381,8 +341,8 @@ def _send_task_base(task_key: str, *, dry_run: bool = False, override_users=None
 
     for user in users:
         email = _cic_v11_normalize_email(getattr(user, "email", ""))
-        subject = _render_template_text(tmpl["subject"], user, task_key)
-        body = _render_template_text(tmpl["body"], user, task_key)
+        subject = _template_service._render_template_text(tmpl["subject"], user, task_key)
+        body = _template_service._render_template_text(tmpl["body"], user, task_key)
         if dry_run:
             ok, msg = True, "Kuru çalışma: gönderim yapılmadı."
         else:
@@ -559,26 +519,6 @@ def _recipients_for_task(task_key: str, override_users: list[User] | None = None
         return _cic_v40_special_day_users()
     return _recipients_for_task_base(task_key, override_users)
 
-def _render_template_text(text: str, user: User | None, task_key: str) -> str:
-    """Render CIC mail template text through one explicit public layer."""
-    rendered = _render_template_text_base(text, user, task_key)
-    special_names = ", ".join(str(d.get("name")) for d in _cic_v40_special_days_today()) or "\u00d6zel G\u00fcn"
-    if user is not None:
-        from app.services.cic.celebration_service import (
-            _cic_v40_service_year,
-        )
-
-        service_year = _cic_v40_service_year(user)
-    else:
-        service_year = 0
-    extra = {
-        "ozel_gun_adi": special_names,
-        "hizmet_yili": service_year or "de\u011ferli",
-        "kutlama_notu": "Ya\u015f bilgisi g\u00f6sterilmeden, KVKK uyumlu kutlama metni olu\u015fturulmu\u015ftur.",
-    }
-    for key, value in extra.items():
-        rendered = rendered.replace("{" + key + "}", str(value))
-    return rendered
 
 __all__ = [
     "_cic_v11_bool",
@@ -595,11 +535,7 @@ __all__ = [
     "_cic_v40_special_days_today",
     "_cic_v40_today",
     "_cic_v40_user_date",
-    "_dashboard_counts",
     "_recipients_for_task",
     "_recipients_for_task_base",
-    "_render_template_text",
-    "_render_template_text_base",
     "_send_task_base",
-    "_user_name",
 ]

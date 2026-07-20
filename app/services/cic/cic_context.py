@@ -23,14 +23,10 @@ from app.services.cic.send_context import (
     _cic_v40_special_days,
     _cic_v40_today,
     _recipients_for_task,
-    _render_template_text,
     _send_task_base,
-    _user_name,
 )
-from app.services.cic.misc_context import (
-    _cic_phase5_audit_list,
-    get_template,
-)
+import app.services.cic.template_service as _template_service
+from app.services.cic.misc_context import _cic_phase5_audit_list
 from datetime import datetime as _cic_dt_datetime
 from datetime import date as _cic_v40_date
 from typing import Any as _cic_v40_Any
@@ -197,7 +193,7 @@ def _cic_phase3_actor_label(actor_user_id: int | None = None) -> str:
     try:
         if actor_user_id:
             u = db.session.get(User, actor_user_id)
-            return _user_name(u)
+            return _template_service._user_name(u)
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:628")
         pass
@@ -253,7 +249,7 @@ def _cic_phase5_now_label() -> str:
 def _cic_phase5_actor(actor_user_id: int | None = None) -> str:
     try:
         if actor_user_id:
-            return _user_name(db.session.get(User, actor_user_id))
+            return _template_service._user_name(db.session.get(User, actor_user_id))
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:883")
         pass
@@ -316,7 +312,7 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2286")
         return 0
     today_id = int(_cic_v40_today().strftime("%Y%m%d"))
-    tmpl = get_template(task_key)
+    tmpl = _template_service.get_template(task_key)
     created = 0
     for user in users or []:
         try:
@@ -328,8 +324,8 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
             ).first()
             if exists:
                 continue
-            title = _render_template_text(tmpl.get("subject", "Kurumsal Kutlama"), user, task_key).strip()[:255] or "Kurumsal Kutlama"
-            body = _render_template_text(tmpl.get("body", ""), user, task_key).strip()
+            title = _template_service._render_template_text(tmpl.get("subject", "Kurumsal Kutlama"), user, task_key).strip()[:255] or "Kurumsal Kutlama"
+            body = _template_service._render_template_text(tmpl.get("body", ""), user, task_key).strip()
             db.session.add(Notification(
                 user_id=getattr(user, "id"),
                 title=title,
