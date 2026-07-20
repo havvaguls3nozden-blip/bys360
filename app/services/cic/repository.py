@@ -7,10 +7,6 @@ Routes, template names, endpoint contracts and public function names are not cha
 """
 from __future__ import annotations
 
-from datetime import date as _cic_v45_date
-from datetime import datetime as _cic_v45_datetime
-from datetime import timedelta as _cic_v45_timedelta
-
 from app.services.cic.access_policy import can_manage
 from app.services.cic.celebration_dates import (
     _cic_v40_bool,
@@ -45,6 +41,7 @@ from app.services.cic.cic_context import (
     _cic_v45_header_key,
     _cic_v45_norm,
     _cic_v45_norm_name,
+    _cic_v45_parse_date,
     _cic_v45_text,
     _cic_weekday_name_tr,
 )
@@ -131,40 +128,3 @@ __all__ = [
     "context",
     "get_recent_logs",
 ]
-
-# --- BYS360 P6 migrated low-risk helpers: start ---
-# These helpers were migrated from app.services.corporate_information_center.
-# The legacy module keeps import aliases for backwards compatibility.
-
-
-
-def _cic_v45_parse_date(value: object) -> _cic_v45_date | None:
-    if value is None:
-        return None
-    if isinstance(value, _cic_v45_datetime):
-        return value.date()
-    if isinstance(value, _cic_v45_date):
-        return value
-    if isinstance(value, (int, float)):
-        try:
-            if value > 20000:
-                return (_cic_v45_datetime(1899, 12, 30) + _cic_v45_timedelta(days=float(value))).date()
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-            pass
-    text = _cic_v45_text(value)
-    if not text:
-        return None
-    text = text.replace("-", ".").replace("/", ".")
-    for fmt in ("%d.%m.%Y", "%Y.%m.%d", "%d.%m.%y"):
-        try:
-            return _cic_v45_datetime.strptime(text, fmt).date()
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-            pass
-    return None
-
-
-# --- BYS360 P6 migrated low-risk helpers: end ---
