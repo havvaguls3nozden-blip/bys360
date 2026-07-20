@@ -7,11 +7,13 @@ Routes, template names, endpoint contracts and public function names are not cha
 """
 from __future__ import annotations
 
-from typing import Any
+from datetime import date as _cic_v40_date
+from datetime import date as _cic_v45_date
+from datetime import datetime as _cic_dt_datetime
+from datetime import datetime as _cic_v40_datetime
+from datetime import datetime as _cic_v45_datetime
+from datetime import timedelta as _cic_v45_timedelta
 
-from sqlalchemy import inspect as sa_inspect
-
-from app.extensions import db
 from app.services.cic.access_policy import can_manage
 from app.services.cic.celebration_dates import (
     _cic_v40_bool,
@@ -45,11 +47,14 @@ from app.services.cic.cic_context import (
     _cic_v45_text,
 )
 from app.services.cic.config_context import (
+    _clean_ids,
     _clothing,
     _dumps_json,
+    _has_settings_table,
+    _loads_json,
     _now,
     _tomorrow_note,
-    get_setting,
+    get_setting,  # noqa: F401 - historical repository compatibility attribute
 )
 from app.services.cic.misc_context import (
     _cic_auto_bool,
@@ -123,26 +128,8 @@ __all__ = [
 # --- BYS360 P6 migrated low-risk helpers: start ---
 # These helpers were migrated from app.services.corporate_information_center.
 # The legacy module keeps import aliases for backwards compatibility.
-import json
-import logging
-from datetime import date as _cic_v40_date
-from datetime import date as _cic_v45_date
-from datetime import datetime as _cic_dt_datetime
-from datetime import datetime as _cic_v40_datetime
-from datetime import datetime as _cic_v45_datetime
-from datetime import timedelta as _cic_v45_timedelta
 
 
-def _clean_ids(values: Any) -> list[int]:
-    out: list[int] = []
-    for v in values or []:
-        try:
-            iv = int(v)
-            if iv not in out:
-                out.append(iv)
-        except Exception:
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/corporate_information_center.py:284")
-    return out
 
 def _cic_v11_bool(value, default=False):
     if value is None or value == "":
@@ -252,27 +239,3 @@ def _cic_v45_parse_date(value: object) -> _cic_v45_date | None:
 
 
 # --- BYS360 P6 migrated low-risk helpers: end ---
-
-# --- BYS360 P7 migrated CIC settings repository helpers: start ---
-# These settings repository helpers were migrated from app.services.corporate_information_center.
-# The legacy module keeps import aliases for backwards compatibility.
-
-def _has_settings_table() -> bool:
-    try:
-        return bool(sa_inspect(db.engine).has_table("system_settings"))
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return False
-
-
-def _loads_json(key: str, default: Any) -> Any:
-    raw = get_setting(key, "")
-    if not raw:
-        return default
-    try:
-        return json.loads(raw)
-    except Exception:
-        return default
-
-# --- BYS360 P7 migrated CIC settings repository helpers: end ---
