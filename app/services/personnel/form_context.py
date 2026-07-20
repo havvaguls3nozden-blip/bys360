@@ -7,11 +7,11 @@ aynı kalır.
 """
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
-from .form_payload import PersonnelFormPayload
 from .categories import PERSONNEL_CATEGORY_OPTIONS
+from .form_payload import PersonnelFormPayload
 
 
 def _as_list(value: Iterable[Any] | None) -> list[Any]:

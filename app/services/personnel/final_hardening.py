@@ -6,9 +6,9 @@ ve kaynak hijyeni açısından kapanış kontrolünü üretir.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from collections.abc import Iterable, Sequence
 
 PHASE10_REQUIRED_SERVICE_MODULES: tuple[str, ...] = (
     "live_scope",

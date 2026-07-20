@@ -8,9 +8,9 @@ Faz 6 kapsamı:
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Callable
 
 from .form_payload import PersonnelFormPayload
 

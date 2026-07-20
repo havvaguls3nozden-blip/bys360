@@ -9,9 +9,9 @@ Canlı Sağlamlaştırma Faz 1.10:
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Callable
 
 try:
     from .form_payload import PersonnelFormPayload

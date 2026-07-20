@@ -9,9 +9,9 @@ Faz 5 kapsamı:
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Iterable
 
 
 @dataclass(frozen=True, slots=True)
