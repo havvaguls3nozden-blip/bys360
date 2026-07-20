@@ -8,11 +8,9 @@ Settings Service Tamamlama Faz 2:
 """
 from __future__ import annotations
 
-
 from collections import OrderedDict
-from typing import Any
 from collections.abc import Iterable
-
+from typing import Any
 
 ALLOWED_VALUE_TYPES: set[str] = {"string", "bool", "int"}
 ALLOWED_INPUT_TYPES: set[str] = {"text", "textarea", "bool", "number", "select", "email", "url", "password"}

@@ -11,7 +11,13 @@ from collections.abc import Iterable
 from typing import Any
 
 from app.config import is_removed_menu_key
-from app.models import ModuleSetting, RoleMenuDefault, SystemSetting, UnitMenuProfile, UserMenuPermission
+from app.models import (
+    ModuleSetting,
+    RoleMenuDefault,
+    SystemSetting,
+    UnitMenuProfile,
+    UserMenuPermission,
+)
 
 
 def _clean_menu_key(value: Any) -> str:

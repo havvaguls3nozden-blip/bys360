@@ -4,10 +4,10 @@ Bu modül dataclass sözleşmeleri içerir; Flask uygulamasını veya veritaban�
 """
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
-from collections.abc import Mapping
 
 
 @dataclass(frozen=True)
