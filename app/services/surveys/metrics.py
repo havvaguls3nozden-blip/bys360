@@ -1,12 +1,13 @@
 """Anket liste/sonuç ekranları için küçük metrik yardımcıları."""
 from __future__ import annotations
 
+import logging
 from collections import Counter
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 from .contracts import SurveyMetricSummary
-import logging
+
 logger = logging.getLogger(__name__)
 
 

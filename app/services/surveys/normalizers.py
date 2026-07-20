@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
-
 SURVEY_ALLOWED_TYPES = {"kurum_ici", "memnuniyet", "egitim", "nabiz", "geri_bildirim"}
 SURVEY_CREATE_ALLOWED_STATUSES = {"draft", "published", "closed"}
 SURVEY_EDIT_ALLOWED_STATUSES = {"draft", "published", "closed", "archived"}
