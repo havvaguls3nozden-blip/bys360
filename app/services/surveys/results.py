@@ -11,17 +11,18 @@ from __future__ import annotations
 import csv
 import datetime as _dt
 import io
-from typing import Any
+import logging
 from collections.abc import Callable
+from typing import Any
 
 from .repository import (
+    _rollback_session,
     safe_completed_response_count,
     safe_question_options,
     safe_survey_questions,
-    _rollback_session,
 )
 from .time_utils import survey_local_now
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,6 +30,7 @@ def safe_question_answers(question_id: int) -> list[Any]:
     """Bir soruya ait yanıtları salt-okuma amaçlı döndürür."""
     try:
         from sqlalchemy.orm import load_only
+
         from app.extensions import db
         from app.models import SurveyAnswer
 
@@ -83,6 +85,7 @@ def simple_completion_trend(survey_id: int) -> list[dict[str, object]]:
     counts: dict[str, int] = {}
     try:
         from sqlalchemy import func
+
         from app.extensions import db
         from app.models import SurveyResponse
 

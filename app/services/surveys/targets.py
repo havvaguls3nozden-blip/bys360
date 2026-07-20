@@ -7,12 +7,19 @@ Faz 6 amacı:
 """
 from __future__ import annotations
 
-from typing import Any
+import logging
 from collections.abc import Callable, Iterable
+from typing import Any
 
 from .contracts import SurveyTargetDraft
-from .normalizers import clean_target_values, normalize_choice, safe_text, SURVEY_ALLOWED_TARGET_TYPES, SURVEY_TARGET_TYPES
-import logging
+from .normalizers import (
+    SURVEY_ALLOWED_TARGET_TYPES,
+    SURVEY_TARGET_TYPES,
+    clean_target_values,
+    normalize_choice,
+    safe_text,
+)
+
 logger = logging.getLogger(__name__)
 
 LogCallback = Callable[[str, BaseException], None]
@@ -115,6 +122,7 @@ def distinct_user_values(
     """Aktif kullanıcılardaki benzersiz rol/birim gibi metin değerlerini döndürür."""
     try:
         from sqlalchemy import func
+
         from app.extensions import db
         from app.models import User
 
@@ -167,6 +175,7 @@ def resolve_target_user_ids(target_type: str, raw_values: Iterable[Any] | None) 
 
     try:
         from sqlalchemy import func
+
         from app.extensions import db
         from app.models import User
 
@@ -257,6 +266,7 @@ def assignment_matches_user_filter(user: Any):
     Bu yardimci ayni kurali SQLAlchemy WHERE/OR katmanina indirir.
     """
     from sqlalchemy import and_, func, or_
+
     from app.models import SurveyAssignment
 
     target_type = func.lower(func.trim(func.coalesce(SurveyAssignment.target_type, "")))
@@ -302,6 +312,7 @@ def assigned_survey_assignment_rows_for_user(user: Any, *, active_window: bool =
     """Kullaniciya uyan yayinlanmis anketleri assignment ile birlikte SQL'den getirir."""
     try:
         from sqlalchemy import or_
+
         from app.models import Survey, SurveyAssignment
 
         query = (
@@ -340,6 +351,7 @@ def target_user_search_items(query_text: str, *, limit: int = 20) -> list[dict[s
 
     try:
         from sqlalchemy import func, or_
+
         from app.models import User
 
         like = f"%{query}%"

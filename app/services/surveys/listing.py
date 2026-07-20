@@ -5,9 +5,10 @@ sorguları route dışına taşındı. Bu dosya salt-okuma ağırlıklıdır.
 """
 from __future__ import annotations
 
-from typing import Any
-from collections.abc import Callable
 import logging
+from collections.abc import Callable
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,8 +24,10 @@ def latest_response_for_user(survey_id: int, user_id: int, *, completed_only: bo
     """Kullanıcının ilgili anketteki en güncel yanıtını döndürür."""
     try:
         from sqlalchemy.orm import load_only
+
         from app.extensions import db
         from app.models import SurveyResponse
+
         from .schema import survey_response_phase2_ready
 
         query = db.session.query(SurveyResponse)
@@ -123,6 +126,7 @@ def get_assigned_surveys_for_user(
 ) -> list[dict[str, Any]]:
     """Kullanıcıya atanmış yayınlanmış anketleri liste satırlarına dönüştürür."""
     from app.models import Survey
+
     from .repository import safe_question_count
     from .targets import assigned_survey_assignment_rows_for_user
 

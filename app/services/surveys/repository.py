@@ -5,8 +5,9 @@ okuma yardımcıları buraya kademeli aktarılabilir.
 """
 from __future__ import annotations
 
-from typing import Any
 import logging
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +22,7 @@ def _rollback_session() -> None:
 def safe_count(model: Any, *filters: Any) -> int:
     try:
         from sqlalchemy import func
+
         from app.extensions import db
 
         query = db.session.query(func.count(model.id))
@@ -137,8 +139,10 @@ def safe_survey_questions(survey_id: int) -> list[Any]:
     """Anket sorularını canlı şema uyumluluğuyla sıralı döndürür."""
     try:
         from sqlalchemy.orm import load_only
+
         from app.extensions import db
         from app.models import SurveyQuestion
+
         from .schema import survey_question_phase2_ready
 
         query = db.session.query(SurveyQuestion)
@@ -169,6 +173,7 @@ def safe_question_options(question_id: int) -> list[Any]:
     """Soru seçeneklerini sıralı ve salt-okuma amaçlı döndürür."""
     try:
         from sqlalchemy.orm import load_only
+
         from app.extensions import db
         from app.models import SurveyQuestionOption
 
