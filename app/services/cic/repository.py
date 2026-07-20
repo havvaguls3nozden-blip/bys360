@@ -1,15 +1,51 @@
 
 """BYS360 CIC facade slice.
 
-This module is intentionally facade-only in P5.
-The legacy implementation remains in app.services.corporate_information_center.
+This module temporarily preserves the historical repository import surface.
+Legacy forwarding wrappers are removed; every imported name resolves to its canonical owner.
 Routes, template names, endpoint contracts and public function names are not changed.
 """
 from __future__ import annotations
 
 from typing import Any
 
-from app.services import corporate_information_center as _legacy
+from app.services.cic.access_policy import can_manage
+from app.services.cic.celebration_dates import (
+    _cic_v40_setting_bool,
+    _cic_v40_special_days,
+    _cic_v40_special_days_today,
+    _cic_v40_user_date,
+)
+from app.services.cic.cic_context import (
+    _cic_auto_last_run_key,
+    _cic_phase3_actor_label,
+    _cic_phase3_last_result,
+    _cic_phase3_make_result,
+    _cic_phase3_public_error,
+    _cic_phase3_store_result,
+    _cic_phase5_actor,
+    _cic_phase5_now_label,
+    _cic_phase5_store_audit,
+    _cic_phase6_bool,
+    _cic_v40_create_system_notifications,
+    _cic_v40_date_input,
+    _cic_v40_upcoming_special_days,
+    _cic_v45_build_user_indexes,
+    _cic_v45_ensure_schema,
+    _cic_v45_existing_user_rows,
+)
+from app.services.cic.config_context import _clothing, _tomorrow_note
+from app.services.cic.misc_context import (
+    _cic_phase5_audit_list,
+    _cic_phase5_last_result,
+    _cic_phase5_log_metrics,
+    _cic_phase5_readiness,
+    _cic_phase5_safe_int,
+    _cic_phase6_build,
+    _cic_phase6_log_quality,
+    context,
+    get_recent_logs,
+)
 
 __all__ = [
     "_cic_auto_bool",
@@ -67,138 +103,6 @@ __all__ = [
     "get_recent_logs",
 ]
 
-def _cic_auto_last_run_key(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_auto_last_run_key``."""
-    return _legacy._cic_auto_last_run_key(*args, **kwargs)
-
-def _cic_phase3_actor_label(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase3_actor_label``."""
-    return _legacy._cic_phase3_actor_label(*args, **kwargs)
-
-def _cic_phase3_last_result(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase3_last_result``."""
-    return _legacy._cic_phase3_last_result(*args, **kwargs)
-
-def _cic_phase3_make_result(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase3_make_result``."""
-    return _legacy._cic_phase3_make_result(*args, **kwargs)
-
-def _cic_phase3_public_error(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase3_public_error``."""
-    return _legacy._cic_phase3_public_error(*args, **kwargs)
-
-def _cic_phase3_store_result(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase3_store_result``."""
-    return _legacy._cic_phase3_store_result(*args, **kwargs)
-
-def _cic_phase5_actor(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_actor``."""
-    return _legacy._cic_phase5_actor(*args, **kwargs)
-
-def _cic_phase5_audit_list(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_audit_list``."""
-    return _legacy._cic_phase5_audit_list(*args, **kwargs)
-
-def _cic_phase5_last_result(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_last_result``."""
-    return _legacy._cic_phase5_last_result(*args, **kwargs)
-
-def _cic_phase5_log_metrics(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_log_metrics``."""
-    return _legacy._cic_phase5_log_metrics(*args, **kwargs)
-
-def _cic_phase5_now_label(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_now_label``."""
-    return _legacy._cic_phase5_now_label(*args, **kwargs)
-
-def _cic_phase5_readiness(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_readiness``."""
-    return _legacy._cic_phase5_readiness(*args, **kwargs)
-
-def _cic_phase5_safe_int(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_safe_int``."""
-    return _legacy._cic_phase5_safe_int(*args, **kwargs)
-
-def _cic_phase5_store_audit(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase5_store_audit``."""
-    return _legacy._cic_phase5_store_audit(*args, **kwargs)
-
-def _cic_phase6_bool(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase6_bool``."""
-    return _legacy._cic_phase6_bool(*args, **kwargs)
-
-def _cic_phase6_build(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase6_build``."""
-    return _legacy._cic_phase6_build(*args, **kwargs)
-
-
-def _cic_phase6_log_quality(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_phase6_log_quality``."""
-    return _legacy._cic_phase6_log_quality(*args, **kwargs)
-
-
-def _cic_v40_create_system_notifications(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_create_system_notifications``."""
-    return _legacy._cic_v40_create_system_notifications(*args, **kwargs)
-
-def _cic_v40_date_input(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_date_input``."""
-    return _legacy._cic_v40_date_input(*args, **kwargs)
-
-def _cic_v40_setting_bool(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_setting_bool``."""
-    return _legacy._cic_v40_setting_bool(*args, **kwargs)
-
-def _cic_v40_special_days(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_special_days``."""
-    return _legacy._cic_v40_special_days(*args, **kwargs)
-
-def _cic_v40_special_days_today(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_special_days_today``."""
-    return _legacy._cic_v40_special_days_today(*args, **kwargs)
-
-def _cic_v40_upcoming_special_days(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_upcoming_special_days``."""
-    return _legacy._cic_v40_upcoming_special_days(*args, **kwargs)
-
-def _cic_v40_user_date(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v40_user_date``."""
-    return _legacy._cic_v40_user_date(*args, **kwargs)
-
-def _cic_v45_build_user_indexes(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v45_build_user_indexes``."""
-    return _legacy._cic_v45_build_user_indexes(*args, **kwargs)
-
-def _cic_v45_ensure_schema(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v45_ensure_schema``."""
-    return _legacy._cic_v45_ensure_schema(*args, **kwargs)
-
-def _cic_v45_existing_user_rows(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_cic_v45_existing_user_rows``."""
-    return _legacy._cic_v45_existing_user_rows(*args, **kwargs)
-
-def _clothing(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_clothing``."""
-    return _legacy._clothing(*args, **kwargs)
-
-
-def _tomorrow_note(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``_tomorrow_note``."""
-    return _legacy._tomorrow_note(*args, **kwargs)
-
-
-def can_manage(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``can_manage``."""
-    return _legacy.can_manage(*args, **kwargs)
-
-def context(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``context``."""
-    return _legacy.context(*args, **kwargs)
-
-def get_recent_logs(*args: Any, **kwargs: Any) -> Any:
-    """Facade wrapper for legacy ``get_recent_logs``."""
-    return _legacy.get_recent_logs(*args, **kwargs)
-
 
 # --- BYS360 P6 migrated low-risk helpers: start ---
 # These helpers were migrated from app.services.corporate_information_center.
@@ -214,6 +118,7 @@ from datetime import datetime as _cic_dt_datetime
 from datetime import datetime as _cic_v40_datetime
 from datetime import datetime as _cic_v45_datetime
 from datetime import timedelta as _cic_v45_timedelta
+
 
 def _now() -> datetime:
     return datetime.now()

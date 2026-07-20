@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.cic.access_policy import can_manage  # noqa: F401
 
 try:
-    from app.services.mail_core import send_email, create_mail_log
+    from app.services.mail_core import create_mail_log, send_email
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:20")
     send_email = None
@@ -13,8 +14,6 @@ except Exception:  # pragma: no cover
 VERSION = "BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE1"
 GROUP_KEY = "corporate_information_center"
 BASE_KEY = "corporate_information_center"
-ADMIN_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
-
 TASK_DEFINITIONS: dict[str, dict[str, Any]] = {
     "staff_morning": {
         "category": "personel",
@@ -160,30 +159,6 @@ from app.services.cic.config_context import (
     get_config,
     set_setting,
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-def can_manage(user: Any) -> bool:
-    if not getattr(user, "is_authenticated", False):
-        return False
-    role = str(getattr(user, "role", "") or "").lower()
-    return role in ADMIN_ROLES
-
-
-
-
-
-
 
 
 # Phase4J V30C CIC save_context facade imports
