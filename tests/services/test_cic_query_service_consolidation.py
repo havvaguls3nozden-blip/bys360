@@ -239,7 +239,7 @@ def test_upcoming_users_preserve_sorting_and_anniversary_filter(monkeypatch) -> 
     )
     monkeypatch.setattr(celebration_dates, "_cic_v40_mmdd", lambda value: value)
     monkeypatch.setattr(
-        cic_context,
+        celebration_dates,
         "_cic_v40_days_until",
         lambda value, _today: {1: 5, 2: 1}[int(value.rsplit("-", 1)[-1])],
     )

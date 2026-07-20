@@ -14,6 +14,7 @@ from app.services.cic.task_contract import BASE_KEY
 
 __all__ = [
     "_cic_v40_bool",
+    "_cic_v40_days_until",
     "_cic_v40_parse_date",
     "_cic_v40_user_date",
     "_cic_v40_today",
@@ -78,6 +79,25 @@ def _cic_v40_today(now: object = None) -> date:
 
 def _cic_v40_mmdd(d: date | None) -> str:
     return d.strftime("%m-%d") if d else ""
+
+
+def _cic_v40_days_until(
+    month_day: str,
+    today: date | None = None,
+) -> int | None:
+    today = today or _cic_v40_today()
+    try:
+        month, day = [int(value) for value in month_day.split("-", 1)]
+        target = date(today.year, month, day)
+        if target < today:
+            target = date(today.year + 1, month, day)
+        return (target - today).days
+    except Exception:
+        __import__("logging").getLogger(__name__).exception(
+            "BYS360 SAFE V5: sessiz except loglandi: "
+            "app/services/corporate_information_center.py:2073"
+        )
+        return None
 
 
 def _cic_v40_setting_bool(name: str, default: bool = True) -> bool:

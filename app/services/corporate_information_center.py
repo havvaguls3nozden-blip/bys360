@@ -177,6 +177,7 @@ from app.services.cic.save_context import (
 # Phase4J V28C CIC canonical mail service compatibility imports
 from app.services.cic.celebration_dates import (
     _cic_v40_bool,
+    _cic_v40_days_until,
     _cic_v40_mmdd,
     _cic_v40_parse_date,
     _cic_v40_today,
@@ -257,7 +258,6 @@ from app.services.cic.cic_context import (
     _cic_phase6_bool,
     _cic_v40_create_system_notifications,
     _cic_v40_date_input,
-    _cic_v40_days_until,
     _cic_v45_norm,
     _cic_weekday_name_tr,
 )

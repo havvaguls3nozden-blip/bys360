@@ -16,6 +16,7 @@ from app.services.cic.config_context import (
     set_setting,
 )
 from app.services.cic.celebration_dates import (
+    _cic_v40_days_until,
     _cic_v40_parse_date,
     _cic_v40_setting_bool,
     _cic_v40_special_days,
@@ -24,7 +25,6 @@ from app.services.cic.celebration_dates import (
 import app.services.cic.template_service as _template_service
 from app.services.cic.misc_context import _cic_phase5_audit_list
 from datetime import datetime as _cic_dt_datetime
-from datetime import date as _cic_v40_date
 from datetime import date as _cic_v45_date, datetime as _cic_v45_datetime, timedelta as _cic_v45_timedelta
 import re as _cic_v45_re
 import unicodedata as _cic_v45_unicodedata
@@ -283,18 +283,6 @@ def _cic_weekday_name_tr(dt: _cic_dt_datetime) -> str:
 
 def _cic_auto_last_run_key(task_key: str) -> str:
     return f"{BASE_KEY}.auto.last_run.{task_key}"
-
-def _cic_v40_days_until(month_day: str, today: _cic_v40_date | None = None) -> int | None:
-    today = today or _cic_v40_today()
-    try:
-        month, day = [int(x) for x in month_day.split("-", 1)]
-        target = _cic_v40_date(today.year, month, day)
-        if target < today:
-            target = _cic_v40_date(today.year + 1, month, day)
-        return (target - today).days
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2073")
-        return None
 
 def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor_user_id: int | None = None) -> int:
     if not _cic_v40_setting_bool("celebration_system_notifications_enabled", True):

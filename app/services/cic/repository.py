@@ -7,19 +7,20 @@ Routes, template names, endpoint contracts and public function names are not cha
 """
 from __future__ import annotations
 
-from datetime import date as _cic_v40_date
 from datetime import date as _cic_v45_date
-from datetime import datetime as _cic_dt_datetime
-from datetime import datetime as _cic_v40_datetime
 from datetime import datetime as _cic_v45_datetime
 from datetime import timedelta as _cic_v45_timedelta
 
 from app.services.cic.access_policy import can_manage
 from app.services.cic.celebration_dates import (
     _cic_v40_bool,
+    _cic_v40_days_until,
+    _cic_v40_mmdd,
+    _cic_v40_parse_date,
     _cic_v40_setting_bool,
     _cic_v40_special_days,
     _cic_v40_special_days_today,
+    _cic_v40_today,
     _cic_v40_user_date,
 )
 from app.services.cic.cic_context import (
@@ -45,6 +46,7 @@ from app.services.cic.cic_context import (
     _cic_v45_norm,
     _cic_v45_norm_name,
     _cic_v45_text,
+    _cic_weekday_name_tr,
 )
 from app.services.cic.config_context import (
     _clean_ids,
@@ -151,61 +153,6 @@ def _cic_v11_normalize_email(value):
     if not email or "@" not in email or " " in email:
         return ""
     return email
-
-
-
-def _cic_weekday_name_tr(dt: _cic_dt_datetime) -> str:
-    names = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
-    try:
-        return names[dt.weekday()]
-    except Exception:
-        return "Bilinmiyor"
-
-
-def _cic_v40_parse_date(value: object) -> _cic_v40_date | None:
-    if value is None:
-        return None
-    if isinstance(value, _cic_v40_datetime):
-        return value.date()
-    if isinstance(value, _cic_v40_date):
-        return value
-    text = str(value).strip()
-    if not text:
-        return None
-    for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%Y/%m/%d"):
-        try:
-            return _cic_v40_datetime.strptime(text, fmt).date()
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-            pass
-    return None
-
-def _cic_v40_today(now: object = None) -> _cic_v40_date:
-    if isinstance(now, _cic_v40_datetime):
-        return now.date()
-    if isinstance(now, _cic_v40_date):
-        return now
-    try:
-        return _now().date()
-    except Exception:
-        return _cic_v40_date.today()
-
-def _cic_v40_mmdd(d: _cic_v40_date | None) -> str:
-    return d.strftime("%m-%d") if d else ""
-
-def _cic_v40_days_until(month_day: str, today: _cic_v40_date | None = None) -> int | None:
-    today = today or _cic_v40_today()
-    try:
-        month, day = [int(x) for x in month_day.split("-", 1)]
-        target = _cic_v40_date(today.year, month, day)
-        if target < today:
-            target = _cic_v40_date(today.year + 1, month, day)
-        return (target - today).days
-    except Exception:
-        import logging
-        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-        return None
 
 
 
