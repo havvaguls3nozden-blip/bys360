@@ -5,8 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-PUBLIC_SERVICE_MODULES = {
-    "app.services.cic.facade",
+CANONICAL_PUBLIC_SERVICE_MODULES = {
     "app.services.cic.service",
 }
 
@@ -101,7 +100,7 @@ def _imported_names_from_public_modules() -> set[str]:
         if relative.startswith("app/services/cic/"):
             continue
         for node in ast.walk(_parse(path)):
-            if isinstance(node, ast.ImportFrom) and node.module in PUBLIC_SERVICE_MODULES:
+            if isinstance(node, ast.ImportFrom) and node.module in CANONICAL_PUBLIC_SERVICE_MODULES:
                 imported.update(alias.name for alias in node.names)
     return imported
 

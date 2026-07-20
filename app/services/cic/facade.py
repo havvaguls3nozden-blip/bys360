@@ -1,7 +1,10 @@
 
-"""Public facade for the staged Corporate Information Center split.
+"""Deprecated compatibility surface for historical CIC imports.
 
-Use this module for new internal calls while old imports continue to work.
+New production calls must use :mod:`app.services.cic.service`, which exposes
+only the 13 supported public operations. This module preserves the historical
+100-name import contract until a separate compatibility-removal decision is
+approved.
 """
 from __future__ import annotations
 

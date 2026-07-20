@@ -19,6 +19,7 @@ from app.services.cic import (
 ROOT = Path(__file__).resolve().parents[2]
 SERVICE_MODULE = "app.services.cic.service"
 FACADE_MODULE = "app.services.cic.facade"
+CIC_README = ROOT / "app/services/cic/README.md"
 
 EXPECTED_SERVICE_EXPORTS = (
     "can_manage",
@@ -127,3 +128,23 @@ def test_active_consumers_use_only_the_canonical_service_entrypoint() -> None:
 def test_cic_service_consumer_union_matches_public_contract() -> None:
     imported = set().union(*EXPECTED_CONSUMERS.values())
     assert imported == set(EXPECTED_SERVICE_EXPORTS)
+
+
+def test_historical_facade_is_explicitly_compatibility_only() -> None:
+    from app.services.cic import facade
+
+    documentation = facade.__doc__ or ""
+    assert "Deprecated compatibility surface" in documentation
+    assert "app.services.cic.service" in documentation
+    assert "13 supported public operations" in documentation
+    assert "100-name import contract" in documentation
+
+
+def test_cic_readme_declares_canonical_and_compatibility_boundaries() -> None:
+    documentation = CIC_README.read_text(encoding="utf-8")
+    normalized = " ".join(documentation.split())
+    assert "app.services.cic.service" in documentation
+    assert "app.services.cic.facade" in documentation
+    assert "compatibility-only" in documentation
+    assert "active BYS360 production code must not import it" in normalized
+    assert "Removing the facade is a separate compatibility decision" in normalized
