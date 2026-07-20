@@ -8,11 +8,11 @@ from typing import Any
 
 from app.services import corporate_information_center
 from app.services.cic import (
+    celebration_dates,
     cic_context,
     facade,
-    misc_context,
-    celebration_dates,
     mail_service,
+    misc_context,
     repository,
     save_context,
     template_service,
