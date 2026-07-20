@@ -28,9 +28,12 @@ except Exception:
     create_mail_log = None  # type: ignore[assignment]
 
 from app.services.cic.misc_context import (
-    _active_staff_users,
     get_recipients,
     get_template,
+)
+from app.services.cic.query_service import (
+    _cic_v40_active_staff_candidates,
+    _cic_v40_special_day_users,
 )
 from datetime import date as _cic_v40_date, datetime as _cic_v40_datetime
 
@@ -537,18 +540,6 @@ def _cic_v40_special_days_today(now: object = None) -> list[dict[str, object]]:
     today_key = _cic_v40_mmdd(_cic_v40_today(now))
     return [d for d in _cic_v40_special_days() if d.get("enabled") and str(d.get("date")) == today_key]
 
-def _cic_v40_active_staff_candidates() -> list[User]:
-    try:
-        users = _active_staff_users()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2175")
-        users = []
-    clean: list[User] = []
-    for user in users or []:
-        if bool(getattr(user, "celebration_opt_out", False)):
-            continue
-        clean.append(user)
-    return clean
 
 def _cic_v40_birthday_users(now: object = None) -> list[User]:
     if not _cic_v40_setting_bool("celebrations_enabled", True) or not _cic_v40_setting_bool("birthday_enabled", True):
@@ -582,19 +573,6 @@ def _cic_v40_anniversary_users(now: object = None) -> list[User]:
             users.append(user)
     return users
 
-def _cic_v40_special_day_users(now: object = None) -> list[User]:
-    if not _cic_v40_setting_bool("celebrations_enabled", True) or not _cic_v40_setting_bool("special_day_enabled", True):
-        return []
-    if not _cic_v40_special_days_today(now):
-        return []
-    mode = get_setting(f"{BASE_KEY}.special_day_recipient_mode", "all_active") or "all_active"
-    if mode == "manual":
-        try:
-            return list(get_recipients().get("staff") or [])
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2229")
-            return []
-    return _cic_v40_active_staff_candidates()
 
 def _recipients_for_task(task_key: str, override_users: list[User] | None = None) -> list[User]:
     """Resolve CIC task recipients through one explicit public layer."""
@@ -629,7 +607,6 @@ __all__ = [
     "_cic_v11_mail_settings",
     "_cic_v11_normalize_email",
     "_cic_v11_send_email_direct",
-    "_cic_v40_active_staff_candidates",
     "_cic_v40_anniversary_users",
     "_cic_v40_birthday_users",
     "_cic_v40_bool",
@@ -637,7 +614,6 @@ __all__ = [
     "_cic_v40_parse_date",
     "_cic_v40_service_year",
     "_cic_v40_setting_bool",
-    "_cic_v40_special_day_users",
     "_cic_v40_special_days",
     "_cic_v40_special_days_today",
     "_cic_v40_today",

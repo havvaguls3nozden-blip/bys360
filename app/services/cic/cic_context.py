@@ -20,14 +20,10 @@ from app.services.cic.config_context import (
     set_setting,
 )
 from app.services.cic.send_context import (
-    _cic_v40_active_staff_candidates,
-    _cic_v40_mmdd,
     _cic_v40_parse_date,
-    _cic_v40_service_year,
     _cic_v40_setting_bool,
     _cic_v40_special_days,
     _cic_v40_today,
-    _cic_v40_user_date,
     _recipients_for_task,
     _render_template_text,
     _send_task_base,
@@ -391,26 +387,6 @@ def _cic_v40_date_input(value: object) -> str:
     d = _cic_v40_parse_date(value)
     return d.isoformat() if d else ""
 
-def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]]:
-    today = _cic_v40_today()
-    rows: list[dict[str, object]] = []
-    for user in _cic_v40_active_staff_candidates():
-        if kind == "birthday":
-            d = _cic_v40_user_date(user, "birth_date", "dogum_tarihi", "date_of_birth")
-        else:
-            d = _cic_v40_user_date(user, "hire_date", "goreve_baslama_tarihi", "ise_baslama_tarihi", "start_date")
-        if not d:
-            continue
-        left = _cic_v40_days_until(_cic_v40_mmdd(d), today)
-        if left is None or left > days:
-            continue
-        row = {"user": user, "date": d, "days_left": left}
-        if kind == "anniversary":
-            row["service_year"] = _cic_v40_service_year(user, today)
-            if int(row["service_year"] or 0) <= 0:
-                continue
-        rows.append(row)
-    return sorted(rows, key=lambda x: int(x.get("days_left") or 0))
 
 def _cic_v40_upcoming_special_days(days: int = 45) -> list[dict[str, object]]:
     today = _cic_v40_today()
@@ -584,7 +560,6 @@ __all__ = [
     "_cic_v40_days_until",
     "_cic_v40_run_weekend_celebrations",
     "_cic_v40_upcoming_special_days",
-    "_cic_v40_upcoming_users",
     "_cic_v45_bool",
     "_cic_v45_build_user_indexes",
     "_cic_v45_ensure_schema",

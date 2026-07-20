@@ -39,7 +39,6 @@ from app.services.cic.send_context import (
     _cic_v11_mail_settings,
     _cic_v11_normalize_email,
     _cic_v11_send_email_direct,
-    _cic_v40_active_staff_candidates,
     _cic_v40_anniversary_users,
     _cic_v40_birthday_users,
     _cic_v40_bool,
@@ -47,7 +46,6 @@ from app.services.cic.send_context import (
     _cic_v40_parse_date,
     _cic_v40_service_year,
     _cic_v40_setting_bool,
-    _cic_v40_special_day_users,
     _cic_v40_special_days,
     _cic_v40_special_days_today,
     _cic_v40_today,
@@ -61,7 +59,6 @@ from app.services.cic.send_context import (
     _user_name,
 )
 from app.services.cic.misc_context import (
-    _active_staff_users,
     _cic_auto_bool,
     _cic_phase5_audit_list,
     _cic_phase5_last_result,
@@ -77,13 +74,11 @@ from app.services.cic.misc_context import (
     _cic_phase6_status,
     _cic_phase6_template_quality,
     _context_base,
-    _users_by_ids,
     context,
     get_auto_scheduler_config,
     get_recent_logs,
     get_recipients,
     get_template,
-    list_users,
 )
 from app.services.cic.cic_context import (
     _cic_auto_last_run_key,
@@ -103,7 +98,6 @@ from app.services.cic.cic_context import (
     _cic_v40_days_until,
     _cic_v40_run_weekend_celebrations,
     _cic_v40_upcoming_special_days,
-    _cic_v40_upcoming_users,
     _cic_v45_bool,
     _cic_v45_build_user_indexes,
     _cic_v45_ensure_schema,

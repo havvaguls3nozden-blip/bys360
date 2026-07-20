@@ -8,14 +8,17 @@ from __future__ import annotations
 from __future__ import annotations
 from typing import Any
 from flask import current_app
-from sqlalchemy import or_
-from app.models import User
 from app.services.cic.config_context import (
     _has_settings_table,
     _loads_json,
     ensure_defaults,
     get_config,
     get_setting,
+)
+from app.services.cic.query_service import (
+    _active_staff_users,
+    _users_by_ids,
+    list_users,
 )
 
 
@@ -156,52 +159,8 @@ BYS360""",
     },
 }
 
-def list_users(search: str | None = None, limit: int = 800) -> list[User]:
-    q = User.query
-    if hasattr(User, "is_active"):
-        try:
-            q = q.filter(User.is_active.is_(True))
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:354")
-            pass
-    if search:
-        s = f"%{search.strip()}%"
-        clauses = []
-        for attr in ("ad", "soyad", "email", "sicil_no", "birim", "ust_birim", "unvan", "role_label", "username"):
-            col = getattr(User, attr, None)
-            if col is not None and hasattr(col, "ilike"):
-                clauses.append(col.ilike(s))
-        if clauses:
-            q = q.filter(or_(*clauses))
-    # Güvenli sıralama: full_name/ad gibi property olabilecek alanlar order_by içinde kullanılmaz.
-    try:
-        return q.order_by(User.id.asc()).limit(limit).all()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:365")
-        return q.limit(limit).all()
 
-def _users_by_ids(ids: list[int]) -> list[User]:
-    if not ids:
-        return []
-    rows = User.query.filter(User.id.in_(ids)).all()
-    order = {uid: idx for idx, uid in enumerate(ids)}
-    return sorted(rows, key=lambda u: order.get(getattr(u, "id", 0), 999999))
 
-def _active_staff_users() -> list[User]:
-    q = User.query
-    if hasattr(User, "is_active"):
-        try:
-            q = q.filter(User.is_active.is_(True))
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:386")
-            pass
-    if hasattr(User, "email"):
-        q = q.filter(User.email.isnot(None), User.email != "")
-    try:
-        return q.order_by(User.id.asc()).all()
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/services/corporate_information_center.py:388")
-        return q.all()
 
 def get_recipients() -> dict[str, Any]:
     cfg = get_config()
@@ -630,7 +589,6 @@ def context(search: str | None = None) -> dict[str, Any]:
     return data
 
 __all__ = [
-    "_active_staff_users",
     "_cic_auto_bool",
     "_cic_phase5_audit_list",
     "_cic_phase5_last_result",
@@ -646,11 +604,9 @@ __all__ = [
     "_cic_phase6_status",
     "_cic_phase6_template_quality",
     "_context_base",
-    "_users_by_ids",
     "context",
     "get_auto_scheduler_config",
     "get_recent_logs",
     "get_recipients",
     "get_template",
-    "list_users",
 ]
