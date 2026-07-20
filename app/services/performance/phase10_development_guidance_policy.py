@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
