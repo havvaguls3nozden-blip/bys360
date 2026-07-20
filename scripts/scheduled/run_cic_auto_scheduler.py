@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 def main() -> int:
     from app import create_app
-    from app.services.cic.facade import run_due_tasks
+    from app.services.cic.service import run_due_tasks
 
     app = create_app()
     with app.app_context():

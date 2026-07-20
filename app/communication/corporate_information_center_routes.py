@@ -6,7 +6,7 @@ from flask import abort, flash, redirect, render_template, request, url_for, ses
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
-from app.services.cic.facade import (
+from app.services.cic.service import (
     can_manage,
     context,
     ensure_defaults,
@@ -174,7 +174,7 @@ def corporate_information_center_system_save():
 @login_required
 def corporate_information_center_celebrations():
     _guard()
-    from app.services.cic.facade import celebration_context, ensure_celebration_schema
+    from app.services.cic.service import celebration_context, ensure_celebration_schema
     ensure_celebration_schema()
     return render_template("corporate_information_center/celebrations.html", **celebration_context(request.args.get("q")))
 
@@ -183,7 +183,7 @@ def corporate_information_center_celebrations():
 @login_required
 def corporate_information_center_celebrations_save():
     _guard()
-    from app.services.cic.facade import save_celebration_settings
+    from app.services.cic.service import save_celebration_settings
     save_celebration_settings(request.form, actor_user_id=getattr(current_user, "id", None))
     flash("Akıllı kutlama ayarları kaydedildi.", "success")
     return redirect(url_for("main.corporate_information_center_celebrations"))
@@ -195,7 +195,7 @@ def corporate_information_center_celebrations_run(task_key: str):
     _guard()
     if task_key not in {"staff_birthday", "work_anniversary", "special_day"}:
         abort(404)
-    from app.services.cic.facade import send_task
+    from app.services.cic.service import send_task
     result = send_task(task_key, dry_run=bool(request.form.get("dry_run")), actor_user_id=getattr(current_user, "id", None))
     session["cic_last_task_result"] = _session_safe_result(result)
     flash(result.get("message") or f"{result.get('task_label', task_key)} çalıştırıldı.", "success" if result.get("ok") else "warning")
@@ -252,7 +252,7 @@ def corporate_information_center_celebration_excel_template():
 @login_required
 def corporate_information_center_celebration_excel_upload():
     _guard()
-    from app.services.cic.facade import import_celebration_dates_from_excel
+    from app.services.cic.service import import_celebration_dates_from_excel
     apply_mode = (request.form.get("mode") == "apply")
     result = import_celebration_dates_from_excel(request.files.get("celebration_excel"), apply=apply_mode, actor_user_id=getattr(current_user, "id", None))
     session["cic_celebration_import_result"] = result
