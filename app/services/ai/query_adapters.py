@@ -1,15 +1,15 @@
 from __future__ import annotations
-from app import db
 
 from typing import Any
 
 from flask_login import current_user
 
+from app import db
 from app.models import PerformanceEvaluation, PerformanceEvaluationItem, SupportTicket
 from app.route_support import is_manager_family_user
+
 from .guardrails import AIInputError, AIResourceNotFound
 from .redaction import redact_payload
-
 
 _REMOVED_MODULE_MESSAGE = (
     "Bu alan canlı kapsamdan çıkarıldı. Eğitim/İSG, eski Strateji, İç Portal ve Belge-Medya Deposu "

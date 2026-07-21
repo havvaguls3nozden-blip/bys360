@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """Iletisim ve destek kayitlarindan kurumsal sinyal analizi servis koprusu.
@@ -12,9 +12,9 @@ yardim/destek kayitlarindan kisisel icerik dokmeden toplu, maskelenmis ve
 insan onayli karar destek sinyalleri uretir.
 """
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Iterable
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card

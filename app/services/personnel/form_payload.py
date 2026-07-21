@@ -8,9 +8,9 @@ Canlı sağlamlaştırma notu:
 """
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Mapping
 
 try:
     from .categories import normalize_personnel_category_label

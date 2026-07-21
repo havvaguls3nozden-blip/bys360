@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import json
 import re
 from collections import defaultdict
@@ -12,8 +11,8 @@ from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog
-from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module, scope_visible_modules
 from app.services.ai.executive_reporting import build_ai_executive_brief
 from app.services.ai.go_live import build_ai_go_live_snapshot
 from app.services.ai.localization import (
@@ -23,6 +22,11 @@ from app.services.ai.localization import (
     ai_recommendation_label,
     ai_status_label,
     ai_target_label,
+)
+from app.services.ai.module_scope import (
+    filter_visible_values,
+    is_visible_ai_module,
+    scope_visible_modules,
 )
 
 NEGATIVE_FEEDBACK_TYPES = {"not_helpful", "wrong", "unsafe", "incorrect", "negative"}

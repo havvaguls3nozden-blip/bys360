@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Faz 9: AI öneri motoru ve risk/önceliklendirme paneli.
 
 Bu servis yalnızca okuma yapar. Mevcut AI günlükleri, öneriler, özet cache
@@ -17,7 +18,13 @@ from typing import Any
 from sqlalchemy import func
 
 from app.extensions import db
-from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
+from app.models import (
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    AISummaryCache,
+)
 from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module
 
 # Faz 9 güvenlik sözleşmesi: otomatik karar/uygulama yoktur.

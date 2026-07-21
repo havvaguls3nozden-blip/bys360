@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 # Ortak yardımcılar: AI panel üreticileri küçük dosyalara bölündü; public import yolu korunur.
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
 THIRD_MANAGER_HEADER_ALIASES = [
@@ -12,10 +13,9 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from typing import Any
-from collections.abc import Iterable
-
 import unicodedata
+from collections.abc import Iterable
+from typing import Any
 
 from flask import current_app, url_for
 from sqlalchemy import func
@@ -24,6 +24,7 @@ from werkzeug.routing import BuildError
 from app.extensions import db
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AISummaryCache
 from app.services.ai.schema_guard import get_ai_schema_status
+
 
 def _get(source: Any, key: str, default: Any = None) -> Any:
     if source is None:

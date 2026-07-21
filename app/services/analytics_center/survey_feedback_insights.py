@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """Anket / geri bildirim / nabiz analiz motoru servis koprusu.
@@ -14,9 +14,9 @@ Bu dosyanin hedefi acik uclu yanitlari kisisel veri dokmeden tema, katilim,
 oncelik ve egilim sinyallerine donusturmektir.
 """
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Iterable
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card

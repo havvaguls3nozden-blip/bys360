@@ -13,12 +13,12 @@ import io
 import re
 import zipfile
 from collections import Counter
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
-from collections.abc import Iterable, Sequence
 
 from werkzeug.datastructures import FileStorage
 

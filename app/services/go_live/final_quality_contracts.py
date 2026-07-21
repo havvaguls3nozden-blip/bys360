@@ -5,7 +5,6 @@ Maintenance Faz 1-6 refactor/guard zincirinin tek yerde izlenebilmesini sağlama
 """
 from __future__ import annotations
 
-
 from dataclasses import dataclass
 from typing import Final
 

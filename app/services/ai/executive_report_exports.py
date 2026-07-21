@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Faz 11: AI yönetici ekranı ve güvenli rapor export servisi.
 
 Bu servis yalnızca okuma ve güvenli raporlama yapar. Ham AI istem/yanıt
@@ -9,16 +10,23 @@ Faz 10 görünürlük/maskeleme kapısı ile uyumlu çalışır; AI nihai karar 
 öneri uygulamaz, kayıt oluşturmaz ve kayıt güncellemez.
 """
 
+import json
+import re
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 from typing import Any
-import json
-import re
 
 from sqlalchemy import func
 
-from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
+from app.models import (
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    AISummaryCache,
+)
 from app.services.ai.module_scope import is_visible_ai_module
+
 try:  # Faz 10 overlay uygulanmışsa güvenli export politikası oradan okunur.
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot
 except Exception:  # pragma: no cover - eski canlı paketlerde güvenli geri dönüş

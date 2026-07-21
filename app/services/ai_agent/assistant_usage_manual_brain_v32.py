@@ -13,9 +13,9 @@ Kritik sınır:
 
 import re
 import unicodedata
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Callable, Iterable
 
 VERSION = "BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32"
 SOURCE_LABEL = "BYS360 Kullanım Kılavuzu Güncel v1.1 · Haziran 2026"

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from typing import Optional
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformanceEvaluation
 

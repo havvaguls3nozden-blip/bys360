@@ -10,10 +10,10 @@ Faz 4 kapsamı:
 - Dosya silme sırasında yalnızca uygulamanın static kökü altındaki dosyalar hedeflenir.
 """
 
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
-from collections.abc import Callable
 
 PhotoSaver = Callable[[Any, Any], Any]
 

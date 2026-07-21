@@ -8,10 +8,10 @@ UI dostu bir servis yüzeyinden okuyabilmektir.
 """
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Mapping
 
 from sqlalchemy import inspect, or_
 from sqlalchemy.orm import joinedload

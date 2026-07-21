@@ -8,10 +8,11 @@ Faz 8 kuralı:
 """
 from __future__ import annotations
 
+import logging
 import uuid
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any
-import logging
+
 logger = logging.getLogger(__name__)
 
 

@@ -4,7 +4,12 @@ from __future__ import annotations
 
 
 try:
-    from app.services.ai_agent.assistant_visible_tutor_v6 import answer_question as bys360_visible_tutor_v6_answer, NEW_WELCOME_MESSAGE as BYS360_VISIBLE_TUTOR_V6_WELCOME
+    from app.services.ai_agent.assistant_visible_tutor_v6 import (
+        NEW_WELCOME_MESSAGE as BYS360_VISIBLE_TUTOR_V6_WELCOME,
+    )
+    from app.services.ai_agent.assistant_visible_tutor_v6 import (
+        answer_question as bys360_visible_tutor_v6_answer,
+    )
 except Exception:  # pragma: no cover
     bys360_visible_tutor_v6_answer = None
     BYS360_VISIBLE_TUTOR_V6_WELCOME = None
@@ -20,13 +25,10 @@ from .action_queue_bridge import (
 from .assistant_panel_bridge import build_assistant_widget_summary_for_user
 from .dashboard_kpi_bridge import build_dashboard_kpi_summary_for_user
 from .performance_bridge import build_performance_summary_for_user
-from .security_bridge import (
-    build_ai_agent_security_policy_payload,
-    build_ai_agent_security_self_check as build_ai_agent_security_self_check_payload,
-)
 from .policy import (
-    AI_AGENT_AG6_VERSION,
+    AG5_CAPABILITIES,
     AI_AGENT_ACTION_QUEUE_NOTICE,
+    AI_AGENT_AG6_VERSION,
     AI_AGENT_ASSISTANT_PANEL_NOTICE,
     AI_AGENT_DASHBOARD_KPI_NOTICE,
     AI_AGENT_DECISION_NOTICE,
@@ -34,11 +36,16 @@ from .policy import (
     AI_AGENT_NO_AUTOMATION_NOTICE,
     AI_AGENT_PERFORMANCE_NOTICE,
     AI_AGENT_SECURITY_NOTICE,
-    AG5_CAPABILITIES,
     capability_payload,
     redact_sensitive_text,
 )
 from .repository import collect_safe_counts_for_user, insert_agent_request_log, table_exists
+from .security_bridge import (
+    build_ai_agent_security_policy_payload,
+)
+from .security_bridge import (
+    build_ai_agent_security_self_check as build_ai_agent_security_self_check_payload,
+)
 
 
 def _user_id(user: Any) -> int | None:
@@ -1018,7 +1025,9 @@ _BYS360_ASSISTANT_PREV_BUILD_REPLY_KB_V1 = _legacy_build_ai_agent_reply_guide
 def _legacy_build_ai_agent_reply_kb(user, question):
     """BYS360 Asistanı Bilgi Bankası V1: önce rol bazlı kullanım rehberini dener."""
     try:
-        from app.services.ai_agent.assistant_knowledge_bank_v1 import build_bys360_assistant_knowledge_reply
+        from app.services.ai_agent.assistant_knowledge_bank_v1 import (
+            build_bys360_assistant_knowledge_reply,
+        )
         kb_reply = build_bys360_assistant_knowledge_reply(user, question or "")
         if kb_reply:
             return kb_reply
@@ -1050,7 +1059,9 @@ _BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_GUIDE_V2 = _legacy_build_ai_agent_reply_
 def _legacy_build_ai_agent_reply_fullguide(user, question):
     # BYS360 Asistanı V2: önce tam canlı kullanım rehberini dener.
     try:
-        from app.services.ai_agent.assistant_full_live_usage_guide_v2 import build_bys360_assistant_full_live_usage_reply
+        from app.services.ai_agent.assistant_full_live_usage_guide_v2 import (
+            build_bys360_assistant_full_live_usage_reply,
+        )
         guide_reply = build_bys360_assistant_full_live_usage_reply(user, question or "")
         if guide_reply:
             return guide_reply
@@ -1081,7 +1092,9 @@ _BYS360_ASSISTANT_PREV_BUILD_REPLY_MASTER_KNOWLEDGE_V3 = _legacy_build_ai_agent_
 def _legacy_build_ai_agent_reply_master(user, question):
     """BYS360 Asistanı V3: kaynak dosya tabanlı proje hafızasını önce dener."""
     try:
-        from app.services.ai_agent.assistant_project_master_knowledge_v3 import build_bys360_assistant_master_reply
+        from app.services.ai_agent.assistant_project_master_knowledge_v3 import (
+            build_bys360_assistant_master_reply,
+        )
         master_reply = build_bys360_assistant_master_reply(user, question or "")
         if master_reply:
             return master_reply
@@ -1112,7 +1125,9 @@ _BYS360_ASSISTANT_PREV_BUILD_REPLY_STEPWISE_TUTOR_V4 = _legacy_build_ai_agent_re
 def _legacy_build_ai_agent_reply_stepwise(user, question):
     # BYS360 Asistanı V4: doğal dilde sorulan kullanım sorularını adım adım öğretir.
     try:
-        from app.services.ai_agent.assistant_stepwise_tutor_v4 import build_bys360_assistant_stepwise_reply
+        from app.services.ai_agent.assistant_stepwise_tutor_v4 import (
+            build_bys360_assistant_stepwise_reply,
+        )
         stepwise_reply = build_bys360_assistant_stepwise_reply(user, question or "")
         if stepwise_reply:
             return stepwise_reply
@@ -1156,7 +1171,11 @@ def bys360_visible_tutor_v6_try_answer(message=None, question=None, prompt=None,
 try:
     from app.services.ai_agent.assistant_visible_tutor_v6 import (
         OLD_GREETING as _BYS360_VT_OLD_GREETING,
+    )
+    from app.services.ai_agent.assistant_visible_tutor_v6 import (
         WELCOME_TEXT as _BYS360_VT_WELCOME_TEXT,
+    )
+    from app.services.ai_agent.assistant_visible_tutor_v6 import (
         try_answer_visible_tutor_v6 as _bys360_vt_try_answer,
     )
 except Exception:
@@ -1299,7 +1318,9 @@ _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32 = _legacy_build_ai_agent_rep
 def build_ai_agent_reply(user, question, context=None):
     """BYS360 Asistanı V32: güncel kullanım kılavuzu tabanlı doğal dil rehberi."""
     try:
-        from app.services.ai_agent.assistant_usage_manual_brain_v32 import build_bys360_assistant_usage_manual_reply_v32
+        from app.services.ai_agent.assistant_usage_manual_brain_v32 import (
+            build_bys360_assistant_usage_manual_reply_v32,
+        )
         previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32
         if previous is build_ai_agent_reply:
             previous = None

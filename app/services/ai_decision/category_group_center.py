@@ -6,13 +6,13 @@ sonuçlarını ve yayın durumunu yalnızca grup/kategori kırılımında özetl
 BYS360_AI_DECISION_FAZ2_CATEGORY_GROUP_CENTER
 """
 from __future__ import annotations
-from app import db
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
-from collections.abc import Mapping
 
+from app import db
 
 DEFAULT_CATEGORY_LABELS: tuple[str, ...] = (
     "Güvenlik",

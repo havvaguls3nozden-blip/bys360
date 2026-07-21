@@ -1,23 +1,29 @@
 from __future__ import annotations
 
-
 import logging
 
 from app.core.datetime_utils import utc_now
-
 from app.extensions import db
-from app.services.performance.low_score_process_service import ensure_low_score_process_for_evaluation
-from app.models import EvaluationAssignment, PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem
+from app.models import (
+    EvaluationAssignment,
+    PerformanceCriteria,
+    PerformanceEvaluation,
+    PerformanceEvaluationItem,
+)
+from app.services.performance.interim_notes_runtime import build_interim_notes_context
+from app.services.performance.low_score_process_service import (
+    ensure_low_score_process_for_evaluation,
+)
+from app.services.performance.period_state_guard import ensure_scoring_window_open
+from app.services.performance.visibility_guard import build_evaluation_form_visibility_context
 
 from .chain import build_resolved_chain
+from .rules import normalize_level_mode, resolve_chain_policy
+from .scoring import compute_final_score, raw_score_to_100
 from .visibility import build_previous_level_comment_snapshot
 from .weights import resolve_weight_plan
 from .workflow import current_actionable_levels
-from .scoring import raw_score_to_100, compute_final_score
-from .rules import normalize_level_mode, resolve_chain_policy
-from app.services.performance.visibility_guard import build_evaluation_form_visibility_context
-from app.services.performance.interim_notes_runtime import build_interim_notes_context
-from app.services.performance.period_state_guard import ensure_scoring_window_open
+
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE5_3_MANAGER_SCORING_SETTINGS_CONTEXT

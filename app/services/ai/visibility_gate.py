@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Faz 10: AI yetki, KVKK maskeleme ve güvenli görünürlük kapısı.
 
 Bu servis yalnızca okuma yapar. AI ekranlarının hangi rol için hangi kapsamda
@@ -9,16 +10,23 @@ tek yerde tanımlar. Ham istem/yanıt metni döndürmez, öneri uygulamaz, kayı
 oluşturmaz, kayıt güncellemez ve nihai idari karar vermez.
 """
 
+import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import re
 from typing import Any
 
 from sqlalchemy import func
 
 from app.extensions import db
-from app.models import AIRecommendation, AIRequestLog, AIRedactionRule, RoleMenuDefault, User, UserMenuPermission
+from app.models import (
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    RoleMenuDefault,
+    User,
+    UserMenuPermission,
+)
 from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module
 
 # Faz 10 güvenlik sözleşmesi

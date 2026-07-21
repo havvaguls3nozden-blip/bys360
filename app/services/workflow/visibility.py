@@ -3,12 +3,12 @@ from __future__ import annotations
 from app.models import PerformanceEvaluation
 
 from .constants import (
+    VISIBLE_TO_LEVEL_2,
     WORKFLOW_DRAFT,
     WORKFLOW_RESUBMITTED,
     WORKFLOW_RETURNED,
     WORKFLOW_SEEN,
     WORKFLOW_SUBMITTED,
-    VISIBLE_TO_LEVEL_2,
 )
 from .state import normalize_workflow_status
 

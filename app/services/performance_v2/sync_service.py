@@ -1,38 +1,49 @@
 from __future__ import annotations
 
 import logging
-from app.core.datetime_utils import utc_now
 from uuid import uuid4
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import AssignmentCoverageLog, EvaluationAssignment, Notification, PerformanceEvaluation, User
+from app.models import (
+    AssignmentCoverageLog,
+    EvaluationAssignment,
+    Notification,
+    PerformanceEvaluation,
+    User,
+)
 from app.services.availability_service import (
     apply_availability_snapshot_to_evaluation,
     get_assignment_reference_date,
     get_period_employee_availability,
     resolve_effective_manager,
 )
-from app.services.performance.common import is_president
 from app.services.hierarchy_rulebook_service import build_lookup
 from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain
+from app.services.performance.common import is_president
+
 # BYS360_PHASE8_4_PERIOD_SCOPE_IMPORT_START
 from app.services.performance.period_scope_assignment import (
     build_period_scope_generation_payload,
     deactivate_out_of_scope_assignments_for_period,
     filter_period_scope_employees,
 )
-# BYS360_PHASE8_4_PERIOD_SCOPE_IMPORT_END
-from app.services.performance.scoring_window_policy import is_before_scoring_start, scoring_window_payload, apply_scoring_start_to_period
 
+# BYS360_PHASE8_4_PERIOD_SCOPE_IMPORT_END
+from app.services.performance.scoring_window_policy import (
+    apply_scoring_start_to_period,
+    is_before_scoring_start,
+    scoring_window_payload,
+)
 from app.services.performance.selected_scope_assessor_policy import (
     assessor_only_exclusion_note,
     split_scored_employees_from_assessor_only,
 )
 
-
 from .chain import build_resolved_chain
 from .schedule import build_due_date_for_period
 from .validators import validate_period_ready
+
 logger = logging.getLogger(__name__)
 
 
@@ -400,7 +411,9 @@ def _resolved_payloads(period, resolved_chain):
             # BYS360_PHASE4_THIRD_SUPERVISOR_TASK_GUARD
             try:
                 # BYS360_PHASE4_2_THIRD_SUPERVISOR_TASK_GUARD
-                from app.services.performance.third_supervisor_policy import should_create_third_supervisor_task
+                from app.services.performance.third_supervisor_policy import (
+                    should_create_third_supervisor_task,
+                )
                 if not should_create_third_supervisor_task(period=period, payload=payload):
                     continue
             except Exception:

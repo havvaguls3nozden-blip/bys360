@@ -6,7 +6,6 @@ Mesaj gönderme, ek kaydetme, bildirim üretme ve thread katılımcı yazımı b
 fazda taşınmaz; canlı yazma akışı route içinde kalır.
 """
 from __future__ import annotations
-from app import db
 
 from dataclasses import dataclass
 from datetime import timedelta
@@ -14,6 +13,7 @@ from typing import Any
 
 from flask_login import current_user
 
+from app import db
 from app.models import Message, MessageThread, MessageThreadParticipant, MessageTypingState, User
 
 from .constants import COMPOSE_USER_SOFT_LIMIT

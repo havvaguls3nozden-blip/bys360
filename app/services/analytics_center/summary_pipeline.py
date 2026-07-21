@@ -6,9 +6,9 @@ atmaz ve yalnızca dashboard/analiz fazları için güvenli özet hazırlığı 
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Iterable
 
 try:
     from app.services.ai_decision.summary_cache import (
@@ -26,7 +26,11 @@ except ImportError:
         build_ai_summary_cache_lookup,
         build_ai_summary_cache_payload,
     )
-from .live_scope import ANALYTICS_SURFACE_KEYS, build_analytics_surface_summary, get_analytics_surfaces
+from .live_scope import (
+    ANALYTICS_SURFACE_KEYS,
+    build_analytics_surface_summary,
+    get_analytics_surfaces,
+)
 
 
 @dataclass(frozen=True)

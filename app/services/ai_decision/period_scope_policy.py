@@ -11,10 +11,10 @@ dönüştürür.
 BYS360_AI_DECISION_FAZ8_PERIOD_SCOPE_POLICY
 """
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Iterable, Mapping
 
 logger = logging.getLogger(__name__)
 

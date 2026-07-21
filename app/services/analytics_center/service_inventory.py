@@ -1,11 +1,19 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Analiz Merkezi servis envanteri."""
 
 
-from .live_scope import ANALYTICS_SURFACE_KEYS, build_analytics_surface_summary, get_analytics_surfaces
-from .summary_pipeline import build_analytics_summary_cache_plan, build_analytics_summary_pipeline_summary
+from .live_scope import (
+    ANALYTICS_SURFACE_KEYS,
+    build_analytics_surface_summary,
+    get_analytics_surfaces,
+)
+from .summary_pipeline import (
+    build_analytics_summary_cache_plan,
+    build_analytics_summary_pipeline_summary,
+)
 
 
 def build_analytics_center_faz0_inventory() -> dict[str, object]:
@@ -89,7 +97,10 @@ def build_analytics_center_summary_cache_summary() -> dict[str, object]:
 
 
 def build_analytics_center_faz3_inventory() -> dict[str, object]:
-    from .dashboard_surface import build_ai_decision_dashboard_readiness_summary, build_ai_decision_dashboard_surface
+    from .dashboard_surface import (
+        build_ai_decision_dashboard_readiness_summary,
+        build_ai_decision_dashboard_surface,
+    )
 
     dashboard_surface = build_ai_decision_dashboard_surface(
         raw_metrics={"personnel_total": 24, "performance_pending": 4, "survey_response_rate": 76, "support_open_items": 3},
@@ -126,7 +137,10 @@ def build_analytics_center_dashboard_surface_summary() -> dict[str, object]:
 
 
 def build_analytics_center_faz4_inventory() -> dict[str, object]:
-    from .personnel_performance_insights import build_personnel_performance_readiness_summary, build_default_personnel_performance_insights
+    from .personnel_performance_insights import (
+        build_default_personnel_performance_insights,
+        build_personnel_performance_readiness_summary,
+    )
 
     insight_context = build_default_personnel_performance_insights()
     return {
@@ -162,7 +176,10 @@ def build_analytics_center_personnel_performance_summary() -> dict[str, object]:
 
 
 def build_analytics_center_faz5_inventory() -> dict[str, object]:
-    from .survey_feedback_insights import build_default_survey_feedback_insights, build_survey_feedback_readiness_summary
+    from .survey_feedback_insights import (
+        build_default_survey_feedback_insights,
+        build_survey_feedback_readiness_summary,
+    )
 
     insight_context = build_default_survey_feedback_insights()
     return {
@@ -200,7 +217,10 @@ def build_analytics_center_survey_feedback_summary() -> dict[str, object]:
 
 
 def build_analytics_center_faz6_inventory() -> dict[str, object]:
-    from .communication_support_insights import build_communication_support_readiness_summary, build_default_communication_support_insights
+    from .communication_support_insights import (
+        build_communication_support_readiness_summary,
+        build_default_communication_support_insights,
+    )
 
     insight_context = build_default_communication_support_insights()
     return {

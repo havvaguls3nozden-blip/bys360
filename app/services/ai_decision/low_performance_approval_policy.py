@@ -12,9 +12,9 @@ hazırlar.
 BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_POLICY
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Mapping
 
 logger = logging.getLogger(__name__)
 

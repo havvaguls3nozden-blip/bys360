@@ -8,8 +8,8 @@ manuel calistirilmalidir.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
 from collections.abc import Iterable
+from dataclasses import asdict, dataclass
 
 
 @dataclass(frozen=True)

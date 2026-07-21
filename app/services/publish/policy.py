@@ -42,12 +42,14 @@ def is_evaluation_publishable(*args, **kwargs):
 
 
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Optional
-from collections.abc import Iterable
 
 from app.extensions import db
 from app.models import PerformanceEvaluation, PerformancePeriod
+
+
 def get_publish_timestamp(evaluation: PerformanceEvaluation | None) -> datetime | None:
     if not evaluation:
         return None

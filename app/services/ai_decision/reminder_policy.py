@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 AI Karar Destek Faz 9 hatırlatma ve aksatan amir politikası.
@@ -13,10 +13,10 @@ yalnızca süreç takibi için özet, uyarı ve öneri sunar.
 BYS360_AI_DECISION_FAZ9_REMINDER_POLICY
 """
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Iterable, Mapping
 
 
 @dataclass(frozen=True)

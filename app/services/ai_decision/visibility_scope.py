@@ -10,11 +10,10 @@ BYS360_AI_DECISION_FAZ3_VISIBILITY_SCOPE
 """
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable
-import re
-
 
 AI_DECISION_MENU_KEYS: tuple[str, ...] = (
     "ai_decision_center",
