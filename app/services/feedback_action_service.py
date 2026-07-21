@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 
-
 def get_priority_badge(priority: str) -> str:
     normalized = (priority or "medium").strip().lower()
     return {

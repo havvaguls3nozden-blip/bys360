@@ -4,7 +4,6 @@ from typing import Any
 
 from app.config.live_scope import get_live_scope_summary
 
-
 _AREA_LABELS: dict[str, str] = {
     "dashboard": "Dashboard",
     "personel_yetki": "Personel ve Yetki",

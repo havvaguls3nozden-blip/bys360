@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from flask import current_app
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import Survey, SurveyAssignment
 from app.models.communication_phase5_models import CommunicationAutomationLog
@@ -19,7 +20,7 @@ from app.services.communication_phase5_service import (
     safe_str,
 )
 from app.services.go_live_readiness_service import build_go_live_readiness_context
-import logging
+
 logger = logging.getLogger(__name__)
 
 

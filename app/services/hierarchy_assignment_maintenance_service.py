@@ -3,9 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.extensions import db
 import app.models as models
-
+from app.extensions import db
 from app.services.auto_hierarchy_service import auto_apply_manager_chains
 from app.services.hierarchy_rulebook_service import build_lookup, is_system_user
 from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain

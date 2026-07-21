@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
-from collections.abc import Iterable
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import Notification, OrganizationUnit, SupportHelpArticle, SupportTicket, Survey, User
+from app.models import (
+    Notification,
+    OrganizationUnit,
+    SupportHelpArticle,
+    SupportTicket,
+    Survey,
+    User,
+)
 from app.models.communication_phase1_models import (
     CommunicationBulletin,
     CommunicationBulletinAudience,
     CommunicationBulletinReceipt,
 )
-
 
 MANAGER_ROLES = {
     "admin",

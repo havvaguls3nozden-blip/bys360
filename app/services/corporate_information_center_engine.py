@@ -11,6 +11,7 @@ except Exception:  # pragma: no cover
     current_user = None
 
 from app.models import User
+
 try:
     from app.services.settings.settings_service import get_setting_value, set_setting_value
 except Exception:

@@ -10,12 +10,12 @@ Bu dosya Flask uygulama açılışını zorlamaz; import edildiğinde Redis'e ba
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
 import importlib
 import logging
 import os
-from typing import Any
 from collections.abc import Callable, Mapping
+from dataclasses import asdict, dataclass
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

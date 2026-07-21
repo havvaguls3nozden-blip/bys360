@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
@@ -14,7 +15,7 @@ from sqlalchemy import inspect as sa_inspect
 from app.extensions import db
 from app.models import MailLog, RoleMenuDefault, SystemSetting, User
 from app.services.mail_core import create_mail_log, send_email
-import logging
+
 logger = logging.getLogger(__name__)
 
 DAILY_WEATHER_MAIL_TYPE = "daily_weather_personnel_info"

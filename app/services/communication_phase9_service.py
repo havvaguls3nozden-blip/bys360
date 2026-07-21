@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 from datetime import datetime
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.communication_phase5_models import CommunicationAutomationLog
 from app.services.communication_phase5_service import (
@@ -17,7 +18,7 @@ from app.services.communication_phase5_service import (
     support_operations_snapshot,
 )
 from app.services.go_live_readiness_service import build_go_live_readiness_context
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +47,10 @@ def _recent_phase9_logs(limit: int = 40) -> list[CommunicationAutomationLog]:
 
 def _try_phase8_snapshot() -> dict[str, Any]:
     try:
-        from app.services.communication_phase8_service import cutover_snapshot, pilot_readiness_snapshot
+        from app.services.communication_phase8_service import (
+            cutover_snapshot,
+            pilot_readiness_snapshot,
+        )
         return {
             'readiness': pilot_readiness_snapshot(),
             'cutover': cutover_snapshot(),

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-
 import json
+import logging
 import subprocess
 from typing import Any
 
 from flask import current_app
-import logging
+
 logger = logging.getLogger(__name__)
 
 try:

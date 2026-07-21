@@ -8,15 +8,15 @@ Amaç:
 """
 from __future__ import annotations
 
-
-from typing import Any
+import logging
 import re
 import unicodedata
-import logging
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 try:
-    from flask import request, redirect, flash
+    from flask import flash, redirect, request
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=21")
     request = None

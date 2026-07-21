@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from datetime import timedelta
-from typing import Any
 import json
 import os
 import urllib.request
+from datetime import timedelta
+from typing import Any
 
 from flask import current_app
 from sqlalchemy import func

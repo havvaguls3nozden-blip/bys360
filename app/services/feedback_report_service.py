@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from datetime import date, timedelta
 import csv
 import io
+from collections import defaultdict
+from datetime import date, timedelta
 
 from app.models import FeedbackCampaign, FeedbackPulseEntry
-from app.services.feedback_service import build_campaign_pulse_context, build_campaign_results, campaign_includes_pulse
+from app.services.feedback_service import (
+    build_campaign_pulse_context,
+    build_campaign_results,
+    campaign_includes_pulse,
+)
 
 
 def build_pulse_trend(unit_id=None, days: int = 14):

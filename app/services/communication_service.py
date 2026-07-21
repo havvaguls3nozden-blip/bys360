@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from app.core.datetime_utils import utc_now
-from app.models import MessageThreadParticipant, MessageAttachment
-from app.models.communication_phase1_models import CommunicationBulletin, CommunicationBulletinReceipt
+from app.extensions import db
+from app.models import MessageAttachment, MessageThreadParticipant
+from app.models.communication_phase1_models import (
+    CommunicationBulletin,
+    CommunicationBulletinReceipt,
+)
 from app.services.communication_phase1_service import resolve_bulletin_target_users
 from app.services.message_service import message_upload_dir
-import logging
-from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

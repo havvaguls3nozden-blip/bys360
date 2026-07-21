@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import re
 import uuid
+
+from app.core.datetime_utils import utc_now
 
 try:
     import pymupdf
@@ -16,7 +17,6 @@ from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.models import PublicationIssue
-
 
 PUBLICATION_TYPE_LABELS = {
     "bulletin": "Kurumsal Bülten",

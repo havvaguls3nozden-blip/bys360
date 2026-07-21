@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 from datetime import datetime, timedelta
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import Notification, SurveyAssignment, SupportTicket
+from app.models import Notification, SupportTicket, SurveyAssignment
 from app.models.communication_phase5_models import CommunicationAutomationLog
 from app.services.communication_phase5_service import OPEN_TICKET_STATUSES, log_action, safe_str
-from app.services.communication_phase9_service import phase9_first72_snapshot, phase9_release_center_snapshot
-import logging
+from app.services.communication_phase9_service import (
+    phase9_first72_snapshot,
+    phase9_release_center_snapshot,
+)
+
 logger = logging.getLogger(__name__)
 
 

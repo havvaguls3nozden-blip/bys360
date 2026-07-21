@@ -125,18 +125,18 @@ def build_assistant_live_summary(user: Any) -> dict[str, Any]:
         MessageThread,
         MessageThreadParticipant,
         Notification,
-        PersonnelCategory,
         PerformanceArchivedResult,
         PerformanceLowScoreProcess,
         PerformancePresidentApproval,
         PerformanceProcessFlow,
         PerformanceProcessNotification,
+        PersonnelCategory,
         SupportTicket,
         Survey,
         SurveyAssignment,
         SurveyResponse,
+        db,
     )
-    from app.models import db
 
     privileged = _is_privileged_user(user)
     president_like = _is_president_like_user(user)

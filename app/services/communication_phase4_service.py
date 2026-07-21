@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import csv
+import logging
 from collections import Counter
 from datetime import date, datetime, timedelta
 from io import StringIO
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     Notification,
@@ -16,7 +17,10 @@ from app.models import (
     SurveyAssignment,
     SurveyResponse,
 )
-from app.models.communication_phase1_models import CommunicationBulletin, CommunicationBulletinReceipt
+from app.models.communication_phase1_models import (
+    CommunicationBulletin,
+    CommunicationBulletinReceipt,
+)
 from app.models.communication_phase3_models import CommunicationSupportSlaPolicy
 from app.models.communication_phase4_models import (
     CommunicationDailyMetric,
@@ -24,7 +28,7 @@ from app.models.communication_phase4_models import (
     CommunicationGovernanceReview,
     CommunicationReportExportLog,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 MANAGER_ROLES = {

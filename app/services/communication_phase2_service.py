@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
-from collections.abc import Iterable
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     Notification,
@@ -28,7 +29,7 @@ from app.models.communication_phase2_models import (
     CommunicationSurveyTemplateQuestion,
 )
 from app.models.communication_phase3_models import CommunicationSurveyReminderLog
-import logging
+
 logger = logging.getLogger(__name__)
 
 

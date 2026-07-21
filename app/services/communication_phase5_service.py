@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import Notification, SupportTicket, Survey, SurveyAssignment, User
-from app.models.support_models import SupportTicketStatusHistory
 from app.models.communication_phase3_models import CommunicationSupportSlaPolicy
 from app.models.communication_phase5_models import (
     CommunicationAutomationLog,
@@ -17,6 +16,7 @@ from app.models.communication_phase5_models import (
     CommunicationOperationHealth,
     CommunicationRetentionPolicy,
 )
+from app.models.support_models import SupportTicketStatusHistory
 
 MANAGER_ROLES = {
     "admin",

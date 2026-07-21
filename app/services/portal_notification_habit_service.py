@@ -1,8 +1,8 @@
 """BYS360 Portal V2E bildirim alışkanlığı servis katmanı."""
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from app.models import Notification
 from app.route_support import sanitize_free_text

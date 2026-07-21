@@ -4,80 +4,149 @@ from typing import Any
 
 from sqlalchemy import inspect
 
-from app.extensions import db
 from app.config import is_removed_menu_key
-from app.menu_registry import ROLE_MENU_DEFAULTS, flatten_menu_definitions, get_role_default_menu_keys as static_role_default_menu_keys
-from app.models import ModuleSetting, RoleMenuDefault, SystemSetting, UnitMenuProfile, UserMenuPermission
+from app.extensions import db
 from app.live_scope import is_live_settings_module_key
+from app.menu_registry import ROLE_MENU_DEFAULTS, flatten_menu_definitions
+from app.menu_registry import get_role_default_menu_keys as static_role_default_menu_keys
+from app.models import (
+    ModuleSetting,
+    RoleMenuDefault,
+    SystemSetting,
+    UnitMenuProfile,
+    UserMenuPermission,
+)
 from app.services.settings.catalog import MODULE_SETTING_DEFINITIONS, SYSTEM_SETTING_DEFINITIONS
-from app.services.settings.value_codec import (
-    value_to_python as _value_to_python,
-    value_to_storage as _value_to_storage,
-)
-from app.services.settings.foundation_access import (
-    build_settings_foundation_context_handler as _build_settings_foundation_context_handler,
-    ensure_settings_phase1_seeded_handler as _ensure_settings_phase1_seeded_handler,
-    iter_live_module_setting_definitions as _iter_live_module_setting_definitions_handler,
-)
-from app.services.settings.menu_profile_access import (
-    build_base_rule_map_for_user_handler as _build_base_rule_map_for_user_handler,
-    build_effective_user_menu_context_handler as _build_effective_user_menu_context_handler,
-    build_role_default_rule_map_handler as _build_role_default_rule_map_handler,
-    build_role_default_snapshot_handler as _build_role_default_snapshot_handler,
-    build_settings_profile_context_handler as _build_settings_profile_context_handler,
-    build_unit_profile_snapshot_handler as _build_unit_profile_snapshot_handler,
-    clear_user_menu_overrides_handler as _clear_user_menu_overrides_handler,
-    get_role_default_menu_keys_handler as _get_role_default_menu_keys_handler,
-    get_unit_profile_menu_keys_handler as _get_unit_profile_menu_keys_handler,
-    save_role_menu_defaults_handler as _save_role_menu_defaults_handler,
-    save_unit_menu_profile_handler as _save_unit_menu_profile_handler,
-    save_user_menu_overrides_handler as _save_user_menu_overrides_handler,
-)
-from app.services.settings.validation_defaults import (
-    build_settings_defaults_snapshot as _build_settings_defaults_snapshot_handler,
-    normalize_module_setting_definitions as _normalize_module_setting_definitions_handler,
-    normalize_system_setting_definitions as _normalize_system_setting_definitions_handler,
-    validate_settings_catalog_contract as _validate_settings_catalog_contract_handler,
-)
 from app.services.settings.change_logs import (
     create_settings_change_log as _create_settings_change_log,
+)
+from app.services.settings.change_logs import (
     deserialize_settings_state as _deserialize_state,
+)
+from app.services.settings.change_logs import (
     list_recent_settings_change_logs,
-)
-from app.services.settings.menu_permissions import (
-    build_complete_visibility_map as _build_complete_visibility_map,
-    filter_live_menu_keys as _filter_live_menu_keys,
-    filter_live_menu_rows as _filter_live_menu_rows,
-    snapshot_module_settings_state as _snapshot_module_settings_state,
-    snapshot_role_menu_state as _snapshot_role_menu_state,
-    snapshot_system_settings_state as _snapshot_system_settings_state,
-    snapshot_unit_menu_state as _snapshot_unit_menu_state,
-    snapshot_user_override_state as _snapshot_user_override_state,
-)
-
-from app.services.settings.rollback_handler import (
-    rollback_settings_change_handler as _rollback_settings_change_handler,
-)
-from app.services.settings.form_pipeline import (
-    save_module_settings_from_form_handler as _save_module_settings_from_form_handler,
-    save_system_settings_from_form_handler as _save_system_settings_from_form_handler,
 )
 from app.services.settings.diagnostics import (
     build_settings_diagnostics_context as _build_settings_diagnostics_context,
 )
+from app.services.settings.final_hardening import (
+    assert_settings_final_hardening_contract as _assert_settings_final_hardening_contract,
+)
+from app.services.settings.final_hardening import (
+    build_settings_final_hardening_report as _build_settings_final_hardening_report,
+)
+from app.services.settings.final_hardening import (
+    get_settings_final_release_checklist as _get_settings_final_release_checklist,
+)
+from app.services.settings.form_pipeline import (
+    save_module_settings_from_form_handler as _save_module_settings_from_form_handler,
+)
+from app.services.settings.form_pipeline import (
+    save_system_settings_from_form_handler as _save_system_settings_from_form_handler,
+)
+from app.services.settings.foundation_access import (
+    build_settings_foundation_context_handler as _build_settings_foundation_context_handler,
+)
+from app.services.settings.foundation_access import (
+    ensure_settings_phase1_seeded_handler as _ensure_settings_phase1_seeded_handler,
+)
+from app.services.settings.foundation_access import (
+    iter_live_module_setting_definitions as _iter_live_module_setting_definitions_handler,
+)
+from app.services.settings.menu_permissions import (
+    build_complete_visibility_map as _build_complete_visibility_map,
+)
+from app.services.settings.menu_permissions import (
+    filter_live_menu_keys as _filter_live_menu_keys,
+)
+from app.services.settings.menu_permissions import (
+    filter_live_menu_rows as _filter_live_menu_rows,
+)
+from app.services.settings.menu_permissions import (
+    snapshot_module_settings_state as _snapshot_module_settings_state,
+)
+from app.services.settings.menu_permissions import (
+    snapshot_role_menu_state as _snapshot_role_menu_state,
+)
+from app.services.settings.menu_permissions import (
+    snapshot_system_settings_state as _snapshot_system_settings_state,
+)
+from app.services.settings.menu_permissions import (
+    snapshot_unit_menu_state as _snapshot_unit_menu_state,
+)
+from app.services.settings.menu_permissions import (
+    snapshot_user_override_state as _snapshot_user_override_state,
+)
+from app.services.settings.menu_profile_access import (
+    build_base_rule_map_for_user_handler as _build_base_rule_map_for_user_handler,
+)
+from app.services.settings.menu_profile_access import (
+    build_effective_user_menu_context_handler as _build_effective_user_menu_context_handler,
+)
+from app.services.settings.menu_profile_access import (
+    build_role_default_rule_map_handler as _build_role_default_rule_map_handler,
+)
+from app.services.settings.menu_profile_access import (
+    build_role_default_snapshot_handler as _build_role_default_snapshot_handler,
+)
+from app.services.settings.menu_profile_access import (
+    build_settings_profile_context_handler as _build_settings_profile_context_handler,
+)
+from app.services.settings.menu_profile_access import (
+    build_unit_profile_snapshot_handler as _build_unit_profile_snapshot_handler,
+)
+from app.services.settings.menu_profile_access import (
+    clear_user_menu_overrides_handler as _clear_user_menu_overrides_handler,
+)
+from app.services.settings.menu_profile_access import (
+    get_role_default_menu_keys_handler as _get_role_default_menu_keys_handler,
+)
+from app.services.settings.menu_profile_access import (
+    get_unit_profile_menu_keys_handler as _get_unit_profile_menu_keys_handler,
+)
+from app.services.settings.menu_profile_access import (
+    save_role_menu_defaults_handler as _save_role_menu_defaults_handler,
+)
+from app.services.settings.menu_profile_access import (
+    save_unit_menu_profile_handler as _save_unit_menu_profile_handler,
+)
+from app.services.settings.menu_profile_access import (
+    save_user_menu_overrides_handler as _save_user_menu_overrides_handler,
+)
 from app.services.settings.quality_gate import (
     build_settings_refactor_quality_snapshot as _build_settings_refactor_quality_snapshot,
+)
+from app.services.settings.quality_gate import (
     build_settings_template_guard_context as _build_settings_template_guard_context,
+)
+from app.services.settings.quality_gate import (
     get_settings_refactor_phase_sequence as _get_settings_refactor_phase_sequence,
+)
+from app.services.settings.rollback_handler import (
+    rollback_settings_change_handler as _rollback_settings_change_handler,
 )
 from app.services.settings.ui_panel import (
     build_settings_ui_diagnostics_panel as _build_settings_ui_diagnostics_panel,
 )
-from app.services.settings.final_hardening import (
-    assert_settings_final_hardening_contract as _assert_settings_final_hardening_contract,
-    build_settings_final_hardening_report as _build_settings_final_hardening_report,
-    get_settings_final_release_checklist as _get_settings_final_release_checklist,
+from app.services.settings.validation_defaults import (
+    build_settings_defaults_snapshot as _build_settings_defaults_snapshot_handler,
 )
+from app.services.settings.validation_defaults import (
+    normalize_module_setting_definitions as _normalize_module_setting_definitions_handler,
+)
+from app.services.settings.validation_defaults import (
+    normalize_system_setting_definitions as _normalize_system_setting_definitions_handler,
+)
+from app.services.settings.validation_defaults import (
+    validate_settings_catalog_contract as _validate_settings_catalog_contract_handler,
+)
+from app.services.settings.value_codec import (
+    value_to_python as _value_to_python,
+)
+from app.services.settings.value_codec import (
+    value_to_storage as _value_to_storage,
+)
+
 
 def _table_exists(table_name: str) -> bool:
     try:

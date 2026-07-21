@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
-
 
 LARGE_ROUTE_THRESHOLD = 50_000
 GENERATED_REPORT_PATTERNS = (

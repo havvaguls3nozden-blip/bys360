@@ -13,7 +13,6 @@ Bu sayede veritabanında olmayan eski modeller/tablo adları personel silme sır
 """
 from __future__ import annotations
 
-
 from typing import Any
 
 from sqlalchemy import MetaData, inspect, text

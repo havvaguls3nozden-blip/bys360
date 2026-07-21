@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import json
 import time
 from datetime import datetime
@@ -10,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from flask import current_app
 
+from app.core.datetime_utils import utc_now
 
 _CACHE: dict[str, object] = {
     "key": None,

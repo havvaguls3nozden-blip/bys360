@@ -6,12 +6,11 @@ Bu servis canlı davranışı değiştirmez, veritabanına yazmaz ve migration
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import os
 import subprocess
 import sys
-
+from dataclasses import dataclass, field
+from pathlib import Path
 
 FINAL_REQUIRED_FILES = [
     Path("docs/role_matrices/README.md"),

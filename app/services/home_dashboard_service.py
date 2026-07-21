@@ -2,10 +2,10 @@
 """BYS360 Anasayfa Faz 1 günlük özet servisi."""
 from __future__ import annotations
 
-from datetime import date
 import time
-from typing import Any
 from collections.abc import Callable
+from datetime import date
+from typing import Any
 
 from sqlalchemy import or_
 

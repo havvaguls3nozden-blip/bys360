@@ -3,11 +3,11 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import datetime
-
-from flask import current_app
 from typing import Any
 
-from sqlalchemy import inspect as sa_inspect, or_, text
+from flask import current_app
+from sqlalchemy import inspect as sa_inspect
+from sqlalchemy import or_, text
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db
@@ -36,18 +36,18 @@ from app.models import (
     PerformancePublishLog,
     PerformanceResultSnapshot,
     PersonnelLeave,
-    Survey,
-    SurveyAnswer,
-    SurveyAssignment,
-    SurveyQuestion,
-    SurveyQuestionOption,
-    SurveyResponse,
     SupportFeedbackRating,
     SupportHelpArticle,
     SupportTicket,
     SupportTicketAttachment,
     SupportTicketMessage,
     SupportTicketStatusHistory,
+    Survey,
+    SurveyAnswer,
+    SurveyAssignment,
+    SurveyQuestion,
+    SurveyQuestionOption,
+    SurveyResponse,
     User,
     UserMenuPermission,
 )

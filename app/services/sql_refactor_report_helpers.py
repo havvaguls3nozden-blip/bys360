@@ -7,9 +7,9 @@ katmanına indirir. .env, migration veya DB yazımı içermez.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable
 
 from sqlalchemy import and_, case, func, or_
 

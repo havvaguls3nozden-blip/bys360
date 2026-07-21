@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import os
 from datetime import datetime
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.communication_phase5_models import CommunicationAutomationLog
 from app.services.communication_phase5_service import log_action, safe_str
