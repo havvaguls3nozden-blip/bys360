@@ -4,10 +4,9 @@ import logging
 from statistics import mean
 from typing import Any
 
+from app.api.mobile.routes import _as_int, _has_global_scope
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformanceResultSnapshot, User
-from app.api.mobile.routes import _as_int, _has_global_scope
-
 
 logger = logging.getLogger(__name__)
 

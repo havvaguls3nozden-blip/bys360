@@ -3,12 +3,11 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from app.extensions import db
-from app.models import User
 from app.api.mobile.routes import _full_name, _item
 from app.api.mobile.services.performance_base_helpers import _label, _period_name
 from app.api.mobile.services.performance_query_helpers import _score_value
-
+from app.extensions import db
+from app.models import User
 
 logger = logging.getLogger(__name__)
 

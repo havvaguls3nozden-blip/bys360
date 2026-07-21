@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime as _v2822_datetime, timezone as _v2822_timezone
+from datetime import datetime as _v2822_datetime
+from datetime import timezone as _v2822_timezone
 from typing import Any
 
-from app.extensions import db
-from app.models import EvaluationAssignment, PerformancePeriod, User
 from app.api.mobile.routes import _full_name, _has_global_scope, _item
 from app.api.mobile.services.performance_base_helpers import _date_text, _label, _period_name
-
+from app.extensions import db
+from app.models import EvaluationAssignment, PerformancePeriod, User
 
 logger = logging.getLogger(__name__)
 
