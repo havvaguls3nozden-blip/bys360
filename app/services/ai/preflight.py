@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import importlib
 from dataclasses import dataclass
 from typing import Any
 
 from flask import current_app
 
+from app.core.datetime_utils import utc_now
 from app.services.ai.client import get_provider_snapshot
 from app.services.ai.schema_guard import get_ai_schema_status
 

@@ -2,19 +2,19 @@ from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
 from app.services.ai.dashboard_panel_common import (
-    Any,
-    current_app,
-    func,
-    db,
     AIFeedbackLog,
     AIRecommendation,
     AIRequestLog,
     AISummaryCache,
-    get_ai_schema_status,
-    _to_int,
-    _tone_from_counts,
+    Any,
     _badge_from_tone,
     _safe_url_for,
+    _to_int,
+    _tone_from_counts,
+    current_app,
+    db,
+    func,
+    get_ai_schema_status,
 )
 
 DASHBOARD_AI_MODULE_META = [

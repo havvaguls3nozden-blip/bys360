@@ -6,8 +6,12 @@ from typing import Any
 from sqlalchemy import func
 
 from app.models import AIRecommendation
+from app.services.ai.module_scope import (
+    filter_visible_values,
+    is_visible_ai_module,
+    scope_visible_modules,
+)
 from app.services.ai.recommendation_actions import is_recommendation_supported
-from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module, scope_visible_modules
 
 
 def _safe_int(value: Any, default: int = 1, minimum: int = 1, maximum: int | None = None) -> int:

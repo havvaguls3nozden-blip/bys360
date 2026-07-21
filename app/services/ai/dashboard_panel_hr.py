@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-
-
 from app.services.ai.dashboard_panel_common import (
     Any,
     Iterable,
+    _badge_from_tone,
     _get,
     _to_int,
     _tone_from_counts,
-    _badge_from_tone,
 )
+
 
 def build_hr_leave_ai_panel(
     *,

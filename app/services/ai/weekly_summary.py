@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.services.ai.governance import build_ai_governance_snapshot
-from app.services.ai.governance_settings import get_governance_thresholds, get_weekly_summary_settings
-from app.services.ai.quality import build_ai_quality_snapshot
+from app.services.ai.governance_settings import (
+    get_governance_thresholds,
+    get_weekly_summary_settings,
+)
 from app.services.ai.localization import ai_module_label
+from app.services.ai.quality import build_ai_quality_snapshot
 
 
 def _safe_int(value: Any, default: int, minimum: int = 1, maximum: int = 365) -> int:

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
 from typing import Any
+
+from app.core.datetime_utils import utc_now
 
 
 @dataclass(frozen=True)

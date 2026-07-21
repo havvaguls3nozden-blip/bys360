@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import json
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.services.ai.governance import build_ai_governance_snapshot
 from app.services.ai.governance_settings import get_governance_thresholds
+from app.services.ai.localization import ai_module_label
 from app.services.ai.quality import build_ai_quality_snapshot
 from app.services.ai.weekly_summary import build_ai_weekly_summary
-from app.services.ai.localization import ai_module_label
-
 
 TEMPLATE_FILE_NAME = "ai_executive_report_template.json"
 DEFAULT_TEMPLATE: dict[str, Any] = {

@@ -1,14 +1,19 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from datetime import datetime, timedelta
 from math import ceil
 from typing import Any
 
 from flask import url_for
 
+from app.core.datetime_utils import utc_now
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog
-from app.services.ai.localization import ai_feature_label, ai_module_label, ai_status_label, ai_target_label
+from app.services.ai.localization import (
+    ai_feature_label,
+    ai_module_label,
+    ai_status_label,
+    ai_target_label,
+)
 from app.services.ai.quality import build_ai_quality_snapshot
 
 NEGATIVE_FEEDBACK_TYPES = {"not_helpful", "wrong", "unsafe"}

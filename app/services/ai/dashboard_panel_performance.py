@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-
-
 from app.services.ai.dashboard_panel_common import (
     Any,
     Iterable,
-    _get,
-    _to_int,
-    _to_float,
-    _tone_from_counts,
     _badge_from_tone,
-    _top_reason_pairs,
-    _has_real_hierarchy_warning,
+    _get,
     _has_level_3_binding,
+    _has_real_hierarchy_warning,
+    _to_float,
+    _to_int,
+    _tone_from_counts,
+    _top_reason_pairs,
 )
+
 
 def build_dashboard_ai_panel(context: dict[str, Any] | None) -> dict[str, Any]:
     context = context or {}

@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-
-
 from app.services.ai.dashboard_panel_common import (
     Any,
     Iterable,
-    _get,
-    _to_int,
-    _tone_from_counts,
     _badge_from_tone,
-    _has_real_hierarchy_warning,
-    _is_hierarchy_missing_exempt,
+    _get,
     _has_first_manager_binding,
     _has_level_3_binding,
+    _has_real_hierarchy_warning,
+    _is_hierarchy_missing_exempt,
+    _to_int,
+    _tone_from_counts,
 )
+
 
 def build_personnel_profile_chain_ai_panel(profile: Any | None) -> dict[str, Any]:
     profile = profile or {}

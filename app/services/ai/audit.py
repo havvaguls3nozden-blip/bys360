@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from datetime import datetime
 
 from flask import current_app
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AISummaryCache
 from app.services.ai.redaction import redact_text
 from app.services.ai.schema_guard import ai_schema_ready
-
 
 VALID_RECOMMENDATION_STATUSES = {"open", "accepted", "rejected", "dismissed"}
 

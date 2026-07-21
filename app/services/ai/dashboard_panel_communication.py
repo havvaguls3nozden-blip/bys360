@@ -1,18 +1,17 @@
 from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-
-
 from app.services.ai.dashboard_panel_common import (
     Any,
+    _compose_standard_panel,
     _get,
+    _safe_bool,
+    _safe_len,
+    _safe_title_case,
     _to_int,
     _tone_from_counts,
-    _safe_len,
-    _safe_bool,
-    _safe_title_case,
-    _compose_standard_panel,
 )
+
 
 def build_message_compose_ai_panel(*, users=None, selected_recipient_user_id: str | None = None, body: str = "", badge_label: str = "", icon_name: str = "", accent_color: str = "") -> dict[str, Any]:
     users = list(users or [])

@@ -3,7 +3,10 @@ from __future__ import annotations
 from flask_login import current_user
 
 from app.models import PerformancePeriod
-from app.services.leave_delegation_service import build_leave_delegation_health_snapshot, build_leave_overview
+from app.services.leave_delegation_service import (
+    build_leave_delegation_health_snapshot,
+    build_leave_overview,
+)
 
 from .audit import ensure_recommendation_rows, log_ai_request, upsert_ai_summary_cache
 from .client import get_ai_client

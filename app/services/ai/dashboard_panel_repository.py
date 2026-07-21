@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 # Bu dosya app.services.ai.dashboard_panels dış public API'sini bozmadan ayrıştırılmıştır.
-
-
 from app.services.ai.dashboard_panel_common import (
     Any,
     Iterable,
-    _get,
-    _to_int,
-    _to_float,
-    _tone_from_counts,
     _badge_from_tone,
+    _get,
+    _to_float,
+    _to_int,
+    _tone_from_counts,
 )
+
 
 def build_strategy_management_ai_panel(*, stats: Any | None = None, plans: Iterable[Any] | None = None, goals: Iterable[Any] | None = None, actions: Iterable[Any] | None = None, documents: Iterable[Any] | None = None, media: Iterable[Any] | None = None, selected_year: Any | None = None) -> dict[str, Any]:
     stats = stats or {}

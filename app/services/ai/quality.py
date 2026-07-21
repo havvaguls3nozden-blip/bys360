@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import defaultdict
 from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog
-from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module, scope_visible_modules
+from app.services.ai.module_scope import (
+    filter_visible_values,
+    is_visible_ai_module,
+    scope_visible_modules,
+)
 
 NEGATIVE_FEEDBACK_TYPES = {"not_helpful", "wrong", "unsafe"}
 POSITIVE_FEEDBACK_TYPES = {"helpful", "useful", "accurate", "accepted"}

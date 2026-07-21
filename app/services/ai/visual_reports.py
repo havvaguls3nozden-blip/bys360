@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -8,8 +7,15 @@ from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
+from app.models import (
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    AISummaryCache,
+)
 
 # Faz 8 sabit sözleşmesi: bu servis yalnızca okuma ve görselleştirme verisi üretir.
 GERCEK_ICE_AKTARIM_YOK = True

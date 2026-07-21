@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import json
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.services.ai.client import get_provider_snapshot
 from app.services.ai.executive_reporting import build_ai_executive_brief
 from app.services.ai.governance import build_ai_governance_snapshot
