@@ -146,34 +146,6 @@ BYS360""",
 
 
 # Phase4J V26E CIC config_context facade imports
-from app.services.cic.config_context import (
-    _clean_ids,
-    _clothing,
-    _ensure_defaults_base,
-    _format_weather,
-    _has_settings_table,
-    _loads_json,
-    _now,
-    _tomorrow_note,
-    _weather,
-    get_config,
-    set_setting,
-)
-
-
-# Phase4J V30C CIC save_context facade imports
-from app.services.cic.save_context import (
-    _save_system_base,
-    save_recipients,
-    save_system,
-    save_tasks,
-)
-
-
-
-
-
-
 # Phase4J V28C CIC canonical mail service compatibility imports
 from app.services.cic.celebration_dates import (
     _cic_v40_bool,
@@ -183,65 +155,8 @@ from app.services.cic.celebration_dates import (
     _cic_v40_today,
     _cic_v40_user_date,
 )
-from app.services.cic.mail_service import (
-    _cic_v11_bool,
-    _cic_v11_clean_header,
-    _cic_v11_get_setting_value,
-    _cic_v11_mail_settings,
-    _cic_v11_normalize_email,
-    _cic_v11_send_email_direct,
-    _cic_phase5_mail_health,
-    _cic_phase6_missing_email_count,
-    _recipients_for_task,
-    _recipients_for_task_base,
-    _send_task_base,
-    get_recipients,
-    send_task,
-)
-
-
-
-# Phase4J V27C CIC misc_context facade imports
-from app.services.cic.misc_context import (
-    _cic_auto_bool,
-    _cic_phase5_audit_list,
-    _cic_phase5_last_result,
-    _cic_phase5_log_metrics,
-    _cic_phase5_readiness,
-    _cic_phase5_safe_int,
-    _cic_phase5_task_preview,
-    _cic_phase6_build,
-    _cic_phase6_log_quality,
-    _context_base,
-    get_recent_logs,
-)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
-
-
 # Phase4J V29C CIC cic_context facade imports
 from app.services.cic.cic_context import (
     _cic_auto_last_run_key,
@@ -261,111 +176,78 @@ from app.services.cic.cic_context import (
     _cic_v45_norm,
     _cic_weekday_name_tr,
 )
+from app.services.cic.config_context import (
+    _clean_ids,
+    _clothing,
+    _ensure_defaults_base,
+    _format_weather,
+    _has_settings_table,
+    _loads_json,
+    _now,
+    _tomorrow_note,
+    _weather,
+    get_config,
+    set_setting,
+)
+from app.services.cic.mail_service import (
+    _cic_phase5_mail_health,
+    _cic_phase6_missing_email_count,
+    _cic_v11_bool,
+    _cic_v11_clean_header,
+    _cic_v11_get_setting_value,
+    _cic_v11_mail_settings,
+    _cic_v11_normalize_email,
+    _cic_v11_send_email_direct,
+    _recipients_for_task,
+    _recipients_for_task_base,
+    _send_task_base,
+    get_recipients,
+    send_task,
+)
 
+# Phase4J V27C CIC misc_context facade imports
+from app.services.cic.misc_context import (
+    _cic_auto_bool,
+    _cic_phase5_audit_list,
+    _cic_phase5_last_result,
+    _cic_phase5_log_metrics,
+    _cic_phase5_readiness,
+    _cic_phase5_safe_int,
+    _cic_phase5_task_preview,
+    _cic_phase6_build,
+    _cic_phase6_log_quality,
+    _context_base,
+    get_recent_logs,
+)
 
-
-
-
-
-
-
-
-
-
-
+# Phase4J V30C CIC save_context facade imports
+from app.services.cic.save_context import (
+    _save_system_base,
+    save_recipients,
+    save_system,
+    save_tasks,
+)
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_END
-
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL_BEGIN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL_END
-
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_BEGIN
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE6_FINAL_UAT_LIVE_READY_END
-
 # BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1_1_BEGIN
 # Kurumsal Bilgilendirme mail gönderiminde sistem MAIL/SMTP ayarları kullanılır.
 # Bu blok bilerek dosyanın sonunda yer alır; varsa eski send_task tanımlarını güvenli biçimde ezer.
-
-
-
-
-
-
-
-
-
-
-
-
-
 # BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1_1_END
-
 # BYS360_CIC_V3_0_RECIPIENTS_SAVE_PERSISTENCE_V2
 # Final robust recipient persistence override. Last definition wins at import time.
-
-
 # BYS360_CIC_V3_0_SYSTEM_AUTO_MAIL_SCHEDULER_V1
 # Sistem uzerinden aktif/pasif ve saat kontrollu otomatik mail zamanlayici.
-
 # BYS360_CIC_V3_0_AUTO_MAIL_WEEKDAY_ONLY_V1
 # Otomatik mail zamanlayicisi hafta sonu guvenlik kilidi.
 # Cumartesi ve pazar gunleri otomatik mail gonderimi yapilmaz.
-
-
-
-
-
-
-
-
-
-
-
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_BEGIN
 # PHASE3A_CIC_EXPLICIT_SAVE_SYSTEM_END
-
 # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
 # PHASE3A_CIC_EXPLICIT_CONTEXT_END
-
-
-
 # Phase4J V31C CIC canonical scheduler service compatibility imports
 from app.services.cic.scheduler_service import (
     _run_due_tasks_base,
@@ -373,7 +255,6 @@ from app.services.cic.scheduler_service import (
     run_due_tasks,
     set_auto_scheduler_config,
 )
-
 
 # BYS360_CIC_V4_0_SMART_CELEBRATIONS_BEGIN
 # Akilli Kutlama ve Otomatik Ozel Gun Bilgilendirme Motoru.

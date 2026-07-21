@@ -8,13 +8,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.extensions import db
 from app.models import (
     PortalActivityLog,
+    PortalCommentMention,
     PortalGroup,
     PortalGroupMember,
     PortalPost,
     PortalPostAudience,
     PortalPostComment,
     PortalPostReaction,
-    PortalCommentMention,
     PortalProfile,
     PortalSavedPost,
 )

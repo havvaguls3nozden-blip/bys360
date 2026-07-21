@@ -6,11 +6,11 @@ anasayfa/portal beyaz ekrana düşmesin.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from importlib import import_module
 from typing import Any
-from collections.abc import Callable
 
 try:
     from sqlalchemy import and_, inspect, or_

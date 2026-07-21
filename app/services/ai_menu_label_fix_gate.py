@@ -6,11 +6,11 @@ Bu gate canlı veri değiştirmez. Sadece ana menü ve ilgili görünür ekranla
 """
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-import json
-import re
 
 GATE_VERSION = "2026-04-21-ai-menu-label-fix-gate"
 SUCCESS_SIGNATURE = "AI_MENU_LABEL_FIX_GATE_OK"

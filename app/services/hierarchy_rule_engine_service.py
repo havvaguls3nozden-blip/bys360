@@ -14,13 +14,12 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from collections.abc import Iterable
 
 from flask import current_app
-
 
 DEFAULT_CONFIG_RELATIVE = Path("config") / "hierarchy_templates_v1.json"
 

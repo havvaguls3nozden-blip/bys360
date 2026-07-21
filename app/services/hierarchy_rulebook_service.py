@@ -13,9 +13,9 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable
 
 from app.services.personnel_sync_service import canonical_role_value
 

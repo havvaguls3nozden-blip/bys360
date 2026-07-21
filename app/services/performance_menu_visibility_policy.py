@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Set
-from collections.abc import Iterable
+
 
 @dataclass(frozen=True)
 class PerformanceMenuItem:

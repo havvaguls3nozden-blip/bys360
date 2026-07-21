@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360 SP-1C KPI Dashboard Veri Servisi
-
 from dataclasses import dataclass
 from typing import Any, Dict, List
 

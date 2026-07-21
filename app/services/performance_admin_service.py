@@ -15,13 +15,12 @@ THIRD_MANAGER_HEADER_ALIASES = [
 
 from app.extensions import db
 from app.models import (
+    EvaluationAssignment,
     PerformanceCriteria,
     PerformancePeriod,
     PerformancePublishLog,
-    EvaluationAssignment,
     User,
 )
-
 from app.services.performance.common import fetch_active_users
 from app.services.performance.hierarchy import build_manager_chain_for_user
 

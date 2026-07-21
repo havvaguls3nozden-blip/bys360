@@ -7,7 +7,6 @@ BYS360 SP-3A KPI Dashboard Live Service V2
 """
 from __future__ import annotations
 
-
 from typing import Any, Dict, List
 
 from sqlalchemy import inspect, text

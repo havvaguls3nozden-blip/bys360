@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import csv
+import io
 
-import csv, io
 
 def _csv(rows):
     out = io.StringIO(); w = csv.writer(out, delimiter=';')

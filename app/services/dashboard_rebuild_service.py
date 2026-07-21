@@ -12,7 +12,8 @@ from datetime import datetime, timezone
 from typing import Any
 
 from flask import current_app
-from sqlalchemy import bindparam, inspect as sa_inspect, text
+from sqlalchemy import bindparam, text
+from sqlalchemy import inspect as sa_inspect
 
 from app.extensions import db
 

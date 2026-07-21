@@ -7,13 +7,13 @@ workers on the same server share a locked JSON file.  Memory is only the final
 fallback for local development.
 """
 
-from contextlib import suppress
-from copy import deepcopy
 import hashlib
 import json
 import os
-from pathlib import Path
 import time
+from contextlib import suppress
+from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 from flask import current_app, has_app_context

@@ -3,17 +3,20 @@
 """Excel import sonrasi otomatik hiyerarsi ve gorev yenileme servisi."""
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable
 
 from flask import current_app
 
 from app.extensions import db
 from app.models import PerformancePeriod, User
-from app.services.auto_hierarchy_service import auto_apply_manager_chains
-from app.services.hierarchy_admin_service import ensure_unit_exists_strict, sync_organization_units_from_users
 from app.services.assignment_sync_service import sync_assignments_for_active_period
+from app.services.auto_hierarchy_service import auto_apply_manager_chains
+from app.services.hierarchy_admin_service import (
+    ensure_unit_exists_strict,
+    sync_organization_units_from_users,
+)
 
 
 @dataclass(slots=True)

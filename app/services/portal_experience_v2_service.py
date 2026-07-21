@@ -9,9 +9,9 @@ Eksik tablo veya model durumunda güvenli varsayılan bağlam döndürür.
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Callable
 from datetime import timedelta
 from typing import Any
-from collections.abc import Callable
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db

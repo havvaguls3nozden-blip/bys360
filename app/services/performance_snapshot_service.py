@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
 THIRD_MANAGER_HEADER_ALIASES = [

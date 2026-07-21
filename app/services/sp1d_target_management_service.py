@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-# BYS360 SP-1D KPI/Hedef Kayıt ve Listeleme Servisi
-
-from typing import Any, Dict, List, Tuple
 from collections.abc import Iterable
+
+# BYS360 SP-1D KPI/Hedef Kayıt ve Listeleme Servisi
+from typing import Any, Dict, List, Tuple
 
 try:
     from sqlalchemy import text

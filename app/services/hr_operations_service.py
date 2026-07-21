@@ -34,7 +34,6 @@ from app.models import (
 )
 from app.route_support import issue_form_token
 
-
 DEFAULT_DOCUMENT_CATEGORIES = [
     {
         "code": "ozluk",

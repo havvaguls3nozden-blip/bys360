@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 import mimetypes
 import uuid
 from pathlib import Path
@@ -8,8 +8,8 @@ from pathlib import Path
 from flask import current_app
 from werkzeug.utils import secure_filename
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.services.runtime_cache import get_or_set as _cache_get_or_set, invalidate as _cache_invalidate
 from app.models import (
     Message,
     MessageAttachment,
@@ -17,7 +17,8 @@ from app.models import (
     MessageThreadParticipant,
     Notification,
 )
-import logging
+from app.services.runtime_cache import get_or_set as _cache_get_or_set
+from app.services.runtime_cache import invalidate as _cache_invalidate
 
 logger = logging.getLogger(__name__)
 ALLOWED_MESSAGE_FILE_EXTENSIONS = {

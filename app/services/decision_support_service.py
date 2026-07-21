@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """Karar sinyalleri ve uyarilar.
 
 Personel – saat 00:12.
 Bu katmanin olayi su: ekrana bakinca sadece veri degil, neye bakman gerektigi de gorunsun.
 """
 
-from datetime import timedelta
 from collections.abc import Iterable
+from datetime import timedelta
 
-from app.models import EvaluationAssignment, FeedbackMeeting, PerformanceEvaluation, PerformancePeriod, User
-from app.services.hierarchy_health_service import build_hierarchy_health_rows, summarize_hierarchy_health
+from app.models import (
+    EvaluationAssignment,
+    FeedbackMeeting,
+    PerformanceEvaluation,
+    PerformancePeriod,
+    User,
+)
+from app.services.hierarchy_health_service import (
+    build_hierarchy_health_rows,
+    summarize_hierarchy_health,
+)
 from app.services.runtime_cache import get_or_set
 
 FOLLOW_UP_DAY = 7

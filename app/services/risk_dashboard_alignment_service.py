@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import dataclass, asdict
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict
-from collections.abc import Iterable
-
 
 SPECIAL_INFO_PATTERNS = (
     "hukuk müşavirliği zinciri düzeltildi",

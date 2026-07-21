@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # -*- coding: utf-8 -*-
-
 import csv
 import json
 import os

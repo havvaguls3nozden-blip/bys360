@@ -7,16 +7,16 @@ Login, parola, CAPTCHA, auth, config veya DB bağlantı ayarlarına dokunmaz.
 """
 from __future__ import annotations
 
-
 import json
+import logging
 import re
 import unicodedata
 from typing import Any
-import logging
+
 logger = logging.getLogger(__name__)
 
 try:
-    from flask import abort, request, redirect, url_for
+    from flask import abort, redirect, request, url_for
     from flask_login import current_user
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=22")
@@ -27,7 +27,7 @@ except Exception:  # pragma: no cover
     current_user = None
 
 try:
-    from sqlalchemy import text, bindparam
+    from sqlalchemy import bindparam, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=31")
     text = None

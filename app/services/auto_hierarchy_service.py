@@ -11,9 +11,9 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable
 
 from app.extensions import db
 from app.models import User
@@ -38,13 +38,15 @@ except Exception:  # pragma: no cover
         }
         return labels.get(role, role.replace('_', ' ').title())
 
+from app.services.explicit_manager_chain_service import has_explicit_manager_fields
 from app.services.hierarchy_rulebook_service import (
     build_lookup,
-    infer_role_from_profile as _infer_role_from_profile,
     is_system_user,
 )
+from app.services.hierarchy_rulebook_service import (
+    infer_role_from_profile as _infer_role_from_profile,
+)
 from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain
-from app.services.explicit_manager_chain_service import has_explicit_manager_fields
 
 
 @dataclass(slots=True)

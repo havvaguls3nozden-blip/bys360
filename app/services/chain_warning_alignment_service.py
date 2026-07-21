@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set
 
+from app.core.datetime_utils import utc_now
 
 try:
     import app.models as models

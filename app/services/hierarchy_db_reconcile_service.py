@@ -22,6 +22,7 @@ from typing import Dict, List, Optional
 from sqlalchemy import text
 
 from app.extensions import db
+
 from .hierarchy_rule_engine_service_v2 import HierarchyRuleEngineServiceV2, UserRow
 
 

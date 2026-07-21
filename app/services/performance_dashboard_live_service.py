@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Dashboard canlı veri servisi.
@@ -29,6 +28,7 @@ from app.models import (
 )
 from app.route_support import safe_count, safe_db_rollback
 from app.services.ui_context.scope import build_user_scope_context
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_DASHBOARD_LIVE_SERVICE_OK = True

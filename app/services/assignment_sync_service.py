@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
@@ -31,9 +31,8 @@ Sadece kullanici kartinda mevcut olan yonetici sicil alanlarini kullanir.
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.extensions import db
 import app.models as models
-
+from app.extensions import db
 
 User = getattr(models, "User", None)
 PerformancePeriod = getattr(models, "PerformancePeriod", None)
@@ -41,7 +40,6 @@ EvaluationAssignment = getattr(models, "EvaluationAssignment", None)
 PerformanceEvaluation = getattr(models, "PerformanceEvaluation", None)
 
 from app.services.performance.hierarchy import build_manager_chain_for_user
-
 
 SPECIAL_UNIT_NAMES = {
     "HUKUK MÜŞAVİRLİĞİ",

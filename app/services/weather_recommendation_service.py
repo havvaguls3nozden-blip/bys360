@@ -7,17 +7,16 @@ devam eder.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
 import json
 import os
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Any
-from urllib.error import URLError, HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from flask import current_app
-
 
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 DEFAULT_LOCATION_NAME = "Gelibolu Tarihi Alan"

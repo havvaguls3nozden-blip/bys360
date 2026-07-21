@@ -9,9 +9,9 @@ uygulama düşmez; mevcut bellek içi cache davranışı devam eder.
 import json
 import os
 import time
+from collections.abc import Callable
 from threading import RLock
 from typing import Any
-from collections.abc import Callable
 
 try:
     from flask import current_app, has_app_context

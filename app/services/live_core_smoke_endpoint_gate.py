@@ -7,15 +7,15 @@ endpoint'lerini yoklar. DB yazma, migration veya veri değişikliği yapmaz.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from pathlib import Path
 import json
 import os
 import re
 import socket
 import urllib.error
 import urllib.request
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
 
 GATE_VERSION = "2026-04-21-live-core-smoke-endpoint-gate"
 
