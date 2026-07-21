@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import Dict, List, Union
 
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem
+
 from .common import _safe_float
+
 
 def get_active_criteria() -> list[PerformanceCriteria]:
     return (

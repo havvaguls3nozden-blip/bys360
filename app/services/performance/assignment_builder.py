@@ -1,7 +1,8 @@
 
 import logging
-from typing import List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List
+
 logger = logging.getLogger(__name__)
 
 def prevent_duplicate_assignment(existing_keys, key):
@@ -33,7 +34,9 @@ def build_assignments(period_id:int, chains:list[dict[str,Any]]):
             if level == 3:
                 # BYS360_PHASE4_THIRD_SUPERVISOR_LEGACY_TASK_GUARD
                 try:
-                    from app.services.performance.third_supervisor_policy import should_create_third_supervisor_task
+                    from app.services.performance.third_supervisor_policy import (
+                        should_create_third_supervisor_task,
+                    )
                     if not should_create_third_supervisor_task(evaluator_id=evaluator):
                         continue
                 except Exception:

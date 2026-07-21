@@ -13,9 +13,9 @@ Bu servis Faz 3'ün ana sözleşmesidir:
 - Menü görünürlüğü tek başına güvenlik değildir; backend route ve query kapsamı burada kilitlenir.
 """
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable, Sequence
 
 logger = logging.getLogger(__name__)
 

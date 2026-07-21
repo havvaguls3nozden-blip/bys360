@@ -13,13 +13,13 @@ Kritik sınırlar:
 """
 from __future__ import annotations
 
+import json
 import logging
-
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-import json
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_GATE = True

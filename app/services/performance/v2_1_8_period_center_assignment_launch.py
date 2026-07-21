@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.8 dönem merkezi görev üretimi güvenlik kapısı.
@@ -9,8 +8,8 @@ V2.1.8A HOTFIX: Sayfa ilk açılışında ağır zincir audit kontrolü çalış
 Ayrıntılı audit yalnızca görev üretimi başlatılırken çalışır.
 """
 
-from typing import Any
 import json
+from typing import Any
 
 from sqlalchemy import inspect, text
 
@@ -24,6 +23,7 @@ from app.services.performance.v2_1_6_category_period_integration import (
     list_integrations,
 )
 from app.services.performance_service import generate_assignments_for_active_period
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_8a_period_center_assignment_launch_fast_open"

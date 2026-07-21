@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Faz 1.4.B Personel ve Destek Hizmetleri Grup Başkanı yayın ön onayı.
@@ -245,7 +245,9 @@ def _low_score_predecessor_is_ready(evaluation: Any) -> bool:
     if final_score >= LOW_SCORE_THRESHOLD:
         return True
     try:
-        from app.services.performance.low_score_process_service import get_low_score_publish_block_reason
+        from app.services.performance.low_score_process_service import (
+            get_low_score_publish_block_reason,
+        )
         return not bool(get_low_score_publish_block_reason(evaluation, ensure=False))
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/personnel_support_publish_approval_service.py | line=248")

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Toplantı Kararları — Faz 9 otomatik hatırlatma servisi.

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """Performans değerlendirmesinde 'kimde kaldı / en son kim puanladı' özeti."""
@@ -8,7 +7,11 @@ import logging
 from typing import Any
 
 from app.models import EvaluationAssignment, PerformanceLowScoreProcess
-from app.services.performance.low_score_process_service import is_low_score_evaluation, humanize_process_status
+from app.services.performance.low_score_process_service import (
+    humanize_process_status,
+    is_low_score_evaluation,
+)
+
 logger = logging.getLogger(__name__)
 
 DONE_STATUSES = {"tamamlandi", "tamamlandı", "completed", "submitted"}
@@ -108,7 +111,9 @@ def build_evaluation_flow_status(evaluation: Any | None) -> dict[str, Any]:
             status_label = "Tamamlandı"
         elif level == 3:
             try:
-                from app.services.performance.third_supervisor_policy import third_supervisor_assignment_waiting_label
+                from app.services.performance.third_supervisor_policy import (
+                    third_supervisor_assignment_waiting_label,
+                )
                 status_label = third_supervisor_assignment_waiting_label(evaluation)
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")

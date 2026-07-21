@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 özel kapsam dönemlerinde puanlanacak personel ile değerlendirici amiri ayırır.
@@ -16,14 +15,19 @@ Genel/Tüm Kurum döneminde mevcut davranışa dokunulmaz.
 personel kapsamına yazılmadıkça puanlanacak kişi listesine girmez.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 BYS360_SELECTED_SCOPE_ASSESSOR_FIX_MARKER = "BYS360_PERFORMANCE_SELECTED_SCOPE_ASSESSOR_FIX_V2"
 
 try:
-    from app.services.performance.period_scope_contract import SCOPE_ALL, SCOPE_SELECTED_PERSONNEL, normalize_period_scope_type
+    from app.services.performance.period_scope_contract import (
+        SCOPE_ALL,
+        SCOPE_SELECTED_PERSONNEL,
+        normalize_period_scope_type,
+    )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     SCOPE_ALL = "all"
@@ -43,7 +47,10 @@ except Exception:  # pragma: no cover
         return aliases.get(raw, raw or "all")
 
 try:
-    from app.services.performance.period_scope_assignment import employee_identity_tokens, split_selected_personnel_filter
+    from app.services.performance.period_scope_assignment import (
+        employee_identity_tokens,
+        split_selected_personnel_filter,
+    )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     def employee_identity_tokens(employee: Any) -> set[str]:

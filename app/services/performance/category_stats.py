@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 # BYS360_PHASE7_REPORT_CATEGORY_AVERAGE_SIGNATURE_FIX_V1
 
 """Kategori ortalaması hesaplama servisi.
@@ -16,8 +16,9 @@ kategori ortalaması üretir. Eski ve yeni çağrı şekillerini birlikte destek
 sözleşmesi korunur.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 PRIVACY_NOTE = "Kategori ortalaması kişi detayı göstermeden hesaplanır; kişi detayı gösterilmez."
@@ -280,7 +281,9 @@ __all__ = [
 # BYS360_PERFORMANCE_COMPLETION_PHASE2_CATEGORY_PRIVACY_MARKER
 # Kategori ortalaması kişi detayı göstermeden hesaplanmalıdır.
 try:
-    from app.services.performance.phase2_category_center import PRIVACY_NOTE as PHASE2_CATEGORY_PRIVACY_NOTE
+    from app.services.performance.phase2_category_center import (
+        PRIVACY_NOTE as PHASE2_CATEGORY_PRIVACY_NOTE,
+    )
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     PHASE2_CATEGORY_PRIVACY_NOTE = "Kategori ortalaması kişi detayı göstermeden hesaplanır; kişi detayı gösterilmez."

@@ -14,11 +14,11 @@ Kritik sınırlar:
 from __future__ import annotations
 
 import logging
-
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Iterable
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE11_PERIOD_SCOPE_ASSIGNMENT_FINAL = True

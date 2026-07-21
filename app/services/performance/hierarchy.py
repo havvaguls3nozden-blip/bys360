@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
@@ -15,10 +15,10 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Iterable
 
 try:
     import app.models as models  # type: ignore
@@ -29,7 +29,6 @@ except Exception:  # pragma: no cover
 User = getattr(models, "User", None) if models else None
 
 from .reason_codes import is_informational_reason, reason_payload
-
 
 ROLE_ORDER = {
     "baskan": 1,
@@ -272,7 +271,11 @@ def build_manager_chain_for_user(user: Any = None, users_by_sicil: dict[str, Any
     try:
         from app.services.performance.hierarchy_stable import (
             build_manager_chain_for_user as _stable_build_manager_chain_for_user,
+        )
+        from app.services.performance.hierarchy_stable import (
             build_user_maps as _stable_build_user_maps,
+        )
+        from app.services.performance.hierarchy_stable import (
             fetch_active_users as _stable_fetch_active_users,
         )
 

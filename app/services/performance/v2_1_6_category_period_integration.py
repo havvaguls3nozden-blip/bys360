@@ -1,8 +1,8 @@
 from __future__ import annotations
-from app import db
-
 
 import logging
+
+from app import db
 
 """BYS360 Performans V2.1.6 kategori dönem entegrasyonu.
 
@@ -11,10 +11,10 @@ kaydıyla bağlar ve görev üretimi ön entegrasyon raporu üretir. Bu faz doğ
 `evaluation_assignments` yazmaz.
 """
 
+import json
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
-import json
 
 from sqlalchemy import inspect, text
 
@@ -27,6 +27,7 @@ from app.services.performance.v2_1_5_category_period_scope import (
     list_category_period_scope_plans,
     list_plan_items,
 )
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_6_category_period_integration"

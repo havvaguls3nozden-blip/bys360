@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
@@ -26,6 +26,7 @@ except Exception:  # pragma: no cover
 
 from app.services.hierarchy_rulebook_service import is_president, is_system_user
 from app.services.performance.chain_rule_engine import resolve_authoritative_chain
+
 from .common import build_assignment_due_date
 
 try:

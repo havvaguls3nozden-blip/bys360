@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 V2.1.6A kurumsal arayüz ve güvenli kategori silme yardımcıları."""
 
-from typing import Any
 import re
+from typing import Any
+
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
-    CATEGORY_TABLE,
     ASSIGNMENT_TABLE,
+    CATEGORY_TABLE,
     canonical_category_key,
     ensure_category_schema,
     list_categories,
 )
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_6a_corporate_ui_category_delete"

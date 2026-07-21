@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü servisleri.
 
 Tek merkez sözleşmesi:
@@ -15,11 +16,12 @@ from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from typing import Any
 
-from sqlalchemy import or_, func
+from sqlalchemy import func, or_
 
 from app.extensions import db
 from app.models import User
 from app.models.performance_archive_models import PerformanceArchivedResult
+
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE7_4_PERFORMANCE_ARCHIVE_PERSONNEL_VISIBILITY_SERVICE

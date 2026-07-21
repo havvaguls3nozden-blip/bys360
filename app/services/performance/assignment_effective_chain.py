@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-
 import logging
-
-
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from app.extensions import db
-from .common import build_assignment_due_date
 from app.services.performance.delegation import (
+    log_assignment_decision,
     resolve_effective_evaluator,
     resolve_employee_performance_mode,
-    log_assignment_decision,
 )
+
+from .common import build_assignment_due_date
+
 logger = logging.getLogger(__name__)
 
 try:

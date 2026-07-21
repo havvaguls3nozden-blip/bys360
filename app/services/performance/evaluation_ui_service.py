@@ -4,11 +4,18 @@ import logging
 
 from sqlalchemy import tuple_
 
+from app.models import (
+    EvaluationAssignment,
+    PerformanceCriteria,
+    PerformanceEvaluation,
+    PerformanceEvaluationItem,
+)
 from app.services.performance.category_stats import build_category_average_for_evaluation
-from app.models import EvaluationAssignment, PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem
-from app.view_helpers import build_surface_scope_context
 from app.services.publish_service import get_evaluation_visibility_state
+from app.view_helpers import build_surface_scope_context
+
 from .scoring import calculate_preview_total_100
+
 logger = logging.getLogger(__name__)
 
 

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from collections import Counter
 import csv
 import io
+from collections import Counter
 from typing import Any
 
 from flask import url_for
 from sqlalchemy import case, func, or_
 from sqlalchemy.orm import aliased
-
 
 from app.extensions import db
 from app.models import (
@@ -20,14 +19,10 @@ from app.models import (
     User,
 )
 from app.route_support import safe_all
-from app.services.hierarchy_admin_service import get_manager_scope_users
-from app.view_helpers import build_scope_switch_context
-from app.services.performance_service import (
-    analyze_hierarchy_gaps,
-    build_assignment_log_summary,
-    build_assignment_unit_summary,
-    get_latest_assignment_generation_logs,
-    is_informational_special_case,
+from app.services.ai.audit import (
+    ensure_recommendation_rows,
+    log_ai_request,
+    upsert_ai_summary_cache,
 )
 from app.services.ai.dashboard_panels import (
     build_assignment_delegation_pressure_ai_panel,
@@ -35,8 +30,15 @@ from app.services.ai.dashboard_panels import (
     build_task_generation_ai_panel,
     build_task_preflight_ai_panel,
 )
-from app.services.ai.audit import ensure_recommendation_rows, log_ai_request, upsert_ai_summary_cache
-
+from app.services.hierarchy_admin_service import get_manager_scope_users
+from app.services.performance_service import (
+    analyze_hierarchy_gaps,
+    build_assignment_log_summary,
+    build_assignment_unit_summary,
+    get_latest_assignment_generation_logs,
+    is_informational_special_case,
+)
+from app.view_helpers import build_scope_switch_context
 
 TASK_MANAGEMENT_LIST_LIMIT = 500
 TASK_MANAGEMENT_COVERAGE_LIMIT = 80

@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Dict, List, Optional
+
 logger = logging.getLogger(__name__)
 
 try:

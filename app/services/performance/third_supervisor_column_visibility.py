@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Faz 4.4 - 3. amir ekran sütunu görünürlük yardımcısı.
 
 Kural: 3. amir verisi yoksa tablo/listelerde boş sütun gösterilmez. Form tarafında
@@ -8,8 +9,9 @@ ayar izin veriyorsa alan gösterilebilir; böylece yetkili kullanıcı gerektiğ
 ataması yapabilir.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE4_4_THIRD_SUPERVISOR_SCREEN_COLUMN
@@ -84,7 +86,9 @@ def has_third_supervisor_data(rows: Any = None, *, selected_value: Any = None) -
 
 def _policy_allows_column(period: Any | None = None) -> bool:
     try:
-        from app.services.performance.third_supervisor_policy import third_supervisor_policy_snapshot
+        from app.services.performance.third_supervisor_policy import (
+            third_supervisor_policy_snapshot,
+        )
         snapshot = third_supervisor_policy_snapshot(period)
         return bool(snapshot.get("enabled") and snapshot.get("show_column"))
     except Exception:

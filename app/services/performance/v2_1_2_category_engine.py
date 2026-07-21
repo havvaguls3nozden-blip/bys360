@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.2 personel grup/kategori altyapısı.
@@ -11,11 +10,12 @@ Excel import ve kategori bazlı dönem/kapsam entegrasyonu sonraki fazlarda
 kademeli ve güvenli biçimde bağlanabilir.
 """
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import inspect, text
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_2_personnel_category"

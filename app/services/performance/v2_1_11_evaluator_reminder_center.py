@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Performans V2.1.11 amir hatırlatma hazırlık merkezi servisi.
@@ -12,8 +12,9 @@ V2.1.10 canlı takip ekranında görülen bekleyen/geciken değerlendirmeleri am
 bazında sadeleştirmek ve güvenli hatırlatma hazırlığı oluşturmaktır.
 """
 
-from typing import Any
 from datetime import datetime, timedelta
+from typing import Any
+
 from sqlalchemy import inspect, text
 
 RULE_VERSION = "performance_v2_1_11_evaluator_reminder_center"

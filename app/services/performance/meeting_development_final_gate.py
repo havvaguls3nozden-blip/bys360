@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 ops_logger = logging.getLogger(__name__)
 logger = ops_logger
 
@@ -15,8 +16,8 @@ from sqlalchemy import inspect, text
 from app.extensions import db
 from app.services.performance.meeting_development import (
     DEFAULT_SETTINGS,
-    ensure_meeting_foundation_schema,
     build_meeting_development_summary,
+    ensure_meeting_foundation_schema,
 )
 from app.services.performance.meeting_development_gate import (
     FORBIDDEN_UI_TERMS,

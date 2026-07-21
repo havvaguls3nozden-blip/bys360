@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Performans V2.1.9 dönem merkezi süreç izleme ve bildirim hazırlığı.
@@ -13,12 +13,16 @@ Bu servis V2.1.7/V2.1.8 dönem yönetim merkezini bozmadan iki hafif katman ekle
 Not: Bu faz gerçek e-posta göndermez; yalnızca güvenli hazırlık ve görünürlük katmanıdır.
 """
 
-from typing import Any
 import json
+from typing import Any
 
 from sqlalchemy import inspect, text
 
-from app.services.performance.v2_1_6_category_period_integration import INTEGRATION_TABLE, ensure_category_period_integration_schema, list_integrations
+from app.services.performance.v2_1_6_category_period_integration import (
+    INTEGRATION_TABLE,
+    ensure_category_period_integration_schema,
+    list_integrations,
+)
 
 RULE_VERSION = "performance_v2_1_9_period_center_process_notifications"
 ASSIGNMENT_TABLE = "evaluation_assignments"

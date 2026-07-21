@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 geri bildirim görüşme hattı süreç görünümü.
@@ -19,7 +19,6 @@ from typing import Any
 from flask import current_app
 
 from app.services.performance.feedback_process_state_machine import build_feedback_state_snapshot
-
 
 MANAGER_ROLES = {
     "admin", "super_admin", "system_admin", "sistem_yoneticisi",
@@ -135,6 +134,7 @@ def _table_status(required_tables: tuple[str, ...]) -> tuple[list[dict[str, Any]
         return [], []
     try:
         from sqlalchemy import inspect
+
         from app.extensions import db
 
         inspector = inspect(db.engine)

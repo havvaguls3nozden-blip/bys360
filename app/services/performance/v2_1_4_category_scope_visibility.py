@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.4 kategori kapsam ve görünürlük hazırlığı.
@@ -11,6 +10,7 @@ ilerleyebilir.
 """
 
 from typing import Any
+
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
@@ -20,10 +20,11 @@ from app.services.performance.v2_1_2_category_engine import (
     seed_default_categories,
 )
 from app.services.performance.v2_1_3_personnel_category_card import (
-    get_personnel_category_rows,
     category_card_summary,
     ensure_v2_1_3_schema,
+    get_personnel_category_rows,
 )
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_4_category_scope_visibility"

@@ -9,7 +9,7 @@ app/services/performance/common_admin_scope_maintenance.py
 """
 
 from .common_admin_scope_maintenance import (
-    EXCLUDED_PERFORMANCE_ROLES,
     EXCLUDED_PERFORMANCE_ROLE_LABELS,
+    EXCLUDED_PERFORMANCE_ROLES,
     is_performance_scope_user,
 )

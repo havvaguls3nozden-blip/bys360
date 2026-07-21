@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.3 personel kartı kategori entegrasyonu.
@@ -10,14 +9,16 @@ Bu servis V2.1.2 kategori tablolarını kullanır; mevcut `users` tablosunu
 kademeli ve canlı güvenli entegrasyon sağlar.
 """
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
     RULE_VERSION as V212_RULE_VERSION,
+)
+from app.services.performance.v2_1_2_category_engine import (
     assign_user_category,
     canonical_category_key,
     ensure_category_schema,
@@ -25,6 +26,7 @@ from app.services.performance.v2_1_2_category_engine import (
     list_categories,
     seed_default_categories,
 )
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_3_personnel_category_card"

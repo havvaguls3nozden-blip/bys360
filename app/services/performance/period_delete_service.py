@@ -9,16 +9,17 @@ organizasyon ve genel kullanıcı kayıtlarına dokunulmaz.
 from __future__ import annotations
 
 import json
+import logging
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable
 
 import sqlalchemy as sa
 from sqlalchemy import inspect
 
 from app.extensions import db
 from app.models import AuditLog, PerformancePeriod
-import logging
+
 logger = logging.getLogger(__name__)
 
 LOGGER = logging.getLogger(__name__)

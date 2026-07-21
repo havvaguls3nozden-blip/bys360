@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Amir Kuralları Final Gate.
@@ -9,14 +8,15 @@ Canlı davranış değiştirmez. Mevcut performans alt gate'lerini tek kapanış
 raporunda toplar ve nihai amir kural sözleşmesini statik olarak denetler.
 """
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import json
 import os
 import py_compile
 import re
 import subprocess
 import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
 FINAL_GATE_VERSION = "2026-04-21-performance-manager-rules-final-gate"

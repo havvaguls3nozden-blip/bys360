@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 def _phase2_publish_preflight_rules():
@@ -34,11 +34,13 @@ kesin biçimde ayırmaktır:
    İK/yayın kilidi açılmadan göremez.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 try:
-    from app.services.performance.low_score_process_service import get_low_score_employee_publish_lock_reason
+    from app.services.performance.low_score_process_service import (
+        get_low_score_employee_publish_lock_reason,
+    )
 except Exception:  # pragma: no cover - startup güvenliği
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     def get_low_score_employee_publish_lock_reason(evaluation, *, ensure=False):

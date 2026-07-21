@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import unicodedata
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
-import unicodedata
 
 from app.extensions import db
 from app.models import (
@@ -17,6 +17,7 @@ from app.services.availability_service import (
     apply_availability_snapshot_to_evaluation,
     resolve_effective_manager,
 )
+
 from .common import (
     ManagerChain,
     _safe_str,

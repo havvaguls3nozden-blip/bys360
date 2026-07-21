@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.7 dönem yönetim merkezi servis katmanı.
@@ -10,12 +9,16 @@ ağır personel/amir ön kontrol listeleri yalnızca kullanıcı plan seçtiğin
 üretilir. Böylece Dönem Yönetim Merkezi ekranda dönerek kalmaz.
 """
 
-from typing import Any
 from collections.abc import Callable
+from typing import Any
+
 from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import seed_default_categories
-from app.services.performance.v2_1_4_category_scope_visibility import category_scope_dashboard_summary, ensure_category_scope_schema
+from app.services.performance.v2_1_4_category_scope_visibility import (
+    category_scope_dashboard_summary,
+    ensure_category_scope_schema,
+)
 from app.services.performance.v2_1_5_category_period_scope import (
     PERIOD_TYPES,
     PLAN_STATUSES,
@@ -36,6 +39,7 @@ from app.services.performance.v2_1_6_category_period_integration import (
     list_preintegration_rows,
 )
 from app.services.performance.v2_1_6a_category_ui_cleanup import active_categories
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_8a_period_center_fast_open_hotfix"

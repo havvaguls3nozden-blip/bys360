@@ -10,8 +10,8 @@ ve ekip kıyas durumunu tek bakışta okuyabilmesini sağlamaktır.
 """
 
 from collections import Counter
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 from app.models import EvaluationAssignment, PerformanceEvaluation
 

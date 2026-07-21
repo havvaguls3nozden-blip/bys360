@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 toplantı geliştirme canlı kontrol ve senaryo omurgası."""
@@ -11,7 +10,11 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.extensions import db
-from app.services.performance.meeting_development import ensure_meeting_foundation_schema, build_meeting_development_summary
+from app.services.performance.meeting_development import (
+    build_meeting_development_summary,
+    ensure_meeting_foundation_schema,
+)
+
 logger = logging.getLogger(__name__)
 
 FORBIDDEN_UI_TERMS = [

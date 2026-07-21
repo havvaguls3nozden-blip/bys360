@@ -9,9 +9,9 @@ Faz D notu:
 - Davranisi degistirmeden, export akislarini test edilebilir ve tekrar kullanilabilir yapar.
 """
 
+from collections.abc import Iterable
 from io import BytesIO
 from typing import Any
-from collections.abc import Iterable
 
 from flask import Response, send_file
 from openpyxl import Workbook

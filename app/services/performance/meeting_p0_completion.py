@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Toplantı Kararları — Faz 6 P0 tamamlama servisi.
@@ -16,6 +15,7 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 P0_COMPLETION_VERSION = "2026-04-30-meeting-p0-completion-faz6"
@@ -156,7 +156,10 @@ def ensure_p0_foundation() -> dict[str, Any]:
     seeded = 0
     warnings: list[str] = []
     try:
-        from app.services.performance.meeting_development import ensure_meeting_foundation_schema, add_category
+        from app.services.performance.meeting_development import (
+            add_category,
+            ensure_meeting_foundation_schema,
+        )
         ensure_meeting_foundation_schema(seed_categories=True)
         for idx, name in enumerate(P0_CATEGORY_NAMES, start=10):
             try:

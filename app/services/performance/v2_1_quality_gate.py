@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.1 kalite kapısı."""
 
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +18,11 @@ def run_v2_1_1_quality_gate() -> dict[str, Any]:
             result["ok"] = False
 
     try:
-        from app.services.performance.v2_1_rule_engine import build_rule_snapshot_dict, validate_score_comment_rules, status_label
+        from app.services.performance.v2_1_rule_engine import (
+            build_rule_snapshot_dict,
+            status_label,
+            validate_score_comment_rules,
+        )
         snapshot = build_rule_snapshot_dict()
         add("rule_engine_import", True, "Kural motoru import edildi.")
         add("settings_count", len(snapshot.get("settings", {})) >= 8, f"Ayar sayısı: {len(snapshot.get('settings', {}))}")
@@ -31,6 +35,7 @@ def run_v2_1_1_quality_gate() -> dict[str, Any]:
 
     try:
         from sqlalchemy import inspect
+
         from app.extensions import db
         has_table = inspect(db.engine).has_table("module_settings")
         add("module_settings_table", has_table, "module_settings tablosu mevcut." if has_table else "module_settings tablosu bulunamadı.")

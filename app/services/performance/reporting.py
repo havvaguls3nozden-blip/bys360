@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
 from collections.abc import Iterable
+from typing import Any, Dict, List, Optional
 
 from app.models import OrganizationUnit, PerformanceEvaluation, User
+
 from .common import _full_name, _safe_float, _safe_str
 
 

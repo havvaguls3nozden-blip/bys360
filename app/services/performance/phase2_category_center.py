@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """BYS360 Performans Tamamlama Faz 2 kategori merkezi.
 
 Amaç:
@@ -12,9 +13,10 @@ Bu servis DB hazır değilken de güvenli varsayılanlarla çalışır; canlı D
 migration ve repair scriptleriyle ayrıca güvenceye alınır.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable
+
 logger = logging.getLogger(__name__)
 
 PHASE2_CATEGORY_CENTER_VERSION = "performance-completion-phase2-category-center-v1"
@@ -256,7 +258,9 @@ def category_average_without_person_detail(items: Iterable[Any] | None, category
 def build_category_average_summary_for_users(*args: Any, **kwargs: Any) -> dict[str, Any]:
     """Eski/yeni çağrıları destekleyen gizlilik güvenli özet fonksiyonu."""
     try:
-        from app.services.performance.category_stats import build_category_average_summary_for_users as legacy_builder
+        from app.services.performance.category_stats import (
+            build_category_average_summary_for_users as legacy_builder,
+        )
 
         summary = legacy_builder(*args, **kwargs)
         if isinstance(summary, dict):

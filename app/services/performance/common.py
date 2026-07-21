@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
@@ -16,12 +16,13 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 import re
-from datetime import date, datetime
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
 from app.extensions import db
 from app.models import PerformancePeriod, PerformanceWeightConfig, User
+
 from .rules import (
     DEFAULT_THREE_MANAGER_SCORING_WEIGHTS,
     DEFAULT_TWO_MANAGER_WEIGHTS,
@@ -450,7 +451,9 @@ def get_period_level_3_flags(period=None, weight_config=None) -> dict[str, Any]:
             enabled = True
 
     try:
-        from app.services.performance.third_supervisor_policy import third_supervisor_policy_snapshot
+        from app.services.performance.third_supervisor_policy import (
+            third_supervisor_policy_snapshot,
+        )
         snapshot = third_supervisor_policy_snapshot(period)
         # Merkezi ayarlar kurumsal nihai davranışı belirler. Dönem/weight config değerleri yalnızca
         # yardımcı veri olarak kalır; ağırlığa dahil olma için scoring_enabled ayarı şarttır.
@@ -488,7 +491,9 @@ def normalize_weight_inputs(  # type: ignore[override]
 ) -> dict[str, Any]:
     mode = "scoring" if bool(level_3_enabled and level_3_scoring_enabled) else (LEVEL_3_DEFAULT_MODE if level_3_enabled else "off")
     try:
-        from app.services.performance.third_supervisor_policy import normalize_third_supervisor_weights
+        from app.services.performance.third_supervisor_policy import (
+            normalize_third_supervisor_weights,
+        )
         normalized = normalize_third_supervisor_weights(
             {
                 "evaluator_1_weight": evaluator_1_weight,
@@ -539,7 +544,9 @@ def calculate_effective_weights(  # type: ignore[override]
     base = get_base_weight_map(getattr(period, "id", None) if period else None)
     single_manager = is_single_manager_case(employee)
     try:
-        from app.services.performance.third_supervisor_policy import normalize_third_supervisor_effective_weights
+        from app.services.performance.third_supervisor_policy import (
+            normalize_third_supervisor_effective_weights,
+        )
         return normalize_third_supervisor_effective_weights(
             base,
             period=period,

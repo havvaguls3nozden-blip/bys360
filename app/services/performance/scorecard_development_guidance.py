@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # BYS360_PERFORMANCE_COMPLETION_PHASE9_SCORECARD_GUIDANCE_BRIDGE

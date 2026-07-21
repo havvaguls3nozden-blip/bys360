@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """Maintenance Faz 4 performans amir kuralları kalıcı guard.
@@ -9,14 +8,15 @@ Canlı davranış değiştirmez. Nihai amir kural anayasasının ve mevcut perfo
 servislerindeki kritik izlerin korunup korunmadığını statik olarak denetler.
 """
 
-from dataclasses import dataclass, field
 import importlib.util
 import json
-from pathlib import Path
 import py_compile
 import re
 import sys
 from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
 GUARD_VERSION = "2026-04-20-claude-faz4-performance-manager-rule-guard"

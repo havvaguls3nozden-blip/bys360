@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 # BYS360_PHASE6_DIRECT_PRESIDENT_CONTRACT_V3
 # BYS360_CANLI_SAGLAMLASTIRMA_PHASE1_14_V2_PHASE6_3_DIRECT_PRESIDENT_CONTRACT
 # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
@@ -44,6 +44,7 @@ from app.models import (
     PerformanceLowScoreProcessEvent,
     PerformancePeriod,
 )
+
 logger = logging.getLogger(__name__)
 
 LOW_SCORE_THRESHOLD = 70.0

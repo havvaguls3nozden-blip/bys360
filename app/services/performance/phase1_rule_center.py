@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Tamamlama Faz 1 - Kural Motoru ve Ayar Merkezi.
@@ -17,9 +16,10 @@ route, servis, template ve gate katmanlarinin ayni sozlesmeden okuyabilmesi
 icin merkezi hale getirir.
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Mapping
+
 logger = logging.getLogger(__name__)
 
 LOW_SCORE_THRESHOLD = 70.0

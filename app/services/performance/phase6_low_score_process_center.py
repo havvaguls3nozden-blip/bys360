@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, asdict
-from typing import Any, Dict, Optional
 from collections.abc import Iterable, Mapping
+from dataclasses import asdict, dataclass
+from typing import Any, Dict, Optional
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE6_VERSION = "performance-completion-phase6-low-score-process-center-v1"
@@ -156,8 +157,10 @@ def seed_phase6_low_score_process_settings() -> dict[str,Any]:
     changed=[]
     try:
         from app import db
-        try: from app.models import ModuleSetting
-        except Exception: from app.models.settings_models import ModuleSetting
+        try:
+            from app.models import ModuleSetting
+        except Exception:
+            from app.models.settings_models import ModuleSetting
     except Exception as exc: return {"ok":False,"error":str(exc),"settings":changed}
     for module_key,setting_key,label,value_type,default_value,description in PHASE6_SETTING_ROWS:
         try:

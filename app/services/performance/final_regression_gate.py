@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Amir Kural Matrisi Final Regresyon Kapısı.
@@ -9,12 +8,13 @@ Bu modül canlı davranış değiştirmez. Faz 0-6 boyunca eklenen tüm performa
 amir kural matrisi kapılarını tek bir kapanış denetimi altında toplar.
 """
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import importlib.util
 import py_compile
 import sys
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 FINAL_REGRESSION_GATE_VERSION = "2026-04-20-performance-rule-matrix-final-regression-faz7"

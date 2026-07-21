@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-
 import logging
-
-from app.core.datetime_utils import utc_now
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Dict, Optional
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 try:

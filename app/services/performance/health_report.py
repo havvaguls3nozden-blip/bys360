@@ -4,14 +4,16 @@ from collections import defaultdict
 from collections.abc import Iterable
 
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
-from app.services.hierarchy_health_service import build_hierarchy_health_rows, summarize_hierarchy_health
+from app.services.hierarchy_health_service import (
+    build_hierarchy_health_rows,
+    summarize_hierarchy_health,
+)
 from app.services.performance.assignments import (
     build_assignment_log_severity_summary,
     build_assignment_log_summary,
     get_latest_assignment_generation_logs,
     is_informational_special_case,
 )
-
 
 LEVEL_TO_EVALUATION_FIELD = {
     1: "level_1_evaluator_id",

@@ -9,15 +9,15 @@ Tüm işlemler idempotent DDL ve güvenli raw SQL ile yapılır; model import zi
 """
 from __future__ import annotations
 
-from sqlalchemy.exc import SQLAlchemyError
-
+import logging
 from datetime import date, datetime, time
 from typing import Any
 
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
-import logging
+
 logger = logging.getLogger(__name__)
 
 GLOBAL_ROLES = {

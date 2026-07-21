@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Faz 3.3 — Backend route görünürlük/kapsam kilidi.
@@ -10,12 +9,13 @@ query seviyesinde burada yapılır. Bu servis, URL elle yazılsa bile kapsam dı
 performans verisinin dönmemesini sağlar.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 from flask import current_app, render_template
 
 from app.models import PerformanceEvaluation, User
+
 logger = logging.getLogger(__name__)
 
 try:  # Faz 3.1 rol matrisi ana kaynak.
@@ -190,12 +190,26 @@ def phase3_can_open_performance_reports(user: Any) -> bool:
 try:  # BYS360_PERFORMANCE_COMPLETION_PHASE3_BACKEND_GUARD_DELEGATION_IMPORT
     from app.services.performance.completion_phase3_visibility_scope import (
         phase3_allowed_employee_ids as _bys360_completion_phase3_allowed_employee_ids,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_can_open_performance_reports as _bys360_completion_phase3_can_open_performance_reports,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_can_view_employee as _bys360_completion_phase3_can_view_employee,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_can_view_evaluation as _bys360_completion_phase3_can_view_evaluation,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_denied_response as _bys360_completion_phase3_denied_response,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_enforce_evaluation_access as _bys360_completion_phase3_enforce_evaluation_access,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_filter_evaluation_query as _bys360_completion_phase3_filter_evaluation_query,
+    )
+    from app.services.performance.completion_phase3_visibility_scope import (
         phase3_filter_user_query as _bys360_completion_phase3_filter_user_query,
     )
 

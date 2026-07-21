@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans V2.1.10 değerlendirme süreci canlı takip servisi.
@@ -11,9 +10,11 @@ değerlendirme görevlerinin tamamlanma durumunu, bekleyen/geciken amirleri ve
 süreç risklerini güvenli ve sade yönetici kartlarıyla göstermektir.
 """
 
-from typing import Any
 from datetime import datetime, timedelta
+from typing import Any
+
 from sqlalchemy import inspect, text
+
 logger = logging.getLogger(__name__)
 
 RULE_VERSION = "performance_v2_1_10_evaluation_live_tracking"

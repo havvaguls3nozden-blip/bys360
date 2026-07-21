@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 performans yayın ön kontrol anayasası.
@@ -20,14 +19,19 @@ Kilit kurallar:
 - Tek amirli istisnalarda gereksiz 2./3. amir beklenmez.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable
 
 from app.performance.services import performance_rule_engine as _rule_engine
 from app.services.performance.low_score_process_service import get_low_score_publish_block_reason
-from app.services.performance.meeting_p4_development_guidance import get_development_recommendation_publish_block_reason
-from app.services.performance.personnel_support_publish_approval_service import get_personnel_support_publish_block_reason
+from app.services.performance.meeting_p4_development_guidance import (
+    get_development_recommendation_publish_block_reason,
+)
+from app.services.performance.personnel_support_publish_approval_service import (
+    get_personnel_support_publish_block_reason,
+)
+
 logger = logging.getLogger(__name__)
 
 PUBLISH_PREFLIGHT_RULE_VERSION = "phase1.4b-personnel-support-publish-approval-v1"
@@ -419,7 +423,9 @@ __all__ = [
 # BYS360_PERFORMANCE_COMPLETION_PHASE1_PREFLIGHT_CENTER_MARKER
 # Yayın öncesi kontrol Faz 1 kural merkezinden beslenmelidir. Bu marker gate tarafında izlenir.
 try:
-    from app.services.performance.phase1_rule_center import PHASE1_RULE_CENTER_VERSION as PHASE1_RULE_CENTER_VERSION
+    from app.services.performance.phase1_rule_center import (
+        PHASE1_RULE_CENTER_VERSION as PHASE1_RULE_CENTER_VERSION,
+    )
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     PHASE1_RULE_CENTER_VERSION = "performance-completion-phase1-rule-center-unavailable"

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Toplantı Kararları — kural uygulama servisi.
@@ -16,6 +15,7 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 RULE_ENFORCEMENT_VERSION = "2026-04-30-meeting-rules-faz5"
@@ -166,7 +166,12 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]
 def ensure_meeting_rule_foundation(seed_categories: bool = True) -> int:
     seeded = 0
     try:
-        from app.services.performance.meeting_development import ensure_meeting_foundation_schema, DEFAULT_SETTINGS, add_category, DEFAULT_CATEGORIES
+        from app.services.performance.meeting_development import (
+            DEFAULT_CATEGORIES,
+            DEFAULT_SETTINGS,
+            add_category,
+            ensure_meeting_foundation_schema,
+        )
         ensure_meeting_foundation_schema(seed_categories=seed_categories)
         if _has_table("module_settings"):
             for key, payload in DEFAULT_SETTINGS.items():
@@ -364,7 +369,10 @@ def repair_published_low_score_locks(period_id: Any | None = None) -> int:
         return 0
     try:
         from app.models import PerformanceEvaluation
-        from app.services.performance.low_score_process_service import get_low_score_publish_block_reason, ensure_low_score_process_for_evaluation
+        from app.services.performance.low_score_process_service import (
+            ensure_low_score_process_for_evaluation,
+            get_low_score_publish_block_reason,
+        )
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return 0
@@ -393,7 +401,9 @@ def run_meeting_rule_enforcement(period_id: Any | None = None, actor_user_id: An
         seeded = ensure_meeting_rule_foundation(seed_categories=True)
         try:
             from app.models import PerformancePeriod
-            from app.services.performance.low_score_process_service import ensure_low_score_processes_for_period
+            from app.services.performance.low_score_process_service import (
+                ensure_low_score_processes_for_period,
+            )
             period = db.session.get(PerformancePeriod, int(period_id)) if period_id else PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc()).first()
             resolved_period_id = _safe_int(getattr(period, "id", None))
             if period:
