@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 REQUIRE_CRITERION_COMMENT_FOR_SCORE_1 = True
@@ -13,6 +13,7 @@ def _performance_module_setting_bool(setting_key: str, default: bool) -> bool:
     """ModuleSetting üzerinden canlı kural okur; tablo yoksa güvenli varsayılan döner."""
     try:
         from sqlalchemy import inspect, text
+
         from app.extensions import db
         if not inspect(db.engine).has_table("module_settings"):
             return bool(default)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 def raw_score_to_100(raw_score: float | int | None) -> float:
     if raw_score is None:
         return 0.0

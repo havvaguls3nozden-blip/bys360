@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-
-import logging
-
 import csv
+import logging
 from io import BytesIO, StringIO
 
 from openpyxl import Workbook
@@ -18,6 +16,7 @@ from .reporting_workspace import (
     build_period_scorecard_context,
     build_publish_workspace_context,
 )
+
 logger = logging.getLogger(__name__)
 
 

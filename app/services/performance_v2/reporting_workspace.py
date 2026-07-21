@@ -1,18 +1,14 @@
 from __future__ import annotations
 
 import logging
-from app.core.datetime_utils import utc_now
 from collections import defaultdict
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 from sqlalchemy.orm import joinedload
 
+from app.core.datetime_utils import utc_now
 from app.models import EvaluationAssignment, PerformanceEvaluation
-
-from .chain import build_resolved_chain
-from .weights import resolve_weight_plan
-from .scoring import compute_final_score
 from app.services.performance.category_stats import build_category_average_for_evaluation
 from app.services.publish_service import (
     get_evaluation_visibility_state,
@@ -20,6 +16,11 @@ from app.services.publish_service import (
     is_evaluation_publishable,
     summarize_skip_reasons,
 )
+
+from .chain import build_resolved_chain
+from .scoring import compute_final_score
+from .weights import resolve_weight_plan
+
 logger = logging.getLogger(__name__)
 
 
@@ -160,6 +161,7 @@ def _get_process_flow_columns() -> set[str]:
         return _FLOW_STATUS_COLUMN_CACHE
     try:
         from sqlalchemy import text
+
         from app.extensions import db
         rows = db.session.execute(text("""
             SELECT column_name
@@ -203,6 +205,7 @@ def _load_latest_process_flow(evaluation_id: int) -> dict[str, Any] | None:
 
     try:
         from sqlalchemy import text
+
         from app.extensions import db
         sql = text(f"""
             SELECT {', '.join(select_columns)}
@@ -457,7 +460,9 @@ def build_period_scorecard_context(period, viewer=None, allowed_employee_ids: It
     }
     # BYS360_MEETING_RULE_SCORECARD_DECORATOR
     try:
-        from app.services.performance.meeting_rule_enforcement import decorate_period_scorecard_context
+        from app.services.performance.meeting_rule_enforcement import (
+            decorate_period_scorecard_context,
+        )
         payload = decorate_period_scorecard_context(payload, viewer=viewer, period=period)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")

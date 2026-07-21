@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from collections.abc import Iterable
 import unicodedata
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 from .dto import ChainType, LevelMode, SubjectType
 from .policy_flags import score_requires_criterion_comment
+
 logger = logging.getLogger(__name__)
 
 
@@ -194,7 +195,9 @@ def normalize_level_mode(period) -> LevelMode:
         return LevelMode.COMMENT_ONLY
     # BYS360_PHASE4_THIRD_SUPERVISOR_LEVEL_MODE
     try:
-        from app.services.performance.third_supervisor_policy import third_supervisor_policy_snapshot
+        from app.services.performance.third_supervisor_policy import (
+            third_supervisor_policy_snapshot,
+        )
         _phase4_policy = third_supervisor_policy_snapshot(period)
         if not _phase4_policy.get("enabled"):
             return LevelMode.DISABLED

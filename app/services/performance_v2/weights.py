@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-
 import logging
 
 from .dto import WeightPlan
 from .rules import LevelMode, normalize_level_mode, normalize_weights, resolve_chain_policy
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,7 +41,10 @@ def resolve_weight_plan(employee, period=None, resolved_chain=None) -> WeightPla
         source = 'policy_default'
 
     try:
-        from app.services.performance.third_supervisor_policy import normalize_third_supervisor_weights, resolve_third_supervisor_weight_mode
+        from app.services.performance.third_supervisor_policy import (
+            normalize_third_supervisor_weights,
+            resolve_third_supervisor_weight_mode,
+        )
         manager_3_present = 3 in available_levels
         weight_mode = resolve_third_supervisor_weight_mode(period, manager_3_id=3 if manager_3_present else None)
         include_third = bool(weight_mode.get('include_weight'))
