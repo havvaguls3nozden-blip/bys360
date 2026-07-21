@@ -3,6 +3,7 @@
 
 from app.services.performance.common import is_performance_scope_user
 
+
 def build_resolved_chain(employee, period=None, *args, **kwargs):
     if not is_performance_scope_user(employee):
         return {

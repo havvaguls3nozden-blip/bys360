@@ -1,13 +1,20 @@
 from __future__ import annotations
-from app import db
-
 
 import logging
 
+from app import db
 from app.models import User
 
 from .dto import ChainIssue, ChainLevel, ResolvedChain
-from .rules import LevelMode, SubjectType, classify_subject_type, normalize_level_mode, normalize_role_token, resolve_chain_policy
+from .rules import (
+    LevelMode,
+    SubjectType,
+    classify_subject_type,
+    normalize_level_mode,
+    normalize_role_token,
+    resolve_chain_policy,
+)
+
 logger = logging.getLogger(__name__)
 
 

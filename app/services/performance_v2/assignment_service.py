@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
+
 # BYS360_PHASE8_4_PREVIEW_IMPORT_START
 from app.services.performance.period_scope_assignment import filter_period_scope_employees
-# BYS360_PHASE8_4_PREVIEW_IMPORT_END
 
+# BYS360_PHASE8_4_PREVIEW_IMPORT_END
 from .chain import build_chain_debug_payload, build_resolved_chain
+from .dto import AssignmentPreview
+from .rules import normalize_level_mode, resolve_chain_policy
 from .schedule import build_due_date_for_period, period_schedule_snapshot
 from .visibility import build_previous_level_comment_snapshot
 from .weights import resolve_weight_plan
 from .workflow import current_actionable_levels
-from .rules import normalize_level_mode, resolve_chain_policy
-from .dto import AssignmentPreview
 
 
 def _existing_assignments(period_id: int, employee_id: int) -> list[EvaluationAssignment]:
