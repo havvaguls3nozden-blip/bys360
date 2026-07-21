@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-
 import logging
-
-from app.core.datetime_utils import utc_now
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
-from collections.abc import Iterable
 
 from sqlalchemy import desc
 
+from app.core.datetime_utils import utc_now
 from app.models import (
     AssignmentCoverageLog,
     EvaluationPublishLog,
@@ -27,6 +25,7 @@ from app.services.performance_v2.reporting_workspace import (
     build_period_scorecard_context,
     build_publish_workspace_context,
 )
+
 logger = logging.getLogger(__name__)
 
 

@@ -7,10 +7,10 @@ kaynak dosyalarda korunup korunmadığını statik olarak denetler.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 TASK_GENERATION_GATE_VERSION = "2026-04-20-performance-task-generation-gate-faz2"
 

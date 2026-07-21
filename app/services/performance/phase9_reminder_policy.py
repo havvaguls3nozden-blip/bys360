@@ -11,12 +11,12 @@ Amaç:
 """
 from __future__ import annotations
 
-
+import logging
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Iterable, Mapping
-import logging
+
 logger = logging.getLogger(__name__)
 
 

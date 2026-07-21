@@ -1,19 +1,23 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
+
 from sqlalchemy import inspect, text
 
-from app.services.performance.v2_1_5_category_period_scope import PLAN_TABLE, PLAN_ITEM_TABLE, list_category_period_scope_plans
+from app.services.performance.v2_1_5_category_period_scope import (
+    PLAN_ITEM_TABLE,
+    PLAN_TABLE,
+    list_category_period_scope_plans,
+)
 from app.services.performance.v2_1_6_category_period_integration import (
-    RULE_VERSION,
     INTEGRATION_TABLE,
     PRECHECK_TABLE,
+    RULE_VERSION,
     ensure_category_period_integration_schema,
     integration_summary,
 )
+
 logger = logging.getLogger(__name__)
 
 

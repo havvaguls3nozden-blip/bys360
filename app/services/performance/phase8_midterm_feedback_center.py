@@ -8,11 +8,11 @@ karneye kontrollü bilgi ve gelişim takibi desteği sağlar.
 from __future__ import annotations
 
 import logging
-
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Iterable
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE8_MIDTERM_FEEDBACK_CENTER = True
@@ -417,8 +417,9 @@ CREATE TABLE IF NOT EXISTS {PHASE8_TABLE_NAME} (
 
 def ensure_phase8_schema() -> dict[str, Any]:
     try:
-        from app import db
         from sqlalchemy import text
+
+        from app import db
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/phase8_midterm_feedback_center.py | line=419")
         return {"ok": False, "error": str(exc), "table": PHASE8_TABLE_NAME}

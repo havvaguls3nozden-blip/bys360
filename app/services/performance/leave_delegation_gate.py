@@ -15,10 +15,10 @@ simülasyonlarıyla denetler:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 LEAVE_DELEGATION_GATE_VERSION = "2026-04-20-performance-leave-delegation-gate-faz5"
 

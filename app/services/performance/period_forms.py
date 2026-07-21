@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import date, datetime, timedelta
 from typing import Any
-from collections.abc import Callable
 
 from .common import _safe_float, _safe_int
 from .period_scope_contract import ALLOWED_PERIOD_SCOPE_TYPES, normalize_period_scope_type
-from .period_special_scenario_contract import build_special_scenario_defaults, normalize_special_period_scenario
+from .period_special_scenario_contract import (
+    build_special_scenario_defaults,
+    normalize_special_period_scenario,
+)
 from .period_type_contract import ALLOWED_PERIOD_TYPES, normalize_period_type
 
 BYS360_SCORING_AFTER_PERIOD_END_FORM_MARKER = "BYS360_PERFORMANCE_SCORING_AFTER_PERIOD_END_FORM_V1_2"

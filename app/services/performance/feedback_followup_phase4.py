@@ -10,13 +10,14 @@ Tasarımdaki temel ilke: otomasyon karar vermez; yalnızca hatırlatır ve kayı
 """
 from __future__ import annotations
 
+import logging
 from datetime import date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import inspect, text
 
 from app.extensions import db
-import logging
+
 logger = logging.getLogger(__name__)
 
 GLOBAL_ROLES = {

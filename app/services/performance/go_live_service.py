@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import Counter
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from app.models import EvaluationAssignment, FeedbackMeeting, PerformanceEvaluation, PerformancePeriod
+from app.core.datetime_utils import utc_now
+from app.models import (
+    EvaluationAssignment,
+    FeedbackMeeting,
+    PerformanceEvaluation,
+    PerformancePeriod,
+)
 from app.services.performance_v2.reporting_workspace import build_publish_workspace_context
 
 OPEN_ASSIGNMENT_STATUSES = {"bekliyor", "atandi", "devam_ediyor", "iade"}

@@ -13,10 +13,10 @@ Bu modül canlı davranış değiştirmez. Nihai performans amir kural matrisini
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 VISIBILITY_PUBLICATION_GATE_VERSION = "2026-04-20-performance-visibility-publication-gate-faz3"
 

@@ -1,21 +1,25 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
+
 from sqlalchemy import inspect, text
 
-from app.services.performance.v2_1_2_category_engine import CATEGORY_TABLE, ASSIGNMENT_TABLE, canonical_category_key
+from app.services.performance.v2_1_2_category_engine import (
+    ASSIGNMENT_TABLE,
+    CATEGORY_TABLE,
+    canonical_category_key,
+)
 from app.services.performance.v2_1_4_category_scope_visibility import (
     RULE_VERSION,
     SCOPE_DRAFT_TABLE,
-    ensure_category_scope_schema,
-    category_scope_summaries,
     category_scope_dashboard_summary,
-    upsert_category_scope_draft,
+    category_scope_summaries,
+    ensure_category_scope_schema,
     list_scope_drafts,
+    upsert_category_scope_draft,
 )
+
 logger = logging.getLogger(__name__)
 
 

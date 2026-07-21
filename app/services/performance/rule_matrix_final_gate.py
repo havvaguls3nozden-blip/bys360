@@ -7,11 +7,11 @@ korunduğunu statik olarak doğrulamak için kullanılır.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
-from collections.abc import Iterable
 import importlib.util
 import sys
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 FINAL_GATE_VERSION = "2026-04-20-performance-rule-matrix-final-gate-faz6"
 

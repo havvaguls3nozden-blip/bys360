@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from sqlalchemy import inspect, text
 
-from app.services.performance.v2_1_2_category_engine import ASSIGNMENT_TABLE, CATEGORY_TABLE, canonical_category_key
+from app.services.performance.v2_1_2_category_engine import (
+    ASSIGNMENT_TABLE,
+    CATEGORY_TABLE,
+    canonical_category_key,
+)
 from app.services.performance.v2_1_3_personnel_category_card import (
     AUDIT_TABLE,
     RULE_VERSION,
@@ -17,6 +19,7 @@ from app.services.performance.v2_1_3_personnel_category_card import (
     parse_user_ids,
     template_get_user_category,
 )
+
 logger = logging.getLogger(__name__)
 
 

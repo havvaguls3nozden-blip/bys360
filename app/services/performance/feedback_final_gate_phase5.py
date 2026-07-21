@@ -6,9 +6,10 @@ Uygulama ekranı için güvenli ve kısa kontrol özeti üretir; idari karar ver
 """
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -350,6 +351,7 @@ def _database_status() -> dict[str, Any]:
     ]
     try:
         from sqlalchemy import inspect  # type: ignore
+
         from app.extensions import db  # type: ignore
         inspector = inspect(db.engine)
         rows = []

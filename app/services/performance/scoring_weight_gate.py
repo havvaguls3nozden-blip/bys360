@@ -13,10 +13,10 @@ ağırlıklandırma ve 3. amir mod sözleşmesini kaynak kod üzerinde denetler:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
 import re
 from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
 
 SCORING_WEIGHT_GATE_VERSION = "2026-04-20-performance-scoring-weight-gate-faz4"
 

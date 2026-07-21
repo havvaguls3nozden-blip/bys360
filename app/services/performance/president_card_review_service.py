@@ -9,6 +9,7 @@ from app.extensions import db
 from app.services.performance.process_engine_phase6_president_approvals import (
     can_view_president_approvals,
 )
+
 logger = logging.getLogger(__name__)
 
 PRESIDENT_CARD_REVIEW_REPAIR_MARKER = "BYS360_PRESIDENT_CARD_REVIEW_FINAL_V1"

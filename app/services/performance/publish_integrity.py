@@ -4,7 +4,9 @@ from typing import Any
 
 from app.models import PerformanceEvaluation, PerformanceEvaluationItem
 from app.services.performance.common import get_period_level_3_flags
-from app.services.performance.policy_flags import is_level_2_comment_required_when_level_1_score_is_three
+from app.services.performance.policy_flags import (
+    is_level_2_comment_required_when_level_1_score_is_three,
+)
 
 
 def _safe_str(value: Any) -> str:

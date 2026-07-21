@@ -12,9 +12,9 @@ Amaç:
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Iterable, Mapping, Sequence
 
 logger = logging.getLogger(__name__)
 

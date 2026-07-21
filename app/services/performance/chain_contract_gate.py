@@ -7,9 +7,9 @@ kontrol eder. Route, görev üretimi, puanlama veya veritabanı işlemi yapmaz.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
-import re
 
 CHAIN_CONTRACT_GATE_VERSION = "2026-04-20-performance-chain-contract-gate-faz1"
 

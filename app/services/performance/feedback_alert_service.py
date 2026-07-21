@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.models import FeedbackMeeting, FeedbackRequest, Notification, User
 from app.services.mail_service import send_email as send_plain_email
 from app.services.message_service import notify_user

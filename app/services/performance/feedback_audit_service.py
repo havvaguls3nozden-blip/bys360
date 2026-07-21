@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import json
+import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
 from statistics import mean
@@ -12,9 +12,10 @@ from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import AuditLog, FeedbackMeeting
-import logging
+
 logger = logging.getLogger(__name__)
 
 PENDING_REQUEST_STATUSES = {"bekliyor", "incelendi"}

@@ -6,12 +6,12 @@ karne özetlerini yetki kontrollü ve denetlenebilir bir arşiv sözleşmesine b
 from __future__ import annotations
 
 import logging
-
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
-from collections.abc import Iterable
+
 logger = logging.getLogger(__name__)
 
 BYS360_PERFORMANCE_COMPLETION_PHASE7_SCORECARD_ARCHIVE_CENTER = True
@@ -315,8 +315,9 @@ CREATE TABLE IF NOT EXISTS {PHASE7_ARCHIVE_TABLE_NAME} (
 
 def ensure_phase7_archive_schema() -> dict[str, Any]:
     try:
-        from app import db
         from sqlalchemy import text
+
+        from app import db
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return {"ok": False, "error": str(exc), "table": PHASE7_ARCHIVE_TABLE_NAME}

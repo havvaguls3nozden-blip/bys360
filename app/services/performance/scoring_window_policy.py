@@ -10,9 +10,10 @@ Kural:
 """
 from __future__ import annotations
 
+import logging
 from datetime import date, datetime, time, timedelta
 from typing import Any
-import logging
+
 logger = logging.getLogger(__name__)
 
 LOGGER = logging.getLogger(__name__)

@@ -8,8 +8,8 @@ referans alarak eski yanlış kuralların tekrar koda sızmasını engeller.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
 from collections.abc import Mapping
+from dataclasses import asdict, dataclass
 
 CONSTITUTION_VERSION = "2026-04-20-claude-faz4-performance-manager-rules"
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime, timedelta
 from typing import Any
-from collections.abc import Iterable
 
+from app.core.datetime_utils import utc_now
 from app.models import FeedbackMeeting, FeedbackRequest, Notification, User
 from app.services.mail_service import send_email
 from app.services.message_service import notify_user

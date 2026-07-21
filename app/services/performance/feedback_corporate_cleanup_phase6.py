@@ -6,12 +6,11 @@ bağlantı, mobil uyum, boş veri mesajı, yetki ve beyaz ekran riskini denetler
 """
 from __future__ import annotations
 
+import logging
+import py_compile
+import re
 from pathlib import Path
 from typing import Any
-import re
-import py_compile
-
-import logging
 
 logger = logging.getLogger(__name__)
 ops_logger = logging.getLogger(__name__)
@@ -268,6 +267,7 @@ def check_database(root: Path) -> dict[str, Any]:
     }
     try:
         from sqlalchemy import inspect
+
         from app.extensions import db
 
         inspector = inspect(db.engine)

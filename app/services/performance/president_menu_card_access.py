@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from typing import Any
 
 from sqlalchemy import inspect, text
 
 from app.extensions import db
-import logging
+
 logger = logging.getLogger(__name__)
 
 PHASE12_PRESIDENT_CARD_ACCESS_VERSION = "2026-04-30-president-menu-card-final"

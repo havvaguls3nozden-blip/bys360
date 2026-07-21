@@ -1,13 +1,12 @@
 from __future__ import annotations
 
+import logging
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
-from collections.abc import Mapping
 
 from app.extensions import db
 from app.models import FeedbackMeeting
-from app.services.mail_service import send_feedback_meeting_created_mail
-from app.services.performance.feedback_audit_service import record_feedback_audit_event
 from app.performance.feedback_helpers import (
     _feedback_manager_ids,
     _find_feedback_meeting_conflict,
@@ -15,7 +14,9 @@ from app.performance.feedback_helpers import (
     _serialize_feedback_meeting_state,
     _serialize_feedback_request_state,
 )
-import logging
+from app.services.mail_service import send_feedback_meeting_created_mail
+from app.services.performance.feedback_audit_service import record_feedback_audit_event
+
 logger = logging.getLogger(__name__)
 
 

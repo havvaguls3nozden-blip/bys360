@@ -13,11 +13,10 @@ Bağımlı olduğu:
 """
 from __future__ import annotations
 
-from io import BytesIO
 from collections.abc import Callable, Iterable
+from io import BytesIO
 
 from openpyxl import Workbook
-
 
 STATUS_OPTIONS = [
     ("bekliyor", "Bekliyor"),

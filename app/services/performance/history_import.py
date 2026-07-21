@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 HISTORY_IMPORT_SOURCE_TYPE = "historical_excel_import"
 HISTORY_IMPORT_DATA_LABEL = "gecmis_veri"

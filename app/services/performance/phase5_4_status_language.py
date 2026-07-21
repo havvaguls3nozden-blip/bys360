@@ -6,8 +6,8 @@ Kod değerleri backend ve veritabanında korunur; yalnızca görünür etiket T�
 from __future__ import annotations
 
 import logging
-
 from typing import Any
+
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE5_4_TECHNICAL_LANGUAGE_CLEANUP

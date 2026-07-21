@@ -18,6 +18,7 @@ from app.services.performance_service import (
     validate_general_comment_requirements,
     validate_score_value,
 )
+
 from .evaluation_ui_service import build_level_total_preview
 
 
