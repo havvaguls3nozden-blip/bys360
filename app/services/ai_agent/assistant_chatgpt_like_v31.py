@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import Callable
 
 V31_MARKER = "BYS360_ASSISTANT_ASSISTANT_LIKE_V31"
 V31_2_HOME_DASHBOARD_SPLIT = "BYS360_ASSISTANT_HOME_DASHBOARD_SPLIT_V31_2"

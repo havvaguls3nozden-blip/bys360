@@ -12,14 +12,12 @@ Bu dosya bilinçli olarak dataclass vb. kullanmaz; Windows/importlib gate testle
 """
 from __future__ import annotations
 
-
+import logging
 import re
 import unicodedata
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
-
-import logging
 ops_logger = logging.getLogger(__name__)
 
 BYS360_VISIBLE_TUTOR_V6_1_MARKER = "BYS360_VISIBLE_TUTOR_V6_1_ACTIVE"
