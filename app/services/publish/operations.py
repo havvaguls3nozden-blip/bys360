@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from typing import Any
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import PerformanceEvaluation, PerformancePeriod
+from app.services.performance.low_score_process_service import (
+    ensure_low_score_process_for_evaluation,
+    ensure_low_score_processes_for_period,
+)
+
 from .policy import is_evaluation_publish_exempt, is_evaluation_publishable
-from app.services.performance.low_score_process_service import ensure_low_score_process_for_evaluation, ensure_low_score_processes_for_period
 
 
 def publish_evaluation(evaluation: PerformanceEvaluation, acted_by: Any) -> tuple[bool, str]:
