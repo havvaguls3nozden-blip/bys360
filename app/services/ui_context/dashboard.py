@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 from datetime import timedelta
 from typing import Any
 
 from flask import request
 from sqlalchemy import or_
 
-from app.models import DelegationAssignment, EvaluationAssignment, FeedbackRequest, Notification, PerformancePeriod
+from app.core.datetime_utils import utc_now
+from app.models import (
+    DelegationAssignment,
+    EvaluationAssignment,
+    FeedbackRequest,
+    Notification,
+    PerformancePeriod,
+)
 from app.route_support import safe_all, safe_count, safe_db_rollback
 from app.services.decision_support_service import build_dashboard_signal_context
 from app.services.performance.assignments import (
@@ -16,10 +22,14 @@ from app.services.performance.assignments import (
     get_latest_assignment_generation_logs,
     is_informational_special_case,
 )
-from app.services.query_health_service import build_dashboard_assignment_query, build_dashboard_meeting_query
-from app.services.recommendation_service import build_dashboard_focus_hints
 from app.services.performance_v2.reporting_workspace import build_publish_workspace_context
+from app.services.query_health_service import (
+    build_dashboard_assignment_query,
+    build_dashboard_meeting_query,
+)
+from app.services.recommendation_service import build_dashboard_focus_hints
 from app.services.sql_refactor_report_helpers import build_dashboard_evaluation_metrics_sql
+
 from .scope import build_user_scope_context
 
 

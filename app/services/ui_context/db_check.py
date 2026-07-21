@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 from flask import current_app
 
@@ -15,7 +15,6 @@ from app.models import (
     PerformancePeriod,
     User,
 )
-
 
 TABLE_MODELS: dict[str, Any] = {
     "users": User,

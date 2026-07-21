@@ -10,6 +10,7 @@ from app.services.performance.assignments import (
     get_latest_assignment_generation_logs,
     is_informational_special_case,
 )
+
 from .scope import build_user_scope_context
 
 BANNER_ALLOWED_PREFIXES = (
