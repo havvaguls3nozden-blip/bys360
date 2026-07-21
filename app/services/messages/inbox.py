@@ -10,14 +10,17 @@ from __future__ import annotations
 from typing import Any
 
 from flask_login import current_user
-
 from sqlalchemy import case, exists, func, or_
 from sqlalchemy.orm import aliased
 
 from app.extensions import db
 from app.models import Message, MessageThread, MessageThreadParticipant, User
 
-from .constants import INBOX_THREAD_FETCH_LIMIT, INBOX_THREAD_FETCH_LIMIT_SEARCH, THREAD_MESSAGE_SOFT_LIMIT
+from .constants import (
+    INBOX_THREAD_FETCH_LIMIT,
+    INBOX_THREAD_FETCH_LIMIT_SEARCH,
+    THREAD_MESSAGE_SOFT_LIMIT,
+)
 from .presence import build_thread_presence
 from .repository import orm_entity
 from .serialization import build_reaction_map

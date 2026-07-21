@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import logging
+from collections.abc import Mapping
 from datetime import timedelta
 from typing import Any
-from collections.abc import Mapping
 
 from flask_login import current_user
 
@@ -10,7 +11,7 @@ from app.extensions import db
 from app.models import MessageThread, MessageTypingState
 
 from .repository import orm_entity, participant_for_thread
-import logging
+
 logger = logging.getLogger(__name__)
 
 _TYPING_FALSE_VALUES = {"0", "false", "hayir", "hayır", "no", "off", ""}

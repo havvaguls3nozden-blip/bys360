@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from typing import Any
-from collections.abc import MutableMapping
 
 from app.extensions import db
 from app.models import Message, MessageThread, MessageThreadParticipant

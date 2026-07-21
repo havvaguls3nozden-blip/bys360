@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from flask_login import current_user
@@ -10,7 +11,7 @@ from app.models import Message, MessageReaction
 from .constants import REACTION_OPTIONS
 from .repository import orm_entity, participant_for_thread
 from .serialization import build_reaction_map
-import logging
+
 logger = logging.getLogger(__name__)
 
 

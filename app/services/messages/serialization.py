@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from flask import url_for
 from flask_login import current_user
 
-from app.models import MessageAttachment, MessageReaction
+from app.models import MessageAttachment, MessageComment, MessageReaction
 from app.services.message_service import (
     attachment_icon_class,
     attachment_is_image,
@@ -16,8 +17,7 @@ from app.services.message_service import (
 
 from .constants import REACTION_OPTIONS
 from .formatting import format_dt_label, message_sender_initials, message_sender_name
-import logging
-from app.models import MessageComment
+
 logger = logging.getLogger(__name__)
 
 
