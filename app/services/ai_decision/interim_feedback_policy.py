@@ -11,11 +11,10 @@ BYS360_AI_DECISION_FAZ10_POLICY_OK
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
+from collections.abc import Mapping, Sequence
+from dataclasses import asdict, dataclass
 from datetime import date, datetime
 from typing import Any
-from collections.abc import Mapping, Sequence
-
 
 NOTE_TYPE_LABELS: dict[str, str] = {
     "positive_event": "Olumlu olay",

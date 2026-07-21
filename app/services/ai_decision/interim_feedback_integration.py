@@ -9,11 +9,12 @@ BYS360_AI_DECISION_FAZ10_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from typing import Any
+import logging
 from collections.abc import Mapping
+from typing import Any
 
 from app.services.ai_decision.interim_feedback_policy import build_interim_feedback_decision_support
-import logging
+
 logger = logging.getLogger(__name__)
 
 try:  # pragma: no cover - canlı projede vardır

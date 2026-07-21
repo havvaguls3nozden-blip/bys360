@@ -10,9 +10,9 @@ BYS360_AI_DECISION_FAZ1_DECISION_ENGINE
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Iterable, Mapping
 
 
 @dataclass(frozen=True)

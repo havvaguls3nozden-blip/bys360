@@ -8,9 +8,9 @@ ya da ilerideki servislerden bu katmana verilir.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass
 from typing import Any
-from collections.abc import Iterable, Mapping
 
 from .security_contract import SENSITIVE_FIELD_NAMES, redact_mapping_for_ai, should_redact_field
 

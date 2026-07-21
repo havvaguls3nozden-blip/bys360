@@ -9,9 +9,9 @@ BYS360_AI_DECISION_FAZ12_POLICY_OK
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import json
+from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Any
 
 PHASES = tuple(range(1, 12))

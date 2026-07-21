@@ -7,8 +7,8 @@ BYS360_AI_DECISION_FAZ2_CATEGORY_GROUP_INTEGRATION
 """
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Iterable, Mapping
+from typing import Any
 
 from flask import current_app
 from flask_login import current_user

@@ -5,8 +5,8 @@ BYS360_AI_DECISION_FAZ12_INTEGRATION_OK
 """
 from __future__ import annotations
 
-from pathlib import Path
 import json
+from pathlib import Path
 from typing import Any
 
 from app.services.ai_decision.final_gate_policy import build_final_report

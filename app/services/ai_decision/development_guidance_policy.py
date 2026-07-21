@@ -10,10 +10,9 @@ BYS360_AI_DECISION_FAZ11_POLICY_OK
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, asdict
-from typing import Any
 from collections.abc import Mapping, Sequence
-
+from dataclasses import asdict, dataclass
+from typing import Any
 
 GUIDANCE_TYPE_LABELS: dict[str, str] = {
     "low_score_recovery": "Düşük performans gelişim takibi",
