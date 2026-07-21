@@ -83,11 +83,11 @@ def _cic_v40_active_staff_candidates() -> list[User]:
 
 
 def _cic_v40_special_day_users(now: object = None) -> list[User]:
-    from app.services.cic.mail_service import get_recipients
     from app.services.cic.celebration_dates import (
         _cic_v40_setting_bool,
         _cic_v40_special_days_today,
     )
+    from app.services.cic.mail_service import get_recipients
 
     if not _cic_v40_setting_bool("celebrations_enabled", True) or not _cic_v40_setting_bool("special_day_enabled", True):
         return []
@@ -104,14 +104,14 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
 
 
 def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]]:
-    from app.services.cic.celebration_service import (
-        _cic_v40_service_year,
-    )
     from app.services.cic.celebration_dates import (
         _cic_v40_days_until,
         _cic_v40_mmdd,
         _cic_v40_today,
         _cic_v40_user_date,
+    )
+    from app.services.cic.celebration_service import (
+        _cic_v40_service_year,
     )
 
     today = _cic_v40_today()

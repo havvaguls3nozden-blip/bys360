@@ -8,6 +8,16 @@ from typing import Any
 
 from app.extensions import db
 from app.models import User
+from app.services.cic.celebration_dates import (
+    _cic_v40_bool,
+    _cic_v40_mmdd,
+    _cic_v40_parse_date,
+    _cic_v40_setting_bool,
+    _cic_v40_special_days,
+    _cic_v40_special_days_today,
+    _cic_v40_today,
+    _cic_v40_user_date,
+)
 from app.services.cic.cic_context import (
     _cic_auto_last_run_key,
     _cic_v40_upcoming_special_days,
@@ -32,16 +42,6 @@ from app.services.cic.query_service import (
     _cic_v40_active_staff_candidates,
     _cic_v40_upcoming_users,
     list_users,
-)
-from app.services.cic.celebration_dates import (
-    _cic_v40_bool,
-    _cic_v40_mmdd,
-    _cic_v40_parse_date,
-    _cic_v40_setting_bool,
-    _cic_v40_special_days,
-    _cic_v40_special_days_today,
-    _cic_v40_today,
-    _cic_v40_user_date,
 )
 from app.services.cic.task_contract import (
     BASE_KEY,
