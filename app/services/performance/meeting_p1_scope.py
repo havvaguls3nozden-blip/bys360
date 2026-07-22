@@ -8,13 +8,17 @@ from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import inspect, text
-from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 
 logger = logging.getLogger(__name__)
 
 P1_SCOPE_VERSION = "2026-04-30-meeting-p1-faz7"
+
+# performance_periods tablosuna bu 5 uyum kolonunu ekleyen Alembic
+# migration'i (scope_type haric -- o kolon ayri, onceki migrationlar
+# tarafindan sahiplenilmis durumda; bkz. ensure_p1_period_scope_columns()).
+P1_SCOPE_SCHEMA_REVISION = "f6d6934ad77f"
 
 P1_REQUIRED_SETTINGS = {
     "performance_period_scope_enabled": {"label": "Dönem kapsamı aktif", "value": "true", "description": "Dönemler tüm kurum, birim/grup, kategori veya seçili personel kapsamıyla açılabilir."},
@@ -134,31 +138,33 @@ def ensure_p1_settings() -> int:
 
 
 def ensure_p1_period_scope_columns() -> tuple[int, list[str]]:
+    """Read-only readiness check for the Alembic-owned P1 scope columns.
+
+    This used to run ``ALTER TABLE ... ADD COLUMN`` at request time. The
+    columns are now owned by the Alembic migration
+    ``P1_SCOPE_SCHEMA_REVISION``; this function only inspects the live
+    schema and never writes to the database (no ``db.session.execute``/
+    ``commit`` calls here).
+
+    Returns a ``(ready_count, warnings)`` tuple where ``ready_count`` is the
+    number of ``P1_PERIOD_SCOPE_COLUMNS`` entries that already exist on
+    ``performance_periods`` -- NOT the number newly added, since nothing is
+    added here anymore. Any column still missing is reported through
+    ``warnings`` instead of being silently patched in.
+    """
     warnings: list[str] = []
     if not _has_table("performance_periods"):
-        return 0, ["performance_periods tablosu bulunamadı; kapsam kolonları canlı DB'de eklenemedi."]
+        return 0, ["performance_periods tablosu bulunamadı; kapsam kolonları kontrol edilemedi."]
     existing = _columns("performance_periods")
-    added = 0
-    for name, ddl_type in P1_PERIOD_SCOPE_COLUMNS.items():
+    ready = 0
+    for name in P1_PERIOD_SCOPE_COLUMNS:
         if name in existing:
+            ready += 1
             continue
-        try:
-            db.session.execute(text(f"ALTER TABLE performance_periods ADD COLUMN {name} {ddl_type}"))
-            added += 1
-        except SQLAlchemyError as exc:
-            db.session.rollback()
-            warnings.append(f"{name} kolonu eklenemedi: {exc.__class__.__name__}")
-        except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            db.session.rollback()
-            warnings.append(f"{name} kolonu eklenemedi: {exc}")
-    try:
-        db.session.commit()
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        db.session.rollback()
-        warnings.append(f"Kapsam kolonları commit edilemedi: {exc}")
-    return added, warnings
+        warnings.append(
+            f"{name} kolonu eksik; migration gerekli (revision: {P1_SCOPE_SCHEMA_REVISION})."
+        )
+    return ready, warnings
 
 
 def p1_status_checks() -> list[dict[str, Any]]:

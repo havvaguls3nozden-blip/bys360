@@ -205,4 +205,4 @@ def test_phase5v_revision_extends_the_single_current_head() -> None:
 
     assert module.revision == "5a7c9e1f2b30"
     assert module.down_revision == "bys360_portal_v2121"
-    assert script.get_heads() == ["f5e19f9107d7"]
+    assert script.get_heads() == ["f6d6934ad77f"]
