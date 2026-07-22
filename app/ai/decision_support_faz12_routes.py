@@ -6,6 +6,7 @@ BYS360_AI_DECISION_FAZ12_ROUTES_OK
 from __future__ import annotations
 
 from pathlib import Path
+
 from flask import Blueprint, jsonify, render_template
 
 from app.services.ai_decision.final_gate_integration import get_ai_decision_final_gate_report
