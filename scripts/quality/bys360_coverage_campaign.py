@@ -5,10 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from decimal import Decimal, ROUND_DOWN
+from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from typing import Any
-
 
 EPSILON = 1e-12
 

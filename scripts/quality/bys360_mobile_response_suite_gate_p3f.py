@@ -7,10 +7,10 @@ import os
 import py_compile
 import subprocess
 import sys
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from collections.abc import Callable
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3F_MOBILE_RESPONSE_SUITE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_RESPONSE_SUITE_GATE_P3F_REPORT.json")

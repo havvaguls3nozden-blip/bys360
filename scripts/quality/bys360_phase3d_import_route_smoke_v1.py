@@ -11,7 +11,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-
 PACKAGE = "BYS360_PHASE3D_IMPORT_ROUTE_SMOKE_V1"
 REPORT_REL = Path("reports/architecture/BYS360_PHASE3D_IMPORT_ROUTE_SMOKE_V1_REPORT.json")
 

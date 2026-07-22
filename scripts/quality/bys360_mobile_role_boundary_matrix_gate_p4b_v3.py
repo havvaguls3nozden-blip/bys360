@@ -12,8 +12,8 @@ import argparse
 import base64
 import json
 import os
-import re
 import py_compile
+import re
 import subprocess
 import sys
 from datetime import datetime

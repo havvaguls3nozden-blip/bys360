@@ -7,7 +7,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-
 PACKAGE = "BYS360_PHASE3C_COMPACT_ROUTE_SERVICE_GATE_V1"
 REPORT_REL = Path("reports/architecture/BYS360_PHASE3C_COMPACT_ROUTE_SERVICE_GATE_V1_REPORT.json")
 
