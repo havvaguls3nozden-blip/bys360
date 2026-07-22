@@ -6,11 +6,10 @@ re-export yüzeyini okunabilir ve denetlenebilir hale getirir.
 """
 from __future__ import annotations
 
+import inspect
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-import inspect
 from typing import Any
-
 
 _METADATA_PREFIXES = ("LEGACY_",)
 _ALLOWED_NON_CALLABLE_EXPORTS = {
