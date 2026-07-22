@@ -4,7 +4,6 @@ from __future__ import annotations
 # Domain: assistant_chat
 # Bu modül mobil API endpoint sözleşmesini domain bazlı taşır.
 # URL/endpoint isimleri korunur; ortak yardımcılar shared.py içinden gelir.
-
 from app.api.mobile.shared import (
     EvaluationAssignment,
     Notification,

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-# BYS360_P1B_MOBILE_ROUTES_SHARED_SPLIT
-
-# BYS360_MOBILE_V2_8_50_ASSISTANT_ASCII_GATEFIX
-
-from datetime import datetime, timezone
 import hashlib
+
+# BYS360_P1B_MOBILE_ROUTES_SHARED_SPLIT
+# BYS360_MOBILE_V2_8_50_ASSISTANT_ASCII_GATEFIX
+from datetime import datetime, timezone
 from functools import wraps
 from statistics import mean
 from typing import Any
@@ -16,8 +15,6 @@ from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
-from app.services.bys360_notification_bridge import notify_support_ticket_comment, notify_support_ticket_created
-from app.security import get_default_first_login_password
 from app.models import (
     AIRecommendation,
     AIRequestLog,
@@ -45,6 +42,11 @@ from app.models import (
     SystemSetting,
     User,
 )
+from app.security import get_default_first_login_password
+from app.services.bys360_notification_bridge import (
+    notify_support_ticket_comment,
+    notify_support_ticket_created,
+)
 
 try:  # SP-1 KPI/Hedef motoru varsa gerçek hedef verisi buradan okunur.
     from app.modules.strategic_performance.models import PerformanceTarget
@@ -52,8 +54,13 @@ except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/api/mobile/shared.py:53")
     PerformanceTarget = None  # type: ignore
 
+from app.api.mobile.services.auth_service import (
+    mobile_login_response,
+    mobile_me_response,
+    mobile_refresh_response,
+)
+
 from . import mobile_api_bp
-from app.api.mobile.services.auth_service import mobile_login_response, mobile_refresh_response, mobile_me_response
 
 _TOKEN_SALT = "bys360-mobile-api-v1"
 _REFRESH_TOKEN_SALT = "bys360-mobile-refresh-v1"
