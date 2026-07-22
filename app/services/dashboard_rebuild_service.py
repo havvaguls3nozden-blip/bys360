@@ -8,7 +8,7 @@ korumalıdır; eksik tablo veya boş veri dashboard'u beyaz ekrana düşürmez.
 """
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 
 from flask import current_app

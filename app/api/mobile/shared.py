@@ -4,7 +4,11 @@ import hashlib
 
 # BYS360_P1B_MOBILE_ROUTES_SHARED_SPLIT
 # BYS360_MOBILE_V2_8_50_ASSISTANT_ASCII_GATEFIX
-from datetime import datetime, timezone, UTC  # noqa: F401 - timezone re-exported to mobile domain modules
+from datetime import (  # noqa: F401 - timezone re-exported to mobile domain modules
+    UTC,
+    datetime,
+    timezone,
+)
 from functools import wraps
 from statistics import mean
 from typing import Any

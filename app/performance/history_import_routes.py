@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """Phase 45 modular performance history import route family.
@@ -11,7 +10,7 @@ getirdim: gecmis veri etiketi net, aktif donem korumasi net, preview daha okunur
 """
 
 from collections import OrderedDict
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -29,22 +28,43 @@ from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_render
 from app.services.legacy_import_service import (
     collect_extra_payload as _collect_extra_payload,
+)
+from app.services.legacy_import_service import (
     legacy_header_index as _legacy_header_index,
+)
+from app.services.legacy_import_service import (
     legacy_norm as _legacy_norm,
+)
+from app.services.legacy_import_service import (
     legacy_pick as _legacy_pick,
+)
+from app.services.legacy_import_service import (
     resolve_legacy_employee as _resolve_legacy_employee,
+)
+from app.services.legacy_import_service import (
     resolve_unit_for_legacy as _resolve_unit_for_legacy,
 )
 from app.services.performance.history_import import (
     HISTORY_IMPORT_ALLOWED_EXTENSIONS,
     HISTORY_IMPORT_DATA_LABEL,
     HISTORY_IMPORT_SOURCE_TYPE,
+)
+from app.services.performance.history_import import (
     build_historical_snapshot_payload as _build_historical_snapshot_payload,
+)
+from app.services.performance.history_import import (
     build_preview_summary as _build_preview_summary,
+)
+from app.services.performance.history_import import (
     canonicalize_history_row as _canonicalize_history_row,
+)
+from app.services.performance.history_import import (
     render_batch_notes as _render_batch_notes,
+)
+from app.services.performance.history_import import (
     validate_history_row as _validate_history_row,
 )
+
 logger = logging.getLogger(__name__)
 
 

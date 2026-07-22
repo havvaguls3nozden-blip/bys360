@@ -9,11 +9,11 @@ Settings Service Tamamlama Faz 3:
 """
 from __future__ import annotations
 
-
-from collections import OrderedDict
-from typing import Any
-from collections.abc import Callable, Iterable
 import logging
+from collections import OrderedDict
+from collections.abc import Callable, Iterable
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 

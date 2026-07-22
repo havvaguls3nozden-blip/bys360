@@ -14,7 +14,7 @@ import socket
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 GATE_VERSION = "2026-04-21-live-core-smoke-endpoint-gate"

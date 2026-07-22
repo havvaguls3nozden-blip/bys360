@@ -6,7 +6,7 @@ import json
 import re
 import sys
 from dataclasses import asdict, dataclass
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 QUALITY9_MAX_APP_PRINT = 0

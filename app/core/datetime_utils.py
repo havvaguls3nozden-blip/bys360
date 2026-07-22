@@ -7,7 +7,7 @@ ayrica aware UTC yardimcisi da vardir.
 """
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 
 def utc_now() -> datetime:

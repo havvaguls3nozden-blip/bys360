@@ -1,22 +1,46 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
-from pathlib import Path
-from secrets import token_hex
+import logging
 import re
 import time
+from datetime import UTC, datetime
+from pathlib import Path
+from secrets import token_hex
 
 from flask import abort, current_app, flash, redirect, request, send_from_directory, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect, or_
 
 from app.extensions import db
-from app.models import OrganizationUnit, SupportCategory, SupportFeedbackRating, SupportHelpArticle, SupportTicket, SupportTicketAttachment, SupportTicketMessage, SupportTicketStatusHistory, User
+from app.models import (
+    OrganizationUnit,
+    SupportCategory,
+    SupportFeedbackRating,
+    SupportHelpArticle,
+    SupportTicket,
+    SupportTicketAttachment,
+    SupportTicketMessage,
+    SupportTicketStatusHistory,
+    User,
+)
 from app.route_registry import main_bp
-from app.route_support import admin_required, can_access_menu, is_manager_family_user, menu_key_required, safe_db_rollback, safe_render, sanitize_free_text
+from app.route_support import (
+    admin_required,
+    can_access_menu,
+    is_manager_family_user,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+    sanitize_free_text,
+)
 from app.security.upload_security import UploadValidationError, safe_store_filename, validate_upload
-from app.services.bys360_notification_bridge import notify_support_ticket_assigned, notify_support_ticket_comment, notify_support_ticket_created, notify_support_ticket_rating, notify_support_ticket_status_changed
-
+from app.services.bys360_notification_bridge import (
+    notify_support_ticket_assigned,
+    notify_support_ticket_comment,
+    notify_support_ticket_created,
+    notify_support_ticket_rating,
+    notify_support_ticket_status_changed,
+)
 from app.support.help_center_content import (
     HELP_CATEGORIES,
     HELP_ROLES,
@@ -27,7 +51,7 @@ from app.support.help_center_content import (
     get_role,
     search_articles,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 SUPPORT_ALLOWED_TABLES = {

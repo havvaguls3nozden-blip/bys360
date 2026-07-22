@@ -8,7 +8,7 @@ import subprocess
 import sys
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 SKIP_DIRS = {

@@ -13,7 +13,7 @@ import os
 import re
 import urllib.parse
 import urllib.request
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 

@@ -1,7 +1,7 @@
 """BYS360 geri bildirim/nabız arka plan görevleri."""
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from typing import Any
 

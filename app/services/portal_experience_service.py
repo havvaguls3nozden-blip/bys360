@@ -7,7 +7,7 @@ anasayfa/portal beyaz ekrana düşmesin.
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from importlib import import_module
 from typing import Any

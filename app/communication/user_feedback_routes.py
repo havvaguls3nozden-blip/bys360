@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 """BYS360 kullanıcı geri bildirim merkezi.
@@ -13,7 +13,7 @@ atanabilir ve kapatılabilir kalır.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from secrets import token_hex
 
 from flask import flash, redirect, request, url_for
@@ -28,14 +28,14 @@ from app.models import (
 )
 from app.route_registry import main_bp
 from app.route_support import safe_db_rollback, safe_render, sanitize_free_text
+from app.security.upload_security import UploadValidationError
+from app.services.bys360_notification_bridge import notify_user_feedback_created
 from app.support.routes import (
     SUPPORT_MODULE_CHOICES,
     _ensure_support_tables_for_current_db,
     _store_ticket_attachment,
     _support_tables_ready,
 )
-from app.security.upload_security import UploadValidationError
-from app.services.bys360_notification_bridge import notify_user_feedback_created
 
 
 @dataclass(frozen=True)
