@@ -6,7 +6,6 @@ import re
 from collections.abc import Collection
 from typing import Protocol
 
-
 _SQL_IDENTIFIER_PATTERN = re.compile(
     r"^[A-Za-z_][A-Za-z0-9_]*$"
 )
