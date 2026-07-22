@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import csv
 import io
 
@@ -8,8 +7,15 @@ from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import AIFeedbackLog, AIRecommendation, AIRequestLog, AIRedactionRule, AISummaryCache
+from app.models import (
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    AISummaryCache,
+)
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_render
 from app.services.ai.audit import mark_recommendation
@@ -27,9 +33,12 @@ from app.services.ai.module_scope import (
     visible_module_options,
 )
 from app.services.ai.preflight import build_ai_preflight_snapshot
-from app.services.ai.smoke import build_ai_smoke_snapshot
 from app.services.ai.schema_guard import get_ai_schema_status
-from app.services.sql_refactor_query_helpers import distinct_non_empty_values, distinct_normalized_non_empty_values
+from app.services.ai.smoke import build_ai_smoke_snapshot
+from app.services.sql_refactor_query_helpers import (
+    distinct_non_empty_values,
+    distinct_normalized_non_empty_values,
+)
 
 KNOWN_AI_MODULES: tuple[str, ...] = live_ai_modules(include_system=True)
 
