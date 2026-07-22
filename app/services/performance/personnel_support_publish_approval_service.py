@@ -280,7 +280,7 @@ def ensure_personnel_support_publish_approval_for_evaluation(evaluation: Any, *,
     if not table_exists():
         return None
 
-    evaluation_id = int(getattr(evaluation, "id"))
+    evaluation_id = int(evaluation.id)
     existing = _approval_row(evaluation_id)
     params = {
         "evaluation_id": evaluation_id,
@@ -321,7 +321,7 @@ def get_personnel_support_publish_block_reason(evaluation: Any, *, ensure: bool 
     if not table_exists():
         return "Personel ve Destek Hizmetleri Grup Başkanı yayın ön onayı hazır olmadan karne personele açılamaz."
 
-    row = ensure_personnel_support_publish_approval_for_evaluation(evaluation, actor=actor) if ensure else _approval_row(int(getattr(evaluation, "id")))
+    row = ensure_personnel_support_publish_approval_for_evaluation(evaluation, actor=actor) if ensure else _approval_row(int(evaluation.id))
     if row is None:
         return "Personel ve Destek Hizmetleri Grup Başkanı yayın ön onayı oluşturulmadan karne personele açılamaz."
     status = str(row.get("status") or "pending").strip().lower()

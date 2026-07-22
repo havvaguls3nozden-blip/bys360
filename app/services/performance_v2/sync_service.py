@@ -486,7 +486,7 @@ def sync_employee_assignments(period, employee, *, run_key: str | None = None, a
     apply_availability_snapshot_to_evaluation(evaluation, availability)
     notes.extend(list(getattr(availability, 'notes', []) or []))
     if getattr(availability, 'reason', None):
-        notes.append(getattr(availability, 'reason'))
+        notes.append(availability.reason)
 
     for chain_issue in resolved_chain.issues:
         if getattr(chain_issue, 'severity', 'warning') in {'warning', 'error'}:

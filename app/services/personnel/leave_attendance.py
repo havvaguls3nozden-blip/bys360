@@ -211,19 +211,19 @@ def read_leave_attendance_filters(source: Mapping[str, Any] | None = None, **ove
 def _apply_user_filter(query: Any, model: Any, user_id: int | None) -> Any:
     if not user_id:
         return query
-    return query.filter(getattr(model, "user_id") == int(user_id))
+    return query.filter(model.user_id == int(user_id))
 
 
 def _apply_period_filter(query: Any, model: Any, period_id: int | None) -> Any:
     if not period_id or not hasattr(model, "period_id"):
         return query
-    return query.filter(getattr(model, "period_id") == int(period_id))
+    return query.filter(model.period_id == int(period_id))
 
 
 def _apply_status_filter(query: Any, model: Any, status: str | None) -> Any:
     if not status or not hasattr(model, "status"):
         return query
-    return query.filter(getattr(model, "status") == status)
+    return query.filter(model.status == status)
 
 
 def _serialize_leave_balance(row: LeaveBalance) -> dict[str, Any]:

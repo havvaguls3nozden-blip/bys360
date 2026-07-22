@@ -191,7 +191,7 @@ def _attendance_page_context() -> dict[str, Any]:
     ctx = _leave_page_context()
     hr_scope = ctx["hr_scope"]
     scope_users = ctx["users"]
-    scope_user_ids = [int(getattr(u, "id")) for u in scope_users if getattr(u, "id", None)]
+    scope_user_ids = [int(u.id) for u in scope_users if getattr(u, "id", None)]
     attendance_rows = _query_rows(AttendanceException, scope_user_ids=scope_user_ids, date_field="record_date", limit=80)
     delegations = ctx.get("active_delegations") or []
     attendance_ai_panel = {"headline": "Devamsızlık ve vekâlet özeti", "bullets": list((ctx.get("delegation_health") or {}).get("notes") or [])[:4], "tone": "calm"}
@@ -216,7 +216,7 @@ def _attendance_page_context() -> dict[str, Any]:
         "leave_sources": ctx.get("leaves") or [],
         "active_delegation_count": len(delegations),
         "pending_delegation_count": sum(1 for row in delegations if _safe_text(getattr(row, "status", None)).lower() in PENDING_STATUSES),
-        "expiring_count": sum(1 for row in delegations if getattr(row, "end_date", None) and getattr(row, "end_date") <= date.today() + timedelta(days=7)),
+        "expiring_count": sum(1 for row in delegations if getattr(row, "end_date", None) and row.end_date <= date.today() + timedelta(days=7)),
         "uncovered_count": int(((ctx.get("delegation_health") or {}).get("coverage_summary") or {}).get("uncovered") or 0),
     })
     return ctx

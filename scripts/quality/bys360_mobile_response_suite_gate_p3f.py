@@ -210,7 +210,7 @@ def _call_gate(root: Path, gate: dict[str, Any]) -> dict[str, Any]:
         sys.path.insert(0, root_s)
     try:
         module = importlib.import_module(gate["module"])
-        run_checks: Callable[..., dict[str, Any]] = getattr(module, "run_checks")
+        run_checks: Callable[..., dict[str, Any]] = module.run_checks
         mode = gate["mode"]
         if mode == "p3a":
             result = run_checks(root, False, False, False, False, write_report=False)

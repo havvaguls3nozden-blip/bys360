@@ -52,7 +52,7 @@ def _role_text(user: Any) -> str:
             values.append(str(value))
     try:
         if hasattr(user, "roles"):
-            roles = getattr(user, "roles") or []
+            roles = user.roles or []
             for role in roles:
                 values.append(str(getattr(role, "name", role)))
     except Exception:

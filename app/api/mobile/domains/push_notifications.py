@@ -91,7 +91,7 @@ def _register_push_token_impl(user):
     ).mappings().first()
 
     params = {
-        "user_id": int(getattr(user, "id")),
+        "user_id": int(user.id),
         "token": token,
         "platform": platform,
         "device_id": device_id or None,
@@ -171,7 +171,7 @@ def mobile_push_unregister_token(user):
         """),
         {
             "token": token,
-            "user_id": int(getattr(user, "id")),
+            "user_id": int(user.id),
         },
     )
     db.session.commit()
@@ -191,7 +191,7 @@ def mobile_push_status(user):
             WHERE user_id = :user_id
               AND is_active = TRUE
         """),
-        {"user_id": int(getattr(user, "id"))},
+        {"user_id": int(user.id)},
     ).scalar() or 0
 
     return jsonify({

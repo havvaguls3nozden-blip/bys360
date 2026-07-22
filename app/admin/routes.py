@@ -1017,7 +1017,7 @@ def personnel_excel_upload():
                         user.organization_unit_id = org_unit.id if org_unit else None
                     assign_user_performance_category(user, personnel_category, db_session=db.session)  # BYS360_PHASE2_EXCEL_CATEGORY_NEW_BINDING
 
-                    if hasattr(user, "set_password") and callable(getattr(user, "set_password")):
+                    if hasattr(user, "set_password") and callable(user.set_password):
                         user.set_password(initial_password)
                     elif hasattr(user, "password_hash"):
                         user.password_hash = generate_password_hash(initial_password)

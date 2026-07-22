@@ -76,7 +76,7 @@ def _default_question_option_id_set(question: Any) -> set[int]:
     option_ids: set[int] = set()
     for option in options or []:
         try:
-            option_ids.add(int(getattr(option, "id")))
+            option_ids.add(int(option.id))
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/surveys/submission.py:75)")
             continue

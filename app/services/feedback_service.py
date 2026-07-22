@@ -538,7 +538,7 @@ def build_pulse_analytics(user, days: int = 30, minimum_group_size: int = 5):
     active_user_count = (
         User.query
         .filter(User.organization_unit_id == unit_id)
-        .filter(getattr(User, "is_active").is_(True) if hasattr(User, "is_active") else True)
+        .filter(User.is_active.is_(True) if hasattr(User, "is_active") else True)
         .count()
     ) or 0
     coverage_rate = round((participant_count / active_user_count) * 100, 2) if active_user_count else None

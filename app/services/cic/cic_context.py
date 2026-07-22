@@ -314,7 +314,7 @@ def _cic_v40_create_system_notifications(task_key: str, users: list[User], actor
             title = _template_service._render_template_text(tmpl.get("subject", "Kurumsal Kutlama"), user, task_key).strip()[:255] or "Kurumsal Kutlama"
             body = _template_service._render_template_text(tmpl.get("body", ""), user, task_key).strip()
             db.session.add(Notification(
-                user_id=getattr(user, "id"),
+                user_id=user.id,
                 title=title,
                 body=body,
                 notification_type="corporate_celebration",

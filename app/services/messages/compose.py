@@ -47,7 +47,7 @@ def user_initials(user: Any) -> str:
 
 def build_compose_user_card(user: Any, subtitle: str | None = None) -> ComposeUserCard:
     return ComposeUserCard(
-        user_id=int(getattr(user, "id")),
+        user_id=int(user.id),
         display_name=user_display_name(user),
         subtitle=subtitle,
         initials=user_initials(user),

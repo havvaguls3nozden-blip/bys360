@@ -120,7 +120,7 @@ def slugify_category_label(value: Any) -> str:
 def _user_category_label(user: Any) -> str:
     rel = getattr(user, "performance_category", None)
     if rel is not None and getattr(rel, "name", None):
-        return normalize_category_label(getattr(rel, "name"))
+        return normalize_category_label(rel.name)
     return normalize_category_label(getattr(user, "personnel_category", None))
 
 

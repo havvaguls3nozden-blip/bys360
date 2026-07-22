@@ -556,7 +556,7 @@ def return_assignment_to_previous_level(assignment_id: int, note: str | None = N
     target.completed_at = None
     assignment.status = 'taslak'
     assignment.completed_at = None
-    setattr(evaluation, 'level_1_completed', False)
+    evaluation.level_1_completed = False
     evaluation.workflow_status = 'level_2_iade'
     evaluation.level_2_return_note = note_text
     db.session.flush()

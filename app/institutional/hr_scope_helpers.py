@@ -233,7 +233,7 @@ def _fallback_scope_context() -> dict[str, Any]:
         "scope_label": label,
         "scope_heading": heading,
         "scope_description": "Canlı çekirdek kapsam görünümü",
-        "scope_user_ids": [int(getattr(u, "id")) for u in scoped if getattr(u, "id", None)],
+        "scope_user_ids": [int(u.id) for u in scoped if getattr(u, "id", None)],
         "scope_user_count": len(scoped),
         "scope_unit_count": unit_count,
         "scope_options": options,
@@ -269,7 +269,7 @@ def _filter_users_in_scope(users: Iterable[Any], scope: dict[str, Any] | None) -
 def _scope_bundle() -> tuple[dict[str, Any], list[Any], list[int]]:
     scope = _hr_scope_context()
     users = _filter_users_in_scope(_all_personnel(), scope)
-    ids = [int(getattr(u, "id")) for u in users if getattr(u, "id", None)]
+    ids = [int(u.id) for u in users if getattr(u, "id", None)]
     return scope, users, ids
 
 

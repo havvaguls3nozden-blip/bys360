@@ -150,7 +150,7 @@ def get_user_personnel_category_label(user: Any) -> str:
         return "Diğer"
     related = getattr(user, "performance_category", None)
     if related is not None and getattr(related, "name", None):
-        return normalize_personnel_category_label(getattr(related, "name"))
+        return normalize_personnel_category_label(related.name)
     return normalize_personnel_category_label(getattr(user, "personnel_category", None))
 
 

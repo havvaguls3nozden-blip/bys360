@@ -621,7 +621,7 @@ def manager_feedback_request_detail(request_id):
                 actor_user_id=current_user.id,
                 recipient_email=getattr(req.employee, "email", None),
             )
-            setattr(req, "response", response_text)
+            req.response = response_text
 
         summary = f"{current_user.ad} {current_user.soyad} talep durumunu {_serialize_feedback_request_state(req).get('status')} olarak güncelledi."
         action_name = "feedback_request_closed" if status == "kapatildi" else ("feedback_request_responded" if response_text else "feedback_request_status_updated")

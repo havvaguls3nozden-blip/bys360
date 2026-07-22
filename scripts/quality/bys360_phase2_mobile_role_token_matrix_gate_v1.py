@@ -213,8 +213,8 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
         client = app.test_client()
 
         try:
-            personel_login = _login(client, getattr(personel, "sicil_no"), password)
-            admin_login = _login(client, getattr(admin, "sicil_no"), password)
+            personel_login = _login(client, personel.sicil_no, password)
+            admin_login = _login(client, admin.sicil_no, password)
 
             result["login_ok"] = bool(personel_login["ok"] and admin_login["ok"])
             result["users"] = {

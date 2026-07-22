@@ -98,21 +98,12 @@ def build_history_rows(evaluation_id: int):
         if getattr(row, "actor", None):
             actor_name = getattr(row.actor, "full_name", None) or getattr(row.actor, "name", None) or getattr(row.actor, "email", None) or "-"
         snap = row.score_snapshot or {}
-        setattr(row, "action_label", humanize_action_type(getattr(row, "action_type", None)))
-        setattr(row, "actor_level_label", humanize_actor_level(getattr(row, "actor_level", None)))
-        setattr(row, "actor_name_label", actor_name)
-        setattr(row, "from_status_label", humanize_workflow_status(getattr(row, "from_status", None)))
-        setattr(row, "to_status_label", humanize_workflow_status(getattr(row, "to_status", None)))
-        setattr(
-            row,
-            "score_summary",
-            {
-                "level_1": float(snap.get("level_1_total_100", 0) or 0),
-                "level_2": float(snap.get("level_2_total_100", 0) or 0),
-                "level_3": float(snap.get("level_3_total_100", 0) or 0),
-                "final": float(snap.get("final_total_100", 0) or 0),
-            },
-        )
+        row.action_label = humanize_action_type(getattr(row, "action_type", None))
+        row.actor_level_label = humanize_actor_level(getattr(row, "actor_level", None))
+        row.actor_name_label = actor_name
+        row.from_status_label = humanize_workflow_status(getattr(row, "from_status", None))
+        row.to_status_label = humanize_workflow_status(getattr(row, "to_status", None))
+        row.score_summary = {"level_1": float(snap.get("level_1_total_100", 0) or 0), "level_2": float(snap.get("level_2_total_100", 0) or 0), "level_3": float(snap.get("level_3_total_100", 0) or 0), "final": float(snap.get("final_total_100", 0) or 0)}
     return rows
 
 def build_history_summary(history_rows) -> dict[str, Any]:

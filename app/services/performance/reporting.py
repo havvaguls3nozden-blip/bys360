@@ -44,7 +44,7 @@ def resolve_report_score(evaluation: Any) -> float:
 def attach_report_scores(evaluations: Iterable[Any]):
     items = list(evaluations)
     for evaluation in items:
-        setattr(evaluation, "report_final_score", resolve_report_score(evaluation))
+        evaluation.report_final_score = resolve_report_score(evaluation)
     return items
 
 def build_team_compare_rows(period_id: int | None = None, manager_id: int | None = None) -> list[dict[str, Any]]:

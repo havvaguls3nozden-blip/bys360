@@ -40,7 +40,7 @@ def _apply_file_center_limits(app: Any, limiter: Any) -> None:
         if getattr(view, "_bys360_file_center_limited", False):
             continue
         wrapped = limiter.limit(limit_value)(view)
-        setattr(wrapped, "_bys360_file_center_limited", True)
+        wrapped._bys360_file_center_limited = True
         app.view_functions[endpoint] = wrapped
         applied.append(f"{endpoint}={limit_value}")
     if applied:

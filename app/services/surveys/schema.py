@@ -45,7 +45,7 @@ def survey_question_phase2_ready() -> bool:
     try:
         from app.models import SurveyQuestion
 
-        mapped = set(getattr(SurveyQuestion, "__mapper__").attrs.keys())
+        mapped = set(SurveyQuestion.__mapper__.attrs.keys())
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/surveys/schema.py | line=48")
         return False

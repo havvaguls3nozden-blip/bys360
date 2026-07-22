@@ -41,7 +41,7 @@ def _build_surface_scope_context(user, raw_scope):
     """
     from importlib import import_module
 
-    helper = getattr(import_module("app.view_helpers"), "build_surface_scope_context")
+    helper = import_module("app.view_helpers").build_surface_scope_context
     return helper(user, raw_scope)
 
 

@@ -1237,7 +1237,7 @@ for _bys360_vt_name in (
     _bys360_vt_fn = globals().get(_bys360_vt_name)
     if callable(_bys360_vt_fn) and not getattr(_bys360_vt_fn, "_bys360_visible_tutor_v6_1_wrapped", False):
         _bys360_vt_wrapped = _bys360_vt_wrap_function_v6_1(_bys360_vt_fn)
-        setattr(_bys360_vt_wrapped, "_bys360_visible_tutor_v6_1_wrapped", True)
+        _bys360_vt_wrapped._bys360_visible_tutor_v6_1_wrapped = True
         globals()[_bys360_vt_name] = _bys360_vt_wrapped
 
 BYS360_VISIBLE_TUTOR_V6_1_SERVICE_BRIDGE = True

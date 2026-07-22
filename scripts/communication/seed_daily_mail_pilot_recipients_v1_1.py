@@ -97,11 +97,11 @@ def main() -> int:
             if not user:
                 missing.append(term)
                 continue
-            uid = int(getattr(user, "id"))
+            uid = int(user.id)
             if uid not in seen:
                 seen.add(uid)
                 selected.append(user)
-        ids = [int(getattr(u, "id")) for u in selected]
+        ids = [int(u.id) for u in selected]
         set_setting_value("daily_weather_mail.enabled", "0" if args.disable else "1")
         set_setting_value("daily_weather_mail.recipient_user_ids", json.dumps(ids, ensure_ascii=False))
         # Aynı gün yeniden test edebilmek için pilot kurulumunda tarih kilidini temizliyoruz.
@@ -112,7 +112,7 @@ def main() -> int:
             "version": "BYS360_DAILY_MAIL_PILOT_V1_1",
             "selected_count": len(ids),
             "selected": [
-                {"id": int(getattr(u, "id")), "name": _full_name(u), "email": str(getattr(u, "email", "") or "")} for u in selected
+                {"id": int(u.id), "name": _full_name(u), "email": str(getattr(u, "email", "") or "")} for u in selected
             ],
             "missing": missing,
             "enabled": current_config().get("enabled"),

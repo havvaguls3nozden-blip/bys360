@@ -255,7 +255,7 @@ def period_scope_employee_ids(employees: Iterable[object], period) -> set[int]:
     ids: set[int] = set()
     for employee in filter_period_scope_employees(employees, period):
         try:
-            ids.add(int(getattr(employee, "id")))
+            ids.add(int(employee.id))
         except (TypeError, ValueError):
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/performance/period_scope_assignment.py:235)")
             continue
