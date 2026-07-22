@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
 import logging
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 try:
     from sqlalchemy import inspect
+
     from app.extensions import db
     from app.models import SupportHelpArticle
 except Exception:  # pragma: no cover - application context not always ready during import checks

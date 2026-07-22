@@ -8,12 +8,12 @@ from __future__ import annotations
 import hashlib
 import os
 import shlex
+import shutil
 import subprocess
+from collections.abc import Iterable
 from datetime import timedelta
 from pathlib import Path
 from secrets import token_urlsafe
-import shutil
-from collections.abc import Iterable
 
 from flask import current_app, request
 from flask_login import current_user
@@ -26,10 +26,8 @@ from app.models.file_center_models import (
     FileAccessLog,
     FileAuditLog,
     FileDownloadLog,
-    FileQuotaUsage,
     FileQuotaPolicy,
-    FileUploadSession,
-    FileUploadChunk,
+    FileQuotaUsage,
     FileRequest,
     FileRequestUpload,
     FileSecurityScan,
@@ -38,8 +36,9 @@ from app.models.file_center_models import (
     FileTransfer,
     FileTransferItem,
     FileTransferRecipient,
+    FileUploadChunk,
+    FileUploadSession,
 )
-
 
 BLOCKED_DEFAULT = ".exe,.bat,.cmd,.ps1,.vbs,.scr,.dll,.msi,.js,.jar,.com,.pif"
 

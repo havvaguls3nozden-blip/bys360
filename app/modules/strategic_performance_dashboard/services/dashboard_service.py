@@ -8,7 +8,11 @@ from typing import Any, Dict
 
 from app.services.kpi_utils import (
     calculate_completion_rate as _calculate_completion_rate_decimal,
+)
+from app.services.kpi_utils import (
     classify_kpi_status,
+)
+from app.services.kpi_utils import (
     to_decimal as _to_decimal,
 )
 

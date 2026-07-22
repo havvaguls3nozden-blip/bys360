@@ -6,8 +6,8 @@ files until P1.3+ micro-refactor packages move them one group at a time.
 """
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Mapping
+from typing import Any
 
 
 def ok_payload(data: Mapping[str, Any] | None = None, **extra: Any) -> dict[str, Any]:

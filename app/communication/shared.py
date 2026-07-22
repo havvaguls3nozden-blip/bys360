@@ -1,23 +1,27 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import datetime as _dt
+import logging
 from urllib.parse import urlsplit
-
-from werkzeug.routing import BuildError
 
 from flask import current_app, redirect, request, url_for
 from flask_login import current_user
+from werkzeug.routing import BuildError
 
+from app.core.datetime_utils import utc_now
 from app.models import SurveyQuestionOption
 from app.route_support import issue_form_token, safe_render
 from app.services.ai import build_message_compose_ai_panel, build_notification_priority_ai_panel
 from app.services.message_service import (
     MESSAGE_THREAD_BADGE_OPTIONS as _MESSAGE_THREAD_BADGE_OPTIONS,
+)
+from app.services.message_service import (
     MESSAGE_THREAD_COLOR_OPTIONS as _MESSAGE_THREAD_COLOR_OPTIONS,
+)
+from app.services.message_service import (
     MESSAGE_THREAD_ICON_OPTIONS as _MESSAGE_THREAD_ICON_OPTIONS,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 
