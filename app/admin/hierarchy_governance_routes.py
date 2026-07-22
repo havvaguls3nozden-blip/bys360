@@ -3,12 +3,20 @@ from __future__ import annotations
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, send_file, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
 from flask_login import current_user, login_required
 
 from app.services.hierarchy_excel_preview_service import HierarchyExcelPreviewService
 from app.services.hierarchy_settings_service import HierarchySettingsService
-
 
 hierarchy_governance_bp = Blueprint(
     "hierarchy_governance",
