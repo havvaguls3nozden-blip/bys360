@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---

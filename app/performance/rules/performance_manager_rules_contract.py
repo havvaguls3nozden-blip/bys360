@@ -25,9 +25,8 @@ Kural özeti:
 - 3. amir zorunlu değildir; yorum veya puan modu sistem ayarıyla yönetilir.
 """
 
-from dataclasses import dataclass
 from collections.abc import Iterable
-
+from dataclasses import dataclass
 
 # ---------------------------------------------------------------------------
 # Birincil terim sabitleri

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 """BYS360 Performans Faz 1.3 - merkezi performans kural motoru.
@@ -12,9 +11,10 @@ Faz 1.3 bilinçli olarak route/template davranışını doğrudan değiştirmez.
 Faz 1.4'te yayın öncesi kontrol ve ekranlar bu servise bağlanacaktır.
 """
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
-from collections.abc import Mapping
+
 logger = logging.getLogger(__name__)
 
 LOW_SCORE_THRESHOLD = 70.0

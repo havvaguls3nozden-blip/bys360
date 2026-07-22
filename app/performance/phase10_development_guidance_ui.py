@@ -13,12 +13,12 @@ v8:
 from __future__ import annotations
 
 import logging
-
 from datetime import datetime
 from typing import Any
 
 from flask import current_app, flash, request
 from sqlalchemy import inspect, text
+
 logger = logging.getLogger(__name__)
 
 try:
