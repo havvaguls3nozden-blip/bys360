@@ -5,17 +5,21 @@ Route decorators stay in ops_routes.py. This module contains implementation bodi
 from __future__ import annotations
 
 from io import BytesIO
+
 from flask import flash, redirect, send_file, url_for
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+
 from app.extensions import db
 from app.models import User
 from app.route_support import safe_render
 from app.services.ai import build_personnel_profile_chain_ai_panel
+
 from .ops_helpers import (
     _profile_full_name,
     _resolve_personnel_profile_hierarchy,
 )
+
 
 def download_personnel_template_impl():
     wb = Workbook()

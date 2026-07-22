@@ -5,9 +5,14 @@ Route decorators stay in ops_routes.py. This module contains the heavy implement
 from __future__ import annotations
 
 from flask import flash, request
+
 from app.models import OrganizationUnit, User
 from app.route_support import safe_render
-from app.services.ai import build_import_health_priority_ai_panel, build_import_health_simulation_ai_panel
+from app.services.ai import (
+    build_import_health_priority_ai_panel,
+    build_import_health_simulation_ai_panel,
+)
+
 
 def admin_import_health_report_impl():
     """İçe aktarım sağlık raporunu veritabanı bağımsız şekilde üret.

@@ -5,6 +5,7 @@ This module intentionally contains helper logic only. Route decorators stay in o
 from __future__ import annotations
 
 from flask import current_app
+
 from app.extensions import db
 from app.models import EmployeeOrgAssignmentHistory, OrganizationUnit, User
 from app.services.hierarchy_admin_service import normalize_text

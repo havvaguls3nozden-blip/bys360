@@ -6,9 +6,11 @@ from __future__ import annotations
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
+
 from app.extensions import db
 from app.models import PerformancePeriod, User
 from app.services.performance_service import generate_assignments_for_active_period
+
 
 def performance_hierarchy_bulk_assign_impl():
     ust_birim = (request.form.get("ust_birim") or "").strip()

@@ -4,19 +4,23 @@ Route decorators stay in ops_routes.py. This module contains implementation bodi
 """
 from __future__ import annotations
 
-from app.services.safe_user_delete_service import safe_delete_user_by_id
-from app.core.datetime_utils import utc_now
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
+
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import User
 from app.route_support import ensure_boolean_toggle, normalize_int_list
 from app.services.hierarchy_admin_service import reset_all_personnel_and_related_data
 from app.services.profile_photo_service import (
     delete_profile_photo_file as _delete_profile_photo_file,
+)
+from app.services.profile_photo_service import (
     save_profile_photo as _save_profile_photo,
 )
+from app.services.safe_user_delete_service import safe_delete_user_by_id
+
 
 def ensure_not_self_target(actor_id, target_id, entity_label="kayıt"):
     if actor_id is not None and target_id is not None and str(actor_id) == str(target_id):

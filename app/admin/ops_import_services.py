@@ -7,23 +7,31 @@ from __future__ import annotations
 from flask import current_app, flash, redirect, request, url_for
 from flask_login import current_user
 from openpyxl import load_workbook
+
 from app.extensions import db
 from app.models import User
 from app.route_support import safe_render
-from app.services.hierarchy_admin_service import normalize_text
-from app.services.auto_hierarchy_service import auto_apply_manager_chains, infer_role_from_profile
-from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
-from app.services.personnel.categories import assign_user_performance_category, normalize_personnel_category_label
-from app.services.performance_service import generate_assignments_for_active_period
 from app.services.ai import build_excel_fix_preview_ai_panel
-from app.services.personnel.import_manager_chain_sync import sync_touched_users_manager_ids_from_sicils
+from app.services.auto_hierarchy_service import auto_apply_manager_chains, infer_role_from_profile
+from app.services.hierarchy_admin_service import normalize_text
+from app.services.performance_service import generate_assignments_for_active_period
+from app.services.personnel.categories import (
+    assign_user_performance_category,
+    normalize_personnel_category_label,
+)
 from app.services.personnel.excel_import_guard import validate_personnel_import_rows_for_commit
+from app.services.personnel.import_manager_chain_sync import (
+    sync_touched_users_manager_ids_from_sicils,
+)
+from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
+
 from .ops_helpers import (
     _canonicalize_import_headers,
     _collapse_spaces,
     _has_explicit_manager_columns,
     get_default_first_login_password,
 )
+
 
 def admin_user_import_impl():
     if request.method == "POST":
