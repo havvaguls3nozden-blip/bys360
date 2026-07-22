@@ -20,7 +20,13 @@ def init_prometheus_metrics(app: Any) -> None:
         return
     try:
         from flask import Response, g, request
-        from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
+        from prometheus_client import (
+            CONTENT_TYPE_LATEST,
+            Counter,
+            Gauge,
+            Histogram,
+            generate_latest,
+        )
     except Exception as exc:  # pragma: no cover
         app.logger.warning("prometheus_client bulunamadı; metrik endpoint'i pasif: %s", exc)
         return

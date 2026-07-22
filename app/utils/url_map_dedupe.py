@@ -10,8 +10,8 @@ instead of assigning to ``_rules``.
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 _IGNORED_METHODS = {"HEAD", "OPTIONS"}
 

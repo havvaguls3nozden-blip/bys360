@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import PurePosixPath
 import fnmatch
+from pathlib import PurePosixPath
 
 AUTO_QUARANTINE_EXACT = {
     "app/portal/helpers_import_fix_snippet.py",

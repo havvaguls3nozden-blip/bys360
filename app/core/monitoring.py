@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from flask import Flask
 
-
 _OBSERVABILITY_REQUIRED_ENVS = {"production", "staging", "live", "canli", "pilot"}
 
 _PLACEHOLDER_DSN_MARKERS = (
