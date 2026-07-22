@@ -116,9 +116,7 @@ def analyze_python(path: Path, root: Path) -> FileFinding:
         elif isinstance(node, ast.ExceptHandler):
             if node.type is None:
                 finding.bare_excepts += 1
-            elif isinstance(node.type, ast.Name) and node.type.id == "Exception":
-                finding.broad_excepts += 1
-            elif isinstance(node.type, ast.Tuple) and any(
+            elif isinstance(node.type, ast.Name) and node.type.id == "Exception" or isinstance(node.type, ast.Tuple) and any(
                 isinstance(item, ast.Name) and item.id == "Exception" for item in node.type.elts
             ):
                 finding.broad_excepts += 1

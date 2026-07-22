@@ -184,7 +184,7 @@ def team_performance_comparison_history():
     selected_birim = (request.args.get("birim") or "").strip()
 
     employees = [u for u in scope_users if not selected_birim or (u.birim or "") == selected_birim]
-    employees = sorted(employees, key=lambda x: ((_display_name(x))).lower())
+    employees = sorted(employees, key=lambda x: (_display_name(x)).lower())
     birimler = sorted({(u.birim or "").strip() for u in scope_users if (u.birim or "").strip()})
 
     selected_employee = None

@@ -57,9 +57,7 @@ def _getlist(form_data: Any, key: str) -> list[str]:
 
 def _get(form_data: Any, key: str, default: str = "") -> str:
     try:
-        if hasattr(form_data, "get"):
-            value = form_data.get(key, default)
-        elif isinstance(form_data, Mapping):
+        if hasattr(form_data, "get") or isinstance(form_data, Mapping):
             value = form_data.get(key, default)
         else:
             value = getattr(form_data, key, default)

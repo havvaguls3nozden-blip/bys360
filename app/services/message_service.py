@@ -212,29 +212,7 @@ def _validate_message_attachment(file_storage, max_bytes: int = MAX_MESSAGE_FILE
 
     header = _peek_bytes(file_storage, 32)
     suspicious = False
-    if ext == ".pdf" and header and not header.startswith(b"%PDF"):
-        suspicious = True
-    elif ext in {".doc", ".xls", ".ppt"} and header and not header.startswith(b"\xd0\xcf\x11\xe0"):
-        suspicious = True
-    elif ext in {".docx", ".xlsx", ".pptx", ".zip"} and header and not header.startswith(b"PK"):
-        suspicious = True
-    elif ext == ".png" and header and not header.startswith(b"\x89PNG\r\n\x1a\n"):
-        suspicious = True
-    elif ext in {".jpg", ".jpeg"} and header and not (header.startswith(b"\xff\xd8\xff")):
-        suspicious = True
-    elif ext == ".webp" and header and not (len(header) >= 12 and header[:4] == b"RIFF" and header[8:12] == b"WEBP"):
-        suspicious = True
-    elif ext == ".gif" and header and not (header.startswith(b"GIF87a") or header.startswith(b"GIF89a")):
-        suspicious = True
-    elif ext == ".bmp" and header and not header.startswith(b"BM"):
-        suspicious = True
-    elif ext == ".7z" and header and not header.startswith(b"7z\xbc\xaf'\x1c"):
-        suspicious = True
-    elif ext in {".mp4", ".mov", ".m4v"} and header and not (len(header) >= 12 and header[4:8] == b"ftyp"):
-        suspicious = True
-    elif ext == ".webm" and header and not header.startswith(b"\x1a\x45\xdf\xa3"):
-        suspicious = True
-    elif ext == ".rar" and header and not (header.startswith(b"Rar!\x1a\x07\x00") or header.startswith(b"Rar!\x1a\x07\x01\x00")):
+    if ext == ".pdf" and header and not header.startswith(b"%PDF") or ext in {".doc", ".xls", ".ppt"} and header and not header.startswith(b"\xd0\xcf\x11\xe0") or ext in {".docx", ".xlsx", ".pptx", ".zip"} and header and not header.startswith(b"PK") or ext == ".png" and header and not header.startswith(b"\x89PNG\r\n\x1a\n") or ext in {".jpg", ".jpeg"} and header and not (header.startswith(b"\xff\xd8\xff")) or ext == ".webp" and header and not (len(header) >= 12 and header[:4] == b"RIFF" and header[8:12] == b"WEBP") or ext == ".gif" and header and not (header.startswith(b"GIF87a") or header.startswith(b"GIF89a")) or ext == ".bmp" and header and not header.startswith(b"BM") or ext == ".7z" and header and not header.startswith(b"7z\xbc\xaf'\x1c") or ext in {".mp4", ".mov", ".m4v"} and header and not (len(header) >= 12 and header[4:8] == b"ftyp") or ext == ".webm" and header and not header.startswith(b"\x1a\x45\xdf\xa3") or ext == ".rar" and header and not (header.startswith(b"Rar!\x1a\x07\x00") or header.startswith(b"Rar!\x1a\x07\x01\x00")):
         suspicious = True
 
     if suspicious:

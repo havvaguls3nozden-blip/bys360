@@ -427,7 +427,7 @@ def build_ai_prompt_compare_snapshot(
         if feedback_total > 0:
             feedback_balance = round(max((positive_feedback - negative_feedback) / feedback_total * 100, -100))
         open_recommendations = int(item.get("open_recommendations") or 0)
-        avg_latency = round((int(item.get("latency_total") or 0) / max(int(item.get("latency_count") or 0), 1))) if int(item.get("latency_count") or 0) else 0
+        avg_latency = round(int(item.get("latency_total") or 0) / max(int(item.get("latency_count") or 0), 1)) if int(item.get("latency_count") or 0) else 0
         quality_score = max(
             0,
             min(

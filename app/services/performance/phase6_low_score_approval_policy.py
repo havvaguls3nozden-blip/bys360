@@ -224,17 +224,11 @@ def build_low_score_process_steps(decision: LowScoreDecision) -> list[dict[str, 
     steps: list[dict[str, Any]] = []
     for index, title in enumerate(PROCESS_STEPS, start=1):
         state = "pending"
-        if index == 1:
-            state = "done"
-        elif index == 2 and decision.low_score:
+        if index == 1 or index == 2 and decision.low_score:
             state = "done"
         elif index == 3 and decision.approval_required:
             state = "done" if decision.approval_status != "president_pending" else "active"
-        elif index == 4 and decision.approval_status == "approved_by_president":
-            state = "done"
-        elif index == 5 and not decision.process_record_required and decision.approval_status == "approved_by_president":
-            state = "done"
-        elif index == 6 and decision.can_publish:
+        elif index == 4 and decision.approval_status == "approved_by_president" or index == 5 and not decision.process_record_required and decision.approval_status == "approved_by_president" or index == 6 and decision.can_publish:
             state = "done"
 
         steps.append(

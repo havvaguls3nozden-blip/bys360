@@ -164,9 +164,7 @@ def _analytics_payload(hr_scope: dict[str, object], scope_users: list[User], sco
         sla = _policy_payload(row) or _sla_payload(row)
         escalation_count = row.escalations.count() if hasattr(row, "escalations") else 0
         is_urgent = False
-        if sla and (sla.get("days_remaining") is not None) and sla.get("days_remaining") < 0 and status not in STATUS_CLOSED:
-            is_urgent = True
-        elif escalation_count > 0 and status not in STATUS_CLOSED:
+        if sla and (sla.get("days_remaining") is not None) and sla.get("days_remaining") < 0 and status not in STATUS_CLOSED or escalation_count > 0 and status not in STATUS_CLOSED:
             is_urgent = True
         if is_urgent:
             urgent_rows.append({

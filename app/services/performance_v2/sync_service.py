@@ -424,13 +424,7 @@ def _resolved_payloads(period, resolved_chain):
             enable_level_3 = bool(getattr(period, 'enable_level_3', False))
             enable_level_3_scoring = bool(getattr(period, 'enable_level_3_scoring', False))
             level_3_disabled = explicit_mode in {'off', 'disabled'}
-            if explicit_mode == 'scoring':
-                level_3_disabled = False
-            elif explicit_mode in {'comment_only', 'yorumcu'}:
-                level_3_disabled = False
-            elif resolved_level_mode in {'comment_only', 'yorumcu', 'scoring'}:
-                level_3_disabled = False
-            elif enable_level_3 or enable_level_3_scoring:
+            if explicit_mode == 'scoring' or explicit_mode in {'comment_only', 'yorumcu'} or resolved_level_mode in {'comment_only', 'yorumcu', 'scoring'} or enable_level_3 or enable_level_3_scoring:
                 level_3_disabled = False
             if level_3_disabled:
                 continue

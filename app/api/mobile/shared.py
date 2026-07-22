@@ -359,13 +359,7 @@ def _mobile_survey_assignments_for_user(user: User, survey_id: int | None = None
     for row in rows:
         target_type = (getattr(row, "target_type", "") or "").strip().lower()
         target_value = str(getattr(row, "target_value", "") or "").strip()
-        if target_type == "all":
-            matched.append(row)
-        elif target_type == "user" and target_value in targets["user"]:
-            matched.append(row)
-        elif target_type == "role" and target_value in targets["role"]:
-            matched.append(row)
-        elif target_type == "unit" and target_value in targets["unit"]:
+        if target_type == "all" or target_type == "user" and target_value in targets["user"] or target_type == "role" and target_value in targets["role"] or target_type == "unit" and target_value in targets["unit"]:
             matched.append(row)
     return matched
 

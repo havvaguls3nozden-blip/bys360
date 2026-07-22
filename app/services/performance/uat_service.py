@@ -18,7 +18,7 @@ def _status_bundle(report: dict[str, Any]) -> tuple[str, str, str]:
     blocker_count = int(report.get("blocker_count") or 0)
     failed_checks = int(report.get("failed_check_count") or 0)
     warning_count = int(report.get("warning_count") or 0)
-    release_score = int(((report.get("cards") or {}).get("release_score") or 0))
+    release_score = int((report.get("cards") or {}).get("release_score") or 0)
 
     if blocker_count or failed_checks:
         return (

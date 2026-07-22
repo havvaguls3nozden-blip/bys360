@@ -554,7 +554,7 @@ def build_assignment_recommendation_payload(selected_period, selected_scope: str
             "log_count": int(row.get("log_count", 0) or 0),
         })
 
-    reasons = Counter(((getattr(row, "reason", None) or "Tanımsız neden").strip() for row in visible_rows))
+    reasons = Counter((getattr(row, "reason", None) or "Tanımsız neden").strip() for row in visible_rows)
     reason_rows = sorted(reasons.items(), key=lambda item: (-int(item[1]), item[0].lower()))
 
     recommendation_rows = []

@@ -321,9 +321,7 @@ def _bys360_assistant_tabs_role_matrix_v2_before_request():
         required = ("ai_agent_knowledge", "ai_teaching_center")
     elif path.startswith("/ai-agent/teaching-center"):
         required = ("ai_agent_teaching_center",)
-    elif path.startswith("/ai-agent/panel"):
-        required = ("assistant_module", "ai_agent_panel", "assistant_center")
-    elif path.startswith("/ai-agent/api/"):
+    elif path.startswith("/ai-agent/panel") or path.startswith("/ai-agent/api/"):
         required = ("assistant_module", "ai_agent_panel", "assistant_center")
 
     if _allowed(*required):

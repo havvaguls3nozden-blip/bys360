@@ -193,7 +193,7 @@ def build_final_gate_context() -> dict[str, Any]:
 
 def print_final_gate_report() -> int:
     context = build_final_gate_context()
-    ops_logger.info(str("BYS360 Toplantı Geliştirme Faz 4 Final Gate"))
+    ops_logger.info("BYS360 Toplantı Geliştirme Faz 4 Final Gate")
     ops_logger.info(str(f"DURUM={context['status']}"))
     ops_logger.info(str(f"HATA={len(context['errors'])} UYARI={len(context['warnings'])}"))
     for item in context["errors"]:
@@ -202,5 +202,5 @@ def print_final_gate_report() -> int:
         ops_logger.info(" ".join(str(x) for x in ("UYARI |", item)))
     if context["errors"]:
         return 1
-    ops_logger.info(str("BYS360_MEETING_DEVELOPMENT_FAZ4_FINAL_GATE_OK"))
+    ops_logger.info("BYS360_MEETING_DEVELOPMENT_FAZ4_FINAL_GATE_OK")
     return 0

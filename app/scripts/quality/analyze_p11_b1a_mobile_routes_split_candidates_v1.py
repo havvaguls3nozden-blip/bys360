@@ -263,7 +263,7 @@ def main() -> int:
     project_root = Path(args.project_root).resolve()
     target = project_root / TARGET_REL
 
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_MOBILE_ROUTES_SPLIT_CANDIDATES_START"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_MOBILE_ROUTES_SPLIT_CANDIDATES_START")
     ops_logger.info(str(f"project_root={project_root}"))
     ops_logger.info(str(f"target_file={target}"))
 
@@ -397,34 +397,34 @@ def main() -> int:
     ops_logger.info(str(f"line_count={len(lines)}"))
     ops_logger.info(str(f"function_count={len(functions)}"))
     ops_logger.info(str(f"route_function_count={len(route_functions)}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_DECORATOR_SUMMARY"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_DECORATOR_SUMMARY")
     for k, v in by_decorator.most_common():
         ops_logger.info(str(f"{v:>4} | {k}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_DECISION_SUMMARY"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_DECISION_SUMMARY")
     for k, v in by_decision.most_common():
         ops_logger.info(str(f"{v:>4} | {k}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_ROUTE_RISK_SUMMARY"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_ROUTE_RISK_SUMMARY")
     for k, v in by_risk.most_common():
         ops_logger.info(str(f"{v:>4} | {k}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_FIRST_SPLIT_CANDIDATES"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_FIRST_SPLIT_CANDIDATES")
     for f in first_candidates[:args.limit]:
         route = ",".join(r["route"] for r in f["routes"])
         methods = ",".join(f["methods"]) if f["methods"] else "-"
         ops_logger.info(str(f"{f['lines']:>4} | {f['domain']} | {f['start']}-{f['end']} | {f['name']} | methods={methods} | route={route}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_LOW_RISK_CANDIDATES"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_LOW_RISK_CANDIDATES")
     for f in low_candidates[:args.limit]:
         route = ",".join(r["route"] for r in f["routes"])
         methods = ",".join(f["methods"]) if f["methods"] else "-"
         ops_logger.info(str(f"{f['lines']:>4} | {f['domain']} | {f['start']}-{f['end']} | {f['name']} | methods={methods} | route={route}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_RECOMMENDATION"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_RECOMMENDATION")
     ops_logger.info(str(f"recommended_domain={recommended_domain or '-'}"))
     if recommendation["recommended_functions"]:
         ops_logger.info(str("recommended_functions=" + ",".join(f["name"] for f in recommendation["recommended_functions"])))
     else:
-        ops_logger.info(str("recommended_functions=-"))
+        ops_logger.info("recommended_functions=-")
     ops_logger.info(str(f"split_candidates_json={json_out}"))
     ops_logger.info(str(f"split_candidates_md={md_out}"))
-    ops_logger.info(str("BYS360_QUALITY_10_10_P11_B1A_MOBILE_ROUTES_SPLIT_CANDIDATES_OK"))
+    ops_logger.info("BYS360_QUALITY_10_10_P11_B1A_MOBILE_ROUTES_SPLIT_CANDIDATES_OK")
     return 0
 
 

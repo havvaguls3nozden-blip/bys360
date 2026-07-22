@@ -136,8 +136,7 @@ def phase6_process_steps(decision: Phase6Decision) -> list[dict[str,Any]]:
     items=[]
     for idx,(key,title) in enumerate(PROCESS_STEPS,start=1):
         state="pending"
-        if key=="evaluation_completed": state="done"
-        elif key=="low_score_detected" and decision.low_score: state="done"
+        if key=="evaluation_completed" or key=="low_score_detected" and decision.low_score: state="done"
         elif key=="upper_approval" and decision.approval_required: state="active" if decision.approval_status=="president_pending" else "done"
         elif key=="approval_completed" and decision.approval_status=="approved_by_president": state="done"
         elif key=="personnel_process_record" and decision.approval_status=="approved_by_president": state="active" if decision.process_record_required else "done"

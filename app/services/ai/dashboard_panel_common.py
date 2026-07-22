@@ -88,7 +88,7 @@ def _normalize_text(value: Any) -> str:
 def _is_informational_hierarchy_reason(message: Any) -> bool:
     lowered = _normalize_text(message).lower()
     hukuk_single_manager_info = (
-        (('hukuk müşavirliği' in lowered or 'hukuk musavirligi' in lowered) and ('tek amir kuralı uygulandı' in lowered or 'tek amir kurali uygulandi' in lowered))
+        ('hukuk müşavirliği' in lowered or 'hukuk musavirligi' in lowered) and ('tek amir kuralı uygulandı' in lowered or 'tek amir kurali uygulandi' in lowered)
     )
     return hukuk_single_manager_info or any(token in lowered for token in [
         'başkan performans değerlendirme zincirine dahil edilmez',

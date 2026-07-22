@@ -73,4 +73,4 @@ def ordered_assignment_rows(query):
         ).all()
     )
     order_map = {3: 0, 2: 1, 1: 2}
-    return sorted(rows, key=lambda row: (((getattr(row.employee, 'birim', '') or '')), ((getattr(row.employee, 'ad', '') or '')), ((getattr(row.employee, 'soyad', '') or '')), order_map.get(getattr(row, 'manager_level', 99), 99), -(getattr(row, 'id', 0) or 0)))
+    return sorted(rows, key=lambda row: (((getattr(row.employee, 'birim', '') or '')), (getattr(row.employee, 'ad', '') or ''), (getattr(row.employee, 'soyad', '') or ''), order_map.get(getattr(row, 'manager_level', 99), 99), -(getattr(row, 'id', 0) or 0)))

@@ -87,7 +87,7 @@ def _support_summary() -> dict[str, int]:
                 base = base.filter(SupportTicket.status.in_(list(OPEN_TICKET_STATUSES)))
             open_total = base.count()
             if hasattr(SupportTicket, 'assigned_to_id'):
-                unassigned_total = base.filter((SupportTicket.assigned_to_id.is_(None))).count()
+                unassigned_total = base.filter(SupportTicket.assigned_to_id.is_(None)).count()
             if hasattr(SupportTicket, 'updated_at'):
                 threshold = _now().replace(microsecond=0)
                 # Savunmacı davran: updated_at tip farklarında patlamasın.

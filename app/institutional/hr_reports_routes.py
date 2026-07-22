@@ -126,7 +126,7 @@ def _reports_context() -> dict[str, Any]:
     readiness = {
         "ready": True,
         "ready_for_go_live": True,
-        "warning_count": int(bool(((health.get("coverage_summary") or {}).get("uncovered") or 0))),
+        "warning_count": int(bool((health.get("coverage_summary") or {}).get("uncovered") or 0)),
         "critical_count": 0,
         "notes": list(health.get("notes") or [])[:6],
     }

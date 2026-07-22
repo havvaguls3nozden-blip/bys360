@@ -22,9 +22,7 @@ def build_runtime_settings_snapshot(
             continue
         definition = indexed_definitions.get(key)
         value = raw_value
-        if mask_sensitive and (definition.sensitive if definition else False):
-            value = mask_sensitive_value(key, raw_value)
-        elif mask_sensitive:
+        if mask_sensitive and (definition.sensitive if definition else False) or mask_sensitive:
             value = mask_sensitive_value(key, raw_value)
         snapshot[key] = value
     return snapshot
