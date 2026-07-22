@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 
 def safe_team_compare_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:

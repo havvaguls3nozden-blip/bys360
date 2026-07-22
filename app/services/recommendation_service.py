@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.models import User
 

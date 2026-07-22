@@ -10,7 +10,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P2A_MOBILE_PYTEST_CONTRACT_GATE_V3"
 EXPECTED_ROUTE_COUNT = 24

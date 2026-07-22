@@ -18,7 +18,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 from collections.abc import Iterable
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     import app.models as models  # type: ignore

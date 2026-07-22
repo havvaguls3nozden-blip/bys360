@@ -16,7 +16,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4C_MOBILE_SECURITY_SUITE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_SECURITY_SUITE_GATE_P4C_REPORT.json")

@@ -5,7 +5,6 @@ BYS360_AI_DECISION_FAZ10_ROUTES_OK
 """
 from __future__ import annotations
 
-from typing import Any, Optional
 import logging
 logger = logging.getLogger(__name__)
 

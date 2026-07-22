@@ -4,7 +4,7 @@ KPI, hedef, yetkinlik ve öz değerlendirme özetlerini güvenli şekilde üreti
 """
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from app.services.kpi_utils import (
     calculate_completion_rate as _calculate_completion_rate_decimal,

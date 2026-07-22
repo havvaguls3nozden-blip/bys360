@@ -18,7 +18,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models import PerformancePeriod, PerformanceWeightConfig, User

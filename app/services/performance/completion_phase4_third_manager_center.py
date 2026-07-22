@@ -14,7 +14,7 @@ module_settings tablosundaki ayarları güvenli şekilde okur/seed eder.
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

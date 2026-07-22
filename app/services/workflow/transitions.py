@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db

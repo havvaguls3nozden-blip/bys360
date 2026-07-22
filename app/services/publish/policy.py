@@ -44,7 +44,7 @@ def is_evaluation_publishable(*args, **kwargs):
 from collections import Counter
 from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models import PerformanceEvaluation, PerformancePeriod

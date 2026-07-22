@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

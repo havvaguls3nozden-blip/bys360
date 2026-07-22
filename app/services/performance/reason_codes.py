@@ -8,7 +8,7 @@ Amaç:
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 TR_CHAR_MAP = str.maketrans({
     "ç": "c", "Ç": "c",

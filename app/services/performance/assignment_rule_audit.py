@@ -8,7 +8,7 @@ bozulmaz. Tamamlanmış görevlerle çakışma varsa otomatik görev üretimi du
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformancePeriod, User

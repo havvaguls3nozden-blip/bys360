@@ -14,7 +14,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any
 
 PRESIDENCY_SINGLE_MANAGER_UNITS = {
     "DANIŞMANLIK",

@@ -10,7 +10,7 @@ Faz 4 amacı:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Final
+from typing import Final
 
 AUTHORITATIVE_PERFORMANCE_RULESET_VERSION: Final[str] = "2026-04-18-chain-engine-lock-v1"
 

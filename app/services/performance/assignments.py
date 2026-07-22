@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unicodedata
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models import (

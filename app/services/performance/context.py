@@ -8,7 +8,7 @@ uretmez; mevcut davranisi koruyarak route katmanini inceltir.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Optional
+from typing import Any
 
 from app.extensions import db
 from app.models import PerformancePeriod, PerformanceWeightConfig

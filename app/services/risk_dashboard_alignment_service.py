@@ -6,7 +6,6 @@ from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict
 
 SPECIAL_INFO_PATTERNS = (
     "hukuk müşavirliği zinciri düzeltildi",

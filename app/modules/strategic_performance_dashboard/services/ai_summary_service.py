@@ -1,7 +1,7 @@
 """BYS360 SP-1B AI Özet Servisi."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 def build_ai_safe_summary(dashboard_summary: dict[str, Any]) -> list[str]:

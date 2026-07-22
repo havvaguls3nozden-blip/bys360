@@ -13,7 +13,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 def _safe_str(value: Any) -> str:

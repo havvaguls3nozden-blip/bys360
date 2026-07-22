@@ -16,7 +16,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
 ]
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     from flask import current_app

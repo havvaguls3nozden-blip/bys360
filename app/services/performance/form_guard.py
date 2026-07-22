@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from .policy_flags import is_level_2_comment_required_when_level_1_score_is_three
 

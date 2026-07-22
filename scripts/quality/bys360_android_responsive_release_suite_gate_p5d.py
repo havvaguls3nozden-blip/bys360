@@ -15,7 +15,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from collections.abc import Sequence
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P5D_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE"
