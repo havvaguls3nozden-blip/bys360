@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_OPTIONAL
 # STATUS_SOURCE: app.communication.route_manifest OPTIONAL_ROUTE_MODULES
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -16,7 +17,7 @@ from app.services.communication_phase8_service import (
     record_phase8_checkpoint,
     record_phase8_note,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

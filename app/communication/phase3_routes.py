@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -11,8 +12,8 @@ from app.models import Notification
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
 from app.services.communication_phase3_service import (
-    CommunicationPhase3Error,
     SUPPORT_STATUS_LABELS,
+    CommunicationPhase3Error,
     add_support_message,
     assign_support_ticket,
     create_survey_reminders,
@@ -24,12 +25,12 @@ from app.services.communication_phase3_service import (
     notification_center_snapshot,
     phase3_dashboard_snapshot,
     save_or_submit_survey,
-    survey_center_for_user,
     support_detail_payload,
     support_queue_snapshot,
+    survey_center_for_user,
     update_support_status,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

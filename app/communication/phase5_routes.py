@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -26,7 +27,7 @@ from app.services.communication_phase5_service import (
     support_operations_snapshot,
     update_notification_preferences,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

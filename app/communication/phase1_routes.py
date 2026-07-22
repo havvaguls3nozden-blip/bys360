@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -11,13 +12,6 @@ from app.extensions import db
 from app.models.communication_phase1_models import CommunicationBulletin
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
-from app.services.communication_service import (
-    CommunicationServiceError,
-    acknowledge_bulletin_receipt,
-    bulletin_receipt_summary,
-    get_bulletin_receipt,
-    mark_bulletin_read,
-)
 from app.services.communication_phase1_service import (
     BULLETIN_PRIORITY_LABELS,
     BULLETIN_STATUS_LABELS,
@@ -31,7 +25,14 @@ from app.services.communication_phase1_service import (
     support_center_snapshot,
     survey_center_snapshot,
 )
-import logging
+from app.services.communication_service import (
+    CommunicationServiceError,
+    acknowledge_bulletin_receipt,
+    bulletin_receipt_summary,
+    get_bulletin_receipt,
+    mark_bulletin_read,
+)
+
 logger = logging.getLogger(__name__)
 
 

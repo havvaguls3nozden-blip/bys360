@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
+
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -33,11 +34,11 @@ from app.services.communication_phase2_service import (
     survey_detail_payload,
     survey_manager_snapshot,
     survey_results_snapshot,
-    upsert_survey_template,
     update_bulletin,
     update_survey_from_builder,
+    upsert_survey_template,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

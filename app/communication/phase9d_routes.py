@@ -3,8 +3,8 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_OPTIONAL
 # STATUS_SOURCE: app.communication.route_manifest OPTIONAL_ROUTE_MODULES
-
 import json
+import logging
 from io import BytesIO
 
 from flask import Response, flash, redirect, request, send_file, url_for
@@ -20,7 +20,7 @@ from app.services.communication_phase9d_service import (
     record_phase9d_hotfix,
     record_phase9d_signal,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 
