@@ -124,6 +124,23 @@ class PerformanceProcessNotification(db.Model):
     read_at = db.Column(db.DateTime, nullable=True)
     rule_version = db.Column(db.String(120), nullable=False, default="phase2_process_engine_v1")
 
+    # Faz 5 uyum sutunlari: eskiden calisma zamaninda ALTER TABLE ile eklenirdi,
+    # artik Alembic tarafindan sahiplenilir (bkz. migrations/versions/f5e19f9107d7_*.py).
+    recipient_user_id = db.Column(db.Integer, nullable=True)
+    recipient_name = db.Column(db.String(255), nullable=True)
+    notification_status = db.Column(db.String(80), nullable=True, default="bekliyor")
+    priority = db.Column(db.String(40), nullable=True, default="normal")
+    action_url = db.Column(db.String(500), nullable=True)
+    source_table = db.Column(db.String(120), nullable=True)
+    source_id = db.Column(db.Integer, nullable=True)
+    flow_status_snapshot = db.Column(db.String(120), nullable=True)
+    actor_user_id = db.Column(db.Integer, nullable=True)
+    sent_at = db.Column(db.DateTime, nullable=True)
+    process_version = db.Column(db.String(120), nullable=True)
+    app_notification_id = db.Column(db.Integer, nullable=True)
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class PerformanceFeedbackPipelineFlow(db.Model):
     """Geri bildirim görüşme hattının P0 -> Final ana süreç kaydı."""
 

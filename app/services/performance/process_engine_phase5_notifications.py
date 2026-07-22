@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.security.sql_identifiers import quote_sql_identifier, validate_sql_identifier
@@ -130,68 +130,126 @@ def _table_columns(table_name: str) -> set[str]:
     }
 
 
-def _add_column(table_name: str, column_name: str, ddl_type: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column_name} {ddl_type}"))
+class Phase5SchemaNotReadyError(RuntimeError):
+    """Raised when the Alembic-owned Faz 5 process-engine schema is not ready."""
 
 
-def _create_index(index_name: str, ddl: str) -> None:
-    db.session.execute(text(f"CREATE INDEX IF NOT EXISTS {index_name} {ddl}"))
+_PHASE5_REQUIRED_SCHEMA = {
+    "performance_process_flows": frozenset(
+        {
+            "id",
+            "evaluation_id",
+            "period_id",
+            "employee_id",
+            "current_owner_id",
+            "current_owner_label",
+            "current_step_key",
+            "current_status",
+            "final_score",
+            "is_low_score",
+            "president_approval_required",
+            "president_approval_status",
+            "is_finalized",
+            "started_at",
+            "last_action_at",
+            "completed_at",
+            "rule_version",
+            "created_at",
+            "updated_at",
+        }
+    ),
+    "performance_process_flow_steps": frozenset(
+        {
+            "id",
+            "flow_id",
+            "evaluation_id",
+            "step_order",
+            "step_key",
+            "step_title",
+            "step_status",
+            "actor_id",
+            "actor_label",
+            "owner_id",
+            "owner_label",
+            "action_summary",
+            "action_note",
+            "score_snapshot",
+            "occurred_at",
+            "created_at",
+            "rule_version",
+        }
+    ),
+    "performance_process_notifications": frozenset(
+        {
+            "id",
+            "flow_id",
+            "evaluation_id",
+            "recipient_id",
+            "notification_type",
+            "title",
+            "body",
+            "target_url",
+            "delivery_status",
+            "source_event_key",
+            "created_at",
+            "read_at",
+            "rule_version",
+            "recipient_user_id",
+            "recipient_name",
+            "notification_status",
+            "priority",
+            "action_url",
+            "source_table",
+            "source_id",
+            "flow_status_snapshot",
+            "actor_user_id",
+            "sent_at",
+            "process_version",
+            "app_notification_id",
+            "updated_at",
+        }
+    ),
+}
+_PHASE5_SCHEMA_REVISION = "f5e19f9107d7"
+
+
+def _phase5_schema_gaps(schema_inspector) -> dict[str, tuple[str, ...]]:
+    existing_tables = set(schema_inspector.get_table_names())
+    gaps: dict[str, tuple[str, ...]] = {}
+    for table_name, required_columns in _PHASE5_REQUIRED_SCHEMA.items():
+        if table_name not in existing_tables:
+            gaps[table_name] = ("<tablo eksik>",)
+            continue
+        existing_columns = {
+            column["name"]
+            for column in schema_inspector.get_columns(table_name)
+        }
+        missing_columns = tuple(sorted(required_columns - existing_columns))
+        if missing_columns:
+            gaps[table_name] = missing_columns
+    return gaps
+
+
+def assert_phase5_schema_ready() -> None:
+    """Validate the Alembic-owned Faz 5 process-engine schema without changing it."""
+    gaps = _phase5_schema_gaps(inspect(db.engine))
+    if not gaps:
+        return
+
+    details = "; ".join(
+        f"{table_name}: {', '.join(missing_items)}"
+        for table_name, missing_items in sorted(gaps.items())
+    )
+    raise Phase5SchemaNotReadyError(
+        "Faz 5 süreç bildirimleri veritabanı şeması hazır değil. "
+        f"Alembic migrationlarını en az {_PHASE5_SCHEMA_REVISION} revisionına kadar "
+        f"uygulayın. Eksikler: {details}"
+    )
 
 
 def apply_phase5_schema() -> None:
-    required_tables = [
-        "performance_process_flows",
-        "performance_process_flow_steps",
-        "performance_process_notifications",
-    ]
-    missing = [name for name in required_tables if not table_exists(name)]
-    if missing:
-        raise RuntimeError("Faz 5 icin once Faz 2-4 altyapisi gerekli: " + ", ".join(missing))
-
-    notification_columns = {
-        "recipient_user_id": "INTEGER",
-        "recipient_name": "VARCHAR(255)",
-        "notification_status": "VARCHAR(80) DEFAULT 'bekliyor'",
-        "priority": "VARCHAR(40) DEFAULT 'normal'",
-        "action_url": "VARCHAR(500)",
-        "source_table": "VARCHAR(120)",
-        "source_id": "INTEGER",
-        "flow_status_snapshot": "VARCHAR(120)",
-        "actor_user_id": "INTEGER",
-        "sent_at": "TIMESTAMP",
-        "process_version": "VARCHAR(120)",
-        "app_notification_id": "INTEGER",
-        "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-    }
-    for column_name, ddl_type in notification_columns.items():
-        _add_column("performance_process_notifications", column_name, ddl_type)
-
-    db.session.execute(
-        text(
-            """
-            UPDATE performance_process_notifications
-               SET recipient_user_id = COALESCE(recipient_user_id, recipient_id),
-                   notification_status = COALESCE(notification_status, delivery_status, 'bekliyor'),
-                   process_version = COALESCE(process_version, rule_version, :version),
-                   updated_at = COALESCE(updated_at, CURRENT_TIMESTAMP)
-            """
-        ),
-        {"version": PHASE5_VERSION},
-    )
-
-    _create_index(
-        "ix_perf_proc_notif_recipient_status_phase5",
-        "ON performance_process_notifications(recipient_user_id, notification_status)",
-    )
-    _create_index(
-        "ix_perf_proc_notif_source_phase5",
-        "ON performance_process_notifications(source_table, source_id)",
-    )
-    _create_index(
-        "ix_perf_proc_notif_flow_type_phase5",
-        "ON performance_process_notifications(flow_id, notification_type)",
-    )
-    db.session.commit()
+    """Backward-compatible, read-only Faz 5 schema readiness guard."""
+    assert_phase5_schema_ready()
 
 
 def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int | None:
