@@ -5,12 +5,14 @@ from flask_login import current_user
 
 from app.route_support import safe_render
 from app.services.home_dashboard_service import build_home_page_context
-# BYS360_CORPORATE_PORTAL_V1_HOME_IMPORT
-from app.services.portal_service import portal_home_context
+from app.services.kunye_settings_service import build_kunye_context
+
 # BYS360 V4: Basında Tarihi Alan ana sayfa hero context'i kaldırıldı; modül kendi sayfasında kalır.
 from app.services.portal_experience_service import portal_experience_context
 from app.services.portal_experience_v2_service import portal_experience_v2_context
-from app.services.kunye_settings_service import build_kunye_context
+
+# BYS360_CORPORATE_PORTAL_V1_HOME_IMPORT
+from app.services.portal_service import portal_home_context
 
 
 def index():

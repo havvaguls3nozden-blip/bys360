@@ -1,24 +1,29 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-from datetime import datetime
 import io
 import json
+import logging
 import re
+from datetime import datetime
 
 from flask import flash, redirect, request, send_file, url_for
 from flask_login import current_user
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
+from app.main_handlers.constants import SECURITY_QUESTION_CHOICES
 from app.menu_registry import (
     flatten_menu_definitions as flatten_settings_menu_definitions,
+)
+from app.menu_registry import (
     get_grouped_menu_definitions,
 )
-from app.main_handlers.constants import SECURITY_QUESTION_CHOICES
 from app.models import SystemSetting, User, UserMenuPermission
 from app.route_support import safe_render
 from app.services.profile_photo_service import (
     delete_profile_photo_file as _delete_profile_photo_file,
+)
+from app.services.profile_photo_service import (
     save_profile_photo as _save_profile_photo,
 )
 from app.services.settings_service import (
@@ -30,15 +35,15 @@ from app.services.settings_service import (
     ensure_settings_phase1_seeded,
     get_role_default_menu_keys,
     get_unit_profile_menu_keys,
+    rollback_settings_change,
     save_module_settings_from_form,
     save_role_menu_defaults,
     save_system_settings_from_form,
     save_unit_menu_profile,
     save_user_menu_overrides,
-    rollback_settings_change,
 )
 from app.view_helpers import enforce_first_login_security_flow_redirect
-import logging
+
 logger = logging.getLogger(__name__)
 
 

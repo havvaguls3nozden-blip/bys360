@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 from app.main_handlers.account_communication_helpers import (
-    utc_now,
+    SECURITY_QUESTION_CHOICES,
+    _delete_profile_photo_file,
+    _save_profile_photo,
+    current_user,
+    db,
+    enforce_first_login_security_flow,
     flash,
     redirect,
     request,
-    url_for,
-    current_user,
-    db,
-    SECURITY_QUESTION_CHOICES,
     safe_render,
-    _delete_profile_photo_file,
-    _save_profile_photo,
-    enforce_first_login_security_flow,
+    url_for,
+    utc_now,
 )
 from app.main_handlers.account_settings_helpers import account, settings_page  # noqa: F401
 

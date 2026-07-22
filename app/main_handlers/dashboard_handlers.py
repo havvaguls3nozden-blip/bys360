@@ -4,11 +4,14 @@ from flask import current_app, render_template, request
 from flask_login import current_user
 
 from app.route_support import safe_render
-from app.view_helpers import build_dashboard_context, build_db_check_context
-from app.services.runtime_cache import get_or_set as cache_get_or_set
-from app.services.ai.dashboard_panels import build_dashboard_ai_operations_bridge, build_dashboard_ai_panel
-from app.services.live_surface_service import build_live_dashboard_surface_context
+from app.services.ai.dashboard_panels import (
+    build_dashboard_ai_operations_bridge,
+    build_dashboard_ai_panel,
+)
 from app.services.dashboard_rebuild_service import build_dashboard_rebuild_context
+from app.services.live_surface_service import build_live_dashboard_surface_context
+from app.services.runtime_cache import get_or_set as cache_get_or_set
+from app.view_helpers import build_dashboard_context, build_db_check_context
 
 BYS360_DASHBOARD_REBUILD_HANDLER_OK = True
 
