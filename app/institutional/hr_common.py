@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
+
 """BYS360 canlı çekirdek kurumsal/personel route düzeltmeleri.
 
 Bu dosyanın amacı geçici shim yönlendirmelerini kaldırıp canlıda kalacak
@@ -12,13 +13,13 @@ bilinçli olarak yüklenmez. Dosya savunmacıdır: eksik tablo veya eksik opsiyo
 alt route modülü uygulamayı düşürmez, güvenli ve boş veriyle çalışan ekran açar.
 """
 
+import csv
+import io
+from collections.abc import Iterable
 from datetime import date, datetime, timedelta
 from importlib import import_module
 from types import SimpleNamespace
 from typing import Any
-from collections.abc import Iterable
-import csv
-import io
 
 from flask import Response, current_app, flash, jsonify, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -78,7 +79,10 @@ except Exception:  # pragma: no cover
     leave_module_ready = None
 
 try:
-    from app.services.ai.dashboard_panels import build_hr_attendance_ai_panel, build_hr_leave_ai_panel
+    from app.services.ai.dashboard_panels import (
+        build_hr_attendance_ai_panel,
+        build_hr_leave_ai_panel,
+    )
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/institutional/hr_common.py:81")
     build_hr_attendance_ai_panel = None

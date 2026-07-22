@@ -29,6 +29,7 @@ from app.institutional.hr_common import (
     utc_now,
 )
 
+
 def _create_delegation_from_form(*, delegator_user_id: int, start_date: date, end_date: date, source_leave_id: int | None = None, source_attendance_id: int | None = None) -> bool:
     delegate_user_id = _safe_int(request.form.get("delegate_user_id"))
     if not delegate_user_id:
