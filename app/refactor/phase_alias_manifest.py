@@ -7,7 +7,6 @@ beklenen dosya ailelerini doğrulamak için kullanılır.
 """
 from __future__ import annotations
 
-
 RENAME_POLICY = "alias-first"
 RUNTIME_RENAME_ALLOWED = False
 PHASE_ALIAS_VERSION = "2026-04-21-core-refactor-faz8-lazy-alias-wrappers"
