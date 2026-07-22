@@ -29,6 +29,7 @@ def _build_about_modal_context() -> dict[str, Any]:
 
     try:
         from sqlalchemy import inspect
+
         from app.extensions import db
         from app.models import SystemSetting
 
@@ -118,22 +119,23 @@ def register_template_safety(app: Flask) -> None:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/template_safety.py:118")
             return 0
 
-    from app.services.performance.phase5_4_status_language import phase5_4_register_filters  # BYS360_PHASE5_4_STATUS_LANGUAGE_FILTERS
-
     from app.services.ai.localization import (
         ai_feature_label,
         ai_feedback_label,
         ai_module_label,
+        ai_plain_label,
         ai_provider_mode_label,
         ai_recommendation_label,
-        ai_risk_label,
         ai_redaction_type_label,
+        ai_risk_label,
         ai_severity_label,
         ai_source_label,
         ai_status_label,
         ai_target_label,
         ai_tone_label,
-        ai_plain_label,
+    )
+    from app.services.performance.phase5_4_status_language import (
+        phase5_4_register_filters,  # BYS360_PHASE5_4_STATUS_LANGUAGE_FILTERS
     )
 
     app.jinja_env.filters.setdefault("or_dash", or_dash)

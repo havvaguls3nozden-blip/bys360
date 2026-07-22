@@ -2,9 +2,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import Flask, current_app, flash, g, jsonify, redirect, render_template, request, session, url_for
-from flask_wtf.csrf import CSRFError
+from flask import (
+    Flask,
+    current_app,
+    flash,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, logout_user
+from flask_wtf.csrf import CSRFError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, MethodNotAllowed, RequestEntityTooLarge
 
