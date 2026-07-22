@@ -68,7 +68,7 @@ def build_admin_user_form_context(*, exclude_user_id: int | None = None) -> dict
         .all()
     ]
 
-    manager_query = User.query.filter(User.is_active == True, User.role != "admin")
+    manager_query = User.query.filter(User.is_active.is_(True), User.role != "admin")
     if exclude_user_id:
         manager_query = manager_query.filter(User.id != exclude_user_id)
 

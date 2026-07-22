@@ -172,7 +172,7 @@ def get_role_choices() -> list[tuple[str, str]]:
 
 
 def build_personnel_form_context(*, exclude_user_id: int | None = None) -> dict[str, Any]:
-    manager_query = User.query.filter(User.role != "admin", User.is_active == True)
+    manager_query = User.query.filter(User.role != "admin", User.is_active.is_(True))
     if exclude_user_id:
         manager_query = manager_query.filter(User.id != exclude_user_id)
 
@@ -184,7 +184,7 @@ def build_personnel_form_context(*, exclude_user_id: int | None = None) -> dict[
 
     units = (
         OrganizationUnit.query
-        .filter(OrganizationUnit.is_active == True)
+        .filter(OrganizationUnit.is_active.is_(True))
         .order_by(OrganizationUnit.sort_order.asc(), OrganizationUnit.name.asc(), OrganizationUnit.id.asc())
         .all()
     )

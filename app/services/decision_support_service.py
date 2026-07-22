@@ -41,7 +41,7 @@ def _age_bucket(assigned_at):
 
 def _build_dashboard_hierarchy_summary() -> dict[str, object]:
     rows = build_hierarchy_health_rows(
-        User.query.filter(User.role != 'admin', User.is_active == True).all()
+        User.query.filter(User.role != 'admin', User.is_active.is_(True)).all()
     )
     return summarize_hierarchy_health(rows)
 
@@ -68,7 +68,7 @@ def build_dashboard_signal_context(user) -> dict[str, object]:
     ).count()
     unpublished_count = PerformanceEvaluation.query.filter(
         PerformanceEvaluation.status == 'tamamlandi',
-        PerformanceEvaluation.is_published_to_employee == False,
+        PerformanceEvaluation.is_published_to_employee.is_(False),
     ).count()
     active_period = PerformancePeriod.query.filter_by(is_active=True).order_by(PerformancePeriod.id.desc()).first()
 

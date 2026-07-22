@@ -279,7 +279,7 @@ def build_performance_task_health_report(period, scope_user_ids: Iterable[int] |
     scope_user_ids = {int(value) for value in (scope_user_ids or []) if value}
     scoped = bool(scope_user_ids)
 
-    user_query = User.query.filter(User.role != "admin", User.is_active == True)
+    user_query = User.query.filter(User.role != "admin", User.is_active.is_(True))
     if scoped:
         user_query = user_query.filter(User.id.in_(list(scope_user_ids)))
     scoped_users = user_query.order_by(User.ad.asc(), User.soyad.asc()).all()

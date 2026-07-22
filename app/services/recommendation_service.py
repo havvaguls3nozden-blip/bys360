@@ -24,7 +24,7 @@ def suggest_manager_candidates_for_user(user: User | None, manager_candidates: I
     if manager_candidates is None:
         manager_candidates = (
             User.query
-            .filter(User.role != "admin", User.is_active == True, User.id != user.id)
+            .filter(User.role != "admin", User.is_active.is_(True), User.id != user.id)
             .order_by(User.ad.asc(), User.soyad.asc())
             .all()
         )

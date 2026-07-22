@@ -16,10 +16,10 @@ def _build_publish_stats(scoped_query):
     return {
         "total": scoped_query.count(),
         "completed": scoped_query.filter(PerformanceEvaluation.status == "tamamlandi").count(),
-        "published": scoped_query.filter(PerformanceEvaluation.is_published_to_employee == True).count(),
+        "published": scoped_query.filter(PerformanceEvaluation.is_published_to_employee.is_(True)).count(),
         "unpublished": scoped_query.filter(
             or_(
-                PerformanceEvaluation.is_published_to_employee == False,
+                PerformanceEvaluation.is_published_to_employee.is_(False),
                 PerformanceEvaluation.is_published_to_employee.is_(None),
             )
         ).count(),

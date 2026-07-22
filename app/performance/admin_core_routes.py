@@ -562,7 +562,7 @@ def performance_period_toggle_active(period_id):
         if target_state:
             (
                 PerformancePeriod.query
-                .filter(PerformancePeriod.is_active == True, PerformancePeriod.id != period.id)
+                .filter(PerformancePeriod.is_active.is_(True), PerformancePeriod.id != period.id)
                 .update({PerformancePeriod.is_active: False}, synchronize_session=False)
             )
             db.session.flush()

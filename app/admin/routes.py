@@ -143,7 +143,7 @@ def admin_dashboard():
     user_count = User.query.filter(User.role != "admin").count()
     active_user_count = User.query.filter(
         User.role != "admin",
-        User.is_active == True,
+        User.is_active.is_(True),
     ).count()
     unit_count = OrganizationUnit.query.count()
     active_period = dashboard_context.get("active_period")
@@ -226,9 +226,9 @@ def admin_users():
             )
         )
     if status == "active":
-        query = query.filter(User.is_active == True)
+        query = query.filter(User.is_active.is_(True))
     elif status == "passive":
-        query = query.filter(User.is_active == False)
+        query = query.filter(User.is_active.is_(False))
 
     users = query.order_by(
         User.ust_birim.asc(),
@@ -243,7 +243,7 @@ def admin_users():
 
     manager_candidates = (
         User.query
-        .filter(User.role != "admin", User.is_active == True)
+        .filter(User.role != "admin", User.is_active.is_(True))
         .order_by(User.ad.asc(), User.soyad.asc())
         .all()
     )
@@ -266,8 +266,8 @@ def admin_users():
         grouped_by_manager[key].append(user)
 
     total_count = User.query.filter(User.role != "admin").count()
-    active_count = User.query.filter(User.role != "admin", User.is_active == True).count()
-    passive_count = User.query.filter(User.role != "admin", User.is_active == False).count()
+    active_count = User.query.filter(User.role != "admin", User.is_active.is_(True)).count()
+    passive_count = User.query.filter(User.role != "admin", User.is_active.is_(False)).count()
 
     return safe_render(
         "admin_users.html",
@@ -303,7 +303,7 @@ def admin_user_create():
 
     manager_candidates = (
         User.query
-        .filter(User.is_active == True, User.role != "admin")
+        .filter(User.is_active.is_(True), User.role != "admin")
         .order_by(User.ust_birim.asc(), User.birim.asc(), User.ad.asc(), User.soyad.asc())
         .all()
     )
@@ -503,7 +503,7 @@ def admin_user_edit(user_id):
 
     manager_candidates = (
         User.query
-        .filter(User.is_active == True, User.role != "admin", User.id != user.id)
+        .filter(User.is_active.is_(True), User.role != "admin", User.id != user.id)
         .order_by(User.ust_birim.asc(), User.birim.asc(), User.ad.asc(), User.soyad.asc())
         .all()
     )

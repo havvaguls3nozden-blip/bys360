@@ -240,7 +240,7 @@ def get_base_weight_map(period_id: int | None = None) -> dict[str, float]:
 
 def fetch_active_non_admin_users(include_president: bool = True) -> list[User]:
     users = (
-        User.query.filter(User.is_active == True)
+        User.query.filter(User.is_active.is_(True))
         .order_by(User.ust_birim.asc(), User.birim.asc(), User.ad.asc(), User.soyad.asc())
         .all()
     )
