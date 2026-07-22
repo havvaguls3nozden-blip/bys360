@@ -43,94 +43,37 @@ STATUS_LABELS = {
     "published": "Yayınlandı",
 }
 
-_PHASE14B_CREATE_TABLE_SQLITE = text("""
-    CREATE TABLE IF NOT EXISTS performance_personnel_support_publish_approvals (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        evaluation_id INTEGER NOT NULL,
-        period_id INTEGER,
-        employee_id INTEGER,
-        final_score NUMERIC(6, 2),
-        status VARCHAR(50) NOT NULL DEFAULT 'pending',
-        requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        requested_by_user_id INTEGER,
-        decided_at TIMESTAMP,
-        decided_by_user_id INTEGER,
-        decision_note TEXT,
-        return_note TEXT,
-        rule_version VARCHAR(120) NOT NULL DEFAULT
-            'phase1.4b-personnel-support-publish-approval-v1',
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-_PHASE14B_CREATE_TABLE_POSTGRESQL = text("""
-    CREATE TABLE IF NOT EXISTS performance_personnel_support_publish_approvals (
-        id SERIAL PRIMARY KEY,
-        evaluation_id INTEGER NOT NULL,
-        period_id INTEGER,
-        employee_id INTEGER,
-        final_score NUMERIC(6, 2),
-        status VARCHAR(50) NOT NULL DEFAULT 'pending',
-        requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        requested_by_user_id INTEGER,
-        decided_at TIMESTAMP,
-        decided_by_user_id INTEGER,
-        decision_note TEXT,
-        return_note TEXT,
-        rule_version VARCHAR(120) NOT NULL DEFAULT
-            'phase1.4b-personnel-support-publish-approval-v1',
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-""")
-_PHASE14B_POSTGRESQL_ALTER_STATEMENTS = (
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS final_score NUMERIC(6, 2)"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS requested_by_user_id INTEGER"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS decided_by_user_id INTEGER"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS decision_note TEXT"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS return_note TEXT"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS rule_version VARCHAR(120)"
-    ),
-    text(
-        "ALTER TABLE performance_personnel_support_publish_approvals "
-        "ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP"
-    ),
+PHASE1_4B_SCHEMA_REVISION = "7c4e1a9b2d60"
+_PHASE14B_REQUIRED_COLUMNS = frozenset(
+    {
+        "id",
+        "evaluation_id",
+        "period_id",
+        "employee_id",
+        "final_score",
+        "status",
+        "requested_at",
+        "requested_by_user_id",
+        "decided_at",
+        "decided_by_user_id",
+        "decision_note",
+        "return_note",
+        "rule_version",
+        "created_at",
+        "updated_at",
+    }
 )
-_PHASE14B_INDEX_STATEMENTS = (
-    text(
-        "CREATE UNIQUE INDEX IF NOT EXISTS ux_phase14b_publish_approval_eval "
-        "ON performance_personnel_support_publish_approvals(evaluation_id)"
-    ),
-    text(
-        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_status "
-        "ON performance_personnel_support_publish_approvals(status)"
-    ),
-    text(
-        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_period_status "
-        "ON performance_personnel_support_publish_approvals(period_id, status)"
-    ),
-    text(
-        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_employee "
-        "ON performance_personnel_support_publish_approvals(employee_id)"
-    ),
+_PHASE14B_REQUIRED_INDEXES = frozenset(
+    {
+        "ix_phase14b_publish_approval_status",
+        "ix_phase14b_publish_approval_period_status",
+        "ix_phase14b_publish_approval_employee",
+    }
 )
+
+
+class PersonnelSupportPublishSchemaNotReadyError(RuntimeError):
+    """Raised when the Phase 1.4B schema migration has not been applied."""
 
 
 @dataclass(frozen=True)
@@ -193,28 +136,57 @@ def table_exists(table_name: str = APPROVAL_TABLE) -> bool:
         return False
 
 
+def _phase1_4b_schema_gaps() -> list[str]:
+    inspector = inspect(db.engine)
+    table_names = set(inspector.get_table_names())
+    if APPROVAL_TABLE not in table_names:
+        return [f"{APPROVAL_TABLE}: <tablo eksik>"]
+
+    columns = {
+        column["name"]
+        for column in inspector.get_columns(APPROVAL_TABLE)
+    }
+    indexes = {
+        index["name"]
+        for index in inspector.get_indexes(APPROVAL_TABLE)
+        if index.get("name")
+    }
+
+    gaps: list[str] = []
+    missing_columns = sorted(_PHASE14B_REQUIRED_COLUMNS - columns)
+    if missing_columns:
+        gaps.append(f"{APPROVAL_TABLE}: {', '.join(missing_columns)}")
+
+    missing_indexes = sorted(_PHASE14B_REQUIRED_INDEXES - indexes)
+    if missing_indexes:
+        gaps.append(
+            f"{APPROVAL_TABLE} indeksleri: {', '.join(missing_indexes)}"
+        )
+    return gaps
+
+
+def assert_phase1_4b_schema_ready() -> None:
+    """Validate the Alembic-owned schema without mutating the database."""
+    try:
+        gaps = _phase1_4b_schema_gaps()
+    except Exception as exc:
+        raise PersonnelSupportPublishSchemaNotReadyError(
+            "Personel/Destek yayın ön onayı şeması doğrulanamadı. "
+            f"Alembic revision {PHASE1_4B_SCHEMA_REVISION} uygulanmalıdır."
+        ) from exc
+
+    if gaps:
+        details = "; ".join(gaps)
+        raise PersonnelSupportPublishSchemaNotReadyError(
+            "Personel/Destek yayın ön onayı şeması hazır değil. "
+            f"Alembic revision {PHASE1_4B_SCHEMA_REVISION} uygulanmalıdır. "
+            f"Eksikler: {details}"
+        )
+
+
 def apply_phase1_4b_schema() -> None:
-    """Ön onay tablosunu idempotent olarak oluşturur.
-
-    PostgreSQL odaklıdır; SQLite test ortamında da güvenli çalışacak sade tipler
-    kullanır. Mevcut tablo varsa yalnızca eksik indeksleri garanti eder.
-    """
-    dialect = getattr(db.engine.dialect, "name", "")
-    create_table_statement = (
-        _PHASE14B_CREATE_TABLE_SQLITE
-        if dialect == "sqlite"
-        else _PHASE14B_CREATE_TABLE_POSTGRESQL
-    )
-    db.session.execute(create_table_statement)
-
-    # ALTER tarafı eski ara kurulumlara tolerans sağlar.
-    for statement in _PHASE14B_POSTGRESQL_ALTER_STATEMENTS:
-        if dialect != "sqlite":
-            db.session.execute(statement)
-
-    for statement in _PHASE14B_INDEX_STATEMENTS:
-        db.session.execute(statement)
-    db.session.commit()
+    """Compatibility entry point; validate schema readiness without writes."""
+    assert_phase1_4b_schema_ready()
 
 
 def is_admin_user(user: Any) -> bool:
@@ -534,8 +506,11 @@ __all__ = [
     "APPROVAL_RETURNED",
     "APPROVAL_TABLE",
     "PHASE1_4B_RULE_VERSION",
+    "PHASE1_4B_SCHEMA_REVISION",
+    "PersonnelSupportPublishSchemaNotReadyError",
     "Phase14BActionResult",
     "apply_phase1_4b_schema",
+    "assert_phase1_4b_schema_ready",
     "build_personnel_support_publish_approval_workspace",
     "can_decide_personnel_support_publish_approval",
     "can_view_personnel_support_publish_approvals",
