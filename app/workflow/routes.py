@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.route_registry import main_bp
@@ -120,7 +120,6 @@ def _full_name_expr(alias="u"):
 
 
 def _first_president_user_id():
-    ensure_tables()
     return db.session.execute(text("""
         SELECT id
         FROM users
@@ -130,115 +129,146 @@ def _first_president_user_id():
         LIMIT 1
     """)).scalar()
 
-def ensure_tables():
-    """Faz 3: iş akış omurgası + gecikme/süre/bildirim kuyruğu tabloları."""
-    sql = [
-        """CREATE TABLE IF NOT EXISTS workflow_instances(
-            id SERIAL PRIMARY KEY,
-            module VARCHAR(80) NOT NULL,
-            entity_type VARCHAR(120),
-            entity_id INTEGER,
-            title VARCHAR(255) NOT NULL,
-            subject_user_id INTEGER,
-            period_id INTEGER,
-            score NUMERIC(8,2),
-            status VARCHAR(40) NOT NULL DEFAULT 'ACTIVE',
-            current_step_name VARCHAR(255),
-            priority VARCHAR(30) NOT NULL DEFAULT 'NORMAL',
-            workflow_family VARCHAR(80) DEFAULT 'GENERAL',
-            delayed_step_count INTEGER NOT NULL DEFAULT 0,
-            created_by_id INTEGER,
-            created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            completed_at TIMESTAMP WITHOUT TIME ZONE,
-            payload_json JSONB
-        )""",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_instances_module_status ON workflow_instances(module,status)",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_instances_subject_period ON workflow_instances(subject_user_id,period_id)",
-        """CREATE TABLE IF NOT EXISTS workflow_steps(
-            id SERIAL PRIMARY KEY,
-            workflow_id INTEGER NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
-            step_order INTEGER NOT NULL,
-            step_code VARCHAR(80),
-            step_type VARCHAR(40),
-            step_name VARCHAR(255) NOT NULL,
-            assigned_user_id INTEGER,
-            visible_to_user_id INTEGER,
-            status VARCHAR(40) NOT NULL DEFAULT 'PENDING',
-            is_active BOOLEAN NOT NULL DEFAULT TRUE,
-            is_required BOOLEAN NOT NULL DEFAULT TRUE,
-            started_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            completed_at TIMESTAMP WITHOUT TIME ZONE,
-            due_at TIMESTAMP WITHOUT TIME ZONE,
-            duration_minutes INTEGER,
-            delay_state VARCHAR(30) NOT NULL DEFAULT 'NORMAL',
-            delay_days NUMERIC(10,2) NOT NULL DEFAULT 0,
-            escalation_level VARCHAR(30) NOT NULL DEFAULT 'NONE',
-            last_reminded_at TIMESTAMP WITHOUT TIME ZONE,
-            reminder_count INTEGER NOT NULL DEFAULT 0,
-            notification_status VARCHAR(30) NOT NULL DEFAULT 'READY',
-            note TEXT
-        )""",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_steps_workflow_order ON workflow_steps(workflow_id,step_order)",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_steps_status ON workflow_steps(status)",
-        """CREATE TABLE IF NOT EXISTS workflow_logs(
-            id SERIAL PRIMARY KEY,
-            workflow_id INTEGER NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
-            step_id INTEGER,
-            user_id INTEGER,
-            action VARCHAR(80) NOT NULL,
-            old_status VARCHAR(40),
-            new_status VARCHAR(40),
-            note TEXT,
-            created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )""",
-        """CREATE TABLE IF NOT EXISTS performance_president_approvals(
-            id SERIAL PRIMARY KEY,
-            evaluation_id INTEGER NOT NULL UNIQUE,
-            period_id INTEGER NOT NULL,
-            employee_id INTEGER NOT NULL,
-            score NUMERIC(8,2) NOT NULL,
-            status VARCHAR(40) NOT NULL DEFAULT 'PENDING',
-            workflow_id INTEGER REFERENCES workflow_instances(id) ON DELETE SET NULL,
-            requested_by_id INTEGER,
-            president_id INTEGER,
-            decided_at TIMESTAMP WITHOUT TIME ZONE,
-            decision_note TEXT,
-            created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )""",
-        "CREATE INDEX IF NOT EXISTS ix_perf_pres_approvals_status ON performance_president_approvals(status)",
-        """CREATE TABLE IF NOT EXISTS workflow_notifications(
-            id SERIAL PRIMARY KEY,
-            workflow_id INTEGER NOT NULL REFERENCES workflow_instances(id) ON DELETE CASCADE,
-            step_id INTEGER REFERENCES workflow_steps(id) ON DELETE CASCADE,
-            target_user_id INTEGER,
-            notification_type VARCHAR(80) NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            body TEXT,
-            status VARCHAR(40) NOT NULL DEFAULT 'PENDING',
-            created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            delivered_at TIMESTAMP WITHOUT TIME ZONE,
-            payload_json JSONB
-        )""",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_notifications_status ON workflow_notifications(status)",
-        "CREATE INDEX IF NOT EXISTS ix_workflow_notifications_target ON workflow_notifications(target_user_id,status)",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS step_type VARCHAR(40)",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS is_required BOOLEAN NOT NULL DEFAULT TRUE",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS delay_state VARCHAR(30) NOT NULL DEFAULT 'NORMAL'",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS visible_to_user_id INTEGER",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS delay_days NUMERIC(10,2) NOT NULL DEFAULT 0",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS escalation_level VARCHAR(30) NOT NULL DEFAULT 'NONE'",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS last_reminded_at TIMESTAMP WITHOUT TIME ZONE",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS reminder_count INTEGER NOT NULL DEFAULT 0",
-        "ALTER TABLE workflow_steps ADD COLUMN IF NOT EXISTS notification_status VARCHAR(30) NOT NULL DEFAULT 'READY'",
-        "ALTER TABLE workflow_instances ADD COLUMN IF NOT EXISTS workflow_family VARCHAR(80) DEFAULT 'GENERAL'",
-        "ALTER TABLE workflow_instances ADD COLUMN IF NOT EXISTS delayed_step_count INTEGER NOT NULL DEFAULT 0",
-    ]
-    for s in sql:
-        db.session.execute(text(s))
-    db.session.commit()
+
+class WorkflowSchemaNotReadyError(RuntimeError):
+    """Raised when the Alembic-owned workflow schema is not ready."""
+
+
+_WORKFLOW_REQUIRED_SCHEMA = {
+    "workflow_instances": frozenset(
+        {
+            "id",
+            "module",
+            "entity_type",
+            "entity_id",
+            "title",
+            "subject_user_id",
+            "period_id",
+            "score",
+            "status",
+            "current_step_name",
+            "priority",
+            "workflow_family",
+            "delayed_step_count",
+            "created_by_id",
+            "created_at",
+            "updated_at",
+            "completed_at",
+            "payload_json",
+        }
+    ),
+    "workflow_steps": frozenset(
+        {
+            "id",
+            "workflow_id",
+            "step_order",
+            "step_code",
+            "step_type",
+            "step_name",
+            "assigned_user_id",
+            "visible_to_user_id",
+            "status",
+            "is_active",
+            "is_required",
+            "started_at",
+            "completed_at",
+            "due_at",
+            "duration_minutes",
+            "delay_state",
+            "delay_days",
+            "escalation_level",
+            "last_reminded_at",
+            "reminder_count",
+            "notification_status",
+            "note",
+        }
+    ),
+    "workflow_logs": frozenset(
+        {
+            "id",
+            "workflow_id",
+            "step_id",
+            "user_id",
+            "action",
+            "old_status",
+            "new_status",
+            "note",
+            "created_at",
+        }
+    ),
+    "workflow_notifications": frozenset(
+        {
+            "id",
+            "workflow_id",
+            "step_id",
+            "target_user_id",
+            "notification_type",
+            "title",
+            "body",
+            "status",
+            "created_at",
+            "delivered_at",
+            "payload_json",
+        }
+    ),
+    "performance_president_approvals": frozenset(
+        {
+            "id",
+            "evaluation_id",
+            "period_id",
+            "employee_id",
+            "score",
+            "status",
+            "workflow_id",
+            "requested_by_id",
+            "president_id",
+            "decided_at",
+            "decision_note",
+            "created_at",
+            "updated_at",
+        }
+    ),
+}
+_WORKFLOW_SCHEMA_REVISION = "6f2b8c4d1a90"
+
+
+def _workflow_schema_gaps(schema_inspector) -> dict[str, tuple[str, ...]]:
+    existing_tables = set(schema_inspector.get_table_names())
+    gaps: dict[str, tuple[str, ...]] = {}
+    for table_name, required_columns in _WORKFLOW_REQUIRED_SCHEMA.items():
+        if table_name not in existing_tables:
+            gaps[table_name] = ("<tablo eksik>",)
+            continue
+        existing_columns = {
+            column["name"]
+            for column in schema_inspector.get_columns(table_name)
+        }
+        missing_columns = tuple(sorted(required_columns - existing_columns))
+        if missing_columns:
+            gaps[table_name] = missing_columns
+    return gaps
+
+
+def assert_workflow_schema_ready() -> None:
+    """Validate the Alembic-owned workflow schema without changing it."""
+    gaps = _workflow_schema_gaps(inspect(db.engine))
+    if not gaps:
+        return
+
+    details = "; ".join(
+        f"{table_name}: {', '.join(missing_items)}"
+        for table_name, missing_items in sorted(gaps.items())
+    )
+    raise WorkflowSchemaNotReadyError(
+        "İş akışı veritabanı şeması hazır değil. "
+        f"Alembic migrationlarını en az {_WORKFLOW_SCHEMA_REVISION} revisionına kadar "
+        f"uygulayın. Eksikler: {details}"
+    )
+
+
+def ensure_tables() -> None:
+    """Backward-compatible, read-only workflow schema readiness guard."""
+    assert_workflow_schema_ready()
 
 
 def _delay_case_sql():
@@ -254,7 +284,7 @@ def _delay_case_sql():
 
 
 def refresh_delay_states():
-    ensure_tables()
+    assert_workflow_schema_ready()
     db.session.execute(
         text(f"""
             UPDATE workflow_steps
@@ -292,7 +322,7 @@ def refresh_delay_states():
 
 def sync_low_scores():
     """Faz 8.1: 70 altı performans kayıtları için Başkan onay akışı üretir."""
-    ensure_tables()
+    assert_workflow_schema_ready()
     rows = db.session.execute(text(f"""
         SELECT e.id evaluation_id,
                e.period_id,
@@ -373,7 +403,7 @@ def sync_performance_timeline():
     kayıtlarından sadece okur ve workflow_instances/workflow_steps görünürlüğünü
     günceller.
     """
-    ensure_tables()
+    assert_workflow_schema_ready()
     rows = db.session.execute(text(f"""
         SELECT e.id evaluation_id,
                e.period_id,
@@ -566,7 +596,7 @@ def sync_performance_timeline():
     return created
 
 def generate_delay_notifications(limit=200):
-    ensure_tables()
+    assert_workflow_schema_ready()
     refresh_delay_states()
     rows = db.session.execute(text("""
         SELECT ws.id step_id, ws.workflow_id, ws.assigned_user_id, ws.step_name, ws.delay_state, ws.delay_days, wi.title
@@ -638,7 +668,7 @@ def workflow_dashboard():
 def workflow_timeline(workflow_id):
     if not _can_view():
         return _deny()
-    ensure_tables()
+    assert_workflow_schema_ready()
     refresh_delay_states()
     workflow = db.session.execute(text(f"""
         SELECT wi.*, {_full_name_expr('u')} employee_name, COALESCE(p.title,'-') period_title
@@ -717,7 +747,7 @@ def workflow_run_delay_reminders():
 def workflow_notifications():
     if not _can_view():
         return _deny()
-    ensure_tables()
+    assert_workflow_schema_ready()
     rows = db.session.execute(text(f"""
         SELECT wn.*, wi.title workflow_title, {_full_name_expr('u')} target_name
         FROM workflow_notifications wn
@@ -754,7 +784,7 @@ def workflow_president_approvals():
 def workflow_president_decide(approval_id):
     if not _can_decide():
         return _deny('Bu işlem Başkan/Admin onayı gerektirir.')
-    ensure_tables()
+    assert_workflow_schema_ready()
     action = (request.form.get('action') or '').upper()
     note = (request.form.get('note') or '').strip()
     mapped = {'APPROVE': ('APPROVED','COMPLETED','DONE'), 'REJECT': ('REJECTED','COMPLETED','REJECTED'), 'RETURN': ('RETURNED','ACTIVE','RETURNED')}.get(action)
@@ -791,7 +821,7 @@ def workflow_president_decide(approval_id):
     return redirect(url_for('main.workflow_president_approvals'))
 
 def _executive_dashboard_payload():
-    ensure_tables()
+    assert_workflow_schema_ready()
     refresh_delay_states()
 
     performance_map_raw = db.session.execute(text("""
@@ -919,7 +949,6 @@ GENERIC_WORKFLOW_MODULES = {
 
 
 def _table_exists(table_name: str) -> bool:
-    ensure_tables()
     return bool(db.session.execute(text("SELECT to_regclass(:t) IS NOT NULL"), {"t": table_name}).scalar())
 
 
@@ -1093,7 +1122,7 @@ def _sync_generic_table(
 
 
 def sync_cross_module_workflows() -> dict[str, int]:
-    ensure_tables()
+    assert_workflow_schema_ready()
     results = {
         'support': _sync_generic_table(
             table_name='support_tickets',
@@ -1160,7 +1189,7 @@ def sync_cross_module_workflows() -> dict[str, int]:
 def workflow_modules_dashboard():
     if not _can_view():
         return _deny()
-    ensure_tables()
+    assert_workflow_schema_ready()
     refresh_delay_states()
     rows = db.session.execute(text("""
         SELECT module,
