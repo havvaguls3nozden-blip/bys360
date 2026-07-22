@@ -11,7 +11,7 @@ getirdim: gecmis veri etiketi net, aktif donem korumasi net, preview daha okunur
 """
 
 from collections import OrderedDict
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -402,7 +402,7 @@ def performance_history_import_commit(batch_id):
                 level_1_general_comment=_legacy_norm(row_data.get("comment_1")) or None,
                 level_2_general_comment=_legacy_norm(row_data.get("comment_2")) or None,
                 level_3_general_comment=_legacy_norm(row_data.get("comment_3")) or None,
-                published_at=datetime.now(timezone.utc),
+                published_at=datetime.now(UTC),
                 published_by_user_id=current_user.id,
                 source_type=HISTORY_IMPORT_SOURCE_TYPE,
                 source_reference=f"{batch.file_name or ''}#batch:{batch.id}",
@@ -427,7 +427,7 @@ def performance_history_import_commit(batch_id):
                 created += 1
 
         batch.status = "tamamlandi"
-        batch.completed_at = datetime.now(timezone.utc)
+        batch.completed_at = datetime.now(UTC)
         batch.success_count = len([r for r in rows if r.status == "tamamlandi"])
         batch.error_count = len([r for r in rows if r.status == "hata"])
         batch.notes = (

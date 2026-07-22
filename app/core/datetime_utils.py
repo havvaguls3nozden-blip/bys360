@@ -7,17 +7,17 @@ ayrica aware UTC yardimcisi da vardir.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 
 def utc_now() -> datetime:
     """Schema degisikligi gerektirmeden naive UTC datetime dondurur."""
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 def utc_now_aware() -> datetime:
     """Timezone-aware UTC datetime dondurur."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def utc_today():

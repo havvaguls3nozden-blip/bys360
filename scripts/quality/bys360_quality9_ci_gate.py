@@ -6,7 +6,7 @@ import json
 import re
 import sys
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 QUALITY9_MAX_APP_PRINT = 0
@@ -174,7 +174,7 @@ def main() -> int:
 
     report = {
         "package": "BYS360_QUALITY9_CI_SAFE_SCOPE_HOTFIX_V10",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "quality9_targets": {
             "app_print_calls_max": QUALITY9_MAX_APP_PRINT,
             "app_broad_except_max": max_broad_except,

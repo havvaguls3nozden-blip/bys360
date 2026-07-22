@@ -14,7 +14,7 @@ import socket
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 GATE_VERSION = "2026-04-21-live-core-smoke-endpoint-gate"
@@ -249,7 +249,7 @@ def build_live_core_smoke_report(root: Path, base_url: str | None = None, requir
 
     report = SmokeReport(
         version=GATE_VERSION,
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
         project_root=str(root),
         base_url=base_url,
         http_required=require_http,

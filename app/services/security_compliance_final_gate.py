@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 import ast
 import json
@@ -384,7 +384,7 @@ def build_security_compliance_report(root: Path | str) -> SecurityComplianceRepo
     uyari = sum(1 for f in findings if f.level == "UYARI")
     return SecurityComplianceReport(
         version=VERSION,
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
         root=str(root),
         ok=ok,
         hata=hata,

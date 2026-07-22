@@ -13,7 +13,7 @@ import os
 import re
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
 
@@ -32,7 +32,7 @@ PROFILE_FETCH_TIMEOUT = 10
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+    return datetime.now(UTC).isoformat(timespec='seconds')
 
 
 def _safe_html_attr(value: Any) -> str:

@@ -4,7 +4,7 @@ import hashlib
 
 # BYS360_P1B_MOBILE_ROUTES_SHARED_SPLIT
 # BYS360_MOBILE_V2_8_50_ASSISTANT_ASCII_GATEFIX
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC  # noqa: F401 - timezone re-exported to mobile domain modules
 from functools import wraps
 from statistics import mean
 from typing import Any
@@ -175,7 +175,7 @@ def _clean_mobile_text(value: Any, limit: int = 2000) -> str:
     return text[:limit]
 
 def _generate_mobile_ticket_no(user: User) -> str:
-    base = datetime.now(timezone.utc).strftime("MOB-%Y%m%d-%H%M%S")
+    base = datetime.now(UTC).strftime("MOB-%Y%m%d-%H%M%S")
     suffix = int(getattr(user, "id", 0) or 0)
     candidate = f"{base}-{suffix}"
     counter = 2
@@ -318,7 +318,7 @@ def _survey_is_active(survey: Survey) -> bool:
     status = (getattr(survey, "status", "") or "").strip().lower()
     if status and status not in _SURVEY_ACTIVE_STATUSES:
         return False
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    now = datetime.now(UTC).replace(tzinfo=None)
     start_at = getattr(survey, "start_at", None)
     end_at = getattr(survey, "end_at", None)
     if start_at and start_at > now:

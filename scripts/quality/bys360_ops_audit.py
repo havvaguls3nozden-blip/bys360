@@ -8,7 +8,7 @@ import subprocess
 import sys
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 SKIP_DIRS = {
@@ -174,7 +174,7 @@ def build_report(root: Path, mode: str, source_paths: list[str] | None = None) -
     return {
         "package": "BYS360_OPS_HARDENING_V1",
         "mode": mode,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "root": str(root),
         "required_files": required_status,
         "env_risks": env_risks,

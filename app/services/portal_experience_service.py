@@ -7,7 +7,7 @@ anasayfa/portal beyaz ekrana düşmesin.
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from functools import lru_cache
 from importlib import import_module
 from typing import Any
@@ -47,7 +47,7 @@ def utc_now() -> datetime:
             import logging
             logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
             pass
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def sanitize_free_text(value: Any, limit: int = 160) -> str:

@@ -13,7 +13,7 @@ atanabilir ve kapatılabilir kalır.
 """
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from secrets import token_hex
 
 from flask import flash, redirect, request, url_for
@@ -117,7 +117,7 @@ def _feedback_kind_label(key: str | None) -> str:
 
 
 def _feedback_ticket_no() -> str:
-    stamp = datetime.now(timezone.utc).replace(tzinfo=None).strftime("%Y%m%d")
+    stamp = datetime.now(UTC).replace(tzinfo=None).strftime("%Y%m%d")
     return f"GBD-{stamp}-{token_hex(3).upper()}"
 
 

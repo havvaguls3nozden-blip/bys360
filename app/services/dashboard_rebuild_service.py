@@ -8,7 +8,7 @@ korumalıdır; eksik tablo veya boş veri dashboard'u beyaz ekrana düşürmez.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from typing import Any
 
 from flask import current_app
@@ -212,7 +212,7 @@ def _short(text_value: Any, max_len: int = 24) -> str:
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).astimezone().strftime("%d.%m.%Y %H:%M")
+    return datetime.now(UTC).astimezone().strftime("%d.%m.%Y %H:%M")
 
 
 def _active_period(reader: _Reader) -> dict[str, Any] | None:
@@ -300,7 +300,7 @@ def _period_completion(reader: _Reader, period_id: int | None, scope_ids: list[i
         return _chart("period_completion", "Dönem Tamamlama", labels, [0, 0, 0], "bars")
     cols = reader.columns("evaluation_assignments")
     where = "WHERE 1=1"
-    params: dict[str, Any] = {"now_value": datetime.now(timezone.utc)}
+    params: dict[str, Any] = {"now_value": datetime.now(UTC)}
     if period_id and "period_id" in cols:
         where += " AND ea.period_id = :period_id"
         params["period_id"] = period_id

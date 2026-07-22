@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 GATE_VERSION = "2026-04-21-ai-menu-label-fix-gate"
@@ -64,7 +64,7 @@ def _read(path: Path) -> str:
         return path.read_text(encoding="utf-8-sig")
 
 def build_ai_menu_label_fix_report(root: Path) -> Report:
-    report = Report(version=GATE_VERSION, generated_at_utc=datetime.now(timezone.utc).isoformat())
+    report = Report(version=GATE_VERSION, generated_at_utc=datetime.now(UTC).isoformat())
 
     for rel in REQUIRED_FILES:
         path = root / rel

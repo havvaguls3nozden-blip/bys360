@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -184,7 +184,7 @@ def _fetch_open_meteo(settings: WeatherSettings) -> dict[str, Any]:
         "daily_min": _first(daily.get("temperature_2m_min")),
         "rain_probability": _first(daily.get("precipitation_probability_max")),
         "daily_wind_max": _first(daily.get("wind_speed_10m_max")),
-        "updated_at": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+        "updated_at": datetime.now(UTC).isoformat(timespec="minutes"),
     }
 
 
@@ -299,7 +299,7 @@ def _fallback_weather(settings: WeatherSettings, message: str, status: str = "fa
         "daily_min": None,
         "rain_probability": None,
         "daily_wind_max": None,
-        "updated_at": datetime.now(timezone.utc).isoformat(timespec="minutes"),
+        "updated_at": datetime.now(UTC).isoformat(timespec="minutes"),
         "message": message,
     }
 
@@ -307,7 +307,7 @@ def _fallback_weather(settings: WeatherSettings, message: str, status: str = "fa
 def get_home_weather_context(force_refresh: bool = False) -> dict[str, Any]:
     settings = get_weather_settings()
     cache_key = f"{settings.provider}:{settings.latitude:.4f}:{settings.longitude:.4f}"
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if not settings.enabled:
         weather = _fallback_weather(settings, "Hava durumu entegrasyonu kapalı.", status="disabled")

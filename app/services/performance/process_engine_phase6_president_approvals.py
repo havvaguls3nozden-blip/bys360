@@ -869,7 +869,7 @@ def _insert_step_for_decision(*, approval_id: int, flow_id: int | None, evaluati
     if not filtered:
         return
     columns = ", ".join(filtered.keys())
-    values = ", ".join(f":{key}" for key in filtered.keys())
+    values = ", ".join(f":{key}" for key in filtered)
     db.session.execute(text(f"INSERT INTO performance_process_flow_steps ({columns}) VALUES ({values})"), filtered)
 
 
@@ -961,7 +961,7 @@ def decide_president_approval(approval_id: int, actor: Any, action: str, note: s
         available = _table_columns("performance_process_flows")
         filtered = {key: value for key, value in flow_payload.items() if key in available}
         if filtered:
-            assignments = ", ".join(f"{key} = :{key}" for key in filtered.keys())
+            assignments = ", ".join(f"{key} = :{key}" for key in filtered)
             filtered["flow_id"] = flow_id
             db.session.execute(text(f"UPDATE performance_process_flows SET {assignments} WHERE id = :flow_id"), filtered)
 

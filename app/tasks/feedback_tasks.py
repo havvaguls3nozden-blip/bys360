@@ -1,7 +1,7 @@
 """BYS360 geri bildirim/nabız arka plan görevleri."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from types import SimpleNamespace
 from typing import Any
 
@@ -36,7 +36,7 @@ def refresh_pulse_analytics_for_unit(unit_id: int, days: int = 30, minimum_group
             "ok": True,
             "unit_id": int(unit_id),
             "days": int(days or 30),
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "participant_count": payload.get("participant_count") if isinstance(payload, dict) else None,
             "eligible": payload.get("eligible") if isinstance(payload, dict) else None,
         }

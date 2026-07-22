@@ -12,7 +12,7 @@ import json
 import os
 import urllib.parse
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from typing import Any
 
 from app.core.datetime_utils import utc_now
@@ -61,7 +61,7 @@ def _parse_instagram_timestamp(value: str) -> datetime:
             normalized = normalized[:-5] + "+00:00"
         parsed = datetime.fromisoformat(normalized)
         if parsed.tzinfo is not None:
-            parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+            parsed = parsed.astimezone(UTC).replace(tzinfo=None)
         return parsed
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/instagram_portal_sync.py:66")

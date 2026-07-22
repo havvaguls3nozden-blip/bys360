@@ -45,7 +45,7 @@ def _parse_datetime_input(raw_value: str | None):
     try:
         parsed = _dt.datetime.fromisoformat(normalized)
         if parsed.tzinfo is not None:
-            return parsed.astimezone(_dt.timezone.utc).replace(tzinfo=None)
+            return parsed.astimezone(_dt.UTC).replace(tzinfo=None)
         return parsed
     except ValueError as exc:
         raise ValueError("Tarih-saat alanı okunamadı. Lütfen takvim alanını yeniden seçin.") from exc

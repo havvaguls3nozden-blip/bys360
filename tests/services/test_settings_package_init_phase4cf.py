@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from types import SimpleNamespace
 
 from app.services import settings
@@ -13,7 +13,7 @@ def test_build_change_payload_masks_sensitive_values_and_serializes_time() -> No
         14,
         19,
         50,
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
 
     meta = {

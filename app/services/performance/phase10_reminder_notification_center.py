@@ -510,7 +510,7 @@ def seed_phase10_reminder_settings(db: Any | None = None) -> dict[str, Any]:
                 payload["default_value"] = str(default_value)
 
             if existing:
-                update_cols = [key for key in payload.keys() if key not in {"module_key", "setting_key"}]
+                update_cols = [key for key in payload if key not in {"module_key", "setting_key"}]
                 if update_cols:
                     set_sql = ", ".join(f"{col}=:{col}" for col in update_cols)
                     params = {col: payload[col] for col in update_cols}

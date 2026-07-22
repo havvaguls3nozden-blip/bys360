@@ -187,7 +187,7 @@ def build_effective_user_menu_context_handler(
     effective_rule_map = dict(base_context["base_rule_map"])
     source_map = {
         key: ("unit_profile" if any(row.menu_key == key for row in base_context["unit_rows"]) else "role_default")
-        for key in effective_rule_map.keys()
+        for key in effective_rule_map
     }
 
     try:

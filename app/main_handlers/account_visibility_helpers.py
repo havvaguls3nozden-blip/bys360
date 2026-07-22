@@ -651,7 +651,7 @@ def _build_visibility_template_payload(user, flat_menu_items, selected_profile_r
         },
         "visible_keys": visible_keys,
         "effective_rule_map": effective_rule_map,
-        "labels": {key: label_map.get(key, key) for key in effective_rule_map.keys()},
+        "labels": {key: label_map.get(key, key) for key in effective_rule_map},
     }
 
 

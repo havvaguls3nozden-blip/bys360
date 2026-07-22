@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime as _v2822_datetime
-from datetime import timezone as _v2822_timezone
+from datetime import UTC
 from typing import Any
 
 from app.api.mobile.routes import _full_name, _has_global_scope, _item
@@ -35,7 +35,7 @@ def _safe_get_model(model, object_id):
 
 def _v2822_now():
     try:
-        return _v2822_datetime.now(_v2822_timezone.utc).replace(tzinfo=None)
+        return _v2822_datetime.now(UTC).replace(tzinfo=None)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return _v2822_datetime.utcnow()

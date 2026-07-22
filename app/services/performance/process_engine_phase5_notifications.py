@@ -144,7 +144,7 @@ def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int | None:
     if not filtered:
         return None
     columns = ", ".join(filtered.keys())
-    values = ", ".join(f":{key}" for key in filtered.keys())
+    values = ", ".join(f":{key}" for key in filtered)
     suffix = ""
     if table_name == "performance_process_notifications":
         suffix = " RETURNING id"
@@ -160,7 +160,7 @@ def _update_process_notification(notification_id: int, payload: dict[str, Any]) 
     filtered = {key: value for key, value in payload.items() if key in available}
     if not filtered:
         return
-    assignments = ", ".join(f"{key} = :{key}" for key in filtered.keys())
+    assignments = ", ".join(f"{key} = :{key}" for key in filtered)
     filtered["notification_id"] = notification_id
     db.session.execute(
         text(f"UPDATE performance_process_notifications SET {assignments} WHERE id = :notification_id"),

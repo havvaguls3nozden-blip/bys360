@@ -20,7 +20,7 @@ import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +88,7 @@ STOPWORDS = {
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+    return datetime.now(UTC).isoformat(timespec='seconds')
 
 def _press_news_sort_key(item: dict[str, Any]) -> float:
     # Haberleri gerçek yayın/işlem tarihine göre sıralar; en yeni kayıt en üstte görünür.
@@ -98,7 +98,7 @@ def _press_news_sort_key(item: dict[str, Any]) -> float:
         if not value: continue
         try:
             dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
-            if dt.tzinfo is None: dt = dt.replace(tzinfo=timezone.utc)
+            if dt.tzinfo is None: dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
         except Exception:
             import logging
@@ -106,7 +106,7 @@ def _press_news_sort_key(item: dict[str, Any]) -> float:
             pass
         try:
             dt = email.utils.parsedate_to_datetime(value)
-            if dt.tzinfo is None: dt = dt.replace(tzinfo=timezone.utc)
+            if dt.tzinfo is None: dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
         except Exception:
             import logging

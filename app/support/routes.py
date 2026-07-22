@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 from secrets import token_hex
 import re
@@ -175,7 +175,7 @@ def _support_guard_or_redirect():
     return redirect(url_for("main.support_index"))
 
 def _build_ticket_no() -> str:
-    return f"DTY-{datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y%m%d')}-{token_hex(3).upper()}"
+    return f"DTY-{datetime.now(UTC).replace(tzinfo=None).strftime('%Y%m%d')}-{token_hex(3).upper()}"
 
 def _ticket_type_map() -> dict[str, str]:
     return {key: label for key, label in SUPPORT_TICKET_TYPES}
@@ -954,7 +954,7 @@ def support_comment(ticket_id: int):
         upload = request.files.get("attachment")
         if upload and getattr(upload, "filename", ""):
             _store_ticket_attachment(ticket, upload, attachment_type="document")
-        ticket.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        ticket.updated_at = datetime.now(UTC).replace(tzinfo=None)
         notify_support_ticket_comment(ticket, current_user, is_internal=is_internal)
         db.session.commit()
         flash("Talep notu kaydedildi.", "success")
@@ -983,9 +983,9 @@ def support_status(ticket_id: int):
         note = sanitize_free_text(request.form.get("status_note"), limit=500)
         old_status = ticket.status
         ticket.status = new_status
-        ticket.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        ticket.updated_at = datetime.now(UTC).replace(tzinfo=None)
         if new_status in {"resolved", "closed", "rejected"}:
-            ticket.closed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            ticket.closed_at = datetime.now(UTC).replace(tzinfo=None)
         elif new_status:
             ticket.closed_at = None
         db.session.add(
@@ -1043,7 +1043,7 @@ def support_assign(ticket_id: int):
                     note=f"Talep {(assignee.full_name if assignee else 'atanmamış')} olarak güncellendi.",
                 )
             )
-        ticket.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        ticket.updated_at = datetime.now(UTC).replace(tzinfo=None)
         notify_support_ticket_assigned(ticket, current_user, assignee=assignee)
         db.session.commit()
         flash("Talep ataması güncellendi.", "success")

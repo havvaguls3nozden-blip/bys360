@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from typing import Any
 
 from app import db
@@ -224,7 +224,7 @@ def collect_category_group_aggregates(
         "summary": summary,
         "categories": category_rows,
         "privacy_note": CATEGORY_PRIVACY_NOTE,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
     }
 
 

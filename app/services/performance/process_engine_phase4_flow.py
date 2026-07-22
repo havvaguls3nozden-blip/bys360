@@ -165,7 +165,7 @@ def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int:
     if not filtered:
         return 0
     columns = ", ".join(filtered.keys())
-    values = ", ".join(f":{key}" for key in filtered.keys())
+    values = ", ".join(f":{key}" for key in filtered)
     db.session.execute(text(f"INSERT INTO {table_name} ({columns}) VALUES ({values})"), filtered)
     return 1
 
@@ -175,7 +175,7 @@ def _update_flow(flow_id: int, payload: dict[str, Any]) -> None:
     filtered = {key: value for key, value in payload.items() if key in available}
     if not filtered:
         return
-    assignments = ", ".join(f"{key} = :{key}" for key in filtered.keys())
+    assignments = ", ".join(f"{key} = :{key}" for key in filtered)
     filtered["flow_id"] = flow_id
     db.session.execute(text(f"UPDATE performance_process_flows SET {assignments} WHERE id = :flow_id"), filtered)
 
