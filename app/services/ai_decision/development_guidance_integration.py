@@ -177,9 +177,8 @@ def fetch_existing_recommendations(
         "performance_development_recommendations": """
             SELECT id, recommendation_text AS text, created_at
             FROM performance_development_recommendations
-            WHERE (:personnel_id IS NULL OR personnel_id = :personnel_id)
+            WHERE (:personnel_id IS NULL OR employee_id = :personnel_id)
               AND (:period_id IS NULL OR period_id = :period_id)
-              AND (:evaluation_id IS NULL OR evaluation_id = :evaluation_id)
             ORDER BY created_at DESC NULLS LAST, id DESC
             LIMIT :limit
         """,
