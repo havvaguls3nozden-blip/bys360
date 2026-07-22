@@ -1,9 +1,3 @@
-from __future__ import annotations
-
-import logging
-
-logger = logging.getLogger(__name__)
-
 """BYS360 Faz 1.4.B Personel ve Destek Hizmetleri Grup Başkanı yayın ön onayı.
 
 Bu servis, performans karnesi personele açılmadan önce Admin/İK nihai yayınının
@@ -20,6 +14,9 @@ Akış:
     yayından önce çalışır.
 """
 
+from __future__ import annotations
+
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -27,6 +24,8 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+
+logger = logging.getLogger(__name__)
 
 PHASE1_4B_RULE_VERSION = "phase1.4b-personnel-support-publish-approval-v1"
 APPROVAL_TABLE = "performance_personnel_support_publish_approvals"
@@ -43,6 +42,95 @@ STATUS_LABELS = {
     "ready_for_hr_publish": "Admin/İK Yayınına Hazır",
     "published": "Yayınlandı",
 }
+
+_PHASE14B_CREATE_TABLE_SQLITE = text("""
+    CREATE TABLE IF NOT EXISTS performance_personnel_support_publish_approvals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        evaluation_id INTEGER NOT NULL,
+        period_id INTEGER,
+        employee_id INTEGER,
+        final_score NUMERIC(6, 2),
+        status VARCHAR(50) NOT NULL DEFAULT 'pending',
+        requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        requested_by_user_id INTEGER,
+        decided_at TIMESTAMP,
+        decided_by_user_id INTEGER,
+        decision_note TEXT,
+        return_note TEXT,
+        rule_version VARCHAR(120) NOT NULL DEFAULT
+            'phase1.4b-personnel-support-publish-approval-v1',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+""")
+_PHASE14B_CREATE_TABLE_POSTGRESQL = text("""
+    CREATE TABLE IF NOT EXISTS performance_personnel_support_publish_approvals (
+        id SERIAL PRIMARY KEY,
+        evaluation_id INTEGER NOT NULL,
+        period_id INTEGER,
+        employee_id INTEGER,
+        final_score NUMERIC(6, 2),
+        status VARCHAR(50) NOT NULL DEFAULT 'pending',
+        requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        requested_by_user_id INTEGER,
+        decided_at TIMESTAMP,
+        decided_by_user_id INTEGER,
+        decision_note TEXT,
+        return_note TEXT,
+        rule_version VARCHAR(120) NOT NULL DEFAULT
+            'phase1.4b-personnel-support-publish-approval-v1',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+""")
+_PHASE14B_POSTGRESQL_ALTER_STATEMENTS = (
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS final_score NUMERIC(6, 2)"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS requested_by_user_id INTEGER"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS decided_by_user_id INTEGER"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS decision_note TEXT"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS return_note TEXT"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS rule_version VARCHAR(120)"
+    ),
+    text(
+        "ALTER TABLE performance_personnel_support_publish_approvals "
+        "ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP"
+    ),
+)
+_PHASE14B_INDEX_STATEMENTS = (
+    text(
+        "CREATE UNIQUE INDEX IF NOT EXISTS ux_phase14b_publish_approval_eval "
+        "ON performance_personnel_support_publish_approvals(evaluation_id)"
+    ),
+    text(
+        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_status "
+        "ON performance_personnel_support_publish_approvals(status)"
+    ),
+    text(
+        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_period_status "
+        "ON performance_personnel_support_publish_approvals(period_id, status)"
+    ),
+    text(
+        "CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_employee "
+        "ON performance_personnel_support_publish_approvals(employee_id)"
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -112,50 +200,20 @@ def apply_phase1_4b_schema() -> None:
     kullanır. Mevcut tablo varsa yalnızca eksik indeksleri garanti eder.
     """
     dialect = getattr(db.engine.dialect, "name", "")
-    if dialect == "sqlite":
-        id_type = "INTEGER PRIMARY KEY AUTOINCREMENT"
-        timestamp_default = "CURRENT_TIMESTAMP"
-    else:
-        id_type = "SERIAL PRIMARY KEY"
-        timestamp_default = "CURRENT_TIMESTAMP"
-
-    db.session.execute(text(f"""
-        CREATE TABLE IF NOT EXISTS {APPROVAL_TABLE} (
-            id {id_type},
-            evaluation_id INTEGER NOT NULL,
-            period_id INTEGER,
-            employee_id INTEGER,
-            final_score NUMERIC(6, 2),
-            status VARCHAR(50) NOT NULL DEFAULT 'pending',
-            requested_at TIMESTAMP NOT NULL DEFAULT {timestamp_default},
-            requested_by_user_id INTEGER,
-            decided_at TIMESTAMP,
-            decided_by_user_id INTEGER,
-            decision_note TEXT,
-            return_note TEXT,
-            rule_version VARCHAR(120) NOT NULL DEFAULT '{PHASE1_4B_RULE_VERSION}',
-            created_at TIMESTAMP NOT NULL DEFAULT {timestamp_default},
-            updated_at TIMESTAMP NOT NULL DEFAULT {timestamp_default}
-        )
-    """))
+    create_table_statement = (
+        _PHASE14B_CREATE_TABLE_SQLITE
+        if dialect == "sqlite"
+        else _PHASE14B_CREATE_TABLE_POSTGRESQL
+    )
+    db.session.execute(create_table_statement)
 
     # ALTER tarafı eski ara kurulumlara tolerans sağlar.
-    for ddl in [
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS final_score NUMERIC(6, 2)",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS requested_by_user_id INTEGER",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS decided_by_user_id INTEGER",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS decision_note TEXT",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS return_note TEXT",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS rule_version VARCHAR(120)",
-        "ALTER TABLE {table} ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP",
-    ]:
+    for statement in _PHASE14B_POSTGRESQL_ALTER_STATEMENTS:
         if dialect != "sqlite":
-            db.session.execute(text(ddl.format(table=APPROVAL_TABLE)))
+            db.session.execute(statement)
 
-    db.session.execute(text(f"CREATE UNIQUE INDEX IF NOT EXISTS ux_phase14b_publish_approval_eval ON {APPROVAL_TABLE}(evaluation_id)"))
-    db.session.execute(text(f"CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_status ON {APPROVAL_TABLE}(status)"))
-    db.session.execute(text(f"CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_period_status ON {APPROVAL_TABLE}(period_id, status)"))
-    db.session.execute(text(f"CREATE INDEX IF NOT EXISTS ix_phase14b_publish_approval_employee ON {APPROVAL_TABLE}(employee_id)"))
+    for statement in _PHASE14B_INDEX_STATEMENTS:
+        db.session.execute(statement)
     db.session.commit()
 
 
@@ -231,9 +289,7 @@ def _is_completed_evaluation(evaluation: Any) -> bool:
     workflow = _normalize(getattr(evaluation, "workflow_status", ""))
     if status in FINAL_STATUSES or workflow in FINAL_STATUSES or "tamam" in workflow or "completed" in workflow:
         return True
-    if bool(getattr(evaluation, "level_1_completed", False)):
-        return True
-    return False
+    return bool(getattr(evaluation, "level_1_completed", False))
 
 
 def _is_published_to_employee(evaluation: Any) -> bool:

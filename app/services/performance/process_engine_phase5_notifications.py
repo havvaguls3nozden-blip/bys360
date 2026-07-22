@@ -7,8 +7,64 @@ from typing import Any
 from sqlalchemy import text
 
 from app.extensions import db
+from app.security.sql_identifiers import quote_sql_identifier, validate_sql_identifier
 
 PHASE5_VERSION = "2026-04-29-process-notifications-phase5"
+
+_INSERT_ALLOWED_COLUMNS = {
+    "notifications": frozenset(
+        {
+            "user_id",
+            "title",
+            "body",
+            "notification_type",
+            "source_type",
+            "source_id",
+            "link_url",
+            "priority",
+            "is_read",
+            "created_at",
+            "updated_at",
+        }
+    ),
+    "performance_process_notifications": frozenset(
+        {
+            "flow_id",
+            "evaluation_id",
+            "recipient_id",
+            "recipient_user_id",
+            "recipient_name",
+            "notification_type",
+            "title",
+            "body",
+            "target_url",
+            "action_url",
+            "delivery_status",
+            "notification_status",
+            "priority",
+            "source_event_key",
+            "source_table",
+            "source_id",
+            "flow_status_snapshot",
+            "actor_user_id",
+            "created_at",
+            "sent_at",
+            "process_version",
+            "rule_version",
+            "updated_at",
+            "app_notification_id",
+        }
+    ),
+}
+_PROCESS_NOTIFICATION_UPDATE_COLUMNS = frozenset(
+    {
+        "app_notification_id",
+        "delivery_status",
+        "notification_status",
+        "sent_at",
+        "updated_at",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -139,28 +195,62 @@ def apply_phase5_schema() -> None:
 
 
 def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int | None:
-    available = _table_columns(table_name)
-    filtered = {key: value for key, value in payload.items() if key in available}
+    safe_table_name = validate_sql_identifier(
+        table_name,
+        allowed=_INSERT_ALLOWED_COLUMNS,
+    )
+    allowed_columns = _INSERT_ALLOWED_COLUMNS[safe_table_name]
+    quoted_table_name = quote_sql_identifier(
+        safe_table_name,
+        dialect=db.engine.dialect,
+        allowed=_INSERT_ALLOWED_COLUMNS,
+    )
+    available = _table_columns(safe_table_name)
+    filtered = {
+        key: value
+        for key, value in payload.items()
+        if key in available and key in allowed_columns
+    }
     if not filtered:
         return None
-    columns = ", ".join(filtered.keys())
+    columns = ", ".join(
+        quote_sql_identifier(
+            key,
+            dialect=db.engine.dialect,
+            allowed=allowed_columns,
+        )
+        for key in filtered
+    )
     values = ", ".join(f":{key}" for key in filtered)
     suffix = ""
-    if table_name == "performance_process_notifications":
+    if safe_table_name == "performance_process_notifications":
         suffix = " RETURNING id"
-    if table_name == "notifications" and "id" in available:
+    if safe_table_name == "notifications" and "id" in available:
         suffix = " RETURNING id"
-    result = db.session.execute(text(f"INSERT INTO {table_name} ({columns}) VALUES ({values}){suffix}"), filtered)
+    result = db.session.execute(
+        text(
+            f"INSERT INTO {quoted_table_name} ({columns}) "
+            f"VALUES ({values}){suffix}"
+        ),
+        filtered,
+    )
     returned = result.scalar() if suffix else None
     return int(returned) if returned else None
 
 
 def _update_process_notification(notification_id: int, payload: dict[str, Any]) -> None:
     available = _table_columns("performance_process_notifications")
-    filtered = {key: value for key, value in payload.items() if key in available}
+    filtered = {
+        key: value
+        for key, value in payload.items()
+        if key in available and key in _PROCESS_NOTIFICATION_UPDATE_COLUMNS
+    }
     if not filtered:
         return
-    assignments = ", ".join(f"{key} = :{key}" for key in filtered)
+    assignments = ", ".join(
+        f"{quote_sql_identifier(key, dialect=db.engine.dialect, allowed=_PROCESS_NOTIFICATION_UPDATE_COLUMNS)} = :{key}"
+        for key in filtered
+    )
     filtered["notification_id"] = notification_id
     db.session.execute(
         text(f"UPDATE performance_process_notifications SET {assignments} WHERE id = :notification_id"),

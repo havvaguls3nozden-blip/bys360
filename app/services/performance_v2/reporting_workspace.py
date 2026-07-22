@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 
 from app.core.datetime_utils import utc_now
 from app.models import EvaluationAssignment, PerformanceEvaluation
+from app.security.sql_identifiers import quote_sql_identifier
 from app.services.performance.category_stats import build_category_average_for_evaluation
 from app.services.publish_service import (
     get_evaluation_visibility_state,
@@ -153,6 +154,45 @@ def _load_period_evaluations(period_id: int, employee_ids: list[int] | None = No
 # BYS360_REPORTING_WORKSPACE_FLOW_STATUS_REPAIR_V1
 _FLOW_STATUS_COLUMN_CACHE: set[str] | None = None
 
+_PROCESS_FLOW_SELECT_COLUMNS = (
+    "id",
+    "evaluation_id",
+    "current_status",
+    "current_stage",
+    "current_owner_user_id",
+    "current_owner_name",
+    "president_status",
+    "president_approval_status",
+    "president_required",
+    "publish_lock_status",
+    "publish_lock_reason",
+    "publish_lock_required_action",
+    "publish_allowed",
+    "tracking_status",
+    "tracking_label",
+    "tracking_bucket",
+    "tracking_priority",
+    "tracking_url",
+    "is_overdue",
+    "overdue_days",
+    "waiting_days",
+    "last_visible_action",
+    "last_action_title",
+    "last_action_at",
+    "last_action_user_name",
+    "final_score",
+    "updated_at",
+    "tracking_updated_at",
+    "created_at",
+)
+_PROCESS_FLOW_ALLOWED_COLUMNS = frozenset(_PROCESS_FLOW_SELECT_COLUMNS)
+_PROCESS_FLOW_ORDER_COLUMNS = (
+    "tracking_updated_at",
+    "updated_at",
+    "created_at",
+    "id",
+)
+
 
 def _get_process_flow_columns() -> set[str]:
     """Return available process-flow columns without making dashboard rendering fragile."""
@@ -184,31 +224,46 @@ def _load_latest_process_flow(evaluation_id: int) -> dict[str, Any] | None:
     if "evaluation_id" not in columns:
         return None
 
-    wanted_columns = [
-        "id", "evaluation_id", "current_status", "current_stage", "current_owner_user_id",
-        "current_owner_name", "president_status", "president_approval_status", "president_required",
-        "publish_lock_status", "publish_lock_reason", "publish_lock_required_action", "publish_allowed",
-        "tracking_status", "tracking_label", "tracking_bucket", "tracking_priority", "tracking_url",
-        "is_overdue", "overdue_days", "waiting_days", "last_visible_action", "last_action_title",
-        "last_action_at", "last_action_user_name", "final_score", "updated_at", "tracking_updated_at", "created_at",
+    select_columns = [
+        column
+        for column in _PROCESS_FLOW_SELECT_COLUMNS
+        if column in columns
     ]
-    select_columns = [column for column in wanted_columns if column in columns]
     if not select_columns:
         return None
 
     order_column = None
-    for candidate in ("tracking_updated_at", "updated_at", "created_at", "id"):
+    for candidate in _PROCESS_FLOW_ORDER_COLUMNS:
         if candidate in columns:
             order_column = candidate
             break
-    order_clause = f"{order_column} DESC NULLS LAST" if order_column and order_column != "id" else "id DESC"
+    if order_column is None:
+        return None
 
     try:
         from sqlalchemy import text
 
         from app.extensions import db
+        quoted_select_columns = [
+            quote_sql_identifier(
+                column,
+                dialect=db.engine.dialect,
+                allowed=_PROCESS_FLOW_ALLOWED_COLUMNS,
+            )
+            for column in select_columns
+        ]
+        quoted_order_column = quote_sql_identifier(
+            order_column,
+            dialect=db.engine.dialect,
+            allowed=_PROCESS_FLOW_ALLOWED_COLUMNS,
+        )
+        order_clause = (
+            f"{quoted_order_column} DESC NULLS LAST"
+            if order_column != "id"
+            else f"{quoted_order_column} DESC"
+        )
         sql = text(f"""
-            SELECT {', '.join(select_columns)}
+            SELECT {', '.join(quoted_select_columns)}
               FROM performance_process_flows
              WHERE evaluation_id = :evaluation_id
              ORDER BY {order_clause}

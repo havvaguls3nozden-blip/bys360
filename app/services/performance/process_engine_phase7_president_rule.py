@@ -9,6 +9,7 @@ from typing import Any
 from sqlalchemy import text
 
 from app.extensions import db
+from app.security.sql_identifiers import quote_sql_identifier
 
 logger = logging.getLogger(__name__)
 
@@ -664,13 +665,18 @@ def candidate_evaluation_ids(limit: int = 500) -> list[int]:
     score_col = _first_existing(cols, SCORE_COLUMNS)
     if not score_col:
         return []
+    quoted_score_col = quote_sql_identifier(
+        score_col,
+        dialect=db.engine.dialect,
+        allowed=SCORE_COLUMNS,
+    )
     rows = db.session.execute(
         text(
             f"""
             SELECT id
             FROM performance_evaluations
-            WHERE {score_col} IS NOT NULL
-              AND {score_col} < 70
+            WHERE {quoted_score_col} IS NOT NULL
+              AND {quoted_score_col} < 70
             ORDER BY id DESC
             LIMIT :limit
             """

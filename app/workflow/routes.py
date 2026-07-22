@@ -7,6 +7,7 @@ from sqlalchemy import text
 from app.extensions import db
 from app.route_registry import main_bp
 from app.route_support import ADMIN_FAMILY_ROLES, safe_render, user_has_any_role
+from app.security.sql_identifiers import quote_sql_identifier, validate_sql_identifier
 
 LOW_SCORE_THRESHOLD = 70.0
 WORKFLOW_VIEW_ROLES = set(ADMIN_FAMILY_ROLES) | {"koordinator", "birim_sorumlusu", "grup_baskani", "baskan_yardimcisi"}
@@ -15,6 +16,82 @@ DELAY_WARNING_DAYS = 2
 DELAY_CRITICAL_DAYS = 5
 DEFAULT_STEP_DUE_DAYS = 3
 REMINDER_REPEAT_HOURS = 24
+
+_GENERIC_SYNC_ALLOWED_COLUMNS = {
+    "support_tickets": frozenset(
+        {
+            "id",
+            "title",
+            "subject",
+            "summary",
+            "created_by_id",
+            "requester_id",
+            "user_id",
+            "owner_id",
+            "status",
+            "state",
+        }
+    ),
+    "leave_requests": frozenset(
+        {
+            "id",
+            "title",
+            "leave_type",
+            "request_type",
+            "summary",
+            "user_id",
+            "employee_id",
+            "personnel_id",
+            "created_by_id",
+            "status",
+            "approval_status",
+            "state",
+        }
+    ),
+    "personnel_leaves": frozenset(
+        {
+            "id",
+            "title",
+            "leave_type",
+            "summary",
+            "user_id",
+            "employee_id",
+            "personnel_id",
+            "created_by_id",
+            "status",
+            "approval_status",
+            "state",
+        }
+    ),
+    "surveys": frozenset(
+        {
+            "id",
+            "title",
+            "name",
+            "subject",
+            "created_by_id",
+            "owner_id",
+            "user_id",
+            "status",
+            "state",
+            "is_active",
+        }
+    ),
+    "announcements": frozenset(
+        {
+            "id",
+            "title",
+            "subject",
+            "headline",
+            "created_by_id",
+            "owner_id",
+            "user_id",
+            "status",
+            "state",
+            "is_active",
+        }
+    ),
+}
 
 
 def _can_view():
@@ -561,7 +638,8 @@ def workflow_dashboard():
 def workflow_timeline(workflow_id):
     if not _can_view():
         return _deny()
-    ensure_tables(); refresh_delay_states()
+    ensure_tables()
+    refresh_delay_states()
     workflow = db.session.execute(text(f"""
         SELECT wi.*, {_full_name_expr('u')} employee_name, COALESCE(p.title,'-') period_title
         FROM workflow_instances wi
@@ -716,7 +794,7 @@ def _executive_dashboard_payload():
     ensure_tables()
     refresh_delay_states()
 
-    performance_map_raw = db.session.execute(text(f"""
+    performance_map_raw = db.session.execute(text("""
         SELECT COALESCE(NULLIF(TRIM(u.birim),''),'Birim belirtilmemiş') AS unit_name,
                COUNT(e.id) AS total,
                COUNT(e.id) FILTER (
@@ -876,23 +954,68 @@ def _sync_generic_table(
     workflow_family: str,
     limit: int = 300,
 ) -> int:
-    if not _table_exists(table_name):
+    safe_table_name = validate_sql_identifier(
+        table_name,
+        allowed=_GENERIC_SYNC_ALLOWED_COLUMNS,
+    )
+    allowed_columns = _GENERIC_SYNC_ALLOWED_COLUMNS[safe_table_name]
+    safe_title_candidates = [
+        validate_sql_identifier(column, allowed=allowed_columns)
+        for column in title_candidates
+    ]
+    safe_subject_candidates = [
+        validate_sql_identifier(column, allowed=allowed_columns)
+        for column in subject_candidates
+    ]
+    safe_status_candidates = [
+        validate_sql_identifier(column, allowed=allowed_columns)
+        for column in status_candidates
+    ]
+
+    if not _table_exists(safe_table_name):
         return 0
 
-    title_col = _first_existing_column(table_name, title_candidates)
-    subject_col = _first_existing_column(table_name, subject_candidates)
-    status_col = _first_existing_column(table_name, status_candidates)
+    title_col = _first_existing_column(safe_table_name, safe_title_candidates)
+    subject_col = _first_existing_column(safe_table_name, safe_subject_candidates)
+    status_col = _first_existing_column(safe_table_name, safe_status_candidates)
 
-    title_expr = f"COALESCE(CAST(t.{title_col} AS TEXT), :fallback_title)" if title_col else ":fallback_title"
-    subject_expr = f"t.{subject_col}" if subject_col else "NULL"
-    status_expr = f"COALESCE(CAST(t.{status_col} AS TEXT), 'ACTIVE')" if status_col else "'ACTIVE'"
+    quoted_table_name = quote_sql_identifier(
+        safe_table_name,
+        dialect=db.engine.dialect,
+        allowed=_GENERIC_SYNC_ALLOWED_COLUMNS,
+    )
+
+    def _quoted_column(column_name: str | None) -> str | None:
+        if column_name is None:
+            return None
+        return quote_sql_identifier(
+            column_name,
+            dialect=db.engine.dialect,
+            allowed=allowed_columns,
+        )
+
+    quoted_title_col = _quoted_column(title_col)
+    quoted_subject_col = _quoted_column(subject_col)
+    quoted_status_col = _quoted_column(status_col)
+
+    title_expr = (
+        f"COALESCE(CAST(t.{quoted_title_col} AS TEXT), :fallback_title)"
+        if quoted_title_col
+        else ":fallback_title"
+    )
+    subject_expr = f"t.{quoted_subject_col}" if quoted_subject_col else "NULL"
+    status_expr = (
+        f"COALESCE(CAST(t.{quoted_status_col} AS TEXT), 'ACTIVE')"
+        if quoted_status_col
+        else "'ACTIVE'"
+    )
 
     rows = db.session.execute(text(f"""
         SELECT t.id AS entity_id,
                {title_expr} AS source_title,
                {subject_expr} AS subject_user_id,
                {status_expr} AS source_status
-        FROM {table_name} t
+        FROM {quoted_table_name} t
         LEFT JOIN workflow_instances wi
           ON wi.module = :module
          AND wi.entity_type = :entity_type
@@ -939,7 +1062,7 @@ def _sync_generic_table(
             "step_name": 'Tamamlandı' if terminal else step_name,
             "by": getattr(current_user, 'id', None),
             "family": workflow_family,
-            "table_name": table_name,
+            "table_name": safe_table_name,
             "source_status": raw_status,
         }).scalar()
         db.session.execute(text("""
@@ -962,7 +1085,7 @@ def _sync_generic_table(
             "wid": wid,
             "by": getattr(current_user, 'id', None),
             "status": instance_status,
-            "note": f"Faz 4 genel iş akış bağlantısı oluşturuldu: {table_name}",
+            "note": f"Faz 4 genel iş akış bağlantısı oluşturuldu: {safe_table_name}",
         })
         created += 1
     db.session.commit()
@@ -1037,7 +1160,8 @@ def sync_cross_module_workflows() -> dict[str, int]:
 def workflow_modules_dashboard():
     if not _can_view():
         return _deny()
-    ensure_tables(); refresh_delay_states()
+    ensure_tables()
+    refresh_delay_states()
     rows = db.session.execute(text("""
         SELECT module,
                workflow_family,
