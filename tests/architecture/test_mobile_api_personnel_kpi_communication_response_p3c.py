@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 from scripts.quality.bys360_mobile_personnel_kpi_communication_response_gate_p3c import run_checks
 

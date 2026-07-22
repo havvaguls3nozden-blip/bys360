@@ -10,7 +10,11 @@ from app.services.performance.chain_rule_engine import (
     resolve_authoritative_chain,
 )
 from app.services.performance.rules import get_authoritative_performance_rules_snapshot
-from app.services.performance_v2.rules import COORDINATOR_POLICY, GROUP_MANAGER_POLICY, GROUP_STAFF_POLICY
+from app.services.performance_v2.rules import (
+    COORDINATOR_POLICY,
+    GROUP_MANAGER_POLICY,
+    GROUP_STAFF_POLICY,
+)
 
 
 def _user(**kwargs):

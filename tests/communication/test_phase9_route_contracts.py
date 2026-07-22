@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
 import ast
+from pathlib import Path
 
 import pytest
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 COMM_ROOT = PROJECT_ROOT / 'app' / 'communication'

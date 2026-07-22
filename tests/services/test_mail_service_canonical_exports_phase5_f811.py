@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from app.services import mail_core
-from app.services import mail_performance_sender
-from app.services import mail_service
+from app.services import mail_core, mail_performance_sender, mail_service
 
 
 def test_mail_service_exports_canonical_implementations():

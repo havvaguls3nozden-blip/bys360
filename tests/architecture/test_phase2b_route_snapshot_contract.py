@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
-from collections import Counter
 import ast
 import json
 import re
+from collections import Counter
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SNAPSHOT_JSON = Path(__file__).resolve().parent / "snapshots" / "phase2b_route_snapshot_baseline.json"

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import pytest
-
 # -*- coding: utf-8 -*-
-
 import json
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 
 def test_android_responsive_core_styles_gate_p5b() -> None:

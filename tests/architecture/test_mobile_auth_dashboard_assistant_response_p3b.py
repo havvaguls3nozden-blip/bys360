@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import pytest
-
 from pathlib import Path
+
+import pytest
 
 from scripts.quality.bys360_mobile_auth_dashboard_assistant_response_gate_p3b import run_checks
 

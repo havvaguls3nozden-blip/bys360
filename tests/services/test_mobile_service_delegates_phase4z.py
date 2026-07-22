@@ -1,7 +1,7 @@
 ﻿from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 PHASE4Z_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PHASE4Z_PROJECT_ROOT) not in sys.path:

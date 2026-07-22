@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.quality.bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2 import run_checks
+from scripts.quality.bys360_mobile_personnel_kpi_communication_response_gate_p3c_v2 import (
+    run_checks,
+)
 
 
 def test_mobile_personnel_kpi_communication_response_gate_p3c_v2() -> None:

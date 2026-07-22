@@ -16,7 +16,10 @@ def test_shared_kpi_completion_rate_boundaries():
 
 
 def test_kpi_service_status_classification():
-    from app.modules.strategic_performance.services.kpi_service import classify_kpi_status, enrich_target
+    from app.modules.strategic_performance.services.kpi_service import (
+        classify_kpi_status,
+        enrich_target,
+    )
 
     assert classify_kpi_status(95)["status_label"] == "Tamamlandı"
     assert classify_kpi_status(75)["status_label"] == "Devam Ediyor"

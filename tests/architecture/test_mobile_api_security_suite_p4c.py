@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import pytest
-
 # -*- coding: utf-8 -*-
-
 import importlib.util
 from pathlib import Path
+
+import pytest
 
 
 def _load_gate(root: Path):

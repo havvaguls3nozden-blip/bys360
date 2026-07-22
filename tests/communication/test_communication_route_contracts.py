@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
 import ast
 import re
+from pathlib import Path
 
 import pytest
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 APP_ROOT = PROJECT_ROOT / "app"

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import pytest
-
 import ast
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 MOBILE_ROOT = ROOT / "app" / "api" / "mobile"

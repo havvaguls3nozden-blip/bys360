@@ -1,7 +1,7 @@
 from app.performance.rules.performance_manager_rules_contract import (
     FORBIDDEN_PRIMARY_TERM,
-    LOW_SCORE_THRESHOLD,
     HIGH_SCORE_THRESHOLD,
+    LOW_SCORE_THRESHOLD,
     NO_BLIND_EVALUATION,
     PERSON_RESULT_VISIBLE_ONLY_AFTER_PUBLISH,
     PRIMARY_TERM,
