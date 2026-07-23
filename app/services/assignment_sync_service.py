@@ -251,7 +251,7 @@ def _desired_levels(user: Any, by_sicil: dict[str, Any], period: Any | None = No
     if m3 and bool(getattr(chain, 'level_3_enabled', True)):
         levels[3] = m3
 
-    base = {
+    base: dict[str, Any] = {
         "employee_id": getattr(user, "id", None),
         "sicil_no": _sicil(user),
         "full_name": _full_name(user),
@@ -376,7 +376,7 @@ def _status_allows_retarget(row: Any) -> bool:
 
 
 def _create_assignment(period_id: int, employee_id: int, evaluator_id: int, manager_level: int) -> Any:
-    row = EvaluationAssignment(
+    row = EvaluationAssignment(  # type: ignore[misc]
         period_id=period_id,
         employee_id=employee_id,
         evaluator_id=evaluator_id,
@@ -445,7 +445,7 @@ def sync_assignments_for_active_period(
                 if not evaluator:
                     continue
 
-                base = {
+                base: dict[str, Any] = {
                     "employee_id": getattr(user, "id", None),
                     "sicil_no": _sicil(user),
                     "full_name": _full_name(user),
