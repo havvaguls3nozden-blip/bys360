@@ -67,6 +67,15 @@ disable_error_code = ["name-defined"]
 module = "app.models.performance_low_score_models"
 disable_error_code = ["method-assign", "assignment"]
 
+# db.relationship(..., lazy="dynamic") returns an AppenderQuery at runtime
+# but mypy sees the plain RelationshipProperty descriptor (no stubs model
+# the lazy="dynamic" instance-access behavior), so .filter()/.order_by()/
+# .first()/.all() on these attributes misreport as "not callable". Verified
+# every remaining finding in this file is this exact pattern before adding.
+[[tool.mypy.overrides]]
+module = "app.services.communication_phase2_service"
+disable_error_code = ["misc", "operator"]
+
 # These modules receive their names via `globals().update(route_globals)`
 # from the parent route module at registration time (see app/api/mobile/*
 # read-route bridges) - a pattern already accepted for ruff's F821 in

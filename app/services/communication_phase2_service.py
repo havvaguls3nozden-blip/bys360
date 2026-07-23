@@ -198,8 +198,6 @@ def _resolve_users_for_audience(target_type: str, raw_values: Iterable[str]) -> 
 
 
 def _notification_create(user_id: int, title: str, body: str, notification_type: str, source_type: str, source_id: int | None, link_url: str | None = None):
-    if not Notification:
-        return None
     row = Notification(
         user_id=user_id,
         title=title,
