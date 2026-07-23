@@ -418,7 +418,7 @@ _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT = _build_role_matrix_ui_context_ba
 
 def build_role_matrix_ui_context(active_group_key: str | None = None):
     if callable(_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT):
-        context = _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT(active_group_key)
+        context = _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT(active_group_key or "tum")
     else:
         context = {}
     if isinstance(context, dict):
@@ -430,11 +430,11 @@ def build_role_matrix_ui_context(active_group_key: str | None = None):
 # BYS360_SETTINGS_MENU_ROLE_MATRIX_ALL_TABS_V1_BEGIN
 # Görsel Rol Matrisi Merkezi de yeni KPI/Hedef ve Öz Değerlendirme sekmelerini gösterir.
 _BYS360_ROLE_MATRIX_UI_EXTRA_PERFORMANCE_ROWS = (
-    MatrixRow('performance_kpi_dashboard', 'KPI Dashboardu', 'performance_kpi_dashboard', 'fa-solid fa-gauge-high', ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'KPI ve hedef gerçekleşmeleri'),
-    MatrixRow('performance_kpi_management', 'KPI ve Hedef Yönetimi', 'performance_kpi_management', 'fa-solid fa-bullseye', ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'], 'Hedef kartları ve KPI kayıtları'),
-    MatrixRow('performance_competency_library', 'Yetkinlik Kütüphanesi', 'performance_competency_library', 'fa-solid fa-layer-group', ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'Rol/görev bazlı yetkinlik tanımları'),
-    MatrixRow('performance_self_assessment', 'Öz Değerlendirme', 'performance_self_assessment', 'fa-solid fa-user-pen', ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'], 'Personel öz değerlendirme ve yönetici özetleri'),
-    MatrixRow('performance_kpi_analysis', 'KPI Analiz Merkezi', 'performance_kpi_analysis', 'fa-solid fa-chart-pie', ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'], 'KPI/hedef analiz ve karar destek özetleri'),
+    MatrixRow('performance_kpi_dashboard', 'KPI Dashboardu', 'performance_kpi_dashboard', 'fa-solid fa-gauge-high', ('admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'), 'KPI ve hedef gerçekleşmeleri'),
+    MatrixRow('performance_kpi_management', 'KPI ve Hedef Yönetimi', 'performance_kpi_management', 'fa-solid fa-bullseye', ('admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'), 'Hedef kartları ve KPI kayıtları'),
+    MatrixRow('performance_competency_library', 'Yetkinlik Kütüphanesi', 'performance_competency_library', 'fa-solid fa-layer-group', ('admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'), 'Rol/görev bazlı yetkinlik tanımları'),
+    MatrixRow('performance_self_assessment', 'Öz Değerlendirme', 'performance_self_assessment', 'fa-solid fa-user-pen', ('admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'), 'Personel öz değerlendirme ve yönetici özetleri'),
+    MatrixRow('performance_kpi_analysis', 'KPI Analiz Merkezi', 'performance_kpi_analysis', 'fa-solid fa-chart-pie', ('admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'), 'KPI/hedef analiz ve karar destek özetleri'),
 )
 try:
     _patched_groups = []
@@ -716,7 +716,7 @@ except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: Dönem Yönetim Merkezi rol matrisi satırı eklenemedi")
 
 _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT_V221 = globals().get("build_role_matrix_ui_context")
-def build_role_matrix_ui_context(active_group_key: str | None = None):
+def build_role_matrix_ui_context(active_group_key: str | None = None):  # type: ignore[no-redef]
     if callable(_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT_V221):
         context = _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_UI_CONTEXT_V221(active_group_key)
     else:

@@ -108,3 +108,12 @@ module = [
     "app.menu_registry_data_performance",
 ]
 disable_error_code = ["name-defined", "assignment", "attr-defined", "index", "call-overload"]
+
+# Same reused-throwaway-variable-name-across-independent-blocks pattern as
+# menu_registry.py (each historical "V-something" role matrix patch block
+# reuses `_rows`/`_group` at module scope with a different inferred
+# list/tuple shape). Every remaining finding here was individually verified
+# to be this pattern before disabling.
+[[tool.mypy.overrides]]
+module = "app.services.role_matrix_ui_service"
+disable_error_code = ["assignment", "operator", "arg-type", "attr-defined"]
