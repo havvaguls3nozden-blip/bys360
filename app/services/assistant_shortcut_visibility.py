@@ -350,5 +350,5 @@ def register_assistant_shortcut_visibility_context(app):
             "assistant_shortcut_visibility_json": visibility,
             "assistant_shortcut_label_json": labels,
         }
-    app._bys360_assistant_shortcut_visibility_context_registered = True  # type: ignore[attr-defined]
+    app._bys360_assistant_shortcut_visibility_context_registered = True
     return app

@@ -31,7 +31,7 @@ def install_default_http_timeout_guard() -> bool:
     if _INSTALLED:
         return False
     try:
-        import requests  # type: ignore
+        import requests
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/runtime/http_timeout_guard.py:34")
         return False

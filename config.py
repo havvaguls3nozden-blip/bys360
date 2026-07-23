@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_8_DOTENV_FALLBACK_V2
 try:
-    from dotenv import load_dotenv  # type: ignore
+    from dotenv import load_dotenv
 except ModuleNotFoundError:
     def load_dotenv(dotenv_path=None, override: bool = False, **_kwargs):
         """python-dotenv yoksa uygulamayı düşürmeyen minimum .env okuyucu."""

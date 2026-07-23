@@ -29,7 +29,7 @@ from typing import (  # noqa: E402 - deferred import (staged facade/route-regist
 )
 
 try:
-    import app.models as models  # type: ignore
+    import app.models as models
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     models = None
@@ -142,7 +142,7 @@ def fetch_active_users() -> list[Any]:
         query = query.filter_by(is_active=True)
     rows = query.order_by(User.id.asc()).all()
     try:
-        from app.services.hierarchy_rulebook_service import is_system_user  # type: ignore
+        from app.services.hierarchy_rulebook_service import is_system_user
         rows = [row for row in rows if not is_system_user(row)]
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")

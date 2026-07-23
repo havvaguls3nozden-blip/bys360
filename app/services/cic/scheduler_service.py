@@ -41,7 +41,7 @@ def _cic_auto_bool(value: object, default: bool = False) -> bool:
     return text in {"1", "true", "on", "yes", "evet", "aktif", "checked"}
 
 
-def get_auto_scheduler_config() -> dict[str, object]:  # type: ignore[override]
+def get_auto_scheduler_config() -> dict[str, object]:
     enabled_raw = get_setting(f"{BASE_KEY}.auto_scheduler_enabled", "false") or "false"
     weekdays_raw = get_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", "true") or "true"
     try:
@@ -61,7 +61,7 @@ def get_auto_scheduler_config() -> dict[str, object]:  # type: ignore[override]
     }
 
 
-def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:  # type: ignore[override]
+def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:
     enabled = "true" if _cic_auto_bool(payload.get("auto_scheduler_enabled"), default=False) else "false"
     if "auto_scheduler_weekdays_only" in payload:
         weekdays_only = "true" if _cic_auto_bool(payload.get("auto_scheduler_weekdays_only"), default=True) else "false"
@@ -85,7 +85,7 @@ def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | N
         db.session.rollback()
 
 
-def _run_due_tasks_base(*, now: datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, Any]:  # type: ignore[override]
+def _run_due_tasks_base(*, now: datetime | None = None, dry_run: bool = False, actor_user_id: int | None = None, force: bool = False) -> dict[str, Any]:
     """Zamanı gelen aktif mail görevlerini çalıştırır; hafta sonu otomatik gönderimi engeller."""
     ensure_defaults(actor_user_id=actor_user_id)
     scheduler = get_auto_scheduler_config()

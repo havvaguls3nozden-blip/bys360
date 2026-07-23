@@ -54,7 +54,7 @@ def _redis_client() -> Any | None:
     if _REDIS_CLIENT is not None and url == _REDIS_CLIENT_KEY:
         return _REDIS_CLIENT
     try:
-        import redis  # type: ignore
+        import redis
         client = redis.Redis.from_url(
             url,
             socket_connect_timeout=float(_cfg("REDIS_CONNECT_TIMEOUT", 1.0) or 1.0),

@@ -52,7 +52,7 @@ def _read_module_setting(module_key: str, setting_key: str, default: Any) -> Any
             from app.models.settings_models import ModuleSetting
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            from app.models import ModuleSetting  # type: ignore
+            from app.models import ModuleSetting
         row = ModuleSetting.query.filter_by(module_key=module_key, setting_key=setting_key).first()
         if row is None or getattr(row, "is_active", True) is False:
             return default
@@ -309,12 +309,12 @@ def normalize_third_supervisor_effective_weights(
 def _phase4_6_resolve_third_supervisor_mode(period: Any | None = None) -> str:
     """3. amir modunu final gate ve UI statü dili için güvenli biçimde çözer."""
     try:
-        raw_mode = get_third_supervisor_setting(  # type: ignore[name-defined]
+        raw_mode = get_third_supervisor_setting(
             "third_supervisor_mode",
-            DEFAULTS.get("performance.third_supervisor_mode", "comment_only"),  # type: ignore[name-defined]
+            DEFAULTS.get("performance.third_supervisor_mode", "comment_only"),
         )
         try:
-            return _normalize_mode(raw_mode, "comment_only")  # type: ignore[name-defined]
+            return _normalize_mode(raw_mode, "comment_only")
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             value = str(raw_mode or "comment_only").strip().lower()
@@ -324,7 +324,7 @@ def _phase4_6_resolve_third_supervisor_mode(period: Any | None = None) -> str:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            value = str(third_supervisor_mode(period) or "comment_only").strip().lower()  # type: ignore[name-defined]
+            value = str(third_supervisor_mode(period) or "comment_only").strip().lower()
             if value in {"scoring", "score", "puan", "puan_modu", "puanlama"}:
                 return "scoring"
         except Exception:

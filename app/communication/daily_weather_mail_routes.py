@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 _SERVICE_ERROR = ""
 try:
-    from app.services.daily_weather_mail import (  # type: ignore
+    from app.services.daily_weather_mail import (
         DAILY_WEATHER_MENU_KEY,
         current_config,
         ensure_daily_weather_defaults,

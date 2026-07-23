@@ -12,7 +12,7 @@ try:
     from app.extensions import db
 except Exception:  # pragma: no cover - legacy fallback
     logger.exception("Performans modulu kritik isleminde hata olustu", exc_info=True)
-    from app import db  # type: ignore
+    from app import db
 
 president_scorecard_v2_bp = Blueprint("president_scorecard_v2", __name__)
 

@@ -648,10 +648,10 @@ def build_bys360_assistant_usage_manual_reply_v32(
     # Eski motor daha iyi cevap üretebilecekse deneriz; ama ham hata veya boş dönüşte genel kılavuz cevabı verilir.
     if callable(legacy_builder):
         try:
-            legacy = legacy_builder(user, question, context=context)  # type: ignore[misc]
+            legacy = legacy_builder(user, question, context=context)
         except TypeError:
             try:
-                legacy = legacy_builder(user, question)  # type: ignore[misc]
+                legacy = legacy_builder(user, question)
             except Exception:
                 legacy = None
         except Exception:

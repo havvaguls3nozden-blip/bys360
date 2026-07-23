@@ -10,7 +10,7 @@ from flask_login import current_user, login_required
 try:
     from app.dashboard import bp
 except Exception:
-    from app.routes import main_bp as bp  # type: ignore
+    from app.routes import main_bp as bp
 
 from app.services.executive_summary_service import (
     build_executive_summary_context,

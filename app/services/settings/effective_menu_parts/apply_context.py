@@ -245,7 +245,7 @@ def _phase3_2_ascii_tr(value: str) -> str:
 
 def _phase3_2_normalize_role_name(value: object) -> str:
     try:
-        base = normalize_role_name(value)  # type: ignore[name-defined]
+        base = normalize_role_name(value)
     except Exception:
         logger = __import__("logging").getLogger(__name__)
         logger.exception("BYS360 effective menu guvenli fallback isleminde hata yakalandi | line=369")

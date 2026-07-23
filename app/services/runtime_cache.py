@@ -12,11 +12,11 @@ try:
 except Exception:  # pragma: no cover
     current_app = None
 
-    def has_app_context() -> bool:  # type: ignore
+    def has_app_context() -> bool:
         return False
 
 try:
-    import redis  # type: ignore
+    import redis
 except Exception:  # pragma: no cover
     redis = None  # type: ignore
 

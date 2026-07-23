@@ -8,9 +8,9 @@ from typing import Any
 from markupsafe import Markup, escape
 
 try:
-    import bleach  # type: ignore
+    import bleach
 except Exception:  # pragma: no cover
-    bleach = None  # type: ignore
+    bleach = None
 
 _ALLOWED_SOCIAL_TAGS = ["blockquote", "a", "br"]
 _ALLOWED_SOCIAL_ATTRS = {

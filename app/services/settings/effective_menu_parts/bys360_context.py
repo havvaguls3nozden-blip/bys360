@@ -414,7 +414,7 @@ def _bys360_portal_role_matrix_v2_12_apply(visibility, user, *, rollback=None):
 
 def _bys360_exec_norm(value: object) -> str:
     try:
-        base = normalize_role_name(value)  # type: ignore[name-defined]
+        base = normalize_role_name(value)
     except Exception:
         logger = __import__("logging").getLogger(__name__)
         logger.exception("BYS360 effective menu isleminde hata yakalandi")

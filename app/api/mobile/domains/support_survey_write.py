@@ -40,15 +40,15 @@ from app.api.mobile.shared import (
 
 try:
     from app.api.mobile.services import (
-        support_survey_service as _mobile_support_service,  # type: ignore
+        support_survey_service as _mobile_support_service,
     )
 except Exception:  # pragma: no cover - compatibility fallback
     try:
         from app.api.mobile.services import (
-            support_service as _mobile_support_service,  # type: ignore
+            support_service as _mobile_support_service,
         )
     except Exception:  # pragma: no cover
-        _mobile_support_service = None  # type: ignore
+        _mobile_support_service = None
 
 def _mobile_support_status_label(value: Any) -> str:
     status = str(value or "open").strip().lower()

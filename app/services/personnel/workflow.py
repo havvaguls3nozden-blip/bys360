@@ -47,7 +47,7 @@ EnsureUnitExists = Callable[..., Any]
 try:
     from app.security import get_default_first_login_password
 except Exception:  # pragma: no cover
-    def get_default_first_login_password() -> str:  # type: ignore[no-redef]
+    def get_default_first_login_password() -> str:
         import secrets
         return secrets.token_urlsafe(12)
 

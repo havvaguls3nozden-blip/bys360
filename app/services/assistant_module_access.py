@@ -193,7 +193,7 @@ def _table_columns(session, table_name: str) -> set[str]:
             return set()
 
     try:
-        from sqlalchemy import inspect  # type: ignore
+        from sqlalchemy import inspect
         if bind is not None:
             return {str(col.get("name")) for col in inspect(bind).get_columns(table) if col.get("name")}
     except Exception:
@@ -494,7 +494,7 @@ def register_assistant_module_master_access(app):
             logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=480")
             return abort(403)
 
-    app._bys360_assistant_module_master_access_registered = True  # type: ignore[attr-defined]
+    app._bys360_assistant_module_master_access_registered = True
     return app
 
 # Compatibility guard.

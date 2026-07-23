@@ -11,7 +11,7 @@ from typing import Any
 try:  # güvenli metin temizliği varsa kullan
     from app.services.ai.guardrails import sanitize_output_text
 except Exception:  # pragma: no cover
-    def sanitize_output_text(value: str) -> str:  # type: ignore[no-redef]
+    def sanitize_output_text(value: str) -> str:
         return str(value or "").strip()
 
 

@@ -27,8 +27,8 @@ try:
     from flask_login import current_user, login_required
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz10_routes.py | line=23")
-    current_user = None  # type: ignore
-    def login_required(func):  # type: ignore
+    current_user = None
+    def login_required(func):
         return func
 
 try:

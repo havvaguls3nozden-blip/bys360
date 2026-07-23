@@ -45,7 +45,7 @@ def init_feedback_followup_scheduler(app: Any) -> bool:
         return True
 
     if not _truthy(os.getenv("BYS360_FEEDBACK_FOLLOWUP_SCHEDULER", "0")):
-        app._bys360_feedback_followup_scheduler_ready = False  # type: ignore[attr-defined]
+        app._bys360_feedback_followup_scheduler_ready = False
         logger.info("BYS360 eylem planı takip zamanlayıcısı kapalı. Harici script/Görev Zamanlayıcı kullanılabilir.")
         return False
 
@@ -53,7 +53,7 @@ def init_feedback_followup_scheduler(app: Any) -> bool:
         from apscheduler.schedulers.background import BackgroundScheduler
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        app._bys360_feedback_followup_scheduler_ready = False  # type: ignore[attr-defined]
+        app._bys360_feedback_followup_scheduler_ready = False
         logger.warning("APScheduler bulunamadı; takip bildirimi için scripts/run_feedback_followup_scheduler.py veya Windows Görev Zamanlayıcı kullanın: %s", exc)
         return False
 
@@ -70,8 +70,8 @@ def init_feedback_followup_scheduler(app: Any) -> bool:
         coalesce=True,
     )
     scheduler.start()
-    app._bys360_feedback_followup_scheduler = scheduler  # type: ignore[attr-defined]
-    app._bys360_feedback_followup_scheduler_ready = True  # type: ignore[attr-defined]
+    app._bys360_feedback_followup_scheduler = scheduler
+    app._bys360_feedback_followup_scheduler_ready = True
     logger.info("BYS360 eylem planı takip zamanlayıcısı aktif | interval=%s dk | days_ahead=%s", interval_minutes, days_ahead)
     return True
 

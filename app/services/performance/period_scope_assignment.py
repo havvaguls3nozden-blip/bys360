@@ -25,7 +25,7 @@ TR_ASCII_MAP = str.maketrans({
 })
 
 try:  # Faz 8.2 sözleşmesi varsa onu kullan.
-    from app.services.performance.period_scope_contract import (  # type: ignore
+    from app.services.performance.period_scope_contract import (
         SCOPE_ALL,
         SCOPE_CATEGORY,
         SCOPE_SELECTED_PERSONNEL,
@@ -72,7 +72,7 @@ except Exception:  # pragma: no cover - eski paket güvenliği
         }.get(normalize_period_scope_type(value), "Tüm Kurum")
 
 try:  # Faz 8.3 özel senaryo varsayılanları varsa onları da uygula.
-    from app.services.performance.period_special_scenario_contract import (  # type: ignore
+    from app.services.performance.period_special_scenario_contract import (
         build_special_scenario_defaults,
         get_special_period_scenario_label,
         normalize_special_period_scenario,

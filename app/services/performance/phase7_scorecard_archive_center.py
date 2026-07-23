@@ -344,7 +344,7 @@ def seed_phase7_scorecard_archive_settings() -> dict[str, Any]:
             from app.models import ModuleSetting
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            from app.models.settings_models import ModuleSetting  # type: ignore
+            from app.models.settings_models import ModuleSetting
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return {"ok": False, "error": str(exc), "settings": changed, "schema": schema}

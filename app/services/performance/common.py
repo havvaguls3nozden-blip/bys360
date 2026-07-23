@@ -430,7 +430,7 @@ def build_assignment_due_date(period: PerformancePeriod | None, assigned_at: dat
     return datetime.combine(end, datetime.max.time().replace(microsecond=0))
 
 # BYS360_PHASE4_5_COMMON_WEIGHT_OVERRIDE
-def get_period_level_3_flags(period=None, weight_config=None) -> dict[str, Any]:  # type: ignore[override]
+def get_period_level_3_flags(period=None, weight_config=None) -> dict[str, Any]:
     period = period or get_active_period()
     weight_config = weight_config or get_active_weight_config(getattr(period, "id", None) if period else None)
 
@@ -481,7 +481,7 @@ def get_period_level_3_flags(period=None, weight_config=None) -> dict[str, Any]:
     return {"enabled": enabled, "scoring_enabled": scoring_enabled, "mode": mode}
 
 
-def normalize_weight_inputs(  # type: ignore[override]
+def normalize_weight_inputs(
     evaluator_1_weight: float,
     evaluator_2_weight: float,
     evaluator_3_weight: float,
@@ -533,7 +533,7 @@ def normalize_weight_inputs(  # type: ignore[override]
         return result
 
 
-def calculate_effective_weights(  # type: ignore[override]
+def calculate_effective_weights(
     period,
     employee,
     manager_1_id,

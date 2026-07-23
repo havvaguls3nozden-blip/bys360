@@ -438,7 +438,7 @@ def _bys360_pf_v14_dedupe_menu_items(items):
     return result
 
 
-def save_user_menu_overrides_handler(  # type: ignore[no-redef]
+def save_user_menu_overrides_handler(
     *,
     user: Any,
     flat_menu_items: list[dict[str, Any]],

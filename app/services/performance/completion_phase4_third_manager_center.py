@@ -179,7 +179,7 @@ def _read_module_setting(module_key: str, setting_key: str, default: Any) -> Any
             from app.models import ModuleSetting
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            from app.models.settings_models import ModuleSetting  # type: ignore
+            from app.models.settings_models import ModuleSetting
         row = ModuleSetting.query.filter_by(module_key=module_key, setting_key=setting_key).first()
         if row is None or getattr(row, "is_active", True) is False:
             return default
@@ -388,7 +388,7 @@ def phase4_should_show_third_manager_column(
         rows_iter = [rows]
     else:
         try:
-            rows_iter = list(rows)  # type: ignore[arg-type]
+            rows_iter = list(rows)
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             rows_iter = [rows]
@@ -497,7 +497,7 @@ def seed_phase4_third_manager_center(commit: bool = True) -> dict[str, Any]:
             from app.models import ModuleSetting
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            from app.models.settings_models import ModuleSetting  # type: ignore
+            from app.models.settings_models import ModuleSetting
 
         for module_key, setting_key, label, value_type, default_value, description in PHASE4_SETTING_ROWS:
             row = ModuleSetting.query.filter_by(module_key=module_key, setting_key=setting_key).first()

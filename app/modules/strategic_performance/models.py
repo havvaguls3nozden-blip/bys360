@@ -12,7 +12,7 @@ try:
     from app.extensions import db
 except Exception:  # Bazı BYS360 sürümlerinde db app içinden gelebilir.
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    from app import db  # type: ignore
+    from app import db
 
 
 class PerformanceTargetPeriod(db.Model):

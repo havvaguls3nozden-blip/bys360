@@ -46,7 +46,7 @@ def apply_v213c_category_menu_wrapper(
                 elif isinstance(_target, list) and _BYS360_V213C_CATEGORY_MENU_KEY not in _target:
                     _target.append(_BYS360_V213C_CATEGORY_MENU_KEY)
         _BYS360_V213C_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = current_build_menu_visibility_map
-        def _bys360_v213c_build_menu_visibility_map_wrapper(user, *args, **kwargs):  # type: ignore[no-redef]
+        def _bys360_v213c_build_menu_visibility_map_wrapper(user, *args, **kwargs):
                 visibility = dict(_BYS360_V213C_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
                 try:
                     _role = normalize_role_name(getattr(user, "role", ""))
@@ -85,7 +85,7 @@ def apply_v215_category_period_scope_wrapper(
         _BYS360_V215_CATEGORY_PERIOD_SCOPE_KEY = "performance_category_period_scope"
         _BYS360_V215_CATEGORY_PERIOD_SCOPE_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
         _BYS360_V215_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = current_build_menu_visibility_map
-        def _bys360_v215_category_period_scope_build_menu_visibility_map_wrapper(user, *args, **kwargs):  # type: ignore[no-redef]
+        def _bys360_v215_category_period_scope_build_menu_visibility_map_wrapper(user, *args, **kwargs):
                 visibility = dict(_BYS360_V215_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
                 try:
                     _role = normalize_role_name(getattr(user, "role", ""))
@@ -127,7 +127,7 @@ def apply_v216_category_period_integration_wrapper(
         _BYS360_V216_CATEGORY_PERIOD_INTEGRATION_KEY = "performance_category_period_integration"
         _BYS360_V216_CATEGORY_PERIOD_INTEGRATION_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
         _BYS360_V216_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = current_build_menu_visibility_map
-        def _bys360_v216_category_period_integration_build_menu_visibility_map_wrapper(user, *args, **kwargs):  # type: ignore[no-redef]
+        def _bys360_v216_category_period_integration_build_menu_visibility_map_wrapper(user, *args, **kwargs):
                 visibility = dict(_BYS360_V216_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
                 try:
                     _role = normalize_role_name(getattr(user, "role", ""))
@@ -169,7 +169,7 @@ def apply_v214_category_scope_wrapper(
         _BYS360_V214_CATEGORY_SCOPE_KEY = "performance_category_scope_visibility"
         _BYS360_V214_CATEGORY_SCOPE_ROLES = {"admin", "administrator", "super_admin", "system_admin", "sistem_yoneticisi"}
         _BYS360_V214_PREVIOUS_BUILD_MENU_VISIBILITY_MAP = current_build_menu_visibility_map
-        def _bys360_v214_category_scope_build_menu_visibility_map_wrapper(user, *args, **kwargs):  # type: ignore[no-redef]
+        def _bys360_v214_category_scope_build_menu_visibility_map_wrapper(user, *args, **kwargs):
                 visibility = dict(_BYS360_V214_PREVIOUS_BUILD_MENU_VISIBILITY_MAP(user, *args, **kwargs) or {})
                 try:
                     _role = normalize_role_name(getattr(user, "role", ""))

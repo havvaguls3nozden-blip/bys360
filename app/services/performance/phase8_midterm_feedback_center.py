@@ -446,7 +446,7 @@ def seed_phase8_midterm_feedback_settings() -> dict[str, Any]:
             from app.models import ModuleSetting
         except Exception:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/phase8_midterm_feedback_center.py | line=440")
-            from app.models.settings_models import ModuleSetting  # type: ignore
+            from app.models.settings_models import ModuleSetting
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/phase8_midterm_feedback_center.py | line=442")
         return {"ok": False, "error": str(exc), "settings": changed, "schema": schema}

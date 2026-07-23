@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 # BYS360_PHASE4_5_V2_WEIGHT_PLAN_OVERRIDE
-def resolve_weight_plan(employee, period=None, resolved_chain=None) -> WeightPlan:  # type: ignore[override]
+def resolve_weight_plan(employee, period=None, resolved_chain=None) -> WeightPlan:
     policy = resolve_chain_policy(employee)
     level_mode = normalize_level_mode(period)
 

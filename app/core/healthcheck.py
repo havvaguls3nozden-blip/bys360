@@ -13,7 +13,7 @@ def _db_status() -> tuple[bool, str]:
     try:
         from sqlalchemy import text
         try:
-            from app.extensions import db  # type: ignore
+            from app.extensions import db
         except Exception:
             from extensions import db  # type: ignore
         db.session.execute(text("SELECT 1"))
@@ -28,7 +28,7 @@ def _redis_status() -> tuple[bool | None, str]:
     if not url:
         return None, "not_configured"
     try:
-        import redis  # type: ignore
+        import redis
         client = redis.Redis.from_url(url, socket_connect_timeout=2, socket_timeout=2)
         return bool(client.ping()), "ok"
     except Exception as exc:  # pragma: no cover - canlı ortam bağımlılığı

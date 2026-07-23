@@ -18,11 +18,11 @@ try:
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.datavalidation import DataValidation
 except Exception:  # pragma: no cover - uygulama açılışını bloklamamak için
-    Workbook = None  # type: ignore[assignment]
-    Comment = None  # type: ignore[assignment]
-    Alignment = Border = Font = PatternFill = Side = None  # type: ignore[assignment]
-    get_column_letter = None  # type: ignore[assignment]
-    DataValidation = None  # type: ignore[assignment]
+    Workbook = None
+    Comment = None
+    Alignment = Border = Font = PatternFill = Side = None
+    get_column_letter = None
+    DataValidation = None
 
 PERSONNEL_EXCEL_TEMPLATE_HEADERS: tuple[str, ...] = (
     "sicil no",

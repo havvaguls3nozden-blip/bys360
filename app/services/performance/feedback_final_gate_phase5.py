@@ -350,9 +350,9 @@ def _database_status() -> dict[str, Any]:
         "notifications",
     ]
     try:
-        from sqlalchemy import inspect  # type: ignore
+        from sqlalchemy import inspect
 
-        from app.extensions import db  # type: ignore
+        from app.extensions import db
         inspector = inspect(db.engine)
         rows = []
         for table in table_names:
