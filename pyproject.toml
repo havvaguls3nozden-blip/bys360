@@ -49,3 +49,48 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 no_implicit_optional = true
 exclude = "(^migrations/|^app/static/|^app/templates/)"
+
+# db.Model is a Flask-SQLAlchemy runtime attribute mypy cannot statically
+# resolve as a base class; every ORM model module hits this the same way.
+[[tool.mypy.overrides]]
+module = [
+    "app.models.*",
+    "app.modules.strategic_performance.models",
+    "app.services.performance.models_phase5_template",
+]
+disable_error_code = ["name-defined"]
+
+# Dynamic property monkeypatching on an ORM class after definition
+# (wrapped in try/except NameError) confuses mypy's method/assignment
+# checks; contained to this one file.
+[[tool.mypy.overrides]]
+module = "app.models.performance_low_score_models"
+disable_error_code = ["method-assign", "assignment"]
+
+# These modules receive their names via `globals().update(route_globals)`
+# from the parent route module at registration time (see app/api/mobile/*
+# read-route bridges) - a pattern already accepted for ruff's F821 in
+# app/menu_registry.py and friends.
+[[tool.mypy.overrides]]
+module = [
+    "app.api.mobile.performance_read_routes",
+    "app.api.mobile.light_read_routes",
+    "app.api.mobile.communication_read_routes",
+    "app.api.mobile.detail_read_routes",
+    "app.api.mobile.support_survey_read_routes",
+    "app.api.mobile.communication_v2_read_routes",
+    "app.api.mobile.utility_routes",
+]
+disable_error_code = ["name-defined"]
+
+# Dynamic menu/live-scope globals populated via globals().get(...)/globals()
+# injection elsewhere in the module - the same pattern already annotated
+# with `# noqa: F821 - dynamic menu registry global` for ruff.
+[[tool.mypy.overrides]]
+module = [
+    "app.live_scope",
+    "app.menu_registry",
+    "app.menu_registry_data_sections",
+    "app.menu_registry_data_performance",
+]
+disable_error_code = ["name-defined"]
