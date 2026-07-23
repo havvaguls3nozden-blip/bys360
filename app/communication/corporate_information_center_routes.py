@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL
+import logging
 
-from flask import abort, flash, redirect, render_template, request, url_for, session
+# BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE5_CONTROL_PANEL
+from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 
+from app.models import User
 from app.route_registry import main_bp
 from app.services.cic.service import (
     can_manage,
@@ -16,8 +18,7 @@ from app.services.cic.service import (
     save_templates,
     send_task,
 )
-from app.models import User
-import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -208,10 +209,11 @@ def corporate_information_center_celebrations_run(task_key: str):
 def corporate_information_center_celebration_excel_template():
     _guard()
     from io import BytesIO
+
     from flask import send_file
     try:
         from openpyxl import Workbook
-        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/communication/corporate_information_center_routes.py | line=214")
         flash("Excel şablonu üretilemedi. openpyxl kurulumu gerekiyor.", "warning")

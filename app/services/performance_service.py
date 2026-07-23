@@ -6,17 +6,9 @@ from typing import Any
 
 from app.services.performance.assignments import (
     build_assignment_log_summary as _build_assignment_log_summary_mod,
-)
-from app.services.performance.assignments import (
     build_assignment_unit_summary as _build_assignment_unit_summary_mod,
-)
-from app.services.performance.assignments import (
     generate_assignments_for_active_period as _generate_assignments_for_active_period_mod,
-)
-from app.services.performance.assignments import (
     get_latest_assignment_generation_logs as _get_latest_assignment_generation_logs_mod,
-)
-from app.services.performance.assignments import (
     is_informational_special_case as _is_informational_special_case_mod,
 )
 from app.services.performance.common import (
@@ -27,11 +19,9 @@ from app.services.performance.common import (
     get_active_weight_config,
     get_base_weight_map,
     get_period,
+    get_period_level_3_flags as _get_period_level_3_flags_mod,
     is_single_manager_case,
     normalize_weight_inputs,
-)
-from app.services.performance.common import (
-    get_period_level_3_flags as _get_period_level_3_flags_mod,
 )
 from app.services.performance.criteria import (
     get_level_items_map,

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Union
-
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformanceEvaluationItem
 
 from .common import _safe_float

@@ -12,12 +12,10 @@ from flask import (
     current_app,
     flash,
     redirect,
+    render_template as flask_render_template,
     request,
     session,
     url_for,
-)
-from flask import (
-    render_template as flask_render_template,
 )
 from flask_login import current_user
 from sqlalchemy.exc import SQLAlchemyError

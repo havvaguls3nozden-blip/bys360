@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+import logging
 import urllib.parse
 import urllib.request
 from datetime import datetime
 from typing import Any
-import logging
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -28,7 +29,7 @@ except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=24")
     MailLog = None
 try:
-    from app.services.mail_core import send_email, create_mail_log
+    from app.services.mail_core import create_mail_log, send_email
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=28")
     send_email = None

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 try:
     from flask import Blueprint, render_template
-    from flask_login import login_required, current_user
+    from flask_login import current_user, login_required
 except ImportError:
     Blueprint = None
     render_template = None
@@ -17,8 +17,8 @@ except ImportError:
         return f
     current_user = None
 
-from .services.dashboard_service import build_dashboard_summary, build_role_scope_label
 from .services.ai_summary_service import build_ai_safe_summary
+from .services.dashboard_service import build_dashboard_summary, build_role_scope_label
 
 if Blueprint:
     strategic_performance_dashboard_bp = Blueprint(

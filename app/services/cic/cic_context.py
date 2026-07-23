@@ -8,11 +8,13 @@ from __future__ import annotations
 import re as _cic_v45_re
 import time
 import unicodedata as _cic_v45_unicodedata
-from datetime import date as _cic_v45_date
-from datetime import datetime
-from datetime import datetime as _cic_dt_datetime
-from datetime import datetime as _cic_v45_datetime
-from datetime import timedelta as _cic_v45_timedelta
+from datetime import (
+    date as _cic_v45_date,
+    datetime,
+    datetime as _cic_dt_datetime,
+    datetime as _cic_v45_datetime,
+    timedelta as _cic_v45_timedelta,
+)
 from typing import Any
 
 import app.services.cic.template_service as _template_service
@@ -419,8 +421,7 @@ def _cic_v45_header_key(value: object) -> str | None:
 
 def _cic_v45_ensure_schema() -> None:
     try:
-        from sqlalchemy import inspect as _sa_inspect
-        from sqlalchemy import text as _sa_text
+        from sqlalchemy import inspect as _sa_inspect, text as _sa_text
         inspector = _sa_inspect(db.engine)
         if not inspector.has_table("users"):
             return
@@ -437,8 +438,7 @@ def _cic_v45_ensure_schema() -> None:
         pass
 
 def _cic_v45_existing_user_rows() -> list[dict[str, object]]:
-    from sqlalchemy import inspect as _sa_inspect
-    from sqlalchemy import text as _sa_text
+    from sqlalchemy import inspect as _sa_inspect, text as _sa_text
     inspector = _sa_inspect(db.engine)
     cols = {c.get("name") for c in inspector.get_columns("users")}
     select_cols = ["id"]

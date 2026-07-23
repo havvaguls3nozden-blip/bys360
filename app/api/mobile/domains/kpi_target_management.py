@@ -64,8 +64,8 @@ def _v2853_status_label(value):
 
 def _v2853_target_models():
     try:
-        from app.modules.strategic_performance.models import PerformanceTarget as _Target
         from app.modules.strategic_performance.models import (
+            PerformanceTarget as _Target,
             PerformanceTargetPeriod as _TargetPeriod,
         )
         return _Target, _TargetPeriod

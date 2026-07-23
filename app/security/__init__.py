@@ -5,13 +5,16 @@ Eski modüller app.security içinden farklı yardımcılar/validator'lar import 
 Bu dosya onları tek noktadan güvenli biçimde köprüler.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
-import os
-import secrets
-import string
-import uuid
-from pathlib import Path
+import os  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+import secrets  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+import string  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+import uuid  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+from pathlib import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Path,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
 try:
     from werkzeug.utils import secure_filename
@@ -27,14 +30,19 @@ except Exception as exc:
     current_app = None
 
 try:
-    from .upload_security import validate_upload as _core_validate_upload, UploadValidationError
+    from .upload_security import UploadValidationError, validate_upload as _core_validate_upload
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
     _core_validate_upload = None
     UploadValidationError = ValueError
 
 try:
-    from .email_policy import corporate_email_error_message, get_allowed_email_domains, is_allowed_corporate_email, normalize_email
+    from .email_policy import (
+        corporate_email_error_message,
+        get_allowed_email_domains,
+        is_allowed_corporate_email,
+        normalize_email,
+    )
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
     corporate_email_error_message = None
@@ -278,7 +286,9 @@ def save_profile_photo_to_user(file_storage, user=None, upload_folder=None, subd
         except Exception as exc:
             logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
             pass
-        from app.services.profile_photo_service import save_profile_photo as _canonical_profile_photo_save
+        from app.services.profile_photo_service import (
+            save_profile_photo as _canonical_profile_photo_save,
+        )
         return _canonical_profile_photo_save(file_storage, user)
 
     filename = secure_filename(file_storage.filename)
@@ -360,22 +370,22 @@ __all__ = [
 # ---------------------------------------------------------------------------
 # security.audit, security.guards, security.headers alt modülleri re-export
 # ---------------------------------------------------------------------------
-from app.security.audit import (  # noqa: F401
+from app.security.audit import (  # noqa: F401, E402
     SecurityAuditFinding,
+    build_security_audit_summary,
     collect_runtime_security_findings,
     findings_to_dicts,
-    build_security_audit_summary,
     log_runtime_security_posture,
 )
-from app.security.guards import (  # noqa: F401
-    UploadGuardProfile,
+from app.security.guards import (  # noqa: F401, E402
     DEFAULT_UPLOAD_PROFILES,
-    resolve_upload_guard,
+    UploadGuardProfile,
     build_security_runtime_report,
+    resolve_upload_guard,
 )
-from app.security.headers import (  # noqa: F401
+from app.security.headers import (  # noqa: F401, E402
     DEFAULT_CSP,
-    build_csp_header,
     apply_default_security_headers,
+    build_csp_header,
     inject_csp_nonce_into_html,
 )

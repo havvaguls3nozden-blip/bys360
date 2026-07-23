@@ -15,10 +15,18 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from collections.abc import Iterable
-from dataclasses import dataclass
-from types import SimpleNamespace
-from typing import Any
+from collections.abc import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Iterable,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from dataclasses import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    dataclass,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from types import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    SimpleNamespace,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from typing import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Any,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
 try:
     import app.models as models  # type: ignore
@@ -28,7 +36,10 @@ except Exception:  # pragma: no cover
 
 User = getattr(models, "User", None) if models else None
 
-from .reason_codes import is_informational_reason, reason_payload
+from .reason_codes import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    is_informational_reason,
+    reason_payload,
+)
 
 ROLE_ORDER = {
     "baskan": 1,
@@ -271,11 +282,7 @@ def build_manager_chain_for_user(user: Any = None, users_by_sicil: dict[str, Any
     try:
         from app.services.performance.hierarchy_stable import (
             build_manager_chain_for_user as _stable_build_manager_chain_for_user,
-        )
-        from app.services.performance.hierarchy_stable import (
             build_user_maps as _stable_build_user_maps,
-        )
-        from app.services.performance.hierarchy_stable import (
             fetch_active_users as _stable_fetch_active_users,
         )
 

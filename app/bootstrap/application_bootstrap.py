@@ -23,16 +23,18 @@ from app.bootstrap.registry import configure_route_bootstrap
 from app.bootstrap.response_hardening import register_response_hardening
 from app.bootstrap.schema_contract import get_expected_schema
 from app.bootstrap.schema_validation import validate_required_schema
-from app.core.monitoring import configure_optional_sentry
 from app.bootstrap.startup import run_runtime_pipeline
+from app.core.monitoring import configure_optional_sentry
 from app.error_handlers import register_error_handlers, register_service_unavailable_handler
 from app.security.startup_audit import run_startup_security_audit
-from app.startup_checks import run_schema_guard_bootstrap
-from app.template_safety import register_template_safety
-from app.template_helpers import register_template_helpers
-from app.services.performance.feedback_followup_scheduler import init_feedback_followup_scheduler
 from app.services.assistant_module_access import register_assistant_module_master_access
-from app.services.assistant_shortcut_visibility import register_assistant_shortcut_visibility_context
+from app.services.assistant_shortcut_visibility import (
+    register_assistant_shortcut_visibility_context,
+)
+from app.services.performance.feedback_followup_scheduler import init_feedback_followup_scheduler
+from app.startup_checks import run_schema_guard_bootstrap
+from app.template_helpers import register_template_helpers
+from app.template_safety import register_template_safety
 
 
 def create_bys360_application(import_name: str) -> Flask:

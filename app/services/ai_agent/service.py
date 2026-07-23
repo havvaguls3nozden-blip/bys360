@@ -6,8 +6,6 @@ from __future__ import annotations
 try:
     from app.services.ai_agent.assistant_visible_tutor_v6 import (
         NEW_WELCOME_MESSAGE as BYS360_VISIBLE_TUTOR_V6_WELCOME,
-    )
-    from app.services.ai_agent.assistant_visible_tutor_v6 import (
         answer_question as bys360_visible_tutor_v6_answer,
     )
 except Exception:  # pragma: no cover
@@ -42,8 +40,6 @@ from .policy import (
 from .repository import collect_safe_counts_for_user, insert_agent_request_log, table_exists
 from .security_bridge import (
     build_ai_agent_security_policy_payload,
-)
-from .security_bridge import (
     build_ai_agent_security_self_check as build_ai_agent_security_self_check_payload,
 )
 
@@ -1171,11 +1167,7 @@ def bys360_visible_tutor_v6_try_answer(message=None, question=None, prompt=None,
 try:
     from app.services.ai_agent.assistant_visible_tutor_v6 import (
         OLD_GREETING as _BYS360_VT_OLD_GREETING,
-    )
-    from app.services.ai_agent.assistant_visible_tutor_v6 import (
         WELCOME_TEXT as _BYS360_VT_WELCOME_TEXT,
-    )
-    from app.services.ai_agent.assistant_visible_tutor_v6 import (
         try_answer_visible_tutor_v6 as _bys360_vt_try_answer,
     )
 except Exception:

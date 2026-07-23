@@ -20,7 +20,7 @@ def apply_runtime_policy_blocks(ns: dict[str, Any], *, logging: Any) -> None:
 
     # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_BEGIN
     # Phase4J V36C effective_menu BYS360 constants facade imports
-    from app.services.settings.effective_menu_parts.bys360_constants import (
+    from app.services.settings.effective_menu_parts.bys360_constants import (  # noqa: F401, I001 - some names kept for parity; line numbers pinned by tests/services/test_settings_campaign2_wave3_phase4dv.py
         _BYS360_AG5E_AI_TEACHING_MENU_KEY,
         _BYS360_AG5E_AI_TEACHING_ROLES,
         _BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS,

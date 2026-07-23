@@ -1,28 +1,45 @@
 from . import menu_profile_access
-from .validation_defaults import build_settings_defaults_snapshot, normalize_module_setting_definitions, normalize_system_setting_definitions, validate_settings_catalog_contract
+from .foundation_access import (
+    build_settings_foundation_context_handler,
+    ensure_settings_phase1_seeded_handler,
+    iter_live_module_setting_definitions,
+)
+from .validation_defaults import (
+    build_settings_defaults_snapshot,
+    normalize_module_setting_definitions,
+    normalize_system_setting_definitions,
+    validate_settings_catalog_contract,
+)
 from .value_codec import normalize_bool, value_to_python, value_to_storage
-from .foundation_access import build_settings_foundation_context_handler, ensure_settings_phase1_seeded_handler, iter_live_module_setting_definitions
+
 """BYS360 Ayarlar servis alt paketleri."""
 
-from .catalog import MODULE_SETTING_DEFINITIONS, SYSTEM_SETTING_DEFINITIONS
-from .change_logs import (
+from .catalog import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    MODULE_SETTING_DEFINITIONS,
+    SYSTEM_SETTING_DEFINITIONS,
+)
+from .change_logs import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     create_settings_change_log,
     deserialize_settings_state,
     list_recent_settings_change_logs,
     serialize_settings_state,
 )
-from .diagnostics import build_settings_diagnostics_context
-from .effective_menu import build_menu_visibility_map
-from .final_hardening import (
+from .diagnostics import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_settings_diagnostics_context,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .effective_menu import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_menu_visibility_map,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .final_hardening import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     assert_settings_final_hardening_contract,
     build_settings_final_hardening_report,
     get_settings_final_release_checklist,
 )
-from .form_pipeline import (
+from .form_pipeline import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     save_module_settings_from_form_handler,
     save_system_settings_from_form_handler,
 )
-from .menu_permissions import (
+from .menu_permissions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     build_complete_visibility_map,
     filter_live_menu_keys,
     filter_live_menu_rows,
@@ -32,13 +49,17 @@ from .menu_permissions import (
     snapshot_unit_menu_state,
     snapshot_user_override_state,
 )
-from .quality_gate import (
+from .quality_gate import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     build_settings_refactor_quality_snapshot,
     build_settings_template_guard_context,
     get_settings_refactor_phase_sequence,
 )
-from .rollback_handler import rollback_settings_change_handler
-from .ui_panel import build_settings_ui_diagnostics_panel
+from .rollback_handler import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    rollback_settings_change_handler,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .ui_panel import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_settings_ui_diagnostics_panel,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
 __all__ = [
     "menu_profile_access",
@@ -93,15 +114,19 @@ __all__ = [
 # ---------------------------------------------------------------------------
 # Faz 1 public contract compatibility exports
 # ---------------------------------------------------------------------------
-from .contracts import (
+from .contracts import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     MenuPermissionRule,
     SettingChange,
     SettingDefinition,
-    SettingValue,
     SettingsAuditFinding,
+    SettingValue,
 )
-from .definitions import build_definition, group_definitions, index_definitions
-from .serialization import (
+from .definitions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_definition,
+    group_definitions,
+    index_definitions,
+)
+from .serialization import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     mask_sensitive_value,
     normalize_menu_key,
     normalize_setting_key,

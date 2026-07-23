@@ -12,7 +12,7 @@ from app.models import (
     PerformanceEvaluationItem,
     User,
 )
-from app.services.availability_service import (
+from app.services.availability_service import (  # noqa: F401 - contract-traced by tests/services/test_performance_assignments_contract.py
     DelegationResolution,
     apply_availability_snapshot_to_evaluation,
     resolve_effective_manager,

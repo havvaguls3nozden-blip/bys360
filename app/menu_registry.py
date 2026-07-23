@@ -1,21 +1,20 @@
 # BYS360_PHASE3_2_MENU_REGISTRY_NOTE: Performans menü görünürlüğünün son kararı app/services/settings/effective_menu.py içindeki PHASE3_2_PERFORMANCE_MENU_POLICY ile verilir.
 from __future__ import annotations
 
-
 from collections import OrderedDict
 from copy import deepcopy
 from typing import Any
 
 from flask import url_for
 from flask_login import current_user
+from werkzeug.routing import BuildError
 
 from app.live_scope import is_live_settings_menu_key
-from werkzeug.routing import BuildError
 
 # BYS360 P11-D2: büyük güvenli menu registry veri blokları bridge import ile ayrıldı.
 from app.menu_registry_data_performance import (
-    ROLE_MENU_DEFAULTS,  # noqa: F821 - dynamic menu registry global
     _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY,
+    ROLE_MENU_DEFAULTS,  # noqa: F821 - dynamic menu registry global
 )
 from app.menu_registry_data_personnel import (
     _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_DISALLOWED_KEYS,

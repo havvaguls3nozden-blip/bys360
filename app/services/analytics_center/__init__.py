@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from .live_scope import ANALYTICS_SURFACE_KEYS, ANALYTICS_SURFACES, build_analytics_surface_summary, get_analytics_surfaces
+from .live_scope import (
+    ANALYTICS_SURFACE_KEYS,
+    ANALYTICS_SURFACES,
+    build_analytics_surface_summary,
+    get_analytics_surfaces,
+)
 from .service_inventory import (
     build_analytics_center_bridge_summary,
     build_analytics_center_faz0_inventory,
@@ -53,9 +58,12 @@ from .dashboard_surface import (
     normalize_dashboard_severity,
     normalize_dashboard_status,
 )
-from .service_inventory import build_analytics_center_dashboard_surface_summary, build_analytics_center_faz3_inventory
+from .service_inventory import (
+    build_analytics_center_dashboard_surface_summary,
+    build_analytics_center_faz3_inventory,
+)
 
-__all__.extend([
+__all__ += [
     "DashboardMetricCard",
     "DashboardSignalCard",
     "build_ai_decision_dashboard_context",
@@ -71,10 +79,10 @@ __all__.extend([
     "coerce_dashboard_number",
     "normalize_dashboard_severity",
     "normalize_dashboard_status",
-])
+]
 
 # Faz 4 — Personel / performans içgörü motoru
-from .personnel_performance_insights import (
+from .personnel_performance_insights import (  # noqa: E402 - deferred import (staged facade architecture)
     PerformanceInsightSignal,
     PersonnelInsightCard,
     build_default_personnel_performance_insights,
@@ -91,9 +99,12 @@ from .personnel_performance_insights import (
     normalize_insight_severity,
     normalize_insight_status,
 )
-from .service_inventory import build_analytics_center_faz4_inventory, build_analytics_center_personnel_performance_summary
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade architecture)
+    build_analytics_center_faz4_inventory,
+    build_analytics_center_personnel_performance_summary,
+)
 
-__all__.extend([
+__all__ += [
     "PerformanceInsightSignal",
     "PersonnelInsightCard",
     "build_analytics_center_faz4_inventory",
@@ -111,10 +122,14 @@ __all__.extend([
     "coerce_insight_number",
     "normalize_insight_severity",
     "normalize_insight_status",
-])
+]
 
 # Faz 5 — Anket / geri bildirim / nabız analiz motoru
-from .survey_feedback_insights import (
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade architecture)
+    build_analytics_center_faz5_inventory,
+    build_analytics_center_survey_feedback_summary,
+)
+from .survey_feedback_insights import (  # noqa: E402 - deferred import (staged facade architecture)
     SurveyFeedbackMetricCard,
     SurveyFeedbackPrioritySignal,
     build_default_survey_feedback_insights,
@@ -133,9 +148,8 @@ from .survey_feedback_insights import (
     normalize_feedback_status,
     normalize_sentiment_hint,
 )
-from .service_inventory import build_analytics_center_faz5_inventory, build_analytics_center_survey_feedback_summary
 
-__all__.extend([
+__all__ += [
     "SurveyFeedbackMetricCard",
     "SurveyFeedbackPrioritySignal",
     "build_analytics_center_faz5_inventory",
@@ -155,10 +169,10 @@ __all__.extend([
     "normalize_feedback_priority",
     "normalize_feedback_status",
     "normalize_sentiment_hint",
-])
+]
 
 # Faz 6 — İletişim ve destek kayıtlarından kurumsal sinyal analizi
-from .communication_support_insights import (
+from .communication_support_insights import (  # noqa: E402 - deferred import (staged facade architecture)
     CommunicationSupportMetricCard,
     CommunicationSupportSignal,
     build_communication_support_insight_context,
@@ -177,9 +191,12 @@ from .communication_support_insights import (
     normalize_signal_severity,
     normalize_signal_status,
 )
-from .service_inventory import build_analytics_center_communication_support_summary, build_analytics_center_faz6_inventory
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade architecture)
+    build_analytics_center_communication_support_summary,
+    build_analytics_center_faz6_inventory,
+)
 
-__all__.extend([
+__all__ += [
     "CommunicationSupportMetricCard",
     "CommunicationSupportSignal",
     "build_analytics_center_communication_support_summary",
@@ -199,4 +216,4 @@ __all__.extend([
     "normalize_signal_priority",
     "normalize_signal_severity",
     "normalize_signal_status",
-])
+]

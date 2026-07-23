@@ -5,8 +5,8 @@ import secrets
 
 from flask import Flask, g, request
 
-from app.security_headers import apply_default_security_headers
 from app.security.headers import inject_csp_nonce_into_html
+from app.security_headers import apply_default_security_headers
 
 
 def register_response_hardening(app: Flask) -> None:

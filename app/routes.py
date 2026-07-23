@@ -29,9 +29,11 @@ from app.main_handlers.comparison_handlers import (
     team_performance_comparison_history,
 )
 from app.main_handlers.dashboard_handlers import dashboard, db_check
-from app.main_handlers.public_handlers import home as _home_handler
-from app.main_handlers.public_handlers import index as _index_handler
-from app.main_handlers.public_handlers import kunye as _kunye_handler
+from app.main_handlers.public_handlers import (
+    home as _home_handler,
+    index as _index_handler,
+    kunye as _kunye_handler,
+)
 from app.route_registry import main_bp
 from app.view_helpers import (
     enforce_first_login_security_flow_redirect,
@@ -196,9 +198,9 @@ from app.account import routes as _account_routes  # noqa: E402,F401
 from app.admin import routes as _admin_routes  # noqa: E402,F401
 from app.ai import routes as _ai_routes  # noqa: E402,F401
 from app.auth import routes as _auth_routes  # noqa: E402,F401
-from app.communication import feedback_routes as _feedback_routes  # noqa: E402,F401
-from app.communication import routes as _communication_routes  # noqa: E402,F401
-from app.communication import (
+from app.communication import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    feedback_routes as _feedback_routes,  # noqa: E402,F401
+    routes as _communication_routes,  # noqa: E402,F401
     user_feedback_routes as _bys360_user_feedback_routes,  # noqa: E402,F401
 )
 from app.dashboard import routes as _dashboard_routes  # noqa: E402,F401

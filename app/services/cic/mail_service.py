@@ -22,8 +22,7 @@ from app.services.cic.config_context import (
 from app.services.cic.task_contract import BASE_KEY, TASK_DEFINITIONS
 
 try:
-    from app.services.mail_core import create_mail_log
-    from app.services.mail_core import send_email as _mail_core_send_email
+    from app.services.mail_core import create_mail_log, send_email as _mail_core_send_email
 except Exception:  # pragma: no cover
     create_mail_log = None  # type: ignore[assignment]
     _mail_core_send_email = None  # type: ignore[assignment]

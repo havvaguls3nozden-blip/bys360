@@ -2,8 +2,15 @@ from __future__ import annotations
 
 import logging
 
-from flask import current_app, flash, redirect, request, send_file, url_for
-from flask import render_template as flask_render_template
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template as flask_render_template,
+    request,
+    send_file,
+    url_for,
+)
 from flask_login import current_user, login_required
 
 from app.core.datetime_utils import utc_now
@@ -25,11 +32,7 @@ from app.services.availability_service import refresh_assignment_live_coverages
 from app.services.feedback_service import can_create_feedback_request, get_open_feedback_request
 from app.services.performance.evaluation_ui_service import (
     build_employee_cards as _build_employee_cards,
-)
-from app.services.performance.evaluation_ui_service import (
     build_scorecard_detail_context as _build_scorecard_detail_context,
-)
-from app.services.performance.evaluation_ui_service import (
     can_access_assignment_for_actor as _can_access_assignment_for_actor,
 )
 from app.services.performance.hardening_service import (
@@ -46,23 +49,11 @@ from app.services.performance.phase3_backend_route_guard import (
 )
 from app.services.performance.team_compare_service import (
     STATUS_OPTIONS as TEAM_COMPARE_STATUS_OPTIONS,
-)
-from app.services.performance.team_compare_service import (
     apply_filters as apply_team_compare_filters,
-)
-from app.services.performance.team_compare_service import (
     build_empty_payload as build_team_compare_empty_payload,
-)
-from app.services.performance.team_compare_service import (
     build_excel_workbook as build_team_compare_workbook,
-)
-from app.services.performance.team_compare_service import (
     build_rows as build_team_compare_rows,
-)
-from app.services.performance.team_compare_service import (
     build_view_payload as build_team_compare_view_payload,
-)
-from app.services.performance.team_compare_service import (
     choose_period_id as choose_team_compare_period_id,
 )
 from app.services.performance_v2.chain import build_resolved_chain

@@ -9,17 +9,9 @@ from app.route_registry import main_bp
 from app.route_support import safe_render
 from app.services.comparison_service import (
     build_change_summary as _build_change_summary,
-)
-from app.services.comparison_service import (
     compare_two_snapshots as _compare_two_snapshots,
-)
-from app.services.comparison_service import (
     comparison_band as _comparison_band,
-)
-from app.services.comparison_service import (
     safe_float as _safe_float,
-)
-from app.services.comparison_service import (
     snapshot_period_options_for_user as _snapshot_period_options_for_user,
 )
 from app.services.hierarchy_admin_service import get_manager_scope_users

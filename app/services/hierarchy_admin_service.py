@@ -6,8 +6,7 @@ from datetime import datetime
 from typing import Any
 
 from flask import current_app
-from sqlalchemy import inspect as sa_inspect
-from sqlalchemy import or_, text
+from sqlalchemy import inspect as sa_inspect, or_, text
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db

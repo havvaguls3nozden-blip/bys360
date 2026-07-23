@@ -6,7 +6,6 @@ portal/repository route aileleri burada çağrılmaz.
 """
 from __future__ import annotations
 
-
 # BYS360_MAINTENANCE_V13_INSTITUTIONAL_CHILD_ROUTES_BEGIN
 _LIVE_CHILD_ROUTE_MODULES = (
     "routes",

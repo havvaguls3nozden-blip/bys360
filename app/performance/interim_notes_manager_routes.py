@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-
 import logging
-
 from functools import lru_cache
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
+
 from app.extensions import db
 from app.route_registry import main_bp
+
 # BYS360_STUB_AI_V60_INTERIM_IMPORT
 from app.services.ai.stub_panel_bridge import build_interim_notes_ai_panel
+
 logger = logging.getLogger(__name__)
 # /BYS360_STUB_AI_V60_INTERIM_IMPORT
 
@@ -244,9 +245,10 @@ def _access_denied():
 @main_bp.route('/performans/donem-ici-notlar', endpoint='performance_interim_notes_tr')
 @login_required
 def performance_interim_notes():
-    from flask import request, redirect, render_template, flash
+    from flask import flash, redirect, render_template, request
     from flask_login import current_user
     from sqlalchemy import text as _sql_text
+
     from app.extensions import db
 
     def _rows(sql, params=None):

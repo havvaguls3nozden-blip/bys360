@@ -51,10 +51,10 @@ from .service_inventory import (
     build_ai_decision_summary_cache_summary,
 )
 from .summary_cache import (
-    AISummaryCacheHit,
-    AISummaryCachePayload,
     DEFAULT_PROMPT_VERSION,
     DEFAULT_SUMMARY_KIND,
+    AISummaryCacheHit,
+    AISummaryCachePayload,
     build_ai_safe_summary_text,
     build_ai_source_hash,
     build_ai_summary_cache_contract,
@@ -127,50 +127,66 @@ __all__ = [
 ]
 
 # Faz 3 — Karar Destek Dashboard veri yüzeyi
-from .service_inventory import build_ai_decision_dashboard_surface_summary, build_ai_decision_faz3_inventory
+from .service_inventory import (
+    build_ai_decision_dashboard_surface_summary,
+    build_ai_decision_faz3_inventory,
+)
 
-__all__.extend([
+__all__ += [
     "build_ai_decision_dashboard_surface_summary",
     "build_ai_decision_faz3_inventory",
-])
+]
 
 # Faz 4 — Personel / performans içgörü motoru
-from .service_inventory import build_ai_decision_faz4_inventory, build_ai_decision_personnel_performance_summary
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_ai_decision_faz4_inventory,
+    build_ai_decision_personnel_performance_summary,
+)
 
-__all__.extend([
+__all__ += [
     "build_ai_decision_faz4_inventory",
     "build_ai_decision_personnel_performance_summary",
-])
+]
 
 # Faz 5 — Anket / geri bildirim / nabız analiz motoru
-from .service_inventory import build_ai_decision_faz5_inventory, build_ai_decision_survey_feedback_summary
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_ai_decision_faz5_inventory,
+    build_ai_decision_survey_feedback_summary,
+)
 
-__all__.extend([
+__all__ += [
     "build_ai_decision_faz5_inventory",
     "build_ai_decision_survey_feedback_summary",
-])
+]
 
 # Faz 6 — İletişim ve destek kayıtlarından kurumsal sinyal analizi
-from .service_inventory import build_ai_decision_communication_support_summary, build_ai_decision_faz6_inventory
+from .service_inventory import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_ai_decision_communication_support_summary,
+    build_ai_decision_faz6_inventory,
+)
 
-__all__.extend([
+__all__ += [
     "build_ai_decision_communication_support_summary",
     "build_ai_decision_faz6_inventory",
-])
+]
 
 # Faz 1 — Karar motoru ve performans entegrasyonu
-from .decision_support_engine import DecisionPolicy, DecisionSupportEngine, build_performance_decision_support
-from .performance_integration import (
+from .decision_support_engine import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    DecisionPolicy,
+    DecisionSupportEngine,
+    build_performance_decision_support,
+)
+from .performance_integration import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     build_ai_decision_faz1_health_payload,
     build_ai_decision_policy_from_settings,
     build_performance_decision_support_response,
 )
 
-__all__.extend([
+__all__ += [
     "DecisionPolicy",
     "DecisionSupportEngine",
     "build_ai_decision_faz1_health_payload",
     "build_ai_decision_policy_from_settings",
     "build_performance_decision_support",
     "build_performance_decision_support_response",
-])
+]

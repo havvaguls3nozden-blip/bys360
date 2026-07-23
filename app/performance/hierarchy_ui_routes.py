@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-
 import logging
+
 logger = logging.getLogger(__name__)
 
 def _build_surface_scope_context(*args, **kwargs):
@@ -25,16 +25,41 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from flask import flash, redirect, request, url_for
-from flask_login import current_user, login_required
+from flask import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    flash,
+    redirect,
+    request,
+    url_for,
+)
+from flask_login import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    current_user,
+    login_required,
+)
 
-from app.extensions import db
-from app.models import PerformancePeriod, User
-from app.route_registry import main_bp
-from app.route_support import admin_required, manager_required, menu_key_required, safe_render, safe_db_rollback
-from app.services.hierarchy_admin_service import sync_organization_units_from_users_if_stale
-from app.services.performance.context import list_performance_periods
-from app.services.performance.hierarchy_ui_service import (
+from app.extensions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    db,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.models import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    PerformancePeriod,
+    User,
+)
+from app.route_registry import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    main_bp,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.route_support import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_required,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
+from app.services.hierarchy_admin_service import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    sync_organization_units_from_users_if_stale,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.services.performance.context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    list_performance_periods,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.services.performance.hierarchy_ui_service import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     SPECIAL_SINGLE_MANAGER_UNITS,
     SPECIAL_TOP_ROLES,
     build_assignment_rows,

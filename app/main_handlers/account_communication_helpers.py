@@ -14,16 +14,12 @@ from app.extensions import db
 from app.main_handlers.constants import SECURITY_QUESTION_CHOICES
 from app.menu_registry import (
     flatten_menu_definitions as flatten_settings_menu_definitions,
-)
-from app.menu_registry import (
     get_grouped_menu_definitions,
 )
 from app.models import SystemSetting, User, UserMenuPermission
 from app.route_support import safe_render
 from app.services.profile_photo_service import (
     delete_profile_photo_file as _delete_profile_photo_file,
-)
-from app.services.profile_photo_service import (
     save_profile_photo as _save_profile_photo,
 )
 from app.services.settings_service import (

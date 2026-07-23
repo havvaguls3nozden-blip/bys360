@@ -10,6 +10,7 @@ from .attachments import (
     remove_message_attachment_file,
     save_message_attachment,
 )
+from .comments import MessageCommentResult, create_message_comment  # BYS360_MESSAGE_INTERACTIONS_V1
 from .compose import (
     ComposeUserCard,
     build_compose_user_card,
@@ -41,10 +42,22 @@ from .inbox import (
     normalize_inbox_scope,
     resolve_selected_inbox_thread,
 )
+from .lifecycle import (
+    MessageAttachmentDownloadResult,
+    MessageMutationResult,
+    delete_message_for_user,
+    edit_message_for_user,
+    resolve_message_attachment_download_for_user,
+)
 from .presence import build_thread_presence
 from .reactions import normalize_reaction_value, toggle_message_reaction
-from .comments import MessageCommentResult, create_message_comment  # BYS360_MESSAGE_INTERACTIONS_V1
 from .repository import orm_entity, participant_for_thread, thread_for_user
+from .sending import (
+    MessageSendResult,
+    append_thread_message_with_attachments,
+    create_direct_message_with_attachments,
+    resolve_thread_for_sending,
+)
 from .serialization import build_reaction_map, serialize_attachment, serialize_message
 from .state import (
     MessageStateChangeResult,
@@ -55,27 +68,12 @@ from .state import (
     toggle_thread_mute_for_user,
     toggle_thread_pin_for_user,
 )
-
-from .lifecycle import (
-    MessageAttachmentDownloadResult,
-    MessageMutationResult,
-    delete_message_for_user,
-    edit_message_for_user,
-    resolve_message_attachment_download_for_user,
-)
-
-from .sending import (
-    MessageSendResult,
-    append_thread_message_with_attachments,
-    create_direct_message_with_attachments,
-    resolve_thread_for_sending,
-)
-from .typing import normalize_typing_flag, update_thread_typing_state
 from .thread_detail import (
     build_thread_activity_payload,
     build_thread_live_payload,
     load_thread_detail_payload,
 )
+from .typing import normalize_typing_flag, update_thread_typing_state
 
 __all__ = [
     "COMPOSE_USER_SOFT_LIMIT",

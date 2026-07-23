@@ -23,7 +23,12 @@ from .factory_bootstrap import (
 )
 from .operational_guards import register_operational_guards, register_teardown_guards
 from .operational_logging import configure_operational_logging
-from .registry import attach_runtime_route_manifest, configure_route_bootstrap, register_application_blueprints, register_core_blueprints
+from .registry import (
+    attach_runtime_route_manifest,
+    configure_route_bootstrap,
+    register_application_blueprints,
+    register_core_blueprints,
+)
 from .response_hardening import register_response_hardening
 from .schema_validation import validate_required_schema
 from .startup import log_startup_summary, run_runtime_pipeline

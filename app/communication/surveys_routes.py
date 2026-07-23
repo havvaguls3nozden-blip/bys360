@@ -10,148 +10,58 @@ from app.extensions import db
 from app.models import Survey, SurveyAssignment, SurveyQuestion, SurveyResponse, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, menu_key_required, safe_render
-from app.services.message_service import notify_user as _notify_user
-from app.services.message_service import survey_manager_allowed as _service_survey_manager_allowed
-from app.services.message_service import user_matches_assignment as _service_user_matches_assignment
+from app.services.message_service import (
+    notify_user as _notify_user,
+    survey_manager_allowed as _service_survey_manager_allowed,
+    user_matches_assignment as _service_user_matches_assignment,
+)
 from app.services.surveys import (
     active_user_count as _service_active_user_count,
-)
-from app.services.surveys import (
     archive_survey as _service_archive_survey,
-)
-from app.services.surveys import (
     build_question_payload_dicts as _service_build_question_payload_dicts,
-)
-from app.services.surveys import (
     build_survey_results_context as _service_build_survey_results_context,
-)
-from app.services.surveys import (
     build_survey_results_csv_text as _service_build_survey_results_csv_text,
-)
-from app.services.surveys import (
     build_survey_state_row as _service_build_survey_state_row,
-)
-from app.services.surveys import (
     bulk_survey_action as _service_bulk_survey_action,
-)
-from app.services.surveys import (
     clean_target_values as _service_clean_target_values,
-)
-from app.services.surveys import (
     close_survey as _service_close_survey,
-)
-from app.services.surveys import (
     dedup_preserve as _service_dedup_preserve,
-)
-from app.services.surveys import (
     delete_survey_if_allowed as _service_delete_survey_if_allowed,
-)
-from app.services.surveys import (
     distinct_user_values as _service_distinct_user_values,
-)
-from app.services.surveys import (
     empty_survey_counts as _service_empty_survey_counts,
-)
-from app.services.surveys import (
     estimate_survey_target_user_ids as _service_estimate_survey_target_user_ids,
-)
-from app.services.surveys import (
     format_survey_dt as _service_format_survey_dt,
-)
-from app.services.surveys import (
     get_assigned_surveys_for_user as _service_get_assigned_surveys_for_user,
-)
-from app.services.surveys import (
     has_table_columns as _service_has_table_columns,
-)
-from app.services.surveys import (
     latest_completed_label_for_survey as _service_latest_completed_label_for_survey,
-)
-from app.services.surveys import (
     latest_response_for_user as _service_latest_response_for_user,
-)
-from app.services.surveys import (
     matching_assignment_for_user as _service_matching_assignment_for_user,
-)
-from app.services.surveys import (
     normalize_choice as _service_normalize_choice,
-)
-from app.services.surveys import (
     persist_survey_questions as _service_persist_survey_questions,
-)
-from app.services.surveys import (
     publish_survey as _service_publish_survey,
-)
-from app.services.surveys import (
     resolve_target_user_ids as _service_resolve_target_user_ids,
-)
-from app.services.surveys import (
     restore_survey as _service_restore_survey,
-)
-from app.services.surveys import (
     safe_any_response_count as _service_safe_any_response_count,
-)
-from app.services.surveys import (
     safe_assignment_count as _service_safe_assignment_count,
-)
-from app.services.surveys import (
     safe_completed_response_count as _service_safe_completed_response_count,
-)
-from app.services.surveys import (
     safe_question_answers as _service_safe_question_answers,
-)
-from app.services.surveys import (
     safe_question_count as _service_safe_question_count,
-)
-from app.services.surveys import (
     safe_question_options as _service_safe_question_options,
-)
-from app.services.surveys import (
     safe_survey_questions as _service_safe_survey_questions,
-)
-from app.services.surveys import (
     selected_user_items_by_ids as _service_selected_user_items_by_ids,
-)
-from app.services.surveys import (
     simple_completion_trend as _service_simple_completion_trend,
-)
-from app.services.surveys import (
     submit_survey_response as _service_submit_survey_response,
-)
-from app.services.surveys import (
     survey_access_state as _service_survey_access_state,
-)
-from app.services.surveys import (
     survey_form_state_from_mapping as _service_survey_form_state_from_mapping,
-)
-from app.services.surveys import (
     survey_local_now as _service_survey_local_now,
-)
-from app.services.surveys import (
     survey_question_attr as _service_survey_question_attr,
-)
-from app.services.surveys import (
     survey_question_compat_defaults as _service_survey_question_compat_defaults,
-)
-from app.services.surveys import (
     survey_question_phase2_ready as _service_survey_question_phase2_ready,
-)
-from app.services.surveys import (
     survey_response_phase2_ready as _service_survey_response_phase2_ready,
-)
-from app.services.surveys import (
     survey_state_from_db as _service_survey_state_from_db,
-)
-from app.services.surveys import (
     table_columns as _service_table_columns,
-)
-from app.services.surveys import (
     target_user_search_items as _service_target_user_search_items,
-)
-from app.services.surveys import (
     unpublish_survey as _service_unpublish_survey,
-)
-from app.services.surveys import (
     user_item as _service_user_item,
 )
 

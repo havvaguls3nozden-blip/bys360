@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 # BYS360_PORTAL_ROLE_MATRIX_DEEP_AUDIT_FIX_V2_12_3
-
-
 import logging
 from typing import Any
 

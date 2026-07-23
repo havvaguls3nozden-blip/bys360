@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Any
 
 """BYS360 Performans V2.1.18 üst yönetim görünümü.

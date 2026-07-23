@@ -6,7 +6,7 @@ from flask_login import current_user
 from app.route_support import ALLOWED_BYPASS_ENDPOINTS, build_menu_visibility_map
 from app.services.message_service import get_unread_notification_count
 from app.services.performance.assignments import build_assignment_log_summary
-from app.services.ui_context import (
+from app.services.ui_context import (  # noqa: F401 - re-exported for app.routes and app.main_handlers.dashboard_handlers
     build_dashboard_context,
     build_db_check_context,
     build_user_scope_context,

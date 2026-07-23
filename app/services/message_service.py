@@ -17,8 +17,10 @@ from app.models import (
     MessageThreadParticipant,
     Notification,
 )
-from app.services.runtime_cache import get_or_set as _cache_get_or_set
-from app.services.runtime_cache import invalidate as _cache_invalidate
+from app.services.runtime_cache import (
+    get_or_set as _cache_get_or_set,
+    invalidate as _cache_invalidate,
+)
 
 logger = logging.getLogger(__name__)
 ALLOWED_MESSAGE_FILE_EXTENSIONS = {

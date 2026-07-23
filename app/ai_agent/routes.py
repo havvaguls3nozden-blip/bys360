@@ -24,7 +24,7 @@ ai_agent_bp = Blueprint(
 # BYS360_AG1_AG2_AI_AGENT_ROUTE_GUARD_START
 @ai_agent_bp.before_request
 def _bys360_ag2b_ai_agent_before_request():
-    from flask import request, render_template
+    from flask import render_template, request
     from flask_login import current_user
 
     endpoint = request.endpoint or ""
@@ -215,7 +215,7 @@ def _ag5_access_denied_response():
 
 @ai_agent_bp.route('/knowledge', methods=['GET', 'POST'])
 def ag5_knowledge_center():
-    from flask import render_template, request, redirect, url_for, flash
+    from flask import flash, redirect, render_template, request, url_for
     from flask_login import current_user
     if not getattr(current_user, 'is_authenticated', False):
         try:
@@ -223,7 +223,12 @@ def ag5_knowledge_center():
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai_agent/routes.py:228")
             return _ag5_access_denied_response()
-    from app.services.ai_agent.knowledge import can_manage_ai_knowledge, create_knowledge_entry, init_knowledge_table, list_knowledge_entries
+    from app.services.ai_agent.knowledge import (
+        can_manage_ai_knowledge,
+        create_knowledge_entry,
+        init_knowledge_table,
+        list_knowledge_entries,
+    )
     if not can_manage_ai_knowledge(current_user):
         return _ag5_access_denied_response()
     init_knowledge_table()
@@ -246,8 +251,9 @@ def ag5_knowledge_center():
 
 @ai_agent_bp.route('/knowledge/<int:entry_id>/toggle', methods=['POST'])
 def ag5_knowledge_toggle(entry_id):
-    from flask import redirect, url_for, flash
+    from flask import flash, redirect, url_for
     from flask_login import current_user
+
     from app.services.ai_agent.knowledge import can_manage_ai_knowledge, toggle_knowledge_entry
     if not can_manage_ai_knowledge(current_user):
         return _ag5_access_denied_response()
@@ -261,8 +267,9 @@ def ag5_knowledge_toggle(entry_id):
 
 @ai_agent_bp.route('/knowledge/<int:entry_id>/delete', methods=['POST'])
 def ag5_knowledge_delete(entry_id):
-    from flask import redirect, url_for, flash
+    from flask import flash, redirect, url_for
     from flask_login import current_user
+
     from app.services.ai_agent.knowledge import can_manage_ai_knowledge, delete_knowledge_entry
     if not can_manage_ai_knowledge(current_user):
         return _ag5_access_denied_response()
@@ -278,6 +285,7 @@ def ag5_knowledge_delete(entry_id):
 def ag5_knowledge_search_api():
     from flask import jsonify, request
     from flask_login import current_user
+
     from app.services.ai_agent.knowledge import search_knowledge_answer
     if not getattr(current_user, 'is_authenticated', False):
         return jsonify({'ok': False, 'message': 'Oturum gerekli.'}), 401

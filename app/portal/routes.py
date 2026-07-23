@@ -1,38 +1,49 @@
 from __future__ import annotations
 
 import re
-
-from sqlalchemy import or_
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from flask import current_app, flash, jsonify, redirect, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
+    Notification,
+    PortalCommentMention,
     PortalGroup,
     PortalGroupMember,
     PortalModerationLog,
     PortalPost,
     PortalPostAttachment,
     PortalPostComment,
-    PortalCommentMention,
     PortalPostReport,
     PortalProfile,
     User,
-    Notification,
 )
 from app.route_registry import main_bp
-from app.route_support import can_access_menu, menu_key_required, normalize_role_name, render_access_denied, safe_render, sanitize_free_text
-from app.services.portal_permission_matrix import portal_permission_allowed
+from app.route_support import (
+    can_access_menu,
+    menu_key_required,
+    normalize_role_name,
+    render_access_denied,
+    safe_render,
+    sanitize_free_text,
+)
+from app.services.bys360_notification_bridge import (
+    notify_portal_comment_added,
+    notify_portal_post_created,
+    notify_portal_reaction,
+    notify_portal_report_created,
+)
 from app.services.instagram_portal_sync import sync_instagram_to_portal
-from app.services.bys360_notification_bridge import notify_portal_comment_added, notify_portal_post_created, notify_portal_reaction, notify_portal_report_created
 from app.services.portal_experience_service import portal_experience_context
 from app.services.portal_experience_v2_service import portal_experience_v2_context
+from app.services.portal_permission_matrix import portal_permission_allowed
 from app.services.portal_press_news_service import (
     archive_press_news_candidate,
     press_news_home_context,
@@ -41,16 +52,16 @@ from app.services.portal_press_news_service import (
     scan_press_news_candidates,
 )
 from app.services.portal_service import (
-    POST_TYPE_OPTIONS,
     PORTAL_ALL_ROLES,
+    POST_TYPE_OPTIONS,
     REACTION_OPTIONS,
     VISIBILITY_OPTIONS,
     add_audience_entries,
     can_manage_portal,
     can_publish_announcement,
-    can_user_view_post,
     can_user_delete_post,
     can_user_post_to_wall,
+    can_user_view_post,
     display_user_name,
     enrich_posts,
     get_or_create_profile,
@@ -982,7 +993,11 @@ def portal_press_news_archive(candidate_id: str):
 @main_bp.before_app_request
 def bys360_portal_v3b8_social_import_removed_redirect():
     try:
-        from flask import request as _bys360_request, redirect as _bys360_redirect, url_for as _bys360_url_for
+        from flask import (
+            redirect as _bys360_redirect,
+            request as _bys360_request,
+            url_for as _bys360_url_for,
+        )
         if str(getattr(_bys360_request, 'path', '') or '').startswith('/portal/social-import'):
             return _bys360_redirect(_bys360_url_for('main.portal_press_news_review'))
     except Exception:

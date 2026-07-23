@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """Communication route family compatibility hub.
 
 Bu dosya iletişim paketinin tek import yüzeyidir. Route registry halen
@@ -8,11 +9,16 @@ Bu dosya iletişim paketinin tek import yüzeyidir. Route registry halen
 modülleri burada import edilerek ana blueprint'e kaydedilir.
 """
 
-from flask_login import current_user
+from flask_login import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    current_user,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
-from app.route_registry import main_bp
-from app.services.message_service import get_unread_notification_count as _get_unread_notification_count
-
+from app.route_registry import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    main_bp,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.services.message_service import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    get_unread_notification_count as _get_unread_notification_count,
+)
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_modular_main_blueprint_routes"
@@ -32,6 +38,32 @@ def bys360_notification_context():
     return {"unread_notification_count": 0}
 
 
+from . import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    feedback_routes as _feedback_routes,  # noqa: E402,F401
+    phase1_routes as _phase1_routes,  # noqa: E402,F401
+    phase2_routes as _phase2_routes,  # noqa: E402,F401
+    phase3_routes as _phase3_routes,  # noqa: E402,F401
+    phase4_routes as _phase4_routes,  # noqa: E402,F401
+    phase5_routes as _phase5_routes,  # noqa: E402,F401
+)
+from .announcement_popup_routes import (  # noqa: E402,F401
+    announcement_popup_acknowledge,
+    announcement_popup_dismiss,
+    announcement_popup_edit,
+    announcement_popup_manage,
+    announcement_popup_media,
+    announcement_popup_new,
+    announcement_popup_report,
+    announcement_popup_report_csv,
+    announcement_popup_runtime_context,
+    announcement_popup_runtime_pending,
+    announcement_popup_target_count,
+    announcement_popup_toggle,
+)
+from .announcements_routes import (  # noqa: E402,F401
+    announcements_list,
+    announcements_new,
+)
 from .messages_routes import (  # noqa: E402,F401
     message_attachment_download,
     messages_delete,
@@ -70,38 +102,13 @@ from .surveys_routes import (  # noqa: E402,F401
     survey_publish,
     survey_restore,
     survey_results,
-    survey_submit,
-    survey_target_users,
     survey_results_export_csv,
+    survey_submit,
     survey_take,
+    survey_target_users,
     survey_unpublish,
     surveys_list,
 )
-from .announcements_routes import (  # noqa: E402,F401
-    announcements_list,
-    announcements_new,
-)
-from .announcement_popup_routes import (  # noqa: E402,F401
-    announcement_popup_acknowledge,
-    announcement_popup_dismiss,
-    announcement_popup_edit,
-    announcement_popup_media,
-    announcement_popup_manage,
-    announcement_popup_report,
-    announcement_popup_report_csv,
-    announcement_popup_new,
-    announcement_popup_runtime_context,
-    announcement_popup_runtime_pending,
-    announcement_popup_target_count,
-    announcement_popup_toggle,
-)
-from . import feedback_routes as _feedback_routes  # noqa: E402,F401
-from . import phase1_routes as _phase1_routes  # noqa: E402,F401
-from . import phase2_routes as _phase2_routes  # noqa: E402,F401
-from . import phase3_routes as _phase3_routes  # noqa: E402,F401
-from . import phase4_routes as _phase4_routes  # noqa: E402,F401
-from . import phase5_routes as _phase5_routes  # noqa: E402,F401
-
 
 messages_thread_send = messages_send
 messages_thread_mark_read = messages_mark_read
@@ -191,7 +198,6 @@ from .export_registry import (  # noqa: E402
     build_communication_export_registry,
     validate_communication_export_surface,
 )
-
 
 COMMUNICATION_ROUTE_EXPORTS = tuple(__all__)
 COMMUNICATION_EXPORT_REGISTRY = build_communication_export_registry(

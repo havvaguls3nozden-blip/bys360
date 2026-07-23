@@ -5,8 +5,10 @@ from flask import Blueprint
 mobile_api_bp = Blueprint("mobile_api", __name__, url_prefix="/api/mobile")
 
 # Route import is intentionally after blueprint creation.
-from . import routes  # noqa: E402,F401
-from . import performance_routes  # noqa: E402,F401
+from . import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    performance_routes,  # noqa: E402,F401
+    routes,  # noqa: E402,F401
+)
 
 
 def _exempt_mobile_api_from_csrf() -> None:

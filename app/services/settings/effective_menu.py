@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+
 """Ayarlar servis menü görünürlük çözümleyicisi.
 
 Bu modül route katmanındaki menü görünürlük hesaplamasını servis tarafına alır.
@@ -8,31 +9,39 @@ Kayıt/commit davranışına dokunmaz; yalnızca okuma, fallback ve canlı menü
 filtreleme mantığını tek noktada toplar.
 """
 
-from collections.abc import Callable
-from typing import Any
+from collections.abc import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Callable,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from typing import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Any,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
-from app.config import is_removed_menu_key
-from app.menu_registry import flatten_menu_definitions
-from app.models import UserMenuPermission
-from app.services.settings_service import build_effective_user_menu_context, get_role_default_menu_keys
+from app.config import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    is_removed_menu_key,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.menu_registry import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    flatten_menu_definitions,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.models import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    UserMenuPermission,  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
+)
+from app.services.settings_service import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
+    build_effective_user_menu_context,
+    get_role_default_menu_keys,
+)
 
 RollbackHook = Callable[[], None]
 
 # Phase4J V47C effective_menu core policy constant facade import
 
-from app.services.settings.effective_menu_parts.bys360_constants import (
+from app.services.settings.effective_menu_parts.bys360_constants import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     _BYS360_PERIOD_CENTER_DEFAULT_ROLES_V221,
     _BYS360_PERIOD_CENTER_MENU_KEY_V221,
     _BYS360_V223_PERIOD_CENTER_KEY_ROLES,
 )
 
-from app.services.settings.effective_menu_parts.core_policy_constants import (
-    CORE_MENU_VISIBILITY_POLICY,
-)
-
-
 # Phase4J V34C effective_menu bys360_context facade imports
-from app.services.settings.effective_menu_parts.bys360_context import (
+from app.services.settings.effective_menu_parts.bys360_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _bys360_admin_period_reminder_is_admin_v1,
     _bys360_apply_general_category_visibility_fix_v1,
     _bys360_apply_performance_main_switch,
@@ -52,7 +61,9 @@ from app.services.settings.effective_menu_parts.bys360_context import (
     _rollback,
     normalize_role_name,
 )
-
+from app.services.settings.effective_menu_parts.core_policy_constants import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    CORE_MENU_VISIBILITY_POLICY,
+)
 
 
 def _log_warning(logger: Any, message: str, *args: Any) -> None:
@@ -66,14 +77,8 @@ def _log_warning(logger: Any, message: str, *args: Any) -> None:
 # Ayarlar > Rol Matrisi ekranında kapatılan sekmeler, çekirdek menü savunması
 # veya kişi bazlı eski override nedeniyle yeniden açılmasın.
 # Phase4J V38C effective_menu ROLE constants facade imports
-from app.services.settings.effective_menu_parts.role_constants import (
-    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS,
-)
-
-
-
 # Phase4J V35C effective_menu apply_context facade imports
-from app.services.settings.effective_menu_parts.apply_context import (
+from app.services.settings.effective_menu_parts.apply_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _apply_bys360_press_news_admin_only_policy,
     _apply_bys360_settings_live_authority_v1,
     _apply_core_menu_visibility_policy,
@@ -84,10 +89,9 @@ from app.services.settings.effective_menu_parts.apply_context import (
     _phase3_2_normalize_role_name,
     _role_allowed_for_menu,
 )
-
-
-
-
+from app.services.settings.effective_menu_parts.role_constants import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS,
+)
 
 
 def _active_menu_items() -> list[dict[str, Any]]:
@@ -100,15 +104,9 @@ def _active_menu_items() -> list[dict[str, Any]]:
 # yeniden açamaz. Kullanıcı Ayarlar ekranında tik kaldırdıysa kapalı kalır.
 
 # Phase4J V45C effective_menu user assigned survey function facade import
-from app.services.settings.effective_menu_parts.user_context import (
-    _user_has_any_assigned_survey,
-)
-
-
-
 # BYS360_PHASE3_VISIBILITY_PERMISSION_MENU_MATRIX
 # Phase4J V37C effective_menu PHASE3 constants facade imports
-from app.services.settings.effective_menu_parts.phase3_constants import (
+from app.services.settings.effective_menu_parts.phase3_constants import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     PHASE3_2_GENERAL_VISIBLE_KEYS,
     PHASE3_2_MANAGER_VISIBLE_KEYS,
     PHASE3_2_MENU_VISIBILITY_MARKER,
@@ -116,10 +114,9 @@ from app.services.settings.effective_menu_parts.phase3_constants import (
     PHASE3_2_PERSONNEL_VISIBLE_KEYS,
     PHASE3_PERFORMANCE_MENU_POLICY,
 )
-
-
-
-
+from app.services.settings.effective_menu_parts.user_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
+    _user_has_any_assigned_survey,
+)
 
 # BYS360_PHASE3_2_MENU_VISIBILITY_BEGIN
 # Faz 3.2 — Performans menü görünürlüğü son güvenlik katmanı.
@@ -174,7 +171,7 @@ def _truthy_bool(value: Any) -> bool:
 # Compatibility guard.
 
 # Phase4J V39C2 effective_menu build core alias-aware facade import
-from app.services.settings.effective_menu_parts.build_context import (
+from app.services.settings.effective_menu_parts.build_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     build_menu_visibility_map as _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2,
 )
 
@@ -183,7 +180,7 @@ build_menu_visibility_map = _BYS360_BUILD_MENU_VISIBILITY_MAP_CORE_V39C2
 
 
 # Phase4J EFFECTIVE_MENU_FACADE_V1 runtime policy blocks
-from app.services.settings.effective_menu_parts.runtime_policy_context import (
+from app.services.settings.effective_menu_parts.runtime_policy_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_runtime_policy_blocks,
 )
 
@@ -193,9 +190,10 @@ apply_runtime_policy_blocks(globals(), logging=logging)
 # Personel Kategori Atama sekmesi base.html'de sabit Jinja ile render edilir.
 # Bu son karar katmanı, admin/sistem yöneticisi rolünde ilgili menu_map anahtarını açık tutar.
 # Phase4J V40C effective_menu V213C wrapper block facade call
-from app.services.settings.effective_menu_parts.build_wrapper_context import (
+from app.services.settings.effective_menu_parts.build_wrapper_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_v213c_category_menu_wrapper,
 )
+
 build_menu_visibility_map = apply_v213c_category_menu_wrapper(
     build_menu_visibility_map,
     logging=logging,
@@ -206,9 +204,10 @@ build_menu_visibility_map = apply_v213c_category_menu_wrapper(
 
 # BYS360_PERFORMANCE_V2_1_4_CATEGORY_SCOPE_EFFECTIVE_MENU_BEGIN
 # Phase4J V43C effective_menu V214 final wrapper block facade call
-from app.services.settings.effective_menu_parts.build_wrapper_context import (
+from app.services.settings.effective_menu_parts.build_wrapper_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_v214_category_scope_wrapper,
 )
+
 build_menu_visibility_map = apply_v214_category_scope_wrapper(
     build_menu_visibility_map,
     logging=logging,
@@ -219,9 +218,10 @@ build_menu_visibility_map = apply_v214_category_scope_wrapper(
 
 # BYS360_PERFORMANCE_V2_1_5_CATEGORY_PERIOD_SCOPE_EFFECTIVE_MENU_BEGIN
 # Phase4J V41C effective_menu V215 wrapper block facade call
-from app.services.settings.effective_menu_parts.build_wrapper_context import (
+from app.services.settings.effective_menu_parts.build_wrapper_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_v215_category_period_scope_wrapper,
 )
+
 build_menu_visibility_map = apply_v215_category_period_scope_wrapper(
     build_menu_visibility_map,
     logging=logging,
@@ -232,9 +232,10 @@ build_menu_visibility_map = apply_v215_category_period_scope_wrapper(
 
 # BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_EFFECTIVE_MENU_BEGIN
 # Phase4J V42C effective_menu V216 wrapper block facade call
-from app.services.settings.effective_menu_parts.build_wrapper_context import (
+from app.services.settings.effective_menu_parts.build_wrapper_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_v216_category_period_integration_wrapper,
 )
+
 build_menu_visibility_map = apply_v216_category_period_integration_wrapper(
     build_menu_visibility_map,
     logging=logging,
@@ -260,9 +261,10 @@ for _set_name in ["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS", "PHASE3_2_MANAGER_VISIBL
 # Dönem Yönetim Merkezi, Canlı Takip ve Amir Hatırlatma menü anahtarları
 # Ayarlar > Rol Matrisi kararına tabi canlı otorite anahtarlarıdır.
 # Phase4J V51C effective_menu period center block facade call
-from app.services.settings.effective_menu_parts.block_context import (
+from app.services.settings.effective_menu_parts.block_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_period_center_key_roles_block,
 )
+
 apply_period_center_key_roles_block(
     CORE_MENU_VISIBILITY_POLICY,
     ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS,
@@ -286,9 +288,10 @@ _BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1 = build_menu_vis
 
 
 # Phase4J V52C effective_menu public build function facade assignment
-from app.services.settings.effective_menu_parts.public_build_context import (
+from app.services.settings.effective_menu_parts.public_build_context import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     apply_admin_period_reminder_public_build_wrapper,
 )
+
 build_menu_visibility_map = apply_admin_period_reminder_public_build_wrapper(
     _BYS360_PREV_BUILD_MENU_VISIBILITY_MAP_ADMIN_PERIOD_REMINDER_V1,
     _bys360_admin_period_reminder_is_admin_v1,

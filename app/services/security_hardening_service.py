@@ -15,8 +15,7 @@ from app.extensions import db
 logger = logging.getLogger(__name__)
 
 try:
-    from sqlalchemy import inspect as sa_inspect
-    from sqlalchemy import text
+    from sqlalchemy import inspect as sa_inspect, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/security_hardening_service.py | line=27")
     text = None

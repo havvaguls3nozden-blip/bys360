@@ -63,6 +63,41 @@ from .categories import (
     slugify_personnel_category,
     user_matches_personnel_category,
 )
+from .excel_import import (
+    PERSONNEL_EXCEL_MANAGER_1_ALIASES,
+    PERSONNEL_EXCEL_MANAGER_2_ALIASES,
+    PERSONNEL_EXCEL_MANAGER_3_ALIASES,
+    PERSONNEL_EXCEL_MANAGER_ALIASES,
+    PERSONNEL_EXCEL_REQUIRED_HEADERS,
+    PERSONNEL_EXCEL_ROLE_ALIASES,
+    PersonnelExcelPreflightResult,
+    PersonnelExcelRowPayload,
+    build_personnel_excel_column_index,
+    build_personnel_excel_import_phase8_summary,
+    build_personnel_excel_row_payload,
+    excel_scalar,
+    has_explicit_personnel_excel_manager_columns,
+    normalize_personnel_excel_headers,
+    preflight_personnel_excel_headers,
+    row_has_required_personnel_excel_fields,
+)
+from .final_hardening import (
+    PHASE10_EXPECTED_FILES,
+    PHASE10_REQUIRED_ROUTE_NAMES,
+    PHASE10_REQUIRED_SERVICE_EXPORTS,
+    PHASE10_REQUIRED_SERVICE_MODULES,
+    PHASE10_SERVICE_SOURCE_FORBIDDEN_MARKERS,
+    PersonnelFinalHardeningIssue,
+    PersonnelFinalHardeningResult,
+    build_personnel_final_hardening_phase10_summary,
+    check_personnel_final_required_files,
+    check_personnel_final_route_contract,
+    check_personnel_final_service_exports,
+    check_personnel_final_service_write_boundary,
+    merge_personnel_final_hardening_results,
+    render_personnel_final_hardening_report,
+    run_personnel_final_hardening_gate,
+)
 from .form_context import (
     build_personnel_create_form_context,
     build_personnel_edit_form_context,
@@ -78,82 +113,6 @@ from .form_payload import (
     validate_edit_password_fields,
     validate_manager_selection,
     validate_required_personnel_payload,
-)
-from .list_query import (
-    PersonnelListFilters,
-    PersonnelListRow,
-    PersonnelListStats,
-    apply_personnel_list_filters,
-    build_personnel_list_base_query,
-    build_personnel_list_context,
-    build_personnel_list_phase2_summary,
-    build_personnel_list_row,
-    build_personnel_list_rows,
-    build_personnel_list_stats,
-    build_personnel_role_values,
-    build_personnel_unit_options,
-    read_personnel_list_filters,
-)
-from .workflow import (
-    PersonnelMutationSummary,
-    apply_personnel_edit_flags,
-    apply_personnel_first_login_defaults,
-    apply_personnel_identity_payload,
-    apply_personnel_initial_password,
-    apply_personnel_manager_payload,
-    apply_personnel_password_update,
-    attach_personnel_org_unit,
-    build_new_personnel_user_from_payload,
-    build_personnel_workflow_phase3_summary,
-    set_personnel_manager_if_exists,
-    set_personnel_manager_sicils_from_ids,
-    set_personnel_role,
-    update_existing_personnel_user_from_payload,
-)
-from .org_hierarchy import (
-    PersonnelOrgHierarchyResult,
-    apply_admin_user_org_hierarchy_fields,
-    apply_manager_id_hierarchy,
-    apply_manager_sicil_hierarchy,
-    attach_organization_unit_to_user,
-    attach_personnel_payload_org_hierarchy,
-    build_personnel_org_hierarchy_phase6_summary,
-    ensure_personnel_organization_unit,
-    resolve_manager_by_id,
-)
-from .excel_import import (
-    PERSONNEL_EXCEL_MANAGER_ALIASES,
-    PERSONNEL_EXCEL_MANAGER_1_ALIASES,
-    PERSONNEL_EXCEL_MANAGER_2_ALIASES,
-    PERSONNEL_EXCEL_MANAGER_3_ALIASES,
-    PERSONNEL_EXCEL_REQUIRED_HEADERS,
-    PERSONNEL_EXCEL_ROLE_ALIASES,
-    PersonnelExcelPreflightResult,
-    PersonnelExcelRowPayload,
-    build_personnel_excel_column_index,
-    build_personnel_excel_import_phase8_summary,
-    build_personnel_excel_row_payload,
-    excel_scalar,
-    has_explicit_personnel_excel_manager_columns,
-    normalize_personnel_excel_headers,
-    preflight_personnel_excel_headers,
-    row_has_required_personnel_excel_fields,
-)
-
-from .profile_photo import (
-    PersonnelProfilePhotoResult,
-    apply_personnel_profile_photo_action,
-    build_personnel_profile_photo_phase4_summary,
-    delete_personnel_profile_photo,
-    upload_personnel_profile_photo,
-)
-from .uniqueness import (
-    PersonnelConflictValidationResult,
-    build_personnel_uniqueness_phase5_summary,
-    validate_admin_manager_sicil_conflicts,
-    validate_personnel_identity_uniqueness,
-    validate_personnel_manager_id_conflicts,
-    validate_personnel_password_change_conflicts,
 )
 from .leave_attendance import (
     ACTIVE_LEAVE_ATTENDANCE_STATUSES,
@@ -173,7 +132,21 @@ from .leave_attendance import (
     list_personnel_leave_rows,
     read_leave_attendance_filters,
 )
-
+from .list_query import (
+    PersonnelListFilters,
+    PersonnelListRow,
+    PersonnelListStats,
+    apply_personnel_list_filters,
+    build_personnel_list_base_query,
+    build_personnel_list_context,
+    build_personnel_list_phase2_summary,
+    build_personnel_list_row,
+    build_personnel_list_rows,
+    build_personnel_list_stats,
+    build_personnel_role_values,
+    build_personnel_unit_options,
+    read_personnel_list_filters,
+)
 from .live_scope import (
     PERSONNEL_CORE_TABLES,
     PERSONNEL_OPTIONAL_EXTENSION_TABLES,
@@ -183,12 +156,24 @@ from .live_scope import (
     build_personnel_live_scope,
     check_personnel_phase0_surface,
 )
-from .service_inventory import (
-    PersonnelServiceFunction,
-    build_personnel_service_inventory,
-    render_personnel_service_inventory_markdown,
+from .org_hierarchy import (
+    PersonnelOrgHierarchyResult,
+    apply_admin_user_org_hierarchy_fields,
+    apply_manager_id_hierarchy,
+    apply_manager_sicil_hierarchy,
+    attach_organization_unit_to_user,
+    attach_personnel_payload_org_hierarchy,
+    build_personnel_org_hierarchy_phase6_summary,
+    ensure_personnel_organization_unit,
+    resolve_manager_by_id,
 )
-
+from .profile_photo import (
+    PersonnelProfilePhotoResult,
+    apply_personnel_profile_photo_action,
+    build_personnel_profile_photo_phase4_summary,
+    delete_personnel_profile_photo,
+    upload_personnel_profile_photo,
+)
 from .quality_gate import (
     PHASE9_REQUIRED_ROUTE_NAMES,
     PHASE9_REQUIRED_SERVICE_EXPORTS,
@@ -202,22 +187,34 @@ from .quality_gate import (
     merge_personnel_quality_gate_results,
     run_personnel_phase9_quality_gate,
 )
-from .final_hardening import (
-    PHASE10_EXPECTED_FILES,
-    PHASE10_REQUIRED_ROUTE_NAMES,
-    PHASE10_REQUIRED_SERVICE_EXPORTS,
-    PHASE10_REQUIRED_SERVICE_MODULES,
-    PHASE10_SERVICE_SOURCE_FORBIDDEN_MARKERS,
-    PersonnelFinalHardeningIssue,
-    PersonnelFinalHardeningResult,
-    build_personnel_final_hardening_phase10_summary,
-    check_personnel_final_required_files,
-    check_personnel_final_route_contract,
-    check_personnel_final_service_exports,
-    check_personnel_final_service_write_boundary,
-    merge_personnel_final_hardening_results,
-    render_personnel_final_hardening_report,
-    run_personnel_final_hardening_gate,
+from .service_inventory import (
+    PersonnelServiceFunction,
+    build_personnel_service_inventory,
+    render_personnel_service_inventory_markdown,
+)
+from .uniqueness import (
+    PersonnelConflictValidationResult,
+    build_personnel_uniqueness_phase5_summary,
+    validate_admin_manager_sicil_conflicts,
+    validate_personnel_identity_uniqueness,
+    validate_personnel_manager_id_conflicts,
+    validate_personnel_password_change_conflicts,
+)
+from .workflow import (
+    PersonnelMutationSummary,
+    apply_personnel_edit_flags,
+    apply_personnel_first_login_defaults,
+    apply_personnel_identity_payload,
+    apply_personnel_initial_password,
+    apply_personnel_manager_payload,
+    apply_personnel_password_update,
+    attach_personnel_org_unit,
+    build_new_personnel_user_from_payload,
+    build_personnel_workflow_phase3_summary,
+    set_personnel_manager_if_exists,
+    set_personnel_manager_sicils_from_ids,
+    set_personnel_role,
+    update_existing_personnel_user_from_payload,
 )
 
 __all__ = [
@@ -363,6 +360,11 @@ __all__ = [
 
 # BYS360_PHASE2_PERSONNEL_CATEGORY_EXPORTS
 try:
-    from .categories import get_personnel_category_options, assign_user_performance_category, user_matches_personnel_category, normalize_personnel_category_label
+    from .categories import (
+        assign_user_performance_category,
+        get_personnel_category_options,
+        normalize_personnel_category_label,
+        user_matches_personnel_category,
+    )
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/personnel/__init__.py:368)")

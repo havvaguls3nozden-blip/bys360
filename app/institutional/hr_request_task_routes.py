@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import csv
 import io
 import logging
@@ -8,10 +7,18 @@ import logging
 from flask import Response, flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import PersonnelSelfServiceRequest, PersonnelSelfServiceRequestTask, User
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
 from .hr_personnel_operations_routes import (
     _current_scope_bundle,

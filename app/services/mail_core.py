@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 import smtplib
 from collections import Counter
 from datetime import datetime, timedelta
@@ -11,6 +11,7 @@ from typing import Any
 from flask import current_app
 from sqlalchemy import inspect as sa_inspect
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     EvaluationAssignment,
@@ -22,7 +23,7 @@ from app.models import (
     SystemSetting,
     User,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

@@ -5,12 +5,87 @@ modelleri alan bazli modullere ayirir. Disaridan hala
 ``from app.models import User, PerformancePeriod`` kullanimlari calismaya devam eder.
 """
 
-from .base import TimestampMixin, db
-from .audit_misc_models import AuditLog, PerformanceEvaluationHistory
-from .core_models import PersonnelCategory, User, UserMenuPermission
-from .settings_models import RoleMenuDefault, SystemSetting, ModuleSetting, UnitMenuProfile, SettingsChangeLog
+from .ai_models import (
+    AIFeedbackLog,
+    AIRecommendation,
+    AIRedactionRule,
+    AIRequestLog,
+    AISummaryCache,
+)
 from .announcement_popup_models import Announcement, AnnouncementRead
+from .audit_misc_models import AuditLog, PerformanceEvaluationHistory
+from .base import TimestampMixin, db
+from .communication_models import (
+    EvaluationPublishLog,
+    FeedbackMeeting,
+    FeedbackRequest,
+    MailLog,
+    Message,
+    MessageAttachment,
+    MessageComment,
+    MessageReaction,
+    MessageThread,
+    MessageThreadParticipant,
+    MessageTypingState,
+    Notification,
+    Survey,
+    SurveyAnswer,
+    SurveyAssignment,
+    SurveyQuestion,
+    SurveyQuestionOption,
+    SurveyResponse,
+)
+from .core_models import PersonnelCategory, User, UserMenuPermission
+from .feedback_models import (
+    FeedbackActionPlan,
+    FeedbackAnswer,
+    FeedbackCampaign,
+    FeedbackCampaignAssignment,
+    FeedbackPulseEntry,
+    FeedbackQuestion,
+    FeedbackQuestionOption,
+    FeedbackSubmission,
+)
+from .hr_models import (
+    AttendanceException,
+    DelegationAssignment,
+    LeaveBalance,
+    PersonnelApprovalStation,
+    PersonnelAssetAssignment,
+    PersonnelAssetTransferLog,
+    PersonnelChecklistReview,
+    PersonnelChecklistTemplateItem,
+    PersonnelDigitalHandoverDocument,
+    PersonnelDocument,
+    PersonnelDocumentCategory,
+    PersonnelDocumentReminderLog,
+    PersonnelDocumentUploadBatch,
+    PersonnelExitInterview,
+    PersonnelExitRiskAssessment,
+    PersonnelHandoverItem,
+    PersonnelHandoverRecord,
+    PersonnelLeave,
+    PersonnelLifecycleCase,
+    PersonnelLifecycleTask,
+    PersonnelPositionHistory,
+    PersonnelProcessNote,
+    PersonnelSelfServiceRequest,
+    PersonnelSelfServiceRequestAttachment,
+    PersonnelSelfServiceRequestEscalation,
+    PersonnelSelfServiceRequestLog,
+    PersonnelSelfServiceRequestSlaPolicy,
+    PersonnelSelfServiceRequestTask,
+    PersonnelSelfServiceRequestTemplate,
+    PersonnelStatusHistory,
+)
 from .org_models import EmployeeOrgAssignmentHistory, OrganizationUnit, OrganizationUnitVersion
+from .performance_archive_models import (
+    PerformanceArchivedResult,  # BYS360_PHASE7_PERFORMANCE_ARCHIVE_MODEL_IMPORT
+)
+from .performance_low_score_models import (
+    PerformanceLowScoreProcess,
+    PerformanceLowScoreProcessEvent,
+)
 from .performance_models import (
     AssignmentCoverageLog,
     EvaluationAssignment,
@@ -24,62 +99,41 @@ from .performance_models import (
     PerformanceResultSnapshot,
     PerformanceWeightConfig,
 )
-from .performance_low_score_models import (
-    PerformanceLowScoreProcess,
-    PerformanceLowScoreProcessEvent,
-)
-from .performance_archive_models import PerformanceArchivedResult  # BYS360_PHASE7_PERFORMANCE_ARCHIVE_MODEL_IMPORT
 from .performance_process_engine_models import (
-    PerformanceProcessFlow,
-    PerformanceProcessFlowStep,
-    PerformanceScoringHistory,
-    PerformancePresidentApproval,
-    PerformanceProcessNotification,
     PerformanceFeedbackPipelineFlow,
     PerformanceFeedbackPipelineStep,
+    PerformancePresidentApproval,
+    PerformanceProcessFlow,
+    PerformanceProcessFlowStep,
+    PerformanceProcessNotification,
+    PerformanceScoringHistory,
 )  # BYS360_MAINTENANCE_FEEDBACK_STATE_MACHINE_MODEL_IMPORT
-from .hr_models import (
-    AttendanceException,
-    DelegationAssignment,
-    LeaveBalance,
-    PersonnelAssetAssignment,
-    PersonnelChecklistReview,
-    PersonnelChecklistTemplateItem,
-    PersonnelDocumentReminderLog,
-    PersonnelAssetTransferLog,
-    PersonnelDocument,
-    PersonnelDocumentCategory,
-    PersonnelDocumentUploadBatch,
-    PersonnelLeave,
-    PersonnelPositionHistory,
-    PersonnelProcessNote,
-    PersonnelStatusHistory,
-    PersonnelSelfServiceRequest,
-    PersonnelSelfServiceRequestAttachment,
-    PersonnelSelfServiceRequestLog,
-    PersonnelSelfServiceRequestTask,
-    PersonnelSelfServiceRequestTemplate,
-    PersonnelSelfServiceRequestEscalation,
-    PersonnelSelfServiceRequestSlaPolicy,
-    PersonnelLifecycleCase,
-    PersonnelLifecycleTask,
-    PersonnelExitInterview,
-    PersonnelHandoverRecord,
-    PersonnelHandoverItem,
-    PersonnelApprovalStation,
-    PersonnelDigitalHandoverDocument,
-    PersonnelExitRiskAssessment,
+
+# BYS360_CORPORATE_PORTAL_V1_MODEL_IMPORTS
+from .portal_models import (
+    PortalActivityLog,
+    PortalCommentMention,
+    PortalCommentReaction,
+    PortalGroup,
+    PortalGroupMember,
+    PortalModerationLog,
+    PortalPinnedPost,
+    PortalPost,
+    PortalPostAttachment,
+    PortalPostAudience,
+    PortalPostComment,
+    PortalPostReaction,
+    PortalPostReport,
+    PortalProfile,
+    PortalSavedPost,
 )
-from .ai_models import AIRequestLog, AIRecommendation, AIFeedbackLog, AIRedactionRule, AISummaryCache
-from .feedback_models import (
-    FeedbackActionPlan,
-    FeedbackAnswer,
-    FeedbackCampaign,
-    FeedbackCampaignAssignment,
-    FeedbackPulseEntry,
-    FeedbackQuestion,
-    FeedbackQuestionOption,
-    FeedbackSubmission,
+from .publication_models import PublicationIssue
+from .settings_models import (
+    ModuleSetting,
+    RoleMenuDefault,
+    SettingsChangeLog,
+    SystemSetting,
+    UnitMenuProfile,
 )
 from .support_models import (
     SupportCategory,
@@ -89,46 +143,6 @@ from .support_models import (
     SupportTicketAttachment,
     SupportTicketMessage,
     SupportTicketStatusHistory,
-)
-from .publication_models import PublicationIssue
-from .communication_models import (
-    EvaluationPublishLog,
-    FeedbackMeeting,
-    FeedbackRequest,
-    MailLog,
-    Message,
-    MessageAttachment,
-    MessageReaction,
-    MessageThread,
-    MessageThreadParticipant,
-    MessageTypingState,
-    Notification,
-    Survey,
-    SurveyAnswer,
-    SurveyAssignment,
-    SurveyQuestion,
-    SurveyQuestionOption,
-    SurveyResponse,
-    MessageComment,
-)
-
-# BYS360_CORPORATE_PORTAL_V1_MODEL_IMPORTS
-from .portal_models import (
-    PortalProfile,
-    PortalGroup,
-    PortalGroupMember,
-    PortalPost,
-    PortalPostAudience,
-    PortalPostAttachment,
-    PortalPostReaction,
-    PortalPostComment,
-    PortalCommentReaction,
-    PortalCommentMention,
-    PortalSavedPost,
-    PortalPostReport,
-    PortalModerationLog,
-    PortalPinnedPost,
-    PortalActivityLog,
 )
 
 # Kaldirilan moduller icin startup uyumluluk katmani

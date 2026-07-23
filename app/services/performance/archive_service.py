@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from typing import Any

@@ -6,7 +6,6 @@ Böylece canlıda route eksikliği 404 olarak gizlenmeden loglardan izlenebilir.
 """
 from __future__ import annotations
 
-
 import importlib
 import logging
 
@@ -26,22 +25,23 @@ def _optional_import(module_name: str) -> None:
 
 
 # Çekirdek route aileleri uygulama açılışında görünür hata versin.
-from . import routes  # noqa: E402,F401
-from . import hierarchy_ui_routes  # noqa: E402,F401
-from . import admin_core_routes  # noqa: E402,F401
-from . import evaluation_core_routes  # noqa: E402,F401
-from . import task_routes  # noqa: E402,F401
-from . import reporting_routes  # noqa: E402,F401
-from . import history_import_routes  # noqa: E402,F401
-from . import engagement_routes  # noqa: E402,F401
-from . import v2_routes  # noqa: E402,F401
-from . import ops_routes  # noqa: E402,F401
-from . import assignment_rule_routes  # noqa: E402,F401
-from . import core_health_routes  # noqa: E402,F401
-from . import low_score_process_routes  # noqa: E402,F401
-from . import process_engine_phase6_president_approvals_routes  # noqa: E402,F401
-from . import president_approval_card_routes as _president_approval_card_routes  # noqa: E402,F401  # BYS360_PRESIDENT_APPROVAL_CARD_ROUTE_IMPORT
-
+from . import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_core_routes,  # noqa: E402,F401
+    assignment_rule_routes,  # noqa: E402,F401
+    core_health_routes,  # noqa: E402,F401
+    engagement_routes,  # noqa: E402,F401
+    evaluation_core_routes,  # noqa: E402,F401
+    hierarchy_ui_routes,  # noqa: E402,F401
+    history_import_routes,  # noqa: E402,F401
+    low_score_process_routes,  # noqa: E402,F401
+    ops_routes,  # noqa: E402,F401
+    president_approval_card_routes as _president_approval_card_routes,  # noqa: E402,F401  # BYS360_PRESIDENT_APPROVAL_CARD_ROUTE_IMPORT
+    process_engine_phase6_president_approvals_routes,  # noqa: E402,F401
+    reporting_routes,  # noqa: E402,F401
+    routes,  # noqa: E402,F401
+    task_routes,  # noqa: E402,F401
+    v2_routes,  # noqa: E402,F401
+)
 
 OPTIONAL_ROUTE_MODULES = [
     # BYS360_PERFORMANCE_V2_1_22B_LIVE_TRACKING_ROUTE_IMPORT

@@ -147,7 +147,7 @@ BYS360""",
 
 # Phase4J V26E CIC config_context facade imports
 # Phase4J V28C CIC canonical mail service compatibility imports
-from app.services.cic.celebration_dates import (
+from app.services.cic.celebration_dates import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _cic_v40_bool,
     _cic_v40_days_until,
     _cic_v40_mmdd,
@@ -158,7 +158,7 @@ from app.services.cic.celebration_dates import (
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_0_PHASE3_DISPATCH_BEGIN
 # Phase4J V29C CIC cic_context facade imports
-from app.services.cic.cic_context import (
+from app.services.cic.cic_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _cic_auto_last_run_key,
     _cic_is_weekend,
     _cic_phase3_actor_label,
@@ -176,7 +176,7 @@ from app.services.cic.cic_context import (
     _cic_v45_norm,
     _cic_weekday_name_tr,
 )
-from app.services.cic.config_context import (
+from app.services.cic.config_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _clean_ids,
     _clothing,
     _ensure_defaults_base,
@@ -189,7 +189,7 @@ from app.services.cic.config_context import (
     get_config,
     set_setting,
 )
-from app.services.cic.mail_service import (
+from app.services.cic.mail_service import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _cic_phase5_mail_health,
     _cic_phase6_missing_email_count,
     _cic_v11_bool,
@@ -206,7 +206,7 @@ from app.services.cic.mail_service import (
 )
 
 # Phase4J V27C CIC misc_context facade imports
-from app.services.cic.misc_context import (
+from app.services.cic.misc_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _cic_auto_bool,
     _cic_phase5_audit_list,
     _cic_phase5_last_result,
@@ -221,7 +221,7 @@ from app.services.cic.misc_context import (
 )
 
 # Phase4J V30C CIC save_context facade imports
-from app.services.cic.save_context import (
+from app.services.cic.save_context import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _save_system_base,
     save_recipients,
     save_system,
@@ -249,7 +249,7 @@ from app.services.cic.save_context import (
 # PHASE3A_CIC_EXPLICIT_CONTEXT_BEGIN
 # PHASE3A_CIC_EXPLICIT_CONTEXT_END
 # Phase4J V31C CIC canonical scheduler service compatibility imports
-from app.services.cic.scheduler_service import (
+from app.services.cic.scheduler_service import (  # noqa: E402, F401 - deferred import (staged facade/route-registration architecture)
     _run_due_tasks_base,
     get_auto_scheduler_config,
     run_due_tasks,

@@ -14,11 +14,11 @@ from typing import Any
 
 from flask import Flask
 
-from config import Config
 from app.core.reverse_proxy import apply_reverse_proxy_fix
 from app.extensions import csrf, db, login_manager, migrate
 from app.security.startup_audit import validate_live_security_defaults
 from app.startup_checks import validate_runtime_prerequisites
+from config import Config
 
 
 def create_configured_flask_app(import_name: str, config_object: type[Any] = Config) -> Flask:

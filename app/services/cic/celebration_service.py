@@ -139,8 +139,7 @@ def ensure_celebration_schema() -> dict[str, object]:
     """Kullanici tablosunda kutlama motoru icin gerekli tarih alanlarini guvenli sekilde olusturur."""
     result: dict[str, object] = {"ok": True, "added": [], "warnings": []}
     try:
-        from sqlalchemy import inspect as _sa_inspect
-        from sqlalchemy import text as _sa_text
+        from sqlalchemy import inspect as _sa_inspect, text as _sa_text
         inspector = _sa_inspect(db.engine)
         if not inspector.has_table("users"):
             result["ok"] = False

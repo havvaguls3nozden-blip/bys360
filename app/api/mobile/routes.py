@@ -4,11 +4,23 @@ import importlib
 from typing import Any
 
 from app.api.mobile import shared as _shared
-from app.api.mobile.shared import (
+
+# Domain modülleri side-effect olarak route decorator kayıtlarını yapar.
+from app.api.mobile.domains import (
+    assistant_chat as _assistant_chat,  # noqa: F401
+    auth as _auth,  # noqa: F401
+    communication_v1_write as _communication_v1_write,
+    communication_v2_write as _communication_v2_write,
+    dashboard as _dashboard,  # noqa: F401
+    kpi_target_management as _kpi_target_management,  # noqa: F401
+    notifications as _notifications,  # noqa: F401
+    personnel_read as _personnel_read,  # noqa: F401
+    personnel_write_all as _personnel_write_all,
+    push_notifications as _push_notifications,  # noqa: F401
+    support_survey_write as _support_survey_write,
+)
+from app.api.mobile.shared import (  # noqa: F401 - re-exported for sibling performance_*_helpers modules
     User,
-    jsonify,
-    require_mobile_user,
-    request,
     _as_int,
     _full_name,
     _has_global_scope,
@@ -16,20 +28,11 @@ from app.api.mobile.shared import (
     _metric,
     _module_payload,
     _safe_count,
+    jsonify,
+    request,
+    require_mobile_user,
 )
 
-# Domain modülleri side-effect olarak route decorator kayıtlarını yapar.
-from app.api.mobile.domains import assistant_chat as _assistant_chat  # noqa: F401
-from app.api.mobile.domains import auth as _auth  # noqa: F401
-from app.api.mobile.domains import communication_v1_write as _communication_v1_write
-from app.api.mobile.domains import communication_v2_write as _communication_v2_write
-from app.api.mobile.domains import dashboard as _dashboard  # noqa: F401
-from app.api.mobile.domains import kpi_target_management as _kpi_target_management  # noqa: F401
-from app.api.mobile.domains import notifications as _notifications  # noqa: F401
-from app.api.mobile.domains import personnel_read as _personnel_read  # noqa: F401
-from app.api.mobile.domains import personnel_write_all as _personnel_write_all
-from app.api.mobile.domains import push_notifications as _push_notifications  # noqa: F401
-from app.api.mobile.domains import support_survey_write as _support_survey_write
 """BYS360 mobile API facade.
 
 Bu dosya endpoint sözleşmesini taşımaz; mobil domain modüllerini ve düşük riskli

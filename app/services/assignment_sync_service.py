@@ -28,18 +28,27 @@ Bu servis hicbir sekilde kafasina gore yeni amir uretmez.
 Sadece kullanici kartinda mevcut olan yonetici sicil alanlarini kullanir.
 """
 
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    dataclass,
+    field,
+)
+from typing import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Any,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
-import app.models as models
-from app.extensions import db
+import app.models as models  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+from app.extensions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    db,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
 User = getattr(models, "User", None)
 PerformancePeriod = getattr(models, "PerformancePeriod", None)
 EvaluationAssignment = getattr(models, "EvaluationAssignment", None)
 PerformanceEvaluation = getattr(models, "PerformanceEvaluation", None)
 
-from app.services.performance.hierarchy import build_manager_chain_for_user
+from app.services.performance.hierarchy import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    build_manager_chain_for_user,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
 SPECIAL_UNIT_NAMES = {
     "HUKUK MÜŞAVİRLİĞİ",

@@ -11,8 +11,10 @@ from app.models import Message, MessageThread, MessageThreadParticipant, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, issue_form_token, menu_key_required, safe_render
 from app.services.ai import build_announcement_form_ai_panel, build_announcements_ai_panel
-from app.services.message_service import can_use_announcement_tools as _can_use_announcement_tools
-from app.services.message_service import notify_user as _notify_user
+from app.services.message_service import (
+    can_use_announcement_tools as _can_use_announcement_tools,
+    notify_user as _notify_user,
+)
 
 from .shared import (
     _clean_message_body,

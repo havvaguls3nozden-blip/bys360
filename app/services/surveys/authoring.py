@@ -6,9 +6,10 @@ sorumluluğu canlı route akışında kalır.
 """
 from __future__ import annotations
 
-from typing import Any
-from collections.abc import Mapping, Sequence
 import logging
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 
@@ -193,6 +194,7 @@ def persist_survey_questions(*, survey_id: int, question_payloads: Sequence[dict
     """Soru ve seçenek kayıtlarını ekler; commit/rollback yapmaz."""
     from app.extensions import db
     from app.models import SurveyQuestion, SurveyQuestionOption
+
     from .schema import survey_question_phase2_ready
 
     inserted: list[tuple[Any, dict[str, Any]]] = []

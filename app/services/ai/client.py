@@ -4,8 +4,7 @@ import json
 import time
 from dataclasses import dataclass
 from typing import Any
-from urllib import error as urlerror
-from urllib import request as urlrequest
+from urllib import error as urlerror, request as urlrequest
 
 from flask import current_app
 

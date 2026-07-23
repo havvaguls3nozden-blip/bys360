@@ -17,8 +17,6 @@ from app.route_support import ensure_boolean_toggle, normalize_int_list
 from app.services.hierarchy_admin_service import reset_all_personnel_and_related_data
 from app.services.profile_photo_service import (
     delete_profile_photo_file as _delete_profile_photo_file,
-)
-from app.services.profile_photo_service import (
     save_profile_photo as _save_profile_photo,
 )
 from app.services.safe_user_delete_service import safe_delete_user_by_id

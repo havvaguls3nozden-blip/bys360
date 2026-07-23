@@ -6,11 +6,11 @@ checks. It must not register routes, touch the database, or mutate app config.
 """
 from __future__ import annotations
 
+import json
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import json
 from typing import Any
-from collections.abc import Iterable
 
 IGNORED_METHODS = {"HEAD", "OPTIONS"}
 

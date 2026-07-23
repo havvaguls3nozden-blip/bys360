@@ -9,10 +9,8 @@ from app.models import User
 from app.services.explicit_manager_chain_service import has_explicit_manager_fields
 from app.services.hierarchy_rulebook_service import (
     build_lookup,
-    is_system_user,
-)
-from app.services.hierarchy_rulebook_service import (
     infer_role_from_profile as _infer_role_from_profile,
+    is_system_user,
 )
 from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain
 

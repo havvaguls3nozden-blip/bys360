@@ -5,50 +5,6 @@ yardım merkezi, dashboard ve AI yönetişim katmanını esas alır. Eğitim,
 Strateji, Belge Deposu ve Portal AI servisleri canlı vitrinde kapalı tutulur.
 """
 
-from .dashboard_panels import (
-    build_repository_dashboard_ai_panel,
-    build_dashboard_ai_panel,
-    build_management_ai_panel,
-    build_scorecard_ai_panel,
-    build_publish_ai_panel,
-    build_periods_ai_panel,
-    build_period_form_ai_panel,
-    build_task_generation_ai_panel,
-    build_task_preflight_ai_panel,
-    build_hierarchy_ai_panel,
-    build_mail_reminder_ai_panel,
-    build_feedback_requests_ai_panel,
-    build_feedback_schedule_ai_panel,
-    build_feedback_meetings_ai_panel,
-    build_personnel_profile_chain_ai_panel,
-    build_admin_user_form_ai_panel,
-    build_excel_fix_preview_ai_panel,
-    build_personnel_list_ai_panel,
-    build_admin_users_risk_ai_panel,
-    build_import_health_priority_ai_panel,
-    build_org_unit_detail_ai_panel,
-    build_personnel_density_ai_panel,
-    build_import_health_simulation_ai_panel,
-    build_hierarchy_tree_ai_panel,
-    build_hierarchy_bulk_edit_ai_panel,
-    build_hierarchy_assignment_person_ai_panel,
-    build_org_units_risk_map_ai_panel,
-    build_assignment_recommendation_center_ai_panel,
-    build_assignment_delegation_pressure_ai_panel,
-    build_hr_leave_ai_panel,
-    build_hr_attendance_ai_panel,
-    build_message_compose_ai_panel,
-    build_message_inbox_ai_panel,
-    build_message_thread_ai_panel,
-    build_notification_priority_ai_panel,
-    build_announcements_ai_panel,
-    build_announcement_form_ai_panel,
-    build_dashboard_ai_operations_bridge,
-)
-from .performance import (  # noqa: F401
-    build_performance_consistency_response,
-    build_performance_summary_response,
-)
 from .audit import (  # noqa: F401
     cache_summary,
     ensure_recommendation_rows,
@@ -57,6 +13,51 @@ from .audit import (  # noqa: F401
     mark_recommendation,
     upsert_ai_summary_cache,
 )
+from .dashboard_panels import (  # noqa: F401
+    build_admin_user_form_ai_panel,
+    build_admin_users_risk_ai_panel,
+    build_announcement_form_ai_panel,
+    build_announcements_ai_panel,
+    build_assignment_delegation_pressure_ai_panel,
+    build_assignment_recommendation_center_ai_panel,
+    build_dashboard_ai_operations_bridge,
+    build_dashboard_ai_panel,
+    build_excel_fix_preview_ai_panel,
+    build_feedback_meetings_ai_panel,
+    build_feedback_requests_ai_panel,
+    build_feedback_schedule_ai_panel,
+    build_hierarchy_ai_panel,
+    build_hierarchy_assignment_person_ai_panel,
+    build_hierarchy_bulk_edit_ai_panel,
+    build_hierarchy_tree_ai_panel,
+    build_hr_attendance_ai_panel,
+    build_hr_leave_ai_panel,
+    build_import_health_priority_ai_panel,
+    build_import_health_simulation_ai_panel,
+    build_mail_reminder_ai_panel,
+    build_management_ai_panel,
+    build_message_compose_ai_panel,
+    build_message_inbox_ai_panel,
+    build_message_thread_ai_panel,
+    build_notification_priority_ai_panel,
+    build_org_unit_detail_ai_panel,
+    build_org_units_risk_map_ai_panel,
+    build_period_form_ai_panel,
+    build_periods_ai_panel,
+    build_personnel_density_ai_panel,
+    build_personnel_list_ai_panel,
+    build_personnel_profile_chain_ai_panel,
+    build_publish_ai_panel,
+    build_repository_dashboard_ai_panel,
+    build_scorecard_ai_panel,
+    build_task_generation_ai_panel,
+    build_task_preflight_ai_panel,
+)
+from .hr import build_hr_leave_brief_response  # noqa: F401
+from .performance import (  # noqa: F401
+    build_performance_consistency_response,
+    build_performance_summary_response,
+)
 from .recommendation_actions import (  # noqa: F401
     apply_recommendation,
     bulk_apply_recommendations,
@@ -64,7 +65,6 @@ from .recommendation_actions import (  # noqa: F401
     list_target_recommendation_payloads,
 )
 from .support import build_support_ticket_triage_response  # noqa: F401
-from .hr import build_hr_leave_brief_response  # noqa: F401
 
 
 def build_dashboard_brief_response(*args, **kwargs):

@@ -9,8 +9,6 @@ from sqlalchemy import inspect, text
 
 from app.services.performance.v2_1_2_category_engine import (
     RULE_VERSION as V212_RULE_VERSION,
-)
-from app.services.performance.v2_1_2_category_engine import (
     assign_user_category,
     canonical_category_key,
     ensure_category_schema,

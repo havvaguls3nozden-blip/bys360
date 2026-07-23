@@ -41,13 +41,26 @@ def is_evaluation_publishable(*args, **kwargs):
     return _phase2_visibility_guard().is_evaluation_publishable(*args, **kwargs)
 
 
-from collections import Counter
-from collections.abc import Iterable
-from datetime import datetime
-from typing import Any
+from collections import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Counter,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from collections.abc import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Iterable,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from datetime import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    datetime,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from typing import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    Any,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
-from app.extensions import db
-from app.models import PerformanceEvaluation, PerformancePeriod
+from app.extensions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    db,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.models import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    PerformanceEvaluation,
+    PerformancePeriod,
+)
 
 
 def get_publish_timestamp(evaluation: PerformanceEvaluation | None) -> datetime | None:

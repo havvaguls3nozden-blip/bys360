@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from flask import flash, jsonify, redirect, request, send_from_directory, session, url_for
 from flask_login import current_user, login_required
 
@@ -7,11 +9,10 @@ from app.extensions import db
 from app.models import User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, issue_form_token, menu_key_required, safe_render
-from app.services.ai import build_message_thread_ai_panel, build_message_inbox_ai_panel
+from app.services.ai import build_message_inbox_ai_panel, build_message_thread_ai_panel
 from app.services.message_service import (
     normalize_incoming_message_files as _normalize_incoming_message_files,
 )
-
 from app.services.messages import (
     COMPOSE_USER_SOFT_LIMIT as _SVC_COMPOSE_USER_SOFT_LIMIT,
     INBOX_THREAD_FETCH_LIMIT as _SVC_INBOX_THREAD_FETCH_LIMIT,
@@ -19,41 +20,41 @@ from app.services.messages import (
     REACTION_OPTIONS as _SVC_REACTION_OPTIONS,
     THREAD_MESSAGE_SOFT_LIMIT as _SVC_THREAD_MESSAGE_SOFT_LIMIT,
     append_thread_message_with_attachments as _svc_append_thread_message_with_attachments,
+    build_compose_user_cards as _svc_build_compose_user_cards,
+    build_inbox_thread_collection as _svc_build_inbox_thread_collection,
+    build_reaction_map as _svc_build_reaction_map,
+    build_recent_message_users_for_compose as _svc_build_recent_message_users_for_compose,
+    build_thread_activity_payload as _svc_build_thread_activity_payload,
+    build_thread_counts_payload as _svc_build_thread_counts_payload,
+    build_thread_live_payload as _svc_build_thread_live_payload,
+    build_thread_presence as _svc_build_thread_presence,
     create_direct_message_with_attachments as _svc_create_direct_message_with_attachments,
-    resolve_thread_for_sending as _svc_resolve_thread_for_sending,
+    create_message_comment as _svc_create_message_comment,  # BYS360_MESSAGE_INTERACTIONS_V1
     delete_message_for_user as _svc_delete_message_for_user,
     edit_message_for_user as _svc_edit_message_for_user,
-    resolve_message_attachment_download_for_user as _svc_resolve_message_attachment_download_for_user,
-    build_inbox_thread_collection as _svc_build_inbox_thread_collection,
-    build_thread_counts_payload as _svc_build_thread_counts_payload,
-    build_thread_activity_payload as _svc_build_thread_activity_payload,
-    build_thread_live_payload as _svc_build_thread_live_payload,
+    format_dt_label as _svc_format_dt_label,
+    load_active_compose_users as _svc_load_active_compose_users,
+    load_all_active_compose_users as _svc_load_all_active_compose_users,
+    load_thread_detail_payload as _svc_load_thread_detail_payload,
     mark_thread_read_for_user as _svc_mark_thread_read_for_user,
+    message_sender_initials as _svc_message_sender_initials,
+    message_sender_name as _svc_message_sender_name,
+    normalize_inbox_filter as _svc_normalize_inbox_filter,
+    normalize_inbox_scope as _svc_normalize_inbox_scope,
+    orm_entity as _svc_orm_entity,
+    participant_for_thread as _svc_participant_for_thread,
+    resolve_active_recipient as _svc_resolve_active_recipient,
+    resolve_message_attachment_download_for_user as _svc_resolve_message_attachment_download_for_user,
+    resolve_selected_inbox_thread as _svc_resolve_selected_inbox_thread,
+    resolve_thread_for_sending as _svc_resolve_thread_for_sending,
+    serialize_attachment as _svc_serialize_attachment,
+    serialize_message as _svc_serialize_message,
+    thread_for_user as _svc_thread_for_user,
+    toggle_message_reaction as _svc_toggle_message_reaction,
     toggle_thread_archive_for_user as _svc_toggle_thread_archive_for_user,
     toggle_thread_mute_for_user as _svc_toggle_thread_mute_for_user,
     toggle_thread_pin_for_user as _svc_toggle_thread_pin_for_user,
     update_thread_typing_state as _svc_update_thread_typing_state,
-    toggle_message_reaction as _svc_toggle_message_reaction,
-    create_message_comment as _svc_create_message_comment,  # BYS360_MESSAGE_INTERACTIONS_V1
-    load_thread_detail_payload as _svc_load_thread_detail_payload,
-    build_compose_user_cards as _svc_build_compose_user_cards,
-    build_recent_message_users_for_compose as _svc_build_recent_message_users_for_compose,
-    load_active_compose_users as _svc_load_active_compose_users,
-    load_all_active_compose_users as _svc_load_all_active_compose_users,
-    resolve_active_recipient as _svc_resolve_active_recipient,
-    normalize_inbox_filter as _svc_normalize_inbox_filter,
-    normalize_inbox_scope as _svc_normalize_inbox_scope,
-    resolve_selected_inbox_thread as _svc_resolve_selected_inbox_thread,
-    build_reaction_map as _svc_build_reaction_map,
-    build_thread_presence as _svc_build_thread_presence,
-    format_dt_label as _svc_format_dt_label,
-    message_sender_initials as _svc_message_sender_initials,
-    message_sender_name as _svc_message_sender_name,
-    orm_entity as _svc_orm_entity,
-    participant_for_thread as _svc_participant_for_thread,
-    serialize_attachment as _svc_serialize_attachment,
-    serialize_message as _svc_serialize_message,
-    thread_for_user as _svc_thread_for_user,
 )
 
 from .shared import (
@@ -65,7 +66,7 @@ from .shared import (
     _render_message_new,
     _utcnow,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 """Phase 2 dogrudan route kayitli mesaj modulu.

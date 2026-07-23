@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 from app.services.safe_user_delete_service import safe_delete_user_by_id
+
 """Admin operasyon route ailesi.
 
 Bu dosya admin toplu işlemleri, personel profil/aksiyonları ve
@@ -10,19 +11,52 @@ hiyerarşi yardımcı rotalarını modüler yapı altında toplar.
 """
 
 
-from flask import flash, redirect, url_for
-from flask_login import login_required
+from flask import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    flash,
+    redirect,
+    url_for,
+)
+from flask_login import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    login_required,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
 
-from app.extensions import db
-from app.models import User
-from app.route_registry import main_bp
-from app.route_support import admin_required, menu_key_required
-from .ops_health_services import admin_import_health_report_impl
-from .ops_import_services import admin_user_import_impl
-from .ops_personnel_services import download_personnel_template_impl
-from .ops_personnel_services import personnel_profile_impl
-from .ops_performance_services import performance_hierarchy_bulk_assign_impl
-from .ops_user_action_services import admin_users_bulk_delete_impl, admin_user_change_photo_impl, admin_user_archive_impl, admin_users_bulk_archive_impl, admin_user_delete_impl, admin_users_bulk_passive_impl, admin_user_toggle_active_impl, admin_users_reset_all_impl
+from app.extensions import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    db,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.models import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    User,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.route_registry import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    main_bp,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from app.route_support import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_required,
+    menu_key_required,
+)
+
+from .ops_health_services import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_import_health_report_impl,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .ops_import_services import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_user_import_impl,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .ops_performance_services import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    performance_hierarchy_bulk_assign_impl,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+)
+from .ops_personnel_services import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    download_personnel_template_impl,
+    personnel_profile_impl,
+)
+from .ops_user_action_services import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    admin_user_archive_impl,
+    admin_user_change_photo_impl,
+    admin_user_delete_impl,
+    admin_user_toggle_active_impl,
+    admin_users_bulk_archive_impl,
+    admin_users_bulk_delete_impl,
+    admin_users_bulk_passive_impl,
+    admin_users_reset_all_impl,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -253,7 +287,9 @@ __all__ = [
 # BYS360_PERFORMANCE_COMPLETION_PHASE2_IMPORT_CATEGORY_MARKER
 # Toplu personel import tarafında kategori/personel kategorisi sütunları desteklenir.
 try:
-    from app.services.performance.phase2_category_center import normalize_category_label as _phase2_normalize_category_label
+    from app.services.performance.phase2_category_center import (
+        normalize_category_label as _phase2_normalize_category_label,
+    )
 except Exception:
     def _phase2_normalize_category_label(value):
         return str(value or "Diğer").strip() or "Diğer"

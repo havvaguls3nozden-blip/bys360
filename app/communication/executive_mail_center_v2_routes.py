@@ -1,10 +1,17 @@
 from __future__ import annotations
 
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+
 from app.route_registry import main_bp
-from app.services.executive_mail_center_v2 import dashboard_context, ensure_defaults, run_task, save_location_from_form, save_recipients_from_form, save_tasks_from_form
+from app.services.executive_mail_center_v2 import (
+    dashboard_context,
+    ensure_defaults,
+    run_task,
+    save_location_from_form,
+    save_recipients_from_form,
+    save_tasks_from_form,
+)
 
 ADMIN_ROLES = {"admin", "sistem_yoneticisi", "system_admin", "super_admin"}
 

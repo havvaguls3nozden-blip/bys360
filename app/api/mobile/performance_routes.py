@@ -1,30 +1,38 @@
 from __future__ import annotations
 
 # BYS360_MOBILE_V2_8_44_SCORE_1_5_COMMENT_OPTIONAL_BACKEND: Mobilde 1 ve 5 puan kriter açıklaması zorunlu değildir.
-
-
 import logging
-from statistics import mean
-
+from statistics import (
+    mean,  # noqa: F401 - available via performance_read_routes.py globals().update() bridge
+)
 from typing import Any
 
 from flask import jsonify, request
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     EvaluationAssignment,
+    PerformanceCriteria,
     PerformanceEvaluation,
     PerformanceEvaluationItem,
     PerformancePeriod,
     PerformancePresidentApproval,
     PerformanceResultSnapshot,
+    PerformanceWeightConfig,
     User,
-    PerformanceCriteria,
-    PerformanceWeightConfig,)
+)
+from app.services.performance.common import get_period_level_3_flags
+from app.services.performance.scoring import (
+    calculate_preview_total_100,
+    recalculate_evaluation_totals,
+    save_evaluation_level,
+    validate_general_comment_requirements,
+)
 
 from . import mobile_api_bp
 from .routes import (
-    _as_int,
+    _as_int,  # noqa: F401 - available via performance_read_routes.py globals().update() bridge
     _full_name,
     _has_global_scope,
     _item,
@@ -33,14 +41,6 @@ from .routes import (
     require_mobile_user,
 )
 
-from app.core.datetime_utils import utc_now
-from app.services.performance.common import get_period_level_3_flags
-from app.services.performance.scoring import (
-    calculate_preview_total_100,
-    recalculate_evaluation_totals,
-    save_evaluation_level,
-    validate_general_comment_requirements,
-)
 logger = logging.getLogger(__name__)
 
 
@@ -89,7 +89,7 @@ def _mobile_perf_safe_get(model, object_id):
 _DONE = {"tamamlandi", "tamamlandı", "completed", "done", "closed", "kapandi", "kapandı", "yayınlandı", "published"}
 
 
-from app.api.mobile.services.performance_base_helpers import (
+from app.api.mobile.services.performance_base_helpers import (  # noqa: E402, F401 - deferred to avoid circular import with performance_period_service; _date_text used via performance_read_routes.py globals() bridge
     _date_range,
     _date_text,
     _label,
@@ -114,7 +114,11 @@ def _bys360_legacy__period_progress(period: Any) -> int:
     return 50
 
 
-from app.api.mobile.services.performance_query_helpers import (
+from app.api.mobile.services.performance_item_helpers import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
+    _assignment_item,
+    _scorecard_item,
+)
+from app.api.mobile.services.performance_query_helpers import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     _assignment_query_for,
     _low_score_count,
     _period_assignment_query,
@@ -125,16 +129,10 @@ from app.api.mobile.services.performance_query_helpers import (
 )
 
 
-from app.api.mobile.services.performance_item_helpers import (
-    _assignment_item,
-    _scorecard_item,
-)
-
-
 @mobile_api_bp.get("/performance/summary")
 @require_mobile_user
 def mobile_performance_summary(user: User):
-    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_summary
+    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_summary  # noqa: I001 - kept single-line for route-file line budget
     return delegate_mobile_performance_summary(user, _bys360_legacy_mobile_performance_summary)
 
 def _bys360_legacy_mobile_performance_summary(user: User):
@@ -227,7 +225,7 @@ def _bys360_legacy_mobile_performance_period_detail(user: User, period_id: int):
     ], items)
 
 
-from app.api.mobile.services.performance_compact_route_services import (
+from app.api.mobile.services.performance_compact_route_services import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     phase3c_mobile_performance_approvals_service as _phase3c_approvals_service,
     phase3c_mobile_performance_criteria_service as _phase3c_criteria_service,
     phase3c_mobile_performance_in_period_notes_legacy_service as _phase3c_in_period_notes_legacy_service,
@@ -255,7 +253,7 @@ def mobile_performance_rules_summary(user: User):
 
 # BYS360 MOBILE V2.8.21 CRITERIA WEIGHT THIRD MANAGER ENDPOINTS
 
-from app.api.mobile.services.performance_config_helpers import (
+from app.api.mobile.services.performance_config_helpers import (  # noqa: E402, F401 - deferred; some names used via performance_read_routes.py globals() bridge
     _v2821_criteria_item,
     _v2821_float,
     _v2821_mode_text,
@@ -274,7 +272,7 @@ def mobile_performance_criteria(user: User):
 # BYS360 P11-C1: mobile_performance_weights read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
 
 
-from app.api.mobile.services.performance_task_detail_route_services import (
+from app.api.mobile.services.performance_task_detail_route_services import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     phase3c_mobile_performance_task_detail_service as _phase3c_task_detail_service,
     phase3c_mobile_performance_third_manager_service as _phase3c_third_manager_service,
 )
@@ -320,7 +318,7 @@ def mobile_performance_third_manager(user: User):
 
 
 # BYS360 MOBILE V2.8.22 PERFORMANCE TASKS
-from app.api.mobile.services.performance_task_helpers import (
+from app.api.mobile.services.performance_task_helpers import (  # noqa: E402, F401 - deferred; some names used via performance_read_routes.py globals() bridge
     _v2822_assignment_card,
     _v2822_assignment_query,
     _v2822_can_view_assignment,
@@ -330,7 +328,6 @@ from app.api.mobile.services.performance_task_helpers import (
     _v2822_sicil,
     _v2822_unit_name,
 )
-
 
 # BYS360 P11-C1: mobile_performance_tasks read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
 
@@ -601,7 +598,7 @@ def _v2837_return_assignment(assignment: Any, evaluation: Any, level: int, user:
     return _bys360_performance_task_service._v2837_return_assignment(assignment, evaluation, level, user, note)
 
 
-from app.api.mobile.services.performance_score_route_services import (
+from app.api.mobile.services.performance_score_route_services import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     phase3c_mobile_performance_task_score_action_service as _phase3c_score_action_service,
     phase3c_mobile_performance_task_score_form_service as _phase3c_score_form_service,
     phase3c_mobile_performance_task_score_submit_service as _phase3c_score_submit_service,
@@ -779,7 +776,7 @@ def _v2852_due_label_safe(row):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return (_label(getattr(row, 'status', None), 'Bekliyor'), 40, 'red')
 
-from app.api.mobile.services.performance_summary_risk_route_services import (
+from app.api.mobile.services.performance_summary_risk_route_services import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     phase3c_mobile_performance_full_feature_summary_service as _phase3c_full_feature_summary_service,
     phase3c_mobile_performance_publish_preapproval_service as _phase3c_publish_preapproval_service,
     phase3c_mobile_performance_risk_analysis_v2852_service as _phase3c_risk_analysis_v2852_service,
@@ -820,7 +817,7 @@ def _bys360_legacy_mobile_performance_full_feature_summary(user: User):
     return _phase3c_full_feature_summary_service(user, _phase3c_summary_risk_route_deps())
 
 def mobile_performance_full_feature_summary(user: User):
-    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_full_feature_summary as _bys360_delegate
+    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_full_feature_summary as _bys360_delegate  # noqa: I001 - kept single-line for route-file line budget
     return _bys360_delegate(_bys360_legacy_mobile_performance_full_feature_summary, user)
 
 # BYS360 P11-C1: mobile_performance_categories read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
@@ -860,7 +857,7 @@ def _bys360_legacy_mobile_performance_in_period_notes(user: User):
     return _phase3c_in_period_notes_legacy_service(user, globals())
 
 def mobile_performance_in_period_notes(user: User):
-    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_in_period_notes
+    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_in_period_notes  # noqa: I001 - kept single-line for route-file line budget
     return delegate_mobile_performance_in_period_notes(user)
 
 def _bys360_legacy_mobile_performance_development_suggestions(user: User):
@@ -888,7 +885,7 @@ def _bys360_legacy_mobile_performance_development_suggestions(user: User):
 @mobile_api_bp.get('/performance/development-suggestions')
 @require_mobile_user
 def mobile_performance_development_suggestions(user: User):
-    from app.api.mobile.services.performance_summary_service import mobile_performance_development_suggestions_delegate
+    from app.api.mobile.services.performance_summary_service import mobile_performance_development_suggestions_delegate  # noqa: I001 - kept single-line for route-file line budget
     return mobile_performance_development_suggestions_delegate(user)
 
 def _bys360_legacy_mobile_performance_reports(user: User):
@@ -921,7 +918,7 @@ def _bys360_legacy_mobile_performance_reports(user: User):
 @mobile_api_bp.get('/performance/reports')
 @require_mobile_user
 def mobile_performance_reports(user: User):
-    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_reports
+    from app.api.mobile.services.performance_summary_service import delegate_mobile_performance_reports  # noqa: I001 - kept single-line for route-file line budget
     return delegate_mobile_performance_reports(_bys360_legacy_mobile_performance_reports, user)
 
 # BYS360 P11-C1: mobile_performance_reminders read-only performance route app/api/mobile/performance_read_routes.py modülüne taşındı.
@@ -934,7 +931,7 @@ def _bys360_legacy_mobile_performance_risk_analysis_v2852(user: User):
     return _phase3c_risk_analysis_v2852_service(user, _phase3c_summary_risk_route_deps())
 
 def mobile_performance_risk_analysis_v2852(user):
-    from app.api.mobile.services.performance_summary_service import mobile_performance_risk_analysis_v2852_delegate
+    from app.api.mobile.services.performance_summary_service import mobile_performance_risk_analysis_v2852_delegate  # noqa: I001 - kept single-line for route-file line budget
     return mobile_performance_risk_analysis_v2852_delegate(_bys360_legacy_mobile_performance_risk_analysis_v2852, user)
 
 # BYS360_MOBILE_V2_8_53_IN_PERIOD_NOTES_API
@@ -949,7 +946,7 @@ def _bys360_legacy__v2853_note_bool(value, default=False):
     return str(value).strip().lower() in {'1', 'true', 'evet', 'yes', 'on'}
 
 def _v2853_note_bool(value, default=False):
-    from app.api.mobile.services import performance_period_service as _bys360_performance_period_service
+    from app.api.mobile.services import performance_period_service as _bys360_performance_period_service  # noqa: I001 - kept single-line for route-file line budget
     return _bys360_performance_period_service._v2853_note_bool(value, default)
 
 
@@ -1004,11 +1001,11 @@ def _bys360_legacy__v2853_note_type_label(value):
     return mapping.get(key, key.replace('_', ' ').title())
 
 def _v2853_note_type_label(value):
-    from app.api.mobile.services import performance_period_service as _bys360_performance_period_service
+    from app.api.mobile.services import performance_period_service as _bys360_performance_period_service  # noqa: I001 - kept single-line for route-file line budget
     return _bys360_performance_period_service._v2853_note_type_label(value)
 
 
-from app.api.mobile.services.performance_note_route_services import (
+from app.api.mobile.services.performance_note_route_services import (  # noqa: E402 - deferred to avoid circular import with performance_period_service
     phase3c_mobile_performance_create_in_period_note_v2853_service as _phase3c_create_in_period_note_v2853_service,
     phase3c_mobile_performance_in_period_notes_v2853_service as _phase3c_in_period_notes_v2853_service,
     phase3c_mobile_performance_note_scorecard_v2863a_service as _phase3c_note_scorecard_v2863a_service,
@@ -1041,7 +1038,7 @@ def _bys360_legacy_mobile_performance_in_period_notes_v2853(user: User):
     return _phase3c_in_period_notes_v2853_service(user, _phase3c_note_route_deps())
 
 def mobile_performance_in_period_notes_v2853(user: User):
-    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_in_period_notes_v2853
+    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_in_period_notes_v2853  # noqa: I001 - kept single-line for route-file line budget
     return delegate_mobile_performance_in_period_notes_v2853(user)
 
 
@@ -1057,20 +1054,20 @@ def _bys360_legacy_mobile_performance_note_scorecard_v2863a(user: User):
     return _phase3c_note_scorecard_v2863a_service(user, _phase3c_note_route_deps())
 
 def mobile_performance_note_scorecard_v2863a(user: User):
-    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_note_scorecard_v2863a
+    from app.api.mobile.services.performance_period_service import delegate_mobile_performance_note_scorecard_v2863a  # noqa: I001 - kept single-line for route-file line budget
     return delegate_mobile_performance_note_scorecard_v2863a(user)
 
 
 # BYS360_MOBILE_V2_8_63A_ARCHIVE_NOTE_SCORECARD
 
 # BYS360 P11-C1: mobile performance read routes bridge
-from app.api.mobile.performance_read_routes import register_mobile_performance_read_routes_v1 as _register_mobile_performance_read_routes_v1
+from app.api.mobile.performance_read_routes import register_mobile_performance_read_routes_v1 as _register_mobile_performance_read_routes_v1  # noqa: I001, E402 - deferred bridge import feeds globals() to register routes
 _register_mobile_performance_read_routes_v1(globals())
 
 # Compatibility guard.
 def _bys360_safe_smoke_500_json_response_v21748(kind, exc=None):
     try:
-        from flask import jsonify, current_app
+        from flask import current_app, jsonify
         try:
             current_app.logger.exception("BYS360_SAFE_SMOKE_500_FIX_V2_17_48: mobile performance smoke fallback kind=%s", kind)
         except Exception:

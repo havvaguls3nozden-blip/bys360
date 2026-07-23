@@ -1,4 +1,5 @@
 import logging
+
 logger = logging.getLogger(__name__)
 # BYS360 SP-1A Stratejik Performans modülü
 # KPI, hedef, yetkinlik ve öz değerlendirme çekirdek katmanı.
