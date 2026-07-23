@@ -47,7 +47,7 @@ def _parse_datetime_input(raw_value: str | None):
         raise ValueError("Tarih-saat alanı okunamadı. Lütfen takvim alanını yeniden seçin.") from exc
 
 
-def _log_communication_exception(context: str, exc: Exception, **extra):
+def _log_communication_exception(context: str, exc: BaseException, **extra):
     try:
         current_app.logger.exception(
             "Communication route failure [%s] | extra=%s | error=%s",

@@ -80,7 +80,7 @@ try:
     from zoneinfo import ZoneInfo as _ZoneInfo
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=71")
-    _ZoneInfo = None
+    _ZoneInfo = None  # type: ignore[assignment,misc]
 
 
 def _survey_local_now():
@@ -340,7 +340,7 @@ def surveys_list():
 def survey_take(survey_id):
     survey = db.session.get(Survey, survey_id)
     survey_ok, survey_reason = _survey_access_state(survey)
-    if not survey_ok:
+    if not survey_ok or survey is None:
         flash(survey_reason, "danger")
         return redirect(url_for("main.surveys_list"))
 
@@ -366,7 +366,7 @@ def survey_take(survey_id):
 def survey_submit(survey_id):
     survey = db.session.get(Survey, survey_id)
     survey_ok, survey_reason = _survey_access_state(survey)
-    if not survey_ok:
+    if not survey_ok or survey is None:
         flash(survey_reason, "danger")
         return redirect(url_for("main.surveys_list"))
 
@@ -766,7 +766,7 @@ def survey_edit(survey_id):
             )
             flash("Anket güncellenirken beklenmeyen bir hata oluştu. Girdileriniz korunarak sayfa yeniden açıldı.", "danger")
 
-    current_assignments = survey.assignments.order_by(SurveyAssignment.id.asc()).all()
+    current_assignments = survey.assignments.order_by(SurveyAssignment.id.asc()).all()  # type: ignore[misc,operator]
     current_questions = _safe_survey_questions(int(survey.id))
     form_state = _survey_form_state_from_request() if request.method == "POST" else None
     if not form_state:
