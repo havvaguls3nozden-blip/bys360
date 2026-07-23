@@ -153,7 +153,7 @@ def manager_filter_options() -> dict[str, list[dict[str, Any]]]:
     return {"roles": roles, "units": units, "users": users}
 
 
-def _normalize_target_values(target_type: str, raw_text: str) -> list[str]:
+def _normalize_target_values(target_type: str, raw_text: str | None) -> list[str]:
     values = [safe_str(part) for part in (raw_text or "").replace("\n", ",").split(",")]
     clean_values = [value for value in values if value]
     if target_type == "all":
@@ -314,6 +314,8 @@ def survey_builder_payload(survey_id: int) -> dict[str, Any]:
         for row in survey.assignments.order_by(SurveyAssignment.id.asc()).all()
         if safe_str(getattr(row, "target_value", ""))
     ]
+    start_at = getattr(survey, "start_at", None)
+    end_at = getattr(survey, "end_at", None)
     return {
         "survey": survey,
         "form_state": {
@@ -325,8 +327,8 @@ def survey_builder_payload(survey_id: int) -> dict[str, Any]:
             "is_anonymous": bool(getattr(survey, "is_anonymous", False)),
             "allow_multiple_submissions": bool(getattr(survey, "allow_multiple_submissions", False)),
             "publish_now": safe_str(getattr(survey, "status", "")) == "published",
-            "start_at": getattr(survey, "start_at", None).strftime("%Y-%m-%dT%H:%M") if getattr(survey, "start_at", None) else "",
-            "end_at": getattr(survey, "end_at", None).strftime("%Y-%m-%dT%H:%M") if getattr(survey, "end_at", None) else "",
+            "start_at": start_at.strftime("%Y-%m-%dT%H:%M") if start_at else "",
+            "end_at": end_at.strftime("%Y-%m-%dT%H:%M") if end_at else "",
             "questions": _question_payloads_from_survey(survey),
         },
     }
@@ -342,7 +344,7 @@ def _next_bulletin_version(bulletin_id: int) -> int:
     return int(getattr(latest, "version_no", 0) or 0) + 1
 
 
-def record_bulletin_revision(bulletin: CommunicationBulletin, changed_by_user_id: int | None, change_note: str = "") -> CommunicationBulletinRevision:
+def record_bulletin_revision(bulletin: CommunicationBulletin, changed_by_user_id: int | None, change_note: str | None = "") -> CommunicationBulletinRevision:
     revision = CommunicationBulletinRevision(
         bulletin_id=bulletin.id,
         version_no=_next_bulletin_version(bulletin.id),
@@ -364,16 +366,16 @@ def update_bulletin(
     *,
     bulletin_id: int,
     actor_user_id: int | None,
-    title: str,
-    summary: str,
-    content: str,
-    bulletin_type: str,
-    priority: str,
-    target_type: str,
-    target_values_text: str,
+    title: str | None,
+    summary: str | None,
+    content: str | None,
+    bulletin_type: str | None,
+    priority: str | None,
+    target_type: str | None,
+    target_values_text: str | None,
     is_pinned: bool,
     require_ack: bool,
-    change_note: str,
+    change_note: str | None,
 ) -> CommunicationBulletin:
     bulletin = db.session.get(CommunicationBulletin, bulletin_id)
     if not bulletin:
@@ -411,7 +413,7 @@ def update_bulletin(
     return bulletin
 
 
-def archive_bulletin(bulletin_id: int, actor_user_id: int | None, note: str = "") -> CommunicationBulletin:
+def archive_bulletin(bulletin_id: int, actor_user_id: int | None, note: str | None = "") -> CommunicationBulletin:
     bulletin = db.session.get(CommunicationBulletin, bulletin_id)
     if not bulletin:
         raise CommunicationPhase2Error("Duyuru kaydı bulunamadı.")
@@ -443,9 +445,9 @@ def upsert_survey_template(
     *,
     template_id: int | None,
     actor_user_id: int | None,
-    title: str,
-    description: str,
-    survey_type: str,
+    title: str | None,
+    description: str | None,
+    survey_type: str | None,
     is_active: bool,
     questions_payload: list[dict[str, Any]],
 ) -> CommunicationSurveyTemplate:
@@ -527,7 +529,7 @@ def _create_survey_questions(survey_id: int, questions_payload: list[dict[str, A
             )
 
 
-def _assignment_rows_from_target_text(target_type: str, target_values_text: str) -> list[tuple[str, str | None]]:
+def _assignment_rows_from_target_text(target_type: str | None, target_values_text: str | None) -> list[tuple[str, str | None]]:
     target_type = safe_str(target_type).lower() or "all"
     values = _normalize_target_values(target_type, target_values_text)
     if target_type == "all":
@@ -538,13 +540,13 @@ def _assignment_rows_from_target_text(target_type: str, target_values_text: str)
 def create_survey_from_template_or_builder(
     *,
     actor_user_id: int,
-    title: str,
-    description: str,
-    survey_type: str,
+    title: str | None,
+    description: str | None,
+    survey_type: str | None,
     is_anonymous: bool,
     allow_multiple_submissions: bool,
-    target_type: str,
-    target_values_text: str,
+    target_type: str | None,
+    target_values_text: str | None,
     publish_now: bool,
     start_at_raw: Any = None,
     end_at_raw: Any = None,
@@ -670,13 +672,13 @@ def update_survey_from_builder(
     *,
     survey_id: int,
     actor_user_id: int,
-    title: str,
-    description: str,
-    survey_type: str,
+    title: str | None,
+    description: str | None,
+    survey_type: str | None,
     is_anonymous: bool,
     allow_multiple_submissions: bool,
-    target_type: str,
-    target_values_text: str,
+    target_type: str | None,
+    target_values_text: str | None,
     publish_now: bool,
     start_at_raw: Any = None,
     end_at_raw: Any = None,
