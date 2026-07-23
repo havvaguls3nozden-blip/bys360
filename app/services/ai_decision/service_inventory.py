@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.core.datetime_utils import utc_now
 
 from .live_scope import (
@@ -27,7 +29,7 @@ from .summary_cache import (
 """AI Karar Destek servis envanteri."""
 
 
-def build_ai_decision_faz0_inventory() -> dict[str, object]:
+def build_ai_decision_faz0_inventory() -> dict[str, Any]:
     return {
         "module": "ai_decision_analytics_center",
         "phase": "faz0_inventory_safe_service_skeleton",
@@ -45,7 +47,7 @@ def build_ai_decision_faz0_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz1_inventory() -> dict[str, object]:
+def build_ai_decision_faz1_inventory() -> dict[str, Any]:
     sample_request_payload = build_ai_request_log_payload(
         module_type="performance",
         feature_type="decision_support",
@@ -95,7 +97,7 @@ def build_ai_decision_faz1_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz2_inventory() -> dict[str, object]:
+def build_ai_decision_faz2_inventory() -> dict[str, Any]:
     sample_source = [
         {"unit": "Örnek Birim", "email": "ornek@kurum.gov.tr", "note": "Risk sinyali insan onayı gerektirir."},
         {"unit": "Örnek Birim", "phone": "+90 555 000 00 00", "note": "Yayın öncesi kontrol önerilir."},
@@ -137,7 +139,7 @@ def build_ai_decision_faz2_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_readiness_summary() -> dict[str, object]:
+def build_ai_decision_readiness_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz0_inventory()
     table_count = len(inventory["live_ai_tables"])
     domain_count = len(inventory["live_domain_keys"])
@@ -152,7 +154,7 @@ def build_ai_decision_readiness_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_service_bridge_summary() -> dict[str, object]:
+def build_ai_decision_service_bridge_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz1_inventory()
     return {
         "ok": len(inventory["supported_payloads"]) >= 4 and inventory["default_redaction_rule_count"] >= 8,
@@ -164,7 +166,7 @@ def build_ai_decision_service_bridge_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_summary_cache_summary() -> dict[str, object]:
+def build_ai_decision_summary_cache_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz2_inventory()
     cache_contract = inventory["cache_contract"]
     return {
@@ -178,7 +180,7 @@ def build_ai_decision_summary_cache_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz3_inventory() -> dict[str, object]:
+def build_ai_decision_faz3_inventory() -> dict[str, Any]:
     return {
         "module": "ai_decision_analytics_center",
         "phase": "faz3_dashboard_data_surface",
@@ -194,7 +196,7 @@ def build_ai_decision_faz3_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_dashboard_surface_summary() -> dict[str, object]:
+def build_ai_decision_dashboard_surface_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz3_inventory()
     return {
         "ok": inventory["external_ai_call"] is False and len(inventory["supported_surface_outputs"]) >= 3,
@@ -206,7 +208,7 @@ def build_ai_decision_dashboard_surface_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz4_inventory() -> dict[str, object]:
+def build_ai_decision_faz4_inventory() -> dict[str, Any]:
     return {
         "module": "ai_decision_analytics_center",
         "phase": "faz4_personnel_performance_insight_engine",
@@ -224,7 +226,7 @@ def build_ai_decision_faz4_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_personnel_performance_summary() -> dict[str, object]:
+def build_ai_decision_personnel_performance_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz4_inventory()
     return {
         "ok": inventory["external_ai_call"] is False
@@ -239,7 +241,7 @@ def build_ai_decision_personnel_performance_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz5_inventory() -> dict[str, object]:
+def build_ai_decision_faz5_inventory() -> dict[str, Any]:
     return {
         "module": "ai_decision_analytics_center",
         "phase": "faz5_survey_feedback_pulse_analysis_engine",
@@ -258,7 +260,7 @@ def build_ai_decision_faz5_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_survey_feedback_summary() -> dict[str, object]:
+def build_ai_decision_survey_feedback_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz5_inventory()
     return {
         "ok": inventory["external_ai_call"] is False and inventory["human_approval_required"] is True and inventory["raw_answer_dump"] is False and len(inventory["supported_surface_outputs"]) >= 4,
@@ -271,7 +273,7 @@ def build_ai_decision_survey_feedback_summary() -> dict[str, object]:
     }
 
 
-def build_ai_decision_faz6_inventory() -> dict[str, object]:
+def build_ai_decision_faz6_inventory() -> dict[str, Any]:
     return {
         "module": "ai_decision_analytics_center",
         "phase": "faz6_communication_support_signal_analysis",
@@ -292,7 +294,7 @@ def build_ai_decision_faz6_inventory() -> dict[str, object]:
     }
 
 
-def build_ai_decision_communication_support_summary() -> dict[str, object]:
+def build_ai_decision_communication_support_summary() -> dict[str, Any]:
     inventory = build_ai_decision_faz6_inventory()
     return {
         "ok": inventory["external_ai_call"] is False

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.core.datetime_utils import utc_now
 
 from .live_scope import (
@@ -15,7 +17,7 @@ from .summary_pipeline import (
 """Analiz Merkezi servis envanteri."""
 
 
-def build_analytics_center_faz0_inventory() -> dict[str, object]:
+def build_analytics_center_faz0_inventory() -> dict[str, Any]:
     return {
         "module": "analytics_center",
         "phase": "faz0_inventory_safe_service_skeleton",
@@ -29,7 +31,7 @@ def build_analytics_center_faz0_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz1_inventory() -> dict[str, object]:
+def build_analytics_center_faz1_inventory() -> dict[str, Any]:
     return {
         "module": "analytics_center",
         "phase": "faz1_ai_request_redaction_bridge_ready",
@@ -45,7 +47,7 @@ def build_analytics_center_faz1_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz2_inventory() -> dict[str, object]:
+def build_analytics_center_faz2_inventory() -> dict[str, Any]:
     sample_rows = [
         {"topic": "personel", "count": 12, "note": "Toplu görünüm"},
         {"topic": "performans", "count": 5, "note": "Yayın öncesi takip"},
@@ -65,7 +67,7 @@ def build_analytics_center_faz2_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_readiness_summary() -> dict[str, object]:
+def build_analytics_center_readiness_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz0_inventory()
     return {
         "ok": len(inventory["surface_keys"]) >= 6,
@@ -75,7 +77,7 @@ def build_analytics_center_readiness_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_bridge_summary() -> dict[str, object]:
+def build_analytics_center_bridge_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz1_inventory()
     return {
         "ok": inventory["safe_mode"] is True and len(inventory["surface_keys"]) >= 6,
@@ -85,7 +87,7 @@ def build_analytics_center_bridge_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_summary_cache_summary() -> dict[str, object]:
+def build_analytics_center_summary_cache_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz2_inventory()
     return {
         "ok": inventory["safe_mode"] is True and inventory["pipeline_summary"]["ok"] is True,
@@ -95,7 +97,7 @@ def build_analytics_center_summary_cache_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz3_inventory() -> dict[str, object]:
+def build_analytics_center_faz3_inventory() -> dict[str, Any]:
     from .dashboard_surface import (
         build_ai_decision_dashboard_readiness_summary,
         build_ai_decision_dashboard_surface,
@@ -122,7 +124,7 @@ def build_analytics_center_faz3_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_dashboard_surface_summary() -> dict[str, object]:
+def build_analytics_center_dashboard_surface_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz3_inventory()
     summary = inventory["readiness_summary"]
     return {
@@ -135,7 +137,7 @@ def build_analytics_center_dashboard_surface_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz4_inventory() -> dict[str, object]:
+def build_analytics_center_faz4_inventory() -> dict[str, Any]:
     from .personnel_performance_insights import (
         build_default_personnel_performance_insights,
         build_personnel_performance_readiness_summary,
@@ -161,7 +163,7 @@ def build_analytics_center_faz4_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_personnel_performance_summary() -> dict[str, object]:
+def build_analytics_center_personnel_performance_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz4_inventory()
     summary = inventory["readiness_summary"]
     return {
@@ -174,7 +176,7 @@ def build_analytics_center_personnel_performance_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz5_inventory() -> dict[str, object]:
+def build_analytics_center_faz5_inventory() -> dict[str, Any]:
     from .survey_feedback_insights import (
         build_default_survey_feedback_insights,
         build_survey_feedback_readiness_summary,
@@ -201,7 +203,7 @@ def build_analytics_center_faz5_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_survey_feedback_summary() -> dict[str, object]:
+def build_analytics_center_survey_feedback_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz5_inventory()
     summary = inventory["readiness_summary"]
     return {
@@ -215,7 +217,7 @@ def build_analytics_center_survey_feedback_summary() -> dict[str, object]:
     }
 
 
-def build_analytics_center_faz6_inventory() -> dict[str, object]:
+def build_analytics_center_faz6_inventory() -> dict[str, Any]:
     from .communication_support_insights import (
         build_communication_support_readiness_summary,
         build_default_communication_support_insights,
@@ -244,7 +246,7 @@ def build_analytics_center_faz6_inventory() -> dict[str, object]:
     }
 
 
-def build_analytics_center_communication_support_summary() -> dict[str, object]:
+def build_analytics_center_communication_support_summary() -> dict[str, Any]:
     inventory = build_analytics_center_faz6_inventory()
     summary = inventory["readiness_summary"]
     return {
