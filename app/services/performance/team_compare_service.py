@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from io import BytesIO
+from typing import Any
 
 from openpyxl import Workbook
 
@@ -36,7 +37,7 @@ def build_empty_payload(
     selected_status: str,
     selected_quick: str,
     q: str,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     return dict(
         rows=[],
         periods=periods,
@@ -120,9 +121,9 @@ def build_rows(
     *,
     visible_score_fn: Callable[[object], float],
     status_options: list[tuple[str, str]] | None = None,
-    visibility_resolver: Callable[[object], dict[str, object]] | None = None,
-) -> list[dict[str, object]]:
-    rows: list[dict[str, object]] = []
+    visibility_resolver: Callable[[object], dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     for evaluation in evaluations:
         if bool(getattr(evaluation, "evaluation_exempted", False)):
             continue
@@ -163,13 +164,13 @@ def build_rows(
 
 
 def apply_filters(
-    rows: Iterable[dict[str, object]],
+    rows: Iterable[dict[str, Any]],
     *,
     selected_birim: str = "",
     selected_status: str = "",
     selected_quick: str = "",
     q: str = "",
-) -> list[dict[str, object]]:
+) -> list[dict[str, Any]]:
     filtered = list(rows)
 
     if selected_birim:
@@ -225,7 +226,7 @@ def apply_filters(
     return filtered
 
 
-def build_stats(rows: Iterable[dict[str, object]]) -> dict[str, object]:
+def build_stats(rows: Iterable[dict[str, Any]]) -> dict[str, Any]:
     rows = list(rows)
     scores = [float(row.get("final_total") or 0) for row in rows]
     low_count = sum(1 for row in rows if float(row.get("final_total") or 0) < 70)
@@ -237,7 +238,7 @@ def build_stats(rows: Iterable[dict[str, object]]) -> dict[str, object]:
     employee_visible_count = sum(1 for row in rows if bool(row.get("employee_visible")))
     internal_preview_count = sum(1 for row in rows if bool(row.get("internal_preview")))
     locked_count = max(len(rows) - employee_visible_count - internal_preview_count, 0)
-    reason_counts: dict[str, dict[str, object]] = {}
+    reason_counts: dict[str, dict[str, Any]] = {}
     for row in rows:
         if bool(row.get("employee_visible")):
             continue
@@ -263,8 +264,8 @@ def build_stats(rows: Iterable[dict[str, object]]) -> dict[str, object]:
     }
 
 
-def build_unit_rankings(rows: Iterable[dict[str, object]]) -> list[dict[str, object]]:
-    ranking_map: dict[str, dict[str, object]] = {}
+def build_unit_rankings(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    ranking_map: dict[str, dict[str, Any]] = {}
     for row in rows:
         unit_key = row.get("birim") or "-"
         payload = ranking_map.setdefault(
@@ -290,7 +291,7 @@ def build_unit_rankings(rows: Iterable[dict[str, object]]) -> list[dict[str, obj
             payload["top_score"] = score
             payload["top_employee"] = row.get("employee_name") or "-"
 
-    birim_rankings: list[dict[str, object]] = []
+    birim_rankings: list[dict[str, Any]] = []
     for payload in ranking_map.values():
         count = max(int(payload["count"]), 1)
         avg_score = round(float(payload["score_sum"]) / count, 2)
@@ -310,7 +311,7 @@ def build_unit_rankings(rows: Iterable[dict[str, object]]) -> list[dict[str, obj
     return birim_rankings
 
 
-def summarize_unit_rankings(birim_rankings: list[dict[str, object]]) -> dict[str, object]:
+def summarize_unit_rankings(birim_rankings: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "top_avg_unit": birim_rankings[0] if birim_rankings else None,
         "largest_unit": max(birim_rankings, key=lambda item: (item["count"], item["avg_score"])) if birim_rankings else None,
@@ -318,7 +319,7 @@ def summarize_unit_rankings(birim_rankings: list[dict[str, object]]) -> dict[str
     }
 
 
-def build_excel_workbook(rows: Iterable[dict[str, object]]) -> BytesIO:
+def build_excel_workbook(rows: Iterable[dict[str, Any]]) -> BytesIO:
     workbook = Workbook()
     sheet = workbook.active
     sheet.title = "Personel Analizi"
@@ -366,7 +367,7 @@ def build_excel_workbook(rows: Iterable[dict[str, object]]) -> BytesIO:
 
 def build_view_payload(
     *,
-    rows: Iterable[dict[str, object]],
+    rows: Iterable[dict[str, Any]],
     periods,
     selected_period_id,
     selected_scope,
@@ -375,7 +376,7 @@ def build_view_payload(
     selected_status: str,
     selected_quick: str,
     q: str,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     rows = list(rows)
     birimler = sorted({(row.get("birim") or "-") for row in rows})
     stats = build_stats(rows)

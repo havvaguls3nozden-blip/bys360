@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from flask import Flask
 
 _OBSERVABILITY_REQUIRED_ENVS = {"production", "staging", "live", "canli", "pilot"}
@@ -63,7 +65,7 @@ def configure_optional_sentry(app: Flask) -> None:
         app.extensions["bys360_sentry_enabled"] = False
         return
 
-    init_kwargs = {
+    init_kwargs: dict[str, Any] = {
         "dsn": dsn,
         "integrations": [
             FlaskIntegration(),
