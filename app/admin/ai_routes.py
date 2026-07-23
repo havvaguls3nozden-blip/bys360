@@ -3,6 +3,8 @@ from __future__ import annotations
 import csv
 import io
 import logging
+from collections.abc import Sequence
+from typing import Any
 
 from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -156,7 +158,7 @@ def _render_ai_schema_not_ready(*, page_title: str, selected_module_type: str = 
     )
 
 
-def _build_health_actions(summary: dict[str, int | dict | list]) -> list[dict[str, str]]:
+def _build_health_actions(summary: dict[str, Any]) -> list[dict[str, str]]:
     actions: list[dict[str, str]] = []
     failed_requests = int(summary.get("failed_requests") or 0)
     unmasked_requests = int(summary.get("unmasked_requests") or 0)
@@ -382,7 +384,7 @@ def _module_health_rows(selected_module_type: str | None = None) -> list[dict[st
     return sorted(rows, key=lambda item: (-int(item.get('risk_score') or 0), -int(item.get('request_total') or 0), -int(item.get('cache_total') or 0), str(item.get('module_type') or '')))
 
 
-def _feature_focus_text(module_type: str, feature_counts: list[tuple[str | None, int]]) -> str:
+def _feature_focus_text(module_type: str, feature_counts: Sequence[tuple[str | None, int]]) -> str:
     top = [str(name or '-').strip() for name, _count in feature_counts[:3] if str(name or '').strip()]
     if top:
         return ', '.join(top)
@@ -515,7 +517,7 @@ def _build_center_snapshot(summary: dict[str, int | dict | list], module_health_
     return snapshot
 
 
-def _build_center_highlights(summary: dict[str, int | dict | list], center_snapshot: dict[str, object]) -> list[dict[str, str]]:
+def _build_center_highlights(summary: dict[str, Any], center_snapshot: dict[str, Any]) -> list[dict[str, str]]:
     hidden_count = int(center_snapshot.get("hidden_legacy_request_count") or 0)
     return [
         {

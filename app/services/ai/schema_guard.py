@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from flask import current_app
 from sqlalchemy import inspect
 
@@ -77,12 +79,12 @@ AI_EXPECTED_SCHEMA: dict[str, set[str]] = {
 }
 
 
-def get_ai_schema_status() -> dict[str, object]:
+def get_ai_schema_status() -> dict[str, Any]:
     cached_errors = list(current_app.extensions.get("schema_check_errors") or [])
     ai_table_names = tuple(AI_EXPECTED_SCHEMA.keys())
     ai_errors = [message for message in cached_errors if any(table_name in str(message) for table_name in ai_table_names)]
 
-    status: dict[str, object] = {
+    status: dict[str, Any] = {
         "ready": True,
         "error_count": 0,
         "missing_tables": [],

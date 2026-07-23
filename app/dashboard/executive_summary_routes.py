@@ -8,7 +8,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 try:
-    from app.dashboard import bp
+    from app.dashboard import bp  # type: ignore[attr-defined]
 except Exception:
     from app.routes import main_bp as bp
 
