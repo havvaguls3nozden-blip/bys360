@@ -49,21 +49,21 @@ try:  # Modeller sürümler arasında parçalı olabilir; route katmanı düşme
         User,
     )
 except Exception:  # pragma: no cover - eski/eksik paketlerde savunmacı mod
-    AssignmentCoverageLog = None
-    AttendanceException = None
-    DelegationAssignment = None
-    EvaluationAssignment = None
-    LeaveBalance = None
-    PerformanceEvaluation = None
-    PerformancePeriod = None
-    PersonnelLeave = None
-    User = None
+    AssignmentCoverageLog = None  # type: ignore[assignment,misc]
+    AttendanceException = None  # type: ignore[assignment,misc]
+    DelegationAssignment = None  # type: ignore[assignment,misc]
+    EvaluationAssignment = None  # type: ignore[assignment,misc]
+    LeaveBalance = None  # type: ignore[assignment,misc]
+    PerformanceEvaluation = None  # type: ignore[assignment,misc]
+    PerformancePeriod = None  # type: ignore[assignment,misc]
+    PersonnelLeave = None  # type: ignore[assignment,misc]
+    User = None  # type: ignore[assignment,misc]
 
 try:
     from app.view_helpers import build_user_scope_context
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/institutional/hr_common.py:65")
-    build_user_scope_context = None
+    build_user_scope_context = None  # type: ignore[assignment]
 
 try:
     from app.services.leave_delegation_service import (
@@ -73,9 +73,9 @@ try:
     )
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/institutional/hr_common.py:74")
-    build_leave_delegation_health_snapshot = None
-    build_leave_overview = None
-    leave_module_ready = None
+    build_leave_delegation_health_snapshot = None  # type: ignore[assignment]
+    build_leave_overview = None  # type: ignore[assignment]
+    leave_module_ready = None  # type: ignore[assignment]
 
 try:
     from app.services.ai.dashboard_panels import (
@@ -84,8 +84,8 @@ try:
     )
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/institutional/hr_common.py:81")
-    build_hr_attendance_ai_panel = None
-    build_hr_leave_ai_panel = None
+    build_hr_attendance_ai_panel = None  # type: ignore[assignment]
+    build_hr_leave_ai_panel = None  # type: ignore[assignment]
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_live_core_routes"
