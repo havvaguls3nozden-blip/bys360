@@ -1,6 +1,16 @@
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
+from typing import Any
+
 from app.core.datetime_utils import utc_now
+
+try:
+    from .live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
+    from .summary_pipeline import build_analytics_safe_summary_card
+except ImportError:  # python -S gate bağımsız çalıştırması
+    from analytics_center.live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
+    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 """Karar Destek Dashboard veri yüzeyi servisleri.
 
@@ -10,16 +20,6 @@ Faz 3 notu:
 - Dış AI servisine istek yapmaz; external_ai_call her zaman False sözleşmesiyle çalışır.
 - Açık metinler dashboard yüzeyine çıkmadan önce güvenli özet/maskeleme hattından geçirilir.
 """
-
-from dataclasses import asdict, dataclass
-from typing import Any
-
-try:
-    from .live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
-    from .summary_pipeline import build_analytics_safe_summary_card
-except ImportError:  # python -S gate bağımsız çalıştırması
-    from analytics_center.live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 
 @dataclass(frozen=True)

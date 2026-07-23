@@ -1,5 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Any
+
+from app.extensions import db
+from app.models import User
+from app.services.explicit_manager_chain_service import has_explicit_manager_fields
+from app.services.hierarchy_rulebook_service import (
+    build_lookup,
+    is_system_user,
+)
+from app.services.hierarchy_rulebook_service import (
+    infer_role_from_profile as _infer_role_from_profile,
+)
+from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
 THIRD_MANAGER_HEADER_ALIASES = [
@@ -10,13 +26,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from collections.abc import Iterable
-from dataclasses import dataclass
-from typing import Any
-
-from app.extensions import db
-from app.models import User
 
 try:
     from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
@@ -37,16 +46,6 @@ except Exception:  # pragma: no cover
             'personel': 'Personel',
         }
         return labels.get(role, role.replace('_', ' ').title())
-
-from app.services.explicit_manager_chain_service import has_explicit_manager_fields
-from app.services.hierarchy_rulebook_service import (
-    build_lookup,
-    is_system_user,
-)
-from app.services.hierarchy_rulebook_service import (
-    infer_role_from_profile as _infer_role_from_profile,
-)
-from app.services.performance.chain_rule_engine import resolve_authoritative_desired_chain
 
 
 @dataclass(slots=True)

@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
+from typing import Any
+
+try:
+    from .summary_pipeline import build_analytics_safe_summary_card
+except ImportError:  # python -S gate bagimsiz calistirmasi
+    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 logger = logging.getLogger(__name__)
 
@@ -11,15 +19,6 @@ route/template degistirmez ve dis AI servisine istek atmaz. Mesajlasma ve
 yardim/destek kayitlarindan kisisel icerik dokmeden toplu, maskelenmis ve
 insan onayli karar destek sinyalleri uretir.
 """
-
-from collections.abc import Iterable
-from dataclasses import asdict, dataclass
-from typing import Any
-
-try:
-    from .summary_pipeline import build_analytics_safe_summary_card
-except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 
 @dataclass(frozen=True)

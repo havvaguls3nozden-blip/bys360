@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from typing import Any
+
+from sqlalchemy import inspect, text
+
+from app.extensions import db
 
 """BYS360 Toplantı Kararları — Faz 6 P0 tamamlama servisi.
 
@@ -8,13 +14,6 @@ P0 hedefi, toplantıda acil olarak belirlenen kuralların yalnızca ekranda not
 olarak kalmamasını; ayar, kategori, görünürlük ve düşük performans kilidi
 seviyesinde denetlenmesini sağlar.
 """
-
-from dataclasses import dataclass
-from typing import Any
-
-from sqlalchemy import inspect, text
-
-from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

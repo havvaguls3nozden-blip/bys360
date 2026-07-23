@@ -1,14 +1,5 @@
 from __future__ import annotations
 
-"""BYS360 mobile API facade.
-
-Bu dosya endpoint sözleşmesini taşımaz; mobil domain modüllerini ve düşük riskli
-okuma köprülerini yükleyen ince facade olarak kalır. Contract gate kuralı:
-- routes.py <= 300 satır
-- routes.py içinde @mobile_api_bp route decorator bulunmaz
-- temel mobil endpoint sözleşmesi app/api/mobile/domains altında yaşar
-"""
-
 import importlib
 from typing import Any
 
@@ -39,6 +30,14 @@ from app.api.mobile.domains import personnel_read as _personnel_read  # noqa: F4
 from app.api.mobile.domains import personnel_write_all as _personnel_write_all
 from app.api.mobile.domains import push_notifications as _push_notifications  # noqa: F401
 from app.api.mobile.domains import support_survey_write as _support_survey_write
+"""BYS360 mobile API facade.
+
+Bu dosya endpoint sözleşmesini taşımaz; mobil domain modüllerini ve düşük riskli
+okuma köprülerini yükleyen ince facade olarak kalır. Contract gate kuralı:
+- routes.py <= 300 satır
+- routes.py içinde @mobile_api_bp route decorator bulunmaz
+- temel mobil endpoint sözleşmesi app/api/mobile/domains altında yaşar
+"""
 
 
 def _mobile_route_registry_v1() -> dict[str, Any]:

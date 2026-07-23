@@ -23,10 +23,9 @@ def setup_logging(app):
 
     already_added = False
     for handler in app.logger.handlers:
-        if isinstance(handler, RotatingFileHandler):
-            if getattr(handler, "baseFilename", None) == os.path.abspath(log_file):
-                already_added = True
-                break
+        if isinstance(handler, RotatingFileHandler) and getattr(handler, "baseFilename", None) == os.path.abspath(log_file):
+            already_added = True
+            break
 
     if not already_added:
         app.logger.addHandler(file_handler)

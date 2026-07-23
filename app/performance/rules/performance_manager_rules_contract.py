@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from dataclasses import dataclass
+
 PRIMARY_TERM_TR = "Değerlendirme Kriterleri"
 PRIMARY_TERM_ASCII = "Degerlendirme Kriterleri"
 PRIMARY_TERM = PRIMARY_TERM_TR
@@ -24,9 +27,6 @@ Kural özeti:
 - 70 altı ve 90 üstü eşiklerde ayrıntılı genel görüş zorunludur.
 - 3. amir zorunlu değildir; yorum veya puan modu sistem ayarıyla yönetilir.
 """
-
-from collections.abc import Iterable
-from dataclasses import dataclass
 
 # ---------------------------------------------------------------------------
 # Birincil terim sabitleri

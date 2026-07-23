@@ -10,11 +10,16 @@ from flask import jsonify
 from flask_login import current_user, login_required
 
 from app.main_handlers.dashboard_handlers import dashboard as dashboard_handler
-from app.main_handlers.dashboard_handlers import dashboard_heavy_panels as dashboard_heavy_panels_handler
+from app.main_handlers.dashboard_handlers import (
+    dashboard_heavy_panels as dashboard_heavy_panels_handler,
+)
 from app.main_handlers.dashboard_handlers import db_check as db_check_handler
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required
-from app.services.dashboard_rebuild_service import build_dashboard_chart_payload, build_dashboard_json_payload
+from app.services.dashboard_rebuild_service import (
+    build_dashboard_chart_payload,
+    build_dashboard_json_payload,
+)
 
 BYS360_DASHBOARD_REBUILD_ROUTES_OK = True
 

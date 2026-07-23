@@ -15,6 +15,19 @@ import logging
 # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V3
 # BYS360_PHASE6_7_FINAL_GATE_ALIGNMENT_V2
 # BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS_V2
+from datetime import date
+from typing import Any
+
+from sqlalchemy import inspect
+
+from app.core.datetime_utils import utc_now
+from app.extensions import db
+from app.models import (
+    PerformanceEvaluation,
+    PerformanceLowScoreProcess,
+    PerformanceLowScoreProcessEvent,
+    PerformancePeriod,
+)
 
 """BYS360_PHASE6_6_SECOND_LOW_SCORE_PROCESS
 
@@ -28,22 +41,6 @@ V2 farkı: süreç yalnızca butonla değil; değerlendirme tamamlanınca, yayı
 kontrolü açılınca ve yayın komutu verilince otomatik üretilir. Böylece 70 altı
 sonuç sessizce karneye/yayına düşemez.
 """
-
-from dataclasses import dataclass
-from datetime import date
-from typing import Any
-
-from sqlalchemy import inspect
-
-from app.core.datetime_utils import utc_now
-from app.extensions import db
-from app.models import (
-    EvaluationAssignment,
-    PerformanceEvaluation,
-    PerformanceLowScoreProcess,
-    PerformanceLowScoreProcessEvent,
-    PerformancePeriod,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -148,10 +145,8 @@ def _is_completed(evaluation: PerformanceEvaluation | None) -> bool:
         return True
     if any(("tamam" in value or "completed" in value or "published" in value) for value in values):
         return True
-    if bool(getattr(evaluation, "level_1_completed", False)):
-        # BYS360 akışında son nihai amir çoğu senaryoda 1. amirdir.
-        return True
-    return False
+    # BYS360 akışında son nihai amir çoğu senaryoda 1. amirdir.
+    return bool(getattr(evaluation, "level_1_completed", False))
 
 def is_low_score_evaluation(evaluation: PerformanceEvaluation | float | int | None) -> bool:
     # BYS360_PHASE6_DIRECT_PRESIDENT_CONTRACT_V3_LOW_SCORE_GUARD

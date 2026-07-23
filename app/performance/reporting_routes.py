@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
-"""Phase 45 modular performance reporting route family."""
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -11,31 +8,50 @@ from sqlalchemy import asc, desc
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.models import FeedbackMeeting, FeedbackRequest, PerformanceEvaluation, PerformancePeriod, User
-from app.services.feedback_service import count_feedback_statuses
+from app.models import (
+    FeedbackMeeting,
+    FeedbackRequest,
+    PerformanceEvaluation,
+    PerformancePeriod,
+    User,
+)
 from app.route_registry import main_bp
 from app.route_support import (
-    flask_render_template,
     ADMIN_FAMILY_ROLES,
+    flask_render_template,
     manager_required,
     menu_key_required,
     safe_render,
     user_has_any_role,
 )
-from app.view_helpers import build_user_scope_context
-from app.services.performance.export_service import build_performance_report_excel_download_response
-from app.services.performance.reporting import attach_report_scores, filter_scope_users_by_query
-from app.services.personnel.categories import get_personnel_category_options, normalize_personnel_category_label, user_matches_personnel_category
-from app.services.performance.category_stats import build_category_average_summary_for_users
+from app.services.feedback_service import count_feedback_statuses
 from app.services.live_surface_service import build_live_report_surface_context
-from app.services.sql_refactor_report_helpers import build_period_evaluation_aggregates_sql, report_score_expr
-from app.services.performance.phase3_backend_route_guard import phase3_allowed_employee_ids, phase3_can_open_performance_reports, phase3_denied_response  # BYS360_PHASE3_3_REPORT_BACKEND_IMPORT
 from app.services.pdf_export_guard import validate_inline_pdf_export
+from app.services.performance.category_stats import build_category_average_summary_for_users
+from app.services.performance.export_service import build_performance_report_excel_download_response
+from app.services.performance.phase3_backend_route_guard import (  # BYS360_PHASE3_3_REPORT_BACKEND_IMPORT
+    phase3_allowed_employee_ids,
+    phase3_can_open_performance_reports,
+    phase3_denied_response,
+)
+from app.services.performance.reporting import attach_report_scores, filter_scope_users_by_query
 from app.services.performance_service import (
     build_assignment_log_summary,
     build_assignment_unit_summary,
     get_latest_assignment_generation_logs,
 )
+from app.services.personnel.categories import (
+    get_personnel_category_options,
+    normalize_personnel_category_label,
+    user_matches_personnel_category,
+)
+from app.services.sql_refactor_report_helpers import (
+    build_period_evaluation_aggregates_sql,
+    report_score_expr,
+)
+from app.view_helpers import build_user_scope_context
+
+"""Phase 45 modular performance reporting route family."""
 logger = logging.getLogger(__name__)
 
 
@@ -488,7 +504,9 @@ def performance_reports_print():
 # BYS360_PERFORMANCE_COMPLETION_PHASE2_REPORT_CATEGORY_FILTER_MARKER
 # Performans raporlarında kategori filtresi Faz 2 kategori merkezinin kalıcı sözleşmesine bağlıdır.
 try:
-    from app.services.performance.phase2_category_center import PHASE2_CATEGORY_CENTER_VERSION as PHASE2_CATEGORY_CENTER_VERSION
+    from app.services.performance.phase2_category_center import (
+        PHASE2_CATEGORY_CENTER_VERSION as PHASE2_CATEGORY_CENTER_VERSION,
+    )
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     PHASE2_CATEGORY_CENTER_VERSION = "performance-completion-phase2-category-center-unavailable"

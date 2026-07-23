@@ -7,5 +7,5 @@ from __future__ import annotations
 def delegate_mobile_b49_assistant_v2_ask(*args, **kwargs):
     """Mevcut davranışı koruyarak asistan route işlemini legacy gövdeye devreder."""
     from app.api.mobile import routes as mobile_routes
-    legacy = getattr(mobile_routes, "_bys360_legacy_mobile_b49_assistant_v2_ask")
+    legacy = mobile_routes._bys360_legacy_mobile_b49_assistant_v2_ask
     return legacy(*args, **kwargs)

@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans V2.1.3 personel kartı kategori entegrasyonu.
-
-Bu servis V2.1.2 kategori tablolarını kullanır; mevcut `users` tablosunu
-şema olarak değiştirmez. Personel kartı, toplu atama ve audit takibi için
-kademeli ve canlı güvenli entegrasyon sağlar.
-"""
-
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -26,6 +18,13 @@ from app.services.performance.v2_1_2_category_engine import (
     list_categories,
     seed_default_categories,
 )
+
+"""BYS360 Performans V2.1.3 personel kartı kategori entegrasyonu.
+
+Bu servis V2.1.2 kategori tablolarını kullanır; mevcut `users` tablosunu
+şema olarak değiştirmez. Personel kartı, toplu atama ve audit takibi için
+kademeli ve canlı güvenli entegrasyon sağlar.
+"""
 
 logger = logging.getLogger(__name__)
 

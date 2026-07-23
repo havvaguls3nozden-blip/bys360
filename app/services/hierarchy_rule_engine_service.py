@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+import json
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from flask import current_app
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,14 +20,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-import json
-from collections.abc import Iterable
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
-
-from flask import current_app
 
 DEFAULT_CONFIG_RELATIVE = Path("config") / "hierarchy_templates_v1.json"
 
@@ -163,10 +163,7 @@ class HierarchyRuleEngineService:
             return False
         if match.get("birim") and birim not in {norm(v) for v in match["birim"]}:
             return False
-        if match.get("unvan_contains"):
-            if not any(norm(k) in unvan for k in match["unvan_contains"]):
-                return False
-        return True
+        return not (match.get("unvan_contains") and not any(norm(k) in unvan for k in match["unvan_contains"]))
 
     def _resolve_level(
         self,

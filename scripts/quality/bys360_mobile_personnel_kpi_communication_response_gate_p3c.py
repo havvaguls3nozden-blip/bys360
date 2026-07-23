@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import py_compile
@@ -203,10 +204,8 @@ def runtime_route_map_check(root: Path) -> dict[str, Any]:
     finally:
         os.chdir(previous)
         if sys_path_added:
-            try:
+            with contextlib.suppress(ValueError):
                 sys.path.remove(str(root))
-            except ValueError:
-                pass
 
 
 def response_code_smoke(root: Path) -> dict[str, Any]:
@@ -259,10 +258,8 @@ def response_code_smoke(root: Path) -> dict[str, Any]:
     finally:
         os.chdir(previous)
         if sys_path_added:
-            try:
+            with contextlib.suppress(ValueError):
                 sys.path.remove(str(root))
-            except ValueError:
-                pass
 
 
 def run_subprocess(cmd: list[str], root: Path, env: dict[str, str] | None = None) -> dict[str, Any]:

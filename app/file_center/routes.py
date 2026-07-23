@@ -1,67 +1,22 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 
 from flask import Response, flash, jsonify, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db
-from app.file_center.services import (
-    create_file_request,
-    create_guest_link,
-    create_transfer_package,
-    file_center_enabled,
-    find_file_request_by_token,
-    find_share_link_by_token,
-    format_bytes,
-    guest_links_enabled,
-    guest_uploads_enabled,
-    is_admin_like,
-    link_status_label,
-    log_access,
-    log_audit,
-    record_guest_download,
-    record_guest_request_upload,
-    request_max_bytes,
-    request_status_label,
-    scan_label,
-    secure_file_path,
-    soft_delete_file,
-    save_uploaded_file,
-    auto_scan_on_upload_enabled,
-    block_file_item,
-    can_download_file,
-    cancel_chunk_upload_session,
-    chunk_session_status_label,
-    chunk_upload_enabled,
-    clamav_enabled,
-    create_chunk_upload_session,
-    chunk_upload_session_to_dict,
-    finalize_chunk_upload_session,
-    upload_chunk_part,
-    create_or_update_quota_policy,
-    deactivate_quota_policy,
-    list_user_upload_sessions,
-    quota_dashboard_summary,
-    quota_policy_enabled,
-    quota_scope_label,
-    quota_status_label,
-    user_quota_summary,
-    file_security_status_label,
-    quarantine_file_item,
-    release_quarantined_file,
-    run_security_scan,
-    scan_pending_files,
-    security_scan_enabled,
-    security_summary,
-    validate_upload_request,
-    verify_share_password,
-)
-
 from app.file_center.mail_service import (
     mail_purpose_label,
     mail_status_label,
     send_file_request_email,
+)
+from app.file_center.maintenance_service import (
+    build_admin_summary,
+    expire_due_links_and_requests,
+    maintenance_checklist,
+    recalculate_quotas,
 )
 from app.file_center.permissions import (
     can_create_guest_links,
@@ -73,25 +28,69 @@ from app.file_center.permissions import (
     can_use_file_center,
     menu_context,
 )
+from app.file_center.services import (
+    auto_scan_on_upload_enabled,
+    block_file_item,
+    can_download_file,
+    cancel_chunk_upload_session,
+    chunk_session_status_label,
+    chunk_upload_enabled,
+    chunk_upload_session_to_dict,
+    clamav_enabled,
+    create_chunk_upload_session,
+    create_file_request,
+    create_guest_link,
+    create_or_update_quota_policy,
+    create_transfer_package,
+    deactivate_quota_policy,
+    file_center_enabled,
+    file_security_status_label,
+    finalize_chunk_upload_session,
+    find_file_request_by_token,
+    find_share_link_by_token,
+    format_bytes,
+    guest_links_enabled,
+    guest_uploads_enabled,
+    is_admin_like,
+    link_status_label,
+    list_user_upload_sessions,
+    log_access,
+    log_audit,
+    quarantine_file_item,
+    quota_dashboard_summary,
+    quota_policy_enabled,
+    quota_scope_label,
+    quota_status_label,
+    record_guest_download,
+    record_guest_request_upload,
+    release_quarantined_file,
+    request_max_bytes,
+    request_status_label,
+    run_security_scan,
+    save_uploaded_file,
+    scan_label,
+    scan_pending_files,
+    secure_file_path,
+    security_scan_enabled,
+    security_summary,
+    soft_delete_file,
+    upload_chunk_part,
+    user_quota_summary,
+    validate_upload_request,
+    verify_share_password,
+)
 from app.file_center.settings_service import (
     ensure_file_center_settings_defaults,
-    settings_grouped,
     setting_to_display_value,
+    settings_grouped,
     update_settings_from_form,
-)
-from app.file_center.maintenance_service import (
-    build_admin_summary,
-    expire_due_links_and_requests,
-    maintenance_checklist,
-    recalculate_quotas,
 )
 from app.models.file_center_models import (
     FileAccessLog,
-    FileCenterMailLog,
     FileAuditLog,
+    FileCenterMailLog,
     FileDownloadLog,
     FileQuotaUsage,
-    FileUploadSession,
     FileRequest,
     FileRequestUpload,
     FileSecurityScan,
@@ -99,9 +98,12 @@ from app.models.file_center_models import (
     FileStorageItem,
     FileTransfer,
     FileTransferItem,
+    FileUploadSession,
 )
 from app.route_registry import main_bp
 from app.route_support import safe_db_rollback, safe_render
+
+logger = logging.getLogger(__name__)
 
 
 def _access_denied_response():
@@ -110,6 +112,7 @@ def _access_denied_response():
 
         return render_access_denied()
     except Exception:
+        logger.exception("Beklenmeyen hata")
         flash("Bu işlem için yetkiniz bulunmamaktadır.", "danger")
         return redirect(url_for("main.home"))
 
@@ -223,6 +226,7 @@ def file_center_upload():
         safe_db_rollback()
         flash(str(exc), "danger")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         log_audit("file_upload_failed", message=f"Dosya yükleme teknik hatası: {exc}", actor_user_id=int(current_user.id))
         flash("Dosya yükleme sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
@@ -248,6 +252,7 @@ def file_center_download(file_id: int):
         db.session.commit()
         return send_file(str(path), as_attachment=True, download_name=item.original_filename, mimetype=item.content_type or "application/octet-stream")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         log_audit("file_download_failed", file_id=item.id, message=f"Dosya indirme teknik hatası: {exc}", actor_user_id=int(current_user.id))
         flash("Dosya indirilemedi. Lütfen daha sonra tekrar deneyin veya sistem yöneticisine başvurun.", "danger")
@@ -267,6 +272,7 @@ def file_center_delete(file_id: int):
         db.session.commit()
         flash("Dosya silindi. Aktif misafir bağlantıları kapatıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya silinemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_home"))
@@ -297,6 +303,7 @@ def file_center_create_guest_link(file_id: int):
         guest_url = url_for("main.file_center_guest_download", token=token, _external=True)
         flash(f"Misafir bağlantısı oluşturuldu. Bağlantı: {guest_url} | Şifreyi ayrı kanaldan paylaşın.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Misafir bağlantısı oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_home"))
@@ -361,6 +368,7 @@ def file_center_create_transfer():
         db.session.commit()
         flash(f"Transfer paketi oluşturuldu: {transfer.title}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Transfer paketi oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_transfers"))
@@ -429,6 +437,7 @@ def file_center_create_request():
         upload_url = url_for("main.file_center_guest_upload", token=token, _external=True)
         flash(f"Dosya isteği oluşturuldu. Yükleme bağlantısı: {upload_url} | Şifreyi ayrı kanaldan paylaşın.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya isteği oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_requests"))
@@ -530,6 +539,7 @@ def file_center_send_request_email_route(request_id: int):
         else:
             flash(f"E-posta gönderimi başarısız oldu; log kaydı oluşturuldu. Hata: {mail_log.error_message}", "danger")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"E-posta işlemi sırasında hata oluştu: {exc}", "danger")
     return redirect(url_for("main.file_center_requests"))
@@ -581,6 +591,7 @@ def file_center_security_scan_pending():
         db.session.commit()
         flash(f"Güvenlik taraması tamamlandı. Toplam: {result['total']} · Güvenli: {result['clean']} · Karantina: {result['quarantined']} · Başarısız: {result['failed']}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Güvenlik taraması tamamlanamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_security"))
@@ -599,6 +610,7 @@ def file_center_security_scan_file(file_id: int):
         db.session.commit()
         flash(f"Dosya tarandı: {item.original_filename} · Durum: {file_security_status_label(scan.status)}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya taranamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_security"))
@@ -618,6 +630,7 @@ def file_center_security_quarantine_file(file_id: int):
         db.session.commit()
         flash("Dosya karantinaya alındı ve aktif misafir bağlantıları kapatıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya karantinaya alınamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_security"))
@@ -637,6 +650,7 @@ def file_center_security_release_file(file_id: int):
         db.session.commit()
         flash("Dosya karantinadan çıkarıldı ve güvenli olarak işaretlendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya karantinadan çıkarılamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_security"))
@@ -656,6 +670,7 @@ def file_center_security_block_file(file_id: int):
         db.session.commit()
         flash("Dosya engellendi ve aktif misafir bağlantıları kapatıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya engellenemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_security"))
@@ -722,6 +737,7 @@ def file_center_maintenance_recalculate_quotas():
         db.session.commit()
         flash(f"Kota bilgileri güncellendi. Kullanıcı: {result['users']} · Dosya: {result['files']}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Kota güncelleme işlemi tamamlanamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_maintenance"))
@@ -739,6 +755,7 @@ def file_center_maintenance_expire():
         db.session.commit()
         flash(f"Süresi dolan kayıtlar kapatıldı. Link: {result['links']} · İstek: {result['requests']}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Bakım işlemi tamamlanamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_maintenance"))
@@ -787,6 +804,7 @@ def file_center_quota_policy_save():
         db.session.commit()
         flash("Kota politikası kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Kota politikası kaydedilemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_quota"))
@@ -804,6 +822,7 @@ def file_center_quota_policy_deactivate(policy_id: int):
         db.session.commit()
         flash("Kota politikası pasifleştirildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Kota politikası pasifleştirilemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_quota"))
@@ -847,6 +866,7 @@ def file_center_chunk_upload_session_create():
         db.session.commit()
         flash(f"Parçalı yükleme oturumu hazırlandı. Parça sayısı: {session.total_chunks}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Parçalı yükleme oturumu oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_chunk_upload"))
@@ -865,6 +885,7 @@ def file_center_chunk_upload_session_cancel(session_id: int):
         db.session.commit()
         flash("Parçalı yükleme oturumu iptal edildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Parçalı yükleme oturumu iptal edilemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_chunk_upload"))
@@ -969,6 +990,7 @@ def file_center_settings_save():
         db.session.commit()
         flash(f"Dosya Merkezi ayarları güncellendi. Değişen alan: {changed}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Dosya Merkezi ayarları kaydedilemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_settings"))
@@ -987,6 +1009,7 @@ def file_center_settings_defaults():
         db.session.commit()
         flash(f"Varsayılan ayarlar kontrol edildi. Yeni: {result['created']} · Güncellenen: {result['updated']}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Varsayılan ayarlar oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_settings"))
@@ -1050,6 +1073,7 @@ def file_center_guest_upload(token: str):
             flash(str(exc), "danger")
             return safe_render("file_center/guest_upload.html", error=None, request_row=row, uploaded=False, format_bytes=format_bytes, request_max_bytes=request_max_bytes)
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
             log_audit("guest_file_upload_failed", message=f"Misafir yükleme teknik hatası: {exc}", actor_user_id=None)
             flash("Dosya şu anda yüklenemedi. Lütfen tekrar deneyin veya bağlantıyı gönderen birimle iletişime geçin.", "danger")
@@ -1085,7 +1109,10 @@ def file_center_role_matrix():
 def file_center_role_matrix_save():
     if not _enabled_or_message():
         return redirect(url_for("main.home"))
-    from app.file_center.permissions import can_manage_file_center_role_matrix, update_role_matrix_from_form
+    from app.file_center.permissions import (
+        can_manage_file_center_role_matrix,
+        update_role_matrix_from_form,
+    )
     if not can_manage_file_center_role_matrix(current_user):
         return _access_denied_response()
     try:
@@ -1094,6 +1121,7 @@ def file_center_role_matrix_save():
         db.session.commit()
         flash(f"Dosya Merkezi rol matrisi güncellendi. Değişen alan: {changed}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Rol matrisi kaydedilemedi: {exc}", "danger")
     return redirect(url_for("main.file_center_role_matrix"))
@@ -1104,7 +1132,10 @@ def file_center_role_matrix_save():
 def file_center_role_matrix_defaults():
     if not _enabled_or_message():
         return redirect(url_for("main.home"))
-    from app.file_center.permissions import can_manage_file_center_role_matrix, ensure_file_center_role_matrix_defaults
+    from app.file_center.permissions import (
+        can_manage_file_center_role_matrix,
+        ensure_file_center_role_matrix_defaults,
+    )
     if not can_manage_file_center_role_matrix(current_user):
         return _access_denied_response()
     try:
@@ -1113,6 +1144,7 @@ def file_center_role_matrix_defaults():
         db.session.commit()
         flash(f"Varsayılan rol matrisi kontrol edildi. Yeni: {result['created']} · Güncellenen: {result['updated']}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Varsayılan rol matrisi oluşturulamadı: {exc}", "danger")
     return redirect(url_for("main.file_center_role_matrix"))

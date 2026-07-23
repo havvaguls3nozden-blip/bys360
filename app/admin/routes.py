@@ -7,8 +7,10 @@ Bu modül kendi `admin_bp` blueprint'ini canlıda register etmez. Bunun yerine
 """
 from __future__ import annotations
 
+import logging
 from collections import defaultdict
-from flask import current_app, flash, redirect, request, url_for, send_file
+
+from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
 from openpyxl import load_workbook
 from sqlalchemy import or_
@@ -25,39 +27,55 @@ from app.models import (
 )
 from app.route_registry import main_bp
 from app.route_support import admin_required, bool_from_form, menu_key_required, safe_render
-from app.security import get_default_first_login_password, save_profile_photo_to_user, validate_excel_file
+from app.security import (
+    get_default_first_login_password,
+    save_profile_photo_to_user,
+    validate_excel_file,
+)
+from app.services.ai import (
+    build_admin_user_form_ai_panel,
+    build_admin_users_risk_ai_panel,
+    build_personnel_density_ai_panel,
+    build_personnel_list_ai_panel,
+)
 from app.services.auto_hierarchy_service import auto_apply_manager_chains, infer_role_from_profile
-from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
+from app.services.hierarchy_admin_service import ensure_unit_exists_strict, normalize_text
+from app.services.performance_service import generate_assignments_for_active_period
 from app.services.personnel import (
     apply_admin_user_org_hierarchy_fields,
     apply_personnel_profile_photo_action,
+    assign_user_performance_category,
     build_new_personnel_user_from_payload,
     build_personnel_create_form_context,
     build_personnel_edit_form_context,
-    build_personnel_list_context,
     build_personnel_excel_row_payload,
-    has_explicit_personnel_excel_manager_columns,
-    preflight_personnel_excel_headers,
-    row_has_required_personnel_excel_fields,
-    read_personnel_form_payload,
-    update_existing_personnel_user_from_payload,
-    assign_user_performance_category,
+    build_personnel_list_context,
     get_personnel_category_options,
+    has_explicit_personnel_excel_manager_columns,
     normalize_personnel_category_label,
+    preflight_personnel_excel_headers,
+    read_personnel_form_payload,
+    row_has_required_personnel_excel_fields,
+    update_existing_personnel_user_from_payload,
     validate_admin_manager_sicil_conflicts,
     validate_personnel_identity_uniqueness,
     validate_personnel_manager_id_conflicts,
     validate_personnel_password_change_conflicts,
     validate_required_personnel_payload,
 )
-from app.services.personnel.excel_template import build_personnel_import_template_bytes, personnel_import_template_filename
-from app.services.personnel.import_manager_chain_sync import sync_touched_users_manager_ids_from_sicils
 from app.services.personnel.excel_import_guard import validate_personnel_import_rows_for_commit
-from app.services.hierarchy_admin_service import ensure_unit_exists_strict, normalize_text
-from app.services.performance_service import generate_assignments_for_active_period
+from app.services.personnel.excel_template import (
+    build_personnel_import_template_bytes,
+    personnel_import_template_filename,
+)
+from app.services.personnel.import_manager_chain_sync import (
+    sync_touched_users_manager_ids_from_sicils,
+)
+from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
 from app.services.sql_refactor_query_helpers import distinct_non_empty_values
-from app.services.ai import build_admin_user_form_ai_panel, build_personnel_list_ai_panel, build_admin_users_risk_ai_panel, build_personnel_density_ai_panel
 from app.view_helpers import build_dashboard_context
+
+logger = logging.getLogger(__name__)
 
 ROLE_CHOICES = [
     ("admin", "Admin"),
@@ -462,6 +480,7 @@ def admin_user_create():
             return redirect(url_for("main.admin_users"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Personel oluşturulurken hata oluştu: {exc}", "danger")
             return safe_render(
@@ -596,6 +615,7 @@ def admin_user_edit(user_id):
             return redirect(url_for("main.admin_users"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Personel güncellenirken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.admin_user_edit", user_id=user.id))
@@ -712,6 +732,7 @@ def personnel_add():
             return redirect(url_for("main.personnel_list"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Personel ekleme sırasında hata oluştu: {exc}", "danger")
 
@@ -828,6 +849,7 @@ def personnel_edit(user_id):
             return redirect(url_for("main.personnel_list"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Personel güncelleme sırasında hata oluştu: {exc}", "danger")
 
@@ -1097,6 +1119,7 @@ def personnel_excel_upload():
             return redirect(url_for("main.personnel_list"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Excel yükleme sırasında hata oluştu: {exc}", "danger")
 
@@ -1127,7 +1150,9 @@ __all__ = [
 # BYS360_PERFORMANCE_COMPLETION_PHASE2_ADMIN_PERSONNEL_CATEGORY_MARKER
 # Personel ekleme/düzenleme ekranlarında personel_category alanı kurumsal veri olarak tutulur.
 try:
-    from app.services.performance.phase2_category_center import DEFAULT_CATEGORY_LABELS as PHASE2_DEFAULT_CATEGORY_LABELS
+    from app.services.performance.phase2_category_center import (
+        DEFAULT_CATEGORY_LABELS as PHASE2_DEFAULT_CATEGORY_LABELS,
+    )
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/admin/routes.py:1152")
     PHASE2_DEFAULT_CATEGORY_LABELS = ("Güvenlik", "Temizlik", "İdari Personel", "Teknik Personel", "Deneme Süreli Personel", "Diğer")

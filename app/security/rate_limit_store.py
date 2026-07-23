@@ -3,6 +3,14 @@ from __future__ import annotations
 
 import logging
 
+import hashlib
+import json
+import os
+import time
+from pathlib import Path
+from collections.abc import Callable, Iterable
+
+from flask import current_app
 """Multi-worker rate-limit store for BYS360 security guards.
 
 The old in-memory bucket dictionaries were safe for a single process, but
@@ -13,15 +21,6 @@ share counters through a small JSON file under LOG_FOLDER.
 No database migration is required.  If the file store cannot be used for any
 reason, callers can continue with their in-process fallback.
 """
-
-import hashlib
-import json
-import os
-import time
-from pathlib import Path
-from collections.abc import Callable, Iterable
-
-from flask import current_app
 logger = logging.getLogger(__name__)
 
 _REDIS_CLIENT = None
@@ -40,7 +39,7 @@ def _redis_client():
     url = _redis_url()
     if not url:
         return None
-    if _REDIS_CLIENT is not None and _REDIS_CLIENT_KEY == url:
+    if _REDIS_CLIENT is not None and url == _REDIS_CLIENT_KEY:
         return _REDIS_CLIENT
     try:
         import redis  # type: ignore

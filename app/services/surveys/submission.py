@@ -27,10 +27,7 @@ def _getlist(form_data: Any, key: str) -> list[str]:
     if callable(getter):
         return list(getter(key) or [])
     value = None
-    if isinstance(form_data, Mapping):
-        value = form_data.get(key)
-    else:
-        value = getattr(form_data, key, None)
+    value = form_data.get(key) if isinstance(form_data, Mapping) else getattr(form_data, key, None)
     if value is None:
         return []
     if isinstance(value, (list, tuple, set)):

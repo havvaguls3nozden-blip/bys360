@@ -1,8 +1,83 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-from datetime import datetime
 import logging
+
+from flask import current_app, flash, redirect, request, send_file, url_for
+from flask import render_template as flask_render_template
+from flask_login import current_user, login_required
+
+from app.core.datetime_utils import utc_now
+from app.extensions import db
+from app.models import (
+    EvaluationAssignment,
+    PerformanceEvaluation,
+    PerformancePeriod,
+)
+from app.route_registry import main_bp
+from app.route_support import (
+    admin_required,
+    manager_required,
+    render_access_denied,
+    safe_render,
+    user_has_any_role,
+)
+from app.services.availability_service import refresh_assignment_live_coverages
+from app.services.feedback_service import can_create_feedback_request, get_open_feedback_request
+from app.services.performance.evaluation_ui_service import (
+    build_employee_cards as _build_employee_cards,
+)
+from app.services.performance.evaluation_ui_service import (
+    build_scorecard_detail_context as _build_scorecard_detail_context,
+)
+from app.services.performance.evaluation_ui_service import (
+    can_access_assignment_for_actor as _can_access_assignment_for_actor,
+)
+from app.services.performance.hardening_service import (
+    build_period_download_name,
+    humanize_export_exception,
+)
+from app.services.performance.history import build_history_summary, get_evaluation_history
+from app.services.performance.interim_notes_runtime import build_scorecard_interim_notes
+from app.services.performance.meeting_p4_development_guidance import (
+    build_scorecard_development_guidance_context,
+)
+from app.services.performance.phase3_backend_route_guard import (
+    phase3_enforce_evaluation_access,  # BYS360_PHASE3_3_BACKEND_ROUTE_IMPORT
+)
+from app.services.performance.team_compare_service import (
+    STATUS_OPTIONS as TEAM_COMPARE_STATUS_OPTIONS,
+)
+from app.services.performance.team_compare_service import (
+    apply_filters as apply_team_compare_filters,
+)
+from app.services.performance.team_compare_service import (
+    build_empty_payload as build_team_compare_empty_payload,
+)
+from app.services.performance.team_compare_service import (
+    build_excel_workbook as build_team_compare_workbook,
+)
+from app.services.performance.team_compare_service import (
+    build_rows as build_team_compare_rows,
+)
+from app.services.performance.team_compare_service import (
+    build_view_payload as build_team_compare_view_payload,
+)
+from app.services.performance.team_compare_service import (
+    choose_period_id as choose_team_compare_period_id,
+)
+from app.services.performance_v2.chain import build_resolved_chain
+from app.services.performance_v2.scoring import compute_final_score
+from app.services.performance_v2.weights import resolve_weight_plan
+from app.services.publish_service import get_evaluation_visibility_state
+from app.services.query_health_service import (
+    apply_assignment_board_filters,
+    attach_workflow_meta,
+    build_assignment_board_query,
+    build_workflow_filter_items,
+    ordered_assignment_rows,
+)
+from app.view_helpers import build_surface_scope_context
+
 logger = logging.getLogger(__name__)
 """Performans degerlendirme cekirdek route'lari.
 
@@ -11,85 +86,6 @@ Burasi projenin kalbi gibi. Fazla oyuncakli bir soyutlama yapmak istemedim;
 insan acinca akisi gorebilsin istedim. Ama ana routes.py de artik bogulmasin diye
 kriterden sonraki agir akisi buraya aldim.
 """
-
-
-from flask import current_app, flash, redirect, render_template as flask_render_template, request, send_file, url_for
-from flask_login import current_user, login_required
-
-from app.extensions import db
-from app.models import (
-    EvaluationAssignment,
-    FeedbackRequest,
-    PerformanceCriteria,
-    PerformanceEvaluation,
-    PerformanceEvaluationItem,
-    PerformancePeriod,
-    PerformanceWeightConfig,
-    User,
-)
-from app.route_registry import main_bp
-from app.route_support import admin_required, manager_required, safe_render, user_has_any_role, render_access_denied
-from app.services.evaluation_workflow_service import (
-    can_level_1_edit,
-    can_level_1_withdraw,
-    complete_level_2,
-    complete_level_3,
-    get_workflow_state,
-    mark_seen_by_level_2,
-    return_to_level_1,
-    submit_to_level_2,
-    withdraw_from_level_2,
-)
-from app.services.hierarchy_admin_service import get_manager_scope_users
-from app.services.query_health_service import (
-    apply_assignment_board_filters,
-    attach_workflow_meta,
-    build_assignment_board_query,
-    build_workflow_filter_items,
-    ordered_assignment_rows,
-)
-from app.services.performance_service import (
-    calculate_effective_weights,
-    get_level_items_map,
-    get_period_level_3_flags,
-    level_1_gave_any_three,
-    calculate_preview_total_100,
-    requires_general_comment,
-    requires_level_2_comment_for_evaluation,
-    save_evaluation_level,
-    validate_general_comment_requirements,
-    validate_score_value,
-)
-from app.services.performance.common import get_evaluation_window_state
-from app.services.performance.team_compare_service import (
-    STATUS_OPTIONS as TEAM_COMPARE_STATUS_OPTIONS,
-    apply_filters as apply_team_compare_filters,
-    build_empty_payload as build_team_compare_empty_payload,
-    build_excel_workbook as build_team_compare_workbook,
-    build_rows as build_team_compare_rows,
-    build_view_payload as build_team_compare_view_payload,
-    choose_period_id as choose_team_compare_period_id,
-)
-from app.services.performance.history import build_history_summary, get_evaluation_history, log_evaluation_action
-from app.services.publish_service import get_evaluation_visibility_state
-from app.services.feedback_service import can_create_feedback_request, get_open_feedback_request
-from app.services.availability_service import refresh_assignment_live_coverages
-from app.view_helpers import build_surface_scope_context
-from app.services.performance.interim_notes_runtime import build_scorecard_interim_notes
-from app.services.performance.meeting_p4_development_guidance import build_scorecard_development_guidance_context
-from app.services.performance_v2.chain import build_resolved_chain
-from app.services.performance_v2.weights import resolve_weight_plan
-from app.services.performance_v2.scoring import compute_final_score
-from app.services.performance.hardening_service import (
-    build_period_download_name,
-    humanize_export_exception,
-)
-from app.services.performance.phase3_backend_route_guard import phase3_enforce_evaluation_access, phase3_denied_response  # BYS360_PHASE3_3_BACKEND_ROUTE_IMPORT
-from app.services.performance.evaluation_ui_service import (
-    build_employee_cards as _build_employee_cards,
-    build_scorecard_detail_context as _build_scorecard_detail_context,
-    can_access_assignment_for_actor as _can_access_assignment_for_actor,
-)
 
 # Bir ara bunu daha da parcali yapayim dedim ama decorator zinciri dagilinca keyfim kacti.
 # Simdilik en dogru orta yol bu gibi duruyor.

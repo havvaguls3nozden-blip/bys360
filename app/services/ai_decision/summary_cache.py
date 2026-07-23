@@ -1,6 +1,26 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import re
+from collections.abc import Iterable, Mapping
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from typing import Any
+
 from app.core.datetime_utils import utc_now
+
+from .live_scope import LIVE_AI_DOMAIN_KEYS, LIVE_AI_TABLE_NAMES
+from .logging_bridge import (
+    normalize_ai_feature_type,
+    normalize_ai_module_type,
+    truncate_ai_log_text,
+)
+from .redaction_bridge import (
+    apply_ai_redaction_rules,
+    build_ai_redaction_context,
+    redact_text_for_ai_log,
+)
 
 """AI özet cache ve güvenli özetleme servis köprüsü.
 
@@ -15,26 +35,6 @@ Tasarım ilkeleri:
 - deterministic_cache_key: aynı kaynak aynı cache anahtarını üretir.
 - human_review: çıktı karar değil, karar destek notudur.
 """
-
-import hashlib
-import json
-import re
-from collections.abc import Iterable, Mapping
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from typing import Any
-
-from .live_scope import LIVE_AI_DOMAIN_KEYS, LIVE_AI_TABLE_NAMES
-from .logging_bridge import (
-    normalize_ai_feature_type,
-    normalize_ai_module_type,
-    truncate_ai_log_text,
-)
-from .redaction_bridge import (
-    apply_ai_redaction_rules,
-    build_ai_redaction_context,
-    redact_text_for_ai_log,
-)
 
 DEFAULT_SUMMARY_KIND = "safe_summary"
 DEFAULT_PROMPT_VERSION = "faz2_safe_summary_v1"

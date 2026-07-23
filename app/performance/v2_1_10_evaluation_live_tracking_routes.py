@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import request
 from flask_login import login_required
 
 from app.route_registry import main_bp
-from app.route_support import admin_required, menu_key_required, safe_render
+from app.route_support import menu_key_required, safe_render
+from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label
 from app.services.performance.v2_1_10_evaluation_live_tracking import (
     build_evaluation_live_tracking_state,
     run_v2_1_10_evaluation_live_tracking_gate,
     status_label,
 )
-from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label
+
 logger = logging.getLogger(__name__)
 
 

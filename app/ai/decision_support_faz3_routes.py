@@ -1,7 +1,26 @@
 from __future__ import annotations
 
-
 import logging
+from collections.abc import Callable
+from typing import Any
+
+from flask import jsonify
+from flask_login import current_user, login_required
+
+from app.extensions import db
+from app.models import PerformanceEvaluation
+from app.route_registry import main_bp
+from app.route_support import safe_db_rollback
+from app.services.ai_decision.category_visibility_integration import (
+    build_visible_category_group_summary,
+)
+from app.services.ai_decision.permission_guard import (
+    AIDecisionPermissionDenied,
+    assert_center_access,
+    build_ai_decision_visibility_context,
+    build_evaluation_visibility_payload,
+)
+
 logger = logging.getLogger(__name__)
 
 """BYS360 AI Karar Destek Faz 3 route ekleri.
@@ -11,24 +30,6 @@ routes.py dosyasını ezmeden Faz 3 uçlarını main_bp üzerine kaydeder.
 
 BYS360_AI_DECISION_FAZ3_ROUTES
 """
-
-from typing import Any
-from collections.abc import Callable
-
-from flask import jsonify
-from flask_login import current_user, login_required
-
-from app.extensions import db
-from app.models import PerformanceEvaluation
-from app.route_registry import main_bp
-from app.route_support import safe_db_rollback
-from app.services.ai_decision.category_visibility_integration import build_visible_category_group_summary
-from app.services.ai_decision.permission_guard import (
-    AIDecisionPermissionDenied,
-    assert_center_access,
-    build_ai_decision_visibility_context,
-    build_evaluation_visibility_payload,
-)
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 

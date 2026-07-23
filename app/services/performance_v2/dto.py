@@ -1,22 +1,22 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class LevelMode(str, Enum):
+class LevelMode(StrEnum):
     DISABLED = 'off'
     COMMENT_ONLY = 'comment_only'
     SCORE_ENABLED = 'scoring'
 
 
-class ChainType(str, Enum):
+class ChainType(StrEnum):
     PRESIDENCY = 'presidency'
     GROUP = 'group'
 
 
-class SubjectType(str, Enum):
+class SubjectType(StrEnum):
     PRESIDENCY = 'presidency_subject'
     GROUP_MANAGER = 'group_manager_subject'
     COORDINATOR = 'coordinator_subject'

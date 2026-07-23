@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +35,6 @@ kesin biçimde ayırmaktır:
 2. Kendi sonuç görünürlüğü: Personel ya da amir, kendi kişisel sonucunu
    İK/yayın kilidi açılmadan göremez.
 """
-
-from collections.abc import Iterable
-from typing import Any
 
 try:
     from app.services.performance.low_score_process_service import (

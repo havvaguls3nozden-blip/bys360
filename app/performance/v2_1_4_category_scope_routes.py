@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, request, url_for
@@ -18,7 +17,9 @@ from app.services.performance.v2_1_4_category_scope_visibility import (
     list_scope_drafts,
     upsert_category_scope_draft,
 )
-from app.services.performance.v2_1_4_category_scope_visibility_gate import run_v2_1_4_category_scope_visibility_gate
+from app.services.performance.v2_1_4_category_scope_visibility_gate import (
+    run_v2_1_4_category_scope_visibility_gate,
+)
 from app.services.performance.v2_1_6a_category_ui_cleanup import (
     active_categories,
     all_categories_with_usage,
@@ -28,6 +29,7 @@ from app.services.performance.v2_1_6a_category_ui_cleanup import (
     label_status,
     restore_category,
 )
+
 logger = logging.getLogger(__name__)
 
 

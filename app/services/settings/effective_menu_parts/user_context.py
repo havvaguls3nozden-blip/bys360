@@ -5,11 +5,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-RollbackHook = Callable[[], None]
-
 from app.services.settings.effective_menu_parts.bys360_context import (
     _rollback,
 )
+
+RollbackHook = Callable[[], None]
 
 
 def _user_has_any_assigned_survey(user: Any, *, rollback: RollbackHook | None = None) -> bool:

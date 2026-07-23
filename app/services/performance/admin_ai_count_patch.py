@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from typing import Any
+
 """Performans kapsamı sayaç yardımcıları.
 
 Bu dosya önce top-level patch parçası olarak ``rows`` ve ``users`` değişkenlerini
 oluşmadan kullanıyordu. V2 ile güvenli helper modülüne dönüştürüldü.
 """
-
-from collections.abc import Iterable
-from typing import Any
 
 try:
     from app.services.performance.common import is_performance_scope_user

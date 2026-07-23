@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import secrets
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 

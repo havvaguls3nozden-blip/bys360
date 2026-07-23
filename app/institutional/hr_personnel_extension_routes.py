@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-from datetime import datetime, date
+import logging
+from datetime import date
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     PersonnelAssetAssignment,
@@ -17,18 +18,26 @@ from app.models import (
     User,
 )
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
 from .hr_personnel_operations_routes import (
     _current_scope_bundle,
     _full_name,
-    _normalize_bool,
     _normalize_text,
     _parse_date,
     _redirect_operations,
     _require_user_in_scope,
     _safe_int,
 )
+
+logger = logging.getLogger(__name__)
 
 ASSET_STATUS_LABELS = {
     "assigned": "Zimmette",
@@ -259,6 +268,7 @@ def hr_personnel_asset_save():
         flash("Zimmet / teslim kaydı kaydedildi.", "success")
         return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=user.id))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
@@ -281,6 +291,7 @@ def hr_personnel_asset_return(asset_id: int):
         db.session.commit()
         flash("Zimmet kaydı teslim alındı olarak işlendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
@@ -301,6 +312,7 @@ def hr_personnel_asset_delete(asset_id: int):
         db.session.commit()
         flash("Zimmet kaydı silindi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
@@ -421,6 +433,7 @@ def hr_personnel_checklist_save():
         db.session.commit()
         flash("Checklist kaydı güncellendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
@@ -441,6 +454,7 @@ def hr_personnel_checklist_delete(review_id: int):
         db.session.commit()
         flash("Checklist kaydı silindi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
@@ -552,6 +566,7 @@ def hr_personnel_reminder_run():
         db.session.commit()
         flash("Belge yenileme hatırlatması kuyruğa alındı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))
@@ -598,6 +613,7 @@ def hr_personnel_reminder_bulk():
         db.session.commit()
         flash(f"Toplu hatırlatma kaydı oluşturuldu: {created}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))

@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from sqlalchemy import inspect, text
 
 """BYS360 Performans V2.1.10 değerlendirme süreci canlı takip servisi.
 
@@ -9,11 +13,6 @@ mail gönderimi veya ağır yeniden hesaplama çalıştırmaz. Amaç; seçili d�
 değerlendirme görevlerinin tamamlanma durumunu, bekleyen/geciken amirleri ve
 süreç risklerini güvenli ve sade yönetici kartlarıyla göstermektir.
 """
-
-from datetime import datetime, timedelta
-from typing import Any
-
-from sqlalchemy import inspect, text
 
 logger = logging.getLogger(__name__)
 

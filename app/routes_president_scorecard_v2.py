@@ -1,12 +1,12 @@
 """BYS360 Başkan Onayları Karne İncelemesi V2 compatibility routes."""
 from __future__ import annotations
 
+import logging
 
-from flask import Blueprint, abort, render_template, render_template_string, request
+from flask import Blueprint, render_template
 from flask_login import current_user, login_required
 from sqlalchemy import inspect, text
 
-import logging
 logger = logging.getLogger(__name__)
 try:
     from app.extensions import db

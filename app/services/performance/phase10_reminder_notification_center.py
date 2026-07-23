@@ -407,8 +407,8 @@ def phase10_contract() -> dict[str, Any]:
         },
         "table": PHASE10_TABLE_NAME,
         "settings": [
-            {"module_key": m, "setting_key": k, "label": l, "value_type": t, "default_value": v, "description": d}
-            for m, k, l, t, v, d in PHASE10_SETTING_ROWS
+            {"module_key": m, "setting_key": k, "label": label, "value_type": t, "default_value": v, "description": d}
+            for m, k, label, t, v, d in PHASE10_SETTING_ROWS
         ],
         "rules": [
             "Bekleyen değerlendirme görevleri için otomatik hatırlatma kararı tek merkezden verilir.",

@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 9 route ekleri.
-
-Otomatik hatırlatma, son tarih yaklaşımı, geciken değerlendirme görevleri ve
-aksatan amir yoğunluğunu güvenli karar destek JSON çıktılarıyla sunar.
-
-BYS360_AI_DECISION_FAZ9_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify, request
 from flask_login import current_user, login_required
@@ -27,6 +16,16 @@ from app.services.ai_decision.reminder_integration import (
     build_reminder_action_plan_payload,
     build_reminder_summary_payload,
 )
+
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 9 route ekleri.
+
+Otomatik hatırlatma, son tarih yaklaşımı, geciken değerlendirme görevleri ve
+aksatan amir yoğunluğunu güvenli karar destek JSON çıktılarıyla sunar.
+
+BYS360_AI_DECISION_FAZ9_ROUTES
+"""
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 

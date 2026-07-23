@@ -122,10 +122,12 @@ def install_social_auto_task() -> dict[str, Any]:
     script = root / "scripts" / "windows" / "install_bys360_social_auto_import_v3b2_task.ps1"
     if not script.exists():
         result = {"ok": False, "message": "Otomatik görev kurulum dosyası bulunamadı.", "script": str(script), "generated_at": _now_iso()}
-        _write_state(result); return result
+        _write_state(result)
+        return result
     res = _run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), "-ProjectRoot", str(root), "-Create"], timeout=90)
     result = {"ok": bool(res.get("ok")), "action": "install", "message": "Otomatik kontrol açıldı." if res.get("ok") else "Otomatik kontrol açılamadı.", "result": res, "generated_at": _now_iso()}
-    _write_state(result); return result
+    _write_state(result)
+    return result
 
 
 def remove_social_auto_task() -> dict[str, Any]:
@@ -133,10 +135,12 @@ def remove_social_auto_task() -> dict[str, Any]:
     script = root / "scripts" / "windows" / "install_bys360_social_auto_import_v3b2_task.ps1"
     if not script.exists():
         result = {"ok": False, "message": "Otomatik görev kurulum dosyası bulunamadı.", "script": str(script), "generated_at": _now_iso()}
-        _write_state(result); return result
+        _write_state(result)
+        return result
     res = _run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script), "-ProjectRoot", str(root), "-Delete"], timeout=60)
     result = {"ok": bool(res.get("ok")), "action": "remove", "message": "Otomatik kontrol kapatıldı." if res.get("ok") else "Otomatik kontrol kapatılamadı.", "result": res, "generated_at": _now_iso()}
-    _write_state(result); return result
+    _write_state(result)
+    return result
 
 
 def run_social_auto_import_now() -> dict[str, Any]:
@@ -147,7 +151,9 @@ def run_social_auto_import_now() -> dict[str, Any]:
     script = root / "scripts" / "portal" / "run_bys360_social_media_embed_scan_v3b.py"
     if not script.exists():
         result = {"ok": False, "message": "Sosyal medya kontrol scripti bulunamadı.", "script": str(script), "generated_at": _now_iso()}
-        _write_state(result); return result
+        _write_state(result)
+        return result
     res = _run([str(py), str(script), "--project-root", str(root), "--manual", "--auto-discover"], timeout=180)
     result = {"ok": bool(res.get("ok")), "action": "run_now", "message": "Otomatik kontrol şimdi çalıştırıldı." if res.get("ok") else "Otomatik kontrol çalıştırılamadı.", "result": res, "generated_at": _now_iso()}
-    _write_state(result); return result
+    _write_state(result)
+    return result

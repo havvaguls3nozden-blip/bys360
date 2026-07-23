@@ -2,6 +2,19 @@ from __future__ import annotations
 
 import logging
 
+from flask import current_app, request, url_for
+from flask_login import current_user
+from sqlalchemy.orm import joinedload
+
+from app.extensions import db
+from app.models import EvaluationAssignment, FeedbackMeeting, FeedbackRequest, User
+from app.services.message_service import notify_user
+from app.services.performance.common import get_period
+from app.services.performance.feedback_audit_service import record_feedback_audit_event
+from app.services.performance.feedback_executive_summary_service import SUMMARY_PRESET_LABELS
+from app.services.performance.hierarchy import build_manager_chain_for_user
+from app.view_helpers import build_surface_scope_context
+
 logger = logging.getLogger(__name__)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
@@ -21,19 +34,6 @@ Bu modül feedback request, meeting, audit ve görünürlük yardımcılarını
 tek noktada toplar. Route gövdelerinin sadece akışa odaklanması için
 ortak sorgu ve bildirim mantığı burada tutulur.
 """
-
-from flask import current_app, request, url_for
-from flask_login import current_user
-from sqlalchemy.orm import joinedload
-
-from app.extensions import db
-from app.models import EvaluationAssignment, FeedbackMeeting, FeedbackRequest, User
-from app.services.message_service import notify_user
-from app.services.performance.common import get_period
-from app.services.performance.feedback_audit_service import record_feedback_audit_event
-from app.services.performance.feedback_executive_summary_service import SUMMARY_PRESET_LABELS
-from app.services.performance.hierarchy import build_manager_chain_for_user
-from app.view_helpers import build_surface_scope_context
 
 
 def _get_scope_context(scope_value: str | None = None):

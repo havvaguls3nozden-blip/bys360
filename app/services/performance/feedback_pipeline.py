@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from flask import current_app
+
+from app.services.performance.feedback_process_state_machine import build_feedback_state_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -11,14 +18,6 @@ eylem planı takibi, yayına hazırlık ve canlı kontrol alanlarını tek
 kurumsal ilerleme yüzeyinde toplar. İdari karar üretmez; yalnızca
 hazırlık, yönlendirme ve süreç bütünlüğü gösterir.
 """
-
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
-
-from flask import current_app
-
-from app.services.performance.feedback_process_state_machine import build_feedback_state_snapshot
 
 MANAGER_ROLES = {
     "admin", "super_admin", "system_admin", "sistem_yoneticisi",

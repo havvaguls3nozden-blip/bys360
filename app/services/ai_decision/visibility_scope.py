@@ -27,7 +27,6 @@ _FULL_SCOPE_ROLES = {
     "admin",
     "administrator",
     "sistem_yoneticisi",
-    "sistem_yoneticisi",
     "system_admin",
     "super_admin",
     "baskan",
@@ -300,10 +299,7 @@ def user_matches_scope(scope: AIDecisionVisibilityScope, target_user: Any) -> bo
             return True
         if any(same_scope_label(item, target_upper_unit) for item in scope.allowed_upper_unit_names):
             return True
-    if scope.can_view_category_scope:
-        if any(same_scope_label(item, target_category) for item in scope.allowed_category_labels):
-            return True
-    return False
+    return bool(scope.can_view_category_scope and any(same_scope_label(item, target_category) for item in scope.allowed_category_labels))
 
 
 def build_safe_scope_payload(scope: AIDecisionVisibilityScope, *, include_menu_keys: bool = True) -> dict[str, Any]:

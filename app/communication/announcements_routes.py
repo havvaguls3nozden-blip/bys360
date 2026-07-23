@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from flask import flash, redirect, request, url_for
 import logging
-logger = logging.getLogger(__name__)
 
-_ANNOUNCEMENT_THREAD_FETCH_LIMIT = 60
+from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
@@ -13,9 +11,19 @@ from app.models import Message, MessageThread, MessageThreadParticipant, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, issue_form_token, menu_key_required, safe_render
 from app.services.ai import build_announcement_form_ai_panel, build_announcements_ai_panel
-from app.services.message_service import can_use_announcement_tools as _can_use_announcement_tools, notify_user as _notify_user
+from app.services.message_service import can_use_announcement_tools as _can_use_announcement_tools
+from app.services.message_service import notify_user as _notify_user
 
-from .shared import _clean_message_body, _log_communication_exception, _normalize_text_search, _utcnow
+from .shared import (
+    _clean_message_body,
+    _log_communication_exception,
+    _normalize_text_search,
+    _utcnow,
+)
+
+logger = logging.getLogger(__name__)
+
+_ANNOUNCEMENT_THREAD_FETCH_LIMIT = 60
 
 
 def _announcement_preview_maps(users) -> dict[str, dict[str, int]]:

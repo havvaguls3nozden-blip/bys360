@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 8 route ekleri.
-
-Çoklu dönem, özel dönem, kategori/grup dönemi ve seçili personel kapsamını
-karar destek merkezi üzerinden güvenli JSON çıktılarıyla sunar.
-
-BYS360_AI_DECISION_FAZ8_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify, request
 from flask_login import current_user, login_required
@@ -26,6 +15,16 @@ from app.services.ai_decision.period_scope_integration import (
     build_period_scope_summary_payload,
     build_single_period_payload,
 )
+
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 8 route ekleri.
+
+Çoklu dönem, özel dönem, kategori/grup dönemi ve seçili personel kapsamını
+karar destek merkezi üzerinden güvenli JSON çıktılarıyla sunar.
+
+BYS360_AI_DECISION_FAZ8_ROUTES
+"""
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 

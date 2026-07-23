@@ -2,6 +2,19 @@ from __future__ import annotations
 
 import logging
 
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from typing import Any
+
+from app.performance.services import performance_rule_engine as _rule_engine
+from app.services.performance.low_score_process_service import get_low_score_publish_block_reason
+from app.services.performance.meeting_p4_development_guidance import (
+    get_development_recommendation_publish_block_reason,
+)
+from app.services.performance.personnel_support_publish_approval_service import (
+    get_personnel_support_publish_block_reason,
+)
+
 """BYS360 performans yayın ön kontrol anayasası.
 
 Bu servis, not karnesinin personele açılmadan önce geçmesi gereken gerçek
@@ -18,19 +31,6 @@ Kilit kurallar:
 - 70 altı Başkan onayı ve yayın kilidi kararı merkezi kural motorundan alınır.
 - Tek amirli istisnalarda gereksiz 2./3. amir beklenmez.
 """
-
-from collections.abc import Iterable
-from dataclasses import dataclass, field
-from typing import Any
-
-from app.performance.services import performance_rule_engine as _rule_engine
-from app.services.performance.low_score_process_service import get_low_score_publish_block_reason
-from app.services.performance.meeting_p4_development_guidance import (
-    get_development_recommendation_publish_block_reason,
-)
-from app.services.performance.personnel_support_publish_approval_service import (
-    get_personnel_support_publish_block_reason,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -318,9 +318,13 @@ def validate_evaluation_for_publish(period: Any, evaluation: Any) -> PublishPref
     blockers.extend(missing_level_findings)
 
     # 3. amir yorum modundaysa puan zorunlu değildir ama görüş/yorum aranır.
-    if 3 in required_levels and level_3_mode == "comment_only" and _level_completed(evaluation, 3):
-        if not _level_has_comment_or_item_note(evaluation, items_by_level, 3):
-            blockers.append(PublishFinding("level_3_comment_required", "3. amir yorum modunda olduğu için görüş alanı boş bırakılamaz.", manager_level=3))
+    if (
+        3 in required_levels
+        and level_3_mode == "comment_only"
+        and _level_completed(evaluation, 3)
+        and not _level_has_comment_or_item_note(evaluation, items_by_level, 3)
+    ):
+        blockers.append(PublishFinding("level_3_comment_required", "3. amir yorum modunda olduğu için görüş alanı boş bırakılamaz.", manager_level=3))
 
     # Puanlayan seviyelerde en az bir kriter satırı olmalı. 3. amir yorum modunda bundan muaftır.
     for level in _workflow_ordered_levels(required_levels):

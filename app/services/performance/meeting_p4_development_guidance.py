@@ -2,6 +2,14 @@ from __future__ import annotations
 
 import logging
 
+from dataclasses import dataclass
+from typing import Any
+
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
+
 """BYS360 Performans Aşama 10 — gelişim önerisi ve rehberlik servisi.
 
 Bu servis performans sonucunu yalnızca puanla kapatmamak için kullanılır:
@@ -12,14 +20,6 @@ Bu servis performans sonucunu yalnızca puanla kapatmamak için kullanılır:
 - AI karar destek kesin karar vermez; yalnızca dikkat notu üretir.
 - Eğitim modülü canlıya açılmaz; ileride ayrı modül olarak genişletilebilir.
 """
-
-from dataclasses import dataclass
-from typing import Any
-
-from sqlalchemy import inspect, text
-from sqlalchemy.exc import SQLAlchemyError
-
-from app.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -527,7 +527,7 @@ def p4_status_checks() -> list[dict[str, Any]]:
         ("p4_no_disciplinary_action", "Gelişim önerileri tek başına idari yaptırım üretmez.", _setting_exists("performance_development_no_disciplinary_action")),
         ("p4_sensitive_data_minimized", "Gelişim önerilerinde hassas veri azaltma ilkesi hazır.", _setting_exists("performance_development_sensitive_data_minimized")),
         ("p4_p8_dependency", "Dönem içi notlarla gelişim önerisi bağı korunuyor.", p8_ready),
-        ("p4_ai_tables_optional", "AI karar destek canlı omurgası varsa güvenli sınırlarla ilişkilendirilebilir.", True if live_ai_tables or _setting_exists("performance_ai_development_notes_enabled") else False),
+        ("p4_ai_tables_optional", "AI karar destek canlı omurgası varsa güvenli sınırlarla ilişkilendirilebilir.", bool(live_ai_tables or _setting_exists("performance_ai_development_notes_enabled"))),
     ]
     return [{"code": code, "title": title, "ok": bool(ok), "status": "Hazır" if ok else "Kontrol gerekli"} for code, title, ok in checks]
 

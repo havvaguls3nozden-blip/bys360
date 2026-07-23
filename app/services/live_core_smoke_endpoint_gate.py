@@ -207,7 +207,7 @@ def _http_get_status(url: str, timeout: float) -> tuple[int | None, str]:
             return int(response.status), response.geturl()
     except urllib.error.HTTPError as exc:
         return int(exc.code), url
-    except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
+    except (urllib.error.URLError, TimeoutError) as exc:
         return None, str(exc)
 
 

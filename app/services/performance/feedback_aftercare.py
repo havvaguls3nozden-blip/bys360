@@ -9,6 +9,7 @@ Tüm işlemler idempotent DDL ve güvenli raw SQL ile yapılır; model import zi
 """
 from __future__ import annotations
 
+import contextlib
 import logging
 from datetime import date, datetime, time
 from typing import Any
@@ -135,10 +136,8 @@ def _execute(sql: str, params: dict[str, Any] | None = None) -> None:
     try:
         db.session.execute(text(sql), params or {})
     except SQLAlchemyError:
-        try:
+        with contextlib.suppress(SQLAlchemyError):
             db.session.rollback()
-        except SQLAlchemyError:
-            pass
         return None
 
 

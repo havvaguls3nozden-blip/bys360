@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-
 import logging
+from urllib.parse import parse_qsl, urlparse
+
+from flask import Flask
+
+from app.security.audit import log_runtime_security_posture
 
 """BYS360 baslangic guvenlik denetimleri.
 
 Bu modul app factory icindeki production/staging guvenlik varsayilanlarini ve
 runtime security posture logunu tek yerde toplar.
 """
-
-from urllib.parse import parse_qsl, urlparse
-
-from flask import Flask
-
-from app.security.audit import log_runtime_security_posture
 logger = logging.getLogger(__name__)
 
 

@@ -13,4 +13,5 @@ def main():
         result = run_due_tasks(dry_run=args.dry_run) if args.task == "due" else run_task(args.task, dry_run=args.dry_run)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         raise SystemExit(0 if result.get("ok", True) else 1)
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

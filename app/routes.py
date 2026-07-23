@@ -7,10 +7,15 @@ kayıt importları burada tutuluyor. Büyük gövdeler ilgili handler modülleri
 """
 from __future__ import annotations
 
-from flask import abort, current_app, jsonify, redirect, request, send_from_directory, url_for
-from app.main_handlers.public_handlers import kunye as _kunye_handler
+from flask import abort, current_app, jsonify, request, send_from_directory
 from flask_login import current_user, login_required
 
+from app.config import (
+    REMOVED_ROUTE_ENDPOINT_PREFIXES,
+    REMOVED_ROUTE_PATH_PREFIXES,
+    REMOVED_SCOPE_COMPAT_ENDPOINTS,
+    is_removed,
+)
 from app.main_handlers.account_handlers import (
     account,
     account_change_password,
@@ -26,13 +31,8 @@ from app.main_handlers.comparison_handlers import (
 from app.main_handlers.dashboard_handlers import dashboard, db_check
 from app.main_handlers.public_handlers import home as _home_handler
 from app.main_handlers.public_handlers import index as _index_handler
+from app.main_handlers.public_handlers import kunye as _kunye_handler
 from app.route_registry import main_bp
-from app.config import (
-    REMOVED_ROUTE_ENDPOINT_PREFIXES,
-    REMOVED_ROUTE_PATH_PREFIXES,
-    REMOVED_SCOPE_COMPAT_ENDPOINTS,
-    is_removed,
-)
 from app.view_helpers import (
     enforce_first_login_security_flow_redirect,
     get_global_risk_banner_context,
@@ -90,6 +90,7 @@ def bys360_profile_photo_file(filename: str):
     """Profil fotoğraflarını kırık görsel oluşturmadan güvenli biçimde sunar."""
     import os
     from pathlib import Path
+
     from werkzeug.utils import secure_filename
 
     safe_name = secure_filename(Path(filename or "").name)
@@ -191,19 +192,22 @@ def home():
 
 
 # Modüler ana blueprint route aileleri
-from app.auth import routes as _auth_routes  # noqa: E402,F401
 from app.account import routes as _account_routes  # noqa: E402,F401
 from app.admin import routes as _admin_routes  # noqa: E402,F401
-from app.performance import routes as _performance_routes  # noqa: E402,F401
+from app.ai import routes as _ai_routes  # noqa: E402,F401
+from app.auth import routes as _auth_routes  # noqa: E402,F401
+from app.communication import feedback_routes as _feedback_routes  # noqa: E402,F401
+from app.communication import routes as _communication_routes  # noqa: E402,F401
+from app.communication import (
+    user_feedback_routes as _bys360_user_feedback_routes,  # noqa: E402,F401
+)
 from app.dashboard import routes as _dashboard_routes  # noqa: E402,F401
 from app.institutional import routes as _institutional_routes  # noqa: E402,F401
-from app.communication import routes as _communication_routes  # noqa: E402,F401
+from app.performance import routes as _performance_routes  # noqa: E402,F401
+
 # BYS360_CORPORATE_PORTAL_V1_ROUTE_IMPORT
 from app.portal import routes as _portal_routes  # noqa: E402,F401
-from app.communication import feedback_routes as _feedback_routes  # noqa: E402,F401
-from app.communication import user_feedback_routes as _bys360_user_feedback_routes  # noqa: E402,F401
 from app.support import routes as _support_routes  # noqa: E402,F401
-from app.ai import routes as _ai_routes  # noqa: E402,F401
 
 __all__ = [
     "main_bp",
@@ -233,13 +237,17 @@ def kunye():
 
 # BYS360_PHASE10_REPORTS_ROUTE_IMPORT_AFTER_MAIN
 try:
-    from app.performance import process_engine_phase10_reports_routes as _phase10_reports_routes  # noqa: F401,E402
+    from app.performance import (
+        process_engine_phase10_reports_routes as _phase10_reports_routes,  # noqa: F401,E402
+    )
 except ImportError:  # route import should never break app startup silently
     raise
 
 # BYS360_PHASE12_PRESIDENT_APPROVALS_CARD_ROUTE_IMPORT
 try:
-    from app.performance import president_low_score_card_routes as _bys360_phase12_president_card_routes  # noqa: F401,E402
+    from app.performance import (
+        president_low_score_card_routes as _bys360_phase12_president_card_routes,  # noqa: F401,E402
+    )
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/routes.py)")
 # /BYS360_PHASE12_PRESIDENT_APPROVALS_CARD_ROUTE_IMPORT
@@ -275,7 +283,9 @@ def bys360_pwa_service_worker():
 
 # BYS360_CORPORATE_INFORMATION_CENTER_V3_ROUTE_IMPORT
 try:
-    from app.communication import corporate_information_center_routes as _bys360_corporate_information_center_routes  # noqa: F401,E402
+    from app.communication import (
+        corporate_information_center_routes as _bys360_corporate_information_center_routes,  # noqa: F401,E402
+    )
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 Kurumsal Bilgilendirme Merkezi route import failed")
 # /BYS360_CORPORATE_INFORMATION_CENTER_V3_ROUTE_IMPORT

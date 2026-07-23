@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from typing import Any
+
+from app.services.personnel_sync_service import canonical_role_value
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,12 +18,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from collections.abc import Iterable
-from dataclasses import dataclass, field
-from typing import Any
-
-from app.services.personnel_sync_service import canonical_role_value
 
 try:
     from app.models import User
@@ -115,9 +115,7 @@ def is_system_user(user: Any) -> bool:
         return True
     if _norm(getattr(user, 'birim', '')) in SYSTEM_UNIT_KEYS:
         return True
-    if _norm(getattr(user, 'ust_birim', '')) in SYSTEM_UNIT_KEYS:
-        return True
-    return False
+    return _norm(getattr(user, 'ust_birim', '')) in SYSTEM_UNIT_KEYS
 
 
 def is_president(user: Any) -> bool:

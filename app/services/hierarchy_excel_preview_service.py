@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+import csv
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from openpyxl import load_workbook
+
+from .hierarchy_rule_engine_service import HierarchyRuleEngineService, UserRow
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,16 +22,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-import csv
-import json
-from datetime import datetime
-from pathlib import Path
-from typing import Any
-
-from openpyxl import load_workbook
-
-from .hierarchy_rule_engine_service import HierarchyRuleEngineService, UserRow
 
 
 class HierarchyExcelPreviewService:

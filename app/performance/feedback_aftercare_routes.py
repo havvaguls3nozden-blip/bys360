@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from sqlalchemy.exc import SQLAlchemyError
+import logging
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.route_registry import main_bp
+
 # BYS360_STUB_AI_V60_AFTERCARE_IMPORT
 from app.services.ai.stub_panel_bridge import attach_aftercare_ai_panel
+
 # /BYS360_STUB_AI_V60_AFTERCARE_IMPORT
 from app.services.performance.feedback_aftercare import (
     add_action_plan,
@@ -17,7 +20,7 @@ from app.services.performance.feedback_aftercare import (
     save_preparation,
     update_action_plan,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 

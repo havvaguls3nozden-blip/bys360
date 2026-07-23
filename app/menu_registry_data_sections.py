@@ -784,7 +784,8 @@ try:
         for _role in ("admin", "super_admin", "system_admin", "sistem_yoneticisi"):
             ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
     if "LIVE_MENU_SCOPE" in globals():
-        try: LIVE_MENU_SCOPE.add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
+        try:
+            LIVE_MENU_SCOPE.add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry_data_sections.py:787")
             pass
@@ -808,7 +809,8 @@ try:
         for _role in ("admin", "super_admin", "system_admin", "sistem_yoneticisi"):
             ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
     if "LIVE_MENU_SCOPE" in globals():
-        try: LIVE_MENU_SCOPE.add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
+        try:
+            LIVE_MENU_SCOPE.add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry_data_sections.py:808")
             pass

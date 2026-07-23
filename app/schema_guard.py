@@ -13,13 +13,13 @@ Dışarıdan import edenler bu dosyayı kullanmaya devam edebilir.
 """
 from __future__ import annotations
 
-from app.schema_guard_types import TableRepair
 from app.schema_guard_core_repairs import TABLE_REPAIRS
-from app.schema_guard_patches import SCHEMA_PATCHES
 from app.schema_guard_engine import (
     repair_runtime_schema,
     should_auto_repair_schema,
 )
+from app.schema_guard_patches import SCHEMA_PATCHES
+from app.schema_guard_types import TableRepair
 
 __all__ = [
     "TableRepair",

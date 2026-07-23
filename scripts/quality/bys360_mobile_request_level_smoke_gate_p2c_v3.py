@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import contextlib
 import json
 import os
 import re
@@ -256,10 +257,8 @@ def run_request_level_smoke(root: Path, static_ok: bool) -> dict[str, Any]:
     except Exception as exc:
         return {"ok": static_ok, "mode": "request_level_import_exception_static_contract", "error": repr(exc)}
     finally:
-        try:
+        with contextlib.suppress(Exception):
             os.chdir(old_cwd)  # type: ignore[name-defined]
-        except Exception:
-            pass
         try:
             if str(root) in sys.path:
                 sys.path.remove(str(root))

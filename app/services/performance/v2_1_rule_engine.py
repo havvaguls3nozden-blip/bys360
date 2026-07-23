@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from typing import Any
 
 """BYS360 Performans V2.1.1 merkezi kural motoru.
 
@@ -8,9 +10,6 @@ Bu servis, performans kurallarını kod içine dağınık sabitlemek yerine
 ``module_settings`` tablosundan okur. Tablo henüz yoksa veya veriye ulaşılamazsa
 BYS360'ın güvenli kurumsal varsayılanlarına döner.
 """
-
-from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

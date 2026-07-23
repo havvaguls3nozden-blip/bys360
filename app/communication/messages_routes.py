@@ -277,8 +277,6 @@ def messages_new_impl():
             flash("Alıcı bulunamadı.", "danger")
             return _render_message_new(users=users, recent_users=recent_users, body=body, badge_label=badge_label, icon_name=icon_name, accent_color=accent_color)
 
-        recipient.id == current_user.id
-
         if not body and not attachment_files:
             flash("Boş mesaj gönderilemez.", "warning")
             return _render_message_new(users=users, recent_users=recent_users, recipient_user_id=recipient_user_id, body=body, badge_label=badge_label, icon_name=icon_name, accent_color=accent_color)

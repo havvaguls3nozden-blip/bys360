@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 """BYS360 Performans V2.1.19 Admin / Performans Yetkilisi işlem akışı.
 
@@ -9,8 +10,6 @@ sıradaki işlem adımını sadeleştirir. Veritabanına yazmaz; görev üretmez
 bildirim göndermez, dönem oluşturmaz. Sadece mevcut merkez verilerinden
 okunabilir iş akışı üretir.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

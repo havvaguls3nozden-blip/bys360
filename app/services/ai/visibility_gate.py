@@ -1,15 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-
-"""Faz 10: AI yetki, KVKK maskeleme ve güvenli görünürlük kapısı.
-
-Bu servis yalnızca okuma yapar. AI ekranlarının hangi rol için hangi kapsamda
-okunabileceğini, KVKK maskeleme zorunluluğunu ve güvenli export sınırını
-tek yerde tanımlar. Ham istem/yanıt metni döndürmez, öneri uygulamaz, kayıt
-oluşturmaz, kayıt güncellemez ve nihai idari karar vermez.
-"""
-
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -18,6 +8,7 @@ from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     AIRecommendation,
@@ -28,6 +19,14 @@ from app.models import (
     UserMenuPermission,
 )
 from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module
+
+"""Faz 10: AI yetki, KVKK maskeleme ve güvenli görünürlük kapısı.
+
+Bu servis yalnızca okuma yapar. AI ekranlarının hangi rol için hangi kapsamda
+okunabileceğini, KVKK maskeleme zorunluluğunu ve güvenli export sınırını
+tek yerde tanımlar. Ham istem/yanıt metni döndürmez, öneri uygulamaz, kayıt
+oluşturmaz, kayıt güncellemez ve nihai idari karar vermez.
+"""
 
 # Faz 10 güvenlik sözleşmesi
 DB_WRITE_ENABLED = False

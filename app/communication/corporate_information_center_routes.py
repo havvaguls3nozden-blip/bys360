@@ -227,7 +227,10 @@ def corporate_information_center_celebration_excel_template():
     white = Font(color="FFFFFF", bold=True)
     thin = Side(style="thin", color="E8D7D7")
     for cell in ws[1]:
-        cell.fill = red; cell.font = white; cell.alignment = Alignment(horizontal="center"); cell.border = Border(bottom=thin)
+        cell.fill = red
+        cell.font = white
+        cell.alignment = Alignment(horizontal="center")
+        cell.border = Border(bottom=thin)
     for col, width in zip("ABCDEFG", [14, 26, 34, 18, 22, 16, 30], strict=False):
         ws.column_dimensions[col].width = width
     ws.freeze_panes = "A2"
@@ -242,9 +245,13 @@ def corporate_information_center_celebration_excel_template():
         ("İşlem", "Ön kontrol veri yazmaz; Uygula personel kartındaki tarih alanlarını günceller."),
     ]
     for r, item in enumerate(notes, start=3):
-        info.cell(r, 1, item[0]); info.cell(r, 2, item[1])
-    info.column_dimensions["A"].width = 28; info.column_dimensions["B"].width = 85
-    bio = BytesIO(); wb.save(bio); bio.seek(0)
+        info.cell(r, 1, item[0])
+        info.cell(r, 2, item[1])
+    info.column_dimensions["A"].width = 28
+    info.column_dimensions["B"].width = 85
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
     return send_file(bio, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, download_name="BYS360_Kutlama_Tarihleri_Sablonu.xlsx")
 
 

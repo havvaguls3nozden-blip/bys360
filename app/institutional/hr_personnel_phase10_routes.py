@@ -3,7 +3,7 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_CHILD_IMPORT
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
-
+import logging
 from collections import defaultdict
 from datetime import date, timedelta
 
@@ -20,17 +20,24 @@ from app.models import (
     User,
 )
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
 from .hr_personnel_extension_routes import (
     _current_scope_bundle,
-    _document_in_scope,
     _full_name,
     _normalize_text,
     _parse_date,
-    _reminder_type_label,
     _safe_int,
 )
+
+logger = logging.getLogger(__name__)
 
 MONTH_LABELS = {
     1: "Ocak", 2: "Şubat", 3: "Mart", 4: "Nisan", 5: "Mayıs", 6: "Haziran",
@@ -405,6 +412,7 @@ def hr_personnel_asset_transfer_save():
         db.session.commit()
         flash("Zimmet devri kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_asset_transfer_center", scope=request.form.get("scope") or "personal", user_id=request.form.get("to_user_id") or request.form.get("from_user_id")))

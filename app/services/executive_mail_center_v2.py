@@ -52,9 +52,12 @@ TASK_DEFINITIONS = [
 
 def _key(name: str) -> str: return f"{SETTING_PREFIX}.{name}"
 def _loads(raw: Any, default: Any):
-    if raw in (None, ""): return default
-    if isinstance(raw, (list, dict, bool, int, float)): return raw
-    try: return json.loads(str(raw))
+    if raw in (None, ""):
+        return default
+    if isinstance(raw, (list, dict, bool, int, float)):
+        return raw
+    try:
+        return json.loads(str(raw))
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:60")
         return default
@@ -63,22 +66,30 @@ def _get(name: str, default: Any=None): return get_setting_value(_key(name), def
 def _set(name: str, value: Any, actor_user_id: int|None=None): return set_setting_value(_key(name), value if isinstance(value, str) else _dumps(value), actor_user_id=actor_user_id)
 
 def ensure_defaults(actor_user_id: int|None=None) -> None:
-    if not _get("tasks"): _set("tasks", TASK_DEFINITIONS, actor_user_id)
-    if not _get("manager_recipient_ids"): _set("manager_recipient_ids", [], actor_user_id)
-    if not _get("staff_recipient_ids"): _set("staff_recipient_ids", [], actor_user_id)
-    if not _get("pilot_mode"): _set("pilot_mode", True, actor_user_id)
-    if not _get("location"): _set("location", DEFAULT_LOCATION, actor_user_id)
+    if not _get("tasks"):
+        _set("tasks", TASK_DEFINITIONS, actor_user_id)
+    if not _get("manager_recipient_ids"):
+        _set("manager_recipient_ids", [], actor_user_id)
+    if not _get("staff_recipient_ids"):
+        _set("staff_recipient_ids", [], actor_user_id)
+    if not _get("pilot_mode"):
+        _set("pilot_mode", True, actor_user_id)
+    if not _get("location"):
+        _set("location", DEFAULT_LOCATION, actor_user_id)
 
 def normalize_tasks(tasks: list[dict[str, Any]]|None=None) -> list[dict[str, Any]]:
     incoming = {str(t.get("key")): dict(t) for t in (tasks or []) if t.get("key")}
     out=[]
     for base in TASK_DEFINITIONS:
-        item=dict(base); item.update(incoming.get(base["key"], {}))
-        try: item["hour"] = max(0, min(23, int(item.get("hour", base["hour"]))))
+        item=dict(base)
+        item.update(incoming.get(base["key"], {}))
+        try:
+            item["hour"] = max(0, min(23, int(item.get("hour", base["hour"]))))
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:78")
             item["hour"] = base["hour"]
-        try: item["minute"] = max(0, min(59, int(item.get("minute", base["minute"]))))
+        try:
+            item["minute"] = max(0, min(59, int(item.get("minute", base["minute"]))))
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:80")
             item["minute"] = base["minute"]
@@ -98,13 +109,16 @@ def current_config() -> dict[str, Any]:
     }
 
 def _parse_ids(values: Any) -> list[int]:
-    if values is None: return []
-    if isinstance(values, str): values = values.replace(";", ",").split(",")
+    if values is None:
+        return []
+    if isinstance(values, str):
+        values = values.replace(";", ",").split(",")
     ids=[]
     for v in values:
         try:
             i=int(v)
-            if i not in ids: ids.append(i)
+            if i not in ids:
+                ids.append(i)
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:104")
             pass
@@ -113,12 +127,15 @@ def _parse_ids(values: Any) -> list[int]:
 def save_tasks_from_form(form: Any, actor_user_id: int|None=None) -> list[dict[str, Any]]:
     tasks=[]
     for base in TASK_DEFINITIONS:
-        key=base["key"]; item=dict(base)
+        key=base["key"]
+        item=dict(base)
         item["enabled"] = str(form.get(f"{key}_enabled") or "").lower() in {"1","on","true","yes","evet"}
         item["hour"] = form.get(f"{key}_hour") or base["hour"]
         item["minute"] = form.get(f"{key}_minute") or base["minute"]
         tasks.append(item)
-    tasks=normalize_tasks(tasks); _set("tasks", tasks, actor_user_id); return tasks
+    tasks=normalize_tasks(tasks)
+    _set("tasks", tasks, actor_user_id)
+    return tasks
 
 def save_recipients_from_form(form: Any, actor_user_id: int|None=None) -> dict[str, Any]:
     getlist = form.getlist if hasattr(form, "getlist") else lambda k: form.get(k, [])
@@ -129,37 +146,48 @@ def save_recipients_from_form(form: Any, actor_user_id: int|None=None) -> dict[s
 
 def save_location_from_form(form: Any, actor_user_id: int|None=None) -> dict[str, str]:
     loc={"city":(form.get("city") or DEFAULT_LOCATION["city"]).strip() or DEFAULT_LOCATION["city"], "latitude":(form.get("latitude") or DEFAULT_LOCATION["latitude"]).strip() or DEFAULT_LOCATION["latitude"], "longitude":(form.get("longitude") or DEFAULT_LOCATION["longitude"]).strip() or DEFAULT_LOCATION["longitude"]}
-    _set("location", loc, actor_user_id); return loc
+    _set("location", loc, actor_user_id)
+    return loc
 
 def list_users(search: str|None=None, limit: int=500) -> list[Any]:
-    if User is None: return []
+    if User is None:
+        return []
     q=User.query
     if hasattr(User, "is_active"):
-        try: q=q.filter(User.is_active.is_(True))
+        try:
+            q=q.filter(User.is_active.is_(True))
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:133")
             pass
     if search:
         from sqlalchemy import or_
-        s=f"%{search.strip()}%"; filters=[]
+        s=f"%{search.strip()}%"
+        filters=[]
         for attr in ("full_name","name","email","username","sicil_no","registry_no"):
             col=getattr(User, attr, None)
-            if col is not None: filters.append(col.ilike(s))
-        if filters: q=q.filter(or_(*filters))
+            if col is not None:
+                filters.append(col.ilike(s))
+        if filters:
+            q=q.filter(or_(*filters))
     getattr(User,"full_name",None) or getattr(User,"name",None) or User.id
     return q.order_by(User.id.asc()).limit(limit).all()
 
 def user_display_name(u: Any) -> str: return (getattr(u,"full_name",None) or getattr(u,"name",None) or getattr(u,"username",None) or f"Kullanıcı #{getattr(u,'id','-')}")
 def user_email(u: Any) -> str: return (getattr(u,"email",None) or "").strip().lower()
 def users_by_ids(ids: list[int]) -> list[Any]:
-    if not ids or User is None: return []
-    rows=User.query.filter(User.id.in_(ids)).all(); by={int(u.id):u for u in rows}
+    if not ids or User is None:
+        return []
+    rows=User.query.filter(User.id.in_(ids)).all()
+    by={int(u.id):u for u in rows}
     return [by[i] for i in ids if i in by]
 def selected_people() -> dict[str, list[Any]]:
-    cfg=current_config(); return {"managers": users_by_ids(cfg["manager_recipient_ids"]), "staff": users_by_ids(cfg["staff_recipient_ids"])}
+    cfg=current_config()
+    return {"managers": users_by_ids(cfg["manager_recipient_ids"]), "staff": users_by_ids(cfg["staff_recipient_ids"])}
 def get_recent_logs(limit: int=80) -> list[Any]:
-    if MailLog is None: return []
-    try: return MailLog.query.filter(MailLog.mail_type.like("exec_center_%")).order_by(MailLog.sent_at.desc(), MailLog.id.desc()).limit(limit).all()
+    if MailLog is None:
+        return []
+    try:
+        return MailLog.query.filter(MailLog.mail_type.like("exec_center_%")).order_by(MailLog.sent_at.desc(), MailLog.id.desc()).limit(limit).all()
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:155")
         return []
@@ -172,8 +200,10 @@ def fetch_weather(location: dict[str,str]|None=None) -> dict[str, Any]:
     loc=location or current_config().get("location") or DEFAULT_LOCATION
     params=urllib.parse.urlencode({"latitude":loc.get("latitude",DEFAULT_LOCATION["latitude"]),"longitude":loc.get("longitude",DEFAULT_LOCATION["longitude"]),"current":"temperature_2m,weather_code,wind_speed_10m","daily":"weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max","timezone":"Europe/Istanbul","forecast_days":2})
     try:
-        with urllib.request.urlopen(f"https://api.open-meteo.com/v1/forecast?{params}", timeout=15) as r: data=json.loads(r.read().decode("utf-8"))
-        cur=data.get("current") or {}; daily=data.get("daily") or {}
+        with urllib.request.urlopen(f"https://api.open-meteo.com/v1/forecast?{params}", timeout=15) as r:
+            data=json.loads(r.read().decode("utf-8"))
+        cur=data.get("current") or {}
+        daily=data.get("daily") or {}
         def arr(name, idx):
             vals=daily.get(name) or []
             return vals[idx] if len(vals)>idx else None
@@ -183,24 +213,34 @@ def fetch_weather(location: dict[str,str]|None=None) -> dict[str, Any]:
         return {"ok":False,"city":loc.get("city") or "Çanakkale","today":{},"tomorrow":{},"source":"fallback","error":str(exc)}
 
 def clothing_advice(weather: dict[str, Any], tomorrow: bool=False) -> str:
-    day=weather.get("tomorrow" if tomorrow else "today") or {}; text=(day.get("condition") or "").lower(); rain=day.get("rain"); temp=day.get("max") or day.get("temp")
+    day=weather.get("tomorrow" if tomorrow else "today") or {}
+    text=(day.get("condition") or "").lower()
+    rain=day.get("rain")
+    temp=day.get("max") or day.get("temp")
     try:
-        if rain is not None and int(rain)>=50: return "Yağış ihtimaline karşı şemsiye veya yağmurluk bulundurmanız önerilir."
+        if rain is not None and int(rain)>=50:
+            return "Yağış ihtimaline karşı şemsiye veya yağmurluk bulundurmanız önerilir."
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:179")
         pass
-    if "yağmur" in text or "sağanak" in text: return "Yağış ihtimaline karşı şemsiye veya yağmurluk bulundurmanız önerilir."
+    if "yağmur" in text or "sağanak" in text:
+        return "Yağış ihtimaline karşı şemsiye veya yağmurluk bulundurmanız önerilir."
     try:
         t=float(temp)
-        if t>=28: return "Hafif ve rahat kıyafetler tercih edilebilir; dış görevlerde güneşten korunmak faydalı olur."
-        if t<=12: return "Serin hava nedeniyle katmanlı ve koruyucu kıyafet tercih edilmesi önerilir."
+        if t>=28:
+            return "Hafif ve rahat kıyafetler tercih edilebilir; dış görevlerde güneşten korunmak faydalı olur."
+        if t<=12:
+            return "Serin hava nedeniyle katmanlı ve koruyucu kıyafet tercih edilmesi önerilir."
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:185")
         pass
     return "Gün içinde rahat ve mevsime uygun kıyafet tercih edilmesi yeterli olacaktır."
 
 def build_body(task: dict[str, Any], recipient: Any|None=None) -> str:
-    d=datetime.now().strftime("%d.%m.%Y"); name=user_display_name(recipient) if recipient else "Çalışma arkadaşımız"; w=fetch_weather(); city=w.get("city","Çanakkale")
+    d=datetime.now().strftime("%d.%m.%Y")
+    name=user_display_name(recipient) if recipient else "Çalışma arkadaşımız"
+    w=fetch_weather()
+    city=w.get("city","Çanakkale")
     if task["audience"]=="managers":
         intro="Günaydın. BYS360 yönetici özeti kapsamında güne başlarken dikkat edilmesi gereken başlıklar aşağıda sunulmuştur." if task["period"]=="morning" else "İyi akşamlar. BYS360 gün sonu yönetici özeti kapsamında günün genel durumu ve ertesi gün için dikkat notu aşağıda sunulmuştur."
         return f"""Sayın Yönetici,\n\n{intro}\n\nTarih: {d}\n\nÖzet Başlıkları:\n- BYS360 otomatik bildirim ve mail altyapısı çalışır durumdadır.\n- Bekleyen süreçler, destek talepleri, geri bildirimler ve performans görünürlüğü Yönetici Özeti ekranından takip edilmelidir.\n- Mail gönderim kayıtları Mail Logları alanında izlenebilir.\n\nHava Durumu ({city}):\n- Bugün: {w.get('today',{}).get('condition','Bilgi alınamadı')} | {w.get('today',{}).get('min','-')}°C / {w.get('today',{}).get('max','-')}°C\n- Yarın: {w.get('tomorrow',{}).get('condition','Bilgi alınamadı')} | {w.get('tomorrow',{}).get('min','-')}°C / {w.get('tomorrow',{}).get('max','-')}°C\n\nNot: Bu e-posta BYS360 tarafından otomatik üretilmiştir. Nihai idari değerlendirme ve karar yetkili yöneticilere aittir.\n\nÇanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı\nBYS360 Yönetici Özeti"""
@@ -211,7 +251,8 @@ def build_body(task: dict[str, Any], recipient: Any|None=None) -> str:
     return f"""Merhaba {name},\n\nİyi akşamlar. Bugünkü çalışmalarınız için teşekkür ederiz.\n\nYarın için beklenen hava durumu ({city}):\n- Durum: {w.get('tomorrow',{}).get('condition','Bilgi alınamadı')}\n- Sıcaklık: {w.get('tomorrow',{}).get('min','-')}°C / {w.get('tomorrow',{}).get('max','-')}°C\n- Yağış ihtimali: %{w.get('tomorrow',{}).get('rain','-')}\n\nYarın için öneri:\n{clothing_advice(w, tomorrow=True)}\n\nİyi akşamlar dileriz.\n\nBYS360"""
 
 def recipients_for_task(task: dict[str, Any]) -> list[Any]:
-    cfg=current_config(); ids=cfg["manager_recipient_ids"] if task["audience"]=="managers" else cfg["staff_recipient_ids"]
+    cfg=current_config()
+    ids=cfg["manager_recipient_ids"] if task["audience"]=="managers" else cfg["staff_recipient_ids"]
     return [u for u in users_by_ids(ids) if user_email(u)]
 
 
@@ -242,40 +283,54 @@ def run_task(task_key: str, dry_run: bool=False, actor_user_id: int|None=None, o
             "message": "Hafta sonu olduğu için personel gün ortası maili gönderilmedi.",
         }
     # BYS360_PHASE4B_WEEKEND_MAIL_GUARD_V1_END
-    ensure_defaults(actor_user_id); tasks={t["key"]:t for t in current_config()["tasks"]}; task=tasks.get(task_key)
-    if not task: return {"ok":False,"task_key":task_key,"error":"Görev bulunamadı.","sent":0,"failed":0}
-    if not task.get("enabled") and not dry_run: return {"ok":True,"task_key":task_key,"skipped":True,"reason":"Görev pasif.","sent":0,"failed":0}
+    ensure_defaults(actor_user_id)
+    tasks={t["key"]:t for t in current_config()["tasks"]}
+    task=tasks.get(task_key)
+    if not task:
+        return {"ok":False,"task_key":task_key,"error":"Görev bulunamadı.","sent":0,"failed":0}
+    if not task.get("enabled") and not dry_run:
+        return {"ok":True,"task_key":task_key,"skipped":True,"reason":"Görev pasif.","sent":0,"failed":0}
     recipients=users_by_ids([only_user_id]) if only_user_id else recipients_for_task(task)
     result={"ok":True,"task_key":task_key,"task_title":task["title"],"dry_run":dry_run,"sent":0,"failed":0,"items":[]}
     subject=task.get("subject","BYS360 Bilgilendirme | {date}").format(date=datetime.now().strftime("%d.%m.%Y"))
     for user in recipients:
-        email=user_email(user); body=build_body(task,user)
-        if dry_run: ok,msg=True,"Kuru çalışma: mail gönderilmedi."
-        elif send_email is None: ok,msg=False,"send_email servisi bulunamadı."
-        else: ok,msg=send_email(email, subject, body)
+        email=user_email(user)
+        body=build_body(task,user)
+        if dry_run:
+            ok,msg=True,"Kuru çalışma: mail gönderilmedi."
+        elif send_email is None:
+            ok,msg=False,"send_email servisi bulunamadı."
+        else:
+            ok,msg=send_email(email, subject, body)
         if create_mail_log is not None and db is not None:
             try:
-                create_mail_log(mail_type=f"exec_center_{task_key}", recipient_email=email, subject=subject, body=body, user_id=getattr(user,"id",None), sent_by_id=actor_user_id, is_success=bool(ok), error_message=None if ok else msg); db.session.commit()
+                create_mail_log(mail_type=f"exec_center_{task_key}", recipient_email=email, subject=subject, body=body, user_id=getattr(user,"id",None), sent_by_id=actor_user_id, is_success=bool(ok), error_message=None if ok else msg)
+                db.session.commit()
             except Exception:
                 logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=209")
-                try: db.session.rollback()
+                try:
+                    db.session.rollback()
                 except Exception:
                     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/executive_mail_center_v2.py:221")
                     pass
         result["items"].append({"email":email,"name":user_display_name(user),"ok":ok,"message":msg})
-        if ok: result["sent"]+=1
-        else: result["failed"]+=1
+        if ok:
+            result["sent"]+=1
+        else:
+            result["failed"]+=1
     result["ok"]=result["failed"]==0
     return result
 
 def run_due_tasks(actor_user_id: int|None=None, dry_run: bool=False) -> dict[str, Any]:
-    now=datetime.now(); results=[]
+    now=datetime.now()
+    results=[]
     for task in current_config()["tasks"]:
         if task.get("enabled") and int(task.get("hour"))==now.hour and int(task.get("minute"))==now.minute:
             results.append(run_task(task["key"], dry_run=dry_run, actor_user_id=actor_user_id))
     return {"ok":True,"checked_at":now.isoformat(timespec="seconds"),"matched":len(results),"results":results}
 
 def dashboard_context(search: str|None=None) -> dict[str, Any]:
-    cfg=current_config(); people=selected_people()
+    cfg=current_config()
+    people=selected_people()
     return {"config":cfg,"tasks":cfg["tasks"],"manager_recipients":people["managers"],"staff_recipients":people["staff"],"users":list_users(search=search, limit=500),"search":search or "","logs":get_recent_logs(80),"location":cfg["location"]}
 

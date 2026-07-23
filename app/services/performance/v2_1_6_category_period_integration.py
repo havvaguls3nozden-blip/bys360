@@ -1,23 +1,14 @@
 from __future__ import annotations
 
-import logging
-
-from app import db
-
-"""BYS360 Performans V2.1.6 kategori dönem entegrasyonu.
-
-Bu servis, V2.1.5 kategori dönem kapsam planını gerçek PerformancePeriod
-kaydıyla bağlar ve görev üretimi ön entegrasyon raporu üretir. Bu faz doğrudan
-`evaluation_assignments` yazmaz.
-"""
-
 import json
+import logging
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
 from sqlalchemy import inspect, text
 
+from app import db
 from app.models import PerformancePeriod, User
 from app.services.performance.period_scope_assignment import employee_matches_period_scope
 from app.services.performance.v2_1_2_category_engine import canonical_category_key, list_categories
@@ -27,6 +18,13 @@ from app.services.performance.v2_1_5_category_period_scope import (
     list_category_period_scope_plans,
     list_plan_items,
 )
+
+"""BYS360 Performans V2.1.6 kategori dönem entegrasyonu.
+
+Bu servis, V2.1.5 kategori dönem kapsam planını gerçek PerformancePeriod
+kaydıyla bağlar ve görev üretimi ön entegrasyon raporu üretir. Bu faz doğrudan
+`evaluation_assignments` yazmaz.
+"""
 
 logger = logging.getLogger(__name__)
 

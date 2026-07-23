@@ -1,36 +1,47 @@
 from __future__ import annotations
 
-
 import logging
-
-"""Performans hiyerarşi route ailesi — ağaç, atama, ayar, tekil düzenleme."""
-
 from collections import OrderedDict
 
-from flask import flash, redirect, request, url_for, current_app
+from flask import current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
 from app.extensions import db
-from app.models import PerformancePeriod, User, PerformanceWeightConfig
+from app.models import PerformancePeriod, PerformanceWeightConfig, User
 from app.route_registry import main_bp
-from app.route_support import admin_required, manager_required, menu_key_required, safe_db_rollback, safe_render
-from app.services.hierarchy_admin_service import sync_organization_units_from_users
+from app.route_support import (
+    admin_required,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
+from app.services.ai.dashboard_panels import (
+    build_hierarchy_ai_panel,
+    build_hierarchy_assignment_person_ai_panel,
+    build_hierarchy_bulk_edit_ai_panel,
+    build_hierarchy_tree_ai_panel,
+)
 from app.services.auto_hierarchy_service import auto_apply_manager_chains
-from app.services.hierarchy_rulebook_service import build_lookup, desired_manager_sicils
-from app.services.personnel_sync_service import canonical_role_value
+from app.services.hierarchy_admin_service import sync_organization_units_from_users
 from app.services.performance.context import build_period_weight_context, list_performance_periods
-from app.services.performance.reason_codes import is_informational_reason, reason_message, reason_payload
+from app.services.performance.reason_codes import (
+    is_informational_reason,
+    reason_message,
+    reason_payload,
+)
 from app.services.performance_service import (
+    _safe_str,
     analyze_hierarchy_rows,
     generate_assignments_for_active_period,
     get_period_level_3_flags,
     normalize_weight_inputs,
     recalculate_all_evaluations,
-    _safe_str,
 )
+from app.services.personnel_sync_service import canonical_role_value
 
-from app.services.ai.dashboard_panels import build_hierarchy_ai_panel, build_hierarchy_tree_ai_panel, build_hierarchy_bulk_edit_ai_panel, build_hierarchy_assignment_person_ai_panel
+"""Performans hiyerarşi route ailesi — ağaç, atama, ayar, tekil düzenleme."""
 logger = logging.getLogger(__name__)
 
 def _build_surface_scope_context(user, raw_scope):

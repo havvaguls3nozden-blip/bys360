@@ -2,16 +2,6 @@ from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
 
-"""BYS360 feedback service.
-
-Bu dosya iki farkli geri bildirim katmanini ayni yerde yasar halde tutar:
-1) Performans modülündeki klasik geri bildirim talebi / randevu akisi
-2) Kurumsal Geri Bildirim modülündeki kampanya / nabiz / aksiyon akisi
-
-Faz paketleri kurulduktan sonra eski import yüzeyini korumak icin
-uyumluluk fonksiyonlari bilerek ayni dosyada tutuldu.
-"""
-
 import secrets
 from collections import defaultdict
 from copy import deepcopy
@@ -47,6 +37,16 @@ from app.services.bys360_notification_bridge import (
 from app.services.shared_cache_store import delete_prefix as _shared_cache_delete_prefix
 from app.services.shared_cache_store import get_json as _shared_cache_get_json
 from app.services.shared_cache_store import set_json as _shared_cache_set_json
+
+"""BYS360 feedback service.
+
+Bu dosya iki farkli geri bildirim katmanini ayni yerde yasar halde tutar:
+1) Performans modülündeki klasik geri bildirim talebi / randevu akisi
+2) Kurumsal Geri Bildirim modülündeki kampanya / nabiz / aksiyon akisi
+
+Faz paketleri kurulduktan sonra eski import yüzeyini korumak icin
+uyumluluk fonksiyonlari bilerek ayni dosyada tutuldu.
+"""
 
 # ---------------------------------------------------------------------------
 # Legacy performance feedback request helpers
@@ -217,9 +217,7 @@ def campaign_is_open(campaign: FeedbackCampaign) -> bool:
         return False
     if campaign.start_at and campaign.start_at > now:
         return False
-    if campaign.end_at and campaign.end_at < now:
-        return False
-    return True
+    return not (campaign.end_at and campaign.end_at < now)
 
 
 def _matches_assignment(user, assignment: FeedbackCampaignAssignment) -> bool:

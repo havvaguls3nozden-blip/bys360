@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-
 import logging
+from importlib import import_module
+
 logger = logging.getLogger(__name__)
 
 """Communication required phase route bridge.
@@ -11,8 +12,6 @@ Optional phase route modulleri manifestte ayrica kalir. Bu dosya required
 route tarafini tek sahipte toplar ve sonraki gercek govde eritmesi icin
 hafif bir merkez saglar.
 """
-
-from importlib import import_module
 
 _REQUIRED = [
     ".phase1_routes",

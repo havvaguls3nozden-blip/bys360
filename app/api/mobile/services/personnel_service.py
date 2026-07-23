@@ -14,12 +14,12 @@ def _personnel_domain_module():
 
 
 def mobile_personnel_all(*args, **kwargs):
-    return getattr(_routes_module(), "_bys360_legacy_mobile_personnel_all")(*args, **kwargs)
+    return _routes_module()._bys360_legacy_mobile_personnel_all(*args, **kwargs)
 
 
 def mobile_personnel_create(*args, **kwargs):
-    return getattr(_personnel_domain_module(), "_bys360_legacy_mobile_personnel_create")(*args, **kwargs)
+    return _personnel_domain_module()._bys360_legacy_mobile_personnel_create(*args, **kwargs)
 
 
 def _mobile_created_personnel_row(*args, **kwargs):
-    return getattr(_personnel_domain_module(), "_bys360_legacy__mobile_created_personnel_row")(*args, **kwargs)
+    return _personnel_domain_module()._bys360_legacy__mobile_created_personnel_row(*args, **kwargs)

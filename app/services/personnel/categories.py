@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 """BYS360 personel kategori servisleri.
 
 Faz 2 kalıcı sözleşme:
@@ -7,8 +9,6 @@ Faz 2 kalıcı sözleşme:
 - Eski users.personnel_category metin alanı ile users.performance_category_id FK alanı birlikte yürütülür.
 - Rapor/karne tarafı kişi detayı sızdırmadan kategori eşleştirmesi yapar.
 """
-
-from typing import Any
 
 PERSONNEL_CATEGORY_DEFAULTS: tuple[str, ...] = (
     "Güvenlik",

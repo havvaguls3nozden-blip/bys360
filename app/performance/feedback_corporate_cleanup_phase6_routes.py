@@ -6,7 +6,6 @@ from flask_login import current_user, login_required
 from app.route_registry import main_bp
 from app.services.performance.feedback_corporate_cleanup_phase6 import build_phase6_context
 
-
 MANAGER_ROLES = {
     "admin", "super_admin", "system_admin", "sistem_yoneticisi",
     "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir",

@@ -13,7 +13,6 @@ from sqlalchemy import inspect, or_
 
 from app.extensions import db
 from app.models import (
-    OrganizationUnit,
     SupportCategory,
     SupportFeedbackRating,
     SupportHelpArticle,

@@ -1,19 +1,18 @@
 from __future__ import annotations
 
+import importlib.util
 import logging
+import py_compile
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
 
 """BYS360 Performans Amir Kural Matrisi Final Regresyon Kapısı.
 
 Bu modül canlı davranış değiştirmez. Faz 0-6 boyunca eklenen tüm performans
 amir kural matrisi kapılarını tek bir kapanış denetimi altında toplar.
 """
-
-import importlib.util
-import py_compile
-import sys
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

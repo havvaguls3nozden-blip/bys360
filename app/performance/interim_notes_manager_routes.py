@@ -59,22 +59,26 @@ def _cols(table):
         return {str(r[1]) for r in rows}
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        db.session.rollback(); return set()
+        db.session.rollback()
+        return set()
 
 def _first(cols, names):
     for n in names:
-        if n in cols: return n
+        if n in cols:
+            return n
     return None
 
 def _name_expr(alias, cols):
     parts = []
     for c in ['full_name_cache','full_name','name']:
-        if c in cols: parts.append(f"NULLIF({alias}.{c}, '')")
+        if c in cols:
+            parts.append(f"NULLIF({alias}.{c}, '')")
     if 'ad' in cols or 'soyad' in cols:
         ad = f"COALESCE({alias}.ad, '')" if 'ad' in cols else "''"
         soyad = f"COALESCE({alias}.soyad, '')" if 'soyad' in cols else "''"
         parts.append(f"NULLIF(TRIM({ad} || ' ' || {soyad}), '')")
-    if 'email' in cols: parts.append(f"NULLIF({alias}.email, '')")
+    if 'email' in cols:
+        parts.append(f"NULLIF({alias}.email, '')")
     parts.append("'Personel'")
     return 'COALESCE(' + ', '.join(parts) + ')'
 
@@ -83,7 +87,8 @@ def _col(alias, cols, name, default="''"):
 
 def _periods():
     cols = _cols('performance_periods')
-    if not cols or 'id' not in cols: return []
+    if not cols or 'id' not in cols:
+        return []
     title = _first(cols, ['title','name','period_name']) or 'id'
     order = _first(cols, ['start_date','created_at','id']) or 'id'
     try:
@@ -91,44 +96,62 @@ def _periods():
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
-        try: return db.session.execute(text(f"SELECT id, {title} AS title FROM performance_periods ORDER BY id DESC LIMIT 100")).mappings().all()
-        except Exception: db.session.rollback(); return []
+        try:
+            return db.session.execute(text(f"SELECT id, {title} AS title FROM performance_periods ORDER BY id DESC LIMIT 100")).mappings().all()
+        except Exception:
+            db.session.rollback()
+            return []
 
 def _people():
     cols = _cols('users')
-    if not cols or 'id' not in cols: return []
+    if not cols or 'id' not in cols:
+        return []
     name = _name_expr('u', cols)
     select = [
         'u.id AS id', f'{name} AS full_name', _col('u', cols, 'sicil_no') + ' AS sicil_no',
         _col('u', cols, 'unvan') + ' AS unvan', _col('u', cols, 'birim') + ' AS birim', _col('u', cols, 'ust_birim') + ' AS ust_birim'
     ]
     where, params = [], {}
-    if 'is_active' in cols: where.append('COALESCE(u.is_active, TRUE)=TRUE')
+    if 'is_active' in cols:
+        where.append('COALESCE(u.is_active, TRUE)=TRUE')
     if not _is_admin_like():
         uid, sicil = getattr(current_user, 'id', None), str(getattr(current_user, 'sicil_no', '') or '').strip()
         scope = []
         for c in ['yonetici_sicil','ikinci_yonetici_sicil','ucuncu_yonetici_sicil','manager_sicil_no','supervisor_sicil_no']:
-            if c in cols and sicil: scope.append(f'u.{c}=:sicil')
+            if c in cols and sicil:
+                scope.append(f'u.{c}=:sicil')
         for c in ['manager_id','supervisor_id','direct_manager_id','first_manager_id','second_manager_id','third_manager_id']:
-            if c in cols and uid is not None: scope.append(f'u.{c}=:uid')
-        if sicil: params['sicil'] = sicil
-        if uid is not None: params['uid'] = int(uid)
-        if scope: where.append('(' + ' OR '.join(scope) + ')')
-        else: return []
+            if c in cols and uid is not None:
+                scope.append(f'u.{c}=:uid')
+        if sicil:
+            params['sicil'] = sicil
+        if uid is not None:
+            params['uid'] = int(uid)
+        if scope:
+            where.append('(' + ' OR '.join(scope) + ')')
+        else:
+            return []
     sql = 'SELECT ' + ', '.join(select) + ' FROM users u'
-    if where: sql += ' WHERE ' + ' AND '.join(where)
+    if where:
+        sql += ' WHERE ' + ' AND '.join(where)
     sql += ' ORDER BY full_name ASC LIMIT 1500'
-    try: return db.session.execute(text(sql), params).mappings().all()
-    except Exception: db.session.rollback(); return []
+    try:
+        return db.session.execute(text(sql), params).mappings().all()
+    except Exception:
+        db.session.rollback()
+        return []
 
 def _allowed_employee(employee_id, people):
-    if not employee_id: return False
-    if _is_admin_like(): return True
+    if not employee_id:
+        return False
+    if _is_admin_like():
+        return True
     return any(int(p.get('id')) == int(employee_id) for p in people if p.get('id') is not None)
 
 def _notes(people, employee_id=None, period_id=None, note_type=None, query=None):
     cols, ucols, pcols = _cols('performance_interim_notes'), _cols('users'), _cols('performance_periods')
-    if not cols or 'id' not in cols: return []
+    if not cols or 'id' not in cols:
+        return []
     emp = 'COALESCE(n.employee_id, n.employee_user_id)' if {'employee_id','employee_user_id'} <= cols else (f"n.{_first(cols, ['employee_id','employee_user_id'])}" if _first(cols, ['employee_id','employee_user_id']) else 'NULL')
     per = 'n.period_id' if 'period_id' in cols else 'NULL'
     typ = f"n.{_first(cols, ['note_type','type'])}" if _first(cols, ['note_type','type']) else "'genel_gozlem'"
@@ -145,18 +168,29 @@ def _notes(people, employee_id=None, period_id=None, note_type=None, query=None)
         author_join = f' LEFT JOIN users au ON au.id = n.{cby}'
         author = _name_expr('au', ucols)
     where, params = [], {}
-    if active: where.append(f'COALESCE(n.{active}, TRUE)=TRUE')
+    if active:
+        where.append(f'COALESCE(n.{active}, TRUE)=TRUE')
     ids = [int(p.get('id')) for p in people if p.get('id') is not None]
     if employee_id:
-        where.append(f'{emp}=:employee_id'); params['employee_id'] = int(employee_id)
+        where.append(f'{emp}=:employee_id')
+        params['employee_id'] = int(employee_id)
     elif not _is_admin_like():
-        if not ids: return []
-        if db.engine.dialect.name == 'postgresql': where.append(f'{emp}=ANY(:scope_ids)'); params['scope_ids'] = ids
-        else: where.append(f'{emp} IN ({','.join(str(i) for i in ids)})')
-    if period_id: where.append(f'({per}=:period_id OR {per} IS NULL)'); params['period_id'] = int(period_id)
-    if note_type: where.append(f'{typ}=:note_type'); params['note_type'] = note_type
+        if not ids:
+            return []
+        if db.engine.dialect.name == 'postgresql':
+            where.append(f'{emp}=ANY(:scope_ids)')
+            params['scope_ids'] = ids
+        else:
+            where.append(f'{emp} IN ({','.join(str(i) for i in ids)})')
+    if period_id:
+        where.append(f'({per}=:period_id OR {per} IS NULL)')
+        params['period_id'] = int(period_id)
+    if note_type:
+        where.append(f'{typ}=:note_type')
+        params['note_type'] = note_type
     if query:
-        where.append(f'(LOWER({title}) LIKE :q OR LOWER({body}) LIKE :q OR LOWER({uname}) LIKE :q)'); params['q'] = '%' + query.lower() + '%'
+        where.append(f'(LOWER({title}) LIKE :q OR LOWER({body}) LIKE :q OR LOWER({uname}) LIKE :q)')
+        params['q'] = '%' + query.lower() + '%'
     sql = f"""
         SELECT n.id AS id, {emp} AS employee_id, {per} AS period_id, {typ} AS note_type,
                {title} AS title, {body} AS note_body, {include} AS include_in_scorecard,
@@ -167,28 +201,40 @@ def _notes(people, employee_id=None, period_id=None, note_type=None, query=None)
         LEFT JOIN performance_periods p ON p.id = {per}
         {author_join}
     """
-    if where: sql += ' WHERE ' + ' AND '.join(where)
+    if where:
+        sql += ' WHERE ' + ' AND '.join(where)
     sql += ' ORDER BY created_at DESC NULLS LAST, n.id DESC LIMIT 250'
-    try: rows = db.session.execute(text(sql), params).mappings().all()
+    try:
+        rows = db.session.execute(text(sql), params).mappings().all()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
-        try: rows = db.session.execute(text(sql.replace(' DESC NULLS LAST', ' DESC')), params).mappings().all()
-        except Exception: db.session.rollback(); return []
+        try:
+            rows = db.session.execute(text(sql.replace(' DESC NULLS LAST', ' DESC')), params).mappings().all()
+        except Exception:
+            db.session.rollback()
+            return []
     out = []
     for r in rows:
-        d = dict(r); key = d.get('note_type') or 'genel_gozlem'
-        d['note_type_label'] = NOTE_LABELS.get(key, key); d['note_type_icon'] = NOTE_ICONS.get(key, 'fa-regular fa-note-sticky')
+        d = dict(r)
+        key = d.get('note_type') or 'genel_gozlem'
+        d['note_type_label'] = NOTE_LABELS.get(key, key)
+        d['note_type_icon'] = NOTE_ICONS.get(key, 'fa-regular fa-note-sticky')
         out.append(d)
     return out
 
 def _summary(notes):
-    counts = {k: 0 for k, *_ in NOTE_TYPES}; scorecard = 0; latest = None
+    counts = {k: 0 for k, *_ in NOTE_TYPES}
+    scorecard = 0
+    latest = None
     for n in notes:
         k = n.get('note_type') or 'genel_gozlem'
-        if k in counts: counts[k] += 1
-        if n.get('include_in_scorecard'): scorecard += 1
-        if not latest and n.get('created_at'): latest = n.get('created_at')
+        if k in counts:
+            counts[k] += 1
+        if n.get('include_in_scorecard'):
+            scorecard += 1
+        if not latest and n.get('created_at'):
+            latest = n.get('created_at')
     return {'total': len(notes), 'scorecard': scorecard, 'latest': latest, 'type_counts': counts}
 
 def _access_denied():
@@ -198,7 +244,6 @@ def _access_denied():
 @main_bp.route('/performans/donem-ici-notlar', endpoint='performance_interim_notes_tr')
 @login_required
 def performance_interim_notes():
-    from datetime import datetime as _dt
     from flask import request, redirect, render_template, flash
     from flask_login import current_user
     from sqlalchemy import text as _sql_text
@@ -385,11 +430,17 @@ def performance_interim_notes():
 @main_bp.route('/performans/donem-ici-notlar/kaydet', methods=['POST'], endpoint='performance_interim_notes_create_tr')
 @login_required
 def performance_interim_notes_create():
-    if not _can_access(): return _access_denied()
-    people = _people(); emp = _int(request.form.get('employee_id')); per = _int(request.form.get('period_id'))
-    ntype = (request.form.get('note_type') or 'genel_gozlem').strip(); title = (request.form.get('title') or NOTE_LABELS.get(ntype, 'Dönem İçi Not')).strip()[:255]
-    body = (request.form.get('note') or request.form.get('note_text') or '').strip(); include = bool(request.form.get('include_in_scorecard') or request.form.get('visible_on_scorecard'))
-    if ntype not in NOTE_LABELS: ntype = 'genel_gozlem'
+    if not _can_access():
+        return _access_denied()
+    people = _people()
+    emp = _int(request.form.get('employee_id'))
+    per = _int(request.form.get('period_id'))
+    ntype = (request.form.get('note_type') or 'genel_gozlem').strip()
+    title = (request.form.get('title') or NOTE_LABELS.get(ntype, 'Dönem İçi Not')).strip()[:255]
+    body = (request.form.get('note') or request.form.get('note_text') or '').strip()
+    include = bool(request.form.get('include_in_scorecard') or request.form.get('visible_on_scorecard'))
+    if ntype not in NOTE_LABELS:
+        ntype = 'genel_gozlem'
     if not _allowed_employee(emp, people):
         flash('Bu personel için dönem içi not ekleme yetkiniz bulunmamaktadır.', 'warning')
         return redirect(url_for('main.performance_interim_notes'))
@@ -403,9 +454,11 @@ def performance_interim_notes_create():
             VALUES
             (:emp, :emp, :per, :uid, :uid, :uid, :ntype, :title, :title, :body, :body, :body, 'manager_scope', 'manager_scope', FALSE, FALSE, :inc, :inc, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         """), {'emp': emp, 'per': per, 'uid': getattr(current_user, 'id', None), 'ntype': ntype, 'title': title, 'body': body, 'inc': include})
-        db.session.commit(); flash('Dönem içi not kaydedildi. Bu kayıt puan üretmez; değerlendirme döneminde hatırlatma ve süreç hafızası için kullanılır.', 'success')
+        db.session.commit()
+        flash('Dönem içi not kaydedildi. Bu kayıt puan üretmez; değerlendirme döneminde hatırlatma ve süreç hafızası için kullanılır.', 'success')
     except SQLAlchemyError as exc:
-        db.session.rollback(); flash(f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}', 'danger')
+        db.session.rollback()
+        flash(f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}', 'danger')
     return redirect(url_for('main.performance_interim_notes', employee_id=emp or '', period_id=per or ''))
 
 # BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND

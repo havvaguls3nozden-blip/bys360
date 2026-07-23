@@ -1,18 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
-from app.services.runtime_page_cache_v4 import bys360_get_page_cache, bys360_set_page_cache  # BYS360_RUNTIME_PAGE_CACHE_V4
-"""BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü route ailesi.
-
-Faz 7.5 kapsamı:
-- Personel yalnızca kendi geçmiş karne arşivini görür.
-- Yönetici yalnızca kendi yetki kapsamındaki geçmişi görür.
-- Detay sayfası doğrudan URL ile kapsam dışına açılmaz.
-- Excel ve manuel giriş yetkili kullanıcılarla sınırlı kalır.
-"""
-
 from io import BytesIO
 
 from flask import flash, redirect, request, send_file, url_for
@@ -37,6 +25,19 @@ from app.services.performance.archive_service import (
     import_archive_results_from_excel,
     manual_entry_employee_options,
 )
+from app.services.runtime_page_cache_v4 import (  # BYS360_RUNTIME_PAGE_CACHE_V4
+    bys360_get_page_cache,
+    bys360_set_page_cache,
+)
+
+"""BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü route ailesi.
+
+Faz 7.5 kapsamı:
+- Personel yalnızca kendi geçmiş karne arşivini görür.
+- Yönetici yalnızca kendi yetki kapsamındaki geçmişi görür.
+- Detay sayfası doğrudan URL ile kapsam dışına açılmaz.
+- Excel ve manuel giriş yetkili kullanıcılarla sınırlı kalır.
+"""
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE7_4_PERFORMANCE_ARCHIVE_PERSONNEL_VISIBILITY_ROUTES

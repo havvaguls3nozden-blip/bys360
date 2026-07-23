@@ -3,7 +3,6 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
-
 import csv
 import io
 
@@ -12,10 +11,16 @@ from flask_login import login_required
 
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_render
-from app.services.ai.governance_settings import get_ai_governance_settings, save_ai_governance_settings
+from app.services.ai.governance_settings import (
+    get_ai_governance_settings,
+    save_ai_governance_settings,
+)
+from app.services.ai.notification_priority import (
+    build_ai_notification_priority_snapshot,
+    export_ai_notification_priority_rows,
+)
 from app.services.ai.schema_guard import get_ai_schema_status
 from app.services.ai.weekly_summary import build_ai_weekly_summary
-from app.services.ai.notification_priority import build_ai_notification_priority_snapshot, export_ai_notification_priority_rows
 
 
 def _safe_int(value: str | None, default: int, minimum: int, maximum: int) -> int:
@@ -180,7 +185,10 @@ def admin_ai_visual_reports():
 @menu_key_required('ai_center')
 def admin_ai_visual_reports_export():
     """Faz 8 rapor kartlarını salt-okunur CSV olarak dışa verir."""
-    from app.services.ai.visual_reports import build_ai_visual_report_snapshot, export_visual_report_rows
+    from app.services.ai.visual_reports import (
+        build_ai_visual_report_snapshot,
+        export_visual_report_rows,
+    )
 
     snapshot = build_ai_visual_report_snapshot(
         lookback_days=request.args.get('lookback_days') or 30,

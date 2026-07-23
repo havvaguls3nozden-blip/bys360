@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
 import logging
-
-logger = logging.getLogger(__name__)
-"""Performans geri bildirim, görüşme ve audit route ailesi."""
-
 from datetime import datetime
 
 from flask import current_app, flash, jsonify, redirect, request, url_for
@@ -13,10 +8,16 @@ from flask_login import current_user, login_required
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import FeedbackMeeting, FeedbackRequest, PerformancePeriod
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
+from app.services.ai.dashboard_panels import (
+    build_feedback_meetings_ai_panel,
+    build_feedback_requests_ai_panel,
+    build_feedback_schedule_ai_panel,
+)
 from app.services.feedback_service import (
     can_create_feedback_request,
     get_feedback_evaluation,
@@ -51,6 +52,11 @@ from app.services.performance.feedback_ops_service import (
     build_feedback_operations_dashboard,
     build_feedback_schedule_preview,
 )
+from app.services.performance.final_pack_service import (
+    build_go_live_smoke_report,
+    export_go_live_management_brief_txt,
+    export_go_live_smoke_csv,
+)
 from app.services.performance.go_live_service import build_performance_go_live_center
 from app.services.performance.uat_service import (
     build_go_live_uat_report,
@@ -58,18 +64,9 @@ from app.services.performance.uat_service import (
     export_go_live_release_packet_txt,
     export_go_live_uat_txt,
 )
-from app.services.performance.final_pack_service import (
-    build_go_live_smoke_report,
-    export_go_live_management_brief_txt,
-    export_go_live_smoke_csv,
-)
 from app.services.pilot_execution_service import build_pilot_execution_context
 from app.services.pilot_readiness_service import build_pilot_readiness_context
-from app.services.ai.dashboard_panels import (
-    build_feedback_meetings_ai_panel,
-    build_feedback_requests_ai_panel,
-    build_feedback_schedule_ai_panel,
-)
+
 from .feedback_helpers import (
     _feedback_manager_ids,
     _find_feedback_meeting_conflict,
@@ -88,6 +85,9 @@ from .feedback_helpers import (
     _serialize_feedback_meeting_state,
     _serialize_feedback_request_state,
 )
+
+logger = logging.getLogger(__name__)
+"""Performans geri bildirim, görüşme ve audit route ailesi."""
 
 @main_bp.route("/performance/feedback-request/<int:period_id>", methods=["GET", "POST"])
 @login_required

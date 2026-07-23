@@ -2,13 +2,13 @@ from __future__ import annotations
 
 # BYS360 SP-1D KPI/Hedef Oluşturma, Listeleme ve Düzenleme Route Katmanı
 # SP-1C route yapısının üzerine güvenli şekilde genişletilmiştir.
-
 import logging
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.services.role_guards import can_manage_strategic_targets, can_view_strategic_performance
+
 logger = logging.getLogger(__name__)
 
 try:

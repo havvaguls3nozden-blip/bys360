@@ -30,7 +30,6 @@ from .routes import (
     _item,
     _metric,
     _module_payload,
-    _safe_count,
     require_mobile_user,
 )
 
@@ -41,7 +40,6 @@ from app.services.performance.scoring import (
     recalculate_evaluation_totals,
     save_evaluation_level,
     validate_general_comment_requirements,
-    validate_item_comment_requirements,
 )
 logger = logging.getLogger(__name__)
 
@@ -258,7 +256,6 @@ def mobile_performance_rules_summary(user: User):
 # BYS360 MOBILE V2.8.21 CRITERIA WEIGHT THIRD MANAGER ENDPOINTS
 
 from app.api.mobile.services.performance_config_helpers import (
-    _v2821_active_text,
     _v2821_criteria_item,
     _v2821_float,
     _v2821_mode_text,
@@ -329,7 +326,6 @@ from app.api.mobile.services.performance_task_helpers import (
     _v2822_can_view_assignment,
     _v2822_due_label,
     _v2822_level_label,
-    _v2822_now,
     _v2822_open_query,
     _v2822_sicil,
     _v2822_unit_name,
@@ -365,9 +361,7 @@ def _v2835_score_mode_for(assignment: Any, period: Any) -> bool:
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         level = 0
-    if level == 3 and not _v2835_level3_scoring_enabled(period):
-        return False
-    return True
+    return not (level == 3 and not _v2835_level3_scoring_enabled(period))
 
 
 def _v2835_existing_evaluation(assignment: Any):

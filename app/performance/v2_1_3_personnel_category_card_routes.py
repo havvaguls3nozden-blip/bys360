@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, request, url_for
@@ -18,7 +17,10 @@ from app.services.performance.v2_1_3_personnel_category_card import (
     get_personnel_category_rows,
     template_get_user_category,
 )
-from app.services.performance.v2_1_3_personnel_category_card_gate import run_v2_1_3_personnel_category_card_gate
+from app.services.performance.v2_1_3_personnel_category_card_gate import (
+    run_v2_1_3_personnel_category_card_gate,
+)
+
 logger = logging.getLogger(__name__)
 
 

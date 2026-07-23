@@ -1,13 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""Ayarlar servisi tanılama ve sağlık özeti yardımcıları.
-
-Bu modül yalnızca okuma/tanılama amacıyla kullanılır. Ayar kayıt davranışını,
-commit/rollback zincirini veya canlı menü izinlerini değiştirmez.
-"""
-
 from collections.abc import Iterable
 from typing import Any
 
@@ -24,6 +17,12 @@ from app.models import (
     UnitMenuProfile,
     UserMenuPermission,
 )
+
+"""Ayarlar servisi tanılama ve sağlık özeti yardımcıları.
+
+Bu modül yalnızca okuma/tanılama amacıyla kullanılır. Ayar kayıt davranışını,
+commit/rollback zincirini veya canlı menü izinlerini değiştirmez.
+"""
 
 CORE_SETTINGS_TABLES: tuple[str, ...] = (
     "system_settings",

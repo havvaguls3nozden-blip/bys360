@@ -6,6 +6,12 @@ BYS360_AI_DECISION_FAZ10_ROUTES_OK
 from __future__ import annotations
 
 import logging
+
+from app.services.ai_decision.interim_feedback_integration import (
+    build_interim_feedback_context,
+    persist_interim_feedback_snapshot,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -30,11 +36,6 @@ try:
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz10_routes.py | line=30")
     db = None  # type: ignore
-
-from app.services.ai_decision.interim_feedback_integration import (
-    build_interim_feedback_context,
-    persist_interim_feedback_snapshot,
-)
 
 
 if Blueprint is not None:

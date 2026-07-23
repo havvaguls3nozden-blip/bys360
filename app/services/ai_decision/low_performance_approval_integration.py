@@ -1,16 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 AI Karar Destek Faz 6 düşük performans onay entegrasyonu.
-
-Performans değerlendirme kaydını güvenli karar destek süreci özetine dönüştürür.
-Bu çıktı idari karar değildir; Başkan/Üst Onay ve yayın kilidi gerekliliklerini
-yetkili kullanıcıya görünür kılar.
-
-BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_INTEGRATION
-"""
-
 from collections.abc import Iterable, Mapping
 from datetime import date, datetime
 from typing import Any
@@ -25,6 +15,15 @@ from .low_performance_approval_policy import (
     score_requires_upper_approval,
     score_to_float,
 )
+
+"""BYS360 AI Karar Destek Faz 6 düşük performans onay entegrasyonu.
+
+Performans değerlendirme kaydını güvenli karar destek süreci özetine dönüştürür.
+Bu çıktı idari karar değildir; Başkan/Üst Onay ve yayın kilidi gerekliliklerini
+yetkili kullanıcıya görünür kılar.
+
+BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_INTEGRATION
+"""
 
 logger = logging.getLogger(__name__)
 

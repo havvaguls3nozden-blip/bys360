@@ -4,6 +4,10 @@ from __future__ import annotations
 
 
 import logging
+from typing import Any
+
+from app.models import RoleMenuDefault, UnitMenuProfile, UserMenuPermission
+
 logger = logging.getLogger(__name__)
 
 """Kurumsal Portal rol matrisi ve etkileşim yetki çözümleyicisi.
@@ -17,16 +21,12 @@ V2.12.3 amacı:
   kullanıcılar paylaşımı görüp beğeni/yorum yapamama sorununa düşmez.
 """
 
-from typing import Any
-
 try:
     from app.config import is_removed_menu_key
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/portal_permission_matrix.py | line=21")
     def is_removed_menu_key(_key: str) -> bool:
         return False
-
-from app.models import RoleMenuDefault, UnitMenuProfile, UserMenuPermission
 
 PORTAL_MATRIX_KEYS = {
     "portal_feed",

@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_6_LOW_SCORE_MODEL
-
 import logging
+
+from app.core.datetime_utils import utc_now
+
+from .base import TimestampMixin, db
+
 logger = logging.getLogger(__name__)
 """BYS360 70 altı performans sonuçları için Başkan onaylı süreç zinciri modelleri.
 
@@ -16,9 +20,6 @@ Bu modeller puan kaydından bağımsız bir idari süreç izi tutar. Amaç: 70 a
 sonuçların Başkan onayı ve personel geçmiş/süreç kaydı
 oluşmadan kesinleşmesini engellemektir.
 """
-
-from app.core.datetime_utils import utc_now
-from .base import TimestampMixin, db
 
 
 class PerformanceLowScoreProcess(TimestampMixin, db.Model):

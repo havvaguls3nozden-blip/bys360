@@ -243,9 +243,7 @@ def _is_formula_text(value: Any) -> bool:
         return False
     if text.startswith("="):
         return True
-    if text[0] in _FORMULA_PREFIXES and len(text) > 1 and re.search(r"[A-Za-z][0-9]|SUM|ORTALAMA|DÜŞEYARA|VLOOKUP", text, re.IGNORECASE):
-        return True
-    return False
+    return bool(text[0] in _FORMULA_PREFIXES and len(text) > 1 and re.search(r"[A-Za-z][0-9]|SUM|ORTALAMA|DÜŞEYARA|VLOOKUP", text, re.IGNORECASE))
 
 
 def _header_sensitivity(normalized_header: str) -> tuple[str, str]:
@@ -342,7 +340,7 @@ def _first_non_empty_row(rows: Sequence[Sequence[Any]]) -> tuple[int, list[Any]]
 
 
 def _normalize_matrix_width(headers: list[Any], rows: list[list[Any]]) -> tuple[list[Any], list[list[Any]]]:
-    width = max([len(headers), *(len(row) for row in rows)] or [0])
+    width = max([len(headers), *(len(row) for row in rows)])
     if width <= 0:
         raise ExcelPreviewValidationError("Dosyada okunabilir sütun bulunamadı.")
     normalized_headers = list(headers) + [""] * (width - len(headers))

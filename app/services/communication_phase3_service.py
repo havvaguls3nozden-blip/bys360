@@ -156,9 +156,7 @@ def _survey_is_open(survey: Any) -> bool:
         return False
     if start_at and start_at > now:
         return False
-    if end_at and end_at < now:
-        return False
-    return True
+    return not (end_at and end_at < now)
 
 
 def _find_matching_assignment(survey: Any, user: Any):

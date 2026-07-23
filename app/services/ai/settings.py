@@ -5,8 +5,8 @@ from typing import Any
 from flask import current_app
 
 from .client import get_provider_snapshot
-from .prompts import get_prompt_catalog_snapshot, get_prompt_registry_meta
 from .module_scope import filter_visible_values
+from .prompts import get_prompt_catalog_snapshot, get_prompt_registry_meta
 
 
 def _status_badge(snapshot: dict[str, Any]) -> tuple[str, str]:

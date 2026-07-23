@@ -1,8 +1,15 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import asdict, dataclass
+from typing import Any
 
 from app.core.datetime_utils import utc_now
+
+try:
+    from .summary_pipeline import build_analytics_safe_summary_card
+except ImportError:  # python -S gate bagimsiz calistirmasi
+    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 """Personel / performans icgoru motoru servis koprusu.
 
@@ -14,15 +21,7 @@ Bu dosyanin hedefi Analiz Merkezi icin toplu, maskelenmis ve yetkiyle
 kullanilabilecek personel / performans icgoru yuzeyi uretmektir.
 """
 
-from dataclasses import asdict, dataclass
-from typing import Any
-
 logger = logging.getLogger(__name__)
-
-try:
-    from .summary_pipeline import build_analytics_safe_summary_card
-except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 
 @dataclass(frozen=True)

@@ -12,9 +12,7 @@ from app.api.mobile.shared import (
     _metric,
     _module_payload,
     _safe_count,
-    jsonify,
     mobile_api_bp,
-    request,
     require_mobile_user,
 )
 

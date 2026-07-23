@@ -1,6 +1,8 @@
 import os
 import re
-from locust import HttpUser, task, between
+
+from locust import HttpUser, between, task
+
 
 class BYS360RemoteUser(HttpUser):
     wait_time = between(2, 6)

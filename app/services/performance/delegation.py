@@ -56,9 +56,7 @@ def _normalize_text(value: Any) -> str:
 def _date_in_range(check_date: date, start_date: date | None, end_date: date | None) -> bool:
     if start_date and check_date < start_date:
         return False
-    if end_date and check_date > end_date:
-        return False
-    return True
+    return not (end_date and check_date > end_date)
 
 
 def _normalize_performance_mode(value: Any, *, default: str = DEFAULT_PERFORMANCE_MODE) -> str:

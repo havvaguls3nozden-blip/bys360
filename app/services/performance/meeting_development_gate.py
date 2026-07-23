@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 toplantı geliştirme canlı kontrol ve senaryo omurgası."""
-
 from dataclasses import dataclass
 from typing import Any
 
@@ -14,6 +11,8 @@ from app.services.performance.meeting_development import (
     build_meeting_development_summary,
     ensure_meeting_foundation_schema,
 )
+
+"""BYS360 toplantı geliştirme canlı kontrol ve senaryo omurgası."""
 
 logger = logging.getLogger(__name__)
 

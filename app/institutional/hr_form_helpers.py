@@ -108,10 +108,8 @@ def _handle_leave_post() -> Any:
     db.session.add(leave)
     db.session.flush()
 
-    if leave.blocks_manager_duties:
-        if not _create_delegation_from_form(delegator_user_id=user_id, start_date=start, end_date=end, source_leave_id=leave.id):
-            if not _active_delegation_exists(user_id, start, end):
-                flash("Bu kayıt yönetici görevlerini blokluyor; aynı tarih aralığı için vekâlet tanımlamanız önerilir.", "warning")
+    if leave.blocks_manager_duties and not _create_delegation_from_form(delegator_user_id=user_id, start_date=start, end_date=end, source_leave_id=leave.id) and not _active_delegation_exists(user_id, start, end):
+        flash("Bu kayıt yönetici görevlerini blokluyor; aynı tarih aralığı için vekâlet tanımlamanız önerilir.", "warning")
 
     _safe_commit("İzin kaydı oluşturuldu.", danger_prefix="İzin kaydı oluşturulamadı")
     return redirect(url_for("main.hr_leave_management", scope=request.form.get("scope") or "personal", user_id=user_id))
@@ -185,10 +183,8 @@ def _handle_attendance_post() -> Any:
     )
     db.session.add(attendance)
     db.session.flush()
-    if attendance.blocks_manager_duties:
-        if not _create_delegation_from_form(delegator_user_id=user_id, start_date=record_date, end_date=record_date, source_attendance_id=attendance.id):
-            if not _active_delegation_exists(user_id, record_date, record_date):
-                flash("Bu kayıt yönetici görevlerini blokluyor; aynı tarih için vekâlet tanımlamanız önerilir.", "warning")
+    if attendance.blocks_manager_duties and not _create_delegation_from_form(delegator_user_id=user_id, start_date=record_date, end_date=record_date, source_attendance_id=attendance.id) and not _active_delegation_exists(user_id, record_date, record_date):
+        flash("Bu kayıt yönetici görevlerini blokluyor; aynı tarih için vekâlet tanımlamanız önerilir.", "warning")
     _safe_commit("Devamsızlık/istisna kaydı oluşturuldu.", danger_prefix="Devamsızlık kaydı oluşturulamadı")
     return redirect(url_for("main.hr_attendance_management", scope=request.form.get("scope") or "personal", user_id=user_id))
 

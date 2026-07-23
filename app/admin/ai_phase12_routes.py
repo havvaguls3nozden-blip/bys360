@@ -20,7 +20,6 @@ Bağımlılıklar:
 """
 from __future__ import annotations
 
-
 import csv
 import io
 
@@ -112,7 +111,10 @@ def admin_ai_final_live_hardening_export_csv():
 @menu_key_required('ai_center')
 def admin_ai_final_live_hardening_export_json():
     """Faz 12 güvenli JSON kapanış raporu: yalnız özet, metrik ve kalite kapısı."""
-    from app.services.ai.final_live_hardening import build_ai_final_live_hardening_snapshot, dumps_safe_json
+    from app.services.ai.final_live_hardening import (
+        build_ai_final_live_hardening_snapshot,
+        dumps_safe_json,
+    )
 
     snapshot = build_ai_final_live_hardening_snapshot(
         current_user=current_user,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import py_compile
@@ -138,10 +139,8 @@ def build_app_and_runtime_routes(root: Path) -> dict[str, Any]:
     finally:
         os.environ.clear()
         os.environ.update(old_env)
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(root))
-        except ValueError:
-            pass
 
 
 def runtime_route_map_check(root: Path) -> dict[str, Any]:

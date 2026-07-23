@@ -12,9 +12,7 @@
 from __future__ import annotations
 
 # BYS360_PHASE6_4_DUPLICATE_ENDPOINT_V4_ROUTES_NORMALIZED
-
 # BYS360_PHASE6_4_DUPLICATE_ENDPOINT_V2_FIX
-
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
@@ -23,13 +21,12 @@ from app.models import PerformanceLowScoreProcess, PerformancePeriod
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required
 from app.services.performance.low_score_process_service import (
-    president_reject_process,
     add_low_score_process_note,
     build_low_score_period_summary,
     build_low_score_process_rows,
     ensure_low_score_processes_for_period,
-    hr_precheck_process,
     president_approve_process,
+    president_reject_process,
     record_first_warning,
     start_second_repeat_admin_process,
 )

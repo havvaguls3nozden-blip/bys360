@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 """BYS360 Performans V2.1.20 Sistem Kontrol Özeti.
 
@@ -9,8 +10,6 @@ Kullanıcı ekranında teknik ifade göstermez; veritabanına yazmaz,
 görev üretmez, e-posta göndermez. Sadece V2.1.7-V2.1.19 hattının
 merkez ekrandaki durumunu sade kontrol kartlarına dönüştürür.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

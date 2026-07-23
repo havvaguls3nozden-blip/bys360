@@ -1,6 +1,12 @@
 
 from __future__ import annotations
 
+import os
+import random
+import re
+
+from locust import HttpUser, between, task
+
 """BYS360 Faz 4 Locust yük testi.
 
 Örnek:
@@ -11,11 +17,6 @@ Hedef:
     Ortalama yanıt < 500ms
     95p < 1500ms
 """
-
-import os
-import random
-import re
-from locust import HttpUser, between, task
 
 
 class BYS360User(HttpUser):

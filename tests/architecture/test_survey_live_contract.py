@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 pytestmark = [pytest.mark.live, pytest.mark.realdb, pytest.mark.slow]
-
-from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SURVEY_ROUTE = PROJECT_ROOT / "app" / "communication" / "surveys_routes.py"

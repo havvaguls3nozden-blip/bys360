@@ -113,9 +113,8 @@ def build_menu_visibility_map(
     if not visibility.get("surveys") and _role_allowed_for_menu(
         {"required_roles": ["admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"]},
         role_name,
-    ):
-        if _user_has_any_assigned_survey(user, rollback=rollback):
-            visibility["surveys"] = True
+    ) and _user_has_any_assigned_survey(user, rollback=rollback):
+        visibility["surveys"] = True
 
     source_map = effective_context.get("source_map", {}) if isinstance(effective_context, dict) else {}
     _apply_role_matrix_closed_guard(visibility, role_name, source_map=source_map, rollback=rollback)
@@ -167,9 +166,8 @@ def build_menu_visibility_map(
                 visibility[_key] = bool(unit_state[_key])
             if role_state.get(_key) is not False and _key in user_state:
                 visibility[_key] = bool(user_state[_key])
-            if role_name in {"personel", "user", "kullanici", "kullan\u0131c\u0131", "standart_personel", "rolsuz", "__none__"} and _key in {"admin_users", "org_units", "hr_management", "hr_reports"}:
-                if role_state.get(_key) is not True and user_state.get(_key) is not True:
-                    visibility[_key] = False
+            if role_name in {"personel", "user", "kullanici", "kullan\u0131c\u0131", "standart_personel", "rolsuz", "__none__"} and _key in {"admin_users", "org_units", "hr_management", "hr_reports"} and role_state.get(_key) is not True and user_state.get(_key) is not True:
+                visibility[_key] = False
 
         visibility["account"] = True
         visibility["logout"] = True

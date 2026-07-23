@@ -8,6 +8,7 @@ oluşmadığını test eder. Canlı veriye yazmaz; Flask test_client kullanır.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import py_compile
@@ -219,10 +220,8 @@ def runtime_route_map(root: Path) -> dict[str, Any]:
             "error": f"{type(exc).__name__}: {exc}",
         }
     finally:
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(root))
-        except ValueError:
-            pass
 
 
 def _call_client(client: Any, method: str, path: str, headers: dict[str, str] | None = None) -> Any:
@@ -297,10 +296,8 @@ def auth_guard_matrix(root: Path) -> dict[str, Any]:
             "error": f"{type(exc).__name__}: {exc}",
         }
     finally:
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(root))
-        except ValueError:
-            pass
 
 
 def app_factory_smoke(root: Path) -> dict[str, Any]:

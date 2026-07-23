@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
+from datetime import date, datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -12,11 +16,6 @@ yalnızca süreç takibi için özet, uyarı ve öneri sunar.
 
 BYS360_AI_DECISION_FAZ9_REMINDER_POLICY
 """
-
-from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
-from datetime import date, datetime
-from typing import Any
 
 
 @dataclass(frozen=True)

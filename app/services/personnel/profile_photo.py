@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any
+
 from app.core.datetime_utils import utc_now
 
 """Personel profil fotoğrafı servis köprüsü.
@@ -9,11 +14,6 @@ Faz 4 kapsamı:
 - Commit/rollback, flash/redirect ve kayıt akışı route tarafında kalır.
 - Dosya silme sırasında yalnızca uygulamanın static kökü altındaki dosyalar hedeflenir.
 """
-
-from collections.abc import Callable
-from dataclasses import asdict, dataclass
-from pathlib import Path
-from typing import Any
 
 PhotoSaver = Callable[[Any, Any], Any]
 

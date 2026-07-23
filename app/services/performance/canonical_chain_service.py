@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,9 +15,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from dataclasses import dataclass
-from typing import Any
 
 PRESIDENCY_SINGLE_MANAGER_UNITS = {
     "DANIŞMANLIK",
@@ -104,9 +104,7 @@ def is_info_exception(row: dict[str, Any]) -> bool:
         return True
     if birim in PRESIDENCY_SINGLE_MANAGER_UNITS:
         return True
-    if birim == "HUKUK MÜŞAVİRLİĞİ" and role == "personel":
-        return True
-    return False
+    return birim == "HUKUK MÜŞAVİRLİĞİ" and role == "personel"
 
 
 def validate_chain_slots(row: dict[str, Any]) -> list[str]:

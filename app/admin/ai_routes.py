@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import io
+import logging
 
 from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -39,6 +40,8 @@ from app.services.sql_refactor_query_helpers import (
     distinct_non_empty_values,
     distinct_normalized_non_empty_values,
 )
+
+logger = logging.getLogger(__name__)
 
 KNOWN_AI_MODULES: tuple[str, ...] = live_ai_modules(include_system=True)
 
@@ -1129,6 +1132,7 @@ def admin_ai_recommendation_status(recommendation_id: int):
         db.session.commit()
         flash("AI öneri durumu güncellendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"AI öneri durumu güncellenemedi: {exc}", "danger")
     return redirect(request.referrer or url_for("main.admin_ai_recommendations"))
@@ -1167,6 +1171,7 @@ def admin_ai_redaction_rules():
                 flash("AI maskeleme kuralı kaydedildi.", "success")
                 return redirect(url_for("main.admin_ai_redaction_rules"))
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"AI maskeleme kuralı kaydedilemedi: {exc}", "danger")
 
@@ -1203,6 +1208,7 @@ def admin_ai_redaction_toggle(rule_id: int):
         db.session.commit()
         flash("AI maskeleme kuralı durumu güncellendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"AI maskeleme kuralı güncellenemedi: {exc}", "danger")
     return redirect(url_for("main.admin_ai_redaction_rules"))

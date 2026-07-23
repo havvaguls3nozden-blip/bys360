@@ -6,9 +6,10 @@ No active route code is moved in P1.2.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+
 # BYS360_P1_3_AUTH_SERVICE_DELEGATE_START
 from typing import Any
-from collections.abc import Callable
 
 from flask import jsonify, request
 from sqlalchemy import or_

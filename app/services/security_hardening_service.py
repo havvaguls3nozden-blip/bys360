@@ -1,9 +1,26 @@
 from __future__ import annotations
 
-
+import json
 import logging
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from flask import current_app
+
+import app.models as models
+from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
+try:
+    from sqlalchemy import inspect as sa_inspect
+    from sqlalchemy import text
+except Exception:  # pragma: no cover
+    logger.exception("BYS360 V6B guarded exception | file=app/services/security_hardening_service.py | line=27")
+    text = None
+    sa_inspect = None
 
 """BYS360 Faz 3 - Guvenlik ve yetki sertlestirme servisleri.
 
@@ -11,25 +28,6 @@ Bu servis, canliya cikis oncesi guvenlik ve yetki durumunu raporlamak icin tasar
 Bilerek yikici degisiklik yapmaz; amaci eksikleri gorunur hale getirmek ve
 kurumsal omurgayi bozmadan riskleri net gostermektir.
 """
-
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
-import json
-import re
-
-from flask import current_app
-
-from app.extensions import db
-import app.models as models
-
-try:
-    from sqlalchemy import text
-    from sqlalchemy import inspect as sa_inspect
-except Exception:  # pragma: no cover
-    logger.exception("BYS360 V6B guarded exception | file=app/services/security_hardening_service.py | line=27")
-    text = None
-    sa_inspect = None
 
 
 User = getattr(models, "User", None)

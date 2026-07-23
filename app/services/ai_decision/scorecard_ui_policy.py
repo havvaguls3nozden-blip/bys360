@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+import re
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass
+from typing import Any
 
 """BYS360 AI Karar Destek Faz 5 karne sunum politikası.
 
@@ -11,11 +15,6 @@ kurumsal Türkçe ile sunulması için ortak etiket, önem düzeyi ve güvenli m
 
 BYS360_AI_DECISION_FAZ5_SCORECARD_UI_POLICY
 """
-
-import re
-from collections.abc import Mapping
-from dataclasses import asdict, dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

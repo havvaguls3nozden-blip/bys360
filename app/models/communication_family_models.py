@@ -8,32 +8,36 @@ Davranis amaci ayni kalir; hangi isimlerin tasindigi dosya uzerinde gorunur olur
 """
 from __future__ import annotations
 
-from app.models.communication_phase1_models import CommunicationBulletin, CommunicationBulletinAudience, CommunicationBulletinReceipt
-
-from app.models.communication_phase2_models import CommunicationBulletinRevision, CommunicationSurveyTemplate, CommunicationSurveyTemplateQuestion
-
+from app.models.communication_phase1_models import (
+    CommunicationBulletin,
+    CommunicationBulletinAudience,
+    CommunicationBulletinReceipt,
+)
+from app.models.communication_phase2_models import (
+    CommunicationBulletinRevision,
+    CommunicationSurveyTemplate,
+    CommunicationSurveyTemplateQuestion,
+)
 from app.models.communication_phase3_models import (
-    CommunicationSupportSlaPolicy,
-    CommunicationSupportAssignmentLog,
-    CommunicationSurveyReminderLog,
     CommunicationHelpArticleViewLog,
+    CommunicationSupportAssignmentLog,
+    CommunicationSupportSlaPolicy,
+    CommunicationSurveyReminderLog,
 )
-
 from app.models.communication_phase4_models import (
-    CommunicationExecutiveReport,
-    CommunicationReportExportLog,
-    CommunicationGovernanceReview,
     CommunicationDailyMetric,
+    CommunicationExecutiveReport,
+    CommunicationGovernanceReview,
+    CommunicationReportExportLog,
 )
-
 from app.models.communication_phase5_models import (
-    TimestampMixin,
-    CommunicationNotificationPreference,
+    CommunicationAutomationLog,
     CommunicationDigestJob,
     CommunicationEscalationRule,
-    CommunicationRetentionPolicy,
+    CommunicationNotificationPreference,
     CommunicationOperationHealth,
-    CommunicationAutomationLog,
+    CommunicationRetentionPolicy,
+    TimestampMixin,
 )
 
 __all__ = [

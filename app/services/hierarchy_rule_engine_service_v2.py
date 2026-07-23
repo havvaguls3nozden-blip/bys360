@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+import json
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from flask import current_app
+
+from .hierarchy_position_registry_service import HierarchyPositionRegistryService
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,16 +22,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-import json
-from collections.abc import Iterable
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
-
-from flask import current_app
-
-from .hierarchy_position_registry_service import HierarchyPositionRegistryService
 
 DEFAULT_CONFIG_RELATIVE = Path("config") / "hierarchy_templates_v2.json"
 ROLE_ALIASES = {
@@ -162,7 +162,8 @@ class HierarchyRuleEngineServiceV2:
         return None
 
     def _matches(self, match: dict[str, Any], user: UserRow) -> bool:
-        norm = lambda v: (v or "").strip().upper()
+        def norm(v):
+            return (v or "").strip().upper()
         role = norm(user.normalized_role)
         unvan = norm(user.unvan)
         birim = norm(user.birim)
@@ -172,9 +173,7 @@ class HierarchyRuleEngineServiceV2:
                 return False
         if match.get("birim") and birim not in {norm(v) for v in match["birim"]}:
             return False
-        if match.get("unvan_contains") and not any(norm(k) in unvan for k in match["unvan_contains"]):
-            return False
-        return True
+        return not (match.get("unvan_contains") and not any(norm(k) in unvan for k in match["unvan_contains"]))
 
     def _resolve_level(self, level_config: dict[str, Any], user: UserRow, users: list[UserRow], by_sicil: dict[str, UserRow]) -> UserRow | None:
         source = level_config.get("source")

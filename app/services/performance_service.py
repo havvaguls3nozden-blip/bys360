@@ -1,22 +1,8 @@
 from __future__ import annotations
 
 import logging
-
-"""Geriye uyumlu performans servis köprüsü.
-
-Bu dosya artık iş kuralı barındıran ana kaynak değil.
-Eski route ve admin ekranları `app.services.performance_service` import etmeye
- devam ettiği için, çağrıları canlı ve güncel modüler servis katmanına yönlendirir.
-
-Amaç:
-- görev üretimini V2 / modüler çekirdeğe bağlamak
-- admin kullanıcısının performans görevlerine karışmasını engellemek
-- 3. amir / ağırlık / log özetlerinde tek kaynak kullanmak
-- eski import yollarını bozmadan canlıyı toparlamak
-"""
-
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from app.services.performance.assignments import (
     build_assignment_log_summary as _build_assignment_log_summary_mod,
@@ -68,6 +54,19 @@ from app.services.performance.scoring import (
     validate_general_comment_requirements,
     validate_score_value,
 )
+
+"""Geriye uyumlu performans servis köprüsü.
+
+Bu dosya artık iş kuralı barındıran ana kaynak değil.
+Eski route ve admin ekranları `app.services.performance_service` import etmeye
+ devam ettiği için, çağrıları canlı ve güncel modüler servis katmanına yönlendirir.
+
+Amaç:
+- görev üretimini V2 / modüler çekirdeğe bağlamak
+- admin kullanıcısının performans görevlerine karışmasını engellemek
+- 3. amir / ağırlık / log özetlerinde tek kaynak kullanmak
+- eski import yollarını bozmadan canlıyı toparlamak
+"""
 
 logger = logging.getLogger(__name__)
 

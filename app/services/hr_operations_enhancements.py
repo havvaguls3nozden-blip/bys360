@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+from datetime import date
+from typing import Any
+
+from flask import request
+from sqlalchemy import inspect
+
+from app.extensions import db
+from app.models import PersonnelDocument, PersonnelPositionHistory, User
+from app.route_support import issue_form_token
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,16 +22,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from datetime import date
-from typing import Any
-
-from flask import request
-from sqlalchemy import inspect
-
-from app.extensions import db
-from app.models import PersonnelDocument, PersonnelPositionHistory, User
-from app.route_support import issue_form_token
 
 POSITION_ASSIGNMENT_TYPE_LABELS = {
     "atama": "Atama",

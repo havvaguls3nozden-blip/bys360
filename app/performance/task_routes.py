@@ -1,50 +1,58 @@
 from __future__ import annotations
 
-
 import logging
-
-from app.services.performance.assignments import build_assignment_log_summary
-
-"""Performans görev yönetimi route ailesi.
-
-Bu dosya performans görev yönetimi ekranlarının istek/yanıt akışını
-modüler yapı altında yönetir.
-"""
-
 from collections import Counter
 
 from flask import Response, current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db
-from app.models import EvaluationAssignment, PerformancePeriod, User
+from app.models import PerformancePeriod, User
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_all, safe_render
-from app.services.performance_service import generate_assignments_for_active_period, is_informational_special_case
+from app.services.availability_service import refresh_assignment_live_coverages
+from app.services.performance.assignments import build_assignment_log_summary
+from app.services.performance.hardening_service import (
+    build_period_download_name,
+    humanize_export_exception,
+)
 from app.services.performance.health_report import build_performance_task_health_report
 from app.services.performance.preflight import (
     build_task_management_preflight_report,
     preflight_has_blockers,
 )
-from app.services.availability_service import refresh_assignment_live_coverages
-from app.services.performance_v2 import build_assignment_preview
-from app.services.performance.hardening_service import (
-    build_period_download_name,
-    humanize_export_exception,
+from app.services.performance.task_management_service import (
+    build_assignment_recommendation_payload as _build_assignment_recommendation_payload,
 )
 from app.services.performance.task_management_service import (
     build_audit_employee_options as _build_audit_employee_options,
-    build_assignment_recommendation_payload as _build_assignment_recommendation_payload,
+)
+from app.services.performance.task_management_service import (
     build_task_audit_csv_text,
     build_task_health_csv_text,
     build_task_management_dashboard_payload,
     build_task_recommendation_export_response,
     build_task_scope_context,
     clear_period_task_records,
-    filter_audit_rows as _filter_audit_rows,
     get_selected_period_from_args,
+)
+from app.services.performance.task_management_service import (
+    filter_audit_rows as _filter_audit_rows,
+)
+from app.services.performance.task_management_service import (
     log_performance_recommendation_export as _log_performance_recommendation_export,
 )
+from app.services.performance_service import (
+    generate_assignments_for_active_period,
+    is_informational_special_case,
+)
+from app.services.performance_v2 import build_assignment_preview
+
+"""Performans görev yönetimi route ailesi.
+
+Bu dosya performans görev yönetimi ekranlarının istek/yanıt akışını
+modüler yapı altında yönetir.
+"""
 
 """Görev yönetimi yardımcıları service katmanında çalışır.
 Bu route dosyası yalnızca istek/yanıt akışını yönetir.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify, render_template, request
 from flask_login import current_user, login_required
@@ -18,10 +18,18 @@ from app.services.ai import (
     log_ai_feedback,
     mark_recommendation,
 )
-from app.services.ai.guardrails import AIAccessDenied, AIInputError, AIResourceNotFound, AIServiceDisabled
-from app.services.ai.recommendation_actions import apply_recommendation, bulk_apply_recommendations, list_target_recommendation_payloads
 from app.services.ai.client import get_provider_snapshot
-
+from app.services.ai.guardrails import (
+    AIAccessDenied,
+    AIInputError,
+    AIResourceNotFound,
+    AIServiceDisabled,
+)
+from app.services.ai.recommendation_actions import (
+    apply_recommendation,
+    bulk_apply_recommendations,
+    list_target_recommendation_payloads,
+)
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 
@@ -185,7 +193,9 @@ def ai_feedback(ai_request_log_id: int):
 @login_required
 def ai_decision_faz1_health():
     """Karar Destek Merkezi giriş durumu - gerçek BYS360 layout ekranı."""
-    from app.services.ai_decision.performance_integration import build_ai_decision_faz1_health_payload
+    from app.services.ai_decision.performance_integration import (
+        build_ai_decision_faz1_health_payload,
+    )
 
     accept_header = str(request.headers.get("Accept", "") or "").lower()
     wants_json = (
@@ -237,7 +247,9 @@ def ai_decision_faz1_health():
 @login_required
 def ai_decision_performance_evaluation(evaluation_id: int):
     """Performans değerlendirmesi için deterministik karar destek çıktısı üretir."""
-    from app.services.ai_decision.performance_integration import build_performance_decision_support_response
+    from app.services.ai_decision.performance_integration import (
+        build_performance_decision_support_response,
+    )
 
     create_recommendations = str(request.args.get("create_recommendations", "1")).strip().lower() not in {"0", "false", "no", "hayir", "hayır"}
     return _run_json_service(
@@ -254,7 +266,9 @@ def ai_decision_performance_evaluation(evaluation_id: int):
 @login_required
 def ai_decision_faz2_health():
     """Karar Destek Merkezi Faz 2 kategori/grup servis sağlığı."""
-    from app.services.ai_decision.category_group_integration import build_ai_decision_faz2_health_payload
+    from app.services.ai_decision.category_group_integration import (
+        build_ai_decision_faz2_health_payload,
+    )
 
     return jsonify(build_ai_decision_faz2_health_payload()), 200
 
@@ -263,7 +277,9 @@ def ai_decision_faz2_health():
 @login_required
 def ai_decision_performance_category_groups():
     """Personel kategori ve grup kırılımı için toplu karar destek çıktısı üretir."""
-    from app.services.ai_decision.category_group_integration import build_category_group_decision_support_response
+    from app.services.ai_decision.category_group_integration import (
+        build_category_group_decision_support_response,
+    )
 
     raw_period_id = str(request.args.get("period_id", "") or "").strip()
     period_id = int(raw_period_id) if raw_period_id.isdigit() else None
@@ -283,7 +299,9 @@ def ai_decision_performance_category_groups():
 @login_required
 def ai_decision_performance_category_groups_for_period(period_id: int):
     """Belirli performans dönemi için kategori/grup karar destek çıktısı üretir."""
-    from app.services.ai_decision.category_group_integration import build_category_group_decision_support_response
+    from app.services.ai_decision.category_group_integration import (
+        build_category_group_decision_support_response,
+    )
 
     include_unpublished = str(request.args.get("include_unpublished", "1")).strip().lower() not in {"0", "false", "no", "hayir", "hayır"}
     create_recommendations = str(request.args.get("create_recommendations", "1")).strip().lower() not in {"0", "false", "no", "hayir", "hayır"}

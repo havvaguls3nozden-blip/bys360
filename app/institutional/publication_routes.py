@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -12,16 +13,18 @@ from app.route_support import manager_required, safe_db_rollback, safe_render
 from app.services.publication_service import (
     archive_publication_issue,
     build_publication_library_context,
-    get_publication_page_count,
-    publication_renderer_available,
-    render_publication_page_image,
     get_publication_issue_or_404,
+    get_publication_page_count,
     permanent_delete_publication_issue,
+    publication_renderer_available,
     publication_type_label,
+    render_publication_page_image,
     toggle_featured_publication,
     update_publication_status,
     upload_publication_issue,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_date(value: str | None):
@@ -86,6 +89,7 @@ def publication_upload():
         db.session.commit()
         flash("Kurumsal yayın eklendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Kurumsal yayın yüklenemedi: {exc}", "danger")
     return redirect(url_for("main.publication_library"))
@@ -168,6 +172,7 @@ def publication_toggle_featured(publication_id: int):
         flash("Öne çıkan yayın durumu güncellendi.", "success")
         return redirect(url_for("main.publication_view", publication_id=row.id))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"İşlem tamamlanamadı: {exc}", "danger")
         return redirect(url_for("main.publication_library"))
@@ -187,6 +192,7 @@ def publication_set_status(publication_id: int):
         flash("Yayın durumu güncellendi.", "success")
         return redirect(url_for("main.publication_view", publication_id=row.id))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Durum güncellenemedi: {exc}", "danger")
         return redirect(url_for("main.publication_library"))
@@ -201,6 +207,7 @@ def publication_archive(publication_id: int):
         db.session.commit()
         flash("Yayın arşive alındı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Arşivleme yapılamadı: {exc}", "danger")
     return redirect(url_for("main.publication_library"))
@@ -214,6 +221,7 @@ def publication_delete(publication_id: int):
         db.session.commit()
         flash(f"Yayın kalıcı olarak silindi: {payload.get('title')}", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Yayın silinemedi: {exc}", "danger")
     return redirect(url_for("main.publication_library"))

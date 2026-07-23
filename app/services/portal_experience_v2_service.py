@@ -111,10 +111,14 @@ def _profile_context(user: Any) -> dict[str, Any]:
     ]
     score = int(round((sum(1 for item in checks if item) / max(len(checks), 1)) * 100))
     missing = []
-    if not checks[0]: missing.append("unvan")
-    if not checks[1]: missing.append("birim")
-    if not checks[3]: missing.append("profil fotoğrafı")
-    if not checks[5]: missing.append("profil açıklaması")
+    if not checks[0]:
+        missing.append("unvan")
+    if not checks[1]:
+        missing.append("birim")
+    if not checks[3]:
+        missing.append("profil fotoğrafı")
+    if not checks[5]:
+        missing.append("profil açıklaması")
     return {
         "name": _display_name(user),
         "title": sanitize_free_text(getattr(user, "unvan", ""), limit=120) or "Kurumsal kullanıcı",

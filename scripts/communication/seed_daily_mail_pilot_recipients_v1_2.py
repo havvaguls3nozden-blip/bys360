@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-
 PILOT_EMAILS = ["mustafa.bektas@ktb.gov.tr", "havva.ozden@ktb.gov.tr"]
 
 
@@ -65,9 +64,13 @@ def main() -> int:
         sys.path.insert(0, str(root))
 
     from app import create_app
-    from app.models import User
-    from app.services.daily_weather_mail import ensure_daily_weather_defaults, set_setting_value, current_config
     from app.extensions import db
+    from app.models import User
+    from app.services.daily_weather_mail import (
+        current_config,
+        ensure_daily_weather_defaults,
+        set_setting_value,
+    )
 
     app = create_app()
     with app.app_context():

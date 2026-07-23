@@ -129,9 +129,7 @@ def looks_placeholder(value: str) -> bool:
         return True
     if "<" in v and ">" in v:
         return True
-    if len(v) < 16 and not ("://" in v and "@" in v):
-        return True
-    return False
+    return len(v) < 16 and not ("://" in v and "@" in v)
 
 
 def looks_env_reference(line: str, value: str = "") -> bool:
@@ -141,9 +139,8 @@ def looks_env_reference(line: str, value: str = "") -> bool:
 
 def looks_regex_or_scanner(line: str, path: Path) -> bool:
     lower_path = str(path).replace("\\", "/").lower()
-    if "/scripts/security/" in lower_path or "/scripts/quality/" in lower_path:
-        if any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS):
-            return True
+    if ("/scripts/security/" in lower_path or "/scripts/quality/" in lower_path) and any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS):
+        return True
     return any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS)
 
 

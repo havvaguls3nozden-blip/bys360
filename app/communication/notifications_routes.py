@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from flask import current_app, flash, jsonify, request
 from flask_login import current_user, login_required
 from sqlalchemy import case, func, or_
@@ -19,7 +21,7 @@ from .shared import (
     _utcdate,
     _utcnow,
 )
-import logging
+
 logger = logging.getLogger(__name__)
 
 """Canlı omurgaya uyarlanmış bildirim modülü."""

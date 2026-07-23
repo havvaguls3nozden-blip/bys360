@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""Performans servis katmanını tek merkezden okuyan güvenli orkestrasyon yardımcıları.
-
-Bu fazın amacı yeni iş kuralı icat etmek değil; mevcut modüler servisleri
-aynı sözleşmede birleştirip operasyon ekranlarının zincir sağlığı, görev üretimi
-ve ekip kıyas durumunu tek bakışta okuyabilmesini sağlamaktır.
-"""
-
 from collections import Counter
 from collections.abc import Iterable
 from typing import Any
@@ -23,6 +15,13 @@ from .assignments import (
 from .common import get_active_period, get_period
 from .hierarchy import analyze_hierarchy_rows, build_assignment_rows
 from .reporting import build_team_compare_rows
+
+"""Performans servis katmanını tek merkezden okuyan güvenli orkestrasyon yardımcıları.
+
+Bu fazın amacı yeni iş kuralı icat etmek değil; mevcut modüler servisleri
+aynı sözleşmede birleştirip operasyon ekranlarının zincir sağlığı, görev üretimi
+ve ekip kıyas durumunu tek bakışta okuyabilmesini sağlamaktır.
+"""
 
 logger = logging.getLogger(__name__)
 

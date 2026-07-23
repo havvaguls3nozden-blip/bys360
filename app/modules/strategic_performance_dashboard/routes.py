@@ -13,7 +13,8 @@ try:
 except ImportError:
     Blueprint = None
     render_template = None
-    login_required = lambda f: f
+    def login_required(f):
+        return f
     current_user = None
 
 from .services.dashboard_service import build_dashboard_summary, build_role_scope_label

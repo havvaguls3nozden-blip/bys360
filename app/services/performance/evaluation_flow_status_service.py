@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""Performans değerlendirmesinde 'kimde kaldı / en son kim puanladı' özeti."""
-
 from typing import Any
 
 from app.models import EvaluationAssignment, PerformanceLowScoreProcess
@@ -11,6 +8,8 @@ from app.services.performance.low_score_process_service import (
     humanize_process_status,
     is_low_score_evaluation,
 )
+
+"""Performans değerlendirmesinde 'kimde kaldı / en son kim puanladı' özeti."""
 
 logger = logging.getLogger(__name__)
 

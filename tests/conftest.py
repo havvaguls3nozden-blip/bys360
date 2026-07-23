@@ -6,6 +6,7 @@ APP_ENV=production gibi değerlerin unit testleri gereksiz yere durdurmasını e
 """
 from __future__ import annotations
 
+import contextlib
 import os
 from pathlib import Path
 
@@ -111,12 +112,10 @@ def app():
 
     if db is not None:
         with app_obj.app_context():
-            try:
+            # Baz? statik/contract testlerinde schema gerekmeyebilir.
+            # Runtime hatas?n? gizlememek i?in route testleri yine sonucu g?sterecek.
+            with contextlib.suppress(Exception):
                 db.create_all()
-            except Exception:
-                # Baz? statik/contract testlerinde schema gerekmeyebilir.
-                # Runtime hatas?n? gizlememek i?in route testleri yine sonucu g?sterecek.
-                pass
 
     yield app_obj
 

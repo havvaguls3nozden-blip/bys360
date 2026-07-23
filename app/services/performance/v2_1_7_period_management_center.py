@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans V2.1.7 dönem yönetim merkezi servis katmanı.
-
-V2.1.8A HOTFIX: İlk sayfa açılışını hafifletir. Plan otomatik seçilmez,
-ağır personel/amir ön kontrol listeleri yalnızca kullanıcı plan seçtiğinde
-üretilir. Böylece Dönem Yönetim Merkezi ekranda dönerek kalmaz.
-"""
-
 from collections.abc import Callable
 from typing import Any
 
@@ -39,6 +31,13 @@ from app.services.performance.v2_1_6_category_period_integration import (
     list_preintegration_rows,
 )
 from app.services.performance.v2_1_6a_category_ui_cleanup import active_categories
+
+"""BYS360 Performans V2.1.7 dönem yönetim merkezi servis katmanı.
+
+V2.1.8A HOTFIX: İlk sayfa açılışını hafifletir. Plan otomatik seçilmez,
+ağır personel/amir ön kontrol listeleri yalnızca kullanıcı plan seçtiğinde
+üretilir. Böylece Dönem Yönetim Merkezi ekranda dönerek kalmaz.
+"""
 
 logger = logging.getLogger(__name__)
 

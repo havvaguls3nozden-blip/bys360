@@ -4,6 +4,8 @@ Route decorators stay in ops_routes.py. This module contains implementation bodi
 """
 from __future__ import annotations
 
+import logging
+
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
@@ -20,6 +22,8 @@ from app.services.profile_photo_service import (
     save_profile_photo as _save_profile_photo,
 )
 from app.services.safe_user_delete_service import safe_delete_user_by_id
+
+logger = logging.getLogger(__name__)
 
 
 def ensure_not_self_target(actor_id, target_id, entity_label="kayıt"):
@@ -93,6 +97,7 @@ def admin_user_change_photo_impl(user_id: int):
         return redirect(url_for("main.admin_user_edit", user_id=user.id))
 
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Profil fotoğrafı güncellenirken hata oluştu: {exc}", "danger")
         return redirect(url_for("main.admin_user_edit", user_id=user.id))
@@ -118,6 +123,7 @@ def admin_user_archive_impl(user_id: int):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Arşivleme sırasında hata oluştu: {exc}", "danger")
     return redirect(url_for("main.admin_users"))
@@ -163,6 +169,7 @@ def admin_user_delete_impl(user_id: int):
         db.session.rollback()
         flash("Bu kullanıcı ilişkili kayıtlar nedeniyle silinemedi.", "danger")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Bu kullanıcı silinemedi: {exc}", "danger")
     return redirect(url_for("main.admin_users"))
@@ -200,6 +207,7 @@ def admin_user_toggle_active_impl(user_id: int):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Kullanıcı durumu güncellenirken hata oluştu: {exc}", "danger")
     return redirect(url_for("main.admin_users"))
@@ -210,6 +218,7 @@ def admin_users_reset_all_impl():
         db.session.commit()
         flash("Personel, hiyerarşi ve ilişkili performans verileri tamamen sıfırlandı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Sıfırlama işlemi sırasında hata oluştu: {exc}", "danger")
 

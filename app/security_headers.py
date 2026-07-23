@@ -8,6 +8,6 @@ from __future__ import annotations
 
 from app.security.headers import (  # noqa: F401
     DEFAULT_CSP,
-    build_csp_header,
     apply_default_security_headers,
+    build_csp_header,
 )

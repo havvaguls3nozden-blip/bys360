@@ -8,4 +8,4 @@ Yeni gerçek modül:
 app/schema_guard_core_maintenances.py
 """
 
-from .schema_guard_core_maintenances import TableRepair, TABLE_REPAIRS
+from .schema_guard_core_maintenances import TABLE_REPAIRS

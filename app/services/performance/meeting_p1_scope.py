@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Toplantı Kararları — Faz 7 P1 geliştirme servisi."""
-
 from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+
+"""BYS360 Toplantı Kararları — Faz 7 P1 geliştirme servisi."""
 
 logger = logging.getLogger(__name__)
 

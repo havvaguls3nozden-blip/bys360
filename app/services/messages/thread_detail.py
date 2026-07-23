@@ -1,15 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-logger = logging.getLogger(__name__)
-
-"""Mesaj thread detay, activity ve live okuma servisleri.
-
-Faz 6 kapsami yalnizca okuma/canli sayac davranisini tasir. Mesaj gonderme,
-ek kaydetme, reaksiyon ve kullanici durum POST islemleri bu fazda tasinmaz.
-"""
-
 from typing import Any
 
 from flask_login import current_user
@@ -20,6 +11,14 @@ from app.models import Message, MessageThread, MessageThreadParticipant
 from .inbox import build_thread_counts_payload
 from .repository import orm_entity, thread_for_user
 from .serialization import build_reaction_map, serialize_message
+
+logger = logging.getLogger(__name__)
+
+"""Mesaj thread detay, activity ve live okuma servisleri.
+
+Faz 6 kapsami yalnizca okuma/canli sayac davranisini tasir. Mesaj gonderme,
+ek kaydetme, reaksiyon ve kullanici durum POST islemleri bu fazda tasinmaz.
+"""
 
 
 def load_thread_detail_payload(thread_id: int, now) -> tuple[dict[str, Any], int]:

@@ -402,15 +402,24 @@ def seed_phase12_final_gate_settings(db: Any | None = None) -> dict[str, Any]:
                 {"module_key": module_key, "setting_key": setting_key},
             ).mappings().first()
             payload: dict[str, Any] = {}
-            if "module_key" in columns: payload["module_key"] = module_key
-            if "setting_key" in columns: payload["setting_key"] = setting_key
-            if "label" in columns: payload["label"] = label
-            if "value_type" in columns: payload["value_type"] = value_type
-            if "description" in columns: payload["description"] = description
-            if "is_active" in columns: payload["is_active"] = True
-            if "value_text" in columns: payload["value_text"] = str(default_value)
-            if "value" in columns: payload["value"] = str(default_value)
-            if "default_value" in columns: payload["default_value"] = str(default_value)
+            if "module_key" in columns:
+                payload["module_key"] = module_key
+            if "setting_key" in columns:
+                payload["setting_key"] = setting_key
+            if "label" in columns:
+                payload["label"] = label
+            if "value_type" in columns:
+                payload["value_type"] = value_type
+            if "description" in columns:
+                payload["description"] = description
+            if "is_active" in columns:
+                payload["is_active"] = True
+            if "value_text" in columns:
+                payload["value_text"] = str(default_value)
+            if "value" in columns:
+                payload["value"] = str(default_value)
+            if "default_value" in columns:
+                payload["default_value"] = str(default_value)
             if existing:
                 update_cols = [key for key in payload if key not in {"module_key", "setting_key"}]
                 if update_cols:

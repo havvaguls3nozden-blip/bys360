@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from app.security.audit import (  # noqa: F401
     SecurityAuditFinding,
+    build_security_audit_summary,
     collect_runtime_security_findings,
     findings_to_dicts,
-    build_security_audit_summary,
     log_runtime_security_posture,
 )

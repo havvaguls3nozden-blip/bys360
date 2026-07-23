@@ -5,7 +5,6 @@ Türkçe alias: /performans/operasyon-merkezi
 """
 from __future__ import annotations
 
-
 from flask import request
 from flask_login import current_user, login_required
 

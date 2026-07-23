@@ -418,7 +418,7 @@ try:
         menu_map.setdefault("general_section", True)
         menu_map.setdefault("home", True)
         menu_map.setdefault("dashboard", True)
-        main_enabled = any(bool(menu_map.get(_key, True if _key == "performance_module" else False)) for _key in _BYS360_PERFORMANCE_MAIN_KEYS_V4)
+        main_enabled = any(bool(menu_map.get(_key, _key == "performance_module")) for _key in _BYS360_PERFORMANCE_MAIN_KEYS_V4)
         if not main_enabled:
             for _key in _BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4:
                 menu_map[_key] = False

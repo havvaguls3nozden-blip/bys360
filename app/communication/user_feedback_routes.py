@@ -1,17 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-logger = logging.getLogger(__name__)
-
-"""BYS360 kullanıcı geri bildirim merkezi.
-
-Bu route ailesi, ekran hatası, eksik/geliştirme önerisi, tebrik ve teşekkür
-kayıtlarını mevcut Destek & Talep Yönetimi omurgasına güvenli biçimde bağlar.
-Ayrı ve kopuk bir veri adası oluşturmaz; kayıtlar destek tablolarında izlenebilir,
-atanabilir ve kapatılabilir kalır.
-"""
-
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from secrets import token_hex
@@ -36,6 +25,16 @@ from app.support.routes import (
     _store_ticket_attachment,
     _support_tables_ready,
 )
+
+logger = logging.getLogger(__name__)
+
+"""BYS360 kullanıcı geri bildirim merkezi.
+
+Bu route ailesi, ekran hatası, eksik/geliştirme önerisi, tebrik ve teşekkür
+kayıtlarını mevcut Destek & Talep Yönetimi omurgasına güvenli biçimde bağlar.
+Ayrı ve kopuk bir veri adası oluşturmaz; kayıtlar destek tablolarında izlenebilir,
+atanabilir ve kapatılabilir kalır.
+"""
 
 
 @dataclass(frozen=True)

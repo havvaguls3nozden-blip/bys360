@@ -132,10 +132,8 @@ def _legacy_can_user_post_to_wall_v28(actor: Any, wall_owner: Any, profile: Port
         return True
     if profile is None:
         profile = PortalProfile.query.filter_by(user_id=owner_id).first()
-    if profile is not None and getattr(profile, "is_wall_enabled", True) is False:
-        return False
     # Kurumsal portal V2.8: varsayılan davranış, aktif kullanıcıların açık profil duvarına paylaşım bırakabilmesidir.
-    return True
+    return not (profile is not None and getattr(profile, "is_wall_enabled", True) is False)
 
 # BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_PERMISSIONS
 def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | None = None) -> bool:
@@ -154,18 +152,14 @@ def can_user_post_to_wall(actor: Any, wall_owner: Any, profile: PortalProfile | 
         return True
     if profile is None:
         profile = PortalProfile.query.filter_by(user_id=owner_id).first()
-    if profile is not None and getattr(profile, "is_wall_enabled", True) is False:
-        return False
-    return True
+    return not (profile is not None and getattr(profile, "is_wall_enabled", True) is False)
 
 # BYS360_PORTAL_PEOPLE_PREMIUM_V2_10_REMOVED_HELPER
 def is_portal_post_removed(post: PortalPost) -> bool:
     status = (getattr(post, "status", "") or "").strip().lower()
     if status in {"deleted", "removed", "hidden", "archived"}:
         return True
-    if getattr(post, "hidden_at", None):
-        return True
-    return False
+    return bool(getattr(post, "hidden_at", None))
 
 def can_user_delete_post(actor: Any, post: PortalPost) -> bool:
     """Paylaşımı silme/yayından kaldırma yetkisini belirler."""
@@ -178,9 +172,7 @@ def can_user_delete_post(actor: Any, post: PortalPost) -> bool:
         return True
     if getattr(post, "author_user_id", None) and int(post.author_user_id) == actor_id:
         return True
-    if getattr(post, "wall_owner_user_id", None) and int(post.wall_owner_user_id) == actor_id:
-        return True
-    return False
+    return bool(getattr(post, "wall_owner_user_id", None) and int(post.wall_owner_user_id) == actor_id)
 
 def list_active_groups_for_user(user: Any, *, include_all_for_manager: bool = False) -> list[PortalGroup]:
     query = PortalGroup.query.filter_by(is_active=True)
@@ -437,9 +429,7 @@ def _is_press_news_home_excluded_v4(post: Any) -> bool:
         return True
     if post_type == "corporate_announcement" and "baskanligimiz hakkinda basinda yer alan haber" in body:
         return True
-    if "kaynak:" in body and "baglanti:" in body and "haber:" in body and "basinda" in body:
-        return True
-    return False
+    return "kaynak:" in body and "baglanti:" in body and "haber:" in body and "basinda" in body
 
 # Compatibility guard.
 def portal_home_context(user: Any) -> dict[str, Any]:

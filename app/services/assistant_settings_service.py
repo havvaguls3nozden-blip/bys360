@@ -1,18 +1,18 @@
 from __future__ import annotations
 
+import unicodedata
+from typing import Any
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
+
 """BYS360 Asistan ayar okuma servisi.
 
 Bu servis, Asistan davranışını mevcut module_settings tablosundan okur.
 Yeni tablo veya migrasyon gerektirmez. Ayar yoksa güvenli varsayılanlarla çalışır.
 BYS360 Asistan idari karar üretmez; bu servis yalnızca görünürlük ve davranış bayraklarını yönetir.
 """
-
-from typing import Any
-import unicodedata
-
-from sqlalchemy.exc import SQLAlchemyError
-
-from app.extensions import db
 
 ASSISTANT_MODULE_KEY = "assistant"
 ASSISTANT_SETTINGS_URL = "/settings#assistant-role-policy"

@@ -60,9 +60,7 @@ def is_protected(path: str) -> bool:
     p = normalize(path)
     if any(p.startswith(prefix) for prefix in PROTECTED_PREFIXES):
         return True
-    if any(part in p for part in PROTECTED_SUBSTRINGS):
-        return True
-    return False
+    return any(part in p for part in PROTECTED_SUBSTRINGS)
 
 
 def is_review_only(path: str) -> bool:
@@ -89,10 +87,7 @@ def is_auto_quarantine(path: str) -> bool:
     if p.startswith("app/") and base.startswith("schema_guard_") and "snippet" in base and p.endswith(".py"):
         return True
 
-    if p.startswith("app/services/performance/") and p.endswith(".py") and any(k in base for k in KEYWORDS):
-        return True
-
-    return False
+    return p.startswith("app/services/performance/") and p.endswith(".py") and any(k in base for k in KEYWORDS)
 
 
 def classify(path: str) -> str:

@@ -5,7 +5,10 @@ from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.route_support import manager_required
-from app.services.performance.meeting_p3_reminders import build_p3_reminders_context, run_p3_reminders
+from app.services.performance.meeting_p3_reminders import (
+    build_p3_reminders_context,
+    run_p3_reminders,
+)
 
 
 @main_bp.route("/performance/meeting-development/faz9", endpoint="performance_meeting_p3_reminders")

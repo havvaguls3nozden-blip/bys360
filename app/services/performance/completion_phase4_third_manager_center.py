@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
+from typing import Any
 
 """BYS360 Performans Tamamlama Faz 4 - 3. Amir Opsiyonelliği ve Akış Temizliği.
 
@@ -11,10 +14,6 @@ modunu net ayırmak ve ağırlıkları her durumda %100'e tamamlamaktır.
 Servis uygulama bağlamı olmadan da import edilebilir. Flask/DB bağlamı varsa
 module_settings tablosundaki ayarları güvenli şekilde okur/seed eder.
 """
-
-from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

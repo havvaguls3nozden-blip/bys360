@@ -1,13 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
-"""Performans yönetimi admin çekirdek rotaları.
-
-Bu dosya değerlendirme kriterleri, dönem yönetimi ve görev üretimi
-akışlarını modüler yapı altında yönetir.
-"""
 
 from flask import current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -16,30 +9,38 @@ from sqlalchemy import or_
 from app.extensions import db
 from app.models import (
     EvaluationAssignment,
-    PerformanceCriteria,
-    PersonnelCategory,
     OrganizationUnit,
+    PerformanceCriteria,
     PerformanceEvaluation,
     PerformanceEvaluationItem,
     PerformancePeriod,
     PerformanceWeightConfig,
+    PersonnelCategory,
     User,
 )
 from app.route_registry import main_bp
-from app.route_support import admin_required, safe_render, ensure_boolean_toggle
-from app.services.hierarchy_admin_service import parse_date
+from app.route_support import admin_required, ensure_boolean_toggle, safe_render
 from app.services.ai.dashboard_panels import build_period_form_ai_panel, build_periods_ai_panel
-from app.services.performance_admin_service import seed_default_performance_criteria
+from app.services.hierarchy_admin_service import parse_date
+from app.services.performance.assignment_rule_audit import build_assignment_generation_preflight
+from app.services.performance.common import _safe_float, get_evaluation_window_state
+from app.services.performance.period_delete_service import (
+    delete_performance_period_with_related_records,
+)
 from app.services.performance.period_forms import parse_period_form
-from app.services.performance.period_delete_service import delete_performance_period_with_related_records
-from app.services.performance.common import _safe_float, _safe_int, get_evaluation_window_state
+from app.services.performance_admin_service import seed_default_performance_criteria
 from app.services.performance_service import (
     build_assignment_log_summary,
     build_assignment_unit_summary,
     generate_assignments_for_active_period,
     get_latest_assignment_generation_logs,
 )
-from app.services.performance.assignment_rule_audit import build_assignment_generation_preflight
+
+"""Performans yönetimi admin çekirdek rotaları.
+
+Bu dosya değerlendirme kriterleri, dönem yönetimi ve görev üretimi
+akışlarını modüler yapı altında yönetir.
+"""
 logger = logging.getLogger(__name__)
 
 

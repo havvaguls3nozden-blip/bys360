@@ -1,15 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-
-"""Faz 11: AI yönetici ekranı ve güvenli rapor export servisi.
-
-Bu servis yalnızca okuma ve güvenli raporlama yapar. Ham AI istem/yanıt
-metinlerini, kişisel verileri ve gerçek içe aktarım satırlarını dışa vermez.
-Faz 10 görünürlük/maskeleme kapısı ile uyumlu çalışır; AI nihai karar vermez,
-öneri uygulamaz, kayıt oluşturmaz ve kayıt güncellemez.
-"""
-
 import json
 import re
 from collections import Counter, defaultdict
@@ -18,6 +8,7 @@ from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.models import (
     AIFeedbackLog,
     AIRecommendation,
@@ -26,6 +17,14 @@ from app.models import (
     AISummaryCache,
 )
 from app.services.ai.module_scope import is_visible_ai_module
+
+"""Faz 11: AI yönetici ekranı ve güvenli rapor export servisi.
+
+Bu servis yalnızca okuma ve güvenli raporlama yapar. Ham AI istem/yanıt
+metinlerini, kişisel verileri ve gerçek içe aktarım satırlarını dışa vermez.
+Faz 10 görünürlük/maskeleme kapısı ile uyumlu çalışır; AI nihai karar vermez,
+öneri uygulamaz, kayıt oluşturmaz ve kayıt güncellemez.
+"""
 
 try:  # Faz 10 overlay uygulanmışsa güvenli export politikası oradan okunur.
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot

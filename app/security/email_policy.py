@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from flask import current_app
 
-
 DEFAULT_ALLOWED_EMAIL_DOMAINS = ("ktb.gov.tr",)
 
 

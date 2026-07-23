@@ -1,21 +1,13 @@
 from __future__ import annotations
 
 import logging
-
-from app.core.datetime_utils import utc_now
-
-"""BYS360 Dalga 8 çekirdek sağlık paneli.
-
-Onarım yapmaz; performans çekirdeğinin zincir, görünürlük, yayın, route,
-güvenlik ve canlı omurga durumunu tek sözleşmede raporlar.
-"""
-
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
 from flask import current_app, has_app_context
 
+from app.core.datetime_utils import utc_now
 from app.models import (
     EvaluationAssignment,
     OrganizationUnit,
@@ -31,6 +23,12 @@ from app.services.performance.chain_rule_engine import (
 from app.services.performance.health_report import build_performance_task_health_report
 from app.services.performance.publish_guard import build_publish_preflight_report
 from app.services.performance.visibility_guard import BLIND_REVIEW_ALLOWED, VISIBILITY_RULE_VERSION
+
+"""BYS360 Dalga 8 çekirdek sağlık paneli.
+
+Onarım yapmaz; performans çekirdeğinin zincir, görünürlük, yayın, route,
+güvenlik ve canlı omurga durumunu tek sözleşmede raporlar.
+"""
 
 logger = logging.getLogger(__name__)
 

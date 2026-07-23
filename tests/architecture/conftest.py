@@ -77,8 +77,10 @@ except AttributeError:
 BYS360_ACTIVE_ARCHITECTURE_TESTS = tuple(list(globals().get('BYS360_ACTIVE_ARCHITECTURE_TESTS', ())) + ['test_mobile_api_auth_guard_matrix_p4a.py'])
 # BYS360_P4B_ACTIVE_SCOPE
 BYS360_ACTIVE_ARCHITECTURE_TESTS = tuple(list(globals().get('BYS360_ACTIVE_ARCHITECTURE_TESTS', ())) + ['test_mobile_api_role_boundary_matrix_p4b_v3.py'])
-"test_mobile_api_security_suite_p4c_v2.py",
-"test_mobile_api_security_evidence_p4d.py",
+# BYS360_P4C_ACTIVE_SCOPE
+BYS360_ACTIVE_ARCHITECTURE_TESTS = tuple(list(globals().get('BYS360_ACTIVE_ARCHITECTURE_TESTS', ())) + ['test_mobile_api_security_suite_p4c_v2.py'])
+# BYS360_P4D_ACTIVE_SCOPE
+BYS360_ACTIVE_ARCHITECTURE_TESTS = tuple(list(globals().get('BYS360_ACTIVE_ARCHITECTURE_TESTS', ())) + ['test_mobile_api_security_evidence_p4d.py'])
 
 # BYS360 P4E active architecture scope marker
 try:

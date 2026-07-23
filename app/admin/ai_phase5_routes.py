@@ -5,6 +5,7 @@ from __future__ import annotations
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
 import csv
 import io
+import logging
 
 from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -15,6 +16,8 @@ from app.route_support import admin_required, menu_key_required, safe_db_rollbac
 from app.services.ai.admin_queue import build_review_queue_snapshot
 from app.services.ai.audit import mark_recommendation
 from app.services.ai.recommendation_actions import bulk_apply_recommendations
+
+logger = logging.getLogger(__name__)
 
 
 def _safe_ids(values: list[str]) -> list[int]:
@@ -129,6 +132,7 @@ def admin_ai_review_queue_bulk():
         else:
             flash('Desteklenmeyen toplu AI işlemi seçildi.', 'warning')
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f'AI toplu işleminde hata oluştu: {exc}', 'danger')
     return redirect(redirect_url)

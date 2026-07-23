@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass, field
+from typing import Any
+
+from app.services.hierarchy_rulebook_service import is_president, is_system_user
+from app.services.performance.chain_rule_engine import resolve_authoritative_chain
+
+from .common import build_assignment_due_date
 
 logger = logging.getLogger(__name__)
 
@@ -15,19 +22,11 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-from dataclasses import dataclass, field
-from typing import Any
-
 try:
     from flask import current_app
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     current_app = None
-
-from app.services.hierarchy_rulebook_service import is_president, is_system_user
-from app.services.performance.chain_rule_engine import resolve_authoritative_chain
-
-from .common import build_assignment_due_date
 
 try:
     from app.extensions import db
@@ -212,7 +211,7 @@ def build_all_manager_chains(users: list[Any] | None = None, period: Any = None)
 def analyze_hierarchy_rows(period_id: int | None = None) -> list[dict[str, Any]]:
     users = fetch_active_users()
     rows = []
-    for user, chain in zip(users, build_all_manager_chains(users, period_id), strict=False):
+    for _user, chain in zip(users, build_all_manager_chains(users, period_id), strict=False):
         rows.append(
             {
                 'employee_id': chain.employee_id,

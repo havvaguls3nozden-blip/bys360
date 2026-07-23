@@ -1,6 +1,7 @@
 import os
 import re
-from locust import HttpUser, task, between
+
+from locust import HttpUser, between, task
 
 REDIRECT_CODES = {301, 302, 303, 307, 308}
 

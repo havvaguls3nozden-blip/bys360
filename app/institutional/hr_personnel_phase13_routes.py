@@ -3,15 +3,14 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_CHILD_IMPORT
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
-
-from app.core.datetime_utils import utc_now
-from datetime import date, datetime
+import logging
 from hashlib import sha256
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     PersonnelApprovalStation,
@@ -22,9 +21,25 @@ from app.models import (
     User,
 )
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
-from .hr_personnel_extension_routes import _base_context, _full_name, _normalize_text, _parse_date, _safe_int, _scope_user_options
+from .hr_personnel_extension_routes import (
+    _base_context,
+    _full_name,
+    _normalize_text,
+    _parse_date,
+    _safe_int,
+    _scope_user_options,
+)
+
+logger = logging.getLogger(__name__)
 
 APPROVAL_STATUS_LABELS = {
     "pending": "Bekliyor",
@@ -223,6 +238,7 @@ def hr_personnel_approval_station_save():
         flash("Onay istasyonu kaydedildi.", "success")
         return _redirect_phase13("main.hr_personnel_approval_station_center", user_id=user_id, scope_mode=selected_scope_mode, station_id=row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_phase13("main.hr_personnel_approval_station_center", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
@@ -248,6 +264,7 @@ def hr_personnel_approval_station_decide():
         flash("Onay istasyonu güncellendi.", "success")
         return _redirect_phase13("main.hr_personnel_approval_station_center", user_id=int(row.user_id), scope_mode=selected_scope_mode, station_id=row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_phase13("main.hr_personnel_approval_station_center", scope_mode=selected_scope_mode)
@@ -347,6 +364,7 @@ def hr_personnel_digital_document_save():
         flash("Dijital tutanak kaydedildi.", "success")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", user_id=user_id, scope_mode=selected_scope_mode, document_id=row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
@@ -379,6 +397,7 @@ def hr_personnel_digital_document_status():
         flash("Dijital tutanak durumu güncellendi.", "success")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", user_id=int(row.user_id), scope_mode=selected_scope_mode, document_id=row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", scope_mode=selected_scope_mode)
@@ -472,6 +491,7 @@ def hr_personnel_exit_risk_save():
         flash("Ayrılış risk değerlendirmesi kaydedildi.", "success")
         return _redirect_phase13("main.hr_personnel_exit_risk_center", user_id=user_id, scope_mode=selected_scope_mode, assessment_id=row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_phase13("main.hr_personnel_exit_risk_center", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)

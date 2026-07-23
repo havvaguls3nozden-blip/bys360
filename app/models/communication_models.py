@@ -1,10 +1,12 @@
 """Mesajlasma, anket ve geri bildirim akisi modelleri."""
 
 
+import logging
+
 from app.core.datetime_utils import utc_now
 
 from .base import TimestampMixin, db
-import logging
+
 logger = logging.getLogger(__name__)
 
 

@@ -2,13 +2,6 @@ from __future__ import annotations
 
 import logging
 
-"""Phase 45 modular performance history import route family.
-
-24 Aralik 2025'te bu projeyi ilk acarken aklimda boyle bir import ekrani bile yoktu.
-Simdi var. Ve artik ana routes.py icinden cikti. Faz 7'de bunu daha guvenli hale
-getirdim: gecmis veri etiketi net, aktif donem korumasi net, preview daha okunur.
-"""
-
 from collections import OrderedDict
 from datetime import UTC, datetime
 
@@ -64,6 +57,12 @@ from app.services.performance.history_import import (
 from app.services.performance.history_import import (
     validate_history_row as _validate_history_row,
 )
+"""Phase 45 modular performance history import route family.
+
+24 Aralik 2025'te bu projeyi ilk acarken aklimda boyle bir import ekrani bile yoktu.
+Simdi var. Ve artik ana routes.py icinden cikti. Faz 7'de bunu daha guvenli hale
+getirdim: gecmis veri etiketi net, aktif donem korumasi net, preview daha okunur.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +189,7 @@ def performance_history_import():
             status=_legacy_pick(row, header_index, "status", "durum", default="tamamlandi") or "tamamlandi",
         )
 
-        for key in header_index.keys():
+        for key in header_index:
             if key not in {
                 "ad", "adi", "isim", "soyad", "soyadi", "ad soyad", "ad_soyad",
                 "employee_name", "personel", "sicil_no", "sicil no", "birim",
@@ -368,10 +367,7 @@ def performance_history_import_commit(batch_id):
             ust_birim_raw = _legacy_norm(row_data.get("ust_birim_raw"))
             unit = _resolve_unit_for_legacy(birim_raw, ust_birim_raw)
 
-            if unit and unit.unit_code:
-                organization_unit_code_snapshot = unit.unit_code
-            else:
-                organization_unit_code_snapshot = None
+            organization_unit_code_snapshot = unit.unit_code if unit and unit.unit_code else None
 
             current_snapshot = PerformanceResultSnapshot.query.filter_by(
                 period_id=batch.period_id,

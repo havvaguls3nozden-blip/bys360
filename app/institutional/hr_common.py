@@ -1,18 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-
-"""BYS360 canlı çekirdek kurumsal/personel route düzeltmeleri.
-
-Bu dosyanın amacı geçici shim yönlendirmelerini kaldırıp canlıda kalacak
-Birim/Pozisyon, Personel Özlük, İzin-Devamsızlık ve Kontrol Paneli
-bağlantılarını gerçek ekranlara bağlamaktır.
-
-Kapsam dışı bırakılan repository/education/strategy/portal modülleri burada
-bilinçli olarak yüklenmez. Dosya savunmacıdır: eksik tablo veya eksik opsiyonel
-alt route modülü uygulamayı düşürmez, güvenli ve boş veriyle çalışan ekran açar.
-"""
-
 import csv
 import io
 from collections.abc import Iterable
@@ -26,6 +13,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import inspect, or_
 from werkzeug.routing import BuildError
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.route_registry import main_bp
 from app.route_support import (
@@ -36,6 +24,17 @@ from app.route_support import (
     safe_db_rollback,
     safe_render,
 )
+
+"""BYS360 canlı çekirdek kurumsal/personel route düzeltmeleri.
+
+Bu dosyanın amacı geçici shim yönlendirmelerini kaldırıp canlıda kalacak
+Birim/Pozisyon, Personel Özlük, İzin-Devamsızlık ve Kontrol Paneli
+bağlantılarını gerçek ekranlara bağlamaktır.
+
+Kapsam dışı bırakılan repository/education/strategy/portal modülleri burada
+bilinçli olarak yüklenmez. Dosya savunmacıdır: eksik tablo veya eksik opsiyonel
+alt route modülü uygulamayı düşürmez, güvenli ve boş veriyle çalışan ekran açar.
+"""
 
 try:  # Modeller sürümler arasında parçalı olabilir; route katmanı düşmemeli.
     from app.models import (

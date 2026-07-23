@@ -89,7 +89,7 @@ def apply_runtime_policy_blocks(ns: dict[str, Any], *, logging: Any) -> None:
         if isinstance(_target, set):
             _target.update(_BYS360_MANUAL_POLICY.keys())
         elif isinstance(_target, list):
-            _target.extend([_k for _k in _BYS360_MANUAL_POLICY.keys() if _k not in _target])
+            _target.extend([_k for _k in _BYS360_MANUAL_POLICY if _k not in _target])
     # BYS360_SETTINGS_MANUAL_V1_EFFECTIVE_MENU_END
 
     # BYS360_SETTINGS_MANUAL_V1_1_REMINDERS_POLICY_BEGIN
@@ -240,7 +240,7 @@ def apply_runtime_policy_blocks(ns: dict[str, Any], *, logging: Any) -> None:
             _target.update(_BYS360_PERSONEL_ALLOWED_POLICY.keys())
         elif isinstance(_target, list):
             _target[:] = [_key for _key in _target if _key not in _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS]
-            _target.extend([_key for _key in _BYS360_PERSONEL_ALLOWED_POLICY.keys() if _key not in _target])
+            _target.extend([_key for _key in _BYS360_PERSONEL_ALLOWED_POLICY if _key not in _target])
     # BYS360_PERSONEL_LIVE_SCOPE_NARROW_V1_EFFECTIVE_MENU_END
 
     # BYS360_PERSONEL_ROLE_MATRIX_CURRENT_SCOPE_V1_EFFECTIVE_MENU_BEGIN

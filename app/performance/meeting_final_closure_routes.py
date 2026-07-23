@@ -5,7 +5,10 @@ from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.route_support import manager_required
-from app.services.performance.meeting_final_closure import build_final_closure_context, run_final_closure_check
+from app.services.performance.meeting_final_closure import (
+    build_final_closure_context,
+    run_final_closure_check,
+)
 
 
 @main_bp.route('/performance/meeting-development/final-closure', endpoint='performance_meeting_final_closure')

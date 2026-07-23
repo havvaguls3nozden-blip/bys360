@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
 
-"""Analiz Merkezi servis envanteri."""
-
-
 from .live_scope import (
     ANALYTICS_SURFACE_KEYS,
     build_analytics_surface_summary,
@@ -14,6 +11,8 @@ from .summary_pipeline import (
     build_analytics_summary_cache_plan,
     build_analytics_summary_pipeline_summary,
 )
+
+"""Analiz Merkezi servis envanteri."""
 
 
 def build_analytics_center_faz0_inventory() -> dict[str, object]:

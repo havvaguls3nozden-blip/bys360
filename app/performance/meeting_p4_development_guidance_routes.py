@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, render_template, request, url_for
@@ -10,8 +9,10 @@ from app.extensions import db
 from app.models import PerformanceEvaluation
 from app.route_registry import main_bp
 from app.route_support import manager_required
+
 # BYS360_STUB_AI_V60_DEVELOPMENT_IMPORT
 from app.services.ai.stub_panel_bridge import attach_development_guidance_ai_panel
+
 # /BYS360_STUB_AI_V60_DEVELOPMENT_IMPORT
 from app.services.performance.meeting_p4_development_guidance import (
     build_p4_development_guidance_context,
@@ -19,6 +20,7 @@ from app.services.performance.meeting_p4_development_guidance import (
     run_p4_development_guidance,
     save_development_recommendation,
 )
+
 logger = logging.getLogger(__name__)
 
 try:

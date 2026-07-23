@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 """BYS360 Faz 3.6 — Yayın sonrası aynı seviye puan görünürlüğü.
 
@@ -13,8 +14,6 @@ Güvenlik sınırı:
 - Kriter detayı, amir görüşleri, PDF ve detay karne bu görünümde açılmaz.
 - Başkan/Admin genel görünüm kuralları bu servisten bağımsız çalışmaya devam eder.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

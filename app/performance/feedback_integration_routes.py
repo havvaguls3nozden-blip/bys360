@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
+
 from flask import render_template, request
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.services.performance.feedback_integration import build_integration_context
-import logging
+
 logger = logging.getLogger(__name__)
 
 

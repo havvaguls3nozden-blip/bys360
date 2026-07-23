@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+from typing import Any
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
+
 """BYS360 Sistem Künyesi ayar okuma servisi.
 
 Künye sayfası içeriği mevcut system_settings tablosundan okunur.
 Yeni tablo veya migrasyon gerektirmez. Ayar yoksa güvenli varsayılan
 kurumsal metinlerle çalışır.
 """
-
-from typing import Any
-from sqlalchemy.exc import SQLAlchemyError
-from app.extensions import db
 
 KUNYE_SETTING_PREFIX = "kunye."
 

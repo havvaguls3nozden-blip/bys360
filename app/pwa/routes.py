@@ -3,7 +3,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flask import Blueprint, Response, current_app, jsonify, make_response, render_template, render_template_string, send_from_directory
+from flask import (
+    Blueprint,
+    Response,
+    current_app,
+    jsonify,
+    make_response,
+    render_template,
+    render_template_string,
+    send_from_directory,
+)
 
 pwa_bp = Blueprint("pwa", __name__)
 

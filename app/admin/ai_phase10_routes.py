@@ -3,7 +3,6 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
-
 import csv
 import io
 import json
@@ -116,6 +115,7 @@ def admin_ai_acceptance_pack_export_csv():
 def admin_ai_visibility_gate():
     """Faz 10: Yetki, KVKK maskeleme ve güvenli görünürlük kapısı."""
     from flask_login import current_user
+
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot
 
     fallback = _schema_fallback('AI Yetki, KVKK Maskeleme ve Güvenli Görünürlük Kapısı')
@@ -139,7 +139,11 @@ def admin_ai_visibility_gate_export():
     """Faz 10 güvenli görünürlük matrisini ham AI metni olmadan CSV verir."""
     from flask_login import current_user
     from werkzeug.exceptions import Forbidden
-    from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot, export_visibility_gate_rows
+
+    from app.services.ai.visibility_gate import (
+        build_ai_visibility_gate_snapshot,
+        export_visibility_gate_rows,
+    )
 
     snapshot = build_ai_visibility_gate_snapshot(
         current_user=current_user,

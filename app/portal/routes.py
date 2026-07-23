@@ -505,10 +505,9 @@ def portal_post_create():
             wall_owner_profile = get_or_create_profile(wall_owner_user)
         else:
             wall_owner_profile = PortalProfile.query.filter_by(user_id=wall_owner_user_id).first()
-    if wall_owner_user and int(wall_owner_user_id) != int(getattr(current_user, "id", 0) or 0):
-        if not _portal_has_permission("portal_wall_post"):
-            flash("Başka personelin profil duvarına paylaşım yapma yetkiniz bulunmamaktadır.", "warning")
-            return redirect(request.referrer or url_for("main.portal_feed"))
+    if wall_owner_user and int(wall_owner_user_id) != int(getattr(current_user, "id", 0) or 0) and not _portal_has_permission("portal_wall_post"):
+        flash("Başka personelin profil duvarına paylaşım yapma yetkiniz bulunmamaktadır.", "warning")
+        return redirect(request.referrer or url_for("main.portal_feed"))
     if not wall_owner_user or not can_user_post_to_wall(current_user, wall_owner_user, wall_owner_profile):
         flash("Bu profil duvarına paylaşım yapma yetkiniz bulunmamaktadır.", "warning")
         return redirect(request.referrer or url_for("main.portal_feed"))

@@ -4,18 +4,19 @@ from __future__ import annotations
 # Başkan onayı URL'leri backend route seviyesinde yalnızca Başkan/Admin ailesine veri vermelidir.
 # Bu dosyadaki mevcut can_access_president_approvals / abort(403) kontrolleri Faz 3.3 kapsamının parçasıdır.
 # -*- coding: utf-8 -*-
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
+from app.services.performance.president_card_review_service import (
+    build_president_card_review_context,
+)
 from app.services.performance.process_engine_phase6_president_approvals import (
     build_president_approval_workspace,
     can_view_president_approvals,
     decide_president_approval,
     delete_president_approval_record,
 )
-from app.services.performance.president_card_review_service import build_president_card_review_context
 
 
 def _render_president_approvals_access_denied():

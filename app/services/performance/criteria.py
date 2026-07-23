@@ -31,7 +31,7 @@ def get_level_items_map(evaluation_id: int, manager_level: int) -> dict[int, Per
             result[criteria_id] = row
     return result
 
-def level_1_gave_any_three(evaluation_or_id: Union[int, PerformanceEvaluation]) -> bool:
+def level_1_gave_any_three(evaluation_or_id: int | PerformanceEvaluation) -> bool:
     evaluation_id = evaluation_or_id.id if hasattr(evaluation_or_id, "id") else int(evaluation_or_id)
     items = get_level_items_map(evaluation_id, 1).values()
     return any(_safe_float(getattr(item, "score", None), 0) == 3 for item in items)

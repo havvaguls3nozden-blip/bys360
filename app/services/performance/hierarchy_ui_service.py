@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections import OrderedDict
+from collections.abc import Iterable
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -25,9 +28,6 @@ Ne zaman kaldırılabilir:
 Bağımlı olduğu:
 - app.performance.hierarchy_ui_routes
 """
-
-from collections import OrderedDict
-from collections.abc import Iterable
 
 SPECIAL_SINGLE_MANAGER_UNITS = {"HUKUK MÜŞAVİRLİĞİ", "DANIŞMANLIK", "İÇ DENETİM", "ÖZEL KALEM"}
 SPECIAL_TOP_ROLES = {"baskan", "baskan_yardimcisi"}

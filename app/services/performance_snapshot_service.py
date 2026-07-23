@@ -1,6 +1,20 @@
 from __future__ import annotations
 
+from collections import defaultdict
+from datetime import date
+from typing import Any
+
+from app import db
 from app.core.datetime_utils import utc_now
+from app.models import (
+    EmployeeOrgAssignmentHistory,
+    OrganizationUnit,
+    PerformanceEvaluation,
+    PerformanceEvaluationItem,
+    PerformancePeriod,
+    PerformanceResultSnapshot,
+    User,
+)
 
 # --- BYS360 third-manager Excel import compatibility patch ---
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
@@ -12,21 +26,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from collections import defaultdict
-from datetime import date
-from typing import Any
-
-from app import db
-from app.models import (
-    EmployeeOrgAssignmentHistory,
-    OrganizationUnit,
-    PerformanceEvaluation,
-    PerformanceEvaluationItem,
-    PerformancePeriod,
-    PerformanceResultSnapshot,
-    User,
-)
 
 
 def _full_name(user: User | None) -> str:

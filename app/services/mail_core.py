@@ -226,10 +226,7 @@ def _mask_email_address(value: str | None) -> str:
     if not email:
         return "-"
     local, _, domain = email.partition("@")
-    if len(local) <= 2:
-        local_mask = (local[:1] or "*") + "***"
-    else:
-        local_mask = local[:2] + "***"
+    local_mask = (local[:1] or "*") + "***" if len(local) <= 2 else local[:2] + "***"
     return f"{local_mask}@{domain}"
 
 

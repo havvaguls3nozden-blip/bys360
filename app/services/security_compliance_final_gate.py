@@ -175,7 +175,7 @@ def _check_compile(root: Path, files: dict[str, str], findings: list[Finding]) -
     elif non_runtime_bad:
         _add(findings, "UYARI", "python.syntax", "Çalışma zamanı dışı Python sözdizimi uyarısı var", "; ".join(non_runtime_bad[:12]))
     else:
-        _add(findings, "OK", "python.syntax", f"Python sözdizimi statik kontrolü temiz", f"dosya={len(py_files)}")
+        _add(findings, "OK", "python.syntax", "Python sözdizimi statik kontrolü temiz", f"dosya={len(py_files)}")
 
 
 def _check_env_and_secret_hygiene(root: Path, files: dict[str, str], findings: list[Finding]) -> None:
@@ -452,7 +452,7 @@ def _to_md(report: SecurityComplianceReport) -> str:
     for f in report.findings:
         rows.append(f"| {f.level} | `{f.code}` | {f.title.replace('|', '/')} | {f.detail.replace('|', '/') if f.detail else ''} | {f.path.replace('|', '/') if f.path else ''} |")
     return "\n".join([
-        f"# BYS360 Güvenlik ve Uyum Final Gate",
+        "# BYS360 Güvenlik ve Uyum Final Gate",
         "",
         f"- Durum: **{status}**",
         f"- Sürüm: `{report.version}`",

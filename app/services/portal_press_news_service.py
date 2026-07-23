@@ -95,10 +95,12 @@ def _press_news_sort_key(item: dict[str, Any]) -> float:
     values = [item.get('published_at_iso'), item.get('published_at'), item.get('published_at_text'), item.get('approved_at'), item.get('created_at'), item.get('updated_at')]
     for raw in values:
         value = str(raw or '').strip()
-        if not value: continue
+        if not value:
+            continue
         try:
             dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
-            if dt.tzinfo is None: dt = dt.replace(tzinfo=UTC)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
         except Exception:
             import logging
@@ -106,7 +108,8 @@ def _press_news_sort_key(item: dict[str, Any]) -> float:
             pass
         try:
             dt = email.utils.parsedate_to_datetime(value)
-            if dt.tzinfo is None: dt = dt.replace(tzinfo=UTC)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
         except Exception:
             import logging

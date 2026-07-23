@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
+import logging
 from datetime import datetime, timedelta
 
 from flask import current_app, flash, make_response, redirect, request, session, url_for
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import User
 from app.main_handlers.constants import SECURITY_QUESTION_CHOICES
+from app.models import User
 from app.route_support import create_login_captcha, get_login_captcha_question, safe_render
+from app.security.email_policy import corporate_email_error_message, is_allowed_corporate_email
 from app.security.request_guard import (
     clear_auth_failures,
     get_auth_throttle_state,
@@ -19,8 +21,7 @@ from app.security.request_guard import (
     record_auth_failure,
     should_log_auth_throttle,
 )
-from app.security.email_policy import corporate_email_error_message, is_allowed_corporate_email
-import logging
+
 logger = logging.getLogger(__name__)
 
 

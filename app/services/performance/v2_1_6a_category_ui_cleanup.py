@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-"""BYS360 V2.1.6A kurumsal arayüz ve güvenli kategori silme yardımcıları."""
-
 import re
 from typing import Any
 
@@ -16,6 +14,8 @@ from app.services.performance.v2_1_2_category_engine import (
     ensure_category_schema,
     list_categories,
 )
+
+"""BYS360 V2.1.6A kurumsal arayüz ve güvenli kategori silme yardımcıları."""
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ def category_usage_summary(category_key: str) -> dict[str, int]:
     if _has_table("performance_category_period_scope_plans"):
         counts["period_plans"] = int(db.session.execute(text(f"SELECT COUNT(*) FROM performance_category_period_scope_plans WHERE category_key=:key AND is_active={_bool_true_sql()}"), {"key": key}).scalar() or 0)
     if _has_table("performance_category_period_scope_integrations"):
-        counts["period_integrations"] = int(db.session.execute(text(f"SELECT COUNT(*) FROM performance_category_period_scope_integrations WHERE category_key=:key"), {"key": key}).scalar() or 0)
+        counts["period_integrations"] = int(db.session.execute(text("SELECT COUNT(*) FROM performance_category_period_scope_integrations WHERE category_key=:key"), {"key": key}).scalar() or 0)
     counts["total_links"] = sum(counts.values())
     return counts
 

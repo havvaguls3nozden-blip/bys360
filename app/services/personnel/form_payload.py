@@ -90,7 +90,7 @@ def _form_get(form: Mapping[str, Any], key: str, default: Any = "") -> Any:
     getter = getattr(form, "get", None)
     if callable(getter):
         return getter(key, default)
-    return form[key] if key in form else default
+    return form.get(key, default)
 
 
 def _clean_text(value: Any) -> str:

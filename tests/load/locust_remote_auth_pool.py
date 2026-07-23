@@ -1,8 +1,9 @@
+import itertools
 import os
 import re
-import itertools
 from pathlib import Path
-from locust import HttpUser, task, between
+
+from locust import HttpUser, between, task
 
 REDIRECT_CODES = {301, 302, 303, 307, 308}
 

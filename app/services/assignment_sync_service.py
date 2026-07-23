@@ -152,9 +152,7 @@ def _is_system_user(user: Any) -> bool:
         return True
     if _norm(getattr(user, "birim", "")) in SYSTEM_UNIT_NAMES:
         return True
-    if _norm(getattr(user, "ust_birim", "")) in SYSTEM_UNIT_NAMES:
-        return True
-    return False
+    return _norm(getattr(user, "ust_birim", "")) in SYSTEM_UNIT_NAMES
 
 
 def _is_special_unit(user: Any) -> bool:

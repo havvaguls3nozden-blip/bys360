@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from app.main_handlers.account_communication_helpers import (
     SECURITY_QUESTION_CHOICES,
     _delete_profile_photo_file,
@@ -15,6 +17,8 @@ from app.main_handlers.account_communication_helpers import (
     utc_now,
 )
 from app.main_handlers.account_settings_helpers import account, settings_page  # noqa: F401
+
+logger = logging.getLogger(__name__)
 
 # Hesap güvenliği ve profil fotoğrafı işlemleri burada kalır; hesap/ayar ekranları
 # account_settings_helpers üzerinden geriye dönük uyumla dışa aktarılır.
@@ -45,6 +49,7 @@ def account_change_photo():
         return redirect(redirect_target)
 
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Profil fotoğrafı güncellenirken hata oluştu: {exc}", "danger")
         return redirect(redirect_target)

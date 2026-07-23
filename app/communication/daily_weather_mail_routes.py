@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
+
 from flask import abort, flash, redirect, render_template, request
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
 
 from app.route_registry import main_bp
-import logging
+
 logger = logging.getLogger(__name__)
 
 _SERVICE_ERROR = ""

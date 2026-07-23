@@ -1,8 +1,6 @@
 """BYS360 Performans Faz 12 final gate köprü servisi."""
 from __future__ import annotations
 
-BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_GATE_BRIDGE = True
-
 from .phase12_performance_final_gate_center import (  # noqa: F401
     BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_GATE,
     BYS360_PERFORMANCE_COMPLETION_PHASE12_VERSION,
@@ -17,3 +15,5 @@ from .phase12_performance_final_gate_center import (  # noqa: F401
     save_phase12_final_gate_report,
     seed_phase12_final_gate_settings,
 )
+
+BYS360_PERFORMANCE_COMPLETION_PHASE12_FINAL_GATE_BRIDGE = True

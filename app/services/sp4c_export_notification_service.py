@@ -41,7 +41,7 @@ def write_xlsx(out_dir: Path, rows):
     headers = list(rows[0].keys())
     sheet_rows = ['<row r="1">' + ''.join(xlsx_cell(i + 1, 1, h) for i, h in enumerate(headers)) + '</row>']
     for r, row in enumerate(rows, start=2):
-        sheet_rows.append('<row r="%s">%s</row>' % (r, ''.join(xlsx_cell(c + 1, r, row.get(h, "")) for c, h in enumerate(headers))))
+        sheet_rows.append('<row r="{}">{}</row>'.format(r, ''.join(xlsx_cell(c + 1, r, row.get(h, "")) for c, h in enumerate(headers))))
     sheet = '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' + ''.join(sheet_rows) + '</sheetData></worksheet>'
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>')

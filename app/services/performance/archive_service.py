@@ -2,16 +2,6 @@ from __future__ import annotations
 
 import logging
 
-"""BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü servisleri.
-
-Tek merkez sözleşmesi:
-- Manuel giriş ve Excel import aynı ``performance_archived_results`` tablosuna yazar.
-- Excel import canlı değerlendirme sonuçlarını değiştirmez.
-- Personel yalnızca kendi geçmiş karne arşivini görür.
-- Yönetici yalnızca ``phase3_allowed_employee_ids`` ile hesaplanan yetki kapsamındaki geçmişi görür.
-- Başkan/Admin ve yetkili performans/personel yönetimi rolleri genel arşiv yönetimi alır.
-"""
-
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from typing import Any
@@ -21,6 +11,16 @@ from sqlalchemy import func, or_
 from app.extensions import db
 from app.models import User
 from app.models.performance_archive_models import PerformanceArchivedResult
+
+"""BYS360 Faz 7.5 — Geçmiş Karne Arşivi yönetici görünürlüğü servisleri.
+
+Tek merkez sözleşmesi:
+- Manuel giriş ve Excel import aynı ``performance_archived_results`` tablosuna yazar.
+- Excel import canlı değerlendirme sonuçlarını değiştirmez.
+- Personel yalnızca kendi geçmiş karne arşivini görür.
+- Yönetici yalnızca ``phase3_allowed_employee_ids`` ile hesaplanan yetki kapsamındaki geçmişi görür.
+- Başkan/Admin ve yetkili performans/personel yönetimi rolleri genel arşiv yönetimi alır.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -207,10 +207,8 @@ def is_personnel_only_archive_user(user: Any) -> bool:
     role = normalize_role(getattr(user, "role", ""))
     if role in PERSONNEL_ONLY_ROLES:
         return True
-    if role in GENERAL_VIEW_ROLES:
-        return False
     # Bilinmeyen veya boş rol güvenli tarafta kalır: yalnızca kendi geçmişi.
-    return True
+    return role not in GENERAL_VIEW_ROLES
 
 
 def is_manager_archive_user(user: Any) -> bool:

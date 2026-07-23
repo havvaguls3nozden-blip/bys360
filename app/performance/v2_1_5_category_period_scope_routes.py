@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, request, url_for
@@ -20,8 +19,15 @@ from app.services.performance.v2_1_5_category_period_scope import (
     preview_category_period_scope,
     upsert_category_period_scope_plan,
 )
-from app.services.performance.v2_1_5_category_period_scope_gate import run_v2_1_5_category_period_scope_gate
-from app.services.performance.v2_1_6a_category_ui_cleanup import active_categories, corporate_gate_label, label_status
+from app.services.performance.v2_1_5_category_period_scope_gate import (
+    run_v2_1_5_category_period_scope_gate,
+)
+from app.services.performance.v2_1_6a_category_ui_cleanup import (
+    active_categories,
+    corporate_gate_label,
+    label_status,
+)
+
 logger = logging.getLogger(__name__)
 
 

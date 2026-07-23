@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 7 route ekleri.
-
-Geçmiş yıl karne ve puan arşivini karar destek merkezi üzerinden güvenli
-JSON çıktılarıyla sunar.
-
-BYS360_AI_DECISION_FAZ7_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify, request
 from flask_login import current_user, login_required
@@ -26,6 +15,16 @@ from app.services.ai_decision.historical_archive_integration import (
     build_archive_summary_payload,
     build_person_archive_payload,
 )
+
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 7 route ekleri.
+
+Geçmiş yıl karne ve puan arşivini karar destek merkezi üzerinden güvenli
+JSON çıktılarıyla sunar.
+
+BYS360_AI_DECISION_FAZ7_ROUTES
+"""
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 

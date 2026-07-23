@@ -1,7 +1,33 @@
 from __future__ import annotations
 
-
 import logging
+import random
+import uuid
+from collections.abc import Iterable
+from functools import wraps
+from typing import Any
+from urllib.parse import urlparse
+
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    request,
+    session,
+    url_for,
+)
+from flask import (
+    render_template as flask_render_template,
+)
+from flask_login import current_user
+from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.routing import BuildError
+
+from app.extensions import db
+from app.services.settings.effective_menu import (
+    build_menu_visibility_map as _settings_build_menu_visibility_map,
+)
+
 logger = logging.getLogger(__name__)
 
 """Ortak route destek katmanı.
@@ -10,30 +36,6 @@ Decorator'lar, rollback yardimcilari, form bool cozumleyicileri ve
 menu izinleri gibi ortak yardimcilari tek yerde toplar. Amaç, route
 govdelerini sade tutarken savunmaci davranisi korumaktir.
 """
-
-import random
-import uuid
-from urllib.parse import urlparse
-from functools import wraps
-from typing import Any
-from collections.abc import Iterable
-
-from flask import (
-    current_app,
-    flash,
-    redirect,
-    render_template as flask_render_template,
-    request,
-    session,
-    url_for,
-)
-from flask_login import current_user
-from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import Forbidden
-from werkzeug.routing import BuildError
-
-from app.extensions import db
-from app.services.settings.effective_menu import build_menu_visibility_map as _settings_build_menu_visibility_map
 
 # BYS360_SPRINT0_REMOVED_MENU_FILTER_BRIDGE_V1
 try:

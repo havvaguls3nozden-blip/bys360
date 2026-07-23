@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-
 import logging
+import re
+from collections.abc import Mapping
+from typing import Any
 
 """HTTP response security header yardimcilari.
 
@@ -10,10 +12,6 @@ BYS360 P0 guvenlik sertlestirmesi:
 - HTML yanitlarinda inline/external script etiketlerine nonce uygulanabilir.
 - CSP header'i nonce ile birlikte uretilir.
 """
-
-import re
-from collections.abc import Mapping
-from typing import Any
 logger = logging.getLogger(__name__)
 
 DEFAULT_CSP = {

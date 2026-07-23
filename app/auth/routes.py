@@ -2,8 +2,6 @@
 """Phase 43 modular authentication route family for the shared main blueprint."""
 from __future__ import annotations
 
-from flask_login import login_required
-
 from app import routes as _core
 from app.route_registry import main_bp
 

@@ -1,14 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-
-"""Faz 12: AI Karar Destek / Analiz Merkezi final canlı sertleştirme servisi.
-
-Bu servis kapanış raporu, kalite kapısı ve canlı güvenlik duruşunu salt-okunur
-şekilde üretir. Veritabanına yazmaz, migration çalıştırmaz, gerçek içe aktarım
-yapmaz, ham AI istem/yanıt metnini panelde veya export içinde açmaz.
-"""
-
 import json
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -18,6 +9,7 @@ from typing import Any
 from flask import current_app
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.models import (
     AIFeedbackLog,
     AIRecommendation,
@@ -28,6 +20,13 @@ from app.models import (
 from app.security_audit import build_security_audit_summary
 from app.services.ai.module_scope import is_visible_ai_module, scope_visible_modules
 from app.services.ai.schema_guard import get_ai_schema_status
+
+"""Faz 12: AI Karar Destek / Analiz Merkezi final canlı sertleştirme servisi.
+
+Bu servis kapanış raporu, kalite kapısı ve canlı güvenlik duruşunu salt-okunur
+şekilde üretir. Veritabanına yazmaz, migration çalıştırmaz, gerçek içe aktarım
+yapmaz, ham AI istem/yanıt metnini panelde veya export içinde açmaz.
+"""
 
 try:
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot

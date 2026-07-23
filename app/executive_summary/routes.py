@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
-from .service import build_executive_summary_payload
 from .mail_engine import send_executive_summary_email
+from .service import build_executive_summary_payload
 
 executive_summary_bp = Blueprint(
     "executive_summary",

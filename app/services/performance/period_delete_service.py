@@ -77,7 +77,7 @@ def _table(table_name: str) -> sa.Table | None:
 
 
 def _has_column(table: sa.Table | None, column_name: str) -> bool:
-    return bool(table is not None and column_name in table.c.keys())
+    return bool(table is not None and column_name in table.c)
 
 
 def _rowcount(result: Any) -> int:
@@ -108,7 +108,7 @@ def _clean_ids(values: Iterable[Any]) -> list[int]:
 
 def _select_ids(table_name: str, *conditions: Any) -> list[int]:
     table = _table(table_name)
-    if table is None or "id" not in table.c.keys():
+    if table is None or "id" not in table.c:
         return []
     where_parts = [part for part in conditions if part is not None]
     if not where_parts:
@@ -125,7 +125,7 @@ def _select_ids_from_table(table: sa.Table | None, *conditions: Any) -> list[int
     Bu yardimci, SELECT ve WHERE tarafinda tek Table nesnesi kullanarak bu
     hatayi engeller.
     """
-    if table is None or "id" not in table.c.keys():
+    if table is None or "id" not in table.c:
         return []
     where_parts = [part for part in conditions if part is not None]
     if not where_parts:
@@ -172,9 +172,9 @@ def _delete_by_period_or_evaluation(table_name: str, period_id: int, evaluation_
     if table is None:
         return 0
     conditions: list[Any] = []
-    if "period_id" in table.c.keys():
+    if "period_id" in table.c:
         conditions.append(table.c.period_id == period_id)
-    if evaluation_ids and "evaluation_id" in table.c.keys():
+    if evaluation_ids and "evaluation_id" in table.c:
         conditions.append(table.c.evaluation_id.in_(evaluation_ids))
     return _delete_from_table(table, *conditions)
 
@@ -241,32 +241,32 @@ def delete_performance_period_with_related_records(period_id: int, actor: Any = 
     result = PeriodDeleteResult(True, period_id=period_id, period_title=period_title)
 
     evaluations = _table("performance_evaluations")
-    evaluation_ids = _select_ids_from_table(evaluations, evaluations.c.period_id == period_id if evaluations is not None and "period_id" in evaluations.c.keys() else None)
+    evaluation_ids = _select_ids_from_table(evaluations, evaluations.c.period_id == period_id if evaluations is not None and "period_id" in evaluations.c else None)
 
     flows = _table("performance_process_flows")
     flow_conditions: list[Any] = []
     if flows is not None:
-        if "period_id" in flows.c.keys():
+        if "period_id" in flows.c:
             flow_conditions.append(flows.c.period_id == period_id)
-        if evaluation_ids and "evaluation_id" in flows.c.keys():
+        if evaluation_ids and "evaluation_id" in flows.c:
             flow_conditions.append(flows.c.evaluation_id.in_(evaluation_ids))
     flow_ids = _select_ids_from_table(flows, *flow_conditions)
 
     low_processes = _table("performance_low_score_processes")
     low_conditions: list[Any] = []
     if low_processes is not None:
-        if "period_id" in low_processes.c.keys():
+        if "period_id" in low_processes.c:
             low_conditions.append(low_processes.c.period_id == period_id)
-        if evaluation_ids and "evaluation_id" in low_processes.c.keys():
+        if evaluation_ids and "evaluation_id" in low_processes.c:
             low_conditions.append(low_processes.c.evaluation_id.in_(evaluation_ids))
     low_process_ids = _select_ids_from_table(low_processes, *low_conditions)
 
     feedback_requests = _table("feedback_requests")
     feedback_conditions: list[Any] = []
     if feedback_requests is not None:
-        if "period_id" in feedback_requests.c.keys():
+        if "period_id" in feedback_requests.c:
             feedback_conditions.append(feedback_requests.c.period_id == period_id)
-        if evaluation_ids and "evaluation_id" in feedback_requests.c.keys():
+        if evaluation_ids and "evaluation_id" in feedback_requests.c:
             feedback_conditions.append(feedback_requests.c.evaluation_id.in_(evaluation_ids))
     feedback_request_ids = _select_ids_from_table(feedback_requests, *feedback_conditions)
 
@@ -285,10 +285,10 @@ def delete_performance_period_with_related_records(period_id: int, actor: Any = 
             _add_count(result.cleared, "feedback_requests.scheduled_meeting_id", cleared_meetings)
 
     batches = _table("performance_import_batches")
-    import_batch_ids = _select_ids_from_table(batches, batches.c.period_id == period_id if batches is not None and "period_id" in batches.c.keys() else None)
+    import_batch_ids = _select_ids_from_table(batches, batches.c.period_id == period_id if batches is not None and "period_id" in batches.c else None)
 
     feedback_flows = _table("performance_feedback_pipeline_flows")
-    feedback_flow_ids = _select_ids_from_table(feedback_flows, feedback_flows.c.period_id == period_id if feedback_flows is not None and "period_id" in feedback_flows.c.keys() else None)
+    feedback_flow_ids = _select_ids_from_table(feedback_flows, feedback_flows.c.period_id == period_id if feedback_flows is not None and "period_id" in feedback_flows.c else None)
 
     # Çocuk tablolar: önce bağlı detay kayıtları temizlenir.
     for table_name, column_name, values in [

@@ -1,12 +1,5 @@
 from __future__ import annotations
 
-"""Shared JSON cache adapter for BYS360.
-
-Redis is used when configured.  If Redis is missing or temporarily unavailable,
-workers on the same server share a locked JSON file.  Memory is only the final
-fallback for local development.
-"""
-
 import hashlib
 import json
 import os
@@ -17,6 +10,13 @@ from pathlib import Path
 from typing import Any
 
 from flask import current_app, has_app_context
+
+"""Shared JSON cache adapter for BYS360.
+
+Redis is used when configured.  If Redis is missing or temporarily unavailable,
+workers on the same server share a locked JSON file.  Memory is only the final
+fallback for local development.
+"""
 
 _MEMORY_CACHE: dict[str, tuple[float, Any]] = {}
 _REDIS_CLIENT: Any | None = None
@@ -51,7 +51,7 @@ def _redis_client() -> Any | None:
     url = _redis_url()
     if not url:
         return None
-    if _REDIS_CLIENT is not None and _REDIS_CLIENT_KEY == url:
+    if _REDIS_CLIENT is not None and url == _REDIS_CLIENT_KEY:
         return _REDIS_CLIENT
     try:
         import redis  # type: ignore

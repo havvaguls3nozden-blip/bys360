@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-from collections import Counter, defaultdict
+import logging
+from collections import Counter
 from datetime import datetime, timedelta
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     PersonnelSelfServiceRequest,
@@ -16,7 +17,14 @@ from app.models import (
     User,
 )
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
 from .hr_personnel_operations_routes import (
     _current_scope_bundle,
@@ -31,7 +39,9 @@ from .hr_personnel_operations_routes import (
     _table_exists,
     _write_request_log,
 )
-from .hr_request_task_routes import _manager_pool, _task_status_label
+from .hr_request_task_routes import _manager_pool
+
+logger = logging.getLogger(__name__)
 
 
 PRIORITY_ORDER = {"critical": 0, "high": 1, "normal": 2, "low": 3}
@@ -332,6 +342,7 @@ def hr_personnel_request_sla_policy_save():
         db.session.commit()
         flash("SLA politikası kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_request_sla_policies", scope=(hr_scope or {}).get("scope_mode")))
@@ -401,6 +412,7 @@ def hr_personnel_request_escalate(request_id: int):
         db.session.commit()
         flash("Talep eskalasyon akışına alındı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_request_analytics", scope=(hr_scope or {}).get("scope_mode")))

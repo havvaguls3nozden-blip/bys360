@@ -44,10 +44,7 @@ def _getlist(form_data: Any, key: str) -> list[str]:
             logger.exception("BYS360 V6B guarded exception | file=app/services/surveys/authoring.py | line=41")
             return []
     value = None
-    if isinstance(form_data, Mapping):
-        value = form_data.get(key)
-    else:
-        value = getattr(form_data, key, None)
+    value = form_data.get(key) if isinstance(form_data, Mapping) else getattr(form_data, key, None)
     if value is None:
         return []
     if isinstance(value, (list, tuple, set)):

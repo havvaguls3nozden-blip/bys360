@@ -5,8 +5,9 @@ uygulama context'i gerektirmez.
 """
 from __future__ import annotations
 
-from functools import lru_cache
 import logging
+from functools import lru_cache
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 def table_columns(table_name: str) -> frozenset[str]:
     try:
         from sqlalchemy import inspect as sa_inspect
+
         from app.extensions import db
 
         cols = {str(col.get("name") or "").strip() for col in sa_inspect(db.engine).get_columns(table_name)}

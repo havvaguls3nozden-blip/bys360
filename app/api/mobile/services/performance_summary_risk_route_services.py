@@ -4,7 +4,6 @@ from typing import Any
 
 
 def phase3c_mobile_performance_full_feature_summary_service(user: Any, deps: dict[str, Any]):
-    EvaluationAssignment = deps['EvaluationAssignment']
     PerformancePeriod = deps['PerformancePeriod']
     PerformancePresidentApproval = deps['PerformancePresidentApproval']
     PerformanceResultSnapshot = deps['PerformanceResultSnapshot']
@@ -25,7 +24,6 @@ def phase3c_mobile_performance_full_feature_summary_service(user: Any, deps: dic
         snapshot_q = _snapshot_query_for(user)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        EvaluationAssignment.query
         snapshot_q = PerformanceResultSnapshot.query
     active_periods = _mobile_perf_safe_count(PerformancePeriod.query.filter_by(is_active=True)) if hasattr(PerformancePeriod, 'is_active') else _mobile_perf_safe_count(PerformancePeriod.query)
     pending = len(_v2852_pending_assignments(user, 1000))

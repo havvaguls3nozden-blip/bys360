@@ -83,7 +83,8 @@ def phase3c_mobile_performance_task_detail_service(user: Any, assignment_id: int
         criteria_rows = PerformanceCriteria.query.filter_by(is_active=True).order_by(PerformanceCriteria.sort_order.asc(), PerformanceCriteria.id.asc()).limit(30).all()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        _mobile_perf_rollback_quietly(); criteria_rows = []
+        _mobile_perf_rollback_quietly()
+        criteria_rows = []
     for row in criteria_rows:
         items.append(_item(f"criteria-{getattr(row, 'id', '')}", str(getattr(row, 'name', None) or 'Değerlendirme Kriteri'), str(getattr(row, 'description', None) or 'Kriter açıklaması bulunmuyor.'), 'Aktif Kriter', 'Puanlama formuna hazırlanıyor', '1-5', 50))
     warning = '70 altı sonuç Başkan/Üst Onay sürecine alınır. 1 ve 5 puanlarda açıklama kuralı uygulanır.'

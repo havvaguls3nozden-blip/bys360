@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import logging
 
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
+from typing import Any
+
 """BYS360 Performans Tamamlama Faz 3 — Görünürlük ve yetki kapsam merkezi.
 
 Bu servis Faz 3'ün ana sözleşmesidir:
@@ -12,10 +16,6 @@ Bu servis Faz 3'ün ana sözleşmesidir:
 - Başkan ve Admin/Sistem Yöneticisi kurum geneli görünürlük alır.
 - Menü görünürlüğü tek başına güvenlik değildir; backend route ve query kapsamı burada kilitlenir.
 """
-
-from collections.abc import Iterable, Sequence
-from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -355,17 +355,17 @@ def phase3_denied_response(message: str | None = None, *, status_code: int = 403
             import logging
             logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/completion_phase3_visibility_scope.py")
     return (
-        """
+        f"""
         <html>
           <head><title>403 - Erişim Yetkisi Bulunmamaktadır</title></head>
           <body style="font-family:Arial,sans-serif;background:#f7f7f7;padding:40px;color:#222;">
             <main style="max-width:760px;margin:auto;background:#fff;border-radius:18px;padding:32px;box-shadow:0 12px 36px rgba(0,0,0,.08);">
               <h2 style="color:#8B0000;margin-top:0;">Erişim Yetkisi Bulunmamaktadır</h2>
-              <p>{message}</p>
+              <p>{safe_message}</p>
             </main>
           </body>
         </html>
-        """.format(message=safe_message),
+        """,
         status_code,
     )
 

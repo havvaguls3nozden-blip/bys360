@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import logging
-
-"""Maintenance Faz 4 performans amir kuralları kalıcı guard.
-
-Canlı davranış değiştirmez. Nihai amir kural anayasasının ve mevcut performans
-servislerindeki kritik izlerin korunup korunmadığını statik olarak denetler.
-"""
-
 import importlib.util
 import json
+import logging
 import py_compile
 import re
 import sys
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
+
+"""Maintenance Faz 4 performans amir kuralları kalıcı guard.
+
+Canlı davranış değiştirmez. Nihai amir kural anayasasının ve mevcut performans
+servislerindeki kritik izlerin korunup korunmadığını statik olarak denetler.
+"""
 
 logger = logging.getLogger(__name__)
 

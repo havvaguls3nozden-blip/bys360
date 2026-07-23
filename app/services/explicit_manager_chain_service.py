@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,9 +15,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from dataclasses import dataclass
-from typing import Any
 
 
 def _safe(value: Any) -> str:

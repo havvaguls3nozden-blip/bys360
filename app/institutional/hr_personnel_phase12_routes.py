@@ -3,21 +3,37 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_CHILD_IMPORT
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
-
-from app.core.datetime_utils import utc_now
+import logging
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import PersonnelHandoverItem, PersonnelHandoverRecord, PersonnelLifecycleCase, User
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, manager_required, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    manager_required,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 
-from .hr_personnel_extension_routes import _base_context, _full_name, _normalize_text, _parse_date, _safe_int, _scope_user_options
+from .hr_personnel_extension_routes import (
+    _base_context,
+    _full_name,
+    _normalize_text,
+    _parse_date,
+    _safe_int,
+    _scope_user_options,
+)
+
+logger = logging.getLogger(__name__)
 
 OPERATION_TYPE_LABELS = {
     "offboarding": "Ayrılış Devir Teslimi",
@@ -245,6 +261,7 @@ def hr_personnel_handover_save():
         flash("Devir teslim kaydı kaydedildi.", "success")
         return _redirect_handover(handover_id=row.id, user_id=user_id, scope_mode=selected_scope_mode)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_handover(user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
@@ -280,6 +297,7 @@ def hr_personnel_handover_item_save():
         flash("Devir teslim satırı eklendi.", "success")
         return _redirect_handover(handover_id=handover.id, user_id=handover.user_id, scope_mode=selected_scope_mode)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_handover(handover_id=_safe_int(request.form.get("handover_id")), scope_mode=selected_scope_mode)
@@ -304,6 +322,7 @@ def hr_personnel_handover_item_status():
         flash("Devir teslim satırı güncellendi.", "success")
         return _redirect_handover(handover_id=row.handover_id, user_id=getattr(row.handover, "user_id", None), scope_mode=selected_scope_mode)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         return _redirect_handover(scope_mode=selected_scope_mode)

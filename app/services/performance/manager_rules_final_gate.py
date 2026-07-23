@@ -1,14 +1,7 @@
 from __future__ import annotations
 
-import logging
-
-"""BYS360 Performans Amir Kuralları Final Gate.
-
-Canlı davranış değiştirmez. Mevcut performans alt gate'lerini tek kapanış
-raporunda toplar ve nihai amir kural sözleşmesini statik olarak denetler.
-"""
-
 import json
+import logging
 import os
 import py_compile
 import re
@@ -16,6 +9,12 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+
+"""BYS360 Performans Amir Kuralları Final Gate.
+
+Canlı davranış değiştirmez. Mevcut performans alt gate'lerini tek kapanış
+raporunda toplar ve nihai amir kural sözleşmesini statik olarak denetler.
+"""
 
 logger = logging.getLogger(__name__)
 

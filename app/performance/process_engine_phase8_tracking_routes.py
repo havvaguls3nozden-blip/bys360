@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
 from urllib.parse import urlencode
 
 from flask import abort, redirect, render_template, request
@@ -17,6 +15,7 @@ from app.services.performance.process_engine_phase8_tracking import (
     delete_visible_process_tracking_flows,
     synchronize_phase8_tracking,
 )
+
 logger = logging.getLogger(__name__)
 
 

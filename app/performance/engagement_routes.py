@@ -14,6 +14,8 @@ Amaç:
 """
 from __future__ import annotations
 
-from . import engagement_publish_routes  # noqa: F401
-from . import engagement_mail_routes  # noqa: F401
-from . import engagement_feedback_routes  # noqa: F401
+from . import (
+    engagement_feedback_routes,  # noqa: F401
+    engagement_mail_routes,  # noqa: F401
+    engagement_publish_routes,  # noqa: F401
+)

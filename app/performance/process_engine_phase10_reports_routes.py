@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import render_template, request
 from flask_login import current_user, login_required
 
 from app.routes import main
+
 logger = logging.getLogger(__name__)
 @main.route("/performans/surec-raporlari", methods=["GET"])
 @main.route("/performance/process-reports", methods=["GET"])
@@ -20,8 +20,9 @@ def performance_process_reports():
 
 # BYS360_PROCESS_REPORTS_ADVANCED_V2_BEGIN
 def _bys360_process_reports_advanced_context(viewer=None, status_filter=None):
-    from app.extensions import db
     from sqlalchemy import text as _sql_text
+
+    from app.extensions import db
 
     def _rows(sql, params=None):
         try:

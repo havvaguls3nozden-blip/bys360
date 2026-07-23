@@ -1,15 +1,5 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-
-"""Faz 9: AI öneri motoru ve risk/önceliklendirme paneli.
-
-Bu servis yalnızca okuma yapar. Mevcut AI günlükleri, öneriler, özet cache
-ve maskeleme kurallarını birlikte değerlendirerek yöneticiye öncelik sırası,
-risk gerekçesi ve güvenli aksiyon notu üretir. Öneri uygulamaz, kayıt
-oluşturmaz, kayıt güncellemez ve nihai idari karar vermez.
-"""
-
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -17,6 +7,7 @@ from typing import Any
 
 from sqlalchemy import func
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import (
     AIFeedbackLog,
@@ -26,6 +17,14 @@ from app.models import (
     AISummaryCache,
 )
 from app.services.ai.module_scope import filter_visible_values, is_visible_ai_module
+
+"""Faz 9: AI öneri motoru ve risk/önceliklendirme paneli.
+
+Bu servis yalnızca okuma yapar. Mevcut AI günlükleri, öneriler, özet cache
+ve maskeleme kurallarını birlikte değerlendirerek yöneticiye öncelik sırası,
+risk gerekçesi ve güvenli aksiyon notu üretir. Öneri uygulamaz, kayıt
+oluşturmaz, kayıt güncellemez ve nihai idari karar vermez.
+"""
 
 # Faz 9 güvenlik sözleşmesi: otomatik karar/uygulama yoktur.
 AI_FINAL_DECISION_ENABLED = False

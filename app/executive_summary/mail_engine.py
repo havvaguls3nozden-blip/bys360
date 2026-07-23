@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import smtplib
 import ssl
@@ -9,7 +10,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 from .service import build_executive_summary_payload, get_default_recipients
-import logging
+
 logger = logging.getLogger(__name__)
 
 

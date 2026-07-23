@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import contextlib
 import json
 import os
 import py_compile
@@ -251,10 +252,8 @@ def runtime_route_map(root: Path) -> dict[str, Any]:
             "error": f"{type(exc).__name__}: {exc}",
         }
     finally:
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(root))
-        except ValueError:
-            pass
 
 
 def _b64url(data: dict[str, Any]) -> str:
@@ -357,10 +356,8 @@ def role_boundary_matrix(root: Path) -> dict[str, Any]:
             "error": f"{type(exc).__name__}: {exc}",
         }
     finally:
-        try:
+        with contextlib.suppress(ValueError):
             sys.path.remove(str(root))
-        except ValueError:
-            pass
 
 
 def app_factory_smoke(root: Path) -> dict[str, Any]:

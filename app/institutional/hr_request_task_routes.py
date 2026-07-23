@@ -3,7 +3,7 @@ from __future__ import annotations
 from app.core.datetime_utils import utc_now
 import csv
 import io
-from datetime import datetime
+import logging
 
 from flask import Response, flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -17,7 +17,6 @@ from .hr_personnel_operations_routes import (
     _current_scope_bundle,
     _full_name,
     _normalize_text,
-    _redirect_request_review,
     _request_in_scope,
     _request_priority_label,
     _request_status_label,
@@ -27,6 +26,8 @@ from .hr_personnel_operations_routes import (
     _table_exists,
     _write_request_log,
 )
+
+logger = logging.getLogger(__name__)
 
 TASK_STATUS_LABELS = {
     "open": "Açık",
@@ -46,10 +47,9 @@ def _manager_pool(scope_users: list[User]) -> list[User]:
     seen: set[int] = set()
     for user in scope_users:
         role = (getattr(user, "role", "") or "").strip().lower()
-        if role in {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "birim_amiri"}:
-            if int(user.id) not in seen:
-                seen.add(int(user.id))
-                result.append(user)
+        if role in {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "birim_amiri"} and int(user.id) not in seen:
+            seen.add(int(user.id))
+            result.append(user)
     if getattr(current_user, "id", None) and int(current_user.id) not in seen:
         result.append(current_user)
     result.sort(key=lambda item: (_full_name(item).lower(), int(getattr(item, "id", 0))))
@@ -258,6 +258,7 @@ def hr_personnel_request_task_assign(request_id: int):
         db.session.commit()
         flash("Talep görevi atandı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_request_tasks", scope=(hr_scope or {}).get("scope_mode"), request_id=request_id))
@@ -300,6 +301,7 @@ def hr_personnel_request_task_complete(task_id: int):
         db.session.commit()
         flash("Görev durumu güncellendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return redirect(url_for("main.hr_personnel_request_tasks", scope=(hr_scope or {}).get("scope_mode"), request_id=_safe_int(request.form.get("request_id"))))

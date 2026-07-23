@@ -1,12 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-ops_logger = logging.getLogger(__name__)
-logger = ops_logger
-
-"""BYS360 Toplantı Geliştirme Faz 4 final canlı kontrol servisi."""
-
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +19,11 @@ from app.services.performance.meeting_development_gate import (
     TEST_SCENARIOS,
     build_gate_summary,
 )
+
+ops_logger = logging.getLogger(__name__)
+logger = ops_logger
+
+"""BYS360 Toplantı Geliştirme Faz 4 final canlı kontrol servisi."""
 
 REQUIRED_TABLES = [
     "performance_employee_categories",

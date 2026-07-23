@@ -13,8 +13,9 @@ from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
-from app.route_support import safe_render, render_access_denied
+from app.route_support import render_access_denied, safe_render
 from app.services.role_guards import can_manage_strategic_targets, is_top_or_manager
+
 logger = logging.getLogger(__name__)
 
 

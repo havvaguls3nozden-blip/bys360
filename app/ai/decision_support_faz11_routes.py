@@ -6,6 +6,12 @@ BYS360_AI_DECISION_FAZ11_ROUTES_OK
 from __future__ import annotations
 
 import logging
+
+from app.services.ai_decision.development_guidance_integration import (
+    build_development_guidance_from_db,
+    persist_development_guidance_snapshot,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -30,11 +36,6 @@ try:
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz11_routes.py | line=30")
     db = None  # type: ignore
-
-from app.services.ai_decision.development_guidance_integration import (
-    build_development_guidance_from_db,
-    persist_development_guidance_snapshot,
-)
 
 
 if Blueprint is not None:

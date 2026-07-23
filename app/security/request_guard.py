@@ -238,10 +238,7 @@ def mask_identity(identity: str | None) -> str:
         return 'unknown'
     if '@' in raw:
         user, domain = raw.split('@', 1)
-        if len(user) <= 2:
-            masked_user = user[:1] + '*'
-        else:
-            masked_user = user[:2] + '*' * max(1, len(user) - 2)
+        masked_user = user[:1] + '*' if len(user) <= 2 else user[:2] + '*' * max(1, len(user) - 2)
         return f'{masked_user}@{domain}'
     if len(raw) <= 3:
         return raw[:1] + '*' * max(1, len(raw) - 1)

@@ -2,13 +2,6 @@ from __future__ import annotations
 
 import logging
 
-"""Performans export / download yardimcilari.
-
-Faz D notu:
-- Route icine gomulu workbook/response kodlarini merkezi hale getirir.
-- Davranisi degistirmeden, export akislarini test edilebilir ve tekrar kullanilabilir yapar.
-"""
-
 from collections.abc import Iterable
 from io import BytesIO
 from typing import Any
@@ -16,6 +9,13 @@ from typing import Any
 from flask import Response, send_file
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+
+"""Performans export / download yardimcilari.
+
+Faz D notu:
+- Route icine gomulu workbook/response kodlarini merkezi hale getirir.
+- Davranisi degistirmeden, export akislarini test edilebilir ve tekrar kullanilabilir yapar.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +80,7 @@ def build_csv_text_download_response(csv_text: str, *, filename: str) -> Respons
 
 
 def build_binary_download_response(content, *, download_name: str, mimetype: str) -> Response:
-    if isinstance(content, str):
-        payload = content.encode("utf-8")
-    else:
-        payload = content
+    payload = content.encode("utf-8") if isinstance(content, str) else content
     return Response(
         payload,
         mimetype=mimetype,

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import logging
 
+from typing import Any
+
 """BYS360 Performans V2.1.18 üst yönetim görünümü.
 
 Bu servis Dönem Yönetim Merkezi için Başkan/üst yönetim odaklı kısa süreç
 özeti üretir. Yazma işlemi yapmaz; görev üretmez, bildirim göndermez,
 değerlendirme veya dönem kaydı oluşturmaz.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +151,6 @@ def build_period_center_executive_view(
     scope_control: dict[str, Any] | None = None,
     reminder_approval: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    state or {}
     summary = embedded_summary or {}
     flow = period_flow or {}
     scope = scope_control or {}

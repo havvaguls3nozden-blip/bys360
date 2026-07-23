@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from sqlalchemy import inspect, text
 
 logger = logging.getLogger(__name__)
 
@@ -11,11 +15,6 @@ amir hatırlatma hedef listesini, gönderim özeti ve e-posta önizleme metinler
 hazırlar. Doğrudan e-posta gönderimi yapmaz; yalnızca onaya sunulacak güvenli
 hazırlık verisini üretir.
 """
-
-from datetime import datetime, timedelta
-from typing import Any
-
-from sqlalchemy import inspect, text
 
 RULE_VERSION = "performance_v2_1_17_reminder_approval_prep"
 PERIOD_TABLE = "performance_periods"

@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 6 route ekleri.
-
-Başkan/Üst Onay ve 70 altı düşük performans süreçlerini karar destek merkezi
-üzerinden güvenli JSON çıktısı olarak sunar.
-
-BYS360_AI_DECISION_FAZ6_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify
 from flask_login import current_user, login_required
@@ -27,8 +16,21 @@ from app.services.ai_decision.low_performance_approval_integration import (
     build_low_performance_bulk_summary,
 )
 
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 6 route ekleri.
+
+Başkan/Üst Onay ve 70 altı düşük performans süreçlerini karar destek merkezi
+üzerinden güvenli JSON çıktısı olarak sunar.
+
+BYS360_AI_DECISION_FAZ6_ROUTES
+"""
+
 try:
-    from app.services.ai_decision.permission_guard import assert_center_access, assert_evaluation_access
+    from app.services.ai_decision.permission_guard import (
+        assert_center_access,
+        assert_evaluation_access,
+    )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz6_routes.py | line=29")
     def assert_center_access(user: Any) -> Any:
@@ -93,7 +95,6 @@ def _load_settings() -> dict[str, Any]:
 
 def _prior_low_count_same_year(evaluation: Any) -> int:
     try:
-        from sqlalchemy import and_
         getattr(evaluation, "final_score", None) or getattr(evaluation, "weighted_score", None) or getattr(evaluation, "score", None)
         user_id = getattr(evaluation, "user_id", None) or getattr(evaluation, "personnel_id", None)
         if user_id is None:

@@ -5,7 +5,6 @@ app.security.audit olarak import edilir.
 """
 from __future__ import annotations
 
-
 from dataclasses import asdict, dataclass
 from typing import Any
 

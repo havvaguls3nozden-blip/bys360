@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans V2.1.4 kategori kapsam ve görünürlük hazırlığı.
-
-Bu servis kategori verisini doğrudan dönem motoruna bağlamaz; canlı güvenli
-hazırlık katmanı oluşturur. V2.1.5 ile dönem kapsam motoru bu yapı üzerinden
-ilerleyebilir.
-"""
-
 from typing import Any
 
 from sqlalchemy import inspect, text
@@ -24,6 +16,13 @@ from app.services.performance.v2_1_3_personnel_category_card import (
     ensure_v2_1_3_schema,
     get_personnel_category_rows,
 )
+
+"""BYS360 Performans V2.1.4 kategori kapsam ve görünürlük hazırlığı.
+
+Bu servis kategori verisini doğrudan dönem motoruna bağlamaz; canlı güvenli
+hazırlık katmanı oluşturur. V2.1.5 ile dönem kapsam motoru bu yapı üzerinden
+ilerleyebilir.
+"""
 
 logger = logging.getLogger(__name__)
 

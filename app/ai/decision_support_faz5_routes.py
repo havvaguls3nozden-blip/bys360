@@ -1,20 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 5 route ekleri.
-
-Mevcut app.ai.routes dosyasını ezmeden ana blueprint üzerine Faz 5 uçlarını
-kaydeder. Uçlar karne ve puanlama ekranları için temiz karar destek özeti
-döndürür.
-
-BYS360_AI_DECISION_FAZ5_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify
 from flask_login import current_user, login_required
@@ -28,8 +16,22 @@ from app.services.ai_decision.scorecard_ui_integration import (
     build_scorecard_decision_panel,
 )
 
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 5 route ekleri.
+
+Mevcut app.ai.routes dosyasını ezmeden ana blueprint üzerine Faz 5 uçlarını
+kaydeder. Uçlar karne ve puanlama ekranları için temiz karar destek özeti
+döndürür.
+
+BYS360_AI_DECISION_FAZ5_ROUTES
+"""
+
 try:
-    from app.services.ai_decision.permission_guard import assert_center_access, assert_evaluation_access
+    from app.services.ai_decision.permission_guard import (
+        assert_center_access,
+        assert_evaluation_access,
+    )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz5_routes.py | line=30")
     def assert_center_access(user: Any) -> Any:

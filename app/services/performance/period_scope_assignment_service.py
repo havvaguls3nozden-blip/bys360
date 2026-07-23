@@ -5,10 +5,8 @@ from collections.abc import Iterable
 from typing import Any
 
 from app.services.performance.phase11_period_scope_assignment_center import (
-    BYS360_PERFORMANCE_COMPLETION_PHASE11_VERSION,
     phase11_assignment_precheck,
     phase11_clean_text,
-    phase11_filter_personnel_by_scope,
     phase11_period_scope_contract,
     phase11_safe_assignment_rows,
     phase11_validate_period_scope,

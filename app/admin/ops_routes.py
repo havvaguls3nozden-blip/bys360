@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from app.services.safe_user_delete_service import safe_delete_user_by_id
 """Admin operasyon route ailesi.
 
@@ -21,6 +23,8 @@ from .ops_personnel_services import download_personnel_template_impl
 from .ops_personnel_services import personnel_profile_impl
 from .ops_performance_services import performance_hierarchy_bulk_assign_impl
 from .ops_user_action_services import admin_users_bulk_delete_impl, admin_user_change_photo_impl, admin_user_archive_impl, admin_users_bulk_archive_impl, admin_user_delete_impl, admin_users_bulk_passive_impl, admin_user_toggle_active_impl, admin_users_reset_all_impl
+
+logger = logging.getLogger(__name__)
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_modular_main_blueprint_routes"
@@ -187,6 +191,7 @@ def personnel_toggle_active(user_id: int):
         else:
             flash("Bu kullanıcı modelinde aktiflik alanı bulunamadı.", "warning")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Durum güncelleme sırasında hata oluştu: {exc}", "danger")
 
@@ -208,6 +213,7 @@ def personnel_delete(user_id: int):
         db.session.commit()
         flash("Personel kaydı silindi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Silme işlemi sırasında hata oluştu: {exc}", "danger")
 

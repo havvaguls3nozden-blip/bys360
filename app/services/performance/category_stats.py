@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 
 # BYS360_PHASE7_REPORT_CATEGORY_AVERAGE_SIGNATURE_FIX_V1
+from collections.abc import Iterable
+from typing import Any
 
 """Kategori ortalaması hesaplama servisi.
 
@@ -15,9 +17,6 @@ kategori ortalaması üretir. Eski ve yeni çağrı şekillerini birlikte destek
 Özellikle /performance/reports rotasının kullandığı period_id/category_label
 sözleşmesi korunur.
 """
-
-from collections.abc import Iterable
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

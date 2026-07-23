@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
+from app.extensions import db
+from app.models import OrganizationUnit, User
+from app.route_support import bool_from_form
+from app.security.email_policy import corporate_email_error_message, is_allowed_corporate_email
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,13 +19,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-from dataclasses import dataclass
-
-from app.extensions import db
-from app.models import OrganizationUnit, User
-from app.route_support import bool_from_form
-from app.security.email_policy import corporate_email_error_message, is_allowed_corporate_email
 
 
 @dataclass(slots=True)

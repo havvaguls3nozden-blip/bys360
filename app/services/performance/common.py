@@ -1,20 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-logger = logging.getLogger(__name__)
-
-# --- BYS360 third-manager Excel import compatibility patch ---
-THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
-THIRD_MANAGER_HEADER_ALIASES = [
-    "ucuncu_yonetici_sicil",
-    "üçüncü yönetici sicil",
-    "ucuncu yonetici sicil",
-    "3. amir sicil",
-    "3 amir sicil",
-    "new_y3",
-]
-
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -28,6 +14,19 @@ from .rules import (
     DEFAULT_TWO_MANAGER_WEIGHTS,
     LEVEL_3_DEFAULT_MODE,
 )
+
+logger = logging.getLogger(__name__)
+
+# --- BYS360 third-manager Excel import compatibility patch ---
+THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
+THIRD_MANAGER_HEADER_ALIASES = [
+    "ucuncu_yonetici_sicil",
+    "üçüncü yönetici sicil",
+    "ucuncu yonetici sicil",
+    "3. amir sicil",
+    "3 amir sicil",
+    "new_y3",
+]
 
 TR_CHAR_MAP = str.maketrans({
     "ç": "c", "Ç": "c",

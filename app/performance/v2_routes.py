@@ -1,25 +1,39 @@
 from __future__ import annotations
 
-
 import logging
-
 import time
-from flask import current_app, flash, jsonify, redirect, render_template, request, send_file, url_for
+
+from flask import (
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
 from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.models import EvaluationAssignment, PerformancePeriod, User
 from app.route_registry import main_bp
 from app.route_support import admin_required
-from app.view_helpers import build_surface_scope_context
-from app.services.ai.dashboard_panels import build_management_ai_panel, build_publish_ai_panel, build_scorecard_ai_panel
-from app.services.performance.low_score_process_service import build_low_score_period_summary, ensure_low_score_processes_for_period
+from app.services.ai.dashboard_panels import (
+    build_management_ai_panel,
+    build_publish_ai_panel,
+    build_scorecard_ai_panel,
+)
+from app.services.performance.interim_notes_runtime import build_interim_notes_context
+from app.services.performance.low_score_process_service import (
+    build_low_score_period_summary,
+    ensure_low_score_processes_for_period,
+)
 from app.services.performance.publish_guard import (
     build_publish_preflight_report,
     build_scorecard_visibility_summary,
     publish_preflight_has_blockers,
 )
-from app.services.performance.interim_notes_runtime import build_interim_notes_context
 from app.services.performance_v2 import (
     build_assignment_preview,
     build_assignment_previews_for_period,
@@ -39,6 +53,8 @@ from app.services.performance_v2 import (
     unpublish_period_results,
     withdraw_assignment_submission,
 )
+from app.view_helpers import build_surface_scope_context
+
 logger = logging.getLogger(__name__)
 
 # BYS360_RUNTIME_LOGGEDIN_SLOW_PAGES_V3_SCORECARD_MEMORY_CACHE

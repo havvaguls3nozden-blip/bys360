@@ -137,7 +137,8 @@ def canonical_social_url(raw_url: str) -> dict[str, Any]:
         return {'ok': False, 'reason': 'X için tekil gönderi bağlantısı gerekir: https://x.com/TarihiAlan/status/...'}
     if host in SUPPORTED_INSTAGRAM_HOSTS:
         if len(path_parts) >= 2 and path_parts[0].lower() in {'p', 'reel', 'tv'} and re.fullmatch(r'[A-Za-z0-9_-]{5,80}', path_parts[1] or ''):
-            kind = path_parts[0].lower(); shortcode = path_parts[1]
+            kind = path_parts[0].lower()
+            shortcode = path_parts[1]
             return {'ok': True, 'platform': 'instagram', 'account': '', 'post_id': shortcode, 'kind': kind, 'url': f'https://www.instagram.com/{kind}/{shortcode}/'}
         return {'ok': False, 'reason': 'Instagram için tekil gönderi/reels bağlantısı gerekir: https://www.instagram.com/p/.../'}
     return {'ok': False, 'reason': 'Sadece X veya Instagram gönderi bağlantısı desteklenir'}
@@ -169,7 +170,8 @@ def _extract_x_status_urls(html_text: str, account: str) -> list[str]:
             post_id = match.group(1)
             url = f'https://x.com/{account}/status/{post_id}'
             if url not in seen:
-                seen.add(url); urls.append(url)
+                seen.add(url)
+                urls.append(url)
     return urls[:8]
 
 
@@ -186,7 +188,8 @@ def _extract_instagram_post_urls(html_text: str, account: str) -> list[str]:
             kind, code = match.group(1).lower(), match.group(2)
             url = f'https://www.instagram.com/{kind}/{code}/'
             if url not in seen:
-                seen.add(url); urls.append(url)
+                seen.add(url)
+                urls.append(url)
     return urls[:8]
 
 
@@ -226,7 +229,8 @@ def discover_latest_social_links() -> dict[str, Any]:
                 if parsed['url'] in seen:
                     continue
                 discovered.append({'url': parsed['url'], 'platform': parsed['platform'], 'account': source['account'], 'source': 'profile_scan'})
-                seen.add(parsed['url']); added += 1
+                seen.add(parsed['url'])
+                added += 1
             result.update(ok=True, found=added, message='Kontrol tamamlandı')
         except Exception as exc:
             result.update(ok=False, message=str(exc)[:240])
@@ -238,7 +242,8 @@ def discover_latest_social_links() -> dict[str, Any]:
     for item in discovered:
         url = item.get('url') or ''
         if url and url not in unique_seen:
-            unique_seen.add(url); unique.append(item)
+            unique_seen.add(url)
+            unique.append(item)
 
     state['seen_urls'] = sorted(set(state.get('seen_urls') or []) | unique_seen)
     state['last_run_at'] = _now_iso()
@@ -303,7 +308,8 @@ def publish_social_url_to_portal(raw_url: str, actor: User | None = None, *, sou
     parsed = canonical_social_url(raw_url)
     if not parsed.get('ok'):
         return {'ok': False, 'status': 'invalid', 'message': parsed.get('reason') or 'Bağlantı desteklenmedi'}
-    url = parsed['url']; platform = parsed['platform']
+    url = parsed['url']
+    platform = parsed['platform']
     existing_id = _existing_post_id(url)
     if existing_id:
         return {'ok': True, 'status': 'duplicate', 'post_id': existing_id, 'message': 'Bu sosyal medya paylaşımı daha önce portala eklenmiş.'}
@@ -319,7 +325,8 @@ def publish_social_url_to_portal(raw_url: str, actor: User | None = None, *, sou
         body = 'Tarihi Alan Başkanlığı ve bağlı hesaplara ait Instagram paylaşımı portal akışına eklenmiştir. Paylaşımı aşağıda görüntüleyebilir veya kaynak bağlantısından açabilirsiniz.'
 
     post = PortalPost(author_user_id=int(author.id), wall_owner_user_id=int(author.id), title=title, body=body, post_type='normal', visibility_scope='public', status='published', comments_enabled=True, is_pinned=False, is_featured_home=False, published_at=utc_now())
-    db.session.add(post); db.session.flush()
+    db.session.add(post)
+    db.session.flush()
     attachments = [
         PortalPostAttachment(post_id=post.id, filename='social-url', stored_path=url, mime_type='text/x-portal-social-url', size_bytes=0, uploaded_by_user_id=author.id),
         PortalPostAttachment(post_id=post.id, filename='social-platform', stored_path=platform, mime_type='text/x-portal-social-platform', size_bytes=0, uploaded_by_user_id=author.id),
@@ -351,7 +358,9 @@ def queue_social_urls(urls: list[str], *, source: str = 'manual') -> dict[str, A
         if parsed['url'] in existing:
             continue
         item = {'url': parsed['url'], 'platform': parsed['platform'], 'status': 'pending', 'source': source, 'added_at': _now_iso()}
-        links.append(item); existing.add(parsed['url']); added.append(item)
+        links.append(item)
+        existing.add(parsed['url'])
+        added.append(item)
     _write_json(_queue_path(), current)
     return {'ok': True, 'added': len(added), 'path': str(_queue_path())}
 
@@ -423,18 +432,27 @@ def run_social_embed_scan(*, manual: bool = False, actor: User | None = None, au
         stats['checked'] += 1
         try:
             result = publish_social_url_to_portal(url, actor=actor, source=item.get('source') or ('auto_discover' if auto_discover else 'queue'), auto_commit=False)
-            item['last_result'] = result; item['processed_at'] = _now_iso()
+            item['last_result'] = result
+            item['processed_at'] = _now_iso()
             if result.get('ok') and result.get('status') == 'created':
-                item['status'] = 'published'; item['post_id'] = result.get('post_id'); stats['created'] += 1
+                item['status'] = 'published'
+                item['post_id'] = result.get('post_id')
+                stats['created'] += 1
             elif result.get('status') == 'duplicate':
-                item['status'] = 'duplicate'; item['post_id'] = result.get('post_id'); stats['duplicate'] += 1
+                item['status'] = 'duplicate'
+                item['post_id'] = result.get('post_id')
+                stats['duplicate'] += 1
             elif result.get('status') == 'invalid':
-                item['status'] = 'invalid'; stats['invalid'] += 1
+                item['status'] = 'invalid'
+                stats['invalid'] += 1
             else:
-                item['status'] = 'failed'; stats['failed'] += 1
+                item['status'] = 'failed'
+                stats['failed'] += 1
             stats['items'].append({'url': url, 'result': result})
         except Exception as exc:
-            item['status'] = 'failed'; item['last_result'] = {'ok': False, 'message': str(exc)[:240]}; stats['failed'] += 1
+            item['status'] = 'failed'
+            item['last_result'] = {'ok': False, 'message': str(exc)[:240]}
+            stats['failed'] += 1
     db.session.commit()
     _write_json(_queue_path(), queue)
     _write_json(_report_path(), stats)

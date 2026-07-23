@@ -134,7 +134,8 @@ def test_bys_basic_loaders_and_rows(monkeypatch):
     assert bys._get_unit_name_for_authority(BadOrg()) == ""
     assert bys._get_unit_name_for_authority(SimpleNamespace()) == ""
 
-    removed.clear(); removed.add("gone")
+    removed.clear()
+    removed.add("gone")
     rows = [SimpleNamespace(menu_key="", is_visible=True), SimpleNamespace(menu_key="gone", is_visible=True), SimpleNamespace(menu_key="ok", is_visible=1)]
     assert bys._row_map_by_key(rows) == {"ok": True}
     assert bys._row_map_by_key([]) == {}
@@ -237,7 +238,8 @@ def test_bys_person_and_general_helpers(monkeypatch):
     assert bys._bys360_person_matrix_user_is_admin_v1(SimpleNamespace(role="admin"))
     assert bys._bys360_person_matrix_user_is_admin_v1(SimpleNamespace(role="x", is_admin=True))
     assert not bys._bys360_person_matrix_user_is_admin_v1(SimpleNamespace(role="x"))
-    removed.clear(); removed.add("gone")
+    removed.clear()
+    removed.add("gone")
     assert not bys._bys360_person_matrix_can_open_v1("", {}, SimpleNamespace(role="admin"))
     assert not bys._bys360_person_matrix_can_open_v1("gone", {}, SimpleNamespace(role="admin"))
     assert not bys._bys360_person_matrix_can_open_v1("x", {"admin_only": True}, SimpleNamespace(role="personel"))
@@ -319,7 +321,8 @@ def make_effective_module():
     m._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES = {"admin"}
     m._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS = {"obsolete"}
     m._active_menu_items = lambda: [{"key": "home"}, {"key": "surveys"}, {"key": "custom"}, {"key": "performance_module"}, {"key": "performance_tasks"}, {"key": "assistant_module"}, {"key": "ai_agent_panel"}, {"key": "executive_summary", "url": "/executive-summary"}, {"key": "portal"}]
-    identity = lambda visibility, *a, **k: visibility
+    def identity(visibility, *a, **k):
+        return visibility
     for name in [
         "_apply_bys360_press_news_admin_only_policy", "_apply_bys360_settings_live_authority_v1", "_apply_core_menu_visibility_policy", "_apply_phase3_2_performance_menu_visibility", "_apply_phase3_performance_menu_policy", "_apply_role_matrix_closed_guard", "_bys360_apply_general_category_visibility_fix_v1", "_bys360_apply_performance_main_switch", "_bys360_apply_performance_shortcut_gate_v4", "_bys360_force_home_menu_visible_v1", "_bys360_perf_rm_v8_apply_aliases", "_bys360_perf_rm_v8_apply_main_gate", "_bys360_portal_role_matrix_v2_12_apply", "_bys360_restore_general_section_v4",
     ]:
@@ -345,7 +348,8 @@ def make_effective_module():
 
 
 def test_build_no_user_and_success(monkeypatch):
-    m = make_effective_module(); sys.modules[m.__name__] = m
+    m = make_effective_module()
+    sys.modules[m.__name__] = m
     out = build.build_menu_visibility_map(None)
     assert out["home"] and out["account"] and out["logout"]
 
@@ -360,8 +364,10 @@ def test_build_no_user_and_success(monkeypatch):
 
 
 def test_build_fallback_rows_and_errors(monkeypatch):
-    m = make_effective_module(); sys.modules[m.__name__] = m
-    removed.clear(); removed.add("gone")
+    m = make_effective_module()
+    sys.modules[m.__name__] = m
+    removed.clear()
+    removed.add("gone")
     m.build_effective_user_menu_context = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("x"))
     m.UserMenuPermission.query = Query([SimpleNamespace(menu_key="custom", is_visible=False), SimpleNamespace(menu_key="gone", is_visible=True)])
     out = build.build_menu_visibility_map(SimpleNamespace(id=2, role="personel"), rollback=lambda: None)
@@ -373,7 +379,8 @@ def test_build_fallback_rows_and_errors(monkeypatch):
 
 
 def test_build_survey_and_exec_edge_paths(monkeypatch):
-    m = make_effective_module(); monkeypatch.setitem(sys.modules, m.__name__, m)
+    m = make_effective_module()
+    monkeypatch.setitem(sys.modules, m.__name__, m)
     build._BYS360_EXEC_ADMIN_ONLY_ROLES = {"admin"}
     build._BYS360_EXEC_KNOWN_KEYS = {"absent_exec"}
 
@@ -404,7 +411,8 @@ def test_build_survey_and_exec_edge_paths(monkeypatch):
 
 
 def test_build_inline_state_and_exception_paths(monkeypatch):
-    m = make_effective_module(); sys.modules[m.__name__] = m
+    m = make_effective_module()
+    sys.modules[m.__name__] = m
     build._BYS360_EXEC_ADMIN_ONLY_ROLES = set()
     build._BYS360_EXEC_KNOWN_KEYS = {"executive_summary"}
     m._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS = {"admin_users", "custom"}
@@ -419,19 +427,23 @@ def test_build_inline_state_and_exception_paths(monkeypatch):
     calls = {"role": 0, "unit": 0, "user": 0, "active": 0}
     def fail_role(*a, **k):
         calls["role"] += 1
-        if calls["role"] >= 2: raise RuntimeError("role")
+        if calls["role"] >= 2:
+            raise RuntimeError("role")
         return {}
     def fail_unit(*a, **k):
         calls["unit"] += 1
-        if calls["unit"] >= 2: raise RuntimeError("unit")
+        if calls["unit"] >= 2:
+            raise RuntimeError("unit")
         return {}
     def fail_user(*a, **k):
         calls["user"] += 1
-        if calls["user"] >= 2: raise RuntimeError("user")
+        if calls["user"] >= 2:
+            raise RuntimeError("user")
         return {}
     def fail_active():
         calls["active"] += 1
-        if calls["active"] >= 2: raise RuntimeError("active")
+        if calls["active"] >= 2:
+            raise RuntimeError("active")
         return [{"key": "home"}, {"key": "executive_summary"}]
     m._load_role_matrix_state = fail_role
     m._load_unit_profile_state = fail_unit

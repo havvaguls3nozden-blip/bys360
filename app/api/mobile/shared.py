@@ -219,9 +219,7 @@ def _can_mobile_reply_ticket(user: User, ticket: SupportTicket) -> bool:
     if not _can_mobile_view_ticket(user, ticket):
         return False
     status = (getattr(ticket, "status", "") or "").strip().lower()
-    if status in {"closed", "kapalı", "kapali", "resolved", "rejected"}:
-        return False
-    return True
+    return status not in {"closed", "kapalı", "kapali", "resolved", "rejected"}
 
 
 def _ticket_detail_payload(ticket: SupportTicket, user: User) -> dict[str, Any]:
@@ -327,9 +325,7 @@ def _survey_is_active(survey: Survey) -> bool:
     end_at = getattr(survey, "end_at", None)
     if start_at and start_at > now:
         return False
-    if end_at and end_at < now:
-        return False
-    return True
+    return not (end_at and end_at < now)
 
 
 def _survey_user_target_values(user: User) -> dict[str, set[str]]:

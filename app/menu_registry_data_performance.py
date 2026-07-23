@@ -486,10 +486,7 @@ except Exception:
 
 # BYS360_PERFORMANCE_V2_1_21_PERIOD_CENTER_ROLE_MATRIX_DEFAULTS_BEGIN
 # Dönem Yönetim Merkezi statik rol varsayılanına bağlıdır. DB satırı varsa son karar Ayarlar ekranındadır.
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 for _role in ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir']:
     _keys = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
     try:
@@ -508,10 +505,7 @@ except Exception:
 # BYS360_PERFORMANCE_V2_1_23_SETTINGS_ROLE_MATRIX_FULL_BEGIN
 # Dönem Yönetim Merkezi hattı Ayarlar > Rol Matrisi, rol varsayılanları,
 # kişi bazlı menü görünürlüğü ve birim profili listelerinde eksiksiz yer alır.
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 _BYS360_V223_PERIOD_CENTER_ROLE_DEFAULTS = {'baskan': ['performance_period_management_center', 'performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'baskan_yardimcisi': ['performance_period_management_center', 'performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'mali_musavir': ['performance_period_management_center', 'performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'grup_baskani': ['performance_period_management_center', 'performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'admin': ['performance_period_management_center', 'performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'koordinator': ['performance_evaluation_live_tracking', 'performance_evaluator_reminder_center'], 'birim_sorumlusu': ['performance_evaluation_live_tracking', 'performance_evaluator_reminder_center']}
 for _role, _keys in _BYS360_V223_PERIOD_CENTER_ROLE_DEFAULTS.items():
     _target = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
@@ -521,10 +515,9 @@ for _role, _keys in _BYS360_V223_PERIOD_CENTER_ROLE_DEFAULTS.items():
         except AttributeError:
             if _key not in _target:
                 _target.append(_key)
-try:
-    _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY
-except NameError:
-    _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY = {}
+_BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY = globals().get(
+    "_BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY", {}
+)
 _BYS360_V223_KEY_ROLES = {'performance_period_management_center': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir'], 'performance_evaluation_live_tracking': ['admin', 'baskan', 'baskan_yardimcisi', 'birim_sorumlusu', 'grup_baskani', 'koordinator', 'mali_musavir'], 'performance_evaluator_reminder_center': ['admin', 'baskan', 'baskan_yardimcisi', 'birim_sorumlusu', 'grup_baskani', 'koordinator', 'mali_musavir']}
 for _key, _roles in _BYS360_V223_KEY_ROLES.items():
     _target = _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY.setdefault(_key, set())

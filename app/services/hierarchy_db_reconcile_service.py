@@ -1,5 +1,16 @@
 from __future__ import annotations
 
+import csv
+import json
+from datetime import datetime
+from pathlib import Path
+
+from sqlalchemy import text
+
+from app.extensions import db
+
+from .hierarchy_rule_engine_service_v2 import HierarchyRuleEngineServiceV2, UserRow
+
 # --- BYS360 third-manager Excel import compatibility patch ---
 
 
@@ -12,17 +23,6 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "3 amir sicil",
     "new_y3",
 ]
-
-import csv
-import json
-from datetime import datetime
-from pathlib import Path
-
-from sqlalchemy import text
-
-from app.extensions import db
-
-from .hierarchy_rule_engine_service_v2 import HierarchyRuleEngineServiceV2, UserRow
 
 
 class HierarchyDbReconcileService:

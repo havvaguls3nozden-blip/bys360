@@ -60,10 +60,7 @@ def should_exclude(path: Path, root: Path) -> bool:
 
     # Eski overlay klasörleri veya geçici inspect/work klasörleri release'e girmesin.
     lower_rel = rel_posix.lower()
-    if any(marker in lower_rel for marker in ("overlay", "inspect", "_work", "work_bys")) and not lower_rel.startswith(("app/", "docs/", "scripts/")):
-        return True
-
-    return False
+    return any(marker in lower_rel for marker in ("overlay", "inspect", "_work", "work_bys")) and not lower_rel.startswith(("app/", "docs/", "scripts/"))
 
 
 def validate_zip(zip_path: Path) -> list[str]:

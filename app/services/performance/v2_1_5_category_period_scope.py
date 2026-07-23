@@ -1,14 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans V2.1.5 kategoriye göre dönem kapsamı ve görev üretimi hazırlığı.
-
-Bu servis gerçek dönem/görev üretimi yapmaz. Kategori bazlı kapsam planı ve
-ön kontrol verisi üretir. Canlı performans tablolarına riskli yazım yapmadan
-V2.1.6 dönem/görev entegrasyonuna zemin hazırlar.
-"""
-
 import re
 from datetime import date
 from typing import Any
@@ -28,6 +20,13 @@ from app.services.performance.v2_1_3_personnel_category_card import (
 from app.services.performance.v2_1_4_category_scope_visibility import (
     ensure_category_scope_schema,
 )
+
+"""BYS360 Performans V2.1.5 kategoriye göre dönem kapsamı ve görev üretimi hazırlığı.
+
+Bu servis gerçek dönem/görev üretimi yapmaz. Kategori bazlı kapsam planı ve
+ön kontrol verisi üretir. Canlı performans tablolarına riskli yazım yapmadan
+V2.1.6 dönem/görev entegrasyonuna zemin hazırlar.
+"""
 
 logger = logging.getLogger(__name__)
 

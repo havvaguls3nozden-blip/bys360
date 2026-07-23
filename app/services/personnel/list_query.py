@@ -71,7 +71,7 @@ def _args_get(args: Mapping[str, Any], key: str, default: str = "") -> Any:
     getter = getattr(args, "get", None)
     if callable(getter):
         return getter(key, default)
-    return args[key] if key in args else default
+    return args.get(key, default)
 
 
 def _clean_text(value: Any) -> str:

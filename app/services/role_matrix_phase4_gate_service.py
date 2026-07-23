@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-
 import logging
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Rol Matrisi Faz 4 kontrol servisi.
@@ -11,11 +15,6 @@ Bu servis uygulama davranışını değiştirmez. Veritabanına yazmaz, migratio
 Rol Matrisi UI omurgasının, rol-yetki-menü görünürlüğü ilkeleriyle tutarlı
 olup olmadığını güvenli biçimde kontrol etmektir.
 """
-
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
-from collections.abc import Iterable
 
 
 REQUIRED_PHASE3_FILES = [

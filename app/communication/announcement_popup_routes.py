@@ -1,16 +1,21 @@
 from __future__ import annotations
 
-
-import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 Duyuru Yönetimi - Video destekli pop-up Faz 5 route'ları."""
-
-from pathlib import Path
 import hmac
+import logging
 import uuid
+from pathlib import Path
 
-from flask import Response, abort, flash, jsonify, redirect, request, send_from_directory, session, url_for
+from flask import (
+    Response,
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,7 +24,13 @@ from werkzeug.utils import safe_join
 from app.extensions import csrf, db
 from app.models.announcement_popup_models import Announcement
 from app.route_registry import main_bp
-from app.route_support import consume_form_token, issue_form_token, menu_key_required, safe_db_rollback, safe_render
+from app.route_support import (
+    consume_form_token,
+    issue_form_token,
+    menu_key_required,
+    safe_db_rollback,
+    safe_render,
+)
 from app.services.announcement_popup_service import (
     ANNOUNCEMENT_TYPES,
     MEDIA_TYPES,
@@ -28,6 +39,7 @@ from app.services.announcement_popup_service import (
     acknowledge_announcement,
     announcement_media_root,
     apply_payload_to_announcement,
+    build_announcement_acceptance_summary,
     commit_runtime_change,
     count_target_users,
     dismiss_announcement,
@@ -35,7 +47,6 @@ from app.services.announcement_popup_service import (
     find_pending_announcement_for_user,
     get_announcement_form_options,
     list_announcement_report_rows,
-    build_announcement_acceptance_summary,
     normalize_announcement_form,
     process_announcement_media_upload,
     record_announcement_seen,
@@ -44,6 +55,10 @@ from app.services.announcement_popup_service import (
     summarize_announcement_reads,
     validate_announcement_payload,
 )
+
+logger = logging.getLogger(__name__)
+
+"""BYS360 Duyuru Yönetimi - Video destekli pop-up Faz 5 route'ları."""
 
 
 def _announcement_form_context(announcement: Announcement | None = None, *, payload: dict | None = None):

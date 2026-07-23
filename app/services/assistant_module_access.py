@@ -421,9 +421,7 @@ def assistant_module_enabled_for_current_user() -> bool:
     if role in OPEN_ROLES:
         return True
 
-    if any(token in role for token in ("admin", "yonetici", "yönetici", "baskan", "başkan", "koordinator", "koordinat", "grup")):
-        return True
-    return False
+    return any(token in role for token in ("admin", "yonetici", "yönetici", "baskan", "başkan", "koordinator", "koordinat", "grup"))
 
 
 def assistant_shortcut_visible(feature_key: str | None = None) -> bool:

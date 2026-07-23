@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
-"""Performans mail hatırlatma ve otomasyon route ailesi."""
 
 from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
@@ -18,10 +15,9 @@ from app.services.mail_service import (
     PERFORMANCE_RESULT_MAIL_TYPE,
     build_assignment_reminder_email,
     build_failed_mail_dashboard,
-    build_pending_assignment_manager_dashboard,
-    build_pending_assignment_manager_rows,
-    build_performance_mail_history_rows,
     build_mail_system_health_snapshot,
+    build_pending_assignment_manager_dashboard,
+    build_performance_mail_history_rows,
     build_reminder_activity_dashboard,
     get_failed_performance_mail_logs,
     get_performance_mail_automation_settings,
@@ -29,18 +25,21 @@ from app.services.mail_service import (
     retry_failed_performance_mail_logs,
     retry_mail_log,
     run_performance_mail_automation,
-    send_test_performance_mail,
     save_performance_mail_automation_settings,
     save_performance_mail_templates,
     send_bulk_assignment_reminders,
     send_selected_assignment_reminders,
     send_single_assignment_reminder,
+    send_test_performance_mail,
 )
-from .mail_helpers import build_styled_excel_bytes
 from app.services.performance.hardening_service import (
     build_period_download_name,
     humanize_export_exception,
 )
+
+from .mail_helpers import build_styled_excel_bytes
+
+"""Performans mail hatırlatma ve otomasyon route ailesi."""
 logger = logging.getLogger(__name__)
 
 @main_bp.route("/performance/mail-reminders/automation-settings", methods=["POST"])

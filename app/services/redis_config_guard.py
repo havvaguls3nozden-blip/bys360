@@ -40,7 +40,11 @@ def sanitize_redis_url(raw_url: str | None, *, app_env: str, deployment_mode: st
         return "", None
     env = (app_env or "").strip().lower()
     mode = (deployment_mode or "").strip().lower()
-    if is_docker_hostname_url(url) and env in PROD_LIKE_ENVS and mode not in {"docker", "compose", "container"}:
-        if not can_resolve_redis_url(url):
-            return "", "redis_url_docker_hostname_unresolved"
+    if (
+        is_docker_hostname_url(url)
+        and env in PROD_LIKE_ENVS
+        and mode not in {"docker", "compose", "container"}
+        and not can_resolve_redis_url(url)
+    ):
+        return "", "redis_url_docker_hostname_unresolved"
     return url, None

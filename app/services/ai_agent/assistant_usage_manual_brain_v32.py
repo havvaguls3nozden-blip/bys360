@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+import re
+import unicodedata
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
+from typing import Any
+
 """BYS360 Asistanı - Güncel Kullanım Kılavuzu Beyni V32.
 
 Bu modül BYS360 Kullanım Kılavuzu Güncel v1.1 (Haziran 2026)
@@ -10,12 +16,6 @@ Kritik sınır:
 - Performans puanı, amir görüşü, mesaj/anket içeriği veya hassas kişisel veri göstermez.
 - Yalnızca rehberlik, işlem adımı, doğru ekran ve yetki kontrollü genel özet mantığı sunar.
 """
-
-import re
-import unicodedata
-from collections.abc import Callable, Iterable
-from dataclasses import dataclass
-from typing import Any
 
 VERSION = "BYS360_ASSISTANT_USAGE_MANUAL_BRAIN_V32"
 SOURCE_LABEL = "BYS360 Kullanım Kılavuzu Güncel v1.1 · Haziran 2026"

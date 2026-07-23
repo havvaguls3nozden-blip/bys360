@@ -8,6 +8,8 @@ hissi veriyor. Buraya alinca ana omurga daha net gorunmeye basladi.
 """
 from __future__ import annotations
 
+import logging
+
 from flask import current_app, flash, redirect, request, url_for
 from flask_login import login_required
 from sqlalchemy import func, or_
@@ -16,12 +18,20 @@ from sqlalchemy.orm import aliased
 from app.extensions import db
 from app.models import OrganizationUnit, User
 from app.route_registry import main_bp
-from app.route_support import admin_required, menu_key_required, safe_all, safe_db_rollback, safe_render, ensure_boolean_toggle
-from app.services.hierarchy_admin_service import (
-    sync_organization_units_from_users,
-    sync_organization_units_from_users_if_stale,
+from app.route_support import (
+    admin_required,
+    ensure_boolean_toggle,
+    menu_key_required,
+    safe_all,
+    safe_db_rollback,
+    safe_render,
 )
 from app.services.ai import build_org_unit_detail_ai_panel, build_org_units_risk_map_ai_panel
+from app.services.hierarchy_admin_service import (
+    sync_organization_units_from_users_if_stale,
+)
+
+logger = logging.getLogger(__name__)
 
 LEGACY_SHIM = False
 LEGACY_RUNTIME_STATUS = "active_modular_main_blueprint_routes"
@@ -120,6 +130,7 @@ def admin_org_unit_create():
             return redirect(url_for("main.admin_org_units"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
             flash(f"Birim oluşturulurken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.admin_org_unit_create"))
@@ -214,6 +225,7 @@ def admin_org_unit_edit(unit_id: int):
             return redirect(url_for("main.admin_org_units"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
             flash(f"Birim güncellenirken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.admin_org_unit_edit", unit_id=unit.id))
@@ -245,6 +257,7 @@ def admin_org_unit_toggle_active(unit_id: int):
         else:
             flash("Birim pasif hale getirildi.", "warning")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(f"Birim durumu güncellenirken hata oluştu: {exc}", "danger")
 
@@ -391,6 +404,7 @@ def org_unit_add():
             return redirect(url_for("main.org_units_list"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Birim ekleme sırasında hata oluştu: {exc}", "danger")
 
@@ -452,6 +466,7 @@ def org_unit_edit(unit_id: int):
             return redirect(url_for("main.org_units_list"))
 
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Birim güncelleme sırasında hata oluştu: {exc}", "danger")
 
@@ -490,6 +505,7 @@ def org_unit_delete(unit_id: int):
         db.session.commit()
         flash("Birim kaydı silindi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         flash(f"Silme işlemi sırasında hata oluştu: {exc}", "danger")
 

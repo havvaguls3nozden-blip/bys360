@@ -10,39 +10,17 @@ from collections.abc import Callable
 from typing import Any
 from app.config import is_removed_menu_key
 from app.models import RoleMenuDefault
-
-RollbackHook = Callable[[], None]
 from app.services.settings.effective_menu_parts.bys360_context import (
-    _bys360_admin_period_reminder_is_admin_v1,
-    _bys360_admin_period_reminder_norm_v1,
-    _bys360_apply_general_category_visibility_fix_v1,
-    _bys360_apply_performance_main_switch,
-    _bys360_apply_performance_shortcut_gate_v4,
-    _bys360_exec_item_matches,
-    _bys360_exec_norm,
-    _bys360_force_home_menu_visible_v1,
-    _bys360_general_category_bool_v1,
-    _bys360_general_category_state_v1,
-    _bys360_is_exec_summary_menu_key,
-    _bys360_perf_rm_v8_apply_aliases,
-    _bys360_perf_rm_v8_apply_main_gate,
-    _bys360_perf_rm_v8_norm_role,
-    _bys360_perf_rm_v8_state_for_keys,
-    _bys360_performance_role_state,
     _bys360_person_matrix_can_open_v1,
-    _bys360_person_matrix_user_is_admin_v1,
-    _bys360_portal_role_matrix_v2_12_apply,
     _bys360_press_news_role,
-    _bys360_restore_general_section_v4,
-    _get_unit_name_for_authority,
     _load_role_matrix_state,
     _load_unit_profile_state,
     _load_user_override_state,
     _rollback,
-    _row_map_by_key,
-    _safe_query_all,
     normalize_role_name,
 )
+
+RollbackHook = Callable[[], None]
 
 CORE_MENU_VISIBILITY_POLICY: dict[str, set[str]] = {
     "messages": {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"},
@@ -195,9 +173,7 @@ def _role_allowed_for_menu(item: dict[str, Any], role_name: str) -> bool:
     if item.get("admin_only") and role_name != "admin":
         return False
     required_roles = {normalize_role_name(v) for v in (item.get("required_roles") or []) if str(v).strip()}
-    if required_roles and role_name not in required_roles:
-        return False
-    return True
+    return not (required_roles and role_name not in required_roles)
 
 def _apply_core_menu_visibility_policy(
     visibility: dict[str, bool],
@@ -339,7 +315,7 @@ def _apply_bys360_settings_live_authority_v1(
     """
     normalized_role = normalize_role_name(role_name)
     item_map = _menu_item_by_key(active_menu_items)
-    all_keys = [key for key in item_map.keys() if key]
+    all_keys = [key for key in item_map if key]
     role_state = _load_role_matrix_state(normalized_role, rollback=rollback)
     unit_state = _load_unit_profile_state(user, rollback=rollback)
     user_state = _load_user_override_state(user, rollback=rollback)

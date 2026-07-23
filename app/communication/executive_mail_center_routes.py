@@ -16,6 +16,7 @@ from app.services.executive_mail_center import (
     save_recipients,
 )
 
+
 def _can_manage_exec_mail_center() -> bool:
     if not getattr(current_user, "is_authenticated", False):
         return False

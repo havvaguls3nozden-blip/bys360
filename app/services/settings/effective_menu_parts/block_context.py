@@ -147,7 +147,7 @@ def apply_performance_role_matrix_new_tab_sets_block(policy_globals, _BYS360_PER
         if isinstance(_target, set):
             _target.update(_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.keys())
         elif isinstance(_target, list):
-            _target.extend([_k for _k in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY.keys() if _k not in _target])
+            _target.extend([_k for _k in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY if _k not in _target])
 
 
 def apply_personel_allowed_policy_block(policy_globals, _BYS360_PERSONEL_ALLOWED_POLICY, _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS):

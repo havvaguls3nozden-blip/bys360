@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from app.core.datetime_utils import utc_now
 
-"""AI Karar Destek servis envanteri."""
-
-
 from .live_scope import (
     AI_DECISION_PHASES,
     LIVE_AI_DOMAIN_KEYS,
@@ -26,6 +23,8 @@ from .summary_cache import (
     build_ai_summary_cache_lookup,
     build_ai_summary_cache_payload,
 )
+
+"""AI Karar Destek servis envanteri."""
 
 
 def build_ai_decision_faz0_inventory() -> dict[str, object]:
@@ -169,7 +168,7 @@ def build_ai_decision_summary_cache_summary() -> dict[str, object]:
     inventory = build_ai_decision_faz2_inventory()
     cache_contract = inventory["cache_contract"]
     return {
-        "ok": "ai_summary_cache" == cache_contract["table"] and len(inventory["supported_payloads"]) >= 4,
+        "ok": cache_contract["table"] == "ai_summary_cache" and len(inventory["supported_payloads"]) >= 4,
         "phase": inventory["phase"],
         "supported_payloads": inventory["supported_payloads"],
         "service_bridge_files": inventory["service_bridge_files"],

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, request, url_for
@@ -17,6 +16,7 @@ from app.services.performance.v2_1_2_category_engine import (
     seed_default_categories,
 )
 from app.services.performance.v2_1_2_category_quality_gate import run_v2_1_2_category_quality_gate
+
 logger = logging.getLogger(__name__)
 
 

@@ -7,9 +7,6 @@ from app.route_registry import main_bp
 from app.route_support import manager_required
 from app.services.performance.meeting_development import (
     DEFAULT_SETTINGS,
-    SETTING_ALLOW_MULTI_PERIODS,
-    SETTING_EDGE_COMMENT,
-    SETTING_SHOW_LEVEL3_OPTIONAL,
     add_category,
     add_observation_note,
     add_period_target,
@@ -31,7 +28,7 @@ def performance_meeting_development():
 @manager_required
 def performance_meeting_development_settings():
     # Faz 3 ile ayar listesi genişledi; yalnızca mevcut formda gönderilen/gönderilmeyen checkbox değerleri güvenli şekilde işlenir.
-    for key in DEFAULT_SETTINGS.keys():
+    for key in DEFAULT_SETTINGS:
         update_setting(key, request.form.get(key) == "on", actor_id=getattr(current_user, "id", None))
     flash("Toplantı kararlarına bağlı performans ayarları güncellendi.", "success")
     return redirect(url_for("main.performance_meeting_development"))

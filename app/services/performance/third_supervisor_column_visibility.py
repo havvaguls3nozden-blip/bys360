@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import logging
 
+from collections.abc import Iterable
+from typing import Any
+
 """BYS360 Faz 4.4 - 3. amir ekran sütunu görünürlük yardımcısı.
 
 Kural: 3. amir verisi yoksa tablo/listelerde boş sütun gösterilmez. Form tarafında
 ayar izin veriyorsa alan gösterilebilir; böylece yetkili kullanıcı gerektiğinde 3. amir
 ataması yapabilir.
 """
-
-from collections.abc import Iterable
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +30,7 @@ EMPTY_VALUES = {None, "", "-", "—", "None", "none", "NULL", "null", 0, "0"}
 def _is_present(value: Any) -> bool:
     if value in EMPTY_VALUES:
         return False
-    if isinstance(value, str) and value.strip() in EMPTY_VALUES:
-        return False
-    return True
+    return not (isinstance(value, str) and value.strip() in EMPTY_VALUES)
 
 
 def _iter_values(obj: Any) -> Iterable[Any]:
@@ -104,9 +102,7 @@ def should_show_third_supervisor_column(rows: Any = None, period: Any | None = N
     """
     if has_third_supervisor_data(rows, selected_value=selected_value):
         return True
-    if allow_setting and _policy_allows_column(period):
-        return True
-    return False
+    return allow_setting and _policy_allows_column(period)
 
 
 __all__ = [

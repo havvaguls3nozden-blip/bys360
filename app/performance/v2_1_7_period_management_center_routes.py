@@ -1,75 +1,68 @@
 from __future__ import annotations
 
-
 import logging
+from functools import wraps
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
-from app.route_support import admin_required, menu_key_required, safe_render
+from app.route_support import menu_key_required, safe_render
 from app.services.performance.v2_1_6_category_period_integration import (
     build_assignment_preintegration,
     create_or_update_period_from_plan,
 )
+from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label, label_status
 from app.services.performance.v2_1_7_period_management_center import (
     build_period_management_center_state,
     create_center_period_plan,
     ensure_period_management_center_ready,
 )
-from app.services.performance.v2_1_7_period_management_center_gate import run_v2_1_7_period_management_center_gate
-from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label, label_status
-
+from app.services.performance.v2_1_7_period_management_center_gate import (
+    run_v2_1_7_period_management_center_gate,
+)
 from app.services.performance.v2_1_8_period_center_assignment_launch import (
     build_assignment_launch_guard,
     launch_assignments_from_period_center,
 )
-from app.services.performance.v2_1_8_period_center_assignment_launch_gate import run_v2_1_8_period_center_assignment_launch_gate
-
+from app.services.performance.v2_1_8_period_center_assignment_launch_gate import (
+    run_v2_1_8_period_center_assignment_launch_gate,
+)
 from app.services.performance.v2_1_9_period_center_process_notifications import (
     build_period_center_process_state,
     prepare_period_center_notifications,
     run_v2_1_9_period_center_process_gate,
 )
-
 from app.services.performance.v2_1_14_period_center_real_summary import (
     build_period_center_real_summary,
     run_v2_1_14_period_center_real_summary_gate,
 )
-
-from functools import wraps
 from app.services.performance.v2_1_15_period_selection_status_flow import (
     build_period_center_selection_flow,
     run_v2_1_15_period_selection_status_flow_gate,
 )
-
 from app.services.performance.v2_1_16_scope_chain_control_panel import (
     build_scope_chain_control_panel,
     run_v2_1_16_scope_chain_control_panel_gate,
 )
-
 from app.services.performance.v2_1_17_reminder_approval_prep import (
     build_reminder_approval_prep_state,
     prepare_reminder_approval_preview,
     run_v2_1_17_reminder_approval_prep_gate,
 )
-
 from app.services.performance.v2_1_18_executive_view import (
     build_period_center_executive_view,
-    is_period_center_executive_user,
+    collect_user_role_terms,
     run_v2_1_18_executive_view_gate,
 )
-
 from app.services.performance.v2_1_19_admin_workflow import (
     build_period_center_admin_workflow,
     run_v2_1_19_admin_workflow_gate,
 )
-
 from app.services.performance.v2_1_20_final_gate_language_cleanup import (
     build_period_center_final_gate,
     run_v2_1_20_final_gate,
 )
-from app.services.performance.v2_1_18_executive_view import collect_user_role_terms
 
 logger = logging.getLogger(__name__)
 

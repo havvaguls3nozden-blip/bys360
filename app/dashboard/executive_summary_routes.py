@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 # BYS360_EXECUTIVE_SUMMARY_V3_LOCAL_PRO_UI
-
 from functools import wraps
 from typing import Any
 
@@ -13,7 +12,10 @@ try:
 except Exception:
     from app.routes import main_bp as bp  # type: ignore
 
-from app.services.executive_summary_service import build_executive_summary_context, send_executive_summary_mail
+from app.services.executive_summary_service import (
+    build_executive_summary_context,
+    send_executive_summary_mail,
+)
 
 _ADMIN_ROLE_TOKENS = {
     "admin",

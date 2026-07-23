@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Any
 
 """BYS360 Performans Tamamlama Faz 1 - Kural Motoru ve Ayar Merkezi.
 
@@ -15,10 +18,6 @@ Not: Bu dosya idari karar vermez; yalnizca mevcut performans is kurallarini
 route, servis, template ve gate katmanlarinin ayni sozlesmeden okuyabilmesi
 icin merkezi hale getirir.
 """
-
-from collections.abc import Mapping
-from dataclasses import dataclass, field
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from sqlalchemy import text
 
 from app.extensions import db
 
-from .repository import table_exists
 from .policy import AI_AGENT_AG6_VERSION, AI_AGENT_SECURITY_NOTICE
-import logging
+from .repository import table_exists
+
 logger = logging.getLogger(__name__)
 
 

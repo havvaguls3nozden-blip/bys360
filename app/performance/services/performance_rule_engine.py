@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Any
 
 """BYS360 Performans Faz 1.3 - merkezi performans kural motoru.
 
@@ -10,10 +13,6 @@ performans değerlendirme kurallarını tek merkezden yorumlar.
 Faz 1.3 bilinçli olarak route/template davranışını doğrudan değiştirmez.
 Faz 1.4'te yayın öncesi kontrol ve ekranlar bu servise bağlanacaktır.
 """
-
-from collections.abc import Mapping
-from dataclasses import dataclass, field
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

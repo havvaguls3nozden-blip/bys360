@@ -120,9 +120,7 @@ def assignment_visible_for_actor(assignment, admin_mode: bool = False, visibilit
     if assignment.manager_level == 1:
         if has_level_3_actor and not bool(getattr(evaluation, "level_3_completed", False)):
             return False
-        if has_level_2_actor and not bool(getattr(evaluation, "level_2_completed", False)):
-            return False
-        return True
+        return not (has_level_2_actor and not bool(getattr(evaluation, "level_2_completed", False)))
     return True
 
 

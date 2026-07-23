@@ -2,6 +2,14 @@ from __future__ import annotations
 
 import logging
 
+from dataclasses import dataclass
+from typing import Any
+
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
+
 logger = logging.getLogger(__name__)
 
 """BYS360 Toplantı Kararları — Faz 9 otomatik hatırlatma servisi.
@@ -12,14 +20,6 @@ sistem içi bildirim ve mail log disiplinini güvenli biçimde hazırlar.
 Faz 9 bilinçli olarak e-posta göndermez; gönderim için denetlenebilir kuyruk, ayar,
 mail log bağlantısı ve aksatan amir özetini kurar.
 """
-
-from dataclasses import dataclass
-from typing import Any
-
-from sqlalchemy import inspect, text
-from sqlalchemy.exc import SQLAlchemyError
-
-from app.extensions import db
 
 P3_REMINDERS_VERSION = "2026-04-30-meeting-faz9-reminders"
 
@@ -139,10 +139,12 @@ def ensure_reminder_queue_table() -> tuple[bool, list[str]]:
         """))
         db.session.commit()
     except SQLAlchemyError as exc:
-        db.session.rollback(); warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc.__class__.__name__}")
+        db.session.rollback()
+        warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=137")
-        db.session.rollback(); warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc}")
+        db.session.rollback()
+        warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc}")
     return _has_table(P3_REMINDER_QUEUE_TABLE), warnings
 
 def ensure_overdue_snapshot_table() -> tuple[bool, list[str]]:
@@ -159,10 +161,12 @@ def ensure_overdue_snapshot_table() -> tuple[bool, list[str]]:
         """))
         db.session.commit()
     except SQLAlchemyError as exc:
-        db.session.rollback(); warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc.__class__.__name__}")
+        db.session.rollback()
+        warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=156")
-        db.session.rollback(); warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc}")
+        db.session.rollback()
+        warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc}")
     return _has_table(P3_OVERDUE_SNAPSHOT_TABLE), warnings
 
 def _existing_live_tables() -> dict[str, bool]:
@@ -230,12 +234,14 @@ def run_p3_reminders(actor_user_id: int | None = None) -> P3ReminderResult:
         seeded = ensure_p3_settings()
         _, queue_warnings = ensure_reminder_queue_table()
         _, overdue_warnings = ensure_overdue_snapshot_table()
-        warnings.extend(queue_warnings); warnings.extend(overdue_warnings)
+        warnings.extend(queue_warnings)
+        warnings.extend(overdue_warnings)
         seed_demo_reminder(actor_user_id=actor_user_id)
         db.session.commit()
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=228")
-        db.session.rollback(); warnings.append(f"Faz 9 hatırlatma hazırlığı tamamlanamadı: {exc}")
+        db.session.rollback()
+        warnings.append(f"Faz 9 hatırlatma hazırlığı tamamlanamadı: {exc}")
     checks = p3_status_checks()
     passed = sum(1 for item in checks if item["ok"])
     tables_ready = int(_has_table(P3_REMINDER_QUEUE_TABLE)) + int(_has_table(P3_OVERDUE_SNAPSHOT_TABLE))

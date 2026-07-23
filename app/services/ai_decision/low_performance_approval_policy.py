@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import Any
 
 """BYS360 AI Karar Destek Faz 6 düşük performans onay politikası.
 
@@ -11,10 +14,6 @@ hazırlar.
 
 BYS360_AI_DECISION_FAZ6_LOW_PERFORMANCE_POLICY
 """
-
-from collections.abc import Mapping
-from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

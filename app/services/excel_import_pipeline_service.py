@@ -65,9 +65,7 @@ def _is_system_user(user: User | None) -> bool:
         return True
     if _safe(getattr(user, "birim", "")).lower() == "bys360":
         return True
-    if _safe(getattr(user, "ust_birim", "")).lower() == "bys360":
-        return True
-    return False
+    return _safe(getattr(user, "ust_birim", "")).lower() == "bys360"
 
 
 def _resolve_scope_users(scope_users: Iterable[User] | None = None, sicils: list[str] | None = None) -> list[User]:

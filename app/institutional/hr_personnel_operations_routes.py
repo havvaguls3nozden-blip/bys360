@@ -1,17 +1,26 @@
 from __future__ import annotations
 
-from app.core.datetime_utils import utc_now
-from datetime import datetime, timedelta
+import logging
 import os
 import uuid
+from datetime import datetime, timedelta
 
 from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect
 from werkzeug.utils import secure_filename
 
+from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import OrganizationUnit, PersonnelDocument, PersonnelDocumentUploadBatch, PersonnelPositionHistory, PersonnelProcessNote, PersonnelStatusHistory, User
+from app.models import (
+    OrganizationUnit,
+    PersonnelDocument,
+    PersonnelDocumentUploadBatch,
+    PersonnelPositionHistory,
+    PersonnelProcessNote,
+    PersonnelStatusHistory,
+    User,
+)
 from app.models.hr_models import (
     PersonnelSelfServiceRequest,
     PersonnelSelfServiceRequestAttachment,
@@ -29,6 +38,8 @@ from app.route_support import (
 )
 
 from .routes import _all_personnel, _filter_users_in_scope, _hr_scope_context, _scope_user_ids
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_PERSONNEL_DOC_EXTENSIONS = {
     ".pdf",
@@ -653,6 +664,7 @@ def hr_self_service_request_save():
         flash(message, "success")
         return _redirect_self_service_requests(row.id)
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         for path in saved_paths:
             _remove_file(path)
@@ -677,6 +689,7 @@ def hr_self_service_request_delete(request_id: int):
         db.session.commit()
         flash("Talep kaydı kaldırıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_self_service_requests()
@@ -692,6 +705,7 @@ def hr_self_service_request_attachment_download(request_id: int, attachment_id: 
             raise ValueError("Ek dosyası bulunamadı.")
         return send_file(path, as_attachment=True, download_name=getattr(row, "original_filename", None) or os.path.basename(path))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         flash(str(exc), "danger")
         return _redirect_self_service_requests(request_id)
 
@@ -712,6 +726,7 @@ def hr_self_service_request_attachment_delete(request_id: int, attachment_id: in
         db.session.commit()
         flash("Talep eki kaldırıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_self_service_requests(request_id)
@@ -772,6 +787,7 @@ def hr_personnel_request_review(request_id: int):
         db.session.commit()
         flash("Talep akışı güncellendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_request_review(hr_scope=hr_scope, request_id=request_id)
@@ -790,6 +806,7 @@ def hr_personnel_request_attachment_download(request_id: int, attachment_id: int
             raise ValueError("Ek dosyası bulunamadı.")
         return send_file(path, as_attachment=True, download_name=getattr(row, "original_filename", None) or os.path.basename(path))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         flash(str(exc), "danger")
         return _redirect_request_review(hr_scope=hr_scope, request_id=request_id)
 
@@ -842,6 +859,7 @@ def hr_personnel_document_save():
         db.session.commit()
         flash(f"{user.full_name} için personel belgesi kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
@@ -937,6 +955,7 @@ def hr_personnel_document_bulk_upload():
         else:
             flash(f"{user.full_name} için {success_count} belge toplu olarak yüklendi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
@@ -961,6 +980,7 @@ def hr_personnel_document_delete(document_id: int):
         _remove_file(old_path)
         flash("Personel belge kaydı kaldırıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         user_id = int(request.form.get("user_id") or 0) or None
@@ -980,6 +1000,7 @@ def hr_personnel_document_download(document_id: int):
             raise ValueError("Belge dosyası sunucuda bulunamadı.")
         return send_file(path, as_attachment=True, download_name=(getattr(row, "original_filename", None) or "personel-belgesi"))
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         flash(str(exc), "danger")
         return redirect(url_for("main.hr_personnel_operations", user_id=int(request.args.get("user_id") or 0) or None, scope=(request.args.get("scope") or "").strip() or None))
 
@@ -1016,6 +1037,7 @@ def hr_personnel_note_save():
         db.session.commit()
         flash(f"{user.full_name} için işlem notu kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
@@ -1046,6 +1068,7 @@ def hr_personnel_note_toggle(note_id: int):
         db.session.commit()
         flash(message, "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         user_id = int(request.form.get("user_id") or 0) or None
@@ -1069,6 +1092,7 @@ def hr_personnel_note_delete(note_id: int):
         db.session.commit()
         flash("İşlem notu kaldırıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         user_id = int(request.form.get("user_id") or 0) or None
@@ -1104,6 +1128,7 @@ def hr_personnel_status_save():
         db.session.commit()
         flash(f"{user.full_name} için durum geçmişi kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
@@ -1126,6 +1151,7 @@ def hr_personnel_status_delete(status_id: int):
         db.session.commit()
         flash("Durum geçmişi kaydı kaldırıldı.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
         user_id = int(request.form.get("user_id") or 0) or None
@@ -1213,6 +1239,7 @@ def hr_personnel_position_save():
         db.session.commit()
         flash("Pozisyon / görev geçmişi kaydı kaydedildi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=_safe_int(request.form.get("user_id")))
@@ -1238,6 +1265,7 @@ def hr_personnel_position_delete(position_id: int):
         db.session.commit()
         flash("Pozisyon / görev geçmişi kaydı silindi.", "success")
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
         flash(str(exc), "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=_safe_int(request.form.get("user_id")))

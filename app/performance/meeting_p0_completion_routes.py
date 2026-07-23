@@ -5,7 +5,10 @@ from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.route_support import manager_required
-from app.services.performance.meeting_p0_completion import build_p0_completion_context, run_p0_completion
+from app.services.performance.meeting_p0_completion import (
+    build_p0_completion_context,
+    run_p0_completion,
+)
 
 
 @main_bp.route("/performance/meeting-development/p0", endpoint="performance_meeting_p0_completion")

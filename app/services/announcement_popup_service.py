@@ -325,9 +325,8 @@ def _dailymotion_id_from_url(raw_url: str) -> str | None:
     candidate = ""
     if host == "dai.ly" and path_parts:
         candidate = path_parts[0]
-    elif host == "dailymotion.com":
-        if len(path_parts) >= 2 and path_parts[0] in {"video", "embed"}:
-            candidate = path_parts[-1]
+    elif host == "dailymotion.com" and len(path_parts) >= 2 and path_parts[0] in {"video", "embed"}:
+        candidate = path_parts[-1]
     candidate = candidate.split("_")[0].strip()
     return candidate if DAILYMOTION_ID_RE.match(candidate) else None
 
@@ -412,9 +411,8 @@ def validate_announcement_payload(payload: dict[str, Any]) -> list[str]:
         errors.append("Rol bazlı duyuru için hedef rol seçilmelidir.")
     if payload.get("target_scope") == "unit" and not payload.get("target_unit_id"):
         errors.append("Birim bazlı duyuru için hedef birim seçilmelidir.")
-    if payload.get("publish_start_at") and payload.get("publish_end_at"):
-        if payload["publish_end_at"] < payload["publish_start_at"]:
-            errors.append("Yayın bitiş tarihi başlangıç tarihinden önce olamaz.")
+    if payload.get("publish_start_at") and payload.get("publish_end_at") and payload["publish_end_at"] < payload["publish_start_at"]:
+        errors.append("Yayın bitiş tarihi başlangıç tarihinden önce olamaz.")
 
     if media_type in EXTERNAL_VIDEO_TYPES:
         if not payload.get("media_url"):
@@ -627,9 +625,7 @@ def is_announcement_in_publish_window(announcement: Announcement, *, now: dateti
         return False
     if announcement.publish_start_at and announcement.publish_start_at > moment:
         return False
-    if announcement.publish_end_at and announcement.publish_end_at < moment:
-        return False
-    return True
+    return not (announcement.publish_end_at and announcement.publish_end_at < moment)
 
 
 def is_user_targeted(announcement: Announcement, user: User) -> bool:

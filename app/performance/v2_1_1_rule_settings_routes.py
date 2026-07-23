@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import logging
 
 from flask import flash, redirect, request, url_for
@@ -8,9 +7,13 @@ from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
 from app.route_support import admin_required, safe_render
-from app.services.performance.v2_1_rule_engine import DEFAULT_SETTINGS, build_rule_snapshot_dict
-from app.services.performance.v2_1_settings_seed import seed_performance_v2_1_1_settings, update_performance_v2_1_1_settings
 from app.services.performance.v2_1_quality_gate import run_v2_1_1_quality_gate
+from app.services.performance.v2_1_rule_engine import DEFAULT_SETTINGS, build_rule_snapshot_dict
+from app.services.performance.v2_1_settings_seed import (
+    seed_performance_v2_1_1_settings,
+    update_performance_v2_1_1_settings,
+)
+
 logger = logging.getLogger(__name__)
 
 

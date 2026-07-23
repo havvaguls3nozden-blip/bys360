@@ -1,6 +1,11 @@
 from __future__ import annotations
 
 import logging
+import re
+from dataclasses import dataclass
+from typing import Any
+
+from sqlalchemy import inspect, text
 
 """BYS360 Performans V2.1.2 personel grup/kategori altyapısı.
 
@@ -9,12 +14,6 @@ ayrı bir eşleme tablosu ile yönetir. Böylece canlı ortamda personel kartı,
 Excel import ve kategori bazlı dönem/kapsam entegrasyonu sonraki fazlarda
 kademeli ve güvenli biçimde bağlanabilir.
 """
-
-import re
-from dataclasses import dataclass
-from typing import Any
-
-from sqlalchemy import inspect, text
 
 logger = logging.getLogger(__name__)
 

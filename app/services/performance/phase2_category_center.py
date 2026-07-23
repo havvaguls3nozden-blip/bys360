@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Any
 
 """BYS360 Performans Tamamlama Faz 2 kategori merkezi.
 
@@ -12,10 +15,6 @@ Amaç:
 Bu servis DB hazır değilken de güvenli varsayılanlarla çalışır; canlı DB işlemleri
 migration ve repair scriptleriyle ayrıca güvenceye alınır.
 """
-
-from collections.abc import Iterable
-from dataclasses import dataclass
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

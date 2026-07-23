@@ -1,16 +1,5 @@
 from __future__ import annotations
 
-# --- BYS360 third-manager Excel import compatibility patch ---
-THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
-THIRD_MANAGER_HEADER_ALIASES = [
-    "ucuncu_yonetici_sicil",
-    "üçüncü yönetici sicil",
-    "ucuncu yonetici sicil",
-    "3. amir sicil",
-    "3 amir sicil",
-    "new_y3",
-]
-
 from datetime import date
 from typing import Any
 
@@ -33,6 +22,17 @@ from app.models import (
     User,
 )
 from app.route_support import issue_form_token
+
+# --- BYS360 third-manager Excel import compatibility patch ---
+THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
+THIRD_MANAGER_HEADER_ALIASES = [
+    "ucuncu_yonetici_sicil",
+    "üçüncü yönetici sicil",
+    "ucuncu yonetici sicil",
+    "3. amir sicil",
+    "3 amir sicil",
+    "new_y3",
+]
 
 DEFAULT_DOCUMENT_CATEGORIES = [
     {

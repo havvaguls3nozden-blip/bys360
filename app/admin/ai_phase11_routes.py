@@ -3,7 +3,6 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
-
 import csv
 import io
 import json
@@ -21,6 +20,7 @@ from app.services.ai.history_compare import (
     render_ai_management_pack_markdown,
 )
 from app.services.ai.schema_guard import get_ai_schema_status
+
 
 def _safe_int(value: str | None, default: int = 30) -> int:
     try:
@@ -236,7 +236,11 @@ def admin_ai_executive_report():
 @menu_key_required('ai_center')
 def admin_ai_executive_report_export_csv():
     """Faz 11 güvenli CSV export: ham AI metni ve kişisel veri içermez."""
-    from app.services.ai.executive_report_exports import EXPORT_COLUMNS, build_ai_executive_report_export_rows, build_ai_executive_report_snapshot
+    from app.services.ai.executive_report_exports import (
+        EXPORT_COLUMNS,
+        build_ai_executive_report_export_rows,
+        build_ai_executive_report_snapshot,
+    )
 
     snapshot = build_ai_executive_report_snapshot(
         current_user=current_user,
@@ -263,7 +267,10 @@ def admin_ai_executive_report_export_csv():
 @menu_key_required('ai_center')
 def admin_ai_executive_report_export_json():
     """Faz 11 güvenli JSON export: sadece özet, metrik ve aksiyon satırları."""
-    from app.services.ai.executive_report_exports import build_ai_executive_report_snapshot, dumps_safe_json
+    from app.services.ai.executive_report_exports import (
+        build_ai_executive_report_snapshot,
+        dumps_safe_json,
+    )
 
     snapshot = build_ai_executive_report_snapshot(
         current_user=current_user,
@@ -285,7 +292,10 @@ def admin_ai_executive_report_export_json():
 @menu_key_required('ai_center')
 def admin_ai_executive_report_export_md():
     """Faz 11 güvenli Markdown export: yönetici rapor metni."""
-    from app.services.ai.executive_report_exports import build_ai_executive_report_snapshot, render_ai_executive_report_markdown
+    from app.services.ai.executive_report_exports import (
+        build_ai_executive_report_snapshot,
+        render_ai_executive_report_markdown,
+    )
 
     snapshot = build_ai_executive_report_snapshot(
         current_user=current_user,

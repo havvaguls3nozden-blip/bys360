@@ -230,6 +230,7 @@ __all__ = [
     "FeedbackPulseEntry",
     "FeedbackActionPlan",
     "SupportCategory",
+    "SupportHelpArticle",
     "SupportTicket",
     "SupportTicketMessage",
     "SupportTicketAttachment",

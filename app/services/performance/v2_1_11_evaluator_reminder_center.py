@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from sqlalchemy import inspect, text
 
 logger = logging.getLogger(__name__)
 
@@ -11,11 +15,6 @@ mail göndermez, şema değiştirmez ve kritik süreç statüsü yazmaz. Amaç;
 V2.1.10 canlı takip ekranında görülen bekleyen/geciken değerlendirmeleri amir
 bazında sadeleştirmek ve güvenli hatırlatma hazırlığı oluşturmaktır.
 """
-
-from datetime import datetime, timedelta
-from typing import Any
-
-from sqlalchemy import inspect, text
 
 RULE_VERSION = "performance_v2_1_11_evaluator_reminder_center"
 PERIOD_TABLE = "performance_periods"

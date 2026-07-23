@@ -182,10 +182,7 @@ def is_informational_reason(
         return True
 
     payload = reason_payload(item, event_type=event_type, manager_level=manager_level)
-    if payload.get("level", "").lower() == "info":
-        return True
-
-    return False
+    return payload.get("level", "").lower() == "info"
 
 
 __all__ = [

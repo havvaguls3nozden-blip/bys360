@@ -13,10 +13,10 @@ import py_compile
 import re
 import subprocess
 import sys
+from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from collections.abc import Sequence
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P5D_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_ANDROID_RESPONSIVE_RELEASE_SUITE_GATE_P5D_REPORT.json")

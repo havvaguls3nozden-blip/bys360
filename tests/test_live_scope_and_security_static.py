@@ -1,8 +1,8 @@
+from pathlib import Path
+
 import pytest
 
 pytestmark = [pytest.mark.live, pytest.mark.realdb, pytest.mark.slow]
-
-from pathlib import Path
 
 
 def test_removed_scope_blocks_education_isg_aliases():

@@ -78,6 +78,16 @@ __all__ = [
     "snapshot_system_settings_state",
     "snapshot_unit_menu_state",
     "snapshot_user_override_state",
+    "MenuPermissionRule",
+    "SettingDefinition",
+    "SettingValue",
+    "SettingsAuditFinding",
+    "build_definition",
+    "group_definitions",
+    "index_definitions",
+    "normalize_menu_key",
+    "normalize_setting_key",
+    "to_bool",
 ]
 
 # ---------------------------------------------------------------------------

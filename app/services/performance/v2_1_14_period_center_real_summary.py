@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from sqlalchemy import inspect, text
 
 """BYS360 Performans V2.1.14 dönem merkezi gerçek özet verileri.
 
@@ -8,11 +12,6 @@ Bu servis yalnızca okuma yapar. Merkez sayfada seçili döneme ait hafif
 özet sayıları gösterir; detay satırları çekmez, görev üretmez, mail göndermez,
 şema değiştirmez.
 """
-
-from datetime import datetime, timedelta
-from typing import Any
-
-from sqlalchemy import inspect, text
 
 logger = logging.getLogger(__name__)
 

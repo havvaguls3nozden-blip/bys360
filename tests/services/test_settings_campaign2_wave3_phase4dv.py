@@ -55,7 +55,8 @@ def _load_apply():
     config = _module('app.config', is_removed_menu_key=lambda key: False)
     registry = _module('app.menu_registry', flatten_menu_definitions=lambda *a, **k: [])
 
-    class Model: pass
+    class Model:
+        pass
     models = _module('app.models', UserMenuPermission=Model, RoleMenuDefault=Model)
     settings_service = _module(
         'app.services.settings_service',
@@ -490,8 +491,12 @@ def _policy_keys(constants):
 def _ns(constants, *, lists=False, authority=None, core=None):
     if lists:
         policies = {name: [] for name in _policy_keys(constants)}
-        make_policy = lambda: {key: [] for key in policies}
-        make_keys = lambda: HybridList(['hr_old'])
+
+        def make_policy():
+            return {key: [] for key in policies}
+
+        def make_keys():
+            return HybridList(['hr_old'])
         authority_value = authority if authority is not None else HybridList(['hr_old'])
     else:
         make_policy = dict

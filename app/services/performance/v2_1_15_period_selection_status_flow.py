@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 """BYS360 Performans V2.1.15 dönem seçimi ve durum akışı.
 
 Bu servis yalnızca merkez ekranında kullanılacak seçim/akış verisini hazırlar.
 Veritabanına yazmaz, görev üretmez, bildirim göndermez.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

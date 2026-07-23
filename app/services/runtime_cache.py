@@ -1,11 +1,5 @@
 from __future__ import annotations
 
-"""BYS360 runtime cache servisi.
-
-Faz 4 ile Redis destekli hale getirildi. Redis yoksa veya bağlantı kurulamazsa
-uygulama düşmez; mevcut bellek içi cache davranışı devam eder.
-"""
-
 import json
 import os
 import time
@@ -25,6 +19,12 @@ try:
     import redis  # type: ignore
 except Exception:  # pragma: no cover
     redis = None  # type: ignore
+
+"""BYS360 runtime cache servisi.
+
+Faz 4 ile Redis destekli hale getirildi. Redis yoksa veya bağlantı kurulamazsa
+uygulama düşmez; mevcut bellek içi cache davranışı devam eder.
+"""
 
 # BYS360_MAINTENANCE_ROADMAP_PHASE4_SCALABILITY_PERFORMANCE_RUNTIME_CACHE
 _CACHE: dict[str, tuple[float, Any]] = {}

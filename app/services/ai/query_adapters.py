@@ -77,9 +77,8 @@ def get_support_ticket_payload(ticket_id: int) -> tuple[SupportTicket, dict[str,
         raise AIResourceNotFound("Destek talebi bulunamadı.")
 
     can_view = False
-    if getattr(current_user, 'is_authenticated', False):
-        if is_manager_family_user(current_user) or int(getattr(ticket, 'created_by_user_id', 0) or 0) == int(getattr(current_user, 'id', 0) or 0) or int(getattr(ticket, 'assigned_to_user_id', 0) or 0) == int(getattr(current_user, 'id', 0) or 0):
-            can_view = True
+    if getattr(current_user, 'is_authenticated', False) and (is_manager_family_user(current_user) or int(getattr(ticket, 'created_by_user_id', 0) or 0) == int(getattr(current_user, 'id', 0) or 0) or int(getattr(ticket, 'assigned_to_user_id', 0) or 0) == int(getattr(current_user, 'id', 0) or 0)):
+        can_view = True
     if not can_view:
         raise AIInputError("Bu destek talebi için AI triage görme yetkiniz yok.")
 

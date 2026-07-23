@@ -12,6 +12,7 @@ Kalite P0 notu:
 """
 from __future__ import annotations
 
+import contextlib
 from collections.abc import Callable
 from importlib import import_module
 
@@ -212,10 +213,8 @@ def _prewarm_menu_visibility(app):
         with app.app_context():
             build_menu_visibility_map(_BYS360MenuVisibilityPrewarmUser())
     except Exception as exc:
-        try:
+        with contextlib.suppress(Exception):
             app.logger.info("BYS360 menu visibility prewarm skipped: %s", exc)
-        except Exception:
-            pass
 
 
 
@@ -231,10 +230,8 @@ def _prewarm_core_templates(app):
             app.jinja_env.get_template("base.html")
             app.jinja_env.get_template("performance/v2_1_4_category_scope.html")
     except Exception as exc:
-        try:
+        with contextlib.suppress(Exception):
             app.logger.info("BYS360 template prewarm skipped: %s", exc)
-        except Exception:
-            pass
 
 
 def create_app() -> Flask:

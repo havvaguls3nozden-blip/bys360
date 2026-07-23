@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
+from .common import build_assignment_due_date
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -18,8 +20,6 @@ try:
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     db = None
-
-from .common import build_assignment_due_date
 
 try:
     import app.models as models

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-
 import logging
-
 from typing import Any
 
 from flask import abort, render_template, render_template_string, url_for
@@ -10,12 +8,12 @@ from flask_login import current_user, login_required
 from sqlalchemy import text
 
 from app.extensions import db
+from app.routes import main
 from app.security.sql_identifiers import (
     quote_sql_identifier,
     validate_sql_identifier,
 )
 
-from app.routes import main
 logger = logging.getLogger(__name__)
 
 PHASE12_PRESIDENT_APPROVALS_MENU_CARD_ACCESS = True

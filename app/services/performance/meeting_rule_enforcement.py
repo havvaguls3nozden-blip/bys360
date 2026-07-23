@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from typing import Any
+
+from sqlalchemy import inspect, text
+
+from app.extensions import db
 
 """BYS360 Toplantı Kararları — kural uygulama servisi.
 
@@ -8,13 +14,6 @@ Bu servis Faz 1-4'te eklenen toplantı kararlarını yalnızca açıklama/kart
 seviyesinde bırakmaz; yayın ön kontrol, görünürlük ve grup ortalaması tarafında
 çalışan tekil bir kural yüzeyi sağlar.
 """
-
-from dataclasses import dataclass
-from typing import Any
-
-from sqlalchemy import inspect, text
-
-from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

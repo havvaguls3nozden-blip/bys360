@@ -80,7 +80,7 @@ def validate_item_comment_requirements(item_payloads: list[dict[str, Any]] | Non
             raise ValueError("Bu puan için sistem ayarında açıklama zorunluluğu aktiftir.")
 
 
-def requires_level_2_comment_for_evaluation(evaluation_or_id: Union[int, PerformanceEvaluation]) -> bool:
+def requires_level_2_comment_for_evaluation(evaluation_or_id: int | PerformanceEvaluation) -> bool:
     # Nihai kurum kuralı: 3 puan tek başına yorum zorunluluğu oluşturmaz.
     # Parametre geriye uyumluluk için korunur.
     _ = evaluation_or_id
@@ -120,7 +120,7 @@ def calculate_level_total_100(evaluation_id: int, manager_level: int) -> float:
 
 
 def calculate_final_total(
-    evaluation_or_period: Union[PerformanceEvaluation, PerformancePeriod, Any],
+    evaluation_or_period: PerformanceEvaluation | PerformancePeriod | Any,
     level_1_total: float | None = None,
     level_2_total: float | None = None,
     level_3_total: float = 0.0,

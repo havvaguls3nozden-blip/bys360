@@ -135,9 +135,7 @@ class PerformancePeriod(TimestampMixin, db.Model):
         end = self.evaluation_window_end
         if start and target < start:
             return False
-        if end and target > end:
-            return False
-        return True
+        return not (end and target > end)
 
     def build_due_datetime(self, assigned_at: datetime | None = None) -> datetime | None:
         anchor = assigned_at or utc_now()

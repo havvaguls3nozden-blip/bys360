@@ -65,12 +65,17 @@ def register_mobile_performance_read_routes_v1(route_globals) -> None:
         q = _v2822_assignment_query(user).order_by(EvaluationAssignment.id.desc())
         open_q = _v2822_open_query(user)
         items = [_v2822_assignment_card(row) for row in _mobile_perf_safe_all(q.limit(80))]
-        overdue = 0; today = 0; completed = 0
+        overdue = 0
+        today = 0
+        completed = 0
         for row in _mobile_perf_safe_all(_v2822_assignment_query(user).limit(500)):
             label, _, _ = _v2822_due_label(row)
-            if label == 'Gecikti': overdue += 1
-            elif label == 'Bugün Son Gün': today += 1
-            if getattr(row, 'completed_at', None): completed += 1
+            if label == 'Gecikti':
+                overdue += 1
+            elif label == 'Bugün Son Gün':
+                today += 1
+            if getattr(row, 'completed_at', None):
+                completed += 1
         return _module_payload([
             _metric('Toplam Görev', _mobile_perf_safe_count(_v2822_assignment_query(user)), 'Yetkinize göre görünen görev', 'red', 'assignment'),
             _metric('Bekleyen', _mobile_perf_safe_count(open_q), 'İşlem bekleyen değerlendirme', 'red', 'assignment'),
@@ -88,19 +93,26 @@ def register_mobile_performance_read_routes_v1(route_globals) -> None:
         by_evaluator: dict[int, dict[str, Any]] = {}
         for row in rows:
             evaluator_id = int(getattr(row, 'evaluator_id', 0) or 0)
-            if not evaluator_id: continue
+            if not evaluator_id:
+                continue
             bucket = by_evaluator.setdefault(evaluator_id, {'user': getattr(row, 'evaluator', None), 'total': 0, 'pending': 0, 'overdue': 0, 'done': 0, 'last': None})
             bucket['total'] += 1
             label, _, _ = _v2822_due_label(row)
-            if label == 'Tamamlandı': bucket['done'] += 1
-            else: bucket['pending'] += 1
-            if label == 'Gecikti': bucket['overdue'] += 1
+            if label == 'Tamamlandı':
+                bucket['done'] += 1
+            else:
+                bucket['pending'] += 1
+            if label == 'Gecikti':
+                bucket['overdue'] += 1
             created = getattr(row, 'updated_at', None) or getattr(row, 'created_at', None)
-            if created and (bucket['last'] is None or created > bucket['last']): bucket['last'] = created
+            if created and (bucket['last'] is None or created > bucket['last']):
+                bucket['last'] = created
         items: list[dict[str, Any]] = []
         for evaluator_id, data in sorted(by_evaluator.items(), key=lambda kv: (kv[1]['overdue'], kv[1]['pending']), reverse=True)[:80]:
             evaluator = data.get('user') or _mobile_perf_safe_get(User, evaluator_id)
-            pending = int(data.get('pending', 0) or 0); overdue = int(data.get('overdue', 0) or 0); total = int(data.get('total', 0) or 0)
+            pending = int(data.get('pending', 0) or 0)
+            overdue = int(data.get('overdue', 0) or 0)
+            total = int(data.get('total', 0) or 0)
             status = 'Kritik' if overdue else ('Dikkat' if pending else 'Normal')
             progress = 100 if total == 0 else max(0, min(100, int((int(data.get('done', 0) or 0) / total) * 100)))
             items.append(_item(evaluator_id, _full_name(evaluator), f'Bekleyen {pending} / Geciken {overdue}', status, f'Toplam {total} görev', _date_text(data.get('last')) if data.get('last') else '', progress))

@@ -5,13 +5,17 @@ app.security.guards olarak import edilir.
 """
 from __future__ import annotations
 
-
 from dataclasses import dataclass
 from typing import Any
 
 from flask import current_app
 
-from app.security import EXCEL_MAX_BYTES, PROFILE_PHOTO_MAX_BYTES, REPOSITORY_DOCUMENT_MAX_BYTES, REPOSITORY_MEDIA_MAX_BYTES
+from app.security import (
+    EXCEL_MAX_BYTES,
+    PROFILE_PHOTO_MAX_BYTES,
+    REPOSITORY_DOCUMENT_MAX_BYTES,
+    REPOSITORY_MEDIA_MAX_BYTES,
+)
 
 
 @dataclass(frozen=True)

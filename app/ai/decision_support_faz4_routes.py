@@ -1,20 +1,8 @@
 from __future__ import annotations
 
-
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 AI Karar Destek Faz 4 route ekleri.
-
-Bu modül mevcut app.ai.routes dosyasını ezmeden main_bp üzerine Faz 4 uçlarını
-kaydeder. Uçlar 3. amir opsiyonelliği ve akış temizliği için güvenli karar
-destek çıktısı döndürür.
-
-BYS360_AI_DECISION_FAZ4_ROUTES
-"""
-
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from flask import jsonify
 from flask_login import current_user, login_required
@@ -28,8 +16,22 @@ from app.services.ai_decision.third_supervisor_integration import (
     build_third_supervisor_decision_payload,
 )
 
+logger = logging.getLogger(__name__)
+
+"""BYS360 AI Karar Destek Faz 4 route ekleri.
+
+Bu modül mevcut app.ai.routes dosyasını ezmeden main_bp üzerine Faz 4 uçlarını
+kaydeder. Uçlar 3. amir opsiyonelliği ve akış temizliği için güvenli karar
+destek çıktısı döndürür.
+
+BYS360_AI_DECISION_FAZ4_ROUTES
+"""
+
 try:
-    from app.services.ai_decision.permission_guard import assert_center_access, assert_evaluation_access
+    from app.services.ai_decision.permission_guard import (
+        assert_center_access,
+        assert_evaluation_access,
+    )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz4_routes.py | line=30")
     def assert_center_access(user: Any) -> Any:

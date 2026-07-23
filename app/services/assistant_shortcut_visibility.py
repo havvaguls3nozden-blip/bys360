@@ -286,9 +286,7 @@ def assistant_shortcut_visible(feature_key: str) -> bool:
     policy = DEFAULT_ROLE_POLICY.get(role)
     if policy and key in policy:
         return bool(policy[key])
-    if any(x in role for x in ("admin", "yonetici", "yönetici", "baskan", "başkan", "koordinator", "koordinat", "grup")):
-        return True
-    return False
+    return any(x in role for x in ("admin", "yonetici", "yönetici", "baskan", "başkan", "koordinator", "koordinat", "grup"))
 
 def assistant_shortcut_visibility_map() -> dict[str, bool]:
     return {key: assistant_shortcut_visible(key) for key in ASSISTANT_SHORTCUTS}

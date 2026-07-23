@@ -2,15 +2,6 @@ from __future__ import annotations
 
 
 import logging
-logger = logging.getLogger(__name__)
-
-"""BYS360 modüller arası sistem içi bildirim köprüsü.
-
-Bu servis; destek/talep, hızlı geri bildirim, kurumsal geri bildirim
-kampanyaları ve portal etkileşimlerinde bildirim üretimini tek noktadan
-ve güvenli biçimde yönetir. Bildirim üretimi ana işlemi düşürmemelidir;
-bu yüzden tüm yardımcılar kontrollü çalışır ve commit çağırmaz.
-"""
 
 from typing import Any
 from collections.abc import Iterable
@@ -21,11 +12,20 @@ from app.extensions import db
 from app.models import Notification, User
 from app.route_support import sanitize_free_text
 
+logger = logging.getLogger(__name__)
+
+"""BYS360 modüller arası sistem içi bildirim köprüsü.
+
+Bu servis; destek/talep, hızlı geri bildirim, kurumsal geri bildirim
+kampanyaları ve portal etkileşimlerinde bildirim üretimini tek noktadan
+ve güvenli biçimde yönetir. Bildirim üretimi ana işlemi düşürmemelidir;
+bu yüzden tüm yardımcılar kontrollü çalışır ve commit çağırmaz.
+"""
+
 _ADMIN_ROLE_TOKENS = {
     "admin",
     "sistem_yoneticisi",
     "sistem yöneticisi",
-    "sistem_yoneticisi",
     "administrator",
 }
 _SUPPORT_ROLE_TOKENS = {

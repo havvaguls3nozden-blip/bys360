@@ -3,7 +3,6 @@ from __future__ import annotations
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.admin.route_manifest REQUIRED_ROUTE_MODULES
-
 import csv
 import io
 import json
@@ -13,7 +12,10 @@ from flask_login import login_required
 
 from app.route_registry import main_bp
 from app.route_support import admin_required, menu_key_required, safe_render
-from app.services.ai.executive_reporting import build_ai_executive_brief, render_ai_executive_markdown
+from app.services.ai.executive_reporting import (
+    build_ai_executive_brief,
+    render_ai_executive_markdown,
+)
 from app.services.ai.schema_guard import get_ai_schema_status
 
 
@@ -145,7 +147,10 @@ def admin_ai_recommendation_priority():
 @menu_key_required('ai_center')
 def admin_ai_recommendation_priority_export():
     """Faz 9 öneri önceliklendirme çıktısını salt-okunur CSV olarak verir."""
-    from app.services.ai.recommendation_priority import build_ai_recommendation_priority_snapshot, export_recommendation_priority_rows
+    from app.services.ai.recommendation_priority import (
+        build_ai_recommendation_priority_snapshot,
+        export_recommendation_priority_rows,
+    )
 
     fallback = _schema_fallback('AI Öneri Motoru ve Risk Önceliklendirme')
     if fallback:

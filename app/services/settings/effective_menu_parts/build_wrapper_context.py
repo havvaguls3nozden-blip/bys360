@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+
 
 def apply_v213c_category_menu_wrapper(
     current_build_menu_visibility_map,
@@ -66,10 +68,8 @@ def apply_v213c_category_menu_wrapper(
 
         return _bys360_v213c_build_menu_visibility_map_wrapper
     except Exception:
-        try:
+        with contextlib.suppress(Exception):
             logging.exception("BYS360 V2.1.3C kategori menü effective_menu force uygulanamadı")
-        except Exception:
-            pass
         return current_build_menu_visibility_map
 
 
@@ -110,10 +110,8 @@ def apply_v215_category_period_scope_wrapper(
 
         return _bys360_v215_category_period_scope_build_menu_visibility_map_wrapper
     except Exception:
-        try:
+        with contextlib.suppress(Exception):
             logging.exception("BYS360 V2.1.5 kategori dönem kapsam effective_menu force uygulanamadı")
-        except Exception:
-            pass
         return current_build_menu_visibility_map
 
 
@@ -154,10 +152,8 @@ def apply_v216_category_period_integration_wrapper(
 
         return _bys360_v216_category_period_integration_build_menu_visibility_map_wrapper
     except Exception:
-        try:
+        with contextlib.suppress(Exception):
             logging.exception("BYS360 V2.1.6 kategori dönem entegrasyonu effective_menu force uygulanamadı")
-        except Exception:
-            pass
         return current_build_menu_visibility_map
 
 
@@ -191,10 +187,8 @@ def apply_v214_category_scope_wrapper(
 
         return _bys360_v214_category_scope_build_menu_visibility_map_wrapper
     except Exception:
-        try:
+        with contextlib.suppress(Exception):
             logging.exception("BYS360 V2.1.4 kategori kapsam effective_menu force uygulanamadı")
-        except Exception:
-            pass
         return current_build_menu_visibility_map
 
 

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 """BYS360 Faz 4.1 - 3. amir merkezi ayar/politika servisi.
 
 Bu servis yalnızca ayarları okur ve normalize eder. Görev üretimi, tablo sütunu,
 statü dili ve ağırlık uygulaması Faz 4.2-4.5 adımlarında bu servise bağlanacaktır.
 """
-
-from typing import Any
 
 logger = logging.getLogger(__name__)
 

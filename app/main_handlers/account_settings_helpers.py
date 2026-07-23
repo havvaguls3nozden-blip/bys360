@@ -1,108 +1,107 @@
 from __future__ import annotations
 
-import app.main_handlers.account_communication_helpers as __account_communication_helpers_import_side_effect
 from app.main_handlers.account_visibility_helpers import (
-    utc_now,
-    datetime,
-    io,
-    json,
-    re,
-    flash,
-    redirect,
-    request,
-    send_file,
-    url_for,
-    current_user,
-    db,
-    flatten_settings_menu_definitions,
-    get_grouped_menu_definitions,
+    _BYS360_ALL_MENU_ROLE_MATRIX_ITEM_BY_KEY,
+    _BYS360_ALL_MENU_ROLE_MATRIX_ITEMS,
+    _BYS360_ASSISTANT_TAB_RECOMMENDED,
+    _BYS360_ASSISTANT_TAB_ROLE_MATRIX_ITEMS,
+    _BYS360_BASE_ROLE_MATRIX_POLICY_CONFIGS,
+    _BYS360_PERFORMANCE_MAIN_SWITCH_ITEM,
+    _BYS360_PERFORMANCE_PERIOD_CENTER_POLICY_ITEMS_V2_1_23B,
+    _BYS360_PERSONNEL_POLICY_CONFIG,
+    _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS,
+    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_ALL_FEATURES_V1,
+    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_FOR_ASSISTANT,
+    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_V2_1_23B,
+    _PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_KEYS,
+    _PORTAL_ROLE_MATRIX_V2_12_CONFIG,
+    ASSISTANT_ROLE_MATRIX_ITEMS,
+    ASSISTANT_ROLE_MATRIX_KEYS,
+    ASSISTANT_ROLE_MATRIX_RECOMMENDED,
+    COMMUNICATION_POLICY_ROLE_OPTIONS,
+    PERFORMANCE_ROLE_MATRIX_V12_ITEMS,
+    PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS,
+    PORTAL_ROLE_MATRIX_V2_12_ITEMS,
+    ROLE_MATRIX_POLICY_CONFIGS,
     SECURITY_QUESTION_CHOICES,
+    SETTINGS_ARCHIVE_GROUP_KEY,
+    SETTINGS_ARCHIVE_KEY_PREFIX,
+    SUPPORT_HELP_ROLE_MATRIX_ITEMS,
     SystemSetting,
     User,
     UserMenuPermission,
-    safe_render,
+    _apply_visibility_keys_to_user,
+    _build_bulk_result_summary,
+    _build_bulk_settings_profiles,
+    _build_communication_policy_items,
+    _build_communication_role_matrix,
+    _build_role_matrix_group,
+    _build_role_matrix_policy_items,
+    _build_settings_archive_setting_key,
+    _build_settings_matrix,
+    _build_settings_presets,
+    _build_settings_role_matrix_groups,
+    _build_user_visibility_diff,
+    _build_visibility_template_payload,
+    _bys360_clean_general_role_matrix_performance_text_v5,
+    _bys360_merge_performance_period_center_policy_items_v2_1_23b,
+    _bys360_pf_v14_dedupe_flat_menu_items,
+    _bys360_role_matrix_all_feature_items_v1,
+    _collect_all_menu_keys,
+    _collect_form_visible_keys,
+    _collect_role_matrix_visible_keys_from_form,
     _delete_profile_photo_file,
+    _delete_settings_template_archive,
+    _extract_visible_keys_from_template_payload,
+    _find_bulk_profile,
+    _find_menu_item_by_key,
+    _get_role_matrix_policy_items_or_raise,
+    _get_settings_template_archive,
+    _list_settings_template_archives,
+    _normalize_visible_keys,
+    _resolve_bulk_profile_keys,
+    _resolve_bulk_result_summary_from_args,
+    _role_matrix_form_field_name,
+    _role_matrix_policy_config_map,
     _save_profile_photo,
+    _save_settings_template_archive,
+    _serialize_bulk_target_users,
+    _slugify_archive_name,
     build_effective_user_menu_context,
     build_settings_foundation_context,
     build_settings_profile_context,
     build_settings_ui_diagnostics_panel,
     clear_user_menu_overrides,
+    current_user,
+    datetime,
+    db,
+    enforce_first_login_security_flow,
+    enforce_first_login_security_flow_redirect,
     ensure_settings_phase1_seeded,
+    extend_flat_menu_items_with_assistant_role_matrix_items,
+    flash,
+    flatten_settings_menu_definitions,
+    get_assistant_role_matrix_recommended_keys,
+    get_grouped_menu_definitions,
     get_role_default_menu_keys,
     get_unit_profile_menu_keys,
+    io,
+    json,
+    logger,
+    logging,
+    re,
+    redirect,
+    request,
+    rollback_settings_change,
+    safe_render,
     save_module_settings_from_form,
     save_role_menu_defaults,
     save_system_settings_from_form,
     save_unit_menu_profile,
     save_user_menu_overrides,
-    rollback_settings_change,
-    enforce_first_login_security_flow_redirect,
-    logging,
-    logger,
-    COMMUNICATION_POLICY_ROLE_OPTIONS,
-    _build_communication_policy_items,
-    _build_communication_role_matrix,
-    SUPPORT_HELP_ROLE_MATRIX_ITEMS,
-    PERFORMANCE_ROLE_MATRIX_V12_ITEMS,
-    ASSISTANT_ROLE_MATRIX_ITEMS,
-    ASSISTANT_ROLE_MATRIX_KEYS,
-    ASSISTANT_ROLE_MATRIX_RECOMMENDED,
-    ROLE_MATRIX_POLICY_CONFIGS,
-    get_assistant_role_matrix_recommended_keys,
-    _role_matrix_policy_config_map,
-    _find_menu_item_by_key,
-    _build_role_matrix_group,
-    _build_settings_role_matrix_groups,
-    _get_role_matrix_policy_items_or_raise,
-    _role_matrix_form_field_name,
-    _collect_role_matrix_visible_keys_from_form,
-    enforce_first_login_security_flow,
-    PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS,
-    _PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_KEYS,
-    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_FOR_ASSISTANT,
-    _BYS360_BASE_ROLE_MATRIX_POLICY_CONFIGS,
-    _BYS360_PERSONNEL_POLICY_CONFIG,
-    _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS,
-    _build_role_matrix_policy_items,
-    _BYS360_ALL_MENU_ROLE_MATRIX_ITEMS,
-    _BYS360_ALL_MENU_ROLE_MATRIX_ITEM_BY_KEY,
-    _BYS360_ASSISTANT_TAB_ROLE_MATRIX_ITEMS,
-    _BYS360_ASSISTANT_TAB_RECOMMENDED,
-    _BYS360_PERFORMANCE_MAIN_SWITCH_ITEM,
-    _bys360_clean_general_role_matrix_performance_text_v5,
-    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_ALL_FEATURES_V1,
-    _bys360_role_matrix_all_feature_items_v1,
-    PORTAL_ROLE_MATRIX_V2_12_ITEMS,
-    _PORTAL_ROLE_MATRIX_V2_12_CONFIG,
-    _BYS360_PERFORMANCE_PERIOD_CENTER_POLICY_ITEMS_V2_1_23B,
-    _bys360_merge_performance_period_center_policy_items_v2_1_23b,
-    _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_V2_1_23B,
-    extend_flat_menu_items_with_assistant_role_matrix_items,
-    _build_settings_matrix,
-    _build_settings_presets,
-    _collect_all_menu_keys,
-    _build_bulk_settings_profiles,
-    _serialize_bulk_target_users,
-    _find_bulk_profile,
-    _build_bulk_result_summary,
-    _resolve_bulk_result_summary_from_args,
-    _resolve_bulk_profile_keys,
-    _apply_visibility_keys_to_user,
-    _collect_form_visible_keys,
-    SETTINGS_ARCHIVE_GROUP_KEY,
-    SETTINGS_ARCHIVE_KEY_PREFIX,
-    _slugify_archive_name,
-    _build_settings_archive_setting_key,
-    _normalize_visible_keys,
-    _list_settings_template_archives,
-    _save_settings_template_archive,
-    _get_settings_template_archive,
-    _delete_settings_template_archive,
-    _build_visibility_template_payload,
-    _extract_visible_keys_from_template_payload,
-    _build_user_visibility_diff,
-    _bys360_pf_v14_dedupe_flat_menu_items,
+    send_file,
+    url_for,
+    utc_now,
 )
 
 
@@ -213,6 +212,7 @@ def settings_page():
                 changed = save_system_settings_from_form(request.form, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"Genel sistem ayarları kaydedildi. Güncellenen alan: {changed}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Genel sistem ayarları kaydedilirken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -223,6 +223,7 @@ def settings_page():
                 changed = save_module_settings_from_form(request.form, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"Modül ayar omurgası kaydedildi. Güncellenen alan: {changed}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Modül ayarları kaydedilirken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -251,6 +252,7 @@ def settings_page():
                 flash(f"{config['title']} kaydedildi. İşlenen satır: {changed_total}", "success")
                 section_id = config["section_id"]
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
                 section_id = "module-role-matrices"
@@ -273,6 +275,7 @@ def settings_page():
                 flash(f"{config['title']} önerilen rol politikasına döndürüldü. İşlenen satır: {changed_total}", "success")
                 section_id = config["section_id"]
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
                 section_id = "module-role-matrices"
@@ -295,6 +298,7 @@ def settings_page():
                     changed_total += save_role_menu_defaults(role_key, all_menu_keys, merged_visible, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"İletişim ve anket rol matrisi kaydedildi. İşlenen satır: {changed_total}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"İletişim ve anket rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -312,6 +316,7 @@ def settings_page():
                     changed_total += save_role_menu_defaults(role_key, all_menu_keys, merged_visible, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"İletişim ve anket rol matrisi önerilen kurala döndürüldü. İşlenen satır: {changed_total}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -323,6 +328,7 @@ def settings_page():
                 selected_count = save_assistant_role_matrix_from_form(request.form, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"Sanal Asistan rol matrisi kaydedildi. Açık rol sayısı: {selected_count}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Sanal Asistan rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -333,6 +339,7 @@ def settings_page():
                 selected_count = reset_assistant_role_matrix_defaults(updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"Sanal Asistan rol matrisi önerilen politikaya döndürüldü. Açık rol sayısı: {selected_count}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Sanal Asistan rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
             keep_user_id = request.form.get("keep_user_id", type=int)
@@ -345,6 +352,7 @@ def settings_page():
                 result = rollback_settings_change(log_id, actor_user_id=getattr(current_user, "id", None))
                 flash(result.get("summary") or "Ayar değişikliği geri alındı.", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Ayar geçmişi geri alınırken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
@@ -394,6 +402,7 @@ def settings_page():
                     redirect_kwargs["user_id"] = keep_user_id
                 return redirect(url_for("main.settings_page", **redirect_kwargs))
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Toplu profil uygulanırken hata oluştu: {exc}", "danger")
                 return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
@@ -432,6 +441,7 @@ def settings_page():
                 result = save_user_menu_overrides(import_user, flat_menu_items, visible_keys, updated_by_user_id=getattr(current_user, "id", None))
                 flash(f"Yetki şablonu içe aktarıldı. Aktif override: {result['override_count']}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Yetki şablonu içe aktarılırken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=import_user.id))
@@ -464,6 +474,7 @@ def settings_page():
                 flash(f"Şablon arşivi kaydedildi: {result['archive_name']} · Açık sekme: {result['visible_count']}", "success")
                 archive_redirect_key = result["setting_key"]
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 archive_redirect_key = (request.form.get('archive_key') or "").strip()
                 flash(f"Şablon arşivi kaydedilirken hata oluştu: {exc}", "danger")
@@ -499,6 +510,7 @@ def settings_page():
                     flash(f"Arşiv seçili personele uygulandı. Kişiye özel sekme kaydı: {result['override_count']}", "success")
                 db.session.commit()
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Arşiv uygulanırken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=selected_user.id if selected_user else None, archive_key=archive_key) if selected_user else url_for("main.settings_page", archive_key=archive_key))
@@ -511,6 +523,7 @@ def settings_page():
                 db.session.commit()
                 flash(f"Şablon arşivi silindi: {result['archive_name']}", "success")
             except Exception as exc:
+                logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
                 flash(f"Şablon arşivi silinirken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=selected_user_id) if selected_user_id else url_for("main.settings_page"))
@@ -543,6 +556,7 @@ def settings_page():
                 )
             return redirect(url_for("main.settings_page", user_id=keep_user_id))
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
             flash(f"Ayarlar kaydedilirken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=keep_user_id))

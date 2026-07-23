@@ -132,11 +132,12 @@ def classify_hidden_chain_warning(entry: str, users_by_name: dict[str, Any], ass
             severity = "info"
             reason = "Görev/assignment gerçeğinde 2. amir seviyesi mevcut; ham uyarı eski ters slotlu zincir motorundan geliyor."
 
-    if birim in SPECIAL_PRESIDENCY_UNITS or ust_birim == "BAŞKANLIK":
-        if "Grup Başkanı bulunamadı" in warning_text or "Koordinatör bulunamadı" in warning_text:
-            severity = "info"
-            resolved = True
-            reason = "Başkanlığa bağlı özel birimde standart çalışma grubu zinciri birebir uygulanmayabilir; bu kayıt manuel kritik değil, istisna/information olarak ele alınmalıdır."
+    if (birim in SPECIAL_PRESIDENCY_UNITS or ust_birim == "BAŞKANLIK") and (
+        "Grup Başkanı bulunamadı" in warning_text or "Koordinatör bulunamadı" in warning_text
+    ):
+        severity = "info"
+        resolved = True
+        reason = "Başkanlığa bağlı özel birimde standart çalışma grubu zinciri birebir uygulanmayabilir; bu kayıt manuel kritik değil, istisna/information olarak ele alınmalıdır."
 
     return ChainWarningRecord(
         employee_id=int(user.id) if user else None,

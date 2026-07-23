@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import logging
+import re
+import unicodedata
+from collections.abc import Iterable, Sequence
 
 """BYS360 Faz 8.4 — dönem kapsamına göre görev üretimi filtresi.
 
@@ -9,10 +12,6 @@ ait olduğunu belirler. Kural güvenli varsayımla çalışır: kapsam özel ise
 bilgi yoksa personel kapsam dışı kabul edilir; boş yönetici/kategori kapsamı
 hiçbir zaman tüm kurum anlamına gelmez.
 """
-
-import re
-import unicodedata
-from collections.abc import Iterable, Sequence
 
 logger = logging.getLogger(__name__)
 

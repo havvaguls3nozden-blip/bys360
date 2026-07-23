@@ -1,15 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans Dashboard canlı veri servisi.
-
-Bu servis /performance/dashboard ekranının temsilî sayılarla değil, mevcut
-PostgreSQL/SQLAlchemy verisiyle çalışması için hazırlanmıştır. Tüm sorgular
-korumalıdır; tablo/kolon uyumsuzluğu veya boş veri durumunda dashboard beyaz
-ekrana düşmez, güvenli boş veri üretir.
-"""
-
 from collections import defaultdict
 from datetime import timedelta
 from typing import Any
@@ -28,6 +19,14 @@ from app.models import (
 )
 from app.route_support import safe_count, safe_db_rollback
 from app.services.ui_context.scope import build_user_scope_context
+
+"""BYS360 Performans Dashboard canlı veri servisi.
+
+Bu servis /performance/dashboard ekranının temsilî sayılarla değil, mevcut
+PostgreSQL/SQLAlchemy verisiyle çalışması için hazırlanmıştır. Tüm sorgular
+korumalıdır; tablo/kolon uyumsuzluğu veya boş veri durumunda dashboard beyaz
+ekrana düşmez, güvenli boş veri üretir.
+"""
 
 logger = logging.getLogger(__name__)
 

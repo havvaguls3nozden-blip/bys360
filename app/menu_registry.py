@@ -1,11 +1,4 @@
 # BYS360_PHASE3_2_MENU_REGISTRY_NOTE: Performans menü görünürlüğünün son kararı app/services/settings/effective_menu.py içindeki PHASE3_2_PERFORMANCE_MENU_POLICY ile verilir.
-"""BYS360 yan menü sicili.
-
-Personel – .
-Burasi benim en gurur duydugum taraflardan biri. Hem rol bazli hem kisi bazli
-menu gorunurlugunu ayni yerde tutuyor. Son 10 gunde aceleyle ekledigim bir iki
-blok da bilerek duruyor; gercek proje izi silinmesin istedim.
-"""
 from __future__ import annotations
 
 
@@ -29,6 +22,19 @@ from app.menu_registry_data_personnel import (
     _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS,
 )
 
+# BYS360 P11-D3: menü section veri blokları bridge import ile ayrıldı.
+from app.menu_registry_data_sections import (
+    MENU_SECTIONS,  # noqa: F821 - dynamic menu registry global
+)
+
+"""BYS360 yan menü sicili.
+
+Personel – .
+Burasi benim en gurur duydugum taraflardan biri. Hem rol bazli hem kisi bazli
+menu gorunurlugunu ayni yerde tutuyor. Son 10 gunde aceleyle ekledigim bir iki
+blok da bilerek duruyor; gercek proje izi silinmesin istedim.
+"""
+
 MENU_KEY_CANONICAL_MAP = {
     "performance_hierarchy": "performance_hierarchy_tree",
     "performance_assignments": "performance_hierarchy_assignments",
@@ -40,11 +46,6 @@ MENU_KEY_ALIASES = {
     "performance_hierarchy_assignments": {"performance_assignments"},
     "performance_assignments": {"performance_hierarchy_assignments"},
 }
-
-# BYS360 P11-D3: menü section veri blokları bridge import ile ayrıldı.
-from app.menu_registry_data_sections import (
-    MENU_SECTIONS,  # noqa: F821 - dynamic menu registry global
-)
 
 # BYS360_PERSONNEL_MANAGEMENT_MENU_HIDE_V1_START
 # Standart personel/kullanıcı tarafında Personel Yönetimi ana menüsü görünmez.
@@ -152,9 +153,7 @@ def _matches_role(item: dict[str, Any], user) -> bool:
     ):
         return False
     required_roles = item.get("required_roles")
-    if required_roles and role_name not in {_normalize_role_value(r) for r in required_roles}:
-        return False
-    return True
+    return not (required_roles and role_name not in {_normalize_role_value(r) for r in required_roles})
 
 def _resolve_href(item: dict[str, Any]) -> str:
     if item.get("href"):
@@ -261,11 +260,6 @@ FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_p3_reminders", {"admin"
 _BYS360_MANUAL_ROLE_MENU_ADDITIONS = {'admin': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'baskan': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'baskan_yardimcisi': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'grup_baskani': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'mali_musavir': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'koordinator': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'birim_sorumlusu': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'personel': ['performance_archive']}
 _BYS360_MANUAL_MENU_ITEMS = [{'key': 'performance_process_tracking', 'label': 'Süreç Takibi', 'icon': 'fa-solid fa-route', 'endpoint': 'main.performance_process_tracking', 'active_path_prefixes': ['/performance/process-tracking', '/performans/surec-takibi'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']}, {'key': 'performance_process_reports', 'label': 'Süreç Raporları', 'icon': 'fa-solid fa-chart-line', 'endpoint': 'main.performance_process_reports', 'active_path_prefixes': ['/performance/process-reports', '/performans/surec-raporlari'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']}, {'key': 'performance_personnel_support_publish_approval', 'label': 'Yayın Ön Onayı', 'icon': 'fa-solid fa-user-check', 'endpoint': 'main.performance_personnel_support_publish_approvals', 'active_path_prefixes': ['/performance/personnel-support-publish-approvals', '/performans/personel-destek-yayin-onayi'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani']}]
 
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
-
 for _role, _keys in _BYS360_MANUAL_ROLE_MENU_ADDITIONS.items():
     _current = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
     if isinstance(_current, set):
@@ -273,10 +267,7 @@ for _role, _keys in _BYS360_MANUAL_ROLE_MENU_ADDITIONS.items():
     elif isinstance(_current, list):
         _current.extend([_k for _k in _keys if _k not in _current])
 
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 
 for _role, _keys in _BYS360_MANUAL_ROLE_MENU_ADDITIONS.items():
     for _key in _keys:
@@ -322,10 +313,7 @@ _BYS360_PROCESS_MENU_ITEMS = [
     },
 ]
 
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 
 for _role in ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']:
     _current = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
@@ -351,10 +339,7 @@ for _list_name in ["MENU_ITEMS", "PERFORMANCE_MENU_ITEMS", "NAV_ITEMS", "MENU_RE
 # BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TABS_V1_MENU_REGISTRY_BEGIN
 _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TABS = [{'key': 'performance_process_tracking', 'label': 'Süreç Takibi', 'icon': 'fa-solid fa-route', 'url': '/performance/process-tracking', 'endpoint': 'main.performance_process_tracking', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'group': 'Performans Yönetimi', 'order': 610}, {'key': 'performance_process_reports', 'label': 'Süreç Raporları', 'icon': 'fa-solid fa-chart-line', 'url': '/performance/process-reports', 'endpoint': 'main.performance_process_reports', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'group': 'Performans Yönetimi', 'order': 620}, {'key': 'performance_interim_notes', 'label': 'Dönem İçi Notlar', 'icon': 'fa-solid fa-clipboard-list', 'url': '/performance/interim-notes', 'endpoint': 'main.performance_interim_notes_tr', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'group': 'Performans Yönetimi', 'order': 630}, {'key': 'performance_development_guidance', 'label': 'Gelişim Rehberi', 'icon': 'fa-solid fa-seedling', 'url': '/performance/meeting-development/faz10', 'endpoint': 'main.performance_meeting_p4_development_guidance', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'group': 'Performans Yönetimi', 'order': 640}, {'key': 'performance_meeting_p3_reminders', 'label': 'Hatırlatma ve Aksatan Amirler', 'icon': 'fa-solid fa-bell', 'url': '/performance/meeting-development/faz9', 'endpoint': 'main.performance_meeting_p3_reminders', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'group': 'Performans Yönetimi', 'order': 650}, {'key': 'performance_archive', 'label': 'Geçmiş Karne Arşivi', 'icon': 'fa-solid fa-box-archive', 'url': '/performance/archive', 'endpoint': 'main.performance_archive', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'], 'group': 'Performans Yönetimi', 'order': 660}, {'key': 'performance_personnel_support_publish_approval', 'label': 'Yayın Ön Onayı', 'icon': 'fa-solid fa-user-check', 'url': '/performance/personnel-support-publish-approvals', 'endpoint': 'main.performance_personnel_support_publish_approvals', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani'], 'group': 'Performans Yönetimi', 'order': 670}, {'key': 'performance_president_approvals', 'label': 'Başkan Onayları', 'icon': 'fa-solid fa-stamp', 'url': '/performance/president-approvals', 'endpoint': 'main.performance_president_approvals', 'roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan'], 'group': 'Performans Yönetimi', 'order': 680}]
 
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 
 for _item in _BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TABS:
     _key = _item["key"]
@@ -422,10 +407,7 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1260)")
 
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 
 _BYS360_ROLE_MATRIX_V12_ROLE_DEFAULTS = {
     "admin": {"performance_process_tracking", "performance_process_reports", "performance_personnel_support_publish_approval"},
@@ -507,9 +489,7 @@ def _bys360_v13_is_removed_menu_item(item: dict) -> bool:
         return True
     paths = [item.get("href")]
     paths.extend(item.get("active_path_prefixes") or [])
-    if any(_bys360_v13_value_is_removed_path(path) for path in paths):
-        return True
-    return False
+    return any(_bys360_v13_value_is_removed_path(path) for path in paths)
 
 
 def _bys360_v13_prune_removed_menu_registry() -> None:
@@ -587,10 +567,7 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1424)")
 
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 
 _BYS360_AY1_ROLE_DEFAULTS = {
     "admin": {"ai_agent_panel", "performance_president_approvals", "performance_personnel_support_publish_approval", "performance_process_tracking", "performance_process_reports", "performance_interim_notes", "performance_development_guidance", "performance_meeting_p3_reminders", "performance_archive", "performance_kpi_dashboard", "performance_kpi_management", "performance_competency_library", "performance_self_assessment", "performance_kpi_analysis"},
@@ -610,10 +587,7 @@ for _role, _keys in _BYS360_AY1_ROLE_DEFAULTS.items():
     elif isinstance(_current, list):
         _current.extend([_key for _key in _keys if _key not in _current])
 
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 
 for _role, _keys in _BYS360_AY1_ROLE_DEFAULTS.items():
     for _key in _keys:
@@ -747,10 +721,7 @@ try:
             _items.append(dict(_BYS360_AG5E_AI_TEACHING_MENU_ITEM))
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1585)")
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 _BYS360_AG5E_AI_TEACHING_ROLES = ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan", "başkan", "ust_yonetim", "ai_yoneticisi"]
 for _role in _BYS360_AG5E_AI_TEACHING_ROLES:
     _current = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
@@ -758,10 +729,7 @@ for _role in _BYS360_AG5E_AI_TEACHING_ROLES:
         _current.add("ai_teaching_center")
     elif isinstance(_current, list) and "ai_teaching_center" not in _current:
         _current.append("ai_teaching_center")
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 for _role in _BYS360_AG5E_AI_TEACHING_ROLES:
     FORCE_VISIBLE_MENU_ROLES.setdefault("ai_teaching_center", set()).add(_role)  # noqa: F821 - dynamic menu registry global
 # BYS360_AG5E_AI_TEACHING_MENU_REGISTRY_END
@@ -908,10 +876,7 @@ try:
             _existing.add(_item["key"])
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1753)")
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 _BYS360_ASSISTANT_TAB_ROLE_DEFAULTS = {
     'admin': {'assistant_module', 'ai_agent_panel', 'ai_agent_knowledge', 'ai_agent_teaching_center', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'},
     'baskan': {'assistant_module', 'ai_agent_panel', 'ai_agent_knowledge', 'ai_agent_teaching_center', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_process_alerts', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs'},
@@ -928,10 +893,7 @@ for _role, _keys in _BYS360_ASSISTANT_TAB_ROLE_DEFAULTS.items():
         _current.update(_keys)
     elif isinstance(_current, list):
         _current.extend([_key for _key in _keys if _key not in _current])
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 # Zorla görünürlük rol matrisi davranışını ezmesin; görünürlüğün son kararı Ayarlar/Rol Matrisi olsun.
 for _key in ["assistant_module", "ai_agent_panel", "ai_agent_knowledge", "ai_agent_teaching_center", "ai_teaching_center"]:
     FORCE_VISIBLE_MENU_ROLES.pop(_key, None)  # noqa: F821 - dynamic menu registry global
@@ -969,10 +931,7 @@ try:
             _items.insert(0, dict(_BYS360_PERFORMANCE_MAIN_SWITCH_ITEM))
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:1814)")
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 # BYS360 P11-D2: _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY veri bloğu data modülüne taşındı.
 for _role, _keys in {_role: {_key for _key, _roles in _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY.items() if _role in _roles} for _role in {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'} }.items():
     _current = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
@@ -980,10 +939,7 @@ for _role, _keys in {_role: {_key for _key, _roles in _BYS360_PERFORMANCE_MAIN_S
         _current.update(_keys)
     elif isinstance(_current, list):
         _current.extend([_key for _key in _keys if _key not in _current])
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 for _key in {'performance_module', 'performance_management', 'performans_yonetimi', 'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}:
     FORCE_VISIBLE_MENU_ROLES.pop(_key, None)  # noqa: F821 - dynamic menu registry global
 # BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_MATRIX_V3_END
@@ -991,20 +947,14 @@ for _key in {'performance_module', 'performance_management', 'performans_yonetim
 # BYS360_GENERAL_SECTION_RESTORE_V4_BEGIN
 # Genel çekirdek menüleri tüm roller için varsayılan görünür tutulur.
 _BYS360_GENERAL_CORE_KEYS_V4 = {'general_section', 'home', 'dashboard', 'notifications', 'support_index', 'support_new', 'support_my_tickets'}
-try:
-    ROLE_MENU_DEFAULTS  # noqa: F821 - dynamic menu registry global
-except NameError:
-    ROLE_MENU_DEFAULTS = {}  # noqa: F821 - dynamic menu registry global
+ROLE_MENU_DEFAULTS = globals().get("ROLE_MENU_DEFAULTS", {})  # noqa: F821 - dynamic menu registry global
 for _role in {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'}:
     _current = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
     if isinstance(_current, set):
         _current.update(_BYS360_GENERAL_CORE_KEYS_V4)
     elif isinstance(_current, list):
         _current.extend([_key for _key in _BYS360_GENERAL_CORE_KEYS_V4 if _key not in _current])
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 # Genel bölümün kaybolmasına neden olabilecek eski zorla-kapat/yanlış filtre izlerini etkisiz bırak.
 for _key in ["home", "dashboard", "general_section"]:
     _roles = FORCE_VISIBLE_MENU_ROLES.setdefault(_key, set())  # noqa: F821 - dynamic menu registry global
@@ -1248,10 +1198,7 @@ try:
     _perf["items"] = _deduped
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/menu_registry.py:2150)")
-try:
-    FORCE_VISIBLE_MENU_ROLES  # noqa: F821 - dynamic menu registry global
-except NameError:
-    FORCE_VISIBLE_MENU_ROLES = {}  # noqa: F821 - dynamic menu registry global
+FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})  # noqa: F821 - dynamic menu registry global
 try:
     for _key in (_BYS360_PERF_RM_V8_GENERAL_REMOVE_KEYS | _BYS360_PERF_RM_V8_ALIAS_REMOVE_KEYS | {"performance_module", "performance_management", "performans_yonetimi"}):
         FORCE_VISIBLE_MENU_ROLES.pop(_key, None)  # noqa: F821 - dynamic menu registry global
@@ -1505,7 +1452,8 @@ try:
         for _role in ("admin", "super_admin", "system_admin", "sistem_yoneticisi"):
             ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
     if "LIVE_MENU_SCOPE" in globals():
-        try: LIVE_MENU_SCOPE.add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
+        try:
+            LIVE_MENU_SCOPE.add("performance_category_period_scope")  # noqa: F821 - dynamic menu registry global
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry.py:1490")
             pass
@@ -1529,7 +1477,8 @@ try:
         for _role in ("admin", "super_admin", "system_admin", "sistem_yoneticisi"):
             ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
     if "LIVE_MENU_SCOPE" in globals():
-        try: LIVE_MENU_SCOPE.add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
+        try:
+            LIVE_MENU_SCOPE.add("performance_category_period_integration")  # noqa: F821 - dynamic menu registry global
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry.py:1511")
             pass

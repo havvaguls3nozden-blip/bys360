@@ -1,15 +1,6 @@
 from __future__ import annotations
 
 import logging
-
-"""BYS360 Performans V2.1.16 kapsam ve amir zinciri kontrol paneli.
-
-Bu servis Dönem Yönetim Merkezi içinde seçili dönem için hafif ön kontrol
-özetini hazırlar. Görev üretmez, e-posta göndermez, değerlendirme kaydı yazmaz.
-Ön kontrol satırları daha önce üretilmişse onları okur; yoksa kullanıcıya
-"Ön kontrol bekliyor" durumunu gösterir.
-"""
-
 from typing import Any
 
 from sqlalchemy import text
@@ -19,6 +10,14 @@ from app.services.performance.v2_1_6_category_period_integration import (
     ensure_category_period_integration_schema,
     list_preintegration_rows,
 )
+
+"""BYS360 Performans V2.1.16 kapsam ve amir zinciri kontrol paneli.
+
+Bu servis Dönem Yönetim Merkezi içinde seçili dönem için hafif ön kontrol
+özetini hazırlar. Görev üretmez, e-posta göndermez, değerlendirme kaydı yazmaz.
+Ön kontrol satırları daha önce üretilmişse onları okur; yoksa kullanıcıya
+"Ön kontrol bekliyor" durumunu gösterir.
+"""
 
 logger = logging.getLogger(__name__)
 

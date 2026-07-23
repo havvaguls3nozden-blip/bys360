@@ -41,7 +41,4 @@ def is_performance_scope_user(user) -> bool:
     if sicil_no in {"admin", "system", "sysadmin"}:
         return False
 
-    if hasattr(user, "is_active") and not bool(getattr(user, "is_active", True)):
-        return False
-
-    return True
+    return not (hasattr(user, "is_active") and not bool(getattr(user, "is_active", True)))

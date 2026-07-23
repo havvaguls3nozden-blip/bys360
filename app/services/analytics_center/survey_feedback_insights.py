@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
+from typing import Any
+
+try:
+    from .summary_pipeline import build_analytics_safe_summary_card
+except ImportError:  # python -S gate bagimsiz calistirmasi
+    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +21,6 @@ toplu, maskelenmis ve karar destek icin guvenli sinyal payload'lari uretir.
 Bu dosyanin hedefi acik uclu yanitlari kisisel veri dokmeden tema, katilim,
 oncelik ve egilim sinyallerine donusturmektir.
 """
-
-from collections.abc import Iterable
-from dataclasses import asdict, dataclass
-from typing import Any
-
-try:
-    from .summary_pipeline import build_analytics_safe_summary_card
-except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
 
 
 @dataclass(frozen=True)

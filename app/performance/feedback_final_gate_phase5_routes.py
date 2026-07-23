@@ -4,11 +4,12 @@ from flask import render_template
 from flask_login import current_user, login_required
 
 from app.route_registry import main_bp
+
 # BYS360_STUB_AI_V60_FINAL_GATE_IMPORT
 from app.services.ai.stub_panel_bridge import attach_process_tracking_ai_panel
+
 # /BYS360_STUB_AI_V60_FINAL_GATE_IMPORT
 from app.services.performance.feedback_final_gate_phase5 import build_phase5_context
-
 
 MANAGER_ROLES = {
     "admin", "super_admin", "system_admin", "sistem_yoneticisi",

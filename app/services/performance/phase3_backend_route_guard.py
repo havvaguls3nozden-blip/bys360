@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from typing import Any
+
+from flask import current_app, render_template
+
+from app.models import PerformanceEvaluation, User
 
 """BYS360 Faz 3.3 — Backend route görünürlük/kapsam kilidi.
 
@@ -8,13 +14,6 @@ Menü görünürlüğü kullanıcı deneyimi içindir; gerçek veri koruması ro
 query seviyesinde burada yapılır. Bu servis, URL elle yazılsa bile kapsam dışı
 performans verisinin dönmemesini sağlar.
 """
-
-from collections.abc import Iterable
-from typing import Any
-
-from flask import current_app, render_template
-
-from app.models import PerformanceEvaluation, User
 
 logger = logging.getLogger(__name__)
 

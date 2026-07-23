@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
+from typing import Any
 
 """BYS360 özel kapsam dönemlerinde puanlanacak personel ile değerlendirici amiri ayırır.
 
@@ -14,9 +16,6 @@ Genel/Tüm Kurum döneminde mevcut davranışa dokunulmaz.
 Özel kapsamlı dönemlerde amirler yalnızca görev sahibi olarak kalır; açıkça seçili
 personel kapsamına yazılmadıkça puanlanacak kişi listesine girmez.
 """
-
-from collections.abc import Iterable
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
