@@ -4,6 +4,7 @@ import logging
 import os
 import uuid
 from datetime import datetime, timedelta
+from typing import Any
 
 from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
@@ -137,15 +138,15 @@ def _table_exists(table_name: str) -> bool:
         return False
 
 
-def _current_scope_bundle() -> tuple[dict[str, object], list[User], set[int]]:
+def _current_scope_bundle() -> tuple[dict[str, Any], list[User], set[int]]:
     hr_scope = _hr_scope_context()
     scope_users = _filter_users_in_scope(_all_personnel(), hr_scope)
     return hr_scope, scope_users, set(_scope_user_ids(hr_scope))
 
 
-def _redirect_operations(*, hr_scope: dict[str, object] | None = None, user_id: int | None = None) -> object:
+def _redirect_operations(*, hr_scope: dict[str, Any] | None = None, user_id: int | None = None) -> object:
     scope_value = (request.form.get("scope") or request.args.get("scope") or (hr_scope or {}).get("scope_mode") or "").strip()
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     if scope_value:
         params["scope"] = scope_value
     if user_id:
@@ -154,15 +155,15 @@ def _redirect_operations(*, hr_scope: dict[str, object] | None = None, user_id: 
 
 
 def _redirect_self_service_requests(request_id: int | None = None) -> object:
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     if request_id:
         params["request_id"] = int(request_id)
     return redirect(url_for("main.hr_self_service_requests", **params))
 
 
-def _redirect_request_review(*, hr_scope: dict[str, object] | None = None, request_id: int | None = None) -> object:
+def _redirect_request_review(*, hr_scope: dict[str, Any] | None = None, request_id: int | None = None) -> object:
     scope_value = (request.form.get("scope") or request.args.get("scope") or (hr_scope or {}).get("scope_mode") or "").strip()
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     if scope_value:
         params["scope"] = scope_value
     if request_id:
@@ -199,7 +200,7 @@ def _remove_file(path: str | None) -> None:
         current_app.logger.warning("Personel belge dosyasi silinemedi: %s", raw)
 
 
-def _save_file(file_storage, *, prefix: str = "personnel") -> dict[str, object]:
+def _save_file(file_storage, *, prefix: str = "personnel") -> dict[str, Any]:
     filename = secure_filename(getattr(file_storage, "filename", "") or "")
     if not filename:
         raise ValueError("Belge dosyası seçilmedi.")
@@ -269,7 +270,7 @@ def _template_by_id(template_id: int | None) -> PersonnelSelfServiceRequestTempl
     return PersonnelSelfServiceRequestTemplate.query.filter_by(id=int(template_id), is_active=True).first()
 
 
-def _serialize_template_card(template: PersonnelSelfServiceRequestTemplate) -> dict[str, object]:
+def _serialize_template_card(template: PersonnelSelfServiceRequestTemplate) -> dict[str, Any]:
     return {
         "id": int(template.id),
         "code": template.code,
@@ -284,7 +285,7 @@ def _serialize_template_card(template: PersonnelSelfServiceRequestTemplate) -> d
     }
 
 
-def _request_attachment_rows(row: PersonnelSelfServiceRequest | None) -> list[dict[str, object]]:
+def _request_attachment_rows(row: PersonnelSelfServiceRequest | None) -> list[dict[str, Any]]:
     if not row or not _table_exists("personnel_self_service_request_attachments"):
         return []
     query_rows = (
@@ -382,7 +383,7 @@ def _compute_due_at(*, base_dt: datetime | None, sla_target_days: int | None, de
     return None
 
 
-def _sla_payload(row: PersonnelSelfServiceRequest | None) -> dict[str, object] | None:
+def _sla_payload(row: PersonnelSelfServiceRequest | None) -> dict[str, Any] | None:
     if not row:
         return None
     due_at = getattr(row, "due_at", None)
@@ -412,9 +413,9 @@ def _sla_payload(row: PersonnelSelfServiceRequest | None) -> dict[str, object] |
     }
 
 
-def _request_review_payload(hr_scope: dict[str, object], scope_user_ids: set[int]) -> dict[str, object]:
+def _request_review_payload(hr_scope: dict[str, Any], scope_user_ids: set[int]) -> dict[str, Any]:
     selected_request_id = _safe_int(request.args.get("request_id"))
-    rows = []
+    rows: list[dict[str, Any]] = []
     if _table_exists("personnel_self_service_requests") and scope_user_ids:
         query_rows = (
             PersonnelSelfServiceRequest.query
@@ -493,8 +494,8 @@ def _request_review_payload(hr_scope: dict[str, object], scope_user_ids: set[int
     }
 
 
-def _self_service_request_payload(user: User) -> dict[str, object]:
-    rows = []
+def _self_service_request_payload(user: User) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
     selected_request_id = _safe_int(request.args.get("request_id"))
     template_cards = [_serialize_template_card(item) for item in _template_rows()]
     if _table_exists("personnel_self_service_requests"):
@@ -842,7 +843,7 @@ def hr_personnel_document_save():
             raise ValueError("Bitiş tarihi düzenlenme tarihinden önce olamaz.")
 
         upload = request.files.get("document_file")
-        if upload and getattr(upload, "filename", ""):
+        if upload and upload.filename:
             file_payload = _save_file(upload)
             old_path = getattr(row, "storage_path", None)
             row.original_filename = str(file_payload["original_filename"])
@@ -973,7 +974,7 @@ def hr_personnel_document_delete(document_id: int):
 
     try:
         row = _document_in_scope(document_id, scope_user_ids)
-        user_id = int(row.user_id)
+        user_id: int | None = int(row.user_id)
         old_path = getattr(row, "storage_path", None)
         db.session.delete(row)
         db.session.commit()
@@ -1055,7 +1056,7 @@ def hr_personnel_note_toggle(note_id: int):
 
     try:
         row = _note_in_scope(note_id, scope_user_ids)
-        user_id = int(row.user_id)
+        user_id: int | None = int(row.user_id)
         if (getattr(row, "status", None) or "open") == "closed":
             row.status = "open"
             row.resolved_at = None
@@ -1087,7 +1088,7 @@ def hr_personnel_note_delete(note_id: int):
 
     try:
         row = _note_in_scope(note_id, scope_user_ids)
-        user_id = int(row.user_id)
+        user_id: int | None = int(row.user_id)
         db.session.delete(row)
         db.session.commit()
         flash("İşlem notu kaldırıldı.", "success")
@@ -1146,7 +1147,7 @@ def hr_personnel_status_delete(status_id: int):
 
     try:
         row = _status_in_scope(status_id, scope_user_ids)
-        user_id = int(row.user_id)
+        user_id: int | None = int(row.user_id)
         db.session.delete(row)
         db.session.commit()
         flash("Durum geçmişi kaydı kaldırıldı.", "success")
