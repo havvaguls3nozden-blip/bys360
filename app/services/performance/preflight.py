@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from app.models import PerformanceCriteria, PerformanceEvaluation, PerformancePeriod
 from app.services.performance.health_report import build_performance_task_health_report
@@ -8,7 +9,7 @@ from app.services.performance.rules import get_authoritative_performance_rules_s
 from app.services.performance_v2.validators import build_period_validation_report
 
 
-def _safe_float(value: object, default: float = 0.0) -> float:
+def _safe_float(value: Any, default: float = 0.0) -> float:
     try:
         return float(value)
     except (TypeError, ValueError):
@@ -24,7 +25,7 @@ def _label_issue_tone(issue: str) -> str:
     return "blocker"
 
 
-def _criteria_snapshot() -> dict[str, object]:
+def _criteria_snapshot() -> dict[str, Any]:
     criteria_rows = (
         PerformanceCriteria.query.filter_by(is_active=True)
         .order_by(PerformanceCriteria.sort_order.asc(), PerformanceCriteria.id.asc())
@@ -41,10 +42,10 @@ def _criteria_snapshot() -> dict[str, object]:
 
 def _build_release_checks(
     *,
-    period_validation: dict[str, object],
-    criteria_snapshot: dict[str, object],
-    health_summary: dict[str, object],
-) -> list[dict[str, object]]:
+    period_validation: dict[str, Any],
+    criteria_snapshot: dict[str, Any],
+    health_summary: dict[str, Any],
+) -> list[dict[str, Any]]:
     weights_total = round(
         _safe_float((period_validation.get("weights") or {}).get("level_1"))
         + _safe_float((period_validation.get("weights") or {}).get("level_2"))
@@ -85,14 +86,14 @@ def _build_release_checks(
     ]
 
 
-def preflight_has_blockers(report: dict[str, object] | None) -> bool:
+def preflight_has_blockers(report: dict[str, Any] | None) -> bool:
     return bool((report or {}).get("blockers"))
 
 
 def build_task_management_preflight_report(
     period,
     scope_user_ids: Iterable[int] | None = None,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     rules_snapshot = get_authoritative_performance_rules_snapshot()
     criteria_snapshot = _criteria_snapshot()
 

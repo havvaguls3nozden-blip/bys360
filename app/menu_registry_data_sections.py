@@ -7,6 +7,8 @@ menu_key değerleri, sıralama mantığı ve veri içeriği değiştirilmemelidi
 """
 from __future__ import annotations
 
+from typing import Any
+
 ANNOUNCEMENT_TOOL_ROLES = {
     "admin",
     "baskan",
@@ -16,7 +18,7 @@ ANNOUNCEMENT_TOOL_ROLES = {
     "mali_musavir",
 }
 
-MENU_SECTIONS = [  # noqa: F821 - dynamic menu registry global
+MENU_SECTIONS: list[dict[str, Any]] = [  # noqa: F821 - dynamic menu registry global
     {
         "key": "genel",
         "label": "Genel",

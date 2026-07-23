@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from sqlalchemy import or_
 
 from app.models import User
@@ -103,7 +105,7 @@ def _cic_v40_special_day_users(now: object = None) -> list[User]:
     return _cic_v40_active_staff_candidates()
 
 
-def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]]:
+def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, Any]]:
     from app.services.cic.celebration_dates import (
         _cic_v40_days_until,
         _cic_v40_mmdd,
@@ -115,7 +117,7 @@ def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]
     )
 
     today = _cic_v40_today()
-    rows: list[dict[str, object]] = []
+    rows: list[dict[str, Any]] = []
     for user in _cic_v40_active_staff_candidates():
         if kind == "birthday":
             d = _cic_v40_user_date(user, "birth_date", "dogum_tarihi", "date_of_birth")
@@ -126,7 +128,7 @@ def _cic_v40_upcoming_users(kind: str, days: int = 30) -> list[dict[str, object]
         left = _cic_v40_days_until(_cic_v40_mmdd(d), today)
         if left is None or left > days:
             continue
-        row = {"user": user, "date": d, "days_left": left}
+        row: dict[str, Any] = {"user": user, "date": d, "days_left": left}
         if kind == "anniversary":
             row["service_year"] = _cic_v40_service_year(user, today)
             if int(row["service_year"] or 0) <= 0:

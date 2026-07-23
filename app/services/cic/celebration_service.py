@@ -101,12 +101,12 @@ def _cic_v40_anniversary_users(now: object = None) -> list[User]:
     return users
 
 
-def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, object]]:
+def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool = False, actor_user_id: int | None = None) -> list[dict[str, Any]]:
     if not _cic_v40_setting_bool("celebrations_include_weekend", False):
         return []
     cfg = get_config()
     tasks_cfg = cfg.get("tasks", {}) if isinstance(cfg, dict) else {}
-    results: list[dict[str, object]] = []
+    results: list[dict[str, Any]] = []
     today = current.strftime("%Y-%m-%d")
     from app.services.cic.mail_service import send_task
     from app.services.cic.scheduler_service import get_auto_scheduler_config
@@ -135,9 +135,9 @@ def _cic_v40_run_weekend_celebrations(current: _cic_v40_datetime, dry_run: bool 
     return results
 
 
-def ensure_celebration_schema() -> dict[str, object]:
+def ensure_celebration_schema() -> dict[str, Any]:
     """Kullanici tablosunda kutlama motoru icin gerekli tarih alanlarini guvenli sekilde olusturur."""
-    result: dict[str, object] = {"ok": True, "added": [], "warnings": []}
+    result: dict[str, Any] = {"ok": True, "added": [], "warnings": []}
     try:
         from sqlalchemy import inspect as _sa_inspect, text as _sa_text
         inspector = _sa_inspect(db.engine)
@@ -167,7 +167,7 @@ def ensure_celebration_schema() -> dict[str, object]:
     return result
 
 
-def save_celebration_settings(payload: dict[str, object], actor_user_id: int | None = None) -> None:
+def save_celebration_settings(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
     ensure_celebration_schema()
     bool_fields = [
         "celebrations_enabled",
@@ -267,9 +267,9 @@ def celebration_context(search: str | None = None) -> dict[str, Any]:
     return data
 
 
-def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = False, actor_user_id: int | None = None) -> dict[str, object]:
+def import_celebration_dates_from_excel(file_storage: Any, *, apply: bool = False, actor_user_id: int | None = None) -> dict[str, Any]:
     _cic_v45_ensure_schema()
-    result: dict[str, object] = {"ok": True, "mode": "apply" if apply else "preview", "total_rows": 0, "matched": 0, "updated": 0, "unmatched": 0, "skipped": 0, "errors": [], "warnings": [], "preview_rows": []}
+    result: dict[str, Any] = {"ok": True, "mode": "apply" if apply else "preview", "total_rows": 0, "matched": 0, "updated": 0, "unmatched": 0, "skipped": 0, "errors": [], "warnings": [], "preview_rows": []}
     if file_storage is None or not getattr(file_storage, "filename", ""):
         result["ok"] = False
         result["errors"].append("Excel dosyası seçilmedi.")
@@ -318,7 +318,7 @@ def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = F
         result["errors"].append("Güncellenecek alan bulunamadı. Doğum Tarihi, İşe Başlama Tarihi veya Kutlama Dışı başlığı gerekli.")
         return result
     indexes = _cic_v45_build_user_indexes(_cic_v45_existing_user_rows())
-    updates: list[dict[str, object]] = []
+    updates: list[dict[str, Any]] = []
     from sqlalchemy import text as _sa_text
     for excel_row_no, row in enumerate(rows_iter, start=2):
         values = {key: row[idx] if idx < len(row) else None for idx, key in header_map.items()}
@@ -350,7 +350,7 @@ def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = F
         hire_date = _cic_v45_parse_date(values.get("hire_date")) if "hire_date" in values else None
         opt_raw = values.get("celebration_opt_out") if "celebration_opt_out" in values else None
         opt_out = _cic_v45_bool(opt_raw)
-        fields: dict[str, object] = {}
+        fields: dict[str, Any] = {}
         if "birth_date" in values and values.get("birth_date") not in (None, ""):
             if birth_date:
                 fields["birth_date"] = birth_date
@@ -377,7 +377,7 @@ def import_celebration_dates_from_excel(file_storage: object, *, apply: bool = F
             for item in updates:
                 fields = item["fields"]
                 set_sql = []
-                params: dict[str, object] = {"id": item["id"]}
+                params: dict[str, Any] = {"id": item["id"]}
                 for col, val in fields.items():
                     set_sql.append(f"{col} = :{col}")
                     params[col] = val

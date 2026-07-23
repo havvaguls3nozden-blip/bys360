@@ -341,9 +341,9 @@ def _cic_v40_date_input(value: object) -> str:
     return d.isoformat() if d else ""
 
 
-def _cic_v40_upcoming_special_days(days: int = 45) -> list[dict[str, object]]:
+def _cic_v40_upcoming_special_days(days: int = 45) -> list[dict[str, Any]]:
     today = _cic_v40_today()
-    rows: list[dict[str, object]] = []
+    rows: list[dict[str, Any]] = []
     for item in _cic_v40_special_days():
         left = _cic_v40_days_until(str(item.get("date") or ""), today)
         if left is None or left > days:
@@ -437,7 +437,7 @@ def _cic_v45_ensure_schema() -> None:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2625")
         pass
 
-def _cic_v45_existing_user_rows() -> list[dict[str, object]]:
+def _cic_v45_existing_user_rows() -> list[dict[str, Any]]:
     from sqlalchemy import inspect as _sa_inspect, text as _sa_text
     inspector = _sa_inspect(db.engine)
     cols = {c.get("name") for c in inspector.get_columns("users")}
@@ -449,10 +449,10 @@ def _cic_v45_existing_user_rows() -> list[dict[str, object]]:
     rows = db.session.execute(_sa_text(sql)).mappings().all()
     return [dict(r) for r in rows]
 
-def _cic_v45_build_user_indexes(rows: list[dict[str, object]]) -> dict[str, dict[str, object]]:
-    by_sicil: dict[str, dict[str, object]] = {}
-    by_email: dict[str, dict[str, object]] = {}
-    by_name: dict[str, dict[str, object]] = {}
+def _cic_v45_build_user_indexes(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    by_sicil: dict[str, dict[str, Any]] = {}
+    by_email: dict[str, dict[str, Any]] = {}
+    by_name: dict[str, dict[str, Any]] = {}
     for r in rows:
         sicil = _cic_v45_text(r.get("sicil_no"))
         email = _cic_v45_text(r.get("email")).lower()

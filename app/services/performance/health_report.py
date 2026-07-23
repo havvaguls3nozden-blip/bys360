@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Iterable
+from typing import Any
 
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
 from app.services.hierarchy_health_service import (
@@ -53,12 +54,12 @@ def _is_open(status: str | None) -> bool:
     return folded not in {"tamamlandi", "completed"}
 
 
-def _build_duplicate_rows(assignments: list[EvaluationAssignment]) -> list[dict[str, object]]:
+def _build_duplicate_rows(assignments: list[EvaluationAssignment]) -> list[dict[str, Any]]:
     grouped: dict[tuple[int, int], list[EvaluationAssignment]] = defaultdict(list)
     for row in assignments:
         grouped[(int(row.employee_id), int(row.manager_level or 0))].append(row)
 
-    duplicate_rows: list[dict[str, object]] = []
+    duplicate_rows: list[dict[str, Any]] = []
     for (_, manager_level), rows in grouped.items():
         if len(rows) <= 1:
             continue
@@ -96,12 +97,12 @@ def _build_duplicate_rows(assignments: list[EvaluationAssignment]) -> list[dict[
 def _build_mismatch_rows(
     evaluations: list[PerformanceEvaluation],
     assignments: list[EvaluationAssignment],
-) -> list[dict[str, object]]:
+) -> list[dict[str, Any]]:
     assignment_map: dict[tuple[int, int], list[EvaluationAssignment]] = defaultdict(list)
     for row in assignments:
         assignment_map[(int(row.employee_id), int(row.manager_level or 0))].append(row)
 
-    mismatch_rows: list[dict[str, object]] = []
+    mismatch_rows: list[dict[str, Any]] = []
     for evaluation in evaluations:
         employee = getattr(evaluation, "employee", None)
         for level, field_name in LEVEL_TO_EVALUATION_FIELD.items():
@@ -154,13 +155,13 @@ def _build_mismatch_rows(
 def _build_orphan_rows(
     evaluations: list[PerformanceEvaluation],
     assignments: list[EvaluationAssignment],
-) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     evaluation_by_employee = {int(row.employee_id): row for row in evaluations}
     assignment_groups: dict[int, list[EvaluationAssignment]] = defaultdict(list)
     for row in assignments:
         assignment_groups[int(row.employee_id)].append(row)
 
-    orphan_evaluations: list[dict[str, object]] = []
+    orphan_evaluations: list[dict[str, Any]] = []
     for evaluation in evaluations:
         if assignment_groups.get(int(evaluation.employee_id)):
             continue
@@ -174,7 +175,7 @@ def _build_orphan_rows(
             "exempted": bool(getattr(evaluation, "evaluation_exempted", False)),
         })
 
-    orphan_assignments: list[dict[str, object]] = []
+    orphan_assignments: list[dict[str, Any]] = []
     for employee_id, rows in assignment_groups.items():
         if employee_id in evaluation_by_employee:
             continue
@@ -193,8 +194,8 @@ def _build_orphan_rows(
     return orphan_evaluations, orphan_assignments
 
 
-def _build_manager_pressure_rows(assignments: list[EvaluationAssignment]) -> list[dict[str, object]]:
-    buckets: dict[int, dict[str, object]] = {}
+def _build_manager_pressure_rows(assignments: list[EvaluationAssignment]) -> list[dict[str, Any]]:
+    buckets: dict[int, dict[str, Any]] = {}
     for row in assignments:
         evaluator = getattr(row, "evaluator", None)
         if not evaluator:
@@ -243,7 +244,7 @@ def _build_manager_pressure_rows(assignments: list[EvaluationAssignment]) -> lis
     return rows[:12]
 
 
-def build_performance_task_health_report(period, scope_user_ids: Iterable[int] | None = None) -> dict[str, object]:
+def build_performance_task_health_report(period, scope_user_ids: Iterable[int] | None = None) -> dict[str, Any]:
     empty_summary = {
         "employee_count": 0,
         "evaluation_count": 0,

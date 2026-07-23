@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from .policy_flags import score_requires_criterion_comment
 
@@ -106,7 +107,7 @@ def validate_score_comment_rules(*, raw_score: float | int | None, score_100: fl
     return issues
 
 
-def build_period_validation_report(period, *, all_periods: Iterable[object] | None = None, evaluations: Iterable[object] | None = None) -> dict[str, object]:
+def build_period_validation_report(period, *, all_periods: Iterable[object] | None = None, evaluations: Iterable[object] | None = None) -> dict[str, Any]:
     issues: list[str] = []
     issues.extend(validate_period_ready(period, allow_locked=True))
     issues.extend(validate_weight_configuration(period))

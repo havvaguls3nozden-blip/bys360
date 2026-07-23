@@ -41,7 +41,7 @@ def _cic_auto_bool(value: object, default: bool = False) -> bool:
     return text in {"1", "true", "on", "yes", "evet", "aktif", "checked"}
 
 
-def get_auto_scheduler_config() -> dict[str, object]:
+def get_auto_scheduler_config() -> dict[str, Any]:
     enabled_raw = get_setting(f"{BASE_KEY}.auto_scheduler_enabled", "false") or "false"
     weekdays_raw = get_setting(f"{BASE_KEY}.auto_scheduler_weekdays_only", "true") or "true"
     try:
@@ -61,7 +61,7 @@ def get_auto_scheduler_config() -> dict[str, object]:
     }
 
 
-def set_auto_scheduler_config(payload: dict[str, object], actor_user_id: int | None = None) -> None:
+def set_auto_scheduler_config(payload: dict[str, Any], actor_user_id: int | None = None) -> None:
     enabled = "true" if _cic_auto_bool(payload.get("auto_scheduler_enabled"), default=False) else "false"
     if "auto_scheduler_weekdays_only" in payload:
         weekdays_only = "true" if _cic_auto_bool(payload.get("auto_scheduler_weekdays_only"), default=True) else "false"
