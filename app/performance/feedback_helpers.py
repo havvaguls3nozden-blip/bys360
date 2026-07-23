@@ -94,19 +94,19 @@ def _load_scoped_feedback_data(
 ):
     """Kapsam filtresi uygulanmış geri bildirim talep ve görüşme listelerini döndürür."""
     requests_query = FeedbackRequest.query.options(
-        joinedload(FeedbackRequest.employee),
-        joinedload(FeedbackRequest.period),
-        joinedload(FeedbackRequest.level_1_manager),
-        joinedload(FeedbackRequest.level_2_manager),
-        joinedload(FeedbackRequest.level_3_manager),
+        joinedload(FeedbackRequest.employee),  # type: ignore[arg-type]
+        joinedload(FeedbackRequest.period),  # type: ignore[arg-type]
+        joinedload(FeedbackRequest.level_1_manager),  # type: ignore[arg-type]
+        joinedload(FeedbackRequest.level_2_manager),  # type: ignore[arg-type]
+        joinedload(FeedbackRequest.level_3_manager),  # type: ignore[arg-type]
     )
     meetings_query = FeedbackMeeting.query.options(
-        joinedload(FeedbackMeeting.employee),
-        joinedload(FeedbackMeeting.manager),
-        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.period),
-        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_1_manager),
-        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_2_manager),
-        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_3_manager),
+        joinedload(FeedbackMeeting.employee),  # type: ignore[arg-type]
+        joinedload(FeedbackMeeting.manager),  # type: ignore[arg-type]
+        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.period),  # type: ignore[arg-type]
+        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_1_manager),  # type: ignore[arg-type]
+        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_2_manager),  # type: ignore[arg-type]
+        joinedload(FeedbackMeeting.feedback_request).joinedload(FeedbackRequest.level_3_manager),  # type: ignore[arg-type]
     )
 
     if selected_scope != "mine" and scope_employee_ids:
@@ -286,6 +286,8 @@ def _resolve_feedback_managers(employee, evaluation=None, period_id=None):
     ordered: dict[int, User] = {}
     for level in (1, 2, 3):
         manager = managers_by_level.get(level)
+        if not manager:
+            continue
         manager_id = getattr(manager, "id", None)
         if not manager_id or manager_id in seen_ids:
             continue
@@ -352,7 +354,8 @@ def _notify_feedback_request_status_changed(feedback_request, *, actor_user=None
         "randevu_ertelendi": "Randevu ertelendi",
         "randevu_iptal": "Randevu iptal edildi",
     }
-    status_label = status_label_map.get(getattr(feedback_request, "status", None), getattr(feedback_request, "status", None) or "Güncellendi")
+    status_value = str(getattr(feedback_request, "status", "") or "")
+    status_label = status_label_map.get(status_value, status_value or "Güncellendi")
     detail_url = url_for("main.manager_feedback_request_detail", request_id=feedback_request.id, scope="mine")
     notify_user(
         int(employee_id),
@@ -408,11 +411,15 @@ def _notify_feedback_meeting_created(meeting):
     )
 
     recipient_ids: set[int] = set()
-    if getattr(employee, "id", None):
-        recipient_ids.add(int(employee.id))
-    for manager_id in _feedback_manager_ids(getattr(meeting, "feedback_request", None)) or {getattr(meeting, "manager_id", None)}:
-        if manager_id:
-            recipient_ids.add(int(manager_id))
+    employee_id = getattr(employee, "id", None)
+    if employee_id:
+        recipient_ids.add(int(employee_id))
+    manager_ids = _feedback_manager_ids(getattr(meeting, "feedback_request", None))
+    if not manager_ids:
+        fallback_manager_id = getattr(meeting, "manager_id", None)
+        manager_ids = {int(fallback_manager_id)} if fallback_manager_id else set()
+    for manager_id in manager_ids:
+        recipient_ids.add(manager_id)
 
     for user_id in sorted(recipient_ids):
         notify_user(
@@ -445,14 +452,19 @@ def _notify_feedback_meeting_updated(meeting):
         "ertelendi": "Ertelendi",
         "iptal_edildi": "İptal edildi",
     }
-    status_label = status_label_map.get(getattr(meeting, "status", None), getattr(meeting, "status", None) or "Güncellendi")
+    meeting_status_value = str(getattr(meeting, "status", "") or "")
+    status_label = status_label_map.get(meeting_status_value, meeting_status_value or "Güncellendi")
 
     recipient_ids: set[int] = set()
-    if getattr(employee, "id", None):
-        recipient_ids.add(int(employee.id))
-    for manager_id in _feedback_manager_ids(getattr(meeting, "feedback_request", None)) or {getattr(meeting, "manager_id", None)}:
-        if manager_id:
-            recipient_ids.add(int(manager_id))
+    employee_id = getattr(employee, "id", None)
+    if employee_id:
+        recipient_ids.add(int(employee_id))
+    manager_ids = _feedback_manager_ids(getattr(meeting, "feedback_request", None))
+    if not manager_ids:
+        fallback_manager_id = getattr(meeting, "manager_id", None)
+        manager_ids = {int(fallback_manager_id)} if fallback_manager_id else set()
+    for manager_id in manager_ids:
+        recipient_ids.add(manager_id)
 
     for user_id in sorted(recipient_ids):
         notify_user(
