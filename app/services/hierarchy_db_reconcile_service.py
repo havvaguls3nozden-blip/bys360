@@ -159,7 +159,7 @@ class HierarchyDbReconcileService:
             return 0, 0
         open_updates = 0
         locked = 0
-        employee_id = int(row['id'])
+        employee_id = int(row['id'])  # type: ignore[call-overload]
         for level_no, sicil in [(1, row.get('manager_1_sicil')), (2, row.get('manager_2_sicil')), (3, row.get('manager_3_sicil'))]:
             sicil = str(sicil or '').strip()
             if not sicil:
@@ -178,7 +178,7 @@ class HierarchyDbReconcileService:
                   AND completed_at IS NULL
                   AND coalesce(status,'') NOT IN ('tamamlandi','tamamlandı','kapali','kapalı','closed','locked','published')
             '''), {'ev': evaluator_id, 'pid': period_id, 'eid': employee_id, 'lvl': level_no})
-            open_updates += int(upd.rowcount or 0)
+            open_updates += int(upd.rowcount or 0)  # type: ignore[attr-defined]
             cnt = db.session.execute(text('''
                 SELECT count(*)
                 FROM evaluation_assignments
@@ -215,6 +215,8 @@ class HierarchyDbReconcileService:
             wr = csv.DictWriter(fh, fieldnames=fields)
             wr.writeheader()
             for r in rows:
+                r_warnings = r.get('warnings')
+                r_info = r.get('info')
                 wr.writerow({
                     'id': r.get('id'),
                     'sicil_no': r.get('sicil_no'),
@@ -227,8 +229,8 @@ class HierarchyDbReconcileService:
                     'manager_1_sicil': r.get('manager_1_sicil'),
                     'manager_2_sicil': r.get('manager_2_sicil'),
                     'manager_3_sicil': r.get('manager_3_sicil'),
-                    'warnings': ' | '.join(r.get('warnings', [])),
-                    'info': ' | '.join(r.get('info', [])),
+                    'warnings': ' | '.join(r_warnings) if isinstance(r_warnings, list) else '',
+                    'info': ' | '.join(r_info) if isinstance(r_info, list) else '',
                     'current_manager_1': r.get('current_manager_1'),
                     'current_manager_2': r.get('current_manager_2'),
                     'current_manager_3': r.get('current_manager_3'),

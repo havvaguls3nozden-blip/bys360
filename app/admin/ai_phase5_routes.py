@@ -6,6 +6,7 @@ from __future__ import annotations
 import csv
 import io
 import logging
+from typing import Any
 
 from flask import flash, make_response, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -18,6 +19,13 @@ from app.services.ai.audit import mark_recommendation
 from app.services.ai.recommendation_actions import bulk_apply_recommendations
 
 logger = logging.getLogger(__name__)
+
+
+def _safe_int(value: str | None, default: int = 1) -> int:
+    try:
+        return max(int(value or default), 1)
+    except (TypeError, ValueError):
+        return default
 
 
 def _safe_ids(values: list[str]) -> list[int]:
@@ -36,7 +44,7 @@ def _safe_ids(values: list[str]) -> list[int]:
     return result
 
 
-def _current_filters() -> dict[str, str]:
+def _current_filters() -> dict[str, Any]:
     return {
         'module_type': (request.values.get('module_type') or '').strip().lower(),
         'target_table': (request.values.get('target_table') or '').strip(),
@@ -52,11 +60,11 @@ def _current_filters() -> dict[str, str]:
 @menu_key_required('ai_center')
 def admin_ai_review_queue():
     snapshot = build_review_queue_snapshot(
-        module_type=request.args.get('module_type'),
-        target_table=request.args.get('target_table'),
+        module_type=request.args.get('module_type') or '',
+        target_table=request.args.get('target_table') or '',
         status=request.args.get('status') or 'open',
-        severity=request.args.get('severity'),
-        page=request.args.get('page') or 1,
+        severity=request.args.get('severity') or '',
+        page=_safe_int(request.args.get('page'), 1),
         per_page=20,
     )
     return safe_render('admin_ai_review_queue.html', **snapshot)
@@ -68,10 +76,10 @@ def admin_ai_review_queue():
 @menu_key_required('ai_center')
 def admin_ai_review_queue_export():
     snapshot = build_review_queue_snapshot(
-        module_type=request.args.get('module_type'),
-        target_table=request.args.get('target_table'),
+        module_type=request.args.get('module_type') or '',
+        target_table=request.args.get('target_table') or '',
         status=request.args.get('status') or 'open',
-        severity=request.args.get('severity'),
+        severity=request.args.get('severity') or '',
         page=1,
         per_page=500,
     )

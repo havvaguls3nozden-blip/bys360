@@ -309,9 +309,10 @@ def simulate_assignment_levels(
         delegate_id = blocked_managers.get(level)
         result = simulate_effective_evaluator(evaluator_id, level, manager_blocked=blocked, delegate_user_id=delegate_id)
         events.append(str(result["event_type"]))
-        if result["effective_evaluator_id"]:
+        effective_evaluator_id = result["effective_evaluator_id"]
+        if effective_evaluator_id and isinstance(effective_evaluator_id, int):
             active_levels.append(level)
-            effective[level] = int(result["effective_evaluator_id"])
+            effective[level] = effective_evaluator_id
     return {"active_levels": tuple(active_levels), "events": tuple(events), "effective": effective}
 
 
@@ -346,14 +347,14 @@ def _check_contract_simulations(report: LeaveDelegationReport) -> None:
             continue
         report.ok.append(f"Vekâlet çözüm sözleşmesi doğru: {label}")
 
-    assignment_cases = [
+    assignment_cases: list[tuple[dict[int, int | None], str, dict[int, int | None], tuple[int, ...], tuple[str, ...], str]] = [
         ({1: 10, 2: 20, 3: 30}, "exclude", {}, (), ("exempted",), "muafiyette görev yok"),
         ({1: 10, 2: 20, 3: 30}, "partial", {2: 99}, (1, 2, 3), ("generated", "delegated", "generated"), "kısmi değerlendirmede seviyeler korunur"),
         ({1: 10, 2: 20, 3: 30}, "informational", {3: None}, (1, 2), ("generated", "generated", "uncovered"), "vekil yoksa sadece ilgili seviye düşer"),
         ({1: 10, 2: None}, "informational", {}, (1,), ("generated", "chain_issue"), "boş değerlendirici görev üretmez"),
     ]
-    for chain, mode, blocked, expected_levels, expected_events, label in assignment_cases:
-        result = simulate_assignment_levels(chain, employee_leave_mode=mode, blocked_managers=blocked)
+    for chain, mode, blocked_managers, expected_levels, expected_events, label in assignment_cases:
+        result = simulate_assignment_levels(chain, employee_leave_mode=mode, blocked_managers=blocked_managers)
         if result["active_levels"] != expected_levels:
             report.findings.append(LeaveDelegationFinding("assignment_level_contract", f"Aktif seviye sözleşmesi hatalı: {label} -> {result}"))
             continue

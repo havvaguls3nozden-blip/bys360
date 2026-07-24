@@ -255,7 +255,7 @@ def generate_secure_first_login_password(length: int = 14) -> str:
     return ''.join(parts)
 
 
-def get_default_first_login_password():
+def get_default_first_login_password() -> str:
     """Geriye dönük uyumluluk için güvenli ilk giriş şifresi döndürür."""
     return generate_secure_first_login_password()
 

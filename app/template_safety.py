@@ -1,9 +1,19 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
 from flask import Flask, url_for
 from jinja2 import ChainableUndefined
+
+
+class _AboutModalDefaults(TypedDict):
+    title: str
+    badges: list[str]
+    description: str
+    application_name: str
+    developer_name: str
+    institution_name: str
+    release_info: str
 
 
 def _build_about_modal_context() -> dict[str, Any]:
@@ -13,7 +23,7 @@ def _build_about_modal_context() -> dict[str, Any]:
     canlı omurgaya uygun güvenli varsayılanlarla çalışır. Böylece ana sayfa ve
     login sonrası ekranlar ayar tablosu kaynaklı bir problemde bozulmaz.
     """
-    defaults = {
+    defaults: _AboutModalDefaults = {
         "title": "BYS360 Hakkında",
         "badges": ["Kurumsal Yayın", "Canlı Ortam"],
         "description": (
@@ -34,7 +44,7 @@ def _build_about_modal_context() -> dict[str, Any]:
         from app.models import SystemSetting
 
         if not inspect(db.engine).has_table("system_settings"):
-            return defaults
+            return dict(defaults)
 
         wanted_keys = [
             "about.modal_title",
@@ -82,7 +92,7 @@ def _build_about_modal_context() -> dict[str, Any]:
             db.session.rollback()
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/template_safety.py)")
-        return defaults
+        return dict(defaults)
 
 
 def safe_url_for(endpoint: str, **kwargs: Any) -> str:

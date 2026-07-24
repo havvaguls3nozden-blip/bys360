@@ -95,7 +95,7 @@ def set_personnel_manager_sicils_from_ids(
     try:
         from .org_hierarchy import apply_manager_id_hierarchy
     except Exception:
-        apply_manager_id_hierarchy = None
+        apply_manager_id_hierarchy = None  # type: ignore[assignment]
     if callable(apply_manager_id_hierarchy):
         apply_manager_id_hierarchy(
             user,
@@ -137,7 +137,7 @@ def attach_personnel_org_unit(
     try:
         from .org_hierarchy import attach_organization_unit_to_user
     except Exception:
-        attach_organization_unit_to_user = None
+        attach_organization_unit_to_user = None  # type: ignore[assignment]
 
     if callable(attach_organization_unit_to_user):
         return attach_organization_unit_to_user(

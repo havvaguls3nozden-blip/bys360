@@ -25,7 +25,7 @@ def build_message_compose_ai_panel(*, users=None, selected_recipient_user_id: st
         f"Mesaj gövdesi {body_length} karakter; kısa not yerine yönlendirici bir metin tercih edilebilir.",
         f"Rozet '{badge_label or 'standart'}', ikon '{icon_name or 'varsayılan'}' ve vurgu rengi '{accent_color or 'kurumsal'}' olarak görünüyor.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Alıcı", "value": "Hazır" if recipient_selected else "Eksik"},
         {"label": "Karakter", "value": body_length},
         {"label": "Rozet", "value": badge_label or "Standart"},
@@ -118,7 +118,7 @@ def build_announcements_ai_panel(*, incoming_rows=None, outgoing_rows=None, unre
         f"Toplam gönderimlerde {total_outgoing_reads} okuma / {total_outgoing_recipients} alıcı üzerinden %{overall_read_rate:.1f} okuma oranı hesaplandı.",
         "Düşük okuma oranlı duyurular için hedef grup daraltma veya tekrar hatırlatma stratejisi düşünülebilir.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Gelen", "value": len(incoming_rows)},
         {"label": "Giden", "value": len(outgoing_rows)},
         {"label": "Okunmamış", "value": len(unread_rows)},
@@ -142,7 +142,7 @@ def build_announcement_form_ai_panel(*, users=None, preview_counts=None, target_
         f"Başlık {subject_len}, içerik {body_len} karakter. Kurumsal duyurularda konu satırının açık kalması okunurluğu artırır.",
         f"Toplam kullanıcı havuzu {len(users)} kişi; hedef kitlenin daraltılması gürültüyü azaltabilir.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Tahmini erişim", "value": estimated},
         {"label": "Başlık", "value": subject_len},
         {"label": "İçerik", "value": body_len},
@@ -234,7 +234,7 @@ def build_portal_hashtag_ai_panel(*, tag: str, feed_rows=None) -> dict[str, Any]
         "Etiket akışı güçlü olduğunda grup veya kampanya bazlı içerik kümeleri daha görünür olur.",
         "Tekrarlayan etiketler için kurumsal kullanım standardı belirlemek aramayı güçlendirir.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Paylaşım", "value": len(feed_rows)},
         {"label": "Etiket", "value": f"#{tag}"},
         {"label": "Durum", "value": "Aktif" if feed_rows else "Yeni"},
@@ -255,7 +255,7 @@ def build_portal_groups_ai_panel(*, groups=None) -> dict[str, Any]:
         "Farklı amaçlı grup kümeleri, moderasyon yükünü dağıtmak için kategorik olarak ayrıştırılabilir.",
         "Açık ve kontrollü grupların dengeli kullanımı kurumsal akışı daha düzenli tutar.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Grup", "value": len(groups)},
         {"label": "Açık", "value": public_count},
         {"label": "Onaylı", "value": moderated_count},
@@ -297,7 +297,7 @@ def build_portal_post_detail_ai_panel(*, post=None, comments=None, post_row=None
         f"İçerik tipi '{_get(post, 'post_type', 'post')}' ve görünür grup '{_get(_get(post, 'group', None), 'name', 'Genel')}'.",
         "Etkileşimi yüksek paylaşımlarda özet veya sabit yanıt yaklaşımı tekrar soruları azaltabilir.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Yorum", "value": comment_count},
         {"label": "Tepki", "value": reaction_count},
         {"label": "Ek", "value": len(ordered_attachments)},
@@ -318,7 +318,7 @@ def build_portal_file_share_ai_panel(*, groups=None, documents=None, media_asset
         f"Arama ifadesi '{search or 'yok'}' olarak çalışıyor.",
         "Dosya paylaşımında belge ve görseli aynı anda daraltmak hedef kitleye uygun akış kurulmasını kolaylaştırır.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Grup", "value": len(groups)},
         {"label": "Belge", "value": len(documents)},
         {"label": "Medya", "value": len(media_assets)},
@@ -416,7 +416,7 @@ def build_portal_announcement_receipts_ai_panel(*, report=None, status: str = 'a
         f"Rapor satırı {len(rows)} ve seçili duyuru kimliği {selected_post_id or 'tümü'} olarak çalışıyor.",
         "Bekleyen alındılar için tekrar hatırlatma veya hedef kitle daraltma seçenekleri değerlendirilebilir.",
     ]
-    actions = [
+    actions: list[dict[str, Any]] = [
         {"label": "Toplam", "value": total},
         {"label": "Onay", "value": acked},
         {"label": "Bekleyen", "value": pending},

@@ -5,6 +5,7 @@ import json
 import logging
 import re
 from datetime import datetime
+from typing import Any
 
 from flask import flash, redirect, request, send_file, url_for
 from flask_login import current_user
@@ -134,7 +135,7 @@ SUPPORT_HELP_ROLE_MATRIX_ITEMS = [
     {"key": "support_all", "label": "Tüm Talepler", "icon": "fa-solid fa-table-list"},
 ]
 
-PERFORMANCE_ROLE_MATRIX_V12_ITEMS = [
+PERFORMANCE_ROLE_MATRIX_V12_ITEMS: list[dict[str, Any]] = [
     {"key": "performance_tasks", "label": "Görevlerim", "icon": "fa-solid fa-list-check"},
     {"key": "performance_scorecard", "label": "Not Karnesi", "icon": "fa-solid fa-id-card"},
     {"key": "my_performance_comparison", "label": "Personel Analizi", "icon": "fa-solid fa-chart-line"},
@@ -220,7 +221,7 @@ ASSISTANT_ROLE_MATRIX_RECOMMENDED = {
     },
 }
 
-ROLE_MATRIX_POLICY_CONFIGS = [
+ROLE_MATRIX_POLICY_CONFIGS: list[dict[str, Any]] = [
     {
         "key": "general",
         "section_id": "general-role-policy",
