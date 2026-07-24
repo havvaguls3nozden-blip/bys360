@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 # --- BYS360 third-manager Excel import compatibility patch ---
 
@@ -53,7 +53,7 @@ def manager_map(users: Iterable[object]) -> dict[str, object]:
 
 def row_for_user(
     user,
-    by_sicil: dict[str, object],
+    by_sicil: Mapping[str, object],
     *,
     special_single_manager_units: set[str] | None = None,
     special_top_roles: set[str] | None = None,

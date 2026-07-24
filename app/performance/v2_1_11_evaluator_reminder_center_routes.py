@@ -4,6 +4,7 @@ import csv
 import io
 import logging
 from functools import wraps
+from typing import Any
 
 from flask import Response, request
 from flask_login import current_user, login_required
@@ -21,8 +22,8 @@ try:
     from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label
 except Exception:  # pragma: no cover - eski kopya uyumu
     logger.exception("BYS360 V6C guarded exception | file=app/performance/v2_1_11_evaluator_reminder_center_routes.py | line=20")
-    def corporate_gate_label(name: str) -> str:
-        return str(name or "Kontrol")
+    def corporate_gate_label(value: Any) -> str:
+        return str(value or "Kontrol")
 
 
 def _period_id_from_request() -> int | None:
@@ -62,7 +63,7 @@ def _period_center_norm_v222a(value):
 
 
 def _period_center_collect_terms_v222a(user):
-    terms = set()
+    terms: set[str] = set()
     if not user:
         return terms
     for attr in ("role", "role_name", "user_role", "authority_level", "title", "unvan", "position", "gorev", "username"):

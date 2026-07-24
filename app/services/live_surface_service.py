@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Iterable
+from typing import Any, cast
 
 from app.config.live_scope import get_live_scope_summary
 
@@ -38,13 +39,13 @@ def build_live_dashboard_surface_context(context: dict[str, Any] | None = None) 
             "title": _area_label(area),
             "note": "Canlı kullanıcı yüzeyinde aktif tutulur.",
         }
-        for area in (summary.get("active_core_areas") or [])
+        for area in cast("Iterable[str]", summary.get("active_core_areas") or [])
     ]
     return {
         "headline": "Canlı kapsam özeti",
         "subtitle": "Dashboard yalnız çekirdek omurgayı ve aktif karar yüzeylerini gösterir.",
         "chips": [
-            {"label": "Aktif çekirdek", "value": int(summary.get("active_core_count") or 0)},
+            {"label": "Aktif çekirdek", "value": int(cast("int | None", summary.get("active_core_count")) or 0)},
             {"label": "Bekleyen onay", "value": int(context.get("pending_feedback_requests") or 0)},
             {"label": "Kapsama riski", "value": int(context.get("coverage_risk_score") or 0)},
         ],
@@ -74,5 +75,5 @@ def build_live_report_surface_context(*, scope: dict[str, Any] | None = None, st
         "subtitle": "Rapor alanı yalnız performans çekirdeği, kapsama logları ve temel dışa aktarma seçenekleriyle sınırlandırıldı. Geniş raporlama varyasyonları sonraki modül fazına bırakıldı.",
         "exports": exports,
         "focus_rows": focus_rows,
-        "removed_modules": [_removed_label(module) for module in (summary.get("removed_modules") or [])],
+        "removed_modules": [_removed_label(module) for module in cast("Iterable[str]", summary.get("removed_modules") or [])],
     }

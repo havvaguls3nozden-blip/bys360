@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,7 @@ def _display_name(user: User | None) -> str:
 
 
 def _manager_map(users: list[User]) -> dict[str, User]:
-    return manager_map(users)
+    return cast("dict[str, User]", manager_map(users))
 
 
 def _row_for_user(user: User, by_sicil: dict[str, User]) -> dict[str, object]:
@@ -177,7 +178,7 @@ def performance_hierarchy_assignments_live():
             safe_db_rollback()
             flash(f"Hiyerarşi ataması kaydedilirken hata oluştu: {exc}", "danger")
 
-    filtered = assignment_payload["filtered_users"]
+    filtered = cast("list[User]", assignment_payload["filtered_users"])
     selected_user = None
     if selected_user_id:
         selected_user = db.session.get(User, selected_user_id)
