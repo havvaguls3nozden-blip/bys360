@@ -240,7 +240,7 @@ def bys360_feedback_new():
             )
 
             upload = request.files.get("attachment")
-            if upload and getattr(upload, "filename", ""):
+            if upload and upload.filename:
                 _store_ticket_attachment(ticket, upload, attachment_type="feedback")
 
             notify_user_feedback_created(ticket, current_user, kind_label=kind.label)

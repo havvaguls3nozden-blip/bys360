@@ -529,7 +529,7 @@ def seed_phase10_reminder_settings(db: Any | None = None) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            db.session.rollback()  # type: ignore[union-attr]
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase10_reminder_notification_center.py:526")

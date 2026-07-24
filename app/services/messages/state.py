@@ -153,7 +153,7 @@ def toggle_thread_pin_for_user(
 
     session_obj[pin_key] = pinned[:max_pins]
     try:
-        session_obj.modified = True
+        session_obj.modified = True  # type: ignore[attr-defined]
     except Exception:
         # Testlerde dict benzeri basit nesneler kullanilabilir; Flask session disinda
         # modified alani olmayabilir.

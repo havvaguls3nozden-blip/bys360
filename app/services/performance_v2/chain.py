@@ -346,7 +346,7 @@ def build_resolved_chain(employee, period=None) -> ResolvedChain:
         manager = matched["user"]
         manager_sicil = str(matched["sicil"])
         used_sicils.add(manager_sicil)
-        if manager.id == getattr(employee, "id", None):
+        if getattr(manager, "id", None) == getattr(employee, "id", None):
             _append_issue_once(
                 resolved,
                 ChainIssue(

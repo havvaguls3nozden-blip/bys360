@@ -83,7 +83,7 @@ def _b46_message_row(message, user: User):
         "message_type": _b46_txt(getattr(message, "message_type", "text")) or "text",
         "sent_at": sent_at.isoformat() if sent_at else None,
         "sent_at_label": _dt_label(sent_at),
-        "edited_at": getattr(message, "edited_at", None).isoformat() if getattr(message, "edited_at", None) else None,
+        "edited_at": edited_at.isoformat() if (edited_at := getattr(message, "edited_at", None)) else None,
         "is_deleted": deleted,
         "is_mine": getattr(message, "sender_user_id", None) == user.id,
     }

@@ -129,6 +129,9 @@ def admin_analysis_center_excel_preview():
     )
     if request.method == 'POST':
         uploaded_file = request.files.get('analysis_file')
+        if not uploaded_file:
+            flash('Yüklenecek dosya bulunamadı.', 'warning')
+            return safe_render('admin_analysis_excel_preview.html', **context)
         try:
             preview = build_safe_excel_preview(
                 uploaded_file,

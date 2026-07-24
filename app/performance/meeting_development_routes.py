@@ -42,7 +42,7 @@ def performance_meeting_development_category():
     if not name:
         flash("Kategori adı zorunludur.", "warning")
         return redirect(url_for("main.performance_meeting_development"))
-    add_category(name, request.form.get("description") or "", request.form.get("sort_order") or 0)
+    add_category(name, request.form.get("description") or "", request.form.get("sort_order", type=int) or 0)
     flash("Personel kategorisi kaydedildi.", "success")
     return redirect(url_for("main.performance_meeting_development"))
 

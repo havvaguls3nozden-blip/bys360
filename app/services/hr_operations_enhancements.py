@@ -146,7 +146,7 @@ def build_hr_personnel_overlay_context(hr_scope: dict[str, Any] | None, scope_us
     selected_position = None
     selected_position_rows: list[dict[str, Any]] = []
     if selected_user and position_ready:
-        selected_position_rows = _position_rows_for_user(int(selected_user_id))
+        selected_position_rows = _position_rows_for_user(int(selected_user_id or 0))
         edit_position_id = _safe_int(request.args.get("edit_position_id"))
         if edit_position_id:
             selected_position = PersonnelPositionHistory.query.filter(

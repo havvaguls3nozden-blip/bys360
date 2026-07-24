@@ -34,7 +34,7 @@ THIRD_MANAGER_HEADER_ALIASES = [
     "new_y3",
 ]
 
-DEFAULT_DOCUMENT_CATEGORIES = [
+DEFAULT_DOCUMENT_CATEGORIES: list[dict[str, Any]] = [
     {
         "code": "ozluk",
         "label": "Özlük",
