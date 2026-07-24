@@ -80,7 +80,7 @@ def build_ai_notification_priority_snapshot(*, lookback_days: int = 7, priority:
 
     total_count = len(all_rows)
     unread_count = sum(1 for row in all_rows if not bool(getattr(row, 'is_read', False)))
-    priority_total = sum(1 for row in all_rows if _priority_rank(getattr(row, 'priority', None)) >= 3)
+    priority_total = sum(1 for row in all_rows if _priority_rank(getattr(row, 'priority', None) or '') >= 3)
     today_count = sum(1 for row in all_rows if getattr(row, 'created_at', None) and row.created_at.date() == utc_now().date())
 
     filtered = list(all_rows)
@@ -93,7 +93,7 @@ def build_ai_notification_priority_snapshot(*, lookback_days: int = 7, priority:
 
     filtered.sort(
         key=lambda row: (
-            _priority_rank(getattr(row, 'priority', None)),
+            _priority_rank(getattr(row, 'priority', None) or ''),
             0 if not bool(getattr(row, 'is_read', False)) else 1,
             getattr(row, 'created_at', datetime.min),
             getattr(row, 'id', 0),

@@ -20,7 +20,7 @@ try:  # Canlı projede var; yoksa servis güvenli dar kapsamla çalışır.
     from app.services.ui_context.scope import build_user_scope_context
 except Exception:  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/dashboard_rebuild_service.py:21")
-    build_user_scope_context = None
+    build_user_scope_context = None  # type: ignore[assignment]
 
 BYS360_DASHBOARD_REBUILD_SERVICE_OK = True
 BYS360_DASHBOARD_REBUILD_PHASES = ("D1", "D2", "D3", "D4", "D5")
@@ -58,7 +58,7 @@ ACTIVE_SURVEY_STATUSES = {"active", "published", "open", "yayinda", "yayında", 
 
 class _Reader:
     def __init__(self) -> None:
-        self._inspector = None
+        self._inspector: Any = None
         self._tables: set[str] | None = None
         self._columns: dict[str, set[str]] = {}
 
@@ -652,7 +652,7 @@ def _count_open_feedback(reader: _Reader, scope_ids: list[int] | None, user: Any
         count += _int(reader.scalar(f"SELECT COUNT(*) FROM feedback_action_plans {where}", params))
     if reader.has_table("feedback_requests"):
         where = "WHERE 1=1"
-        params: dict[str, Any] = {}
+        params = {}
         if reader.has_col("feedback_requests", "status"):
             where += " AND LOWER(COALESCE(status,'')) NOT IN ('closed','completed','resolved','kapalı','kapali')"
         if scope_ids is not None:

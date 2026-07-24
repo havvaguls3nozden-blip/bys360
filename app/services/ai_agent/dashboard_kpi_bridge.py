@@ -70,7 +70,7 @@ def _normalize_status(value: Any, completion_rate: float) -> str:
 
 
 def _empty_summary(message: str, *, privileged: bool, user_id: int | None) -> dict[str, Any]:
-    summary = {
+    summary: dict[str, Any] = {
         "ok": True,
         "scope": "yonetici_kpi_ozeti" if privileged else "kullanici_kpi_ozeti",
         "can_view_global_summary": privileged,
@@ -291,7 +291,7 @@ def build_dashboard_kpi_summary_for_user(user: Any) -> dict[str, Any]:
         },
     ]
 
-    summary = {
+    summary: dict[str, Any] = {
         "ok": True,
         "scope": "yonetici_kpi_ozeti" if privileged else "kullanici_kpi_ozeti",
         "can_view_global_summary": privileged,

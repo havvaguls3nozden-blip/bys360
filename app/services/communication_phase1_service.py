@@ -192,7 +192,7 @@ def resolve_bulletin_target_users(bulletin: CommunicationBulletin) -> list[Any]:
     if not bulletin:
         return []
 
-    audiences = bulletin.audiences.order_by(CommunicationBulletinAudience.id.asc()).all()
+    audiences = bulletin.audiences.order_by(CommunicationBulletinAudience.id.asc()).all()  # type: ignore[misc,operator]
     if not audiences:
         return _active_user_query().all()
 
@@ -370,7 +370,7 @@ def manager_filter_options() -> dict[str, list[tuple[str, str]]]:
             roles_seen.append((role, role.replace("_", " ").title()))
             seen_role_values.add(role)
 
-    unit_rows = OrganizationUnit.query.order_by(OrganizationUnit.name.asc()).all() if OrganizationUnit else []
+    unit_rows = OrganizationUnit.query.order_by(OrganizationUnit.name.asc()).all()
     for row in unit_rows:
         value = str(row.id)
         label = safe_str(getattr(row, "name", "")) or value

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from flask_login import current_user
 
@@ -27,7 +27,7 @@ def get_performance_evaluation_payload(evaluation_id: int) -> tuple[PerformanceE
         raise AIResourceNotFound("Performans değerlendirme kaydı bulunamadı.")
 
     item_rows = []
-    item_query = evaluation.items.order_by(
+    item_query = evaluation.items.order_by(  # type: ignore[misc,operator]
         PerformanceEvaluationItem.manager_level.asc(),
         PerformanceEvaluationItem.criteria_id.asc(),
     ) if hasattr(evaluation.items, 'order_by') else evaluation.items
@@ -82,7 +82,7 @@ def get_support_ticket_payload(ticket_id: int) -> tuple[SupportTicket, dict[str,
     if not can_view:
         raise AIInputError("Bu destek talebi için AI triage görme yetkiniz yok.")
 
-    latest_status_entry = ticket.status_history[0] if getattr(ticket, 'status_history', None) else None
+    latest_status_entry = cast("list[Any]", ticket.status_history)[0] if getattr(ticket, 'status_history', None) else None
     visible_messages = []
     for row in list(getattr(ticket, 'messages', []) or [])[-8:]:
         if getattr(row, 'is_internal', False) and not is_manager_family_user(current_user):
