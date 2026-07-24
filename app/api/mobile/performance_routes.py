@@ -98,6 +98,12 @@ from app.api.mobile.services.performance_base_helpers import (  # noqa: E402, F4
     _period_status,
 )
 
+# performance_period_service._period_scope delegates here under the
+# _bys360_legacy_ naming convention used by every other extracted helper
+# in this module; _period_scope itself is a passthrough import rather than
+# a locally defined function, so it never got the rename other helpers did.
+_bys360_legacy__period_scope = _period_scope
+
 
 def _period_progress(period: Any):
     from app.api.mobile.services import performance_period_service as _bys360_period_service
