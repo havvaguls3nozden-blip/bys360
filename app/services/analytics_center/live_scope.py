@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Final
+from typing import Any, Final
 
 
 @dataclass(frozen=True)
@@ -15,7 +15,7 @@ class AnalyticsSurface:
     safe_default: str
     export_policy: str = "authorized_export_only"
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
@@ -67,11 +67,11 @@ ANALYTICS_SURFACES: Final[tuple[AnalyticsSurface, ...]] = (
 ANALYTICS_SURFACE_KEYS: Final[tuple[str, ...]] = tuple(surface.key for surface in ANALYTICS_SURFACES)
 
 
-def get_analytics_surfaces() -> list[dict[str, object]]:
+def get_analytics_surfaces() -> list[dict[str, Any]]:
     return [surface.to_dict() for surface in ANALYTICS_SURFACES]
 
 
-def build_analytics_surface_summary() -> dict[str, object]:
+def build_analytics_surface_summary() -> dict[str, Any]:
     return {
         "surface_count": len(ANALYTICS_SURFACES),
         "surfaces": get_analytics_surfaces(),

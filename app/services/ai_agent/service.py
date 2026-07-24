@@ -5,11 +5,11 @@ from __future__ import annotations
 
 try:
     from app.services.ai_agent.assistant_visible_tutor_v6 import (
-        NEW_WELCOME_MESSAGE as BYS360_VISIBLE_TUTOR_V6_WELCOME,
-        answer_question as bys360_visible_tutor_v6_answer,
+        WELCOME_TEXT as BYS360_VISIBLE_TUTOR_V6_WELCOME,
+        answer_visible_tutor_v6 as bys360_visible_tutor_v6_answer,
     )
 except Exception:  # pragma: no cover
-    bys360_visible_tutor_v6_answer = None
+    bys360_visible_tutor_v6_answer = None  # type: ignore[assignment]
     BYS360_VISIBLE_TUTOR_V6_WELCOME = None
 # BYS360_ASSISTANT_VISIBLE_TUTOR_V6_IMPORT_END
 
@@ -1173,7 +1173,7 @@ try:
 except Exception:
     _BYS360_VT_OLD_GREETING = "Merhaba. Ben BYS360 Asistanı. BYS360 içinde performans dönemi oluşturma, personel ekleme, rol matrisi, anket, destek, KPI/Hedef ve karar destek işlemlerinde sizi adım adım yönlendiririm. İdari karar vermem, performans puanı belirlemem, hassas veri göstermem; doğru ekranı, gerekli yetkiyi ve işlem sırasını öğretirim."
     _BYS360_VT_WELCOME_TEXT = "Merhaba. Ben BYS360 Asistanı. BYS360 içinde performans dönemi oluşturma, personel ekleme, rol matrisi, anket, destek, KPI/Hedef ve karar destek işlemlerinde sizi adım adım yönlendiririm. İdari karar vermem, performans puanı belirlemem, hassas veri göstermem; doğru ekranı, gerekli yetkiyi ve işlem sırasını öğretirim."
-    def _bys360_vt_try_answer(message=""):
+    def _bys360_vt_try_answer(message: Any = "") -> str:
         return _BYS360_VT_WELCOME_TEXT
 
 def _bys360_vt_extract_message_v6_1(args, kwargs):
@@ -1278,7 +1278,7 @@ def _legacy_build_ai_agent_reply_assistantlike(user, question, context=None):
     # V31.2 final answer bridge: server-first, BYS360-only, home/dashboard ayrımı korunur.
     try:
         from .assistant_chatgpt_like_v31 import build_bys360_assistant_chatgpt_like_reply_v31
-        previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31
+        previous: Any = _BYS360_ASSISTANT_PREV_BUILD_REPLY_ASSISTANT_LIKE_V31
         if previous is build_ai_agent_reply:
             previous = None
         return build_bys360_assistant_chatgpt_like_reply_v31(
@@ -1313,7 +1313,7 @@ def build_ai_agent_reply(user, question, context=None):
         from app.services.ai_agent.assistant_usage_manual_brain_v32 import (
             build_bys360_assistant_usage_manual_reply_v32,
         )
-        previous = _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32
+        previous: Any = _BYS360_ASSISTANT_PREV_BUILD_REPLY_USAGE_MANUAL_V32
         if previous is build_ai_agent_reply:
             previous = None
         reply = build_bys360_assistant_usage_manual_reply_v32(

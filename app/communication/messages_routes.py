@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import flash, jsonify, redirect, request, send_from_directory, session, url_for
 from flask_login import current_user, login_required
@@ -169,8 +170,8 @@ def messages_inbox_impl():
 
     users = []
     recent_users = []
-    compose_user_cards = []
-    recent_compose_user_cards = []
+    compose_user_cards: list[dict[str, Any]] = []
+    recent_compose_user_cards: list[dict[str, Any]] = []
     should_load_compose_users = bool(compose_picker_open or preselected_recipient_user_id)
     if should_load_compose_users:
         users = _svc_load_active_compose_users(_COMPOSE_USER_SOFT_LIMIT)
@@ -297,6 +298,7 @@ def messages_new_impl():
                 now=_utcnow(),
             )
             thread = send_result.thread
+            assert thread is not None
             flash(send_result.message, "success")
             return redirect(url_for("main.messages_inbox", thread_id=thread.id, scope="self" if send_result.is_self_message else "all"))
 
@@ -597,6 +599,8 @@ def message_attachment_download_impl(filename):
         flash(result.message or "Bu dosyayı görüntüleme yetkiniz yok ya da dosya bulunamadı.", "danger")
         return redirect(url_for("main.messages_inbox"))
 
+    assert result.upload_dir is not None
+    assert result.safe_name is not None
     return send_from_directory(result.upload_dir, result.safe_name, as_attachment=False, download_name=result.download_name)
 
 

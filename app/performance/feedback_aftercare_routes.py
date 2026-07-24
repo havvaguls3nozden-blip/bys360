@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
+from typing import Any
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -25,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 
 # BYS360_FEEDBACK_AFTERCARE_PHASE7_USABILITY_IMPORTS
+build_phase7_context: Callable[..., dict[str, Any]] | None
+create_meeting_from_feedback_request: Callable[..., int] | None
 try:
     from app.services.performance.feedback_aftercare_phase7 import (
         build_phase7_context,
@@ -38,6 +42,8 @@ except Exception:
 
 
 # BYS360_FEEDBACK_AFTERCARE_PHASE7_1_PERSON_PERIOD_IMPORTS
+build_phase7_1_context: Callable[..., dict[str, Any]] | None
+create_person_period_meeting: Callable[..., int] | None
 try:
     from app.services.performance.feedback_aftercare_phase7_person_period import (
         build_phase7_1_context,

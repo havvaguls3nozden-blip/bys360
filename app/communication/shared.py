@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import logging
+from typing import Any
 from urllib.parse import urlsplit
 
 from flask import current_app, redirect, request, url_for
@@ -64,7 +65,7 @@ def _normalize_text_search(raw_value: str | None, *, limit: int = 120) -> str:
     return value[:limit]
 
 
-def _current_message_view_state(thread_id: int | None = None) -> dict[str, str | int]:
+def _current_message_view_state(thread_id: int | None = None) -> dict[str, Any]:
     current_filter = (request.form.get("current_filter") or request.args.get("filter") or "active").strip().lower()
     if current_filter not in {"active", "unread", "pinned", "muted", "archived", "all"}:
         current_filter = "active"

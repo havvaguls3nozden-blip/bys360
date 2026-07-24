@@ -9,8 +9,13 @@ try:
     from .live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
     from .summary_pipeline import build_analytics_safe_summary_card
 except ImportError:  # python -S gate bağımsız çalıştırması
-    from analytics_center.live_scope import ANALYTICS_SURFACE_KEYS, get_analytics_surfaces
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
+    from analytics_center.live_scope import (  # type: ignore[no-redef]
+        ANALYTICS_SURFACE_KEYS,
+        get_analytics_surfaces,
+    )
+    from analytics_center.summary_pipeline import (  # type: ignore[no-redef]
+        build_analytics_safe_summary_card,
+    )
 
 """Karar Destek Dashboard veri yüzeyi servisleri.
 
@@ -33,7 +38,7 @@ class DashboardMetricCard:
     source_domain: str = "live_core"
     visibility_scope: str = "manager"
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
@@ -47,7 +52,7 @@ class DashboardSignalCard:
     action_hint: str = "İnsan onayıyla değerlendiriniz."
     visibility_scope: str = "manager"
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
@@ -91,7 +96,7 @@ def build_dashboard_metric_card(
     description: str = "",
     source_domain: str = "live_core",
     visibility_scope: str = "manager",
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Tek dashboard KPI kartı üretir."""
     return DashboardMetricCard(
         key=str(key or "metric").strip() or "metric",
@@ -114,7 +119,7 @@ def build_dashboard_signal_card(
     source_domain: str = "live_core",
     action_hint: str = "İnsan onayıyla değerlendiriniz.",
     visibility_scope: str = "manager",
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """AI karar destek sinyal kartı üretir."""
     safe_summary = build_analytics_safe_summary_card(
         "executive_overview",
@@ -132,13 +137,13 @@ def build_dashboard_signal_card(
     ).to_dict()
 
 
-def build_dashboard_source_health_cards(source_counts: dict[str, Any] | None = None) -> list[dict[str, object]]:
+def build_dashboard_source_health_cards(source_counts: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """Canlı veri alanlarının dashboard kaynak sağlık kartlarını döndürür."""
     counts = source_counts or {}
-    cards: list[dict[str, object]] = []
+    cards: list[dict[str, Any]] = []
     for surface in get_analytics_surfaces():
         domain = str(surface.get("source_domain") or surface.get("key") or "live_core")
-        count = coerce_dashboard_number(counts.get(domain, counts.get(surface.get("key"), 0)))
+        count = coerce_dashboard_number(counts.get(domain, counts.get(str(surface.get("key") or ""), 0)))
         cards.append(
             build_dashboard_metric_card(
                 key=f"source_{surface.get('key')}",
@@ -153,7 +158,7 @@ def build_dashboard_source_health_cards(source_counts: dict[str, Any] | None = N
     return cards
 
 
-def build_default_dashboard_metrics(raw_metrics: dict[str, Any] | None = None) -> list[dict[str, object]]:
+def build_default_dashboard_metrics(raw_metrics: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """Karar destek dashboard başlangıç metriklerini üretir."""
     data = raw_metrics or {}
     return [
@@ -164,7 +169,7 @@ def build_default_dashboard_metrics(raw_metrics: dict[str, Any] | None = None) -
     ]
 
 
-def build_default_dashboard_signals(raw_signals: list[dict[str, Any]] | None = None) -> list[dict[str, object]]:
+def build_default_dashboard_signals(raw_signals: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     """Karar destek dashboard için güvenli sinyal kartları üretir."""
     signals = raw_signals or [
         {"key": "publication_readiness", "title": "Yayın öncesi kontrol", "summary": "Performans sonuçları yayınlanmadan önce İK/Admin kontrolü korunmalıdır.", "severity": "medium", "source_domain": "performance"},
@@ -179,7 +184,7 @@ def build_ai_decision_dashboard_surface(
     raw_signals: list[dict[str, Any]] | None = None,
     source_counts: dict[str, Any] | None = None,
     user_scope: str = "manager",
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """AI Karar Destek dashboard veri yüzeyi üretir; kayıt oluşturmaz, commit yapmaz."""
     metrics = build_default_dashboard_metrics(raw_metrics)
     signals = build_default_dashboard_signals(raw_signals)
@@ -207,7 +212,7 @@ def build_ai_decision_dashboard_context(
     raw_signals: list[dict[str, Any]] | None = None,
     source_counts: dict[str, Any] | None = None,
     user_scope: str = "manager",
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Template/route entegrasyonu için hazır dashboard context döndürür."""
     surface = build_ai_decision_dashboard_surface(raw_metrics=raw_metrics, raw_signals=raw_signals, source_counts=source_counts, user_scope=user_scope)
     return {
@@ -218,7 +223,7 @@ def build_ai_decision_dashboard_context(
     }
 
 
-def build_ai_decision_dashboard_readiness_summary() -> dict[str, object]:
+def build_ai_decision_dashboard_readiness_summary() -> dict[str, Any]:
     surface = build_ai_decision_dashboard_surface(
         raw_metrics={"personnel_total": 12, "performance_pending": 3, "survey_response_rate": 80, "support_open_items": 2},
         source_counts={"personnel": 12, "performance": 3, "survey_feedback": 5, "communication_support": 2},

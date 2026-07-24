@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from datetime import timedelta
+from typing import Any
 
 from app.core.datetime_utils import utc_now
 from app.models import (
@@ -38,14 +39,14 @@ def _age_bucket(assigned_at):
     return 'fresh'
 
 
-def _build_dashboard_hierarchy_summary() -> dict[str, object]:
+def _build_dashboard_hierarchy_summary() -> dict[str, Any]:
     rows = build_hierarchy_health_rows(
         User.query.filter(User.role != 'admin', User.is_active.is_(True)).all()
     )
     return summarize_hierarchy_health(rows)
 
 
-def build_dashboard_signal_context(user) -> dict[str, object]:
+def build_dashboard_signal_context(user) -> dict[str, Any]:
     summary = get_or_set(
         'dashboard:signal:hierarchy_summary:v1',
         _build_dashboard_hierarchy_summary,
@@ -131,7 +132,7 @@ def build_dashboard_signal_context(user) -> dict[str, object]:
     }
 
 
-def build_task_signal_context(assignments: Iterable[EvaluationAssignment], hierarchy_summary: dict[str, object] | None = None) -> dict[str, object]:
+def build_task_signal_context(assignments: Iterable[EvaluationAssignment], hierarchy_summary: dict[str, Any] | None = None) -> dict[str, Any]:
     assignment_list = list(assignments)
     delayed_count = sum(1 for assignment in assignment_list if assignment.status != 'tamamlandi' and _age_bucket(getattr(assignment, 'assigned_at', None)) == 'delayed')
     attention_count = sum(1 for assignment in assignment_list if assignment.status != 'tamamlandi' and _age_bucket(getattr(assignment, 'assigned_at', None)) == 'attention')
@@ -156,7 +157,7 @@ def build_task_signal_context(assignments: Iterable[EvaluationAssignment], hiera
     return {'task_signal_items': signal_items, 'task_warning_items': warning_items}
 
 
-def build_personnel_signal_context(summary: dict[str, object]) -> dict[str, object]:
+def build_personnel_signal_context(summary: dict[str, Any]) -> dict[str, Any]:
     items = [
         {'label': 'Zincir eksiği', 'value': summary.get('missing_chain_count', 0), 'note': '1. veya 2. amiri eksik kayıtlar', 'tone': 'danger' if summary.get('missing_chain_count') else 'success'},
         {'label': 'Atama yok', 'value': summary.get('unassigned_count', 0), 'note': 'Hiç amir atanmamış kayıtlar', 'tone': 'warning' if summary.get('unassigned_count') else 'gray'},
@@ -175,7 +176,7 @@ def build_personnel_signal_context(summary: dict[str, object]) -> dict[str, obje
     return {'personnel_signal_items': items, 'personnel_warning_items': warnings}
 
 
-def build_hierarchy_signal_context(summary: dict[str, object]) -> dict[str, object]:
+def build_hierarchy_signal_context(summary: dict[str, Any]) -> dict[str, Any]:
     items = [
         {'label': 'Zinciri eksik', 'value': summary.get('missing_chain_count', 0), 'note': 'Amir ataması tamamlanmamış', 'tone': 'danger' if summary.get('missing_chain_count') else 'success'},
         {'label': 'Çakışma', 'value': summary.get('conflict_count', 0), 'note': 'Aynı kişi / döngü riski', 'tone': 'warning' if summary.get('conflict_count') else 'gray'},

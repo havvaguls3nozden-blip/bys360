@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from flask import jsonify
 from flask_login import current_user, login_required
@@ -15,6 +15,9 @@ from app.services.ai_decision.third_supervisor_integration import (
     build_third_supervisor_bulk_payload,
     build_third_supervisor_decision_payload,
 )
+
+if TYPE_CHECKING:
+    from app.services.ai_decision.visibility_scope import AIDecisionVisibilityScope
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +37,13 @@ try:
     )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz4_routes.py | line=30")
-    def assert_center_access(user: Any) -> Any:
-        return True
+    def assert_center_access(user: Any) -> AIDecisionVisibilityScope:
+        return True  # type: ignore[return-value]
 
-    def assert_evaluation_access(user: Any, evaluation: Any, allow_own_published: bool = True) -> Any:
-        return True
+    def assert_evaluation_access(
+        user: Any, evaluation: Any, *, allow_own_published: bool = True
+    ) -> AIDecisionVisibilityScope:
+        return True  # type: ignore[return-value]
 
 
 ResponseBuilder = Callable[..., dict[str, Any]]
