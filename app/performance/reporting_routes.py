@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any, cast
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -171,8 +172,8 @@ def _build_report_evaluations(filtered_user_ids, selected_period_id: int | None 
     query = (
         PerformanceEvaluation.query
         .options(
-            joinedload(PerformanceEvaluation.employee),
-            joinedload(PerformanceEvaluation.period),
+            joinedload(PerformanceEvaluation.employee),  # type: ignore[arg-type]
+            joinedload(PerformanceEvaluation.period),  # type: ignore[arg-type]
         )
         .join(User, PerformanceEvaluation.employee_id == User.id)
         .outerjoin(PerformancePeriod, PerformanceEvaluation.period_id == PerformancePeriod.id)
@@ -214,8 +215,8 @@ def _build_report_filter_summary(scope, selected_period=None, q: str = "", statu
 def performance_reports():
     if not phase3_can_open_performance_reports(current_user):  # BYS360_PHASE3_3_REPORT_PAGE_BACKEND_GUARD
         return phase3_denied_response()
-    if user_has_any_role(current_user, "admin"):
-        return redirect(url_for("main.performance_v2_phase8_dashboard", **request.args.to_dict(flat=True)))
+    if user_has_any_role(current_user, {"admin"}):
+        return redirect(url_for("main.performance_v2_phase8_dashboard", **cast("dict[str, Any]", request.args.to_dict(flat=True))))
 
     selected_period_id = request.args.get("period_id", type=int)
     q = (request.args.get("q") or "").strip()
@@ -249,7 +250,7 @@ def performance_reports():
             score_query = score_query.filter(PerformanceEvaluation.period_id == selected_period_id)
 
         score_expr = report_score_expr()
-        score_query = score_query.options(joinedload(PerformanceEvaluation.employee), joinedload(PerformanceEvaluation.period))
+        score_query = score_query.options(joinedload(PerformanceEvaluation.employee), joinedload(PerformanceEvaluation.period))  # type: ignore[arg-type]
         top_eval_rows = attach_report_scores(
             score_query.order_by(desc(score_expr), PerformanceEvaluation.id.desc()).limit(5).all()
         )

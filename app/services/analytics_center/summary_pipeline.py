@@ -19,7 +19,7 @@ try:
         build_ai_summary_cache_payload,
     )
 except ImportError:
-    from ai_decision.summary_cache import (
+    from ai_decision.summary_cache import (  # type: ignore[no-redef]
         DEFAULT_PROMPT_VERSION,
         build_ai_safe_summary_text,
         build_ai_source_hash,

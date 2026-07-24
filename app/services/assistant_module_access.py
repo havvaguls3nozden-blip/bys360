@@ -20,17 +20,17 @@ try:
     from flask_login import current_user
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=22")
-    abort = None
-    request = None
-    redirect = None
-    url_for = None
+    abort = None  # type: ignore[assignment]
+    request = None  # type: ignore[assignment]
+    redirect = None  # type: ignore[assignment]
+    url_for = None  # type: ignore[assignment]
     current_user = None
 
 try:
     from sqlalchemy import bindparam, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=31")
-    text = None
+    text = None  # type: ignore[assignment]
 
 
 ASSISTANT_MASTER_KEYS = {

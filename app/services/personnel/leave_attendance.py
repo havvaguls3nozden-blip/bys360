@@ -305,7 +305,7 @@ def _serialize_delegation_row(row: DelegationAssignment) -> dict[str, Any]:
 
 
 def list_personnel_leave_balances(filters: PersonnelLeaveAttendanceFilters) -> list[dict[str, Any]]:
-    query = LeaveBalance.query.options(joinedload(LeaveBalance.user))
+    query = LeaveBalance.query.options(joinedload(LeaveBalance.user))  # type: ignore[arg-type]
     query = _apply_user_filter(query, LeaveBalance, filters.user_id)
     if filters.year:
         query = query.filter(LeaveBalance.year == int(filters.year))
@@ -314,7 +314,7 @@ def list_personnel_leave_balances(filters: PersonnelLeaveAttendanceFilters) -> l
 
 
 def list_personnel_leave_rows(filters: PersonnelLeaveAttendanceFilters) -> list[dict[str, Any]]:
-    query = PersonnelLeave.query.options(joinedload(PersonnelLeave.user), joinedload(PersonnelLeave.approved_by))
+    query = PersonnelLeave.query.options(joinedload(PersonnelLeave.user), joinedload(PersonnelLeave.approved_by))  # type: ignore[arg-type]
     query = _apply_user_filter(query, PersonnelLeave, filters.user_id)
     query = _apply_period_filter(query, PersonnelLeave, filters.period_id)
     query = _apply_status_filter(query, PersonnelLeave, filters.status)
@@ -323,7 +323,7 @@ def list_personnel_leave_rows(filters: PersonnelLeaveAttendanceFilters) -> list[
 
 
 def list_personnel_attendance_rows(filters: PersonnelLeaveAttendanceFilters) -> list[dict[str, Any]]:
-    query = AttendanceException.query.options(joinedload(AttendanceException.user), joinedload(AttendanceException.approved_by))
+    query = AttendanceException.query.options(joinedload(AttendanceException.user), joinedload(AttendanceException.approved_by))  # type: ignore[arg-type]
     query = _apply_user_filter(query, AttendanceException, filters.user_id)
     query = _apply_period_filter(query, AttendanceException, filters.period_id)
     query = _apply_status_filter(query, AttendanceException, filters.status)
@@ -333,8 +333,8 @@ def list_personnel_attendance_rows(filters: PersonnelLeaveAttendanceFilters) -> 
 
 def list_personnel_delegation_rows(filters: PersonnelLeaveAttendanceFilters) -> list[dict[str, Any]]:
     query = DelegationAssignment.query.options(
-        joinedload(DelegationAssignment.delegator),
-        joinedload(DelegationAssignment.delegate),
+        joinedload(DelegationAssignment.delegator),  # type: ignore[arg-type]
+        joinedload(DelegationAssignment.delegate),  # type: ignore[arg-type]
     )
     if filters.user_id:
         query = query.filter(

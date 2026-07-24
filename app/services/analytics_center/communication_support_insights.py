@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import Any, cast
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card
 except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
+    from analytics_center.summary_pipeline import (  # type: ignore[no-redef]
+        build_analytics_safe_summary_card,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -303,14 +305,15 @@ def build_default_communication_support_insights() -> dict[str, object]:
 
 def build_communication_support_readiness_summary() -> dict[str, object]:
     context = build_default_communication_support_insights()
-    privacy = context.get("privacy_contract", {})
+    privacy = cast("dict[str, Any]", context.get("privacy_contract", {}))
+    counts = cast("dict[str, Any]", context.get("counts", {}))
     return {
         "ok": context.get("external_ai_call") is False
         and context.get("human_approval_required") is True
         and privacy.get("raw_message_dump") is False
         and privacy.get("raw_ticket_body_dump") is False
-        and context.get("counts", {}).get("message_cards", 0) >= 5
-        and context.get("counts", {}).get("support_cards", 0) >= 5,
+        and counts.get("message_cards", 0) >= 5
+        and counts.get("support_cards", 0) >= 5,
         "phase": context["phase"],
         "counts": context["counts"],
         "privacy_contract": privacy,

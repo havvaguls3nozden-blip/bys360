@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 # BYS360_AG1_AG2_ASSISTANT_MENU_VISIBILITY_SERVICE_START
 
 def _bys360_assistant_norm(value):
@@ -201,7 +203,7 @@ def _legacy_build_menu_visibility_map_v1(user=None):
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/menu_visibility.py:200")
             user = None
 
-    menu_map = {}
+    menu_map: dict[str, bool] = {}
     if user is None or not getattr(user, "is_authenticated", False):
         return menu_map
 
@@ -230,7 +232,7 @@ _BYS360_ASSISTANT_PANEL_ROLES = {'admin', 'baskan', 'baskan_yardimcisi', 'grup_b
 _BYS360_ASSISTANT_ADMIN_ROLES = {'admin', 'baskan'}
 _BYS360_ASSISTANT_ALL_TAB_KEYS = {'assistant_module', 'ai_agent_panel', 'ai_agent_knowledge', 'ai_agent_teaching_center', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
 
-def _bys360_assistant_apply_key(menu_map, raw_key, raw_value=True):
+def _bys360_assistant_apply_key(menu_map, raw_key, raw_value=True):  # type: ignore[no-redef]
     key_norm = _bys360_assistant_norm(raw_key)
     allowed = _bys360_assistant_truthy(raw_value)
     if key_norm in ('assistant_module', 'ai_agent', 'ai_agent_module', 'virtual_assistant', 'sanal_asistan', 'guvenli_sanal_asistan', 'güvenli_sanal_asistan'):
@@ -272,7 +274,7 @@ def _bys360_assistant_default_map_for_role(role_key):
     return _map
 
 
-def _bys360_assistant_collect_from_db(user, menu_map):
+def _bys360_assistant_collect_from_db(user, menu_map):  # type: ignore[no-redef]
     db = _bys360_assistant_get_db()
     if db is None:
         return
@@ -288,7 +290,7 @@ def _bys360_assistant_collect_from_db(user, menu_map):
     role_values = [_bys360_assistant_norm(v).replace(" ", "_") for v in _bys360_assistant_user_role_values(user) if v]
     role_values = [v for v in role_values if v]
 
-    queries = []
+    queries: list[tuple[str, str | None, str | None]] = []
     if "role_menu_defaults" in table_names and role_values:
         queries.append(("role_menu_defaults", "role_name", None))
     if "user_menu_permissions" in table_names and uid is not None:
@@ -303,7 +305,7 @@ def _bys360_assistant_collect_from_db(user, menu_map):
         if "menu_key" not in cols or "is_visible" not in cols:
             continue
         where = []
-        params = {}
+        params: dict[str, Any] = {}
         if role_col and role_col in cols:
             where.append(f"lower(cast({role_col} as text)) IN :roles")
             params["roles"] = tuple(role_values)
@@ -349,7 +351,7 @@ def build_menu_visibility_map(user=None):
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/menu_visibility.py:344")
             user = None
-    menu_map = {}
+    menu_map: dict[str, bool] = {}
     if user is None or not getattr(user, "is_authenticated", False):
         return menu_map
     role_key = _bys360_assistant_role_key(user)
