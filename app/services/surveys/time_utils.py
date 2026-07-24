@@ -11,6 +11,7 @@ from .contracts import SurveyAccessResult
 
 logger = logging.getLogger(__name__)
 
+_ZoneInfo: type[Any] | None
 try:  # Python 3.9+
     from zoneinfo import ZoneInfo as _ZoneInfo
 except Exception:  # pragma: no cover

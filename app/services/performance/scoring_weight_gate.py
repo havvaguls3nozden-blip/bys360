@@ -267,17 +267,20 @@ def simulate_normalize_weights(w1: float, w2: float, w3: float, *, level_3_enabl
         else:
             w1, w2, w3 = 50.0, 50.0, 0.0
         total = 100.0
-    result = {
-        "evaluator_1_weight": round((w1 / total) * 100.0, 2),
-        "evaluator_2_weight": round((w2 / total) * 100.0, 2),
-        "evaluator_3_weight": round((w3 / total) * 100.0, 2),
+    evaluator_1_weight = round((w1 / total) * 100.0, 2)
+    evaluator_2_weight = round((w2 / total) * 100.0, 2)
+    evaluator_3_weight = round((w3 / total) * 100.0, 2)
+    total_after = evaluator_1_weight + evaluator_2_weight + evaluator_3_weight
+    if total_after != 100.0:
+        evaluator_1_weight = round(evaluator_1_weight + (100.0 - total_after), 2)
+    result: dict[str, float | str | bool] = {
+        "evaluator_1_weight": evaluator_1_weight,
+        "evaluator_2_weight": evaluator_2_weight,
+        "evaluator_3_weight": evaluator_3_weight,
         "level_3_enabled": bool(level_3_enabled),
         "level_3_scoring_enabled": bool(level_3_enabled and level_3_scoring_enabled),
         "level_3_mode": mode,
     }
-    total_after = result["evaluator_1_weight"] + result["evaluator_2_weight"] + result["evaluator_3_weight"]  # type: ignore[operator]
-    if total_after != 100.0:
-        result["evaluator_1_weight"] = round(float(result["evaluator_1_weight"]) + (100.0 - float(total_after)), 2)
     return result
 
 

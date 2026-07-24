@@ -265,12 +265,12 @@ def _check_contract_simulations(report: VisibilityPublicationReport) -> None:
             report.findings.append(VisibilityPublicationFinding("manager_preview_contract", "Amir iç görünüm/kendi sonuç kilidi sözleşmesi bozuldu."))
 
     expected_previous = {1: (3, 2), 2: (3,), 3: (), 0: ()}
-    for level, expected in expected_previous.items():
-        got = simulate_previous_levels(level)
-        if got == expected:
-            report.ok.append(f"previous_level_contract::{level}={expected}")
+    for level, expected_levels in expected_previous.items():
+        got_levels = simulate_previous_levels(level)
+        if got_levels == expected_levels:
+            report.ok.append(f"previous_level_contract::{level}={expected_levels}")
         else:
-            report.findings.append(VisibilityPublicationFinding("previous_level_contract", f"Önceki amir görünürlüğü sözleşmesi bozuldu: level={level}, got={got}, expected={expected}"))
+            report.findings.append(VisibilityPublicationFinding("previous_level_contract", f"Önceki amir görünürlüğü sözleşmesi bozuldu: level={level}, got={got_levels}, expected={expected_levels}"))
 
 
 def build_visibility_publication_gate_report(project_root: str | Path | None = None) -> VisibilityPublicationReport:

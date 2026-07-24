@@ -78,8 +78,8 @@ def build_personnel_service_inventory(project_root: str | Path = ".") -> dict[st
     public_count = sum(1 for item in functions if not item.is_private)
     private_count = sum(1 for item in functions if item.is_private)
     categories: dict[str, int] = {}
-    for item in functions:
-        categories[item.category] = categories.get(item.category, 0) + 1
+    for func in functions:
+        categories[func.category] = categories.get(func.category, 0) + 1
 
     return {
         "phase": "personnel_service_faz0",

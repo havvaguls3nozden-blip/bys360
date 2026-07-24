@@ -122,6 +122,7 @@ def build_scope_switch_context(
     # geriye donuk uyumluluk icin sessizce kabul ediyoruz.
     scope_ctx = build_surface_scope_context(user, raw_scope)
     endpoint = endpoint or request.endpoint
+    assert endpoint is not None, "build_scope_switch_context requires an active request or explicit endpoint"
     options = []
     extra_params = extra_params or {}
     label_map = {row["value"]: row.get("label", row["value"]) for row in build_user_scope_context(user, raw_scope).get("scope_options", [])}
@@ -144,7 +145,7 @@ def build_scope_switch_context(
 _BYS360_PHASE3_6_ORIGINAL_BUILD_SURFACE_SCOPE_CONTEXT = build_surface_scope_context
 
 
-def build_surface_scope_context(user, raw_scope: str | None) -> dict:
+def build_surface_scope_context(user, raw_scope: str | None) -> dict:  # type: ignore[no-redef]
     context = _BYS360_PHASE3_6_ORIGINAL_BUILD_SURFACE_SCOPE_CONTEXT(user, raw_scope)
     try:
         from app.services.performance.peer_published_score_visibility import (

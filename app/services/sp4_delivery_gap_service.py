@@ -8,10 +8,14 @@ Kapsam:
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import inspect, text
 
+if TYPE_CHECKING:
+    from flask_sqlalchemy import SQLAlchemy
+
+db: SQLAlchemy | None
 try:
     from app import db
 except Exception:  # pragma: no cover
@@ -83,7 +87,7 @@ def mark_notification_read(notification_id: int, user_id: int | None = None) -> 
 
     result = db.session.execute(sql, params)
     db.session.commit()
-    return {"ok": True, "updated": result.rowcount}
+    return {"ok": True, "updated": result.rowcount}  # type: ignore[attr-defined]
 
 
 def list_user_notifications(user_id: int, limit: int = 20) -> list[dict[str, Any]]:

@@ -120,7 +120,7 @@ def build_scope_chain_control_panel(state: dict[str, Any] | None, *, limit: int 
     selected_plan = st.get("selected_plan") or None
     selected_integration = st.get("selected_integration") or None
 
-    base = {
+    base: dict[str, Any] = {
         "rule_version": RULE_VERSION,
         "plan_key": plan_key,
         "period_id": period_id,

@@ -812,7 +812,7 @@ def support_new():
             )
 
             upload = request.files.get("attachment")
-            if upload and getattr(upload, "filename", ""):
+            if upload and upload.filename:
                 _store_ticket_attachment(ticket, upload, attachment_type="document")
 
             notify_support_ticket_created(ticket, current_user)
@@ -975,7 +975,7 @@ def support_comment(ticket_id: int):
             )
         )
         upload = request.files.get("attachment")
-        if upload and getattr(upload, "filename", ""):
+        if upload and upload.filename:
             _store_ticket_attachment(ticket, upload, attachment_type="document")
         ticket.updated_at = datetime.now(UTC).replace(tzinfo=None)
         notify_support_ticket_comment(ticket, current_user, is_internal=is_internal)

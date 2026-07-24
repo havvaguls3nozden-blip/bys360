@@ -28,8 +28,8 @@ def attach_workflow_meta(assignments: list[EvaluationAssignment]) -> dict[str, i
     if filters:
         evaluations = (
             PerformanceEvaluation.query.options(
-                joinedload(PerformanceEvaluation.period),
-                joinedload(PerformanceEvaluation.employee),
+                joinedload(PerformanceEvaluation.period),  # type: ignore[arg-type]
+                joinedload(PerformanceEvaluation.employee),  # type: ignore[arg-type]
             )
             .filter(or_(*filters))
             .all()

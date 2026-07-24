@@ -11,9 +11,11 @@ def period_schedule_snapshot(period) -> dict[str, object]:
             'evaluation_due_days': None,
             'is_open_today': False,
         }
+    start_date = getattr(period, 'evaluation_window_start', None)
+    end_date = getattr(period, 'evaluation_window_end', None)
     return {
-        'evaluation_start_date': getattr(period, 'evaluation_window_start', None).isoformat() if getattr(period, 'evaluation_window_start', None) else None,
-        'evaluation_end_date': getattr(period, 'evaluation_window_end', None).isoformat() if getattr(period, 'evaluation_window_end', None) else None,
+        'evaluation_start_date': start_date.isoformat() if start_date else None,
+        'evaluation_end_date': end_date.isoformat() if end_date else None,
         'evaluation_due_days': getattr(period, 'evaluation_due_days_effective', None),
         'is_open_today': bool(period.is_evaluation_open_on(date.today())),
     }

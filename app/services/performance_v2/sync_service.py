@@ -117,8 +117,9 @@ def _log_issue_rows(*, period, employee, resolved_chain, run_key: str | None, ac
             severity = 'warning'
         level = None
         details = getattr(chain_issue, 'details', None) or {}
+        raw_level = details.get('level')
         try:
-            level = int(details.get('level')) if details.get('level') not in (None, '') else None
+            level = int(raw_level) if raw_level is not None and raw_level != '' else None
         except (TypeError, ValueError):
             level = None
         _create_generation_log(
@@ -655,19 +656,10 @@ def ensure_assignments_for_period(period, employee_ids: list[int] | None = None,
     apply_scoring_start_to_period(period)
     phase8_scoring_window_payload = scoring_window_payload(period)
     if is_before_scoring_start(period):
-        try:
-            _create_generation_log(
-                period_id=period.id,
-                employee_id=None,
-                event_type='scoring_window_waiting',
-                reason='Puanlama dönem bitişinden sonra başlayacaktır.',
-                severity='info',
-                run_key=run_key,
-                created_by_user_id=actor_user_id,
-            )
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/performance_v2/sync_service.py)")
+        # AssignmentCoverageLog.employee_id is NOT NULL; this event is period-wide
+        # with no associated employee, so it cannot be recorded as a generation log
+        # row (would stage an unflushable record). Logged directly instead.
+        logger.info("BYS360 puanlama penceresi henüz başlamadı: period_id=%s", period.id)
         return {
             'ok': True,
             'created_count': 0,
