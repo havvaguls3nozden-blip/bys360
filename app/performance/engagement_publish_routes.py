@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any, cast
 
 from flask import current_app, flash, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
@@ -40,7 +41,7 @@ logger = logging.getLogger(__name__)
 @admin_required
 @menu_key_required("performance_publish")
 def performance_publish_dashboard():
-    return redirect(url_for("main.performance_v2_phase5_publish", **request.args.to_dict(flat=True)))
+    return redirect(url_for("main.performance_v2_phase5_publish", **cast(dict[str, Any], request.args.to_dict(flat=True))))
 
 
 def _redirect_publish_dashboard(period_id=None, selected_scope="", q="", status=""):
@@ -211,7 +212,7 @@ def performance_publish_evaluation(evaluation_id):
             flash(f"Yayın tamamlandı ancak snapshot oluşturulurken hata oluştu: {snap_exc}", "warning")
 
         notification_result = send_published_evaluation_notifications(
-            evaluation.period,
+            cast(PerformancePeriod, evaluation.period),
             [evaluation.id],
             actor_user_id=current_user.id,
         )

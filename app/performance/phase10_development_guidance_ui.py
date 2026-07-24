@@ -14,10 +14,13 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from flask import current_app, flash, request
 from sqlalchemy import inspect, text
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,7 @@ except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     current_user = None
 
+db: SQLAlchemy | None
 try:
     from app.extensions import db
 except Exception:  # pragma: no cover
@@ -177,7 +181,7 @@ def _cols(table_name: str) -> set[str]:
     if not _has_table(table_name):
         return set()
     try:
-        return {c["name"] for c in inspect(db.engine).get_columns(table_name)}
+        return {c["name"] for c in inspect(db.engine).get_columns(table_name)}  # type: ignore[union-attr]
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         _rollback_safely()
@@ -620,7 +624,7 @@ def normalize_recommendation(row: dict[str, Any]) -> dict[str, Any]:
         visibility_badge = "gray"
 
     created = row.get("updated_at") or row.get("created_at")
-    created_label = created.strftime("%d.%m.%Y %H:%M") if hasattr(created, "strftime") else _safe(created, "Tarih yok")
+    created_label = created.strftime("%d.%m.%Y %H:%M") if isinstance(created, datetime) else _safe(created, "Tarih yok")
 
     return {
         "id": row.get("id"),
@@ -685,12 +689,13 @@ def _fetch_recommendations(limit: int = 120) -> list[dict[str, Any]]:
     if not ensure_phase10_recommendation_table():
         return []
     try:
-        rows = db.session.execute(text("""
+        sql = text("""
             SELECT *
             FROM performance_development_recommendations
             ORDER BY updated_at DESC, created_at DESC, id DESC
             LIMIT :limit
-        """), {"limit": limit}).all()
+        """)
+        rows = db.session.execute(sql, {"limit": limit}).all()  # type: ignore[union-attr]
         return [dict(r._mapping) for r in rows]
     except Exception as exc:
         _rollback_safely()

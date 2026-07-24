@@ -59,7 +59,7 @@ def performance_v2_1_6_category_period_integration():
     selected_plan = request.args.get("plan") or ""
     integrations = list_integrations()
     selected_integration = next((i for i in integrations if i.get("plan_key") == selected_plan), None) if selected_plan else None
-    period_id = int(selected_integration.get("period_id") or 0) if selected_integration else None
+    period_id_int = int(selected_integration.get("period_id") or 0) if selected_integration else None
     return safe_render(
         "performance/v2_1_6_category_period_integration.html",
         page_title="Kategori Dönem Bağlantısı",
@@ -67,7 +67,7 @@ def performance_v2_1_6_category_period_integration():
         integrations=integrations,
         selected_plan=selected_plan,
         selected_integration=selected_integration,
-        pre_rows=list_preintegration_rows(selected_plan, period_id, limit=150) if selected_plan else [],
+        pre_rows=list_preintegration_rows(selected_plan, period_id_int, limit=150) if selected_plan else [],
         summary=integration_summary(),
         gate=run_v2_1_6_category_period_integration_gate(),
         label_status=label_status,

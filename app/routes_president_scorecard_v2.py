@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
@@ -198,7 +199,7 @@ def _history_from_table(record, employee_id, period_id):
         return []
     cols = _cols("performance_evaluation_history")
     clauses = []
-    params = {}
+    params: dict[str, Any] = {}
     for key in ("evaluation_id", "assignment_id"):
         value = _first(record, [key])
         if key in cols and value:
@@ -338,7 +339,7 @@ def _list_items():
         if rows:
             out = []
             for r in rows:
-                data = _build_data(int(r.get("id")))
+                data = _build_data(int(r.get("id") or 0))
                 out.append(data)
             return out
     return []

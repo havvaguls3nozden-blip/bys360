@@ -266,6 +266,7 @@ except Exception:
 @main_bp.get("/manifest.webmanifest")
 def bys360_pwa_manifest():
     from flask import current_app, make_response, send_from_directory
+    assert current_app.static_folder is not None, "BYS360 app must have a configured static folder"
     response = make_response(send_from_directory(current_app.static_folder, "pwa/manifest.webmanifest", mimetype="application/manifest+json"))
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return response
@@ -274,6 +275,7 @@ def bys360_pwa_manifest():
 @main_bp.get("/bys360-sw.js")
 def bys360_pwa_service_worker():
     from flask import current_app, make_response, send_from_directory
+    assert current_app.static_folder is not None, "BYS360 app must have a configured static folder"
     response = make_response(send_from_directory(current_app.static_folder, "pwa/bys360-sw.js", mimetype="application/javascript"))
     response.headers["Service-Worker-Allowed"] = "/"
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"

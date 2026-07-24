@@ -86,7 +86,7 @@ def build_pulse_analytics_decision_support(analytics: dict[str, Any] | None, day
 
 def build_results_decision_support(campaign: Any, results: list[dict[str, Any]] | None, pulse_context: dict[str, Any] | None) -> dict[str, Any]:
     rows = results or []
-    avgs = [_f(r.get('average')) for r in rows if _f(r.get('average')) is not None]
+    avgs = [avg for r in rows if (avg := _f(r.get('average'))) is not None]
     scale_avg = round(mean(avgs), 2) if avgs else None
     total = max([_i(r.get('submission_count')) for r in rows] or [0])
     low, high = [], []

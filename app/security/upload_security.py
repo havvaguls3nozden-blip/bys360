@@ -6,7 +6,7 @@ import re
 import secrets
 import zipfile
 from pathlib import Path
-from typing import BinaryIO
+from typing import IO
 
 from flask import current_app
 from werkzeug.datastructures import FileStorage
@@ -114,7 +114,7 @@ def safe_store_filename(original_name: str) -> str:
     return f"{token}{suffix}"
 
 
-def detect_mime_from_stream(stream: BinaryIO) -> str:
+def detect_mime_from_stream(stream: IO[bytes]) -> str:
     pos = stream.tell()
     head = stream.read(32)
     stream.seek(pos)
@@ -134,7 +134,7 @@ def _is_extension_allowed(extension: str, allowed_extensions: set[str]) -> bool:
     return extension in allowed_extensions
 
 
-def _archive_names(stream: BinaryIO) -> list[str]:
+def _archive_names(stream: IO[bytes]) -> list[str]:
     pos = stream.tell()
     try:
         with zipfile.ZipFile(stream) as archive:
@@ -143,7 +143,7 @@ def _archive_names(stream: BinaryIO) -> list[str]:
         stream.seek(pos)
 
 
-def _validate_archive_container(stream: BinaryIO, extension: str) -> None:
+def _validate_archive_container(stream: IO[bytes], extension: str) -> None:
     if extension not in {"zip", "docx", "xlsx", "pptx"}:
         return
 

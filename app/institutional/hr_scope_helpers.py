@@ -349,6 +349,8 @@ def _selected_user_guard(user_id: int | None, period: Any | None = None) -> dict
         return {"is_manager": False, "requires_delegation": False, "has_covering_delegation": False, "coverage": {"total": 0, "level_1": 0, "level_2": 0, "level_3": 0}}
     try:
         user = db.session.get(User, int(user_id))
+        if user is None:
+            return {"is_manager": False, "requires_delegation": False, "has_covering_delegation": False, "coverage": {"total": 0, "level_1": 0, "level_2": 0, "level_3": 0}}
         sicil = _safe_text(getattr(user, "sicil_no", None))
         if not sicil:
             return {"is_manager": False, "requires_delegation": False, "has_covering_delegation": False, "coverage": {"total": 0, "level_1": 0, "level_2": 0, "level_3": 0}}

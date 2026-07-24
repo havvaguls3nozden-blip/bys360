@@ -133,3 +133,13 @@ disable_error_code = ["assignment", "operator", "arg-type", "attr-defined"]
 [[tool.mypy.overrides]]
 module = "app.services.leave_delegation_service"
 disable_error_code = ["arg-type"]
+
+# self.status_history is a plain db.relationship (no lazy="dynamic") accessed
+# from within the model's own @property methods, where it is the actual
+# instance-level related-object list at runtime; the stub only models the
+# class-level RelationshipProperty descriptor, so indexing/iterating it here
+# misreports as not indexable/not iterable. Both findings in this file
+# verified to be this exact pattern.
+[[tool.mypy.overrides]]
+module = "app.models.support_models"
+disable_error_code = ["index", "attr-defined"]

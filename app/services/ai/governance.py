@@ -31,7 +31,7 @@ def _safe_int(value: Any, default: int, minimum: int | None = None, maximum: int
     return parsed
 
 
-def _severity_rank(value: str) -> int:
+def _severity_rank(value: str | None) -> int:
     text = str(value or "").strip().lower()
     if text == "critical":
         return 3

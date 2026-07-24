@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import lru_cache
+from typing import Any
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -112,7 +113,8 @@ def _people():
         'u.id AS id', f'{name} AS full_name', _col('u', cols, 'sicil_no') + ' AS sicil_no',
         _col('u', cols, 'unvan') + ' AS unvan', _col('u', cols, 'birim') + ' AS birim', _col('u', cols, 'ust_birim') + ' AS ust_birim'
     ]
-    where, params = [], {}
+    where: list[str] = []
+    params: dict[str, Any] = {}
     if 'is_active' in cols:
         where.append('COALESCE(u.is_active, TRUE)=TRUE')
     if not _is_admin_like():
@@ -168,7 +170,8 @@ def _notes(people, employee_id=None, period_id=None, note_type=None, query=None)
     if cby and ucols:
         author_join = f' LEFT JOIN users au ON au.id = n.{cby}'
         author = _name_expr('au', ucols)
-    where, params = [], {}
+    where: list[str] = []
+    params: dict[str, Any] = {}
     if active:
         where.append(f'COALESCE(n.{active}, TRUE)=TRUE')
     ids = [int(p.get('id')) for p in people if p.get('id') is not None]

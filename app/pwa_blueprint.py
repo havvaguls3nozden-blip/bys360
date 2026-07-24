@@ -13,6 +13,7 @@ pwa_bp = Blueprint("bys360_pwa", __name__)
 @pwa_bp.route("/manifest.webmanifest")
 def bys360_manifest():
     """Serve the web app manifest from a stable root URL."""
+    assert current_app.static_folder is not None, "BYS360 app must have a configured static folder"
     return send_from_directory(
         current_app.static_folder,
         "pwa/manifest.webmanifest",
@@ -28,6 +29,7 @@ def bys360_service_worker():
     A root-level service worker is required for app-wide scope. The worker is
     deliberately conservative and does not cache authenticated HTML pages.
     """
+    assert current_app.static_folder is not None, "BYS360 app must have a configured static folder"
     response = make_response(
         send_from_directory(
             current_app.static_folder,
