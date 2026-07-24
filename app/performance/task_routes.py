@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import Counter
+from typing import Any
 
 from flask import Response, current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -110,7 +111,7 @@ def performance_task_management_generate():
     manager_level = request.form.get("manager_level", type=int)
     force_generate = (request.form.get("force_generate") or "").strip().lower() in {"1", "true", "on", "yes"}
 
-    redirect_args = {"period_id": period_id, "scope": selected_scope or None}
+    redirect_args: dict[str, Any] = {"period_id": period_id, "scope": selected_scope or None}
     if q:
         redirect_args["q"] = q
     if status:
@@ -274,7 +275,7 @@ def performance_task_management_audit_export():
     except Exception as exc:
         current_app.logger.exception("Atama denetim export hatası: %s", exc)
         flash(f"Atama denetim dışa aktarma sırasında hata oluştu: {humanize_export_exception(exc)}", "danger")
-        return redirect(url_for("main.performance_task_management_audit_detail", **request.args.to_dict(flat=True)))
+        return redirect(url_for("main.performance_task_management_audit_detail", **request.args.to_dict(flat=True)))  # type: ignore[arg-type]
 
 
 @main_bp.route("/performance/task-management/recommendations")
@@ -376,7 +377,7 @@ def performance_task_management_health_export():
     except Exception as exc:
         current_app.logger.exception("Görev sağlık export hatası: %s", exc)
         flash(f"Görev sağlık raporu dışa aktarma sırasında hata oluştu: {humanize_export_exception(exc)}", "danger")
-        return redirect(url_for("main.performance_task_management_health", **request.args.to_dict(flat=True)))
+        return redirect(url_for("main.performance_task_management_health", **request.args.to_dict(flat=True)))  # type: ignore[arg-type]
 
 
 @main_bp.route("/performance/task-management/recommendations/export")
@@ -421,7 +422,7 @@ def performance_task_management_recommendations_export():
     except Exception as exc:
         current_app.logger.exception("AI öneri export hatası: %s", exc)
         flash(f"AI öneri dışa aktarma sırasında hata oluştu: {humanize_export_exception(exc)}", "danger")
-        return redirect(url_for("main.performance_task_management_recommendations", **request.args.to_dict(flat=True)))
+        return redirect(url_for("main.performance_task_management_recommendations", **request.args.to_dict(flat=True)))  # type: ignore[arg-type]
 
 
 @main_bp.route("/performance/task-management/clear/<int:period_id>", methods=["POST"])

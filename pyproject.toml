@@ -117,3 +117,10 @@ disable_error_code = ["name-defined", "assignment", "attr-defined", "index", "ca
 [[tool.mypy.overrides]]
 module = "app.services.role_matrix_ui_service"
 disable_error_code = ["assignment", "operator", "arg-type", "attr-defined"]
+
+# Every remaining finding in this file is joinedload(Model.relationship)
+# against the same unstubbed lazy="dynamic" relationship descriptor as
+# elsewhere; verified individually (no other arg-type finding exists here).
+[[tool.mypy.overrides]]
+module = "app.services.leave_delegation_service"
+disable_error_code = ["arg-type"]

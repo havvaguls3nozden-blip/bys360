@@ -202,7 +202,7 @@ def build_leave_mode_breakdown(*, period_id: int | None = None) -> dict[str, Any
     if period is not None:
         query = query.filter(PersonnelLeave.start_date <= period.end_date).filter(PersonnelLeave.end_date >= period.start_date)
     rows = query.all()
-    summary = {
+    summary: dict[str, Any] = {
         "total": 0,
         "exclude": 0,
         "partial": 0,
