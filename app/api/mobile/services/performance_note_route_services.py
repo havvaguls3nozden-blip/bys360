@@ -92,12 +92,12 @@ def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, de
     if not note:
         return jsonify({'message': 'Not metni boş bırakılamaz.'}), 400
     try:
-        period_id = int(payload.get('period_id')) if payload.get('period_id') else None
+        period_id = int(raw_period_id) if (raw_period_id := payload.get('period_id')) else None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         period_id = None
     try:
-        employee_id = int(payload.get('employee_id')) if payload.get('employee_id') else None
+        employee_id = int(raw_employee_id) if (raw_employee_id := payload.get('employee_id')) else None
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         employee_id = None

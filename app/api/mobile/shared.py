@@ -396,7 +396,7 @@ def _mobile_survey_completed(user: User, survey: Survey) -> bool:
 def _mobile_survey_options(question: SurveyQuestion) -> list[dict[str, Any]]:
     options = getattr(question, "options", None)
     try:
-        rows = options.order_by(SurveyQuestionOption.sort_order.asc(), SurveyQuestionOption.id.asc()).all() if hasattr(options, "order_by") else list(options or [])
+        rows = options.order_by(SurveyQuestionOption.sort_order.asc(), SurveyQuestionOption.id.asc()).all() if hasattr(options, "order_by") else list(options or [])  # type: ignore[union-attr]
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/api/mobile/shared.py:399")
         rows = []
@@ -409,7 +409,7 @@ def _mobile_survey_options(question: SurveyQuestion) -> list[dict[str, Any]]:
 def _mobile_survey_questions(survey: Survey) -> list[SurveyQuestion]:
     questions = getattr(survey, "questions", None)
     try:
-        return questions.order_by(SurveyQuestion.sort_order.asc(), SurveyQuestion.id.asc()).all() if hasattr(questions, "order_by") else list(questions or [])
+        return questions.order_by(SurveyQuestion.sort_order.asc(), SurveyQuestion.id.asc()).all() if hasattr(questions, "order_by") else list(questions or [])  # type: ignore[union-attr]
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/api/mobile/shared.py:411")
         return []

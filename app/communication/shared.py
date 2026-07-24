@@ -126,7 +126,7 @@ def _notification_redirect_endpoint() -> str:
 
 def _redirect_notifications_view():
     state = _current_notifications_view_state()
-    query_kwargs = {"view": state.get("view") or "all"}
+    query_kwargs: dict[str, Any] = {"view": state.get("view") or "all"}
     if state.get("q"):
         query_kwargs["q"] = state.get("q")
     return redirect(url_for("main.notifications_list", **query_kwargs))

@@ -42,7 +42,7 @@ def phase3c_mobile_performance_task_score_submit_service(user: Any, assignment_i
     body = request.get_json(silent=True) or {}
     completed = bool(body.get('completed'))
     general_comment = str(body.get('general_comment') or body.get('generalComment') or '').strip()
-    raw_items = body.get('items') if isinstance(body.get('items'), list) else []
+    raw_items = items if isinstance(items := body.get('items'), list) else []
 
     period = getattr(assignment, 'period', None) or _mobile_perf_safe_get(PerformancePeriod, getattr(assignment, 'period_id', None))
     level = int(getattr(assignment, 'manager_level', 0) or 0)
@@ -56,7 +56,7 @@ def phase3c_mobile_performance_task_score_submit_service(user: Any, assignment_i
         if not isinstance(raw, dict):
             continue
         try:
-            criteria_id = int(raw.get('criteria_id') or raw.get('id'))
+            criteria_id = int(raw.get('criteria_id') or raw.get('id'))  # type: ignore[arg-type]
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/api/mobile/performance_routes.py:956)")

@@ -4,6 +4,8 @@ Route decorators stay in ops_routes.py. This module contains the heavy implement
 """
 from __future__ import annotations
 
+from typing import Any
+
 from flask import flash, request
 
 from app.models import OrganizationUnit, User
@@ -35,11 +37,11 @@ def admin_import_health_report_impl():
     )
 
     unit_by_id = {unit.id: unit for unit in units}
-    users_by_unit_id = {}
+    users_by_unit_id: dict[Any, list[Any]] = {}
     for user in users:
         users_by_unit_id.setdefault(user.organization_unit_id, []).append(user)
 
-    duplicate_buckets = {}
+    duplicate_buckets: dict[tuple[str, str, str], list[Any]] = {}
     for unit in units:
         parent = unit_by_id.get(unit.parent_id)
         key = (
@@ -49,7 +51,7 @@ def admin_import_health_report_impl():
         )
         duplicate_buckets.setdefault(key, []).append(unit)
 
-    duplicate_units = []
+    duplicate_units: list[dict[str, Any]] = []
     for (unit_name, unit_type, parent_name), bucket in duplicate_buckets.items():
         if len(bucket) <= 1:
             continue

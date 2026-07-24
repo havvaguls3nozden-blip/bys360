@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from flask import jsonify, request
@@ -75,7 +75,7 @@ def _limit(default: int = 250) -> int:
         return default
 
 
-def _periods(limit: int = 250) -> list[Any]:
+def _periods(limit: int = 250) -> Sequence[Any]:
     return db.session.execute(
         text(
             """
@@ -107,7 +107,7 @@ def _single_period(period_id: int) -> Any:
     return row
 
 
-def _assignments(limit: int = 5000, period_id: int | None = None) -> list[Any]:
+def _assignments(limit: int = 5000, period_id: int | None = None) -> Sequence[Any]:
     where = "WHERE period_id = :period_id" if period_id is not None else ""
     params = {"limit": limit}
     if period_id is not None:

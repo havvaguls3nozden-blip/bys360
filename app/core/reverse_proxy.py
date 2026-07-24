@@ -1,4 +1,8 @@
+from __future__ import annotations
 
+from typing import Any
+
+ProxyFix: type[Any] | None
 try:
     from werkzeug.middleware.proxy_fix import ProxyFix
 except Exception:  # pragma: no cover - ortamda middleware olmayabilir

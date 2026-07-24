@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from flask import jsonify, request
@@ -74,7 +74,7 @@ def _limit(default: int = 250) -> int:
         return default
 
 
-def _archive_rows(limit: int = 250) -> list[Any]:
+def _archive_rows(limit: int = 250) -> Sequence[Any]:
     return db.session.execute(
         text(
             """
@@ -91,7 +91,7 @@ def _archive_rows(limit: int = 250) -> list[Any]:
     ).mappings().all()
 
 
-def _person_archive_rows(user_id: int, limit: int = 100) -> list[Any]:
+def _person_archive_rows(user_id: int, limit: int = 100) -> Sequence[Any]:
     return db.session.execute(
         text(
             """

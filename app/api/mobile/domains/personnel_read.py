@@ -30,8 +30,8 @@ def mobile_personnel_list(user: User):
             _full_name(u),
             f"{getattr(u, 'birim', '') or getattr(u, 'ust_birim', '') or 'Birim yok'} / Sicil {getattr(u, 'sicil_no', '-')}",
             "Aktif" if getattr(u, "is_active", False) else "Pasif",
-            getattr(u, "personnel_category", None) or getattr(u, "unvan", ""),
-            getattr(u, "role_label", None) or getattr(u, "role", ""),
+            getattr(u, "personnel_category", None) or getattr(u, "unvan", "") or "",
+            getattr(u, "role_label", None) or getattr(u, "role", "") or "",
             100 if getattr(u, "is_active", False) else 0,
         ))
     return _module_payload([

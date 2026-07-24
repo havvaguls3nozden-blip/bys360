@@ -5,6 +5,7 @@ from __future__ import annotations
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
 import logging
 from hashlib import sha256
+from typing import Any
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -131,7 +132,7 @@ def _calculate_risk_level(score: int) -> str:
 
 
 def _redirect_phase13(endpoint: str, user_id: int | None = None, scope_mode: str | None = None, **kwargs):
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     scope_value = (scope_mode or request.form.get("scope") or request.args.get("scope") or "").strip()
     if scope_value:
         params["scope"] = scope_value
