@@ -20,21 +20,21 @@ try:
     from werkzeug.utils import secure_filename
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
-    def secure_filename(name):
-        return name or "upload.bin"
+    def secure_filename(filename: str) -> str:
+        return filename or "upload.bin"
 
 try:
     from flask import current_app
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
-    current_app = None
+    current_app = None  # type: ignore[assignment]
 
 try:
     from .upload_security import UploadValidationError, validate_upload as _core_validate_upload
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
-    _core_validate_upload = None
-    UploadValidationError = ValueError
+    _core_validate_upload = None  # type: ignore[assignment]
+    UploadValidationError = ValueError  # type: ignore[misc,assignment]
 
 try:
     from .email_policy import (
@@ -45,10 +45,10 @@ try:
     )
 except Exception as exc:
     logger.exception("BYS360 critical exception captured in app/security/__init__.py", exc_info=exc)
-    corporate_email_error_message = None
-    get_allowed_email_domains = None
-    is_allowed_corporate_email = None
-    normalize_email = None
+    corporate_email_error_message = None  # type: ignore[assignment]
+    get_allowed_email_domains = None  # type: ignore[assignment]
+    is_allowed_corporate_email = None  # type: ignore[assignment]
+    normalize_email = None  # type: ignore[assignment]
 
 
 DEFAULT_MESSAGE_EXTENSIONS = {

@@ -28,11 +28,11 @@ THIRD_MANAGER_HEADER_ALIASES = [
 try:
     from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
 except Exception:  # pragma: no cover
-    def canonical_role_value(value: Any) -> str:
-        return str(value or 'personel').strip().lower().replace(' ', '_') or 'personel'
+    def canonical_role_value(raw_role: Any) -> str:
+        return str(raw_role or 'personel').strip().lower().replace(' ', '_') or 'personel'
 
-    def canonical_role_label(value: Any) -> str:
-        role = canonical_role_value(value)
+    def canonical_role_label(raw_role: Any) -> str:
+        role = canonical_role_value(raw_role)
         labels = {
             'admin': 'Admin',
             'baskan': 'Başkan',

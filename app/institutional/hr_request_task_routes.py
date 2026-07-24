@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import logging
+from typing import Any
 
 from flask import Response, flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -63,7 +64,7 @@ def _manager_pool(scope_users: list[User]) -> list[User]:
     return result
 
 
-def _task_row_payload(row: PersonnelSelfServiceRequestTask) -> dict[str, object]:
+def _task_row_payload(row: PersonnelSelfServiceRequestTask) -> dict[str, Any]:
     req = getattr(row, "request", None)
     sla = _sla_payload(req)
     return {
@@ -92,7 +93,7 @@ def _task_row_payload(row: PersonnelSelfServiceRequestTask) -> dict[str, object]
     }
 
 
-def _task_rows(scope_user_ids: set[int]) -> list[dict[str, object]]:
+def _task_rows(scope_user_ids: set[int]) -> list[dict[str, Any]]:
     if not _table_exists("personnel_self_service_request_tasks"):
         return []
     rows = (
@@ -105,7 +106,7 @@ def _task_rows(scope_user_ids: set[int]) -> list[dict[str, object]]:
     return [_task_row_payload(row) for row in rows]
 
 
-def _request_report_rows(scope_user_ids: set[int]) -> list[dict[str, object]]:
+def _request_report_rows(scope_user_ids: set[int]) -> list[dict[str, Any]]:
     if not _table_exists("personnel_self_service_requests"):
         return []
     from app.models.hr_models import PersonnelSelfServiceRequest
@@ -141,7 +142,7 @@ def _request_report_rows(scope_user_ids: set[int]) -> list[dict[str, object]]:
     return result
 
 
-def _task_dashboard_payload(hr_scope: dict[str, object], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, object]:
+def _task_dashboard_payload(hr_scope: dict[str, Any], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, Any]:
     rows = _task_rows(scope_user_ids)
     manager_pool = _manager_pool(scope_users)
     my_task_count = sum(1 for row in rows if row.get("assigned_to_name") == _full_name(current_user) and row.get("status") not in {"completed", "cancelled"})
@@ -181,7 +182,7 @@ def _task_dashboard_payload(hr_scope: dict[str, object], scope_users: list[User]
     }
 
 
-def _request_reports_payload(hr_scope: dict[str, object], scope_user_ids: set[int]) -> dict[str, object]:
+def _request_reports_payload(hr_scope: dict[str, Any], scope_user_ids: set[int]) -> dict[str, Any]:
     rows = _request_report_rows(scope_user_ids)
     return {
         "hr_scope": hr_scope,

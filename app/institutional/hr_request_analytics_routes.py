@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections import Counter
 from datetime import datetime, timedelta
+from typing import Any
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -80,7 +81,7 @@ def _effective_due_at(row: PersonnelSelfServiceRequest) -> datetime | None:
     return None
 
 
-def _policy_payload(row: PersonnelSelfServiceRequest) -> dict[str, object] | None:
+def _policy_payload(row: PersonnelSelfServiceRequest) -> dict[str, Any] | None:
     policy = _find_policy(getattr(row, "request_type", None), getattr(row, "priority", None))
     if not policy and not getattr(row, "sla_target_days", None) and not getattr(row, "due_at", None):
         return None
@@ -144,12 +145,12 @@ def _avg_close_hours(rows: list[PersonnelSelfServiceRequest]) -> float:
     return round(sum(values) / len(values), 1) if values else 0.0
 
 
-def _analytics_payload(hr_scope: dict[str, object], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, object]:
+def _analytics_payload(hr_scope: dict[str, Any], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, Any]:
     rows = _request_rows(scope_user_ids)
     escalations = _escalation_rows(scope_user_ids)
-    status_counts = Counter()
-    type_counts = Counter()
-    assignee_counts = Counter()
+    status_counts: Counter[str] = Counter()
+    type_counts: Counter[str] = Counter()
+    assignee_counts: Counter[str] = Counter()
     aging = {"0_2": 0, "3_7": 0, "8_plus": 0}
     urgent_rows = []
 
@@ -173,8 +174,9 @@ def _analytics_payload(hr_scope: dict[str, object], scope_users: list[User], sco
                 aging["8_plus"] += 1
         sla = _policy_payload(row) or _sla_payload(row)
         escalation_count = row.escalations.count() if hasattr(row, "escalations") else 0
+        days_remaining = sla.get("days_remaining") if sla else None
         is_urgent = False
-        if sla and (sla.get("days_remaining") is not None) and sla.get("days_remaining") < 0 and status not in STATUS_CLOSED or escalation_count > 0 and status not in STATUS_CLOSED:
+        if days_remaining is not None and days_remaining < 0 and status not in STATUS_CLOSED or escalation_count > 0 and status not in STATUS_CLOSED:
             is_urgent = True
         if is_urgent:
             urgent_rows.append({
@@ -242,7 +244,7 @@ def _analytics_payload(hr_scope: dict[str, object], scope_users: list[User], sco
     }
 
 
-def _policy_payload_page(hr_scope: dict[str, object], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, object]:
+def _policy_payload_page(hr_scope: dict[str, Any], scope_users: list[User], scope_user_ids: set[int]) -> dict[str, Any]:
     rows = []
     for row in _policy_rows():
         rows.append({

@@ -394,7 +394,9 @@ __all__ = [
     "_attendance_overlaps",
 ]
 # Compatibility guard.
-def _bool_from_form(name: str) -> bool:
+def _bool_from_form(name: str, default: bool = False) -> bool:
+    if name not in request.form:
+        return default
     value = str(request.form.get(name, "") or "").strip().lower()
     return value in {"1", "true", "on", "yes", "evet", "e"}
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -34,12 +35,12 @@ except Exception as exc:  # pragma: no cover - opsiyonel UI yükleme güvenliği
     PHASE10_UI_AVAILABLE = False
     PHASE10_UI_IMPORT_ERROR = exc
 
-    def build_phase10_meeting_development_context():
+    def build_phase10_meeting_development_context() -> dict[str, Any]:
         context = build_p4_development_guidance_context()
         context["ui_warning"] = "Gelişim rehberi arayüz bileşeni yüklenemedi; temel rehber görünümü açıldı."
         return context
 
-    def save_phase10_recommendation_from_request():
+    def save_phase10_recommendation_from_request() -> bool:
         raise RuntimeError(f"Gelişim rehberi kayıt bileşeni yüklenemedi: {PHASE10_UI_IMPORT_ERROR}")
 
 

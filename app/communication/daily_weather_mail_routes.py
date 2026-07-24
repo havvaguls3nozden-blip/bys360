@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING, Any
 
 from flask import abort, flash, redirect, render_template, request
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
 
 from app.route_registry import main_bp
+
+if TYPE_CHECKING:
+    from app.models.communication_models import MailLog
+    from app.models.core_models import User
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +33,10 @@ except Exception as exc:  # Service yoksa sayfa yine açılsın, sistem düşmes
     _SERVICE_ERROR = str(exc)
     DAILY_WEATHER_MENU_KEY = "executive_summary_daily_weather_mail"
 
-    def ensure_daily_weather_defaults(actor_user_id=None):
+    def ensure_daily_weather_defaults(actor_user_id: int | None = None) -> None:
         return None
 
-    def current_config():
+    def current_config() -> dict[str, Any]:
         return {
             "enabled": False,
             "run_hour": 9,
@@ -45,22 +50,24 @@ except Exception as exc:  # Service yoksa sayfa yine açılsın, sistem düşmes
             "recipient_user_ids": [],
         }
 
-    def get_recent_logs(limit=25):
+    def get_recent_logs(limit: int = 25) -> list[MailLog]:
         return []
 
-    def get_recipient_users():
+    def get_recipient_users() -> list[User]:
         return []
 
-    def list_active_users_for_selection():
+    def list_active_users_for_selection() -> list[User]:
         return []
 
-    def preview_daily_weather_mail(user):
+    def preview_daily_weather_mail(user: User | None = None) -> dict[str, Any]:
         return {
             "subject": "Günlük personel bilgilendirme maili",
             "body": "Mail servisi henüz local projede tam bağlı değil. Route aktif; servis bağlantısı kontrol edilmeli.",
         }
 
-    def run_daily_weather_mail(actor_user_id=None, force=False, dry_run=False):
+    def run_daily_weather_mail(
+        *, actor_user_id: int | None = None, force: bool = False, dry_run: bool = False
+    ) -> dict[str, Any]:
         return {
             "ok": False,
             "skipped": True,
@@ -70,7 +77,7 @@ except Exception as exc:  # Service yoksa sayfa yine açılsın, sistem düşmes
             "recipient_count": 0,
         }
 
-    def save_config(payload, actor_user_id=None):
+    def save_config(payload: dict[str, Any], *, actor_user_id: int | None = None) -> dict[str, Any]:
         raise RuntimeError("Günlük hava maili servisi local projede yüklenemedi: " + _SERVICE_ERROR)
 
 

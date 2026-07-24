@@ -336,28 +336,35 @@ __all__ = [
 try:
     from app.services.performance import phase1_rule_center as _phase1_rule_center
 
-    def load_performance_rule_settings(overrides=None):
+    def load_performance_rule_settings(overrides: Mapping[str, Any] | None = None) -> dict[str, Any]:
         return _phase1_rule_center.get_phase1_rule_settings(overrides)
 
-    def is_score_comment_required(score, settings=None):
+    def is_score_comment_required(score: Any, settings: Mapping[str, Any] | None = None) -> bool:
         return _phase1_rule_center.is_score_comment_required(score, settings)
 
-    def is_general_comment_required(final_score, settings=None):
+    def is_general_comment_required(final_score: Any, settings: Mapping[str, Any] | None = None) -> bool:
         return _phase1_rule_center.is_general_comment_required(final_score, settings)
 
-    def requires_president_approval(final_score, settings=None):
+    def requires_president_approval(final_score: Any, settings: Mapping[str, Any] | None = None) -> bool:
         return _phase1_rule_center.requires_president_approval(final_score, settings)
 
-    def is_publish_locked(final_score, president_approved=False, settings=None):
+    def is_publish_locked(
+        final_score: Any,
+        president_approved: bool = False,
+        settings: Mapping[str, Any] | None = None,
+    ) -> bool:
         return _phase1_rule_center.is_publish_locked(final_score, president_approved, settings)
 
-    def display_status(status_code, settings=None):
+    def display_status(status_code: Any, settings: Mapping[str, Any] | None = None) -> str:
         return _phase1_rule_center.display_status(status_code, settings)
 
-    def build_status_choice_list(codes=None):
+    def build_status_choice_list(codes: list[str] | tuple[str, ...] | None = None) -> list[dict[str, str]]:
         return _phase1_rule_center.build_status_choice_list(codes)
 
-    def reviewer_action_decision(reviewer_level=None, third_reviewer_mode=None):
+    def reviewer_action_decision(
+        reviewer_level: int | str | None = None,
+        third_reviewer_mode: str | None = None,
+    ) -> ReviewerActionDecision:
         _decision = _phase1_rule_center.reviewer_action_decision(reviewer_level, third_reviewer_mode)
         try:
             return ReviewerActionDecision(
@@ -367,7 +374,7 @@ try:
             )
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            return _decision
+            return ReviewerActionDecision(action_type="score", label="Puanlama Bekliyor", affects_score=True)
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/performance/services/performance_rule_engine.py)")

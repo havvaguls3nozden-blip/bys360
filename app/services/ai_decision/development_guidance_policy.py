@@ -129,8 +129,8 @@ def summarize_development_inputs(
     """Gelişim önerisi üretmek için gerekli veriyi güvenli özetler."""
     numeric_score = _to_float(score)
     band = _score_band(numeric_score)
-    previous_numeric = [_to_float(v) for v in (previous_scores or [])]
-    previous_numeric = [v for v in previous_numeric if v is not None]
+    previous_numeric_raw = [_to_float(v) for v in (previous_scores or [])]
+    previous_numeric: list[float] = [v for v in previous_numeric_raw if v is not None]
     trend_label = "Geçmiş eğilim bulunmuyor"
     if len(previous_numeric) >= 2:
         if previous_numeric[-1] < previous_numeric[0] - 5:
