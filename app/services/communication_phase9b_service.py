@@ -18,6 +18,7 @@ from app.services.security_hardening_service import run_security_and_access_audi
 
 logger = logging.getLogger(__name__)
 
+func: Any | None
 try:
     from sqlalchemy import func
 except Exception:  # pragma: no cover

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from types import ModuleType
 from typing import Any
 
 from app.core.datetime_utils import utc_now
 
+models: ModuleType | None
 try:
     import app.models as models
 except Exception:  # pragma: no cover

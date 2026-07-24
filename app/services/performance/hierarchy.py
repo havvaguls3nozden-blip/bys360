@@ -22,12 +22,14 @@ from dataclasses import (  # noqa: E402 - deferred import (staged facade/route-r
     dataclass,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
 )
 from types import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
+    ModuleType,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     SimpleNamespace,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
 )
 from typing import (  # noqa: E402 - deferred import (staged facade/route-registration architecture)
     Any,  # noqa: E402 - deferred import (staged facade/route-registration architecture)
 )
 
+models: ModuleType | None
 try:
     import app.models as models
 except Exception:  # pragma: no cover

@@ -25,7 +25,7 @@ REQUIRED_MODEL_MODULES = [
     "communication_phase5_models",
 ]
 
-OPTIONAL_MODEL_MODULES = []
+OPTIONAL_MODEL_MODULES: list[str] = []
 
 SERVICE_REQUIRED_BRIDGE = "app.services.communication_required_service"
 SERVICE_OPTIONAL_BRIDGE = "app.services.communication_optional_service"

@@ -5,8 +5,12 @@ import os
 import time
 from collections.abc import Callable
 from threading import RLock
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+if TYPE_CHECKING:
+    from flask import Flask
+
+current_app: Flask | None
 try:
     from flask import current_app, has_app_context
 except Exception:  # pragma: no cover

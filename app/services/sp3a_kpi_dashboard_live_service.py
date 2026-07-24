@@ -7,10 +7,14 @@ BYS360 SP-3A KPI Dashboard Live Service V2
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import inspect, text
 
+if TYPE_CHECKING:
+    from flask_sqlalchemy import SQLAlchemy
+
+db: SQLAlchemy | None
 try:
     from app import db
 except Exception:  # pragma: no cover
@@ -189,7 +193,7 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     """
 
     try:
-        rows = db.session.execute(text(sql)).mappings().all()
+        rows = db.session.execute(text(sql)).mappings().all()  # type: ignore[union-attr]
     except Exception as exc:
         return _empty_context(f"KPI verisi okunurken sorun oluştu: {exc}")
 

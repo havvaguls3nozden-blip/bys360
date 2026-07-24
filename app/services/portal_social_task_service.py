@@ -11,8 +11,12 @@ import platform
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+if TYPE_CHECKING:
+    from flask import Flask
+
+current_app: Flask | None
 try:
     from flask import current_app
 except Exception:  # pragma: no cover

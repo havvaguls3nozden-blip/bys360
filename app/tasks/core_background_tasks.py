@@ -46,8 +46,8 @@ def run_core_health_snapshot() -> dict[str, Any]:
     ctx = _ensure_app_context()
     try:
         try:
-            from app.services.performance.core_health_panel import build_core_health_payload
-            payload = build_core_health_payload()
+            from app.services.performance.core_health_panel import build_core_health_panel_snapshot
+            payload = build_core_health_panel_snapshot()
         except Exception as exc:
             payload = {"ok": False, "error": str(exc), "note": "core_health_panel okunamadı."}
         payload["generated_at"] = datetime.now(UTC).isoformat()

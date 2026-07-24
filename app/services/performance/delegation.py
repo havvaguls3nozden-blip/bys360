@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date
+from types import ModuleType
 from typing import Any
 
 from app.core.datetime_utils import utc_now
@@ -10,6 +11,7 @@ from app.extensions import db
 
 logger = logging.getLogger(__name__)
 
+models: ModuleType | None
 try:
     import app.models as models
 except Exception:

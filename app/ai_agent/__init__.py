@@ -7,6 +7,12 @@ AG-1 aşamasında dış AI servisi çağrısı ve otomatik veri değiştirme yok
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flask import Blueprint
+
+ai_agent_bp: Blueprint | None
 try:
     from .routes import ai_agent_bp
 except Exception:  # Uygulama başlangıcını kırmamak için güvenli fallback.

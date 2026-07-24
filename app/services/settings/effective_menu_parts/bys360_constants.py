@@ -7,7 +7,7 @@ from __future__ import annotations
 
 _BYS360_MANUAL_ROLE_MENU_ADDITIONS = {'admin': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'baskan': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'baskan_yardimcisi': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'grup_baskani': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'mali_musavir': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'koordinator': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'birim_sorumlusu': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'personel': ['performance_archive']}
 
-_BYS360_MANUAL_POLICY = {}
+_BYS360_MANUAL_POLICY: dict[str, set[str]] = {}
 
 _BYS360_REMINDERS_MENU_KEY = 'performance_meeting_p3_reminders'
 
