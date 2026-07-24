@@ -11,8 +11,8 @@ try:
     from flask import Blueprint, render_template
     from flask_login import current_user, login_required
 except ImportError:
-    Blueprint = None
-    render_template = None
+    Blueprint = None  # type: ignore[assignment,misc]
+    render_template = None  # type: ignore[assignment]
     def login_required(f):
         return f
     current_user = None
@@ -20,7 +20,7 @@ except ImportError:
 from .services.ai_summary_service import build_ai_safe_summary
 from .services.dashboard_service import build_dashboard_summary, build_role_scope_label
 
-if Blueprint:
+if Blueprint:  # type: ignore[truthy-function]
     strategic_performance_dashboard_bp = Blueprint(
         "strategic_performance_dashboard",
         __name__,

@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import logging
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import Any, cast
 
 from app.core.datetime_utils import utc_now
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card
 except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
+    from analytics_center.summary_pipeline import (  # type: ignore[no-redef]
+        build_analytics_safe_summary_card,
+    )
 
 """Personel / performans icgoru motoru servis koprusu.
 
@@ -394,12 +396,13 @@ def build_default_personnel_performance_insights() -> dict[str, object]:
 
 def build_personnel_performance_readiness_summary() -> dict[str, object]:
     context = build_default_personnel_performance_insights()
+    counts = cast("dict[str, Any]", context["counts"])
     return {
         "ok": context["external_ai_call"] is False
         and context["human_approval_required"] is True
-        and context["counts"]["personnel_cards"] >= 4
-        and context["counts"]["performance_cards"] >= 4
-        and context["counts"]["risk_signals"] >= 1,
+        and counts["personnel_cards"] >= 4
+        and counts["performance_cards"] >= 4
+        and counts["risk_signals"] >= 1,
         "phase": context["phase"],
         "counts": context["counts"],
         "external_ai_call": context["external_ai_call"],

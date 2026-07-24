@@ -8,7 +8,7 @@ sabit sözleşmeye dönüştürmektir.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, cast
 
 
 @dataclass(frozen=True)
@@ -216,7 +216,7 @@ def get_third_manager_mode(mode: str) -> ThirdManagerModeRule:
 
 
 def validate_weight_profile(profile: tuple[int, int, int]) -> bool:
-    return sum(profile) == int(PERFORMANCE_SCORING_CONTRACT["weight_total_percent"])
+    return sum(profile) == int(cast(int, PERFORMANCE_SCORING_CONTRACT["weight_total_percent"]))
 
 
 def get_contract_summary() -> dict[str, object]:

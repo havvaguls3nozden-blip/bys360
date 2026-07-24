@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any, cast
 
 from flask import (
     current_app,
@@ -87,7 +88,7 @@ kriterden sonraki agir akisi buraya aldim.
 @main_bp.route("/performance/scorecard")
 @login_required
 def performance_scorecard():
-    return redirect(url_for("main.performance_v2_phase5_scorecard", **request.args.to_dict(flat=True)))
+    return redirect(url_for("main.performance_v2_phase5_scorecard", **cast("dict[str, Any]", request.args.to_dict(flat=True))))
 
 @main_bp.route("/performance/scorecard/<int:evaluation_id>")
 @login_required
@@ -319,7 +320,7 @@ def performance_team_compare():
         except Exception as exc:
             current_app.logger.exception("Personel analizi export hatası: %s", exc)
             flash(f"Personel analizi dışa aktarma sırasında hata oluştu: {humanize_export_exception(exc)}", "danger")
-            redirect_args = request.args.to_dict(flat=True)
+            redirect_args: dict[str, Any] = request.args.to_dict(flat=True)
             redirect_args.pop("export", None)
             return redirect(url_for("main.performance_team_compare", **redirect_args))
 
@@ -340,7 +341,7 @@ def performance_team_compare():
 @main_bp.route("/performance/assignments")
 @login_required
 def performance_tasks():
-    return redirect(url_for("main.performance_v2_phase3_dashboard", **request.args.to_dict(flat=True)))
+    return redirect(url_for("main.performance_v2_phase3_dashboard", **cast("dict[str, Any]", request.args.to_dict(flat=True))))
 @main_bp.route("/performance/evaluation-tasks", endpoint="performance_evaluation_tasks")
 @login_required
 @admin_required
@@ -446,6 +447,9 @@ def performance_evaluate(assignment_id):
 
     refresh_assignment_live_coverages(period_id=assignment.period_id)
     assignment = db.session.get(EvaluationAssignment, assignment_id)
+    if not assignment:
+        flash("Değerlendirme görevi bulunamadı.", "danger")
+        return redirect(url_for("main.performance_tasks"))
 
     if not _can_access_assignment_for_actor(assignment, current_user):
         flash("Bu değerlendirme görevine erişim yetkiniz yok.", "danger")

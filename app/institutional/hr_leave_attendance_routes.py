@@ -143,7 +143,7 @@ def _leave_page_context() -> dict[str, Any]:
     leave_ai_panel = {"headline": "İzin ve vekâlet özeti", "bullets": list(getattr(overview, "notes", []) or [])[:4], "tone": "calm"}
     if build_hr_leave_ai_panel is not None:
         try:
-            leave_ai_panel = build_hr_leave_ai_panel({"summary": getattr(overview, "summary", {}), "delegation_health": health}, scope_label=hr_scope.get("scope_label"))
+            leave_ai_panel = build_hr_leave_ai_panel(summary=getattr(overview, "summary", {}) or {}, period=effective_period, scope_label=hr_scope.get("scope_label"))
         except Exception:
             safe_db_rollback()
     return {
@@ -203,7 +203,7 @@ def _attendance_page_context() -> dict[str, Any]:
     attendance_ai_panel = {"headline": "Devamsızlık ve vekâlet özeti", "bullets": list((ctx.get("delegation_health") or {}).get("notes") or [])[:4], "tone": "calm"}
     if build_hr_attendance_ai_panel is not None:
         try:
-            attendance_ai_panel = build_hr_attendance_ai_panel({"delegation_health": ctx.get("delegation_health"), "attendance_count": len(attendance_rows)}, scope_label=hr_scope.get("scope_label"))
+            attendance_ai_panel = build_hr_attendance_ai_panel(summary=ctx.get("delegation_health") or {}, period=ctx.get("effective_period"), scope_label=hr_scope.get("scope_label"))
         except Exception:
             safe_db_rollback()
     ctx.update({

@@ -14,8 +14,8 @@ from typing import Final
 try:
     from cryptography.fernet import Fernet, InvalidToken
 except Exception:  # pragma: no cover
-    Fernet = None  # type: ignore[assignment]
-    InvalidToken = Exception  # type: ignore[assignment]
+    Fernet = None  # type: ignore[assignment,misc]
+    InvalidToken = Exception  # type: ignore[assignment,misc]
 
 _TCKN_RE: Final[re.Pattern[str]] = re.compile(r"^\d{11}$")
 

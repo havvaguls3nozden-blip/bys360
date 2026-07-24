@@ -46,8 +46,8 @@ logger = logging.getLogger(__name__)
 
 def _visible_archive_query():
     query = build_archive_query_for_user(current_user).options(
-        joinedload(PerformanceArchivedResult.employee),
-        joinedload(PerformanceArchivedResult.created_by),
+        joinedload(PerformanceArchivedResult.employee),  # type: ignore[arg-type]
+        joinedload(PerformanceArchivedResult.created_by),  # type: ignore[arg-type]
     )
     return query
 
@@ -153,8 +153,8 @@ def performance_archive_template():
 @login_required
 def performance_archive_detail(result_id: int):
     result = PerformanceArchivedResult.query.options(
-        joinedload(PerformanceArchivedResult.employee),
-        joinedload(PerformanceArchivedResult.created_by),
+        joinedload(PerformanceArchivedResult.employee),  # type: ignore[arg-type]
+        joinedload(PerformanceArchivedResult.created_by),  # type: ignore[arg-type]
     ).get_or_404(result_id)
     if not can_view_archived_result(current_user, result):
         return render_access_denied()

@@ -146,7 +146,7 @@ def periods_overlap(start_a: Any, end_a: Any, start_b: Any, end_b: Any) -> bool:
     a_end = to_date(end_a)
     b_start = to_date(start_b)
     b_end = to_date(end_b)
-    if not all([a_start, a_end, b_start, b_end]):
+    if not a_start or not a_end or not b_start or not b_end:
         return False
     return a_start <= b_end and b_start <= a_end
 
