@@ -102,8 +102,9 @@ def build_publish_log_export_response(logs: Iterable[Any], *, download_name: str
     excel_rows: list[list[Any]] = []
     for log in logs:
         employee = getattr(log, "employee", None)
+        created_at = getattr(log, "created_at", None)
         excel_rows.append([
-            getattr(log, "created_at", None).strftime("%d.%m.%Y %H:%M") if getattr(log, "created_at", None) else "-",
+            created_at.strftime("%d.%m.%Y %H:%M") if created_at else "-",
             getattr(log, "action_type", None) or "-",
             getattr(getattr(log, "period", None), "title", None) or "-",
             _full_name(employee),
@@ -125,7 +126,7 @@ def build_publish_log_export_response(logs: Iterable[Any], *, download_name: str
 def build_mail_history_export_response(rows: Iterable[dict[str, Any]], *, period_id: int):
     excel_rows = [
         [
-            row.get("sent_at").strftime("%d.%m.%Y %H:%M") if row.get("sent_at") else "-",
+            sent_at.strftime("%d.%m.%Y %H:%M") if (sent_at := row.get("sent_at")) else "-",
             row.get("mail_type") or "-",
             row.get("user_name") or "-",
             row.get("recipient_email") or "-",

@@ -1,18 +1,6 @@
 from __future__ import annotations
 
-# BYS360_ASSISTANT_VISIBLE_TUTOR_V6_IMPORT
-
-
-try:
-    from app.services.ai_agent.assistant_visible_tutor_v6 import (
-        WELCOME_TEXT as BYS360_VISIBLE_TUTOR_V6_WELCOME,
-        answer_visible_tutor_v6 as bys360_visible_tutor_v6_answer,
-    )
-except Exception:  # pragma: no cover
-    bys360_visible_tutor_v6_answer = None  # type: ignore[assignment]
-    BYS360_VISIBLE_TUTOR_V6_WELCOME = None
-# BYS360_ASSISTANT_VISIBLE_TUTOR_V6_IMPORT_END
-
+from collections.abc import Callable
 from typing import Any
 
 from .action_queue_bridge import (
@@ -42,6 +30,19 @@ from .security_bridge import (
     build_ai_agent_security_policy_payload,
     build_ai_agent_security_self_check as build_ai_agent_security_self_check_payload,
 )
+
+# BYS360_ASSISTANT_VISIBLE_TUTOR_V6_IMPORT
+bys360_visible_tutor_v6_answer: Callable[..., str] | None
+BYS360_VISIBLE_TUTOR_V6_WELCOME: str | None
+try:
+    from app.services.ai_agent.assistant_visible_tutor_v6 import (
+        WELCOME_TEXT as BYS360_VISIBLE_TUTOR_V6_WELCOME,
+        answer_visible_tutor_v6 as bys360_visible_tutor_v6_answer,
+    )
+except Exception:  # pragma: no cover
+    bys360_visible_tutor_v6_answer = None
+    BYS360_VISIBLE_TUTOR_V6_WELCOME = None
+# BYS360_ASSISTANT_VISIBLE_TUTOR_V6_IMPORT_END
 
 
 def _user_id(user: Any) -> int | None:

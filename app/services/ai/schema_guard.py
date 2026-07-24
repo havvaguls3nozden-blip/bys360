@@ -113,8 +113,8 @@ def get_ai_schema_status() -> dict[str, Any]:
     try:
         inspector = inspect(db.engine)
         existing_tables = set(inspector.get_table_names())
-        missing_tables: list[str] = []
-        missing_columns: list[str] = []
+        missing_tables = []
+        missing_columns = []
         for table_name, expected_columns in AI_EXPECTED_SCHEMA.items():
             if table_name not in existing_tables:
                 missing_tables.append(table_name)

@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import Any, cast
 
 try:
     from .summary_pipeline import build_analytics_safe_summary_card
 except ImportError:  # python -S gate bagimsiz calistirmasi
-    from analytics_center.summary_pipeline import build_analytics_safe_summary_card
+    from analytics_center.summary_pipeline import (  # type: ignore[no-redef]
+        build_analytics_safe_summary_card,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -289,8 +291,8 @@ def build_default_survey_feedback_insights() -> dict[str, object]:
 
 def build_survey_feedback_readiness_summary() -> dict[str, object]:
     context = build_default_survey_feedback_insights()
-    counts = context.get("counts", {})
-    privacy = context.get("privacy_contract", {})
+    counts = cast(dict[str, int], context.get("counts", {}))
+    privacy = cast(dict[str, Any], context.get("privacy_contract", {}))
     return {
         "ok": context.get("external_ai_call") is False and context.get("human_approval_required") is True and privacy.get("raw_answer_dump") is False and counts.get("survey_cards", 0) >= 4 and counts.get("feedback_cards", 0) >= 4,
         "phase": context.get("phase"),

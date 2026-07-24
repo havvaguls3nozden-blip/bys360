@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from sqlalchemy import tuple_
 
@@ -155,7 +156,7 @@ def can_access_assignment_for_actor(assignment, actor) -> bool:
 
 
 def build_employee_cards(assignments, include_coverage: bool = False):
-    grouped = {}
+    grouped: dict[int, dict[str, Any]] = {}
     for assignment in assignments:
         employee = assignment.employee
         if not employee:
@@ -216,9 +217,9 @@ def build_employee_cards(assignments, include_coverage: bool = False):
             getattr(assignment, "assigned_at", None),
             getattr(assignment, "created_at", None),
         ]
-        candidate_dates = [value for value in candidate_dates if value is not None]
-        if candidate_dates:
-            latest = max(candidate_dates)
+        known_dates = [value for value in candidate_dates if value is not None]
+        if known_dates:
+            latest = max(known_dates)
             if card["last_activity_at"] is None or latest > card["last_activity_at"]:
                 card["last_activity_at"] = latest
 

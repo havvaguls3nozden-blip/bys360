@@ -253,10 +253,11 @@ def build_thread_card(thread: Any, my_participant: Any, pinned_ids: set[int] | f
 
 
 def _card_matches_filter(card: dict[str, Any], *, current_filter: str, current_scope: str, search_query: str | None) -> bool:
+    last_message = card.get("last_message")
     haystack = " ".join(
         [
             str(card.get("display_title") or ""),
-            str(card.get("last_message").body if card.get("last_message") else ""),
+            str(last_message.body if last_message else ""),
             " ".join(
                 _user_name(user)
                 for user in (card.get("participants") or [])
@@ -413,7 +414,7 @@ def resolve_selected_inbox_thread(
     selected_participants: list[Any] = []
     selected_thread_card = None
     selected_reaction_map: dict[int, list[dict[str, Any]]] = {}
-    selected_thread_presence = {"typing_text": None, "last_active_text": None, "statuses": []}
+    selected_thread_presence: dict[str, Any] = {"typing_text": None, "last_active_text": None, "statuses": []}
 
     if not selected_thread_id and current_scope == "self":
         self_thread_card = next((item for item in thread_cards if item["thread"].thread_type == "self"), None)

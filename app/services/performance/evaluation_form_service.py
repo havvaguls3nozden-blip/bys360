@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 
@@ -23,7 +25,7 @@ from .evaluation_ui_service import build_level_total_preview
 
 
 def redirect_to_assignment_form(assignment_id: int, *, saved: bool = False):
-    params = {"assignment_id": assignment_id}
+    params: dict[str, Any] = {"assignment_id": assignment_id}
     if saved:
         params["saved"] = 1
     return redirect(url_for("main.performance_evaluate", **params))

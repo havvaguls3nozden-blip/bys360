@@ -130,8 +130,11 @@ def fetch_previous_scores(
                 LIMIT :limit
             """), {"personnel_id": personnel_id, "limit": limit})
             for row in _rows_as_dicts(result):
+                raw_score = row.get("score")
+                if raw_score is None:
+                    continue
                 try:
-                    scores.append(float(row.get("score")))
+                    scores.append(float(raw_score))
                 except Exception:
                     import logging
                     logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")
@@ -149,8 +152,11 @@ def fetch_previous_scores(
                 LIMIT :limit
             """), {"personnel_id": personnel_id, "current_evaluation_id": current_evaluation_id, "limit": limit})
             for row in _rows_as_dicts(result):
+                raw_score = row.get("score")
+                if raw_score is None:
+                    continue
                 try:
-                    scores.append(float(row.get("score")))
+                    scores.append(float(raw_score))
                 except Exception:
                     import logging
                     logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/ai_decision/development_guidance_integration.py")

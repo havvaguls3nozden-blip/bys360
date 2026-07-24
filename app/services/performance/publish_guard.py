@@ -41,7 +41,7 @@ def publish_preflight_has_blockers(report: dict[str, Any] | None) -> bool:
 
 
 def _finding(title: str, detail: str, *, code: str = "publish_guard", evaluation_id: int | None = None, employee_id: int | None = None) -> dict[str, Any]:
-    row = {"title": title, "detail": detail, "code": code}
+    row: dict[str, Any] = {"title": title, "detail": detail, "code": code}
     if evaluation_id is not None:
         row["evaluation_id"] = evaluation_id
     if employee_id is not None:

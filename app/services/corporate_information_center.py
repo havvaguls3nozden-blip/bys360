@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from app.services.cic.access_policy import can_manage  # noqa: F401
 
+send_email: Callable[..., Any] | None
+create_mail_log: Callable[..., Any] | None
 try:
     from app.services.mail_core import create_mail_log, send_email
 except Exception:  # pragma: no cover

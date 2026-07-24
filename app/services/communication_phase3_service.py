@@ -205,7 +205,7 @@ def notification_center_snapshot(user: Any, filter_name: str = "all", limit: int
     rows = query.order_by(Notification.is_read.asc(), Notification.created_at.desc()).limit(limit).all()
     all_rows = Notification.query.filter_by(user_id=user.id).all()
 
-    summary = Counter()
+    summary: Counter[str] = Counter()
     for row in all_rows:
         summary["all"] += 1
         if not getattr(row, "is_read", False):
@@ -587,7 +587,7 @@ def support_queue_snapshot(user: Any, filter_name: str = "all") -> dict[str, Any
         query = query.filter(SupportTicket.assigned_to_user_id == user.id)
 
     rows = query.all()
-    counts = Counter()
+    counts: Counter[str] = Counter()
     for row in rows:
         counts["all"] += 1
         counts[safe_str(getattr(row, "status", "")) or "open"] += 1
