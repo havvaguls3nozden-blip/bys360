@@ -4,20 +4,12 @@ from __future__ import annotations
 
 import re
 from collections.abc import Collection
-from typing import Protocol
+
+from sqlalchemy.engine import Dialect
 
 _SQL_IDENTIFIER_PATTERN = re.compile(
     r"^[A-Za-z_][A-Za-z0-9_]*$"
 )
-
-
-class _IdentifierPreparer(Protocol):
-    def quote(self, value: str) -> str:
-        ...
-
-
-class _SqlDialect(Protocol):
-    identifier_preparer: _IdentifierPreparer
 
 
 def validate_sql_identifier(
@@ -44,7 +36,7 @@ def validate_sql_identifier(
 def quote_sql_identifier(
     value: str,
     *,
-    dialect: _SqlDialect,
+    dialect: Dialect,
     allowed: Collection[str] | None = None,
 ) -> str:
     """Validate and quote an SQL identifier with the active dialect."""

@@ -3,6 +3,8 @@ from __future__ import annotations
 # BYS360 SP-1D KPI/Hedef Oluşturma, Listeleme ve Düzenleme Route Katmanı
 # SP-1C route yapısının üzerine güvenli şekilde genişletilmiştir.
 import logging
+from collections.abc import Callable
+from typing import Any
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -11,12 +13,18 @@ from app.services.role_guards import can_manage_strategic_targets, can_view_stra
 
 logger = logging.getLogger(__name__)
 
+build_sp1c_kpi_dashboard_context: Callable[[Any], dict[str, Any]] | None
 try:
     from app.services.sp1c_kpi_dashboard_service import build_sp1c_kpi_dashboard_context
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
     build_sp1c_kpi_dashboard_context = None
 
+build_target_form_context: Callable[[Any], dict[str, Any]] | None
+create_target_from_form: Callable[[Any, Any], tuple[bool, str]] | None
+get_target_for_edit: Callable[[int, Any], dict[str, Any] | None] | None
+list_targets_for_user: Callable[[Any], list[dict[str, Any]]] | None
+update_target_from_form: Callable[[int, Any, Any], tuple[bool, str]] | None
 try:
     from app.services.sp1d_target_management_service import (
         build_target_form_context,

@@ -71,7 +71,7 @@ def _effective_final_total(evaluation: Any) -> float:
     try:
         resolved_chain = build_resolved_chain(employee=employee, period=period)
         weight_plan = resolve_weight_plan(employee=employee, period=period, resolved_chain=resolved_chain)
-        level_scores = {
+        level_scores: dict[int, float | int | None] = {
             1: float(getattr(evaluation, "level_1_total_100", 0.0) or 0.0),
             2: float(getattr(evaluation, "level_2_total_100", 0.0) or 0.0),
             3: float(getattr(evaluation, "level_3_total_100", 0.0) or 0.0),
@@ -142,8 +142,8 @@ def _load_period_evaluations(period_id: int, employee_ids: list[int] | None = No
     query = (
         PerformanceEvaluation.query
         .options(
-            joinedload(PerformanceEvaluation.employee),
-            joinedload(PerformanceEvaluation.period),
+            joinedload(PerformanceEvaluation.employee),  # type: ignore[arg-type]
+            joinedload(PerformanceEvaluation.period),  # type: ignore[arg-type]
         )
         .filter_by(period_id=period_id)
     )
@@ -609,7 +609,7 @@ def build_manager_summary_context(period):
         return {"period": None, "rows": []}
 
     assignments = EvaluationAssignment.query.filter_by(period_id=period.id).all()
-    summary = defaultdict(lambda: {"total": 0, "completed": 0, "overdue": 0, "user": None})
+    summary: defaultdict[Any, dict[str, Any]] = defaultdict(lambda: {"total": 0, "completed": 0, "overdue": 0, "user": None})
 
     for assignment in assignments:
         slot = summary[getattr(assignment, "evaluator_id", None)]
@@ -620,7 +620,7 @@ def build_manager_summary_context(period):
         if _is_assignment_overdue(assignment):
             slot["overdue"] += 1
 
-    rows = []
+    rows: list[dict[str, Any]] = []
     for payload in summary.values():
         user = payload["user"]
         rows.append({
