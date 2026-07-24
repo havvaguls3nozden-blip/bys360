@@ -237,7 +237,7 @@ def save_role_menu_defaults_handler(
     filter_live_menu_keys_func: Callable[[Iterable[Any]], list[str]],
     snapshot_role_menu_state_func: Callable[[str, Iterable[Any]], dict[str, bool]],
     build_complete_visibility_map_func: Callable[[Iterable[Any], Iterable[Any]], dict[str, bool]],
-    create_settings_change_log_func: Callable[..., None],
+    create_settings_change_log_func: Callable[..., object],
 ) -> int:
     """Rol menu varsayilanlarini kaydeder ve degisim gunlugu olusturur."""
     normalized_role = (role_name or "").strip().lower()
@@ -296,7 +296,7 @@ def save_unit_menu_profile_handler(
     filter_live_menu_keys_func: Callable[[Iterable[Any]], list[str]],
     snapshot_unit_menu_state_func: Callable[[str, Iterable[Any]], dict[str, bool]],
     build_complete_visibility_map_func: Callable[[Iterable[Any], Iterable[Any]], dict[str, bool]],
-    create_settings_change_log_func: Callable[..., None],
+    create_settings_change_log_func: Callable[..., object],
 ) -> int:
     """Birim menu profilini kaydeder ve degisim gunlugu olusturur."""
     normalized_unit = (unit_name or "").strip()
@@ -354,7 +354,7 @@ def clear_user_menu_overrides_handler(
     db_session: Any,
     filter_live_menu_rows_func: Callable[[Iterable[Any]], list[Any]],
     snapshot_user_override_state_func: Callable[[int | None], dict[str, bool]],
-    create_settings_change_log_func: Callable[..., None],
+    create_settings_change_log_func: Callable[..., object],
 ) -> int:
     """Kisi bazli override satirlarini temizler ve loglar."""
     previous_state = snapshot_user_override_state_func(user_id)
@@ -451,7 +451,7 @@ def save_user_menu_overrides_handler(
     filter_live_menu_keys_func: Callable[[Iterable[Any]], list[str]],
     snapshot_user_override_state_func: Callable[[int | None], dict[str, bool]],
     build_base_rule_map_for_user_func: Callable[[Any, list[dict[str, Any]]], dict[str, Any]],
-    create_settings_change_log_func: Callable[..., None],
+    create_settings_change_log_func: Callable[..., object],
 ) -> dict[str, int]:
     flat_menu_items = [
         item for item in _bys360_pf_v14_dedupe_menu_items(flat_menu_items)

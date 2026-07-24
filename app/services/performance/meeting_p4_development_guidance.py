@@ -361,9 +361,12 @@ def _recommendation_rows_for_evaluation(evaluation: Any, limit: int = 20) -> lis
         LIMIT :limit
     """, params)
     for row in rows:
-        row["type_label"] = P4_TYPE_LABELS.get(row.get("recommendation_type"), row.get("recommendation_type") or "Gelişim Önerisi")
-        row["visibility_label"] = P4_VISIBILITY_LABELS.get(row.get("visibility_scope"), "Yetkili görünürlük")
-        row["status_label"] = P4_STATUS_LABELS.get(row.get("status"), "Kontrol Bekliyor")
+        recommendation_type = str(row.get("recommendation_type") or "")
+        visibility_scope = str(row.get("visibility_scope") or "")
+        status = str(row.get("status") or "")
+        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, recommendation_type or "Gelişim Önerisi")
+        row["visibility_label"] = P4_VISIBILITY_LABELS.get(visibility_scope, "Yetkili görünürlük")
+        row["status_label"] = P4_STATUS_LABELS.get(status, "Kontrol Bekliyor")
         row["created_display"] = _safe_text(row.get("created_at"))[:16].replace("T", " ") or "-"
     return rows
 
@@ -551,9 +554,12 @@ def build_p4_development_guidance_context(viewer: Any | None = None) -> dict[str
         ORDER BY id DESC LIMIT 10
     """) if _has_table(P4_RECOMMENDATION_TABLE) else []
     for row in rows:
-        row["type_label"] = P4_TYPE_LABELS.get(row.get("recommendation_type"), row.get("recommendation_type") or "Gelişim Önerisi")
-        row["visibility_label"] = P4_VISIBILITY_LABELS.get(row.get("visibility_scope"), "Yetkili görünürlük")
-        row["status_label"] = P4_STATUS_LABELS.get(row.get("status"), "Kontrol Bekliyor")
+        recommendation_type = str(row.get("recommendation_type") or "")
+        visibility_scope = str(row.get("visibility_scope") or "")
+        status = str(row.get("status") or "")
+        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, recommendation_type or "Gelişim Önerisi")
+        row["visibility_label"] = P4_VISIBILITY_LABELS.get(visibility_scope, "Yetkili görünürlük")
+        row["status_label"] = P4_STATUS_LABELS.get(status, "Kontrol Bekliyor")
     return {
         "title": "Aşama 10 Gelişim Önerisi ve Rehberlik",
         "version": P4_DEVELOPMENT_GUIDANCE_VERSION,

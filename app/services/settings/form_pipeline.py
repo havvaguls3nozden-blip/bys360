@@ -32,7 +32,7 @@ ValueToStorageFn = Callable[[Any, str], str]
 SnapshotSystemFn = Callable[[], dict[str, str]]
 SnapshotModuleFn = Callable[[], dict[str, dict[str, str]]]
 ModuleDefinitionIterator = Callable[[], Iterable[SettingsDefinition]]
-ChangeLogFn = Callable[..., SettingsChangeLog]
+ChangeLogFn = Callable[..., SettingsChangeLog | None]
 
 
 FORM_SAVE_PIPELINE_SCOPES: tuple[str, str] = ("system_settings", "module_settings")

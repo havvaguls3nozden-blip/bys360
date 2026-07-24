@@ -34,7 +34,7 @@ SnapshotFn = Callable[[], dict[str, Any]]
 TableExistsFn = Callable[[str], bool]
 ValueToStorageFn = Callable[[Any, str], str]
 ModuleDefinitionIterator = Callable[[], Iterable[SettingsDefinition]]
-ChangeLogFn = Callable[..., SettingsChangeLog]
+ChangeLogFn = Callable[..., SettingsChangeLog | None]
 DeserializeFn = Callable[[str | None], dict[str, Any] | None]
 
 ROLLBACK_SUPPORTED_SCOPES: tuple[str, ...] = (
@@ -304,5 +304,7 @@ def rollback_settings_change_handler(
         reverted_from_log_id=row.id,
         is_rollback=True,
     )
+    if rollback_row is None:
+        raise RuntimeError("settings_change_logs tablosu yok. Önce flask db upgrade çalıştırın.")
     db.session.commit()
     return {"rolled_back_log_id": row.id, "new_log_id": rollback_row.id, "summary": summary}

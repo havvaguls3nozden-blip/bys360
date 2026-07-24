@@ -13,6 +13,8 @@ bilinçli olarak gösterilmez.
 """
 from __future__ import annotations
 
+from typing import Any
+
 SYSTEM_SETTING_DEFINITIONS = [
     {
         "setting_key": "general.system_name",
@@ -631,7 +633,7 @@ SYSTEM_SETTING_DEFINITIONS = [
 ]
 
 
-MODULE_SETTING_DEFINITIONS = [
+MODULE_SETTING_DEFINITIONS: list[dict[str, Any]] = [
     {
         "module_key": "identity_access",
         "module_label": "Kimlik, Kullanıcı ve Yetki",

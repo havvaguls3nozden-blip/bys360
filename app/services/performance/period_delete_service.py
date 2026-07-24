@@ -155,14 +155,14 @@ def _delete_by_ids(table_name: str, column_name: str, values: Iterable[Any]) -> 
     if not ids:
         return 0
     table = _table(table_name)
-    if not _has_column(table, column_name):
+    if table is None or not _has_column(table, column_name):
         return 0
     return _rowcount(db.session.execute(table.delete().where(table.c[column_name].in_(ids))))
 
 
 def _delete_by_period(table_name: str, period_id: int, column_name: str = "period_id") -> int:
     table = _table(table_name)
-    if not _has_column(table, column_name):
+    if table is None or not _has_column(table, column_name):
         return 0
     return _rowcount(db.session.execute(table.delete().where(table.c[column_name] == period_id)))
 
@@ -181,7 +181,7 @@ def _delete_by_period_or_evaluation(table_name: str, period_id: int, evaluation_
 
 def _clear_period_link(table_name: str, period_id: int, column_name: str = "period_id") -> int:
     table = _table(table_name)
-    if not _has_column(table, column_name):
+    if table is None or not _has_column(table, column_name):
         return 0
     return _rowcount(
         db.session.execute(
@@ -274,7 +274,7 @@ def delete_performance_period_with_related_records(period_id: int, actor: Any = 
     # bağlantı oluşabildiği için önce toplantı referansını boşaltıyoruz.
     if feedback_request_ids:
         feedback_table = _table("feedback_requests")
-        if _has_column(feedback_table, "scheduled_meeting_id"):
+        if feedback_table is not None and _has_column(feedback_table, "scheduled_meeting_id"):
             cleared_meetings = _rowcount(
                 db.session.execute(
                     feedback_table.update()
