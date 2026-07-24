@@ -183,10 +183,10 @@ def build_feedback_alert_dashboard(requests_list: list[Any], meetings: list[Any]
                 "hours_late": hours_late,
             })
 
-        manager_id = getattr(meeting, "manager_id", None)
-        if manager_id:
-            row = manager_stats[int(manager_id)]
-            row["manager_id"] = int(manager_id)
+        meeting_manager_id = getattr(meeting, "manager_id", None)
+        if meeting_manager_id:
+            row = manager_stats[int(meeting_manager_id)]
+            row["manager_id"] = int(meeting_manager_id)
             row["manager_name"] = _full_name(getattr(meeting, "manager", None))
             if _meeting_within_window(meeting, now, MEETING_REMINDER_WINDOW_HOURS):
                 row["upcoming_meetings"] += 1

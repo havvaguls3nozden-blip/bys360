@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def build_reaction_map(messages: list[Any] | tuple[Any, ...] | None) -> dict[int, list[dict[str, Any]]]:
     """Mesajlara ait emoji tepkilerini route davranisiyla ayni sekilde gruplar."""
 
-    message_ids = [getattr(message, "id", None) for message in (messages or []) if getattr(message, "id", None)]
+    message_ids = [mid for message in (messages or []) if (mid := getattr(message, "id", None))]
     if not message_ids:
         return {}
     rows = (

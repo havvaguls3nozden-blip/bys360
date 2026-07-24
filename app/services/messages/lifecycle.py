@@ -207,7 +207,7 @@ def resolve_message_attachment_download_for_user(filename: str, *, user_id: int)
 
     return MessageAttachmentDownloadResult(
         ok=True,
-        upload_dir=upload_dir,
+        upload_dir=str(upload_dir),
         safe_name=safe_name,
         download_name=getattr(attachment, "original_filename", None),
     )

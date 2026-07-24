@@ -45,7 +45,7 @@ def create_message_comment(message_id: int, body: str, *, now) -> tuple[dict[str
     if not message or getattr(message, "is_deleted", False):
         return {"ok": False, "error": "not_found", "message": "Mesaj bulunamadı."}, 404
 
-    participant = participant_for_thread(getattr(message, "thread_id", None))
+    participant = participant_for_thread(int(getattr(message, "thread_id", 0) or 0))
     if not participant:
         return {"ok": False, "error": "forbidden", "message": "Bu mesaja yorum yapma yetkiniz bulunmamaktadır."}, 403
 

@@ -79,7 +79,7 @@ def register_teardown_guards(app: Flask) -> None:
     """Hata alan isteklerden sonra DB oturumunu temizler."""
 
     @app.teardown_request
-    def cleanup_failed_session(_error: Exception | None):
+    def cleanup_failed_session(_error: BaseException | None) -> None:
         if _error is None:
             return None
         try:

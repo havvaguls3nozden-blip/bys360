@@ -54,7 +54,7 @@ def _tone(row: Any) -> str:
     return "normal"
 
 
-def _item(row: Any) -> dict[str, str]:
+def _item(row: Any) -> dict[str, Any]:
     return {
         "title": sanitize_free_text(getattr(row, "title", ""), limit=120) or "Bildirim",
         "body": sanitize_free_text(getattr(row, "body", ""), limit=170) or "Yeni bildiriminiz var.",

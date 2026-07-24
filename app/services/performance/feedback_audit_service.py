@@ -177,7 +177,7 @@ def _load_logs(*, request_ids: list[int], meeting_ids: list[int]) -> list[AuditL
     if not clauses:
         return []
     return (
-        AuditLog.query.options(joinedload(AuditLog.user))
+        AuditLog.query.options(joinedload(AuditLog.user))  # type: ignore[arg-type]
         .filter(or_(*clauses))
         .order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
         .all()

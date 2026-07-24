@@ -70,7 +70,7 @@ def _build_org_path(unit: OrganizationUnit | None) -> str:
     while current and current.id not in seen:
         seen.add(current.id)
         parts.append((current.name or "").strip())
-        current = current.parent
+        current = current.parent  # type: ignore[assignment]
     parts = [part for part in reversed(parts) if part]
     return " > ".join(parts) if parts else "-"
 

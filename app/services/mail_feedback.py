@@ -68,7 +68,7 @@ def send_feedback_request_mail(feedback: FeedbackRequest) -> dict[str, Any]:
     for manager in [feedback.level_1_manager, feedback.level_2_manager, feedback.level_3_manager]:
         email = _normalize_email_address(getattr(manager, "email", "") or "") if manager else ""
         if manager and email and email not in seen_emails:
-            recipients.append(manager)
+            recipients.append(manager)  # type: ignore[arg-type]
             seen_emails.add(email)
 
     success_count = 0

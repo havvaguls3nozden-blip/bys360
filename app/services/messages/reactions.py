@@ -28,7 +28,7 @@ def toggle_message_reaction(message_id: int, reaction_value: str) -> tuple[dict[
     if not message or getattr(message, "is_deleted", False):
         return {"ok": False, "error": "not_found"}, 404
 
-    participant = participant_for_thread(getattr(message, "thread_id", None))
+    participant = participant_for_thread(int(getattr(message, "thread_id", 0) or 0))
     if not participant:
         return {"ok": False, "error": "forbidden"}, 403
 

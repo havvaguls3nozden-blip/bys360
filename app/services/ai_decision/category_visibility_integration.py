@@ -58,7 +58,7 @@ def build_visible_category_group_summary(*, acting_user: Any, period_id: int | N
                 combined = combined | clause
             query = query.filter(combined)
         else:
-            query = query.filter(False)
+            query = query.filter(False)  # type: ignore[arg-type]
 
     rows = query.limit(5000).all()
     grouped: dict[str, dict[str, Any]] = {}

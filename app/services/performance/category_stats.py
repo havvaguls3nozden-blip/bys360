@@ -177,7 +177,7 @@ def _query_evaluations(
         return []
 
     try:
-        query = PerformanceEvaluation.query.options(joinedload(PerformanceEvaluation.employee))
+        query = PerformanceEvaluation.query.options(joinedload(PerformanceEvaluation.employee))  # type: ignore[arg-type]
         if hasattr(PerformanceEvaluation, "status"):
             query = query.filter(PerformanceEvaluation.status == FINAL_STATUS)
         if period_id:

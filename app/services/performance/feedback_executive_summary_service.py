@@ -85,10 +85,10 @@ def _normalize_recipient_users(recipients: Iterable[Any] | None) -> list[User]:
             user = User.query.filter_by(id=user_id, is_active=True).first()
         if not user:
             continue
-        user_id = getattr(user, "id", None)
-        if not user_id or int(user_id) in seen_ids:
+        resolved_user_id = getattr(user, "id", None)
+        if not resolved_user_id or int(resolved_user_id) in seen_ids:
             continue
-        seen_ids.add(int(user_id))
+        seen_ids.add(int(resolved_user_id))
         resolved.append(user)
     return resolved
 

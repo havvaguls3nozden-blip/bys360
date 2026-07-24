@@ -71,7 +71,7 @@ def build_personnel_profile_chain_ai_panel(profile: Any | None) -> dict[str, Any
     if not recommendations:
         recommendations.append('Zincir görünümü dengeli; bir sonraki adım profil ile organizasyon birimi atamasının aynı terminolojiyi koruduğunu doğrulamaktır.')
 
-    risk_rows = []
+    risk_rows: list[dict[str, Any]] = []
     if not _get(profile, 'manager_1'):
         risk_rows.append({'label': '1. amir', 'value': 'Eksik', 'tone': 'critical'})
     if not _get(profile, 'manager_2'):
