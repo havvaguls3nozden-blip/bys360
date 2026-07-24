@@ -19,9 +19,9 @@ try:
     from flask import flash, redirect, request
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=21")
-    request = None
-    redirect = None
-    flash = None
+    request = None  # type: ignore[assignment]
+    redirect = None  # type: ignore[assignment]
+    flash = None  # type: ignore[assignment]
 
 try:
     from flask_login import current_user
@@ -33,7 +33,7 @@ try:
     from sqlalchemy import bindparam, inspect, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=33")
-    text = None
+    text = None  # type: ignore[assignment]
 
 
 ASSISTANT_ROLE_COLUMNS = [
@@ -239,7 +239,7 @@ def assistant_role_matrix_v10_save_endpoint():
 
     session = _db_session()
     if session is None:
-        if flash:
+        if flash:  # type: ignore[truthy-function]
             flash("Sanal Asistan Rol Matrisi kaydedilemedi: DB oturumu bulunamadı.", "danger")
         return redirect(request.referrer or "/settings")
 
@@ -253,7 +253,7 @@ def assistant_role_matrix_v10_save_endpoint():
 
     try:
         session.commit()
-        if flash:
+        if flash:  # type: ignore[truthy-function]
             flash(f"Sanal Asistan Rol Matrisi kaydedildi. Güncellenen alan: {changed}", "success")
     except Exception as exc:
         try:
@@ -261,7 +261,7 @@ def assistant_role_matrix_v10_save_endpoint():
         except Exception:
             import logging
             logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
-        if flash:
+        if flash:  # type: ignore[truthy-function]
             flash(f"Sanal Asistan Rol Matrisi kaydedilemedi: {exc}", "danger")
 
     return redirect(request.referrer or "/settings")

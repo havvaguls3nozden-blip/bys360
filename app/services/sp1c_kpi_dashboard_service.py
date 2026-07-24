@@ -4,10 +4,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from sqlalchemy import text
+
 try:
     from app import db
 except Exception:  # pragma: no cover
-    db = None
+    db = None  # type: ignore[assignment]
 
 
 @dataclass
@@ -24,19 +26,21 @@ def _safe_query_targets() -> list[dict[str, Any]]:
         return []
     try:
         rows = db.session.execute(
-            """
-            SELECT
-                target_code,
-                target_name,
-                target_type,
-                category,
-                COALESCE(completion_rate, 0) AS completion_rate,
-                COALESCE(status, 'ongoing') AS status,
-                COALESCE(risk_level, 'low') AS risk_level
-            FROM performance_targets
-            ORDER BY id DESC
-            LIMIT 20
-            """
+            text(
+                """
+                SELECT
+                    target_code,
+                    target_name,
+                    target_type,
+                    category,
+                    COALESCE(completion_rate, 0) AS completion_rate,
+                    COALESCE(status, 'ongoing') AS status,
+                    COALESCE(risk_level, 'low') AS risk_level
+                FROM performance_targets
+                ORDER BY id DESC
+                LIMIT 20
+                """
+            )
         ).mappings().all()
         return [dict(row) for row in rows]
     except Exception:

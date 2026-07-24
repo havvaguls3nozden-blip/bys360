@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import date
-from typing import Any
+from typing import Any, cast
 
 from app import db
 from app.core.datetime_utils import utc_now
@@ -47,7 +47,7 @@ def build_org_path(unit: OrganizationUnit | None) -> str:
     if not unit:
         return ""
     parts: list[str] = []
-    current = unit
+    current: OrganizationUnit | None = unit
     guard = 0
     while current is not None and guard < 50:
         name = (getattr(current, "name", "") or "").strip()
@@ -167,11 +167,11 @@ def create_snapshot_for_evaluation(evaluation_id: int, actor_user_id: int | None
     if not evaluation:
         raise ValueError("Değerlendirme bulunamadı.")
 
-    employee = evaluation.employee
+    employee = cast(User, evaluation.employee)
     if not employee:
         raise ValueError("Değerlendirilen personel bulunamadı.")
 
-    period = evaluation.period
+    period = cast(PerformancePeriod, evaluation.period)
     if not period:
         raise ValueError("Dönem bulunamadı.")
 
@@ -200,9 +200,9 @@ def create_snapshot_for_evaluation(evaluation_id: int, actor_user_id: int | None
         elif assignment.organization_unit and getattr(assignment.organization_unit, "unit_code", None):
             unit_code_snapshot = assignment.organization_unit.unit_code
 
-        manager_1 = assignment.manager_1_user or manager_1
-        manager_2 = assignment.manager_2_user or manager_2
-        manager_3 = assignment.manager_3_user or manager_3
+        manager_1 = cast("User | None", assignment.manager_1_user) or manager_1
+        manager_2 = cast("User | None", assignment.manager_2_user) or manager_2
+        manager_3 = cast("User | None", assignment.manager_3_user) or manager_3
     elif current_unit:
         unit_id_snapshot = current_unit.id
         unit_code_snapshot = getattr(current_unit, "unit_code", None)

@@ -72,13 +72,13 @@ def communication_phase1_bulletin_new():
     if request.method == "POST":
         try:
             bulletin = create_bulletin(
-                title=request.form.get("title"),
-                summary=request.form.get("summary"),
-                content=request.form.get("content"),
-                bulletin_type=request.form.get("bulletin_type"),
-                priority=request.form.get("priority"),
-                target_type=request.form.get("target_type"),
-                target_values_text=request.form.get("target_values"),
+                title=request.form.get("title") or "",
+                summary=request.form.get("summary") or "",
+                content=request.form.get("content") or "",
+                bulletin_type=request.form.get("bulletin_type") or "",
+                priority=request.form.get("priority") or "",
+                target_type=request.form.get("target_type") or "",
+                target_values_text=request.form.get("target_values") or "",
                 creator_user_id=current_user.id,
                 is_pinned=bool(request.form.get("is_pinned")),
                 require_ack=bool(request.form.get("require_ack")),

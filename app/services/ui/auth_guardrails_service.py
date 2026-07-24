@@ -25,7 +25,7 @@ def build_auth_guardrails_snapshot(project_root: str) -> dict[str, object]:
     ]
     text = '\n'.join(_scan_file(p) for p in candidate_files if p.exists())
     lowered = text.lower()
-    snapshot = {
+    snapshot: dict[str, object] = {
         'captcha_reference': 'captcha' in lowered,
         'failed_login_threshold_reference': '3 failed' in lowered or '3 hatalı' in lowered or 'three failed' in lowered,
         'secret_question_reference': 'secret question' in lowered or 'gizli soru' in lowered,

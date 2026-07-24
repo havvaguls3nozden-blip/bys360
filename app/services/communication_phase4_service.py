@@ -255,7 +255,7 @@ def executive_summary_snapshot(days: int = 30) -> dict[str, Any]:
             low_completion_rows.append(row)
 
     policy_map = _sla_policy_map()
-    support_status_counter = Counter()
+    support_status_counter: Counter[str] = Counter()
     overdue_first = 0
     overdue_resolution = 0
     support_rows = []
@@ -351,8 +351,8 @@ def survey_analytics_snapshot(days: int = 180) -> dict[str, Any]:
     clean_days = sanitize_days(days, default=180, minimum=30, maximum=365)
     rows = _load_surveys(clean_days)
     surveys = []
-    status_counter = Counter()
-    type_counter = Counter()
+    status_counter: Counter[str] = Counter()
+    type_counter: Counter[str] = Counter()
     band_counter = Counter({"0-24": 0, "25-49": 0, "50-74": 0, "75-100": 0})
     anonymous_count = 0
     submit_durations = []
@@ -421,9 +421,9 @@ def support_analytics_snapshot(days: int = 180) -> dict[str, Any]:
     clean_days = sanitize_days(days, default=180, minimum=30, maximum=365)
     rows = _load_tickets(clean_days)
     policy_map = _sla_policy_map()
-    status_counter = Counter()
-    priority_counter = Counter()
-    assignee_counter = Counter()
+    status_counter: Counter[str] = Counter()
+    priority_counter: Counter[str] = Counter()
+    assignee_counter: Counter[str] = Counter()
     age_buckets = {"0-2 gün": 0, "3-7 gün": 0, "8-14 gün": 0, "15+ gün": 0}
     detailed_rows = []
     total_age = 0
@@ -701,7 +701,7 @@ def export_center_snapshot(days: int = 90) -> dict[str, Any]:
     clean_days = sanitize_days(days, default=90, minimum=30, maximum=365)
     logs = CommunicationReportExportLog.query.order_by(CommunicationReportExportLog.created_at.desc()).limit(50).all()
     rows = []
-    type_counter = Counter()
+    type_counter: Counter[str] = Counter()
     total_rows = 0
     for row in logs:
         export_type = safe_str(getattr(row, "export_type", ""))

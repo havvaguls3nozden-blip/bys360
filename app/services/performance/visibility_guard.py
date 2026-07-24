@@ -42,7 +42,7 @@ try:
     )
 except Exception:  # pragma: no cover - startup güvenliği
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    def get_low_score_employee_publish_lock_reason(evaluation, *, ensure=False):
+    def get_low_score_employee_publish_lock_reason(evaluation=None, *, ensure=False):
         return ""
 
 
@@ -345,7 +345,7 @@ def can_employee_view_evaluation(evaluation: Any | None, employee: Any) -> bool:
         return False
     if _employee_id(evaluation) != _viewer_id(employee):
         return False
-    visibility = get_evaluation_visibility_state(evaluation, employee, allowed_employee_ids={_viewer_id(employee)})
+    visibility = get_evaluation_visibility_state(evaluation, employee, allowed_employee_ids={_viewer_id(employee) or 0})
     return bool(visibility.get("employee_visible", False))
 
 
