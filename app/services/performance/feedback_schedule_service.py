@@ -41,7 +41,7 @@ def schedule_feedback_meeting(*, feedback_request: Any, actor_user: Any, form_da
     if meeting_start >= meeting_end:
         return {"ok": False, "category": "warning", "message": "Başlangıç saati bitiş saatinden küçük olmalıdır."}
 
-    related_manager_ids = _feedback_manager_ids(feedback_request) or {getattr(actor_user, "id", None)}
+    related_manager_ids = _feedback_manager_ids(feedback_request) or {int(getattr(actor_user, "id", 0) or 0)}
     conflict_meeting, conflict_message = _find_feedback_meeting_conflict(
         manager_ids=related_manager_ids,
         employee_id=getattr(feedback_request, "employee_id", None),

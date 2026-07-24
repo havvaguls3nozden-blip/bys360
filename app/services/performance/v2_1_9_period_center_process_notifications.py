@@ -333,7 +333,7 @@ def build_notification_preview(period: dict[str, Any], process: dict[str, Any]) 
     overdue = _safe_int(process.get("overdue"))
     due_soon = _safe_int(process.get("due_soon"))
     total = _safe_int(process.get("total"))
-    preview = [
+    preview: list[dict[str, Any]] = [
         {
             "key": "start_call",
             "title": "Değerlendirme Başlangıç Bildirimi",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from flask import render_template, request
 from flask_login import current_user, login_required
@@ -94,7 +95,7 @@ def _bys360_process_reports_advanced_context(viewer=None, status_filter=None):
         }
 
     where = "WHERE 1=1"
-    params = {}
+    params: dict[str, Any] = {}
 
     if status_filter == "pending":
         where += " AND COALESCE(f.is_finalized, FALSE) = FALSE"

@@ -201,6 +201,7 @@ def _cic_v11_send_email_direct(to_email, subject, body):
     msg.attach(MIMEText((body or "").strip() or "BYS360 bildirimi", "plain", "utf-8"))
 
     try:
+        smtp: smtplib.SMTP
         if settings.get("use_ssl"):
             smtp = smtplib.SMTP_SSL(settings["server"], settings["port"], timeout=30)
         else:

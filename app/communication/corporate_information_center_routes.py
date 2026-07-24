@@ -165,7 +165,7 @@ def corporate_information_center_system():
 @login_required
 def corporate_information_center_system_save():
     _guard()
-    save_system(request.form, actor_user_id=getattr(current_user, "id", None))
+    save_system(dict(request.form), actor_user_id=getattr(current_user, "id", None))
     flash("Sistem ayarları kaydedildi.", "success")
     return redirect(url_for("main.corporate_information_center_system"))
 # BYS360_CIC_V3_0_MAIL_ENGINE_SYSTEM_SENDER_V1_1_ROUTE

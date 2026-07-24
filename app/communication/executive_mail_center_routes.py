@@ -79,7 +79,7 @@ def executive_mail_center_tasks():
 def executive_mail_center_recipients():
     _require_exec_mail_center()
     if request.method == "POST":
-        ids = request.form.getlist("recipient_user_ids")
+        ids = [int(raw_id) for raw_id in request.form.getlist("recipient_user_ids") if raw_id.strip().isdigit()]
         save_recipients(ids)
         flash("Mail alıcı listesi güncellendi.", "success")
         return redirect("/executive-summary/mail-center/recipients")

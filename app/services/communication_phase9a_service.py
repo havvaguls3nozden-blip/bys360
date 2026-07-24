@@ -38,7 +38,7 @@ def _env_row(key: str, required: bool = True, expected: str = '', mask: bool = T
 
 
 def _path_row(label: str, path_value: str | None) -> dict[str, Any]:
-    exists = bool(path_value) and os.path.exists(path_value)
+    exists = path_value is not None and os.path.exists(path_value)
     return {
         'label': label,
         'path': path_value or '-',

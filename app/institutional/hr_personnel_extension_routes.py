@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date
+from typing import Any
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -367,7 +368,7 @@ def hr_personnel_checklist_center():
             "checked_by_name": _full_name(getattr(review, "checked_by", None)) if review else "-",
         })
 
-    team_rows = []
+    team_rows: list[dict[str, Any]] = []
     if scope_user_ids and template_rows:
         template_count = len(template_rows)
         for user in scope_users:
