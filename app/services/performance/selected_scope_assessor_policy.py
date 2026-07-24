@@ -71,7 +71,7 @@ def _safe_int(value: object) -> int | None:
     try:
         if value is None or str(value).strip() == "":
             return None
-        return int(value)
+        return int(value)  # type: ignore[call-overload]  # defensive parse; TypeError/ValueError caught below
     except (TypeError, ValueError):
         return None
 

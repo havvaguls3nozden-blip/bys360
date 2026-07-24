@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from app.models import EvaluationAssignment, PerformanceEvaluation, User
 
 # BYS360_PHASE8_4_PREVIEW_IMPORT_START
@@ -51,7 +53,7 @@ def build_assignment_preview(employee, period) -> dict[str, object]:
                 evaluator_role=chain_level.evaluator_role,
                 due_date_iso=due_date.isoformat() if due_date else None,
                 score_enabled=chain_level.score_enabled,
-                visible_previous_levels=[item['level'] for item in build_previous_level_comment_snapshot(evaluation=evaluation, current_level=level, policy=policy, level_mode=level_mode)],
+                visible_previous_levels=[cast(int, item['level']) for item in build_previous_level_comment_snapshot(evaluation=evaluation, current_level=level, policy=policy, level_mode=level_mode)],
                 existing_status=getattr(existing, 'status', None),
                 existing_assignment_id=getattr(existing, 'id', None),
             )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from app.extensions import db
 from app.models import (
@@ -8,6 +8,7 @@ from app.models import (
     PerformanceEvaluation,
     PerformanceEvaluationItem,
     PerformancePeriod,
+    User,
 )
 from app.services.performance_v2.policy_flags import score_requires_criterion_comment
 
@@ -28,7 +29,7 @@ def calculate_preview_total_100(item_payloads: list[dict[str, Any]] | None, crit
     total = 0.0
     for payload in item_payloads or []:
         try:
-            criteria_id = int(payload.get("criteria_id"))
+            criteria_id = int(payload.get("criteria_id"))  # type: ignore[arg-type]  # None/bad values raise below by design
         except (TypeError, ValueError):
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/performance/scoring.py:19)")
             continue
@@ -157,7 +158,7 @@ def calculate_final_total(
 
 def _required_completion_levels(evaluation: PerformanceEvaluation) -> list[int]:
     levels: list[int] = []
-    employee = evaluation.employee
+    employee = cast("User | None", evaluation.employee)
     period = evaluation.period
     flags = get_period_level_3_flags(period)
 
@@ -301,7 +302,7 @@ def save_evaluation_level(
     seen_criteria_ids = set()
     for payload in item_payloads or []:
         try:
-            criteria_id = int(payload.get("criteria_id"))
+            criteria_id = int(payload.get("criteria_id"))  # type: ignore[arg-type]  # None/bad values raise below by design
         except (TypeError, ValueError):
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/performance/scoring.py:292)")
             continue
@@ -318,7 +319,7 @@ def save_evaluation_level(
     for payload in clean_payloads:
         create_or_update_item(
             evaluation_id=evaluation.id,
-            criteria_id=int(payload.get("criteria_id")),
+            criteria_id=int(payload.get("criteria_id")),  # type: ignore[arg-type]  # already validated in clean_payloads above
             manager_level=manager_level,
             score=validate_score_value(payload.get("score")),
             comment=_safe_str(payload.get("comment")),

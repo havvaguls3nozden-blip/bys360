@@ -260,9 +260,12 @@ def apply_effective_chain_to_evaluation(
     coverage_resolutions: dict[int, DelegationResolution] | None = None,
 ) -> PerformanceEvaluation:
     coverage_resolutions = coverage_resolutions or {}
-    evaluation.level_1_evaluator_id = (coverage_resolutions.get(1).acting_manager_id if coverage_resolutions.get(1) else chain.manager_1_id)
-    evaluation.level_2_evaluator_id = (coverage_resolutions.get(2).acting_manager_id if coverage_resolutions.get(2) else chain.manager_2_id)
-    evaluation.level_3_evaluator_id = (coverage_resolutions.get(3).acting_manager_id if coverage_resolutions.get(3) else chain.manager_3_id) if chain.level_3_enabled else None
+    resolution_1 = coverage_resolutions.get(1)
+    resolution_2 = coverage_resolutions.get(2)
+    resolution_3 = coverage_resolutions.get(3)
+    evaluation.level_1_evaluator_id = (resolution_1.acting_manager_id if resolution_1 else chain.manager_1_id)
+    evaluation.level_2_evaluator_id = (resolution_2.acting_manager_id if resolution_2 else chain.manager_2_id)
+    evaluation.level_3_evaluator_id = (resolution_3.acting_manager_id if resolution_3 else chain.manager_3_id) if chain.level_3_enabled else None
     db.session.add(evaluation)
     return evaluation
 
@@ -518,8 +521,8 @@ def sync_assignments_for_employee(
     }
     wanted = {
         level: (
-            coverage_resolutions.get(level).acting_manager_id
-            if coverage_resolutions.get(level)
+            resolution.acting_manager_id
+            if (resolution := coverage_resolutions.get(level))
             else original_id
         )
         for level, original_id in original_map.items()

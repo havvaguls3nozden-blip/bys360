@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 
-def current_actionable_levels(resolved_chain, existing_assignments: list[object]) -> list[int]:
+
+def current_actionable_levels(resolved_chain, existing_assignments: Sequence[object]) -> list[int]:
     submitted_levels = {
         getattr(item, 'manager_level', None)
         for item in existing_assignments

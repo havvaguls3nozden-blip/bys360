@@ -311,8 +311,9 @@ def notify_support_ticket_assigned(ticket: Any, actor: Any, *, assignee: Any | N
 def notify_support_ticket_rating(ticket: Any, actor: Any, *, rating: int | None = None, note: str | None = None) -> int:
     actor_id = _actor_id(actor)
     recipients = _support_manager_ids(exclude=[actor_id])
-    if _safe_int(getattr(ticket, "assigned_to_user_id", None)):
-        recipients.append(getattr(ticket, "assigned_to_user_id", None))
+    assigned_to_user_id = _safe_int(getattr(ticket, "assigned_to_user_id", None))
+    if assigned_to_user_id:
+        recipients.append(assigned_to_user_id)
     return create_notifications(
         user_ids=recipients,
         title="Talep değerlendirmesi kaydedildi",
@@ -425,14 +426,15 @@ def _portal_audience_user_ids(post: Any, *, limit: int = 160) -> list[int]:
     try:
         from app.models import PortalGroupMember, PortalPostAudience
         scope = _text(getattr(post, "visibility_scope", ""), limit=30)
-        if _safe_int(getattr(post, "wall_owner_user_id", None)):
-            ids.append(getattr(post, "wall_owner_user_id", None))
+        wall_owner_user_id = _safe_int(getattr(post, "wall_owner_user_id", None))
+        if wall_owner_user_id:
+            ids.append(wall_owner_user_id)
         if scope == "selected_users":
             rows = PortalPostAudience.query.filter_by(post_id=post.id, audience_type="user").limit(limit).all()
-            ids.extend([getattr(row, "audience_value", None) for row in rows])
+            ids.extend([v for v in (_safe_int(getattr(row, "audience_value", None)) for row in rows) if v])
         elif scope == "group" and _safe_int(getattr(post, "group_id", None)):
             rows = PortalGroupMember.query.filter_by(group_id=post.group_id, is_active=True).limit(limit).all()
-            ids.extend([getattr(row, "user_id", None) for row in rows])
+            ids.extend([v for v in (_safe_int(getattr(row, "user_id", None)) for row in rows) if v])
         elif scope == "role" and _text(getattr(post, "target_role_name", ""), limit=80):
             role = _text(getattr(post, "target_role_name", ""), limit=80).lower()
             rows = _active_users_query().limit(1000).all()

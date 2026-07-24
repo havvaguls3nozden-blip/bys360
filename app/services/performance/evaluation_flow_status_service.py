@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 
 from app.models import EvaluationAssignment, PerformanceLowScoreProcess
@@ -33,7 +34,7 @@ def _is_done_assignment(assignment: Any | None) -> bool:
 
 
 def _level_label(level: int | None) -> str:
-    return {1: "1. Amir", 2: "2. Amir", 3: "3. Amir"}.get(level, "Süreç")
+    return {1: "1. Amir", 2: "2. Amir", 3: "3. Amir"}.get(level or 0, "Süreç")
 
 
 def _assignments(evaluation: Any | None) -> list[Any]:
@@ -85,7 +86,7 @@ def _evaluator(evaluation: Any | None, level: int) -> Any | None:
 def _level_score(evaluation: Any | None, level: int) -> float | None:
     value = getattr(evaluation, f"level_{level}_total_100", None)
     try:
-        return round(float(value), 2)
+        return round(float(value), 2)  # type: ignore[arg-type]  # defensive parse; falls through to except below
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return None
@@ -133,7 +134,7 @@ def build_evaluation_flow_status(evaluation: Any | None) -> dict[str, Any]:
         })
 
     completed_assignments = [a for a in assignments if _is_done_assignment(a)]
-    completed_assignments.sort(key=lambda a: getattr(a, "completed_at", None) or getattr(a, "updated_at", None) or getattr(a, "created_at", None), reverse=True)
+    completed_assignments.sort(key=lambda a: getattr(a, "completed_at", None) or getattr(a, "updated_at", None) or getattr(a, "created_at", None) or datetime.min, reverse=True)
     last_assignment = completed_assignments[0] if completed_assignments else None
     last_scorer = _safe_name(getattr(last_assignment, "evaluator", None)) if last_assignment else "Henüz yok"
     last_level = int(getattr(last_assignment, "manager_level", 0) or 0) if last_assignment else None

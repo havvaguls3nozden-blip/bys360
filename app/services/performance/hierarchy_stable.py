@@ -26,19 +26,19 @@ try:
     from flask import current_app
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    current_app = None
+    current_app = None  # type: ignore[assignment]
 
 try:
     from app.extensions import db
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    db = None
+    db = None  # type: ignore[assignment]
 
 try:
     import app.models as models
 except Exception:  # pragma: no cover
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    models = None
+    models = None  # type: ignore[assignment]
 
 User = getattr(models, 'User', None) if models else None
 PerformancePeriod = getattr(models, 'PerformancePeriod', None) if models else None
@@ -145,7 +145,7 @@ def build_manager_chain_for_user(user: Any, users_by_sicil: dict[str, Any], peri
     desired = resolve_authoritative_chain(user, users_by_sicil.values(), preserve_explicit_level3=True)
 
     chain = StableManagerChain(
-        employee_id=_get_user_id(user),
+        employee_id=_get_user_id(user) or 0,
         employee_name=_user_name(user),
     )
 

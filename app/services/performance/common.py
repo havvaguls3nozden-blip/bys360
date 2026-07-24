@@ -4,7 +4,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any
+from typing import Any, overload
 
 from app.extensions import db
 from app.models import PerformancePeriod, PerformanceWeightConfig, User
@@ -67,7 +67,11 @@ def _safe_str(value: Any) -> str:
     return str(value).strip() if value is not None else ""
 
 
-def _safe_float(value: Any, default: float = 0.0) -> float:
+@overload
+def _safe_float(value: Any, default: float = 0.0) -> float: ...
+@overload
+def _safe_float(value: Any, default: None) -> float | None: ...
+def _safe_float(value: Any, default: float | None = 0.0) -> float | None:
     try:
         if value in (None, ""):
             return default
@@ -80,7 +84,11 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def _safe_int(value: Any, default: int = 0) -> int:
+@overload
+def _safe_int(value: Any, default: int = 0) -> int: ...
+@overload
+def _safe_int(value: Any, default: None) -> int | None: ...
+def _safe_int(value: Any, default: int | None = 0) -> int | None:
     try:
         if value in (None, "") or isinstance(value, bool):
             return default
