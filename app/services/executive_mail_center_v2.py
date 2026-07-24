@@ -13,7 +13,7 @@ try:
     from app import db
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=13")
-    db = None
+    db = None  # type: ignore[assignment]
 try:
     from app.models.user import User
 except Exception:
@@ -27,13 +27,13 @@ try:
     from app.models.communication_models import MailLog
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=24")
-    MailLog = None
+    MailLog = None  # type: ignore[assignment,misc]
 try:
     from app.services.mail_core import create_mail_log, send_email
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center_v2.py | line=28")
-    send_email = None
-    create_mail_log = None
+    send_email = None  # type: ignore[assignment]
+    create_mail_log = None  # type: ignore[assignment]
 try:
     from app.services.settings.system_settings_service import get_setting_value, set_setting_value
 except Exception:
@@ -43,7 +43,7 @@ except Exception:
 
 SETTING_PREFIX = "executive_mail_center.v2"
 DEFAULT_LOCATION = {"city": "Çanakkale", "latitude": "40.1467", "longitude": "26.4086"}
-TASK_DEFINITIONS = [
+TASK_DEFINITIONS: list[dict[str, Any]] = [
     {"key":"manager_morning","audience":"managers","period":"morning","hour":8,"minute":0,"title":"Amir/Yönetici Sabah Özeti","description":"Amirlere sabah kurum içi durum, bekleyen işler ve kısa yönetici notu gönderir.","subject":"BYS360 Sabah Yönetici Özeti | {date}","enabled":True},
     {"key":"manager_evening","audience":"managers","period":"evening","hour":17,"minute":30,"title":"Amir/Yönetici Akşam Özeti","description":"Amirlere gün sonu durum, tamamlanan/bekleyen işler ve ertesi gün dikkat notu gönderir.","subject":"BYS360 Akşam Yönetici Özeti | {date}","enabled":True},
     {"key":"staff_morning","audience":"staff","period":"morning","hour":8,"minute":15,"title":"Personel Sabah Günaydın ve Hava Durumu","description":"Personele günaydın mesajı, güncel hava durumu ve kıyafet önerisi gönderir.","subject":"Günaydın | BYS360 Günlük Bilgilendirme | {date}","enabled":True},
@@ -195,7 +195,7 @@ def get_recent_logs(limit: int=80) -> list[Any]:
 
 def _weather_code_text(code: int|None) -> str:
     mapping={0:"Açık",1:"Az bulutlu",2:"Parçalı bulutlu",3:"Bulutlu",45:"Sisli",48:"Kırağılı sis",51:"Hafif çiseleme",53:"Çiseleme",55:"Yoğun çiseleme",61:"Hafif yağmur",63:"Yağmur",65:"Kuvvetli yağmur",71:"Hafif kar",73:"Kar",75:"Yoğun kar",80:"Kısa süreli yağmur",81:"Sağanak yağmur",82:"Kuvvetli sağanak",95:"Gök gürültülü"}
-    return mapping.get(code, "Hava durumu bilgisi")
+    return mapping.get(code, "Hava durumu bilgisi") if code is not None else "Hava durumu bilgisi"
 
 def fetch_weather(location: dict[str,str]|None=None) -> dict[str, Any]:
     loc=location or current_config().get("location") or DEFAULT_LOCATION
@@ -227,7 +227,7 @@ def clothing_advice(weather: dict[str, Any], tomorrow: bool=False) -> str:
     if "yağmur" in text or "sağanak" in text:
         return "Yağış ihtimaline karşı şemsiye veya yağmurluk bulundurmanız önerilir."
     try:
-        t=float(temp)
+        t=float(temp)  # type: ignore[arg-type]
         if t>=28:
             return "Hafif ve rahat kıyafetler tercih edilebilir; dış görevlerde güneşten korunmak faydalı olur."
         if t<=12:
