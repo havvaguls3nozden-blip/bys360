@@ -217,7 +217,7 @@ def _home_summary_cache_set(key: str, payload: dict[str, Any]) -> dict[str, Any]
 _build_home_summary_context_uncached = build_home_summary_context
 
 
-def build_home_summary_context(user: Any) -> dict[str, Any]:
+def build_home_summary_context(user: Any) -> dict[str, Any]:  # type: ignore[no-redef]
     cache_key = _home_summary_cache_key(user)
     cached = _home_summary_cache_get(cache_key)
     if cached is None:

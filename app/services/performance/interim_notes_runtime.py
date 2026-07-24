@@ -51,7 +51,7 @@ NOTE_TYPE_OPTIONS = [
 
 def _dialect_name() -> str:
     try:
-        return db.session.bind.dialect.name
+        return db.session.bind.dialect.name  # type: ignore[union-attr]
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return "postgresql"

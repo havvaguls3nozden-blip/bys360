@@ -366,9 +366,9 @@ def list_plan_items(plan_key: str, include_person_details: bool = False, limit: 
         for row in get_personnel_category_rows(limit=1000, category_key=category_key):
             user_map[int(row.user_id)] = row
     for item in output:
-        row = user_map.get(int(item.get("user_id") or 0))
-        if row:
-            item.update({"display_name": row.display_name, "sicil_no": row.sicil_no, "title": row.title, "unit_name": row.unit_name})
+        matched_row = user_map.get(int(item.get("user_id") or 0))
+        if matched_row:
+            item.update({"display_name": matched_row.display_name, "sicil_no": matched_row.sicil_no, "title": matched_row.title, "unit_name": matched_row.unit_name})
     return output
 
 

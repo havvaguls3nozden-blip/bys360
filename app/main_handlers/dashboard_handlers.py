@@ -20,7 +20,7 @@ BYS360_DASHBOARD_REBUILD_HANDLER_OK = True
 _build_dashboard_rebuild_context_uncached = build_dashboard_rebuild_context
 
 
-def build_dashboard_rebuild_context(user):
+def build_dashboard_rebuild_context(user):  # type: ignore[no-redef]
     cache_key = _dashboard_cache_key(user, "rebuild_context_v3")
 
     def _factory():

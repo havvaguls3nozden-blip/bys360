@@ -66,7 +66,7 @@ def _default_question_option_id_set(question: Any) -> set[int]:
         options = getattr(question, "survey_options", None)
     try:
         if hasattr(options, "all"):
-            options = options.all()
+            options = options.all()  # type: ignore[union-attr]
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/surveys/submission.py | line=71")
         options = []

@@ -233,7 +233,7 @@ def estimate_survey_target_user_ids(survey: Any) -> set[int]:
         users = User.query.filter_by(is_active=True).all()
         target_user_ids: set[int] = set()
         assignments = getattr(survey, "assignments", None)
-        assignment_rows = assignments.all() if hasattr(assignments, "all") else list(assignments or [])
+        assignment_rows = assignments.all() if hasattr(assignments, "all") else list(assignments or [])  # type: ignore[union-attr]
         for assignment in assignment_rows:
             target_type = safe_text(getattr(assignment, "target_type", "")).lower()
             target_value = safe_text(getattr(assignment, "target_value", ""))

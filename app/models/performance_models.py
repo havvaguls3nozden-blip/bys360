@@ -123,6 +123,8 @@ class PerformancePeriod(TimestampMixin, db.Model):
     @property
     def evaluation_due_days_effective(self) -> int | None:
         raw = getattr(self, "evaluation_due_days", None)
+        if raw is None:
+            return None
         try:
             value = int(raw)
         except (TypeError, ValueError):

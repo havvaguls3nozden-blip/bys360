@@ -34,10 +34,6 @@ def mobile_dashboard_summary(*args, **kwargs):
     return mobile_dashboard_summary_delegate(_bys360_legacy_mobile_dashboard_summary, *args, **kwargs)
 
 def _bys360_legacy_mobile_dashboard_summary(user: User):
-    from app.api.mobile.services.dashboard_service import delegate_mobile_dashboard_summary
-    return delegate_mobile_dashboard_summary(_bys360_legacy_mobile_dashboard_summary, user)
-
-def _bys360_legacy_mobile_dashboard_summary(user: User):
     global_scope = _has_global_scope(user)
     pending_assignments_q = EvaluationAssignment.query.filter(EvaluationAssignment.evaluator_id == user.id)
     try:

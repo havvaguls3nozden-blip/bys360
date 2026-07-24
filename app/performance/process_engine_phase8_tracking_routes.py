@@ -68,7 +68,7 @@ def performance_process_tracking_delete_record():
     if not str(flow_id or "").isdigit():
         return _process_tracking_redirect(delete_error="GecersizKayit")
     try:
-        deleted = delete_process_tracking_flow(int(flow_id), current_user)
+        deleted = delete_process_tracking_flow(int(flow_id or 0), current_user)
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return _process_tracking_redirect(delete_error="SilmeBasarisiz")

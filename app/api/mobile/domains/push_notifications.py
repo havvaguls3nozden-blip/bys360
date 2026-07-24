@@ -16,7 +16,7 @@ def _push_text(value, *, limit=500):
 
 def _is_sqlite() -> bool:
     try:
-        return db.session.bind.dialect.name == "sqlite"
+        return db.session.bind.dialect.name == "sqlite"  # type: ignore[union-attr]
     except Exception:
         return False
 

@@ -449,7 +449,7 @@ def backfill_from_existing_evaluations(limit: int | None = None) -> dict[str, in
             if not any(key in row for key in ("score", "score_value", "final_score", "final_total_100", "total_score", "status")):
                 continue
             try:
-                if record_from_mapping(row, commit=False):
+                if record_from_mapping(dict(row), commit=False):
                     inserted += 1
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")

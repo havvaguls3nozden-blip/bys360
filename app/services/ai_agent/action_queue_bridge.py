@@ -80,7 +80,7 @@ def _user_id(user: Any) -> int | None:
 def _extract_counts(summary: dict[str, Any]) -> dict[str, int]:
     if not isinstance(summary, dict):
         return {}
-    counts = summary.get("counts") if isinstance(summary.get("counts"), dict) else summary
+    counts = raw_counts if isinstance(raw_counts := summary.get("counts"), dict) else summary
     safe: dict[str, int] = {}
     for key, value in counts.items():
         try:

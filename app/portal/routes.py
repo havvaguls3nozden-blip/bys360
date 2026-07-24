@@ -387,17 +387,6 @@ def _portal_common_context() -> dict:
         **portal_experience_v2_context(current_user),
     }
 
-# BYS360_PORTAL_PROFILE_WALL_V2_8_WALL_HELPER
-def _wall_owner_id_from_form() -> int:
-    raw_value = request.form.get("target_wall_user_id") or request.form.get("wall_owner_user_id")
-    try:
-        wall_owner_id = int(raw_value or 0)
-    except (TypeError, ValueError):
-        wall_owner_id = 0
-    if wall_owner_id <= 0:
-        wall_owner_id = int(getattr(current_user, "id", 0) or 0)
-    return wall_owner_id
-
 # BYS360_PORTAL_PROFILE_WALL_V2_9_WALL_HELPERS
 def _wall_owner_id_from_form() -> int:
     raw_value = request.form.get("target_wall_user_id") or request.form.get("wall_owner_user_id")
