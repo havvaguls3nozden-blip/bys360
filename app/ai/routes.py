@@ -183,6 +183,8 @@ def ai_feedback(ai_request_log_id: int):
             feedback_type=feedback_type,
             feedback_note=feedback_note,
         )
+        if row is None:
+            raise AIServiceDisabled("AI şema hazır değil; geri bildirim kaydedilemedi.")
         return {"ok": True, "data": {"id": row.id, "feedback_type": row.feedback_type}}
 
     return _run_json_service(_save_feedback, ai_request_log_id)
@@ -319,49 +321,49 @@ try:
     from app.ai import decision_support_faz3_routes as _bys360_ai_decision_faz3_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:302")
-    _bys360_ai_decision_faz3_routes = None
+    _bys360_ai_decision_faz3_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ4_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz4_routes as _bys360_ai_decision_faz4_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:308")
-    _bys360_ai_decision_faz4_routes = None
+    _bys360_ai_decision_faz4_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ5_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz5_routes as _bys360_ai_decision_faz5_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:314")
-    _bys360_ai_decision_faz5_routes = None
+    _bys360_ai_decision_faz5_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ6_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz6_routes as _bys360_ai_decision_faz6_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:320")
-    _bys360_ai_decision_faz6_routes = None
+    _bys360_ai_decision_faz6_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ7_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz7_routes as _bys360_ai_decision_faz7_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:326")
-    _bys360_ai_decision_faz7_routes = None
+    _bys360_ai_decision_faz7_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ8_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz8_routes as _bys360_ai_decision_faz8_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:332")
-    _bys360_ai_decision_faz8_routes = None
+    _bys360_ai_decision_faz8_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ9_ROUTE_REGISTRATION
 try:
     from app.ai import decision_support_faz9_routes as _bys360_ai_decision_faz9_routes  # noqa: F401
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:338")
-    _bys360_ai_decision_faz9_routes = None
+    _bys360_ai_decision_faz9_routes = None  # type: ignore[assignment]
 
 # BYS360_AI_DECISION_FAZ10_ROUTE_REGISTERED
 try:
@@ -378,7 +380,7 @@ try:
     from app.ai.decision_support_faz11_routes import ai_decision_faz11_bp
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:354")
-    ai_decision_faz11_bp = None
+    ai_decision_faz11_bp = None  # type: ignore[assignment]
 
 try:
     _bys360_parent_bp = globals().get("bp") or globals().get("ai_bp") or globals().get("ai")
@@ -401,7 +403,7 @@ try:
     from app.ai.decision_support_faz12_routes import ai_decision_faz12_bp
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai/routes.py:376")
-    ai_decision_faz12_bp = None
+    ai_decision_faz12_bp = None  # type: ignore[assignment]
 
 try:
     _bys360_parent_bp = globals().get("bp") or globals().get("ai_bp") or globals().get("ai")
