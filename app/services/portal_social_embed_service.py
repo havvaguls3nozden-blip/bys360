@@ -39,10 +39,13 @@ def _safe_html_attr(value: Any) -> str:
     return html.escape(str(value or ''), quote=True)
 
 
+_TR_LOWER_TRANSLATION_MAP: dict[str, str | int | None] = {'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c'}
+
+
 def _tr_lower(value: Any) -> str:
     text = str(value or '')
     text = text.replace('İ', 'i').replace('I', 'ı').lower()
-    return text.translate(str.maketrans({'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c'}))
+    return text.translate(str.maketrans(_TR_LOWER_TRANSLATION_MAP))
 
 
 def _data_dir() -> Path:
@@ -207,7 +210,7 @@ def discover_latest_social_links() -> dict[str, Any]:
 
     # 1) Önceden dosyaya bırakılan kurumsal gömme/link havuzu: API'siz en stabil yedek kanal.
     for item in manual_bank.get('links', []):
-        url = item.get('url') if isinstance(item, dict) else str(item)
+        url = (item.get('url') or '') if isinstance(item, dict) else str(item)
         parsed = canonical_social_url(url)
         if parsed.get('ok') and parsed['url'] not in seen:
             discovered.append({'url': parsed['url'], 'platform': parsed['platform'], 'account': parsed.get('account') or item.get('account', '') if isinstance(item, dict) else '', 'source': 'watch_links'})
@@ -417,14 +420,14 @@ def social_import_context() -> dict[str, Any]:
 
 
 def run_social_embed_scan(*, manual: bool = False, actor: User | None = None, auto_discover: bool = False) -> dict[str, Any]:
-    discovery = {'ok': True, 'discovered_count': 0, 'discovered': [], 'sources': []}
+    discovery: dict[str, Any] = {'ok': True, 'discovered_count': 0, 'discovered': [], 'sources': []}
     if auto_discover:
         discovery = discover_latest_social_links()
         queue_social_urls([item['url'] for item in discovery.get('discovered', []) if item.get('url')], source='auto_discover')
 
     queue = _read_json(_queue_path(), {'links': []})
     links = queue.setdefault('links', [])
-    stats = {'ok': True, 'manual': bool(manual), 'auto_discover': bool(auto_discover), 'checked': 0, 'created': 0, 'duplicate': 0, 'invalid': 0, 'failed': 0, 'items': [], 'discovery': discovery, 'generated_at': _now_iso()}
+    stats: dict[str, Any] = {'ok': True, 'manual': bool(manual), 'auto_discover': bool(auto_discover), 'checked': 0, 'created': 0, 'duplicate': 0, 'invalid': 0, 'failed': 0, 'items': [], 'discovery': discovery, 'generated_at': _now_iso()}
     for item in links:
         if (item.get('status') or 'pending') != 'pending':
             continue

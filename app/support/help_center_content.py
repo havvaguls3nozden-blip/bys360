@@ -12,9 +12,9 @@ try:
     from app.models import SupportHelpArticle
 except Exception:  # pragma: no cover - application context not always ready during import checks
     logger.exception("BYS360 V6C guarded exception | file=app/support/help_center_content.py | line=12")
-    inspect = None
-    db = None
-    SupportHelpArticle = None
+    inspect = None  # type: ignore[assignment]
+    db = None  # type: ignore[assignment]
+    SupportHelpArticle = None  # type: ignore[assignment,misc]
 
 
 HELP_CATEGORIES = [
@@ -673,7 +673,7 @@ ARTICLE_MAP = {item["slug"]: item for item in HELP_ARTICLES}
 
 
 def _help_tables_ready() -> bool:
-    if not db or not inspect or not SupportHelpArticle:
+    if not db or not inspect or not SupportHelpArticle:  # type: ignore[truthy-function]
         return False
     try:
         existing = set(inspect(db.engine).get_table_names())
@@ -705,9 +705,9 @@ def _normalize_static_article(article: dict[str, Any]) -> dict[str, Any]:
 
 
 def _normalize_db_article(article: Any) -> dict[str, Any]:
-    role_slugs = []
-    tags = []
-    related = []
+    role_slugs: list[Any] = []
+    tags: list[Any] = []
+    related: list[Any] = []
     for attr, target in (("get_role_slugs", role_slugs), ("get_tags", tags), ("get_related_slugs", related)):
         try:
             target.extend(getattr(article, attr)() or [])
@@ -1054,7 +1054,7 @@ def get_role(slug: str) -> dict[str, Any] | None:
 def get_article(slug: str, include_unpublished: bool = False) -> dict[str, Any] | None:
     for article in get_all_articles(published_only=not include_unpublished):
         if article.get("slug") == slug:
-            category = CATEGORY_MAP.get(article.get("category_slug"), {})
+            category = CATEGORY_MAP.get(article.get("category_slug") or "", {})
             roles = [ROLE_MAP[r] for r in article.get("role_slugs", []) if r in ROLE_MAP]
             return {**article, "category": category, "roles": roles, "related_articles": get_related_articles(article)}
     return None
