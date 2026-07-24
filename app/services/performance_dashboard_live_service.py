@@ -252,7 +252,7 @@ def _returned_count(period_id: int | None, scope_user_ids: list[int]) -> int:
 
 def _approval_status(total: int, published: int, president_pending: int, returned: int) -> dict[str, Any]:
     pending = max(int(total or 0) - int(published or 0) - int(president_pending or 0) - int(returned or 0), 0)
-    rows = [
+    rows: list[dict[str, Any]] = [
         {"key": "published", "label": STATUS_LABELS["published"], "count": published, "percent": _pct(published, total), "tone": "green"},
         {"key": "president", "label": STATUS_LABELS["president"], "count": president_pending, "percent": _pct(president_pending, total), "tone": "blue"},
         {"key": "pending", "label": STATUS_LABELS["pending"], "count": pending, "percent": _pct(pending, total), "tone": "amber"},
@@ -372,7 +372,7 @@ def _overdue_managers(period_id: int | None, scope_user_ids: list[int]) -> list[
             .all()
         )
         max_days = 1
-        temp = []
+        temp: list[dict[str, Any]] = []
         for ad, soyad, task_count, oldest_due in rows:
             days = max((now - oldest_due).days if oldest_due else 0, 0)
             max_days = max(max_days, days)
@@ -424,7 +424,7 @@ def _risk_matrix(period_id: int | None, scope_user_ids: list[int]) -> dict[str, 
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         safe_db_rollback()
-    matrix_rows = []
+    matrix_rows: list[dict[str, Any]] = []
     total = 0
     for label, values in rows.items():
         row_total = sum(values.values())

@@ -22,7 +22,7 @@ except Exception:
 try:
     from app.core.datetime_utils import utc_now as _app_utc_now
 except Exception:
-    _app_utc_now = None
+    _app_utc_now = None  # type: ignore[assignment]
 
 try:
     from app.extensions import db
@@ -32,7 +32,7 @@ except Exception:
 try:
     from app.route_support import sanitize_free_text as _sanitize_free_text
 except Exception:
-    _sanitize_free_text = None
+    _sanitize_free_text = None  # type: ignore[assignment]
 
 OPEN_SUPPORT_STATUSES = {"open", "reviewing", "waiting_info", "assigned", "planned", "in_progress", "pending", "waiting", "bekliyor", "inceleniyor"}
 ACTIVE_SURVEY_STATUSES = {"published", "active", "yayinda", "aktif"}
@@ -40,7 +40,7 @@ PENDING_ASSIGNMENT_STATUSES = {"bekliyor", "kismen_tamamlandi", "pending", "in_p
 
 
 def utc_now() -> datetime:
-    if _app_utc_now:
+    if _app_utc_now:  # type: ignore[truthy-function]
         try:
             return _app_utc_now()
         except Exception:
@@ -51,7 +51,7 @@ def utc_now() -> datetime:
 
 
 def sanitize_free_text(value: Any, limit: int = 160) -> str:
-    if _sanitize_free_text:
+    if _sanitize_free_text:  # type: ignore[truthy-function]
         try:
             return _sanitize_free_text(value, limit=limit)
         except Exception:

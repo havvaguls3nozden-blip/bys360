@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func
@@ -122,7 +122,7 @@ def _bar_rows(counter: Counter[str], *, labels: dict[str, str] | None = None, li
     return rows
 
 
-def _date_range(days: int) -> list[datetime.date]:
+def _date_range(days: int) -> list[date]:
     today = utc_now().date()
     start = today - timedelta(days=max(days - 1, 0))
     return [start + timedelta(days=offset) for offset in range(days)]

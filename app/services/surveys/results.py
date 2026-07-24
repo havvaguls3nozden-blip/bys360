@@ -146,7 +146,7 @@ def build_question_summary_row(question: Any) -> dict[str, Any]:
     answers = safe_question_answers(int(getattr(question, "id", 0) or 0))
 
     if qtype in {"single_choice", "multiple_choice", "yes_no"}:
-        option_stats = []
+        option_stats: list[dict[str, Any]] = []
         total_option_answers = len([a for a in answers if _selected_option_id(a)])
         for option in safe_question_options(int(getattr(question, "id", 0) or 0)):
             option_id = getattr(option, "id", None)
@@ -241,8 +241,8 @@ def build_survey_results_context(
     summary: list[dict[str, Any]] = []
     total_completed = 0
     estimated_target_count = 0
-    completion_rate = 0
-    rating_average = 0
+    completion_rate: float = 0
+    rating_average: float = 0
     rating_question_count = 0
     text_response_count = 0
     option_question_count = 0

@@ -25,7 +25,12 @@ def build_menu_visibility_map(
     4. Çekirdek canlı menü savunması
     """
     # Phase4J V39C2: lazy facade dependency imports avoid circular import during module load
-    from app.services.settings.effective_menu import (
+    # _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_* and PORTAL_MENU_VISIBILITY_POLICY are
+    # injected into effective_menu's globals() by apply_runtime_policy_blocks() at that
+    # module's import time (see effective_menu_parts/runtime_policy_context.py) rather than
+    # being literal assignments, so mypy can't see them statically even though they exist
+    # at runtime by the time this lazy import executes.
+    from app.services.settings.effective_menu import (  # type: ignore[attr-defined]
         _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS,
         _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_MANAGER_ROLES,
         _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS,

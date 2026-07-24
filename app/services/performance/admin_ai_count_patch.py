@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from app.models import User
 
 """Performans kapsamı sayaç yardımcıları.
 
@@ -12,7 +15,7 @@ oluşmadan kullanıyordu. V2 ile güvenli helper modülüne dönüştürüldü.
 try:
     from app.services.performance.common import is_performance_scope_user
 except Exception:  # pragma: no cover
-    def is_performance_scope_user(user: Any) -> bool:
+    def is_performance_scope_user(user: User | None) -> bool:
         return True
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 from app.services.safe_user_delete_service import safe_delete_user_by_id
 
@@ -291,7 +292,7 @@ try:
         normalize_category_label as _phase2_normalize_category_label,
     )
 except Exception:
-    def _phase2_normalize_category_label(value):
+    def _phase2_normalize_category_label(value: Any) -> str:
         return str(value or "Diğer").strip() or "Diğer"
 
 

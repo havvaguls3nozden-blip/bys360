@@ -23,7 +23,7 @@ try:
     from app.config import is_removed_menu_key
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/portal_permission_matrix.py | line=21")
-    def is_removed_menu_key(_key: str) -> bool:
+    def is_removed_menu_key(menu_key: str | None) -> bool:
         return False
 
 PORTAL_MATRIX_KEYS = {
