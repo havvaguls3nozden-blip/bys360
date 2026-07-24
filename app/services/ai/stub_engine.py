@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import Any
 
 # BYS360_STUB_AI_V60_EXTENSION_IMPORT
+NEW_STUB_SCENARIOS: tuple[tuple[str, str], ...]
 try:
     from .stub_engine_extension import (
         NEW_SCENARIO_BUILDERS,

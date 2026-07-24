@@ -228,8 +228,8 @@ def _check_literal_contracts(root: Path, report: ChainContractReport) -> None:
             report.findings.append(ChainContractFinding("invalid_expected_weight_total", f"Gate beklenen ağırlık toplamı 100 değil: {constant}"))
         else:
             report.ok.append(f"{constant} beklenen toplam=100")
-        for slot, value in weights.items():
-            token = f"{slot}: {value:.1f}"
+        for slot, weight_value in weights.items():
+            token = f"{slot}: {weight_value:.1f}"
             if token not in content:
                 report.findings.append(ChainContractFinding("weight_contract_mismatch", f"{constant} için beklenen ağırlık yok: {token}"))
             else:

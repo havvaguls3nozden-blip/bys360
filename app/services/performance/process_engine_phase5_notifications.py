@@ -389,7 +389,7 @@ def _mirror_to_application_notifications(
     return _insert_if_columns("notifications", payload)
 
 
-def _safe_text(value: Any, fallback: str = "") -> str:
+def _safe_text(value: Any, fallback: str | None = "") -> str | None:
     text_value = str(value or "").strip()
     return text_value if text_value else fallback
 

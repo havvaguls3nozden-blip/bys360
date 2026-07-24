@@ -192,7 +192,7 @@ def get_personnel_category_rows(limit: int = 100, offset: int = 0, search: str |
     wanted_category = canonical_category_key(category_key) if category_key else ""
     rows: list[PersonnelCategoryRow] = []
     for user in users:
-        user_id = int(user.get("id"))
+        user_id = int(user.get("id") or 0)
         cat = get_user_category(user_id) or {}
         current_key = str(cat.get("category_key") or "")
         if wanted_category and current_key != wanted_category:

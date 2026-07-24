@@ -70,5 +70,5 @@ def get_governance_thresholds() -> dict[str, int]:
 
 def get_weekly_summary_settings() -> dict[str, Any]:
     settings = get_ai_governance_settings()
-    summary = settings.get("weekly_summary") if isinstance(settings.get("weekly_summary"), dict) else {}
+    summary = raw_summary if isinstance(raw_summary := settings.get("weekly_summary"), dict) else {}
     return _merge_dict(DEFAULT_SETTINGS["weekly_summary"], summary)

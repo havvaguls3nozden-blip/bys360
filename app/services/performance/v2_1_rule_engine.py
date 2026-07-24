@@ -169,7 +169,12 @@ def get_setting_bool(setting_key: str, default: bool | None = None) -> bool:
 def get_setting_float(setting_key: str, default: float | None = None) -> float:
     fallback_raw = _default_text(setting_key)
     try:
-        fallback = float(default if default is not None else fallback_raw)
+        if default is not None:
+            fallback = float(default)
+        elif fallback_raw is not None:
+            fallback = float(fallback_raw)
+        else:
+            fallback = 0.0
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         fallback = 0.0

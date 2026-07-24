@@ -18,6 +18,7 @@ from flask_login import current_user, logout_user
 from flask_wtf.csrf import CSRFError
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import HTTPException, MethodNotAllowed, RequestEntityTooLarge
+from werkzeug.wrappers import Response
 
 from app.extensions import db
 
@@ -203,7 +204,7 @@ def _handle_expired_csrf_response(error: CSRFError):
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/error_handlers.py:193")
         wants_json = False
     if wants_json:
-        response = jsonify({"ok": False, "message": message, "csrf_refresh_url": "/pwa/csrf-refresh"})
+        response: Response = jsonify({"ok": False, "message": message, "csrf_refresh_url": "/pwa/csrf-refresh"})
         response.status_code = 400
     else:
         try:

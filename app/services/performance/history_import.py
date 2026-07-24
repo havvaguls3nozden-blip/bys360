@@ -53,7 +53,7 @@ def normalize_history_status(value: Any) -> str:
 
 
 def canonicalize_history_row(row_data: dict[str, Any]) -> dict[str, Any]:
-    payload = {key: _norm(value) for key, value in dict(row_data or {}).items()}
+    payload: dict[str, Any] = {key: _norm(value) for key, value in dict(row_data or {}).items()}
 
     final_total, final_error = parse_history_score(payload.get("final_total_100"))
     level_1_total, level_1_error = parse_history_score(payload.get("level_1_total_100"))

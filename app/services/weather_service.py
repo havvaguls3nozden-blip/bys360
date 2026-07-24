@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 from datetime import datetime
+from typing import cast
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
@@ -191,7 +192,7 @@ def build_portal_weather_widget() -> dict:
     cache_key = (round(latitude, 4), round(longitude, 4), timezone_name)
 
     current_ts = time.time()
-    if _CACHE.get("key") == cache_key and current_ts < float(_CACHE.get("expires_at", 0) or 0):
+    if _CACHE.get("key") == cache_key and current_ts < float(cast(float, _CACHE.get("expires_at", 0) or 0)):
         cached_value = _CACHE.get("value")
         if isinstance(cached_value, dict):
             return cached_value

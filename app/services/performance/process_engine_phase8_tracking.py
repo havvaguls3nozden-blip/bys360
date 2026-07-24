@@ -764,7 +764,7 @@ def _delete_tracking_flow_ids(flow_ids: list[int]) -> int:
         )
         db.session.commit()
         try:
-            return int(result.rowcount or 0)
+            return int(result.rowcount or 0)  # type: ignore[attr-defined]
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return len(clean_ids)

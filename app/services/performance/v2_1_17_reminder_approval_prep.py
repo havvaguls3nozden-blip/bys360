@@ -251,7 +251,7 @@ def build_reminder_approval_prep_state(
 ) -> dict[str, Any]:
     pid = _safe_int(period_id)
     title = _period_title(pid, period_title)
-    base = {
+    base: dict[str, Any] = {
         "rule_version": RULE_VERSION,
         "period_id": pid,
         "period_title": title,

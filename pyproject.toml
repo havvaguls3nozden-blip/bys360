@@ -76,6 +76,13 @@ disable_error_code = ["method-assign", "assignment"]
 module = "app.bootstrap.route_bootstrap"
 disable_error_code = ["method-assign", "assignment"]
 
+# Process-wide monkeypatch of requests.sessions.Session.request to install a
+# default outbound HTTP timeout guard; same Ruff B010 vs direct-assignment
+# tradeoff as app.bootstrap.route_bootstrap above.
+[[tool.mypy.overrides]]
+module = "app.runtime.http_timeout_guard"
+disable_error_code = ["method-assign"]
+
 # db.relationship(..., lazy="dynamic") returns an AppenderQuery at runtime
 # but mypy sees the plain RelationshipProperty descriptor (no stubs model
 # the lazy="dynamic" instance-access behavior), so .filter()/.order_by()/
