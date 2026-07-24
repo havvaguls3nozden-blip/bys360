@@ -70,7 +70,7 @@ def build_performance_go_live_center(
     scope_employee_ids: list[int] | None = None,
 ) -> dict[str, Any]:
     now = now or utc_now()
-    cards = {
+    cards: dict[str, Any] = {
         "active_period": getattr(active_period, "title", None) or "Aktif dönem yok",
         "open_assignments": 0,
         "overdue_assignments": 0,
@@ -106,7 +106,7 @@ def build_performance_go_live_center(
         assignments = assignment_query.all()
         evaluations = evaluation_query.all()
 
-    publish_summary = build_publish_workspace_context(
+    publish_summary: dict[str, Any] = build_publish_workspace_context(
         active_period,
         allowed_employee_ids=scoped_employee_ids,
         limit=6,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
+from typing import Any, cast
 
 from flask import current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -172,7 +173,7 @@ def performance_hierarchy_tree():
         if (u.birim or "").strip()
     })
 
-    grouped_tree = OrderedDict()
+    grouped_tree: OrderedDict[str, OrderedDict[str, list[User]]] = OrderedDict()
     active_count = 0
     passive_count = 0
 
@@ -226,7 +227,7 @@ def performance_hierarchy_tree():
 @manager_required
 @menu_key_required("performance_hierarchy_tree")
 def hierarchy_tree_legacy():
-    return redirect(url_for("main.performance_hierarchy_tree", **request.args.to_dict(flat=True)))
+    return redirect(url_for("main.performance_hierarchy_tree", **cast("dict[str, Any]", request.args.to_dict(flat=True))))
 
 
 @main_bp.route("/performance/hierarchy-assignments", methods=["GET", "POST"], endpoint="performance_hierarchy_assignments")
@@ -549,16 +550,16 @@ def performance_hierarchy_settings():
 
         weights = row.get("effective_weights") or {}
         weight_summary = "-"
-        w1 = float(weights.get("evaluator_1_weight", 0) or 0)
-        w2 = float(weights.get("evaluator_2_weight", 0) or 0)
-        w3 = float(weights.get("evaluator_3_weight", 0) or 0)
+        weight_1 = float(weights.get("evaluator_1_weight", 0) or 0)
+        weight_2 = float(weights.get("evaluator_2_weight", 0) or 0)
+        weight_3 = float(weights.get("evaluator_3_weight", 0) or 0)
         parts = []
-        if w1:
-            parts.append(f"1. amir %{int(round(w1))}")
-        if w2:
-            parts.append(f"2. amir %{int(round(w2))}")
-        if w3:
-            parts.append(f"3. amir %{int(round(w3))}")
+        if weight_1:
+            parts.append(f"1. amir %{int(round(weight_1))}")
+        if weight_2:
+            parts.append(f"2. amir %{int(round(weight_2))}")
+        if weight_3:
+            parts.append(f"3. amir %{int(round(weight_3))}")
         if parts:
             weight_summary = " • ".join(parts)
         elif has_level_3:

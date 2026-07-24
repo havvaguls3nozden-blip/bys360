@@ -19,7 +19,7 @@ try:
     import app.models as models
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    models = None
+    models = None  # type: ignore[assignment]
 
 PerformancePeriod = getattr(models, "PerformancePeriod", None) if models else None
 EvaluationAssignment = getattr(models, "EvaluationAssignment", None) if models else None
@@ -42,6 +42,8 @@ def _safe_list(value: Any) -> list[Any]:
 
 
 def ensure_evaluation_summary(period_id: int, employee_id: int, chain_map: dict[int, int | None]) -> Any:
+    if not PerformanceEvaluation or not db:
+        return None
     row = PerformanceEvaluation.query.filter_by(period_id=period_id, employee_id=employee_id).first()
     if row:
         row.level_1_evaluator_id = chain_map.get(1)
@@ -66,6 +68,8 @@ def ensure_evaluation_summary(period_id: int, employee_id: int, chain_map: dict[
 
 def ensure_assignment(period_id: int, employee_id: int, evaluator_id: int | None, manager_level: int) -> bool:
     if not evaluator_id:
+        return False
+    if not EvaluationAssignment or not db or not PerformancePeriod:
         return False
 
     period = db.session.get(PerformancePeriod, period_id)

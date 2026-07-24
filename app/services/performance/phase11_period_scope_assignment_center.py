@@ -282,7 +282,7 @@ def phase11_validate_period_scope(payload: dict[str, Any]) -> Phase11ValidationR
 
 def phase11_dates_overlap(start_a: Any, end_a: Any, start_b: Any, end_b: Any) -> bool:
     a_start, a_end, b_start, b_end = _as_date(start_a), _as_date(end_a), _as_date(start_b), _as_date(end_b)
-    if not all([a_start, a_end, b_start, b_end]):
+    if not a_start or not a_end or not b_start or not b_end:
         return False
     return a_start <= b_end and b_start <= a_end
 
@@ -434,7 +434,8 @@ def ensure_phase11_tables(db: Any | None = None) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            if db is not None:
+                db.session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase11_period_scope_assignment_center.py:434")
@@ -500,7 +501,8 @@ def seed_phase11_settings(db: Any | None = None) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            if db is not None:
+                db.session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase11_period_scope_assignment_center.py:498")

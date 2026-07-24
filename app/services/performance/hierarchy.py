@@ -451,7 +451,7 @@ def build_assignment_rows(users: Iterable[Any] | None = None) -> list[dict[str, 
     return rows
 
 
-def _coerce_user_source(source: Iterable[Any] | None = None) -> list[Any] | None:
+def _coerce_user_source(source: Iterable[Any] | int | None = None) -> list[Any] | None:
     """`analyze_hierarchy_rows(period_id)` gibi hatalı/eski çağrıları tolere et."""
     if source is None:
         return None
@@ -491,7 +491,7 @@ def _real_issue_messages(chain: Any) -> list[str]:
     return messages
 
 
-def analyze_hierarchy_rows(users: Iterable[Any] | None = None) -> list[dict[str, Any]]:
+def analyze_hierarchy_rows(users: Iterable[Any] | int | None = None) -> list[dict[str, Any]]:
     """Seçili kullanıcı kümesi için yönetici zinciri analiz satırlarını üretir.
 
     Dönen her kayıt; kullanıcı nesnesi, çözülmüş zincir, gerçek aksiyon gerektiren

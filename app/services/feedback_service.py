@@ -464,7 +464,7 @@ def _daily_average_buckets(rows, start_date: date, end_date: date):
         buckets[row.entry_date].append(float(row.mood_value or 0))
     labels = []
     values = []
-    spark_points = []
+    spark_points: list[dict[str, Any]] = []
     cursor = start_date
     while cursor <= end_date:
         labels.append(cursor.isoformat())
@@ -727,7 +727,7 @@ def submit_campaign_answers(*, user, campaign: FeedbackCampaign, form):
     db.session.add(submission)
     db.session.flush()
 
-    for question in campaign.questions.order_by(FeedbackQuestion.sort_order.asc(), FeedbackQuestion.id.asc()).all():
+    for question in campaign.questions.order_by(FeedbackQuestion.sort_order.asc(), FeedbackQuestion.id.asc()).all():  # type: ignore[misc,operator]
         field_name = f"question_{question.id}"
         raw_value = form.get(field_name)
         if question.is_required and not raw_value:
@@ -801,7 +801,7 @@ def build_dashboard_data(user):
 def build_campaign_results(campaign: FeedbackCampaign):
     results = []
     submission_count = campaign.submissions.count()
-    for question in campaign.questions.order_by(FeedbackQuestion.sort_order.asc(), FeedbackQuestion.id.asc()).all():
+    for question in campaign.questions.order_by(FeedbackQuestion.sort_order.asc(), FeedbackQuestion.id.asc()).all():  # type: ignore[misc,operator]
         row = {
             "question": question,
             "submission_count": submission_count,
@@ -848,7 +848,7 @@ def build_manager_summary(user):
         .filter(FeedbackPulseEntry.entry_date >= thirty_days_ago)
         .all()
     )
-    pulse_counts = defaultdict(int)
+    pulse_counts: defaultdict[str, int] = defaultdict(int)
     for row in pulse_rows:
         pulse_counts[row.mood_label] += 1
     pulse_average = round(sum(row.mood_value for row in pulse_rows) / len(pulse_rows), 2) if pulse_rows else None

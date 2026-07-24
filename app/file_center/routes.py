@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
+from typing import Any, cast
 
 from flask import Response, flash, jsonify, redirect, request, send_file, url_for
 from flask_login import current_user, login_required
@@ -343,7 +344,7 @@ def file_center_transfers():
         .limit(50)
         .all()
     )
-    transfer_items = {}
+    transfer_items: dict[int, list[Any]] = {}
     if transfers:
         ids = [x.id for x in transfers]
         rows = FileTransferItem.query.filter(FileTransferItem.transfer_id.in_(ids)).all()
@@ -362,7 +363,7 @@ def file_center_create_transfer():
             owner_user_id=int(current_user.id),
             title=request.form.get("title") or "Dosya Transferi",
             message=request.form.get("message"),
-            file_ids=request.form.getlist("file_ids"),
+            file_ids=[int(x) for x in request.form.getlist("file_ids") if str(x).strip()],
             recipient_emails=request.form.get("recipient_emails"),
         )
         db.session.commit()
@@ -385,8 +386,8 @@ def file_center_requests():
         .limit(100)
         .all()
     )
-    uploads_by_request = {}
-    mail_logs_by_request = {}
+    uploads_by_request: dict[int, list[FileRequestUpload]] = {}
+    mail_logs_by_request: dict[int, list[FileCenterMailLog]] = {}
     if requests:
         ids = [x.id for x in requests]
         rows = FileRequestUpload.query.filter(FileRequestUpload.request_id.in_(ids)).order_by(FileRequestUpload.created_at.desc()).all()
@@ -1030,12 +1031,12 @@ def file_center_guest_download(token: str):
             flash("Şifre hatalı.", "danger")
             return safe_render("file_center/guest_download.html", error=None, link=link, format_bytes=format_bytes)
         try:
-            ok, security_message = can_download_file(link.file)
+            ok, security_message = can_download_file(cast(FileStorageItem, link.file))
             if not ok:
                 record_guest_download(link, status="blocked_by_security")
                 db.session.commit()
                 return safe_render("file_center/guest_download.html", error=security_message, link=None, format_bytes=format_bytes)
-            path = secure_file_path(link.file)
+            path = secure_file_path(cast(FileStorageItem, link.file))
             record_guest_download(link, status="success")
             db.session.commit()
             return send_file(str(path), as_attachment=True, download_name=link.file.original_filename, mimetype=link.file.content_type or "application/octet-stream")

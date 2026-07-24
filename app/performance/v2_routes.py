@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
+from typing import Any, cast
 
 from flask import (
     current_app,
@@ -59,7 +60,7 @@ logger = logging.getLogger(__name__)
 
 # BYS360_RUNTIME_LOGGEDIN_SLOW_PAGES_V3_SCORECARD_MEMORY_CACHE
 _SCORECARD_CONTEXT_CACHE_TTL_SECONDS = 30
-_SCORECARD_CONTEXT_CACHE = {}
+_SCORECARD_CONTEXT_CACHE: dict[str, tuple[float, Any]] = {}
 _build_period_scorecard_context_uncached = build_period_scorecard_context
 
 
@@ -92,7 +93,7 @@ def _scorecard_cache_set(key: str, value):
     return value
 
 
-def build_period_scorecard_context(period, *args, **kwargs):
+def build_period_scorecard_context(period, *args, **kwargs):  # type: ignore[no-redef]
     endpoint = str(getattr(request, "endpoint", "") or "")
     # Yayın, ön kontrol ve POST akışları her zaman taze çalışır; sadece okuma ekranları cache'lenir.
     if request.method != "GET" or endpoint.endswith("_publish") or endpoint.endswith("_publish_preflight"):
@@ -159,7 +160,7 @@ def performance_v2_phase1_dashboard():
 def performance_v2_phase1_preview(employee_id: int):
     period_id = request.args.get('period_id', type=int)
     period = _resolve_period(period_id)
-    employee = db.session.get_or_404(User, employee_id)
+    employee = User.query.get_or_404(employee_id)
     if not period:
         return jsonify({'ok': False, 'message': 'Aktif dönem bulunamadı.'}), 404
     return jsonify({'ok': True, 'data': build_assignment_preview(employee=employee, period=period)})
@@ -269,14 +270,14 @@ def performance_v2_phase3_assignment(assignment_id: int):
 @main_bp.route('/performans/v2/faz4')
 @login_required
 def performance_v2_phase4_dashboard():
-    return redirect(url_for('main.performance_v2_phase3_dashboard', **request.args))
+    return redirect(url_for('main.performance_v2_phase3_dashboard', **cast("dict[str, Any]", request.args.to_dict())))
 
 
 @main_bp.route('/performance/v2/faz4/board')
 @main_bp.route('/performans/v2/faz4/board')
 @login_required
 def performance_v2_phase4_board():
-    return redirect(url_for('main.performance_v2_phase4_dashboard', **request.args))
+    return redirect(url_for('main.performance_v2_phase4_dashboard', **cast("dict[str, Any]", request.args.to_dict())))
 
 
 @main_bp.route('/performance/v2/faz4/assignment/<int:assignment_id>', methods=['GET', 'POST'])
@@ -512,7 +513,7 @@ def performance_v2_phase6_print():
 @login_required
 def performance_v2_phase8_dashboard():
     """Canlı akışta Faz 8 adı geçen yönlendirmeleri güvenli alias ile karşıla."""
-    return redirect(url_for('main.performance_v2_phase6_dashboard', **request.args))
+    return redirect(url_for('main.performance_v2_phase6_dashboard', **cast("dict[str, Any]", request.args.to_dict())))
 
 
 @main_bp.route('/performance/v2/faz8/assignment/<int:assignment_id>', endpoint='performance_v2_phase8_assignment', methods=['GET', 'POST'])
