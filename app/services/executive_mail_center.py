@@ -13,13 +13,13 @@ try:
     from app import db
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center.py | line=14")
-    db = None
+    db = None  # type: ignore[assignment]
 
 try:
     from sqlalchemy import inspect, text
 except Exception:
     logger.exception("BYS360 V6C guarded exception | file=app/services/executive_mail_center.py | line=19")
-    text = None
+    text = None  # type: ignore[assignment]
 
 MAIL_CENTER_VERSION = "BYS360_EXECUTIVE_MAIL_CENTER_V1_6_FULL_PAGES"
 
@@ -185,7 +185,7 @@ def get_recent_mail_logs(limit: int = 50) -> list[dict[str, Any]]:
     return []
 
 def get_scheduled_task_statuses() -> list[dict[str, Any]]:
-    result = []
+    result: list[dict[str, Any]] = []
     if not hasattr(subprocess, "run"):
         return result
     for t in DEFAULT_TASKS:

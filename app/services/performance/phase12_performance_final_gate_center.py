@@ -372,7 +372,8 @@ def ensure_phase12_tables(db: Any | None = None) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            if db is not None:
+                db.session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:372")
@@ -439,7 +440,8 @@ def seed_phase12_final_gate_settings(db: Any | None = None) -> dict[str, Any]:
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            if db is not None:
+                db.session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:428")
@@ -475,7 +477,8 @@ def save_phase12_final_gate_report(report: dict[str, Any], db: Any | None = None
     except Exception as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            db.session.rollback()
+            if db is not None:
+                db.session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:462")

@@ -83,11 +83,11 @@ def _parse_accounts() -> list[dict[str, str]]:
         ("casamer_tarihialan", os.getenv("BYS360_INSTAGRAM_CASAMER_ID")),
     ]
     existing = {row["ig_user_id"] for row in accounts}
-    for username, ig_user_id in fallbacks:
-        ig_user_id = _clean(ig_user_id, limit=120)
-        if ig_user_id and ig_user_id not in existing:
-            accounts.append({"username": username, "ig_user_id": ig_user_id})
-            existing.add(ig_user_id)
+    for username, fallback_ig_id in fallbacks:
+        fallback_ig_id = _clean(fallback_ig_id, limit=120)
+        if fallback_ig_id and fallback_ig_id not in existing:
+            accounts.append({"username": username, "ig_user_id": fallback_ig_id})
+            existing.add(fallback_ig_id)
     return accounts
 
 
@@ -103,14 +103,14 @@ def _fetch_graph_json(path: str, *, fields: str, limit: int, access_token: str) 
 def fetch_account_media(ig_user_id: str, *, limit: int, access_token: str) -> list[dict[str, Any]]:
     fields = "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,username"
     payload = _fetch_graph_json(f"{ig_user_id}/media", fields=fields, limit=limit, access_token=access_token)
-    rows = payload.get("data") if isinstance(payload, dict) else []
+    rows = (payload.get("data") or []) if isinstance(payload, dict) else []
     return [row for row in rows if isinstance(row, dict)]
 
 
 def fetch_account_stories(ig_user_id: str, *, limit: int, access_token: str) -> list[dict[str, Any]]:
     fields = "id,caption,media_type,media_url,permalink,thumbnail_url,timestamp,username"
     payload = _fetch_graph_json(f"{ig_user_id}/stories", fields=fields, limit=limit, access_token=access_token)
-    rows = payload.get("data") if isinstance(payload, dict) else []
+    rows = (payload.get("data") or []) if isinstance(payload, dict) else []
     return [row for row in rows if isinstance(row, dict)]
 
 

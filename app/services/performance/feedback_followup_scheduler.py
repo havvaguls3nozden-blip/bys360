@@ -21,7 +21,12 @@ def _run_job(app: Any, days_ahead: int) -> None:
     with app.app_context():
         try:
             from app.services.performance.feedback_followup_phase4 import generate_followup_notices
-            result = generate_followup_notices(days_ahead=days_ahead)
+            result = generate_followup_notices(
+                current_user_id=None,
+                current_user_role=None,
+                is_superuser=True,
+                days_ahead=days_ahead,
+            )
             logger.info(
                 "BYS360 eylem planı takip bildirimi çalıştı | created=%s skipped=%s",
                 result.get("created"),

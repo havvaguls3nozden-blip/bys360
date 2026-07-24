@@ -225,7 +225,7 @@ def build_feedback_schedule_preview(
                 }
                 break
 
-    suggestions = []
+    suggestions: list[dict[str, str]] = []
     cursor = datetime.combine(meeting_date, business_start)
     business_limit = datetime.combine(meeting_date, business_end)
     duration = timedelta(minutes=max(default_duration_minutes, slot_minutes))
@@ -234,9 +234,9 @@ def build_feedback_schedule_preview(
         slot_start = cursor.time()
         slot_end = (cursor + duration).time()
         if not any(
-            _ranges_overlap(slot_start, slot_end, getattr(meeting, "meeting_start", None), getattr(meeting, "meeting_end", None))
+            _ranges_overlap(slot_start, slot_end, m_start, m_end)
             for meeting in related
-            if getattr(meeting, "meeting_start", None) and getattr(meeting, "meeting_end", None)
+            if (m_start := getattr(meeting, "meeting_start", None)) and (m_end := getattr(meeting, "meeting_end", None))
         ):
             suggestions.append(
                 {

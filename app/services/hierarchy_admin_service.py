@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from flask import current_app
 from sqlalchemy import inspect as sa_inspect, or_, text
@@ -373,7 +373,7 @@ def _safe_user_reference_nullify(model: Any, *columns: str) -> None:
     existing_tables = _existing_table_names()
     if not _model_table_exists(model, existing_tables):
         return
-    updates = {}
+    updates: dict[Any, Any] = {}
     for column in columns:
         attr = getattr(model, column, None)
         if attr is not None:
@@ -412,7 +412,7 @@ def _user_fk_references_to_existing_tables() -> list[dict[str, Any]]:
             if "id" not in (fk.get("referred_columns") or []):
                 continue
             for column_name in fk.get("constrained_columns") or []:
-                column_info = columns.get(column_name, {})
+                column_info = cast("dict[str, Any]", columns.get(column_name, {}))
                 refs.append({
                     "table": table_name,
                     "column": column_name,
@@ -445,7 +445,7 @@ def _detach_non_admin_user_fk_references() -> list[dict[str, Any]]:
             )
             action = "delete"
         result = db.session.execute(sql, {"admin_role": "admin"})
-        rowcount = int(result.rowcount or 0)
+        rowcount = int(result.rowcount or 0)  # type: ignore[attr-defined]
         if rowcount:
             touched.append({"table": table_name, "column": column_name, "action": action, "rowcount": rowcount})
     if touched:

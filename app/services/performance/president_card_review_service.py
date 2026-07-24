@@ -508,7 +508,7 @@ def _criteria_scorecard(evaluation_id: int | None) -> list[dict[str, Any]]:
 
         level = row.get("manager_level")
         try:
-            level_int = int(level)
+            level_int = int(level)  # type: ignore[arg-type]  # defensive parse; falls through to except below
         except (TypeError, ValueError):
             level_int = 0
         score100 = _safe_float(row.get("score_100"))
@@ -531,10 +531,8 @@ def _criteria_scorecard(evaluation_id: int | None) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     for key in ordered_keys:
         item = grouped[key]
-        scores100 = [_safe_float(v.get("score_100")) for v in item["levels"].values()]
-        scores100 = [v for v in scores100 if v is not None]
-        raw_scores = [_safe_float(v.get("raw_score")) for v in item["levels"].values()]
-        raw_scores = [v for v in raw_scores if v is not None]
+        scores100 = [v for v in (_safe_float(lv.get("score_100")) for lv in item["levels"].values()) if v is not None]
+        raw_scores = [v for v in (_safe_float(lv.get("raw_score")) for lv in item["levels"].values()) if v is not None]
         if scores100:
             avg100 = sum(scores100) / len(scores100)
             item["average_score_100"] = _score(avg100)

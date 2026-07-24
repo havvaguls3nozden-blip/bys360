@@ -58,7 +58,7 @@ def _scope_rows(rows: Iterable[dict[str, Any]], employee_ids: Iterable[int] | No
     for row in rows or []:
         employee_id = row.get('employee_id')
         try:
-            employee_id = int(employee_id)
+            employee_id = int(employee_id)  # type: ignore[arg-type]  # defensive parse; falls through to except below
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/performance/orchestration.py:55)")
@@ -154,7 +154,11 @@ def build_team_compare_snapshot(*, period_id: int | None = None, manager_id: int
 
 def build_assignment_generation_snapshot(*, period_id: int | None = None, employee_ids: Iterable[int] | None = None) -> dict[str, Any]:
     period = _selected_period(period_id)
-    logs = get_latest_assignment_generation_logs(getattr(period, 'id', None), limit=200, employee_ids=employee_ids)
+    logs = get_latest_assignment_generation_logs(
+        getattr(period, 'id', None) or 0,
+        limit=200,
+        employee_ids=list(employee_ids) if employee_ids is not None else None,
+    )
     rows = list(logs.get('rows') or [])
     summary = build_assignment_log_summary(rows)
     return {

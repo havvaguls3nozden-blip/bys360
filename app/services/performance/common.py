@@ -321,7 +321,7 @@ def get_president_user(users_by_sicil=None):
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
-            from app.models.user import User
+            from app.models.user import User  # type: ignore[no-redef]
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return None
@@ -402,7 +402,7 @@ def get_evaluation_due_days(period: PerformancePeriod | None) -> int | None:
         return None
     raw = getattr(period, "evaluation_due_days", None)
     try:
-        value = int(raw)
+        value = int(raw)  # type: ignore[arg-type]  # defensive parse; falls through to except below
     except (TypeError, ValueError):
         return None
     return value if value > 0 else None
@@ -527,7 +527,7 @@ def normalize_weight_inputs(
         if total <= 0:
             w1, w2, w3 = DEFAULT_THREE_MANAGER_SCORING_WEIGHTS if mode == "scoring" else DEFAULT_TWO_MANAGER_WEIGHTS
             total = 100.0
-        result = {
+        result: dict[str, Any] = {
             "evaluator_1_weight": round((w1 / total) * 100.0, 2),
             "evaluator_2_weight": round((w2 / total) * 100.0, 2),
             "evaluator_3_weight": round((w3 / total) * 100.0, 2),

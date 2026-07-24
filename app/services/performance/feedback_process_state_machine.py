@@ -198,7 +198,7 @@ def can_mark_step(statuses: dict[str, str], step_key: str, target_status: str) -
     if target_status == "completed":
         blocked = _blocked_by(statuses, step)
         if blocked:
-            labels = [step_by_key(key).title for key in blocked if step_by_key(key)]
+            labels = [found.title for key in blocked if (found := step_by_key(key))]
             return False, "Önce tamamlanması gereken adımlar: " + ", ".join(labels)
     return True, "Adım sırası uygundur."
 
@@ -227,7 +227,7 @@ def build_feedback_state_snapshot(flow_id: int | None = None) -> dict[str, Any]:
             "status_label": STATUS_LABELS.get(effective_status, "Başlamadı"),
             "status_class": STATUS_CLASS.get(effective_status, "muted"),
             "blocked_by": blocked_by,
-            "blocked_by_labels": [step_by_key(key).title for key in blocked_by if step_by_key(key)],
+            "blocked_by_labels": [found.title for key in blocked_by if (found := step_by_key(key))],
         })
 
     total = len(STATE_STEPS)
@@ -295,7 +295,7 @@ def ensure_feedback_pipeline_flow(*, actor_id: int | None = None, title: str = "
                 },
             )
         db.session.commit()
-        return int(flow_id)
+        return int(flow_id)  # type: ignore[arg-type]  # INSERT...RETURNING id always yields a row here
     except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/feedback_process_state_machine.py | line=297")
         db.session.rollback()
