@@ -168,7 +168,7 @@ def extract_routes_from_ast(node: ast.AST) -> list[dict[str, Any]]:
 def classify(name: str, routes: list[dict[str, Any]], src: str) -> str:
     route_text = " ".join(r["route"] for r in routes)
     low = f"{name}\n{route_text}\n{src}".lower()
-    scores = Counter()
+    scores: Counter[str] = Counter()
     for domain, hints in DOMAIN_HINTS.items():
         for hint in hints:
             if hint.lower() in low:
@@ -297,7 +297,7 @@ def main() -> int:
             recommended_domain = domain
             break
 
-    recommendation = {
+    recommendation: dict[str, Any] = {
         "recommended_domain": recommended_domain,
         "recommended_functions": grouped.get(recommended_domain, []) if recommended_domain else [],
         "reason": (

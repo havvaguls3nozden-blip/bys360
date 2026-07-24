@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from datetime import date
+from typing import Any
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -109,7 +110,7 @@ def _handover_item_in_scope(item_id: int | None, scope_user_ids: set[int]) -> Pe
 
 
 def _redirect_handover(handover_id: int | None = None, user_id: int | None = None, scope_mode: str | None = None):
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     scope_value = (scope_mode or request.form.get("scope") or request.args.get("scope") or "").strip()
     if scope_value:
         params["scope"] = scope_value
@@ -337,7 +338,7 @@ def hr_personnel_clearance_board():
     board_ready = all(_table_exists(name) for name in ["personnel_handover_records", "personnel_handover_items"])
     summary = {"total": 0, "completed": 0, "critical": 0, "items": 0}
     board_rows = []
-    type_totals = defaultdict(lambda: {"total": 0, "completed": 0})
+    type_totals: defaultdict[str, dict[str, int]] = defaultdict(lambda: {"total": 0, "completed": 0})
     if board_ready and scope_user_ids:
         rows = (
             PersonnelHandoverRecord.query

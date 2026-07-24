@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from flask import jsonify, request
@@ -98,7 +98,7 @@ def _select_expr(columns: set[str], name: str, aliases: tuple[str, ...] = (), fa
     return f"{fallback} AS {name}"
 
 
-def _assignments(limit: int = 1000, period_id: int | None = None) -> list[Any]:
+def _assignments(limit: int = 1000, period_id: int | None = None) -> Sequence[Any]:
     columns = _table_columns("evaluation_assignments")
     if not columns:
         return []
@@ -128,7 +128,7 @@ def _assignments(limit: int = 1000, period_id: int | None = None) -> list[Any]:
     return db.session.execute(text(sql), params).mappings().all()
 
 
-def _notification_rows(limit: int = 500) -> list[Any]:
+def _notification_rows(limit: int = 500) -> Sequence[Any]:
     columns = _table_columns("notifications")
     if not columns:
         return []
@@ -141,7 +141,7 @@ def _notification_rows(limit: int = 500) -> list[Any]:
     return db.session.execute(text(sql), {"limit": limit}).mappings().all()
 
 
-def _mail_log_rows(limit: int = 500) -> list[Any]:
+def _mail_log_rows(limit: int = 500) -> Sequence[Any]:
     columns = _table_columns("mail_logs")
     if not columns:
         return []

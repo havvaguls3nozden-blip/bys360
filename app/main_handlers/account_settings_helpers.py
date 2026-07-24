@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.main_handlers.account_visibility_helpers import (
     _BYS360_ALL_MENU_ROLE_MATRIX_ITEM_BY_KEY,
     _BYS360_ALL_MENU_ROLE_MATRIX_ITEMS,
@@ -170,7 +172,7 @@ def settings_page():
     compare_user = db.session.get(User, compare_user_id) if compare_user_id else None
     selected_rule_map = {}
     settings_matrix = None
-    settings_presets = {"presets": [], "group_toggles": []}
+    settings_presets: dict[str, list[Any]] = {"presets": [], "group_toggles": []}
     bulk_settings_profiles = _build_bulk_settings_profiles(grouped_menu_definitions)
     bulk_target_users = _serialize_bulk_target_users(users)
     role_options = sorted({(user.role or "").strip() for user in users if (user.role or "").strip()})
@@ -348,13 +350,16 @@ def settings_page():
         if form_action == "rollback_settings_change_entry":
             log_id = request.form.get("change_log_id", type=int)
             keep_user_id = request.form.get("keep_user_id", type=int)
-            try:
-                result = rollback_settings_change(log_id, actor_user_id=getattr(current_user, "id", None))
-                flash(result.get("summary") or "Ayar değişikliği geri alındı.", "success")
-            except Exception as exc:
-                logger.exception("Beklenmeyen hata: %s", exc)
-                db.session.rollback()
-                flash(f"Ayar geçmişi geri alınırken hata oluştu: {exc}", "danger")
+            if log_id is None:
+                flash("Geri alınacak ayar değişikliği kaydı belirtilmedi.", "danger")
+            else:
+                try:
+                    result = rollback_settings_change(log_id, actor_user_id=getattr(current_user, "id", None))
+                    flash(result.get("summary") or "Ayar değişikliği geri alındı.", "success")
+                except Exception as exc:
+                    logger.exception("Beklenmeyen hata: %s", exc)
+                    db.session.rollback()
+                    flash(f"Ayar geçmişi geri alınırken hata oluştu: {exc}", "danger")
             return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
 
         if form_action == "bulk_apply_profile":
@@ -428,7 +433,7 @@ def settings_page():
                 return redirect(url_for("main.settings_page"))
             raw_payload = (request.form.get("import_template_json") or "").strip()
             upload = request.files.get("import_template_file")
-            if not raw_payload and upload and getattr(upload, "filename", ""):
+            if not raw_payload and upload and upload.filename:
                 raw_payload = upload.read().decode("utf-8", errors="ignore").strip()
             if not raw_payload:
                 flash("İçe aktarmak için JSON metni veya dosyası seçiniz.", "warning")

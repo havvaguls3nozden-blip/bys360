@@ -119,7 +119,7 @@ def performance_mail_history_export(period_id):
         rows = build_performance_mail_history_rows(period_id=period.id, limit=5000)
         excel_rows = [
             [
-                row.get("sent_at").strftime("%d.%m.%Y %H:%M") if row.get("sent_at") else "-",
+                sent_at.strftime("%d.%m.%Y %H:%M") if (sent_at := row.get("sent_at")) else "-",
                 row.get("mail_type") or "-",
                 row.get("user_name") or "-",
                 row.get("recipient_email") or "-",
@@ -296,8 +296,9 @@ def performance_send_selected_mail_reminders(period_id):
         return redirect(url_for('main.performance_mail_reminders', period_id=period_id))
 
     force_send = str(request.form.get('force_send') or '').strip().lower() in {'1', 'true', 'on', 'yes', 'evet'}
+    manager_id_ints = [int(item) for item in manager_ids if str(item).strip()]
     try:
-        result = send_selected_assignment_reminders(period, manager_ids, actor_user_id=current_user.id, force=force_send)
+        result = send_selected_assignment_reminders(period, manager_id_ints, actor_user_id=current_user.id, force=force_send)
         db.session.commit()
         flash(
             f"Seçili yöneticiler için gönderim tamamlandı. Başarılı: {result.get('success_count', 0)}, başarısız: {result.get('failed_count', 0)}, atlanan: {result.get('skipped_count', 0)}",

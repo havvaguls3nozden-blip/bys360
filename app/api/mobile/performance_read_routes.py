@@ -131,17 +131,17 @@ def register_mobile_performance_read_routes_v1(route_globals) -> None:
                 rows = [user]
         except Exception:
             rows = [user]
-        buckets = {}
+        buckets: dict[str, dict[str, Any]] = {}
         for row in rows:
             category = _v2852_employee_category(row) or 'Diğer'
             bucket = buckets.setdefault(category, {'total': 0, 'active': 0, 'sample': None})
             bucket['total'] += 1
-            active = True
+            is_active = True
             try:
-                active = bool(getattr(row, 'is_active', True))
+                is_active = bool(getattr(row, 'is_active', True))
             except Exception:
-                active = True
-            if active:
+                is_active = True
+            if is_active:
                 bucket['active'] += 1
             if bucket['sample'] is None:
                 bucket['sample'] = row
@@ -151,9 +151,9 @@ def register_mobile_performance_read_routes_v1(route_globals) -> None:
         items = []
         for category, data in sorted(buckets.items(), key=lambda kv: (-kv[1]['total'], kv[0])):
             total = int(data.get('total', 0) or 0)
-            active = int(data.get('active', 0) or 0)
+            active_count = int(data.get('active', 0) or 0)
             status = 'Kayıt Var' if total else 'Tanımlı Kategori'
-            items.append(_item(category, category, f'{active} aktif / {total} toplam personel', status, 'Kategori bazlı dönem ve rapor kapsamı', '', 100 if total else 35))
+            items.append(_item(category, category, f'{active_count} aktif / {total} toplam personel', status, 'Kategori bazlı dönem ve rapor kapsamı', '', 100 if total else 35))
         return _module_payload([
             _metric('Kategori', len(buckets), 'Tanımlı kategori/grup başlığı', 'blue', 'people'),
             _metric('Personel', sum(int(v.get('total', 0) or 0) for v in buckets.values()), 'Yetki kapsamındaki personel', 'red', 'people'),

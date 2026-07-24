@@ -5,6 +5,7 @@ from __future__ import annotations
 # STATUS_SOURCE: app.institutional.routes LOADED_CHILD_ROUTE_MODULES
 import logging
 from datetime import date
+from typing import Any
 
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
@@ -145,7 +146,7 @@ def _progress(case: PersonnelLifecycleCase) -> int:
 
 
 def _redirect_center(case_id: int | None = None, user_id: int | None = None, scope_mode: str | None = None):
-    params: dict[str, object] = {}
+    params: dict[str, Any] = {}
     scope_value = (scope_mode or request.form.get('scope') or request.args.get('scope') or '').strip()
     if scope_value:
         params['scope'] = scope_value
@@ -344,7 +345,7 @@ def hr_personnel_lifecycle_board():
     hr_scope, scope_users, scope_user_ids, selected_scope_mode, _selected_user = _base_context()
     board_ready = _table_exists('personnel_lifecycle_cases')
     status_columns = ['draft', 'in_progress', 'waiting', 'completed']
-    board = {key: [] for key in status_columns}
+    board: dict[str, list[dict[str, Any]]] = {key: [] for key in status_columns}
     if board_ready and scope_user_ids:
         rows = (
             PersonnelLifecycleCase.query

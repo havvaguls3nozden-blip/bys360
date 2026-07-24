@@ -234,7 +234,7 @@ def ag5_knowledge_center():
     init_knowledge_table()
     if request.method == 'POST':
         try:
-            create_knowledge_entry(title=request.form.get('title',''), question_patterns=request.form.get('question_patterns',''), answer=request.form.get('answer',''), tags=request.form.get('tags',''), audience=request.form.get('audience','all'), priority=request.form.get('priority',50), created_by=getattr(current_user,'id',None))
+            create_knowledge_entry(title=request.form.get('title',''), question_patterns=request.form.get('question_patterns',''), answer=request.form.get('answer',''), tags=request.form.get('tags',''), audience=request.form.get('audience','all'), priority=request.form.get('priority', type=int) or 50, created_by=getattr(current_user,'id',None))
             try:
                 flash("Bilgi kaydı BYS360 Asistanınına öğretildi.", 'success')
             except Exception:
@@ -323,7 +323,7 @@ def _bys360_assistant_tabs_role_matrix_v2_before_request():
     def _allowed(*keys):
         return any(bool(menu_map.get(key)) for key in keys)
 
-    required = ("assistant_module", "ai_agent_panel")
+    required: tuple[str, ...] = ("assistant_module", "ai_agent_panel")
     if path.startswith("/ai-agent/knowledge"):
         required = ("ai_agent_knowledge", "ai_teaching_center")
     elif path.startswith("/ai-agent/teaching-center"):

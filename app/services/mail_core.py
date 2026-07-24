@@ -341,7 +341,7 @@ def get_performance_mail_template_rows() -> list[dict[str, Any]]:
     return [get_mail_template_content(key) for key in (PERFORMANCE_REMINDER_MAIL_TYPE, PERFORMANCE_RESULT_MAIL_TYPE)]
 
 
-def save_performance_mail_templates(payload_by_mail_type: dict[str, dict[str, str]], *, actor_user_id: int | None = None) -> int:
+def save_performance_mail_templates(payload_by_mail_type: dict[str, dict[str, str | None]], *, actor_user_id: int | None = None) -> int:
     if not _system_settings_ready():
         raise RuntimeError("system_settings tablosu bulunamadı. Önce flask db upgrade çalıştırın.")
 

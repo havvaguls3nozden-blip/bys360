@@ -67,6 +67,15 @@ disable_error_code = ["name-defined"]
 module = "app.models.performance_low_score_models"
 disable_error_code = ["method-assign", "assignment"]
 
+# Deliberate temporary monkeypatch of Flask's bound app.add_url_rule method
+# to catch-and-skip a specific duplicate-endpoint AssertionError during
+# blueprint registration, restored via try/finally right after. Ruff's B010
+# rejects the setattr() alternative, so the direct assignment (the actual
+# established pattern) is kept and only this narrow error class silenced.
+[[tool.mypy.overrides]]
+module = "app.bootstrap.route_bootstrap"
+disable_error_code = ["method-assign", "assignment"]
+
 # db.relationship(..., lazy="dynamic") returns an AppenderQuery at runtime
 # but mypy sees the plain RelationshipProperty descriptor (no stubs model
 # the lazy="dynamic" instance-access behavior), so .filter()/.order_by()/
