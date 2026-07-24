@@ -178,7 +178,7 @@ def _validate_submission(assignment, evaluation, items, *, score_enabled: bool, 
 def _update_level_totals(evaluation, employee, period):
     resolved_chain = build_resolved_chain(employee=employee, period=period)
     weight_plan = resolve_weight_plan(employee=employee, period=period, resolved_chain=resolved_chain)
-    level_scores = {
+    level_scores: dict[int, float | int | None] = {
         1: float(getattr(evaluation, 'level_1_total_100', 0.0) or 0.0),
         2: float(getattr(evaluation, 'level_2_total_100', 0.0) or 0.0),
         3: float(getattr(evaluation, 'level_3_total_100', 0.0) or 0.0),

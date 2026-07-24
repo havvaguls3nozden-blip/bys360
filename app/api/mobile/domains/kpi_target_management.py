@@ -94,7 +94,7 @@ def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):
     )
     return delegate_mobile_kpi_target_management_v2853(_bys360_legacy_mobile_kpi_target_management_v2853, user)
 
-def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):
+def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return _module_payload([
@@ -115,7 +115,7 @@ def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):
         rows = q.order_by(Target.id.desc()).limit(250).all()
         rates = []
         for target in rows:
-            rate = _as_int(getattr(target, 'completion_rate', None), None) if getattr(target, 'completion_rate', None) is not None else _v2853_completion(getattr(target, 'current_value', None), getattr(target, 'target_value', None))
+            rate = _as_int(getattr(target, 'completion_rate', None)) if getattr(target, 'completion_rate', None) is not None else _v2853_completion(getattr(target, 'current_value', None), getattr(target, 'target_value', None))
             rates.append(rate)
             risk_level = str(getattr(target, 'risk_level', '') or '').lower()
             risk, tone = _v2853_risk(rate)
@@ -161,7 +161,7 @@ def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):
     from app.api.mobile.services.dashboard_service import delegate_mobile_kpi_target_create_v2853
     return delegate_mobile_kpi_target_create_v2853(_bys360_legacy_mobile_kpi_target_create_v2853, user)
 
-def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):
+def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return jsonify({'message': 'KPI/Hedef modeli bu kurulumda bulunamadı.'}), 503
@@ -220,7 +220,7 @@ def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):
     from app.api.mobile.services.dashboard_service import delegate_mobile_kpi_target_progress_v2853
     return delegate_mobile_kpi_target_progress_v2853(_bys360_legacy_mobile_kpi_target_progress_v2853, user, target_id)
 
-def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):
+def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return jsonify({'message': 'KPI/Hedef modeli bu kurulumda bulunamadı.'}), 503

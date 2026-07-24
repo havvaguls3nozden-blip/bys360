@@ -8,18 +8,18 @@ from typing import Any
 try:
     from sqlalchemy import text
 except Exception:  # pragma: no cover
-    text = None
+    text = None  # type: ignore[assignment]
 
 try:
     from app import db
 except Exception:  # pragma: no cover
-    db = None
+    db = None  # type: ignore[assignment]
 
 
 def _execute(statement: str, params: dict[str, Any] | None = None):
     if db is None:
         raise RuntimeError("Veritabanı bağlantısı kullanılamıyor.")
-    if text:
+    if text:  # type: ignore[truthy-function]
         return db.session.execute(text(statement), params or {})
     return db.session.execute(statement, params or {})
 

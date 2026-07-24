@@ -15,9 +15,9 @@ def build_assignment_board_query(*, evaluator_id: int | None = None, admin_mode:
         EvaluationAssignment.query.join(User, EvaluationAssignment.employee_id == User.id)
         .join(PerformancePeriod, EvaluationAssignment.period_id == PerformancePeriod.id)
         .options(
-            joinedload(EvaluationAssignment.employee),
-            joinedload(EvaluationAssignment.evaluator),
-            joinedload(EvaluationAssignment.period),
+            joinedload(EvaluationAssignment.employee),  # type: ignore[arg-type]
+            joinedload(EvaluationAssignment.evaluator),  # type: ignore[arg-type]
+            joinedload(EvaluationAssignment.period),  # type: ignore[arg-type]
         )
     )
     if not admin_mode and evaluator_id is not None:

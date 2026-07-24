@@ -215,8 +215,8 @@ def render_personnel_live_scope_markdown(project_root: str | Path = ".") -> str:
     for item in PERSONNEL_SERVICE_MODULES:
         lines.append(f"- `{item.path}` — {item.label}")
     lines.extend(["", "## Kontroller"])
-    for item in checks:
-        mark = "OK" if item["ok"] else "HATA"
-        lines.append(f"- {mark} `{item['name']}` — {item['detail']}")
+    for check in checks:
+        mark = "OK" if check["ok"] else "HATA"
+        lines.append(f"- {mark} `{check['name']}` — {check['detail']}")
     lines.append("")
     return "\n".join(lines)

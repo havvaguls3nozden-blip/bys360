@@ -217,7 +217,7 @@ def _open_task_count(evaluation_id: int) -> int:
         if not status_col:
             continue
         placeholders = ", ".join(f":s{i}" for i, _ in enumerate(OPEN_STATUS_VALUES))
-        params = {f"s{i}": status for i, status in enumerate(OPEN_STATUS_VALUES)}
+        params: dict[str, Any] = {f"s{i}": status for i, status in enumerate(OPEN_STATUS_VALUES)}
         params["evaluation_id"] = evaluation_id
         total += int(
             db.session.execute(
@@ -341,7 +341,7 @@ def _ensure_flow(evaluation_id: int, period_id: int | None, employee_id: int | N
             "version": PHASE7_VERSION,
         },
     ).scalar()
-    return int(new_id)
+    return int(new_id)  # type: ignore[arg-type]  # INSERT...RETURNING id always yields a row here
 
 
 def _step_exists(flow_id: int, event_key: str) -> bool:
@@ -470,7 +470,7 @@ def _ensure_approval(
             "version": PHASE7_VERSION,
         },
     ).scalar()
-    return int(new_id)
+    return int(new_id)  # type: ignore[arg-type]  # INSERT...RETURNING id always yields a row here
 
 
 def _notification_exists(flow_id: int, recipient_id: int | None, source_event_key: str) -> bool:

@@ -18,8 +18,8 @@ try:
     from sqlalchemy import inspect as sa_inspect, text
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/security_hardening_service.py | line=27")
-    text = None
-    sa_inspect = None
+    text = None  # type: ignore[assignment]
+    sa_inspect = None  # type: ignore[assignment]
 
 """BYS360 Faz 3 - Guvenlik ve yetki sertlestirme servisleri.
 
@@ -366,7 +366,7 @@ def _scan_captcha(report: AuditReport, root_dir: Path) -> None:
 def _scan_tckn_exposure(report: AuditReport, root_dir: Path) -> None:
     app_dir = root_dir / "app"
     files = _iter_files(app_dir, (".py", ".html", ".jinja", ".j2", ".js"), skip_parts=("migrations", "__pycache__"))
-    hits = []
+    hits: list[dict[str, Any]] = []
     for path in files:
         text = path.read_text(encoding="utf-8", errors="ignore")
         for idx, line in enumerate(text.splitlines(), start=1):

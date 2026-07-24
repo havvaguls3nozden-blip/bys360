@@ -13,7 +13,7 @@ Bu sayede veritabanında olmayan eski modeller/tablo adları personel silme sır
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import MetaData, inspect, text
 
@@ -76,7 +76,7 @@ def _user_fk_refs() -> list[dict[str, Any]]:
                 continue
 
             for column_name in constrained_columns:
-                col_info = columns.get(column_name, {})
+                col_info = cast("dict[str, Any]", columns.get(column_name, {}))
                 refs.append(
                     {
                         "table": table_name,
@@ -141,7 +141,7 @@ def safe_delete_user_by_id(
                 result = db.session.execute(sql, {"uid": uid})
                 action = "delete"
 
-            rowcount = int(result.rowcount or 0)
+            rowcount = int(result.rowcount or 0)  # type: ignore[attr-defined]
             if rowcount:
                 touched.append(
                     {
@@ -160,7 +160,7 @@ def safe_delete_user_by_id(
             {"uid": uid},
         )
 
-        deleted = int(result.rowcount or 0)
+        deleted = int(result.rowcount or 0)  # type: ignore[attr-defined]
 
         if commit:
             db.session.commit()

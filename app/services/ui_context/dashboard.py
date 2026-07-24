@@ -359,7 +359,7 @@ def build_dashboard_context(user, detail_level: str = "full") -> dict[str, Any]:
     total_evaluations, completed_evaluations, unpublished_results_count, pending_feedback_requests, total_assignments = _evaluation_metrics(
         getattr(active_period, "id", None), scope_user_ids,
     )
-    latest_log_payload = {"created_at": None, "rows": [], "summary": build_assignment_log_summary([])}
+    latest_log_payload: dict[str, Any] = {"created_at": None, "rows": [], "summary": build_assignment_log_summary([])}
     coverage_summary = build_assignment_log_summary([])
     coverage_risk_score = 0
     coverage_risk_tone, coverage_risk_label = _coverage_tone(coverage_risk_score)

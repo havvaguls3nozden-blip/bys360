@@ -12,7 +12,7 @@ statü dili ve ağırlık uygulaması Faz 4.2-4.5 adımlarında bu servise bağl
 logger = logging.getLogger(__name__)
 
 # BYS360_PHASE4_1_THIRD_SUPERVISOR_SETTINGS
-DEFAULTS = {
+DEFAULTS: dict[str, Any] = {
     "performance.third_supervisor_enabled": True,
     "performance.third_supervisor_mode": "comment_only",
     "performance.third_supervisor_show_column": False,
