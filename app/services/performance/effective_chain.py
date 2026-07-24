@@ -13,19 +13,19 @@ try:
     from flask import current_app
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    current_app = None
+    current_app = None  # type: ignore[assignment]
 
 try:
     from app.extensions import db
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    db = None
+    db = None  # type: ignore[assignment]
 
 try:
     import app.models as models
 except Exception:
     logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-    models = None
+    models = None  # type: ignore[assignment]
 
 
 User = getattr(models, "User", None) if models else None
@@ -215,7 +215,7 @@ def write_assignment_audit_log(period_id: int, employee_id: int, effective: Effe
 
 
 def ensure_effective_assignment(period_id: int, employee_id: int, effective: EffectiveEvaluator):
-    if not EvaluationAssignment or not db:
+    if not EvaluationAssignment or not db or not PerformancePeriod:
         return None
 
     if not effective.effective_evaluator_id:
@@ -285,6 +285,9 @@ def generate_effective_assignments(period_id: int, chains: list[dict[str, Any]],
 
     for chain in chains:
         employee_id = _get_id(chain.get("employee_id"))
+        if employee_id is None:
+            issues.append("employee_id eksik; zincir atlandı.")
+            continue
         manager_1_id = _get_id(chain.get("manager_1_id"))
         manager_2_id = _get_id(chain.get("manager_2_id"))
         manager_3_id = _get_id(chain.get("manager_3_id"))

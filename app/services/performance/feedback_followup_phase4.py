@@ -329,8 +329,8 @@ def _decorate_action(row: dict[str, Any], today: date | None = None) -> dict[str
     today = today or date.today()
     due = _parse_date(row.get("target_date")) or _parse_date(row.get("follow_up_check_date"))
     row["due_date"] = due.isoformat() if due else ""
-    row["status_label"] = ACTION_STATUS_LABELS.get(row.get("status"), row.get("status") or "-")
-    row["responsible_label"] = RESPONSIBLE_LABELS.get(row.get("responsible_role"), row.get("responsible_role") or "-")
+    row["status_label"] = ACTION_STATUS_LABELS.get(row.get("status") or "", row.get("status") or "-")
+    row["responsible_label"] = RESPONSIBLE_LABELS.get(row.get("responsible_role") or "", row.get("responsible_role") or "-")
     status = (row.get("status") or "").strip().lower()
     if status in CLOSED_STATUSES:
         row["due_state"] = "closed"
@@ -674,8 +674,8 @@ def list_recent_notices(
     """
     rows = _rows(sql, params)
     for row in rows:
-        row["notice_type_label"] = NOTICE_TYPE_LABELS.get(row.get("notice_type"), row.get("notice_type") or "-")
-        row["status_label"] = NOTICE_STATUS_LABELS.get(row.get("status"), row.get("status") or "-")
+        row["notice_type_label"] = NOTICE_TYPE_LABELS.get(row.get("notice_type") or "", row.get("notice_type") or "-")
+        row["status_label"] = NOTICE_STATUS_LABELS.get(row.get("status") or "", row.get("status") or "-")
     return rows
 
 

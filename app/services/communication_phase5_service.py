@@ -214,8 +214,8 @@ def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
     now = _now()
     tickets = SupportTicket.query.order_by(SupportTicket.created_at.desc()).limit(limit).all()
     open_rows = []
-    priority_counts = Counter()
-    status_counts = Counter()
+    priority_counts: Counter[str] = Counter()
+    status_counts: Counter[str] = Counter()
     assignee_counter: dict[tuple[int | None, str], int] = defaultdict(int)
     stale_rows = []
     unassigned_rows = []
@@ -254,7 +254,7 @@ def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
     open_rows.sort(key=lambda item: (_priority_rank(item["priority"]), -item["risk_ratio"], -item["age_hours"]))
     stale_rows.sort(key=lambda item: (-item["age_hours"], _priority_rank(item["priority"])))
     unassigned_rows.sort(key=lambda item: (_priority_rank(item["priority"]), -item["age_hours"]))
-    assignee_load = [
+    assignee_load: list[dict[str, Any]] = [
         {"user_id": key[0], "name": key[1], "open_count": count}
         for key, count in assignee_counter.items()
     ]
@@ -348,7 +348,7 @@ def escalation_snapshot() -> dict[str, Any]:
         assignee_counter[(getattr(assigned, "id", None), user_display_name(assigned) if assigned else "Atanmamış")] += 1
     breaches.sort(key=lambda item: (-item["breach_hours"], -item["age_hours"]))
     nearing.sort(key=lambda item: (_priority_rank(item["priority"]), -item["age_hours"]))
-    assignee_load = [{"user_id": key[0], "name": key[1], "open_count": count} for key, count in assignee_counter.items()]
+    assignee_load: list[dict[str, Any]] = [{"user_id": key[0], "name": key[1], "open_count": count} for key, count in assignee_counter.items()]
     assignee_load.sort(key=lambda item: (-item["open_count"], item["name"].lower()))
     return {
         "rules": rules,

@@ -354,7 +354,7 @@ def list_meetings_for_aftercare(
     params["limit"] = int(limit or 80)
     rows = _rows(sql, params)
     for row in rows:
-        row["status_label"] = STATUS_LABELS.get(row.get("status"), row.get("status") or "-")
+        row["status_label"] = STATUS_LABELS.get(row.get("status") or "", row.get("status") or "-")
         row["is_prepared"] = bool(int(row.get("has_preparation") or 0))
         row["is_closed"] = bool(int(row.get("has_after_note") or 0))
     return rows
@@ -381,7 +381,7 @@ def get_meeting_aftercare_detail(
     meeting = _row(sql, params)
     if not meeting:
         return {"meeting": None, "preparation": {}, "after_note": {}, "actions": [], "can_edit": False}
-    meeting["status_label"] = STATUS_LABELS.get(meeting.get("status"), meeting.get("status") or "-")
+    meeting["status_label"] = STATUS_LABELS.get(meeting.get("status") or "", meeting.get("status") or "-")
     preparation = _row("SELECT * FROM feedback_meeting_preparations WHERE meeting_id = :meeting_id", {"meeting_id": meeting_id}) or {}
     after_note = _row("SELECT * FROM feedback_meeting_after_notes WHERE meeting_id = :meeting_id", {"meeting_id": meeting_id}) or {}
     actions = _rows(
@@ -397,8 +397,8 @@ def get_meeting_aftercare_detail(
         {"meeting_id": meeting_id},
     )
     for action in actions:
-        action["status_label"] = ACTION_STATUS_LABELS.get(action.get("status"), action.get("status") or "-")
-        action["responsible_label"] = RESPONSIBLE_LABELS.get(action.get("responsible_role"), action.get("responsible_role") or "-")
+        action["status_label"] = ACTION_STATUS_LABELS.get(action.get("status") or "", action.get("status") or "-")
+        action["responsible_label"] = RESPONSIBLE_LABELS.get(action.get("responsible_role") or "", action.get("responsible_role") or "-")
     role = (current_user_role or "").lower()
     can_edit = bool(_is_global_user(role, is_admin=is_admin, is_superuser=is_superuser) or current_user_id in {meeting.get("manager_id"), meeting.get("employee_id")})
     mail_draft = build_summary_mail_draft(meeting, after_note, actions)

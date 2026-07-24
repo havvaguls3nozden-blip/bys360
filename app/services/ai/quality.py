@@ -163,7 +163,7 @@ def build_ai_quality_snapshot(*, module_type: str = "", prompt_version: str = ""
             payload["latency_count"] += 1
 
     for row in recommendation_rows:
-        key = request_prompt_lookup.get(getattr(row, "ai_request_log_id", None))
+        key = request_prompt_lookup.get(getattr(row, "ai_request_log_id", None) or 0) or ""
         if not key:
             continue
         payload = prompt_map[key]
@@ -175,7 +175,7 @@ def build_ai_quality_snapshot(*, module_type: str = "", prompt_version: str = ""
             payload["open_recommendations"] += 1
 
     for row in feedback_rows:
-        key = request_prompt_lookup.get(getattr(row, "ai_request_log_id", None))
+        key = request_prompt_lookup.get(getattr(row, "ai_request_log_id", None) or 0) or ""
         if not key:
             continue
         payload = prompt_map[key]
@@ -259,7 +259,7 @@ def build_ai_quality_snapshot(*, module_type: str = "", prompt_version: str = ""
             payload["latency_count"] += 1
 
     for row in recommendation_rows:
-        key = request_module_lookup.get(getattr(row, "ai_request_log_id", None))
+        key = request_module_lookup.get(getattr(row, "ai_request_log_id", None) or 0) or ""
         if not key:
             continue
         payload = module_map[key]
@@ -271,7 +271,7 @@ def build_ai_quality_snapshot(*, module_type: str = "", prompt_version: str = ""
             payload["open_recommendations"] += 1
 
     for row in feedback_rows:
-        key = request_module_lookup.get(getattr(row, "ai_request_log_id", None))
+        key = request_module_lookup.get(getattr(row, "ai_request_log_id", None) or 0) or ""
         if not key:
             continue
         payload = module_map[key]

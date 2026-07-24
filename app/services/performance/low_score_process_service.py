@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 # BYS360_PHASE6_DIRECT_PRESIDENT_CONTRACT_V3
 # BYS360_CANLI_SAGLAMLASTIRMA_PHASE1_14_V2_PHASE6_3_DIRECT_PRESIDENT_CONTRACT
@@ -509,7 +510,7 @@ def _legacy_add_low_score_process_note_phase1(process_id=None, actor=None, note=
         from app.extensions import db
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        db = None
+        db = None  # type: ignore[assignment]
     target = process
     if target is None and process_id is not None and db is not None:
         try:
@@ -598,6 +599,7 @@ def _legacy_start_second_repeat_admin_process_phase1(process, *, actor=None, not
         import logging
         logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/low_score_process_service.py")
     return process
+@dataclass
 class LowScorePeriodSummary:
     total: int
     pending_president: int
