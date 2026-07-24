@@ -174,7 +174,7 @@ def filter_phase6_real_low_score_approvals(rows: Iterable[Mapping[str,Any]]) -> 
 def phase6_contract() -> dict[str,Any]:
     return {"version":BYS360_PERFORMANCE_COMPLETION_PHASE6_VERSION,"phase_marker":PHASE6_POLICY_MARKER,"low_score_threshold":LOW_SCORE_THRESHOLD,"fake_approval_records_forbidden":True,"publish_block_until_upper_approval":True,"first_low_warning_required":True,"second_low_administrative_process_required":True,"process_record_required_after_approval":True,"technical_status_hidden":True,"status_labels":dict(STATUS_LABELS),"settings":[{"module_key":m,"setting_key":k,"label":label,"value_type":t,"default_value":d,"description":desc} for m,k,label,t,d,desc in PHASE6_SETTING_ROWS]}
 def seed_phase6_low_score_process_settings() -> dict[str,Any]:
-    changed=[]
+    changed:list[str]=[]
     try:
         from app import db
         try:

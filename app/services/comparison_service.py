@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import Any
 
 from app.extensions import db
 from app.models import (
@@ -105,7 +106,7 @@ def _build_payload_from_evaluation(evaluation: PerformanceEvaluation) -> dict:
         .all()
     )
 
-    grouped = {}
+    grouped: dict[int, dict[str, Any]] = {}
     for item in items:
         criteria = item.criteria
         if not criteria:

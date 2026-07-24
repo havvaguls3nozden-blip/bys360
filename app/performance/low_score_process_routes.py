@@ -151,7 +151,7 @@ def performance_low_score_add_note(process_id: int):
         if not note_text:
             flash("Süreç notu boş bırakılamaz.", "warning")
             return _process_redirect(process)
-        add_low_score_process_note(process, actor=current_user, note=note_text)
+        add_low_score_process_note(process, user_or_id=current_user, note=note_text)
         db.session.commit()
         flash("Süreç notu kaydedildi.", "success")
         return _process_redirect(process)

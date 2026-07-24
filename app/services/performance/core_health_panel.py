@@ -206,7 +206,7 @@ def _compact_publish_preflight(period: Any | None) -> tuple[list[CoreFinding], d
 
 
 def _split_findings(findings: Iterable[CoreFinding]) -> dict[str, list[dict[str, str]]]:
-    result = {"blockers": [], "warnings": [], "infos": []}
+    result: dict[str, list[dict[str, str]]] = {"blockers": [], "warnings": [], "infos": []}
     for finding in findings:
         if finding.severity == "blocker":
             result["blockers"].append(finding.as_dict())

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -26,6 +27,7 @@ Faz 10 görünürlük/maskeleme kapısı ile uyumlu çalışır; AI nihai karar 
 öneri uygulamaz, kayıt oluşturmaz ve kayıt güncellemez.
 """
 
+build_ai_visibility_gate_snapshot: Callable[..., dict[str, Any]] | None
 try:  # Faz 10 overlay uygulanmışsa güvenli export politikası oradan okunur.
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot
 except Exception:  # pragma: no cover - eski canlı paketlerde güvenli geri dönüş

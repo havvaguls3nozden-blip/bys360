@@ -442,7 +442,7 @@ def portal_home_context(user: Any) -> dict[str, Any]:
         posts = [p for p in raw_posts if not _is_press_news_home_excluded_v4(p)][:10]
         # BYS360_PORTAL_LIGHT_HOME_V2_8_81_HIDE_INSTAGRAM_HOME_POSTS
         enriched = enrich_posts(posts, user)
-        portal_home_instagram_stories = []
+        portal_home_instagram_stories: list[Any] = []
         # BYS360_PORTAL_INSTAGRAM_FEED_V2_11_2_PORTAL_STORY_HOME_STORIES
 
         visible_posts_count = len(enriched)

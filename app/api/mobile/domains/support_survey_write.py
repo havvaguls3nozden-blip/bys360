@@ -39,7 +39,7 @@ from app.api.mobile.shared import (
 )
 
 try:
-    from app.api.mobile.services import (
+    from app.api.mobile.services import (  # type: ignore[attr-defined]
         support_survey_service as _mobile_support_service,
     )
 except Exception:  # pragma: no cover - compatibility fallback

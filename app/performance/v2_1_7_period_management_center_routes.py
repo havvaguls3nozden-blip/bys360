@@ -125,7 +125,7 @@ def _period_center_norm_v222a(value):
 
 
 def _period_center_collect_terms_v222a(user):
-    terms = set()
+    terms: set[str] = set()
     if not user:
         return terms
     for attr in ("role", "role_name", "user_role", "authority_level", "title", "unvan", "position", "gorev", "username"):

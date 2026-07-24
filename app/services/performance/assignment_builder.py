@@ -22,7 +22,7 @@ def sync_evaluation_summary(evaluation, evaluator_id, level):
 
 def build_assignments(period_id:int, chains:list[dict[str,Any]]):
     assignments = []
-    existing_keys = set()
+    existing_keys: set[str] = set()
 
     for c in chains:
         emp = c["employee_id"]

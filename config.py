@@ -1,20 +1,20 @@
-import logging
 import ipaddress
+import logging
 import os
-import secrets
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
 logger = logging.getLogger(__name__)
 
 # BYS360_CANLI_SAGLAMLASTIRMA_FAZ1_8_DOTENV_FALLBACK_V2
 try:
     from dotenv import load_dotenv
 except ModuleNotFoundError:
-    def load_dotenv(dotenv_path=None, override: bool = False, **_kwargs):
+    def load_dotenv(dotenv_path=None, override: bool = False, **_kwargs):  # type: ignore[misc]
         """python-dotenv yoksa uygulamayı düşürmeyen minimum .env okuyucu."""
         path = dotenv_path or ".env"
         try:
-            with open(path, "r", encoding="utf-8-sig") as handle:
+            with open(path, encoding="utf-8-sig") as handle:
                 lines = handle.readlines()
         except FileNotFoundError:
             return False

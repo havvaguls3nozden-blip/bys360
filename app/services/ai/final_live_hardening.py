@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,7 @@ Bu servis kapanış raporu, kalite kapısı ve canlı güvenlik duruşunu salt-o
 yapmaz, ham AI istem/yanıt metnini panelde veya export içinde açmaz.
 """
 
+build_ai_visibility_gate_snapshot: Callable[..., dict[str, Any]] | None
 try:
     from app.services.ai.visibility_gate import build_ai_visibility_gate_snapshot
 except Exception:  # pragma: no cover - Faz 10 öncesi paketlerde güvenli geri dönüş
