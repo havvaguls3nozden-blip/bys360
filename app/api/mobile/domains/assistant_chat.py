@@ -64,7 +64,10 @@ def _b49_safe_summary(user):
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/api/mobile/domains/assistant_chat.py:49")
         open_support = 0
     try:
-        pending_perf = _safe_count(EvaluationAssignment.query.filter_by(evaluator_user_id=user.id, status='pending'))
+        pending_perf = _safe_count(EvaluationAssignment.query.filter(
+            EvaluationAssignment.evaluator_id == user.id,
+            EvaluationAssignment.status.in_(['bekliyor', 'kismen_tamamlandi']),
+        ))
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/api/mobile/domains/assistant_chat.py:53")
         pending_perf = 0
