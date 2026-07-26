@@ -120,11 +120,11 @@ def _integration_for_plan(plan_key: str) -> dict[str, Any] | None:
         for item in list_integrations():
             if str(item.get("plan_key") or "") == key:
                 return item
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=111")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=114")
             pass
     return None
@@ -134,11 +134,11 @@ def ensure_period_center_process_notification_schema() -> dict[str, Any]:
     """Entegrasyon tablosuna bildirim hazırlığı özet alanlarını ekler."""
     try:
         ensure_category_period_integration_schema()
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=123")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=126")
             pass
     db = _db()
@@ -225,11 +225,11 @@ def _assignment_scalar(period_id: int | None, expression: str, fallback: int = 0
     try:
         value = _db().session.execute(text(f"SELECT {expression} FROM {ASSIGNMENT_TABLE} WHERE period_id=:pid"), {"pid": pid}).scalar()
         return int(value or 0)
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=207")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=210")
             pass
         return fallback
@@ -242,11 +242,11 @@ def _assignment_count_where(period_id: int | None, where_clause: str) -> int:
     try:
         value = _db().session.execute(text(f"SELECT COUNT(*) FROM {ASSIGNMENT_TABLE} WHERE period_id=:pid AND ({where_clause})"), {"pid": pid}).scalar()
         return int(value or 0)
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=222")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=225")
             pass
         return 0
@@ -317,11 +317,11 @@ def _recent_mail_count(period_id: int | None) -> int:
         return 0
     try:
         return int(_db().session.execute(text(f"SELECT COUNT(*) FROM {MAIL_LOG_TABLE} WHERE period_id=:pid"), {"pid": pid}).scalar() or 0)
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=295")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=298")
             pass
         return 0
