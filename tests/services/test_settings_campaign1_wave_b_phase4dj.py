@@ -31,6 +31,12 @@ class _Session:
 
 class _SystemModel:
     query = _Query([])
+    # Set dynamically via __init__(**kwargs) below; declared here so the
+    # instances constructed and asserted against later in this file expose
+    # their real, always-present attributes to the type checker.
+    setting_key: str
+    value_text: str
+    updated_by_user_id: int | None
 
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -38,6 +44,11 @@ class _SystemModel:
 
 class _ModuleModel:
     query = _Query([])
+    # Same rationale as _SystemModel above.
+    module_key: str
+    setting_key: str
+    value_text: str
+    updated_by_user_id: int | None
 
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)

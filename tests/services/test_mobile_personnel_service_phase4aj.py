@@ -52,12 +52,16 @@ def test_mobile_personnel_all_delegates_to_routes(
     fake_mobile_routes: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"items": ["person-1"]})
-    fake_mobile_routes._bys360_legacy_mobile_personnel_all = legacy
+    # fake_mobile_routes is a ModuleType stand-in with no fixed attribute
+    # contract -- its entire purpose is to receive this ad hoc legacy
+    # delegate symbol, exactly like a real module's namespace after exec.
+    routes: Any = fake_mobile_routes
+    routes._bys360_legacy_mobile_personnel_all = legacy
 
     result = svc.mobile_personnel_all("filter-1", page=2)
 
     assert result == {"items": ["person-1"]}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": ("filter-1",), "kwargs": {"page": 2}}
     ]
 
@@ -66,12 +70,14 @@ def test_mobile_personnel_create_delegates_to_personnel_domain(
     fake_personnel_domain: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"created": True})
-    fake_personnel_domain._bys360_legacy_mobile_personnel_create = legacy
+    # Same rationale as fake_mobile_routes above.
+    domain: Any = fake_personnel_domain
+    domain._bys360_legacy_mobile_personnel_create = legacy
 
     result = svc.mobile_personnel_create({"name": "Ada"}, source="mobile")
 
     assert result == {"created": True}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": ({"name": "Ada"},), "kwargs": {"source": "mobile"}}
     ]
 
@@ -80,11 +86,13 @@ def test_mobile_created_personnel_row_delegates_to_personnel_domain(
     fake_personnel_domain: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"row": {"id": 7}})
-    fake_personnel_domain._bys360_legacy__mobile_created_personnel_row = legacy
+    # Same rationale as fake_mobile_routes above.
+    domain: Any = fake_personnel_domain
+    domain._bys360_legacy__mobile_created_personnel_row = legacy
 
     result = svc._mobile_created_personnel_row(7, include_meta=True)
 
     assert result == {"row": {"id": 7}}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": (7,), "kwargs": {"include_meta": True}}
     ]

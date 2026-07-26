@@ -2,9 +2,21 @@ from __future__ import annotations
 
 import logging
 from types import SimpleNamespace
+from typing import Any, TypedDict
 
 import app.services.settings.change_logs as change_logs
 import app.services.settings.ui_panel as ui_panel
+
+
+class _CommonChangeLogKwargs(TypedDict):
+    """Matches change_logs.create_settings_change_log's required keyword-only params, so **common below is a checked splat rather than an untyped dict."""
+
+    actor_user_id: int | None
+    change_scope: str
+    action_type: str
+    summary: str
+    previous_state: Any
+    new_state: Any
 
 
 class _Expr:
@@ -542,7 +554,7 @@ def test_create_change_log_handles_missing_and_present_table(
         lambda name: False,
     )
 
-    common = {
+    common: _CommonChangeLogKwargs = {
         "actor_user_id": 1,
         "change_scope": (
             "system_settings"
@@ -565,7 +577,7 @@ def test_create_change_log_handles_missing_and_present_table(
         is None
     )
 
-    added = []
+    added: list[_LogModel] = []
 
     monkeypatch.setattr(
         change_logs,
