@@ -49,6 +49,19 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 no_implicit_optional = true
 exclude = "(^migrations/|^app/static/|^app/templates/)"
+# tests/ has no __init__.py anywhere (by design of this repo's test layout),
+# so several identically-named conftest.py files (tests/conftest.py,
+# tests/critical/conftest.py, tests/architecture/conftest.py, ...) collide
+# on the same top-level module name "conftest" under mypy's classic
+# module-name resolution, crashing the CI invocation with
+# "Duplicate module named conftest" (exit code 2) before any type checking
+# runs. explicit_package_bases (+ mypy_path pointing at the repo root)
+# makes mypy derive each file's dotted module name from its path relative
+# to the repo root instead (e.g. tests.conftest vs
+# tests.critical.conftest), which resolves the collision without adding
+# __init__.py files anywhere. Config-only change; no test files touched.
+explicit_package_bases = true
+mypy_path = "."
 
 # db.Model is a Flask-SQLAlchemy runtime attribute mypy cannot statically
 # resolve as a base class; every ORM model module hits this the same way.
