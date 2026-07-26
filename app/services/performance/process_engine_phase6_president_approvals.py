@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
 
@@ -265,7 +266,7 @@ def delete_president_approval_record(approval_id: int, actor: Any) -> Phase6Acti
             {"approval_id": approval_id},
         )
         db.session.commit()
-    except Exception as exc:
+    except SQLAlchemyError as exc:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
         return Phase6ActionResult(False, f"Kayıt silinemedi: {exc}", approval_id)
@@ -650,7 +651,7 @@ def _display_user_name(user_id: Any) -> str:
             """),
             {"user_id": user_id},
         ).mappings().first()
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
         row = None

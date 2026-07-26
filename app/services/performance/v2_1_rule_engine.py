@@ -4,6 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
+from sqlalchemy.exc import SQLAlchemyError
+
 """BYS360 Performans V2.1.1 merkezi kural motoru.
 
 Bu servis, performans kurallarını kod içine dağınık sabitlemek yerine
@@ -115,7 +117,7 @@ def _has_module_settings_table() -> bool:
 
         from app.extensions import db
         return bool(inspect(db.engine).has_table("module_settings"))
-    except Exception:
+    except (SQLAlchemyError, ImportError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return False
 
@@ -149,7 +151,7 @@ def get_setting_text(setting_key: str, default: Any | None = None) -> str | None
             return fallback
         raw = row[0]
         return fallback if raw is None else str(raw)
-    except Exception:
+    except (SQLAlchemyError, ImportError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return fallback
 
@@ -175,13 +177,13 @@ def get_setting_float(setting_key: str, default: float | None = None) -> float:
             fallback = float(fallback_raw)
         else:
             fallback = 0.0
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         fallback = 0.0
     raw = get_setting_text(setting_key, str(fallback))
     try:
         return float(str(raw).replace(",", "."))
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return fallback
 
@@ -196,7 +198,7 @@ def normalize_raw_score(raw_score: Any) -> int | None:
         if raw_score in (None, ""):
             return None
         return int(float(raw_score))
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return None
 
@@ -211,7 +213,7 @@ def score_requires_criterion_comment(raw_score: Any) -> bool:
 def is_low_score(score_100: Any) -> bool:
     try:
         return float(score_100 or 0) < get_setting_float("low_score_threshold", LOW_SCORE_DEFAULT)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return False
 
@@ -219,7 +221,7 @@ def is_low_score(score_100: Any) -> bool:
 def is_high_score(score_100: Any) -> bool:
     try:
         return float(score_100 or 0) > get_setting_float("high_score_threshold", HIGH_SCORE_DEFAULT)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return False
 
@@ -268,7 +270,7 @@ def evaluation_final_score(evaluation: Any) -> float:
         if value not in (None, ""):
             try:
                 return float(value)
-            except Exception:
+            except (TypeError, ValueError):
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 continue
     return 0.0
