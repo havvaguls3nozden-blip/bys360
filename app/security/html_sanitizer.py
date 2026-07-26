@@ -9,7 +9,7 @@ from markupsafe import Markup, escape
 
 try:
     import bleach
-except Exception:  # pragma: no cover
+except (ImportError, OSError):  # pragma: no cover
     bleach = None
 
 _ALLOWED_SOCIAL_TAGS = ["blockquote", "a", "br"]

@@ -13,7 +13,7 @@ from typing import Final
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
-except Exception:  # pragma: no cover
+except (ImportError, OSError):  # pragma: no cover
     Fernet = None  # type: ignore[assignment,misc]
     InvalidToken = Exception  # type: ignore[assignment,misc]
 
@@ -45,7 +45,7 @@ def _derive_fernet_key(raw_key: str) -> bytes:
         decoded = base64.urlsafe_b64decode(raw_key.encode("utf-8"))
         if len(decoded) == 32:
             return raw_key.encode("utf-8")
-    except Exception:
+    except (UnicodeError, ValueError):
         pass
     digest = hashlib.sha256(raw_key.encode("utf-8")).digest()
     return base64.urlsafe_b64encode(digest)
@@ -64,7 +64,7 @@ def _get_config_key(explicit_key: str | None = None) -> str:
         key = current_app.config.get("TCKN_ENCRYPTION_KEY")
         if key:
             return str(key).strip()
-    except Exception:
+    except (ImportError, RuntimeError):
         pass
     return os.getenv("TCKN_ENCRYPTION_KEY", "").strip()
 

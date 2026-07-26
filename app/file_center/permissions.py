@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from flask_login import current_user
-from sqlalchemy.exc import OperationalError, ProgrammingError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db
@@ -157,9 +157,7 @@ def _table_ready() -> bool:
     try:
         FileCenterRolePermission.query.limit(1).all()
         return True
-    except (OperationalError, ProgrammingError):
-        return False
-    except Exception:
+    except (SQLAlchemyError, RuntimeError):
         return False
 
 
@@ -224,7 +222,7 @@ def _permission_from_matrix(user, field: str) -> bool | None:
         if row is None:
             return None
         return bool(getattr(row, field, False))
-    except Exception:
+    except (SQLAlchemyError, RuntimeError):
         return None
 
 
