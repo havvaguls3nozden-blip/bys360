@@ -66,8 +66,9 @@ BLOCKED_REPO_SUFFIXES = {
     ".sqlite3", ".sqlite", ".db", ".dump", ".bak", ".backup", ".old", ".orig",
     ".log", ".key", ".pem", ".p12", ".pfx", ".ppk", ".jks", ".keystore",
 }
+ENV_FILE_BLOCK_RE = re.compile(r"(^|/|\\)\.env($|\.)", re.I)
 BLOCKED_REPO_NAME_PATTERNS = (
-    re.compile(r"(^|/|\\)\.env($|\.)", re.I),
+    ENV_FILE_BLOCK_RE,
     re.compile(r"\.gitignore\.bak", re.I),
     re.compile(r"\.bak_", re.I),
     re.compile(r"disabled_by_rollback", re.I),
@@ -270,6 +271,10 @@ def scan_blocked_repo_artifacts(root: Path, findings: list[dict[str, Any]]) -> N
             continue
 
         for pattern in BLOCKED_REPO_NAME_PATTERNS:
+            if pattern is ENV_FILE_BLOCK_RE and is_allowed_env_example(path):
+                # .env.example / .env.sample / diger izinli sablon dosyalari gercek
+                # secret icermez; bu blok yalnizca gercek .env* dosyalarini hedefler.
+                continue
             if pattern.search(rel):
                 findings.append({
                     "type": "blocked_repo_file_name",
