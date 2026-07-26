@@ -34,7 +34,13 @@ jobs:
       - name: Build safe release audit
         run: python scripts/release/build_bys360_safe_release.py --root . --output /tmp/bys360-ci-safe-release.zip --audit-only
 
-      - name: Ruff F821 hard gate
+      # NOT (BYS360 Truthful Quality Gates, Campaign 1, 2026-07-24): bu adım isminden
+      # farklı olarak yalnızca F821'i değil, pyproject.toml [tool.ruff.lint] select
+      # listesinin tamamını (E,F,I,UP,B,SIM) uygular. Ad, gerçek kapsamı yansıtacak
+      # şekilde düzeltildi; komut/kapsam DEĞİŞTİRİLMEDİ. Bu adım şu an gerçekten
+      # kırmızıdır (41 bulgu) — bkz. reports/quality/BYS360_RUFF_GATE_DEBT_INVENTORY_FOR_CAMPAIGN2.md
+      # ve branch phase5-ruff-tests-cleanup-v1.
+      - name: Ruff full-select gate (E,F,I,UP,B,SIM)
         run: python -m ruff check app config.py wsgi.py run.py scripts tests
 
       - name: Compile Python source
