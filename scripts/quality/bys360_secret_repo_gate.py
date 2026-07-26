@@ -2,19 +2,13 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 PACKAGE = "BYS360_SECRET_REPO_GATE_V2_PHASE1"
-
-IGNORED_DIR_NAMES = {
-    ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
-    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".idea", ".vscode", ".dart_tool", ".gradle",
-    "reports", "backups", "backup", "archive", "archives", "releases", "release", "quarantine", ".quarantine",
-    "_quarantine", "build", "dist", "android_build", "ios_build", "coverage", ".coverage",
-}
 
 TEXT_EXTS = {
     ".py", ".ps1", ".sh", ".bat", ".cmd", ".yml", ".yaml", ".toml", ".ini",
@@ -27,8 +21,15 @@ SECRET_KEYS = (
     "API_KEY", "ACCESS_TOKEN", "INSTAGRAM_ACCESS_TOKEN", "TOKEN",
 )
 
+# BYS360 Phase 5 secret-gate scope correction (2026-07-26): the leading ""
+# sentinel here made `any(word in lower for word in PLACEHOLDER_WORDS)`
+# unconditionally True (an empty string is a substring of every string),
+# which silently classified every real secret value as a placeholder and
+# made the hardcoded-secret/database-url finding paths permanently
+# unreachable. Removed; an empty value is still caught separately by the
+# `len(v) < 16` check below.
 PLACEHOLDER_WORDS = (
-    "", "none", "null", "false", "true", "change_me", "changeme", "placeholder", "example",
+    "none", "null", "false", "true", "change_me", "changeme", "placeholder", "example",
     "dummy", "redacted", "your_", "buraya", "degistir", "değiştir", "not_set", "unset",
     "local", "localhost", "127.0.0.1", "test", "testing", "dev", "development", "bys_pass",
     "secret_key_from_env", "database_url_from_env", "sentry_dsn_from_env",
@@ -46,6 +47,18 @@ REGEX_OR_SCANNER_MARKERS = (
 )
 
 DB_URL_RE = re.compile(r"(?:postgresql|postgres|mysql|mariadb)://([^\s:'\"/@]+):([^\s'\"/@]+)@", re.I)
+# BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): DB_URL_RE above
+# already deliberately excludes the sqlite scheme from its embedded-
+# credential check, because a `sqlite:///...` DSN is structurally a file
+# path or `:memory:` -- it has no `user:password@host` component to leak.
+# DATABASE_URL_KEY_ASSIGN_RE / DICT_ASSIGN_RE below match on the DATABASE_URL
+# / SQLALCHEMY_DATABASE_URI *key name* regardless of scheme, so they lacked
+# that same scheme-awareness. SQLITE_DSN_RE lets the DATABASE_URL/
+# SQLALCHEMY_DATABASE_URI handling in scan_file() apply the identical,
+# pre-existing precedent -- scoped only to those two connection-string keys,
+# not to PASSWORD/SECRET_KEY/TOKEN/API_KEY.
+SQLITE_DSN_RE = re.compile(r"^sqlite:///", re.I)
+DATABASE_URL_KEYS = frozenset({"DATABASE_URL", "SQLALCHEMY_DATABASE_URI"})
 ASSIGN_RE = re.compile(
     r"(?P<key>SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|INSTAGRAM_ACCESS_TOKEN|TOKEN)\s*[:=]\s*(?P<quote>[\"'])(?P<value>.*?)(?P=quote)",
     re.I,
@@ -74,19 +87,102 @@ BLOCKED_REPO_NAME_PATTERNS = (
     re.compile(r"disabled_by_rollback", re.I),
     re.compile(r"clean_package_manifest.*\.json$", re.I),
 )
-BLOCKED_SCAN_SKIP_DIRS = {
-    ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
-    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".idea", ".vscode", ".dart_tool",
-    "reports", "backups", "backup", "archive", "releases", "release", "quarantine", ".quarantine",
-}
 
 
-def is_ignored(path: Path, root: Path) -> bool:
+class GitCandidateListError(RuntimeError):
+    """Git tabanlı repository aday dosya listesi üretilemediğini belirtir.
+
+    BYS360 Phase 5 kapsam düzeltmesi: gate artık kendi elle yazdığı dizin/uzantı
+    hariç-tutma listeleriyle fiziksel dosya sistemini taramaz; Git'in tracked/
+    staged/untracked-non-ignored sınıflandırmasını kaynak kabul eder. Bu
+    sınıflandırma üretilemezse (ör. `.git` yok, git PATH'te değil, komut
+    başarısız) gate sessizce fiziksel köke düşüp sahte bir PASS üretmek yerine
+    açıkça başarısız olmalıdır.
+    """
+
+
+def _git_lines(args: list[str], root: Path) -> list[str]:
     try:
-        rel = path.relative_to(root)
+        proc = subprocess.run(
+            ["git", *args],
+            cwd=str(root),
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError as exc:
+        raise GitCandidateListError(f"git {' '.join(args)} çalıştırılamadı: {exc}") from exc
+    if proc.returncode != 0:
+        raise GitCandidateListError(
+            f"git {' '.join(args)} başarısız (exit={proc.returncode}): {proc.stderr.strip()}"
+        )
+    return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+
+def _resolve_candidate(root: Path, rel: str) -> Path | None:
+    """Bir git yol dizesini repo köküne göre normalize eder.
+
+    Repo dışına çıkan (path traversal veya repo dışına işaret eden symlink
+    hedefi) veya artık var olmayan/dizin olan girdiler için None döner.
+    """
+    normalized = rel.replace("\\", "/").strip()
+    if not normalized:
+        return None
+    candidate = (root / normalized).resolve()
+    try:
+        candidate.relative_to(root)
     except ValueError:
-        rel = path
-    return any(part in IGNORED_DIR_NAMES for part in rel.parts)
+        return None
+    if not candidate.is_file():
+        return None
+    return candidate
+
+
+def collect_repository_candidate_files(root: Path) -> dict[str, Any]:
+    """Secret taraması için gerçek repository yüzeyini Git'ten türetir.
+
+    Aday kapsamı: tracked dosyalar + stage edilmiş yeni/değiştirilmiş dosyalar +
+    untracked ama `.gitignore` kapsamına girmeyen dosyalar. `.gitignore`
+    kapsamındaki runtime log/cache/venv/coverage çalışma dosyaları bu üç
+    listenin hiçbirinde görünmez, dolayısıyla asla taranmaz. Aynı yol birden
+    fazla listede görünüyorsa tek kez taranır.
+    """
+    root = root.resolve()
+
+    tracked = _git_lines(["ls-files"], root)
+    staged = _git_lines(["diff", "--cached", "--name-only", "--diff-filter=ACMR"], root)
+    untracked = _git_lines(["ls-files", "--others", "--exclude-standard"], root)
+
+    candidates: dict[str, Path] = {}
+    for rel in (*tracked, *staged, *untracked):
+        normalized = rel.replace("\\", "/").strip()
+        if not normalized or normalized in candidates:
+            continue
+        resolved = _resolve_candidate(root, normalized)
+        if resolved is None:
+            continue
+        candidates[normalized] = resolved
+
+    return {
+        "tracked_candidate_count": len(set(tracked)),
+        "staged_candidate_count": len(set(staged)),
+        "untracked_non_ignored_candidate_count": len(set(untracked)),
+        "unique_scanned_candidate_count": len(candidates),
+        "candidates": candidates,
+    }
+
+
+def _count_ignored_files_best_effort(root: Path) -> int | None:
+    """Bilgi amaçlı: `.gitignore` nedeniyle atlanan dosya sayısı.
+
+    Bu metrik yalnız raporlama amaçlıdır (section 6: "mümkünse yalnız toplam
+    sayı olarak"); üretilemezse gate'i kırmızı yapmaz, None döner.
+    """
+    try:
+        ignored = _git_lines(["ls-files", "--others", "--ignored", "--exclude-standard"], root)
+    except GitCandidateListError:
+        return None
+    return len(set(ignored))
 
 
 def is_env_file(path: Path) -> bool:
@@ -130,7 +226,21 @@ def looks_placeholder(value: str) -> bool:
         return True
     if "<" in v and ">" in v:
         return True
+    # BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): real API
+    # keys/tokens/passwords/DB URLs are conventionally a single unbroken
+    # token and never contain literal whitespace. A value with a space or
+    # tab is far more likely to be natural-language documentation/glossary
+    # text (e.g. a UI-terminology dictionary entry) than a credential; this
+    # mirrors the existing "<...>" placeholder-bracket check above rather
+    # than targeting any specific word, key, or file path.
+    if " " in v or "\t" in v:
+        return True
     return len(v) < 16 and not ("://" in v and "@" in v)
+
+
+def is_non_sensitive_database_url(value: str) -> bool:
+    v = value.strip().strip('"\'').strip()
+    return bool(SQLITE_DSN_RE.match(v))
 
 
 def looks_env_reference(line: str, value: str = "") -> bool:
@@ -195,6 +305,14 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
             for m in regex.finditer(line):
                 key = m.group("key").upper()
                 value = m.group("value")
+                if key in DATABASE_URL_KEYS and is_non_sensitive_database_url(value):
+                    add_warning(warnings, {
+                        "type": "database_url_reference_or_placeholder",
+                        "path": rel,
+                        "line": lineno,
+                        "detail": f"{key} bir sqlite DSN'i; kullanıcı adı/parola içermez, uyarı olarak izlendi.",
+                    })
+                    continue
                 if looks_placeholder(value) or looks_env_reference(line, value) or looks_regex_or_scanner(line, path):
                     add_warning(warnings, {
                         "type": "secret_reference_or_placeholder",
@@ -220,31 +338,18 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
                     "detail": f"{key} için kaynak kodda gömülü değer bulundu; değer rapora yazılmadı.",
                 })
 
-def scan_blocked_repo_artifacts(root: Path, findings: list[dict[str, Any]]) -> None:
-    """Kaynak agacinda bulunmamasi gereken local/hassas artefaktlari yakalar."""
-    root = root.resolve()
-    reported_dirs: set[str] = set()
-    for path in root.rglob("*"):
-        try:
-            rel_path = path.relative_to(root)
-        except ValueError:
-            continue
-        rel = str(rel_path).replace("\\", "/")
-        parts = rel_path.parts
-        lower_parts = [p.lower() for p in parts]
-        if any(part in BLOCKED_SCAN_SKIP_DIRS for part in lower_parts):
-            continue
+def scan_blocked_repo_artifacts(candidates: dict[str, Path], findings: list[dict[str, Any]]) -> None:
+    """Kaynak agacinda bulunmamasi gereken local/hassas artefaktlari yakalar.
 
-        if path.is_dir():
-            if path.name.lower() in BLOCKED_REPO_DIR_NAMES and rel not in reported_dirs:
-                reported_dirs.add(rel)
-                findings.append({
-                    "type": "blocked_repo_directory",
-                    "path": rel,
-                    "line": 0,
-                    "detail": "Kaynak paketinde bulunmamasi gereken local/runtime klasor tespit edildi.",
-                })
-            continue
+    Tarama kapsamı repository aday dosya listesidir (bkz. `collect_repository_
+    candidate_files`) -- fiziksel dizin rglob taraması yapılmaz. Bir dosya bu
+    listede görünüyorsa (tracked/staged/untracked-non-ignored) hijyen kuralları
+    uygulanır; `.gitignore` kapsamındaki dosyalar zaten bu listeye hiç girmez.
+    """
+    reported_dirs: set[str] = set()
+    for rel, path in candidates.items():
+        parts = rel.split("/")
+        lower_parts = [p.lower() for p in parts]
 
         blocked_parent = next((p for p in lower_parts[:-1] if p in BLOCKED_REPO_DIR_NAMES), None)
         if blocked_parent:
@@ -289,16 +394,13 @@ def run(root: Path) -> dict[str, Any]:
     root = root.resolve()
     findings: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
-    scanned = 0
 
-    scan_blocked_repo_artifacts(root, findings)
+    candidate_info = collect_repository_candidate_files(root)
+    candidates: dict[str, Path] = candidate_info["candidates"]
 
-    for path in root.rglob("*"):
-        if path.is_dir():
-            continue
-        if is_ignored(path, root):
-            continue
-        scanned += 1
+    scan_blocked_repo_artifacts(candidates, findings)
+
+    for path in candidates.values():
         scan_file(path, root, findings, warnings)
 
     warning_count_real = len(warnings)
@@ -318,10 +420,16 @@ def run(root: Path) -> dict[str, Any]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "root": str(root),
         "ok": len(findings) == 0,
-        "scanned_file_count": scanned,
+        "scanned_file_count": candidate_info["unique_scanned_candidate_count"],
         "finding_count": len(findings),
         "warning_count": warning_count_real,
-        "ignored_dirs": sorted(IGNORED_DIR_NAMES),
+        "git_candidate_classification": {
+            "tracked_candidate_count": candidate_info["tracked_candidate_count"],
+            "staged_candidate_count": candidate_info["staged_candidate_count"],
+            "untracked_non_ignored_candidate_count": candidate_info["untracked_non_ignored_candidate_count"],
+            "unique_scanned_candidate_count": candidate_info["unique_scanned_candidate_count"],
+            "skipped_ignored_file_count": _count_ignored_files_best_effort(root),
+        },
         "findings": findings,
         "warnings": warnings[:81],
         "report": str(report_path),
@@ -329,6 +437,8 @@ def run(root: Path) -> dict[str, Any]:
             "finding_count 0 ise P0 güvenlik/repo hijyen gate tamamlanmış kabul edilebilir.",
             "Gerçek secret dosyaları kaynak klasöründe tutulmamalı; .env sadece local/canlı ortamda dışarıdan sağlanmalıdır.",
             "warning_count kalite kapısını düşürmez; örnek dosya/env referansı/regex tarama kalıbı olarak izlenir.",
+            "Tarama kapsamı Git'in tracked/staged/untracked-non-ignored siniflandirmasidir; "
+            ".gitignore kapsamındaki runtime/cache/venv/coverage dosyaları asla taranmaz.",
         ],
     }
     report_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -341,7 +451,13 @@ def main(argv: list[str]) -> int:
         idx = argv.index("--root")
         if idx + 1 < len(argv):
             root = Path(argv[idx + 1])
-    result = run(root)
+    try:
+        result = run(root)
+    except GitCandidateListError as exc:
+        # Git tabanli aday listesi uretilemedi: sahte bir PASS/ok:true JSON'u
+        # BASMADAN, acikca ve non-zero exit ile basarisiz ol.
+        print(f"SECRET REPO GATE HATA: repository aday dosya listesi uretilemedi: {exc}", file=sys.stderr)
+        return 2
     print(json.dumps({
         "ok": result["ok"],
         "finding_count": result["finding_count"],

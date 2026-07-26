@@ -107,7 +107,7 @@ DOMAIN_OWNERS = {
 }
 
 SMOKE_SUFFIXES = [
-    ("POST", "/auth/login", {"sicil_no": "__bys360_smoke__", "password": "__bys360_smoke__"}),
+    ("POST", "/auth/login", {"sicil_no": "__bys360_smoke__", "password": "__bys360_smoke__"}),  # hardcoded_secret fixture
     ("GET", "/dashboard/summary", None),
     ("GET", "/personnel/list", None),
     ("GET", "/kpi/target-management", None),
