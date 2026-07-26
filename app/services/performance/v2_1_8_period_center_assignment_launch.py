@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models import PerformancePeriod
 from app.services.performance.assignment_rule_audit import build_assignment_generation_preflight
@@ -36,7 +37,7 @@ def _db():
 def _dialect_name() -> str:
     try:
         return _db().engine.dialect.name
-    except Exception:
+    except RuntimeError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return "unknown"
 
@@ -47,7 +48,7 @@ def _has_column(table_name: str, column_name: str) -> bool:
         if not inspector.has_table(table_name):
             return False
         return column_name in {col.get("name") for col in inspector.get_columns(table_name)}
-    except Exception:
+    except (SQLAlchemyError, RuntimeError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return False
 
@@ -59,7 +60,7 @@ def _alter_add_column_sql(table_name: str, column_name: str, column_type: str) -
 def _safe_json(payload: Any) -> str:
     try:
         return json.dumps(payload or {}, ensure_ascii=False, default=str)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return "{}"
 
@@ -67,7 +68,7 @@ def _safe_json(payload: Any) -> str:
 def _safe_int(value: Any, default: int = 0) -> int:
     try:
         return int(value or default)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return default
 
@@ -89,7 +90,7 @@ def ensure_period_center_assignment_launch_schema() -> dict[str, Any]:
             try:
                 db.session.execute(text(_alter_add_column_sql(INTEGRATION_TABLE, name, sql_type)))
                 added.append(name)
-            except Exception:
+            except SQLAlchemyError:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 db.session.rollback()
                 if not _has_column(INTEGRATION_TABLE, name):
@@ -106,11 +107,11 @@ def _integration_for_plan(plan_key: str) -> dict[str, Any] | None:
         for item in list_integrations():
             if str(item.get("plan_key") or "") == key:
                 return item
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
     return None
@@ -124,11 +125,11 @@ def _period_for_integration(integration: dict[str, Any] | None) -> PerformancePe
         return None
     try:
         return _db().session.get(PerformancePeriod, period_id)
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
         return None
@@ -140,11 +141,11 @@ def _precheck_count(plan_key: str, period_id: int) -> int:
             text(f"SELECT COUNT(*) FROM {PRECHECK_TABLE} WHERE plan_key=:plan_key AND period_id=:period_id"),
             {"plan_key": plan_key, "period_id": period_id},
         ).scalar() or 0)
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
         return 0
@@ -157,11 +158,11 @@ def _precheck_status_counts(plan_key: str, period_id: int) -> dict[str, int]:
             {"plan_key": plan_key, "period_id": period_id},
         ).mappings().all()
         return {str(row.get("precheck_status") or ""): int(row.get("total") or 0) for row in rows}
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
         return {}
