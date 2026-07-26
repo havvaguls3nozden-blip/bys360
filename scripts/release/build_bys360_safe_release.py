@@ -55,16 +55,14 @@ def _git_ls_files(root: Path) -> list[str] | None:
             ["git", "rev-parse", "--is-inside-work-tree"],
             cwd=root,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             text=True,
         )
         result = subprocess.run(
             ["git", "ls-files", "-z"],
             cwd=root,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         )
         return [item.decode("utf-8", errors="replace") for item in result.stdout.split(b"\0") if item]
     except Exception:

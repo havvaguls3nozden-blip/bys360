@@ -33,7 +33,7 @@ class _FakeResult:
 
     def mappings(
         self,
-    ) -> "_FakeResult":
+    ) -> _FakeResult:
         return self
 
     def all(

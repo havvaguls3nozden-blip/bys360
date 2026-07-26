@@ -11,8 +11,6 @@ PHASE4AD_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PHASE4AD_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PHASE4AD_PROJECT_ROOT))
 
-from app.api.mobile.services import performance_period_service as svc
-
 
 def _install_fake_performance_routes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, tuple[Any, ...], dict[str, Any]]]:
     calls: list[tuple[str, tuple[Any, ...], dict[str, Any]]] = []
@@ -48,6 +46,8 @@ def _install_fake_performance_routes(monkeypatch: pytest.MonkeyPatch) -> list[tu
 
 
 def test_phase4ad_period_service_delegates_forward_args_and_kwargs(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.api.mobile.services import performance_period_service as svc
+
     calls = _install_fake_performance_routes(monkeypatch)
 
     assert svc._v2853_note_type_label(1, label="ara") == {
@@ -78,6 +78,8 @@ def test_phase4ad_period_service_delegates_forward_args_and_kwargs(monkeypatch: 
 
 
 def test_phase4ad_public_contract_is_stable() -> None:
+    from app.api.mobile.services import performance_period_service as svc
+
     assert callable(svc._v2853_note_type_label)
     assert callable(svc._v2853_note_bool)
     assert callable(svc.delegate_mobile_performance_in_period_notes)

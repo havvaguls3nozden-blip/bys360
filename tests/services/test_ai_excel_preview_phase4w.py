@@ -1,25 +1,25 @@
 ﻿from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-PHASE4W_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-if str(PHASE4W_PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PHASE4W_PROJECT_ROOT))
 import io
+import sys
 from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from werkzeug.datastructures import FileStorage
 
-from app.services.ai import excel_preview as svc
+PHASE4W_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PHASE4W_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PHASE4W_PROJECT_ROOT))
 
 
 def test_phase4w_safety_flags_and_basic_converters() -> None:
+    from app.services.ai import excel_preview as svc
+
     assert svc.GERCEK_ICE_AKTARIM_YOK is True
     assert svc.DB_WRITE_ENABLED is False
-    assert svc.ALLOWED_ANALYSIS_EXTENSIONS == {"xlsx", "csv"}
+    assert {"xlsx", "csv"} == svc.ALLOWED_ANALYSIS_EXTENSIONS
 
     assert svc._safe_int("12", default=8, minimum=3, maximum=25) == 12
     assert svc._safe_int("999", default=8, minimum=3, maximum=25) == 25
@@ -40,6 +40,8 @@ def test_phase4w_safety_flags_and_basic_converters() -> None:
 
 
 def test_phase4w_sensitivity_and_masking_helpers() -> None:
+    from app.services.ai import excel_preview as svc
+
     assert svc._is_formula_text("=SUM(A1:A2)") is True
     assert svc._is_formula_text("+A1") is True
     assert svc._is_formula_text("normal metin") is False
@@ -74,6 +76,8 @@ def test_phase4w_sensitivity_and_masking_helpers() -> None:
 
 
 def test_phase4w_dataclass_to_dict_metrics_and_empty_context() -> None:
+    from app.services.ai import excel_preview as svc
+
     high_column = svc.ColumnProfile(
         index=0,
         header="TC Kimlik",
@@ -149,6 +153,8 @@ def test_phase4w_dataclass_to_dict_metrics_and_empty_context() -> None:
 
 
 def test_phase4w_matrix_profiles_and_preview_rows() -> None:
+    from app.services.ai import excel_preview as svc
+
     headers = ["TC Kimlik", "E posta", "Puan", ""]
     rows = [
         ["12345678901", "ada@example.com", 85, "=SUM(A1:A2)"],
@@ -180,11 +186,13 @@ def test_phase4w_matrix_profiles_and_preview_rows() -> None:
 
 
 def test_phase4w_csv_reader_and_safe_preview_with_patched_upload_validation(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.services.ai import excel_preview as svc
+
     payload = (
-        "TC Kimlik;E posta;Puan;Not\n"
-        "12345678901;ada@example.com;85;=SUM(A1:A2)\n"
-        "98765432109;veli@example.com;90;normal not\n"
-    ).encode("utf-8")
+        b"TC Kimlik;E posta;Puan;Not\n"
+        b"12345678901;ada@example.com;85;=SUM(A1:A2)\n"
+        b"98765432109;veli@example.com;90;normal not\n"
+    )
 
     headers, data_rows, warnings, header_index, estimated, truncated = svc._read_csv_rows(
         payload,
@@ -240,6 +248,8 @@ def test_phase4w_csv_reader_and_safe_preview_with_patched_upload_validation(monk
 
 
 def test_phase4w_csv_validation_errors_are_safe() -> None:
+    from app.services.ai import excel_preview as svc
+
     with pytest.raises(svc.ExcelPreviewValidationError):
         svc._first_non_empty_row([[None, ""], ["", None]])
 

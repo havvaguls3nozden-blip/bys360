@@ -9,11 +9,11 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app import create_app
-from app.services.corporate_information_center import send_task
-
 
 def main() -> int:
+    from app import create_app
+    from app.services.corporate_information_center import send_task
+
     p = argparse.ArgumentParser()
     p.add_argument("--task", required=True)
     p.add_argument("--dry-run", action="store_true")

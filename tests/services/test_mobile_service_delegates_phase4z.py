@@ -7,12 +7,9 @@ PHASE4Z_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PHASE4Z_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PHASE4Z_PROJECT_ROOT))
 
-from app.api.mobile.services import base
-from app.api.mobile.services import dashboard_service as dashboard
-from app.api.mobile.services import profile_service as profile
-
-
 def test_phase4z_base_payload_helpers_are_stable() -> None:
+    from app.api.mobile.services import base
+
     data = {"user": "BYS360", "count": 2}
 
     ok = base.ok_payload(data)
@@ -28,6 +25,8 @@ def test_phase4z_base_payload_helpers_are_stable() -> None:
 
 
 def test_phase4z_profile_legacy_delegates_return_legacy_result() -> None:
+    from app.api.mobile.services import profile_service as profile
+
     calls: list[str] = []
 
     def legacy_profile():
@@ -49,6 +48,8 @@ def test_phase4z_profile_legacy_delegates_return_legacy_result() -> None:
 
 
 def test_phase4z_dashboard_legacy_delegates_return_legacy_result() -> None:
+    from app.api.mobile.services import dashboard_service as dashboard
+
     calls: list[str] = []
 
     def make_legacy(name: str):

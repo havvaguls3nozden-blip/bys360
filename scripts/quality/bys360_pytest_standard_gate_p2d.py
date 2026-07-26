@@ -43,8 +43,8 @@ def append_unique_lines(path: Path, lines: list[str]) -> dict[str, Any]:
     added: list[str] = []
     out = before.rstrip()
     for line in lines:
-        normalized_name = re.split(r"[<>=!~ ]", line.strip(), 1)[0].lower()
-        has_same_pkg = any(re.split(r"[<>=!~ ]", item, 1)[0].lower() == normalized_name for item in existing)
+        normalized_name = re.split(r"[<>=!~ ]", line.strip(), maxsplit=1)[0].lower()
+        has_same_pkg = any(re.split(r"[<>=!~ ]", item, maxsplit=1)[0].lower() == normalized_name for item in existing)
         if not has_same_pkg:
             added.append(line)
             out = (out + "\n" if out else "") + line

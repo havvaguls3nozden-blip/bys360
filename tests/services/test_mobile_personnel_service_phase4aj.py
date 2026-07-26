@@ -52,7 +52,7 @@ def test_mobile_personnel_all_delegates_to_routes(
     fake_mobile_routes: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"items": ["person-1"]})
-    setattr(fake_mobile_routes, "_bys360_legacy_mobile_personnel_all", legacy)
+    fake_mobile_routes._bys360_legacy_mobile_personnel_all = legacy
 
     result = svc.mobile_personnel_all("filter-1", page=2)
 
@@ -66,7 +66,7 @@ def test_mobile_personnel_create_delegates_to_personnel_domain(
     fake_personnel_domain: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"created": True})
-    setattr(fake_personnel_domain, "_bys360_legacy_mobile_personnel_create", legacy)
+    fake_personnel_domain._bys360_legacy_mobile_personnel_create = legacy
 
     result = svc.mobile_personnel_create({"name": "Ada"}, source="mobile")
 
@@ -80,7 +80,7 @@ def test_mobile_created_personnel_row_delegates_to_personnel_domain(
     fake_personnel_domain: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"row": {"id": 7}})
-    setattr(fake_personnel_domain, "_bys360_legacy__mobile_created_personnel_row", legacy)
+    fake_personnel_domain._bys360_legacy__mobile_created_personnel_row = legacy
 
     result = svc._mobile_created_personnel_row(7, include_meta=True)
 

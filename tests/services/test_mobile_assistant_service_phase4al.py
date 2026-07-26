@@ -33,7 +33,7 @@ def test_delegate_mobile_b49_assistant_v2_ask_forwards_to_legacy(
     fake_assistant_chat: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"answer": "ok"})
-    setattr(fake_assistant_chat, "_bys360_legacy_mobile_b49_assistant_v2_ask", legacy)
+    fake_assistant_chat._bys360_legacy_mobile_b49_assistant_v2_ask = legacy
 
     result = svc.delegate_mobile_b49_assistant_v2_ask("hello", user_id=42)
 

@@ -33,10 +33,7 @@ def pytest_collection_modifyitems(config, items):
 # BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE: active architecture test -> test_mobile_auth_dashboard_assistant_response_p3b.py
 
 # BYS360_P3D_ACTIVE_SCOPE_MARKER
-try:
-    ACTIVE_ARCHITECTURE_TESTS
-except NameError:
-    ACTIVE_ARCHITECTURE_TESTS = set()
+ACTIVE_ARCHITECTURE_TESTS = globals().get("ACTIVE_ARCHITECTURE_TESTS", set())
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, tuple):
     ACTIVE_ARCHITECTURE_TESTS = set(ACTIVE_ARCHITECTURE_TESTS)
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, list):
@@ -47,10 +44,7 @@ except AttributeError:
     ACTIVE_ARCHITECTURE_TESTS = set(ACTIVE_ARCHITECTURE_TESTS) | {'test_mobile_api_support_survey_notifications_response_p3d.py'}
 
 # BYS360_P3E_ACTIVE_SCOPE_MARKER
-try:
-    ACTIVE_ARCHITECTURE_TESTS
-except NameError:
-    ACTIVE_ARCHITECTURE_TESTS = set()
+ACTIVE_ARCHITECTURE_TESTS = globals().get("ACTIVE_ARCHITECTURE_TESTS", set())
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, tuple):
     ACTIVE_ARCHITECTURE_TESTS = set(ACTIVE_ARCHITECTURE_TESTS)
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, list):
@@ -61,10 +55,7 @@ except AttributeError:
     ACTIVE_ARCHITECTURE_TESTS = set(ACTIVE_ARCHITECTURE_TESTS) | {'test_mobile_api_performance_response_p3e.py'}
 
 # BYS360_P3F_ACTIVE_SCOPE_MARKER
-try:
-    ACTIVE_ARCHITECTURE_TESTS
-except NameError:
-    ACTIVE_ARCHITECTURE_TESTS = set()
+ACTIVE_ARCHITECTURE_TESTS = globals().get("ACTIVE_ARCHITECTURE_TESTS", set())
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, tuple):
     ACTIVE_ARCHITECTURE_TESTS = set(ACTIVE_ARCHITECTURE_TESTS)
 if isinstance(ACTIVE_ARCHITECTURE_TESTS, list):

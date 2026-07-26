@@ -1,7 +1,11 @@
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+
 from app import create_app
 from app.services.executive_mail_center_v2 import run_due_tasks, run_task
+
 
 def main():
     p = argparse.ArgumentParser()

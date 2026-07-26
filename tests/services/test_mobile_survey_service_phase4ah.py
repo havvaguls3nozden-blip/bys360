@@ -31,7 +31,7 @@ def _recording_legacy(return_value: Any):
 
 def test_call_legacy_invokes_named_handler(fake_mobile_routes: types.ModuleType) -> None:
     legacy = _recording_legacy({"ok": True})
-    setattr(fake_mobile_routes, "_bys360_legacy_mobile_survey_custom", legacy)
+    fake_mobile_routes._bys360_legacy_mobile_survey_custom = legacy
 
     result = svc._call_legacy("mobile_survey_custom", "person-1", page=2)
 

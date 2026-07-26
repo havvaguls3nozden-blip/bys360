@@ -101,8 +101,7 @@ def _subprocess_tail(cmd: list[str], root: Path, env: dict[str, str] | None = No
         cwd=str(root),
         env=merged_env,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         timeout=90,
     )
     return {

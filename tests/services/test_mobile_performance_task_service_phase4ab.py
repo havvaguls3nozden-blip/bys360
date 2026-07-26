@@ -11,8 +11,6 @@ PHASE4AB_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PHASE4AB_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PHASE4AB_PROJECT_ROOT))
 
-from app.api.mobile.services import performance_task_service as svc
-
 
 def _install_fake_performance_routes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, tuple[Any, ...], dict[str, Any]]]:
     calls: list[tuple[str, tuple[Any, ...], dict[str, Any]]] = []
@@ -45,6 +43,8 @@ def _install_fake_performance_routes(monkeypatch: pytest.MonkeyPatch) -> list[tu
 
 
 def test_phase4ab_success_delegates_forward_args_and_kwargs(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.api.mobile.services import performance_task_service as svc
+
     calls = _install_fake_performance_routes(monkeypatch)
 
     assert svc.delegate_v2835_score_form_payload(1, mode="preview") == {
@@ -69,6 +69,8 @@ def test_phase4ab_success_delegates_forward_args_and_kwargs(monkeypatch: pytest.
 
 
 def test_phase4ab_delegate_v2835_missing_legacy_raises_runtime_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.api.mobile.services import performance_task_service as svc
+
     fake_routes = ModuleType("app.api.mobile.performance_routes")
     monkeypatch.setitem(sys.modules, "app.api.mobile.performance_routes", fake_routes)
 
@@ -83,6 +85,8 @@ def test_phase4ab_delegate_v2835_missing_legacy_raises_runtime_error(monkeypatch
 
 
 def test_phase4ab_public_contract_is_stable() -> None:
+    from app.api.mobile.services import performance_task_service as svc
+
     assert callable(svc.delegate_v2835_score_form_payload)
     assert callable(svc._v2837_action_capabilities)
     assert callable(svc._v2837_find_return_target)
