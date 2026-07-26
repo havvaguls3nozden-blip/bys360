@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from sqlalchemy.exc import SQLAlchemyError
+
 """BYS360 personel kategori servisleri.
 
 Faz 2 kalıcı sözleşme:
@@ -61,7 +63,7 @@ def _session_bind(db_session: Any):
         return None
     try:
         return db_session.get_bind()
-    except Exception:
+    except (SQLAlchemyError, AttributeError):
         return getattr(db_session, "bind", None)
 
 
@@ -71,7 +73,7 @@ def _table_available(db_session: Any, table_name: str = "personnel_categories") 
 
         bind = _session_bind(db_session)
         return bool(bind is not None and inspect(bind).has_table(table_name))
-    except Exception:
+    except (SQLAlchemyError, ImportError):
         import logging
         logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
         return False
@@ -91,7 +93,7 @@ def get_personnel_category_options(db_session: Any | None = None) -> list[str]:
             labels = [normalize_personnel_category_label(getattr(row, "name", None)) for row in rows if getattr(row, "name", None)]
             if labels:
                 return labels
-        except Exception:
+        except (SQLAlchemyError, ImportError):
             import logging
             logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/personnel/categories.py")
     return list(PERSONNEL_CATEGORY_DEFAULTS)
@@ -120,7 +122,7 @@ def ensure_personnel_category(db_session: Any, label: Any):
         db_session.add(row)
         db_session.flush()
         return row
-    except Exception:
+    except (SQLAlchemyError, ImportError):
         import logging
         logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
         return None

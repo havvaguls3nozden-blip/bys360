@@ -366,5 +366,5 @@ try:
         normalize_personnel_category_label,
         user_matches_personnel_category,
     )
-except Exception:  # pragma: no cover
+except (ImportError, AttributeError):  # pragma: no cover
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/personnel/__init__.py:368)")

@@ -15,7 +15,7 @@ from typing import Any
 
 try:
     from .form_payload import PersonnelFormPayload
-except Exception:  # pragma: no cover - import kırık ortamda güvenli tip yedeği
+except (ImportError, AttributeError):  # pragma: no cover - import kırık ortamda güvenli tip yedeği
     @dataclass(frozen=True, slots=True)
     class PersonnelFormPayload:  # type: ignore[no-redef]
         ad: str = ""
@@ -34,7 +34,7 @@ except Exception:  # pragma: no cover - import kırık ortamda güvenli tip yede
 
 try:
     from .categories import assign_user_performance_category
-except Exception:  # pragma: no cover
+except (ImportError, AttributeError):  # pragma: no cover
     def assign_user_performance_category(user: Any, category_label: Any, *, db_session: Any | None = None) -> str:
         label = str(category_label or "Diğer").strip() or "Diğer"
         if hasattr(user, "personnel_category"):
@@ -46,7 +46,7 @@ EnsureUnitExists = Callable[..., Any]
 
 try:
     from app.security import get_default_first_login_password
-except Exception:  # pragma: no cover
+except (ImportError, AttributeError):  # pragma: no cover
     def get_default_first_login_password() -> str:
         import secrets
         return secrets.token_urlsafe(12)
@@ -94,7 +94,7 @@ def set_personnel_manager_sicils_from_ids(
     """Faz 6 hiyerarşi servisine geriye dönük uyum köprüsü."""
     try:
         from .org_hierarchy import apply_manager_id_hierarchy
-    except Exception:
+    except (ImportError, AttributeError):
         apply_manager_id_hierarchy = None  # type: ignore[assignment]
     if callable(apply_manager_id_hierarchy):
         apply_manager_id_hierarchy(
@@ -136,7 +136,7 @@ def attach_personnel_org_unit(
     """Organizasyon birimini bağlar; commit/rollback yapmaz."""
     try:
         from .org_hierarchy import attach_organization_unit_to_user
-    except Exception:
+    except (ImportError, AttributeError):
         attach_organization_unit_to_user = None  # type: ignore[assignment]
 
     if callable(attach_organization_unit_to_user):

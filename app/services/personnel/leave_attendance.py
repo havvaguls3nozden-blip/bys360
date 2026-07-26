@@ -14,6 +14,7 @@ from datetime import date, datetime
 from typing import Any
 
 from sqlalchemy import inspect, or_
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
@@ -181,7 +182,12 @@ def check_leave_attendance_readiness() -> PersonnelLeaveAttendanceReadiness:
             missing_tables=missing,
             checked_tables=LEAVE_ATTENDANCE_REQUIRED_TABLES,
         )
-    except Exception:
+    except (SQLAlchemyError, AttributeError):
+        import logging
+
+        logging.getLogger(__name__).exception(
+            "BYS360 personel izin/devamsızlık hazırlık kontrolü başarısız oldu."
+        )
         return PersonnelLeaveAttendanceReadiness(
             available=False,
             missing_tables=LEAVE_ATTENDANCE_REQUIRED_TABLES,

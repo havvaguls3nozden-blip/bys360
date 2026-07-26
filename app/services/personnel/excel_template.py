@@ -17,7 +17,7 @@ try:
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.datavalidation import DataValidation
-except Exception:  # pragma: no cover - uygulama açılışını bloklamamak için
+except (ImportError, OSError):  # pragma: no cover - uygulama açılışını bloklamamak için
     Workbook = None
     Comment = None
     Alignment = Border = Font = PatternFill = Side = None

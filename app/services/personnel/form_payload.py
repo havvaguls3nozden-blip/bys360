@@ -14,7 +14,7 @@ from typing import Any
 
 try:
     from .categories import normalize_personnel_category_label
-except Exception:  # pragma: no cover - canlı import güvenliği
+except (ImportError, AttributeError):  # pragma: no cover - canlı import güvenliği
     def normalize_personnel_category_label(value: Any) -> str:
         text = str(value or "").strip()
         return text or "Diğer"
