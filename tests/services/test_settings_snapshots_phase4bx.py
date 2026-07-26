@@ -1,15 +1,27 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Mapping
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 import app.services.settings.snapshots as snapshots
+
+# app/services/settings/snapshots.py declares Iterable/Mapping/Callable
+# parameters that are not Optional, but every function under test here
+# implements its own None-tolerance internally (verified by reading each
+# function body: `for x in (arg or [])`, `set(get_visible_keys(...) or [])`,
+# etc.). These tests deliberately exercise that documented None-handling
+# behavior, so the None/partial values passed below are cast to the
+# declared parameter type rather than replaced with an empty collection --
+# replacing them would silently stop testing the None-input path. Widening
+# the production signatures themselves is out of scope for this test-only
+# wave.
 
 
 def test_build_complete_visibility_map_handles_none_blank_and_membership() -> None:
     assert snapshots.build_complete_visibility_map(
-        None,
-        None,
+        cast(Iterable[Any], None),
+        cast(Iterable[Any], None),
     ) == {}
 
     result = snapshots.build_complete_visibility_map(
@@ -54,7 +66,7 @@ def test_snapshot_system_rows_uses_rows_defaults_and_value_types() -> None:
 
     assert snapshots.snapshot_system_rows(
         {},
-        None,
+        cast(Iterable[Mapping[str, Any]], None),
         value_to_storage=to_storage,
     ) == {}
 
@@ -68,7 +80,7 @@ def test_snapshot_system_rows_uses_rows_defaults_and_value_types() -> None:
         "missing_attr": SimpleNamespace(),
     }
 
-    definitions = [
+    definitions: list[dict[str, Any]] = [
         {
             "setting_key": "",
             "default": "ignored",
@@ -144,7 +156,7 @@ def test_snapshot_module_rows_handles_invalid_existing_and_default_rows() -> Non
 
     assert snapshots.snapshot_module_rows(
         {},
-        None,
+        cast(Iterable[Mapping[str, Any]], None),
         value_to_storage=to_storage,
     ) == {}
 
@@ -161,7 +173,7 @@ def test_snapshot_module_rows_handles_invalid_existing_and_default_rows() -> Non
         ): SimpleNamespace(),
     }
 
-    definitions = [
+    definitions: list[dict[str, Any]] = [
         {
             "module_key": "",
             "setting_key": "orphan",
@@ -222,7 +234,7 @@ def test_snapshot_module_rows_handles_invalid_existing_and_default_rows() -> Non
 
 def test_snapshot_user_override_rows_skips_blank_and_overwrites_duplicates() -> None:
     assert snapshots.snapshot_user_override_rows(
-        None
+        cast(Iterable[Any], None)
     ) == {}
 
     rows = [
@@ -271,20 +283,20 @@ def test_build_role_default_snapshot_rows_normalizes_roles_and_ratios() -> None:
         return None
 
     assert snapshots.build_role_default_snapshot_rows(
-        None,
-        get_visible_keys=visible_keys,
+        cast(Iterable[str], None),
+        get_visible_keys=cast(Callable[[str], Iterable[str]], visible_keys),
         all_menu_count=0,
     ) == []
 
     result = snapshots.build_role_default_snapshot_rows(
-        [
+        cast(Iterable[str], [
             None,
             "",
             " Admin ",
             "admin",
             " USER ",
-        ],
-        get_visible_keys=visible_keys,
+        ]),
+        get_visible_keys=cast(Callable[[str], Iterable[str]], visible_keys),
         all_menu_count=4,
     )
 
@@ -311,7 +323,7 @@ def test_build_role_default_snapshot_rows_normalizes_roles_and_ratios() -> None:
 
 def test_build_unit_profile_snapshot_rows_groups_and_counts_visibility() -> None:
     assert snapshots.build_unit_profile_snapshot_rows(
-        None,
+        cast(Iterable[Any], None),
         all_menu_count=0,
     ) == []
 
@@ -384,7 +396,7 @@ def test_build_setting_groups_preserves_group_order_and_current_values() -> None
         }
 
     def row_key(
-        definition: dict[str, Any],
+        definition: Mapping[str, Any],
     ) -> str:
         key = str(
             definition.get("setting_key") or ""
@@ -394,7 +406,7 @@ def test_build_setting_groups_preserves_group_order_and_current_values() -> None
         return key
 
     assert snapshots.build_setting_groups(
-        None,
+        cast(Iterable[Mapping[str, Any]], None),
         {},
         value_to_python=to_python,
         group_key_field="group_key",
@@ -415,7 +427,7 @@ def test_build_setting_groups_preserves_group_order_and_current_values() -> None
         ),
     }
 
-    definitions = [
+    definitions: list[dict[str, Any]] = [
         {
             "group_key": "",
             "setting_key": "ignored",

@@ -2,10 +2,20 @@
 
 from datetime import date
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
+from app.models import PerformanceEvaluation, PerformancePeriod
 from app.services.performance import low_score_process_service as svc
+
+# _period_year/_is_completed/is_low_score_evaluation all read their argument
+# purely through getattr(x, attr, default) (verified in
+# app/services/performance/low_score_process_service.py), so a SimpleNamespace
+# exposing only the handful of attributes each test needs is a faithful,
+# duck-typed stand-in for the real PerformancePeriod/PerformanceEvaluation
+# instance. The casts below tell mypy that, without touching production
+# signatures.
 
 
 def _phase4t_contains_value(value, expected) -> bool:
@@ -31,23 +41,23 @@ def test_phase4t_safe_normalize_actor_and_period_helpers() -> None:
     assert svc._actor_id("bozuk") is None
     assert svc._actor_id(None) is None
 
-    assert svc._period_year(SimpleNamespace(end_date=date(2026, 7, 31))) == 2026
-    assert svc._period_year(SimpleNamespace(start_date=date(2025, 1, 1))) == 2025
+    assert svc._period_year(cast(PerformancePeriod, SimpleNamespace(end_date=date(2026, 7, 31)))) == 2026
+    assert svc._period_year(cast(PerformancePeriod, SimpleNamespace(start_date=date(2025, 1, 1)))) == 2025
     assert isinstance(svc._period_year(None), int)
 
 
 def test_phase4t_completed_guard_rejects_draft_pending_and_returned_values() -> None:
     assert svc._is_completed(None) is False
 
-    assert svc._is_completed(SimpleNamespace(status="draft")) is False
-    assert svc._is_completed(SimpleNamespace(status="pending")) is False
-    assert svc._is_completed(SimpleNamespace(status="iade_edildi")) is False
-    assert svc._is_completed(SimpleNamespace(workflow_status="returned_by_president")) is False
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(status="draft"))) is False
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(status="pending"))) is False
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(status="iade_edildi"))) is False
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(workflow_status="returned_by_president"))) is False
 
-    assert svc._is_completed(SimpleNamespace(status="completed")) is True
-    assert svc._is_completed(SimpleNamespace(workflow_status="tamamlandı")) is True
-    assert svc._is_completed(SimpleNamespace(publish_status="published")) is True
-    assert svc._is_completed(SimpleNamespace(level_1_completed=True)) is True
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(status="completed"))) is True
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(workflow_status="tamamlandı"))) is True
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(publish_status="published"))) is True
+    assert svc._is_completed(cast(PerformanceEvaluation, SimpleNamespace(level_1_completed=True))) is True
 
 
 def test_phase4t_low_score_evaluation_detection_for_numbers_and_objects() -> None:
@@ -56,34 +66,34 @@ def test_phase4t_low_score_evaluation_detection_for_numbers_and_objects() -> Non
     assert svc.is_low_score_evaluation(69.99) is True
     assert svc.is_low_score_evaluation(70) is False
 
-    completed_low = SimpleNamespace(
+    completed_low = cast(PerformanceEvaluation, SimpleNamespace(
         status="completed",
         workflow_status="",
         approval_status="",
         publish_status="",
         final_total_100=69,
         level_1_completed=False,
-    )
+    ))
     assert svc.is_low_score_evaluation(completed_low) is True
 
-    completed_not_low = SimpleNamespace(
+    completed_not_low = cast(PerformanceEvaluation, SimpleNamespace(
         status="completed",
         workflow_status="",
         approval_status="",
         publish_status="",
         final_total_100=70,
         level_1_completed=False,
-    )
+    ))
     assert svc.is_low_score_evaluation(completed_not_low) is False
 
-    draft_low = SimpleNamespace(
+    draft_low = cast(PerformanceEvaluation, SimpleNamespace(
         status="draft",
         workflow_status="",
         approval_status="",
         publish_status="",
         final_total_100=50,
         level_1_completed=False,
-    )
+    ))
     assert svc.is_low_score_evaluation(draft_low) is False
 
 

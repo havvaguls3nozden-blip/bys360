@@ -5,6 +5,7 @@ import sys
 import types
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -29,7 +30,7 @@ class Model:
     query = Query()
 
 
-removed = set()
+removed: set[str] = set()
 
 def is_removed(key):
     return key in removed
@@ -37,11 +38,15 @@ def is_removed(key):
 
 app = types.ModuleType("app")
 app.__path__ = []
-config = types.ModuleType("app.config")
+# These stand-ins have no fixed attribute contract -- their entire purpose is
+# to receive whatever ad hoc symbols the loaded production module imports at
+# runtime, exactly like a real module's namespace after exec. `Any` is the
+# accurate type here, not a loosened one.
+config: Any = types.ModuleType("app.config")
 config.is_removed_menu_key = is_removed
-menu_registry = types.ModuleType("app.menu_registry")
+menu_registry: Any = types.ModuleType("app.menu_registry")
 menu_registry.flatten_menu_definitions = lambda *a, **k: []
-models = types.ModuleType("app.models")
+models: Any = types.ModuleType("app.models")
 models.UserMenuPermission = type("UserMenuPermission", (), {"query": Query()})
 models.RoleMenuDefault = type("RoleMenuDefault", (), {"query": Query()})
 models.UnitMenuProfile = type("UnitMenuProfile", (), {"query": Query()})
@@ -49,7 +54,7 @@ services = types.ModuleType("app.services")
 services.__path__ = []
 settings_pkg = types.ModuleType("app.services.settings")
 settings_pkg.__path__ = []
-settings_service = types.ModuleType("app.services.settings_service")
+settings_service: Any = types.ModuleType("app.services.settings_service")
 settings_service.build_effective_user_menu_context = lambda *a, **k: {}
 settings_service.get_role_default_menu_keys = lambda role: []
 STUB_MODULES = {
@@ -69,8 +74,8 @@ for name, module in STUB_MODULES.items():
 def load(name, relative):
     path = ROOT / relative
     spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
     assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
@@ -313,7 +318,10 @@ def test_bys_portal_exec_and_admin(monkeypatch):
 
 
 def make_effective_module():
-    m = types.ModuleType("app.services.settings.effective_menu")
+    # Same rationale as the STUB_MODULES stand-ins above: this module object
+    # exists solely to receive an ad hoc set of dynamically-assigned
+    # attributes, so `Any` is its accurate type, not a loosened one.
+    m: Any = types.ModuleType("app.services.settings.effective_menu")
     m.Any = object
     m.PORTAL_MENU_VISIBILITY_POLICY = {"portal": {"admin"}}
     m.UserMenuPermission = type("UP", (), {"query": Query()})
