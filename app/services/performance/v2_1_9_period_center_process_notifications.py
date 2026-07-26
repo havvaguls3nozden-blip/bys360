@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.services.performance.v2_1_6_category_period_integration import (
     INTEGRATION_TABLE,
@@ -38,7 +39,7 @@ def _db():
 def _safe_json(payload: Any) -> str:
     try:
         return json.dumps(payload or {}, ensure_ascii=False, default=str)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=37")
         return "{}"
 
@@ -50,7 +51,7 @@ def _parse_json(raw: Any) -> Any:
         return raw
     try:
         return json.loads(str(raw))
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=48")
         return None
 
@@ -58,7 +59,7 @@ def _parse_json(raw: Any) -> Any:
 def _safe_int(value: Any, default: int = 0) -> int:
     try:
         return int(value or default)
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=55")
         return default
 
@@ -68,7 +69,7 @@ def _safe_percent(done: int, total: int) -> int:
         return 0
     try:
         return max(0, min(100, int(round((done / total) * 100))))
-    except Exception:
+    except (TypeError, ValueError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=64")
         return 0
 
@@ -76,7 +77,7 @@ def _safe_percent(done: int, total: int) -> int:
 def _dialect_name() -> str:
     try:
         return _db().engine.dialect.name
-    except Exception:
+    except RuntimeError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=71")
         return "unknown"
 
@@ -88,7 +89,7 @@ def _inspector():
 def _has_table(table_name: str) -> bool:
     try:
         return bool(_inspector().has_table(table_name))
-    except Exception:
+    except (SQLAlchemyError, RuntimeError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=82")
         return False
 
@@ -98,7 +99,7 @@ def _columns(table_name: str) -> set[str]:
         if not _has_table(table_name):
             return set()
         return {str(col.get("name")) for col in _inspector().get_columns(table_name)}
-    except Exception:
+    except (SQLAlchemyError, RuntimeError):
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=91")
         return set()
 
@@ -157,7 +158,7 @@ def ensure_period_center_process_notification_schema() -> dict[str, Any]:
             try:
                 db.session.execute(text(_alter_add_column_sql(INTEGRATION_TABLE, name, sql_type)))
                 added.append(name)
-            except Exception:
+            except SQLAlchemyError:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 db.session.rollback()
                 if not _has_column(INTEGRATION_TABLE, name):
@@ -180,11 +181,11 @@ def _period_summary(period_id: int | None) -> dict[str, Any]:
             text(f"SELECT {', '.join(select_cols)} FROM {PERIOD_TABLE} WHERE id=:pid"),
             {"pid": pid},
         ).mappings().first()
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=167")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=170")
             pass
         row = None
@@ -207,11 +208,11 @@ def _assignment_status_counts(period_id: int | None) -> dict[str, int]:
             {"pid": pid},
         ).mappings().all()
         return {str(row.get("status") or "bekliyor"): int(row.get("total") or 0) for row in rows}
-    except Exception:
+    except SQLAlchemyError:
         logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=192")
         try:
             _db().session.rollback()
-        except Exception:
+        except SQLAlchemyError:
             logger.exception("BYS360 V6C guarded exception | file=app/services/performance/v2_1_9_period_center_process_notifications.py | line=195")
             pass
         return {}
