@@ -187,7 +187,7 @@ def test_truthy_bool_handles_boolean_and_text_values() -> None:
             value
         ) is True
 
-    for value in (
+    for falsy_value in (
         None,
         0,
         "",
@@ -197,5 +197,5 @@ def test_truthy_bool_handles_boolean_and_text_values() -> None:
         "off",
     ):
         assert target._truthy_bool(
-            value
+            falsy_value
         ) is False

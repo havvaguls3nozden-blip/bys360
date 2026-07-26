@@ -4,6 +4,7 @@ import ast
 import logging
 from datetime import date, datetime
 from pathlib import Path
+from typing import cast
 from unittest.mock import Mock
 
 from app.services import corporate_information_center
@@ -139,7 +140,10 @@ def test_weekday_name_preserves_turkish_names_and_invalid_fallback(
 
     logger = Mock()
     monkeypatch.setattr(logging, "getLogger", Mock(return_value=logger))
-    assert cic_context._cic_weekday_name_tr(object()) == "Bilinmiyor"
+    # _cic_weekday_name_tr's try/except tolerates any input lacking
+    # .weekday() (verified in app/services/cic/cic_context.py), returning
+    # "Bilinmiyor" -- this deliberately exercises that fallback path.
+    assert cic_context._cic_weekday_name_tr(cast(datetime, object())) == "Bilinmiyor"
     logger.exception.assert_called_once()
 
 

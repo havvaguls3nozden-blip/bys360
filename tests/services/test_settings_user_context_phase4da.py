@@ -86,6 +86,7 @@ def _install_survey(
     class Survey:
         status = _Field()
         id = _Field()
+        query: _Query
 
     Survey.query = query
 
