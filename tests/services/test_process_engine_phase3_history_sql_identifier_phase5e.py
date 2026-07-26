@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import pytest
 
@@ -33,7 +34,7 @@ class _FakeResult:
 class _FakeSession:
     def __init__(self, scalar_values=None) -> None:
         self.scalar_values = list(scalar_values or [])
-        self.calls = []
+        self.calls: list[tuple[str, Any]] = []
 
     def execute(self, statement, params=None) -> _FakeResult:
         self.calls.append((str(statement), params))

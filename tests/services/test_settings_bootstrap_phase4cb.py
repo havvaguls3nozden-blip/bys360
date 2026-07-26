@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import Any, cast
+
 from app.services.settings import bootstrap
 
 
@@ -89,6 +92,6 @@ def test_merge_defaults_accepts_empty_inputs() -> None:
     ) == {}
 
     assert bootstrap.merge_defaults(
-        None,
-        None,
+        cast(Mapping[str, Any], None),
+        cast(Mapping[str, Any], None),
     ) == {}

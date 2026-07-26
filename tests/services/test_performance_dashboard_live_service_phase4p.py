@@ -2,9 +2,11 @@
 
 from datetime import date, datetime
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
+from app.models import PerformancePeriod
 from app.services import performance_dashboard_live_service as svc
 
 
@@ -19,29 +21,29 @@ def test_phase4p_safe_number_helpers_handle_valid_and_invalid_values() -> None:
 
     assert svc._pct(1, 4) == 25.0
     assert svc._pct(1, 0) == 0.0
-    assert svc._pct("bozuk", 2) == 0.0
+    assert svc._pct(cast(float, "bozuk"), 2) == 0.0
 
 
 def test_phase4p_period_label_and_range_are_safe() -> None:
     assert svc._period_label(None) == "Aktif dönem yok"
 
-    named_period = SimpleNamespace(id=9, title="2026 Performans", name=None)
+    named_period = cast(PerformancePeriod, SimpleNamespace(id=9, title="2026 Performans", name=None))
     assert svc._period_label(named_period) == "2026 Performans"
 
-    fallback_period = SimpleNamespace(id=42, title=None, name=None)
+    fallback_period = cast(PerformancePeriod, SimpleNamespace(id=42, title=None, name=None))
     assert svc._period_label(fallback_period) == "Dönem #42"
 
-    dated_period = SimpleNamespace(
+    dated_period = cast(PerformancePeriod, SimpleNamespace(
         start_date=date(2026, 1, 1),
         end_date=date(2026, 1, 31),
-    )
+    ))
     period_range = svc._period_range(dated_period)
     assert "01.01.2026" in period_range
     assert "31.01.2026" in period_range
 
     assert svc._period_range(None) == "Dönem seçildiğinde veriler otomatik güncellenir."
 
-    malformed_period = SimpleNamespace(start_date="baslangic", end_date="bitis")
+    malformed_period = cast(PerformancePeriod, SimpleNamespace(start_date="baslangic", end_date="bitis"))
     malformed_range = svc._period_range(malformed_period)
     assert "baslangic" in malformed_range
     assert "bitis" in malformed_range

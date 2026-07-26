@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
 from app.services import corporate_information_center
 from app.services.cic import (
@@ -45,7 +45,11 @@ class _Column:
     def asc(self) -> tuple[str, str]:
         return ("asc", self.name)
 
-    def __ne__(self, value: object) -> tuple[str, str, object]:
+    def __ne__(self, value: object) -> Any:
+        # Deliberately mimics SQLAlchemy's Column.__ne__, which returns a
+        # query-clause expression rather than bool -- the same intentional
+        # LSP violation real SQLAlchemy makes. Any is the honest return
+        # type for this override; the returned tuple itself is unchanged.
         return ("ne", self.name, value)
 
 
@@ -151,8 +155,11 @@ def test_list_users_preserves_active_search_order_and_limit(monkeypatch) -> None
     assert query.limit_value == 1
     assert query.ordering == (("asc", "id"),)
     assert query.filters[0] == (("is", "is_active", True),)
-    assert query.filters[1][0][0] == "or"
-    assert len(query.filters[1][0][1]) == 9
+    # query.filters[1][0] is the ("or", clauses) tuple built by the or_
+    # stub monkeypatched above.
+    or_clause = cast(tuple[str, tuple[Any, ...]], query.filters[1][0])
+    assert or_clause[0] == "or"
+    assert len(or_clause[1]) == 9
 
 
 def test_user_id_and_active_staff_queries_preserve_contract(monkeypatch) -> None:

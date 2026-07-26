@@ -31,12 +31,14 @@ def _recording_legacy(return_value: Any):
 
 def test_call_legacy_invokes_named_handler(fake_mobile_routes: types.ModuleType) -> None:
     legacy = _recording_legacy({"ok": True})
-    fake_mobile_routes._bys360_legacy_mobile_survey_custom = legacy
+    # No fixed attribute contract -- see fake_mobile_routes fixture above.
+    routes: Any = fake_mobile_routes
+    routes._bys360_legacy_mobile_survey_custom = legacy
 
     result = svc._call_legacy("mobile_survey_custom", "person-1", page=2)
 
     assert result == {"ok": True}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": ("person-1",), "kwargs": {"page": 2}}
     ]
 
@@ -79,7 +81,7 @@ def test_survey_delegate_wrappers_forward_to_expected_legacy(
     result = delegate("survey-1", answers={"q1": "yes"})
 
     assert result == {"marker": marker}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": ("survey-1",), "kwargs": {"answers": {"q1": "yes"}}}
     ]
 

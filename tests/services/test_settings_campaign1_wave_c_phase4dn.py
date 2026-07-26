@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from types import SimpleNamespace
+from typing import Any, cast
 
 import app.services.settings.diagnostics as diagnostics
 import app.services.settings.foundation_access as foundation
+from app.models.settings_models import SettingsChangeLog
 
 
 class _Inspector:
@@ -570,14 +572,14 @@ def test_diagnostics_activity_and_context(
 
     assert (
         diagnostics._log_to_dict(
-            row
+            cast(SettingsChangeLog, row)
         )["created_at"]
         == created.isoformat()
     )
 
     assert (
         diagnostics._log_to_dict(
-            empty_time_row
+            cast(SettingsChangeLog, empty_time_row)
         )["created_at"]
         is None
     )
@@ -594,7 +596,9 @@ def test_diagnostics_activity_and_context(
         == []
     )
 
-    fake_model = type(
+    # Dynamically-built via type(); has no fixed attribute contract for
+    # mypy to see, matching the ad hoc namespaces used throughout this file.
+    fake_model: Any = type(
         "LogModel",
         (),
         {
@@ -1156,14 +1160,14 @@ def test_foundation_context_success():
                 )
             ),
             build_role_default_snapshot=(
-                lambda: [
+                lambda: cast(list[dict[str, Any]], [
                     "role"
-                ]
+                ])
             ),
             build_unit_profile_snapshot=(
-                lambda: [
+                lambda: cast(list[dict[str, Any]], [
                     "unit"
-                ]
+                ])
             ),
             list_recent_settings_change_logs_func=(
                 lambda: [

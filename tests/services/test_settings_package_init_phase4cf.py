@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from types import SimpleNamespace
+from typing import cast
 
 from app.services import settings
+from app.services.settings.contracts import SettingChange
 
 
 def test_build_change_payload_masks_sensitive_values_and_serializes_time() -> None:
@@ -32,7 +34,7 @@ def test_build_change_payload_masks_sensitive_values_and_serializes_time() -> No
     )
 
     payload = settings.build_change_payload(
-        change
+        cast(SettingChange, change)
     )
 
     assert payload == {
@@ -64,7 +66,7 @@ def test_build_change_payload_preserves_public_values_and_empty_optional_fields(
     )
 
     assert settings.build_change_payload(
-        change
+        cast(SettingChange, change)
     ) == {
         "key": "site_name",
         "old_value": "Old Name",

@@ -4,8 +4,9 @@ import ast
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 
+from app.models import User
 from app.services import corporate_information_center
 from app.services.cic import (
     celebration_dates,
@@ -90,40 +91,40 @@ def test_existing_entry_points_use_canonical_template_functions() -> None:
 def test_user_name_preserves_display_fallback_order() -> None:
     assert template_service._user_name(None) == "-"
     assert template_service._user_name(
-        SimpleNamespace(
+        cast(User, SimpleNamespace(
             ad="Ada",
             soyad="Lovelace",
             full_name_cache="Cached",
             email="ada@example.test",
             id=1,
-        )
+        ))
     ) == "Ada Lovelace"
     assert template_service._user_name(
-        SimpleNamespace(
+        cast(User, SimpleNamespace(
             ad="",
             soyad="",
             full_name_cache="Cached Name",
             email="cached@example.test",
             id=2,
-        )
+        ))
     ) == "Cached Name"
     assert template_service._user_name(
-        SimpleNamespace(
+        cast(User, SimpleNamespace(
             ad="",
             soyad="",
             full_name_cache=None,
             email="mail@example.test",
             id=3,
-        )
+        ))
     ) == "mail@example.test"
     assert template_service._user_name(
-        SimpleNamespace(
+        cast(User, SimpleNamespace(
             ad="",
             soyad="",
             full_name_cache=None,
             email=None,
             id=4,
-        )
+        ))
     ) == "Kullanıcı #4"
 
 
@@ -201,11 +202,11 @@ def test_render_template_base_preserves_all_standard_placeholders(
             "yarin_yonetici_notu": "Hazırlık",
         },
     )
-    user = SimpleNamespace(
+    user = cast(User, SimpleNamespace(
         ad="Ayşe",
         soyad="Yılmaz",
         email="ayse@example.test",
-    )
+    ))
     text = (
         "{ad_soyad}|{email}|{tarih}|{saat}|{konum}|"
         "{bugun_hava}|{yarin_hava}|{kiyafet_onerisi}|{yarin_oneri}|"
@@ -285,7 +286,7 @@ def test_render_template_adds_celebration_placeholders(monkeypatch) -> None:
 
     rendered = template_service._render_template_text(
         "{ad_soyad}|{ozel_gun_adi}|{hizmet_yili}|{kutlama_notu}",
-        SimpleNamespace(id=1),
+        cast(User, SimpleNamespace(id=1)),
         "special_day",
     )
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from app.services.settings.value_codec import (
     normalize_bool,
     value_to_python,
@@ -22,7 +24,7 @@ def test_normalize_bool_accepts_supported_values() -> None:
 
 
 def test_normalize_bool_rejects_false_and_unknown_values() -> None:
-    values = [
+    values: list[Any] = [
         None,
         0,
         False,

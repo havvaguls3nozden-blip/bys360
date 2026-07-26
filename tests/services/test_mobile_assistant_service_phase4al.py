@@ -33,12 +33,14 @@ def test_delegate_mobile_b49_assistant_v2_ask_forwards_to_legacy(
     fake_assistant_chat: types.ModuleType,
 ) -> None:
     legacy = _recording_legacy({"answer": "ok"})
-    fake_assistant_chat._bys360_legacy_mobile_b49_assistant_v2_ask = legacy
+    # No fixed attribute contract -- see fake_assistant_chat fixture above.
+    chat: Any = fake_assistant_chat
+    chat._bys360_legacy_mobile_b49_assistant_v2_ask = legacy
 
     result = svc.delegate_mobile_b49_assistant_v2_ask("hello", user_id=42)
 
     assert result == {"answer": "ok"}
-    assert legacy.calls == [  # type: ignore[attr-defined]
+    assert legacy.calls == [
         {"args": ("hello",), "kwargs": {"user_id": 42}}
     ]
 

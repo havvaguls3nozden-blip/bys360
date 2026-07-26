@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from types import SimpleNamespace
+from typing import Any, cast
 
 from app.services.settings.contracts import MenuPermissionRule
 from app.services.settings.menu_rules import (
@@ -139,7 +141,7 @@ def test_enabled_menu_keys_returns_only_enabled_normalized_rules() -> None:
 
 
 def test_filter_live_menu_keys_handles_empty_and_removed_values() -> None:
-    assert filter_live_menu_keys(None) == []
+    assert filter_live_menu_keys(cast(Iterable[Any], None)) == []
     assert filter_live_menu_keys(["  portal  "]) == ["portal"]
 
     result = filter_live_menu_keys(
@@ -166,7 +168,7 @@ def test_filter_live_menu_rows_supports_passthrough_and_filtering() -> None:
     removed = SimpleNamespace(menu_key="education")
     no_key = SimpleNamespace()
 
-    assert filter_live_menu_rows(None) == []
+    assert filter_live_menu_rows(cast(Iterable[Any], None)) == []
 
     original = [portal, removed, no_key]
 
