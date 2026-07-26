@@ -4,6 +4,7 @@ import builtins
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 
 def _find_root() -> Path:
@@ -157,7 +158,11 @@ def _mixed_policies():
 
 
 def test_block_daily_weather_success_and_error():
-    policies = {
+    # Deliberately heterogeneous per key (dict / str "skip" / None / set /
+    # list) to exercise the production function's defensive handling of
+    # malformed policy entries -- Any is the accurate type of this
+    # container, not a loosened one.
+    policies: dict[str, Any] = {
         POLICY_NAMES[0]: {
             "executive_summary": {
                 "existing",
@@ -251,7 +256,7 @@ def test_block_daily_weather_success_and_error():
 
 
 def test_block_runtime_authority_success_and_error():
-    values = set()
+    values: set[str] = set()
 
     block.apply_role_matrix_runtime_authority_keys_block(
         values
@@ -430,8 +435,8 @@ def test_block_policy_mutators_set_list_and_skips():
 
 
 def test_block_period_center_success_and_errors():
-    core = {}
-    authority = set()
+    core: dict[str, set[str]] = {}
+    authority: set[str] = set()
 
     block.apply_period_center_key_roles_block(
         core,

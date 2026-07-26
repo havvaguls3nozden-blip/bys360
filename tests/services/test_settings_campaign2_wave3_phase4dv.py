@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from collections.abc import Callable
 from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
+from typing import Any
 
 import pytest
 
@@ -23,7 +25,7 @@ def _package(name: str) -> ModuleType:
 
 @contextmanager
 def _temporary_modules(mapping: dict[str, ModuleType]):
-    previous = {name: sys.modules.get(name, _SENTINEL) for name in mapping}
+    previous: dict[str, ModuleType | object] = {name: sys.modules.get(name, _SENTINEL) for name in mapping}
     sys.modules.update(mapping)
     try:
         yield
@@ -32,6 +34,10 @@ def _temporary_modules(mapping: dict[str, ModuleType]):
             if value is _SENTINEL:
                 sys.modules.pop(name, None)
             else:
+                # `value` came from sys.modules.get(...) in the branch that
+                # is not the `_SENTINEL` placeholder, so it is always a real
+                # module here.
+                assert isinstance(value, ModuleType)
                 sys.modules[name] = value
 
 
@@ -67,8 +73,11 @@ def _load_apply():
     def normalize(value):
         return str(value or '').strip().lower().replace('-', '_').replace(' ', '_')
 
+    def _rollback_hook(hook: Callable[[], Any] | None = None) -> Any:
+        return hook() if hook else None
+
     bys_attrs = {
-        '_rollback': lambda hook=None: hook() if hook else None,
+        '_rollback': _rollback_hook,
         'normalize_role_name': normalize,
         '_load_role_matrix_state': lambda *a, **k: {},
         '_load_unit_profile_state': lambda *a, **k: {},
@@ -342,7 +351,13 @@ class LineFailAuthority(set):
 
     def _maybe_fail(self):
         import inspect
-        line = inspect.currentframe().f_back.f_back.f_lineno
+        frame = inspect.currentframe()
+        assert frame is not None
+        caller = frame.f_back
+        assert caller is not None
+        grandcaller = caller.f_back
+        assert grandcaller is not None
+        line = grandcaller.f_lineno
         if line == self.fail_line:
             raise RuntimeError(f"authority line {line}")
 
@@ -366,7 +381,11 @@ class LineFailCore(dict):
 
     def setdefault(self, key, default=None):
         import inspect
-        line = inspect.currentframe().f_back.f_lineno
+        frame = inspect.currentframe()
+        assert frame is not None
+        caller = frame.f_back
+        assert caller is not None
+        line = caller.f_lineno
         if line == self.fail_line:
             raise RuntimeError(f"core line {line}")
         return super().setdefault(key, default)
@@ -490,7 +509,7 @@ def _policy_keys(constants):
 
 def _ns(constants, *, lists=False, authority=None, core=None):
     if lists:
-        policies = {name: [] for name in _policy_keys(constants)}
+        policies: dict[str, list[str]] = {name: [] for name in _policy_keys(constants)}
 
         def make_policy():
             return {key: [] for key in policies}

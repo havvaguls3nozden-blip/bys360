@@ -14,7 +14,13 @@ if str(PHASE4AD_PROJECT_ROOT) not in sys.path:
 
 def _install_fake_performance_routes(monkeypatch: pytest.MonkeyPatch) -> list[tuple[str, tuple[Any, ...], dict[str, Any]]]:
     calls: list[tuple[str, tuple[Any, ...], dict[str, Any]]] = []
-    fake_routes = ModuleType("app.api.mobile.performance_routes")
+    # This stand-in has no fixed attribute contract -- its entire purpose is
+    # to receive whatever ad hoc legacy delegate symbols are attached below,
+    # exactly like a real module's namespace after exec. `Any` is the
+    # accurate type here, not a loosened one (same pattern already
+    # established for the STUB_MODULES construction in
+    # tests/services/test_settings_campaign2_wave2_phase4du.py).
+    fake_routes: Any = ModuleType("app.api.mobile.performance_routes")
 
     def make_legacy(name: str):
         def legacy(*args: Any, **kwargs: Any) -> dict[str, Any]:
