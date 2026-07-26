@@ -52,10 +52,19 @@ jobs:
           python scripts/release/build_bys360_safe_release.py --root . --output reports/quality/BYS360_SAFE_RELEASE_CI_AUDIT.zip --audit-only
 
       - name: Run quality tests
-        run: python -m pytest tests/quality -m "ci_safe" --tb=short -q
+        run: python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report= --cov-fail-under=0 --tb=short -q
 
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture tests/security tests/critical --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+
+      # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
+      # [tool.coverage.report] fail_under is enforced by pytest-cov on EVERY
+      # invocation, but the ci_safe step alone measures ~0% (it imports almost no
+      # app code), which would abort this sequence before the broader step ever
+      # runs. --cov-fail-under=0 disables that per-invocation check; this ratchet
+      # step is the real, single enforcement point instead.
+      - name: Coverage ratchet gate
+        run: python scripts/quality/bys360_coverage_ratchet.py --coverage-xml reports/quality/coverage.xml --baseline reports/quality/coverage_baseline.json
 
       - name: Type check service layer
         run: python -m mypy app tests scripts --ignore-missing-imports --no-error-summary

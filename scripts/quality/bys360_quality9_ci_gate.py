@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import ast
+import configparser
 import json
 import re
+import shlex
 import sys
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -101,29 +103,273 @@ def scan_python(root: Path) -> tuple[dict[str, int], list[GateFinding]]:
     return totals, findings
 
 
+def workflow_run_commands(text: str) -> list[str]:
+    """Return executable YAML ``run`` commands, excluding comments and metadata."""
+    lines = text.splitlines()
+    commands: list[str] = []
+    index = 0
+
+    while index < len(lines):
+        line = lines[index]
+        match = re.match(r"^(?P<indent>[ \t]*)run:\s*(?P<value>.*)$", line)
+        if not match:
+            index += 1
+            continue
+
+        base_indent = len(match.group("indent").expandtabs(8))
+        value = match.group("value").strip()
+        if value.startswith(("|", ">")):
+            folded = value.startswith(">")
+            block_lines: list[str] = []
+            index += 1
+            while index < len(lines):
+                candidate = lines[index]
+                stripped = candidate.strip()
+                if not stripped:
+                    index += 1
+                    continue
+                indent = len(candidate) - len(candidate.lstrip(" \t"))
+                if indent <= base_indent:
+                    break
+                if not stripped.startswith("#"):
+                    block_lines.append(stripped)
+                index += 1
+            if folded and block_lines:
+                commands.append(" ".join(block_lines))
+            else:
+                commands.extend(block_lines)
+            continue
+
+        if value and not value.startswith("#"):
+            commands.append(value)
+        index += 1
+
+    return commands
+
+
+def _command_tokens(command: str) -> list[str]:
+    try:
+        return shlex.split(command, comments=True, posix=True)
+    except ValueError:
+        return []
+
+
+def _normalized_path(value: str) -> str:
+    return value.strip("'\"").replace("\\", "/").lstrip("./")
+
+
+def _option_values(tokens: list[str], option: str) -> list[str]:
+    values: list[str] = []
+    prefix = f"{option}="
+    for index, token in enumerate(tokens):
+        if token == option and index + 1 < len(tokens):
+            values.append(tokens[index + 1])
+        elif token.startswith(prefix):
+            values.append(token[len(prefix) :])
+    return values
+
+
+def _option_sequence(tokens: list[str], option: str) -> list[str]:
+    try:
+        start = tokens.index(option) + 1
+    except ValueError:
+        return []
+
+    values: list[str] = []
+    for token in tokens[start:]:
+        if token.startswith("-"):
+            break
+        values.append(token)
+    return values
+
+
+def _is_pytest_command(tokens: list[str]) -> bool:
+    normalized = [_normalized_path(token) for token in tokens]
+    if any(token.rsplit("/", 1)[-1] in {"pytest", "pytest.exe"} for token in normalized):
+        return True
+    return any(tokens[index : index + 2] == ["-m", "pytest"] for index in range(len(tokens) - 1))
+
+
+def _runs_script(tokens: list[str], expected_path: str) -> bool:
+    expected = _normalized_path(expected_path)
+    return any(_normalized_path(token) == expected for token in tokens)
+
+
+def _has_test_scope(tokens: list[str], expected_scope: str) -> bool:
+    expected = _normalized_path(expected_scope).rstrip("/")
+    return any(_normalized_path(token).rstrip("/") == expected for token in tokens)
+
+
+def _has_option_value(tokens: list[str], option: str, expected: str) -> bool:
+    normalized_expected = _normalized_path(expected)
+    return any(_normalized_path(value) == normalized_expected for value in _option_values(tokens, option))
+
+
 def check_workflow(root: Path, max_broad_except: int) -> list[GateFinding]:
     findings: list[GateFinding] = []
     path = root / ".github" / "workflows" / "bys360-ci.yml"
     if not path.exists():
         return [GateFinding("missing_ci_workflow", rel(path, root), "CI workflow bulunamadı")]
     text = path.read_text(encoding="utf-8", errors="ignore")
-    normalized = text.replace("'", '"')
-    accepted_pytest_commands = (
-        'python -m pytest tests/quality -m "ci_safe" --tb=short -q',
-        'python -m pytest tests/ -m "ci_safe" --tb=short -q',
-    )
-    if "name: Run tests" not in text or not any(cmd in normalized for cmd in accepted_pytest_commands):
+    commands = workflow_run_commands(text)
+    tokenized = [_command_tokens(command) for command in commands]
+    pytest_commands = [tokens for tokens in tokenized if _is_pytest_command(tokens)]
+
+    ci_safe_commands = [
+        tokens
+        for tokens in pytest_commands
+        if _has_test_scope(tokens, "tests/quality")
+        and "ci_safe" in _option_values(tokens, "-m")
+    ]
+    if not ci_safe_commands:
         findings.append(GateFinding("pytest_not_enforced", rel(path, root), "CI içinde ci_safe pytest kapısı zorunlu"))
-    if "--max-broad-except 3500" in text:
-        findings.append(GateFinding("broad_except_threshold_too_loose", rel(path, root), "3500 eşiği kalite güvencesi üretmez"))
-    match = re.search(r"--max-broad-except\s+(\d+)", text)
-    if not match:
+    if not any(_has_option_value(tokens, "--cov", "app") for tokens in ci_safe_commands):
+        findings.append(
+            GateFinding(
+                "coverage_measurement_not_enforced",
+                rel(path, root),
+                "ci_safe pytest adımı uygulama coverage ölçümünü --cov=app ile başlatmalı",
+            )
+        )
+
+    coverage_xml_commands = [
+        tokens
+        for tokens in pytest_commands
+        if "--cov-append" in tokens
+        and _has_option_value(tokens, "--cov", "app")
+        and _has_option_value(tokens, "--cov-report", "xml:reports/quality/coverage.xml")
+    ]
+    if not coverage_xml_commands:
+        findings.append(
+            GateFinding(
+                "coverage_xml_not_enforced",
+                rel(path, root),
+                "CI birleşik app coverage verisini reports/quality/coverage.xml olarak üretmeli",
+            )
+        )
+
+    ratchet_commands = [
+        tokens
+        for tokens in tokenized
+        if _runs_script(tokens, "scripts/quality/bys360_coverage_ratchet.py")
+        and _has_option_value(tokens, "--coverage-xml", "reports/quality/coverage.xml")
+        and _has_option_value(tokens, "--baseline", "reports/quality/coverage_baseline.json")
+    ]
+    if not ratchet_commands:
+        findings.append(
+            GateFinding(
+                "coverage_ratchet_not_enforced",
+                rel(path, root),
+                "Coverage ratchet doğru XML ve baseline yollarıyla çağrılmalı",
+            )
+        )
+    if not (root / "scripts" / "quality" / "bys360_coverage_ratchet.py").is_file():
+        findings.append(
+            GateFinding(
+                "missing_coverage_ratchet_script",
+                "scripts/quality/bys360_coverage_ratchet.py",
+                "CI tarafından çağrılan coverage ratchet scripti bulunamadı",
+            )
+        )
+    if not (root / "reports" / "quality" / "coverage_baseline.json").is_file():
+        findings.append(
+            GateFinding(
+                "missing_coverage_baseline",
+                "reports/quality/coverage_baseline.json",
+                "Coverage ratchet baseline dosyası bulunamadı",
+            )
+        )
+
+    audit_commands = [
+        tokens
+        for tokens in tokenized
+        if _runs_script(tokens, "scripts/quality/bys360_ops_audit.py")
+    ]
+    broad_except_values = [
+        value
+        for tokens in audit_commands
+        for value in _option_values(tokens, "--max-broad-except")
+    ]
+    if not broad_except_values:
         findings.append(GateFinding("missing_broad_except_threshold", rel(path, root), "CI broad-except eşiği bulunamadı"))
-    elif int(match.group(1)) > max_broad_except:
-        findings.append(GateFinding("broad_except_threshold_above_quality9", rel(path, root), f"Eşik {match.group(1)}; kalite hedefi {max_broad_except}"))
-    if "--source-paths app config.py wsgi.py run.py" not in text:
+    else:
+        try:
+            threshold = int(broad_except_values[0])
+        except ValueError:
+            findings.append(
+                GateFinding(
+                    "invalid_broad_except_threshold",
+                    rel(path, root),
+                    f"CI broad-except eşiği sayı değil: {broad_except_values[0]}",
+                )
+            )
+        else:
+            if threshold == 3500:
+                findings.append(
+                    GateFinding(
+                        "broad_except_threshold_too_loose",
+                        rel(path, root),
+                        "3500 eşiği kalite güvencesi üretmez",
+                    )
+                )
+            elif threshold > max_broad_except:
+                findings.append(
+                    GateFinding(
+                        "broad_except_threshold_above_quality9",
+                        rel(path, root),
+                        f"Eşik {threshold}; kalite hedefi {max_broad_except}",
+                    )
+                )
+
+    required_sources = {"app", "config.py", "wsgi.py", "run.py"}
+    if not any(
+        required_sources.issubset({_normalized_path(value) for value in _option_sequence(tokens, "--source-paths")})
+        for tokens in audit_commands
+    ):
         findings.append(GateFinding("audit_scope_not_app", rel(path, root), "CI bütçesi yaşayan uygulama kodu için app/config/wsgi/run kapsamına bağlanmalı"))
     return findings
+
+
+def _attribute_path(node: ast.AST) -> tuple[str, ...]:
+    parts: list[str] = []
+    current = node
+    while isinstance(current, ast.Attribute):
+        parts.append(current.attr)
+        current = current.value
+    if isinstance(current, ast.Name):
+        parts.append(current.id)
+    return tuple(reversed(parts))
+
+
+def _node_mentions_ci_safe(node: ast.AST) -> bool:
+    for child in ast.walk(node):
+        if isinstance(child, ast.Name) and "ci_safe" in child.id.lower():
+            return True
+        if isinstance(child, ast.Attribute) and child.attr.lower() == "ci_safe":
+            return True
+        if (
+            isinstance(child, ast.Constant)
+            and isinstance(child.value, str)
+            and child.value.strip().lower() == "ci_safe"
+        ):
+            return True
+    return False
+
+
+def _module_declares_ci_safe_pytestmark(tree: ast.Module) -> bool:
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        if not any(isinstance(target, ast.Name) and target.id == "pytestmark" for target in targets):
+            continue
+        value = node.value
+        if value is None:
+            continue
+        candidates = value.elts if isinstance(value, (ast.List, ast.Tuple)) else [value]
+        if any(_attribute_path(candidate) == ("pytest", "mark", "ci_safe") for candidate in candidates):
+            return True
+    return False
 
 
 def check_ci_safe_hook(root: Path) -> list[GateFinding]:
@@ -132,21 +378,104 @@ def check_ci_safe_hook(root: Path) -> list[GateFinding]:
     if not path.exists():
         return [GateFinding("missing_tests_conftest", rel(path, root), "tests/conftest.py bulunamadı")]
     text = path.read_text(encoding="utf-8", errors="ignore")
-    required = [
-        "BYS360_QUALITY9_CI_SAFE_SCOPE_DISCIPLINE_START",
-        "pytest_collection_modifyitems",
-        "pytest_deselected",
-        "tests/quality",
-        "ci_safe",
-    ]
-    missing = [item for item in required if item not in text]
-    if missing:
-        findings.append(GateFinding("ci_safe_scope_discipline_missing", rel(path, root), "Eksik parçalar: " + ", ".join(missing)))
-    if "item.add_marker(ci_safe_marker)" in text:
-        findings.append(GateFinding("ci_safe_scope_too_broad", rel(path, root), "Tüm testleri otomatik ci_safe işaretleyen eski davranış kapatılmalı"))
+    try:
+        tree = ast.parse(text, filename=str(path))
+    except SyntaxError as exc:
+        return [
+            GateFinding(
+                "invalid_tests_conftest",
+                rel(path, root),
+                exc.msg,
+                exc.lineno,
+            )
+        ]
+
+    if any(
+        isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "pytest_collection_modifyitems"
+        for node in ast.walk(tree)
+    ):
+        findings.append(
+            GateFinding(
+                "ci_safe_custom_collection_hook_present",
+                rel(path, root),
+                "ci_safe seçimi path tabanlı collection hook yerine pytest marker ifadesine bırakılmalı",
+            )
+        )
+    if any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "add_marker"
+        and any(_node_mentions_ci_safe(argument) for argument in node.args)
+        for node in ast.walk(tree)
+    ):
+        findings.append(
+            GateFinding(
+                "ci_safe_scope_too_broad",
+                rel(path, root),
+                "Tüm testleri otomatik ci_safe işaretleyen davranış kapatılmalı",
+            )
+        )
+
+    pytest_config = root / "pytest.ini"
+    parser = configparser.ConfigParser(interpolation=None)
+    if not pytest_config.exists():
+        findings.append(
+            GateFinding(
+                "missing_pytest_config",
+                rel(pytest_config, root),
+                "pytest.ini bulunamadı",
+            )
+        )
+    else:
+        try:
+            parser.read(pytest_config, encoding="utf-8")
+            markers = parser.get("pytest", "markers", fallback="")
+        except (configparser.Error, OSError) as exc:
+            findings.append(
+                GateFinding(
+                    "invalid_pytest_config",
+                    rel(pytest_config, root),
+                    str(exc),
+                )
+            )
+        else:
+            if not re.search(r"(?m)^\s*ci_safe\s*:", markers):
+                findings.append(
+                    GateFinding(
+                        "ci_safe_marker_not_registered",
+                        rel(pytest_config, root),
+                        "pytest.ini içinde ci_safe marker kaydı bulunamadı",
+                    )
+                )
+
     quality_test = root / "tests" / "quality" / "test_quality9_ci_safe_contract.py"
     if not quality_test.exists():
         findings.append(GateFinding("missing_quality9_ci_safe_tests", rel(quality_test, root), "Deterministik ci_safe kalite testi bulunamadı"))
+    else:
+        try:
+            quality_tree = ast.parse(
+                quality_test.read_text(encoding="utf-8"),
+                filename=str(quality_test),
+            )
+        except SyntaxError as exc:
+            findings.append(
+                GateFinding(
+                    "invalid_quality9_ci_safe_tests",
+                    rel(quality_test, root),
+                    exc.msg,
+                    exc.lineno,
+                )
+            )
+        else:
+            if not _module_declares_ci_safe_pytestmark(quality_tree):
+                findings.append(
+                    GateFinding(
+                        "quality9_tests_not_ci_safe",
+                        rel(quality_test, root),
+                        "Quality 9 sözleşme testleri pytest.mark.ci_safe ile işaretlenmeli",
+                    )
+                )
     return findings
 
 def main() -> int:

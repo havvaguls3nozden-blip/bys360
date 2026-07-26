@@ -11,7 +11,32 @@ omit = [
   "app/inspect_*",
   "app/*snippet*",
 ]
-fail_under = 80
+# BYS360 Campaign 1B (2026-07-24): the previous fail_under = 80 was fictional --
+# no CI step ever ran pytest with --cov=, so this threshold was never actually
+# enforced against a real measurement. Re-measured for real, over CI's true
+# test scope (tests/quality -m ci_safe, then tests/integration
+# tests/architecture tests/security tests/critical; branch=true), combined
+# line+branch coverage = 18.85% (see reports/quality/coverage_baseline.json
+# and reports/quality/coverage.xml for the full reproducible measurement:
+# lines 23480/102307, branches 1355/29448). fail_under is set to 18 here --
+# an integer floor conservatively below the measured 18.85%, so a bare
+# `pytest --cov=app` / `coverage report` run (which has no access to the
+# ratchet script's own 0.5-point tolerance) does not spuriously fail on
+# ordinary float/platform noise.
+#
+# This is an enforced FLOOR, not an aspirational number. The real CI gate
+# that must not regress below the current measured baseline is
+# scripts/quality/bys360_coverage_ratchet.py, which compares
+# reports/quality/coverage.xml against reports/quality/coverage_baseline.json
+# with documented tolerance -- see that script's docstring. Raising this
+# fail_under value (or the ratchet baseline) is a separate, human-reviewed
+# action once real coverage has genuinely and durably improved -- never done
+# automatically by any script here.
+#
+# 80% MAY be documented as a long-term aspirational target for this project,
+# but must never be presented as today's verified coverage -- today's
+# verified combined coverage is 18.85%, not 80%.
+fail_under = 18
 skip_covered = true
 
 [tool.black]

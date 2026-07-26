@@ -1,0 +1,33 @@
+{
+  "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m ci_safe, then tests/integration tests/architecture tests/security tests/critical, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and scripts/quality/bys360_coverage_ratchet.py docstring for the no-self-raise constraint.",
+  "combined_pct": 18.85,
+  "combined_pct_precise": 18.849379530188607,
+  "line_pct": 22.95,
+  "branch_pct": 4.6,
+  "lines_covered": 23480,
+  "lines_valid": 102307,
+  "branches_covered": 1355,
+  "branches_valid": 29448,
+  "measured_at": "2026-07-24T16:46:50Z",
+  "measured_by": "Agent 1 - Coverage Gate Closure (Campaign 1B)",
+  "environment": {
+    "python_version": "3.12.10",
+    "pytest_version": "9.0.3",
+    "pytest_cov_version": "7.1.0",
+    "coverage_version": "7.15.0",
+    "os": "Windows 11 (worktree measurement; CI runner is ubuntu-latest -- see tolerance note in ratchet script)",
+    "venv": "C:\\bys360\\project\\.venv\\Scripts\\python.exe"
+  },
+  "commands": [
+    "python -m pytest tests/quality -m \"ci_safe\" --cov=app --cov-report= --cov-fail-under=0 --tb=short -q",
+    "python -m pytest tests/integration tests/architecture tests/security tests/critical --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q"
+  ],
+  "test_counts": {
+    "step1_ci_safe_passed": 5,
+    "step1_ci_safe_deselected": 33,
+    "step2_broader_scope_passed": 236,
+    "total_passed": 241
+  },
+  "tolerance_pct": 0.5,
+  "tolerance_rationale": "Absorbs float rounding and Windows-worktree-vs-Ubuntu-CI-runner platform noise (this baseline was measured on Windows; the actual CI runner is ubuntu-latest, which can take slightly different code paths on OS-conditional branches). Not intended to absorb a real coverage regression, which is expected to be much larger than 0.5 points in practice."
+}
