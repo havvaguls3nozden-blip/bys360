@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fnmatch
 import json
 import subprocess
 from datetime import datetime
@@ -82,29 +83,79 @@ PHASE2E_OWN_PATHS = {
     "tests/quality/test_phase2_test_coverage_evidence_gate_v1.py",
 }
 
+# BYS360 Phase2E root-cause fix (2026-07-26): bilinen ve kasıtlı kalite kanıt
+# artefaktları. Bunlar gerçek çalışma sırasında üretilen, commit'e gerek
+# duymayan (coverage ölçümü, secret-gate raporu, teslim dokümanları gibi)
+# untracked dosyalardır. Sadece ?? statüsündeki ve burada tanımlı gerçek yol/
+# desenlere uyan dosyalar kabul edilir; başka hiçbir untracked veya tracked
+# değişiklik bu whitelist'ten faydalanmaz.
+PHASE2E_ALLOWED_ARTIFACT_EXACT_PATHS = {
+    ".coverage",
+    "reports/quality/coverage.xml",
+    "reports/quality/BYS360_SECRET_REPO_GATE_V1_REPORT.json",
+}
+PHASE2E_ALLOWED_ARTIFACT_PATTERNS = (
+    "reports/quality/*_DELIVERY_REPORT.docx",
+)
 
-def _git_status_clean_or_own_files_only(stdout: str) -> bool:
-    if not stdout.strip():
+
+def _is_allowed_artifact(path: str) -> bool:
+    if path in PHASE2E_ALLOWED_ARTIFACT_EXACT_PATHS:
         return True
+    return any(fnmatch.fnmatchcase(path, pattern) for pattern in PHASE2E_ALLOWED_ARTIFACT_PATTERNS)
+
+
+def _classify_git_status(stdout: str) -> dict[str, list[str]]:
+    untracked_files: list[str] = []
+    ignored_files: list[str] = []
+    allowed_artifacts: list[str] = []
+    unexpected_files: list[str] = []
 
     for line in stdout.splitlines():
         raw = line.strip()
         if not raw:
             continue
 
-        # git status --short formatı: " M path", "A  path", "?? path"
+        # git status --short --ignored formatı: " M path", "A  path", "?? path", "!! path"
         if len(line) >= 3 and line[2] == " ":
+            code = line[:2]
             candidate = line[3:]
         elif raw.startswith("?? "):
+            code = "??"
+            candidate = raw[3:]
+        elif raw.startswith("!! "):
+            code = "!!"
             candidate = raw[3:]
         else:
+            code = raw[:2]
             candidate = raw.split(maxsplit=1)[-1] if " " in raw else raw
 
         normalized = candidate.strip().replace("\\", "/")
-        if normalized not in PHASE2E_OWN_PATHS:
-            return False
+        if normalized in PHASE2E_OWN_PATHS:
+            continue
 
-    return True
+        if code == "!!":
+            ignored_files.append(normalized)
+            continue
+
+        if code == "??":
+            untracked_files.append(normalized)
+            if _is_allowed_artifact(normalized):
+                allowed_artifacts.append(normalized)
+            else:
+                unexpected_files.append(normalized)
+            continue
+
+        # tracked değişiklikler (M, A, D, R, vb.) - PHASE2E_OWN_PATHS dışı kalanlar reddedilir
+        unexpected_files.append(normalized)
+
+    return {
+        "untracked_files": untracked_files,
+        "ignored_files": ignored_files,
+        "allowed_artifacts": allowed_artifacts,
+        "unexpected_files": unexpected_files,
+    }
+
 
 def _run(cmd: list[str], root: Path) -> dict[str, Any]:
     proc = subprocess.run(
@@ -237,13 +288,14 @@ def _write_markdown(path: Path, result: dict[str, Any]) -> None:
 
 
 def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
-    git_status = _run(["git", "status", "--short"], root)
+    git_status = _run(["git", "status", "--short", "--ignored"], root)
     git_log = _run(["git", "log", "--oneline", "-9"], root)
 
     required_files = _check_required_files(root)
     reports = _check_reports(root)
 
-    git_clean_ok = git_status["ok"] and _git_status_clean_or_own_files_only(git_status.get("stdout", ""))
+    git_status_classification = _classify_git_status(git_status.get("stdout", ""))
+    git_clean_ok = git_status["ok"] and not git_status_classification["unexpected_files"]
     required_files_ok = all(row["ok"] for row in required_files)
     reports_ok = all(row["ok"] for row in reports)
 
@@ -253,6 +305,7 @@ def run_checks(root: Path, write_report: bool = True) -> dict[str, Any]:
         "root": str(root),
         "evidence_gate_ok": bool(git_clean_ok and required_files_ok and reports_ok),
         "git_clean_ok": git_clean_ok,
+        "git_status_classification": git_status_classification,
         "required_files_ok": required_files_ok,
         "reports_ok": reports_ok,
         "git_status": git_status,
