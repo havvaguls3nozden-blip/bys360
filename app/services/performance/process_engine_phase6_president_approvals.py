@@ -899,82 +899,88 @@ def decide_president_approval(approval_id: int, actor: Any, action: str, note: s
     visible_status = "Onaylandı" if action == "approved" else "İade edildi"
     decision_action = "onay" if action == "approved" else "iade"
 
-    db.session.execute(
-        text(
-            """
-            UPDATE performance_president_approvals
-               SET status = :status,
-                   decision_status = :status,
-                   decision_action = :decision_action,
-                   president_user_id = COALESCE(president_user_id, :actor_id),
-                   decided_by_user_id = :actor_id,
-                   decided_by_name = :actor_name,
-                   decided_at = :now,
-                   decision_note = :note,
-                   visible_status = :visible_status,
-                   action_required = FALSE,
-                   process_version = :version,
-                   updated_by_phase6_at = :now,
-                   updated_at = :now
-             WHERE id = :approval_id
-            """
-        ),
-        {
-            "approval_id": approval_id,
-            "status": action,
-            "decision_action": decision_action,
-            "actor_id": actor_id,
-            "actor_name": actor_name,
-            "now": now,
-            "note": note,
-            "visible_status": visible_status,
-            "version": PHASE6_VERSION,
-        },
-    )
+    try:
+        db.session.execute(
+            text(
+                """
+                UPDATE performance_president_approvals
+                   SET status = :status,
+                       decision_status = :status,
+                       decision_action = :decision_action,
+                       president_user_id = COALESCE(president_user_id, :actor_id),
+                       decided_by_user_id = :actor_id,
+                       decided_by_name = :actor_name,
+                       decided_at = :now,
+                       decision_note = :note,
+                       visible_status = :visible_status,
+                       action_required = FALSE,
+                       process_version = :version,
+                       updated_by_phase6_at = :now,
+                       updated_at = :now
+                 WHERE id = :approval_id
+                """
+            ),
+            {
+                "approval_id": approval_id,
+                "status": action,
+                "decision_action": decision_action,
+                "actor_id": actor_id,
+                "actor_name": actor_name,
+                "now": now,
+                "note": note,
+                "visible_status": visible_status,
+                "version": PHASE6_VERSION,
+            },
+        )
 
-    flow_id = row.get("flow_id")
-    evaluation_id = row.get("evaluation_id")
-    if flow_id and table_exists("performance_process_flows"):
-        if action == "approved":
-            flow_payload = {
-                "current_status": "kesinlesme_bekliyor",
-                "current_stage": "Başkan onayı tamamlandı",
-                "current_owner_user_id": None,
-                "current_owner_name": None,
-                "last_action_title": "Başkan onayı verildi",
-                "last_action_at": now,
-                "president_approval_status": "approved",
-                "flow_summary": "Başkan onayı tamamlandı. Süreç kesinleşme/yayın kontrolüne hazır.",
-                "process_version": PHASE6_VERSION,
-                "updated_by_engine_at": now,
-            }
-        else:
-            flow_payload = {
-                "current_status": "iade_edildi",
-                "current_stage": "Başkan tarafından iade edildi",
-                "last_action_title": "Başkan tarafından iade edildi",
-                "last_action_at": now,
-                "president_approval_status": "returned",
-                "flow_summary": note or "Başkan değerlendirme sürecini inceleme için iade etti.",
-                "process_version": PHASE6_VERSION,
-                "updated_by_engine_at": now,
-            }
-        available = _table_columns("performance_process_flows")
-        filtered = {key: value for key, value in flow_payload.items() if key in available}
-        if filtered:
-            assignments = ", ".join(f"{key} = :{key}" for key in filtered)
-            filtered["flow_id"] = flow_id
-            db.session.execute(text(f"UPDATE performance_process_flows SET {assignments} WHERE id = :flow_id"), filtered)
+        flow_id = row.get("flow_id")
+        evaluation_id = row.get("evaluation_id")
+        if flow_id and table_exists("performance_process_flows"):
+            if action == "approved":
+                flow_payload = {
+                    "current_status": "kesinlesme_bekliyor",
+                    "current_stage": "Başkan onayı tamamlandı",
+                    "current_owner_user_id": None,
+                    "current_owner_name": None,
+                    "last_action_title": "Başkan onayı verildi",
+                    "last_action_at": now,
+                    "president_approval_status": "approved",
+                    "flow_summary": "Başkan onayı tamamlandı. Süreç kesinleşme/yayın kontrolüne hazır.",
+                    "process_version": PHASE6_VERSION,
+                    "updated_by_engine_at": now,
+                }
+            else:
+                flow_payload = {
+                    "current_status": "iade_edildi",
+                    "current_stage": "Başkan tarafından iade edildi",
+                    "last_action_title": "Başkan tarafından iade edildi",
+                    "last_action_at": now,
+                    "president_approval_status": "returned",
+                    "flow_summary": note or "Başkan değerlendirme sürecini inceleme için iade etti.",
+                    "process_version": PHASE6_VERSION,
+                    "updated_by_engine_at": now,
+                }
+            available = _table_columns("performance_process_flows")
+            filtered = {key: value for key, value in flow_payload.items() if key in available}
+            if filtered:
+                assignments = ", ".join(f"{key} = :{key}" for key in filtered)
+                filtered["flow_id"] = flow_id
+                db.session.execute(text(f"UPDATE performance_process_flows SET {assignments} WHERE id = :flow_id"), filtered)
 
-    _insert_step_for_decision(
-        approval_id=approval_id,
-        flow_id=flow_id,
-        evaluation_id=evaluation_id,
-        actor=actor,
-        action=action,
-        note=note,
-    )
-    db.session.commit()
+        _insert_step_for_decision(
+            approval_id=approval_id,
+            flow_id=flow_id,
+            evaluation_id=evaluation_id,
+            actor=actor,
+            action=action,
+            note=note,
+        )
+        db.session.commit()
+    except SQLAlchemyError:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        db.session.rollback()
+        return Phase6ActionResult(False, "Karar kaydedilemedi; lütfen tekrar deneyin.", approval_id)
+
     return Phase6ActionResult(True, "Başkan onayı kaydedildi." if action == "approved" else "Süreç iade edildi.", approval_id)
 
 
