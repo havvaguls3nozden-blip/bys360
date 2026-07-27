@@ -12,9 +12,17 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P2C_MOBILE_REQUEST_LEVEL_SMOKE_GATE_V2"
+
+
+class _RouteEntry(TypedDict):
+    method: str
+    rule: str
+    file: str
+    line: int
+    decorator: str
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_REQUEST_LEVEL_SMOKE_GATE_P2C_V2_REPORT.json")
 
 EXPECTED_DOMAIN_FILES = [
@@ -79,11 +87,11 @@ def _function_count(path: Path) -> int:
     except SyntaxError:
         return 0
 
-def _extract_routes(root: Path, rel: str) -> list[dict[str, str]]:
+def _extract_routes(root: Path, rel: str) -> list[_RouteEntry]:
     path = root / rel
     if not path.exists():
         return []
-    routes = []
+    routes: list[_RouteEntry] = []
     for line_no, line in enumerate(_read(path).splitlines(), 1):
         m = DECORATOR_RE.search(line.strip())
         if m:
@@ -101,7 +109,7 @@ def build_inventory(root: Path) -> dict[str, Any]:
     domain_files = EXPECTED_DOMAIN_FILES
     files = [routes_file] + domain_files
     domain_inventory = []
-    all_routes: list[dict[str, str]] = []
+    all_routes: list[_RouteEntry] = []
     missing_files = []
     for rel in files:
         path = root / rel
@@ -116,7 +124,7 @@ def build_inventory(root: Path) -> dict[str, Any]:
             "function_count": _function_count(path),
             "lines": _line_count(path),
         })
-    seen = {}
+    seen: dict[tuple[str, str], _RouteEntry] = {}
     duplicate_route_decorators = []
     for route in all_routes:
         key = (route["method"], route["rule"])
@@ -239,7 +247,7 @@ def run_request_level_smoke(root: Path, static_ok: bool) -> dict[str, Any]:
         old_cwd = Path.cwd()
         sys.path.insert(0, str(root))
         os.chdir(root)
-        from app import create_app  # type: ignore
+        from app import create_app
         app = create_app()
         runtime_rules = sorted(str(rule.rule) for rule in app.url_map.iter_rules())
         expected_suffixes = [rule for _method, rule, _feature, _owner in EXPECTED_ROUTES]
@@ -258,7 +266,7 @@ def run_request_level_smoke(root: Path, static_ok: bool) -> dict[str, Any]:
         return {"ok": static_ok, "mode": "request_level_import_exception_static_contract", "error": repr(exc)}
     finally:
         with contextlib.suppress(Exception):
-            os.chdir(old_cwd)  # type: ignore[name-defined]
+            os.chdir(old_cwd)
         try:
             if str(root) in sys.path:
                 sys.path.remove(str(root))
@@ -278,8 +286,10 @@ def run_gate(root: Path, mode: str = "all", compile_all: bool = False, run_app_f
     request_smoke = run_request_level_smoke(root, static["direct_contract_ok"] and static["behavior_smoke_ok"])
     compile_info = compile_targets(root) if compile_all else {"ok": True, "results": []}
     app_factory = run_app_factory_smoke(root) if run_app_factory else {"ok": True, "skipped": True}
-    secret_gate = run_secret_gate(root) if run_secret else {"ok": True, "skipped": True}
+    secret_gate: dict[str, Any] = run_secret_gate(root) if run_secret else {"ok": True, "skipped": True}
     pytest_info = run_pytest_or_fallback(root, request_smoke["ok"] and static["direct_contract_ok"] and static["behavior_smoke_ok"]) if run_pytest_flag else {"ok": True, "mode": "skipped"}
+    raw_secret_parsed = secret_gate.get("parsed")
+    secret_parsed: dict[str, Any] = raw_secret_parsed if isinstance(raw_secret_parsed, dict) else {}
     result: dict[str, Any] = {
         "ok": False,
         "package": PACKAGE,
@@ -296,7 +306,7 @@ def run_gate(root: Path, mode: str = "all", compile_all: bool = False, run_app_f
         "compile_ok": compile_info["ok"],
         "app_factory_ok": bool(app_factory.get("ok")),
         "secret_gate_ok": bool(secret_gate.get("ok")),
-        "secret_gate_finding_count": int((secret_gate.get("parsed") or {}).get("finding_count", 0) or 0) if isinstance(secret_gate.get("parsed"), dict) else 0,
+        "secret_gate_finding_count": int(secret_parsed.get("finding_count", 0) or 0),
         "pytest_ok": bool(pytest_info.get("ok")),
         "pytest_mode": pytest_info.get("mode"),
         "inventory": static["inventory"],

@@ -16,7 +16,12 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
+
+
+class _Scenario(TypedDict):
+    name: str
+    headers: dict[str, str]
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P4A_MOBILE_AUTH_GUARD_MATRIX_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_AUTH_GUARD_MATRIX_GATE_P4A_REPORT.json")
@@ -177,12 +182,12 @@ def runtime_route_map(root: Path) -> dict[str, Any]:
     _ensure_testing_env()
     sys.path.insert(0, str(root))
     try:
-        from app import create_app  # type: ignore
+        from app import create_app
 
         app = create_app()
         runtime_routes: list[dict[str, Any]] = []
         for rule in app.url_map.iter_rules():
-            methods = sorted(m for m in rule.methods if m not in {"HEAD", "OPTIONS"})
+            methods = sorted(m for m in (rule.methods or ()) if m not in {"HEAD", "OPTIONS"})
             item = {"rule": str(rule.rule), "methods": methods, "endpoint": rule.endpoint}
             runtime_routes.append(item)
 
@@ -238,14 +243,14 @@ def auth_guard_matrix(root: Path) -> dict[str, Any]:
     _ensure_testing_env()
     sys.path.insert(0, str(root))
     try:
-        from app import create_app  # type: ignore
+        from app import create_app
 
         app = create_app()
         app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
         client = app.test_client()
         responses: list[dict[str, Any]] = []
         failures: list[dict[str, Any]] = []
-        scenarios = [
+        scenarios: list[_Scenario] = [
             {"name": "no_authorization", "headers": {}},
             {"name": "malformed_bearer", "headers": {"Authorization": "Bearer bys360.invalid.test.token"}},
         ]
@@ -362,7 +367,7 @@ def run_checks(
     compile_ok = all(item["ok"] for item in compile_results)
 
     app_smoke = app_factory_smoke(root) if app_factory else {"ok": True, "skipped": True}
-    secret = secret_gate(root) if secret_gate_enabled else {"ok": True, "skipped": True, "parsed": {}}
+    secret: dict[str, Any] = secret_gate(root) if secret_gate_enabled else {"ok": True, "skipped": True, "parsed": {}}
     pytest_result = pytest_gate(root) if pytest_gate_enabled else {"ok": True, "skipped": True, "mode": "not_requested"}
 
     direct_contract_ok = (

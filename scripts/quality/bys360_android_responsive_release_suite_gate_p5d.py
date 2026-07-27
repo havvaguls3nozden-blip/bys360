@@ -234,10 +234,14 @@ def _css_evidence(root: Path) -> dict[str, Any]:
 
 
 def _surface_evidence(p5a: dict[str, Any], p5b: dict[str, Any], p5c: dict[str, Any]) -> dict[str, Any]:
-    p5a_device = p5a.get("android_device_matrix") if isinstance(p5a.get("android_device_matrix"), dict) else {}
-    p5a_scan = p5a.get("responsive_surface_scan") if isinstance(p5a.get("responsive_surface_scan"), dict) else {}
-    p5b_surface = p5b.get("surface_priority") if isinstance(p5b.get("surface_priority"), dict) else {}
-    p5c_surfaces = p5c.get("target_surfaces") if isinstance(p5c.get("target_surfaces"), dict) else {}
+    raw_p5a_device = p5a.get("android_device_matrix")
+    p5a_device: dict[str, Any] = raw_p5a_device if isinstance(raw_p5a_device, dict) else {}
+    raw_p5a_scan = p5a.get("responsive_surface_scan")
+    p5a_scan: dict[str, Any] = raw_p5a_scan if isinstance(raw_p5a_scan, dict) else {}
+    raw_p5b_surface = p5b.get("surface_priority")
+    p5b_surface: dict[str, Any] = raw_p5b_surface if isinstance(raw_p5b_surface, dict) else {}
+    raw_p5c_surfaces = p5c.get("target_surfaces")
+    p5c_surfaces: dict[str, Any] = raw_p5c_surfaces if isinstance(raw_p5c_surfaces, dict) else {}
 
     target_paths = [item.get("path", "") for item in p5c_surfaces.get("targeted_templates", []) if isinstance(item, dict)]
     target_text = "\n".join(target_paths).lower()
@@ -311,7 +315,7 @@ def run_gate(args: argparse.Namespace) -> dict[str, Any]:
         ])
     compile_ok = (all(item.get("ok") for item in compile_results) if compile_results else True) and bool(active_scope.get("compile_ok"))
     app_factory = _app_factory_smoke(root) if args.app_factory else {"ok": True, "skipped": True}
-    secret = _secret_gate(root) if args.secret_gate else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
+    secret: dict[str, Any] = _secret_gate(root) if args.secret_gate else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
     pytest = _pytest_gate(root) if args.pytest_gate else {"ok": True, "skipped": True, "mode": "not_run"}
     secret_count = int((secret.get("parsed") or {}).get("finding_count", 0) or 0)
     direct_contract_ok = bool(

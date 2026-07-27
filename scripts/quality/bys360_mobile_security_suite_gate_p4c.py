@@ -120,9 +120,12 @@ def _safe_get(d: dict[str, Any], *keys: str, default: Any = None) -> Any:
 
 
 def _extract_probe_summary(report: dict[str, Any], matrix_key: str) -> dict[str, Any]:
-    matrix = report.get(matrix_key) if isinstance(report.get(matrix_key), dict) else {}
-    responses = matrix.get("responses") if isinstance(matrix.get("responses"), list) else []
-    failures = matrix.get("failures") if isinstance(matrix.get("failures"), list) else []
+    raw_matrix = report.get(matrix_key)
+    matrix: dict[str, Any] = raw_matrix if isinstance(raw_matrix, dict) else {}
+    raw_responses = matrix.get("responses")
+    responses: list[Any] = raw_responses if isinstance(raw_responses, list) else []
+    raw_failures = matrix.get("failures")
+    failures: list[Any] = raw_failures if isinstance(raw_failures, list) else []
     status_counts: dict[str, int] = {}
     scenario_counts: dict[str, int] = {}
     feature_counts: dict[str, int] = {}

@@ -9,12 +9,21 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3B_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE_V3"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_AUTH_DASHBOARD_ASSISTANT_RESPONSE_GATE_P3B_V3_REPORT.json")
 EXPECTED_CONTRACT_ROUTE_COUNT = 24
-EXPECTED_TARGET_ENDPOINTS = [
+
+
+class _TargetEndpoint(TypedDict):
+    feature: str
+    method: str
+    suffix: str
+    status_ok: list[int]
+
+
+EXPECTED_TARGET_ENDPOINTS: list[_TargetEndpoint] = [
     {"feature": "auth", "method": "POST", "suffix": "/api/mobile/auth/login", "status_ok": [200, 400, 401, 403, 422, 500]},
     {"feature": "auth", "method": "POST", "suffix": "/api/mobile/auth/refresh", "status_ok": [200, 400, 401, 403, 422, 500]},
     {"feature": "dashboard", "method": "GET", "suffix": "/api/mobile/dashboard/summary", "status_ok": [200, 302, 401, 403, 500]},
@@ -127,11 +136,11 @@ def build_app_and_runtime_routes(root: Path) -> dict[str, Any]:
     old_env = os.environ.copy()
     os.environ.update(ensure_env())
     try:
-        from app import create_app  # type: ignore
+        from app import create_app
         app = create_app()
         rows = []
         for rule in app.url_map.iter_rules():
-            methods = sorted(m for m in rule.methods if m not in {"HEAD", "OPTIONS"})
+            methods = sorted(m for m in (rule.methods or ()) if m not in {"HEAD", "OPTIONS"})
             rows.append({"rule": str(rule.rule), "methods": methods, "endpoint": rule.endpoint})
         return {"ok": True, "app": app, "routes": rows, "error": ""}
     except Exception as exc:  # noqa: BLE001 - diagnostic gate
@@ -277,7 +286,7 @@ def run_checks(root: str | Path, *, compile_all: bool = True, app_factory: bool 
     response = response_code_smoke(root)
     compile_ok, compile_results = compile_files(root) if compile_all else (True, [])
     app_res = app_factory_smoke(root) if app_factory else {"ok": True, "returncode": 0, "stdout_tail": "", "stderr_tail": ""}
-    secret_res = secret_gate(root) if secret_gate_enabled else {"ok": True, "returncode": 0, "stdout_tail": "", "stderr_tail": "", "parsed": {"finding_count": 0}}
+    secret_res: dict[str, Any] = secret_gate(root) if secret_gate_enabled else {"ok": True, "returncode": 0, "stdout_tail": "", "stderr_tail": "", "parsed": {"finding_count": 0}}
     pytest_res = pytest_gate(root, pytest_gate_enabled)
 
     result: dict[str, Any] = {

@@ -8,16 +8,25 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 PACKAGE = "BYS360_MAINTENANCE_SCORE_UPLIFT_P3E_MOBILE_PERFORMANCE_RESPONSE_GATE"
 REPORT_REL = Path("reports/architecture/BYS360_MOBILE_PERFORMANCE_RESPONSE_GATE_P3E_REPORT.json")
 TEST_NAME = "test_mobile_api_performance_response_p3e.py"
 EXPECTED_CONTRACT_ROUTE_COUNT = 24
 
+
+class _Scenario(TypedDict):
+    feature: str
+    method: str
+    suffix: str
+    concrete: str
+    json: NotRequired[dict[str, object]]
+
+
 # P3E hedefi: performans mobil endpointleri route/runtime/response-code seviyesinde korunur.
 # Bu smoke yetkisiz test_client ile calisir; 404/405 yakalar, canli veriye yazmaz.
-TARGET_SCENARIOS = [
+TARGET_SCENARIOS: list[_Scenario] = [
     {"feature": "performance", "method": "GET", "suffix": "/performance/summary", "concrete": "/api/mobile/performance/summary"},
     {"feature": "performance", "method": "GET", "suffix": "/performance/periods", "concrete": "/api/mobile/performance/periods"},
     {"feature": "performance", "method": "GET", "suffix": "/performance/periods/<int:period_id>", "concrete": "/api/mobile/performance/periods/1"},
@@ -160,7 +169,7 @@ def _ensure_sqlite_test_schema(flask_app) -> None:
     import importlib
 
     importlib.import_module("app.models")
-    from app.extensions import db  # type: ignore
+    from app.extensions import db
 
     with flask_app.app_context():
         dialect_name = str(getattr(getattr(db.engine, "dialect", None), "name", "") or "").lower()
@@ -173,7 +182,7 @@ def _build_app(root: Path):
     root_s = str(root)
     if root_s not in sys.path:
         sys.path.insert(0, root_s)
-    from app import create_app  # type: ignore
+    from app import create_app
     app = create_app()
     app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
     _ensure_sqlite_test_schema(app)
@@ -258,7 +267,7 @@ def compile_files(root: Path) -> list[dict[str, str | bool]]:
         "tests/architecture/test_mobile_api_performance_response_p3e.py",
         "tests/architecture/conftest.py",
     ]
-    results = []
+    results: list[dict[str, str | bool]] = []
     for rel in rels:
         path = root / rel
         if not path.exists():
@@ -366,7 +375,7 @@ def run_checks(root: Path, *, compile_all: bool = False, app_factory: bool = Fal
     compile_results = compile_files(root) if compile_all else []
     compile_ok = all(item["ok"] for item in compile_results) if compile_all else True
     app_result = app_factory_smoke(root) if app_factory else {"ok": True}
-    secret_result = secret_gate(root) if secret_gate_run else {"ok": True, "parsed": {"finding_count": 0}}
+    secret_result: dict[str, Any] = secret_gate(root) if secret_gate_run else {"ok": True, "parsed": {"finding_count": 0}}
     pytest_result = run_pytest(root) if pytest_gate else {"ok": True, "mode": "not_requested"}
     result: dict[str, Any] = {
         "ok": bool(direct_contract_ok and runtime.get("ok") and response.get("ok") and compile_ok and app_result.get("ok") and secret_result.get("ok") and pytest_result.get("ok")),

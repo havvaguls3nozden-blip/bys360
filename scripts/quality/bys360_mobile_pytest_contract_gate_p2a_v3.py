@@ -75,8 +75,8 @@ def _function_count(path: Path) -> int:
     return sum(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) for node in ast.walk(tree))
 
 
-def _compile(paths: list[Path]) -> tuple[bool, list[dict[str, str]]]:
-    results: list[dict[str, str]] = []
+def _compile(paths: list[Path]) -> tuple[bool, list[dict[str, str | bool]]]:
+    results: list[dict[str, str | bool]] = []
     ok = True
     for path in paths:
         if not path.exists():
@@ -238,8 +238,9 @@ def run(root: Path, mode: str, compile_all: bool, run_app_factory: bool, run_sec
     compile_paths.append(test_path)
     compile_ok, compile_results = _compile(compile_paths) if compile_all else (True, [])
     app_factory = _run_app_factory(root) if run_app_factory else {"ok": True, "skipped": True}
-    secret_gate = _run_secret_gate(root) if run_secret_gate else {"ok": True, "skipped": True}
+    secret_gate: dict[str, Any] = _run_secret_gate(root) if run_secret_gate else {"ok": True, "skipped": True}
     pytest_result = _run_pytest(root, test_path) if run_pytest else {"ok": True, "mode": "skipped"}
+    raw_secret_parsed = secret_gate.get("parsed")
     ok = bool(direct_contract_ok and compile_ok and app_factory.get("ok") and secret_gate.get("ok") and pytest_result.get("ok"))
     report = {
         "ok": ok,
@@ -256,7 +257,7 @@ def run(root: Path, mode: str, compile_all: bool, run_app_factory: bool, run_sec
         "compile_ok": compile_ok,
         "app_factory_ok": bool(app_factory.get("ok")),
         "secret_gate_ok": bool(secret_gate.get("ok")),
-        "secret_gate_finding_count": int(secret_gate.get("parsed", {}).get("finding_count", 0)) if isinstance(secret_gate.get("parsed"), dict) else None,
+        "secret_gate_finding_count": int(raw_secret_parsed.get("finding_count", 0)) if isinstance(raw_secret_parsed, dict) else None,
         "pytest_ok": bool(pytest_result.get("ok")),
         "pytest_mode": pytest_result.get("mode", "unknown"),
         "inventory": inventory,
