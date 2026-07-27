@@ -73,7 +73,13 @@ check_untyped_defs = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 no_implicit_optional = true
-exclude = "(^migrations/|^app/static/|^app/templates/)"
+# scripts/archive/ holds frozen historical snapshots (pre_handover_20260708/)
+# and one-off refactor-campaign tooling (phase2y-wave1/2) that were never
+# live and are not imported by any active code path; the one exception
+# (bys360_score100_quality_gate_v1.py) was canonicalized to its active
+# scripts/quality/ location on 2026-07-27 and no longer depends on the
+# archive at runtime. See tests/architecture/test_score100_active_canonical_source_contract.py.
+exclude = "(^migrations/|^app/static/|^app/templates/|^scripts/archive/)"
 # tests/ has no __init__.py anywhere (by design of this repo's test layout),
 # so several identically-named conftest.py files (tests/conftest.py,
 # tests/critical/conftest.py, tests/architecture/conftest.py, ...) collide
