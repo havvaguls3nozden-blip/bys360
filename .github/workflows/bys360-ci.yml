@@ -74,8 +74,17 @@ jobs:
       # (46/46, 0 failed). tests/migrations runs real Alembic upgrade()/downgrade() against
       # an isolated in-memory SQLite engine (no network, no persistent state); adds this
       # step's runtime by only ~8% for the full added set of 46 tests.
+      #
+      # NOT (BYS360 Phase 6, Communication/Behavior/Mobile CI Coverage Expansion,
+      # 2026-07-27): tests/communication and tests/mobile are 0-import AST/source-contract
+      # checks (no app.* import at all, so they add ~0% measurable app/ coverage, but are
+      # kept as required structural gates for route registration and facade-size
+      # invariants); tests/behavior imports real app.services/app.models and does
+      # contribute measurable app/ coverage. All three: 0 cross-scope duplicate node IDs,
+      # 0 skip/xfail, stable across 2 isolated runs + 1 combined run (29/29, 0 failed);
+      # adds only ~2% to this step's runtime.
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
 
       # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
       # [tool.coverage.report] fail_under is enforced by pytest-cov on EVERY
