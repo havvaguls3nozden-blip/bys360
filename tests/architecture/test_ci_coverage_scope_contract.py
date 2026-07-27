@@ -7,6 +7,12 @@ invocation as the rest of the CI-exact scope (Policy A -- no separate
 coverage-combine step). Also locks in that the coverage source scope and
 ratchet floor were not weakened while doing so.
 
+Also locks in the follow-up Critical Operational CI Coverage Expansion
+(2026-07-27): ``tests/migrations``, ``tests/workflow`` and ``tests/release``
+(46 tests total, 0 cross-scope duplicate node IDs, 0 skip/xfail, each stable
+across 2 isolated runs + 1 combined run) were added via the same Policy A
+single-invocation approach.
+
 These are pure contract/parsing tests -- they read real repo files, they do
 not run the workflow or any subprocess.
 """
@@ -32,6 +38,13 @@ PYPROJECT = ROOT / "pyproject.toml"
 # -- locked here as a historical floor so the ratchet can never be silently
 # lowered back toward it by a future edit.
 PRE_CLOSURE_BASELINE_COMBINED_PCT = 18.85
+
+# The baseline in effect before the Critical Operational CI Coverage
+# Expansion (services-only scope, 2026-07-27) -- locked here so the ratchet
+# can never be silently lowered back toward it by a future edit.
+PRE_CRITICAL_EXPANSION_BASELINE_COMBINED_PCT = 23.27
+
+CRITICAL_OPERATIONAL_TEST_PATHS = ("tests/migrations", "tests/workflow", "tests/release")
 
 
 def _ci_workflow_commands() -> list[str]:
@@ -186,3 +199,93 @@ def test_pytest_ini_does_not_exclude_services_from_collection() -> None:
     excluded_dirs = norecursedirs_match.group(1).split()
     assert "services" not in excluded_dirs
     assert "tests/services" not in excluded_dirs
+
+
+# =====================================================================
+# BYS360 Phase 6 -- Critical Operational CI Coverage Expansion
+# (tests/migrations, tests/workflow, tests/release)
+# =====================================================================
+
+# --- Tests A/B/C: migrations/workflow/release are in the real coverage-measured CI scope ---
+
+
+@pytest.mark.parametrize("target_path", CRITICAL_OPERATIONAL_TEST_PATHS)
+def test_critical_operational_path_is_included_in_coverage_instrumented_ci_step(target_path: str) -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert target_path in command, f"{target_path} must be part of the real coverage-instrumented CI step"
+
+
+# --- Test D: no duplicate execution, neither against the ci_safe step nor across each other ---
+
+
+@pytest.mark.parametrize("target_path", CRITICAL_OPERATIONAL_TEST_PATHS)
+def test_critical_operational_path_is_not_also_run_in_the_ci_safe_step(target_path: str) -> None:
+    ci_safe_command = _ci_safe_step_command()
+    assert target_path not in ci_safe_command
+
+
+@pytest.mark.parametrize("target_path", CRITICAL_OPERATIONAL_TEST_PATHS)
+def test_critical_operational_path_appears_in_exactly_one_ci_workflow_run_command(target_path: str) -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if target_path in c]
+    assert len(hits) == 1, f"expected {target_path} in exactly one CI run command, found {len(hits)}: {hits}"
+
+
+def test_no_critical_operational_path_appears_more_than_once_in_the_same_command() -> None:
+    """Each of tests/migrations, tests/workflow, tests/release must appear
+    exactly once as a distinct pytest rootdir argument in the broad step --
+    guards against an accidental copy-paste duplicate within the same run
+    line (which pytest would silently collect twice)."""
+    command = _coverage_instrumented_broad_step_command()
+    tokens = command.split()
+    for target_path in CRITICAL_OPERATIONAL_TEST_PATHS:
+        assert tokens.count(target_path) == 1, f"{target_path} must appear exactly once as a pytest argument"
+
+
+# --- Test E: a migration/workflow/release failure actually blocks the coverage job ---
+# (covered generically by test_coverage_step_has_no_failure_suppression above --
+# that check already applies to the whole broad step command, which now
+# includes these three paths too; no continue-on-error/|| true was added.)
+
+
+# --- Test F: production coverage source scope was not weakened ---
+# (covered generically by test_coverage_source_scope_is_unchanged and
+# test_coverage_omit_list_was_not_expanded_to_hide_services_or_app_code
+# above -- those assertions are not services-specific, they hold for the
+# whole [tool.coverage] contract regardless of which test paths feed it.)
+
+
+# --- Test G: the ratchet floor was raised again, never lowered back toward the pre-expansion value ---
+
+
+def test_coverage_ratchet_baseline_was_raised_past_pre_critical_expansion_value() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    new_combined_pct = float(data["combined_pct"])
+    assert new_combined_pct >= PRE_CRITICAL_EXPANSION_BASELINE_COMBINED_PCT, (
+        f"new coverage_baseline.json combined_pct ({new_combined_pct}) must not regress below "
+        f"the pre-critical-expansion baseline ({PRE_CRITICAL_EXPANSION_BASELINE_COMBINED_PCT})"
+    )
+
+
+def test_coverage_baseline_commands_include_all_critical_operational_paths() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    for target_path in CRITICAL_OPERATIONAL_TEST_PATHS:
+        assert any(target_path in c for c in commands), (
+            f"coverage_baseline.json's recorded 'commands' must reflect the real "
+            f"measured scope, including {target_path}"
+        )
+
+
+# --- Test H: baseline test-count metadata arithmetic is internally consistent ---
+
+
+def test_baseline_metadata_step_counts_sum_to_total_passed() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    counts = data["test_counts"]
+    step1_passed = counts["step1_ci_safe_passed"]
+    step2_passed = counts["step2_broader_scope_passed"]
+    assert step1_passed + step2_passed == counts["total_passed"], (
+        f"step1_ci_safe_passed ({step1_passed}) + step2_broader_scope_passed "
+        f"({step2_passed}) must equal total_passed ({counts['total_passed']})"
+    )

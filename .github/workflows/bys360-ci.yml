@@ -64,8 +64,18 @@ jobs:
       # coverage gain. Root cause of the prior exclusion was a stalled rollout plan, not a
       # technical blocker -- see reports/quality/coverage_baseline.json for the full
       # re-measurement this addition is based on.
+      #
+      # NOT (BYS360 Phase 6, Critical Operational CI Coverage Expansion, 2026-07-27):
+      # tests/migrations, tests/workflow and tests/release are stable, isolated and
+      # required for schema/deployment coverage. Migration, workflow and release tests are
+      # stable, isolated and required for schema/deployment coverage: 0 cross-scope
+      # duplicate node IDs against the rest of this workflow or each other, 0 skip/xfail,
+      # no local conftest.py, each folder passed twice in isolation and once combined
+      # (46/46, 0 failed). tests/migrations runs real Alembic upgrade()/downgrade() against
+      # an isolated in-memory SQLite engine (no network, no persistent state); adds this
+      # step's runtime by only ~8% for the full added set of 46 tests.
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
 
       # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
       # [tool.coverage.report] fail_under is enforced by pytest-cov on EVERY
