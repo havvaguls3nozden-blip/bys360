@@ -1,15 +1,23 @@
 {
-  "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m ci_safe, then tests/integration tests/architecture tests/security tests/critical, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and scripts/quality/bys360_coverage_ratchet.py docstring for the no-self-raise constraint.",
-  "combined_pct": 18.85,
-  "combined_pct_precise": 18.849379530188607,
-  "line_pct": 22.95,
-  "branch_pct": 4.6,
-  "lines_covered": 23480,
-  "lines_valid": 102307,
-  "branches_covered": 1355,
-  "branches_valid": 29448,
-  "measured_at": "2026-07-24T16:46:50Z",
-  "measured_by": "Agent 1 - Coverage Gate Closure (Campaign 1B)",
+  "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m ci_safe, then tests/integration tests/architecture tests/security tests/critical tests/services, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and its docstring for the no-self-raise constraint.",
+  "_history": "Phase 6 CI Coverage Scope Policy Closure (2026-07-27): tests/services (422 tests) was added to the CI-enforced coverage scope -- it was previously excluded for no remaining technical reason (root cause: a stalled Campaign-1 rollout plan, not flakiness/perf/DB-dependency; verified via 3 stability runs, 0 skip/xfail/realdb/slow/live markers, no dedicated conftest.py). Combined coverage measured twice, identically, at 23.2735%. Previous baseline (CI scope without tests/services, Campaign 1B, 2026-07-24) was combined_pct=18.85 -- kept here for continuity, not reused as the active floor.",
+  "combined_pct": 23.27,
+  "combined_pct_precise": 23.273515742867758,
+  "line_pct": 27.32,
+  "branch_pct": 9.21,
+  "lines_covered": 27985,
+  "lines_valid": 102439,
+  "branches_covered": 2713,
+  "branches_valid": 29462,
+  "measured_at": "2026-07-27T15:18:00Z",
+  "measured_by": "BYS360 Phase 6 - CI Coverage Scope Policy Closure",
+  "previous_baseline": {
+    "combined_pct": 18.85,
+    "combined_pct_precise": 18.849379530188607,
+    "measured_at": "2026-07-24T16:46:50Z",
+    "measured_by": "Agent 1 - Coverage Gate Closure (Campaign 1B)",
+    "scope": "tests/quality (ci_safe) + tests/integration + tests/architecture + tests/security + tests/critical (tests/services NOT included)"
+  },
   "environment": {
     "python_version": "3.12.10",
     "pytest_version": "9.0.3",
@@ -20,13 +28,19 @@
   },
   "commands": [
     "python -m pytest tests/quality -m \"ci_safe\" --cov=app --cov-report= --cov-fail-under=0 --tb=short -q",
-    "python -m pytest tests/integration tests/architecture tests/security tests/critical --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q"
+    "python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q"
   ],
   "test_counts": {
-    "step1_ci_safe_passed": 5,
-    "step1_ci_safe_deselected": 33,
-    "step2_broader_scope_passed": 236,
-    "total_passed": 241
+    "step1_ci_safe_passed": 60,
+    "step1_ci_safe_deselected": 40,
+    "step2_broader_scope_passed": 808,
+    "step2_services_contribution": 422,
+    "total_passed": 868
+  },
+  "repeatability": {
+    "run_1_combined_pct_precise": 23.273515742867758,
+    "run_2_combined_pct_precise": 23.273515742867758,
+    "note": "Two independent full runs of the new combined command produced an identical measurement (deterministic given no test randomization is in use). The recorded combined_pct is the true measured value, consistent with lines_covered/lines_valid/branches_covered/branches_valid (see tests/quality/test_bys360_coverage_ratchet.py::test_committed_baseline_counts_are_internally_consistent); the sole safety margin is the pre-existing tolerance_pct field below, unchanged at 0.5 points."
   },
   "tolerance_pct": 0.5,
   "tolerance_rationale": "Absorbs float rounding and Windows-worktree-vs-Ubuntu-CI-runner platform noise (this baseline was measured on Windows; the actual CI runner is ubuntu-latest, which can take slightly different code paths on OS-conditional branches). Not intended to absorb a real coverage regression, which is expected to be much larger than 0.5 points in practice."
