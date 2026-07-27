@@ -451,6 +451,7 @@ TOP_LEVEL_SAFE_TEST_FILES = (
     "tests/test_feedback_pulse_menu_visibility_static.py",
     "tests/test_feedback_pulse_privacy_behavior.py",
     "tests/test_hr_reports_template_no_unpack_static.py",
+    "tests/test_live_scope_and_security_static.py",
     "tests/test_module_maturity_scoring.py",
     "tests/test_no_admin_org_units_duplicate_static.py",
     "tests/test_no_duplicate_admin_org_units_static.py",
@@ -468,9 +469,6 @@ TOP_LEVEL_SAFE_TEST_FILES = (
     "tests/test_team_compare_publish_visibility.py",
     "tests/test_team_compare_service.py",
 )
-
-BLOCKED_LIVE_MARKED_TOP_LEVEL_FILE = "tests/test_live_scope_and_security_static.py"
-
 
 # --- The ci_safe step's command is untouched (still the exact literal
 # "ci_safe" the Quality9 gate requires); the 40 previously-deselected tests
@@ -516,8 +514,9 @@ def test_exactly_14_quality_candidate_files_are_tracked_by_this_contract() -> No
     assert len(set(QUALITY_CANDIDATE_FILES_NOW_MARKED_CI_SAFE)) == 14
 
 
-# --- The 32 verified-safe top-level files are in the real coverage-measured
-# CI scope; the 1 blocked (stale live/realdb/slow-marked) file is not ---
+# --- The 33 verified-safe top-level files are in the real coverage-measured
+# CI scope (Phase 8 resolved the 1 file previously blocked pending marker
+# review -- see below) ---
 
 
 @pytest.mark.parametrize("target_path", TOP_LEVEL_SAFE_TEST_FILES)
@@ -526,14 +525,20 @@ def test_top_level_safe_file_is_included_in_coverage_instrumented_ci_step(target
     assert target_path in command, f"{target_path} must be part of the real coverage-instrumented CI step"
 
 
-def test_blocked_live_marked_top_level_file_is_not_added_to_any_ci_step() -> None:
-    """tests/test_live_scope_and_security_static.py carries a module-level
-    pytest.mark.live/realdb/slow despite its bodies being plain static file
-    checks -- deliberately left out of this expansion pending a separate,
-    human-reviewed decision on whether that marker is stale."""
-    commands = _ci_workflow_commands()
-    for command in commands:
-        assert BLOCKED_LIVE_MARKED_TOP_LEVEL_FILE not in command
+# --- BYS360 Phase 8: tests/test_live_scope_and_security_static.py's
+# pytest.mark.live/realdb/slow markers were confirmed stale (plain static
+# Path.read_text() checks, no app.*/DB/network/subprocess use, no recorded
+# rationale in git history) and removed; the file is now included above like
+# any other verified-safe top-level file ---
+
+
+def test_live_scope_file_no_longer_declares_live_realdb_slow_markers() -> None:
+    tree = ast.parse((ROOT / "tests" / "test_live_scope_and_security_static.py").read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "pytestmark" for target in node.targets
+        ):
+            raise AssertionError("tests/test_live_scope_and_security_static.py must not declare a pytestmark")
 
 
 def test_tests_load_is_not_accidentally_included_in_any_ci_step() -> None:
@@ -565,12 +570,12 @@ def test_no_top_level_safe_file_appears_more_than_once_in_the_same_command() -> 
         assert tokens.count(target_path) == 1, f"{target_path} must appear exactly once as a pytest argument"
 
 
-def test_exactly_32_top_level_safe_files_are_tracked_by_this_contract() -> None:
+def test_exactly_33_top_level_safe_files_are_tracked_by_this_contract() -> None:
     """Guards against silently growing or shrinking the reviewed set without
     updating this contract -- a new tests/test_*.py file must be explicitly
     triaged (Policy A/B/C/D) before being added here or to the workflow."""
-    assert len(TOP_LEVEL_SAFE_TEST_FILES) == 32
-    assert len(set(TOP_LEVEL_SAFE_TEST_FILES)) == 32
+    assert len(TOP_LEVEL_SAFE_TEST_FILES) == 33
+    assert len(set(TOP_LEVEL_SAFE_TEST_FILES)) == 33
 
 
 # --- A quality-candidate or top-level-candidate failure actually blocks the
@@ -608,13 +613,6 @@ def test_coverage_baseline_commands_include_unchanged_marker_and_top_level_paths
             f"coverage_baseline.json's recorded 'commands' must reflect the real measured scope, "
             f"including {target_path}"
         )
-
-
-def test_baseline_does_not_record_the_blocked_live_marked_file() -> None:
-    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
-    commands = data.get("commands", [])
-    for command in commands:
-        assert BLOCKED_LIVE_MARKED_TOP_LEVEL_FILE not in command
 
 
 def test_phase7_baseline_metadata_step_counts_sum_to_total_passed() -> None:

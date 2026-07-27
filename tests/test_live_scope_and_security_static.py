@@ -1,8 +1,14 @@
 from pathlib import Path
 
-import pytest
-
-pytestmark = [pytest.mark.live, pytest.mark.realdb, pytest.mark.slow]
+# BYS360 Phase 8: pytest.mark.live/realdb/slow removed (2026-07-27) -- all
+# three tests below are plain Path.read_text() + string-presence checks, with
+# no app.* import, DB, network, or subprocess use. Verified against git
+# history: the markers predate this repo's earliest visible commit (already
+# present in the initial baseline-squash commit) with no rationale recorded
+# anywhere, and an identical marker combo was found on another purely static
+# file (tests/architecture/test_survey_live_contract.py) -- consistent with a
+# naming-convention-driven mistagging ("live" in the filename) rather than an
+# actual runtime requirement.
 
 
 def test_removed_scope_blocks_education_isg_aliases():

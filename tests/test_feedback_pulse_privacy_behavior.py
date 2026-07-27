@@ -1,33 +1,19 @@
 from __future__ import annotations
 
-import ast
-from collections import defaultdict
 from datetime import date, timedelta
-from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
-
-def _load_pure_helper():
-    source = Path("app/services/feedback_service.py").read_text(encoding="utf-8")
-    module = ast.parse(source)
-    helper = next(
-        node for node in module.body
-        if isinstance(node, ast.FunctionDef) and node.name == "_build_pulse_risk_users_from_rows"
-    )
-    code = ast.unparse(helper)
-    namespace = {
-        "defaultdict": defaultdict,
-        "date": date,
-        "timedelta": timedelta,
-        "Any": Any,
-    }
-    exec(code, namespace)
-    return namespace["_build_pulse_risk_users_from_rows"]
+# BYS360 Phase 8: previously loaded via ast.parse + exec() of the source text
+# to avoid importing app/services/feedback_service.py's wider dependency
+# chain (app.extensions.db, app.models, notification bridge). Verified
+# (2026-07-27) that a plain import carries no app-context/DB requirement --
+# _build_pulse_risk_users_from_rows is a pure function -- and contributes
+# real, measurable app/ coverage instead of 0% (exec()'d code is invisible
+# to coverage.py because its co_filename is "<string>", not the real file).
+from app.services.feedback_service import _build_pulse_risk_users_from_rows as build_risk_users
 
 
 def test_anonymous_pulse_entries_never_become_named_risk_users():
-    build_risk_users = _load_pure_helper()
     today = date(2026, 4, 18)
     rows = [
         SimpleNamespace(user_id=1, is_anonymous=True, mood_value=1, entry_date=today - timedelta(days=2)),
@@ -48,7 +34,6 @@ def test_anonymous_pulse_entries_never_become_named_risk_users():
 
 
 def test_named_risk_streak_breaks_when_mood_recovers():
-    build_risk_users = _load_pure_helper()
     today = date(2026, 4, 18)
     rows = [
         SimpleNamespace(user_id=5, is_anonymous=False, mood_value=1, entry_date=today - timedelta(days=3)),
