@@ -303,7 +303,7 @@ def run_checks(root: Path, compile_all: bool = True, app_factory: bool = True, s
     responses = test_client_response_smoke(root)
     compile_ok, compile_results = compile_targets(root) if compile_all else (True, [])
     app_result = app_factory_smoke(root) if app_factory else {"ok": True, "skipped": True}
-    secret_result = run_secret_gate(root) if secret_gate else {"ok": True, "parsed": {"finding_count": 0}, "skipped": True}
+    secret_result: dict[str, Any] = run_secret_gate(root) if secret_gate else {"ok": True, "parsed": {"finding_count": 0}, "skipped": True}
     pytest_result = run_pytest(root) if pytest_gate else {"ok": True, "mode": "skipped"}
     checks = {
         "direct_contract_ok": direct_contract_ok,

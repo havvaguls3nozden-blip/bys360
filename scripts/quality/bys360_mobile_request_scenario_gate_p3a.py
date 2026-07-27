@@ -179,8 +179,8 @@ print(json.dumps({"ok": True, "route_count": len(routes), "routes": routes}, ens
     }
 
 
-def compile_files(root: Path) -> tuple[bool, list[dict[str, str]]]:
-    results = []
+def compile_files(root: Path) -> tuple[bool, list[dict[str, str | bool]]]:
+    results: list[dict[str, str | bool]] = []
     ok = True
     for rel in COMPILE_TARGETS:
         path = root / rel
@@ -250,13 +250,14 @@ def run_checks(root: Path, compile_all: bool, app_factory: bool, secret: bool, p
         and not inv["expected_missing_routes"]
         and not inv["wrong_domain_owner_routes"]
     )
-    compile_ok, compile_results = (True, [])
+    compile_ok: bool = True
+    compile_results: list[dict[str, str | bool]] = []
     if compile_all:
         compile_ok, compile_results = compile_files(root)
     app_smoke = {"ok": True}
     if app_factory:
         app_smoke = app_factory_smoke(root)
-    sec = {"ok": True, "parsed": {"finding_count": 0}}
+    sec: dict[str, Any] = {"ok": True, "parsed": {"finding_count": 0}}
     if secret:
         sec = secret_gate(root)
     py = {"ok": True, "mode": "not_requested"}

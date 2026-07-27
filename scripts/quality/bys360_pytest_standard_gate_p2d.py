@@ -211,7 +211,7 @@ def main() -> int:
 
     compile_result = compile_files(root) if args.compile_all else {"ok": True, "results": []}
     app_factory = run_app_factory(root) if args.run_app_factory_smoke else {"ok": True}
-    secret_gate = run_secret_gate(root) if args.run_secret_gate else {"ok": True, "parsed": {"finding_count": 0}}
+    secret_gate: dict[str, Any] = run_secret_gate(root) if args.run_secret_gate else {"ok": True, "parsed": {"finding_count": 0}}
     pytest_result = run_pytest(root) if args.run_pytest and pytest_installed else {
         "ok": not args.run_pytest,
         "mode": "pytest_not_installed",

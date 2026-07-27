@@ -161,13 +161,13 @@ def runtime_route_map_check(root: Path) -> dict[str, Any]:
         os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
         os.environ.setdefault("SENTRY_DSN", "")
         os.environ.setdefault("BYS360_DISABLE_SCHEDULERS", "1")
-        from app import create_app  # type: ignore
+        from app import create_app
 
         app = create_app()
         routes = []
         for rule in app.url_map.iter_rules():
             if str(rule.rule).startswith("/api/mobile"):
-                methods = sorted(m for m in rule.methods if m not in {"HEAD", "OPTIONS"})
+                methods = sorted(m for m in (rule.methods or ()) if m not in {"HEAD", "OPTIONS"})
                 routes.append({"rule": str(rule.rule), "methods": methods, "endpoint": rule.endpoint})
 
         missing = []
@@ -222,7 +222,7 @@ def response_code_smoke(root: Path) -> dict[str, Any]:
         os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
         os.environ.setdefault("SENTRY_DSN", "")
         os.environ.setdefault("BYS360_DISABLE_SCHEDULERS", "1")
-        from app import create_app  # type: ignore
+        from app import create_app
 
         app = create_app()
         client = app.test_client()
@@ -347,7 +347,7 @@ def run_checks(root: Path, compile_all: bool = True, app_factory: bool = True, s
     compile_ok = all(item["ok"] for item in compile_results) if compile_all else True
 
     app_factory_smoke = run_app_factory(root) if app_factory else {"ok": True, "skipped": True}
-    secret_result = run_secret_gate(root) if secret_gate else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
+    secret_result: dict[str, Any] = run_secret_gate(root) if secret_gate else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
     pytest_result = run_pytest(root) if pytest_gate else {"ok": True, "skipped": True, "mode": "skipped"}
 
     direct_contract_ok = (

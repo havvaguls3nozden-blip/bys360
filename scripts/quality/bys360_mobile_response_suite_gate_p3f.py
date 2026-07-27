@@ -17,7 +17,7 @@ REPORT_REL = Path("reports/architecture/BYS360_MOBILE_RESPONSE_SUITE_GATE_P3F_RE
 TEST_NAME = "test_mobile_api_response_suite_p3f.py"
 EXPECTED_CONTRACT_ROUTE_COUNT = 24
 
-P3_GATES = [
+P3_GATES: list[dict[str, Any]] = [
     {
         "key": "p3a_request_scenarios",
         "label": "P3A Mobile Request Scenario Gate",
@@ -277,13 +277,13 @@ def run_checks(
     suite_ok = all(item.get("ok") for item in gate_results)
 
     app_result = app_factory_smoke(root) if app_factory else {"ok": True, "skipped": True}
-    secret_result = secret_gate(root) if secret_gate_run else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
+    secret_result: dict[str, Any] = secret_gate(root) if secret_gate_run else {"ok": True, "skipped": True, "parsed": {"finding_count": 0}}
     pytest_result = run_pytest(root) if pytest_gate else {"ok": True, "mode": "not_requested"}
 
     feature_coverage: dict[str, bool] = {}
-    for gate, result in zip(P3_GATES, gate_results, strict=False):
+    for gate, gate_result in zip(P3_GATES, gate_results, strict=False):
         for feature in gate.get("features", []):
-            feature_coverage[feature] = bool(result.get("ok"))
+            feature_coverage[feature] = bool(gate_result.get("ok"))
 
     result: dict[str, Any] = {
         "ok": bool(suite_ok and compile_ok and app_result.get("ok") and secret_result.get("ok") and pytest_result.get("ok")),

@@ -134,7 +134,7 @@ def _responsive_hardening_ok(root: Path, media_count: int) -> bool:
 def _app_factory_ok(root: Path) -> bool:
     try:
         sys.path.insert(0, str(root))
-        from app import create_app  # type: ignore
+        from app import create_app
 
         app = create_app()
         return app is not None

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import argparse
+from typing import Any
 
 from app import create_app
 
 try:
     from app.services.executive_mail_center import get_selected_recipients
 except Exception:
-    def get_selected_recipients():
+    def get_selected_recipients() -> list[dict[str, Any]]:
         return []
 def main():
     p=argparse.ArgumentParser()

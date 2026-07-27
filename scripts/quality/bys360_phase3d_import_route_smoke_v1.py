@@ -149,7 +149,7 @@ def _app_factory_route_smoke(root: Path) -> dict[str, Any]:
             rules.append({
                 "rule": str(rule.rule),
                 "endpoint": str(rule.endpoint),
-                "methods": sorted(m for m in rule.methods if m not in {"HEAD", "OPTIONS"}),
+                "methods": sorted(m for m in (rule.methods or ()) if m not in {"HEAD", "OPTIONS"}),
             })
 
         expected_results = []
