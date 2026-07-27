@@ -1,22 +1,22 @@
 {
-  "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m ci_safe, then tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and its docstring for the no-self-raise constraint.",
-  "_history": "Phase 6 Communication/Behavior/Mobile CI Coverage Expansion (2026-07-27): tests/communication (19), tests/behavior (7) and tests/mobile (3) -- 29 tests total -- were added to the CI-enforced coverage scope. 0 cross-scope duplicate node IDs against the rest of the workflow or each other; stable across 2 isolated runs + 1 combined run (29/29, 0 failed); adds only ~2% to this step's runtime. tests/communication and tests/mobile are 0-import AST/source-contract checks (contribute ~0% to app/ coverage directly, kept as required structural gates for route registration and facade-size invariants); tests/behavior imports real app.services/app.models and does contribute measurable app/ coverage. Combined coverage measured twice, identically, at 23.45125029371859%. Previous baseline (Critical Operational CI Coverage Expansion, migrations/workflow/release, 2026-07-27) was combined_pct=23.39 -- kept in _history for continuity, not reused as the active floor. Earlier baselines: CI Coverage Scope Policy Closure (services-only) combined_pct=23.27; Campaign 1B (2026-07-24) combined_pct=18.85 -- see previous_baseline below for the immediately preceding one.",
-  "combined_pct": 23.45,
-  "combined_pct_precise": 23.45125029371859,
-  "line_pct": 27.51,
-  "branch_pct": 9.32,
-  "lines_covered": 28192,
+  "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m \"ci_safe\" -- unchanged literal marker, now naturally selecting 40 more tests via per-file pytestmark -- then tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile + 32 loose tests/test_*.py files, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and its docstring for the no-self-raise constraint.",
+  "_history": "Phase 7 Quality/Top-Level CI Coverage Expansion (2026-07-27): 40 tests across 14 tests/quality files that were never marked @pytest.mark.ci_safe (collected but silently deselected from real CI) were brought into scope by adding a module-level pytestmark = pytest.mark.ci_safe to each of the 14 files -- the ci_safe step's own pytest command is UNCHANGED (still the exact literal -m \"ci_safe\"), because scripts/quality/bys360_quality9_ci_gate.py::check_workflow hard-requires that exact literal value and is outside this expansion's allowed change scope (a marker-expression-widening approach was tried first and rejected after it broke that gate). Separately, 32 of the 33 loose tests/test_*.py files (533 of 536 tests) were added to the broad coverage-instrumented step; tests/test_live_scope_and_security_static.py (3 tests) was deliberately excluded because it carries a module-level pytest.mark.live/realdb/slow despite static-only test bodies -- left for a separate human decision on whether that marker is stale. 573 candidate tests added, plus 136 new contract tests added to the existing tests/architecture/test_ci_coverage_scope_contract.py (already in-scope directory) that lock this expansion in -- 709 tests added to the real count in total; the 136 contract tests are pure JSON/AST/regex parsing of repo config files (0-import, 0% app/ coverage contribution) exactly like the pre-existing contract tests already in that file. 0 cross-scope duplicate node IDs anywhere, 0 skip/xfail beyond the pre-existing 1, stable across 2 isolated runs + 1 full-suite-mixed run + a post-full-suite isolated re-run for every candidate group (quality candidates 40/40, top-level candidates 533/533, combined 573/573, 0 failed every time), and 2 identical final full-scope runs including the new contract tests (1680/1680 passed, 0 failed). Combined coverage measured twice, identically, at 24.138741292664996% -- unchanged to the 15th decimal place before and after the 136 contract tests were added, confirming they contribute 0 measurable app/ coverage as expected. Adds ~14s to the ci_safe step and no measurable net increase to the broad step (395-403s measured across repeated runs vs 409s baseline -- within normal run-to-run variance). Previous baseline (Phase 6 Communication/Behavior/Mobile CI Coverage Expansion, 2026-07-27) was combined_pct=23.45 -- kept in _history for continuity, not reused as the active floor. Earlier baselines: Critical Operational Expansion combined_pct=23.39; CI Coverage Scope Policy Closure (services-only) combined_pct=23.27; Campaign 1B (2026-07-24) combined_pct=18.85 -- see previous_baseline below for the immediately preceding one.",
+  "combined_pct": 24.14,
+  "combined_pct_precise": 24.138741292664996,
+  "line_pct": 28.21,
+  "branch_pct": 9.97,
+  "lines_covered": 28910,
   "lines_valid": 102467,
-  "branches_covered": 2747,
+  "branches_covered": 2936,
   "branches_valid": 29462,
-  "measured_at": "2026-07-27T18:21:00Z",
-  "measured_by": "BYS360 Phase 6 - Communication/Behavior/Mobile CI Coverage Expansion",
+  "measured_at": "2026-07-27T20:09:00Z",
+  "measured_by": "BYS360 Phase 7 - Quality/Top-Level CI Coverage Expansion",
   "previous_baseline": {
-    "combined_pct": 23.39,
-    "combined_pct_precise": 23.386063716089716,
-    "measured_at": "2026-07-27T17:07:00Z",
-    "measured_by": "BYS360 Phase 6 - Critical Operational CI Coverage Expansion",
-    "scope": "tests/quality (ci_safe) + tests/integration + tests/architecture + tests/security + tests/critical + tests/services + tests/migrations + tests/workflow + tests/release (communication/behavior/mobile NOT included)"
+    "combined_pct": 23.45,
+    "combined_pct_precise": 23.45125029371859,
+    "measured_at": "2026-07-27T18:21:00Z",
+    "measured_by": "BYS360 Phase 6 - Communication/Behavior/Mobile CI Coverage Expansion",
+    "scope": "tests/quality (ci_safe only) + tests/integration + tests/architecture + tests/security + tests/critical + tests/services + tests/migrations + tests/workflow + tests/release + tests/communication + tests/behavior + tests/mobile (40 tests/quality candidates and the 32 safe top-level tests/test_*.py files NOT included)"
   },
   "environment": {
     "python_version": "3.12.10",
@@ -28,12 +28,14 @@
   },
   "commands": [
     "python -m pytest tests/quality -m \"ci_safe\" --cov=app --cov-report= --cov-fail-under=0 --tb=short -q",
-    "python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q"
+    "python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile tests/test_10_10_core_static_gate.py tests/test_ai_analysis_excel_preview_static.py tests/test_ai_executive_report_static.py tests/test_ai_recommendation_priority_static.py tests/test_ai_routes.py tests/test_claude_phase5_function_signatures.py tests/test_claude_phase5_template_compilation.py tests/test_compat_redirects.py tests/test_datetime_utils.py tests/test_error_support.py tests/test_feedback_admin_endpoint_static.py tests/test_feedback_privacy_static.py tests/test_feedback_pulse_admin_tab_static.py tests/test_feedback_pulse_menu_visibility_static.py tests/test_feedback_pulse_privacy_behavior.py tests/test_hr_reports_template_no_unpack_static.py tests/test_module_maturity_scoring.py tests/test_no_admin_org_units_duplicate_static.py tests/test_no_duplicate_admin_org_units_static.py tests/test_performance_archive_visibility_contract.py tests/test_performance_chain_constitution.py tests/test_performance_form_guard.py tests/test_performance_ops_center.py tests/test_performance_preflight.py tests/test_performance_publish_guard.py tests/test_performance_publish_preflight_static.py tests/test_personel_analizi_dalga7_static.py tests/test_score100_handover_docs_contract_v1.py tests/test_shared_cache_store_behavior.py tests/test_sp_routes_smoke.py tests/test_team_compare_publish_visibility.py tests/test_team_compare_service.py --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q"
   ],
   "test_counts": {
-    "step1_ci_safe_passed": 60,
-    "step1_ci_safe_deselected": 40,
-    "step2_broader_scope_passed": 911,
+    "step1_ci_safe_passed": 100,
+    "step1_ci_safe_deselected": 0,
+    "step1_ci_safe_skipped": 1,
+    "step1_quality_candidate_contribution": 40,
+    "step2_broader_scope_passed": 1580,
     "step2_services_contribution": 422,
     "step2_migrations_contribution": 33,
     "step2_workflow_contribution": 7,
@@ -41,12 +43,14 @@
     "step2_communication_contribution": 19,
     "step2_behavior_contribution": 7,
     "step2_mobile_contribution": 3,
-    "total_passed": 971
+    "step2_top_level_safe_contribution": 533,
+    "step2_phase7_contract_test_contribution": 136,
+    "total_passed": 1680
   },
   "repeatability": {
-    "run_1_combined_pct_precise": 23.45125029371859,
-    "run_2_combined_pct_precise": 23.45125029371859,
-    "note": "Two independent full runs of the new combined command produced an identical measurement (deterministic given no test randomization is in use). The recorded combined_pct is the true measured value, consistent with lines_covered/lines_valid/branches_covered/branches_valid (see tests/quality/test_bys360_coverage_ratchet.py::test_committed_baseline_counts_are_internally_consistent); the sole safety margin is the pre-existing tolerance_pct field below, unchanged at 0.5 points."
+    "run_1_combined_pct_precise": 24.138741292664996,
+    "run_2_combined_pct_precise": 24.138741292664996,
+    "note": "Two independent full runs of the new combined command (both steps) produced an identical measurement (deterministic given no test randomization is in use): lines 28910/102467, branches 2936/29462 in both runs. The recorded combined_pct is the true measured value, consistent with lines_covered/lines_valid/branches_covered/branches_valid (see tests/quality/test_bys360_coverage_ratchet.py::test_committed_baseline_counts_are_internally_consistent); the sole safety margin is the pre-existing tolerance_pct field below, unchanged at 0.5 points."
   },
   "tolerance_pct": 0.5,
   "tolerance_rationale": "Absorbs float rounding and Windows-worktree-vs-Ubuntu-CI-runner platform noise (this baseline was measured on Windows; the actual CI runner is ubuntu-latest, which can take slightly different code paths on OS-conditional branches). Not intended to absorb a real coverage regression, which is expected to be much larger than 0.5 points in practice."

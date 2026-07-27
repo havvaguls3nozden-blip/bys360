@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 
 def test_tckn_crypto_never_returns_plaintext_token_and_masks_identity():
     from app.security.tckn_crypto import (

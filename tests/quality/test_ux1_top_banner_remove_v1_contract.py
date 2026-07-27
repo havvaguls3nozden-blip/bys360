@@ -1,5 +1,9 @@
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / "app" / "templates" / "base.html"
 JS = ROOT / "app" / "static" / "js" / "bys360_ux1_simple_screen_guide.js"

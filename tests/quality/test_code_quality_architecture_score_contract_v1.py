@@ -3,6 +3,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 

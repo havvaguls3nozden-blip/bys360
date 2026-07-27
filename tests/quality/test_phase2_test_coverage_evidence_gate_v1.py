@@ -7,6 +7,8 @@ import pytest
 
 import scripts.quality.bys360_phase2_test_coverage_evidence_gate_v1 as gate
 
+pytestmark = pytest.mark.ci_safe
+
 ROOT = Path(__file__).resolve().parents[2]
 
 # BYS360 Phase2E root-cause fix (2026-07-26): "git status --short" gerçek

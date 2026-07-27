@@ -1,5 +1,9 @@
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 
 def test_effective_menu_is_facade_v1():
     path = Path("app/services/settings/effective_menu.py")

@@ -3,11 +3,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from scripts.quality.bys360_coverage_regression_gate_phase4n import (
     DEFAULT_MIN_BRANCH,
     DEFAULT_MIN_TOTAL,
     build_report,
 )
+
+pytestmark = pytest.mark.ci_safe
 
 CURRENT_TOTAL = 21.852348588737023
 CURRENT_BRANCH = 7.716944238419527

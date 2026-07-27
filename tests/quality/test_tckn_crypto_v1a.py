@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
 from cryptography.fernet import Fernet
+
+pytestmark = pytest.mark.ci_safe
 
 
 def test_tckn_crypto_roundtrip():

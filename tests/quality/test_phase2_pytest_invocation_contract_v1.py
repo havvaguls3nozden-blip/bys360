@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 
 def test_phase2_windows_test_runner_uses_venv_python_m_pytest() -> None:
     root = Path(__file__).resolve().parents[2]

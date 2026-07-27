@@ -83,8 +83,30 @@ jobs:
       # contribute measurable app/ coverage. All three: 0 cross-scope duplicate node IDs,
       # 0 skip/xfail, stable across 2 isolated runs + 1 combined run (29/29, 0 failed);
       # adds only ~2% to this step's runtime.
+      #
+      # NOT (BYS360 Phase 7, Quality/Top-Level CI Coverage Expansion, 2026-07-27):
+      # 32 of the 33 loose tests/test_*.py files (536 of 536 minus the 3 tests in
+      # tests/test_live_scope_and_security_static.py, which carries a module-level
+      # pytest.mark.live/realdb/slow despite its bodies being plain static file
+      # checks -- left out deliberately, needs a separate human decision on
+      # whether that marker is stale, not swept in here) were never part of any
+      # CI-enforced run at all. Re-verified here: 0 skip/xfail, 0 cross-scope
+      # duplicate node IDs against the rest of this workflow or each other, stable
+      # across 2 isolated runs + 1 full-suite-mixed run + post-full-suite isolated
+      # re-run (533/533, 0 failed every time), no subprocess/network/real-DB/Redis
+      # usage anywhere in the set. Listed explicitly (not a glob) so collection is
+      # unambiguous across shells. tests/test_claude_phase5_template_compilation.py
+      # (454 of the 533) is a 0-import Jinja2 syntax-parse contract test, kept as
+      # a required structural gate like tests/communication/tests/mobile even
+      # though it contributes ~0% measurable app/ coverage on its own; the
+      # remaining tests import real app.services/app.models/app factory code and
+      # do contribute measurable app/ coverage. Adds ~14s to this step's runtime
+      # (395-403s measured vs 409s baseline across repeated runs -- within normal
+      # run-to-run variance, not a real regression). tests/load and tests/performance
+      # are explicitly out of scope for this addition -- see
+      # reports/quality/coverage_baseline.json for the full re-measurement.
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile tests/test_10_10_core_static_gate.py tests/test_ai_analysis_excel_preview_static.py tests/test_ai_executive_report_static.py tests/test_ai_recommendation_priority_static.py tests/test_ai_routes.py tests/test_claude_phase5_function_signatures.py tests/test_claude_phase5_template_compilation.py tests/test_compat_redirects.py tests/test_datetime_utils.py tests/test_error_support.py tests/test_feedback_admin_endpoint_static.py tests/test_feedback_privacy_static.py tests/test_feedback_pulse_admin_tab_static.py tests/test_feedback_pulse_menu_visibility_static.py tests/test_feedback_pulse_privacy_behavior.py tests/test_hr_reports_template_no_unpack_static.py tests/test_module_maturity_scoring.py tests/test_no_admin_org_units_duplicate_static.py tests/test_no_duplicate_admin_org_units_static.py tests/test_performance_archive_visibility_contract.py tests/test_performance_chain_constitution.py tests/test_performance_form_guard.py tests/test_performance_ops_center.py tests/test_performance_preflight.py tests/test_performance_publish_guard.py tests/test_performance_publish_preflight_static.py tests/test_personel_analizi_dalga7_static.py tests/test_score100_handover_docs_contract_v1.py tests/test_shared_cache_store_behavior.py tests/test_sp_routes_smoke.py tests/test_team_compare_publish_visibility.py tests/test_team_compare_service.py --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
 
       # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
       # [tool.coverage.report] fail_under is enforced by pytest-cov on EVERY

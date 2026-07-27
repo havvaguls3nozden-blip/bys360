@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from collections import Counter
 
+import pytest
+
+pytestmark = pytest.mark.ci_safe
+
 
 def _normalize_methods(methods):
     return tuple(sorted(set(methods or set()) - {"HEAD", "OPTIONS"}))
