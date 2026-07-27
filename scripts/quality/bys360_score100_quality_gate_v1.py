@@ -142,6 +142,13 @@ class GateReport:
     counts: dict[str, int] = field(default_factory=dict)
     findings: list[Finding] = field(default_factory=list)
     artifacts: dict[str, str] = field(default_factory=dict)
+    # BYS360 Phase 6 dependency-audit closure (2026-07-27): explicit,
+    # machine-readable dependency-audit outcome, additive to the existing
+    # Finding-based PIP_AUDIT/PIP_AUDIT_UNAVAILABLE findings below (those are
+    # kept unchanged for backward compatibility with existing score/status
+    # consumers). Populated only when --run-pip-audit was requested; see
+    # classify_dependency_audit_result().
+    dependency_audit: dict[str, Any] = field(default_factory=dict)
 
     def add(self, finding: Finding) -> None:
         self.findings.append(finding)
@@ -254,7 +261,112 @@ def parse_requirements(requirements_path: Path) -> dict[str, str]:
     return pins
 
 
-def check_dependency_pins(root: Path, report: GateReport, run_pip_audit: bool) -> None:
+# BYS360 Phase 6 dependency-audit closure (2026-07-27): pip-audit's own
+# unreachable-network / DNS / proxy / certificate failures must be reported
+# as BLOCKED, not silently folded into the same generic "unavailable" bucket
+# as a real audit error. These substrings are matched case-insensitively
+# against the combined stdout+stderr of the pip-audit subprocess.
+_DEPENDENCY_AUDIT_NETWORK_BLOCKED_MARKERS = (
+    "connectionerror",
+    "failed to establish a new connection",
+    "getaddrinfo failed",
+    "name or service not known",
+    "newconnectionerror",
+    "max retries exceeded",
+    "proxyerror",
+    "sslerror",
+    "temporary failure in name resolution",
+    "readtimeout",
+    "connecttimeout",
+    "certificate verify failed",
+    "network is unreachable",
+    "no route to host",
+    "nodename nor servname provided",
+)
+
+
+def classify_dependency_audit_result(
+    *,
+    return_code: int,
+    stdout: str,
+    stderr: str,
+    audit_json_path: Path,
+    duration_seconds: float,
+) -> tuple[str, str, int | None, int | None]:
+    """Classify a completed pip-audit subprocess run into PASS/FAIL/BLOCKED.
+
+    Returns (status, reason, packages_scanned, vulnerabilities_found).
+    ``status`` is always exactly one of "PASS", "FAIL", "BLOCKED" -- never a
+    fourth bucket -- so callers can enforce policy without guessing.
+
+    This function does not itself run anything or touch the network; it only
+    interprets an already-completed subprocess result, which is what makes
+    it deterministically unit-testable (see
+    tests/quality/test_score100_dependency_audit_status_contract.py).
+    """
+    combined_lower = f"{stdout}\n{stderr}".lower()
+
+    if return_code == 124:
+        return "BLOCKED", "timeout", None, None
+
+    if return_code == 127 or "modulenotfounderror" in combined_lower and "pip_audit" in combined_lower:
+        return "BLOCKED", "tool_not_available", None, None
+
+    if any(marker in combined_lower for marker in _DEPENDENCY_AUDIT_NETWORK_BLOCKED_MARKERS):
+        return "BLOCKED", "network_unreachable", None, None
+
+    if return_code == 0:
+        packages_scanned, vulnerabilities = _read_pip_audit_json_summary(audit_json_path)
+        return "PASS", "clean_scan", packages_scanned, vulnerabilities
+
+    if return_code == 1 and audit_json_path.exists():
+        packages_scanned, vulnerabilities = _read_pip_audit_json_summary(audit_json_path)
+        if vulnerabilities:
+            return "FAIL", "vulnerabilities_found", packages_scanned, vulnerabilities
+        return "FAIL", "audit_error_undetermined", packages_scanned, vulnerabilities
+
+    return "FAIL", "audit_error_undetermined", None, None
+
+
+def _read_pip_audit_json_summary(audit_json_path: Path) -> tuple[int | None, int | None]:
+    """Best-effort parse of pip-audit's JSON output for a packages/vulns
+    summary. Never raises -- an unexpected schema degrades to (None, None)
+    rather than crashing the gate."""
+    try:
+        data = json.loads(audit_json_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None, None
+    dependencies = data.get("dependencies") if isinstance(data, dict) else None
+    if not isinstance(dependencies, list):
+        return None, None
+    packages_scanned = len(dependencies)
+    vulnerabilities = 0
+    for dep in dependencies:
+        if isinstance(dep, dict) and isinstance(dep.get("vulns"), list):
+            vulnerabilities += len(dep["vulns"])
+    return packages_scanned, vulnerabilities
+
+
+def resolve_dependency_audit_policy(explicit: str | None) -> str:
+    """Strict|Diagnostic policy resolution. Explicit CLI value always wins;
+    otherwise a real CI signal (``CI=true``, the standard GitHub Actions
+    default) selects Strict, and anything else (a local/dev run) selects
+    Diagnostic. Never guesses -- absence of the CI signal is treated as
+    "not CI", matching GitHub Actions' own documented default."""
+    if explicit:
+        normalized = explicit.strip().lower()
+        if normalized in {"strict", "diagnostic"}:
+            return normalized
+    ci_signal = (os.environ.get("CI") or "").strip().lower()
+    return "strict" if ci_signal == "true" else "diagnostic"
+
+
+def check_dependency_pins(
+    root: Path,
+    report: GateReport,
+    run_pip_audit: bool,
+    dependency_audit_python: str | None = None,
+) -> None:
     req = root / "requirements.txt"
     if not req.exists():
         report.add(
@@ -300,9 +412,32 @@ def check_dependency_pins(root: Path, report: GateReport, run_pip_audit: bool) -
         out_dir = Path(report.artifacts.get("output_dir", root / "reports" / "quality"))
         out_dir.mkdir(parents=True, exist_ok=True)
         audit_json = out_dir / "score100_pip_audit_v1.json"
-        cmd = [sys.executable, "-m", "pip_audit", "-r", str(req), "-f", "json", "-o", str(audit_json)]
+        audit_python = dependency_audit_python or sys.executable
+        cmd = [audit_python, "-m", "pip_audit", "-r", str(req), "-f", "json", "-o", str(audit_json)]
+        audit_started = _dt.datetime.now()
         rc, stdout, stderr = run_cmd(cmd, root, timeout=240)
-        if rc == 0:
+        duration_seconds = (_dt.datetime.now() - audit_started).total_seconds()
+
+        audit_status, audit_reason, packages_scanned, vulnerabilities = classify_dependency_audit_result(
+            return_code=rc,
+            stdout=stdout,
+            stderr=stderr,
+            audit_json_path=audit_json,
+            duration_seconds=duration_seconds,
+        )
+        report.dependency_audit = {
+            "dependency_audit_status": audit_status,
+            "dependency_audit_reason": audit_reason,
+            "dependency_audit_exit_code": rc,
+            "dependency_audit_duration_seconds": round(duration_seconds, 3),
+            "dependency_audit_tool": "pip-audit",
+            "dependency_audit_python": audit_python,
+            "dependency_audit_target_manifest": relpath(req, root),
+            "dependency_audit_packages_scanned": packages_scanned,
+            "dependency_audit_vulnerabilities": vulnerabilities,
+        }
+
+        if audit_status == "PASS":
             report.add(
                 Finding(
                     "PIP_AUDIT",
@@ -312,7 +447,7 @@ def check_dependency_pins(root: Path, report: GateReport, run_pip_audit: bool) -
                     evidence={"output": relpath(audit_json, root)},
                 )
             )
-        elif rc == 1 and audit_json.exists():
+        elif audit_status == "FAIL" and audit_reason == "vulnerabilities_found":
             report.add(
                 Finding(
                     "PIP_AUDIT",
@@ -323,15 +458,31 @@ def check_dependency_pins(root: Path, report: GateReport, run_pip_audit: bool) -
                     recommendation="pip-audit JSON çıktısındaki fix_versions alanlarına göre bağımlılıkları yükseltin.",
                 )
             )
+        elif audit_status == "FAIL":
+            report.add(
+                Finding(
+                    "PIP_AUDIT_FAILED",
+                    "pip-audit gerçek tarama hatasıyla sonuçlandı",
+                    "FAIL",
+                    "pip-audit ağ/timeout dışı bir nedenle başarısız oldu; sonuç güvenilir bir PASS değil.",
+                    evidence={"returncode": rc, "reason": audit_reason, "stdout_tail": stdout[-2000:], "stderr_tail": stderr[-2000:]},
+                    recommendation="pip-audit çıktısını inceleyin; requirements.txt veya ortam çözümleme hatası olabilir.",
+                )
+            )
         else:
+            # BLOCKED: network/DNS/proxy/certificate/timeout/tool-missing.
+            # Kept as a WARN Finding (not FAIL) for backward compatibility
+            # with the existing score/status computation -- the explicit
+            # dependency_audit_status above is what downstream consumers and
+            # the Strict CI policy actually key off of, not this Finding.
             report.add(
                 Finding(
                     "PIP_AUDIT_UNAVAILABLE",
                     "pip-audit çalıştırılamadı",
                     "WARN",
-                    "pip-audit modülü yok veya çalışırken hata aldı.",
-                    evidence={"returncode": rc, "stdout_tail": stdout[-2000:], "stderr_tail": stderr[-2000:]},
-                    recommendation=".venv içinde pip install pip-audit komutunu çalıştırın veya requirements.txt içindeki pip-audit kurulumunu doğrulayın.",
+                    "pip-audit ortamsal bir nedenle (ağ/timeout/araç eksikliği) tamamlanamadı; bu bir PASS kanıtı değildir.",
+                    evidence={"returncode": rc, "reason": audit_reason, "stdout_tail": stdout[-2000:], "stderr_tail": stderr[-2000:]},
+                    recommendation=".venv içinde pip install pip-audit komutunu çalıştırın veya ağ/proxy erişimini doğrulayın.",
                 )
             )
 
@@ -1282,6 +1433,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-ruff", action="store_true")
     parser.add_argument("--run-app-factory-duplicate-check", action="store_true")
     parser.add_argument("--strict", action="store_true", help="WARN durumlarını gate modunda daha katı değerlendir")
+    parser.add_argument(
+        "--dependency-audit-policy",
+        choices=["strict", "diagnostic"],
+        default=None,
+        help=(
+            "pip-audit BLOCKED/FAIL sonucunun gate exit code'unu nasıl etkileyeceği. "
+            "Belirtilmezse CI=true ise strict, değilse diagnostic varsayılır."
+        ),
+    )
     args = parser.parse_args(argv)
 
     root = Path(args.project_root).resolve()
@@ -1321,6 +1481,9 @@ def main(argv: list[str] | None = None) -> int:
     finalize_score_and_status(report, strict=args.strict)
     write_report(report, output_dir)
 
+    dependency_audit_policy = resolve_dependency_audit_policy(args.dependency_audit_policy)
+    print(f"DEPENDENCY_AUDIT_POLICY={dependency_audit_policy}")
+
     summary = {
         "package": PACKAGE,
         "version": VERSION,
@@ -1333,6 +1496,8 @@ def main(argv: list[str] | None = None) -> int:
             "PASS": sum(1 for f in report.findings if f.severity == "PASS"),
             "INFO": sum(1 for f in report.findings if f.severity == "INFO"),
         },
+        "dependency_audit_policy": dependency_audit_policy,
+        "dependency_audit": report.dependency_audit or None,
         "reports": {
             "json": str(output_dir / "BYS360_SCORE100_QUALITY_GATE_V1_REPORT.json"),
             "md": str(output_dir / "BYS360_SCORE100_QUALITY_GATE_V1_REPORT.md"),
@@ -1343,6 +1508,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.mode == "gate" and report.status == "FAIL":
         return 1
     if args.mode == "gate" and args.strict and report.status != "PASS":
+        return 1
+    # BYS360 Phase 6 dependency-audit closure (2026-07-27): in Strict policy
+    # (real CI), a BLOCKED or FAIL dependency-audit result must fail the gate
+    # even if no other Finding pushed report.status to FAIL -- a network
+    # limitation or undetected audit error must never present as green in CI.
+    # In Diagnostic policy (local/dev), BLOCKED stays a non-fatal WARN signal
+    # (already reflected in report.status/score_estimate above); it is never
+    # silently upgraded to a hard pass or a hard fail here.
+    dependency_status = report.dependency_audit.get("dependency_audit_status") if report.dependency_audit else None
+    if args.mode == "gate" and dependency_audit_policy == "strict" and dependency_status in {"FAIL", "BLOCKED"}:
         return 1
     return 0
 
