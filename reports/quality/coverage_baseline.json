@@ -33,9 +33,9 @@
   "test_counts": {
     "step1_ci_safe_passed": 60,
     "step1_ci_safe_deselected": 40,
-    "step2_broader_scope_passed": 808,
+    "step2_broader_scope_passed": 810,
     "step2_services_contribution": 422,
-    "total_passed": 868
+    "total_passed": 870
   },
   "repeatability": {
     "run_1_combined_pct_precise": 23.273515742867758,
