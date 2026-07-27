@@ -541,6 +541,36 @@ def test_live_scope_file_no_longer_declares_live_realdb_slow_markers() -> None:
             raise AssertionError("tests/test_live_scope_and_security_static.py must not declare a pytestmark")
 
 
+# --- BYS360 Phase 9: tests/architecture/test_survey_live_contract.py's
+# pytest.mark.live/realdb/slow markers were confirmed stale by the exact
+# same criteria as the Phase 8 file above (plain static Path.read_text()
+# check against app/communication/surveys_routes.py, no app.*/DB/network/
+# subprocess use, no recorded rationale in git history, same origin commit
+# as the Phase 8 file) and removed. Unlike the Phase 8 file, no workflow
+# change was needed: this file already lives in tests/architecture, which
+# the broad coverage-instrumented step already collects as a whole directory
+# with no -m marker filter, so it was already executing in CI regardless of
+# its (inert, for that step) markers ---
+
+
+def test_survey_live_contract_file_no_longer_declares_live_realdb_slow_markers() -> None:
+    tree = ast.parse((ROOT / "tests" / "architecture" / "test_survey_live_contract.py").read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "pytestmark" for target in node.targets
+        ):
+            raise AssertionError("tests/architecture/test_survey_live_contract.py must not declare a pytestmark")
+
+
+def test_survey_live_contract_is_not_explicitly_named_in_any_ci_command() -> None:
+    """It must be collected exactly once, implicitly, via the tests/architecture
+    directory argument -- never named explicitly (which would risk double
+    collection if the directory argument is ever also kept)."""
+    commands = _ci_workflow_commands()
+    for command in commands:
+        assert "test_survey_live_contract.py" not in command
+
+
 def test_tests_load_is_not_accidentally_included_in_any_ci_step() -> None:
     commands = _ci_workflow_commands()
     for command in commands:

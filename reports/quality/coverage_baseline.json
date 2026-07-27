@@ -1,6 +1,6 @@
 {
   "_comment": "BYS360 coverage ratchet baseline. Truthful, re-measured floor for CI's actual test scope (tests/quality -m \"ci_safe\" -- unchanged literal marker, now naturally selecting 40 more tests via per-file pytestmark -- then tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile + 33 loose tests/test_*.py files, branch=true). This value is NOT aspirational and must NEVER be raised automatically by any script -- raising it is a separate, human-reviewed action after real coverage genuinely improves. See scripts/quality/bys360_coverage_ratchet.py for enforcement logic and its docstring for the no-self-raise constraint.",
-  "_history": "Phase 8 Top-Level Test Hygiene Closure (2026-07-27): tests/test_live_scope_and_security_static.py's pytest.mark.live/realdb/slow markers (withheld in Phase 7 pending review) were confirmed stale -- all 3 tests are plain Path.read_text() + string-presence checks, the markers predate this repo's earliest visible commit with no recorded rationale, and an identical mistagging pattern was found on another purely static file (tests/architecture/test_survey_live_contract.py, out of this wave's scope). Markers removed; the file added to the broad coverage-instrumented step (33rd of 33 loose tests/test_*.py files, all now included). tests/test_sp_routes_smoke.py's os.environ.setdefault calls were empirically proven to be inert no-ops (tests/conftest.py already sets the same 3 keys unconditionally at import time, before any test runs) -- confirmed via before/after and reversed-order probes showing byte-identical environment state; left unchanged (NO CHANGE -- NO ENVIRONMENT LEAK DEMONSTRATED). tests/test_feedback_pulse_privacy_behavior.py's ast.parse+exec() indirection (used to avoid importing app/services/feedback_service.py) was replaced with a plain import of the pure, side-effect-free target function -- verified to require no app-context/DB, behaviorally identical (2 isolated runs + both file orderings + post-full-suite re-run, all pass), and to raise its own coverage.py-attributed contribution from 0% (exec()'d code has co_filename='<string>', invisible to coverage.py) to a real, measurable contribution. Net effect: +3 tests (step2), 0 new/removed test count elsewhere in target files, +2 tests in tests/architecture/test_ci_coverage_scope_contract.py (contract updates: 2 obsolete blocked-file tests removed, 1 new marker-removal check added, existing TOP_LEVEL_SAFE_TEST_FILES-parametrized tests grew from 32 to 33 entries). Combined coverage measured twice, identically, at 24.16299676341062% (up from 24.138741292664996%). 0 cross-scope duplicate node IDs, 0 skip/xfail beyond the pre-existing 1, full-suite-mixed + post-full-suite isolated re-run stable for all 3 target files. Adds no measurable net time cost. Previous baseline (Phase 7 Quality/Top-Level CI Coverage Expansion, 2026-07-27) was combined_pct=24.14 -- kept in _history for continuity, not reused as the active floor. Earlier baselines: Phase 6 Communication/Behavior/Mobile combined_pct=23.45; Critical Operational Expansion combined_pct=23.39; CI Coverage Scope Policy Closure (services-only) combined_pct=23.27; Campaign 1B (2026-07-24) combined_pct=18.85 -- see previous_baseline below for the immediately preceding one.",
+  "_history": "Phase 9 Architecture Marker Hygiene Closure (2026-07-27): tests/architecture/test_survey_live_contract.py's pytest.mark.live/realdb/slow markers (flagged as a Phase 8 follow-up candidate) were confirmed stale by the same criteria as the Phase 8 file: all 3 tests are a static Path.read_text() + string-presence contract check against app/communication/surveys_routes.py, with 0 app.*/DB/network/subprocess/Redis use; the markers predate this repo's earliest visible commit with no recorded rationale, and trace to the exact same baseline-squash commit as the Phase 8 file. Markers removed. Unlike Phase 8, no workflow change was needed: this file already lives in tests/architecture, which the broad coverage-instrumented step already collects as a whole directory with no -m marker filter, so it was already executing in real CI regardless of its (inert, for that step) markers -- confirmed via 2 isolated runs, marker-filtered/unfiltered runs (identical either way), a full-suite-mixed run, and a post-full-suite isolated re-run, all 3/3 passed every time, 0 cross-scope duplicate node IDs. Isolated coverage contribution is 0% (0/101921 lines; pure Path.read_text(), no app.* import) -- unchanged from before, since the file was already running. 2 new contract tests were added to the already-in-scope tests/architecture/test_ci_coverage_scope_contract.py to lock the marker removal in, raising step2_broader_scope_passed by exactly 2 (1585 -> 1587) with 0 coverage impact -- combined coverage measured twice, identically, at 24.16299676341062%, byte-identical to the Phase 8 baseline (confirming 0 measurable coverage change, as expected for 0-import AST contract tests). Previous baseline (Phase 8 Top-Level Test Hygiene Closure, 2026-07-27) was combined_pct=24.16 -- kept in _history for continuity, not reused as the active floor. Earlier baselines: Phase 7 Quality/Top-Level CI Coverage Expansion combined_pct=24.14; Phase 6 Communication/Behavior/Mobile combined_pct=23.45; Critical Operational Expansion combined_pct=23.39; CI Coverage Scope Policy Closure (services-only) combined_pct=23.27; Campaign 1B (2026-07-24) combined_pct=18.85 -- see previous_baseline below for the immediately preceding one.",
   "combined_pct": 24.16,
   "combined_pct_precise": 24.16299676341062,
   "line_pct": 28.24,
@@ -9,14 +9,14 @@
   "lines_valid": 102467,
   "branches_covered": 2946,
   "branches_valid": 29462,
-  "measured_at": "2026-07-27T22:58:00Z",
-  "measured_by": "BYS360 Phase 8 - Top-Level Test Hygiene Closure",
+  "measured_at": "2026-07-27T23:44:00Z",
+  "measured_by": "BYS360 Phase 9 - Architecture Marker Hygiene Closure",
   "previous_baseline": {
-    "combined_pct": 24.14,
-    "combined_pct_precise": 24.138741292664996,
-    "measured_at": "2026-07-27T20:09:00Z",
-    "measured_by": "BYS360 Phase 7 - Quality/Top-Level CI Coverage Expansion",
-    "scope": "tests/quality (ci_safe, 40 candidates now marked) + tests/integration + tests/architecture + tests/security + tests/critical + tests/services + tests/migrations + tests/workflow + tests/release + tests/communication + tests/behavior + tests/mobile + 32 of 33 safe top-level tests/test_*.py files (tests/test_live_scope_and_security_static.py NOT included, pending marker review)"
+    "combined_pct": 24.16,
+    "combined_pct_precise": 24.16299676341062,
+    "measured_at": "2026-07-27T22:58:00Z",
+    "measured_by": "BYS360 Phase 8 - Top-Level Test Hygiene Closure",
+    "scope": "tests/quality (ci_safe, 40 candidates marked) + tests/integration + tests/architecture + tests/security + tests/critical + tests/services + tests/migrations + tests/workflow + tests/release + tests/communication + tests/behavior + tests/mobile + all 33 safe top-level tests/test_*.py files (tests/architecture/test_survey_live_contract.py still carried stale pytest.mark.live/realdb/slow, pending Phase 9 review)"
   },
   "environment": {
     "python_version": "3.12.10",
@@ -35,7 +35,7 @@
     "step1_ci_safe_deselected": 0,
     "step1_ci_safe_skipped": 1,
     "step1_quality_candidate_contribution": 40,
-    "step2_broader_scope_passed": 1585,
+    "step2_broader_scope_passed": 1587,
     "step2_services_contribution": 422,
     "step2_migrations_contribution": 33,
     "step2_workflow_contribution": 7,
@@ -47,7 +47,8 @@
     "step2_phase7_contract_test_contribution": 136,
     "step2_live_scope_contribution": 3,
     "step2_phase8_contract_test_delta": 2,
-    "total_passed": 1685
+    "step2_phase9_contract_test_delta": 2,
+    "total_passed": 1687
   },
   "repeatability": {
     "run_1_combined_pct_precise": 24.16299676341062,

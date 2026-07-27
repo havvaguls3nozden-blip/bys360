@@ -2,9 +2,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-pytestmark = [pytest.mark.live, pytest.mark.realdb, pytest.mark.slow]
+# BYS360 Phase 9: pytest.mark.live/realdb/slow removed (2026-07-27) -- all
+# three tests below are a static source-contract check (Path.read_text() +
+# string-presence assertions against app/communication/surveys_routes.py),
+# not a live-service or real-DB integration test; "live" here refers to the
+# production/"canlı" route naming being verified, not a runtime dependency.
+# No app.* import, DB, network, or subprocess use. The markers predate this
+# repo's earliest visible commit with no recorded rationale, and an
+# identical mistagging pattern was found on tests/test_live_scope_and_
+# security_static.py (fixed in Phase 8) -- both trace to the same baseline
+# commit, consistent with a naming-convention-driven mistagging rather than
+# an actual runtime requirement.
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SURVEY_ROUTE = PROJECT_ROOT / "app" / "communication" / "surveys_routes.py"
