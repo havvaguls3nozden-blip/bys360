@@ -9,8 +9,12 @@ from __future__ import annotations
 import contextlib
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy import SQLAlchemy
 
 # Testler uygulama paketini import etmeden önce güvenli test bağlamı kurulmalıdır.
 os.environ["APP_ENV"] = "testing"
@@ -77,6 +81,7 @@ def app():
         DATABASE_URL=db_uri,
     )
 
+    db: SQLAlchemy | None
     try:
         from app.extensions import db
     except Exception:

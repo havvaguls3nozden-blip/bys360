@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import cast
+
 import pytest
+from sqlalchemy.engine import Dialect
 
 from app.security.sql_identifiers import (
     quote_sql_identifier,
@@ -55,6 +58,6 @@ def test_validate_sql_identifier_rejects_unknown_allowlist_value() -> None:
 def test_quote_sql_identifier_uses_active_dialect() -> None:
     assert quote_sql_identifier(
         "performance_scoring_history",
-        dialect=_FakeDialect(),
+        dialect=cast(Dialect, _FakeDialect()),
         allowed={"performance_scoring_history"},
     ) == '"performance_scoring_history"'

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -27,7 +28,7 @@ EXPECTED_FUNCTIONS = {
 
 
 def _discover_functions():
-    found = {}
+    found: dict[str, list[dict[str, Any]]] = {}
     if not APP_ROOT.exists():
         return found
 

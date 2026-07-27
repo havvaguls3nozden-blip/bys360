@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from app.refactor.final_quality_release_evidence_contract import (
     FINAL_RELEASE_EVIDENCE_CATEGORIES,
     FINAL_RELEASE_EVIDENCE_ITEMS,
@@ -78,4 +80,4 @@ def test_final_quality_faz5_summary_is_final_lock() -> None:
     assert summary["database_migration"] is False
     assert summary["external_network"] is False
     assert summary["release_marker"] == "FINAL_QUALITY_FAZ5_CHAIN_OK"
-    assert "FINAL_QUALITY_FAZ5_RELEASE_EVIDENCE_OK" in summary["required_final_markers"]
+    assert "FINAL_QUALITY_FAZ5_RELEASE_EVIDENCE_OK" in cast(tuple, summary["required_final_markers"])

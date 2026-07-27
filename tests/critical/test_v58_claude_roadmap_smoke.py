@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 CRITICAL_ROUTES = [
@@ -24,7 +26,7 @@ def _v58_disable_login(app):
 
 
 def test_v58_assistant_context_processors_are_registered(app):
-    keys = {}
+    keys: dict[str, Any] = {}
     with app.test_request_context("/dashboard"):
         for processor in app.template_context_processors.get(None, []):
             try:

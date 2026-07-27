@@ -86,7 +86,7 @@ def test_app_factory_registers_routes_without_duplicate_endpoints(app):
 
 def test_main_blueprint_namespace_is_modular_source_distributed(app):
     """Shared main blueprint is allowed, but it must stay source-module distributed."""
-    module_counts = Counter()
+    module_counts: Counter[str] = Counter()
 
     for rule in app.url_map.iter_rules():
         if not rule.endpoint.startswith("main."):

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from typing import Any
+
 
 def test_save_pulse_entry_schedules_async_refresh_without_inline(monkeypatch):
     import app.services.feedback_service as svc
 
-    calls = []
+    calls: list[tuple[Any, ...]] = []
 
     class FakeSession:
         def add(self, obj): pass

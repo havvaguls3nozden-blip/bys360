@@ -8,8 +8,8 @@ def _load_gate():
     root = Path(__file__).resolve().parents[2]
     path = root / "scripts" / "quality" / "bys360_mobile_pytest_contract_gate_p2a_v3.py"
     spec = importlib.util.spec_from_file_location("bys360_mobile_pytest_contract_gate_p2a_v3", path)
-    module = importlib.util.module_from_spec(spec)
     assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module, root
 

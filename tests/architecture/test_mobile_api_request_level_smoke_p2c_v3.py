@@ -11,7 +11,7 @@ def _load_gate_module():
     spec = importlib.util.spec_from_file_location("bys360_mobile_request_level_smoke_gate_p2c_v3", script)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # type: ignore[attr-defined]
+    spec.loader.exec_module(module)
     return module
 
 
