@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from types import ModuleType
+from typing import Any
 
 import sqlalchemy as sa
 from alembic.migration import MigrationContext
@@ -66,7 +66,11 @@ REQUIRED_COLUMNS = {
 }
 
 
-def _load_migration() -> ModuleType:
+def _load_migration() -> Any:
+    # The loaded migration module's op/upgrade/downgrade/revision attributes
+    # are dynamically defined by whichever versions/*.py file is loaded, and
+    # `op` is deliberately reassigned below before each upgrade/downgrade
+    # call -- there is no fixed static contract to type against.
     spec = importlib.util.spec_from_file_location(
         "phase60b_development_recommendations_adoption", MIGRATION_PATH
     )

@@ -9,6 +9,7 @@ Flask bağımlılıkları yüklü değilse test atlanır; canlı/proje ortamınd
 from __future__ import annotations
 
 import os
+from typing import Any
 
 import pytest
 
@@ -63,7 +64,7 @@ def _make_app():
     os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
     os.environ.setdefault("SECRET_KEY", "test-secret-key-for-v59-route-smoke-very-long")
     try:
-        from app import create_app  # type: ignore
+        from app import create_app
     except Exception as exc:  # pragma: no cover - canlı ortamda import beklenir
         pytest.skip(f"BYS360 uygulaması import edilemedi: {exc}")
     try:
@@ -74,7 +75,8 @@ def _make_app():
 
 def _candidate_routes(app) -> list[str]:
     routes = set(STATIC_CRITICAL_ROUTES)
-    for rule in getattr(app, "url_map", []).iter_rules():
+    url_map: Any = getattr(app, "url_map", [])
+    for rule in url_map.iter_rules():
         route = str(rule.rule)
         if "<" in route:
             continue

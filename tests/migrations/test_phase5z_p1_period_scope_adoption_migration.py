@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from types import ModuleType
+from typing import Any
 
 import pytest
 import sqlalchemy as sa
@@ -25,7 +25,11 @@ NEW_SCOPE_COLUMNS = {
 }
 
 
-def _load_migration() -> ModuleType:
+def _load_migration() -> Any:
+    # The loaded migration module's op/upgrade/downgrade/revision attributes
+    # are dynamically defined by whichever versions/*.py file is loaded, and
+    # `op` is deliberately reassigned below before each upgrade/downgrade
+    # call -- there is no fixed static contract to type against.
     spec = importlib.util.spec_from_file_location("phase5z_p1_period_scope_adoption", MIGRATION_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)

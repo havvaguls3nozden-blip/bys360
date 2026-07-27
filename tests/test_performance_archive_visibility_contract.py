@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import cast
+
+from app.models.performance_archive_models import PerformanceArchivedResult
 
 
 def _user(user_id=1, role="personel", **extra):
@@ -33,8 +36,8 @@ def test_archive_direct_detail_access_uses_allowed_ids(monkeypatch):
     from app.services.performance import archive_service as svc
 
     personel = _user(10, "personel")
-    record = SimpleNamespace(employee_id=11)
-    own_record = SimpleNamespace(employee_id=10)
+    record = cast(PerformanceArchivedResult, SimpleNamespace(employee_id=11))
+    own_record = cast(PerformanceArchivedResult, SimpleNamespace(employee_id=10))
 
     assert svc.can_view_archived_result(personel, record) is False
     assert svc.can_view_archived_result(personel, own_record) is True

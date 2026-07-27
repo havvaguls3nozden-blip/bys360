@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 
 from app.services.hierarchy_rulebook_service import build_lookup, desired_manager_sicils
 from app.services.performance.chain_rule_engine import (
@@ -105,8 +106,9 @@ def test_authoritative_snapshots_are_aligned():
     snapshot = get_authoritative_performance_rules_snapshot()
     engine = get_chain_rule_matrix_snapshot()
 
-    assert snapshot['authoritative_slot_matrix']['coordinator'] == {'slot_1': 'baskan_yardimcisi', 'slot_2': 'grup_baskani'}
-    assert snapshot['authoritative_slot_matrix']['group_staff'] == {'slot_1': 'grup_baskani', 'slot_2': 'koordinator', 'slot_3': 'birim_amiri_optional'}
+    authoritative_slot_matrix = cast(dict, snapshot['authoritative_slot_matrix'])
+    assert authoritative_slot_matrix['coordinator'] == {'slot_1': 'baskan_yardimcisi', 'slot_2': 'grup_baskani'}
+    assert authoritative_slot_matrix['group_staff'] == {'slot_1': 'grup_baskani', 'slot_2': 'koordinator', 'slot_3': 'birim_amiri_optional'}
     assert engine['slots']['group_manager'] == {1: 'baskan', 2: 'baskan_yardimcisi'}
 
     assert COORDINATOR_POLICY.labels[1] == 'Başkan Yardımcısı'

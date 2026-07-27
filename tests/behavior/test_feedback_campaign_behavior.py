@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import Any, cast
 
 import pytest
+
+from app.models.feedback_models import FeedbackCampaign
 
 
 def test_campaign_assignment_all_user_role_and_unit_behavior():
@@ -16,19 +19,22 @@ def test_campaign_assignment_all_user_role_and_unit_behavior():
         def all(self):
             return self._rows
 
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="all", target_value=None)]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="user", target_value="7")]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="user", target_value="123")]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="role", target_value="KOORDINATOR")]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="unit", target_value="44")]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="unit", target_value="eğitim")]))) is True
-    assert user_can_see_campaign(user, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type="role", target_value="personel")]))) is False
+    def _campaign(target_type: str, target_value) -> FeedbackCampaign:
+        return cast(FeedbackCampaign, SimpleNamespace(assignments=Assignments([SimpleNamespace(target_type=target_type, target_value=target_value)])))
+
+    assert user_can_see_campaign(user, _campaign("all", None)) is True
+    assert user_can_see_campaign(user, _campaign("user", "7")) is True
+    assert user_can_see_campaign(user, _campaign("user", "123")) is True
+    assert user_can_see_campaign(user, _campaign("role", "KOORDINATOR")) is True
+    assert user_can_see_campaign(user, _campaign("unit", "44")) is True
+    assert user_can_see_campaign(user, _campaign("unit", "eğitim")) is True
+    assert user_can_see_campaign(user, _campaign("role", "personel")) is False
 
 
 def test_anonymous_campaign_submission_does_not_store_user_id(monkeypatch):
     import app.services.feedback_service as svc
 
-    captured = {"objects": []}
+    captured: dict[str, Any] = {"objects": []}
 
     class FakeSession:
         def add(self, obj):
@@ -69,7 +75,7 @@ def test_anonymous_campaign_submission_does_not_store_user_id(monkeypatch):
 
     user = SimpleNamespace(id=55, organization_unit_id=8)
     question = SimpleNamespace(id=1, is_required=True, question_text="Memnuniyet", question_type="text")
-    campaign = SimpleNamespace(id=9, is_anonymous=True, allow_multiple_submissions=False, questions=FakeQuestions([question]))
+    campaign = cast(FeedbackCampaign, SimpleNamespace(id=9, is_anonymous=True, allow_multiple_submissions=False, questions=FakeQuestions([question])))
 
     submission = svc.submit_campaign_answers(user=user, campaign=campaign, form={"question_1": "İyi"})
 
@@ -106,6 +112,6 @@ def test_required_campaign_question_blocks_empty_submission(monkeypatch):
     with pytest.raises(ValueError, match="zorunludur"):
         svc.submit_campaign_answers(
             user=SimpleNamespace(id=1, organization_unit_id=1),
-            campaign=SimpleNamespace(id=1, is_anonymous=False, allow_multiple_submissions=True, questions=FakeQuestions()),
+            campaign=cast(FeedbackCampaign, SimpleNamespace(id=1, is_anonymous=False, allow_multiple_submissions=True, questions=FakeQuestions())),
             form={},
         )

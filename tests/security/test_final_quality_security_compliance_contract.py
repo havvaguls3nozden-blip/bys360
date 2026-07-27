@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import cast
+
 from app.refactor.final_quality_security_compliance_contract import (
     FINAL_QUALITY_FAZ4_VERSION,
     PERSONAL_DATA_FLOWS,
@@ -52,8 +54,8 @@ def test_security_audit_evidence_keeps_required_release_markers() -> None:
 def test_faz4_summary_declares_no_runtime_mutation_or_external_network() -> None:
     summary = get_final_quality_faz4_summary()
     assert summary["version"] == FINAL_QUALITY_FAZ4_VERSION
-    assert summary["security_control_count"] >= 6
-    assert summary["personal_data_flow_count"] >= 5
+    assert cast(int, summary["security_control_count"]) >= 6
+    assert cast(int, summary["personal_data_flow_count"]) >= 5
     assert summary["runtime_mutation"] is False
     assert summary["database_migration"] is False
     assert summary["external_network"] is False

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from types import ModuleType
+from typing import Any, cast
 
 import sqlalchemy as sa
 from alembic.migration import MigrationContext
@@ -85,7 +85,11 @@ NOTIFICATION_REQUIRED_COLUMNS = {
 }
 
 
-def _load_migration() -> ModuleType:
+def _load_migration() -> Any:
+    # The loaded migration module's op/upgrade/downgrade/revision attributes
+    # are dynamically defined by whichever versions/*.py file is loaded, and
+    # `op` is deliberately reassigned below before each upgrade/downgrade
+    # call -- there is no fixed static contract to type against.
     spec = importlib.util.spec_from_file_location("phase5y_process_engine_adoption", MIGRATION_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -110,7 +114,10 @@ def _column_names(connection: sa.Connection, table_name: str) -> set[str]:
 
 
 def _index_names(connection: sa.Connection, table_name: str) -> set[str]:
-    return {index["name"] for index in sa.inspect(connection).get_indexes(table_name)}
+    # Real indexes always have a real string name (SQLite/Postgres both
+    # require one); ReflectedIndex.name is only str | None in SQLAlchemy's
+    # generic reflection stub for dialects that could theoretically omit it.
+    return {cast(str, index["name"]) for index in sa.inspect(connection).get_indexes(table_name)}
 
 
 def test_phase5y_creates_complete_schema_on_empty_database() -> None:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from types import ModuleType
+from typing import Any, cast
 
 import sqlalchemy as sa
 from alembic.migration import MigrationContext
@@ -30,7 +30,11 @@ REQUIRED_COLUMNS = {
 }
 
 
-def _load_migration() -> ModuleType:
+def _load_migration() -> Any:
+    # The loaded migration module's op/upgrade/downgrade/revision attributes
+    # are dynamically defined by whichever versions/*.py file is loaded, and
+    # `op` is deliberately reassigned below before each upgrade/downgrade
+    # call -- there is no fixed static contract to type against.
     spec = importlib.util.spec_from_file_location("phase60a_mobile_push_tokens_adoption", MIGRATION_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -54,8 +58,11 @@ def _column_names(connection: sa.Connection, table_name: str) -> set[str]:
     return {column["name"] for column in sa.inspect(connection).get_columns(table_name)}
 
 
-def _indexes_by_name(connection: sa.Connection, table_name: str) -> dict[str, dict]:
-    return {index["name"]: index for index in sa.inspect(connection).get_indexes(table_name)}
+def _indexes_by_name(connection: sa.Connection, table_name: str) -> dict[str, Any]:
+    # Real indexes always have a real string name (SQLite/Postgres both
+    # require one); ReflectedIndex.name is only str | None in SQLAlchemy's
+    # generic reflection stub for dialects that could theoretically omit it.
+    return {cast(str, index["name"]): index for index in sa.inspect(connection).get_indexes(table_name)}
 
 
 def _create_legacy_self_healed_table(connection: sa.Connection) -> None:
