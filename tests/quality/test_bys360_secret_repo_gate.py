@@ -287,3 +287,307 @@ def test_candidate_classification_counts_are_reported(tmp_path: Path) -> None:
     assert classification["tracked_candidate_count"] >= 1
     assert classification["untracked_non_ignored_candidate_count"] >= 1
     assert classification["unique_scanned_candidate_count"] == result["scanned_file_count"]
+
+
+# --- BYS360 Phase 10I: unquoted .env-format assignment scanning ---
+# ASSIGN_RE/DICT_ASSIGN_RE above only matched values wrapped in a quote
+# character, so a standard unquoted .env-style line (KEY=value -- the
+# actual shape of every real .env.example/.env.docker.example line in this
+# repo) was never scanned at all. These tests lock in the fix without
+# weakening any of the quoted-assignment behavior exercised above.
+
+_UNQUOTED_ENV_SYNTHETIC_SECRET = "sk_live_abcdef1234567890xyz"
+
+
+def test_unquoted_env_secret_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == ".env.docker.example"
+        for f in result["findings"]
+    )
+    assert _UNQUOTED_ENV_SYNTHETIC_SECRET not in json.dumps(result)
+
+
+def test_single_quoted_env_secret_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    env_content = f"SECRET_KEY='{_UNQUOTED_ENV_SYNTHETIC_SECRET}'\n"  # hardcoded_secret fixture
+    (repo / ".env.docker.example").write_text(env_content, encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _UNQUOTED_ENV_SYNTHETIC_SECRET not in json.dumps(result)
+
+
+def test_export_prefixed_env_secret_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"export SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _UNQUOTED_ENV_SYNTHETIC_SECRET not in json.dumps(result)
+
+
+def test_unquoted_vs_quoted_same_value_both_trigger_red(tmp_path: Path) -> None:
+    """Proves the unquoted-parsing fix produces the same finding type as the
+    pre-existing quoted path for an equivalent value -- quote-handling
+    alone doesn't change classification."""
+    repo = _init_repo(tmp_path)
+    quoted_content = f'SECRET_KEY = "{_UNQUOTED_ENV_SYNTHETIC_SECRET}"\n'  # hardcoded_secret fixture
+    (repo / "quoted.py").write_text(quoted_content, encoding="utf-8")
+    (repo / ".env.docker.example").write_text(
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", "quoted.py", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    types_by_path = {f["path"]: f["type"] for f in result["findings"]}
+    assert types_by_path.get("quoted.py") == "hardcoded_secret_value"
+    assert types_by_path.get(".env.docker.example") == "hardcoded_secret_value"
+
+
+def test_unquoted_env_safe_placeholder_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "SECRET_KEY=replace-with-a-strong-random-value\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_env_empty_sensitive_value_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text("SECRET_KEY=\n", encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_env_commented_secret_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"# SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_env_non_sensitive_key_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"NORMAL_SETTING={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_env_docker_example_placeholders_stay_green(tmp_path: Path) -> None:
+    """Real-file regression: the actual tracked .env.docker.example must
+    still scan clean under the new unquoted-assignment path -- this is
+    exactly what the PLACEHOLDER_WORDS/DATABASE_URL_KEYS fixes landing
+    together with the parser change are meant to guarantee."""
+    repo = _init_repo(tmp_path)
+    real_content = (Path(__file__).resolve().parents[2] / ".env.docker.example").read_text(
+        encoding="utf-8"
+    )
+    (repo / ".env.docker.example").write_text(real_content, encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_env_example_placeholders_stay_green(tmp_path: Path) -> None:
+    """Same real-file regression for the repo's other tracked template."""
+    repo = _init_repo(tmp_path)
+    real_content = (Path(__file__).resolve().parents[2] / ".env.example").read_text(
+        encoding="utf-8"
+    )
+    (repo / ".env.example").write_text(real_content, encoding="utf-8")
+    _git(["add", "-f", ".env.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_url_fragment_hash_is_not_treated_as_comment(tmp_path: Path) -> None:
+    """A '#' with no preceding whitespace (a URL fragment) must not be
+    mistaken for an inline comment marker. CALLBACK_URL isn't a sensitive
+    key so it never produces a finding on its own -- asserting the very
+    next line's real SECRET_KEY still fires proves the URL line didn't
+    swallow anything past it."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"CALLBACK_URL=https://example.invalid/path#fragment\n"
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n",
+        encoding="utf-8",
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["line"] == 2
+        for f in result["findings"]
+    )
+
+
+def test_unquoted_trailing_comment_is_stripped_from_value(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET} # rotate this before shipping\n",
+        encoding="utf-8",
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _UNQUOTED_ENV_SYNTHETIC_SECRET not in json.dumps(result)
+
+
+def test_unquoted_env_crlf_matches_lf_result(tmp_path: Path) -> None:
+    lf_dir = tmp_path / "lf"
+    lf_dir.mkdir()
+    lf_repo = _init_repo(lf_dir)
+    (lf_repo / ".env.docker.example").write_bytes(
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\n".encode()
+    )
+    _git(["add", "-f", ".env.docker.example"], lf_repo)
+    _commit(lf_repo)
+    lf_result = run(lf_repo)
+
+    crlf_dir = tmp_path / "crlf"
+    crlf_dir.mkdir()
+    crlf_repo = _init_repo(crlf_dir)
+    (crlf_repo / ".env.docker.example").write_bytes(
+        f"SECRET_KEY={_UNQUOTED_ENV_SYNTHETIC_SECRET}\r\n".encode()
+    )
+    _git(["add", "-f", ".env.docker.example"], crlf_repo)
+    _commit(crlf_repo)
+    crlf_result = run(crlf_repo)
+
+    assert lf_result["ok"] == crlf_result["ok"] is False
+    assert lf_result["finding_count"] == crlf_result["finding_count"] == 1
+
+
+def test_unquoted_env_whitespace_around_key_and_value_is_handled(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"  SECRET_KEY   =   {_UNQUOTED_ENV_SYNTHETIC_SECRET}  \n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+
+
+def test_unquoted_env_malformed_lines_do_not_crash(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "not_an_assignment_line\nA=B=C\n=noKeyHere\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_assignment_scanning_is_scoped_to_env_files(tmp_path: Path) -> None:
+    """Python source legitimately contains countless unquoted `key = expr`
+    lines (variable assignments, function calls) that are not, and cannot
+    be, a literal secret the way an unquoted .env line is -- a real
+    hardcoded secret in Python source requires a quoted string literal,
+    already covered by ASSIGN_RE. The unquoted path must stay scoped to
+    .env/.env.* files only."""
+    repo = _init_repo(tmp_path)
+    (repo / "config_local.py").write_text(
+        "initial_password = get_default_first_login_password()\n", encoding="utf-8"
+    )
+    _git(["add", "-f", "config_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_unquoted_database_url_placeholder_is_not_double_flagged(tmp_path: Path) -> None:
+    """DATABASE_URL/SQLALCHEMY_DATABASE_URI values are already fully
+    classified by the dedicated embedded-password scan (DB_URL_RE); the
+    unquoted-assignment path must not re-evaluate the whole URL string and
+    produce a second, redundant/false finding on a safe placeholder URL."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "DATABASE_URL=postgresql://user:password@db:5432/bys360\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_real_env_file_still_not_tracked() -> None:
+    root = Path(__file__).resolve().parents[2]
+    tracked = subprocess.run(
+        ["git", "ls-files"], cwd=str(root), text=True, capture_output=True, check=True
+    ).stdout.splitlines()
+    assert ".env" not in tracked

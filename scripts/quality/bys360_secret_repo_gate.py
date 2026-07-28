@@ -33,6 +33,12 @@ PLACEHOLDER_WORDS = (
     "dummy", "redacted", "your_", "buraya", "degistir", "değiştir", "not_set", "unset",
     "local", "localhost", "127.0.0.1", "test", "testing", "dev", "development", "bys_pass",
     "secret_key_from_env", "database_url_from_env", "sentry_dsn_from_env",
+    # BYS360 Phase 10I unquoted-.env-assignment hardening: this is the exact
+    # instructional-placeholder phrase used in the tracked .env.docker.example
+    # (SECRET_KEY=replace-with-a-strong-random-value / POSTGRES_PASSWORD=...).
+    # It matched no prior word here, so once unquoted assignments started
+    # being scanned it would have false-positived on that already-safe file.
+    "replace-with",
 )
 
 ENV_REFERENCE_MARKERS = (
@@ -59,14 +65,45 @@ DB_URL_RE = re.compile(r"(?:postgresql|postgres|mysql|mariadb)://([^\s:'\"/@]+):
 # not to PASSWORD/SECRET_KEY/TOKEN/API_KEY.
 SQLITE_DSN_RE = re.compile(r"^sqlite:///", re.I)
 DATABASE_URL_KEYS = frozenset({"DATABASE_URL", "SQLALCHEMY_DATABASE_URI"})
+# BYS360 Phase 10I: shared across the quoted (ASSIGN_RE/DICT_ASSIGN_RE) and
+# unquoted (UNQUOTED_ASSIGN_RE) patterns below so the set of sensitive key
+# names can't drift between them.
+SENSITIVE_KEY_ALTERNATION = (
+    r"SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|"
+    r"PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|"
+    r"INSTAGRAM_ACCESS_TOKEN|TOKEN"
+)
 ASSIGN_RE = re.compile(
-    r"(?P<key>SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|INSTAGRAM_ACCESS_TOKEN|TOKEN)\s*[:=]\s*(?P<quote>[\"'])(?P<value>.*?)(?P=quote)",
+    rf"(?P<key>{SENSITIVE_KEY_ALTERNATION})\s*[:=]\s*(?P<quote>[\"'])(?P<value>.*?)(?P=quote)",
     re.I,
 )
 DICT_ASSIGN_RE = re.compile(
-    r"(?P<quote>[\"'])(?P<key>SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|INSTAGRAM_ACCESS_TOKEN|TOKEN)(?P=quote)\s*:\s*(?P<vquote>[\"'])(?P<value>.*?)(?P=vquote)",
+    rf"(?P<quote>[\"'])(?P<key>{SENSITIVE_KEY_ALTERNATION})(?P=quote)\s*:\s*(?P<vquote>[\"'])(?P<value>.*?)(?P=vquote)",
     re.I,
 )
+# BYS360 Phase 10I unquoted-.env-assignment hardening: ASSIGN_RE/DICT_ASSIGN_RE
+# above only match a value wrapped in a quote character, so a standard,
+# unquoted .env-format line (KEY=value -- the actual shape of every real
+# .env/.env.example/.env.docker.example line in this repo) was never even
+# considered for placeholder-vs-real classification. Anchored to the whole
+# (stripped) line, with an optional shell-style `export ` prefix, and only
+# tried in scan_file() when neither quoted pattern already matched -- quoted
+# assignments keep going through the exact path they always did. The
+# `[A-Z0-9_]*` prefix before the named `key` group (matching, not captured)
+# mirrors ASSIGN_RE's own unanchored `.finditer()` behavior, which already
+# lets a compound name ending in a sensitive suffix (SMTP_PASSWORD,
+# STRIPE_API_KEY, REFRESH_TOKEN, ...) match today when quoted -- without it,
+# the unquoted path would cover a narrower set of key names than the quoted
+# path already does.
+UNQUOTED_ASSIGN_RE = re.compile(
+    rf"^(?:export\s+)?[A-Z0-9_]*(?P<key>{SENSITIVE_KEY_ALTERNATION})\s*=\s*(?P<value>.*)$",
+    re.I,
+)
+# Splits a trailing ` # comment` off an unquoted value. Requires a preceding
+# whitespace character before `#` so a `#` with no leading space -- e.g. a
+# URL fragment like `https://example.com/path#section` -- is never mistaken
+# for a comment marker and truncated.
+INLINE_COMMENT_RE = re.compile(r"\s#")
 
 
 # BYS360_PHASE1_BLOCKED_REPO_ARTIFACTS
@@ -260,6 +297,74 @@ def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any], limit: int
         warnings.append(item)
 
 
+def strip_inline_comment(value: str) -> str:
+    """See INLINE_COMMENT_RE: cuts a value at the first whitespace-preceded
+    `#`, leaving a bare trailing `#fragment` (no preceding space) intact."""
+    m = INLINE_COMMENT_RE.search(value)
+    if m is None:
+        return value.strip()
+    return value[: m.start()].strip()
+
+
+def classify_assignment_value(
+    *,
+    key: str,
+    value: str,
+    line: str,
+    lineno: int,
+    rel: str,
+    path: Path,
+    findings: list[dict[str, Any]],
+    warnings: list[dict[str, Any]],
+) -> None:
+    """Shared classification for a sensitive KEY's extracted value, used by
+    both the quoted (ASSIGN_RE/DICT_ASSIGN_RE) and unquoted
+    (UNQUOTED_ASSIGN_RE) assignment paths in scan_file() so the two never
+    drift apart (BYS360 Phase 10I)."""
+    if key in DATABASE_URL_KEYS:
+        if is_non_sensitive_database_url(value):
+            add_warning(warnings, {
+                "type": "database_url_reference_or_placeholder",
+                "path": rel,
+                "line": lineno,
+                "detail": f"{key} bir sqlite DSN'i; kullanıcı adı/parola içermez, uyarı olarak izlendi.",
+            })
+            return
+        if "://" in value:
+            # A connection-string-shaped DATABASE_URL/SQLALCHEMY_DATABASE_URI
+            # value is already fully classified by the dedicated DB_URL_RE
+            # scan earlier in scan_file(), which extracts and evaluates the
+            # actual embedded password. Re-evaluating the whole URL string
+            # here would either double-report the same real secret or
+            # false-positive on a safe placeholder URL such as
+            # postgresql://user:password@db:5432/bys360 (BYS360 Phase 10I).
+            return
+    if looks_placeholder(value) or looks_env_reference(line, value) or looks_regex_or_scanner(line, path):
+        add_warning(warnings, {
+            "type": "secret_reference_or_placeholder",
+            "path": rel,
+            "line": lineno,
+            "detail": f"{key} için referans/placeholder değer bulundu.",
+        })
+        return
+    # Local test defaults are warnings, not production secret findings.
+    lower_path = rel.lower()
+    if lower_path.startswith("tests/") and ("localhost" in value.lower() or "127.0.0.1" in value.lower() or "test" in value.lower()):
+        add_warning(warnings, {
+            "type": "test_secret_like_default",
+            "path": rel,
+            "line": lineno,
+            "detail": f"{key} için test/local varsayılan değer bulundu.",
+        })
+        return
+    findings.append({
+        "type": "hardcoded_secret_value",
+        "path": rel,
+        "line": lineno,
+        "detail": f"{key} için kaynak kodda gömülü değer bulundu; değer rapora yazılmadı.",
+    })
+
+
 def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: list[dict[str, Any]]) -> None:
     rel = str(path.relative_to(root)).replace("\\", "/")
     if is_env_file(path) and not is_allowed_env_example(path):
@@ -300,43 +405,51 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
                     "detail": "Veritabanı bağlantısında gömülü parola bulundu; değer rapora yazılmadı.",
                 })
 
-        # Literal assignments/dicts for sensitive keys.
+        # Literal assignments/dicts for sensitive keys (quoted Python/JSON
+        # style: KEY = "value" / "KEY": "value").
+        quoted_match_found = False
         for regex in (ASSIGN_RE, DICT_ASSIGN_RE):
             for m in regex.finditer(line):
-                key = m.group("key").upper()
-                value = m.group("value")
-                if key in DATABASE_URL_KEYS and is_non_sensitive_database_url(value):
-                    add_warning(warnings, {
-                        "type": "database_url_reference_or_placeholder",
-                        "path": rel,
-                        "line": lineno,
-                        "detail": f"{key} bir sqlite DSN'i; kullanıcı adı/parola içermez, uyarı olarak izlendi.",
-                    })
-                    continue
-                if looks_placeholder(value) or looks_env_reference(line, value) or looks_regex_or_scanner(line, path):
-                    add_warning(warnings, {
-                        "type": "secret_reference_or_placeholder",
-                        "path": rel,
-                        "line": lineno,
-                        "detail": f"{key} için referans/placeholder değer bulundu.",
-                    })
-                    continue
-                # Local test defaults are warnings, not production secret findings.
-                lower_path = rel.lower()
-                if lower_path.startswith("tests/") and ("localhost" in value.lower() or "127.0.0.1" in value.lower() or "test" in value.lower()):
-                    add_warning(warnings, {
-                        "type": "test_secret_like_default",
-                        "path": rel,
-                        "line": lineno,
-                        "detail": f"{key} için test/local varsayılan değer bulundu.",
-                    })
-                    continue
-                findings.append({
-                    "type": "hardcoded_secret_value",
-                    "path": rel,
-                    "line": lineno,
-                    "detail": f"{key} için kaynak kodda gömülü değer bulundu; değer rapora yazılmadı.",
-                })
+                quoted_match_found = True
+                classify_assignment_value(
+                    key=m.group("key").upper(),
+                    value=m.group("value"),
+                    line=line,
+                    lineno=lineno,
+                    rel=rel,
+                    path=path,
+                    findings=findings,
+                    warnings=warnings,
+                )
+
+        # Standard unquoted .env-format assignments (KEY=value, optionally
+        # `export`-prefixed) -- scoped to .env/.env.* files only, where a
+        # bare unquoted word is the actual valid (and only) syntax for a
+        # value. Every other text type this scanner reads (.py, .yml,
+        # .json, ...) legitimately contains countless unquoted `key = expr`
+        # constructs -- Python variable assignments, dict keys with
+        # variable values, YAML mappings -- that are not, and structurally
+        # cannot be, a literal secret value the way an unquoted .env line
+        # is; a real embedded secret in source code requires a quoted
+        # string literal, which ASSIGN_RE/DICT_ASSIGN_RE already cover.
+        # Also only attempted when no quoted assignment already matched
+        # this line, so a well-formed quoted .env-style line (unusual but
+        # not invalid) keeps going through the path above (BYS360 Phase 10I).
+        if is_env_file(path) and not quoted_match_found:
+            unquoted_match = UNQUOTED_ASSIGN_RE.match(stripped)
+            if unquoted_match:
+                raw_value = unquoted_match.group("value")
+                if raw_value[:1] not in ("\"", "'"):
+                    classify_assignment_value(
+                        key=unquoted_match.group("key").upper(),
+                        value=strip_inline_comment(raw_value),
+                        line=line,
+                        lineno=lineno,
+                        rel=rel,
+                        path=path,
+                        findings=findings,
+                        warnings=warnings,
+                    )
 
 def scan_blocked_repo_artifacts(candidates: dict[str, Path], findings: list[dict[str, Any]]) -> None:
     """Kaynak agacinda bulunmamasi gereken local/hassas artefaktlari yakalar.
