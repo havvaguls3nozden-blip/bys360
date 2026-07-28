@@ -109,6 +109,12 @@ Karar:
 - Kod dosyasi degisikligi yoktur.
 - pytest guncellemesi sanal ortam guvenlik sertlestirmesi olarak uygulanmistir.
 
+Not (guncel durum, 2026-07-28):
+- Yukaridaki temiz pip-audit sonucu 2026-07-09 tarihli, kurulu ortami `--path` yontemiyle tarayan tarihsel bir olcumdur.
+- Sonraki requirements.txt degisiklikleri (bkz. commit `bfd741d`, 2026-07-15) nedeniyle guncel HEAD icin guvenlik kaniti sayilmaz.
+- Depo icin GitHub Actions dependency-audit workflow'u tanimlidir (`.github/workflows/bys360-ci.yml`), ancak GitHub deposu (`havvaguls3nozden-blip/bys360`) henuz bos oldugundan (0 ref, salt-okunur dogrulandi) bu workflow guncel HEAD icin hic calismamistir.
+- Guncel dependency guvenlik durumu, gercek CI `pip-audit -r requirements.txt` sonucu dogrulanana kadar bilinmiyor olarak degerlendirilmelidir.
+
 ## 2026-07-09 - Faz 2D Pytest / Coverage / Skip Verification
 
 Kapsam:
@@ -244,6 +250,7 @@ Sonuc:
 - Faz 2A PASS: SQL identifier trace tamamlandi.
 - Faz 2B PASS: Login rate limit trace tamamlandi.
 - Faz 2C PASS: Dependency audit tamamlandi, pip-audit sonucu temiz.
+- Not (guncel durum, 2026-07-28): Yukaridaki Faz 2C sonucu 2026-07-09 tarihli --path tabanli ortam taramasidir; 2026-07-15 tarihli commit `bfd741d` (requirements.txt degisikligi) sonrasi guncel HEAD icin gecerli sayilamaz. GitHub deposu (`havvaguls3nozden-blip/bys360`) henuz bos oldugundan gercek CI pip-audit sonucu mevcut degildir; guncel durum dogrulanana kadar bilinmiyor kabul edilmelidir.
 - Faz 2D kismi PASS: Aktif pytest calisiyor fakat coverage 18% ile 80 hedefinin altinda.
 - Faz 2E kismi PASS: OpenAPI taslagi mevcut fakat mobil API endpointleri OpenAPI kapsaminda degil.
 - Faz 2F kismi PASS: Repo hijyeni ve secret dokumanlari mevcut; gercek secret rotation ayrica yetki/onay gerektirir.
