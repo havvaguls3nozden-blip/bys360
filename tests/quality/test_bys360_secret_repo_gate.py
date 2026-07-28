@@ -296,7 +296,7 @@ def test_candidate_classification_counts_are_reported(tmp_path: Path) -> None:
 # repo) was never scanned at all. These tests lock in the fix without
 # weakening any of the quoted-assignment behavior exercised above.
 
-_UNQUOTED_ENV_SYNTHETIC_SECRET = "sk_live_abcdef1234567890xyz"
+_UNQUOTED_ENV_SYNTHETIC_SECRET = "sk_live_abcdef1234567890xyz"  # hardcoded_secret fixture
 
 
 def test_unquoted_env_secret_triggers_red(tmp_path: Path) -> None:
@@ -591,3 +591,419 @@ def test_real_env_file_still_not_tracked() -> None:
         ["git", "ls-files"], cwd=str(root), text=True, capture_output=True, check=True
     ).stdout.splitlines()
     assert ".env" not in tracked
+
+
+# --- BYS360 Phase 10J: bare SECRET suffix coverage expansion ---
+# config.py reads FLASK_SECRET (a real runtime env var, used as the Flask
+# secret-key fallback, loaded at app-factory startup) whose name ends in
+# bare SECRET, not SECRET_KEY -- this was confirmed by evidence (not
+# speculation) to be invisible to every prior scan path. These tests lock
+# in the fix and, more importantly, lock in that PUBLIC_KEY/*_PATH/*_NAME/
+# *_ID-shaped metadata fields are never caught purely by containing the
+# word SECRET or KEY -- these metadata guards are independent of exactly
+# which sensitive suffix triggered them and must hold regardless of future
+# key-list changes.
+
+_BARE_SECRET_SYNTHETIC = "sk_live_abcdef1234567890xyz"  # hardcoded_secret fixture
+
+
+def test_flask_secret_quoted_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    quoted_content = f'FLASK_SECRET = "{_BARE_SECRET_SYNTHETIC}"\n'  # hardcoded_secret fixture
+    (repo / "settings_local.py").write_text(quoted_content, encoding="utf-8")
+    _git(["add", "-f", "settings_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_flask_secret_unquoted_env_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == ".env.docker.example"
+        for f in result["findings"]
+    )
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_flask_secret_export_prefixed_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"export FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_flask_secret_single_quoted_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    env_content = f"FLASK_SECRET='{_BARE_SECRET_SYNTHETIC}'\n"  # hardcoded_secret fixture
+    (repo / ".env.docker.example").write_text(env_content, encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_bare_secret_dict_style_triggers_red(tmp_path: Path) -> None:
+    """DICT_ASSIGN_RE requires the quoted JSON key to exactly equal one of
+    the sensitive alternatives (no compound-name prefix tolerance, unlike
+    ASSIGN_RE/UNQUOTED_ASSIGN_RE) -- a pre-existing, key-name-independent
+    limitation (also true for e.g. "PASSWORD" today) that this phase does
+    not change. This test exercises the new bare SECRET entry through the
+    exact-match case DICT_ASSIGN_RE actually supports; compound dict keys
+    like "FLASK_SECRET" are a separate, out-of-scope gap (see Phase 10J
+    coordinator report)."""
+    repo = _init_repo(tmp_path)
+    dict_content = f'{{"SECRET": "{_BARE_SECRET_SYNTHETIC}"}}\n'  # hardcoded_secret fixture
+    (repo / "config_dump.json").write_text(dict_content, encoding="utf-8")
+    _git(["add", "-f", "config_dump.json"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_bare_secret_suffix_compound_name_triggers_red(tmp_path: Path) -> None:
+    """Proves the new bare SECRET entry inherits the existing unanchored
+    suffix-matching behavior (like SMTP_PASSWORD already does for PASSWORD)
+    rather than only matching the exact word SECRET."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"BYS360_SESSION_SECRET={_BARE_SECRET_SYNTHETIC}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+
+
+def test_flask_secret_lowercase_key_name_triggers_red(tmp_path: Path) -> None:
+    """Case-insensitive matching (re.I) is pre-existing policy, not a new
+    decision made in this phase; this locks in that it still applies to the
+    newly-added bare SECRET suffix."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"flask_secret={_BARE_SECRET_SYNTHETIC}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+
+
+def test_flask_secret_safe_placeholder_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "FLASK_SECRET=replace-with-a-strong-random-value\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_flask_secret_empty_value_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text("FLASK_SECRET=\n", encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_flask_secret_commented_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"# FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_flask_secret_env_reference_is_warning_not_finding(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    py_content = 'FLASK_SECRET = os.environ.get("FLASK_SECRET")\n'
+    (repo / "settings_local.py").write_text(py_content, encoding="utf-8")
+    _git(["add", "-f", "settings_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+# --- Metadata/public-field guards (key-list-independent, durable) ---
+
+
+def test_public_key_never_flagged_by_key_name_alone(tmp_path: Path) -> None:
+    """PUBLIC_KEY must never produce a hardcoded_secret_value finding purely
+    from its name -- neither SECRET_KEY, PASSWORD, TOKEN, API_KEY, nor the
+    new bare SECRET entry end with the bare word KEY, so PUBLIC_KEY (which
+    ends in KEY, not any of those full suffixes) does not match. This test
+    is a durable regression lock against ever adding a bare KEY entry."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "PUBLIC_KEY=ssh-ed25519-example-public-material-not-secret\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_private_key_path_is_not_treated_as_key_material(tmp_path: Path) -> None:
+    """PRIVATE_KEY_PATH is a filesystem path reference, not the key content
+    itself. PRIVATE_KEY is not a sensitive suffix in this repo (no evidenced
+    runtime usage -- see Phase 10J coordinator report), so this is safe
+    today; the test still locks in that a _PATH suffix breaks the required
+    immediate assignment-operator adjacency, in case PRIVATE_KEY is ever
+    added later."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "PRIVATE_KEY_PATH=/run/secrets/private-key.pem\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_key_id_metadata_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "KEY_ID=example-key-id\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_client_secret_name_metadata_is_pass(tmp_path: Path) -> None:
+    """CLIENT_SECRET_NAME is a name/label, not a secret value. The _NAME
+    suffix sits after SECRET and before '=', breaking the same adjacency
+    that protects every other metadata-suffixed field."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "CLIENT_SECRET_NAME=oauth-client-secret\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_secret_rotation_id_metadata_is_pass(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "SECRET_ROTATION_ID=abc123\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_secret_immediately_followed_by_more_identifier_chars_is_pass(tmp_path: Path) -> None:
+    """Boundary-collision guard: a sensitive suffix immediately followed by
+    MORE identifier characters with no separator (SECRETKEYSTORE, not
+    SECRET_KEYSTORE) must not match either -- the assignment operator still
+    has to appear immediately after the matched suffix."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        "SECRETKEYSTORE_ENABLED=true\n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_multiple_new_and_metadata_keys_in_one_file_count_correctly(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\n"
+        "PUBLIC_KEY=not-a-secret\n"
+        "PRIVATE_KEY_PATH=/run/secrets/private-key.pem\n"
+        "KEY_ID=example-key-id\n"
+        "CLIENT_SECRET_NAME=oauth-client-secret\n",
+        encoding="utf-8",
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert result["finding_count"] == 1
+    assert result["findings"][0]["line"] == 1
+
+
+def test_flask_secret_crlf_matches_lf_result(tmp_path: Path) -> None:
+    lf_dir = tmp_path / "lf"
+    lf_dir.mkdir()
+    lf_repo = _init_repo(lf_dir)
+    (lf_repo / ".env.docker.example").write_bytes(
+        f"FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\n".encode()
+    )
+    _git(["add", "-f", ".env.docker.example"], lf_repo)
+    _commit(lf_repo)
+    lf_result = run(lf_repo)
+
+    crlf_dir = tmp_path / "crlf"
+    crlf_dir.mkdir()
+    crlf_repo = _init_repo(crlf_dir)
+    (crlf_repo / ".env.docker.example").write_bytes(
+        f"FLASK_SECRET={_BARE_SECRET_SYNTHETIC}\r\n".encode()
+    )
+    _git(["add", "-f", ".env.docker.example"], crlf_repo)
+    _commit(crlf_repo)
+    crlf_result = run(crlf_repo)
+
+    assert lf_result["ok"] == crlf_result["ok"] is False
+    assert lf_result["finding_count"] == crlf_result["finding_count"] == 1
+
+
+def test_flask_secret_whitespace_around_key_and_value_is_handled(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"  FLASK_SECRET   =   {_BARE_SECRET_SYNTHETIC}  \n", encoding="utf-8"
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+
+
+def test_flask_secret_trailing_comment_is_stripped(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / ".env.docker.example").write_text(
+        f"FLASK_SECRET={_BARE_SECRET_SYNTHETIC} # rotate before shipping\n",
+        encoding="utf-8",
+    )
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(f["type"] == "hardcoded_secret_value" for f in result["findings"])
+    assert _BARE_SECRET_SYNTHETIC not in json.dumps(result)
+
+
+def test_bare_secret_unquoted_scanning_is_scoped_to_env_files(tmp_path: Path) -> None:
+    """A Python variable ending in _SECRET assigned to an unquoted
+    expression (not a string literal) is ordinary code, not a leaked
+    credential -- the unquoted-assignment path must stay scoped to
+    .env/.env.* files, exactly as it already was before this phase."""
+    repo = _init_repo(tmp_path)
+    (repo / "config_local.py").write_text(
+        "session_secret = derive_session_secret_from_master_key()\n", encoding="utf-8"
+    )
+    _git(["add", "-f", "config_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_env_docker_example_still_green_after_secret_expansion(tmp_path: Path) -> None:
+    """Re-verifies the real tracked .env.docker.example (which has no
+    FLASK_SECRET or other *_SECRET line) stays clean after the bare SECRET
+    suffix is added -- catches any future accidental *_SECRET addition to
+    that file without a safe placeholder."""
+    repo = _init_repo(tmp_path)
+    real_content = (Path(__file__).resolve().parents[2] / ".env.docker.example").read_text(
+        encoding="utf-8"
+    )
+    (repo / ".env.docker.example").write_text(real_content, encoding="utf-8")
+    _git(["add", "-f", ".env.docker.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_env_example_still_green_after_secret_expansion(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    real_content = (Path(__file__).resolve().parents[2] / ".env.example").read_text(
+        encoding="utf-8"
+    )
+    (repo / ".env.example").write_text(real_content, encoding="utf-8")
+    _git(["add", "-f", ".env.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0

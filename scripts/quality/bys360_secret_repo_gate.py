@@ -19,6 +19,12 @@ SECRET_KEYS = (
     "SECRET_KEY", "DATABASE_URL", "SQLALCHEMY_DATABASE_URI", "POSTGRES_PASSWORD",
     "DB_PASSWORD", "PASSWORD", "TCKN_ENCRYPTION_KEY", "SENTRY_DSN", "AI_API_KEY",
     "API_KEY", "ACCESS_TOKEN", "INSTAGRAM_ACCESS_TOKEN", "TOKEN",
+    # BYS360 Phase 10J: config.py reads FLASK_SECRET (a real runtime env var,
+    # used as the Flask secret-key fallback, loaded at app-factory startup)
+    # whose name ends in bare SECRET, not SECRET_KEY -- previously invisible
+    # to this list. Kept here for documentation only; SENSITIVE_KEY_ALTERNATION
+    # below is what actually drives detection.
+    "SECRET",
 )
 
 # BYS360 Phase 5 secret-gate scope correction (2026-07-26): the leading ""
@@ -71,7 +77,17 @@ DATABASE_URL_KEYS = frozenset({"DATABASE_URL", "SQLALCHEMY_DATABASE_URI"})
 SENSITIVE_KEY_ALTERNATION = (
     r"SECRET_KEY|DATABASE_URL|SQLALCHEMY_DATABASE_URI|POSTGRES_PASSWORD|DB_PASSWORD|"
     r"PASSWORD|TCKN_ENCRYPTION_KEY|SENTRY_DSN|AI_API_KEY|API_KEY|ACCESS_TOKEN|"
-    r"INSTAGRAM_ACCESS_TOKEN|TOKEN"
+    r"INSTAGRAM_ACCESS_TOKEN|TOKEN|"
+    # BYS360 Phase 10J: bare SECRET, added specifically because config.py's
+    # FLASK_SECRET (real runtime env var, Flask secret-key fallback read at
+    # app-factory startup) ends in SECRET, not SECRET_KEY, and was invisible
+    # to every scan path. A bare word here is precedented by PASSWORD/TOKEN
+    # above; the required immediate `\s*[:=]\s*`/`\s*=\s*` adjacency in
+    # ASSIGN_RE/DICT_ASSIGN_RE/UNQUOTED_ASSIGN_RE means a metadata suffix
+    # like _NAME/_PATH/_ID sitting between the matched word and the
+    # assignment operator still breaks the match -- e.g. CLIENT_SECRET_NAME
+    # or SECRET_ROTATION_ID are not affected by this addition.
+    r"SECRET"
 )
 ASSIGN_RE = re.compile(
     rf"(?P<key>{SENSITIVE_KEY_ALTERNATION})\s*[:=]\s*(?P<quote>[\"'])(?P<value>.*?)(?P=quote)",
