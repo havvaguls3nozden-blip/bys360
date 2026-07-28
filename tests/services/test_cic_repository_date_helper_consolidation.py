@@ -31,6 +31,25 @@ def _top_level_definitions(path: Path) -> set[str]:
     }
 
 
+def _scoped_get_logger(target_module, fake_logger):
+    """``logging.getLogger`` replacement that hands back ``fake_logger``
+    only for ``target_module``'s own name, delegating every other call --
+    including pytest's own internal logging-plugin calls made while this
+    monkeypatch is active -- to the real ``logging.getLogger``. Replacing
+    the whole factory unconditionally (``Mock(return_value=...)``) let a
+    prior version of this test hand the fake logger to unrelated callers
+    too, which could corrupt pytest's own global logging manager state for
+    the remainder of the session (BYS360 Phase 10G)."""
+    real_get_logger = logging.getLogger
+
+    def _get_logger(name=None):
+        if name == target_module.__name__:
+            return fake_logger
+        return real_get_logger(name)
+
+    return _get_logger
+
+
 def test_date_and_weekday_helpers_have_canonical_owners() -> None:
     for name in DATE_HELPERS:
         expected = getattr(celebration_dates, name)
@@ -69,7 +88,7 @@ def test_parse_date_invalid_value_uses_canonical_logging_contract(
     monkeypatch,
 ) -> None:
     logger = Mock()
-    monkeypatch.setattr(logging, "getLogger", Mock(return_value=logger))
+    monkeypatch.setattr(logging, "getLogger", _scoped_get_logger(celebration_dates, logger))
 
     assert celebration_dates._cic_v40_parse_date("not-a-date") is None
     assert logger.exception.call_count == 4
@@ -85,7 +104,7 @@ def test_today_preserves_passthrough_and_fallback_contracts(
     ) == expected
 
     logger = Mock()
-    monkeypatch.setattr(logging, "getLogger", Mock(return_value=logger))
+    monkeypatch.setattr(logging, "getLogger", _scoped_get_logger(celebration_dates, logger))
 
     def raise_now() -> datetime:
         raise RuntimeError("clock unavailable")
@@ -111,7 +130,7 @@ def test_mmdd_and_days_until_preserve_current_calendar_contracts(
     ) == 1
 
     logger = Mock()
-    monkeypatch.setattr(logging, "getLogger", Mock(return_value=logger))
+    monkeypatch.setattr(logging, "getLogger", _scoped_get_logger(celebration_dates, logger))
     assert celebration_dates._cic_v40_days_until(
         "02-29",
         date(2025, 1, 1),
@@ -139,7 +158,7 @@ def test_weekday_name_preserves_turkish_names_and_invalid_fallback(
         assert cic_context._cic_weekday_name_tr(current) == expected
 
     logger = Mock()
-    monkeypatch.setattr(logging, "getLogger", Mock(return_value=logger))
+    monkeypatch.setattr(logging, "getLogger", _scoped_get_logger(cic_context, logger))
     # _cic_weekday_name_tr's try/except tolerates any input lacking
     # .weekday() (verified in app/services/cic/cic_context.py), returning
     # "Bilinmiyor" -- this deliberately exercises that fallback path.
@@ -154,3 +173,24 @@ def test_query_service_uses_canonical_date_owner() -> None:
         not in query_source
     )
     assert "from app.services.cic.celebration_dates import (" in query_source
+
+
+def test_logging_getlogger_patches_above_do_not_leak_into_global_manager_state() -> None:
+    """Regression guard (BYS360 Phase 10G): the tests above monkeypatch
+    ``logging.getLogger`` while exercising a fake logger. Earlier this
+    module replaced the whole factory unconditionally, which could hand
+    the fake logger to unrelated callers (including pytest's own logging
+    plugin) during those tests' execution window and corrupt
+    ``logging.root.manager.loggerDict`` for the rest of the pytest
+    session -- surfacing far downstream as pytest's own sessionfinish
+    hook crashing with "TypeError: 'Mock' object is not iterable". This
+    must hold regardless of test execution order, so it does not assume
+    it runs immediately after any specific test above."""
+    manager = logging.getLogger().manager
+    assert hasattr(manager.loggerDict, "values")
+    # The real regression signature was exactly this call raising
+    # TypeError because loggerDict had become a non-iterable Mock.
+    list(manager.loggerDict.values())
+
+    probe = logging.getLogger("bys360.phase10g.regression_probe")
+    probe.info("regression probe log line")
