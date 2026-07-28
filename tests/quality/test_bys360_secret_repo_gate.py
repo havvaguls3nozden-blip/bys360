@@ -48,6 +48,7 @@ def test_env_templates_are_allowed_but_runtime_env_files_are_blocked(
 ) -> None:
     allowed = [
         ".env.example",
+        ".env.docker.example",
         ".env.production.example",
         ".env.sample",
         ".env.template",
