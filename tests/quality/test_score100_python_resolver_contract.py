@@ -70,6 +70,11 @@ def _run_resolver(
     timeout: int = 60,
 ) -> subprocess.CompletedProcess[str]:
     ps_command = (
+        # BYS360 Phase 10F: PowerShell 5.1's stdout byte encoding for a piped
+        # invocation is ambient/unstable (observed as both ibm857 and UTF-8
+        # across sessions on this machine); pin it to BOM-less UTF-8 so the
+        # Python side's explicit encoding="utf-8" below always matches.
+        "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
         f". '{WRAPPER}'; "
         f"$r = Resolve-BysPython -Root '{root}' -ExplicitPythonPath '{explicit_python}' "
         f"-CanonicalSiblingPythonPath '{canonical_sibling}' -RequiredMajorMinor '{required_major_minor}'; "
@@ -90,7 +95,7 @@ def _run_resolver(
     proc = subprocess.run(
         [_powershell_exe(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_command],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         env=env,
         timeout=timeout,
     )
@@ -227,6 +232,45 @@ def test_path_only_validated_python_is_selected(tmp_path: Path) -> None:
     assert f"RESOLVED_PATH={linked}" in proc.stdout
 
 
+# --- Test E2: same as Test E, but the path deliberately contains non-ASCII
+# characters chosen independently of the real OS account name. Test E's
+# tmp_path happens to expose a PowerShell/subprocess text-encoding mismatch
+# only on machines whose Windows username contains non-ASCII characters
+# (see the explicit UTF-8 handling in _run_resolver); this test makes that
+# same guarantee -- the resolver reports the exact resolved path byte-for-
+# character correctly -- deterministic on any machine or CI runner. ---
+
+
+def test_path_only_resolved_path_preserves_non_ascii_characters(tmp_path: Path) -> None:
+    base_python = _standalone_base_python()
+    if base_python is None:
+        pytest.skip("could not locate a standalone base CPython to hardlink for PATH test")
+
+    isolated_dir = tmp_path / "pythön_çözümleyici_ıığşü_test"
+    isolated_dir.mkdir()
+    linked = isolated_dir / "python.exe"
+    try:
+        os.link(base_python, linked)
+    except OSError:
+        pytest.skip("hardlink not supported for this base python on this filesystem")
+
+    empty_root = tmp_path / "no_venv_project"
+    empty_root.mkdir()
+
+    isolated_path = f"{isolated_dir};{_windows_system_path_entry()}"
+    proc = _run_resolver(
+        root=empty_root,
+        explicit_python="",
+        canonical_sibling=r"C:\nonexistent_bys360_sibling\python.exe",
+        clear_env=("BYS360_CANONICAL_PYTHON",),
+        path_override=isolated_path,
+    )
+
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert "RESOLVED_SOURCE=validated-path" in proc.stdout
+    assert f"RESOLVED_PATH={linked}" in proc.stdout
+
+
 # --- Negative: nothing usable anywhere -> explicit fail-closed, no global fallback ---
 
 
@@ -252,6 +296,7 @@ def test_no_usable_candidate_fails_closed_with_no_silent_fallback(tmp_path: Path
 
 def test_wrapper_script_is_valid_powershell_syntax() -> None:
     ps_command = (
+        "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
         "$errors = $null; $tokens = $null; "
         f"[System.Management.Automation.Language.Parser]::ParseFile('{WRAPPER}', [ref]$tokens, [ref]$errors) | Out-Null; "
         "if ($errors.Count -gt 0) { $errors | ForEach-Object { Write-Output $_.Message }; exit 1 } else { exit 0 }"
@@ -259,7 +304,7 @@ def test_wrapper_script_is_valid_powershell_syntax() -> None:
     proc = subprocess.run(
         [_powershell_exe(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_command],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         timeout=30,
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
@@ -268,10 +313,14 @@ def test_wrapper_script_is_valid_powershell_syntax() -> None:
 def test_dot_sourcing_wrapper_does_not_execute_main_gate_body(tmp_path: Path) -> None:
     """Dot-sourcing must only define functions; it must not attempt to
     resolve a project root, invoke Python, or print the gate banner."""
+    ps_command = (
+        "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
+        f". '{WRAPPER}'; Write-Output 'DOT_SOURCE_OK'"
+    )
     proc = subprocess.run(
-        [_powershell_exe(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", f". '{WRAPPER}'; Write-Output 'DOT_SOURCE_OK'"],
+        [_powershell_exe(), "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_command],
         capture_output=True,
-        text=True,
+        encoding="utf-8",
         timeout=30,
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
