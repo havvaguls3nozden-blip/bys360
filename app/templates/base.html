@@ -268,12 +268,11 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#8B0000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BYS360">
 <link rel="apple-touch-icon" href="/static/pwa/icons/apple-touch-icon.png">
 
 <!-- BYS360_IOS_PWA_V2_HEAD_BEGIN -->
-<link rel="manifest" href="/manifest.webmanifest?v=ios-pwa-v2">
 <meta name="application-name" content="BYS360">
 <meta name="theme-color" content="#8B0000">
 <meta name="color-scheme" content="light">
@@ -304,7 +303,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='pwa/ios_pwa_performance_mobile_v3_1.css') }}">
 <!-- /BYS360_iOS_PWA_V3_1_PERFORMANCE_MOBILE_CSS -->
 <!-- BYS360_IOS_PWA_V3_5_STABLE_HEAD_START -->
-<link rel="manifest" href="{{ url_for('static', filename='pwa/manifest-ios-premium.webmanifest') }}">
 <meta name="theme-color" content="#8B0000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -373,6 +371,9 @@ html, body { min-height: 100% !important; }
 
 <!-- BYS360_ASSISTANT_NO_CHAT_INTRO_OPEN_FIX_V34_CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_assistant_no_chat_intro_open_fix_v34.css') }}?v=34">
+
+<!-- BYS360_RESPONSIVE_FOUNDATION_V11A_CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_responsive_foundation_v11a.css') }}?v=11a">
 </head>
 <body class="{% block body_class %}{% endblock %}" data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}">
 <div id="pageLoader" class="page-loader">
@@ -855,8 +856,8 @@ function submitLogoutForm(event){
         setCollapsed(collapsed,false);
     }
     toggle.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(mq.matches){setMobile(!sidebar.classList.contains('mobile-open'));}else{setCollapsed(!document.body.classList.contains('sidebar-collapsed'));}});
-    if(overlay) overlay.addEventListener('click',function(){setMobile(false);});
-    document.addEventListener('keydown',function(e){if(e.key==='Escape') setMobile(false);});
+    if(overlay) overlay.addEventListener('click',function(){setMobile(false);toggle.focus();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape' && sidebar.classList.contains('mobile-open')){setMobile(false);toggle.focus();}});
     sidebar.addEventListener('click',function(e){if(mq.matches && e.target.closest('a.nav-link-bys')) setMobile(false);});
     if(typeof mq.addEventListener==='function') mq.addEventListener('change',sync); else if(typeof mq.addListener==='function') mq.addListener(sync);
     sync();
