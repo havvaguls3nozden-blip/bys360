@@ -77,6 +77,15 @@
   @media (max-width:1200px){.manager-grid{grid-template-columns:1fr}.trend-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
   @media (max-width:768px){.trend-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:768px){.metric-grid{grid-template-columns:1fr}.survey-select,.survey-select .field{width:100%}.cw-btn{width:100%;justify-content:center}}
+  .share-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.44);z-index:1600}
+  .share-modal[hidden]{display:none}
+  .share-dialog{width:min(560px,100%);max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px);overflow-y:auto;background:#fff;border-radius:24px;border:1px solid #eaecf3;box-shadow:0 24px 64px rgba(15,23,42,.18);padding:24px;display:grid;gap:16px}
+  .share-dialog-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .share-dialog-title{margin:0;font-size:1.02rem;font-weight:900;color:#101828}
+  .share-dialog-sub{margin:6px 0 0;color:#667085;font-size:.88rem;line-height:1.7}
+  .share-link-row{display:flex;gap:10px;align-items:center;padding:12px 14px;border:1px solid #d0d5dd;border-radius:16px;background:#f8fafc}
+  .share-link-row input{flex:1;border:none;background:transparent;color:#101828;font-size:.86rem;outline:none;padding:0}
+  .share-actions-row{display:flex;gap:10px;flex-wrap:wrap}
 </style>
 
 {% set survey_status = (selected_survey.status if selected_survey else '')|default('', true) %}

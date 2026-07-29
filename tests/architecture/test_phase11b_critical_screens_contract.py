@@ -124,7 +124,9 @@ def test_active_error_handler_passes_title_and_message_to_templates():
 
 def test_settings_role_matrix_tables_opt_out_of_auto_card_conversion():
     settings = text("app/templates/settings.html")
-    assert settings.count('data-no-mobile-card="1"') == 5
+    # Phase 11C added a 6th opt-out (Sanal Asistan Rol Matrisi, a V10-era table
+    # that fell outside Phase 11B's scope) alongside the original 5.
+    assert settings.count('data-no-mobile-card="1"') == 6
     assert 'class="role-default-table" data-no-mobile-card="1"' in settings
     assert 'class="matrix-table" data-no-mobile-card="1"' in settings
 

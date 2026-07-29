@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Giriş - BYS360</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,6 +131,17 @@
         @keyframes barFlow{
             0%{transform:translateX(-110%);}
             100%{transform:translateX(290%);}
+        }
+
+        @media (prefers-reduced-motion: reduce){
+            .page-loader-ring,
+            .page-loader-logo{
+                animation:none !important;
+            }
+            .page-loader-bar::before{
+                animation:none !important;
+                transform:translateX(0);
+            }
         }
 
         .login-shell{
@@ -298,6 +309,7 @@
             background:#fff;
             padding:12px 14px 12px 42px;
             font:inherit;
+            font-size:16px;
             color:#111827;
             outline:none;
             transition:all .18s ease;
@@ -310,6 +322,13 @@
         .form-input:focus{
             border-color:rgba(139,0,0,.30);
             box-shadow:0 0 0 4px rgba(139,0,0,.06);
+        }
+
+        .form-input:focus-visible,
+        .btn-login:focus-visible,
+        .password-toggle:focus-visible{
+            outline:2px solid var(--bys-red);
+            outline-offset:2px;
         }
 
         .password-toggle{
