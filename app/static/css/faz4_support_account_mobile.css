@@ -4,6 +4,8 @@
 .faz4-mobile-table-cards{display:none;gap:12px;margin-top:16px}
 .faz4-mobile-record-card{background:rgba(255,255,255,.96);border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.06)}
 .faz4-mobile-record-card__head{display:grid;gap:6px;padding-bottom:10px;border-bottom:1px solid rgba(15,23,42,.08);margin-bottom:10px}
+.faz4-mobile-record-card__select{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 2px;font-size:.85rem;font-weight:800;color:#374151;cursor:pointer}
+.faz4-mobile-record-card__select input[type="checkbox"]{width:20px;height:20px;flex-shrink:0;accent-color:#8B0000}
 .faz4-mobile-record-card__title{font-size:.98rem;font-weight:900;color:#111827;line-height:1.55}
 .faz4-mobile-record-card__meta{font-size:.8rem;color:#6b7280;line-height:1.6}
 .faz4-mobile-record-card__body{display:grid;gap:10px}

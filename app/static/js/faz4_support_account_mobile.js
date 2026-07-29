@@ -35,9 +35,28 @@
 
       let titleHtml = cells[0].innerHTML;
       let titleText = cleanText(cells[0].textContent);
+      let selectSource = null;
       if(cells[1] && titleText.length < 3){
+        selectSource = cells[0].querySelector('input[type="checkbox"]');
         titleHtml = cells[1].innerHTML;
         titleText = cleanText(cells[1].textContent);
+      }
+      if(selectSource){
+        const selectLabel = document.createElement('label');
+        selectLabel.className = 'faz4-mobile-record-card__select';
+        const mirror = document.createElement('input');
+        mirror.type = 'checkbox';
+        mirror.checked = selectSource.checked;
+        mirror.setAttribute('aria-label', selectSource.getAttribute('aria-label') || 'Kaydı seç');
+        mirror.addEventListener('change', function(){
+          selectSource.checked = mirror.checked;
+          selectSource.dispatchEvent(new Event('change', {bubbles:true}));
+        });
+        selectLabel.appendChild(mirror);
+        const selectText = document.createElement('span');
+        selectText.textContent = 'Seç';
+        selectLabel.appendChild(selectText);
+        head.appendChild(selectLabel);
       }
       const title = document.createElement('div');
       title.className = 'faz4-mobile-record-card__title';

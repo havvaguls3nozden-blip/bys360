@@ -283,7 +283,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
                         <input type="hidden" name="form_action" value="{{ matrix.save_action }}">
-                        <table class="role-default-table">
+                        <table class="role-default-table" data-no-mobile-card="1">
                             <thead>
                                 <tr>
                                     <th>Sekme</th>
@@ -355,7 +355,7 @@
         {% if selected_user %}<input type="hidden" name="keep_user_id" value="{{ selected_user.id }}">{% endif %}
         <input type="hidden" name="form_action" value="save_assistant_role_matrix">
 
-        <table class="role-default-table">
+        <table class="role-default-table" data-no-mobile-card="1">
             <thead>
                 <tr>
                     <th>Asistan Alanı</th>
@@ -430,7 +430,7 @@
                             <button type="submit" class="btn-soft secondary"><i class="fa-solid fa-rotate"></i> Varsayılanları Senkronize Et</button>
                         </form>
                     </div>
-                    <table class="role-default-table">
+                    <table class="role-default-table" data-no-mobile-card="1">
                         <thead>
                             <tr>
                                 <th>Rol</th>
@@ -463,7 +463,7 @@
                     <div class="section-title">Birim Profili Anlık Durumu</div>
                     <div class="section-text" style="margin-bottom:12px;">Rol varsayılanına ek olarak birim bazlı menü profilleri kalıcı olarak saklanır ve kişi bazlı yetki katmanından önce uygulanır.</div>
                     {% if foundation_context.unit_profiles_snapshot %}
-                    <table class="role-default-table">
+                    <table class="role-default-table" data-no-mobile-card="1">
                         <thead>
                             <tr>
                                 <th>Birim</th>
@@ -948,7 +948,7 @@
                 <div class="matrix-box">
                     <div class="section-title" style="margin-bottom:4px;">Rol / Birim Yetki Özeti</div>
                     <p class="section-text" style="margin-bottom:0;">Aşağıdaki tablo seçili kişinin rol varsayılanını, mevcut açık sekmelerini ve grup bazında ne kadar özelleştirme yapıldığını birlikte gösterir.</p>
-                    <table class="matrix-table">
+                    <table class="matrix-table" data-no-mobile-card="1">
                         <thead>
                             <tr>
                                 <th>Menü Grubu</th>
