@@ -103,38 +103,50 @@ KNOWN_CONFLICTS: dict[str, _KnownConflict] = {
         "endpoints": ["main.sp1_kpi_dashboard_tr", "strategic_performance.kpi_dashboard"],
         "winners": {"GET": "main.sp1_kpi_dashboard_tr"},
         "note": (
-            "Repo-geneli envanterde (Agent 1) bulundu, Başkan Onayları kapsamı dışında. "
-            "main blueprint CORE_BLUEPRINT_SEQUENCE'ta strategic_performance'tan önce "
-            "register edilir (app/bootstrap/route_bootstrap.py:31). Shadowed handler "
-            "farklı bir servis pipeline'ı (sp3a) kullanıyor -> Phase 12B adayı, bu fazda "
-            "değiştirilmedi."
+            "Phase 12B: DISTINCT_BUSINESS_FLOW. main winner sabit performance_targets/SP1C "
+            "pipeline'ını, shadowed handler dinamik tablo/kolon, aktiflik, ağırlıklı başarı "
+            "ve risk grupları içeren SP3A pipeline'ını kullanır. Aynı template'e farklı veri "
+            "sözleşmeleri verirler; ürün sahipliği kararı olmadan silinemez veya birleştirilemez."
         ),
     },
     "/performans/stratejik/hedefler": {
         "methods": ["GET"],
         "endpoints": ["main.sp1_kpi_targets_tr", "strategic_performance.target_list"],
         "winners": {"GET": "main.sp1_kpi_targets_tr"},
-        "note": "Aynı kök neden (main vs strategic_performance registration order). Phase 12B adayı.",
+        "note": (
+            "Phase 12B: ROUTE_OWNERSHIP_AMBIGUOUS. İki handler aynı liste servisini kullanır "
+            "ancak main safe_render, strategic doğrudan render uygular; template create/edit "
+            "bağlantıları strategic endpoint'lerine giderken liste request'ini main kazanır."
+        ),
     },
     "/performans/stratejik/yetkinlik-kutuphanesi": {
         "methods": ["GET"],
         "endpoints": ["main.sp1_competency_library_tr", "strategic_performance.competency_library"],
         "winners": {"GET": "main.sp1_competency_library_tr"},
-        "note": "Aynı kök neden. Phase 12B adayı.",
+        "note": (
+            "Phase 12B: SHADOWED_BUT_NOT_SAFE_TO_REMOVE. Ortak guard/template'e rağmen "
+            "safe_render ve doğrudan render hata davranışları farklıdır; menü ayrıca shadowed "
+            "strategic endpoint adını referans eder."
+        ),
     },
     "/performans/stratejik/oz-degerlendirme": {
         "methods": ["GET", "POST"],
         "endpoints": ["main.sp1_self_review_tr", "strategic_performance.self_review"],
         "winners": {"GET": "main.sp1_self_review_tr", "POST": "main.sp1_self_review_tr"},
-        "note": "Aynı kök neden. Phase 12B adayı.",
+        "note": (
+            "Phase 12B: SHADOWED_BUT_NOT_SAFE_TO_REMOVE. POST gövdeleri kayıt yapmasa da "
+            "main İngilizce /performance/self-review alias'ına, strategic Türkçe endpoint'e "
+            "redirect eder; render hata davranışları da farklıdır."
+        ),
     },
     "/performans/stratejik/ai-kpi-analiz": {
         "methods": ["GET"],
         "endpoints": ["main.sp1_ai_kpi_analysis_tr", "strategic_performance.ai_kpi_analysis"],
         "winners": {"GET": "main.sp1_ai_kpi_analysis_tr"},
         "note": (
-            "Kısmi shadow: strategic_performance.ai_kpi_analysis kendi '/performans/stratejik/"
-            "kpi-analiz' URL'i üzerinden hâlâ erişilebilir. Phase 12B adayı."
+            "Phase 12B: LEGACY_ALIAS. /ai-kpi-analiz kaydını main kazanır; aynı strategic "
+            "handler /performans/stratejik/kpi-analiz üzerinden canlıdır. AI/deep-link "
+            "kaynakları iki URL'yi de kullandığı için alias ürün kararı olmadan kaldırılamaz."
         ),
     },
     "/manifest.webmanifest": {
@@ -142,8 +154,10 @@ KNOWN_CONFLICTS: dict[str, _KnownConflict] = {
         "endpoints": ["main.bys360_pwa_manifest", "pwa.manifest_webmanifest"],
         "winners": {"GET": "main.bys360_pwa_manifest"},
         "note": (
-            "main blueprint pwa'dan önce register edilir. Shadowed pwa.manifest_webmanifest "
-            "ekstra bir X-Content-Type-Options header'ı taşıyor -> Phase 12B adayı."
+            "Phase 12B: MANIFEST_CONTRACTS_DIFFER. Mevcut dosyada gövde, status, MIME ve "
+            "cache-control eşittir; ham Pragma/X-Content-Type-Options, ETag/path çözümleme ve "
+            "eksik dosyada main=404, pwa=fallback-200 davranışları farklıdır. main winner "
+            "response kontratı kilitlenmeden registration silinemez."
         ),
     },
 }
