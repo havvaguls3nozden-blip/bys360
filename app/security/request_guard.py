@@ -71,13 +71,15 @@ def _truthy(value: Any, default: bool = False) -> bool:
     return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
 
 
+# BYS360_P13B_SEC002_FIX: bu fonksiyon daha once X-Forwarded-For/X-Real-IP
+# basliklarini dogrudan ve kosulsuz olarak guveniyordu; herhangi bir anonim
+# istemci bu basligi kendisi belirleyip her istekte farkli bir "IP" bucket'i
+# secerek IP-bazli login/reset kilitlenmesini atlayabiliyordu (Phase 13B
+# SEC-002, confirmed). Guvenilir tek kaynak, ProxyFix middleware'i (etkinse)
+# tarafindan zaten dogrulanmis PROXY_FIX_X_FOR sayida hop ile normallestirilen
+# request.remote_addr'dir; ProxyFix kapaliysa da ham istemci soketi budur ve
+# istemci tarafindan tahrif edilemez.
 def get_client_ip() -> str:
-    forwarded_for = request.headers.get('X-Forwarded-For', '')
-    if forwarded_for:
-        return forwarded_for.split(',')[0].strip() or 'unknown'
-    real_ip = request.headers.get('X-Real-IP', '').strip()
-    if real_ip:
-        return real_ip
     return request.remote_addr or 'unknown'
 
 
@@ -221,6 +223,55 @@ def record_auth_failure(client_ip: str, identity: str | None) -> AuthThrottleSta
 def clear_auth_failures(client_ip: str, identity: str | None) -> None:
     identity_bucket = f'auth_ident:{_normalize_identity(identity)}'
     ip_bucket = f'auth_ip:{client_ip}'
+    with _LOCK:
+        _BUCKETS.pop(ip_bucket, None)
+        _BUCKETS.pop(identity_bucket, None)
+
+
+# BYS360_P13B_AUTH003_FIX: /forgot-password onceden hicbir throttle'a tabi
+# degildi (Phase 13B AUTH-003, confirmed - 40+ ardisik yanlis cevap sifir
+# kilitlenmeyle sonuclaniyordu). Login throttle ile ayni desen, ayri bucket
+# ad alaniyla (reset_ip/reset_ident) tekrar kullanilir.
+def get_reset_throttle_state(client_ip: str, identity: str | None) -> AuthThrottleState:
+    if not _truthy(current_app.config.get('RESET_THROTTLE_ENABLED', True), True):
+        return AuthThrottleState(True, 0, 0, 0, 0, 0)
+
+    window_seconds = int(current_app.config.get('RESET_LOCKOUT_MINUTES', 15) or 15) * 60
+    ip_limit = int(current_app.config.get('RESET_IP_MAX_ATTEMPTS', 10) or 10)
+    identity_limit = int(current_app.config.get('RESET_IDENTITY_MAX_ATTEMPTS', 5) or 5)
+
+    ip_bucket = f'reset_ip:{client_ip}'
+    identity_bucket = f'reset_ident:{_normalize_identity(identity)}'
+
+    ip_count, ip_retry = _read_bucket_count(ip_bucket, window_seconds)
+    identity_count, identity_retry = _read_bucket_count(identity_bucket, window_seconds)
+    retry_after = max(ip_retry, identity_retry)
+    allowed = ip_count < ip_limit and identity_count < identity_limit
+    return AuthThrottleState(allowed, retry_after, ip_count, ip_limit, identity_count, identity_limit)
+
+
+def record_reset_attempt(client_ip: str, identity: str | None) -> AuthThrottleState:
+    if not _truthy(current_app.config.get('RESET_THROTTLE_ENABLED', True), True):
+        return AuthThrottleState(True, 0, 0, 0, 0, 0)
+
+    window_seconds = int(current_app.config.get('RESET_LOCKOUT_MINUTES', 15) or 15) * 60
+    ip_limit = int(current_app.config.get('RESET_IP_MAX_ATTEMPTS', 10) or 10)
+    identity_limit = int(current_app.config.get('RESET_IDENTITY_MAX_ATTEMPTS', 5) or 5)
+
+    ip_bucket = f'reset_ip:{client_ip}'
+    identity_bucket = f'reset_ident:{_normalize_identity(identity)}'
+
+    ip_count, _ip_blocked, ip_retry = _record_hit(ip_bucket, window_seconds=window_seconds, limit=ip_limit)
+    identity_count, _identity_blocked, identity_retry = _record_hit(identity_bucket, window_seconds=window_seconds, limit=identity_limit)
+
+    retry_after = max(ip_retry, identity_retry)
+    allowed = ip_count < ip_limit and identity_count < identity_limit
+    return AuthThrottleState(allowed, retry_after, ip_count, ip_limit, identity_count, identity_limit)
+
+
+def clear_reset_failures(client_ip: str, identity: str | None) -> None:
+    identity_bucket = f'reset_ident:{_normalize_identity(identity)}'
+    ip_bucket = f'reset_ip:{client_ip}'
     with _LOCK:
         _BUCKETS.pop(ip_bucket, None)
         _BUCKETS.pop(identity_bucket, None)

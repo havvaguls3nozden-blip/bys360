@@ -26,6 +26,7 @@ from app.route_registry import main_bp
 from app.route_support import (
     admin_required,
     can_access_menu,
+    is_admin_family_user,
     is_manager_family_user,
     menu_key_required,
     safe_db_rollback,
@@ -258,22 +259,44 @@ def _can_use_all_support_view() -> bool:
     return bool(is_manager_family_user(current_user) or can_access_menu(current_user, "support_all"))
 
 
+# BYS360_P13B_NEW1_FIX: _can_use_all_support_view() manager ailesine kurum
+# geneli erisim veriyordu ve is_private hicbir yerde okunmuyordu (Phase 13B,
+# confirmed - baska birimin yoneticisi, "sadece yetkili kullanicilar gorsun"
+# etiketli gizli bir bileti okuyabiliyordu). Talep sahibi/atanan/admin ailesi
+# disinda, gizli bir bilet artik yalnizca talebin birim anlik goruntusuyle
+# ayni birimdeki yoneticilere acilir.
+def _can_view_private_scope(ticket: SupportTicket) -> bool:
+    if is_admin_family_user(current_user):
+        return True
+    if not bool(getattr(ticket, "is_private", False)):
+        return True
+    ticket_unit = getattr(ticket, "unit_name_snapshot", None)
+    if not ticket_unit:
+        return False
+    viewer_units = {getattr(current_user, "birim", None), getattr(current_user, "ust_birim", None)}
+    return ticket_unit in viewer_units
+
+
 def _can_view_ticket(ticket: SupportTicket) -> bool:
     if not current_user.is_authenticated:
         return False
-    if _can_use_all_support_view():
-        return True
     current_id = int(getattr(current_user, "id", 0) or 0)
-    return int(ticket.created_by_user_id or 0) == current_id or _is_ticket_assignee(ticket)
+    if int(ticket.created_by_user_id or 0) == current_id or _is_ticket_assignee(ticket):
+        return True
+    if not _can_use_all_support_view():
+        return False
+    return _can_view_private_scope(ticket)
 
 
 def _can_operate_ticket(ticket: SupportTicket) -> bool:
     if not current_user.is_authenticated:
         return False
-    if _can_use_all_support_view():
-        return True
     current_id = int(getattr(current_user, "id", 0) or 0)
-    return int(ticket.created_by_user_id or 0) == current_id or _is_ticket_assignee(ticket)
+    if int(ticket.created_by_user_id or 0) == current_id or _is_ticket_assignee(ticket):
+        return True
+    if not _can_use_all_support_view():
+        return False
+    return _can_view_private_scope(ticket)
 
 def _normalize_choice(value: str | None, allowed: set[str], default: str) -> str:
     normalized = (value or "").strip().lower()

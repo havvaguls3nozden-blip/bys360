@@ -55,12 +55,34 @@ def account_change_photo():
         return redirect(redirect_target)
 
 
+_MIN_SECURITY_ANSWER_LENGTH = 4
+
+
 def account_security_setup():
     if request.method == "POST":
         question = (request.form.get("security_question") or "").strip()
         answer = (request.form.get("security_answer") or "").strip()
         if not question or not answer:
             flash("Gizli soru ve cevap zorunludur.", "warning")
+            return safe_render(
+                "account_security_setup.html",
+                "<h3>Gizli soru</h3>",
+                security_questions=SECURITY_QUESTION_CHOICES,
+            )
+        # BYS360_P13B_AUTH003_FIX: soru serbest metin olarak kabul ediliyor ve
+        # cevap uzunlugu hic sinirlanmiyordu (Phase 13B, confirmed - tek
+        # karakterlik cevap kabul edilmisti). Onaylanmis soru listesi ve
+        # minimum cevap uzunlugu, parola sifirlamanin fiili guvenlik
+        # faktorunu zayif tutmasini engeller.
+        if question not in SECURITY_QUESTION_CHOICES:
+            flash("Lütfen listeden geçerli bir gizli soru seçin.", "warning")
+            return safe_render(
+                "account_security_setup.html",
+                "<h3>Gizli soru</h3>",
+                security_questions=SECURITY_QUESTION_CHOICES,
+            )
+        if len(answer) < _MIN_SECURITY_ANSWER_LENGTH:
+            flash(f"Gizli soru cevabı en az {_MIN_SECURITY_ANSWER_LENGTH} karakter olmalıdır.", "warning")
             return safe_render(
                 "account_security_setup.html",
                 "<h3>Gizli soru</h3>",

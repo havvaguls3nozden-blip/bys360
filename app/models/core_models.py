@@ -1,5 +1,7 @@
 """Cekirdek kullanici ve organizasyon baglamina giris modelleri."""
 
+import secrets
+
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -81,6 +83,13 @@ class User(UserMixin, TimestampMixin, db.Model):
     security_question = db.Column(db.String(255), nullable=True)
     security_answer_hash = db.Column(db.String(255), nullable=True)
     is_first_login = db.Column(db.Boolean, default=True, nullable=False)
+
+    # BYS360_P13B_SESSION_STAMP: parola sifirlama (forgot-password) baska bir
+    # cihazda oturum acik kalan kullaniciyi disariya cikarmiyordu (Phase 13B,
+    # confirmed - reset sonrasi eski oturum yetkili sayfalara erismeye devam
+    # ediyordu). get_id() bu degeri session cerezine gomer; user_loader ile
+    # DB'deki guncel degerle eslesmeyen oturumlar otomatik gecersiz sayilir.
+    security_stamp = db.Column(db.String(64), nullable=False, default=lambda: secrets.token_hex(16))
 
     organization_unit_id = db.Column(
         db.Integer,
@@ -289,6 +298,17 @@ class User(UserMixin, TimestampMixin, db.Model):
             )
         except (ValueError, TypeError):
             return False
+
+    def rotate_security_stamp(self) -> None:
+        """Parola sifirlama/degistirme sonrasi diger tum oturumlari gecersiz kilar."""
+        self.security_stamp = secrets.token_hex(16)
+
+    def get_id(self):
+        # BYS360_P13B_SESSION_STAMP: Flask-Login varsayilani yalnizca id
+        # dondururdu; stamp'i cerezin icine gomerek DB'deki guncel degerle
+        # eslesmeyen (ör. parola sifirlanmis) oturumlarin user_loader
+        # tarafindan reddedilmesini saglar.
+        return f"{self.id}:{self.security_stamp}"
 
     def __repr__(self):
         role_name = (self.role_label or self.role or "-").strip()

@@ -35,6 +35,29 @@ except Exception:  # pragma: no cover
     logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_role_matrix_v10.py | line=33")
     text = None  # type: ignore[assignment]
 
+try:
+    from app.core.datetime_utils import utc_now
+except Exception:  # pragma: no cover
+    logger.exception("BYS360 P13B guarded exception | file=app/services/assistant_role_matrix_v10.py | utc_now import")
+    from datetime import UTC, datetime
+
+    def utc_now() -> datetime:
+        return datetime.now(UTC)
+
+# BYS360_P13B_AUTH001_FIX: bu route yalnizca UI/menu katmaninda degil, backend'de
+# de admin ailesine kapali degildi (anonim POST rol matrisini degistirebiliyordu).
+# Import basarisiz olursa fail-open olmamasi icin kapali (403) bir fallback kullanilir.
+try:
+    from app.route_support import admin_required as _bys360_admin_required
+except Exception:  # pragma: no cover
+    logger.exception("BYS360 P13B guarded exception | file=app/services/assistant_role_matrix_v10.py | admin_required import")
+
+    def _bys360_admin_required(view_func):
+        def _fail_closed(*args, **kwargs):
+            return ("Yetkisiz erişim.", 403)
+
+        return _fail_closed
+
 
 ASSISTANT_ROLE_COLUMNS = [
     ("admin", "ADMIN"),
@@ -170,7 +193,7 @@ def _get_db_value(session, role: str, feature_key: str) -> bool | None:
 def _set_db_value(session, role: str, feature_key: str, visible: bool) -> bool:
     if text is None:
         return False
-    role_col, key_col, value_col, _ = _role_defaults_columns(session)
+    role_col, key_col, value_col, cols = _role_defaults_columns(session)
     if not role_col or not key_col or not value_col:
         return False
 
@@ -188,15 +211,40 @@ def _set_db_value(session, role: str, feature_key: str, visible: bool) -> bool:
         if row:
             session.execute(text(f"""
                 update role_menu_defaults
+                set {value_col} = :visible, updated_at = :updated_at
+                where id = :id
+            """) if "updated_at" in cols else text(f"""
+                update role_menu_defaults
                 set {value_col} = :visible
                 where id = :id
-            """), {"visible": visible, "id": row[0]})
+            """), {"visible": visible, "id": row[0], "updated_at": utc_now()})
             return True
 
+        # BYS360_P13B_NEW5_FIX: raw SQL INSERT gecmiste source_type/created_at/
+        # updated_at gibi NOT NULL kolonlari atliyordu; bu da ilk-kez-yazilan bir
+        # (role, feature) cifti icin INSERT'in constraint ihlaliyle patlamasina ve
+        # except blogunun ayni islemde daha once basarili olan UPDATE'leri de
+        # rollback ile geri almasina yol aciyordu (kismi/gorunmez veri kaybi).
+        insert_cols = [role_col, key_col, value_col]
+        insert_placeholders = [":role", ":key", ":visible"]
+        insert_params: dict[str, Any] = {"role": role, "key": key, "visible": visible}
+        if "source_type" in cols:
+            insert_cols.append("source_type")
+            insert_placeholders.append(":source_type")
+            insert_params["source_type"] = "user_override"
+        if "created_at" in cols:
+            insert_cols.append("created_at")
+            insert_placeholders.append(":created_at")
+            insert_params["created_at"] = utc_now()
+        if "updated_at" in cols:
+            insert_cols.append("updated_at")
+            insert_placeholders.append(":updated_at")
+            insert_params["updated_at"] = utc_now()
+
         session.execute(text(f"""
-            insert into role_menu_defaults ({role_col}, {key_col}, {value_col})
-            values (:role, :key, :visible)
-        """), {"role": role, "key": key, "visible": visible})
+            insert into role_menu_defaults ({", ".join(insert_cols)})
+            values ({", ".join(insert_placeholders)})
+        """), insert_params)
         return True
     except Exception:
         try:
@@ -280,7 +328,12 @@ def register_assistant_role_matrix_v10(app):
         app.add_url_rule(
             route,
             endpoint="assistant_role_matrix_v10_save",
-            view_func=assistant_role_matrix_v10_save_endpoint,
+            # BYS360_P13B_AUTH001_FIX: bu satir raw add_url_rule ile hicbir
+            # decorator olmadan kayitli oldugu icin anonim POST rol matrisini
+            # degistirebiliyordu (Phase 13B AUTH-001, confirmed). Sayfa zaten
+            # Ayarlar > admin_required ekraninda sunuldugu icin ayni yetki
+            # ailesi backend'de de zorunlu kilinir.
+            view_func=_bys360_admin_required(assistant_role_matrix_v10_save_endpoint),
             methods=["POST"],
         )
     return app

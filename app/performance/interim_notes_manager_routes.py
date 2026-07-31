@@ -254,6 +254,20 @@ def performance_interim_notes():
 
     from app.extensions import db
 
+    # BYS360_P13B_NEW13B01_FIX: bu view @login_required disinda hicbir
+    # yetki/kapsam kontrolu yapmiyordu (Phase 13B, confirmed - birimi
+    # ilgilendirmeyen bir personel, tum calisanlarin gizli olumsuz
+    # performans notlarini okuyup baska bir calisan adina sahte not
+    # ekleyebiliyordu; menu haritasi zaten bu anahtari o rol icin False
+    # olarak isaretliyordu). Dosyadaki mevcut _can_access()/_people()/
+    # _allowed_employee() kapsam yardimcilari (asagida kardes create
+    # endpoint'inde de kullanilir) burada da zorunlu kilinir.
+    if not _can_access():
+        return _access_denied()
+
+    scoped_people = _people()
+    scoped_ids = [int(p.get('id')) for p in scoped_people if p.get('id') is not None]
+
     def _rows(sql, params=None):
         try:
             return list(db.session.execute(_sql_text(sql), params or {}).mappings())
@@ -322,6 +336,10 @@ def performance_interim_notes():
             flash("Personel seçimi geçerli değil.", "warning")
             return redirect(request.path)
 
+        if not _allowed_employee(personnel_id, scoped_people):
+            flash("Bu personel için dönem içi not ekleme yetkiniz bulunmamaktadır.", "warning")
+            return redirect(request.path)
+
         period_id = None
         if period_id_raw:
             try:
@@ -355,16 +373,14 @@ def performance_interim_notes():
         flash("Dönem içi not başarıyla kaydedildi.", "success")
         return redirect(request.path)
 
+    # BYS360_P13B_NEW13B01_FIX: personel secimi eskiden kapsam gozetmeksizin
+    # kurumdaki TUM kullanicilari listeliyordu; artik _people() ile ayni
+    # yonetici-hiyerarsisi kapsamini kullanir (admin benzeri roller icin
+    # degismez, tam liste gorur).
     personnel_options = [
-        dict(row)
-        for row in _rows("""
-            SELECT
-                id,
-                COALESCE(NULLIF(TRIM(CONCAT_WS(' ', ad, soyad)), ''), email, CAST(id AS TEXT)) AS label
-            FROM users
-            ORDER BY COALESCE(NULLIF(TRIM(CONCAT_WS(' ', ad, soyad)), ''), email, CAST(id AS TEXT))
-            LIMIT 500
-        """)
+        {"id": p.get("id"), "label": p.get("full_name") or str(p.get("id"))}
+        for p in scoped_people
+        if p.get("id") is not None
     ]
 
     period_options = [
@@ -379,23 +395,38 @@ def performance_interim_notes():
         """)
     ]
 
-    note_items_raw = _rows("""
-        SELECT
-            n.id,
-            n.personnel_id,
-            n.period_id,
-            n.note_type,
-            n.title,
-            n.note,
-            n.scorecard_visible,
-            TO_CHAR(n.created_at, 'DD.MM.YYYY HH24:MI') AS created_at_label,
-            COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.ad, u.soyad)), ''), u.email, CAST(n.personnel_id AS TEXT)) AS personnel_name,
-            '' AS unit_name
-        FROM performance_interim_notes_live n
-        LEFT JOIN users u ON u.id = n.personnel_id
-        ORDER BY n.created_at DESC, n.id DESC
-        LIMIT 300
-    """)
+    # BYS360_P13B_NEW13B01_FIX: bu sorgu hicbir WHERE kosulu tasimiyordu; her
+    # giris yapmis kullanici kurumdaki TUM calisanlarin dahil gizli olumsuz
+    # notlarini goruyordu (Phase 13B, confirmed). Admin-benzeri roller disinda
+    # sonuc _people() kapsamindaki personel kimlikleriyle sinirlanir.
+    if _is_admin_like():
+        scope_where = ""
+    elif scoped_ids:
+        scope_where = "WHERE n.personnel_id IN ({})".format(", ".join(str(int(i)) for i in scoped_ids))
+    else:
+        scope_where = None
+
+    if scope_where is None:
+        note_items_raw = []
+    else:
+        note_items_raw = _rows(f"""
+            SELECT
+                n.id,
+                n.personnel_id,
+                n.period_id,
+                n.note_type,
+                n.title,
+                n.note,
+                n.scorecard_visible,
+                TO_CHAR(n.created_at, 'DD.MM.YYYY HH24:MI') AS created_at_label,
+                COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.ad, u.soyad)), ''), u.email, CAST(n.personnel_id AS TEXT)) AS personnel_name,
+                '' AS unit_name
+            FROM performance_interim_notes_live n
+            LEFT JOIN users u ON u.id = n.personnel_id
+            {scope_where}
+            ORDER BY n.created_at DESC, n.id DESC
+            LIMIT 300
+        """)
 
     note_items = []
     for row in note_items_raw:

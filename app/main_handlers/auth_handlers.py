@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 
-from flask import current_app, flash, make_response, redirect, request, session, url_for
+from flask import abort, current_app, flash, make_response, redirect, request, session, url_for
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import or_
 
@@ -15,12 +15,17 @@ from app.route_support import create_login_captcha, get_login_captcha_question, 
 from app.security.email_policy import corporate_email_error_message, is_allowed_corporate_email
 from app.security.request_guard import (
     clear_auth_failures,
+    clear_reset_failures,
     get_auth_throttle_state,
     get_client_ip,
+    get_reset_throttle_state,
     mask_identity,
     record_auth_failure,
+    record_reset_attempt,
     should_log_auth_throttle,
 )
+
+_MIN_PASSWORD_LENGTH = 8
 
 logger = logging.getLogger(__name__)
 
@@ -228,6 +233,17 @@ def forgot_password():
         answer = (request.form.get("security_answer") or "").strip()
         new_password = request.form.get("new_password") or ""
         new_password_repeat = request.form.get("new_password_repeat") or ""
+        client_ip = get_client_ip()
+
+        # BYS360_P13B_AUTH003_FIX: bu route hicbir throttle'a tabi degildi
+        # (Phase 13B AUTH-003, confirmed - 40+ ardisik yanlis gizli soru
+        # cevabi sifir kilitlenmeyle sonuclaniyor, tam hesap ele gecirmeyi
+        # pratikte saniyeler icinde mumkun kiliyordu). Login ile ayni
+        # IP+kimlik bazli kilitlenme burada da zorunlu kilinir.
+        throttle_state = get_reset_throttle_state(client_ip, sicil_or_email)
+        if not throttle_state.allowed:
+            flash("Çok fazla deneme algılandı. Lütfen birkaç dakika sonra tekrar deneyin.", "danger")
+            return safe_render("forgot_password.html", "<h3>Şifremi Unuttum</h3>", found_user=None)
 
         found_user = User.query.filter(
             or_(
@@ -237,21 +253,24 @@ def forgot_password():
         ).first()
 
         if not found_user:
+            record_reset_attempt(client_ip, sicil_or_email)
             flash("Kullanıcı bulunamadı.", "danger")
             return safe_render("forgot_password.html", "<h3>Şifremi Unuttum</h3>", found_user=None)
 
         question = found_user.security_question
         if not question:
+            record_reset_attempt(client_ip, sicil_or_email)
             flash("Bu kullanıcı için gizli soru tanımlı değil. Yöneticiyle görüşün.", "warning")
             return safe_render("forgot_password.html", "<h3>Şifremi Unuttum</h3>", found_user=found_user, question=None)
 
         if answer and new_password and new_password_repeat:
             if not found_user.check_security_answer(answer):
+                record_reset_attempt(client_ip, sicil_or_email)
                 flash("Gizli soru cevabı hatalı.", "danger")
                 return safe_render("forgot_password.html", "<h3>Şifremi Unuttum</h3>", found_user=found_user, question=question)
 
-            if len(new_password) < 8:
-                flash("Yeni şifre en az 8 karakter olmalıdır.", "warning")
+            if len(new_password) < _MIN_PASSWORD_LENGTH:
+                flash(f"Yeni şifre en az {_MIN_PASSWORD_LENGTH} karakter olmalıdır.", "warning")
                 return safe_render("forgot_password.html", "<h3>Şifremi Unuttum</h3>", found_user=found_user, question=question)
 
             if new_password != new_password_repeat:
@@ -267,8 +286,19 @@ def forgot_password():
             found_user.captcha_required = False
             if hasattr(found_user, "must_change_password"):
                 found_user.must_change_password = False
+            # BYS360_P13B_SESSION_STAMP: reset sonrasi baska bir cihazda acik
+            # kalan onceki oturumlarin tamami bu satirla gecersiz kilinir
+            # (Phase 13B, confirmed - reset onceden hicbir oturumu etkilemiyordu).
+            found_user.rotate_security_stamp()
             db.session.commit()
+            clear_reset_failures(client_ip, sicil_or_email)
             _reset_auth_challenge_state()
+
+            current_app.logger.info(
+                "Parola sifirlama tamamlandi | kimlik=%s | ip=%s",
+                mask_identity(sicil_or_email),
+                client_ip,
+            )
 
             flash("Şifreniz güncellendi. Giriş yapabilirsiniz.", "success")
             return redirect(url_for("main.login"))
@@ -373,7 +403,23 @@ def logout():
     _bys360_no_store_response(response)
     return response
 
+def _setup_admin_route_permitted() -> bool:
+    # BYS360_P13B_SEC001_FIX: bu route'un tek korumasi "users tablosu bos mu"
+    # kontroluydu; production'da acikca kapatan bir ortam/flag yoktu (Phase
+    # 13B SEC-001, confirmed - production benzeri bir app'te anonim GET/POST
+    # ile ilk admin olusturulabiliyordu). Varsayilan olarak production/staging
+    # ortaminda fail-closed'dir; yalnizca acik SETUP_ADMIN_ENABLED bayragiyla
+    # bilincli olarak yeniden acilabilir (ör. kontrollu ilk kurulum penceresi).
+    app_env = str(current_app.config.get("APP_ENV") or "").strip().lower()
+    if app_env not in {"production", "staging"}:
+        return True
+    return bool(current_app.config.get("SETUP_ADMIN_ENABLED", False))
+
+
 def setup_admin():
+    if not _setup_admin_route_permitted():
+        abort(404)
+
     if User.query.count() > 0:
         return redirect(url_for("main.login"))
 
@@ -381,6 +427,11 @@ def setup_admin():
         admin_email = (request.form.get("email") or "").strip().lower()
         if not is_allowed_corporate_email(admin_email):
             flash(corporate_email_error_message(), "warning")
+            return safe_render("setup_admin.html", "<h3>İlk admin kurulumu</h3>")
+
+        password = request.form.get("password") or ""
+        if len(password) < _MIN_PASSWORD_LENGTH:
+            flash(f"Parola en az {_MIN_PASSWORD_LENGTH} karakter olmalıdır.", "warning")
             return safe_render("setup_admin.html", "<h3>İlk admin kurulumu</h3>")
 
         user = User(
@@ -396,7 +447,7 @@ def setup_admin():
             ikinci_yonetici_sicil=request.form["sicil_no"].strip(),
             is_active=True,
         )
-        user.set_password(request.form["password"])
+        user.set_password(password)
         if hasattr(user, "must_change_password"):
             user.must_change_password = False
         if hasattr(user, "must_set_security_question"):
@@ -405,6 +456,11 @@ def setup_admin():
             user.is_first_login = False
         db.session.add(user)
         db.session.commit()
+        current_app.logger.warning(
+            "Ilk admin bootstrap ile olusturuldu | sicil=%s | ip=%s",
+            user.sicil_no,
+            get_client_ip(),
+        )
         flash("İlk admin oluşturuldu.", "success")
         return redirect(url_for("main.login"))
 

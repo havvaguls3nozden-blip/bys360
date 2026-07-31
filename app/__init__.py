@@ -43,10 +43,23 @@ OPTIONAL_STARTUP_REGISTRATIONS: tuple[tuple[str, str], ...] = (
 
 @login_manager.user_loader
 def load_user(user_id: str) -> User | None:
+    # BYS360_P13B_SESSION_STAMP: User.get_id() artik "id:stamp" bicimindedir.
+    # Stamp DB'deki guncel security_stamp ile eslesmezse (ör. forgot-password
+    # ile parola sifirlandiysa) oturum sessizce gecersiz sayilir ve kullanici
+    # anonim davranilir - eski cerezler icin kademe kademe cikis anlamina gelir.
+    raw = str(user_id or "")
+    stamp = None
+    if ":" in raw:
+        raw, _, stamp = raw.partition(":")
     try:
-        return db.session.get(User, int(user_id))
+        user = db.session.get(User, int(raw))
     except (TypeError, ValueError):
         return None
+    if user is None:
+        return None
+    if stamp is not None and stamp != (user.security_stamp or ""):
+        return None
+    return user
 
 
 def _run_optional_startup(app: Flask, label: str, callback: Callable[[], None]) -> None:
