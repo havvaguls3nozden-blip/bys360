@@ -1,0 +1,6 @@
+/* Style-2B CSP migration: semantic classes for app/templates/assignment_recommendations.html */
+.assignment-rec-spacing-top-md{margin-top:14px;}
+.assignment-rec-pill-align-end{margin-left:auto;}
+.assignment-rec-pill-inline-gap{margin-left:8px;}
+.assignment-rec-action-spacing{margin-top:12px;}
+.assignment-rec-list-stack{display:grid;gap:12px;margin-top:14px;}

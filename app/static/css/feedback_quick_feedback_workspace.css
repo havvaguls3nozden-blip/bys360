@@ -1,0 +1,8 @@
+/* Style-2B CSP migration: semantic classes for app/templates/feedback/quick_feedback.html */
+.quick-feedback-setup-note{margin-top:5px;line-height:1.7;}
+.quick-feedback-panel-heading-lg{font-size:1.04rem;}
+.quick-feedback-timeline-spacing{margin-top:16px;}
+.quick-feedback-section-head-spacing{margin-bottom:14px;}
+.quick-feedback-section-text-spacing{margin-top:5px;}
+.quick-feedback-btn-compact{min-height:36px;padding:0 12px;font-size:.78rem;}
+.quick-feedback-tips-grid{display:grid;gap:11px;margin-top:15px;}

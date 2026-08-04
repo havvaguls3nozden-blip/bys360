@@ -1,0 +1,254 @@
+"""BYS360 CSP inline-style migration — cumulative, wave-agnostic repo-wide
+inventory contract.
+
+WHY THIS FILE EXISTS: `test_csp_style2a_repo_wide_contract.py` originally
+carried its own repo-wide "active total == 1235 - N" / "<style> block total
+== 272" locks. Those assumed Style-2A was the last wave that would ever
+touch a `style="..."` attribute anywhere in the repo. When Style-2B
+legitimately removed 58 more static style attributes from 8 *other*
+templates, those locks failed — not because anything was wrong, but
+because they were never designed to accommodate a second wave. See that
+file's own docstring for the full incident writeup.
+
+This file is the replacement: a single, wave-agnostic, manifest-driven
+cumulative contract. Every wave registers itself in
+`STYLE_MIGRATION_WAVES` with the templates it touched and how many fully-
+static attributes it removed from them. The expected repo-wide total is
+always ``INITIAL_ACTIVE_STYLE_TOTAL - sum(wave.removed_static for wave)``.
+Adding a Style-2C, Style-2D, ... wave later means adding one manifest
+entry here — nothing else in this file changes.
+
+CANONICAL METHODOLOGY: all counting goes through the single shared helper
+`tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
+based tokenization, not a naive regex) so this file, the per-wave files,
+and any future wave's contract test can never silently disagree about what
+counts as a real `style="..."` attribute. See that module's docstring for
+why a naive regex is unsafe here (JS `<script>` template-literal strings
+containing literal `style="..."` text as DATA, not a real attribute; and
+`{% if x %}style="..."{% endif %}` bare-Jinja-mid-tag fragments that a raw
+`HTMLParser` loses sync on and silently drops).
+
+SCOPE: exactly `app/templates` + `app/modules/*/templates` +
+`app/workflow/templates` (Flask/Jinja render roots). `app/static` (PWA
+offline HTML, served as static files, never Jinja-rendered) and anything
+under `scripts/` (not part of the Flask app at all) are deliberately
+excluded — mixing them in previously caused scope-consistency bugs (see
+`_bys360_style_inventory.py` and `test_csp_style2a_repo_wide_contract.py`
+docstrings for the specific files/line numbers that were affected).
+
+INITIAL BASELINE EVIDENCE: `INITIAL_ACTIVE_STYLE_TOTAL` /
+`INITIAL_DYNAMIC_STYLE_TOTAL` / `INITIAL_STYLE_BLOCK_TOTAL` are measured
+directly (canonical helper, `compute_inventory_at_git_ref`) against git
+commit `dab2c1de08024bd330f4c15eeffc089dbbcd8b2e` — the immediate parent of
+`649f4530...` (the squashed "Style-1 + Style-2A" checkpoint), i.e. the
+repo state before ANY inline-style migration wave touched anything.
+`test_initial_baseline_constants_match_historical_git_ref` re-derives them
+from that commit at test-run time (not from a cached number) so this
+baseline can never silently drift from its own evidence. That test skips
+only if the `git` binary itself is unavailable (an environment limitation,
+not a correctness gap) — it is NOT gated on there being any uncommitted
+diff, so it runs identically on a clean, fully-committed worktree.
+
+NO SKIP-ON-CLEAN-WORKTREE ANYWHERE IN THIS FILE: every test here compares
+the *current on-disk worktree* against fixed manifest arithmetic. None of
+it depends on `git status`/`git diff` having anything pending, so it
+behaves identically before and after this wave's own commit lands.
+"""
+from __future__ import annotations
+
+import subprocess
+from typing import TypedDict
+
+import pytest
+
+from tests.security._bys360_style_inventory import (
+    REPO_ROOT,
+    compute_inventory_at_git_ref,
+    compute_inventory_from_worktree,
+    count_static_style_attrs_in_text,
+)
+
+# ---------------------------------------------------------------------------
+# Canonical pre-migration baseline (evidence: see module docstring above and
+# test_initial_baseline_constants_match_historical_git_ref below).
+# ---------------------------------------------------------------------------
+
+INITIAL_BASELINE_GIT_REF = "dab2c1de08024bd330f4c15eeffc089dbbcd8b2e"
+INITIAL_ACTIVE_STYLE_TOTAL = 1166
+INITIAL_DYNAMIC_STYLE_TOTAL = 66
+INITIAL_STYLE_BLOCK_TOTAL = 270
+
+# ---------------------------------------------------------------------------
+# Wave manifest. Each wave: the templates it targeted, and the number of
+# fully-static `style="..."` attributes it removed from them (evidence for
+# each wave's own number lives in that wave's own local contract test file,
+# e.g. test_csp_style2a_repo_wide_contract.py::TARGET_TEMPLATES /
+# test_csp_style2b_target_templates_contract.py::TARGET_TEMPLATES).
+# ---------------------------------------------------------------------------
+
+class _WaveManifestEntry(TypedDict):
+    templates: tuple[str, ...]
+    removed_static: int
+
+
+STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
+    "style2a": {
+        "templates": (
+            "app/templates/support/help_admin_list.html",
+            "app/templates/support/detail.html",
+            "app/templates/support/new.html",
+            "app/templates/notifications_list.html",
+            "app/templates/hr_attendance.html",
+            "app/templates/hr_personnel_dashboard.html",
+            "app/templates/file_center/index.html",
+            "app/templates/admin_analysis_excel_preview.html",
+        ),
+        "removed_static": 40,
+    },
+    "style2b": {
+        "templates": (
+            "app/templates/communication/phase1_bulletin_form.html",
+            "app/templates/feedback/quick_feedback.html",
+            "app/templates/feedback_executive_summary_dashboard.html",
+            "app/templates/assignment_recommendations.html",
+            "app/templates/hr_personnel_lifecycle_center.html",
+            "app/templates/admin_ai_center.html",
+            "app/templates/feedback_meeting_detail.html",
+            "app/templates/performance_v2_phase1.html",
+        ),
+        "removed_static": 58,
+    },
+}
+
+CUMULATIVE_REMOVED_STATIC = sum(w["removed_static"] for w in STYLE_MIGRATION_WAVES.values())
+EXPECTED_ACTIVE_STYLE_TOTAL = INITIAL_ACTIVE_STYLE_TOTAL - CUMULATIVE_REMOVED_STATIC
+
+
+def test_no_template_is_claimed_by_more_than_one_wave() -> None:
+    """A template counted as "removed" by two waves would silently
+    double-count -- this would never be caught by the arithmetic alone."""
+    seen: dict[str, str] = {}
+    duplicates: list[tuple[str, str, str]] = []
+    for wave_name, wave in STYLE_MIGRATION_WAVES.items():
+        for template in wave["templates"]:
+            if template in seen:
+                duplicates.append((template, seen[template], wave_name))
+            else:
+                seen[template] = wave_name
+    assert duplicates == [], f"Template(s) claimed by more than one wave: {duplicates!r}"
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    sorted({t for w in STYLE_MIGRATION_WAVES.values() for t in w["templates"]}),
+)
+def test_every_wave_target_template_has_zero_active_style_attribute(relative_path: str) -> None:
+    """Every template EVER claimed by ANY completed wave must still have
+    zero fully-static `style="..."` attributes -- protects against a LATER
+    wave accidentally reintroducing one into an already-migrated file."""
+    text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    count = count_static_style_attrs_in_text(text, relative_path)
+    assert count == 0, (
+        f"{relative_path} has {count} static style=\"...\" attribute(s) remaining; "
+        "this template was already claimed as fully migrated by a completed wave."
+    )
+
+
+def test_cumulative_active_static_style_total_matches_manifest() -> None:
+    inventory = compute_inventory_from_worktree()
+    assert inventory.active_static_total == EXPECTED_ACTIVE_STYLE_TOTAL, (
+        f"Repo-wide active (static) style attribute total is "
+        f"{inventory.active_static_total}; expected "
+        f"{INITIAL_ACTIVE_STYLE_TOTAL} - {CUMULATIVE_REMOVED_STATIC} "
+        f"(cumulative across waves {sorted(STYLE_MIGRATION_WAVES)}) = "
+        f"{EXPECTED_ACTIVE_STYLE_TOTAL}."
+    )
+
+
+def test_cumulative_dynamic_style_total_is_unchanged() -> None:
+    inventory = compute_inventory_from_worktree()
+    assert inventory.dynamic_total == INITIAL_DYNAMIC_STYLE_TOTAL, (
+        f"Repo-wide Jinja-dynamic style attribute total is {inventory.dynamic_total}; "
+        f"expected {INITIAL_DYNAMIC_STYLE_TOTAL} (no inline-style wave may add/remove "
+        "a dynamic style attribute)."
+    )
+
+
+def test_cumulative_style_block_total_is_unchanged() -> None:
+    inventory = compute_inventory_from_worktree()
+    assert inventory.style_block_total == INITIAL_STYLE_BLOCK_TOTAL, (
+        f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
+        f"{INITIAL_STYLE_BLOCK_TOTAL} (no wave may move/edit an existing <style> "
+        "block -- only add new <link rel=\"stylesheet\"> tags)."
+    )
+
+
+def test_cumulative_inline_handler_total_is_zero() -> None:
+    inventory = compute_inventory_from_worktree()
+    assert inventory.inline_handler_total == 0, (
+        f"Repo-wide inline event-handler (on*=) total is "
+        f"{inventory.inline_handler_total}; expected 0."
+    )
+
+
+def test_cumulative_javascript_url_total_is_zero() -> None:
+    inventory = compute_inventory_from_worktree()
+    assert inventory.javascript_url_total == 0, (
+        f"Repo-wide javascript: URL total is {inventory.javascript_url_total}; expected 0."
+    )
+
+
+def test_initial_baseline_constants_match_historical_git_ref() -> None:
+    """Re-derives INITIAL_ACTIVE_STYLE_TOTAL / INITIAL_DYNAMIC_STYLE_TOTAL /
+    INITIAL_STYLE_BLOCK_TOTAL directly from the fixed historical commit they
+    claim to come from, so the baseline can never silently drift from its
+    own evidence. Skips ONLY if the `git` binary itself is unavailable (an
+    environment limitation) -- NOT based on whether there is any pending
+    diff, so this runs identically on a clean, fully-committed worktree."""
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
+    except OSError:
+        pytest.skip("git CLI not available in this environment.")
+
+    verify = subprocess.run(
+        ["git", "cat-file", "-e", INITIAL_BASELINE_GIT_REF],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=False,
+        timeout=10,
+    )
+    if verify.returncode != 0:
+        pytest.skip(
+            f"Historical ref {INITIAL_BASELINE_GIT_REF} not present in this checkout "
+            "(e.g. a shallow clone) -- environment limitation, not a correctness gap."
+        )
+
+    inventory = compute_inventory_at_git_ref(INITIAL_BASELINE_GIT_REF)
+    assert inventory.active_static_total == INITIAL_ACTIVE_STYLE_TOTAL, (
+        f"Historical active total at {INITIAL_BASELINE_GIT_REF} is "
+        f"{inventory.active_static_total}, constant says {INITIAL_ACTIVE_STYLE_TOTAL}."
+    )
+    assert inventory.dynamic_total == INITIAL_DYNAMIC_STYLE_TOTAL, (
+        f"Historical dynamic total at {INITIAL_BASELINE_GIT_REF} is "
+        f"{inventory.dynamic_total}, constant says {INITIAL_DYNAMIC_STYLE_TOTAL}."
+    )
+    assert inventory.style_block_total == INITIAL_STYLE_BLOCK_TOTAL, (
+        f"Historical style-block total at {INITIAL_BASELINE_GIT_REF} is "
+        f"{inventory.style_block_total}, constant says {INITIAL_STYLE_BLOCK_TOTAL}."
+    )
+
+
+def test_style_inventory_scope_roots_are_exactly_the_flask_jinja_template_roots() -> None:
+    """Locks the canonical scope itself: app/templates + app/modules/*/
+    templates + app/workflow/templates, nothing more, nothing less
+    (in particular: NOT app/static, NOT scripts/)."""
+    from tests.security._bys360_style_inventory import STYLE_ATTR_SCOPE_ROOTS
+
+    relative_roots = sorted(
+        str(root.relative_to(REPO_ROOT)).replace("\\", "/") for root in STYLE_ATTR_SCOPE_ROOTS
+    )
+    assert "app/templates" in relative_roots
+    assert "app/workflow/templates" in relative_roots
+    assert any(r.startswith("app/modules/") and r.endswith("/templates") for r in relative_roots)
+    assert not any(r.startswith("app/static") for r in relative_roots)
+    assert not any(r.startswith("scripts") for r in relative_roots)

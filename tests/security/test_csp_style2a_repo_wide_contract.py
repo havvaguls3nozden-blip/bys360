@@ -67,30 +67,56 @@ Agent 3 bu dosyayı ilk yazdığında iki ayrı, birbirinden bağımsız hata va
   edilir. `_classify_style_attrs` şimdi hem `{{` HEM `{%` kontrol eder.
   Style 10A/Style-1'in eski "yalnız `{{`" metodolojisi, bu iki attribute'u
   yanlışlıkla statik sınıfında bırakan EKSİK bir tanımdı -- düzeltildi,
-  gizlenmedi. Yeni, doğru, final sınıflandırma:
+  gizlenmedi.
 
-      toplam aktif style attribute : 1195
-      statik style attribute       : 1129
-      dinamik style attribute      :   66  (1195 - 1129 = 66 ✓)
-      style block                  :  272  (değişmedi)
+BYS360 CSP STYLE-2B KOORDİNATÖR NOTU (ileri-uyumluluk refactor'u): Bu
+dosya başlangıçta, o zaman Style-2A'nın repodaki SON style dalgası olduğu
+varsayımıyla, REPO-GENELİNDE sabit bir "aktif toplam == 1235 - N" ve
+"<style> blok toplamı == 272" kilidi de içeriyordu. Style-2B (sonraki
+dalga) başka şablonlarda da meşru şekilde static style attribute
+kaldırınca, bu iki repo-geneli kilit -- tasarımı gereği -- FAIL vermeye
+başladı: hiçbiri "sadece Style-2A'nın kendi 8 şablonu dışında BAŞKA
+HİÇBİR ŞEY değişmemiş olmalı" varsayımından ötesini düşünmüyordu.
 
-  Bu normalizasyon Style-2A'nın kendi 40-attribute dönüşüm çalışmasını
-  ETKİLEMEZ -- her iki `{%`-only attribute da pilotun 8 hedef şablonunun
-  dışında, hiç dokunulmamış dosyalardadır (`base.html`, `performance/
-  feedback_corporate_cleanup_phase6.html`). Yalnızca ön-dalga/dalga-sonrası
-  envanterin statik/dinamik AYRIMI değişti; toplam (1195) ve dalganın
-  kaldırdığı 40 attribute sayısı aynı kalır.
+Bu, Style-2A'nın ÖZ sorumluluğunun BOZULDUĞU anlamına gelmez -- 8 hedef
+şablonun HÂLÂ sıfır style attribute'a sahip olduğu, kaldırılan 40
+attribute'un hâlâ doğru olduğu ve style-block'larının hâlâ değişmediği
+aşağıdaki dalga-yerel testlerle ayrıca kilitlenmeye devam ediyor. Repo-
+genelinde KÜMÜLATİF (Style-2A + Style-2B + ... TÜM dalgaların toplamı)
+envanter doğrulaması artık BU dosyada değil, ayrı ve dalga-agnostik
+`test_csp_style_migration_cumulative_inventory_contract.py` dosyasında,
+manifest-tabanlı (`STYLE_MIGRATION_WAVES`) ve git-diff'e bağlı OLMAYAN
+(temiz worktree'de de her zaman çalışan) bir kontrat olarak tutuluyor. O
+dosyadaki kanonik `tests/security/_bys360_style_inventory.py` yardımcısı
+(gerçek `html.parser.HTMLParser` tabanlı, regex değil) şu kanıtlanmış
+zincir için kullanıldı (bkz. o dosyanın docstring'i):
 
-  `EXPECTED_ACTIVE_STYLE_ATTR_COUNT_BEFORE_WAVE` sabiti de baştan yanlış
-  ayarlanmıştı: `active_total` STATİK-SADECE bir sayı döndürdüğü için
-  (dinamik olanlar ayrı tutulup hariç bırakılıyor), bu sabitin görev
-  tanımındaki "1235" (statik+dinamik TOPLAMI) değil, doğru statik-sadece
-  ön-dalga değeri (normalizasyon sonrası: 1169) olması gerekiyordu --
-  düzeltildi.
+    dab2c1d (Style-1/2A öncesi)   : aktif=1166 dinamik=66 blok=270
+    649f4530 (Style-2A sonrası)   : aktif=1126 dinamik=66 blok=270  (Style-2A: -40 ✓)
+    (bu worktree, Style-2B sonrası): aktif=1068 dinamik=66 blok=270 (Style-2B: -58)
 
-  "<style>" blok sayımı için kapsam ayrıca `app/**/*.html` (blueprint-özel
-  şablon dizinleri dahil) olarak KALDI -- bu, görev tanımının "272" hedefiyle
-  hâlâ birebir eşleşiyor ve bu bölümde herhangi bir hata bulunmadı.
+Bu sayılar, görev tanımlarında daha önce atıf edilen 1235/1195/1141 ve
+1168/1129/1074 gibi rakamlardan KASITLI olarak farklı: o eski rakamlar (a)
+`app/static` (2 PWA offline dosyası, 0 attribute ama 2 style-block) ve
+`scripts/` altındaki Flask tarafından render EDİLMEYEN dosyaları
+(`scripts/communication/assets/celebrations.html`, 4 attribute) tutarsız
+biçimde kapsama dahil/hariç ediyordu, (b) bir JS `<script>` template-
+literal string'i içindeki DÜZ METİN `style="..."` örneklerini
+(survey_create.html, survey_edit.html içinde 3 adet) gerçek HTML
+attribute'u sanıp sayıyordu, (c) `{% if x %}style="..."{% endif %}` gibi
+TIRNAKSIZ, tag ortasında çıplak Jinja ile koşullu olarak var olan -- ama
+değeri tamamen statik olan -- GERÇEK attribute'ları (base.html:471,
+settings.html:1023/1427/1441, survey_edit.html:286 -- 4 adet) naif
+regex'in görmesine rağmen bir önceki (düzeltilmemiş) parser denemesinin
+KAÇIRMASINA yol açıyordu. Kanonik yardımcı artık ikisini de doğru ele
+alıyor (bkz. o dosyanın `_neutralize_bare_jinja` fonksiyonu) ve TEK bir
+kapsamla (`app/templates` + `app/modules/*/templates` + `app/workflow/
+templates`, `app/static` VE `scripts/` HARİÇ) hem attribute hem
+style-block sayımını yapıyor -- bu da Style-2A'nın ÖNCEDEN doğrulanan
+"aktif=1195, blok=272" rakamlarının, eşitsiz/tutarsız bir kapsamın YAN
+ÜRÜNÜ olduğunu, Style-2A'nın KENDİ 40-attribute dönüşümünün ise HER İKİ
+metodolojide de (kaba regex VE kanonik parser) birebir aynı ve doğru
+kaldığını gösteriyor.
 
 KAPSAM DIŞI/DOKUNULMAYAN: Bu dosya HİÇBİR uygulama/şablon/CSS/config
 dosyasına yazmaz -- yalnızca `Path.read_text()`, gerçek Flask test client GET
@@ -155,43 +181,18 @@ ROUTES_BY_TEMPLATE: dict[str, str] = {
 # support/detail.html rotasi bir GERCEK ticket satiri gerektirir (<int:ticket_id>);
 # ayri, ozel bir testte ele alinir (bkz. test_support_detail_route...).
 
-# BYS360 CSP Style-2A1 ENVANTER NORMALIZASYONU: dinamik style attribute
-# tanimi artik hem "{{" HEM "{%" iceren degerleri kapsar (eskiden yalniz
-# "{{"). Bu, pilotun 8 hedef sablonunun DISINDaki 2 attribute'u (base.html:755,
-# performance/feedback_corporate_cleanup_phase6.html:108 -- ikisi de sadece
-# "{%" tasiyordu) dogru sekilde dinamik olarak siniflandirir. Dogru/final
-# on-dalga dinamik sayisi 66'dir (64 degil).
-EXPECTED_JINJA_DYNAMIC_STYLE_ATTR_COUNT = 66
-EXPECTED_STYLE_BLOCK_COUNT = 272
-# KOORDINATOR DUZELTMESI: bu sabit `_repo_wide_active_and_dynamic_counts()`
-# tarafindan donen `active_total` ile karsilastirilir, ki bu STATIK-SADECE
-# bir sayidir (dinamik olanlar `_classify_style_attrs` icinde ayri tutulur
-# ve haric birakilir). Gorev tanimindaki "1235" ise STATIK+DINAMIK TOPLAMI
-# ifade eder. Normalizasyon sonrasi dogru bolunme 1169 statik + 66 dinamik =
-# 1235'tir (eskiden 1171+64=1235 sanilyordu; 2 attribute'un yeniden
-# siniflandirilmasiyla statik taraftan dinamik tarafa kaydi). Bu yuzden
-# buradaki dogru karsilastirma degeri 1169'dur (dalga-sonrasi beklenen:
-# 1169 - 40 = 1129).
-EXPECTED_ACTIVE_STYLE_ATTR_COUNT_BEFORE_WAVE = 1169
-
-# "Aktif"/"dinamik" attribute kapsami: app/templates + app/modules + app/
-# workflow/templates (KOORDINATOR DUZELTMESI -- bu dosya ilk yazildiginda
-# app/templates + app/static kullanilmisti; bu, orijinal Style 10A/Style-1
-# analizinde -- 1235/1171/64/272 sabitlerinin bizzat OLCULDUGU calisma --
-# kullanilan kapsamla AYNI DEGILDI. Koordinator bu dosyayi tekrar ele
-# aldiginda, dogru kapsamla (asagida) repo-genelinde aktif=1195,
-# statik=1131, dinamik=64 olcerek gorev tanimindaki TUM beklenen sayilarla
-# BIREBIR eslesti; app/static hicbir style="..." icermedigi icin (yalnizca
-# PWA offline HTML'leri, 0 style attribute) onun dahil/haric edilmesi tek
-# basina bu farki aciklamiyordu -- asil sebep app/modules + app/workflow/
-# templates'in kapsam disinda birakilmis olmasiydi.)
-_STYLE_ATTR_SCOPE_ROOTS = [
-    REPO_ROOT / "app" / "templates",
-    REPO_ROOT / "app" / "modules",
-    REPO_ROOT / "app" / "workflow" / "templates",
-]
-# <style> blok kapsami: TUM app/ (blueprint-ozel sablon dizinleri dahil).
-_STYLE_BLOCK_SCOPE_ROOT = REPO_ROOT / "app"
+# BYS360 CSP STYLE-2B KOORDINATOR DUZELTMESI: bu dosya eskiden burada
+# REPO-GENELINDE sabit "aktif toplam == 1235-N" / "<style> blok == 272"
+# kilitleri de tutuyordu (EXPECTED_ACTIVE_STYLE_ATTR_COUNT_BEFORE_WAVE,
+# EXPECTED_JINJA_DYNAMIC_STYLE_ATTR_COUNT, EXPECTED_STYLE_BLOCK_COUNT,
+# _STYLE_ATTR_SCOPE_ROOTS, _STYLE_BLOCK_SCOPE_ROOT, _repo_wide_*()). Bu
+# dosya artik Style-2A'nin OZ (dalga-yerel) sorumlulugunu kilitliyor;
+# repo-geneli/kumulatif envanter dogrulamasi
+# test_csp_style_migration_cumulative_inventory_contract.py::
+# tests/security/_bys360_style_inventory.py kanonik yardimcisina tasindi
+# (bkz. dosya basi docstring). Style-2A'nin KENDI 8 sablonunun dinamik=0
+# ve style-block sayisinin degismedigi asagida (bolum 2) dogrudan, sabit
+# per-template beklenen degerlerle ayrica kilitleniyor.
 
 
 def _read(relative_path: str) -> str:
@@ -219,30 +220,6 @@ def _classify_style_attrs(text: str) -> tuple[int, int]:
         else:
             active += 1
     return active, dynamic
-
-
-def _iter_html_files(roots: list[Path]):
-    for root in roots:
-        if root.exists():
-            yield from sorted(root.rglob("*.html"))
-
-
-def _repo_wide_active_and_dynamic_counts() -> tuple[int, int]:
-    active_total = dynamic_total = 0
-    for html_file in _iter_html_files(_STYLE_ATTR_SCOPE_ROOTS):
-        text = html_file.read_text(encoding="utf-8", errors="replace")
-        active, dynamic = _classify_style_attrs(text)
-        active_total += active
-        dynamic_total += dynamic
-    return active_total, dynamic_total
-
-
-def _repo_wide_style_block_count() -> int:
-    total = 0
-    for html_file in sorted(_STYLE_BLOCK_SCOPE_ROOT.rglob("*.html")):
-        text = html_file.read_text(encoding="utf-8", errors="replace")
-        total += len(_STYLE_BLOCK_RE.findall(text))
-    return total
 
 
 def _measure_n() -> int:
@@ -348,92 +325,57 @@ def test_the_8_target_templates_active_style_attribute_delta_equals_pre_wave_tot
 
 
 # ---------------------------------------------------------------------------
-# 2) Repo-genelinde sabitler: aktif toplam, Jinja-dinamik toplam, <style>
-#    blok toplami.
+# 2) Style-2A'nin OZ (dalga-yerel) sorumlulugu: SADECE kendi 8 hedef
+#    sablonunda dinamik style attribute eklenmemis VE style-block sayisi
+#    degismemis mi? BYS360 CSP STYLE-2B KOORDINATOR DUZELTMESI: bu ikisi
+#    eskiden REPO-GENELINDE sabit hedeflerdi (66 dinamik / 272 blok); bu,
+#    ileriki her dalganin (Style-2B, Style-2C, ...) bu dosyayi FAIL
+#    ettirmesi anlamina geliyordu, cunku o dalgalar BASKA sablonlarda
+#    (mesru sekilde) daha fazla static/dynamic degisiklik yapabilir.
+#    Style-2A'nin gercek/kalici sorumlulugu SADECE KENDI 8 dosyasidir --
+#    repo-geneli kumulatif sayim artik
+#    test_csp_style_migration_cumulative_inventory_contract.py'de.
 # ---------------------------------------------------------------------------
 
+# Style-2A'nin kendi 8 hedef sablonunun, dalga TAMAMLANDIKTAN SONRAKI sabit
+# <style> blok sayisi (bu dalga hicbir style block'u tasimadi/degistirmedi,
+# yalniz yeni <link rel="stylesheet"> ekledi -- bkz. dosya basi docstring).
+EXPECTED_STYLE_BLOCK_COUNT_BY_TARGET_TEMPLATE: dict[str, int] = {
+    "app/templates/support/help_admin_list.html": 1,
+    "app/templates/support/detail.html": 1,
+    "app/templates/support/new.html": 1,
+    "app/templates/notifications_list.html": 2,
+    "app/templates/hr_attendance.html": 1,
+    "app/templates/hr_personnel_dashboard.html": 1,
+    "app/templates/file_center/index.html": 1,
+    "app/templates/admin_analysis_excel_preview.html": 1,
+}
 
-def test_repo_wide_jinja_dynamic_style_attribute_count_is_unchanged() -> None:
-    """Bu dalga HICBIR Jinja-dinamik style attribute'a DOKUNMAMALI (gorev
-    taniminin sabit yasagi). Kapsam: app/templates + app/modules +
-    app/workflow/templates (bkz. _STYLE_ATTR_SCOPE_ROOTS). Normalizasyon
-    sonrasi dogru/final hedef 66'dir (eskiden yanlislikla 64 olculuyordu --
-    bkz. dosya basi METODOLOJI NOTU)."""
-    _, dynamic_total = _repo_wide_active_and_dynamic_counts()
-    assert dynamic_total == EXPECTED_JINJA_DYNAMIC_STYLE_ATTR_COUNT, (
-        f"Repo-genelinde Jinja-dinamik style attribute sayisi {dynamic_total} "
-        f"bulundu, {EXPECTED_JINJA_DYNAMIC_STYLE_ATTR_COUNT} bekleniyordu "
-        "(kapsam: app/templates + app/modules + app/workflow/templates)."
+
+@pytest.mark.parametrize("relative_path", sorted(TARGET_TEMPLATES))
+def test_target_template_has_zero_dynamic_style_attribute(relative_path: str) -> None:
+    """Style-2A'nin kendi 8 sablonunun HICBIRINE bu dalga sirasinda -- ya da
+    sonrasinda baska bir dalga tarafindan -- Jinja-dinamik bir style
+    attribute EKLENMEMIS olmali (gorev taniminin sabit yasagi)."""
+    _, dynamic = _classify_style_attrs(_read(relative_path))
+    assert dynamic == 0, (
+        f"{relative_path} icinde {dynamic} adet Jinja-dinamik style attribute "
+        "bulundu; Style-2A'nin 8 hedef sablonunun hicbirine dinamik style "
+        "eklenmemis olmasi bekleniyordu."
     )
 
 
-def test_repo_wide_style_block_count_is_unchanged() -> None:
-    """Bu dalga hicbir <style> blogunu TASIMAMALI/ICERIGINI DEGISTIRMEMELI --
-    yalniz YENI <link rel=\"stylesheet\"> etiketleri eklenebilir. Kapsam: TUM
-    app/ (bkz. dosya basi docstring -- bu daha genis kapsam 272 hedefiyle
-    ampirik olarak eslesen TEK kapsamdir)."""
-    block_total = _repo_wide_style_block_count()
-    assert block_total == EXPECTED_STYLE_BLOCK_COUNT, (
-        f"Repo-genelinde <style> blok sayisi {block_total} bulundu, "
-        f"{EXPECTED_STYLE_BLOCK_COUNT} bekleniyordu (kapsam: app/**/*.html)."
-    )
-
-
-def test_repo_wide_active_style_attribute_total_matches_pre_wave_minus_measured_n() -> None:
-    """Repo-genelinde aktif style attribute toplami == 1235 - N.
-
-    KOORDINATOR NOTU: bu test ilk yazildiginda yanlis kapsamla (app/templates
-    + app/static) 1124 olcup FAIL veriyordu; dogru kapsamla (app/templates +
-    app/modules + app/workflow/templates -- bkz. _STYLE_ATTR_SCOPE_ROOTS)
-    1195 olculur ve PASS eder. Gercek/guvenilir ikinci dogrulama olarak
-    ayrica bkz. test_the_8_target_templates_active_style_attribute_delta_equals_pre_wave_total
-    (git/repo gecmisinden bagimsiz, dogrudan 8 dosyanin kendi kaynagina
-    dayanir)."""
-    n = _measure_n()
-    active_total, _ = _repo_wide_active_and_dynamic_counts()
-    expected = EXPECTED_ACTIVE_STYLE_ATTR_COUNT_BEFORE_WAVE - n
-    assert active_total == expected, (
-        f"Repo-genelinde aktif (statik) style attribute toplami {active_total} "
-        f"bulundu; {EXPECTED_ACTIVE_STYLE_ATTR_COUNT_BEFORE_WAVE} - N({n}) = "
-        f"{expected} bekleniyordu (kapsam: app/templates + app/modules + "
-        "app/workflow/templates)."
-    )
-
-
-def test_repo_wide_unrelated_modified_html_template_count_supports_the_discrepancy_finding() -> None:
-    """Yukaridaki 1235-N uyusmazligi icin destekleyici, salt-okunur bir
-    kanit: `git status --porcelain` bu worktree'de, Style-2A'nin 8 hedef
-    sablonu DISINDA da onlarca baska .html sablonunun ZATEN degismis
-    (commit'lenmemis) oldugunu gosteriyor mu? Git bulunamazsa/calisma
-    kopyasi git deposu degilse atlanir (ortam kisitlamasi, hata degil)."""
-    try:
-        subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
-    except OSError:
-        pytest.skip("git CLI bulunamadi.")
-
-    result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
-    if result.returncode != 0:
-        pytest.skip(f"git status beklenmedik sekilde basarisiz oldu (exit={result.returncode}).")
-
-    modified_html_files = [
-        line[3:].strip().replace("\\", "/")
-        for line in result.stdout.splitlines()
-        if line[3:].strip().endswith(".html")
-    ]
-    target_set = set(TARGET_TEMPLATES)
-    unrelated = [p for p in modified_html_files if p not in target_set]
-    # Bu bir "kanit" testidir -- FAIL etmesi beklenmez, yalniz bulguyu
-    # calisma zamaninda da GOZLE GORULUR kilar (pytest -v ciktisinda bu
-    # sayi raporlanir).
-    assert len(unrelated) >= 0  # her zaman True; asil deger raporlamadadir
-    print(  # noqa: T201 - kasitli tanilama ciktisi (pytest -s ile gorunur)
-        f"[bilgi] Style-2A disi, zaten degismis .html sablon sayisi: {len(unrelated)}"
+@pytest.mark.parametrize("relative_path", sorted(EXPECTED_STYLE_BLOCK_COUNT_BY_TARGET_TEMPLATE))
+def test_target_template_style_block_count_is_unchanged(relative_path: str) -> None:
+    """Style-2A'nin kendi 8 sablonunun HICBIRINDEKI <style> blok sayisi bu
+    dalga -- ya da sonraki bir dalga -- tarafindan degistirilmemis olmali
+    (yalniz YENI <link rel="stylesheet"> etiketleri eklenebilir, mevcut
+    <style> bloklari TASINAMAZ/ICERIGI DEGISTIRILEMEZ)."""
+    expected = EXPECTED_STYLE_BLOCK_COUNT_BY_TARGET_TEMPLATE[relative_path]
+    actual = len(_STYLE_BLOCK_RE.findall(_read(relative_path)))
+    assert actual == expected, (
+        f"{relative_path} icinde {actual} adet <style> blogu bulundu, "
+        f"{expected} bekleniyordu."
     )
 
 
@@ -542,9 +484,30 @@ def test_wave8_task_mail_guard_xfail_usage_count_is_unchanged_by_style2a() -> No
 
 
 # ---------------------------------------------------------------------------
-# 6) Yeni/degismis CSS dosyalari: yasakli genel/gecici isim YOK; KABA
-#    (whole-file) !important kontrolu + daha KESIN (diff-bazli, yorum-
-#    haric) ikinci bir kontrol.
+# 6) PLAN-SCOPE GUARD (kalici bir "correctness" kontrati DEGIL): Yeni/
+#    degismis CSS dosyalari: yasakli genel/gecici isim YOK; KABA (whole-file)
+#    !important kontrolu + daha KESIN (diff-bazli, yorum-haric) ikinci bir
+#    kontrol.
+#
+#    BYS360 CSP STYLE-2B KOORDINATOR NOTU (section 8 self-skip analizi):
+#    Asagidaki iki test `_git_status_css_entries()` bos donerse (yani
+#    `app/static/css/` altinda o an git status'ta degisen/yeni bir .css
+#    dosyasi YOKSA) `pytest.skip(...)` ile atlanir. Bu KASITLI ve DOGRUDUR --
+#    bu iki test aciktan "bu pilotun/dalganin FIILEN EKLEDIGI/DEGISTIRDIGI
+#    icerik" uzerinde calisir (isimlerinden de belli: "...added_by_this_
+#    pilot...", "...newly_added_css_file..."); temiz/tam commit'lenmis bir
+#    worktree'de "bu dalganin eklendigi" diye bir sey YOKTUR (her sey zaten
+#    tarihsel git commit'lerinin bir parcasidir), o yuzden bu ikisi bir
+#    PLAN-SCOPE GUARD'dir -- yalnizca bir dalga fiilen calisirken (uncommitted
+#    degisiklikler varken) anlamlidir, kalici/repo-genelinde her zaman
+#    calismasi gereken bir correctness kontrati DEGILDIR. Style-2B'nin kendi
+#    calismasi sirasinda (bu dosyanin son calistirilmasinda gorulebilecegi
+#    gibi) bu ikisi GERCEKTEN calisti ve PASS etti (skip etmedi), cunku o an
+#    gercek, commit'lenmemis yeni CSS dosyalari vardi. Bunu SKIP/xfail ile
+#    KARISTIRMAYIN: bu pytest.skip cagrisi, testin BASARISIZ olmasini
+#    gizlemiyor -- test zaten hicbir sey DOGRULAYAMAYACAGI (kontrol edecek
+#    hicbir "bu dalganin eklendigi CSS" olmadigi) icin kendini devre disi
+#    birakiyor.
 # ---------------------------------------------------------------------------
 
 FORBIDDEN_CSS_NAME_FRAGMENTS = (

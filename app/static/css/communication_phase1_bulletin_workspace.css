@@ -1,0 +1,7 @@
+/* Style-2B CSP migration: semantic classes for app/templates/communication/phase1_bulletin_form.html */
+.bulletin-target-textarea{min-height:110px;}
+.bulletin-preset-panel{padding:18px;background:#f8fafc;box-shadow:none;}
+.bulletin-preset-title{font-weight:900;color:#111827;margin-bottom:8px;}
+.bulletin-preset-subheading{font-size:.84rem;font-weight:800;color:#6b7280;margin-bottom:6px;}
+.bulletin-preset-list{color:#374151;font-size:.9rem;line-height:1.8;}
+.bulletin-preset-chip{display:inline-block;margin:0 10px 8px 0;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid rgba(15,23,42,.08);}

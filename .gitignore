@@ -109,3 +109,6 @@ instance/*.sqlite3
 project/
 reports/local/
 cleanup_manifest/
+
+# BYS360 Style-2B - secret repo gate local run output
+/reports/quality/BYS360_SECRET_REPO_GATE_V1_REPORT.json

@@ -1,0 +1,9 @@
+/* Style-2B CSP migration: semantic classes for app/templates/feedback_executive_summary_dashboard.html */
+.feedback-exec-summary-scope-note{color:#6b7280;font-size:.82rem;}
+.feedback-exec-summary-heading-spacing{margin-top:14px;}
+.feedback-exec-summary-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.feedback-exec-summary-form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.feedback-exec-summary-col-stack{display:grid;gap:18px;}
+.feedback-exec-summary-item-title-spacing{margin-top:10px;}
+.feedback-exec-summary-col-stack-start{display:grid;gap:18px;align-content:start;}
+.feedback-exec-summary-chip-row-compact{display:flex;gap:8px;flex-wrap:wrap;}

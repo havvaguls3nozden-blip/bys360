@@ -104,6 +104,7 @@
   @media (max-width:1180px){.gbd-hero-inner,.gbd-layout{grid-template-columns:1fr}.gbd-info-grid{grid-template-columns:1fr 1fr}.gbd-kind-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
   @media (max-width:720px){.gbd-hero-inner{padding:22px}.gbd-hero-main{display:block}.gbd-hero-icon{margin-bottom:12px}.gbd-info-grid,.gbd-kind-grid,.gbd-field-grid{grid-template-columns:1fr}.gbd-form-body,.gbd-panel-body{padding:19px}.gbd-actions{padding:16px 18px;display:grid}.gbd-actions-right{display:grid;width:100%}.gbd-btn{width:100%}.gbd-mini-item{display:block}.gbd-status{margin-top:8px}.gbd-trust-card{grid-template-columns:1fr;padding:17px}.gbd-trust-mark{width:46px;height:46px}.gbd-hero-title{font-size:1.34rem}.gbd-nav-wrap .cw-nav,.gbd-nav-wrap .gbd-safe-note{width:100%}}
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/feedback_quick_feedback_workspace.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -144,7 +145,7 @@
     <i class="fa-solid fa-circle-info"></i>
     <div>
       <strong>Geri bildirim altyapısı hazırlanıyor.</strong>
-      <div class="gbd-muted" style="margin-top:5px;line-height:1.7;">Destek ve talep tabloları henüz hazır değilse yetkili kullanıcı kurulum ekranından altyapıyı aktifleştirebilir.</div>
+      <div class="gbd-muted quick-feedback-setup-note">Destek ve talep tabloları henüz hazır değilse yetkili kullanıcı kurulum ekranından altyapıyı aktifleştirebilir.</div>
     </div>
   </div>
   {% endif %}
@@ -245,9 +246,9 @@
     <aside class="gbd-side-stack">
       <div class="gbd-panel">
         <div class="gbd-panel-body">
-          <h3 class="gbd-section-title" style="font-size:1.04rem;">Nasıl değerlendirilir?</h3>
+          <h3 class="gbd-section-title quick-feedback-panel-heading-lg">Nasıl değerlendirilir?</h3>
           <p class="gbd-section-text">Kayıt, destek ve talep sürecine bağlanarak yetkili kullanıcılar tarafından takip edilir.</p>
-          <div class="gbd-timeline" style="margin-top:16px;">
+          <div class="gbd-timeline quick-feedback-timeline-spacing">
             <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-file-circle-plus"></i></div><div><p class="gbd-timeline-title">Kayıt oluşur</p><p class="gbd-timeline-text">Geri bildirim numarası ve durum geçmişi hazırlanır.</p></div></div>
             <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-user-check"></i></div><div><p class="gbd-timeline-title">Yetkili inceler</p><p class="gbd-timeline-text">Hata, öneri veya teşekkür türüne göre ilgili süreç yürütülür.</p></div></div>
             <div class="gbd-timeline-row"><div class="gbd-timeline-dot"><i class="fa-solid fa-chart-simple"></i></div><div><p class="gbd-timeline-title">İyileştirme verisi olur</p><p class="gbd-timeline-text">Tekrar eden konular rapor ve geliştirme kararlarını besler.</p></div></div>
@@ -257,12 +258,12 @@
 
       <div class="gbd-panel">
         <div class="gbd-panel-body">
-          <div class="gbd-section-head" style="margin-bottom:14px;">
+          <div class="gbd-section-head quick-feedback-section-head-spacing">
             <div>
-              <h3 class="gbd-section-title" style="font-size:1.04rem;">Son kayıtlarım</h3>
-              <p class="gbd-section-text" style="margin-top:5px;">Daha önce gönderdiğiniz geri bildirimler.</p>
+              <h3 class="gbd-section-title quick-feedback-panel-heading-lg">Son kayıtlarım</h3>
+              <p class="gbd-section-text quick-feedback-section-text-spacing">Daha önce gönderdiğiniz geri bildirimler.</p>
             </div>
-            <a class="gbd-btn secondary" style="min-height:36px;padding:0 12px;font-size:.78rem;" href="{{ url_for('main.support_my_tickets') }}">Tümünü Gör</a>
+            <a class="gbd-btn secondary quick-feedback-btn-compact" href="{{ url_for('main.support_my_tickets') }}">Tümünü Gör</a>
           </div>
           <div class="gbd-mini-list">
             {% for row in recent_feedback %}
@@ -282,8 +283,8 @@
 
       <div class="gbd-panel">
         <div class="gbd-panel-body">
-          <h3 class="gbd-section-title" style="font-size:1.04rem;">Kısa yazım rehberi</h3>
-          <div style="display:grid;gap:11px;margin-top:15px;">
+          <h3 class="gbd-section-title quick-feedback-panel-heading-lg">Kısa yazım rehberi</h3>
+          <div class="quick-feedback-tips-grid">
             <div class="gbd-tip"><i class="fa-solid fa-bug"></i><div><strong>Hata bildirirken</strong><div class="gbd-muted">Ekran adı, işlem adımı ve beklenen sonucu yazın.</div></div></div>
             <div class="gbd-tip"><i class="fa-solid fa-lightbulb"></i><div><strong>Öneri yazarken</strong><div class="gbd-muted">Hangi süreci kolaylaştıracağını bir iki cümleyle anlatın.</div></div></div>
             <div class="gbd-tip"><i class="fa-solid fa-heart"></i><div><strong>Tebrik / teşekkür</strong><div class="gbd-muted">Beğendiğiniz ekranı veya katkı sağlayan çalışmayı doğrudan yazabilirsiniz.</div></div></div>
