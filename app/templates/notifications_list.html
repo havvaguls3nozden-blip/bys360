@@ -172,7 +172,7 @@
                 </form>
             </div>
         </div>
-        <div class="bulk-bar" style="margin-top:14px;">
+        <div class="bulk-bar section-spacing-top-sm">
             <form method="POST" action="{{ url_for('main.notifications_bulk_mark_read') }}" id="bulkReadForm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="current_view" value="{{ current_view }}">
@@ -187,7 +187,7 @@
                 <div id="notifBulkUnreadFields"></div>
                 <button class="btn-soft" type="submit" id="notifBulkUnreadBtn"><i class="fa-solid fa-envelope"></i> Seçilenleri Okunmamış Yap</button>
             </form>
-            <form method="POST" action="{{ url_for('main.notifications_bulk_delete') }}" id="bulkDeleteForm" onsubmit="return confirm('Seçilen bildirimler kaldırılacak. Devam edilsin mi?');">
+            <form method="POST" action="{{ url_for('main.notifications_bulk_delete') }}" id="bulkDeleteForm" data-confirm="Seçilen bildirimler kaldırılacak. Devam edilsin mi?">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="current_view" value="{{ current_view }}">
                 {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
@@ -296,8 +296,8 @@
         {% else %}
             <div class="empty-box">
                 <i class="fa-solid fa-bell-slash"></i>
-                <h5 style="margin:0;color:#111827;font-size:1rem;font-weight:900;">Bildirim görünmüyor</h5>
-                <p style="margin:0;line-height:1.8;">Bu görünümde henüz listelenecek bir kayıt yok.</p>
+                <h5 class="empty-state-heading">Bildirim görünmüyor</h5>
+                <p class="empty-state-text">Bu görünümde henüz listelenecek bir kayıt yok.</p>
             </div>
         {% endif %}
     </section>
@@ -394,6 +394,14 @@
     document.querySelectorAll('.notification-action-link').forEach(function(link){
         link.addEventListener('click', function(){
             link.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Açılıyor';
+        });
+    });
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
         });
     });
     syncCounter();

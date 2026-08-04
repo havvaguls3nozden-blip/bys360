@@ -16,7 +16,7 @@
     <aside class="portal-v2-profile-card">
       <div class="portal-v2-profile-top">
         <div class="portal-v2-avatar">
-          {% if p.photo_url %}<img src="{{ p.photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-empty')">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+          {% if p.photo_url %}<img src="{{ p.photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-empty">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
         </div>
         <div>
           <b>{{ p.name|default(current_user.full_name or current_user.email, true) }}</b>
@@ -83,4 +83,16 @@
     </section>
   </div>
 </section>
+<script>
+(function () {
+    document.querySelectorAll('img[data-fallback-class]').forEach(function (img) {
+        img.addEventListener('error', function () {
+            img.remove();
+            if (img.parentElement) {
+                img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+            }
+        });
+    });
+})();
+</script>
 {% endif %}

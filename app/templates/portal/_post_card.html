@@ -43,7 +43,7 @@
       <a class="portal-avatar portal-avatar-ring portal-instagram-avatar" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram profilini aç"><i class="fa-brands fa-instagram"></i></a>
     {% else %}
       <a class="portal-avatar portal-avatar-ring" href="{{ safe_url_for('main.portal_profile', user_id=post.author_user_id, fallback='#') }}" aria-label="Profil">
-        {% if post.author and post.author.profile_photo_url %}<img src="{{ post.author.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+        {% if post.author and post.author.profile_photo_url %}<img src="{{ post.author.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
       </a>
     {% endif %}
     <div class="portal-post-meta">
@@ -150,7 +150,7 @@
       <a class="portal-btn instagram" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> Instagram’da Aç</a>
       <a class="portal-link-btn" href="{{ ig.permalink or ('https://www.instagram.com/' ~ ig.account ~ '/') }}" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-heart"></i> Beğen / Yorum Yap</a>
       {% if item is defined and item.can_delete %}
-        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" onsubmit="return confirm('Bu Instagram kaydı portal akışından kaldırılacak. Devam etmek istiyor musunuz?');">
+        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" data-confirm="Bu Instagram kaydı portal akışından kaldırılacak. Devam etmek istiyor musunuz?">
           {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
           <button class="portal-link-btn danger portal-delete-post-v210" type="submit"><i class="fa-regular fa-trash-can"></i> Akıştan Kaldır</button>
         </form>
@@ -188,7 +188,7 @@
 
     <div class="portal-post-actions">
       {% if item is defined and item.can_delete %}
-        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" onsubmit="return confirm('Bu paylaşım yayından kaldırılacak. Devam etmek istiyor musunuz?');">
+        <form class="portal-post-delete-form-v210" method="post" action="{{ safe_url_for('main.portal_post_delete', post_id=post.id, fallback='/portal/posts/' ~ post.id ~ '/delete') }}" data-confirm="Bu paylaşım yayından kaldırılacak. Devam etmek istiyor musunuz?">
           {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
           <button class="portal-link-btn danger portal-delete-post-v210" type="submit" title="Paylaşımı yayından kaldır"><i class="fa-regular fa-trash-can"></i> Sil</button>
         </form>

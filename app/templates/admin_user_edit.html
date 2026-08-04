@@ -372,7 +372,7 @@ Mevcut personel kaydını güncelleyin, organizasyon bilgilerini revize edin ve 
                      class="profile-avatar"
                      id="profileMainPreview"
                      alt="Profil"
-                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                     data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
 
                 <div>
                     <h3 class="profile-name">
@@ -558,7 +558,7 @@ Mevcut personel kaydını güncelleyin, organizasyon bilgilerini revize edin ve 
                          class="avatar-preview"
                          id="avatarPreview"
                          alt="Önizleme"
-                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                         data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
 
                     <div style="flex:1; min-width:220px;">
                         <input type="file" name="profile_photo" id="profile_photo" class="form-input" accept="image/*">

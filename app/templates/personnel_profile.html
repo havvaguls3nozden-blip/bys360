@@ -297,7 +297,7 @@ Personelin kimlik, kurumsal konum, hiyerarşi ve hesap durumu bilgilerini tek ek
                 <div class="avatar-wrap">
                     <img src="{{ profile.avatar_url }}"
                          alt="{{ profile.full_name }}"
-                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                         data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
                 </div>
 
                 <div>

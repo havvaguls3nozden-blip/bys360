@@ -39,7 +39,7 @@
 <div class="print-shell">
     <div class="print-card">
         <div class="toolbar">
-            <button onclick="window.print()" class="btn-soft">
+            <button type="button" id="printReportBtn" class="btn-soft">
                 <i class="fa-solid fa-print"></i>
                 Yazdır / PDF Kaydet
             </button>
@@ -105,3 +105,16 @@
 {% endblock %}
 
 {# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var printBtn = document.getElementById('printReportBtn');
+    if (!printBtn) return;
+
+    printBtn.addEventListener('click', function () {
+        window.print();
+    });
+})();
+</script>
+{% endblock %}

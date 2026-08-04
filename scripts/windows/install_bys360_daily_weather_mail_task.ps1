@@ -24,11 +24,28 @@ New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 function Install-BysTask {
     param([string]$TaskName,[string]$Runner,[string]$Launcher,[string]$LogPath,[int]$Hour,[int]$Minute,[string]$Description)
-    @"
-`$ErrorActionPreference = "Continue"
-Set-Location "$ProjectRoot"
-& "$Python" "$Runner" >> "$LogPath" 2>&1
-"@ | Set-Content -Path $Launcher -Encoding UTF8
+
+    # GUVENLIK KONTRATI: Bu fonksiyon launcher dosyasinin ICERIGINI ASLA
+    # URETMEZ/UZERINE YAZMAZ (Set-Content/Out-File KULLANILMAZ). Launcher'lar
+    # kaynak kontrollu, elle incelenmis kanonik dosyalardir (orn.
+    # scripts\communication\run_daily_weather_personnel_mail.ps1). Bu fonksiyon
+    # sadece mevcut, gecerli bir launcher'i Scheduled Task tanimina baglar.
+    if (!(Test-Path $Launcher)) {
+        throw "Launcher bulunamadi (installer bunu URETMEZ; repoda onceden var olmasi gerekir): $Launcher"
+    }
+
+    $ParseErrors = $null
+    $null = [System.Management.Automation.Language.Parser]::ParseFile($Launcher, [ref]$null, [ref]$ParseErrors)
+    if ($ParseErrors.Count -gt 0) {
+        throw "Launcher gecersiz PowerShell sozdizimine sahip: $Launcher ($($ParseErrors.Count) parse hatasi)"
+    }
+
+    $LauncherText = Get-Content -Path $Launcher -Raw
+    $RunnerLeaf = Split-Path -Path $Runner -Leaf
+    if (-not $LauncherText.Contains($RunnerLeaf)) {
+        throw "Launcher beklenen runner scriptini referans etmiyor ($RunnerLeaf bulunamadi icinde): $Launcher"
+    }
+
     $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$Launcher`"" -WorkingDirectory $ProjectRoot
     $TriggerTime = (Get-Date).Date.AddHours($Hour).AddMinutes($Minute)
     $Trigger = New-ScheduledTaskTrigger -Daily -At $TriggerTime

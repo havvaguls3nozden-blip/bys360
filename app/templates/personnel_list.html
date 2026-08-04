@@ -556,7 +556,7 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
                 <form method="POST" action="{{ url_for('main.admin_users_bulk_archive') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="selected_ids" id="bulkArchiveIds">
-                    <button type="submit" class="btn-soft warning" onclick="return fillBulkIds('bulkArchiveIds','Seçili personeller arşivlensin mi?');">
+                    <button type="submit" class="btn-soft warning" data-bulk-target="bulkArchiveIds" data-bulk-confirm="Seçili personeller arşivlensin mi?">
                         <i class="fa-solid fa-box-archive"></i>
                         Toplu Arşivle
                     </button>
@@ -564,12 +564,12 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
                 <form method="POST" action="{{ url_for('main.admin_users_bulk_delete') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="selected_ids" id="bulkDeleteIds">
-                    <button type="submit" class="btn-soft primary" onclick="return fillBulkIds('bulkDeleteIds','Seçili personeller silinsin mi?');">
+                    <button type="submit" class="btn-soft primary" data-bulk-target="bulkDeleteIds" data-bulk-confirm="Seçili personeller silinsin mi?">
                         <i class="fa-solid fa-trash"></i>
                         Toplu Sil
                     </button>
                 </form>
-                <form method="POST" action="{{ url_for('main.admin_users_reset_all') }}" onsubmit="return confirm('Tüm personel verileri ve bağlı kayıtlar sıfırlansın mı?');">
+                <form method="POST" action="{{ url_for('main.admin_users_reset_all') }}" data-confirm-submit="Tüm personel verileri ve bağlı kayıtlar sıfırlansın mı?">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn-soft secondary">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -594,7 +594,7 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
                             <div class="avatar-wrap">
                                 <img src="{{ row.avatar_url }}"
                                      alt="{{ row.full_name }}"
-                                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                                     data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
                             </div>
 
                             <div>
@@ -687,7 +687,7 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
                                 </form>
                             {% endif %}
 
-                            <form method="POST" action="{{ url_for('main.personnel_delete', user_id=row.id) }}" class="inline-form" onsubmit="return confirm('Bu personel kaydını silmek istediğinize emin misiniz?');">
+                            <form method="POST" action="{{ url_for('main.personnel_delete', user_id=row.id) }}" class="inline-form" data-confirm-submit="Bu personel kaydını silmek istediğinize emin misiniz?">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-soft primary sm">
                                     <i class="fa-solid fa-trash"></i>
@@ -708,6 +708,7 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
     </div>
 </div>
 {% endblock %}
+{% block extra_scripts %}
 <script>
 function fillBulkIds(targetId, confirmText){
     const ids = Array.from(document.querySelectorAll('input[name="selected_person"]:checked')).map(el => el.value);
@@ -715,4 +716,22 @@ function fillBulkIds(targetId, confirmText){
     document.getElementById(targetId).value = ids.join(',');
     return confirm(confirmText);
 }
+document.querySelectorAll('[data-bulk-target]').forEach(function(btn){
+    btn.addEventListener('click', function(event){
+        const targetId = btn.getAttribute('data-bulk-target');
+        const confirmText = btn.getAttribute('data-bulk-confirm') || '';
+        if (!fillBulkIds(targetId, confirmText)) {
+            event.preventDefault();
+        }
+    });
+});
+document.querySelectorAll('form[data-confirm-submit]').forEach(function(form){
+    form.addEventListener('submit', function(event){
+        const confirmText = form.getAttribute('data-confirm-submit') || '';
+        if (!confirm(confirmText)) {
+            event.preventDefault();
+        }
+    });
+});
 </script>
+{% endblock %}

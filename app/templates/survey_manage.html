@@ -178,14 +178,14 @@
                             <div id="surveyBulkRestoreFields"></div>
                             <button type="submit" class="mini-btn" id="surveyBulkRestoreBtn"><i class="fa-solid fa-rotate-left"></i> Taslağa Al</button>
                         </form>
-                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkDeleteForm" onsubmit="return confirm('Seçili anketler kalıcı olarak silinecek. Devam edilsin mi?');">
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkDeleteForm" data-confirm="Seçili anketler kalıcı olarak silinecek. Devam edilsin mi?">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="current_status" value="{{ current_status }}">
                             <input type="hidden" name="bulk_action" value="delete">
                             <div id="surveyBulkDeleteFields"></div>
                             <button type="submit" class="mini-btn danger" id="surveyBulkDeleteBtn"><i class="fa-solid fa-trash"></i> Sil</button>
                         </form>
-                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkForceDeleteForm" onsubmit="return confirm('Seçili anketler ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?');">
+                        <form method="POST" action="{{ url_for('main.survey_bulk_action') }}" id="surveyBulkForceDeleteForm" data-confirm="Seçili anketler ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="current_status" value="{{ current_status }}">
                             <input type="hidden" name="bulk_action" value="delete">
@@ -282,11 +282,11 @@
                                                 <button type="submit" class="mini-btn"><i class="fa-solid fa-rotate-left"></i> Taslağa Geri Al</button>
                                             </form>
                                             {% endif %}
-                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" onsubmit="return confirm('Bu anket kalıcı olarak silinecek. Devam edilsin mi?');">
+                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" data-confirm="Bu anket kalıcı olarak silinecek. Devam edilsin mi?">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button type="submit" class="mini-btn danger"><i class="fa-solid fa-trash"></i> Sil</button>
                                             </form>
-                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" onsubmit="return confirm('Bu anket ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?');">
+                                            <form method="POST" action="{{ url_for('main.survey_delete', survey_id=row.survey.id) }}" data-confirm="Bu anket ve tüm yanıtları kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <input type="hidden" name="force_delete" value="1">
                                                 <button type="submit" class="mini-btn danger"><i class="fa-solid fa-trash-can"></i> Yanıtlarıyla Birlikte Sil</button>
@@ -433,6 +433,15 @@
     }
     syncSearch();
     syncSelection();
+
+    document.querySelectorAll('form[data-confirm]').forEach(function(form){
+        form.addEventListener('submit', function(event){
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 })();
 </script>
 <script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>

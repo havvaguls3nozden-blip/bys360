@@ -137,10 +137,10 @@
 
                 {% if message.sender_user_id == current_user.id and not message.is_deleted %}
                 <div class="msg-thread-actions msg-inline-actions">
-                  <button type="button" class="msg-mini-btn" onclick="openEditModal('{{ message.id }}', {{ message.body|tojson }})">
+                  <button type="button" class="msg-mini-btn" data-message-edit-trigger data-message-id="{{ message.id }}" data-message-body="{{ message.body or '' }}">
                     <i class="fa-solid fa-pen"></i> Düzenle
                   </button>
-                  <form method="POST" action="{{ url_for('main.messages_delete', message_id=message.id) }}" onsubmit="return confirm('Bu mesaj silinsin mi?');">
+                  <form method="POST" action="{{ url_for('main.messages_delete', message_id=message.id) }}" data-confirm="Bu mesaj silinsin mi?">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="msg-mini-btn danger"><i class="fa-solid fa-trash"></i> Sil</button>
                   </form>
@@ -211,6 +211,7 @@ function openEditModal(messageId, bodyText) {
     modal.show();
   }
 }
+window.openEditModal = openEditModal;
 </script>
 <script src="{{ url_for('static', filename='js/messages_messenger_mobile.js') }}?v=message-interactions-v1"></script>
 {% endblock %}

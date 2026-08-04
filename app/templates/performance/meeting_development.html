@@ -400,7 +400,7 @@
             <option value="hatirlatildi">Hatırlatıldı</option>
             <option value="tamamlandi">Tamamlandı</option>
         </select>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.location.reload()">
+        <button type="button" id="bysRemReloadBtn" class="btn btn-sm btn-outline-secondary">
             <i class="fa-solid fa-rotate-right me-1"></i> Yenile
         </button>
     </div>
@@ -602,6 +602,9 @@
 
     if (search) search.addEventListener("input", applyFilters);
     if (status) status.addEventListener("change", applyFilters);
+
+    const reloadBtn = document.getElementById("bysRemReloadBtn");
+    if (reloadBtn) reloadBtn.addEventListener("click", function(){ window.location.reload(); });
 })();
 </script>
 {# BYS360_AI_DECISION_FAZ11_PANEL_INCLUDED #}

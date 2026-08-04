@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------
+# KANONIK registrasyon scripti: "BYS360 Executive Summary 0001" / "BYS360
+# Executive Summary 0830" Scheduled Task'lari icin TEK gecerli Action kaynagi
+# budur. register_bys360_executive_summary_tasks_v2_14_1.ps1 artik kendi
+# Action'ini uretmiyor; SADECE bu dosyaya delege eder (bkz. o dosyadaki
+# DEPRECATED basligi). Ayni TaskName'in iki farkli mekanizmayla kurulmasi
+# artik mumkun degil.
+# ------------------------------------------------------------------------
 param(
     [string]$ProjectRoot = "C:\bys360\project"
 )
@@ -12,15 +20,28 @@ New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $morningScript = Join-Path $ProjectRoot "scripts\windows\run_executive_summary_0830.ps1"
 $nightScript = Join-Path $ProjectRoot "scripts\windows\run_executive_summary_0001.ps1"
 
-@"
-Set-Location "$ProjectRoot"
-& "$python" "scripts\executive\send_daily_executive_summary.py" --type morning >> "logs\executive_summary_0830.log" 2>&1
-"@ | Set-Content -Path $morningScript -Encoding UTF8
+# GUVENLIK KONTRATI: Bu script launcher dosyalarinin ICERIGINI ASLA
+# URETMEZ/UZERINE YAZMAZ (Set-Content/Out-File KULLANILMAZ). Launcher'lar
+# kaynak kontrollu, elle incelenmis kanonik dosyalardir. Bu script sadece
+# mevcut, gecerli launcher'lari Scheduled Task tanimina baglar.
+function Assert-LauncherReady {
+    param([string]$Path, [string]$Label, [string]$ExpectedFragment)
+    if (!(Test-Path $Path)) {
+        throw "$Label launcher bulunamadi (bu script bunu URETMEZ; repoda onceden var olmasi gerekir): $Path"
+    }
+    $ParseErrors = $null
+    $null = [System.Management.Automation.Language.Parser]::ParseFile($Path, [ref]$null, [ref]$ParseErrors)
+    if ($ParseErrors.Count -gt 0) {
+        throw "$Label launcher gecersiz PowerShell sozdizimine sahip: $Path ($($ParseErrors.Count) parse hatasi)"
+    }
+    $text = Get-Content -Path $Path -Raw
+    if (-not $text.Contains($ExpectedFragment)) {
+        throw "$Label launcher beklenen icerigi referans etmiyor ('$ExpectedFragment' bulunamadi icinde): $Path"
+    }
+}
 
-@"
-Set-Location "$ProjectRoot"
-& "$python" "scripts\executive\send_daily_executive_summary.py" --type night >> "logs\executive_summary_0001.log" 2>&1
-"@ | Set-Content -Path $nightScript -Encoding UTF8
+Assert-LauncherReady -Path $morningScript -Label "Executive Summary 0830" -ExpectedFragment "--type morning"
+Assert-LauncherReady -Path $nightScript -Label "Executive Summary 0001" -ExpectedFragment "--type night"
 
 $actionMorning = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$morningScript`"" -WorkingDirectory $ProjectRoot
 $triggerMorning = New-ScheduledTaskTrigger -Daily -At 08:30

@@ -546,6 +546,15 @@
     });
 
     document.addEventListener('submit', function(event){
+      const confirmForm = event.target.closest('form[data-confirm]');
+      if(confirmForm){
+        const message = confirmForm.getAttribute('data-confirm');
+        if(message && !window.confirm(message)){
+          event.preventDefault();
+        }
+        return;
+      }
+
       const reactionForm = event.target.closest('.js-message-reaction-form');
       if(reactionForm){
         event.preventDefault();
@@ -606,6 +615,14 @@
     });
 
     document.addEventListener('click', function(event){
+      const editTrigger = event.target.closest('[data-message-edit-trigger]');
+      if(editTrigger){
+        if (typeof window.openEditModal === 'function') {
+          window.openEditModal(editTrigger.getAttribute('data-message-id'), editTrigger.getAttribute('data-message-body'));
+        }
+        return;
+      }
+
       const toggle = event.target.closest('[data-message-comment-toggle]');
       if(!toggle) return;
       const messageId = toggle.dataset.messageId || '';

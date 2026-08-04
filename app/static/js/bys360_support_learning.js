@@ -17,5 +17,12 @@
       });
     });
   }
-  document.addEventListener('DOMContentLoaded', function(){copyArticleLink(); smoothAnchors();});
+  function bindArticlePrint(){
+    var btn=document.getElementById('helpArticlePrintBtn');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      window.print();
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function(){copyArticleLink(); smoothAnchors(); bindArticlePrint();});
 })();

@@ -490,7 +490,7 @@
         <img src="{{ url_for('static', filename='img/bys360.svg') }}"
              alt="Yükleniyor"
              class="page-loader-logo"
-             onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+             data-fallback-src="{{ url_for('static', filename='img/logo.png') }}">
         <div class="page-loader-text">Lütfen bekleyiniz...</div>
         <div class="page-loader-bar"></div>
     </div>
@@ -502,7 +502,7 @@
             <img src="{{ url_for('static', filename='img/bys360.svg') }}"
                  alt="BYS360 Logo"
                  class="brand-logo"
-                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+                 data-fallback-src="{{ url_for('static', filename='img/logo.png') }}">
         </div>
 
         <div class="brand-footer">
@@ -599,6 +599,15 @@
 </div>
 
 <script>
+    (function(){
+        document.querySelectorAll('img[data-fallback-src]').forEach(function (img) {
+            img.addEventListener('error', function onImgError() {
+                img.removeEventListener('error', onImgError);
+                img.src = img.getAttribute('data-fallback-src');
+            }, { once: true });
+        });
+    })();
+
     (function(){
         const passwordField = document.getElementById('passwordField');
         const toggleButton = document.getElementById('togglePassword');

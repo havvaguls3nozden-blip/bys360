@@ -6,7 +6,6 @@ import uuid
 from collections.abc import Iterable
 from functools import wraps
 from typing import Any
-from urllib.parse import urlparse
 
 from flask import (
     current_app,
@@ -22,6 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.routing import BuildError
 
 from app.extensions import db
+from app.security import redirect_guard as _redirect_guard
 from app.services.settings.effective_menu import (
     build_menu_visibility_map as _settings_build_menu_visibility_map,
 )
@@ -314,22 +314,58 @@ def safe_url_for(endpoint: str, fallback: str = "#", **values: Any) -> str:
         return fallback
 
 
+# BYS360_PHASE5_3A_A2_HOST_HEADER_OPEN_REDIRECT_HARDENING
+# Bilinçli tasarım kararı: bu fonksiyon "aynı origin mi?" sorusunu ASLA
+# `request.host` / `request.host_url` üzerinden yanıtlamaz. O değerler
+# istemcinin gönderdiği `Host` başlığından türer (ProxyFix ve/veya bir
+# ters-proxy/IIS zincirinde `X-Forwarded-Host` yanlış yapılandırılmışsa
+# doğrudan saldırgan tarafından belirlenebilir) ve buna güvenmek host-header
+# poisoning ile açık yönlendirmeye (open redirect) yol açar: saldırgan sahte
+# bir `Host` gönderip kendi domainini "güvenli" gösterebilir. Güven kökü
+# bunun yerine sunucu tarafında sabit `APP_BASE_URL` (+ opsiyonel host
+# allowlist'i) olmalıdır. Gerçek karşılaştırma/parse mantığı, Flask
+# request/app context olmadan da kapsamlı biçimde birim testi yazılabilsin
+# diye çerçeveden bağımsız `app.security.redirect_guard` modülünde yaşar.
 def is_safe_redirect_target(target: str | None) -> bool:
-    if not target:
-        return False
-    candidate = str(target).strip()
-    if not candidate or candidate.startswith("///") or candidate.startswith("//"):
-        return False
+    """Bir yönlendirme hedefinin güvenli olup olmadığını denetler.
 
-    parsed = urlparse(candidate)
-    if parsed.scheme and parsed.scheme not in {"http", "https"}:
-        return False
+    Kabul edilenler: tek `/` ile başlayan uygulama-içi göreli yollar ve host'u
+    kanonik `APP_BASE_URL` (veya operatörün açıkça tanımladığı bir
+    allowlist) ile eşleşen `http`/`https` mutlak URL'ler. Ayrıntılı sözleşme
+    ve reddedilen saldırı desenleri için `app/security/redirect_guard.py`
+    docstring'ine bakın.
+    """
+    settings = _redirect_guard_settings()
+    return _redirect_guard.is_safe_redirect_target(target, **settings)
 
-    if not parsed.netloc:
-        return candidate.startswith("/")
 
-    host = urlparse(request.host_url)
-    return (parsed.scheme or host.scheme) == host.scheme and parsed.netloc == host.netloc
+def _redirect_guard_settings() -> dict[str, Any]:
+    """`is_safe_redirect_target` için güven kökünü `current_app.config`'ten okur.
+
+    - ``APP_BASE_URL``: config.py'de zaten tanımlı, sunucu tarafı kanonik taban
+      URL (Host header'dan etkilenmez). Bu fonksiyon config.py'yi DEĞİŞTİRMEZ,
+      yalnızca mevcut anahtarı okur.
+    - ``REDIRECT_ALLOWED_HOSTS``: config.py'de HENÜZ TANIMLI DEĞİL (bilinçli
+      olarak eklenmedi -- bkz. bu görevin raporu). Anahtar yoksa
+      `current_app.config.get(...)` güvenli biçimde boş listeye düşer; ileride
+      eklenirse ek güvenilir host'lar (ör. çoklu-domain kurulumlarında bir
+      portal alt alan adı) kod değişikliği gerekmeden tanınır.
+    - Yerel geliştirme/test ortamında (``TESTING``, ``DEBUG`` veya
+      ``APP_ENV in {"development", "test", "testing"}``) dar bir
+      localhost/127.0.0.1 istisnası açılır ki yerel geliştirme kırılmasın;
+      canlı/staging'de bu asla devreye girmez.
+    """
+    app_env = str(current_app.config.get("APP_ENV", "") or "").strip().lower()
+    allow_local_dev = bool(
+        current_app.config.get("TESTING")
+        or current_app.debug
+        or app_env in {"development", "test", "testing"}
+    )
+    return {
+        "app_base_url": current_app.config.get("APP_BASE_URL"),
+        "allowed_hosts": current_app.config.get("REDIRECT_ALLOWED_HOSTS") or [],
+        "allow_local_dev": allow_local_dev,
+    }
 
 
 def redirect_to_next_or(default_endpoint: str | None = None, fallback_url: str | None = None, **values: Any):

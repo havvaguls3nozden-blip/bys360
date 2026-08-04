@@ -63,24 +63,258 @@ def _host_is_local_or_private(hostname: str | None) -> bool:
     return bool(ip_value.is_private or ip_value.is_loopback or ip_value.is_link_local)
 
 
-def _default_secure_cookie(app_env: str, app_base_url: str) -> bool:
-    parsed = urlparse((app_base_url or '').strip())
-    scheme = (parsed.scheme or '').lower()
-    hostname = parsed.hostname
-    if scheme and scheme != 'https':
-        return False
+def _default_secure_cookie(app_base_url: str, preferred_url_scheme: str) -> bool:
+    """Acik env degeri yokken cookie Secure varsayilani.
+
+    BYS360_SEC3A_A1_SCHEME_COOKIE_CONSISTENCY_V1: karar artik yalnizca ham
+    APP_BASE_URL semasina degil, cozumlenmis PREFERRED_URL_SCHEME'e (etkili
+    dis HTTPS sinyali -- explicit env override > APP_BASE_URL semasi, bkz.
+    _resolve_preferred_url_scheme) bakar. Boylece PREFERRED_URL_SCHEME=https
+    override edildiginde varsayilan sessizce eski/yerel APP_BASE_URL
+    semasinda takili kalmaz. Host local/private ise (mevcut dev/test akisi)
+    Secure her zaman False kalir -- aksi halde tarayici Secure cerezi
+    yalnizca HTTPS baglantida gonderecegi icin oturum fiilen kirilir.
+    """
+    hostname = urlparse((app_base_url or '').strip()).hostname
     if _host_is_local_or_private(hostname):
         return False
-    return app_env in {'production', 'staging'}
+    return (preferred_url_scheme or '').strip().lower() == 'https'
 
 
-def _resolve_secure_cookie(raw_value: str | None, app_env: str, app_base_url: str) -> bool:
+def _resolve_secure_cookie(
+    raw_value: str | None,
+    app_env: str,
+    app_base_url: str,
+    preferred_url_scheme: str,
+    *,
+    cookie_name: str = 'SESSION_COOKIE_SECURE',
+) -> bool:
+    """SESSION_COOKIE_SECURE / REMEMBER_COOKIE_SECURE icin tek cozumleme sozlesmesi.
+
+    Sira: acik env degeri > etkili dis HTTPS semasiyla (PREFERRED_URL_SCHEME,
+    sadece ham APP_BASE_URL degil) tutarli guvenli varsayilan.
+
+    - Acik 'true' istenmis olsa bile, host local/private ise ya da etkili dis
+      sema https degilse yok sayilir (Secure cerez boyle bir baglantida
+      tarayicidan hic donmeyecegi icin oturumu kirar) ve bu durum loglanir.
+    - BYS360_SEC3B_A1_COOKIE_FAIL_FAST_V1: acik 'false' -- production/staging
+      APP_ENV'de VE etkili dis sema HTTPS (host public) iken -- artik
+      operatorun "bilincli tercihi" sayilip sessizce/yalnizca bir warning ile
+      gecirilmez. Bu kombinasyon her zaman bir RuntimeError ile config.py'nin
+      import edilmesini durdurur (once bir logger.warning ile isaretlenir,
+      sonra ayni bilgiyle RuntimeError firlatilir) -- SECRET_KEY guard'i ve
+      asagidaki PREFERRED_URL_SCHEME/APP_BASE_URL sema-celiskisi guard'i ile
+      ayni fail-fast usluptadir. Boylece config.py, uygulama hic olusturul-
+      madan (bare `import config` seviyesinde) bile bagimsiz/self-sufficient
+      olarak bu riskli kombinasyonu reddeder; production/staging disi
+      (development/testing) ya da local/private host icin bu dal ASLA
+      tetiklenmez.
+      Not: app/security/startup_audit.validate_live_security_defaults da
+      ayni iki alani (SESSION_COOKIE_SECURE/REMEMBER_COOKIE_SECURE) semadan
+      bagimsiz olarak production/staging'de True olmaya zorlar, ama SADECE
+      gercek bir Flask app create_app() ile olusturuldugunda (factory_
+      bootstrap.run_preflight_checks adiminda) calisir. Bu fonksiyondaki
+      fail-fast onun YERINE GECMEZ -- ikisi farkli katmanlarda ayni sonuca
+      varan bagimsiz/tekrarlayan (defense-in-depth) guard'lardir: burasi
+      "etkili sema https iken false" gibi daha dar/erken bir alt kumeyi
+      config.py import zamaninda yakalar; validate_live_security_defaults
+      ise semadan bagimsiz olarak (ornegin gercekten http olan bir production
+      dagitiminda bile) Secure cerez zorunlulugunu app olusturma zamaninda
+      genel olarak denetler. Biri diger kontrolu "ekarte etmez"; ikisi de
+      kalir.
+    - Acik deger yoksa sonuc _default_secure_cookie() ile belirlenir.
+    """
     parsed = urlparse((app_base_url or '').strip())
-    scheme = (parsed.scheme or '').lower()
     hostname = parsed.hostname
-    if (scheme and scheme != 'https') or _host_is_local_or_private(hostname):
+    host_is_local = _host_is_local_or_private(hostname)
+    scheme_is_https = (preferred_url_scheme or '').strip().lower() == 'https'
+    effective_https = scheme_is_https and not host_is_local
+
+    raw = raw_value.strip() if isinstance(raw_value, str) else raw_value
+    has_explicit = bool(raw)
+    if has_explicit:
+        explicit_value = str_to_bool(raw, False)
+        if explicit_value and not effective_https:
+            logger.warning(
+                "%s=true acikca istenmis ama etkili dis sema/host bunu desteklemiyor "
+                "(host=%s, PREFERRED_URL_SCHEME=%s); Secure cerez boyle bir "
+                "baglantida tarayicidan hic donmeyip oturumu kirabileceginden bu "
+                "deger guvenli sekilde False'a dusuruldu.",
+                cookie_name, hostname or app_base_url, preferred_url_scheme,
+            )
+            return False
+        if not explicit_value and effective_https and app_env in {'production', 'staging'}:
+            conflict_msg = (
+                f"{cookie_name}=false acikca ayarlanmis; ancak etkili dis sema HTTPS "
+                f"(PREFERRED_URL_SCHEME={preferred_url_scheme}, host={hostname or app_base_url}) "
+                f"ve APP_ENV={app_env}. Production/staging'de etkili dis sema HTTPS "
+                f"oldugunda {cookie_name} True olmak zorundadir; cerez calinmasi / oturum "
+                "ele gecirme riski tasidigindan bu kombinasyon artik operatorun bilincli "
+                "tercihi olarak bile sessizce kabul edilmiyor."
+            )
+            logger.warning(conflict_msg)
+            raise RuntimeError(
+                "Production/staging ortaminda etkili dis sema HTTPS iken "
+                f"{cookie_name}=false celisir, uygulama baslatilamaz: " + conflict_msg +
+                f" Guvenli acilis icin {cookie_name} degiskenini kaldirin ya da true yapin."
+            )
+        return explicit_value
+
+    return _default_secure_cookie(app_base_url, preferred_url_scheme)
+
+
+def _resolve_preferred_url_scheme(raw_value: str | None, app_base_url: str) -> str:
+    """Acik PREFERRED_URL_SCHEME > APP_BASE_URL semasi > guvenli varsayilan (http).
+
+    Explicit env degeri gecerli (http/https) degilse yok sayilir ve bir sonraki
+    kaynaga (APP_BASE_URL semasi) dusulur; o da cozulemezse Flask'in kendi
+    varsayilanina esdeger, guvenli/iddiasiz 'http' donulur -- boylece hicbir
+    zaman dogrulanmamis bir HTTPS iddiasi uretilmez.
+    """
+    explicit = (raw_value or '').strip().lower()
+    if explicit in {'http', 'https'}:
+        return explicit
+    base_scheme = (urlparse((app_base_url or '').strip()).scheme or '').strip().lower()
+    if base_scheme in {'http', 'https'}:
+        return base_scheme
+    return 'http'
+
+
+def _preferred_url_scheme_conflicts_with_app_base_url(raw_preferred_value: str | None, app_base_url: str) -> bool:
+    """PREFERRED_URL_SCHEME'in acik env degeri, APP_BASE_URL'in kendi semasindan farkli mi?
+
+    Yalnizca acik bir override varsa anlamlidir: override yoksa
+    _resolve_preferred_url_scheme() zaten APP_BASE_URL semasine duser, bu
+    yuzden trivial olarak celisme olamaz. Her iki yon de (APP_BASE_URL=http
+    + PREFERRED_URL_SCHEME=https, ya da tersi) celiski sayilir.
+    """
+    explicit = (raw_preferred_value or '').strip().lower()
+    if explicit not in {'http', 'https'}:
         return False
-    return str_to_bool(raw_value, _default_secure_cookie(app_env, app_base_url))
+    base_scheme = (urlparse((app_base_url or '').strip()).scheme or '').strip().lower()
+    if base_scheme not in {'http', 'https'}:
+        return False
+    return explicit != base_scheme
+
+
+_LOCAL_TRUSTED_HOST_DEFAULTS: tuple[str, ...] = ('localhost', '127.0.0.1', '::1')
+
+
+def _split_trusted_hosts_env(raw_value: str | None) -> list[str]:
+    """Virgulle ayrilmis TRUSTED_HOSTS env degerini temiz bir listeye cevirir."""
+    if not raw_value:
+        return []
+    return [item.strip() for item in raw_value.split(',') if item.strip()]
+
+
+def _resolve_trusted_hosts(raw_value: str | None, app_base_url: str, app_env: str) -> list[str]:
+    """Flask'in yerlesik ``app.config['TRUSTED_HOSTS']`` Host-header dogrulamasi
+    (bkz. ``werkzeug.sansio.utils.get_host`` / ``host_is_trusted`` -- Flask 3.1,
+    her istekte ``create_url_adapter()`` icinde otomatik cagrilir, ek bir
+    route_support.py kancasi GEREKMEZ) icin kullanilacak allowlist'i cozer.
+
+    Sozlesme:
+      * Kanonik host -- ``app_base_url``'in kendi hostname'i -- HER ZAMAN
+        listenin ilk/temel ogesidir. Bu, tutarli tek bir "gercek" host
+        kaynagini garanti eder ve dondurulen liste ASLA bos olmaz (bos/None
+        bir TRUSTED_HOSTS, Werkzeug'de "tum host'lara guven" -- fiilen
+        wildcard'a esdeger -- anlamina gelir, bkz. host_is_trusted:
+        ``if not trusted_list: return True``).
+      * Acik ``TRUSTED_HOSTS`` env degeri (virgulle ayrilmis) varsa ek host
+        olarak eklenir. '*' girdisi production/staging'de KESINLIKLE
+        reddedilir (RuntimeError) -- Werkzeug'de bos/None disinda '*' diye
+        ozel bir "hepsine izin ver" degeri yoktur, boyle bir girdi sadece
+        literal '*' host adiyla eslesir ve operatorun aslinda korumayi
+        tamamen kapatmak istedigine isaret eder; bu yanlis anlamayi
+        production'da erken ve gurultulu sekilde reddediyoruz.
+      * Acik TRUSTED_HOSTS, kanonik host'u icermiyorsa (operator hatasi/
+        eksik konfigurasyon) sessizce gecilmez -- bir logger.warning
+        yazilir VE kanonik host yine de listeye eklenerek tutarlilik
+        otomatik saglanir (APP_BASE_URL bu modulun tek guven kokudur).
+      * Dev/test ortaminda (``app_env in {'development','test','testing'}``
+        VEYA kanonik host zaten ``_host_is_local_or_private`` ise)
+        localhost/127.0.0.1/::1 otomatik eklenir -- boylece yerel gelistirme
+        akislari (Flask test client'in varsayilan Host'u dahil) kirilmaz.
+      * Port: girdiler yalnizca host-bazlidir. ``urlparse(...).hostname``
+        zaten portu ayiklar, bu yuzden kanonik host hicbir zaman port
+        icermez; Werkzeug'un kendi ``host_is_trusted()``'i da hem gelen
+        Host basligindaki hem de trusted-list girdilerindeki portu
+        (varsa) karsilastirmadan once atar -- bu yuzden operator yanlislikla
+        ``host:port`` yapistirirsa bile kirilmaz, port basitce yok sayilir.
+      * IDN/punycode: BILINCLI olarak burada AYRICA normalize edilmez.
+        Werkzeug'un ``host_is_trusted()``'i her trusted-list girdisini
+        karsilastirmadan once kendisi ``.encode('idna')`` ile kodlar (bkz.
+        werkzeug/sansio/utils.py); ayrica gelen Host basligi zaten ASCII/
+        punycode olmak ZORUNDADIR (Werkzeug, ASCII-disi karakter iceren bir
+        Host basligini `_host_re` regex'i ile daha karsilastirmadan once
+        gecersiz sayar). Yani hem Unicode hem de onceden punycode'lanmis
+        TRUSTED_HOSTS girdileri ayni sonucu verir; burada tekrar/celiskili
+        bir IDNA katmani eklemek gereksiz karmasikliktir.
+    """
+    canonical_host = (urlparse((app_base_url or '').strip()).hostname or '').strip().lower()
+    explicit_entries = _split_trusted_hosts_env(raw_value)
+
+    if app_env in {'production', 'staging'}:
+        for entry in explicit_entries:
+            if entry == '*':
+                raise RuntimeError(
+                    "Production/staging ortaminda TRUSTED_HOSTS icinde '*' (wildcard) "
+                    "kullanilamaz -- bu Flask'in Host header dogrulamasini fiilen "
+                    "devre disi birakip host-header poisoning / cache poisoning "
+                    "riskini geri getirir. TRUSTED_HOSTS'u somut, virgulle ayrilmis "
+                    "host adlariyla sinirlayin (ornek: 'bys360.canakkaletarihialan."
+                    "gov.tr')."
+                )
+
+    resolved: list[str] = []
+    _seen_lower: set[str] = set()
+
+    def _add(host: str) -> None:
+        host = (host or '').strip()
+        if host and host.lower() not in _seen_lower:
+            _seen_lower.add(host.lower())
+            resolved.append(host)
+
+    if canonical_host:
+        _add(canonical_host)
+
+    if explicit_entries and canonical_host:
+        normalized_explicit = set()
+        for entry in explicit_entries:
+            normalized = entry.strip().lower()
+            normalized = normalized[1:] if normalized.startswith('.') else normalized
+            normalized_explicit.add(normalized)
+        already_covered = any(
+            canonical_host == entry or canonical_host.endswith('.' + entry)
+            for entry in normalized_explicit
+        )
+        if not already_covered:
+            logger.warning(
+                "TRUSTED_HOSTS acikca ayarlanmis ('%s') ama APP_BASE_URL'in kendi "
+                "host'unu ('%s') icermiyor; tutarliligi bozmamak icin APP_BASE_URL "
+                "host'u allowlist'e otomatik eklendi. Operator TRUSTED_HOSTS'u "
+                "APP_BASE_URL ile tutarli olacak sekilde guncellemelidir.",
+                raw_value, canonical_host,
+            )
+
+    for entry in explicit_entries:
+        _add(entry)
+
+    is_dev_or_test_env = app_env in {'development', 'test', 'testing'}
+    if is_dev_or_test_env or _host_is_local_or_private(canonical_host or None):
+        for local_host in _LOCAL_TRUSTED_HOST_DEFAULTS:
+            _add(local_host)
+
+    if not resolved and app_env in {'production', 'staging'}:
+        raise RuntimeError(
+            "TRUSTED_HOSTS icin gecerli bir kanonik host belirlenemedi (APP_BASE_URL="
+            f"'{app_base_url}'); production/staging ortaminda bos/None TRUSTED_HOSTS "
+            "Flask'in tum Host basliklarina guvenmesi (wildcard'a esdeger) anlamina "
+            "gelir ve kabul edilemez. Gecerli bir APP_BASE_URL (host iceren) "
+            "ayarlayin."
+        )
+
+    return resolved
 
 
 def _coerce_positive_int(raw_value: str | None, fallback: int) -> int:
@@ -155,6 +389,133 @@ def _is_sqlite_url(db_url: str) -> bool:
 class Config:
     APP_ENV = os.getenv('APP_ENV', 'development').strip().lower()
     APP_BASE_URL = os.getenv('APP_BASE_URL', 'http://127.0.0.1:8000').strip()
+    PREFERRED_URL_SCHEME = _resolve_preferred_url_scheme(os.getenv('PREFERRED_URL_SCHEME'), APP_BASE_URL)
+
+    # BYS360_SEC3A_A1_SCHEME_COOKIE_CONSISTENCY_V1
+    # PREFERRED_URL_SCHEME'in acik env override'i APP_BASE_URL'in kendi
+    # semasindan farkliysa (ornek: APP_BASE_URL=http://... ama acik
+    # PREFERRED_URL_SCHEME=https, ya da tersi), HSTS ve cookie Secure
+    # kararlarinin hangi semaya gore verildigi belirsizlesir. Production/
+    # staging'de -- host local/private degilse, yani gercek bir canli
+    # dagitim soz konusuysa -- bu SECRET_KEY ile ayni uslupta fail-fast'e
+    # donusturulur. Local/private host'larda (dev/test akisi, ornegin bu
+    # dosyadaki HSTS testlerinin PREFERRED_URL_SCHEME'i app.config uzerinden
+    # gecici olarak override etmesi) ve APP_ENV='testing'/'development'
+    # oldugu surece asla tetiklenmez.
+    _preferred_scheme_raw_override = os.getenv('PREFERRED_URL_SCHEME')
+    _preferred_scheme_conflict = _preferred_url_scheme_conflicts_with_app_base_url(
+        _preferred_scheme_raw_override, APP_BASE_URL
+    )
+    _preferred_scheme_conflict_host = urlparse(APP_BASE_URL).hostname
+    if _preferred_scheme_conflict and not _host_is_local_or_private(_preferred_scheme_conflict_host):
+        _preferred_scheme_conflict_msg = (
+            f"PREFERRED_URL_SCHEME (acik deger: '{_preferred_scheme_raw_override}') "
+            f"APP_BASE_URL semasindan ('{urlparse(APP_BASE_URL).scheme}') farkli; HSTS ve "
+            "cookie Secure kararlari hangi semanin 'gercek' oldugu konusunda ayrisir."
+        )
+        if APP_ENV in {'production', 'staging'}:
+            logger.warning(_preferred_scheme_conflict_msg)
+            raise RuntimeError(
+                "Production/staging ortaminda PREFERRED_URL_SCHEME ile APP_BASE_URL "
+                "semasi celisemez: " + _preferred_scheme_conflict_msg + " APP_BASE_URL'i "
+                "gercek dis semaya gore guncelleyin ya da PREFERRED_URL_SCHEME "
+                "override'ini kaldirin."
+            )
+
+    # BYS360_SEC3C_A1_PRODUCTION_HTTPS_FAIL_FAST_V1
+    # Yukaridaki celiski guard'i (hemen ustte) YALNIZCA acik bir
+    # PREFERRED_URL_SCHEME override'i APP_BASE_URL semasiyla CELISIYORSA
+    # tetiklenir. Gercek acik nokta bu degildi: production/staging'de
+    # APP_BASE_URL=http://... (hicbir acik PREFERRED_URL_SCHEME override'i
+    # YOK, host public) -> _resolve_preferred_url_scheme() sessizce APP_BASE_
+    # URL'in kendi semasina (http) duser, yukaridaki celiski guard'i devre
+    # disi kalir (celisecek bir "acik deger" hic yok ki), SECRET_KEY/cookie
+    # guard'lari da bu durumu yakalamaz -> bare `import config` exit=0 ile
+    # basariyla tamamlanir ve production canli bir HTTP dagitimini onaysiz
+    # kabul eder. BYS360'in production sozlesmesi HER ZAMAN HTTPS olmak
+    # zorunda oldugundan bu artik kabul edilemez.
+    #
+    # Bu guard yukaridaki PREFERRED_URL_SCHEME/APP_BASE_URL celiski guard'i
+    # ile CAKISMAZ, onu TAMAMLAR (ikisi de "production'da guvenilir olmayan
+    # dis sema" kok nedenini farkli acidan yakalayan, kasitli olarak
+    # ortusen/defense-in-depth iki kontroldur):
+    #   - Yukaridaki guard: yalnizca acik bir PREFERRED_URL_SCHEME override'i
+    #     APP_BASE_URL semasindan FARKLIYSA calisir (iki yonlu celiski).
+    #     Class body'de bu guard AYNI PREFERRED_URL_SCHEME/APP_BASE_URL
+    #     celiskisini asagidaki guard'dan ONCE degerlendirdigi icin, celisen
+    #     bir override oldugunda (ornegin APP_BASE_URL=https + override=http,
+    #     ki bu durumda cozumlenen PREFERRED_URL_SCHEME de 'http' olur ve
+    #     asagidaki guard da teorik olarak tetiklenebilirdi) import HER ZAMAN
+    #     once burada durur -- asagidaki guard'a hic ulasilmaz. Bu beklenen
+    #     ve zararsizdir; hangisinin "once" ateslendigi onemli degildir,
+    #     ikisi de ayni sonuca (RuntimeError, boot durur) varir.
+    #   - Asagidaki guard (bu guard): cozumlenen PREFERRED_URL_SCHEME'in
+    #     KENDISI (acik bir override olsun ya da OLMASIN -- ozellikle
+    #     override HIC yokken APP_BASE_URL'in kendi http semasina sessizce
+    #     dusuldugu, yukaridaki guard'in hic devreye giremeyecegi durumu)
+    #     https DEGILSE, production/staging + non-local/private host'ta
+    #     devreye girer. Bu, yukaridaki guard'in kapsam disi biraktigi tam
+    #     bosluktur.
+    #   - Local/private host'ta (dev/test akislari, _host_is_local_or_private)
+    #     bu guard ASLA tetiklenmez -- yukaridaki guard ile ayni istisna.
+    if (
+        APP_ENV in {'production', 'staging'}
+        and PREFERRED_URL_SCHEME != 'https'
+        and not _host_is_local_or_private(_preferred_scheme_conflict_host)
+    ):
+        _production_https_required_msg = (
+            f"APP_ENV={APP_ENV} + cozumlenen PREFERRED_URL_SCHEME='{PREFERRED_URL_SCHEME}' "
+            f"(APP_BASE_URL='{APP_BASE_URL}', host='{_preferred_scheme_conflict_host}'). "
+            "Production/staging ortaminda dis sema HER ZAMAN HTTPS olmak "
+            "zorundadir; acik bir PREFERRED_URL_SCHEME/APP_BASE_URL celiskisi "
+            "olmasa bile sema http'de kalirsa HSTS, cookie Secure ve diger "
+            "HTTPS-bagimli guvenlik sinyalleri sessizce devre disi kalir."
+        )
+        logger.warning(_production_https_required_msg)
+        raise RuntimeError(
+            "Production/staging ortaminda PREFERRED_URL_SCHEME https olmak "
+            "zorundadir: " + _production_https_required_msg + " APP_BASE_URL'i "
+            "https:// ile baslatin ve/veya PREFERRED_URL_SCHEME=https ayarlayin."
+        )
+
+    # BYS360_SEC3C_A1_TRUSTED_HOSTS_V1
+    # Flask 3.1'in yerlesik app.config['TRUSTED_HOSTS'] Host-header dogrulamasi
+    # (bkz. _resolve_trusted_hosts() docstring'i) -- her istekte Flask'in kendi
+    # create_url_adapter()'i tarafindan otomatik uygulanir, ek bir
+    # route_support.py kancasi GEREKMEZ.
+    #
+    # Enforcement kapisi BILINCLI olarak asimetriktir:
+    #   - production/staging: HER ZAMAN zorlanir (liste asla None degildir --
+    #     bos/None TRUSTED_HOSTS Werkzeug'de "tum host'lara guven" anlamina
+    #     gelir, bu production'da kabul edilemez).
+    #   - development/testing: yalnizca operator ACIKCA bir TRUSTED_HOSTS env
+    #     degeri verdiyse (opt-in) zorlanir; aksi halde Flask'in varsayilan
+    #     davranisi (None = tum Host basliklarina guven, mevcut/eski davranis)
+    #     KORUNUR. Bu kasitli bir geriye-uyumluluk karari: repo'da zaten
+    #     APP_ENV=testing altinda gercek create_app() ile kurulan, kasitli
+    #     olarak SAHTE bir Host basligi gonderip uygulama mantiginin
+    #     request.host'a guvenmedigini kanitlayan mevcut testler var (bkz.
+    #     tests/security/test_account_change_photo_redirect_guard.py --
+    #     ozellikle test_account_change_photo_direct_call_ignores_forged_
+    #     host_header/..._still_honors_relative_next_under_forged_host,
+    #     Host: evil.attacker.example ile test_request_context kullaniyor).
+    #     Bu dosya bu gorevin izin verilen dosya listesinde DEGIL. TRUSTED_HOSTS'u
+    #     testing'de kosulsuz zorlamak, Werkzeug'un request.host cached_property'
+    #     sinin ilk erisimde SecurityError firlatmasina (dogrulanmis: gercek
+    #     Flask app + test_request_context + TRUSTED_HOSTS=['127.0.0.1',
+    #     'localhost','::1'] ile deneysel olarak dogrulandi) ve bu tamamen
+    #     ilgisiz, zaten gecen testleri kirmasina yol acardi. Production/
+    #     staging bu riski tasimaz (o dosya yalnizca APP_ENV=testing ile
+    #     calisir) ve BYS360'in "production'da her zaman kisitla" sozlesmesi
+    #     bu istisnadan bagimsiz olarak tam korunur.
+    _trusted_hosts_raw_env = os.getenv('TRUSTED_HOSTS')
+    _trusted_hosts_resolved = _resolve_trusted_hosts(_trusted_hosts_raw_env, APP_BASE_URL, APP_ENV)
+    _trusted_hosts_explicit_opt_in = bool((_trusted_hosts_raw_env or '').strip())
+    TRUSTED_HOSTS = (
+        _trusted_hosts_resolved
+        if APP_ENV in {'production', 'staging'} or _trusted_hosts_explicit_opt_in
+        else None
+    )
 
     DOTENV_PATH = str(DOTENV_PATH)
     REQUIRE_DOTENV_FILE = str_to_bool(os.getenv('REQUIRE_DOTENV_FILE'), APP_ENV in {'production', 'staging'})
@@ -230,10 +591,16 @@ class Config:
 
     SESSION_COOKIE_HTTPONLY = str_to_bool(os.getenv('SESSION_COOKIE_HTTPONLY'), True)
     SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
-    SESSION_COOKIE_SECURE = _resolve_secure_cookie(os.getenv('SESSION_COOKIE_SECURE'), APP_ENV, APP_BASE_URL)
+    SESSION_COOKIE_SECURE = _resolve_secure_cookie(
+        os.getenv('SESSION_COOKIE_SECURE'), APP_ENV, APP_BASE_URL, PREFERRED_URL_SCHEME,
+        cookie_name='SESSION_COOKIE_SECURE',
+    )
 
     REMEMBER_COOKIE_HTTPONLY = str_to_bool(os.getenv('REMEMBER_COOKIE_HTTPONLY'), True)
-    REMEMBER_COOKIE_SECURE = _resolve_secure_cookie(os.getenv('REMEMBER_COOKIE_SECURE'), APP_ENV, APP_BASE_URL)
+    REMEMBER_COOKIE_SECURE = _resolve_secure_cookie(
+        os.getenv('REMEMBER_COOKIE_SECURE'), APP_ENV, APP_BASE_URL, PREFERRED_URL_SCHEME,
+        cookie_name='REMEMBER_COOKIE_SECURE',
+    )
 
     WTF_CSRF_TIME_LIMIT = int(os.getenv('WTF_CSRF_TIME_LIMIT', 3600))
     SESSION_REFRESH_EACH_REQUEST = str_to_bool(os.getenv('SESSION_REFRESH_EACH_REQUEST'), True)
@@ -328,6 +695,8 @@ class Config:
     CSP_FRAME_ANCESTORS = os.getenv('CSP_FRAME_ANCESTORS', "'self'").strip() or "'self'"
     CSP_IMG_SRC = os.getenv('CSP_IMG_SRC', "'self' data: blob: https:").strip() or "'self' data: blob: https:"
     CSP_STYLE_SRC = os.getenv('CSP_STYLE_SRC', "'self' 'unsafe-inline' https:").strip() or "'self' 'unsafe-inline' https:"
+    CSP_STYLE_SRC_ELEM = os.getenv('CSP_STYLE_SRC_ELEM', "'self' 'unsafe-inline' https:").strip() or "'self' 'unsafe-inline' https:"
+    CSP_STYLE_SRC_ATTR = os.getenv('CSP_STYLE_SRC_ATTR', "'unsafe-inline'").strip() or "'unsafe-inline'"
     # BYS360_P0_SECURITY_OBSERVABILITY_V1: script tarafinda unsafe-inline varsayilan kapali; nonce uygulanir.
     CSP_SCRIPT_SRC = os.getenv('CSP_SCRIPT_SRC', "'self' https:").strip() or "'self' https:"
     CSP_FONT_SRC = os.getenv('CSP_FONT_SRC', "'self' data: https:").strip() or "'self' data: https:"

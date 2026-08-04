@@ -151,7 +151,7 @@
                 <p class="bys-guide-card-desc">İlk 30 saniye görüşmenin tonunu belirler. Cümleyi aynen okumayın; kendi sesinize uyarlayın.</p>
             </div>
             <form method="get" action="{{ safe_url_for('main.performance_feedback_meeting_guide') }}">
-                <select class="bys-select" name="scenario" onchange="this.form.submit()">
+                <select id="feedbackScenarioSelect" class="bys-select" name="scenario" data-autosubmit="1">
                     {% for scenario in scenarios %}<option value="{{ scenario.key }}" {% if selected_scenario.key == scenario.key %}selected{% endif %}>{{ scenario.title }}</option>{% endfor %}
                 </select>
             </form>
@@ -277,6 +277,12 @@
             var out=document.getElementById('sbiPreview');
             if(!s || !b || !i){ out.innerText='Lütfen Durum, Davranış ve Etki alanlarını doldurun.'; return; }
             out.innerText=s + ' ' + b + '; bu nedenle ' + i + '.';
+        });
+    }
+    var scenarioSelect=document.getElementById('feedbackScenarioSelect');
+    if(scenarioSelect && scenarioSelect.hasAttribute('data-autosubmit')){
+        scenarioSelect.addEventListener('change', function(){
+            if(scenarioSelect.form) scenarioSelect.form.submit();
         });
     }
 })();

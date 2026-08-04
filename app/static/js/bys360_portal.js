@@ -342,3 +342,47 @@
   });
 })();
 // /BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_JS
+
+// BYS360_PORTAL_POST_CARD_CSP_DELEGATION_V1_BEGIN
+(function () {
+  if (document.documentElement.hasAttribute('data-bys360-postcard-delegation-bound')) return;
+  document.documentElement.setAttribute('data-bys360-postcard-delegation-bound', '1');
+
+  // _post_card.html is rendered N times per page (once per feed item) via
+  // {% include %} inside a Jinja for-loop, so it must never contain a
+  // <script> tag of its own (that would bind N duplicate listeners).
+  // These two delegated, page-level listeners replace the inline
+  // onsubmit="confirm(...)" and onerror="..." handlers that used to live
+  // directly on each card's markup.
+
+  // submit bubbles, so a single delegated listener on document covers
+  // every post-card delete form regardless of how many cards are rendered.
+  document.addEventListener('submit', function (event) {
+    var form = event.target.closest('form[data-confirm]');
+    if (!form) return;
+    if (!form.closest('[data-portal-post-card]')) return;
+    var message = form.getAttribute('data-confirm');
+    if (message && !window.confirm(message)) {
+      event.preventDefault();
+    }
+  });
+
+  // error does NOT bubble, so this must be registered on the capture phase
+  // to observe it at all. Scoped to [data-portal-post-card] so it only
+  // handles the avatar images owned by this partial; feed.html/profile.html
+  // avatars and the _composer.html/_experience_v2_hub.html/
+  // _profile_summary_card_v2d.html partial avatars use the same
+  // data-fallback-class attribute but live outside a post-card wrapper and
+  // already have their own dedicated 'error' listeners, so this delegation
+  // intentionally does not match them (no duplicate binding).
+  document.addEventListener('error', function (event) {
+    var img = event.target;
+    if (!img || !img.matches || !img.matches('img[data-fallback-class]')) return;
+    if (!img.closest('[data-portal-post-card]')) return;
+    img.remove();
+    if (img.parentElement) {
+      img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+    }
+  }, true);
+})();
+// BYS360_PORTAL_POST_CARD_CSP_DELEGATION_V1_END

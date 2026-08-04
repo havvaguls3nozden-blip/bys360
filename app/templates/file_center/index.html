@@ -11,12 +11,12 @@
 <div class="container-fluid py-4">
  <section class="fc-hero p-4 p-lg-5 mb-4">
   <div class="content d-flex align-items-start justify-content-between flex-wrap gap-4">
-   <div style="max-width:820px;">
+   <div class="fc-hero-copy">
     <div class="fc-pill mb-3">Güvenli Kurumsal Dosya Paylaşımı</div>
     <h1 class="display-6 fw-bold mb-3">BYS360 Dosya Merkezi</h1>
     <p class="lead mb-0">Büyük dosyaları kurum içinde güvenli biçimde yükleyin, indirin ve gerektiğinde şifreli süreli misafir bağlantısı oluşturun.</p>
    </div>
-   <div class="bg-white bg-opacity-10 rounded-4 p-3 border border-white border-opacity-25" style="min-width:250px;">
+   <div class="bg-white bg-opacity-10 rounded-4 p-3 border border-white border-opacity-25 fc-hero-security-box">
     <div class="small opacity-75">Varsayılan güvenlik</div>
     <div class="fw-bold">Şifreli bağlantı · süre sınırı · indirme logu</div>
    </div>
@@ -45,7 +45,7 @@
      <form method="post" action="{{ url_for('main.file_center_upload') }}" enctype="multipart/form-data">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="fc-drop p-4 text-center mb-3">
-       <div class="display-6 mb-2" style="color:#8B0000;">↑</div>
+       <div class="display-6 mb-2 fc-upload-icon-color">↑</div>
        <label class="form-label fw-bold">Yüklenecek dosya</label>
        <input type="file" name="file" class="form-control" required>
        <div class="form-text mt-2">İzin verilen varsayılan sınır: 5 GB. Riskli dosya türleri engellenir.</div>
@@ -99,7 +99,7 @@
            <a class="btn btn-outline-secondary" href="{{ url_for('main.file_center_download', file_id=file.id) }}">İndir</a>
            {% if guest_links_enabled %}<button class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#share{{ file.id }}">Misafir Bağlantısı</button>{% endif %}
           </div>
-          <form method="post" action="{{ url_for('main.file_center_delete', file_id=file.id) }}" class="d-inline" onsubmit="return confirm('Bu dosya silinsin mi? Aktif misafir bağlantıları da kapatılır.');">
+          <form method="post" action="{{ url_for('main.file_center_delete', file_id=file.id) }}" class="d-inline" data-confirm="Bu dosya silinsin mi? Aktif misafir bağlantıları da kapatılır.">
            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
            <button class="btn btn-sm btn-link text-danger text-decoration-none">Sil</button>
           </form>
@@ -174,4 +174,15 @@
   </div>
  </div>
 </div>
+
+<script>
+document.querySelectorAll('form[data-confirm]').forEach(function(form){
+    form.addEventListener('submit', function(event){
+        const m = form.getAttribute('data-confirm');
+        if (m && !window.confirm(m)) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
 {% endblock %}

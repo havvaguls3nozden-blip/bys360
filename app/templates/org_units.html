@@ -282,7 +282,7 @@
 
                         <form method="post"
                               action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}"
-                              onsubmit="return confirm('Bu birimi silmek istediğinize emin misiniz?');">
+                              data-confirm="Bu birimi silmek istediğinize emin misiniz?">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="mini-btn secondary">
                                 <i class="fa-solid fa-trash"></i> Sil
@@ -299,4 +299,17 @@
         </tbody>
     </table>
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

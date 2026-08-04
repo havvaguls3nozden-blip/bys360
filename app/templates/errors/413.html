@@ -92,9 +92,17 @@
             <p>Dosya boyutu uygun olduğu halde bu ekranı görüyorsanız, local büyük dosya çalıştırma komutunun 5 GB destekli açıldığını kontrol edin.</p>
             <div class="actions">
                 <a class="primary" href="/file-center">Dosya Merkezi’ne dön</a>
-                <a class="secondary" href="javascript:history.back()">Önceki sayfaya dön</a>
+                <a class="secondary" href="#" data-action="history-back">Önceki sayfaya dön</a>
             </div>
         </section>
     </main>
+    <script>
+        document.querySelectorAll('[data-action="history-back"]').forEach(function (el) {
+            el.addEventListener('click', function (event) {
+                event.preventDefault();
+                window.history.back();
+            });
+        });
+    </script>
 </body>
 </html>

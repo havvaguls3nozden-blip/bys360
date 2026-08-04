@@ -58,6 +58,18 @@ REGEX_OR_SCANNER_MARKERS = (
     "SECRET_KEY i", "DATABASE_URL i", "SQLALCHEMY_DATABASE_URI i",
 )
 
+# BYS360 Phase 5 secret-gate closure (2026-08-02): raw PEM/OpenSSH/PGP private
+# key material pasted directly into a file (not wrapped in a `KEY = "value"`
+# assignment) was invisible to every scan path above -- ASSIGN_RE/DICT_ASSIGN_RE/
+# UNQUOTED_ASSIGN_RE only ever look at a value following a sensitive KEY name
+# and an assignment operator on the same line, and a PEM block's header line
+# has neither. Confirmed by direct reproduction: a tracked file containing only
+# a "-----BEGIN PRIVATE KEY-----" header produced finding_count=0 before this
+# addition. The header line alone is a reliable, low-false-positive signal --
+# real key material is essentially the only thing that legitimately starts a
+# line this way -- so it is matched independently of the KEY=value machinery.
+PRIVATE_KEY_HEADER_RE = re.compile(r"-----BEGIN (?:[A-Z0-9]+ )?PRIVATE KEY(?: BLOCK)?-----")
+
 DB_URL_RE = re.compile(r"(?:postgresql|postgres|mysql|mariadb)://([^\s:'\"/@]+):([^\s'\"/@]+)@", re.I)
 # BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): DB_URL_RE above
 # already deliberately excludes the sqlite scheme from its embedded-
@@ -402,6 +414,21 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
         stripped = line.strip()
         if not stripped or stripped.startswith("#") or stripped.startswith("//"):
             continue
+
+        # Raw PEM/OpenSSH/PGP private-key header, independent of the KEY=value
+        # assignment machinery above (see PRIVATE_KEY_HEADER_RE definition).
+        # Scanner/test code that merely documents or matches this pattern as a
+        # string (e.g. a regex literal in another quality-gate script, or a
+        # fixture line marked with the pre-existing "hardcoded_secret" comment
+        # convention used throughout tests/quality/test_bys360_secret_repo_gate.py)
+        # is excluded via the same looks_regex_or_scanner() used elsewhere.
+        if PRIVATE_KEY_HEADER_RE.search(line) and not looks_regex_or_scanner(line, path):
+            findings.append({
+                "type": "hardcoded_private_key_material",
+                "path": rel,
+                "line": lineno,
+                "detail": "Kaynak kodda gömülü özel anahtar (private key) materyali bulundu; değer rapora yazılmadı.",
+            })
 
         # Database URLs with embedded password. Regex/test/scanner placeholders are warnings, real values are findings.
         for m in DB_URL_RE.finditer(line):

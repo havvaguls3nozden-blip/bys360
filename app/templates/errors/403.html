@@ -137,10 +137,18 @@
       <div class="message">{{ message or "Bu sayfaya erişim yetkiniz bulunmamaktadır." }}</div>
       <div class="actions">
         <a class="btn primary" href="{{ back_url or url_for('main.dashboard') }}">Ana sayfaya dön</a>
-        <a class="btn secondary" href="javascript:history.back()">Geri dön</a>
+        <a class="btn secondary" href="#" data-action="history-back">Geri dön</a>
       </div>
       <div class="note">Yetki gerektiğini düşünüyorsanız sistem yöneticisiyle iletişime geçiniz.</div>
     </section>
   </main>
+  <script>
+    document.querySelectorAll('[data-action="history-back"]').forEach(function (el) {
+      el.addEventListener('click', function (event) {
+        event.preventDefault();
+        window.history.back();
+      });
+    });
+  </script>
 </body>
 </html>

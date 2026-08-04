@@ -523,7 +523,7 @@ Personel kayıtlarını görüntüleyin, filtreleyin, düzenleyin ve kurumsal hi
                                             <img src="{{ photo }}"
                                                  alt="Avatar"
                                                  class="person-avatar"
-                                                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                                                 data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
                                         {% else %}
                                             <div class="person-avatar-fallback">{{ initials }}</div>
                                         {% endif %}

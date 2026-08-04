@@ -1007,3 +1007,262 @@ def test_tracked_env_example_still_green_after_secret_expansion(tmp_path: Path) 
 
     assert result["ok"] is True
     assert result["finding_count"] == 0
+
+
+# --- BYS360 Phase 5 secret-gate closure (2026-08-02): Bölüm 3C Ajan 3 ---
+# tests/security/test_phase13b_setup_admin.py posts realistic-looking
+# passwords ("AttackerPass123!", "OperatorStrongPass1!", "SecondAdminPass1!")
+# to exercise setup-admin bootstrap negative/positive assertions. These are
+# not real secrets, but the gate previously had no way to tell that apart
+# from a genuinely leaked credential and flagged all three as
+# hardcoded_secret_value (finding_count=3). The fix renamed the fixture
+# values to obviously-fake, still-valid (>= 8 chars, the only requirement
+# enforced by _MIN_PASSWORD_LENGTH in app/main_handlers/auth_handlers.py)
+# values containing "Test" -- which the gate's own PRE-EXISTING
+# PLACEHOLDER_WORDS list ("test" was already in it) downgrades to a warning.
+# No new gate mechanism, no tests/-wide exemption, no allowlist: the below
+# tests prove the classification comes from the *value's content*, not from
+# a blanket "this file/folder is a test" carve-out.
+
+
+def test_phase13b_style_fixture_password_is_warning_not_finding(tmp_path: Path) -> None:
+    """Reproduces the exact dict-literal POST-data shape used in
+    tests/security/test_phase13b_setup_admin.py with the real, current
+    fixture value, inside an isolated tests/ tree. Must be a warning, not a
+    finding."""
+    repo = _init_repo(tmp_path)
+    (repo / "tests" / "security").mkdir(parents=True)
+    fixture_content = (
+        "def test_example():\n"
+        "    data = {\n"
+        '        "password": "AttackerTestFixtureOnly123!",\n'
+        "    }\n"
+    )
+    (repo / "tests" / "security" / "test_example_fixture.py").write_text(
+        fixture_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_example_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert any(
+        w["path"] == "tests/security/test_example_fixture.py" for w in result["warnings"]
+    )
+
+
+def test_phase13b_fixture_pattern_without_test_marker_still_fails(tmp_path: Path) -> None:
+    """Controlled negative for the test above (and the durable proof that
+    the gate does NOT broadly ignore the tests/ folder): identical
+    dict-literal shape, identical tests/ path, but a realistic value that
+    contains none of PLACEHOLDER_WORDS (no "test", "local", "dev", ...).
+    This must still be a finding."""
+    repo = _init_repo(tmp_path)
+    (repo / "tests" / "security").mkdir(parents=True)
+    realistic_value = "Xk9#mQ7vBzR2pL5w"  # hardcoded_secret fixture
+    fixture_content = (
+        "def test_example():\n"
+        "    data = {\n"
+        '        "password": "Xk9#mQ7vBzR2pL5w",\n'  # hardcoded_secret fixture
+        "    }\n"
+    )
+    (repo / "tests" / "security" / "test_example_fixture.py").write_text(
+        fixture_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_example_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value"
+        and f["path"] == "tests/security/test_example_fixture.py"
+        for f in result["findings"]
+    )
+    assert realistic_value not in json.dumps(result)
+
+
+def test_real_phase13b_setup_admin_test_file_scans_clean(tmp_path: Path) -> None:
+    """Direct regression lock on the actual tracked file: copies the real,
+    current tests/security/test_phase13b_setup_admin.py content into an
+    isolated repo and asserts zero findings -- the real-world instance of
+    the fixture-rename fix above."""
+    repo = _init_repo(tmp_path)
+    real_content = (
+        Path(__file__).resolve().parents[2]
+        / "tests"
+        / "security"
+        / "test_phase13b_setup_admin.py"
+    ).read_text(encoding="utf-8")
+    (repo / "tests" / "security").mkdir(parents=True)
+    (repo / "tests" / "security" / "test_phase13b_setup_admin.py").write_text(
+        real_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_phase13b_setup_admin.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+# --- BYS360 Phase 5 secret-gate closure: raw PEM/OpenSSH/PGP private-key material ---
+# Confirmed by direct reproduction (a tmp_path repo containing only a
+# "-----BEGIN PRIVATE KEY-----" header, no KEY="value" wrapper) that
+# finding_count was 0 before PRIVATE_KEY_HEADER_RE existed: none of
+# ASSIGN_RE/DICT_ASSIGN_RE/UNQUOTED_ASSIGN_RE can ever see a bare PEM header
+# line since it has no sensitive KEY name followed by an assignment
+# operator. The new check matches the header line independently of that
+# machinery, still routed through the same looks_regex_or_scanner() escape
+# hatch used everywhere else in this file for scanner/test source code.
+
+_FAKE_PEM_BODY = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcw\n-----END PRIVATE KEY-----\n"  # hardcoded_secret fixture -- synthetic, not a real key
+
+
+def test_raw_private_key_header_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / "id_rsa_leaked.txt").write_text(_FAKE_PEM_BODY, encoding="utf-8")
+    _git(["add", "-f", "id_rsa_leaked.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_private_key_material" and f["path"] == "id_rsa_leaked.txt"
+        for f in result["findings"]
+    )
+
+
+def test_rsa_and_openssh_and_pgp_private_key_variants_trigger_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    rsa_body = "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA\n-----END RSA PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    openssh_body = "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXk\n-----END OPENSSH PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    pgp_body = "-----BEGIN PGP PRIVATE KEY BLOCK-----\nlQOYBF\n-----END PGP PRIVATE KEY BLOCK-----\n"  # hardcoded_secret fixture
+    (repo / "rsa_key.txt").write_text(rsa_body, encoding="utf-8")
+    (repo / "openssh_key.txt").write_text(openssh_body, encoding="utf-8")
+    (repo / "pgp_key.txt").write_text(pgp_body, encoding="utf-8")
+    _git(["add", "-f", "rsa_key.txt", "openssh_key.txt", "pgp_key.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    flagged_paths = {
+        f["path"] for f in result["findings"] if f["type"] == "hardcoded_private_key_material"
+    }
+    assert flagged_paths == {"rsa_key.txt", "openssh_key.txt", "pgp_key.txt"}
+
+
+def test_private_key_pattern_in_own_regex_source_is_not_flagged(tmp_path: Path) -> None:
+    """A quality-gate script that documents the PEM header as a regex
+    literal (exactly the pre-existing pattern in
+    scripts/quality/bys360_score100_quality_gate_v1.py) must not be
+    flagged -- looks_regex_or_scanner() already exempts any line containing
+    a "re.compile" marker; this locks that same exemption in for the new
+    private-key check."""
+    repo = _init_repo(tmp_path)
+    (repo / "scripts" / "quality").mkdir(parents=True)
+    content = (
+        "import re\n"
+        'PATTERN = re.compile(r"-----BEGIN (RSA |EC |OPENSSH |DSA |)?PRIVATE KEY-----")\n'
+    )
+    (repo / "scripts" / "quality" / "some_gate.py").write_text(content, encoding="utf-8")
+    _git(["add", "-f", "scripts/quality/some_gate.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_repo_has_no_private_key_material_anywhere() -> None:
+    """Full real-repo regression: confirms no tracked/staged/untracked file
+    in this actual repository contains PEM/OpenSSH/PGP private-key material
+    now that the check exists (including this test file's own synthetic
+    fixtures above, which are marked so they don't self-flag)."""
+    root = Path(__file__).resolve().parents[2]
+    result = run(root)
+
+    assert not any(f["type"] == "hardcoded_private_key_material" for f in result["findings"])
+
+
+# --- BYS360 Phase 5 secret-gate closure: Sentry DSN real-value / empty-template regression ---
+
+
+def test_sentry_dsn_real_value_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    real_dsn = "https://abcdef1234567890abcdef1234567890@o123456.ingest.sentry.io/6789012"  # hardcoded_secret fixture
+    (repo / "config_local.py").write_text(
+        f'SENTRY_DSN = "{real_dsn}"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "config_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "config_local.py"
+        for f in result["findings"]
+    )
+    assert real_dsn not in json.dumps(result)
+
+
+def test_env_example_empty_sentry_dsn_is_pass(tmp_path: Path) -> None:
+    """Regression: an empty SENTRY_DSN= line in a template .env file (the
+    actual, current shape of the tracked .env.example) must stay accepted."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.example").write_text("SENTRY_DSN=\n", encoding="utf-8")
+    _git(["add", "-f", ".env.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_real_env_example_sentry_dsn_line_is_empty() -> None:
+    """Confirms the actual tracked .env.example still uses the accepted
+    empty-value shape (SENTRY_DSN=) rather than a real value -- a source-file
+    regression guard, independent of the gate itself."""
+    root = Path(__file__).resolve().parents[2]
+    env_example = (root / ".env.example").read_text(encoding="utf-8")
+    sentry_lines = [
+        line for line in env_example.splitlines() if line.strip().upper().startswith("SENTRY_DSN")
+    ]
+    assert sentry_lines, "SENTRY_DSN satırı .env.example içinde bulunamadı"
+    assert all(line.strip() == "SENTRY_DSN=" for line in sentry_lines)
+
+
+# --- BYS360 Phase 5 secret-gate closure: API-key-like value (dedicated regression) ---
+# API_KEY is already covered indirectly by test_staged_new_secret_triggers_red
+# above; this is a direct, dedicated regression requested explicitly by the
+# Phase 5 secret-gate closure checklist.
+
+
+def test_api_key_like_value_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    realistic_key = "ak_prod_5f4e3d2c1b0a9988776655443322"  # hardcoded_secret fixture
+    (repo / "integration_config.py").write_text(
+        f'API_KEY = "{realistic_key}"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "integration_config.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "integration_config.py"
+        for f in result["findings"]
+    )
+    assert realistic_key not in json.dumps(result)

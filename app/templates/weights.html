@@ -264,7 +264,7 @@
 
                         <form method="post"
                               action="{{ safe_url_for('main.performance_weight_delete', weight_id=item.id) }}"
-                              onsubmit="return confirm('Bu ağırlık kaydını silmek istediğinize emin misiniz?');">
+                              data-confirm="Bu ağırlık kaydını silmek istediğinize emin misiniz?">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="mini-btn secondary">
                                 <i class="fa-solid fa-trash"></i> Sil
@@ -281,4 +281,17 @@
         </tbody>
     </table>
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

@@ -14,10 +14,10 @@
     <section class="card">
         <div class="toolbar">
             <div>
-                <h3 style="margin:0;font-size:1.12rem;font-weight:900;color:#111827;">Yönetim Paneli</h3>
-                <p style="margin:8px 0 0;color:#6b7280;line-height:1.8;">Hazır rehberleri ilk kez veritabanına aktarabilir veya güncel statik içerikle tekrar eşitleyebilirsiniz. Manuel oluşturulan kayıtlar eşitleme sırasında korunur.</p>
+                <h3 class="panel-heading">Yönetim Paneli</h3>
+                <p class="panel-subtitle">Hazır rehberleri ilk kez veritabanına aktarabilir veya güncel statik içerikle tekrar eşitleyebilirsiniz. Manuel oluşturulan kayıtlar eşitleme sırasında korunur.</p>
             </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="header-actions-row">
                 <a href="{{ url_for('main.support_help_admin_new') }}" class="btn-main"><i class="fa-solid fa-plus"></i> Yeni Makale</a>
                 <form method="post" action="{{ url_for('main.support_help_admin_seed') }}" class="inline">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -29,7 +29,7 @@
                 </form>
             </div>
         </div>
-        <form method="get" class="search-form" style="margin-top:16px;">
+        <form method="get" class="search-form section-spacing-top-md">
             <input class="search-input" type="text" name="q" value="{{ search_query or '' }}" placeholder="Başlık, slug veya özet ara...">
             <select class="select-input" name="status">
                 <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Tümü</option>
@@ -58,7 +58,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn-soft"><i class="fa-solid fa-eye"></i> {% if article.is_published %}Taslağa Al{% else %}Yayınla{% endif %}</button>
                     </form>
-                    <form method="post" action="{{ url_for('main.support_help_admin_delete', article_id=article.id) }}" class="inline" onsubmit="return confirm('Bu makaleyi silmek istediğinize emin misiniz?');">
+                    <form method="post" action="{{ url_for('main.support_help_admin_delete', article_id=article.id) }}" class="inline" data-confirm="Bu makaleyi silmek istediğinize emin misiniz?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn-danger"><i class="fa-solid fa-trash"></i> Sil</button>
                     </form>
@@ -67,9 +67,21 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty" style="margin-top:18px;">Filtreye uygun makale bulunamadı.</div>
+        <div class="empty section-spacing-top-lg">Filtreye uygun makale bulunamadı.</div>
         {% endif %}
     </section>
 </div>
 <script src="{{ url_for('static', filename='js/faz4_support_account_mobile.js') }}"></script>
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

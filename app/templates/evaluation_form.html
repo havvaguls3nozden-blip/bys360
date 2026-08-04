@@ -279,9 +279,9 @@ Değerlendirme kriterleri, önceki amir görüşleri ve nihai puan etkisi aynı 
 
                     <div class="bulk-score-buttons">
                         {% for bulk_value in [1, 2, 3, 4, 5] %}
-                        <button type="button" class="bulk-chip" onclick="applyBulkScore({{ bulk_value }})">Hepsini {{ bulk_value }} Yap</button>
+                        <button type="button" class="bulk-chip" data-bulk-value="{{ bulk_value }}">Hepsini {{ bulk_value }} Yap</button>
                         {% endfor %}
-                        <button type="button" class="bulk-chip clear" onclick="clearBulkScores()">Seçimleri Temizle</button>
+                        <button type="button" class="bulk-chip clear" id="clearBulkScoresBtn">Seçimleri Temizle</button>
                     </div>
                 </div>
 
@@ -713,6 +713,14 @@ Değerlendirme kriterleri, önceki amir görüşleri ve nihai puan etkisi aynı 
 
     initializePreviews();
     recalculate();
+
+    document.querySelectorAll('[data-bulk-value]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            applyBulkScore(parseInt(btn.getAttribute('data-bulk-value'), 10));
+        });
+    });
+    var clearBtn = document.getElementById('clearBulkScoresBtn');
+    if (clearBtn) clearBtn.addEventListener('click', function(){ clearBulkScores(); });
 })();
 </script>
 {% endblock %}

@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime as _dt
 import logging
 from typing import Any
-from urllib.parse import urlsplit
 
 from flask import current_app, redirect, request, url_for
 from flask_login import current_user
@@ -11,7 +10,7 @@ from werkzeug.routing import BuildError
 
 from app.core.datetime_utils import utc_now
 from app.models import SurveyQuestionOption
-from app.route_support import issue_form_token, safe_render
+from app.route_support import is_safe_redirect_target, issue_form_token, safe_render
 from app.services.ai import build_message_compose_ai_panel, build_notification_priority_ai_panel
 from app.services.message_service import (
     MESSAGE_THREAD_BADGE_OPTIONS as _MESSAGE_THREAD_BADGE_OPTIONS,
@@ -132,27 +131,23 @@ def _redirect_notifications_view():
     return redirect(url_for("main.notifications_list", **query_kwargs))
 
 
+# BYS360_PHASE5_3C_A2_COMMUNICATION_SHARED_OPEN_REDIRECT_HARDENING
+# Eskiden burada iki bağımsız, zayıf kontrol vardı:
+#   1) `target.startswith("/") and not target.startswith("//")` -- backslash
+#      ("/\\evil.example") ve percent-encode edilmiş ayraç
+#      ("/%2Fevil.example", "%5cevil.example") varyantlarına karşı
+#      savunmasızdı.
+#   2) Mutlak URL'ler için `parsed.netloc == urlsplit(request.host_url).netloc`
+#      -- yani "aynı origin mi?" sorusu `request.host_url`'e, dolayısıyla
+#      istemcinin gönderdiği `Host` başlığına dayanıyordu (ters-proxy/IIS
+#      zincirinde yanlış yapılandırılmışsa saldırgan tarafından
+#      belirlenebilir -> host-header poisoning).
+# Tek doğruluk kaynağı artık kanonik `APP_BASE_URL`'e dayanan ve bu saldırı
+# ailesine karşı test edilmiş `app.route_support.is_safe_redirect_target`.
 def _safe_internal_redirect(link_url: str | None):
     target = (link_url or "").strip()
-    if not target:
-        return _redirect_notifications_view()
-
-    if target.startswith("/") and not target.startswith("//"):
+    if target and is_safe_redirect_target(target):
         return redirect(target)
-
-    try:
-        parsed = urlsplit(target)
-        request_root = urlsplit(request.host_url)
-        if parsed.scheme in {"http", "https"} and parsed.netloc and parsed.netloc == request_root.netloc:
-            safe_path = parsed.path or "/"
-            if parsed.query:
-                safe_path = f"{safe_path}?{parsed.query}"
-            if parsed.fragment:
-                safe_path = f"{safe_path}#{parsed.fragment}"
-            return redirect(safe_path)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/communication/shared.py)")
-
     return _redirect_notifications_view()
 
 

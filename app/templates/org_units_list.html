@@ -649,7 +649,7 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
                                             Düzenle
                                         </a>
 
-                                        <form method="POST" action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}" style="display:inline;" onsubmit="return confirm('Bu kayıt silinsin mi?');">
+                                        <form method="POST" action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}" style="display:inline;" data-confirm="Bu kayıt silinsin mi?">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="mini-btn danger">
                                                 <i class="fa-solid fa-trash"></i>
@@ -756,6 +756,17 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
     } else {
         normalizeWarnings();
     }
+})();
+
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 })();
 </script>
 {# BYS360_ORG_UNITS_TARGETED_DATA_WARNING_V2_1_END #}

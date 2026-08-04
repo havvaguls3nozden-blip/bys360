@@ -32,6 +32,7 @@ from werkzeug.utils import secure_filename
 from app.extensions import db
 from app.models import OrganizationUnit, User
 from app.models.announcement_popup_models import Announcement, AnnouncementRead
+from app.route_support import is_safe_redirect_target
 
 ANNOUNCEMENT_TYPES = {
     "info": "Bilgilendirme",
@@ -120,11 +121,24 @@ def _normalize_choice(value: Any, allowed: dict[str, str], default: str) -> str:
     return normalized if normalized in allowed else default
 
 
+# BYS360_PHASE5_3C_A2_ANNOUNCEMENT_POPUP_CTA_OPEN_REDIRECT_HARDENING
+# Eskiden göreli hedefler için `raw.startswith("/") and not raw.startswith("//")`
+# kullanılıyordu -- bu; backslash ("/\\evil.example") ve percent-encode
+# edilmiş ayraç ("/%2Fevil.example", "%5cevil.example") varyantlarına karşı
+# savunmasızdı (admin CTA linki, `errors/403.html` gibi bir `redirect()`
+# değil ama template'te `href` olarak render edilir -- tarayıcı yine de
+# şema-göreli bir authority olarak yorumlayabilir). Göreli hedef denetimi
+# artık kanonik `APP_BASE_URL`'e dayanan `app.route_support.is_safe_redirect_target`
+# üzerinden yapılır. Mutlak URL davranışı KASITLI olarak değişmedi: CTA/medya
+# bağlantıları operatör tarafından girilen keyfi güvenilir dış sitelere
+# (ör. bir eğitim videosu, harici bir kurum sayfası) işaret edebilmeli --
+# bu yüzden mutlak `http(s)` + netloc içeren adresler, kanonik host ile
+# eşleşmeseler bile (eskisi gibi) kabul edilmeye devam eder.
 def _safe_url(value: Any, *, allow_relative: bool = True, limit: int = 1000) -> str:
     raw = str(value or "").strip()[:limit]
     if not raw:
         return ""
-    if allow_relative and raw.startswith("/") and not raw.startswith("//"):
+    if allow_relative and is_safe_redirect_target(raw):
         return raw
     parsed = urlsplit(raw)
     if parsed.scheme in SAFE_CTA_SCHEMES and parsed.netloc:

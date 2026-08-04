@@ -379,7 +379,7 @@ html, body { min-height: 100% !important; }
 <div id="pageLoader" class="page-loader">
     <div class="page-loader-inner">
         <div class="page-loader-ring"></div>
-        <img src="{{ url_for('static', filename='img/bys360.svg') }}" alt="Yükleniyor" class="page-loader-logo" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+        <img src="{{ url_for('static', filename='img/bys360.svg') }}" alt="Yükleniyor" class="page-loader-logo" data-fallback-src="{{ url_for('static', filename='img/logo.png') }}">
         <div class="page-loader-text">Lütfen bekleyiniz...</div>
         <div class="page-loader-bar"></div>
     </div>
@@ -481,7 +481,7 @@ html, body { min-height: 100% !important; }
         <div class="sidebar-inner">
 
             <div class="brand-ribbon">
-                <img src="{{ side_logo_src }}" alt="BYS360 Logo" class="brand-logo" onerror="this.onerror=null;this.src='{{ fallback_logo_src }}';">
+                <img src="{{ side_logo_src }}" alt="BYS360 Logo" class="brand-logo" data-fallback-src="{{ fallback_logo_src }}">
             </div>
 
             {% if show_menu_section %}
@@ -700,7 +700,7 @@ html, body { min-height: 100% !important; }
                         {% if menu_map.get('account', True) %}{{ nav_item(safe_url_for('main.account'), 'fa-user', 'Hesabım', current_ep.startswith('main.account')) }}{% endif %}
                         {% if menu_map.get('settings', False) %}{{ nav_item(safe_url_for('main.settings_page'), 'fa-sliders', 'Ayarlar', current_ep == 'main.settings_page') }}{% endif %}
                         {% if menu_map.get('db_check', False) %}{{ nav_item(safe_url_for('main.db_check'), 'fa-database', 'DB Kontrol', current_ep == 'main.db_check') }}{% endif %}
-                        {% if menu_map.get('logout', True) %}{{ nav_item(safe_url_for('main.logout', fallback='#'), 'fa-right-from-bracket', 'Güvenli Çıkış', false, none, 'data-placeholder-bypass="true" onclick="return submitLogoutForm(event);"') }}{% endif %}
+                        {% if menu_map.get('logout', True) %}{{ nav_item(safe_url_for('main.logout', fallback='#'), 'fa-right-from-bracket', 'Güvenli Çıkış', false, none, 'data-placeholder-bypass="true" data-logout-trigger="true"') }}{% endif %}
                     </div>
                 </details>
             </div>
@@ -744,7 +744,7 @@ html, body { min-height: 100% !important; }
         <header class="topbar" id="topbar">
             <div class="topbar-left">
                 <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menüyü Aç/Kapat" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
-                <a href="{{ safe_url_for('main.home') }}" class="topbar-brand" aria-label="BYS360 Ana Sayfa"><img src="{{ side_logo_src }}" alt="BYS360 Logo" class="topbar-brand-logo" onerror="this.onerror=null;this.src='{{ fallback_logo_src }}';"></a>
+                <a href="{{ safe_url_for('main.home') }}" class="topbar-brand" aria-label="BYS360 Ana Sayfa"><img src="{{ side_logo_src }}" alt="BYS360 Logo" class="topbar-brand-logo" data-fallback-src="{{ fallback_logo_src }}"></a>
                 <div class="page-meta">
                     <div class="page-kicker">{% block page_kicker %}BYS360{% endblock %}</div>
                     <h1 class="page-title">{% block page_title %}{% if request.path.startswith('/file-center') or request.path.startswith('/guest/files') or request.path.startswith('/guest/upload') %}Dosya Merkezi{% else %}Kontrol Paneli{% endif %}{% endblock %}</h1>
@@ -755,9 +755,9 @@ html, body { min-height: 100% !important; }
                 {% if show_notifications_shortcut %}<a href="{{ safe_url_for('main.notifications_list') }}" class="quick-link notify-pill {% if current_ep == 'main.notifications_list' or current_ep.startswith('main.notifications_') or current_path.startswith('/notifications') %}active{% endif %}"><i class="fa-solid fa-bell"></i> Bildirimler <span class="notify-count" id="topbarNotificationBadge" style="{% if unread_notification_count <= 0 %}display:none;{% endif %}">{{ unread_notification_count }}</span></a>{% endif %}
                 <a href="{{ safe_url_for('main.account') }}" class="quick-link"><i class="fa-solid fa-id-badge"></i> Hesabım</a>
                 <details class="user-menu">
-                    <summary class="user-summary"><img src="{{ avatar_src }}" alt="Avatar" class="user-avatar" onerror="this.onerror=null;this.src='{{ default_avatar }}';"><div class="user-meta"><div class="user-name">{{ current_user.full_name }}</div><div class="user-role">{{ current_user.role_label or current_user.unvan or current_user.role }}</div></div><i class="fa-solid fa-chevron-down" style="color:#9ca3af;font-size:.8rem;"></i></summary>
+                    <summary class="user-summary"><img src="{{ avatar_src }}" alt="Avatar" class="user-avatar" data-fallback-src="{{ default_avatar }}"><div class="user-meta"><div class="user-name">{{ current_user.full_name }}</div><div class="user-role">{{ current_user.role_label or current_user.unvan or current_user.role }}</div></div><i class="fa-solid fa-chevron-down" style="color:#9ca3af;font-size:.8rem;"></i></summary>
                     <div class="user-dropdown">
-                        <div class="dropdown-head"><img src="{{ avatar_src }}" alt="Avatar" class="dropdown-avatar" onerror="this.onerror=null;this.src='{{ default_avatar }}';"><div><div class="dropdown-name">{{ current_user.full_name }}</div><div class="dropdown-sub">{{ current_user.email or '-' }}<br>Sicil: {{ current_user.sicil_no or '-' }}</div></div></div>
+                        <div class="dropdown-head"><img src="{{ avatar_src }}" alt="Avatar" class="dropdown-avatar" data-fallback-src="{{ default_avatar }}"><div><div class="dropdown-name">{{ current_user.full_name }}</div><div class="dropdown-sub">{{ current_user.email or '-' }}<br>Sicil: {{ current_user.sicil_no or '-' }}</div></div></div>
                         <a href="{{ safe_url_for('main.account') }}" class="dropdown-link"><i class="fa-solid fa-user"></i> Hesabım</a>
                         {% if menu_map.get('messages', False) %}<a href="{{ safe_url_for('main.messages_inbox') }}" class="dropdown-link"><i class="fa-solid fa-envelope"></i> Mesajlar</a>{% endif %}
                         {% if show_notifications_shortcut %}<a href="{{ safe_url_for('main.notifications_list') }}" class="dropdown-link"><i class="fa-solid fa-bell"></i> Bildirimler{% if unread_notification_count > 0 %} ({{ unread_notification_count }}){% endif %}</a>{% endif %}
@@ -766,7 +766,7 @@ html, body { min-height: 100% !important; }
                         <a href="{{ safe_url_for('main.kunye') }}" class="dropdown-link bys360-avatar-kunye-link" data-bys360-avatar-kunye="active"><i class="fa-solid fa-address-card"></i> Künye</a>
                         {% if current_ep != 'main.account_change_password' %}<a href="{{ safe_url_for('main.account_change_password') }}" class="dropdown-link"><i class="fa-solid fa-key"></i> Şifre Değiştir</a>{% endif %}
                         {% if menu_map.get('settings', False) %}<a href="{{ safe_url_for('main.settings_page') }}" class="dropdown-link"><i class="fa-solid fa-sliders"></i> Ayarlar</a>{% endif %}
-                        <a href="{{ safe_url_for('main.logout', fallback='#') }}" class="dropdown-link" data-placeholder-bypass="true" onclick="return submitLogoutForm(event);"><i class="fa-solid fa-right-from-bracket"></i> Güvenli Çıkış</a>
+                        <a href="{{ safe_url_for('main.logout', fallback='#') }}" class="dropdown-link" data-placeholder-bypass="true" data-logout-trigger="true"><i class="fa-solid fa-right-from-bracket"></i> Güvenli Çıkış</a>
                     </div>
                 </details>
             </div>
@@ -815,6 +815,15 @@ function submitLogoutForm(event){
     if(href && href !== '#') window.location.assign(href);
     return false;
 }
+document.querySelectorAll('[data-logout-trigger]').forEach(function(el){
+    el.addEventListener('click', submitLogoutForm);
+});
+document.querySelectorAll('img[data-fallback-src]').forEach(function(img){
+    img.addEventListener('error', function onImgError(){
+        img.removeEventListener('error', onImgError);
+        img.src = img.getAttribute('data-fallback-src');
+    }, { once: true });
+});
 (function(){
     const loader=document.getElementById('pageLoader');
     let hidden=false;

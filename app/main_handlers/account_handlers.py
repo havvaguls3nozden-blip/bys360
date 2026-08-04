@@ -17,15 +17,25 @@ from app.main_handlers.account_communication_helpers import (
     utc_now,
 )
 from app.main_handlers.account_settings_helpers import account, settings_page  # noqa: F401
+from app.route_support import is_safe_redirect_target
 
 logger = logging.getLogger(__name__)
 
 # Hesap güvenliği ve profil fotoğrafı işlemleri burada kalır; hesap/ayar ekranları
 # account_settings_helpers üzerinden geriye dönük uyumla dışa aktarılır.
 
+# BYS360_PHASE5_3B_A2_ACCOUNT_CHANGE_PHOTO_OPEN_REDIRECT_HARDENING
+# Eskiden burada bağımsız, zayıf bir kontrol vardı:
+#   next_url.startswith("/") and not next_url.startswith("//")
+# Bu; backslash ("/\\evil.example") ve percent-encode edilmiş ayraç
+# ("/%2Fevil.example", "/%5Cevil.example") tabanlı open-redirect
+# bypass'larına karşı savunmasızdı (tarayıcılar bu biçimleri "//evil.example"
+# ile eşdeğer, şema-göreli bir authority olarak yorumlayabilir). Artık tek
+# doğruluk kaynağı, host-header'a değil kanonik APP_BASE_URL'e dayanan ve
+# bu saldırı ailesine karşı test edilmiş `app.route_support.is_safe_redirect_target`.
 def account_change_photo():
     next_url = (request.form.get("next") or "").strip()
-    redirect_target = next_url if next_url.startswith("/") and not next_url.startswith("//") else url_for("main.account")
+    redirect_target = next_url if is_safe_redirect_target(next_url) else url_for("main.account")
 
     try:
         remove_photo = (request.form.get("remove_profile_photo") or "").strip().lower() in {"1", "true", "on", "evet", "yes"}

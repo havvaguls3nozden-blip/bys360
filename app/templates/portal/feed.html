@@ -57,7 +57,7 @@
     {% include 'portal/_press_news_left_card_v3a.html' ignore missing %}
       <section class="portal-card portal-profile-mini portal-profile-upgraded">
         <div class="portal-cover"></div>
-        <div class="portal-avatar big portal-avatar-ring">{% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}</div>
+        <div class="portal-avatar big portal-avatar-ring">{% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">{% else %}<i class="fa-regular fa-user"></i>{% endif %}</div>
         <h2>{{ current_user.full_name or (current_user.ad ~ ' ' ~ current_user.soyad) or current_user.email }}</h2>
         <p>{{ current_user.unvan or 'BYS360 Kullanıcısı' }}</p>
         <span><i class="fa-solid fa-building"></i> {{ current_user.birim or 'Birim bilgisi yok' }}</span>
@@ -105,6 +105,19 @@
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <script async src="https://www.instagram.com/embed.js"></script>
 <script>window.addEventListener('load',function(){try{if(window.twttr&&twttr.widgets){twttr.widgets.load();} if(window.instgrm&&instgrm.Embeds){instgrm.Embeds.process();}}catch(e){}});</script>
+
+<script>
+(function () {
+    document.querySelectorAll('img[data-fallback-class]').forEach(function (img) {
+        img.addEventListener('error', function () {
+            img.remove();
+            if (img.parentElement) {
+                img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}
 
 {# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

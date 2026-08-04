@@ -4,7 +4,7 @@
     <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat">
       <div class="portal-composer-summary-left">
         <div class="portal-avatar portal-avatar-ring">
-          {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+          {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
         </div>
         <div class="portal-composer-title compact-title">
           <span class="portal-kicker"><i class="fa-solid fa-pen-nib"></i> Paylaşım</span>
@@ -162,6 +162,18 @@
     </form>
   </details>
 </section>
+<script>
+(function () {
+    document.querySelectorAll('img[data-fallback-class]').forEach(function (img) {
+        img.addEventListener('error', function () {
+            img.remove();
+            if (img.parentElement) {
+                img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+            }
+        });
+    });
+})();
+</script>
 {# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_END #}
 
 {# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

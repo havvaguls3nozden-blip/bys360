@@ -643,7 +643,7 @@
                                     <input type="hidden" name="status" value="bekliyor">
                                     <button type="submit" class="subtle-btn">Beklet</button>
                                 </form>
-                                <form method="post" action="{{ url_for('main.hr_leave_delete', leave_id=row.id) }}" onsubmit="return confirm('İzin kaydı silinsin mi?');">
+                                <form method="post" action="{{ url_for('main.hr_leave_delete', leave_id=row.id) }}" data-confirm="İzin kaydı silinsin mi?">
                                     <input type="hidden" name="scope" value="{{ selected_scope_mode or 'personal' }}">
                                     <input type="hidden" name="user_id" value="{{ selected_user_id or row.user_id or '' }}">
                                     <input type="hidden" name="period_id" value="{{ selected_period_id or row.period_id or '' }}">
@@ -735,6 +735,17 @@
   if(managerCheckbox){ managerCheckbox.addEventListener('change', syncLeaveForm); }
   syncLeaveForm();
   syncPerformanceMode();
+})();
+
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 })();
 </script>
 

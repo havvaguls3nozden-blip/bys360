@@ -63,7 +63,7 @@ Mevcut personel kaydını güncelleyin. Yapılan değişiklikler ilgili modülle
         <div class="hero-row">
             <div class="hero-left">
                 <div class="avatar-wrap">
-                    <img src="{{ avatar_url or url_for('static', filename='img/default-avatar.svg') }}" alt="{{ display_name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                    <img src="{{ avatar_url or url_for('static', filename='img/default-avatar.svg') }}" alt="{{ display_name }}" data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
                 </div>
                 <div>
                     <h3 class="hero-title">{{ display_name }}</h3>

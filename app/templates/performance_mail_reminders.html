@@ -102,7 +102,7 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
    <form method="get" style="display:contents;">
     <div class="form-group">
      <label for="period_id">Dönem Seçin</label>
-     <select id="period_id" name="period_id" onchange="this.form.submit()">
+     <select id="period_id" name="period_id" data-autosubmit="1">
       <option value="">Dönem seçiniz</option>
       {% for period in periods %}
        <option value="{{ period.id }}" {% if selected_period and selected_period.id == period.id %}selected{% endif %}>{{ period.title }}</option>
@@ -115,7 +115,7 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
    <form method="post" action="{{ url_for('main.performance_send_mail_reminders', period_id=selected_period.id) }}" class="inline-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label class="check-inline"><input type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
-    <button type="submit" class="btn-soft primary" onclick="return confirm('Seçili dönem için tüm uygun amirlere hatırlatma maili gönderilsin mi?');">
+    <button type="submit" class="btn-soft primary" data-confirm="Seçili dönem için tüm uygun amirlere hatırlatma maili gönderilsin mi?">
      <i class="fa-solid fa-paper-plane"></i> Tümüne Gönder
     </button>
    </form>
@@ -284,7 +284,7 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
     <input type="hidden" name="period_id" value="{{ selected_period.id }}">
     <label class="check-inline"><input type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
     <label class="check-inline"><input type="checkbox" name="dry_run" value="1"> Sadece önizleme mesajı üret</label>
-    <button type="submit" class="btn-soft secondary" onclick="return confirm('Mail otomasyonu seçili kurallarla çalıştırılsın mı?');"><i class="fa-solid fa-play"></i> Otomasyonu Çalıştır</button>
+    <button type="submit" class="btn-soft secondary" data-confirm="Mail otomasyonu seçili kurallarla çalıştırılsın mı?"><i class="fa-solid fa-play"></i> Otomasyonu Çalıştır</button>
    </form>
   </article>
  </section>
@@ -371,7 +371,7 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
      <label class="check-inline"><input form="selected-managers-form" type="checkbox" name="force_send" value="1"> Bekleme süresini geçersiz say</label>
     </div>
     <div class="toolbar-right">
-     <button form="selected-managers-form" type="submit" class="btn-soft primary" onclick="return confirm('Seçili yöneticilere hatırlatma gönderilsin mi?');"><i class="fa-solid fa-envelope-open-text"></i> Seçilileri Gönder</button>
+     <button form="selected-managers-form" type="submit" class="btn-soft primary" data-confirm="Seçili yöneticilere hatırlatma gönderilsin mi?"><i class="fa-solid fa-envelope-open-text"></i> Seçilileri Gönder</button>
     </div>
    </div>
    <div class="table-wrap">
@@ -413,13 +413,13 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
         <div class="action-stack">
          <form method="post" action="{{ url_for('main.performance_send_single_mail_reminder', period_id=selected_period.id, manager_id=item.manager.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn-soft secondary" onclick="return confirm('{{ item.manager.ad }} {{ item.manager.soyad }} için hatırlatma maili gönderilsin mi?');">Kişi Bazlı Gönder</button>
+          <button type="submit" class="btn-soft secondary" data-confirm="{{ item.manager.ad }} {{ item.manager.soyad }} için hatırlatma maili gönderilsin mi?">Kişi Bazlı Gönder</button>
          </form>
          {% if not item.can_send_now %}
          <form method="post" action="{{ url_for('main.performance_send_single_mail_reminder', period_id=selected_period.id, manager_id=item.manager.id) }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="force_send" value="1">
-          <button type="submit" class="btn-soft warning" onclick="return confirm('Bekleme süresi aktif. Buna rağmen zorla tekrar gönderilsin mi?');">Zorla Tekrar Gönder</button>
+          <button type="submit" class="btn-soft warning" data-confirm="Bekleme süresi aktif. Buna rağmen zorla tekrar gönderilsin mi?">Zorla Tekrar Gönder</button>
          </form>
          {% endif %}
         </div>
@@ -483,7 +483,7 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
    {% if failed_mail_logs %}
    <form method="post" action="{{ url_for('main.performance_retry_failed_mail_logs', period_id=selected_period.id) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="btn-soft warning" onclick="return confirm('Bu dönem için başarısız tüm mailler yeniden denensin mi?');"><i class="fa-solid fa-rotate-right"></i> Başarısızları Yeniden Dene</button>
+    <button type="submit" class="btn-soft warning" data-confirm="Bu dönem için başarısız tüm mailler yeniden denensin mi?"><i class="fa-solid fa-rotate-right"></i> Başarısızları Yeniden Dene</button>
    </form>
    {% endif %}
   </div>
@@ -546,6 +546,25 @@ Bekleyen görevi olan amirlere toplu, seçili veya kişi bazlı hatırlatma mail
   if (!toggleAll) return;
   toggleAll.addEventListener('change', function(){
    document.querySelectorAll('.manager-checkbox').forEach(function(item){ item.checked = toggleAll.checked; });
+  });
+ })();
+
+ (function(){
+  const periodSelect = document.getElementById('period_id');
+  if (!periodSelect || !periodSelect.hasAttribute('data-autosubmit')) return;
+  periodSelect.addEventListener('change', function(){
+   if (periodSelect.form) periodSelect.form.submit();
+  });
+ })();
+
+ (function(){
+  document.querySelectorAll('[data-confirm]').forEach(function(el){
+   el.addEventListener('click', function(event){
+    const message = el.getAttribute('data-confirm');
+    if (message && !window.confirm(message)) {
+     event.preventDefault();
+    }
+   });
   });
  })();
 </script>
