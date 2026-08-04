@@ -34,33 +34,37 @@ ayrica `app/`icindeki gercek kaynak koda (route decorator'lari, view
 fonksiyonu govdesi, render_template/safe_render cagrisi) grep ile
 dogrulanmistir -- varsayimla degil.
 
-GERCEK BULGU (bu dosyanin yazarinin, gorev tanimindaki 8 rotayi canli
-Flask test client ile GERCEKTEN denerken bulup KAPATMADIGI, mevcut/on-
-Style-2B bir hata): `/performance/feedback-executive-summary`
+GERCEK BULGU, SONRADAN DUZELTILDI (bu dosyanin yazarinin, gorev tanimindaki
+8 rotayi canli Flask test client ile GERCEKTEN denerken bulup -- Style-2B
+kapsaminda degil, kapsamli olarak belgeleyip -- ayri bir bugfix dalgasinda
+KAPATILAN bir hata): `/performance/feedback-executive-summary`
 (`feedback_executive_summary_dashboard` view fonksiyonu,
-app/performance/engagement_feedback_routes.py) admin olarak GET
-edildiginde 500 doner. Kok neden: view govdesi
-`build_feedback_executive_summary(...)`'in dondurdugu `dashboard` dict'ini
-`**dashboard` ile `safe_render(..., preset=preset, **dashboard)` cagrisina
-aciyor; ancak `build_feedback_executive_summary`
-(app/services/performance/feedback_executive_summary_service.py:224,295)
-donus sozlugune KENDI `"preset"` anahtarini da koyuyor -- bu da
+app/performance/engagement_feedback_routes.py) Style-2B'nin ORIJINAL
+calismasi sirasinda admin olarak GET edildiginde 500 donuyordu. Kok neden:
+view govdesi `build_feedback_executive_summary(...)`'in dondurdugu
+`dashboard` dict'ini `**dashboard` ile `safe_render(..., preset=preset,
+**dashboard)` cagrisina aciyordu; ancak `build_feedback_executive_summary`
+(app/services/performance/feedback_executive_summary_service.py:224)
+donus sozlugune KENDI `"preset"` anahtarini da koyuyordu -- bu da
 `safe_render()` cagrisinda `preset` icin CIFT deger (`TypeError:
 app.route_support.safe_render() got multiple values for keyword argument
-'preset'`) hatasina yol aciyor. Bu, Style-2B'nin DOKUNMADIGI
+'preset'`) hatasina yol aciyordu. Bu, Style-2B'nin DOKUNMADIGI
 `app/performance/engagement_feedback_routes.py` dosyasinda onceden var
-olan bir hatadir (bkz. `test_engagement_feedback_routes_file_is_untouched_
-by_this_wave` -- bu dosyanin `git status`'ta degismedigi ayrica
-dogrulanir); Style-2B'nin sablon/CSS degisikligiyle ILGISI YOKTUR ve bu
-dosya kapsaminda DUZELTILMEMISTIR (yalniz test-only bir dosya yazma izni
-var). Bu yuzden bu rota, asagidaki "canli render" testlerinde (bolum 7)
-GENEL dongudEN CIKARILMIS ve KENDI ozel, mevcut 500 durumunu DOGRU sekilde
-belgeleyen (WEAKEN/SKIP EDILMEYEN, gercek durumu kilitleyen) bir
-regresyon testiyle ayrica ele alinmistir -- bkz.
-`test_feedback_executive_summary_dashboard_route_has_a_known_pre_existing_
-preset_kwarg_collision_bug`. Diger 7 rota canli olarak 200 doner ve tam
-render (base.html sarmali + hicbir safe_render exception-fallback izi)
-uretir; bu, ayri bir prob calistirilarak ONCEDEN dogrulanmistir.
+olan bir hataydi (bkz. `test_engagement_feedback_routes_file_was_untouched_
+by_style2b_itself` -- Style-2B'nin KENDI kapanis commit'inin bu dosyayi
+degistirmedigi, sabit bir tarihsel commit araligina kilitlenerek ayrica
+dogrulanir); Style-2B'nin sablon/CSS degisikligiyle ILGISI YOKTU ve o dalga
+kapsaminda DUZELTILMEDI (yalniz test-only bir dosya yazma izni vardi).
+Hata artik DUZELTILDI (ayri bir "BYS360 Performans Feedback Executive
+Summary 500 Hatasi" bugfix dalgasinda, app/performance/
+engagement_feedback_routes.py:305'teki fazladan `preset=preset` kwarg'i
+kaldirilarak) -- kapsamli regresyon testleri
+tests/performance/test_feedback_executive_summary_preset_context_regression.py
+dosyasinda. Bu yuzden bu rota artik asagidaki "canli render" testlerinde
+(bolum 7) GENEL donguye DAHIL (eskiden haric tutuluyordu); ayrica bkz.
+`test_feedback_executive_summary_dashboard_route_preset_kwarg_collision_bug_is_fixed`.
+Tum 8 rota canli olarak 200 doner ve tam render (base.html sarmali +
+hicbir safe_render exception-fallback izi) uretir.
 
 KAPSAM DISI/DOKUNULMAYAN: Bu dosya HICBIR uygulama/sablon/CSS/config
 dosyasina yazmaz.
@@ -161,12 +165,16 @@ TARGET_TEMPLATES: dict[str, dict[str, str | int]] = {
 }
 TOTAL_PRE_WAVE_ATTRS = sum(int(v["pre_wave"]) for v in TARGET_TEMPLATES.values())  # 58
 
-# Bu rota gercekten calisir (200) VE tam render uretir -- feedback_executive_summary_dashboard
-# HARIC (bkz. dosya basi docstring -- pre-existing/out-of-scope 500 hatasi).
+# Bu 8 rotanin TAMAMI gercekten calisir (200) VE tam render uretir.
+# BYS360 PERFORMANS BUGFIX KOORDINATOR NOTU: feedback_executive_summary_dashboard
+# eskiden burada -- pre-existing/out-of-scope bir "preset" cift-kwarg
+# TypeError'i yuzunden -- haric tutuluyordu (bkz. dosya basi docstring). O hata
+# app/performance/engagement_feedback_routes.py:305'teki fazladan `preset=preset`
+# kwarg'i kaldirilarak ayri bir bugfix dalgasinda duzeltildi (bkz.
+# tests/performance/test_feedback_executive_summary_preset_context_regression.py);
+# rota artik 200 doner, exclude kaldirildi.
 LIVE_RENDER_ROUTES: dict[str, str] = {
-    relative_path: str(meta["route"])
-    for relative_path, meta in TARGET_TEMPLATES.items()
-    if relative_path != "app/templates/feedback_executive_summary_dashboard.html"
+    relative_path: str(meta["route"]) for relative_path, meta in TARGET_TEMPLATES.items()
 }
 
 
@@ -484,6 +492,10 @@ UNCONDITIONAL_LIVE_CLASS_SAMPLE: dict[str, tuple[str, str]] = {
     "app/templates/feedback/quick_feedback.html": (
         "quick-feedback-panel-heading-lg",
         "font-size:1.04rem;",
+    ),
+    "app/templates/feedback_executive_summary_dashboard.html": (
+        "feedback-exec-summary-scope-note",
+        "color:#6b7280;font-size:.82rem;",
     ),
     "app/templates/assignment_recommendations.html": (
         "assignment-rec-spacing-top-md",
@@ -1075,42 +1087,71 @@ def test_target_template_route_response_contains_new_css_classes_and_not_old_rem
     )
 
 
-def test_feedback_executive_summary_dashboard_route_has_a_known_pre_existing_preset_kwarg_collision_bug(
+def test_feedback_executive_summary_dashboard_route_preset_kwarg_collision_bug_is_fixed(
     style2b_env,
 ) -> None:
-    """Bu, PAPERED-OVER edilmemis, GERCEK bir bulgu: `feedback_executive_summary_
-    dashboard` view fonksiyonu (Style-2B tarafindan DOKUNULMAMIS
-    app/performance/engagement_feedback_routes.py icinde) su an admin olarak
-    GET edildiginde 500 dondurur -- `build_feedback_executive_summary()`'in
-    dondurdugu dict kendi 'preset' anahtarini icerdigi icin `safe_render(...,
-    preset=preset, **dashboard)` cagrisinda CIFT deger hatasi olusur. Bu test
-    bu MEVCUT durumu kilitler (weaken/skip EDILMEMISTIR); route/CSS
-    migrasyonunun kendisi (sablon kaynagi, CSS dosyasi, <link> etiketi) ayri
-    testlerle zaten dogrulaniyor -- yalniz CANLI render bu bilinen, kapsam
-    disi hatadan dolayi su an calismiyor."""
+    """BYS360 PERFORMANS BUGFIX KOORDINATOR NOTU: bu test eskiden -- dogru
+    sekilde -- bir 500 durumunu kilitliyordu (bkz. git history/bu dosyanin
+    onceki hali): `feedback_executive_summary_dashboard` view fonksiyonu
+    (Style-2B'nin KENDISI DOKUNMAMIS oldugu app/performance/
+    engagement_feedback_routes.py icinde) admin olarak GET edildiginde 500
+    donuyordu -- `build_feedback_executive_summary()`'in dondurdugu dict
+    kendi 'preset' anahtarini icerdigi icin `safe_render(..., preset=preset,
+    **dashboard)` cagrisinda CIFT deger hatasi olusuyordu.
+
+    O hata, ayri bir bugfix dalgasinda, route dosyasindaki fazladan
+    `preset=preset` kwarg'i kaldirilarak duzeltildi (`dashboard["preset"]`
+    zaten ayni degeri **dashboard uzerinden tasidigi icin). Kapsamli
+    regresyon kanit/testleri artik
+    tests/performance/test_feedback_executive_summary_preset_context_regression.py
+    dosyasinda; bu test SADECE Style-2B'nin kendi companion contract
+    dosyasinda bu rotanin artik gercekten CALISTIGINI (200) dogrulayan hafif
+    bir kontrol olarak kalir -- LIVE_RENDER_ROUTES/route disi birakma
+    mantigi da bu yuzden kaldirildi (rota artik genel donguye dahil)."""
     client, _meeting_id = style2b_env
     response = client.get("/performance/feedback-executive-summary", follow_redirects=True)
-    assert response.status_code == 500, (
-        "feedback_executive_summary_dashboard rotasi artik 500 DONDURMUYOR -- eger bu "
-        "duzeldiyse (route dosyasindaki 'preset' cift-kwarg hatasi giderildiyse), bu "
-        "testi (ve LIVE_RENDER_ROUTES/route disi birakma mantigini) guncelleyin: rota "
-        f"artik {response.status_code} donuyor."
+    assert response.status_code == 200, (
+        f"feedback_executive_summary_dashboard rotasi 200 DONMEDI (bulunan: "
+        f"{response.status_code}) -- 'preset' cift-kwarg TypeError'i geri gelmis "
+        "olabilir."
     )
 
 
-def test_engagement_feedback_routes_file_is_untouched_by_this_wave() -> None:
+STYLE2B_CLOSURE_REF = "54ccf908c937bd06d0146e11b16ecd71dd569c51"
+
+
+def test_engagement_feedback_routes_file_was_untouched_by_style2b_itself() -> None:
     """feedback_executive_summary_dashboard'daki 500 hatasinin kok nedeni
-    Style-2B'nin DOKUNMADIGI bir dosyada (app/performance/
-    engagement_feedback_routes.py) -- bu, `git diff`'in bu dosya icin BOS
-    oldugunu dogrudan dogrulayarak kanitlanir (dosyanin bu wave'in bir PARCASI
-    OLMADIGINI, dolayisiyla bu dosya kapsaminda duzeltilmemesinin dogru
-    oldugunu gosterir)."""
-    diff_text = _git_diff_text("app/performance/engagement_feedback_routes.py")
-    assert diff_text == "", (
-        "app/performance/engagement_feedback_routes.py bu calisma agacinda "
-        "degistirilmis gorunuyor -- dosya basi docstring'deki 'Style-2B bu dosyaya "
-        "dokunmadi' iddiasi artik dogru olmayabilir, yeniden degerlendirin:\n"
-        f"{diff_text}"
+    Style-2B'nin DOKUNMADIGI bir dosyadaydi (app/performance/
+    engagement_feedback_routes.py) -- bu, Style-2B'nin KENDI kapanis commit'i
+    (STYLE2B_CLOSURE_REF) ile onun bir onceki dalganin kapanis commit'i
+    (PRE_WAVE_REF) arasindaki SABIT/tarihsel `git diff`'in bu dosya icin BOS
+    oldugunu dogrulayarak kanitlanir.
+
+    BYS360 PERFORMANS BUGFIX KOORDINATOR NOTU: bu test ONCEDEN calisan
+    worktree'nin GUNCEL/commit'lenmemis diff'ine (`git diff` -- HEAD'e karsi)
+    bakiyordu; bu, Style-2B'nin test_csp_style2a_repo_wide_contract.py'de
+    tam olarak duzelttigi ayni ileri-uyumsuzluk hatasini tasiyordu -- bir
+    SONRAKI dalga (burada: ayri, mesru bir bugfix dalgasi, preset kwarg
+    cakismasini duzelten) bu dosyaya dokunur dokunmaz FAIL verecekti. Artik
+    SABIT bir tarihsel commit araligina (649f4530..54ccf908) kilitlendi: bu,
+    Style-2B'nin KENDI committinin bu dosyaya dokunmadigini SONSUZA KADAR
+    dogru kalacak sekilde kanitlar -- sonraki (bu dahil) hicbir dalgadan
+    etkilenmez."""
+    result = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "diff", f"{PRE_WAVE_REF}..{STYLE2B_CLOSURE_REF}", "--", "app/performance/engagement_feedback_routes.py"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    if result.returncode != 0:
+        pytest.skip(f"git diff basarisiz oldu (exit={result.returncode}).")
+    assert result.stdout == "", (
+        "Style-2B'nin KENDI kapanis commit'i (649f4530..54ccf908) "
+        "app/performance/engagement_feedback_routes.py'yi degistirmis gorunuyor -- "
+        "dosya basi docstring'deki 'Style-2B bu dosyaya dokunmadi' iddiasi yanlis "
+        f"olabilir, yeniden degerlendirin:\n{result.stdout}"
     )
 
 

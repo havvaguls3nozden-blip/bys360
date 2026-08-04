@@ -302,7 +302,11 @@ def feedback_executive_summary_dashboard():
         "feedback_executive_summary_dashboard.html",
         "<h3>Yönetici Özet Merkezi</h3>",
         selected_scope=selected_scope,
-        preset=preset,
+        # `preset` is intentionally NOT passed explicitly here: `dashboard`
+        # (from build_feedback_executive_summary) already carries the same
+        # resolved/validated preset string under its own "preset" key.
+        # Passing it twice raised `TypeError: safe_render() got multiple
+        # values for keyword argument 'preset'`.
         preset_options=[{"value": key, "label": value} for key, value in SUMMARY_PRESET_LABELS.items() if key in {"daily", "weekly"}],
         scope_options=scope_ctx.get("scope_options"),
         scope_label=scope_ctx.get("scope_label"),
