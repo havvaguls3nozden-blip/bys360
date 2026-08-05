@@ -18,6 +18,22 @@ always ``INITIAL_ACTIVE_STYLE_TOTAL - sum(wave.removed_static for wave)``.
 Adding a Style-2C, Style-2D, ... wave later means adding one manifest
 entry here — nothing else in this file changes.
 
+FORWARD-COMPATIBILITY FOLLOW-UP (Style-3A, same class of bug as the
+Style-2A/2B incident above, fixed the same way): this file originally also
+hardcoded a single, wave-agnostic-in-name-only "`style_block_total` always
+equals `INITIAL_STYLE_BLOCK_TOTAL`" lock in `test_cumulative_style_block_
+total_is_unchanged`. That was true for Style-2A/2B (both attribute-only
+waves that never removed a `<style>` BLOCK, only `style="..."` attributes)
+but is false in general — Style-3A is the first wave whose entire purpose
+is removing `<style>` blocks (10 of them, by design: see
+`test_csp_style3a_duplicate_block_extraction_contract.py`). Exactly like
+`CUMULATIVE_REMOVED_STATIC` above, block removal is now a per-wave manifest
+field (`removed_blocks`) summed into `CUMULATIVE_REMOVED_BLOCKS`, and the
+expected total is ``INITIAL_STYLE_BLOCK_TOTAL - CUMULATIVE_REMOVED_BLOCKS``
+(renamed to `test_cumulative_style_block_total_matches_manifest` to match
+the naming of its active-attribute sibling). Style-2A/2B's entries simply
+carry `removed_blocks: 0`, so their expected total is unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -56,6 +72,7 @@ behaves identically before and after this wave's own commit lands.
 """
 from __future__ import annotations
 
+import re
 import subprocess
 from typing import TypedDict
 
@@ -89,6 +106,7 @@ INITIAL_STYLE_BLOCK_TOTAL = 270
 class _WaveManifestEntry(TypedDict):
     templates: tuple[str, ...]
     removed_static: int
+    removed_blocks: int
 
 
 STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
@@ -104,6 +122,7 @@ STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
             "app/templates/admin_analysis_excel_preview.html",
         ),
         "removed_static": 40,
+        "removed_blocks": 0,
     },
     "style2b": {
         "templates": (
@@ -117,11 +136,31 @@ STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
             "app/templates/performance_v2_phase1.html",
         ),
         "removed_static": 58,
+        "removed_blocks": 0,
+    },
+    "style3a": {
+        "templates": (
+            "app/templates/errors/400.html",
+            "app/templates/errors/401.html",
+            "app/templates/errors/404.html",
+            "app/templates/errors/405.html",
+            "app/templates/errors/500.html",
+            "app/templates/strategic_performance/ai_kpi_analysis.html",
+            "app/templates/strategic_performance/competency_library.html",
+            "app/templates/strategic_performance/kpi_dashboard.html",
+            "app/templates/strategic_performance/self_review_form.html",
+            "app/templates/strategic_performance/target_list.html",
+        ),
+        "removed_static": 0,
+        "removed_blocks": 10,
     },
 }
 
 CUMULATIVE_REMOVED_STATIC = sum(w["removed_static"] for w in STYLE_MIGRATION_WAVES.values())
 EXPECTED_ACTIVE_STYLE_TOTAL = INITIAL_ACTIVE_STYLE_TOTAL - CUMULATIVE_REMOVED_STATIC
+
+CUMULATIVE_REMOVED_BLOCKS = sum(w["removed_blocks"] for w in STYLE_MIGRATION_WAVES.values())
+EXPECTED_STYLE_BLOCK_TOTAL = INITIAL_STYLE_BLOCK_TOTAL - CUMULATIVE_REMOVED_BLOCKS
 
 
 def test_no_template_is_claimed_by_more_than_one_wave() -> None:
@@ -154,6 +193,41 @@ def test_every_wave_target_template_has_zero_active_style_attribute(relative_pat
     )
 
 
+_STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    sorted(
+        {
+            t
+            for w in STYLE_MIGRATION_WAVES.values()
+            if w["removed_blocks"] > 0
+            for t in w["templates"]
+        }
+    ),
+)
+def test_every_block_removal_wave_target_template_has_zero_style_blocks(relative_path: str) -> None:
+    """Every template EVER claimed by a wave that removed `<style>` BLOCKS
+    (not just attributes -- `removed_blocks > 0`) must still have zero
+    `<style>` blocks -- the block-removal analog of the active-attribute
+    check above, protecting against a LATER wave accidentally reintroducing
+    a block into an already-migrated file. Style-2A/2B never removed a
+    block (`removed_blocks: 0`), so this currently only covers Style-3A's
+    10 templates; Style-3A's own dedicated contract file
+    (test_csp_style3a_duplicate_block_extraction_contract.py) already
+    covers this per-template, per-group, in far more depth (byte-parity,
+    link-tag shape, live render/HTTP proof, etc.) -- this is a deliberately
+    short cross-check, valuable specifically because THIS file is the one
+    place that reasons about ALL waves cumulatively."""
+    text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    count = len(_STYLE_TAG_RE.findall(text))
+    assert count == 0, (
+        f"{relative_path} has {count} <style> block(s) remaining; this template was "
+        "already claimed as fully block-migrated by a completed wave."
+    )
+
+
 def test_cumulative_active_static_style_total_matches_manifest() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.active_static_total == EXPECTED_ACTIVE_STYLE_TOTAL, (
@@ -174,12 +248,13 @@ def test_cumulative_dynamic_style_total_is_unchanged() -> None:
     )
 
 
-def test_cumulative_style_block_total_is_unchanged() -> None:
+def test_cumulative_style_block_total_matches_manifest() -> None:
     inventory = compute_inventory_from_worktree()
-    assert inventory.style_block_total == INITIAL_STYLE_BLOCK_TOTAL, (
+    assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{INITIAL_STYLE_BLOCK_TOTAL} (no wave may move/edit an existing <style> "
-        "block -- only add new <link rel=\"stylesheet\"> tags)."
+        f"{INITIAL_STYLE_BLOCK_TOTAL} - {CUMULATIVE_REMOVED_BLOCKS} "
+        f"(cumulative across waves {sorted(STYLE_MIGRATION_WAVES)}) = "
+        f"{EXPECTED_STYLE_BLOCK_TOTAL}."
     )
 
 

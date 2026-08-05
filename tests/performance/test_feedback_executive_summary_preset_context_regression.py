@@ -359,6 +359,26 @@ def test_route_only_touches_isolated_temp_sqlite_db(perf_bugfix_env) -> None:
 # ---------------------------------------------------------------------------
 # 12) Style/CSP/nonce/PWA kapsamina bu bugfix'in DIFF'i sifir -- salt-okunur
 #    git diff kontrolu. Yalniz git binary'si yoksa atlanir (ortam kisitlamasi).
+#
+#    BYS360 CSP STYLE-3A KOORDINATOR DUZELTMESI (ileri-uyumluluk): bu iki
+#    test eskiden GUNCEL/commit'lenmemis calisma agacinin `HEAD`'e karsi
+#    diff'ine bakiyordu. Bu, Style-2A'nin repo-genelinde tam olarak ayni
+#    hatayi tasiyordu (bkz. test_csp_style2a_repo_wide_contract.py'nin "BYS360
+#    CSP STYLE-2B KOORDINATOR NOTU" bolumu) ve Style-2B'nin kendi "dosya bu
+#    dalga tarafindan dokunulmadi" testinde de (test_csp_style2b_target_
+#    templates_contract.py::test_engagement_feedback_routes_file_was_
+#    untouched_by_style2b_itself) ayni sekilde bulunup duzeltilmisti: bu
+#    bugfix ARTIK commit'lendigi (54ccf908..e0340cb) icin `git diff HEAD --`
+#    o degisikligi bir daha HICBIR ZAMAN gostermez (HEAD zaten iceriyor) --
+#    VE bu bugfix'ten SONRAKI herhangi bir dalganin (orn. Style-3A, `app/
+#    templates/errors/*.html` + `app/templates/strategic_performance/*.html`
+#    dosyalarini MESRU sekilde degistiren) commit'lenmemis kendi calismasi
+#    da bu "HEAD'e karsi genel diff" kontrolune YAKALANIRDI -- bu bugfix'in
+#    kendisiyle hicbir ilgisi olmamasina ragmen. Artik SABIT bir tarihsel
+#    commit araligina (BUGFIX_PRE_REF..BUGFIX_CLOSURE_REF) kilitlendi: bu,
+#    bu bugfix'in KENDI commit'inin bu kapsamlara/dosyaya dokunmadigini
+#    SONSUZA KADAR dogru kalacak sekilde kanitlar -- sonraki hicbir dalgadan
+#    etkilenmez.
 # ---------------------------------------------------------------------------
 
 _UNTOUCHED_SCOPE_PATHS = (
@@ -373,6 +393,9 @@ _UNTOUCHED_SCOPE_PATHS = (
     "sw.js",
 )
 
+BUGFIX_PRE_REF = "54ccf908c937bd06d0146e11b16ecd71dd569c51"
+BUGFIX_CLOSURE_REF = "e0340cbaba6f7fd439d4420b2c88bcdcc7031968"
+
 
 def test_style_csp_nonce_and_pwa_paths_have_zero_diff_from_this_bugfix() -> None:
     try:
@@ -381,7 +404,10 @@ def test_style_csp_nonce_and_pwa_paths_have_zero_diff_from_this_bugfix() -> None
         pytest.skip("git CLI bulunamadi.")
 
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", "HEAD", "--", *_UNTOUCHED_SCOPE_PATHS],
+        [
+            "git", "-C", str(REPO_ROOT), "diff", "--name-only",
+            f"{BUGFIX_PRE_REF}..{BUGFIX_CLOSURE_REF}", "--", *_UNTOUCHED_SCOPE_PATHS,
+        ],
         capture_output=True,
         text=True,
         timeout=30,
@@ -392,14 +418,16 @@ def test_style_csp_nonce_and_pwa_paths_have_zero_diff_from_this_bugfix() -> None
 
     changed = [line.strip() for line in result.stdout.splitlines() if line.strip()]
     assert changed == [], (
-        f"Bu bugfix'in kapsamadigi dosya(lar) degismis gorunuyor: {changed!r} -- "
-        "yalniz app/performance/engagement_feedback_routes.py ve regresyon test "
-        "dosyasi degismeliydi."
+        f"Bu bugfix'in KENDI kapanis commit'i ({BUGFIX_PRE_REF}..{BUGFIX_CLOSURE_REF}) "
+        f"kapsamadigi dosya(lar)i degistirmis gorunuyor: {changed!r} -- yalniz "
+        "app/performance/engagement_feedback_routes.py ve regresyon test dosyasi "
+        "degismeliydi."
     )
 
 
 def test_route_file_diff_is_scoped_to_the_single_kwarg_removal() -> None:
-    """Ekstra bir guvence: degisen dosyanin GERCEK diff'i (git diff HEAD --)
+    """Ekstra bir guvence: bu bugfix'in KENDI kapanis commit'indeki (SABIT
+    tarihsel `BUGFIX_PRE_REF..BUGFIX_CLOSURE_REF` araligi) GERCEK diff'i
     beklenenden fazla bir seyi degistirmemis -- yalniz `preset=preset,`
     satirinin kaldirilmasi (+ aciklayici yorum) civarinda."""
     try:
@@ -408,7 +436,7 @@ def test_route_file_diff_is_scoped_to_the_single_kwarg_removal() -> None:
         pytest.skip("git CLI bulunamadi.")
 
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "HEAD", "--", ROUTE_FILE],
+        ["git", "-C", str(REPO_ROOT), "diff", f"{BUGFIX_PRE_REF}..{BUGFIX_CLOSURE_REF}", "--", ROUTE_FILE],
         capture_output=True,
         text=True,
         timeout=30,

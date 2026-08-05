@@ -570,14 +570,82 @@ def _strip_css_comments(text: str) -> str:
     return re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
 
 
+_STYLE_BLOCK_INNER_RE = re.compile(r"<style\b[^>]*>(.*?)</style>", re.DOTALL | re.IGNORECASE)
+
+
+def _normalize_for_move_detection(text: str) -> str:
+    """Line-based normalization used ONLY to detect 'this new CSS file's
+    content is a byte-for-byte RELOCATION of a `<style>` block some modified
+    template used to have' -- rstrip each line, then drop leading/trailing
+    EMPTY lines. Matches the normalization used by the Style-3A byte-parity
+    tests (see tests/security/test_csp_style3a_duplicate_block_extraction_
+    contract.py) so a genuine block-move is recognized consistently."""
+    lines = [line.rstrip() for line in text.splitlines()]
+    while lines and lines[0] == "":
+        lines.pop(0)
+    while lines and lines[-1] == "":
+        lines.pop()
+    return "\n".join(lines)
+
+
+def _removed_style_block_contents() -> set[str]:
+    """Normalized content of every `<style>` block that used to exist (at
+    git HEAD) in a currently-modified (status 'M') .html file but is gone
+    from that file's current on-disk content. Used to recognize a duplicate-
+    style-BLOCK extraction wave's new CSS files as MOVED content, not newly
+    authored content -- see test_no_important_declaration_added_by_this_
+    pilot_precise_diff_check below for why this distinction matters."""
+    lines = _git_status_porcelain_lines()
+    if lines is None:
+        return set()
+    removed: set[str] = set()
+    for line in lines:
+        if len(line) < 4 or line[:2].strip() != "M":
+            continue
+        path = line[3:].strip().replace("\\", "/")
+        if not path.endswith(".html"):
+            continue
+        old_result = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "show", f"HEAD:{path}"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if old_result.returncode != 0:
+            continue
+        current_text = (REPO_ROOT / path).read_text(encoding="utf-8", errors="replace")
+        for match in _STYLE_BLOCK_INNER_RE.finditer(old_result.stdout):
+            normalized = _normalize_for_move_detection(match.group(1))
+            if normalized and normalized not in current_text.replace("\r\n", "\n"):
+                removed.add(normalized)
+    return removed
+
+
 def _git_diff_added_content_for_css_file(code: str, path: str) -> str:
     """Bu dalganin bu dosyaya EKLEDIGI icerigi dondurur: '??' (yeni/
     izlenmeyen dosya) icin dosyanin TAMAMI; degistirilmis (M) dosyalar icin
     yalniz `git diff` EKLENEN ('+') satirlari (yorum bloklari haric
-    tutulmus haliyle, kesinlik icin)."""
+    tutulmus haliyle, kesinlik icin).
+
+    ISTISNA (duplicate-style-BLOCK extraction dalgalari icin, orn. Style-3A):
+    eger '??' bir dosyanin TUM normalize edilmis icerigi, bu diff'te
+    modifiye edilmis (M) bir .html dosyasinin git HEAD'deki `<style>`
+    blogundan KALDIRILMIS icerikle BIREBIR eslesirse, bu dosya yeni
+    YAZILMIS/AUTHORED bir CSS degil, var olan bir `<style>` blogunun
+    OLDUGU GIBI TASINMASIDIR -- bu durumda "eklenen icerik" bos donuyor
+    (tasinan icerikteki onceden var olan '!important' kullanimlari bu
+    kontrol tarafindan yanlis-pozitif olarak YAKALANMAZ). Bu, dosya adindan
+    veya hangi dalganin calistigindan BAGIMSIZ, genel bir tespittir --
+    gelecekteki her block-extraction dalgasi icin otomatik calisir."""
     if code.strip() == "??":
         full_path = REPO_ROOT / path
-        return _strip_css_comments(full_path.read_text(encoding="utf-8", errors="replace"))
+        raw_text = full_path.read_text(encoding="utf-8", errors="replace")
+        if _normalize_for_move_detection(raw_text) in _removed_style_block_contents():
+            return ""
+        return _strip_css_comments(raw_text)
     result = subprocess.run(
         ["git", "-C", str(REPO_ROOT), "diff", "--", path],
         capture_output=True,

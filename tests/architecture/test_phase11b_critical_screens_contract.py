@@ -106,10 +106,24 @@ def test_error_pages_do_not_leak_technical_terms():
 
 
 def test_error_pages_meet_touch_target_and_reduced_motion():
+    # BYS360 CSP STYLE-3A KOORDINATOR DUZELTMESI: bu iki sayfanin ortak,
+    # byte-birebir ayni statik <style> blogu Style-3A dalgasinda harici
+    # app/static/css/error_pages_404_500_shared.css dosyasina tasindi (bkz.
+    # o dalganin kontrat testleri, tests/security/test_csp_style3a_
+    # duplicate_block_extraction_contract.py) -- deklarasyonlarin kendisi
+    # DEGISMEDI, yalnizca konumu degisti. Bu test artik hem sablonun dogru
+    # stylesheet'i yukledigini HEM DE garanti edilen erisilebilirlik
+    # ozelliklerinin (44px dokunma hedefi + reduced-motion destegi) o
+    # stylesheet icinde hala var oldugunu dogrular -- garanti kaybolmadi,
+    # yalnizca nereye bakildigi degisti.
+    css = text("app/static/css/error_pages_404_500_shared.css")
+    assert "min-height:44px" in css
+    assert "prefers-reduced-motion: reduce" in css
     for rel in ["app/templates/errors/404.html", "app/templates/errors/500.html"]:
         content = text(rel)
-        assert "min-height:44px" in content
-        assert "prefers-reduced-motion: reduce" in content
+        assert "css/error_pages_404_500_shared.css" in content, (
+            f"{rel} artik erisilebilirlik garantisini tasiyan stylesheet'i yuklemiyor."
+        )
 
 
 def test_active_error_handler_passes_title_and_message_to_templates():
