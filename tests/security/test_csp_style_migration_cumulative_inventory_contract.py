@@ -80,6 +80,22 @@ way, so this ledger has no entry for them. `INITIAL_*` constants and the
 `style2a`/`style2b`/`style3a`/`DELETED_TEMPLATE_WAVES` entries above are
 unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 4 (BYS360 Daily Weather/Mail Orphan
+Template Temizliği, a DELETED_TEMPLATE_WAVES-class wave): a new
+`"daily_weather_mail_cleanup"` entry was added recording the deletion of
+the exact 2 templates dropped from Style-3B's scope above (both
+independently re-confirmed ORPHAN, not just assumed) plus 2 more
+(`daily_mail_tasks_premium.html`, `daily_mail_tasks_v1_4.html`, already
+correctly identified as orphan by Wave 8's own original contract).
+`removed_static=20`/`removed_blocks=4` are the sum of each of the 4
+templates' independently-measured, identical per-template contribution (5
+static attrs + 1 block each) — see
+`tests/security/test_csp_wave8_weather_mail_contract.py` and
+`tests/security/test_csp_wave8_executive_summary_mail_contract.py`'s own
+module docstrings for the full per-template evidence and the correction of
+a previously-incorrect "CANLI" (live) claim for one of the four. `INITIAL_*`
+constants and all prior wave entries are unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -236,14 +252,34 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         "removed_static": 8,
         "removed_blocks": 6,
     },
+    # BYS360 Daily Weather/Mail Orphan Template Temizliği: 4 template, hepsi
+    # ORPHAN_CONFIRMED (hiçbir gerçek route render etmiyor -- iki tanesi
+    # zaten Wave 8'in kendi zamanında doğru tespit edilmişti, diğer iki
+    # tanesi (communication/daily_weather_mail_settings.html ve executive_
+    # summary/daily_weather_mail_tasks.html) Wave 8'in test dosyasındaki
+    # YANLIŞ "CANLI" iddiasının düzeltilmesiyle birlikte yeniden doğrulandı
+    # -- bkz. tests/security/test_csp_wave8_weather_mail_contract.py'nin
+    # kendi düzeltme notu. removed_static=20/removed_blocks=4 dört
+    # template'in her birinin ayrı ayrı ölçülen katkısının (5 statik attr +
+    # 1 blok her birinde, hepsi byte-birebir aynı) toplamıdır.
+    "daily_weather_mail_cleanup": {
+        "templates": (
+            "app/templates/communication/daily_weather_mail_settings.html",
+            "app/templates/executive_summary/daily_weather_mail_tasks.html",
+            "app/templates/executive_summary/daily_mail_tasks_premium.html",
+            "app/templates/executive_summary/daily_mail_tasks_v1_4.html",
+        ),
+        "removed_static": 20,
+        "removed_blocks": 4,
+    },
 }
 
-# The fixed commit immediately BEFORE the orphan_mail_cleanup wave's own
-# deletion commit -- the schema-fix commit that proved these six templates'
-# only renderer (app/communication/executive_mail_center_routes.py) was
-# dead code, at which point all six templates still existed on disk.
+# The fixed commit immediately BEFORE each deleted-template wave's own
+# deletion commit -- the repo state at which point that wave's templates
+# still existed on disk.
 DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "orphan_mail_cleanup": "297c8da746a59d84e5f3f9536b92e824ce5bd70a",
+    "daily_weather_mail_cleanup": "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47",
 }
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)

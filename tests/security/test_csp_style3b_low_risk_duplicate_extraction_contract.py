@@ -424,9 +424,15 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 #    global <style> block total dropped by EXACTLY 2.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1060
+# BYS360 KOORDINATOR DUZELTMESI: was 1060/252 as of Style-3B's own closure.
+# A later, unrelated wave (BYS360 Daily Weather/Mail Orphan Template
+# Temizliği) deleted 4 more confirmed-orphan templates, removing 20 more
+# static style="..." attributes and 4 more <style> blocks: 1060 - 20 = 1040,
+# 252 - 4 = 248. See tests/security/test_csp_style_migration_cumulative_
+# inventory_contract.py's DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"].
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1040
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B = 66
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 252
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 248
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:
@@ -552,29 +558,42 @@ def test_service_worker_files_are_untouched_by_this_wave() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 12) Plan-scope guard: this wave's own (not-yet-committed) working-tree
-#     diff against HEAD touches ONLY the 2 templates + the new CSS file
-#     under app/templates/ and app/static/css/ -- nothing else, and
-#     specifically NOT the two confirmed-orphan daily_weather_mail files.
+# 12) Plan-scope guard: this wave's OWN closure commit range touches ONLY
+#     the 2 templates + the new CSS file under app/templates/ and
+#     app/static/css/ -- nothing else, and specifically NOT the two
+#     confirmed-orphan daily_weather_mail files.
 #
-#     BYS360 KOORDINATOR NOTU: bu test HENUZ commit'lenmemis calisma
-#     agacini `git diff HEAD` ile kontrol eder -- Style-3A'nin kendi
-#     ilk versiyonuyla ayni desendir. Bu wave'in KENDI commit'i landed
-#     olduktan SONRA, sonraki bir commit/dalga bu path'lere dokunursa bu
-#     test sahte FAIL verebilir -- o noktada Style-3A'nin izlediği gibi
-#     sabit bir tarihsel commit araligina (HEAD_REF..bu-wave'in-kendi-
-#     kapanis-commit'i) yeniden ankorlanmalidir.
+#     BYS360 KOORDINATOR DUZELTMESI: bu test ilk yazildiginda HENUZ
+#     commit'lenmemis calisma agacini `git diff HEAD` ile kontrol
+#     ediyordu -- bu, Style-3B HENUZ commit'lenmemisken DOGRUYDU. Style-3B
+#     commit'lendikten (1d20cde) SONRA, bir SONRAKI dalga (BYS360 Daily
+#     Weather/Mail Orphan Template Temizligi) app/templates/ altinda 4 daha
+#     dosya sildi -- bu, "HEAD"'e karsi live diff kontrolunun artik
+#     Style-3B'nin KENDI degisikligini degil, SONRAKI dalganin degisikligini
+#     de gormesine yol aciyordu (sahte FAIL). Ayni sinif hata, Style-3A'nin
+#     kendi HEAD_REF/STYLE3A_CLOSURE_REF KOORDINATOR NOTU'nda ve bu dosyanin
+#     kendi list_users sozlesme dosyasinda daha once de gorulmustu. Artik
+#     SABIT, Style-3B'nin KENDI commit araligina (HEAD_REF..STYLE3B_CLOSURE_
+#     REF) kilitlendi -- bu, "Style-3B hicbir sey degistirmedi" iddiasini
+#     SONSUZA KADAR dogru sekilde kanitlar, sonraki hicbir commit/dalgadan
+#     (ornegin 4 orphan daily-weather-mail template'ini silen commit'ten)
+#     etkilenmez.
 # ---------------------------------------------------------------------------
 
+STYLE3B_CLOSURE_REF = "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47"  # Style-3B'nin KENDI kapanis commit'i
 
-def test_style3b_uncommitted_diff_scoped_to_wave_files_only() -> None:
+
+def test_style3b_closure_commit_scoped_to_wave_files_only() -> None:
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
     except OSError:
         pytest.skip("git CLI not available in this environment.")
 
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--name-status", "HEAD", "--", "app/templates/", "app/static/css/"],
+        [
+            "git", "-C", str(REPO_ROOT), "diff", "--name-status",
+            f"{HEAD_REF}..{STYLE3B_CLOSURE_REF}", "--", "app/templates/", "app/static/css/",
+        ],
         capture_output=True,
         text=True,
         timeout=30,

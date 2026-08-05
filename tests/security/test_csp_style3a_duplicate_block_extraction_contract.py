@@ -819,11 +819,15 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # app/templates/executive_summary/executive_mail_*.html templates (their only
 # renderer, app/communication/executive_mail_center_routes.py, was proven
 # absent from sys.modules/route_manifest.py/the real url_map), removing 8
-# static style="..." attributes with them: 1068 - 8 = 1060. See
+# static style="..." attributes with them: 1068 - 8 = 1060. A further later
+# wave (BYS360 Daily Weather/Mail Orphan Template Temizliği) deleted 4 more
+# confirmed-orphan templates, removing 20 more static style="..." attributes
+# (5 each, byte-identical): 1060 - 20 = 1040. See
 # tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
-# DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"] for the independently
+# DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"] and
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"] for the independently
 # re-derived evidence.
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1060
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1040
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 66
 
 
@@ -880,20 +884,26 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # performance/meeting_p3_reminders.html, each carried exactly one <style>
 # block, extracted to app/static/css/meeting_development_b_shared.css -- see
 # tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
-# STYLE_MIGRATION_WAVES["style3b_low_risk"]). 270 - 10 - 6 - 2 = 252.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2
+# STYLE_MIGRATION_WAVES["style3b_low_risk"]). -4 from the later
+# daily_weather_mail_cleanup wave (4 confirmed-orphan templates deleted, each
+# carried exactly one <style> block -- see that same ledger file's
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]).
+# 270 - 10 - 6 - 2 - 4 = 248.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
         "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "
         "one <style> block; the later style3b_low_risk wave extracted 2 more "
-        "<style> blocks from 2 active templates)."
+        "<style> blocks from 2 active templates; the later daily_weather_mail_"
+        "cleanup wave deleted 4 more dead templates each with exactly one "
+        "<style> block)."
     )
 
 

@@ -21,18 +21,27 @@ paralel ajan dosyasında kapsanmıştır -- burada TEKRAR EDİLMEZ:
       (daily_mail_tasks_premium.html + daily_mail_tasks_v1_4.html)
     - tests/security/test_csp_wave8_weather_mail_contract.py
       (daily_weather_mail_tasks.html + communication/daily_weather_mail_
-      settings.html, ayrıca orphan-route teyidi)
+      settings.html, ayrıca orphan-route teyidi -- ve o dosyanın yanlış
+      "CANLI" iddiasının düzeltilmesi)
+
+SİLME VE GİT-GEÇMİŞİ KAYNAKLI DOĞRULAMA (BYS360 Daily Weather/Mail Orphan
+Template Temizliği görevi): tüm DÖRT template de, hiçbir gerçek route
+tarafından render edilmediği bağımsız olarak (yeniden) kanıtlandıktan sonra
+dosya sisteminden SİLİNDİ. Bu dosyadaki `_read()`/render fonksiyonları
+artık canlı dosyaları DEĞİL, silme öncesi sabit bir git ref'ini
+(`PRE_DELETION_REF`) okuyor -- böylece Wave 8'in orijinal, dört dosyayı
+BİR ARADA doğrulayan koordinasyon/güvenlik kanıtı SİLİNMEDEN kalıcı olarak
+korunuyor. Yeni `test_deleted_template_no_longer_exists_on_disk` testi
+silme sonrası dosya-yokluğu sözleşmesini kilitler.
 
 Bu dosyanın kendine özgü, TAMAMLAYICI kapsamı:
-    A) Repo GENELİNDE inline-handler SAYIM regresyonu (dört dosya BİRLİKTE +
-       geri kalan kapsam-dışı 3 dosya: messages_thread.html, file_center/
-       index.html, file_center/requests.html).
+    A) Repo GENELİNDE inline-handler SAYIM regresyonu (artık dört dosya
+       SİLİNDİĞİ için repo-geneli tarama onları zaten içermez + geri kalan
+       kapsam-dışı 3 dosya: messages_thread.html, file_center/index.html,
+       file_center/requests.html).
     B) scripts/windows ve scripts/communication altındaki launcher/installer
        PowerShell dosyalarının bu dalgada HİÇ değişmediğinin `git diff
-       --exit-code` (gerçek subprocess çağrısıyla) DOĞRUDAN kanıtı --
-       kardeş dosyalar bunu yalnızca statik metin-arama ile (dosya X hiç
-       import/read edilmedi) doğruluyordu, burada gerçek git geçmişiyle
-       karşılaştırılıyor.
+       --exit-code` (gerçek subprocess çağrısıyla) DOĞRUDAN kanıtı.
     C) Bu test dosyasının kendisinin gerçek bir süreç (schtasks.exe,
        Register-ScheduledTask, Start-ScheduledTask, powershell.exe) veya
        gerçek bir SMTP gönderim fonksiyonu ÇALIŞTIRMADIĞININ hem statik hem
@@ -40,38 +49,28 @@ Bu dosyanın kendine özgü, TAMAMLAYICI kapsamı:
     D) Dört dosyanın HEPSİNİN (iki çift TEK ARADA) confirm mesajı/action/
        method/CSRF/delegasyon sözleşmesini tutarlı şekilde koruduğunun ve
        render çıktısında script'in tam 1 kez geçtiğinin çapraz-dosya
-       doğrulaması (kardeş dosyalar yalnızca KENDİ 2'şer dosyalık çiftini
-       test ediyor, dördünü BİR ARADA doğrulayan tek nokta burasıdır).
+       doğrulaması (PRE_DELETION_REF içeriği üzerinden).
 
 ÖNEMLİ NOT -- register_bys360_executive_summary_tasks_v2_14_1.ps1 /
 ..._v2_14_3.ps1 İÇİN BİLİNEN ÖN-VAROLAN (WAVE 8 İLE İLGİSİZ) DURUM: Bu iki
 dosya, Dalga 8 çalışması BAŞLAMADAN ÖNCE bile bu worktree'de zaten
-`git diff` ile farklıydı (bu görev başlamadan önceki `git status` çıktısında
-da " M" olarak görünüyorlardı). İçerik incelendiğinde bu farkın Dalga 8/CSP
+`git diff` ile farklıydı. İçerik incelendiğinde bu farkın Dalga 8/CSP
 confirm dönüşümüyle HİÇBİR ilgisi olmadığı, önceki bir "launcher-overwrite-
-guard" düzeltmesi (v2_14_1'in artık kendi Action'ını üretmeyip v2_14_3'e
-DELEGE etmesi -- bkz. tests/quality/test_installer_launcher_overwrite_
-guard_v1.py) olduğu doğrulanmıştır: diff metninde `onsubmit`, `data-confirm`,
-`window.confirm(` gibi hiçbir CSP/confirm izi YOKTUR. Bu yüzden
-`test_launcher_and_register_scripts_have_zero_git_diff_after_wave8` testi bu
-iki dosya için ŞU AN başarısız olabilir -- ama bu, "diğer ajanlar henüz
-bitirmedi" durumundan FARKLI bir başarısızlık nedenidir (ön-varolan/ilgisiz
-bir değişiklik, Wave 8 regresyonu DEĞİL). Bu ayrım, testin başarısızlık
-mesajında programatik olarak sınıflandırılır (diff metninde CSP izi var mı
-yok mu kontrolü). Asıl anlamlı regresyon kilidi
-`test_launcher_and_register_scripts_diff_has_no_csp_confirm_regression_
-markers` testidir -- bu, ön-varolan ilgisiz değişikliklerden ETKİLENMEDEN
-her koşulda doğru sinyali verir.
+guard" düzeltmesi olduğu doğrulanmıştır: diff metninde `onsubmit`,
+`data-confirm`, `window.confirm(` gibi hiçbir CSP/confirm izi YOKTUR. Asıl
+anlamlı regresyon kilidi `test_launcher_and_register_scripts_diff_has_no_
+csp_confirm_regression_markers` testidir.
 
 GERÇEK GÖREV/MAIL/TARAYICI/POWERSHELL ÇALIŞTIRILMADI: Bu dosyadaki hiçbir
 test gerçek `schtasks.exe`, gerçek `Register-ScheduledTask`/
 `Start-ScheduledTask` PowerShell cmdlet'i, gerçek bir SMTP bağlantısı veya
-gerçek bir tarayıcı ÇAĞIRMAZ/ÇALIŞTIRMAZ. Yalnızca: (a) kaynak-kod okuma
-(`Path.read_text`), (b) gerçek Jinja motoruyla `flask.render_template()`
-(ağ/DB/SMTP/süreç YOK), (c) `git diff` (salt-okunur, hiçbir dosyayı
-değiştirmez) alt-süreci ve (d) `unittest.mock.patch` ile devre dışı
-bırakılmış `subprocess.run`/`subprocess.Popen`/`os.system`/`os.popen`
-kullanılır. Bölüm C'deki testler bunun ÇALIŞMA-ZAMANI pozitif kanıtıdır.
+gerçek bir tarayıcı ÇAĞIRMAZ/ÇALIŞTIRMAZ. Yalnızca: (a) salt-okunur
+`git show` (silinen 4 template'in tarihsel içeriği için) ve `git diff`
+(launcher/installer koruma için), (b) gerçek Jinja motoruyla
+`flask.render_template_string()` (ağ/DB/SMTP/süreç YOK), (c)
+`unittest.mock.patch` ile devre dışı bırakılmış `subprocess.run`/
+`subprocess.Popen`/`os.system`/`os.popen` kullanılır. Bölüm C'deki testler
+bunun ÇALIŞMA-ZAMANI pozitif kanıtıdır.
 """
 from __future__ import annotations
 
@@ -99,6 +98,10 @@ FOUR_WAVE8_TEMPLATES = [
     DAILY_WEATHER_MAIL_TASKS,
     DAILY_WEATHER_MAIL_SETTINGS,
 ]
+
+# Fixed commit immediately BEFORE the orphan-cleanup deletion commit -- the
+# repo state where all four templates still existed on disk.
+PRE_DELETION_REF = "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47"
 
 # Dalga 8 zamanında kapsam dışı bırakılan, o an repoda hâlâ inline
 # event-attribute içeren 3 dosya (koordinatör bulgusu: Dalga 8 dönüşümü
@@ -163,8 +166,34 @@ _FORBIDDEN_MAIL_SEND_MARKERS = (
 )
 
 
+def _git_show(ref: str, relative_path: str) -> str:
+    result = subprocess.run(
+        ["git", "show", f"{ref}:{relative_path}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0, f"'git show {ref}:{relative_path}' failed: {result.stderr!r}"
+    return result.stdout
+
+
 def _read(relative_path: str) -> str:
-    return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    """Reads the template's content at PRE_DELETION_REF -- all
+    FOUR_WAVE8_TEMPLATES were deleted after being confirmed orphan (see
+    module docstring)."""
+    return _git_show(PRE_DELETION_REF, relative_path)
+
+
+def _render_from_pre_deletion_ref(app, relative_path: str, **context: object) -> str:
+    from flask import render_template_string
+
+    text = _git_show(PRE_DELETION_REF, relative_path)
+    with app.test_request_context("/"):
+        return render_template_string(text, **context)
 
 
 def _require_git() -> str:
@@ -204,13 +233,9 @@ def test_repo_wide_inline_handler_count_after_wave8_equals_four() -> None:
     file_center/requests.html) toplam 4. Dalga 9 -- script/event-handler CSP
     temizliğinin SON dalgası -- tam olarak bu 3 dosyayı kapsama aldı ve
     hepsini 0'a indirdi; bu yüzden EXPECTED_REPO_WIDE_HANDLER_TOTAL_AFTER_WAVE8
-    artık 0'dır (fonksiyon adı tarihi/geriye dönük referans olarak korunuyor).
-    Fonksiyon adı yeniden adlandırılmadı ki bu dosyanın Dalga 8 zamanındaki
-    orijinal niyetiyle git geçmişinde izlenebilir kalsın; asıl güncel/ongoing
-    repo-geneli sıfır-handler kapısı artık
-    tests/security/test_csp_wave9_final_zero_handler_contract.py'dir -- bu
-    test onunla birlikte, ondan BAĞIMSIZ ikinci bir kanıt katmanı olarak
-    çalışır."""
+    artık 0'dır. Dört Dalga-8 hedef dosyası daha sonra (orphan-cleanup
+    görevinde) tamamen SİLİNDİĞİ için repo-geneli tarama artık onları hiç
+    içermiyor -- bu, toplamı ETKİLEMEZ (zaten hepsi 0 katkı yapıyordu)."""
     pattern = re.compile(r"""[\s]on[a-zA-Z]+\s*=\s*["']""")
     templates_root = REPO_ROOT / "app" / "templates"
     offenders: dict[str, int] = {}
@@ -226,19 +251,29 @@ def test_repo_wide_inline_handler_count_after_wave8_equals_four() -> None:
     assert total == EXPECTED_REPO_WIDE_HANDLER_TOTAL_AFTER_WAVE8, (
         f"Repo genelinde beklenen inline-handler toplami "
         f"{EXPECTED_REPO_WIDE_HANDLER_TOTAL_AFTER_WAVE8} degil, {total} bulundu. "
-        f"Dagilim: {offenders!r}. Eger dort hedef Dalga 8 dosyasindan biri hala "
-        "listede goruyorsa, paralel donusum ajanlari henuz isini bitirmemis "
-        "olabilir -- koordinator bu testi tekrar calistiracaktir."
+        f"Dagilim: {offenders!r}."
     )
 
 
 @pytest.mark.parametrize("relative_path", FOUR_WAVE8_TEMPLATES)
 def test_four_target_files_have_zero_inline_event_handlers(relative_path: str) -> None:
-    """Dört hedef dosyanın HER BİRİNDE `on[a-zA-Z]+=` regex'inin hiçbir
-    eşleşme vermediğini ayrı ayrı doğrular."""
+    """Dört hedef dosyanın HER BİRİNDE (PRE_DELETION_REF içeriğinde)
+    `on[a-zA-Z]+=` regex'inin hiçbir eşleşme vermediğini ayrı ayrı
+    doğrular."""
     text = _read(relative_path)
     matches = _INLINE_EVENT_ATTR_RE.findall(text)
     assert not matches, f"{relative_path} icinde hala inline event-attribute bulundu: {matches!r}"
+
+
+@pytest.mark.parametrize("relative_path", FOUR_WAVE8_TEMPLATES)
+def test_deleted_template_no_longer_exists_on_disk(relative_path: str) -> None:
+    """Orphan-absence sözleşmesi: dört hedef template de artık dosya
+    sisteminde YOK -- ORPHAN_CONFIRMED sınıflandırmasının silme kararının
+    gerçekten uygulandığının kanıtı."""
+    assert not (REPO_ROOT / relative_path).exists(), (
+        f"{relative_path} hala diskte mevcut ama orphan-cleanup tarafindan silinmis "
+        "olmasi bekleniyordu."
+    )
 
 
 @pytest.mark.parametrize(
@@ -248,15 +283,8 @@ def test_three_out_of_scope_files_retain_expected_untouched_handler_counts(
     relative_path: str, expected_count: int
 ) -> None:
     """Dalga 8 kapsamı dışındaki 3 dosyanın (Dalga 8'de DOKUNULMAYAN, Dalga
-    9'da tamamlanan) inline-handler sayısı beklenen değerde kalmalı.
-
-    TARİHÇE: Dalga 8 zamanında beklenen değerler {2, 1, 1} idi (bu dosyalara
-    henüz dokunulmamıştı). Dalga 9 -- script/event-handler CSP temizliğinin
-    SON dalgası -- tam olarak bu 3 dosyayı dönüştürüp hepsini 0'a indirdi;
-    değerler bu güncel/doğru duruma göre güncellendi. Ne kazara farklı bir
-    sayıya düşmüş (beklenmedik kısmi değişiklik) ne de hâlâ eski Dalga-8
-    değerinde kalmış (Dalga 9 dönüşümü eksik/geri alınmış) olmamalı."""
-    text = _read(relative_path)
+    9'da tamamlanan) inline-handler sayısı beklenen değerde kalmalı."""
+    text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
     matches = _INLINE_EVENT_ATTR_RE.findall(text)
     assert len(matches) == expected_count, (
         f"{relative_path} icin beklenen inline-handler sayisi {expected_count}, "
@@ -267,8 +295,7 @@ def test_three_out_of_scope_files_retain_expected_untouched_handler_counts(
 
 def test_out_of_scope_handler_counts_sum_to_repo_wide_expected_total() -> None:
     """Sağlamlık kontrolü: yukarıdaki sözlükteki sayıların toplamı, repo-geneli
-    testte beklenen toplamla (4) tutarlı olmalı -- sabitler arasında yazım
-    hatası/uyumsuzluk olmadığının kanıtı."""
+    testte beklenen toplamla (0) tutarlı olmalı."""
     assert sum(REMAINING_OUT_OF_SCOPE_HANDLER_COUNTS.values()) == EXPECTED_REPO_WIDE_HANDLER_TOTAL_AFTER_WAVE8
 
 
@@ -290,18 +317,10 @@ def test_launcher_and_register_scripts_have_zero_git_diff_after_wave8(relative_p
     varsa test SERT BAŞARISIZ olur -- bu asıl korunan invaryanttır.
 
     BİLİNEN İSTİSNA: register_bys360_executive_summary_tasks_v2_14_1.ps1 ve
-    ..._v2_14_3.ps1 bu görev BAŞLAMADAN ÖNCE de zaten farklıydı (ön-varolan,
-    Dalga 8 ile ilgisiz bir launcher-overwrite-guard düzeltmesi -- bkz. modül
-    docstring'i). Bu durumda test'i BAŞARISIZ SAYMIYORUZ (koordinatör
-    tarafından `register_bys360_executive_summary_tasks_v2_14_3.ps1` diff'i
-    satır satır incelendi: yalnızca launcher-overwrite-guard içeriği,
-    hiçbir onsubmit/data-confirm/window.confirm izi yok) -- aksi halde
-    pytest'in `lastfailed` cache yazma girişimi her koşuda ekstra bir
-    PytestCacheWarning üretip warning sayısını yapay şekilde artırıyordu.
-    Asıl regresyon kilidi hâlâ aşağıdaki
-    `test_launcher_and_register_scripts_diff_has_no_csp_confirm_regression_
-    markers` testidir ve bu test onunla birlikte, ondan BAĞIMSIZ ikinci bir
-    kanıt katmanı olarak çalışır."""
+    ..._v2_14_3.ps1 bu görev BAŞLAMADAN ÖNCE de zaten farklıydı (bkz. modül
+    docstring'i). Bu durumda test'i BAŞARISIZ SAYMIYORUZ -- asıl regresyon
+    kilidi hâlâ aşağıdaki `test_launcher_and_register_scripts_diff_has_no_
+    csp_confirm_regression_markers` testidir."""
     exit_code, diff_text = _git_diff_exit_code_and_text(relative_path)
     if exit_code == 0:
         return
@@ -367,13 +386,25 @@ def test_launcher_guard_test_file_still_present_and_contains_test_functions(
 def test_wave8_static_scans_and_template_renders_never_spawn_a_real_process(app) -> None:
     """POZİTİF çalışma-zamanı kanıtı: `subprocess.run`, `subprocess.Popen`,
     `os.system`, `os.popen` bir context manager içinde mock'lanır; bu test
-    dosyasının fiilen yaptığı işlemler (dört hedef şablonun
-    `flask.render_template()` ile render edilmesi + repo-genelindeki statik
-    regex taraması) bu mock'lu blok İÇİNDE çalıştırılır. Hiçbiri
+    dosyasının fiilen yaptığı işlemler (dört hedef şablonun PRE_DELETION_REF
+    içeriğinin `render_template_string()` ile render edilmesi + repo-
+    genelindeki statik regex taraması) bu mock'lu blok İÇİNDE çalıştırılır.
+    NOT: `_git_show()`'un kendi (gerçek, salt-okunur) `subprocess.run`
+    çağrısı BİLEREK bu mock'lu bloğun DIŞINDA, önceden çağrılır (mock'lu
+    `subprocess.run` git show'u da engellerdi) -- template içerikleri mock
+    bloğuna girmeden ÖNCE okunur, render işleminin kendisi (saf Jinja,
+    hiçbir subprocess çağrısı yapmaz) mock bloğun içinde kalır. Hiçbir mock
     çağrılmazsa (`assert_not_called()`), bu, `schtasks.exe`,
     `Register-ScheduledTask`, `Start-ScheduledTask`, `powershell.exe` gibi
     gerçek bir sürecin YANLIŞLIKLA tetiklenmediğinin doğrudan kanıtıdır."""
-    from flask import render_template
+    from flask import render_template_string
+
+    # Mock bloguna girmeden ONCE, gercek (salt-okunur) git show ile icerikleri oku.
+    template_texts = {relative_path: _git_show(PRE_DELETION_REF, relative_path) for relative_path in FOUR_WAVE8_TEMPLATES}
+    out_of_scope_texts = {
+        relative_path: (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        for relative_path in REMAINING_OUT_OF_SCOPE_HANDLER_COUNTS
+    }
 
     with (
         mock.patch("subprocess.run") as mock_run,
@@ -381,18 +412,17 @@ def test_wave8_static_scans_and_template_renders_never_spawn_a_real_process(app)
         mock.patch("os.system") as mock_os_system,
         mock.patch("os.popen") as mock_os_popen,
     ):
-        for relative_path in FOUR_WAVE8_TEMPLATES:
-            template_name = relative_path.split("app/templates/", 1)[1]
+        for text in template_texts.values():
             with app.test_request_context("/"):
-                html = render_template(template_name)
+                html = render_template_string(text)
             assert isinstance(html, str)
             assert "onsubmit=" not in html
 
         # Bu test dosyasinin statik regex taramalarini da ayni mock'lu blok
-        # icinde tekrarla (dosya-sistemi okumasi disinda hicbir sey yapmadigini
-        # dogrulamak icin).
-        for relative_path in [*FOUR_WAVE8_TEMPLATES, *REMAINING_OUT_OF_SCOPE_HANDLER_COUNTS]:
-            (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        # icinde tekrarla (onceden okunan metinler uzerinde, dosya sistemine
+        # tekrar erismeden -- salt bellekte string islemi).
+        for text in [*template_texts.values(), *out_of_scope_texts.values()]:
+            assert isinstance(text, str)
 
     mock_run.assert_not_called()
     mock_popen.assert_not_called()
@@ -405,9 +435,10 @@ def test_this_guard_file_never_imports_or_calls_real_smtp_or_mail_send_functions
     (`app.services.mail_core.send_email` -- iç kısmında `smtplib.SMTP`
     kullanır -- ve `app.executive_summary.mail_engine.send_executive_
     summary_email`) hiçbir zaman import ETMEDİĞİNİ veya çağırmadığını
-    statik olarak doğrular. Bu dosya SADECE `flask.render_template()`,
-    `Path.read_text()` ve (mock'lanmış) `subprocess`/`os` referansları
-    kullanır -- bir mail gönderme fonksiyonuna asla erişimi yoktur.
+    statik olarak doğrular. Bu dosya SADECE `flask.render_template_string()`,
+    `Path.read_text()`, salt-okunur `git show`/`git diff` ve (mock'lanmış)
+    `subprocess`/`os` referansları kullanır -- bir mail gönderme fonksiyonuna
+    asla erişimi yoktur.
 
     `_FORBIDDEN_MAIL_SEND_MARKERS` sabitinin KENDİ tanım bloğu (marker
     string'lerinin doğal olarak yer aldığı tek yer) taramadan HARİÇ
@@ -421,22 +452,22 @@ def test_this_guard_file_never_imports_or_calls_real_smtp_or_mail_send_functions
         assert marker not in scan_text, f"Bu test dosyasinda yasakli mail-gonderim izi bulundu: {marker!r}"
 
 
-def test_this_guard_file_only_references_subprocess_via_mock_patch_strings() -> None:
+def test_this_guard_file_only_references_subprocess_via_mock_patch_strings_or_git_commands() -> None:
     """Ek statik kontrol: bu dosyada `subprocess.run`/`subprocess.Popen`/
     `os.system`/`os.popen` isimlerine parantezli ÇIPLAK (mock'lanmamış) bir
     çağrı kalıbıyla erişim YOKTUR -- bu isimlere yalnızca (a)
-    `mock.patch(...)` içinde bir STRING argüman olarak, veya (b)
-    `_git_diff_exit_code_and_text` içindeki gerçek (ve kasıtlı,
-    salt-okunur) `subprocess.run` çağrısı içinde erişilir. Bu test,
-    ileride birinin yanlışlıkla mock'suz doğrudan bir süreç başlatma
+    `mock.patch(...)` içinde bir STRING argüman olarak, veya (b) iki
+    KASITLI, salt-okunur gerçek `subprocess.run` çağrısı içinde erişilir:
+    `_git_diff_exit_code_and_text` (launcher/installer koruma) ve
+    `_git_show` (silinen dört template'in PRE_DELETION_REF içeriği). Bu
+    test, ileride birinin yanlışlıkla mock'suz doğrudan bir süreç başlatma
     satırı eklemediğini kilitler.
 
     Bu fonksiyonun KENDİ kaynak gövdesi (docstring + aranan kalıpların
     doğal olarak yer aldığı kod satırları) taramadan tamamen HARİÇ
-    tutulur -- yalnızca dosyanın GERİ KALANI taranır. Aksi halde bu
-    fonksiyonun kendi tanım/açıklama satırları yanlış-pozitif yaratırdı."""
+    tutulur -- yalnızca dosyanın GERİ KALANI taranır."""
     text = Path(__file__).read_text(encoding="utf-8")
-    own_function_name = "test_this_guard_file_only_references_subprocess_via_mock_patch_strings"
+    own_function_name = "test_this_guard_file_only_references_subprocess_via_mock_patch_strings_or_git_commands"
     own_def_start = text.index(f"def {own_function_name}")
     next_def_start = text.index("\ndef ", own_def_start + 1)
     scan_text = text[:own_def_start] + text[next_def_start:]
@@ -446,33 +477,26 @@ def test_this_guard_file_only_references_subprocess_via_mock_patch_strings() -> 
             f"Bu dosyada mock'lanmamis '{marker}' cagrisi bulundu -- gercek bir "
             "surec baslatma riski."
         )
-    # subprocess.run( yalnizca _git_diff_exit_code_and_text icindeki tek,
-    # salt-okunur `git diff` cagrisinda gecmeli (mock.patch string
-    # referanslarinda "subprocess.run(" degil "subprocess.run" -- parantezsiz
-    # -- gectigi icin bu sayaci etkilemez).
+    # subprocess.run( yalnizca iki salt-okunur cagrida gecmeli: git diff
+    # (_git_diff_exit_code_and_text) ve git show (_git_show).
     bare_subprocess_run_count = scan_text.count("subprocess.run(")
-    assert bare_subprocess_run_count == 1, (
+    assert bare_subprocess_run_count == 2, (
         f"Beklenmeyen sayida ciplak 'subprocess.run(' cagrisi bulundu: "
-        f"{bare_subprocess_run_count} (yalnizca git diff icin 1 beklenir)."
+        f"{bare_subprocess_run_count} (git diff + git show icin 2 beklenir)."
     )
 
-    # Gercek subprocess.run cagrisinin komut ARGUMAN LISTESI sadece
-    # 'git ... diff --exit-code ...' iceriyor -- schtasks/powershell/
-    # Register-ScheduledTask gibi bir Task Scheduler/PowerShell komutu
-    # ICERMIYOR. Dosya genelinde "keyword in text" taramasi KASITLI olarak
-    # YAPILMAZ (bu anahtar kelimeler docstring'lerde ACIKLAYICI metin olarak
-    # da geciyor); bunun yerine gercek komutun ARGUMAN LISTESI birebir
-    # kontrol edilir -- ileride biri bu listeye riskli bir arguman eklerse bu
-    # test bunu yakalar.
-    real_call_argument_list = '[exe, "-C", str(REPO_ROOT), "diff", "--exit-code", "--", relative_path]'
-    assert real_call_argument_list in text, "Gercek git diff cagrisinin komut listesi beklenen bicimde degil."
+    diff_call_argument_list = '[exe, "-C", str(REPO_ROOT), "diff", "--exit-code", "--", relative_path]'
+    show_call_argument_list = '["git", "show", f"{ref}:{relative_path}"]'
+    assert diff_call_argument_list in text, "Gercek git diff cagrisinin komut listesi beklenen bicimde degil."
+    assert show_call_argument_list in text, "Gercek git show cagrisinin komut listesi beklenen bicimde degil."
     for keyword in ("schtasks", "Register-ScheduledTask", "Start-ScheduledTask", "powershell"):
-        assert keyword not in real_call_argument_list
+        assert keyword not in diff_call_argument_list
+        assert keyword not in show_call_argument_list
 
 
 # ---------------------------------------------------------------------------
 # D) Dört dosyanın (iki çift BİR ARADA) çapraz-dosya confirm/CSRF/action/
-#    method/render sözleşmesi.
+#    method/render sözleşmesi (PRE_DELETION_REF içeriği üzerinden).
 # ---------------------------------------------------------------------------
 
 
@@ -507,27 +531,17 @@ def test_all_four_have_preventdefault_and_window_confirm_guard_in_script(relativ
 
 @pytest.mark.parametrize("relative_path", FOUR_WAVE8_TEMPLATES)
 def test_all_four_render_with_script_exactly_once_no_duplicate_binding(app, relative_path: str) -> None:
-    """Dört dosyanın HEPSİ gerçek Jinja motoruyla (`flask.render_template()`,
-    ağ/DB/SMTP/süreç YOK) render edilir; her birinin ÜRETTİĞİ TAM SAYFA
-    çıktısında `form[data-confirm]` delegasyonu TAM OLARAK 1 kez geçmelidir
-    (çift dinleyici/çift confirm dialog riski yok). NOT: bu dört şablon
-    `base.html`'i extend ettiği için tam sayfa çıktısında `<script` etiketi
-    ONLARCA kez geçer (Bootstrap/FontAwesome/paylaşılan JS include'ları --
-    `base.html`'in kendi scriptleri) -- bu yüzden `<script` SAYISI burada
-    KASITLI olarak KONTROL EDİLMEZ (yalnızca şablonun KENDİ kaynağında,
-    `Path.read_text()` ile, `test_all_four_have_preventdefault_and_window_
-    confirm_guard_in_script` ve kardeş dosyalardaki statik testlerde 1
-    olduğu doğrulanır). Burada asıl doğrulanan, delegasyon deseninin
-    `base.html`'den GELMEDİĞİ (bkz. sibling dosyalardaki
-    `test_base_template_has_no_global_form_data_confirm_delegation`) ve
-    sayfa başına tam olarak bir kez render edildiğidir. Kardeş dosyalar
-    bunu yalnızca kendi 2'şer dosyalık çiftleri için doğruluyor; bu test
-    dördünü TEK bir parametrized suite'te birlikte doğrular."""
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    with app.test_request_context("/"):
-        html = render_template(template_name)
+    """Dört dosyanın HEPSİ gerçek Jinja motoruyla (PRE_DELETION_REF içeriği,
+    `render_template_string()`, ağ/DB/SMTP/süreç YOK) render edilir; her
+    birinin ÜRETTİĞİ TAM SAYFA çıktısında `form[data-confirm]` delegasyonu
+    TAM OLARAK 1 kez geçmelidir (çift dinleyici/çift confirm dialog riski
+    yok). NOT: bu dört şablon `base.html`'i extend ettiği için tam sayfa
+    çıktısında `<script` etiketi ONLARCA kez geçer (Bootstrap/FontAwesome/
+    paylaşılan JS include'ları) -- bu yüzden `<script` SAYISI burada
+    KASITLI olarak KONTROL EDİLMEZ. Burada asıl doğrulanan, delegasyon
+    deseninin `base.html`'den GELMEDİĞİ ve sayfa başına tam olarak bir kez
+    render edildiğidir."""
+    html = _render_from_pre_deletion_ref(app, relative_path)
 
     assert "onsubmit=" not in html
     assert html.count("querySelectorAll('form[data-confirm]')") == 1
@@ -537,11 +551,8 @@ def test_all_four_render_with_script_exactly_once_no_duplicate_binding(app, rela
 
 def test_all_four_wave8_templates_are_byte_identical_across_both_pairs() -> None:
     """Koordinatör bulgusu: dört dosya Dalga 8 ÖNCESİ byte-birebir aynıydı.
-    Aynı düzeltme hepsine BİREBİR AYNI şekilde uygulandığı için hâlâ
-    byte-birebir aynı olmalılar. Kardeş dosyalar yalnızca KENDİ çiftleri
-    içinde (premium==v1_4 ayrı, tasks==settings ayrı) byte-eşitliği
-    doğruluyor; bu test dördünü ÇAPRAZ olarak (premium==tasks dahil)
-    tek bir noktada doğrular."""
+    Aynı düzeltme hepsine BİREBİR AYNI şekilde uygulandığı için
+    PRE_DELETION_REF içeriğinde de hâlâ byte-birebir aynı olmalılar."""
     contents = {relative_path: _read(relative_path) for relative_path in FOUR_WAVE8_TEMPLATES}
     base_path, base_text = next(iter(contents.items()))
     for relative_path, text in contents.items():

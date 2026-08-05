@@ -16,23 +16,28 @@ handler, iki dosyada BİREBİR AYNI):
     - app/templates/executive_summary/daily_mail_tasks_premium.html
     - app/templates/executive_summary/daily_mail_tasks_v1_4.html
 
-ORPHAN TEYİDİ: Bu iki dosya, dalga başlamadan önce de başladıktan sonra da
+ORPHAN TEYİDİ (Wave 8'in kendi zamanında zaten doğru tespit edilmişti):
+Bu iki dosya, dalga başlamadan önce de başladıktan sonra da
 `grep -rn "daily_mail_tasks_premium\\|daily_mail_tasks_v1_4" app --include=*.py`
 ile 0 (sıfır) eşleşme verir -- repo genelinde hiçbir `render_template()`
-çağrısı bu iki dosya adını kullanmıyor. Yani bu ekranlar şu an hiçbir route'a
-bağlı değil (muhtemelen eski/yedek ekran kopyaları). Bu durum dönüşümün
-"gereksiz" olduğu anlamına gelmez -- kapsam kullanıcı tarafından açıkça bu
-iki dosya olarak verilmiştir ve ileride bir route bunlara bağlanırsa CSP
-enforce modunda hazır ve doğru olmaları gerekir. Bu test dosyası hem statik
-kaynak-kod kontratını hem de gerçek Jinja motoruyla `render_template()`
-çıktısını doğrular; HİÇBİR test bu şablonların bağlı olduğu (olmayan) bir
-Flask route'una HTTP isteği ATMAZ ve gerçek mail gönderme/Task Scheduler
-kodu ÇAĞIRMAZ (ayrıntı için alttaki "GERÇEK MAIL/GÖREV ÇALIŞTIRILMADI"
-bölümüne bakın).
+çağrısı bu iki dosya adını kullanmıyor. Yani bu ekranlar hiçbir route'a
+bağlı değildi (muhtemelen eski/yedek ekran kopyaları).
 
-ÇÖZÜM (her iki dosyaya da BİREBİR AYNI şekilde uygulandı): İki dosyada da
-tek risk aynı satırdaydı (döngü dışında, sayfa başına bir kez render edilen
-"Sabah Mailini Gönder" formu):
+SİLME (BYS360 Daily Weather/Mail Orphan Template Temizliği görevi): bu
+doğru orphan tespitinin ardından her iki template de dosya sisteminden
+SİLİNDİ. Bu dosyadaki TÜM eski statik/render testleri artık canlı
+dosyaları DEĞİL, silme öncesi sabit bir git ref'ini (`PRE_DELETION_REF`)
+okuyor -- böylece Wave 8'in orijinal CSP/confirm dönüşüm kanıtı SİLİNMEDEN
+kalıcı olarak korunuyor (bkz. `_read()`/`_render_from_pre_deletion_ref()`).
+Yeni `test_deleted_template_no_longer_exists_on_disk` testi silme sonrası
+dosya-yokluğu sözleşmesini kilitler. Bu durum dönüşümün "gereksiz" olduğu
+anlamına gelmiyordu -- kapsam kullanıcı tarafından açıkça bu iki dosya
+olarak verilmişti; sonradan (ayrı bir görevde) her iki dosyanın da
+gerçekten hiçbir route'a bağlanmadığı kesinleşince silindiler.
+
+ÇÖZÜM (her iki dosyaya da BİREBİR AYNI şekilde uygulandı, Wave 8'in kendi
+kapanışında): İki dosyada da tek risk aynı satırdaydı (döngü dışında,
+sayfa başına bir kez render edilen "Sabah Mailini Gönder" formu):
     onsubmit="return confirm('Seçili alıcılara sabah hava durumu maili
     şimdi gönderilsin mi?');"
 kaldırıldı,
@@ -42,7 +47,7 @@ eklendi (mesaj birebir korunmuştur). Hemen yanındaki "Kuru Çalıştır"
 formuna (action=".../dry-run") HİÇ dokunulmadı -- zaten onsubmit/confirm
 içermiyordu ve koordinatör talimatı gereği ellenmedi.
 
-Dosyanın sonunda (satır ~30) ZATEN var olan tek `<script>(function(){...})();
+Dosyanın sonunda (satır ~30) ZATEN var olan tek `<script>(function(){...});
 </script>` bloğu (arama/filtre/checkbox-sayma JS'i) YENİ bir blok AÇILMADAN
 kullanıldı: kurulu Dalga 1-7 `form[data-confirm]` submit-delegasyon deseni bu
 MEVCUT IIFE'nin gövdesinin sonuna, son `count();` çağrısından hemen sonra ve
@@ -52,25 +57,24 @@ YOK) ve tek delegasyon page-load başına bir kez kayıt olur.
 
 GERÇEK MAIL/GÖREV ÇALIŞTIRILMADI: Bu dosyadaki hiçbir test (a) şablonların
 bağlı olabileceği `/executive-summary/daily-weather-mail/*` route'larına
-HTTP isteği atmaz -- yalnızca `flask.render_template()` ile şablon
-DOĞRUDAN render edilir, route katmanına hiç girilmez; (b) gerçek SMTP/mail
-gönderme kodunu (`app.executive_summary.mail_engine.send_executive_summary_
-email`, `smtplib.SMTP`/`SMTP_SSL` kullanan fonksiyon) tetiklemez. Ayrıca
+HTTP isteği atmaz -- yalnızca Jinja motoruyla `render_template_string()`
+ile şablon PRE_DELETION_REF içeriğinden DOĞRUDAN render edilir, route
+katmanına hiç girilmez; (b) gerçek SMTP/mail gönderme kodunu
+(`app.executive_summary.mail_engine.send_executive_summary_email`,
+`smtplib.SMTP`/`SMTP_SSL` kullanan fonksiyon) tetiklemez. Ayrıca
 `test_render_never_calls_real_mail_send_function` testi bu gerçek gönderim
 fonksiyonunu monkeypatch ile "çağrılırsa AssertionError fırlat" şeklinde
 değiştirip tüm render senaryolarını çalıştırır ve fonksiyonun hiç
 çağrılmadığını kanıtlar. `tests/conftest.py` ayrıca süreç genelinde
 `MAIL_SUPPRESS_SEND=true` ve `WTF_CSRF_ENABLED=false` ortam bayraklarını
-zaten ayarlar (bu dosyanın testleri bu bayraklara ekstra bir şey eklemez,
-sadece var olan güvenli test ortamına güvenir). Bu şablonlardaki
+zaten ayarlar. Bu şablonlardaki
 `scripts/windows/install_bys360_daily_mail_tasks_v1_4.ps1` ve benzeri
 launcher komutları yalnızca `<div class="command">...</div>` içinde
 METİN olarak GÖSTERİLİR -- bu dosyanın hiçbir testi o PowerShell
-dosyalarını okumaz, çalıştırmaz veya değiştirmez (dokunulmadıkları git
-durumuyla ayrıca doğrulanmıştır, bkz. görev raporu).
+dosyalarını okumaz, çalıştırmaz veya değiştirmez.
 
 ÖNEMLİ SINIRLAMA: Bu dosyadaki HİÇBİR test gerçek bir tarayıcıda
-çalışmadı/çalıştırılmadı. `render_template()` yalnızca ÜRETİLEN HTML'i
+çalışmadı/çalıştırılmadı. Render testleri yalnızca ÜRETİLEN HTML'i
 doğrular (inline handler yok, data-confirm attribute'u doğru, script bloğu
 sayfa başına doğru sayıda render ediliyor). CSP enforce edilmiş gerçek bir
 tarayıcıda "Sabah Mailini Gönder" butonunun confirm() diyaloğunu fiilen
@@ -78,13 +82,14 @@ açıp iptal edilebildiğini KANITLAMAZ -- bu, ayrı bir manuel/E2E doğrulama
 gerektirir ve bu dosyanın kapsamı dışındadır.
 
 Statik testler `tests/security/test_csp_wave7_support_help_contract.py` ile
-aynı desendedir (Path.read_text() + regex, sonra gerçek Jinja motoruyla
-`render_template()` çıktı testleri; `app` fixture'ı `tests/conftest.py`'den
-gelir).
+aynı desendedir (git show + regex, sonra gerçek Jinja motoruyla
+`render_template_string()` çıktı testleri; `app` fixture'ı
+`tests/conftest.py`'den gelir).
 """
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -98,6 +103,10 @@ BASE_TEMPLATE = "app/templates/base.html"
 
 WAVE8_FILES = [PREMIUM_TEMPLATE, V1_4_TEMPLATE]
 
+# Fixed commit immediately BEFORE the orphan-cleanup deletion commit -- the
+# repo state where both templates still existed on disk.
+PRE_DELETION_REF = "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47"
+
 SEND_NOW_CONFIRM_MESSAGE = "Seçili alıcılara sabah hava durumu maili şimdi gönderilsin mi?"
 
 # HTML attribute syntax: bosluk + on<harfler> + '=' + tirnak. CSS/JS icindeki
@@ -109,8 +118,33 @@ _JS_URL_ANYWHERE_RE = re.compile(r"""javascript:""", re.IGNORECASE)
 _FORBIDDEN_JS_SINKS = ("eval(", "new Function(", "document.write(")
 
 
+def _git_show(ref: str, relative_path: str) -> str:
+    result = subprocess.run(
+        ["git", "show", f"{ref}:{relative_path}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+        encoding="utf-8",
+        errors="replace",
+    )
+    assert result.returncode == 0, f"'git show {ref}:{relative_path}' failed: {result.stderr!r}"
+    return result.stdout
+
+
 def _read(relative_path: str) -> str:
-    return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    """Reads the template's content at PRE_DELETION_REF -- both WAVE8_FILES
+    were deleted after being confirmed orphan (see module docstring)."""
+    return _git_show(PRE_DELETION_REF, relative_path)
+
+
+def _render_from_pre_deletion_ref(app, relative_path: str, **context: object) -> str:
+    from flask import render_template_string
+
+    text = _git_show(PRE_DELETION_REF, relative_path)
+    with app.test_request_context("/"):
+        return render_template_string(text, **context)
 
 
 def _fake_user(user_id: int, **overrides: object) -> dict[str, object]:
@@ -169,16 +203,16 @@ def _render_context(**overrides: object) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
-# 1) Statik kaynak-kod kontratı (Path.read_text + regex). Kosulsuz calisir,
-#    Jinja if-bloklarinin arkasinda kalan durumlari da yakalar.
+# 1) Statik kaynak-kod kontratı (PRE_DELETION_REF'den git show + regex).
+#    Kosulsuz calisir, Jinja if-bloklarinin arkasinda kalan durumlari da
+#    yakalar.
 # ---------------------------------------------------------------------------
 
 
 def test_wave8_files_are_byte_identical() -> None:
     """Koordinator bulgusu: iki dosya donusum ONCESI byte-birebir aynıydı.
     Aynı düzeltme her iki dosyaya da BİREBİR AYNI şekilde uygulandığı için
-    donusum SONRASI da byte-birebir aynı kalmalidir (yapısal parite
-    regresyon kilidi)."""
+    donusum SONRASI da (PRE_DELETION_REF'te) byte-birebir aynı kalmalidir."""
     premium = _read(PREMIUM_TEMPLATE)
     v1_4 = _read(V1_4_TEMPLATE)
     assert premium == v1_4
@@ -319,7 +353,7 @@ def test_base_template_has_no_global_form_data_confirm_delegation() -> None:
     form[data-confirm] delegasyonu eklerse bu, bu şablonların kendi yerel
     delegasyonuyla ÇİFT LİSTENER (çift confirm dialog'u) oluşturacağından
     bu test o riski erken yakalar."""
-    text = _read(BASE_TEMPLATE)
+    text = (REPO_ROOT / BASE_TEMPLATE).read_text(encoding="utf-8")
     assert "querySelectorAll('form[data-confirm]')" not in text
     assert "data-confirm" not in text
 
@@ -328,9 +362,9 @@ def test_windows_powershell_launcher_scripts_untouched_by_this_wave() -> None:
     """Koordinator talimati: bu dalga scripts/windows altindaki hicbir
     PowerShell dosyasina dokunmamalidir (bu sablonlarda bu script'lerin
     yalnizca KOMUT METNI <div class="command"> icinde gosterilir, hicbir
-    test/kod bunlari calistirmaz). Bu test, sablonlarin o komut metinlerini
-    hala degismeden referans verdigini dogrular (metin gosterimi -- calistirma
-    degil)."""
+    test/kod bunlari calistirmaz). Bu test, sablonlarin (PRE_DELETION_REF
+    icindeki) o komut metinlerini hala degismeden referans verdigini
+    dogrular (metin gosterimi -- calistirma degil)."""
     text = _read(V1_4_TEMPLATE)
     assert (
         "powershell -ExecutionPolicy Bypass -File "
@@ -342,22 +376,28 @@ def test_windows_powershell_launcher_scripts_untouched_by_this_wave() -> None:
     # ile calistirmaz.
 
 
+@pytest.mark.parametrize("relative_path", WAVE8_FILES)
+def test_deleted_template_no_longer_exists_on_disk(relative_path: str) -> None:
+    """Orphan-absence sözleşmesi: her iki template de artık dosya
+    sisteminde YOK -- ORPHAN_CONFIRMED sınıflandırmasının silme kararının
+    gerçekten uygulandığının kanıtı."""
+    assert not (REPO_ROOT / relative_path).exists(), (
+        f"{relative_path} hala diskte mevcut ama orphan-cleanup tarafindan silinmis "
+        "olmasi bekleniyordu."
+    )
+
+
 # ---------------------------------------------------------------------------
 # 2) Calisma-zamani render kontrolu: gercek Flask app + gercek Jinja motoru
-#    ile `render_template()` cagrisi (bkz. `app` fixture, tests/conftest.py).
-#    ONEMLI: bu bolumdeki HICBIR test route'a HTTP istegi atmaz; yalnizca
-#    sablon dogrudan render edilir.
+#    ile PRE_DELETION_REF icerigini `render_template_string()` ile render
+#    eder (bkz. `app` fixture, tests/conftest.py). ONEMLI: bu bolumdeki
+#    HICBIR test route'a HTTP istegi atmaz.
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("relative_path", WAVE8_FILES)
 def test_wave8_render_with_fake_recipients_has_no_inline_handlers(app, relative_path: str) -> None:
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    context = _render_context()
-    with app.test_request_context("/"):
-        html = render_template(template_name, **context)
+    html = _render_from_pre_deletion_ref(app, relative_path, **_render_context())
 
     assert not _INLINE_EVENT_ATTR_RE.findall(html)
     assert not _JS_HREF_RE.search(html)
@@ -366,11 +406,7 @@ def test_wave8_render_with_fake_recipients_has_no_inline_handlers(app, relative_
 
 @pytest.mark.parametrize("relative_path", WAVE8_FILES)
 def test_wave8_render_confirm_message_and_form_action_preserved(app, relative_path: str) -> None:
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    with app.test_request_context("/"):
-        html = render_template(template_name, **_render_context())
+    html = _render_from_pre_deletion_ref(app, relative_path, **_render_context())
 
     assert html.count(f'data-confirm="{SEND_NOW_CONFIRM_MESSAGE}"') == 1
     assert (
@@ -378,9 +414,6 @@ def test_wave8_render_confirm_message_and_form_action_preserved(app, relative_pa
         f'data-confirm="{SEND_NOW_CONFIRM_MESSAGE}">'
         in html
     )
-    # Delegasyon script'i sayfa basina bir kez render edilir (base.html'in
-    # KENDI form[data-confirm] deseni olmadigi ayrica dogrulanmistir, bkz.
-    # test_base_template_has_no_global_form_data_confirm_delegation).
     assert html.count("querySelectorAll('form[data-confirm]')") == 1
     assert not _INLINE_EVENT_ATTR_RE.findall(html)
 
@@ -390,14 +423,11 @@ def test_wave8_render_with_empty_recipients_and_logs_still_has_single_script(app
     """Bos alici/log listeleriyle ({% else %} dallari) render edilse bile
     delegasyon script'i tam olarak 1 kez render edilir ve inline handler
     kalmaz."""
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    context = _render_context(
+    html = _render_from_pre_deletion_ref(
+        app,
+        relative_path,
         selected_users=[], recipients=[], users=[], selected_ids=set(), logs=[],
     )
-    with app.test_request_context("/"):
-        html = render_template(template_name, **context)
 
     assert "Henüz seçili alıcı yok" in html
     assert "Aktif personel listesi alınamadı." in html
@@ -413,11 +443,7 @@ def test_wave8_render_with_missing_optional_context_still_safe(app, relative_pat
     formu hala data-confirm'e sahiptir. `selected_ids` ozellikle bos bir
     kumeyle verilir cunku sablon onu `|default` filtresi olmadan dogrudan
     `user.id in selected_ids` icinde kullanir."""
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    with app.test_request_context("/"):
-        html = render_template(template_name, selected_ids=set())
+    html = _render_from_pre_deletion_ref(app, relative_path, selected_ids=set())
 
     assert f'data-confirm="{SEND_NOW_CONFIRM_MESSAGE}"' in html
     assert not _INLINE_EVENT_ATTR_RE.findall(html)
@@ -425,18 +451,17 @@ def test_wave8_render_with_missing_optional_context_still_safe(app, relative_pat
 
 @pytest.mark.parametrize("relative_path", WAVE8_FILES)
 def test_wave8_render_with_multiple_logs_success_and_failure_rows(app, relative_path: str) -> None:
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    context = _render_context(
-        logs=[
-            _fake_log(10, is_success=True, status="success"),
-            _fake_log(11, is_success=False, status="failed", error_message="Bağlantı zaman aşımı"),
-            _fake_log(12, is_success=False, status="pending", error_message=None),
-        ]
+    html = _render_from_pre_deletion_ref(
+        app,
+        relative_path,
+        **_render_context(
+            logs=[
+                _fake_log(10, is_success=True, status="success"),
+                _fake_log(11, is_success=False, status="failed", error_message="Bağlantı zaman aşımı"),
+                _fake_log(12, is_success=False, status="pending", error_message=None),
+            ]
+        ),
     )
-    with app.test_request_context("/"):
-        html = render_template(template_name, **context)
 
     assert "Başarılı" in html
     assert "Bağlantı zaman aşımı" in html
@@ -447,15 +472,11 @@ def test_wave8_render_with_multiple_logs_success_and_failure_rows(app, relative_
 @pytest.mark.parametrize("relative_path", WAVE8_FILES)
 def test_wave8_render_does_not_perform_http_request_to_route(app, relative_path: str) -> None:
     """Bu testin dogasi geregi zaten bir route'a HTTP POST atmiyor -- yalnizca
-    `flask.render_template()` cagrilir, `app.test_client()` hic
-    kullanilmaz. Bu, sablonun bagli olabilecegi (mevcutta bagli OLMAYAN,
-    bkz. orphan teyidi) `/executive-summary/daily-weather-mail/send-now`
-    route handler'inin bu testte asla calismadiginin acik kanitidir."""
-    from flask import render_template
-
-    template_name = relative_path.split("app/templates/", 1)[1]
-    with app.test_request_context("/"):
-        html = render_template(template_name, **_render_context())
+    Jinja render cagrilir, `app.test_client()` hic kullanilmaz. Bu, sablonun
+    bagli olabilecegi (mevcutta bagli OLMAYAN, bkz. orphan teyidi)
+    `/executive-summary/daily-weather-mail/send-now` route handler'inin bu
+    testte asla calismadiginin acik kanitidir."""
+    html = _render_from_pre_deletion_ref(app, relative_path, **_render_context())
 
     assert isinstance(html, str)
     assert "/executive-summary/daily-weather-mail/send-now" in html
@@ -472,8 +493,6 @@ def test_render_never_calls_real_mail_send_function(app, monkeypatch: pytest.Mon
     cagrilmazsa (beklenen sonuc), bu satirlarin hicbiri patlamaz ve bu test
     PASS eder -- bu, render-only testlerin gercekten hicbir gercek mail
     gondermedigini calisma-zamaninda kanitlayan negatif kontroldur."""
-    from flask import render_template
-
     from app.executive_summary import mail_engine
 
     def _forbidden_send(*args: Any, **kwargs: Any) -> dict[str, Any]:
@@ -487,9 +506,7 @@ def test_render_never_calls_real_mail_send_function(app, monkeypatch: pytest.Mon
     monkeypatch.setattr(mail_engine, "send_executive_summary_email", _forbidden_send)
 
     for relative_path in WAVE8_FILES:
-        template_name = relative_path.split("app/templates/", 1)[1]
-        with app.test_request_context("/"):
-            html = render_template(template_name, **_render_context())
+        html = _render_from_pre_deletion_ref(app, relative_path, **_render_context())
         assert isinstance(html, str)
         assert f'data-confirm="{SEND_NOW_CONFIRM_MESSAGE}"' in html
 
