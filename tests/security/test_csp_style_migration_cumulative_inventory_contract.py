@@ -34,6 +34,35 @@ expected total is ``INITIAL_STYLE_BLOCK_TOTAL - CUMULATIVE_REMOVED_BLOCKS``
 the naming of its active-attribute sibling). Style-2A/2B's entries simply
 carry `removed_blocks: 0`, so their expected total is unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 2 (orphan template deletion, a new wave
+CLASS this manifest did not originally support): `STYLE_MIGRATION_WAVES`
+above assumes a wave EDITS a template in place (the file still exists
+afterward, now with zero static attrs/blocks) — that assumption is baked
+into `test_every_wave_target_template_has_zero_active_style_attribute` and
+`test_every_block_removal_wave_target_template_has_zero_style_blocks`,
+which both `.read_text()` every listed template. A wave that instead
+DELETES a template entirely (its whole rendering surface was dead code —
+see the "BYS360 Executive Mail Orphan Alt Sistemi" cleanup: a route module,
+`app/communication/executive_mail_center_routes.py`, proven absent from
+`sys.modules`/`route_manifest.py`/the real `url_map` after `create_app()`,
+whose only 6 templates therefore had zero reachable renderer) would make
+those two tests raise `FileNotFoundError`, not a clean assertion failure.
+`DELETED_TEMPLATE_WAVES` below is a separate, parallel manifest for exactly
+this wave class: same `removed_static`/`removed_blocks` shape, folded into
+the SAME `CUMULATIVE_REMOVED_STATIC`/`CUMULATIVE_REMOVED_BLOCKS` sums (so
+`EXPECTED_ACTIVE_STYLE_TOTAL`/`EXPECTED_STYLE_BLOCK_TOTAL` account for both
+wave classes uniformly), but checked by its own
+`test_every_deleted_wave_target_template_is_genuinely_absent_from_worktree`
+(asserts the file is GONE, the inverse of the edit-in-place check) and its
+own `test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_
+git_ref` (independently re-derives `removed_static`/`removed_blocks` from
+the fixed git ref immediately before the deletion commit, so the recorded
+numbers are never just trusted). `INITIAL_ACTIVE_STYLE_TOTAL` /
+`INITIAL_DYNAMIC_STYLE_TOTAL` / `INITIAL_STYLE_BLOCK_TOTAL` and the
+`STYLE_MIGRATION_WAVES` entries above are untouched by this follow-up —
+they are historical fact about waves that already landed, not affected by
+a later, unrelated wave deleting different, always-dead templates.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -156,25 +185,131 @@ STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
     },
 }
 
-CUMULATIVE_REMOVED_STATIC = sum(w["removed_static"] for w in STYLE_MIGRATION_WAVES.values())
+class _DeletedWaveManifestEntry(TypedDict):
+    templates: tuple[str, ...]
+    removed_static: int
+    removed_blocks: int
+
+
+# Waves that DELETED their templates entirely (as opposed to editing them in
+# place) -- see the "FORWARD-COMPATIBILITY FOLLOW-UP 2" docstring section
+# above for why this is a separate manifest from STYLE_MIGRATION_WAVES.
+# removed_static=8 / removed_blocks=6 are independently re-derived from a
+# fixed pre-deletion git ref by
+# test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_ref
+# below -- never just trusted.
+DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
+    "orphan_mail_cleanup": {
+        "templates": (
+            "app/templates/executive_summary/executive_mail_center.html",
+            "app/templates/executive_summary/executive_mail_tasks.html",
+            "app/templates/executive_summary/executive_mail_recipients.html",
+            "app/templates/executive_summary/executive_mail_logs.html",
+            "app/templates/executive_summary/executive_mail_scheduled_jobs.html",
+            "app/templates/executive_summary/executive_mail_test.html",
+        ),
+        "removed_static": 8,
+        "removed_blocks": 6,
+    },
+}
+
+# The fixed commit immediately BEFORE the orphan_mail_cleanup wave's own
+# deletion commit -- the schema-fix commit that proved these six templates'
+# only renderer (app/communication/executive_mail_center_routes.py) was
+# dead code, at which point all six templates still existed on disk.
+DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
+    "orphan_mail_cleanup": "297c8da746a59d84e5f3f9536b92e824ce5bd70a",
+}
+
+_STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
+
+CUMULATIVE_REMOVED_STATIC = sum(w["removed_static"] for w in STYLE_MIGRATION_WAVES.values()) + sum(
+    w["removed_static"] for w in DELETED_TEMPLATE_WAVES.values()
+)
 EXPECTED_ACTIVE_STYLE_TOTAL = INITIAL_ACTIVE_STYLE_TOTAL - CUMULATIVE_REMOVED_STATIC
 
-CUMULATIVE_REMOVED_BLOCKS = sum(w["removed_blocks"] for w in STYLE_MIGRATION_WAVES.values())
+CUMULATIVE_REMOVED_BLOCKS = sum(w["removed_blocks"] for w in STYLE_MIGRATION_WAVES.values()) + sum(
+    w["removed_blocks"] for w in DELETED_TEMPLATE_WAVES.values()
+)
 EXPECTED_STYLE_BLOCK_TOTAL = INITIAL_STYLE_BLOCK_TOTAL - CUMULATIVE_REMOVED_BLOCKS
 
 
 def test_no_template_is_claimed_by_more_than_one_wave() -> None:
     """A template counted as "removed" by two waves would silently
-    double-count -- this would never be caught by the arithmetic alone."""
+    double-count -- this would never be caught by the arithmetic alone.
+    Covers both wave classes (edited-in-place and deleted-entirely) since
+    both feed the same cumulative sums above."""
     seen: dict[str, str] = {}
     duplicates: list[tuple[str, str, str]] = []
-    for wave_name, wave in STYLE_MIGRATION_WAVES.items():
+    all_waves: dict[str, _WaveManifestEntry | _DeletedWaveManifestEntry] = {
+        **STYLE_MIGRATION_WAVES,
+        **DELETED_TEMPLATE_WAVES,
+    }
+    for wave_name, wave in all_waves.items():
         for template in wave["templates"]:
             if template in seen:
                 duplicates.append((template, seen[template], wave_name))
             else:
                 seen[template] = wave_name
     assert duplicates == [], f"Template(s) claimed by more than one wave: {duplicates!r}"
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    sorted({t for w in DELETED_TEMPLATE_WAVES.values() for t in w["templates"]}),
+)
+def test_every_deleted_wave_target_template_is_genuinely_absent_from_worktree(relative_path: str) -> None:
+    """Every template claimed as fully deleted by a DELETED_TEMPLATE_WAVES
+    entry must genuinely be gone from the current worktree -- protects
+    against the manifest claiming a deletion that never actually happened
+    (which would silently make EXPECTED_ACTIVE_STYLE_TOTAL/EXPECTED_STYLE_
+    BLOCK_TOTAL wrong while this file's own arithmetic-only tests kept
+    passing by coincidence)."""
+    assert not (REPO_ROOT / relative_path).exists(), (
+        f"{relative_path} is recorded as deleted in DELETED_TEMPLATE_WAVES but "
+        "still exists on disk."
+    )
+
+
+def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_ref() -> None:
+    """Independently re-derives DELETED_TEMPLATE_WAVES' removed_static/
+    removed_blocks numbers from the fixed historical ref immediately BEFORE
+    each wave's own deletion commit, where the templates still existed on
+    disk -- never just trusts the manifest's own recorded numbers."""
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
+    except OSError:
+        pytest.skip("git CLI not available in this environment.")
+
+    for wave_name, wave in DELETED_TEMPLATE_WAVES.items():
+        pre_ref = DELETED_TEMPLATE_WAVES_PRE_DELETION_REF[wave_name]
+        total_static = 0
+        total_blocks = 0
+        for relative_path in wave["templates"]:
+            result = subprocess.run(
+                ["git", "show", f"{pre_ref}:{relative_path}"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+                encoding="utf-8",
+                errors="replace",
+            )
+            if result.returncode != 0:
+                pytest.skip(f"'git show {pre_ref}:{relative_path}' failed; environment limitation.")
+            total_static += count_static_style_attrs_in_text(result.stdout, relative_path)
+            total_blocks += len(_STYLE_TAG_RE.findall(result.stdout))
+
+        assert total_static == wave["removed_static"], (
+            f"{wave_name}: independently-derived static style attribute count at "
+            f"{pre_ref} is {total_static}; manifest says removed_static="
+            f"{wave['removed_static']}."
+        )
+        assert total_blocks == wave["removed_blocks"], (
+            f"{wave_name}: independently-derived <style> block count at {pre_ref} "
+            f"is {total_blocks}; manifest says removed_blocks={wave['removed_blocks']}."
+        )
 
 
 @pytest.mark.parametrize(
@@ -191,9 +326,6 @@ def test_every_wave_target_template_has_zero_active_style_attribute(relative_pat
         f"{relative_path} has {count} static style=\"...\" attribute(s) remaining; "
         "this template was already claimed as fully migrated by a completed wave."
     )
-
-
-_STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
 
 
 @pytest.mark.parametrize(

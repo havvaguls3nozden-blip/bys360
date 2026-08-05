@@ -59,6 +59,19 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SERVICE_FILE = "app/services/executive_mail_center.py"
 TEMPLATE_FILE = "app/templates/executive_summary/executive_mail_center.html"
 
+# BYS360 KOORDINATOR DUZELTMESI: bu fix'in KENDI ebeveyn commit'i (fix'ten
+# hemen once, SERVICE_FILE hala bozuk ham SQL'i iceriyorken). Bu dosya ilk
+# yazildiginda `_pre_fix_query_text()` ve _UNTOUCHED_SCOPE_* asagida hala
+# canli "HEAD" kullaniyordu -- bu, bu fix'in KENDI commit'i (297c8da) HENUZ
+# olusturulmamisken DOGRUYDU. Commit landed olduktan SONRA "HEAD" artik bu
+# fix'in KENDI (zaten duzeltilmis) commit'ini isaret ediyor, bu yuzden
+# `git show HEAD:{SERVICE_FILE}` artik "duzeltme oncesi" degil "duzeltme
+# SONRASI" icerik donduruyor -- ayni sinif hata, Style-3A'nin kendi HEAD_REF/
+# STYLE3A_CLOSURE_REF KOORDINATOR NOTU'nda tarif edilen ve bu dosyanin
+# kendi 16 numarali bolumunde ONCEDEN tarif edilen desenle ayni. Artik SABIT
+# bu fix'in ebeveynine kilitlendi.
+PRE_FIX_GIT_REF = "3b3a5f8496076dcc36a195c66ddf2cbc2775160c"
+
 _TEST_DB_ROOT = Path("C:/bys360/audit_tmp/executive_mail_center_list_users_regression/test_dbs")
 
 
@@ -149,7 +162,7 @@ def _clear_users(db) -> None:
 
 def _pre_fix_query_text() -> str | None:
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "show", f"HEAD:{SERVICE_FILE}"],
+        ["git", "-C", str(REPO_ROOT), "show", f"{PRE_FIX_GIT_REF}:{SERVICE_FILE}"],
         capture_output=True,
         text=True,
         timeout=30,
@@ -472,14 +485,29 @@ def test_fixture_only_touches_isolated_temp_sqlite_db(app_and_db) -> None:
 
 # ---------------------------------------------------------------------------
 # 16) Template/CSS/JS/CSP/nonce/route dosyasi bu fix tarafindan degismedi --
-#    plan-disi degisiklik kontrolu. Bu, bu dalganin KENDI (henuz commit'lenmemis)
-#    calisma agaci diff'ini HEAD'e karsi kontrol eder -- bu asamada dogru
-#    kontrol budur (bkz. onceki bugfix dalgalarinin, KENDI commit'leri
-#    landed olduktan SONRA bu tur kontrolleri sabit bir commit araligina
-#    yeniden ankorlamak zorunda kaldigi emsaller -- bu commit henuz
-#    olusturulmadigi icin burada uygulanamaz, ileride bu dosyaya
-#    donuldugunde ayni desen izlenmelidir).
+#    plan-disi degisiklik kontrolu.
+#
+#    BYS360 KOORDINATOR DUZELTMESI (bu dosyanin kendi docstring'inde
+#    ONCEDEN tarif edilen, onceki bugfix/wave dalgalarinin ayni sinif
+#    hatasiyla ayni desen -- bkz. test_csp_style3a_..._contract.py'nin
+#    kendi HEAD_REF/STYLE3A_CLOSURE_REF KOORDINATOR NOTU): bu test ilk
+#    yazildiginda live `git diff HEAD` kullaniyordu -- bu, bu dosyanin KENDI
+#    fix commit'i (297c8da) HENUZ olusturulmamisken DOGRUYDU. Commit
+#    landed olduktan SONRA, "HEAD" ileri giden her yeni commit'i de diff'e
+#    dahil etmeye baslar -- ozellikle app/communication/executive_mail_center_
+#    routes.py ve altindaki 6 template'in KENDI, bu fix'ten TAMAMEN BAGIMSIZ,
+#    sonraki "orphan mail cleanup" silme commit'i tarafindan degistirilmesi,
+#    bu testi sahte FAIL'e dusururdu (dosyalar bu fix tarafindan degil,
+#    daha SONRAKI, ayri bir commit tarafindan silindi). Artik SABIT, bu
+#    fix'in KENDI commit araligina (3b3a5f8..297c8da) kilitlendi -- bu,
+#    "bu fix hicbir sey degistirmedi" anlamini SONSUZA KADAR dogru sekilde
+#    kanitlar, sonraki hicbir commit/dalgadan (ornegin route dosyasini VE
+#    6 template'i kasitli olarak silen orphan-cleanup commit'inden)
+#    etkilenmez.
 # ---------------------------------------------------------------------------
+
+_UNTOUCHED_SCOPE_PRE_REF = PRE_FIX_GIT_REF  # bu fix'in ebeveyni
+_UNTOUCHED_SCOPE_POST_REF = "297c8da746a59d84e5f3f9536b92e824ce5bd70a"  # bu fix'in KENDI commit'i
 
 _UNTOUCHED_SCOPE_PATHS = (
     "app/templates",
@@ -502,7 +530,11 @@ def test_style_csp_nonce_template_and_dead_route_paths_have_zero_diff() -> None:
         pytest.skip("git CLI bulunamadi.")
 
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--name-only", "HEAD", "--", *_UNTOUCHED_SCOPE_PATHS],
+        [
+            "git", "-C", str(REPO_ROOT), "diff", "--name-only",
+            f"{_UNTOUCHED_SCOPE_PRE_REF}..{_UNTOUCHED_SCOPE_POST_REF}",
+            "--", *_UNTOUCHED_SCOPE_PATHS,
+        ],
         capture_output=True,
         text=True,
         timeout=30,

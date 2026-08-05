@@ -814,7 +814,16 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 #     present, byte-for-byte, in their two templates.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1068
+# Was 1068 as of Style-3A's own closure. A later, unrelated wave (the "BYS360
+# Executive Mail Orphan Alt Sistemi" cleanup) deleted 6 dead, unreachable
+# app/templates/executive_summary/executive_mail_*.html templates (their only
+# renderer, app/communication/executive_mail_center_routes.py, was proven
+# absent from sys.modules/route_manifest.py/the real url_map), removing 8
+# static style="..." attributes with them: 1068 - 8 = 1060. See
+# tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
+# DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"] for the independently
+# re-derived evidence.
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1060
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 66
 
 
@@ -864,16 +873,21 @@ def test_pre_existing_dynamic_progress_bar_style_attribute_is_still_present(
 # ---------------------------------------------------------------------------
 
 PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10
+# -10 from Style-3A itself. -6 from the later orphan_mail_cleanup wave (see
+# EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A's comment above): its 6 deleted
+# templates each carried exactly one <style> block. 270 - 10 - 6 = 254.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
-        "<style> block from each of its 10 templates and added none)."
+        "<style> block from each of its 10 templates and added none; the later "
+        "orphan_mail_cleanup wave then deleted 6 more dead templates, each with "
+        "exactly one <style> block)."
     )
 
 
