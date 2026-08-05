@@ -42,11 +42,18 @@ KENDİSİ değil.
 
 SİLME: yukarıdaki tespitin ardından her iki template de (BYS360 Daily
 Weather/Mail Orphan Template Temizliği görevinde) dosya sisteminden
-SİLİNDİ -- `app/dashboard/executive_summary_routes.py` (dead code, ayrı bir
-görev kapsamında) DOKUNULMADAN bırakıldı (bu dosyanın satır 144-148'i hâlâ
-`render_template("executive_summary/daily_weather_mail_tasks.html")`
-metnini içerir, ama modül hiç import edilmediği için bu satır asla
-çalışmaz). Bu dosyadaki TÜM eski statik/render testleri artık canlı
+SİLİNDİ -- `app/dashboard/executive_summary_routes.py` (dead code) o
+görevde kasıtlı olarak DOKUNULMADAN bırakılmıştı (bu dosyanın satır
+144-148'i hâlâ `render_template("executive_summary/daily_weather_mail_
+tasks.html")` metnini içeriyordu, ama modül hiç import edilmediği için bu
+satır asla çalışmadı). DAHA SONRA, ayrı bir görevde (BYS360 Executive
+Summary Dead Route Cleanup), bu route modülünün KENDİSİNİN de -- yalnızca
+daily-weather-mail route'ları değil, `/dashboard/yonetici-ozeti` (gerçek
+`app.executive_summary.routes` ile URL çakışması -- farklı modül kazanır)
+ve `/dashboard/yonetici-ozeti/send-test` route'ları dahil TÜMÜYLE -- hiçbir
+yerden import edilmediği bağımsız olarak yeniden kanıtlandı ve dosyanın
+tamamı silindi (bkz. `test_dead_route_module_no_longer_exists_on_disk`).
+Bu dosyadaki TÜM eski statik/render testleri artık canlı
 dosyaları DEĞİL, silme öncesi sabit bir git ref'ini (`PRE_DELETION_REF`)
 okuyor -- böylece Wave 8'in orijinal CSP/confirm dönüşüm kanıtı SİLİNMEDEN
 kalıcı olarak korunuyor (bkz. `_read()`/`_render_from_pre_deletion_ref()`).
@@ -500,18 +507,39 @@ def test_tasks_template_owning_module_is_confirmed_never_imported() -> None:
     )
 
 
+# The commit immediately BEFORE the "BYS360 Executive Summary Dead Route
+# Cleanup" task's own deletion commit -- the repo state where
+# app/dashboard/executive_summary_routes.py itself (not just the templates
+# it claimed to render) still existed on disk.
+ROUTE_MODULE_PRE_DELETION_REF = "31394332285c54f05d41cbcebd70954d91676e7a"
+
+
 def test_tasks_template_route_source_still_calls_render_template_with_no_kwargs_historical() -> None:
-    """TARİHSEL KANIT (route dosyası ayrı bir görev kapsamında dokunulmadan
-    bırakıldı): `executive_summary_daily_weather_mail_tasks_v1_3_1()`
-    fonksiyonu hâlâ kaynak kodda context KWARGS OLMADAN `render_template(
-    "executive_summary/daily_weather_mail_tasks.html")` çağırıyor -- bu
-    satır artık ASLA ÇALIŞMAZ (modül import edilmediği için), ama Wave 8'in
-    orijinal niyetinin (bu route'un canlı olması PLANLANMIŞTI, sonradan
-    gerçekte hiç bağlanmadığı keşfedildi) kaynak-seviyesinde kalıcı
-    kanıtıdır."""
-    routes_source = (REPO_ROOT / "app/dashboard/executive_summary_routes.py").read_text(encoding="utf-8")
+    """TARİHSEL KANIT: `executive_summary_daily_weather_mail_tasks_v1_3_1()`
+    fonksiyonu, silinmeden hemen önceki halinde (ROUTE_MODULE_PRE_DELETION_
+    REF), hâlâ kaynak kodda context KWARGS OLMADAN `render_template(
+    "executive_summary/daily_weather_mail_tasks.html")` çağırıyordu -- bu
+    satır zaten (dosya hâlâ diskteyken de) ASLA ÇALIŞMADI (modül import
+    edilmediği için), ama Wave 8'in orijinal niyetinin (bu route'un canlı
+    olması PLANLANMIŞTI, sonradan gerçekte hiç bağlanmadığı keşfedildi, ve
+    en sonunda tüm dosya -- BYS360 Executive Summary Dead Route Cleanup
+    görevinde -- silindi) kaynak-seviyesinde kalıcı kanıtıdır."""
+    routes_source = _git_show(ROUTE_MODULE_PRE_DELETION_REF, "app/dashboard/executive_summary_routes.py")
     assert 'def executive_summary_daily_weather_mail_tasks_v1_3_1():' in routes_source
     assert 'return render_template("executive_summary/daily_weather_mail_tasks.html")' in routes_source
+
+
+def test_dead_route_module_no_longer_exists_on_disk() -> None:
+    """Orphan-absence sözleşmesi: `app/dashboard/executive_summary_routes.py`
+    (daily_weather_mail_tasks.html'in tek iddia edilen tüketicisi) artık
+    dosya sisteminde YOK -- BYS360 Executive Summary Dead Route Cleanup
+    görevinin tam kapsamlı sınıflandırmasının (yalnızca template değil, onu
+    render etmeye çalışan ölü Python modülünün de) gerçekten uygulandığının
+    kanıtı."""
+    assert not (REPO_ROOT / "app/dashboard/executive_summary_routes.py").exists(), (
+        "app/dashboard/executive_summary_routes.py hala diskte mevcut ama "
+        "orphan-cleanup tarafindan silinmis olmasi bekleniyordu."
+    )
 
 
 @pytest.mark.parametrize("relative_path", WAVE8_FILES)

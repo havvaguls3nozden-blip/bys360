@@ -1,5 +1,5 @@
 {
-  "route_count": 1042,
+  "route_count": 1038,
   "contract_keys": [
     "/about-bys360|GET",
     "/account/change-password|GET,POST",
@@ -341,9 +341,7 @@
     "/dashboard/rebuild-data|GET",
     "/dashboard/summary|GET",
     "/dashboard/yonetici-ozeti/data|GET",
-    "/dashboard/yonetici-ozeti/send-test|POST",
     "/dashboard/yonetici-ozeti/test-mail|POST",
-    "/dashboard/yonetici-ozeti|GET",
     "/dashboard/yonetici-ozeti|GET",
     "/dashboard|GET",
     "/db-check|GET",
@@ -358,7 +356,6 @@
     "/executive-summary/daily-weather-mail/settings|POST",
     "/executive-summary/daily-weather-mail|GET",
     "/executive-summary/daily-weather-mail|GET",
-    "/executive-summary/daily-weather-mail|GET,POST",
     "/executive-summary/mail-center/location|POST",
     "/executive-summary/mail-center/logs|GET",
     "/executive-summary/mail-center/recipients|GET,POST",
@@ -1040,7 +1037,6 @@
     "/yonetici-ozeti/gunluk-hava-maili/kuru-calisma|POST",
     "/yonetici-ozeti/gunluk-hava-maili/simdi-gonder|POST",
     "/yonetici-ozeti/gunluk-hava-maili|GET",
-    "/yonetici-ozeti/gunluk-hava-maili|GET,POST",
     "/yonetici-ozeti/mail-center|GET",
     "/|GET"
   ]
