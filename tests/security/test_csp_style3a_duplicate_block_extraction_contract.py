@@ -74,7 +74,23 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-HEAD_REF = "HEAD"
+
+# BYS360 KOORDINATOR DUZELTMESI (ileri-uyumluluk, ayni sinif hata Style-2A'nin
+# repo-genelinde testinde, Style-2B'nin "dosya dokunulmadi" testinde ve bir
+# sonraki bugfix dalgasinin iki "git diff HEAD" testinde de bulunup
+# duzeltilmisti -- bkz. o dosyalarin kendi KOORDINATOR NOTU bolumleri): bu
+# dosya ilk yazildiginda HEAD_REF = "HEAD" idi -- bu, Style-3A HENUZ
+# commit'lenmemisken DOGRUYDU (o an HEAD = onceki bugfix'in kapanis commit'i,
+# yani "dalga oncesi" durumdu). Style-3A commit'lendikten (3b3a5f8) SONRA,
+# "HEAD" artik Style-3A'nin KENDI commit'ini isaret ediyor -- yani
+# `git show HEAD:<path>` artik "dalga oncesi" degil, "dalga SONRASI" (zaten
+# duzeltilmis, <style> blogu OLMAYAN) icerigi donduruyor, bu da byte-parity/
+# no-Jinja/CSS-eslesme testlerinin sahte FAIL vermesine yol aciyordu. Artik
+# SABIT, tarihsel bir commit'e kilitlendi -- bu, "dalga oncesi" anlamini
+# SONSUZA KADAR koruyacak sekilde dogru kalir, sonraki hicbir commit/dalgadan
+# etkilenmez.
+HEAD_REF = "e0340cbaba6f7fd439d4420b2c88bcdcc7031968"  # Style-3A'nin ebeveyni (bugfix'in kapanis commit'i)
+STYLE3A_CLOSURE_REF = "3b3a5f8496076dcc36a195c66ddf2cbc2775160c"  # Style-3A'nin KENDI kapanis commit'i
 
 from tests.security._bys360_style_inventory import (  # noqa: E402
     compute_inventory_from_worktree,
@@ -942,28 +958,31 @@ def test_pwa_static_directory_is_untouched_by_this_wave() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 14) Plan-scope guard: the current, uncommitted working-tree diff touches
-#     ONLY the 10 templates + 3 new CSS files under app/templates/ and
-#     app/static/css/ -- nothing else. This is a PRE-COMMIT gate for this
-#     wave's own uncommitted change, not a permanent cross-wave invariant
-#     (it is expected to become trivially empty/moot once this wave's
-#     changes are committed -- that is fine, see task brief). Scoped to
-#     app/templates/ + app/static/css/ specifically (not the whole repo)
-#     so it is not tripped by unrelated, pre-existing untracked artifacts
-#     elsewhere in the repo (e.g. reports/quality/*.json) or by this test
-#     file's own addition under tests/ -- exactly mirroring how Style-2A's
-#     own plan-scope guard (test_csp_style2a_repo_wide_contract.py, section
-#     6) scoped itself to app/static/css/ rather than a full repo diff.
+# 14) Plan-scope guard: Style-3A's OWN closure commit (HEAD_REF..
+#     STYLE3A_CLOSURE_REF, a FIXED historical range) touches ONLY the 10
+#     templates + 3 new CSS files under app/templates/ and app/static/css/
+#     -- nothing else.
+#
+#     BYS360 KOORDINATOR DUZELTMESI: bu test ilk yazildiginda live `git
+#     status --porcelain` (commit'lenmemis calisma agaci durumu) kullaniyordu
+#     -- bu, Style-3A HENUZ commit'lenmemisken dogruydu, ama commit'lendikten
+#     SONRA `git status` HER ZAMAN bos doner (degisiklikler zaten HEAD'in bir
+#     PARCASI), bu da "degisen sablon seti bos, 10 bekleniyordu" seklinde
+#     sahte FAIL'e yol aciyordu. Artik SABIT bir tarihsel commit araligina
+#     (`git diff --name-status HEAD_REF..STYLE3A_CLOSURE_REF`) kilitlendi --
+#     bu, Style-3A'nin KENDI commit'inin GERCEKTEN neyi degistirdigini
+#     SONSUZA KADAR dogru sekilde kanitlar, sonraki hicbir dalga/commit'ten
+#     etkilenmez.
 # ---------------------------------------------------------------------------
 
 
-def _git_status_porcelain_lines(scope_paths: tuple[str, ...]) -> list[str] | None:
+def _git_diff_name_status_lines(pre_ref: str, post_ref: str, scope_paths: tuple[str, ...]) -> list[str] | None:
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
     except OSError:
         return None
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "status", "--porcelain", "--", *scope_paths],
+        ["git", "-C", str(REPO_ROOT), "diff", "--name-status", f"{pre_ref}..{post_ref}", "--", *scope_paths],
         capture_output=True,
         text=True,
         timeout=30,
@@ -974,8 +993,8 @@ def _git_status_porcelain_lines(scope_paths: tuple[str, ...]) -> list[str] | Non
     return result.stdout.splitlines()
 
 
-def test_uncommitted_diff_scoped_to_wave_directories_touches_only_the_10_templates_and_3_css_files() -> None:
-    lines = _git_status_porcelain_lines(("app/templates/", "app/static/css/"))
+def test_style3a_closure_commit_scoped_to_wave_directories_touches_only_the_10_templates_and_3_css_files() -> None:
+    lines = _git_diff_name_status_lines(HEAD_REF, STYLE3A_CLOSURE_REF, ("app/templates/", "app/static/css/"))
     if lines is None:
         pytest.skip("git CLI not available in this environment.")
 
@@ -983,13 +1002,13 @@ def test_uncommitted_diff_scoped_to_wave_directories_touches_only_the_10_templat
     new_css_files: set[str] = set()
     unexpected: list[str] = []
     for line in lines:
-        if len(line) < 4:
+        if not line.strip():
             continue
-        code = line[:2]
-        path = line[3:].strip().replace("\\", "/")
+        parts = line.split("\t")
+        code, path = parts[0], parts[-1].replace("\\", "/")
         if code.strip() == "M" and path in ALL_TEMPLATE_CSS:
             modified_templates.add(path)
-        elif code.strip() in {"??", "A"} and path.startswith("app/static/css/") and path.endswith(".css"):
+        elif code.strip() == "A" and path.startswith("app/static/css/") and path.endswith(".css"):
             new_css_files.add(path)
         else:
             unexpected.append(f"{code} {path}")

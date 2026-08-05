@@ -131,7 +131,7 @@ def get_selected_recipients() -> list[dict[str, Any]]:
     if not ids or not _db_ready():
         return []
     rows = db.session.execute(text("""
-        SELECT id, full_name, email, username, title, unit_name
+        SELECT id, full_name, email, sicil_no AS username, unvan AS title, birim AS unit_name
         FROM users
         WHERE id = ANY(:ids)
         ORDER BY full_name
@@ -143,10 +143,10 @@ def list_users(q: str = "") -> list[dict[str, Any]]:
         return []
     like = f"%{q.lower()}%"
     rows = db.session.execute(text("""
-        SELECT id, full_name, email, username, title, unit_name
+        SELECT id, full_name, email, sicil_no AS username, unvan AS title, birim AS unit_name
         FROM users
         WHERE COALESCE(is_active, true)=true
-          AND (:q='' OR lower(COALESCE(full_name,'')) LIKE :like OR lower(COALESCE(email,'')) LIKE :like OR lower(COALESCE(username,'')) LIKE :like)
+          AND (:q='' OR lower(COALESCE(full_name,'')) LIKE :like OR lower(COALESCE(email,'')) LIKE :like OR lower(COALESCE(sicil_no,'')) LIKE :like)
         ORDER BY full_name
         LIMIT 300
     """), {"q": q.lower(), "like": like}).mappings().all()
