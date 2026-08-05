@@ -875,19 +875,25 @@ def test_pre_existing_dynamic_progress_bar_style_attribute_is_still_present(
 PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # -10 from Style-3A itself. -6 from the later orphan_mail_cleanup wave (see
 # EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A's comment above): its 6 deleted
-# templates each carried exactly one <style> block. 270 - 10 - 6 = 254.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6
+# templates each carried exactly one <style> block. -2 from the later
+# style3b_low_risk wave (2 templates, performance/meeting_development.html +
+# performance/meeting_p3_reminders.html, each carried exactly one <style>
+# block, extracted to app/static/css/meeting_development_b_shared.css -- see
+# tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
+# STYLE_MIGRATION_WAVES["style3b_low_risk"]). 270 - 10 - 6 - 2 = 252.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
-        "orphan_mail_cleanup wave then deleted 6 more dead templates, each with "
-        "exactly one <style> block)."
+        "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "
+        "one <style> block; the later style3b_low_risk wave extracted 2 more "
+        "<style> blocks from 2 active templates)."
     )
 
 

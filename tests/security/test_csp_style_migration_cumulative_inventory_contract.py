@@ -63,6 +63,23 @@ numbers are never just trusted). `INITIAL_ACTIVE_STYLE_TOTAL` /
 they are historical fact about waves that already landed, not affected by
 a later, unrelated wave deleting different, always-dead templates.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 3 (Style-3B, an ordinary edit-in-place wave
+— back to the original `STYLE_MIGRATION_WAVES` shape, no new manifest
+needed): a new `"style3b_low_risk"` entry was added with `removed_static=0`,
+`removed_blocks=2` for its 2 templates (`performance/meeting_development.
+html`, `performance/meeting_p3_reminders.html`, both genuinely `ACTIVE` —
+independently re-verified with a real, isolated `create_app()` before this
+wave touched anything). Note this wave was originally scoped to 4 templates
+across 2 groups; the second group (`executive_summary/daily_weather_mail_
+tasks.html` + `communication/daily_weather_mail_settings.html`) was dropped
+entirely after the same pre-implementation re-verification proved both of
+those templates are ORPHAN (see
+`tests/security/test_csp_style3b_low_risk_duplicate_extraction_contract.py`'s
+own module docstring for the full evidence) — neither was touched in any
+way, so this ledger has no entry for them. `INITIAL_*` constants and the
+`style2a`/`style2b`/`style3a`/`DELETED_TEMPLATE_WAVES` entries above are
+unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -182,6 +199,14 @@ STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
         ),
         "removed_static": 0,
         "removed_blocks": 10,
+    },
+    "style3b_low_risk": {
+        "templates": (
+            "app/templates/performance/meeting_development.html",
+            "app/templates/performance/meeting_p3_reminders.html",
+        ),
+        "removed_static": 0,
+        "removed_blocks": 2,
     },
 }
 
@@ -312,19 +337,63 @@ def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_r
         )
 
 
+# style3b_low_risk is a BLOCK-only wave (removed_static=0 -- see its manifest
+# entry) whose 2 target templates each carry ONE pre-existing, fully-static
+# `style="margin-top:16px;"` attribute on a `<section class="bys-rem-card">`
+# that has nothing to do with the extracted <style> block and was never in
+# this wave's scope. Confirmed identical, byte-for-byte, at the wave's own
+# pre-wave git ref (f37a3132ed88921e8389970a6210489111f18c8a) -- i.e.
+# genuinely pre-existing, not introduced by this wave. Same precedent as
+# Style-3A's own PROGRESS_BAR_TEMPLATES exception in
+# test_csp_style3a_duplicate_block_extraction_contract.py (a wave's target
+# template can carry an unrelated, out-of-scope style="..." the wave never
+# claimed to remove).
+KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES = frozenset(
+    {
+        "app/templates/performance/meeting_development.html",
+        "app/templates/performance/meeting_p3_reminders.html",
+    }
+)
+
+
 @pytest.mark.parametrize(
     "relative_path",
-    sorted({t for w in STYLE_MIGRATION_WAVES.values() for t in w["templates"]}),
+    sorted(
+        {t for w in STYLE_MIGRATION_WAVES.values() for t in w["templates"]}
+        - KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES
+    ),
 )
 def test_every_wave_target_template_has_zero_active_style_attribute(relative_path: str) -> None:
     """Every template EVER claimed by ANY completed wave must still have
     zero fully-static `style="..."` attributes -- protects against a LATER
-    wave accidentally reintroducing one into an already-migrated file."""
+    wave accidentally reintroducing one into an already-migrated file.
+    Excludes KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES (see that constant's
+    own comment for the documented, evidence-based reason)."""
     text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
     count = count_static_style_attrs_in_text(text, relative_path)
     assert count == 0, (
         f"{relative_path} has {count} static style=\"...\" attribute(s) remaining; "
         "this template was already claimed as fully migrated by a completed wave."
+    )
+
+
+@pytest.mark.parametrize("relative_path", sorted(KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES))
+def test_known_pre_existing_static_attr_template_has_exactly_the_documented_one_attribute(
+    relative_path: str,
+) -> None:
+    """Companion check for the exception above: proves the excluded count is
+    EXACTLY 1 (not silently growing), and that its value is byte-identical
+    to the one independently confirmed at the wave's own pre-wave git ref --
+    so this exception can never silently mask a REAL regression."""
+    text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    count = count_static_style_attrs_in_text(text, relative_path)
+    assert count == 1, (
+        f"{relative_path}: expected exactly 1 pre-existing static style=\"...\" "
+        f"attribute (the documented bys-rem-card one), found {count}."
+    )
+    assert 'class="bys-rem-card" style="margin-top:16px;"' in text, (
+        f"{relative_path}: the documented pre-existing style=\"margin-top:16px;\" "
+        "attribute on class=\"bys-rem-card\" was not found byte-for-byte."
     )
 
 
