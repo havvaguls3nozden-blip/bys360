@@ -394,30 +394,47 @@ def test_source_only_candidates_have_dependencies_that_block_safe_removal():
     to that page raised `werkzeug.routing.exceptions.BuildError` (a 500).
     See `tests/performance/test_phase6_dashboard_dead_workflow_link_fix.py`
     for the full fix evidence -- the dead button/link was removed from that
-    template entirely. This test's remaining assertions (about the still-
-    genuinely-source-only `app.workflow.routes`/scorecard-v2 candidates)
-    were not affected by that fix and are unchanged below.
+    template entirely.
+
+    BYS360 Workflow Orphan Presentation Subsystem Temizliği update: with that
+    live bug gone, `app.workflow.routes` had ZERO remaining application/CLI/
+    test dependencies of any kind (independently re-verified) -- so it no
+    longer belongs in a list of candidates that "block safe removal". It (and
+    its sibling `app.workflow.dashboard_upgrade_routes`, and their 14
+    templates, and the now-pointless `"app.workflow.routes"` manifest string
+    in `app/route_registry.py`, and the two test files that only tested that
+    now-deleted code) were removed in that same wave -- see
+    `tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_
+    contract.py` for the full removal evidence. This test's remaining
+    assertions cover only the OTHER, still-genuinely-source-only
+    `app.routes_president_scorecard_v2` candidate, which this wave did not
+    touch. `docs/api/openapi_draft.json` still contains the stale
+    `main_bp_workflow_president_approvals` operationId documenting the now-
+    deleted route -- left as-is deliberately: there is no canonical
+    generator script for that file in this repo, and broad manual JSON
+    reformatting across its ~36 workflow-related entries is out of scope for
+    this wave (a future, dedicated docs-sync wave should handle it).
     """
-    route_registry = (REPO_ROOT / "app" / "route_registry.py").read_text(encoding="utf-8")
-    workflow_test = (
-        REPO_ROOT / "tests" / "workflow" / "test_phase5w_workflow_schema_readiness.py"
-    ).read_text(encoding="utf-8")
     scorecard_test = (
         REPO_ROOT / "tests" / "security" / "test_sql_identifier_escaping_negative.py"
     ).read_text(encoding="utf-8")
     scorecard_template = (
         REPO_ROOT / "app" / "templates" / "performance" / "president_approvals_v2.html"
     ).read_text(encoding="utf-8")
-    openapi = (REPO_ROOT / "docs" / "api" / "openapi_draft.json").read_text(
-        encoding="utf-8"
-    )
 
-    assert '"app.workflow.routes"' in route_registry
-    assert "from app.workflow import routes" in workflow_test
     assert "from app.routes_president_scorecard_v2 import _qident" in scorecard_test
     assert "president_scorecard_v2.president_approval_scorecard_v2" in scorecard_template
-    assert "main_bp_workflow_president_approvals" in openapi
-    assert "president_scorecard_v2_bp_president_approvals_tr_v2" in openapi
+
+
+def test_workflow_routes_manifest_string_and_dead_test_dependencies_are_gone():
+    """Companion, positive-direction check for the removal documented above:
+    the two dependencies that used to "block safe removal" of `app.workflow.
+    routes` (the route_registry.py manifest string, and the test file that
+    directly imported it) are both confirmed gone."""
+    route_registry = (REPO_ROOT / "app" / "route_registry.py").read_text(encoding="utf-8")
+    assert '"app.workflow.routes"' not in route_registry
+    assert not (REPO_ROOT / "app" / "workflow").exists()
+    assert not (REPO_ROOT / "tests" / "workflow").exists()
 
 
 def test_performance_v2_phase6_dashboard_no_longer_references_the_dead_workflow_endpoint():

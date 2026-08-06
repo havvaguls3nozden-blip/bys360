@@ -432,12 +432,18 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # Servis/Template Temizliği) deleted 1 more confirmed-orphan template
 # (app/templates/dashboard/executive_summary.html), removing 3 more static
 # style="..." attributes and 1 more <style> block: 1040 - 3 = 1037,
-# 248 - 1 = 247. See tests/security/test_csp_style_migration_cumulative_
-# inventory_contract.py's DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]
-# and DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"].
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1037
-EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B = 66
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 247
+# 248 - 1 = 247. A further later wave (BYS360 Workflow Orphan Presentation
+# Subsystem Temizliği) deleted 14 more confirmed-orphan templates (2 full
+# trees of 7), removing 2 more static style="..." attributes, 2 dynamic
+# style="..." attributes, and 14 more <style> blocks: 1037 - 2 = 1035,
+# 66 - 2 = 64, 247 - 14 = 233. See tests/security/test_csp_style_migration_
+# cumulative_inventory_contract.py's
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"],
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"], and
+# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"].
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1035
+EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B = 64
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 233
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:

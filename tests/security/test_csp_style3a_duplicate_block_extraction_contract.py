@@ -825,14 +825,19 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # (5 each, byte-identical): 1060 - 20 = 1040. A further later wave (BYS360
 # Executive Summary Artık Servis/Template Temizliği) deleted 1 more
 # confirmed-orphan template (app/templates/dashboard/executive_summary.html),
-# removing 3 more static style="..." attributes: 1040 - 3 = 1037. See
+# removing 3 more static style="..." attributes: 1040 - 3 = 1037. A further
+# later wave (BYS360 Workflow Orphan Presentation Subsystem Temizliği)
+# deleted 14 more confirmed-orphan templates (2 full trees of 7), removing 2
+# more static style="..." attributes and (the first wave ever to do so) 2
+# dynamic style="..." attributes: 1037 - 2 = 1035, 66 - 2 = 64. See
 # tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
 # DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"],
-# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"], and
-# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"] for the
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"],
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"], and
+# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"] for the
 # independently re-derived evidence.
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1037
-EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 66
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1035
+EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 64
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:
@@ -894,16 +899,20 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]). -1 from the later
 # executive_summary_dashboard_cleanup wave (1 confirmed-orphan template
 # deleted, carried exactly one <style> block -- see that same ledger file's
-# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"]).
-# 270 - 10 - 6 - 2 - 4 - 1 = 247.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"]). -14 from
+# the later workflow_orphan_presentation_cleanup wave (14 confirmed-orphan
+# templates deleted -- two full 7-template trees -- each carried exactly one
+# <style> block -- see that same ledger file's
+# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]).
+# 270 - 10 - 6 - 2 - 4 - 1 - 14 = 233.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
         "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "

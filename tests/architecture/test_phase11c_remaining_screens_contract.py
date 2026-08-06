@@ -4,6 +4,16 @@ Statik metin tabanlı kontrat testleri: gerçek tarayıcı/cihaz render'ı
 doğrulamaz, yalnızca kaynak koddaki responsive/güvenlik/dil kurallarının
 var olduğunu ve gerilemediğini denetler. Phase 11A/11B'deki
 test_phase11a/11b_*_contract.py dosyalarıyla aynı desen.
+
+BYS360 Workflow Orphan Presentation Subsystem Temizliği update:
+`test_president_approvals_route_template_contract_unchanged` below used to
+also `.read_text()` `app/workflow/routes.py` to assert its (never actually
+live -- see `tests/quality/test_workflow_orphan_presentation_subsystem_
+cleanup_contract.py` for the full evidence) route/view-name pair was
+"unchanged". That file was deleted along with the rest of its confirmed-
+dead subsystem; those two assertions were removed, leaving only the
+still-meaningful "canonical, genuinely active president-approvals route
+file still exposes both its URL aliases" checks.
 """
 from pathlib import Path
 
@@ -112,9 +122,6 @@ def test_login_does_not_extend_base_html_by_design():
 
 
 def test_president_approvals_route_template_contract_unchanged():
-    routes = text("app/workflow/routes.py")
-    assert "@main_bp.route('/workflow/president-approvals')" in routes
-    assert "def workflow_president_approvals():" in routes
     canonical_routes = text(
         "app/performance/process_engine_phase6_president_approvals_routes.py"
     )

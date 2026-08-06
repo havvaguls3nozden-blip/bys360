@@ -496,10 +496,18 @@ def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> N
 # migration_cumulative_inventory_contract.py's
 # DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"] for the
 # independently re-derived evidence. The residual service `.py` file
-# carried no template markup, so it contributes 0 to this ledger.
-EXPECTED_ACTIVE_STYLE_TOTAL = 1037
-EXPECTED_DYNAMIC_STYLE_TOTAL = 66
-EXPECTED_STYLE_BLOCK_TOTAL = 247
+# carried no template markup, so it contributes 0 to this ledger. A further
+# later wave (BYS360 Workflow Orphan Presentation Subsystem Temizliği)
+# deleted 14 more confirmed-orphan templates (2 full trees of 7), removing 2
+# more static style="..." attributes, 2 dynamic style="..." attributes, and
+# 14 more <style> blocks: 1037 - 2 = 1035, 66 - 2 = 64, 247 - 14 = 233. See
+# that same ledger file's
+# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]. Neither
+# of this wave's own deleted files (app/workflow/routes.py,
+# app/workflow/dashboard_upgrade_routes.py) carried template markup either.
+EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_DYNAMIC_STYLE_TOTAL = 64
+EXPECTED_STYLE_BLOCK_TOTAL = 233
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

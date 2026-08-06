@@ -122,6 +122,32 @@ service `.py` file carried no template markup, so it contributes 0 to this
 style/CSP ledger. `INITIAL_*` constants and all prior wave entries are
 unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 6 (BYS360 Workflow Orphan Presentation
+Subsystem Temizliği, düzeltilmiş Alternatif A+ -- the first DELETED_
+TEMPLATE_WAVES-class wave to remove a DYNAMIC style="..." attribute, not
+just static ones): every prior deleted-template wave happened to leave
+`dynamic_total` untouched, which let `test_cumulative_dynamic_style_total_
+is_unchanged` get away with a flat `inventory.dynamic_total ==
+INITIAL_DYNAMIC_STYLE_TOTAL` lock -- exactly the same class of "wave-
+agnostic-in-name-only" bug the original `CUMULATIVE_REMOVED_STATIC`/
+`CUMULATIVE_REMOVED_BLOCKS` follow-ups above already fixed once each for
+static attributes and blocks. This wave's `"workflow_orphan_presentation_
+cleanup"` entry below deletes the two `executive_dashboard.html` copies,
+each carrying one dynamic `style="width: {{ ... }}%"` progress-bar
+attribute (2 total) -- so a THIRD manifest field, `removed_dynamic`, was
+added to `_DeletedWaveManifestEntry` (defaulting to `0` on every prior
+entry, none of which ever touched a dynamic attribute), summed into a new
+`CUMULATIVE_REMOVED_DYNAMIC`, and the test renamed/rewired to `test_
+cumulative_dynamic_style_total_matches_manifest` with expected total
+``INITIAL_DYNAMIC_STYLE_TOTAL - CUMULATIVE_REMOVED_DYNAMIC`` -- same
+pattern as its two siblings. `STYLE_MIGRATION_WAVES` (the edit-in-place
+manifest) is NOT given a `removed_dynamic` field: no edit-in-place wave has
+ever removed a dynamic attribute either, and none is expected to (dynamic
+attributes are, by definition, driven by live Jinja context, not dead
+markup an edit-in-place wave would touch) -- if that ever changes, it gets
+its own follow-up then. `INITIAL_*` constants and all prior wave entries
+(including their `removed_dynamic: 0` additions) are otherwise unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -256,6 +282,7 @@ class _DeletedWaveManifestEntry(TypedDict):
     templates: tuple[str, ...]
     removed_static: int
     removed_blocks: int
+    removed_dynamic: int
 
 
 # Waves that DELETED their templates entirely (as opposed to editing them in
@@ -264,7 +291,10 @@ class _DeletedWaveManifestEntry(TypedDict):
 # removed_static=8 / removed_blocks=6 are independently re-derived from a
 # fixed pre-deletion git ref by
 # test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_ref
-# below -- never just trusted.
+# below -- never just trusted. `removed_dynamic` (FORWARD-COMPATIBILITY
+# FOLLOW-UP 6, see below) defaults to 0 for every wave here except
+# `workflow_orphan_presentation_cleanup` -- no prior deleted-template wave
+# ever removed a dynamic `style="...{{ }}..."` attribute.
 DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
     "orphan_mail_cleanup": {
         "templates": (
@@ -277,6 +307,7 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         ),
         "removed_static": 8,
         "removed_blocks": 6,
+        "removed_dynamic": 0,
     },
     # BYS360 Daily Weather/Mail Orphan Template Temizliği: 4 template, hepsi
     # ORPHAN_CONFIRMED (hiçbir gerçek route render etmiyor -- iki tanesi
@@ -297,6 +328,7 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         ),
         "removed_static": 20,
         "removed_blocks": 4,
+        "removed_dynamic": 0,
     },
     # BYS360 Executive Summary Artık Servis/Template Temizliği: residual
     # orphan left explicitly out-of-scope by the prior dead-route-module
@@ -311,6 +343,49 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         ),
         "removed_static": 3,
         "removed_blocks": 1,
+        "removed_dynamic": 0,
+    },
+    # BYS360 Workflow Orphan Presentation Subsystem Temizliği (düzeltilmiş
+    # Alternatif A+, FORWARD-COMPATIBILITY FOLLOW-UP 6 -- see module
+    # docstring): 14 templates across TWO byte-mostly-identical trees
+    # (app/templates/workflow/*.html and app/workflow/templates/workflow/
+    # *.html, 7 filenames each), both independently re-confirmed
+    # ORPHAN_CONFIRMED -- the whole `app/workflow/` presentation/route
+    # package (`routes.py`, `dashboard_upgrade_routes.py`) was never
+    # imported at startup (see the separate read-only "BYS360 Workflow Alt
+    # Sistemi" audit and this wave's own
+    # test_workflow_orphan_presentation_subsystem_cleanup_contract.py for
+    # the full evidence, including a reproduced 985->997 same-process
+    # import-contamination proof). removed_static=2/removed_blocks=14/
+    # removed_dynamic=2 are independently re-derived from the fixed
+    # pre-deletion git ref below: every one of the 14 files carries exactly
+    # one <style> block; only the two `president_approvals.html` copies each
+    # carry one static style="..." attribute (2 total); only the two
+    # `executive_dashboard.html` copies each carry one DYNAMIC
+    # style="width: {{ ... }}%" progress-bar attribute (2 total) -- the
+    # FIRST deleted-template wave to ever remove a dynamic attribute, hence
+    # the new `removed_dynamic` manifest field (see FORWARD-COMPATIBILITY
+    # FOLLOW-UP 6 above).
+    "workflow_orphan_presentation_cleanup": {
+        "templates": (
+            "app/templates/workflow/dashboard.html",
+            "app/templates/workflow/delays.html",
+            "app/templates/workflow/executive_dashboard.html",
+            "app/templates/workflow/modules.html",
+            "app/templates/workflow/notifications.html",
+            "app/templates/workflow/president_approvals.html",
+            "app/templates/workflow/timeline.html",
+            "app/workflow/templates/workflow/dashboard.html",
+            "app/workflow/templates/workflow/delays.html",
+            "app/workflow/templates/workflow/executive_dashboard.html",
+            "app/workflow/templates/workflow/modules.html",
+            "app/workflow/templates/workflow/notifications.html",
+            "app/workflow/templates/workflow/president_approvals.html",
+            "app/workflow/templates/workflow/timeline.html",
+        ),
+        "removed_static": 2,
+        "removed_blocks": 14,
+        "removed_dynamic": 2,
     },
 }
 
@@ -321,9 +396,17 @@ DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "orphan_mail_cleanup": "297c8da746a59d84e5f3f9536b92e824ce5bd70a",
     "daily_weather_mail_cleanup": "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47",
     "executive_summary_dashboard_cleanup": "c5a6a61b47caf2d39ca812b74f7fd22f329629c4",
+    "workflow_orphan_presentation_cleanup": "88d148c61f11fe9cc8d323cd8cdce1d80a146dfe",
 }
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
+# Simple raw-text dynamic-attribute matcher for git-show re-derivation only
+# (canonical live-worktree dynamic counting stays the HTMLParser-based
+# `compute_inventory_from_worktree`/`compute_inventory_at_git_ref` in
+# `_bys360_style_inventory.py` -- this is a defense-in-depth cross-check
+# against a fixed historical git ref's raw text, same spirit as
+# `count_static_style_attrs_in_text` being used for the same purpose above).
+_DYNAMIC_STYLE_ATTR_RE = re.compile(r'style="[^"]*\{\{[^"]*\}\}[^"]*"')
 
 CUMULATIVE_REMOVED_STATIC = sum(w["removed_static"] for w in STYLE_MIGRATION_WAVES.values()) + sum(
     w["removed_static"] for w in DELETED_TEMPLATE_WAVES.values()
@@ -334,6 +417,12 @@ CUMULATIVE_REMOVED_BLOCKS = sum(w["removed_blocks"] for w in STYLE_MIGRATION_WAV
     w["removed_blocks"] for w in DELETED_TEMPLATE_WAVES.values()
 )
 EXPECTED_STYLE_BLOCK_TOTAL = INITIAL_STYLE_BLOCK_TOTAL - CUMULATIVE_REMOVED_BLOCKS
+
+# FORWARD-COMPATIBILITY FOLLOW-UP 6 (see module docstring): only
+# DELETED_TEMPLATE_WAVES entries carry `removed_dynamic` -- STYLE_MIGRATION_
+# WAVES (edit-in-place) has never needed one.
+CUMULATIVE_REMOVED_DYNAMIC = sum(w["removed_dynamic"] for w in DELETED_TEMPLATE_WAVES.values())
+EXPECTED_DYNAMIC_STYLE_TOTAL = INITIAL_DYNAMIC_STYLE_TOTAL - CUMULATIVE_REMOVED_DYNAMIC
 
 
 def test_no_template_is_claimed_by_more_than_one_wave() -> None:
@@ -375,9 +464,10 @@ def test_every_deleted_wave_target_template_is_genuinely_absent_from_worktree(re
 
 def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_ref() -> None:
     """Independently re-derives DELETED_TEMPLATE_WAVES' removed_static/
-    removed_blocks numbers from the fixed historical ref immediately BEFORE
-    each wave's own deletion commit, where the templates still existed on
-    disk -- never just trusts the manifest's own recorded numbers."""
+    removed_blocks/removed_dynamic numbers from the fixed historical ref
+    immediately BEFORE each wave's own deletion commit, where the templates
+    still existed on disk -- never just trusts the manifest's own recorded
+    numbers."""
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
     except OSError:
@@ -387,6 +477,7 @@ def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_r
         pre_ref = DELETED_TEMPLATE_WAVES_PRE_DELETION_REF[wave_name]
         total_static = 0
         total_blocks = 0
+        total_dynamic = 0
         for relative_path in wave["templates"]:
             result = subprocess.run(
                 ["git", "show", f"{pre_ref}:{relative_path}"],
@@ -402,6 +493,7 @@ def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_r
                 pytest.skip(f"'git show {pre_ref}:{relative_path}' failed; environment limitation.")
             total_static += count_static_style_attrs_in_text(result.stdout, relative_path)
             total_blocks += len(_STYLE_TAG_RE.findall(result.stdout))
+            total_dynamic += len(_DYNAMIC_STYLE_ATTR_RE.findall(result.stdout))
 
         assert total_static == wave["removed_static"], (
             f"{wave_name}: independently-derived static style attribute count at "
@@ -411,6 +503,11 @@ def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_r
         assert total_blocks == wave["removed_blocks"], (
             f"{wave_name}: independently-derived <style> block count at {pre_ref} "
             f"is {total_blocks}; manifest says removed_blocks={wave['removed_blocks']}."
+        )
+        assert total_dynamic == wave["removed_dynamic"], (
+            f"{wave_name}: independently-derived dynamic style attribute count at "
+            f"{pre_ref} is {total_dynamic}; manifest says removed_dynamic="
+            f"{wave['removed_dynamic']}."
         )
 
 
@@ -517,12 +614,20 @@ def test_cumulative_active_static_style_total_matches_manifest() -> None:
     )
 
 
-def test_cumulative_dynamic_style_total_is_unchanged() -> None:
+def test_cumulative_dynamic_style_total_matches_manifest() -> None:
+    """Renamed from test_cumulative_dynamic_style_total_is_unchanged (see
+    FORWARD-COMPATIBILITY FOLLOW-UP 6 in the module docstring): a flat
+    "always equals INITIAL_DYNAMIC_STYLE_TOTAL" lock held for every wave
+    until workflow_orphan_presentation_cleanup, the first DELETED_TEMPLATE_
+    WAVES entry to legitimately remove a dynamic attribute (by deleting the
+    dead template that carried it)."""
     inventory = compute_inventory_from_worktree()
-    assert inventory.dynamic_total == INITIAL_DYNAMIC_STYLE_TOTAL, (
+    assert inventory.dynamic_total == EXPECTED_DYNAMIC_STYLE_TOTAL, (
         f"Repo-wide Jinja-dynamic style attribute total is {inventory.dynamic_total}; "
-        f"expected {INITIAL_DYNAMIC_STYLE_TOTAL} (no inline-style wave may add/remove "
-        "a dynamic style attribute)."
+        f"expected {INITIAL_DYNAMIC_STYLE_TOTAL} - {CUMULATIVE_REMOVED_DYNAMIC} "
+        f"(cumulative across deleted-template waves) = {EXPECTED_DYNAMIC_STYLE_TOTAL}. "
+        "No edit-in-place wave may add/remove a dynamic style attribute; only a "
+        "deleted-template wave's own manifest-declared removed_dynamic may."
     )
 
 

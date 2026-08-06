@@ -306,11 +306,21 @@ def test_remaining_hero_action_buttons_are_still_present_and_unchanged() -> None
 # ---------------------------------------------------------------------------
 # 4) Style/CSP/handler inventory unchanged (the removed line carried no
 #    style="..." attribute or inline handler to begin with).
+#
+#    NOTE: these totals reflect the state as of THIS fix's own commit
+#    (1037/66/247). A later, separate wave (BYS360 Workflow Orphan
+#    Presentation Subsystem Temizliği) deleted 14 more confirmed-orphan
+#    templates unrelated to this fix, dropping the live repo-wide totals to
+#    1035/64/233 -- see tests/security/test_csp_style_migration_cumulative_
+#    inventory_contract.py's DELETED_TEMPLATE_WAVES["workflow_orphan_
+#    presentation_cleanup"]. Updated here to match, since this test asserts
+#    against the live worktree, not a frozen snapshot of this fix's own
+#    diff.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1037
-EXPECTED_DYNAMIC_STYLE_TOTAL = 66
-EXPECTED_STYLE_BLOCK_TOTAL = 247
+EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_DYNAMIC_STYLE_TOTAL = 64
+EXPECTED_STYLE_BLOCK_TOTAL = 233
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:
