@@ -407,13 +407,20 @@ def test_source_only_candidates_have_dependencies_that_block_safe_removal():
     `tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_
     contract.py` for the full removal evidence. This test's remaining
     assertions cover only the OTHER, still-genuinely-source-only
-    `app.routes_president_scorecard_v2` candidate, which this wave did not
-    touch. `docs/api/openapi_draft.json` still contains the stale
-    `main_bp_workflow_president_approvals` operationId documenting the now-
-    deleted route -- left as-is deliberately: there is no canonical
-    generator script for that file in this repo, and broad manual JSON
-    reformatting across its ~36 workflow-related entries is out of scope for
-    this wave (a future, dedicated docs-sync wave should handle it).
+    `app.routes_president_scorecard_v2` candidate, which no wave has touched.
+
+    BYS360 OpenAPI ve Route Dokümantasyonu Workflow Drift Kapanışı update:
+    `docs/api/openapi_draft.json` used to still contain the stale
+    `main_bp_workflow_president_approvals` operationId (and 11 sibling dead-
+    workflow-route entries) documenting the now-deleted route -- confirmed
+    at the time there is no canonical generator script for that file in this
+    repo (`docs/api/BYS360_OPENAPI_BOOTSTRAP.md`, which would have documented
+    one, was itself deleted in commit `e1b8c62c`). A dedicated later wave
+    removed exactly those 12 dead path entries via a deterministic,
+    programmatic JSON edit (pure deletion, zero unrelated diff -- verified
+    byte-identical elsewhere, including `/api/mobile`'s 72 operations and all
+    `components`/`security` sections) -- see `tests/quality/test_openapi_
+    workflow_drift_cleanup_contract.py` for the full removal evidence.
     """
     scorecard_test = (
         REPO_ROOT / "tests" / "security" / "test_sql_identifier_escaping_negative.py"
