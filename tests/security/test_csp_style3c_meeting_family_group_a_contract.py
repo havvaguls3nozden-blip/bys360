@@ -1,55 +1,39 @@
-"""CSP "Style-3B" low-risk duplicate-`<style>`-block extraction wave -- this
-wave's own contract test.
+"""CSP "Style-3C" active meeting-family duplicate-`<style>`-block extraction
+wave -- this wave's own contract test.
 
-CONTEXT: Style-3B is a coordinated, test-only wave that verifies work already
-applied to the working tree: ONE group of 2 templates, both byte-identical
-340-line `<style>...</style>` blocks, each replaced with exactly one
+CONTEXT: Style-3C is a coordinated, test-only wave that verifies work already
+applied to the working tree: ONE group of 8 templates, all raw-byte-identical
+387-line `<style>...</style>` blocks, each replaced with exactly one
 `<link rel="stylesheet" href="{{ url_for('static', filename='css/<file>.css') }}">`
 pointing at a brand-new shared CSS file:
 
-    app/templates/performance/meeting_development.html
-    app/templates/performance/meeting_p3_reminders.html
-    -> app/static/css/meeting_development_b_shared.css
+    app/templates/performance/meeting_development_faz3.html
+    app/templates/performance/meeting_development_faz4.html
+    app/templates/performance/meeting_development_scenarios.html
+    app/templates/performance/meeting_final_closure.html
+    app/templates/performance/meeting_p0_completion.html
+    app/templates/performance/meeting_p1_scope.html
+    app/templates/performance/meeting_p2_archive_notes.html
+    app/templates/performance/meeting_rule_enforcement.html
+    -> app/static/css/meeting_development_c_shared.css
 
-HISTORY NOTE -- SCOPE CORRECTION (micro-wave scope exception, user-approved):
-the pre-implementation candidate analysis for Style-3B originally identified
-4 templates across 2 groups for this "low risk" wave: the 2 above, PLUS
-app/templates/executive_summary/daily_weather_mail_tasks.html and
-app/templates/communication/daily_weather_mail_settings.html (claimed
-byte-identical to each other). Before touching any file, a mandatory
-re-verification step (independent of the candidate analysis) proved BOTH of
-those two templates are ORPHAN, not active:
+NAMING NOTE: the coordinator's original suggested filename was
+`meeting_development_group_a_shared.css`. This repo already has a
+`meeting_development_b_shared.css` (Style-3B's own 2-template shared file,
+see test_csp_style3b_low_risk_duplicate_extraction_contract.py) -- the
+established convention in this template family is a single-letter suffix,
+not a "group_a"/"group_b" pair (which would also collide in spirit with
+Style-3A's own, unrelated, already-reverted "Group A" executive-mail naming
+from a completely different template family -- see that file's own module
+docstring HISTORY NOTE). `meeting_development_c_shared.css` (the next letter
+after "_b") was used instead to stay consistent with the one real precedent
+in this repo and avoid reusing a name history already retired.
 
-  - app/templates/communication/daily_weather_mail_settings.html: the real
-    `/communication/daily-weather-mail` GET route
-    (app/communication/daily_weather_mail_routes.py::daily_weather_mail_
-    settings()) renders a COMPLETELY DIFFERENT template,
-    "executive_summary/mail_center/overview.html" -- confirmed by this
-    repo's own pre-existing test_csp_wave8_weather_mail_contract.py, whose
-    docstring already documents this file as "ORPHAN" (the filename
-    coincidentally matches the route's Python FUNCTION name, not its actual
-    render target -- two similar but unrelated names).
-  - app/templates/executive_summary/daily_weather_mail_tasks.html: its only
-    claimed renderer, app/dashboard/executive_summary_routes.py, is never
-    imported anywhere in the application (verified with a real, isolated
-    `create_app()` subprocess: absent from `sys.modules`, and a repo-wide
-    grep for any import of this module returns zero hits outside the file's
-    own self-referential logging strings). The SAME
-    test_csp_wave8_weather_mail_contract.py's docstring incorrectly labels
-    this file "CANLI" (live) based only on source-level decorator evidence
-    (a `@route` existing in the file), not on real import/`url_map`
-    verification -- that existing claim is WRONG. This is a pre-existing
-    test-documentation defect in this repo, independent of and NOT fixed by
-    this wave (no application code was changed to investigate or correct
-    it; this file only documents the discrepancy for a future, separate
-    follow-up).
-
-Because 2 of the original 4 candidate templates are confirmed dead, the user
-explicitly narrowed Style-3B's scope to ONLY the meeting_development pair --
-below this repo's usual 3-6-template "low risk" floor, approved as a
-one-off "Style-3B micro-wave scope exception". The daily_weather_mail pair
-was NOT touched in any way (no template edit, no CSS extraction, no route
-change) and remains fully out of scope for this wave.
+All 8 templates are independently confirmed runtime-ACTIVE below (section 6):
+each has its own `app/performance/<name>_routes.py` module registered in
+`app/performance/__init__.py::OPTIONAL_ROUTE_MODULES`, a real `@main_bp.route`
+GET endpoint guarded by `@login_required` + `@manager_required`, and a real
+`render_template()` call referencing the template.
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 `Path.read_text()`, `git show`/`git status`/`git diff` (read-only), and real
@@ -59,6 +43,15 @@ BYTE-PARITY NORMALIZATION: identical methodology to
 test_csp_style3a_duplicate_block_extraction_contract.py's own
 `_normalize_style_block` (line-based rstrip + leading/trailing empty-line
 trim) -- see that file's docstring for the full empirical justification.
+
+HEAD_REF: a fixed, historical commit SHA (not the literal string "HEAD") --
+the tip of `phase5-critical-lint-clean-v1` immediately before this wave's own
+templates/CSS/test changes were written. Using a pinned SHA rather than
+"HEAD" means the pre-wave byte-parity evidence below stays correct forever,
+even after this wave's own commit lands and later, unrelated commits are
+added on top -- see test_csp_style3a_duplicate_block_extraction_contract.py's
+own module docstring "BYS360 KOORDINATOR DUZELTMESI" note for the full
+history of why this matters in this repo.
 """
 from __future__ import annotations
 
@@ -72,25 +65,57 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# The commit immediately BEFORE this wave's own (not-yet-created) commit --
-# i.e. the repo state where both templates still had their inline <style>
-# block. Fixed, historical; never affected by any later commit.
-HEAD_REF = "f37a3132ed88921e8389970a6210489111f18c8a"
+# Tip of phase5-critical-lint-clean-v1 immediately before Style-3C's own
+# template/CSS/test changes -- the repo state where all 8 templates still
+# carried their inline <style> block. Fixed, historical; never affected by
+# any later commit.
+HEAD_REF = "7a605b228ab27f0b7048391ff9a672b9e9ee5d33"
 
-GROUP_CSS = "meeting_development_b_shared"
+GROUP_CSS = "meeting_development_c_shared"
 
 GROUP_TEMPLATES: dict[str, dict[str, str]] = {
-    "app/templates/performance/meeting_development.html": {
-        "route": "/performance/meeting-development",
-        "view_file": "app/performance/meeting_development_routes.py",
-        "view_name": "performance_meeting_development",
+    "app/templates/performance/meeting_development_faz3.html": {
+        "route": "/performance/meeting-development/faz3",
+        "view_file": "app/performance/meeting_development_faz3_routes.py",
+        "view_name": "performance_meeting_development_faz3",
     },
-    "app/templates/performance/meeting_p3_reminders.html": {
-        "route": "/performance/meeting-development/faz9",
-        "view_file": "app/performance/meeting_p3_reminders_routes.py",
-        "view_name": "performance_meeting_p3_reminders",
+    "app/templates/performance/meeting_development_faz4.html": {
+        "route": "/performance/meeting-development/final-gate",
+        "view_file": "app/performance/meeting_development_faz4_routes.py",
+        "view_name": "performance_meeting_final_gate",
+    },
+    "app/templates/performance/meeting_development_scenarios.html": {
+        "route": "/performance/meeting-development/test-scenarios",
+        "view_file": "app/performance/meeting_test_routes.py",
+        "view_name": "performance_meeting_test_scenarios",
+    },
+    "app/templates/performance/meeting_final_closure.html": {
+        "route": "/performance/meeting-development/final-closure",
+        "view_file": "app/performance/meeting_final_closure_routes.py",
+        "view_name": "performance_meeting_final_closure",
+    },
+    "app/templates/performance/meeting_p0_completion.html": {
+        "route": "/performance/meeting-development/p0",
+        "view_file": "app/performance/meeting_p0_completion_routes.py",
+        "view_name": "performance_meeting_p0_completion",
+    },
+    "app/templates/performance/meeting_p1_scope.html": {
+        "route": "/performance/meeting-development/p1",
+        "view_file": "app/performance/meeting_p1_scope_routes.py",
+        "view_name": "performance_meeting_p1_scope",
+    },
+    "app/templates/performance/meeting_p2_archive_notes.html": {
+        "route": "/performance/meeting-development/p2",
+        "view_file": "app/performance/meeting_p2_archive_notes_routes.py",
+        "view_name": "performance_meeting_p2_archive_notes",
+    },
+    "app/templates/performance/meeting_rule_enforcement.html": {
+        "route": "/performance/meeting-development/rules",
+        "view_file": "app/performance/meeting_rule_enforcement_routes.py",
+        "view_name": "performance_meeting_rule_enforcement",
     },
 }
+assert len(GROUP_TEMPLATES) == 8
 
 _STYLE_BLOCK_RE = re.compile(r"<style\b[^>]*>(.*?)</style>", re.IGNORECASE | re.DOTALL)
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
@@ -147,7 +172,7 @@ def _css_path(css_stem: str) -> Path:
 # ---------------------------------------------------------------------------
 # 1) Byte-parity proof: the OLD <style> block content (at HEAD_REF, before
 #    this wave) normalized-hashes identically to the NEW shared CSS file's
-#    normalized hash, independently for each template.
+#    normalized hash, independently for each of the 8 templates.
 # ---------------------------------------------------------------------------
 
 
@@ -166,34 +191,46 @@ def test_old_style_block_byte_parity_with_new_css_file(relative_path: str) -> No
     )
 
 
-def test_both_templates_pre_wave_blocks_were_raw_byte_identical_to_each_other() -> None:
+def test_all_eight_templates_pre_wave_blocks_were_raw_byte_identical_to_each_other() -> None:
     """Independent proof the ORIGINAL duplicate-block claim was correct --
     not just normalize-equal, but byte-for-byte identical before any
-    normalization."""
+    normalization, across all 8 templates (not merely pairwise)."""
     paths = sorted(GROUP_TEMPLATES)
-    raw_blocks = [
-        _extract_style_block_text(_git_show(HEAD_REF, p), p) for p in paths
-    ]
-    assert raw_blocks[0] == raw_blocks[1], (
-        f"{paths[0]} and {paths[1]}: pre-wave <style> blocks were not raw "
-        "byte-identical at HEAD_REF."
+    raw_blocks = {p: _extract_style_block_text(_git_show(HEAD_REF, p), p) for p in paths}
+    first_path = paths[0]
+    first_block = raw_blocks[first_path]
+    mismatches = [p for p in paths[1:] if raw_blocks[p] != first_block]
+    assert mismatches == [], (
+        f"Templates whose pre-wave <style> block was NOT raw byte-identical to "
+        f"{first_path}'s: {mismatches!r}"
     )
+
+
+def test_pre_wave_block_line_count_is_387() -> None:
+    old_text = _git_show(HEAD_REF, "app/templates/performance/meeting_development_faz3.html")
+    old_block = _extract_style_block_text(
+        old_text, "app/templates/performance/meeting_development_faz3.html"
+    )
+    line_count = old_block.count("\n") + 1
+    assert line_count == 387, f"Expected pre-wave <style> block to be 387 lines, found {line_count}."
 
 
 # ---------------------------------------------------------------------------
 # 2) The OLD <style> block (at HEAD_REF) was fully static -- no Jinja, no
-#    url(), no @media print.
+#    url(), no @media print, no @font-face, no !important-driven data
+#    dependency.
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize("relative_path", sorted(GROUP_TEMPLATES))
-def test_old_style_block_was_fully_static_no_jinja_no_url_no_print(relative_path: str) -> None:
+def test_old_style_block_was_fully_static(relative_path: str) -> None:
     old_text = _git_show(HEAD_REF, relative_path)
     old_block = _extract_style_block_text(old_text, relative_path)
     assert "{{" not in old_block, f"{relative_path}: pre-wave <style> block contains a Jinja expression."
     assert "{%" not in old_block, f"{relative_path}: pre-wave <style> block contains a Jinja statement."
     assert "url(" not in old_block, f"{relative_path}: pre-wave <style> block contains a url() reference."
     assert "@media print" not in old_block, f"{relative_path}: pre-wave <style> block contains @media print."
+    assert "@font-face" not in old_block, f"{relative_path}: pre-wave <style> block contains @font-face."
 
 
 # ---------------------------------------------------------------------------
@@ -210,7 +247,8 @@ def test_target_template_now_has_zero_style_blocks(relative_path: str) -> None:
 
 # ---------------------------------------------------------------------------
 # 4) Each template contains EXACTLY ONE <link rel="stylesheet" ...> pointing
-#    at the shared CSS file (no duplicates).
+#    at the shared CSS file (no duplicates), and no OTHER template in the
+#    repo accidentally links this wave's CSS file.
 # ---------------------------------------------------------------------------
 
 
@@ -224,9 +262,29 @@ def test_target_template_links_shared_stylesheet_exactly_once(relative_path: str
     )
 
 
+def test_no_other_template_in_the_repo_links_this_waves_css_file() -> None:
+    scope_roots = [REPO_ROOT / "app" / "templates", REPO_ROOT / "app" / "workflow" / "templates"]
+    modules_root = REPO_ROOT / "app" / "modules"
+    if modules_root.is_dir():
+        scope_roots.extend(p for p in modules_root.glob("*/templates") if p.is_dir())
+
+    offenders: list[str] = []
+    expected = {str((REPO_ROOT / p).resolve()) for p in GROUP_TEMPLATES}
+    for root in scope_roots:
+        for html_path in root.rglob("*.html"):
+            resolved = str(html_path.resolve())
+            text = html_path.read_text(encoding="utf-8", errors="replace")
+            if _LINK_STYLESHEET_RE.search(text) and resolved not in expected:
+                offenders.append(str(html_path.relative_to(REPO_ROOT)))
+    assert offenders == [], (
+        f"Template(s) outside this wave's own 8-template group unexpectedly link "
+        f"css/{GROUP_CSS}.css: {offenders!r}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # 5) The new shared CSS file exists and its content matches the byte-parity
-#    hash independently derived for BOTH templates.
+#    hash independently derived for ALL 8 templates.
 # ---------------------------------------------------------------------------
 
 
@@ -242,12 +300,22 @@ def test_group_css_file_exists_and_matches_every_member_template() -> None:
         )
 
 
+def test_css_content_has_no_jinja_url_or_print_dependency() -> None:
+    css_text = _css_path(GROUP_CSS).read_text(encoding="utf-8")
+    assert "{{" not in css_text
+    assert "{%" not in css_text
+    assert "url(" not in css_text
+    assert "@media print" not in css_text
+    assert "@font-face" not in css_text
+
+
 # ---------------------------------------------------------------------------
 # 6) Route/view function evidence -- grep-based SOURCE evidence that a route
 #    decorator + render_template() call referencing the template exists in
-#    the claimed view file, AND that the owning module is genuinely imported
-#    at startup (not just source-level decorator presence -- see this file's
-#    own module docstring history note on why that distinction matters).
+#    the claimed view file, AND that the owning module is genuinely
+#    registered for import at startup via
+#    app/performance/__init__.py::OPTIONAL_ROUTE_MODULES (not just
+#    source-level decorator presence).
 # ---------------------------------------------------------------------------
 
 
@@ -274,10 +342,8 @@ def test_template_has_route_and_render_evidence_in_owning_file(relative_path: st
     meta = GROUP_TEMPLATES[relative_path]
     view_file_text = (REPO_ROOT / meta["view_file"]).read_text(encoding="utf-8")
     body = _extract_function_body(view_file_text, meta["view_name"])
-    basename_with_dir = "/".join(relative_path.split("/")[-2:])  # e.g. "performance/meeting_development.html"
-    assert basename_with_dir in body or Path(relative_path).name in body, (
-        f"{meta['view_name']}() in {meta['view_file']} does not reference '{relative_path}'."
-    )
+    basename = Path(relative_path).name
+    assert basename in body, f"{meta['view_name']}() in {meta['view_file']} does not reference '{basename}'."
     assert "render_template(" in body, f"{meta['view_name']}() in {meta['view_file']} has no render_template() call."
     decorator_block = _decorator_block_before(view_file_text, meta["view_name"])
     assert re.search(r"@\w+(?:_bp)?\.route\(", decorator_block), (
@@ -287,28 +353,38 @@ def test_template_has_route_and_render_evidence_in_owning_file(relative_path: st
     assert "manager_required" in decorator_block, f"{meta['view_name']}() is missing @manager_required."
 
 
+def test_all_eight_route_modules_are_registered_in_optional_route_modules() -> None:
+    init_text = (REPO_ROOT / "app" / "performance" / "__init__.py").read_text(encoding="utf-8")
+    expected_modules = {Path(meta["view_file"]).stem for meta in GROUP_TEMPLATES.values()}
+    missing = [m for m in expected_modules if f'"{m}"' not in init_text]
+    assert missing == [], (
+        f"Route module(s) not found in app/performance/__init__.py's "
+        f"OPTIONAL_ROUTE_MODULES: {missing!r}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # 7) Real Flask/Jinja render checks via genuine HTTP requests through the
 #    ACTUAL route (not a direct render_template() bypass) -- module-scoped
 #    isolated Flask app with a real admin user + real login, matching the
-#    established Wave2/phase13b/Style-2A/2B/3A fixture pattern (UUID-based
+#    established Wave2/phase13b/Style-2A/2B/3A/3B fixture pattern (UUID-based
 #    temp SQLite, pytest.MonkeyPatch + mp.undo(), WTF_CSRF_ENABLED=False).
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style3b/test_dbs")
+_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style3c/test_dbs")
 _SAFE_RENDER_FALLBACK_MARKERS = ("\u015fablonunda hata var", "\u015fablonu hatal\u0131")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 
 
 @pytest.fixture(scope="module")
-def style3b_env():
+def style3c_env():
     mp = pytest.MonkeyPatch()
     _TEST_DB_ROOT.mkdir(parents=True, exist_ok=True)
     db_path = _TEST_DB_ROOT / f"{uuid.uuid4().hex}.sqlite3"
 
     mp.setenv("APP_ENV", "testing")
     mp.setenv("FLASK_ENV", "testing")
-    mp.setenv("SECRET_KEY", "test-secret-key-for-csp-style3b-contract-min-length-ok")
+    mp.setenv("SECRET_KEY", "test-secret-key-for-csp-style3c-contract-min-length-ok")
     mp.setenv("DEFAULT_FIRST_LOGIN_PASSWORD", "test-password")
     mp.setenv("FLASK_SKIP_SCHEMA_VALIDATION", "1")
     mp.setenv("AUTO_REPAIR_SCHEMA", "false")
@@ -342,23 +418,23 @@ def style3b_env():
     with app.app_context():
         db.create_all()
         user = User(
-            sicil_no="style3b001",
-            email="style3b.contract@ktb.gov.tr",
-            ad="Style3B",
+            sicil_no="style3c001",
+            email="style3c.contract@ktb.gov.tr",
+            ad="Style3C",
             soyad="Kontrat",
             role="admin",
             is_active=True,
             must_change_password=False,
             must_set_security_question=False,
         )
-        user.set_password("Style3BTestContractKey1!")
+        user.set_password("Style3CTestContractKey1!")
         db.session.add(user)
         db.session.commit()
 
     client = app.test_client()
     login_response = client.post(
         "/login",
-        data={"sicil_or_email": "style3b001", "password": "Style3BTestContractKey1!"},
+        data={"sicil_or_email": "style3c001", "password": "Style3CTestContractKey1!"},
         follow_redirects=False,
     )
     assert login_response.status_code == 302, f"Test admin login failed: status={login_response.status_code}"
@@ -372,13 +448,8 @@ def style3b_env():
 
 
 @pytest.mark.parametrize("relative_path", sorted(GROUP_TEMPLATES))
-def test_template_route_renders_successfully_via_real_http_get(style3b_env, relative_path: str) -> None:
-    """Real end-to-end HTTP GET through the actual registered route (not a
-    render_template() bypass) -- both context builders (build_meeting_
-    development_context / build_p3_reminders_context) guard every DB query
-    with `_has_table(...)`, so they run cleanly against a freshly-created,
-    empty schema."""
-    _app, client = style3b_env
+def test_template_route_renders_successfully_via_real_http_get(style3c_env, relative_path: str) -> None:
+    _app, client = style3c_env
     meta = GROUP_TEMPLATES[relative_path]
     response = client.get(meta["route"], follow_redirects=True)
     assert response.status_code == 200, (
@@ -395,10 +466,18 @@ def test_template_route_renders_successfully_via_real_http_get(style3b_env, rela
     # tag is the only place this content appears), not that <style> is
     # absent from the page entirely.
     for style_match in re.finditer(r"<style\b[^>]*>(.*?)</style>", body, re.IGNORECASE | re.DOTALL):
-        assert ".bys-rem-shell" not in style_match.group(1), (
+        assert ".bys-md-shell" not in style_match.group(1), (
             f"{meta['route']}: the extracted CSS's own selector is still duplicated inline "
             "in a <style> block on the rendered page."
         )
+
+
+def test_static_css_file_is_served_with_200(style3c_env) -> None:
+    _app, client = style3c_env
+    response = client.get(f"/static/css/{GROUP_CSS}.css")
+    assert response.status_code == 200, (
+        f"/static/css/{GROUP_CSS}.css returned unexpected status {response.status_code}."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -421,59 +500,41 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # ---------------------------------------------------------------------------
 # 9) Global active/dynamic style ATTRIBUTE totals unchanged (this wave only
 #    touched <style> BLOCKS, never style="..." attributes anywhere) --
-#    global <style> block total dropped by EXACTLY 2.
+#    global <style> block total dropped by EXACTLY 8 (233 -> 225). See
+#    tests/security/test_csp_style_migration_cumulative_inventory_contract.py
+#    ::STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"] for the
+#    manifest entry this cross-checks against.
 # ---------------------------------------------------------------------------
 
-# BYS360 KOORDINATOR DUZELTMESI: was 1060/252 as of Style-3B's own closure.
-# A later, unrelated wave (BYS360 Daily Weather/Mail Orphan Template
-# Temizliği) deleted 4 more confirmed-orphan templates, removing 20 more
-# static style="..." attributes and 4 more <style> blocks: 1060 - 20 = 1040,
-# 252 - 4 = 248. A further later wave (BYS360 Executive Summary Artık
-# Servis/Template Temizliği) deleted 1 more confirmed-orphan template
-# (app/templates/dashboard/executive_summary.html), removing 3 more static
-# style="..." attributes and 1 more <style> block: 1040 - 3 = 1037,
-# 248 - 1 = 247. A further later wave (BYS360 Workflow Orphan Presentation
-# Subsystem Temizliği) deleted 14 more confirmed-orphan templates (2 full
-# trees of 7), removing 2 more static style="..." attributes, 2 dynamic
-# style="..." attributes, and 14 more <style> blocks: 1037 - 2 = 1035,
-# 66 - 2 = 64, 247 - 14 = 233. See tests/security/test_csp_style_migration_
-# cumulative_inventory_contract.py's
-# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"],
-# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"], and
-# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]. A further
-# later wave (style3c_meeting_family_group_a) extracted 8 more <style> blocks
-# from 8 active templates (no static/dynamic attributes touched): 233 - 8 =
-# 225. See that same ledger file's
-# STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1035
-EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B = 64
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 225
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1035
+EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C = 64
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 225
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:
     from tests.security._bys360_style_inventory import compute_inventory_from_worktree
 
     inventory = compute_inventory_from_worktree()
-    assert inventory.active_static_total == EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B, (
+    assert inventory.active_static_total == EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C, (
         f"Repo-wide active (static) style attribute total is "
         f"{inventory.active_static_total}; expected "
-        f"{EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B} (unchanged -- Style-3B must not "
+        f"{EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C} (unchanged -- Style-3C must not "
         "touch any style=\"...\" attribute)."
     )
-    assert inventory.dynamic_total == EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B, (
+    assert inventory.dynamic_total == EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C, (
         f"Repo-wide Jinja-dynamic style attribute total is {inventory.dynamic_total}; "
-        f"expected {EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B} (unchanged)."
+        f"expected {EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C} (unchanged)."
     )
 
 
-def test_repo_wide_style_block_total_dropped_by_exactly_2() -> None:
+def test_repo_wide_style_block_total_dropped_by_exactly_8() -> None:
     from tests.security._bys360_style_inventory import compute_inventory_from_worktree
 
     inventory = compute_inventory_from_worktree()
-    assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B, (
+    assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"254 - 2 = {EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B} (Style-3B removed "
-        "exactly one <style> block from each of its 2 templates and added none)."
+        f"233 - 8 = {EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C} (Style-3C removed "
+        "exactly one <style> block from each of its 8 templates and added none)."
     )
 
 
@@ -530,7 +591,8 @@ def test_csp_style_directives_contain_no_nonce_token(client, directive: str) -> 
 
 # ---------------------------------------------------------------------------
 # 11) Static PWA/service-worker files are byte-identical to git HEAD -- this
-#     wave should not have touched app/static/pwa/ at all.
+#     wave should not have touched app/static/pwa/ or service-worker files
+#     at all.
 # ---------------------------------------------------------------------------
 
 
@@ -549,7 +611,7 @@ def test_pwa_static_directory_is_untouched_by_this_wave() -> None:
     )
     assert result.returncode == 0, f"'git diff --stat' failed: {result.stderr!r}"
     assert result.stdout.strip() == "", (
-        f"app/static/pwa/ has uncommitted changes; Style-3B must not touch it:\n{result.stdout}"
+        f"app/static/pwa/ has uncommitted changes; Style-3C must not touch it:\n{result.stdout}"
     )
 
 
@@ -568,65 +630,73 @@ def test_service_worker_files_are_untouched_by_this_wave() -> None:
     )
     assert result.returncode == 0, f"'git diff --stat' failed: {result.stderr!r}"
     assert result.stdout.strip() == "", (
-        f"service-worker.js/sw.js has uncommitted changes; Style-3B must not touch it:\n{result.stdout}"
+        f"service-worker.js/sw.js has uncommitted changes; Style-3C must not touch it:\n{result.stdout}"
     )
 
 
 # ---------------------------------------------------------------------------
-# 12) Plan-scope guard: this wave's OWN closure commit range touches ONLY
-#     the 2 templates + the new CSS file under app/templates/ and
-#     app/static/css/ -- nothing else, and specifically NOT the two
-#     confirmed-orphan daily_weather_mail files.
-#
-#     BYS360 KOORDINATOR DUZELTMESI: bu test ilk yazildiginda HENUZ
-#     commit'lenmemis calisma agacini `git diff HEAD` ile kontrol
-#     ediyordu -- bu, Style-3B HENUZ commit'lenmemisken DOGRUYDU. Style-3B
-#     commit'lendikten (1d20cde) SONRA, bir SONRAKI dalga (BYS360 Daily
-#     Weather/Mail Orphan Template Temizligi) app/templates/ altinda 4 daha
-#     dosya sildi -- bu, "HEAD"'e karsi live diff kontrolunun artik
-#     Style-3B'nin KENDI degisikligini degil, SONRAKI dalganin degisikligini
-#     de gormesine yol aciyordu (sahte FAIL). Ayni sinif hata, Style-3A'nin
-#     kendi HEAD_REF/STYLE3A_CLOSURE_REF KOORDINATOR NOTU'nda ve bu dosyanin
-#     kendi list_users sozlesme dosyasinda daha once de gorulmustu. Artik
-#     SABIT, Style-3B'nin KENDI commit araligina (HEAD_REF..STYLE3B_CLOSURE_
-#     REF) kilitlendi -- bu, "Style-3B hicbir sey degistirmedi" iddiasini
-#     SONSUZA KADAR dogru sekilde kanitlar, sonraki hicbir commit/dalgadan
-#     (ornegin 4 orphan daily-weather-mail template'ini silen commit'ten)
-#     etkilenmez.
+# 12) Plan-scope guard: comparing the fixed pre-wave ref (HEAD_REF) against
+#     the current on-disk state touches ONLY the 8 templates + the new CSS
+#     file under app/templates/ and app/static/css/ -- nothing else. Uses a
+#     single-ref `git diff --name-status HEAD_REF` (pre-wave ref vs. current
+#     worktree/index), which is correct both before AND immediately after
+#     this wave's own commit lands. Per this repo's own established pattern
+#     (see test_csp_style3a_duplicate_block_extraction_contract.py's and
+#     test_csp_style3b_low_risk_duplicate_extraction_contract.py's own
+#     "KOORDINATOR DUZELTMESI" notes), if a LATER, unrelated wave touches
+#     app/templates/ or app/static/css/ again before this test is corrected
+#     to a fixed two-ref range (HEAD_REF..<this wave's own closure commit>),
+#     this test would need that same follow-up correction then -- not a
+#     currently-known issue, just the same class of drift this repo has
+#     handled before.
 # ---------------------------------------------------------------------------
 
-STYLE3B_CLOSURE_REF = "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47"  # Style-3B'nin KENDI kapanis commit'i
 
-
-def test_style3b_closure_commit_scoped_to_wave_files_only() -> None:
+def test_style3c_diff_scoped_to_wave_files_only() -> None:
+    """NOTE: plain `git diff` never reports untracked files (a brand-new,
+    not-yet-`git add`-ed CSS file is invisible to it), so the new shared CSS
+    file's *addition* is verified separately via
+    `git status --porcelain=v1 --untracked-files=all` -- discovered
+    empirically while writing this test: an earlier version that relied on
+    `git diff --name-status` alone always reported zero added files, even
+    though app/static/css/meeting_development_c_shared.css genuinely existed
+    on disk."""
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
     except OSError:
         pytest.skip("git CLI not available in this environment.")
 
-    result = subprocess.run(
+    diff_result = subprocess.run(
         [
             "git", "-C", str(REPO_ROOT), "diff", "--name-status",
-            f"{HEAD_REF}..{STYLE3B_CLOSURE_REF}", "--", "app/templates/", "app/static/css/",
+            HEAD_REF, "--", "app/templates/", "app/static/css/",
         ],
         capture_output=True,
         text=True,
         timeout=30,
         check=False,
     )
-    assert result.returncode == 0, f"'git diff --name-status' failed: {result.stderr!r}"
+    assert diff_result.returncode == 0, f"'git diff --name-status' failed: {diff_result.stderr!r}"
+
+    status_result = subprocess.run(
+        [
+            "git", "-C", str(REPO_ROOT), "status", "--porcelain=v1", "--untracked-files=all",
+            "--", "app/templates/", "app/static/css/",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert status_result.returncode == 0, f"'git status --porcelain' failed: {status_result.stderr!r}"
 
     expected_modified = set(GROUP_TEMPLATES)
     expected_added = {f"app/static/css/{GROUP_CSS}.css"}
-    orphan_files_must_not_appear = {
-        "app/templates/executive_summary/daily_weather_mail_tasks.html",
-        "app/templates/communication/daily_weather_mail_settings.html",
-    }
 
     modified: set[str] = set()
     added: set[str] = set()
     unexpected: list[str] = []
-    for line in result.stdout.splitlines():
+    for line in diff_result.stdout.splitlines():
         if not line.strip():
             continue
         parts = line.split("\t")
@@ -634,9 +704,30 @@ def test_style3b_closure_commit_scoped_to_wave_files_only() -> None:
         if code == "M" and path in expected_modified:
             modified.add(path)
         elif code == "A" and path in expected_added:
+            # Reachable once this wave's CSS file is committed (tracked): a
+            # single-ref `git diff <ref>` then reports it as "A" against the
+            # pre-wave ref, same as any other committed addition.
             added.add(path)
         else:
-            unexpected.append(f"{code} {path}")
+            unexpected.append(f"diff:{code} {path}")
+
+    for line in status_result.stdout.splitlines():
+        if not line.strip():
+            continue
+        code, path = line[:2], line[3:].strip().replace("\\", "/")
+        if code == "??" and path in expected_added:
+            # Reachable before this wave's CSS file is committed (untracked):
+            # `git diff` never reports untracked files, so this is the only
+            # way to see it pre-commit -- see this test's own docstring.
+            added.add(path)
+        elif "M" in code and path in expected_modified:
+            # Already accounted for via diff_result above (the canonical
+            # source for tracked-file modifications) -- `git status` reports
+            # the same 8 templates as modified, which is expected, not a new
+            # finding.
+            continue
+        elif code.strip():
+            unexpected.append(f"status:{code} {path}")
 
     assert unexpected == [], (
         f"Unexpected changes under app/templates/ or app/static/css/ outside this "
@@ -649,11 +740,6 @@ def test_style3b_closure_commit_scoped_to_wave_files_only() -> None:
     assert added == expected_added, (
         f"New CSS file set does not match: missing={expected_added - added!r}, extra={added - expected_added!r}"
     )
-    for orphan in orphan_files_must_not_appear:
-        assert orphan not in modified and orphan not in added, (
-            f"{orphan} appears in this wave's diff -- it is a confirmed orphan and must "
-            "remain completely untouched by Style-3B."
-        )
 
 
 # ---------------------------------------------------------------------------

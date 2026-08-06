@@ -315,12 +315,15 @@ def test_remaining_hero_action_buttons_are_still_present_and_unchanged() -> None
 #    inventory_contract.py's DELETED_TEMPLATE_WAVES["workflow_orphan_
 #    presentation_cleanup"]. Updated here to match, since this test asserts
 #    against the live worktree, not a frozen snapshot of this fix's own
-#    diff.
+#    diff. A further later wave (style3c_meeting_family_group_a) extracted 8
+#    more <style> blocks from 8 active templates (no static/dynamic
+#    attributes touched), dropping the block total to 225 -- see that same
+#    ledger file's STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
 # ---------------------------------------------------------------------------
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1035
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 233
+EXPECTED_STYLE_BLOCK_TOTAL = 225
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

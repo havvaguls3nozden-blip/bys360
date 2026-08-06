@@ -903,16 +903,20 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # the later workflow_orphan_presentation_cleanup wave (14 confirmed-orphan
 # templates deleted -- two full 7-template trees -- each carried exactly one
 # <style> block -- see that same ledger file's
-# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]).
-# 270 - 10 - 6 - 2 - 4 - 1 - 14 = 233.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14
+# DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]). -8 from
+# the later style3c_meeting_family_group_a wave (8 active templates, each
+# carried exactly one <style> block, extracted to app/static/css/
+# meeting_development_c_shared.css -- see that same ledger file's
+# STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"]).
+# 270 - 10 - 6 - 2 - 4 - 1 - 14 - 8 = 225.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14 - 8
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 - 8 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
         "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "

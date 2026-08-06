@@ -505,9 +505,13 @@ def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> N
 # DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"]. Neither
 # of this wave's own deleted files (app/workflow/routes.py,
 # app/workflow/dashboard_upgrade_routes.py) carried template markup either.
+# A further later wave (style3c_meeting_family_group_a) extracted 8 more
+# <style> blocks from 8 active templates (no static/dynamic attributes
+# touched): 233 - 8 = 225. See that same ledger file's
+# STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
 EXPECTED_ACTIVE_STYLE_TOTAL = 1035
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 233
+EXPECTED_STYLE_BLOCK_TOTAL = 225
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

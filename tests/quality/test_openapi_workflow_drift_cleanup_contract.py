@@ -345,11 +345,19 @@ def test_route_snapshot_and_route_registry_have_no_workflow_entries() -> None:
 # ---------------------------------------------------------------------------
 # 11) Style/CSP inventory completely unaffected (this wave touches only a
 #     docs/ JSON file, outside the Jinja template scan scope entirely).
+#
+#     NOTE: EXPECTED_STYLE_BLOCK_TOTAL reflects the LIVE repo-wide total, not
+#     a frozen snapshot of this wave's own diff -- a later, unrelated wave
+#     (style3c_meeting_family_group_a) extracted 8 more <style> blocks from 8
+#     active templates (no static/dynamic attributes touched), dropping the
+#     total from 233 to 225. See tests/security/test_csp_style_migration_
+#     cumulative_inventory_contract.py's
+#     STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
 # ---------------------------------------------------------------------------
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1035
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 233
+EXPECTED_STYLE_BLOCK_TOTAL = 225
 
 
 def test_style_and_handler_inventory_is_completely_unaffected() -> None:

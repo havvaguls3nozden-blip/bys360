@@ -276,6 +276,25 @@ STYLE_MIGRATION_WAVES: dict[str, _WaveManifestEntry] = {
         "removed_static": 0,
         "removed_blocks": 2,
     },
+    # Style-3C: active meeting-family duplicate <style> block extraction, 8
+    # templates, all raw-byte-identical 387-line blocks extracted to
+    # app/static/css/meeting_development_c_shared.css. See
+    # tests/security/test_csp_style3c_meeting_family_group_a_contract.py for
+    # the full byte-parity/runtime-activity/HTTP evidence.
+    "style3c_meeting_family_group_a": {
+        "templates": (
+            "app/templates/performance/meeting_development_faz3.html",
+            "app/templates/performance/meeting_development_faz4.html",
+            "app/templates/performance/meeting_development_scenarios.html",
+            "app/templates/performance/meeting_final_closure.html",
+            "app/templates/performance/meeting_p0_completion.html",
+            "app/templates/performance/meeting_p1_scope.html",
+            "app/templates/performance/meeting_p2_archive_notes.html",
+            "app/templates/performance/meeting_rule_enforcement.html",
+        ),
+        "removed_static": 0,
+        "removed_blocks": 8,
+    },
 }
 
 class _DeletedWaveManifestEntry(TypedDict):
@@ -529,12 +548,37 @@ KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES = frozenset(
     }
 )
 
+# style3c_meeting_family_group_a is also a BLOCK-only wave (removed_static=0)
+# whose 8 target templates each carry TWO pre-existing, fully-static, byte-
+# identical `style="margin-top:16px;"` attributes on `<section class="bys-md-
+# card">` elements that have nothing to do with the extracted <style> block
+# and were never in this wave's scope. Confirmed identical, byte-for-byte, at
+# the wave's own pre-wave git ref (7a605b228ab27f0b7048391ff9a672b9e9ee5d33)
+# -- i.e. genuinely pre-existing, not introduced by this wave. Same precedent
+# as style3b_low_risk's own KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES above
+# (a wave's target template can carry an unrelated, out-of-scope style="..."
+# the wave never claimed to remove) -- kept as a SEPARATE set/companion test
+# below because the expected per-template count here is 2, not 1.
+KNOWN_PRE_EXISTING_TWO_STATIC_ATTR_TEMPLATES = frozenset(
+    {
+        "app/templates/performance/meeting_development_faz3.html",
+        "app/templates/performance/meeting_development_faz4.html",
+        "app/templates/performance/meeting_development_scenarios.html",
+        "app/templates/performance/meeting_final_closure.html",
+        "app/templates/performance/meeting_p0_completion.html",
+        "app/templates/performance/meeting_p1_scope.html",
+        "app/templates/performance/meeting_p2_archive_notes.html",
+        "app/templates/performance/meeting_rule_enforcement.html",
+    }
+)
+
 
 @pytest.mark.parametrize(
     "relative_path",
     sorted(
         {t for w in STYLE_MIGRATION_WAVES.values() for t in w["templates"]}
         - KNOWN_PRE_EXISTING_STATIC_ATTR_TEMPLATES
+        - KNOWN_PRE_EXISTING_TWO_STATIC_ATTR_TEMPLATES
     ),
 )
 def test_every_wave_target_template_has_zero_active_style_attribute(relative_path: str) -> None:
@@ -568,6 +612,28 @@ def test_known_pre_existing_static_attr_template_has_exactly_the_documented_one_
     assert 'class="bys-rem-card" style="margin-top:16px;"' in text, (
         f"{relative_path}: the documented pre-existing style=\"margin-top:16px;\" "
         "attribute on class=\"bys-rem-card\" was not found byte-for-byte."
+    )
+
+
+@pytest.mark.parametrize("relative_path", sorted(KNOWN_PRE_EXISTING_TWO_STATIC_ATTR_TEMPLATES))
+def test_known_pre_existing_two_static_attr_template_has_exactly_the_documented_two_attributes(
+    relative_path: str,
+) -> None:
+    """Companion check for KNOWN_PRE_EXISTING_TWO_STATIC_ATTR_TEMPLATES above:
+    proves the excluded count is EXACTLY 2 (not silently growing), and that
+    both occurrences are byte-identical to the ones independently confirmed
+    at the wave's own pre-wave git ref -- so this exception can never
+    silently mask a REAL regression."""
+    text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+    count = count_static_style_attrs_in_text(text, relative_path)
+    assert count == 2, (
+        f"{relative_path}: expected exactly 2 pre-existing static style=\"...\" "
+        f"attributes (the documented bys-md-card ones), found {count}."
+    )
+    occurrences = text.count('class="bys-md-card" style="margin-top:16px;"')
+    assert occurrences == 2, (
+        f"{relative_path}: expected exactly 2 byte-identical occurrences of "
+        f"'class=\"bys-md-card\" style=\"margin-top:16px;\"', found {occurrences}."
     )
 
 
