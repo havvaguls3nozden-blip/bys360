@@ -384,12 +384,23 @@ print(json.dumps(payload))
 
 
 def test_source_only_candidates_have_dependencies_that_block_safe_removal():
+    """BYS360 P0 update: this test used to also assert that
+    `app/templates/performance_v2_phase6_dashboard.html` contained
+    `"main.workflow_executive_dashboard"` -- but that reference was itself a
+    LIVE BUG, not a legitimate "blocks safe removal" dependency: the
+    template is rendered by the genuinely ACTIVE `/performance/v2/faz6`
+    route, and the referenced endpoint does not exist at runtime (`app.
+    workflow.routes` is never imported at startup), so every real request
+    to that page raised `werkzeug.routing.exceptions.BuildError` (a 500).
+    See `tests/performance/test_phase6_dashboard_dead_workflow_link_fix.py`
+    for the full fix evidence -- the dead button/link was removed from that
+    template entirely. This test's remaining assertions (about the still-
+    genuinely-source-only `app.workflow.routes`/scorecard-v2 candidates)
+    were not affected by that fix and are unchanged below.
+    """
     route_registry = (REPO_ROOT / "app" / "route_registry.py").read_text(encoding="utf-8")
     workflow_test = (
         REPO_ROOT / "tests" / "workflow" / "test_phase5w_workflow_schema_readiness.py"
-    ).read_text(encoding="utf-8")
-    workflow_template = (
-        REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
     ).read_text(encoding="utf-8")
     scorecard_test = (
         REPO_ROOT / "tests" / "security" / "test_sql_identifier_escaping_negative.py"
@@ -403,11 +414,20 @@ def test_source_only_candidates_have_dependencies_that_block_safe_removal():
 
     assert '"app.workflow.routes"' in route_registry
     assert "from app.workflow import routes" in workflow_test
-    assert "main.workflow_executive_dashboard" in workflow_template
     assert "from app.routes_president_scorecard_v2 import _qident" in scorecard_test
     assert "president_scorecard_v2.president_approval_scorecard_v2" in scorecard_template
     assert "main_bp_workflow_president_approvals" in openapi
     assert "president_scorecard_v2_bp_president_approvals_tr_v2" in openapi
+
+
+def test_performance_v2_phase6_dashboard_no_longer_references_the_dead_workflow_endpoint():
+    """Companion, positive-direction check for the P0 fix documented above:
+    locks in that the dead reference stays gone."""
+    workflow_template = (
+        REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
+    ).read_text(encoding="utf-8")
+    assert "main.workflow_executive_dashboard" not in workflow_template
+    assert "/workflow/executive-dashboard" not in workflow_template
 
 
 def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):

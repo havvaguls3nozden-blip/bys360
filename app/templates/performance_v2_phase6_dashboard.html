@@ -23,7 +23,6 @@
           <a class="bys-pro-btn light" href="{{ url_for('main.performance_v2_phase6_export_xlsx', period_id=period.id) if period else '#' }}"><i class="fa-solid fa-file-excel"></i> Excel</a>
           <a class="bys-pro-btn" href="{{ url_for('main.performance_v2_phase6_print', period_id=period.id) if period else '#' }}"><i class="fa-solid fa-print"></i> Yazdır</a>
           <a class="bys-pro-btn" href="{{ url_for('main.performance_team_compare', period_id=period.id) if period else url_for('main.performance_team_compare') }}"><i class="fa-solid fa-users-viewfinder"></i> Personel Analizi</a>
-          <a class="bys-pro-btn light" href="{{ url_for('main.workflow_executive_dashboard') }}"><i class="fa-solid fa-route"></i> İş Akış Paneli</a>
         </div>
       </div>
       <aside class="bys-pro-hero-panel">
