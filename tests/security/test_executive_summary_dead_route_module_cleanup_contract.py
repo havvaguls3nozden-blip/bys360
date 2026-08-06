@@ -63,12 +63,27 @@ UNTOUCHED for the same reason.
 DELETED: `app/dashboard/executive_summary_routes.py` (150 lines, 3 route
 groups, all confirmed unreachable).
 
-PRESERVED (all explicitly out of scope): `app/services/executive_summary_
-service.py`, `app/templates/dashboard/executive_summary.html`, the real
-`app/executive_summary/` package, `app/communication/daily_weather_mail_
-routes.py`, `app/dashboard/routes.py`, `app/dashboard/__init__.py`,
-`app/route_registry.py`, all launcher/installer scripts, CSS/JS, CSP/nonce,
-meeting templates.
+PRESERVED (all explicitly out of scope, AT THE TIME): `app/services/
+executive_summary_service.py`, `app/templates/dashboard/executive_summary.
+html`, the real `app/executive_summary/` package, `app/communication/
+daily_weather_mail_routes.py`, `app/dashboard/routes.py`,
+`app/dashboard/__init__.py`, `app/route_registry.py`, all launcher/
+installer scripts, CSS/JS, CSP/nonce, meeting templates.
+
+FOLLOW-UP (BYS360 Executive Summary Artık Servis/Template Temizliği, a
+separate, later wave -- the two tests below that used to assert these two
+files still EXIST have been converted to absence contracts): the residual
+candidates flagged above (`app/services/executive_summary_service.py` and
+`app/templates/dashboard/executive_summary.html`) were independently
+re-verified in that follow-up wave -- still zero application/CLI/test
+consumers of either, real isolated `create_app()` still 985 routes /
+byte-identical endpoint SHA, `/dashboard/yonetici-ozeti` still resolves to
+the same live `executive_summary.yonetici_ozeti` view rendering
+`executive_summary/yonetici_ozeti.html` (a completely different template
+from the deleted `dashboard/executive_summary.html`) -- and BOTH files were
+then deleted. `RESIDUAL_CLEANUP_PRE_DELETION_REF` below is the commit
+immediately before that follow-up wave's own deletion (this file's own
+commit, `c5a6a61b47caf2d39ca812b74f7fd22f329629c4`, HEAD at the time).
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 `Path.read_text()`, `git show` (read-only), and real Flask
@@ -89,6 +104,15 @@ DEAD_ROUTE_FILE = "app/dashboard/executive_summary_routes.py"
 # The commit immediately BEFORE this cleanup's own deletion commit -- the
 # repo state where the dead route file still existed on disk.
 PRE_DELETION_REF = "31394332285c54f05d41cbcebd70954d91676e7a"
+
+# The commit immediately BEFORE the LATER "BYS360 Executive Summary Artık
+# Servis/Template Temizliği" follow-up wave's own deletion commit -- the
+# repo state where the two residual files below still existed on disk (see
+# module docstring FOLLOW-UP section).
+RESIDUAL_CLEANUP_PRE_DELETION_REF = "c5a6a61b47caf2d39ca812b74f7fd22f329629c4"
+
+RESIDUAL_SERVICE_FILE = "app/services/executive_summary_service.py"
+RESIDUAL_TEMPLATE_FILE = "app/templates/dashboard/executive_summary.html"
 
 # Independently re-verified (see module docstring) via a real, isolated
 # create_app() both immediately before and immediately after deletion --
@@ -313,33 +337,137 @@ def test_dead_modules_claimed_urls_either_404_or_resolve_to_a_different_live_vie
 
 
 # ---------------------------------------------------------------------------
-# 4) Preserved files: service module and dashboard template untouched
-#    (explicitly out of this task's scope, even though both are now
-#    doubly-orphaned).
+# 4) Residual files (service module + dashboard template): a LATER, separate
+#    wave ("BYS360 Executive Summary Artık Servis/Template Temizliği")
+#    independently re-verified both as still ORPHAN_CONFIRMED and deleted
+#    them. These two tests used to assert the opposite (still exist,
+#    untouched) -- converted to absence contracts, per that follow-up wave's
+#    own evidence (see module docstring FOLLOW-UP section).
 # ---------------------------------------------------------------------------
 
 
-def test_executive_summary_service_module_still_exists_untouched() -> None:
-    """`app/services/executive_summary_service.py` had zero OTHER consumers
-    besides the now-deleted route file, but deleting a service module was
-    not part of this task's declared scope -- it must remain, unmodified,
-    as a residual cleanup candidate for a future, separate task."""
-    service_path = REPO_ROOT / "app/services/executive_summary_service.py"
-    assert service_path.exists(), (
-        "app/services/executive_summary_service.py is missing -- it should have been "
-        "left untouched by this cleanup."
+def test_executive_summary_service_module_no_longer_exists() -> None:
+    """`app/services/executive_summary_service.py` had zero consumers even
+    at the time of THIS file's own original wave (see module docstring);
+    the later residual-cleanup follow-up wave independently re-confirmed
+    that and deleted it."""
+    service_path = REPO_ROOT / RESIDUAL_SERVICE_FILE
+    assert not service_path.exists(), (
+        f"{RESIDUAL_SERVICE_FILE} is recorded as deleted by the residual-cleanup "
+        "follow-up wave but still exists on disk."
     )
 
 
-def test_dashboard_executive_summary_template_still_exists_untouched() -> None:
-    """`app/templates/dashboard/executive_summary.html` (the dead
-    dashboard route's own template) was likewise left untouched -- deleting
-    templates was not part of this task's declared scope."""
-    template_path = REPO_ROOT / "app/templates/dashboard/executive_summary.html"
-    assert template_path.exists(), (
-        "app/templates/dashboard/executive_summary.html is missing -- it should have been "
-        "left untouched by this cleanup."
+def test_executive_summary_service_module_pre_deletion_content_is_reproducible_from_git_history() -> None:
+    """Companion check: RESIDUAL_CLEANUP_PRE_DELETION_REF is a real, correct
+    ref (not a typo'd/broken one that would silently make the absence check
+    above pass vacuously)."""
+    text = _git_show(RESIDUAL_CLEANUP_PRE_DELETION_REF, RESIDUAL_SERVICE_FILE)
+    assert "def build_executive_summary_context(" in text
+    assert "def send_executive_summary_mail(" in text
+
+
+def test_dashboard_executive_summary_template_no_longer_exists() -> None:
+    """`app/templates/dashboard/executive_summary.html` (the dead dashboard
+    route's own template) -- likewise independently re-confirmed
+    ORPHAN_CONFIRMED and deleted by the residual-cleanup follow-up wave."""
+    template_path = REPO_ROOT / RESIDUAL_TEMPLATE_FILE
+    assert not template_path.exists(), (
+        f"{RESIDUAL_TEMPLATE_FILE} is recorded as deleted by the residual-cleanup "
+        "follow-up wave but still exists on disk."
     )
+
+
+def test_dashboard_executive_summary_template_pre_deletion_content_is_reproducible_from_git_history() -> None:
+    """Companion check for the template's own absence contract, same
+    reasoning as the service module's above."""
+    text = _git_show(RESIDUAL_CLEANUP_PRE_DELETION_REF, RESIDUAL_TEMPLATE_FILE)
+    assert '{% extends "base.html" %}' in text
+    assert "execv3" in text
+
+
+def test_no_python_file_anywhere_actually_imports_the_deleted_service_module() -> None:
+    """Repo-wide re-verification (independent of the follow-up wave's own
+    analysis) that no application or CLI code imports the deleted service
+    module by its real module path. Scoped to `app/` and `scripts/` (real
+    code, never a test file's own documentation/needle strings) -- the
+    same scoping trick `test_no_python_file_anywhere_actually_imports_the_
+    dead_module` above already relies on to avoid self-matching its own
+    needle-pattern string literals; this test's needle patterns are
+    themselves such literals, so scanning `tests/` (which would include
+    this very file) would false-positive."""
+    real_import_needle_patterns = (
+        "import executive_summary_service",
+        "from .executive_summary_service",
+        "from app.services.executive_summary_service",
+        "from app.services import executive_summary_service",
+    )
+    offending_files: list[str] = []
+    for scan_root in (REPO_ROOT / "app", REPO_ROOT / "scripts"):
+        for py_file in scan_root.rglob("*.py"):
+            content = py_file.read_text(encoding="utf-8", errors="ignore")
+            if any(pattern in content for pattern in real_import_needle_patterns):
+                offending_files.append(str(py_file.relative_to(REPO_ROOT)))
+    assert not offending_files, (
+        f"A real import of the deleted service module was found: {offending_files!r} "
+        "-- this invalidates the orphan classification."
+    )
+
+
+def test_no_template_anywhere_references_the_deleted_dashboard_template() -> None:
+    """Repo-wide re-verification that no Jinja `render_template`, `include`,
+    or `extends` anywhere still targets the deleted
+    `dashboard/executive_summary.html` path."""
+    offending_files: list[str] = []
+    for template_file in (REPO_ROOT / "app/templates").rglob("*.html"):
+        content = template_file.read_text(encoding="utf-8", errors="ignore")
+        if "dashboard/executive_summary.html" in content:
+            offending_files.append(str(template_file.relative_to(REPO_ROOT)))
+    for py_file in (REPO_ROOT / "app").rglob("*.py"):
+        content = py_file.read_text(encoding="utf-8", errors="ignore")
+        if "dashboard/executive_summary.html" in content or "dashboard\\executive_summary.html" in content:
+            offending_files.append(str(py_file.relative_to(REPO_ROOT)))
+    assert not offending_files, (
+        f"A reference to the deleted template was found: {offending_files!r} -- this "
+        "invalidates the orphan classification."
+    )
+
+
+def test_active_executive_summary_route_still_renders_its_own_unrelated_template() -> None:
+    """Re-proves (independent of the residual-cleanup wave's own claim) that
+    the real, live `/dashboard/yonetici-ozeti` route -- registered from the
+    unrelated `app/executive_summary/` package -- renders
+    `executive_summary/yonetici_ozeti.html`, a completely different template
+    from the one just deleted, and that deleting the orphan template did not
+    change that. Isolated subprocess, same reason as the url_map checks
+    below."""
+    probe_script = (
+        "from app import create_app\n"
+        "app = create_app()\n"
+        "with app.test_request_context():\n"
+        "    from app.executive_summary.routes import yonetici_ozeti\n"
+        "    import inspect\n"
+        "    src = inspect.getsource(yonetici_ozeti)\n"
+        "    print('RENDERS_YONETICI_OZETI_TEMPLATE=%s' % ('executive_summary/yonetici_ozeti.html' in src))\n"
+        "    print('RENDERS_DELETED_TEMPLATE=%s' % ('dashboard/executive_summary.html' in src))\n"
+    )
+    output_lines = _run_isolated_create_app_probe(probe_script)
+    assert "RENDERS_YONETICI_OZETI_TEMPLATE=True" in output_lines, output_lines
+    assert "RENDERS_DELETED_TEMPLATE=False" in output_lines, output_lines
+
+
+def test_active_executive_summary_package_still_imports_cleanly() -> None:
+    """Re-proves the real, live `app.executive_summary` package (routes,
+    service, mail_engine -- the genuinely active code this cleanup must
+    never touch) still imports without error after both deletions."""
+    probe_script = (
+        "from app.executive_summary import executive_summary_bp\n"
+        "from app.executive_summary.service import build_executive_summary_payload\n"
+        "from app.executive_summary.mail_engine import send_executive_summary_email\n"
+        "print('ACTIVE_PACKAGE_IMPORTS_OK=True')\n"
+    )
+    output_lines = _run_isolated_create_app_probe(probe_script)
+    assert "ACTIVE_PACKAGE_IMPORTS_OK=True" in output_lines, output_lines
 
 
 def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> None:
@@ -360,9 +488,18 @@ def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> N
 #    affect the HTML-scoped canonical inventory -- defense-in-depth check).
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1040
+# BYS360 Executive Summary Artık Servis/Template Temizliği (the later
+# residual-cleanup follow-up wave, see module docstring) deleted 1 more
+# confirmed-orphan template (app/templates/dashboard/executive_summary.html),
+# removing 3 static style="..." attributes and 1 <style> block:
+# 1040 - 3 = 1037, 248 - 1 = 247. See tests/security/test_csp_style_
+# migration_cumulative_inventory_contract.py's
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"] for the
+# independently re-derived evidence. The residual service `.py` file
+# carried no template markup, so it contributes 0 to this ledger.
+EXPECTED_ACTIVE_STYLE_TOTAL = 1037
 EXPECTED_DYNAMIC_STYLE_TOTAL = 66
-EXPECTED_STYLE_BLOCK_TOTAL = 248
+EXPECTED_STYLE_BLOCK_TOTAL = 247
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

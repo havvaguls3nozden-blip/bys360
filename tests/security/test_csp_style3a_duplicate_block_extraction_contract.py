@@ -822,12 +822,16 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # static style="..." attributes with them: 1068 - 8 = 1060. A further later
 # wave (BYS360 Daily Weather/Mail Orphan Template Temizliği) deleted 4 more
 # confirmed-orphan templates, removing 20 more static style="..." attributes
-# (5 each, byte-identical): 1060 - 20 = 1040. See
+# (5 each, byte-identical): 1060 - 20 = 1040. A further later wave (BYS360
+# Executive Summary Artık Servis/Template Temizliği) deleted 1 more
+# confirmed-orphan template (app/templates/dashboard/executive_summary.html),
+# removing 3 more static style="..." attributes: 1040 - 3 = 1037. See
 # tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
-# DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"] and
-# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"] for the independently
-# re-derived evidence.
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1040
+# DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"],
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"], and
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"] for the
+# independently re-derived evidence.
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1037
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 66
 
 
@@ -887,9 +891,12 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # STYLE_MIGRATION_WAVES["style3b_low_risk"]). -4 from the later
 # daily_weather_mail_cleanup wave (4 confirmed-orphan templates deleted, each
 # carried exactly one <style> block -- see that same ledger file's
-# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]).
-# 270 - 10 - 6 - 2 - 4 = 248.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4
+# DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]). -1 from the later
+# executive_summary_dashboard_cleanup wave (1 confirmed-orphan template
+# deleted, carried exactly one <style> block -- see that same ledger file's
+# DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"]).
+# 270 - 10 - 6 - 2 - 4 - 1 = 247.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:

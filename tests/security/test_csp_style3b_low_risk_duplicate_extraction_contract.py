@@ -428,11 +428,16 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # A later, unrelated wave (BYS360 Daily Weather/Mail Orphan Template
 # Temizliği) deleted 4 more confirmed-orphan templates, removing 20 more
 # static style="..." attributes and 4 more <style> blocks: 1060 - 20 = 1040,
-# 252 - 4 = 248. See tests/security/test_csp_style_migration_cumulative_
-# inventory_contract.py's DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"].
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1040
+# 252 - 4 = 248. A further later wave (BYS360 Executive Summary Artık
+# Servis/Template Temizliği) deleted 1 more confirmed-orphan template
+# (app/templates/dashboard/executive_summary.html), removing 3 more static
+# style="..." attributes and 1 more <style> block: 1040 - 3 = 1037,
+# 248 - 1 = 247. See tests/security/test_csp_style_migration_cumulative_
+# inventory_contract.py's DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"]
+# and DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"].
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3B = 1037
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3B = 66
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 248
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3B = 247
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:

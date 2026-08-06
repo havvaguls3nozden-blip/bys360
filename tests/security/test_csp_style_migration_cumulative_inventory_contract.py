@@ -96,6 +96,32 @@ module docstrings for the full per-template evidence and the correction of
 a previously-incorrect "CANLI" (live) claim for one of the four. `INITIAL_*`
 constants and all prior wave entries are unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 5 (BYS360 Executive Summary Artık
+Servis/Template Temizliği, a DELETED_TEMPLATE_WAVES-class wave): the prior
+"dead route module" wave (`app/dashboard/executive_summary_routes.py`
+removal, commit `c5a6a61b`) had deliberately left `app/services/
+executive_summary_service.py` and `app/templates/dashboard/executive_
+summary.html` untouched as an explicitly out-of-scope residual candidate
+(neither had any OTHER consumer even then). This follow-up wave
+independently re-verified both are still ORPHAN_CONFIRMED with a real,
+isolated `create_app()` (985 routes, byte-identical endpoint SHA before and
+after) and a repo-wide consumer grep (zero application/CLI/test consumers
+of `app.services.executive_summary_service` beyond the file's own
+self-referential log strings; zero `render_template`/`include`/`extends`
+reference to `dashboard/executive_summary.html` anywhere — the live
+`/dashboard/yonetici-ozeti` route, registered from the unrelated
+`app/executive_summary/` package, renders a completely different template,
+`executive_summary/yonetici_ozeti.html`). The deleted template also
+referenced a nonexistent `url_for('main.executive_summary_send_mail')`
+endpoint, which would have raised a `BuildError` had it ever actually been
+rendered — further evidence it had no live renderer to begin with. Added a
+new `"executive_summary_dashboard_cleanup"` entry: `removed_static=3`,
+`removed_blocks=1`, independently re-derived from the fixed pre-deletion
+git ref (see `DELETED_TEMPLATE_WAVES_PRE_DELETION_REF`). The deleted
+service `.py` file carried no template markup, so it contributes 0 to this
+style/CSP ledger. `INITIAL_*` constants and all prior wave entries are
+unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -272,6 +298,20 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         "removed_static": 20,
         "removed_blocks": 4,
     },
+    # BYS360 Executive Summary Artık Servis/Template Temizliği: residual
+    # orphan left explicitly out-of-scope by the prior dead-route-module
+    # wave, independently re-confirmed ORPHAN_CONFIRMED (see FORWARD-
+    # COMPATIBILITY FOLLOW-UP 5 above for the full evidence). removed_static=3/
+    # removed_blocks=1 are this single template's own static style="..."
+    # attribute count (3: execv3-actions hero spacer, execv3-schedule status
+    # line, execv3-note test-mail banner) and <style> block count (1).
+    "executive_summary_dashboard_cleanup": {
+        "templates": (
+            "app/templates/dashboard/executive_summary.html",
+        ),
+        "removed_static": 3,
+        "removed_blocks": 1,
+    },
 }
 
 # The fixed commit immediately BEFORE each deleted-template wave's own
@@ -280,6 +320,7 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
 DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "orphan_mail_cleanup": "297c8da746a59d84e5f3f9536b92e824ce5bd70a",
     "daily_weather_mail_cleanup": "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47",
+    "executive_summary_dashboard_cleanup": "c5a6a61b47caf2d39ca812b74f7fd22f329629c4",
 }
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
