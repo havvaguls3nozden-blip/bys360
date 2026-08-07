@@ -635,32 +635,34 @@ def test_service_worker_files_are_untouched_by_this_wave() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 12) Plan-scope guard: comparing the fixed pre-wave ref (HEAD_REF) against
-#     the current on-disk state touches ONLY the 8 templates + the new CSS
-#     file under app/templates/ and app/static/css/ -- nothing else. Uses a
-#     single-ref `git diff --name-status HEAD_REF` (pre-wave ref vs. current
-#     worktree/index), which is correct both before AND immediately after
-#     this wave's own commit lands. Per this repo's own established pattern
-#     (see test_csp_style3a_duplicate_block_extraction_contract.py's and
+# 12) Plan-scope guard: a FIXED two-ref range (HEAD_REF..STYLE3C_CLOSURE_REF)
+#     touches ONLY the 8 templates + the new CSS file under app/templates/
+#     and app/static/css/ -- nothing else.
+#
+#     KOORDINATOR DUZELTMESI: this test originally used a single-ref
+#     `git diff --name-status HEAD_REF` (pre-wave ref vs. CURRENT worktree/
+#     index) plus a live `git status --porcelain` fallback for the
+#     not-yet-committed CSS file. That was correct only up until Style-3C's
+#     own commit landed -- exactly the same class of bug already documented
+#     in test_csp_style3a_duplicate_block_extraction_contract.py's and
 #     test_csp_style3b_low_risk_duplicate_extraction_contract.py's own
-#     "KOORDINATOR DUZELTMESI" notes), if a LATER, unrelated wave touches
-#     app/templates/ or app/static/css/ again before this test is corrected
-#     to a fixed two-ref range (HEAD_REF..<this wave's own closure commit>),
-#     this test would need that same follow-up correction then -- not a
-#     currently-known issue, just the same class of drift this repo has
-#     handled before.
+#     "KOORDINATOR DUZELTMESI" notes (this test's own prior docstring even
+#     predicted it: "if a LATER, unrelated wave touches app/templates/ ...
+#     this test would need that same follow-up correction then"). The later,
+#     unrelated "BYS360 Duplicate Template Dalga 1" wave (9 confirmed-orphan
+#     template deletions, none of them Style-3C's own 8 templates) did touch
+#     app/templates/ again, which made the single-ref live-diff form report
+#     those 9 unrelated deletions as "unexpected changes" under this test's
+#     scope. Fixed the same way as Style-3A/3B: pinned BOTH ends to fixed,
+#     historical refs -- STYLE3C_CLOSURE_REF is Style-3C's own already-
+#     pushed closure commit, so this range can never again see any later
+#     wave's changes, no matter how many more land under app/templates/.
 # ---------------------------------------------------------------------------
+
+STYLE3C_CLOSURE_REF = "d4ee2043931b37cef6df2ceef898094e0eebb04d"  # Style-3C'nin KENDI kapanis commit'i
 
 
 def test_style3c_diff_scoped_to_wave_files_only() -> None:
-    """NOTE: plain `git diff` never reports untracked files (a brand-new,
-    not-yet-`git add`-ed CSS file is invisible to it), so the new shared CSS
-    file's *addition* is verified separately via
-    `git status --porcelain=v1 --untracked-files=all` -- discovered
-    empirically while writing this test: an earlier version that relied on
-    `git diff --name-status` alone always reported zero added files, even
-    though app/static/css/meeting_development_c_shared.css genuinely existed
-    on disk."""
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=False, timeout=10)
     except OSError:
@@ -669,7 +671,7 @@ def test_style3c_diff_scoped_to_wave_files_only() -> None:
     diff_result = subprocess.run(
         [
             "git", "-C", str(REPO_ROOT), "diff", "--name-status",
-            HEAD_REF, "--", "app/templates/", "app/static/css/",
+            f"{HEAD_REF}..{STYLE3C_CLOSURE_REF}", "--", "app/templates/", "app/static/css/",
         ],
         capture_output=True,
         text=True,
@@ -677,18 +679,6 @@ def test_style3c_diff_scoped_to_wave_files_only() -> None:
         check=False,
     )
     assert diff_result.returncode == 0, f"'git diff --name-status' failed: {diff_result.stderr!r}"
-
-    status_result = subprocess.run(
-        [
-            "git", "-C", str(REPO_ROOT), "status", "--porcelain=v1", "--untracked-files=all",
-            "--", "app/templates/", "app/static/css/",
-        ],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
-    assert status_result.returncode == 0, f"'git status --porcelain' failed: {status_result.stderr!r}"
 
     expected_modified = set(GROUP_TEMPLATES)
     expected_added = {f"app/static/css/{GROUP_CSS}.css"}
@@ -704,30 +694,9 @@ def test_style3c_diff_scoped_to_wave_files_only() -> None:
         if code == "M" and path in expected_modified:
             modified.add(path)
         elif code == "A" and path in expected_added:
-            # Reachable once this wave's CSS file is committed (tracked): a
-            # single-ref `git diff <ref>` then reports it as "A" against the
-            # pre-wave ref, same as any other committed addition.
             added.add(path)
         else:
             unexpected.append(f"diff:{code} {path}")
-
-    for line in status_result.stdout.splitlines():
-        if not line.strip():
-            continue
-        code, path = line[:2], line[3:].strip().replace("\\", "/")
-        if code == "??" and path in expected_added:
-            # Reachable before this wave's CSS file is committed (untracked):
-            # `git diff` never reports untracked files, so this is the only
-            # way to see it pre-commit -- see this test's own docstring.
-            added.add(path)
-        elif "M" in code and path in expected_modified:
-            # Already accounted for via diff_result above (the canonical
-            # source for tracked-file modifications) -- `git status` reports
-            # the same 8 templates as modified, which is expected, not a new
-            # finding.
-            continue
-        elif code.strip():
-            unexpected.append(f"status:{code} {path}")
 
     assert unexpected == [], (
         f"Unexpected changes under app/templates/ or app/static/css/ outside this "

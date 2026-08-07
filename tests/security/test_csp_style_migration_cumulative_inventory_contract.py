@@ -406,6 +406,34 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         "removed_blocks": 14,
         "removed_dynamic": 2,
     },
+    # BYS360 Duplicate Template Dalga 1: 4 raw-byte-identical duplicate groups
+    # (9 templates total), every one independently re-confirmed
+    # ORPHAN_CONFIRMED (zero render_template/safe_render/Jinja include-extends-
+    # import-from/macro-import/dynamic-name/menu-registry/test consumers
+    # anywhere in the repo -- only incidental mentions in static historical
+    # JSON inventory snapshots and one zip archive report, neither a real
+    # dependency). See
+    # tests/security/test_duplicate_template_orphan_cleanup_wave1_contract.py
+    # for the full per-file evidence. All 9 templates independently measured
+    # 0 static/dynamic style attributes, 0 <style> blocks, 0 inline handlers,
+    # 0 javascript: URLs each -- removed_static/removed_blocks/removed_dynamic
+    # are all 0, this wave has zero style/CSP inventory impact.
+    "duplicate_template_orphan_cleanup_wave1": {
+        "templates": (
+            "app/templates/portal/_press_news_home_hero_v3a.html",
+            "app/templates/portal/_press_news_home_hero_v3a.safe_v1.html",
+            "app/templates/portal/_press_news_home_hero_v3a.safe_v1a.html",
+            "app/templates/_action_suggestion_macros.html",
+            "app/templates/action_suggestion_macros.html",
+            "app/templates/_decision_support_macros.html",
+            "app/templates/decision_support_macros.html",
+            "app/templates/_performance_workspace_macros.html",
+            "app/templates/performance_workspace_macros.html",
+        ),
+        "removed_static": 0,
+        "removed_blocks": 0,
+        "removed_dynamic": 0,
+    },
 }
 
 # The fixed commit immediately BEFORE each deleted-template wave's own
@@ -416,6 +444,7 @@ DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "daily_weather_mail_cleanup": "1d20cdeffdd1f20fe24c3f5414fa5d7ba498df47",
     "executive_summary_dashboard_cleanup": "c5a6a61b47caf2d39ca812b74f7fd22f329629c4",
     "workflow_orphan_presentation_cleanup": "88d148c61f11fe9cc8d323cd8cdce1d80a146dfe",
+    "duplicate_template_orphan_cleanup_wave1": "d4ee2043931b37cef6df2ceef898094e0eebb04d",
 }
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
