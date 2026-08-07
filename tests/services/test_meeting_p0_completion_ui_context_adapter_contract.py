@@ -131,6 +131,60 @@ def test_p0_template_has_no_jinja_safety_violations() -> None:
     assert "javascript:" not in text.lower(), "P0 template must not add a javascript: URL."
 
 
+def test_p0_template_has_no_script_block_and_zero_click_listeners() -> None:
+    """P0's prior body (the shared generic meeting-family shell) carried one
+    <script> block with exactly one addEventListener("click", ...) reload-
+    button hook -- previously guarded by test_csp_wave3_meeting_group_b_
+    contract.py's own test_meeting_group_b_file_has_exactly_one_click_
+    listener / test_bys_md_template_render_includes_reload_hook (both
+    removed from that file's own parametrize list for this path, since P0
+    no longer belongs to that reload-button group by deliberate redesign --
+    see this file's module docstring). This wave's own redesign is a pure,
+    static, read-only status screen with NO interactivity at all -- stronger
+    than "exactly one listener", not weaker: this asserts zero script
+    surface, not just a correctly-wired one."""
+    text = (REPO_ROOT / TEMPLATE_FILE).read_text(encoding="utf-8")
+    assert "<script" not in text.lower(), "P0 template must not contain any <script> block."
+    assert "addEventListener" not in text, "P0 template must not register any event listener."
+
+
+def test_p0_template_has_no_fake_data_onclick_attribute() -> None:
+    """Direct replacement for test_csp_wave3_meeting_group_b_contract.py's
+    own (now-removed-for-this-path) test_meeting_group_b_file_does_not_use_
+    fake_data_onclick_attribute."""
+    text = (REPO_ROOT / TEMPLATE_FILE).read_text(encoding="utf-8")
+    assert "data-onclick" not in text
+
+
+def test_p0_template_introduces_no_dangerous_js_sinks() -> None:
+    """Direct replacement for test_csp_wave3_meeting_group_b_contract.py's
+    own (now-removed-for-this-path) test_meeting_group_b_file_introduces_
+    no_dangerous_js_sinks."""
+    text = (REPO_ROOT / TEMPLATE_FILE).read_text(encoding="utf-8")
+    for forbidden in ("eval(", "new Function(", "document.write("):
+        assert forbidden not in text, f"P0 template contains a forbidden JS sink: {forbidden}"
+
+
+def test_p0_rendered_output_has_no_inline_handlers_or_dangerous_sinks(p0_response_body) -> None:
+    """Real-render counterpart (not just static source read) to the checks
+    above -- direct replacement for test_csp_wave3_meeting_group_b_
+    contract.py's own (now-removed-for-this-path) test_meeting_group_b_
+    template_render_has_no_inline_handlers. Scoped to the P0 shell content
+    only (data-page="meeting-p0-completion" ... its closing </div>), not the
+    whole page, since base.html legitimately carries its own <script> blocks
+    (topbar/sidebar/assistant JS) that are out of this wave's scope."""
+    _status, body = p0_response_body
+    start = body.find('data-page="meeting-p0-completion"')
+    end = body.find("<script", start) if start != -1 else -1
+    assert start != -1, "Could not locate the P0 shell content in the rendered response."
+    shell_only = body[start : end if end != -1 else start + 20000]
+    assert not re.search(r'\bon\w+\s*=\s*"', shell_only, re.IGNORECASE)
+    assert "javascript:" not in shell_only.lower()
+    assert "data-onclick" not in shell_only
+    for forbidden in ("eval(", "new Function(", "document.write("):
+        assert forbidden not in shell_only
+
+
 def test_p0_template_links_shared_css_exactly_once_and_no_new_css_file() -> None:
     text = (REPO_ROOT / TEMPLATE_FILE).read_text(encoding="utf-8")
     matches = re.findall(
