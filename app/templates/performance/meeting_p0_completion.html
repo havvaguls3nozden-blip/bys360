@@ -1,110 +1,92 @@
 {% extends "base.html" %}
 
-{% block title %}Hatırlatma ve Gelişim Takibi{% endblock %}
+{% block title %}{{ title|default('P0 Tamamlama') }}{% endblock %}
 
 {% block content %}
-{% set page_summary = page_summary if page_summary is defined and page_summary else {} %}
-{% set reminder_items = reminder_items if reminder_items is defined and reminder_items else [] %}
-{% set overdue_items = overdue_items if overdue_items is defined and overdue_items else [] %}
-{% set development_items = development_items if development_items is defined and development_items else [] %}
-{% set mail_items = mail_items if mail_items is defined and mail_items else [] %}
+{% set cards = cards if cards is defined and cards else [] %}
+{% set scenarios = scenarios if scenarios is defined and scenarios else [] %}
+{% set categories = categories if categories is defined and categories else [] %}
+{% set settings = settings if settings is defined and settings else [] %}
+{% set warnings = warnings if warnings is defined and warnings else [] %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/meeting_development_c_shared.css') }}">
 
-<div class="bys-md-shell" data-page="meeting-development-clean">
+<div class="bys-md-shell" data-page="meeting-p0-completion">
     <section class="bys-md-hero">
         <div class="bys-md-eyebrow">
-            <i class="fa-solid fa-bell"></i>
-            Performans Yönetimi
+            <i class="fa-solid fa-shield-halved"></i>
+            Performans Yönetimi · P0 Hazırlık
         </div>
 
-        <h1 class="bys-md-title">Hatırlatma ve Gelişim Takibi</h1>
+        <h1 class="bys-md-title">{{ title|default('P0 Tamamlama') }}</h1>
 
         <p class="bys-md-subtitle">
-            Değerlendirme sürecindeki bekleyen işler, geciken değerlendirmeler, gelişim önerileri ve bildirim kayıtları
-            tek ekranda izlenir. Bu ekran yalnızca yetki kapsamındaki bilgileri gösterir; karar veya puan üretmez.
+            Toplantıda acil olarak belirlenen P0 kararlarının yalnızca ekranda not olarak kalmaması için; ayar,
+            kategori, görünürlük ve düşük performans kilidi seviyesinde hazırlık durumu bu ekranda izlenir. Bu ekran
+            salt-okunurdur; ayar değiştirmez, onarım tetiklemez.
         </p>
 
+        {% if cards %}
         <div class="bys-md-grid">
+            {% for card in cards %}
             <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-list-check"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.pending_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Bekleyen değerlendirme ve takip işi</div>
+                <div class="bys-md-stat-icon">
+                    <i class="fa-solid {% if loop.index0 == 0 %}fa-list-check{% elif loop.index0 == 1 %}fa-layer-group{% elif loop.index0 == 2 %}fa-sliders{% else %}fa-lock{% endif %}"></i>
+                </div>
+                <div class="bys-md-stat-number">{{ card.value|default('-') }}</div>
+                <div class="bys-md-stat-label">{{ card.label|default('') }}{% if card.note %} · {{ card.note }}{% endif %}</div>
             </div>
-
-            <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-clock"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.overdue_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Süresi geçen veya dikkat isteyen kayıt</div>
-            </div>
-
-            <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.reminder_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Gönderilen hatırlatma ve bilgilendirme</div>
-            </div>
-
-            <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-seedling"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.development_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Gelişim önerisi veya takip notu</div>
-            </div>
+            {% endfor %}
         </div>
+        {% endif %}
     </section>
-
-    <div class="bys-md-toolbar">
-        <input id="bysMdSearch" class="bys-md-input" type="search" placeholder="Personel, birim, amir veya süreç başlığı ara...">
-        <select id="bysMdStatus" class="bys-md-select">
-            <option value="">Tüm durumlar</option>
-            <option value="bekliyor">Bekliyor</option>
-            <option value="gecikti">Gecikti</option>
-            <option value="tamamlandi">Tamamlandı</option>
-            <option value="gelisim">Gelişim Takibi</option>
-        </select>
-        <button type="button" id="bysMdReloadBtn" class="btn btn-sm btn-outline-secondary">
-            <i class="fa-solid fa-rotate-right me-1"></i> Yenile
-        </button>
-    </div>
 
     <section class="bys-md-section-grid">
         <div class="bys-md-card">
             <div class="bys-md-card-header">
                 <div>
-                    <h2 class="bys-md-card-title">Süreçte Dikkat Gerektiren Kayıtlar</h2>
+                    <h2 class="bys-md-card-title">Gerekli Ayarlar</h2>
                     <p class="bys-md-card-desc">
-                        Süresi yaklaşan, geciken veya yöneticinin kontrol etmesi gereken kayıtlar burada özetlenir.
+                        P0 kararlarının uygulanabilmesi için gereken performans ayarlarının veritabanındaki güncel
+                        durumu.
                     </p>
                 </div>
-                <span class="bys-md-badge bys-md-badge-warning">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    Yetki kapsamlı görünüm
+                <span class="bys-md-badge">
+                    <i class="fa-solid fa-gear"></i>
+                    {{ settings|length }} ayar
                 </span>
             </div>
             <div class="bys-md-card-body">
-                {% if overdue_items %}
+                {% if settings %}
                 <div class="bys-md-list">
-                    {% for item in overdue_items %}
-                    <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default('') ~ ' ' ~ item.manager_name|default(''))|lower }}" data-status="{{ item.status_key|default('gecikti') }}">
+                    {% for item in settings %}
+                    <article class="bys-md-list-item">
                         <span class="bys-md-dot"></span>
                         <div>
-                            <h3 class="bys-md-item-title">{{ item.title|default('Dikkat gerektiren kayıt') }}</h3>
-                            <div class="bys-md-item-meta">
-                                {{ item.personnel_name|default('Personel bilgisi') }}
-                                {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
-                                {% if item.manager_name is defined and item.manager_name %} · Sorumlu: {{ item.manager_name }}{% endif %}
-                            </div>
+                            <h3 class="bys-md-item-title">{{ item.label|default(item.setting_key)|default('Ayar') }}</h3>
+                            {% if item.description %}
+                            <div class="bys-md-item-meta">{{ item.description }}</div>
+                            {% endif %}
                         </div>
-                        <span class="bys-md-badge bys-md-badge-danger">
-                            {{ item.status_label|default('Kontrol Gerekiyor') }}
+                        {% if item.value_text|default('') in ('true', 'True', '1') %}
+                        <span class="bys-md-badge bys-md-badge-success">
+                            <i class="fa-solid fa-circle-check"></i> Açık
                         </span>
+                        {% elif item.value_text|default('') in ('false', 'False', '0') %}
+                        <span class="bys-md-badge bys-md-badge-danger">
+                            <i class="fa-solid fa-circle-xmark"></i> Kapalı
+                        </span>
+                        {% else %}
+                        <span class="bys-md-badge">{{ item.value_text|default('Değer yok') }}</span>
+                        {% endif %}
                     </article>
                     {% endfor %}
                 </div>
                 {% else %}
                 <div class="bys-md-empty">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <div><strong>Dikkat gerektiren gecikmiş kayıt görünmüyor.</strong></div>
-                    <div>Yetki kapsamınızda açık bir aksama yoksa bu alan boş kalır.</div>
+                    <i class="fa-solid fa-gear"></i>
+                    <div><strong>Gerekli ayarlar henüz veritabanında bulunmuyor.</strong></div>
+                    <div>Ayarlar hazırlandığında bu alanda listelenir.</div>
                 </div>
                 {% endif %}
             </div>
@@ -113,49 +95,41 @@
         <aside class="bys-md-card">
             <div class="bys-md-card-header">
                 <div>
-                    <h2 class="bys-md-card-title">Hızlı İşlemler</h2>
-                    <p class="bys-md-card-desc">Sık kullanılan performans takip ekranlarına güvenli geçiş.</p>
+                    <h2 class="bys-md-card-title">P0 Kontrol Listesi</h2>
+                    <p class="bys-md-card-desc">
+                        Toplantıdan çıkan kritik P0 senaryolarının her birinin güncel geçti/kontrol-gerekli durumu.
+                    </p>
                 </div>
+                <span class="bys-md-badge {% if scenarios and scenarios|selectattr('ok')|list|length == scenarios|length %}bys-md-badge-success{% else %}bys-md-badge-warning{% endif %}">
+                    <i class="fa-solid fa-list-check"></i>
+                    {{ scenarios|selectattr('ok')|list|length }}/{{ scenarios|length }} geçti
+                </span>
             </div>
             <div class="bys-md-card-body">
-                <div class="bys-md-actions">
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_tracking') }}">
+                {% if scenarios %}
+                <div class="bys-md-list">
+                    {% for item in scenarios %}
+                    <article class="bys-md-list-item">
+                        <span class="bys-md-dot"></span>
                         <div>
-                            <strong>Süreç Takibine Git</strong>
-                            <span>Bekleyen ve tamamlanan süreçleri incele.</span>
+                            <h3 class="bys-md-item-title">{{ item.title|default(item.code)|default('P0 kontrolü') }}</h3>
+                            {% if item.code %}
+                            <div class="bys-md-item-meta">{{ item.code }}</div>
+                            {% endif %}
                         </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_reports') }}">
-                        <div>
-                            <strong>Süreç Raporlarını Aç</strong>
-                            <span>Geciken işler ve yoğunlukları değerlendir.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_interim_notes_manager') }}">
-                        <div>
-                            <strong>Dönem İçi Notlar</strong>
-                            <span>Gelişim, başarı ve gözlem notlarını yönet.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_development_guidance') }}">
-                        <div>
-                            <strong>Gelişim Rehberi</strong>
-                            <span>Karne sonrası öneri ve takip alanını aç.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+                        <span class="bys-md-badge {% if item.ok %}bys-md-badge-success{% else %}bys-md-badge-warning{% endif %}">
+                            {{ item.status|default('Kontrol gerekli') }}
+                        </span>
+                    </article>
+                    {% endfor %}
                 </div>
-
-                <div class="bys-md-note">
-                    <strong>Bilgi:</strong> Bu ekran performans puanı üretmez ve idari karar vermez. Yalnızca
-                    yetkili olduğunuz süreçleri takip etmenizi ve gerekli ekrana güvenli şekilde geçmenizi sağlar.
+                {% else %}
+                <div class="bys-md-empty">
+                    <i class="fa-solid fa-list-check"></i>
+                    <div><strong>Henüz görüntülenecek P0 kontrolü yok.</strong></div>
+                    <div>Kontroller hazırlandığında bu alanda listelenir.</div>
                 </div>
+                {% endif %}
             </div>
         </aside>
     </section>
@@ -163,65 +137,51 @@
     <section class="bys-md-card" style="margin-top:16px;">
         <div class="bys-md-card-header">
             <div>
-                <h2 class="bys-md-card-title">Hatırlatma ve Bildirim Kayıtları</h2>
+                <h2 class="bys-md-card-title">Kategori ve Hazırlık Durumu</h2>
                 <p class="bys-md-card-desc">
-                    Değerlendirme sürecindeki hatırlatma, bildirim ve e-posta kayıtları kurumsal takip amacıyla listelenir.
+                    P0 kararları için gereken varsayılan personel/grup kategorilerinin kaydı ve hazırlık sırasında
+                    oluşan uyarılar.
                 </p>
             </div>
             <span class="bys-md-badge">
-                <i class="fa-solid fa-envelope-open-text"></i>
-                Kayıtlı iletişim
+                <i class="fa-solid fa-layer-group"></i>
+                {{ categories|length }} kategori
             </span>
         </div>
-
         <div class="bys-md-card-body">
-            {% if reminder_items or mail_items %}
-            <div class="bys-md-table-wrap">
-                <table class="bys-md-table">
-                    <thead>
-                        <tr>
-                            <th>Kayıt</th>
-                            <th>İlgili Kişi / Birim</th>
-                            <th>Tür</th>
-                            <th>Durum</th>
-                            <th>Tarih</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in reminder_items %}
-                        <tr data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="{{ item.status_key|default('bekliyor') }}">
-                            <td><strong>{{ item.title|default('Hatırlatma kaydı') }}</strong></td>
-                            <td>
-                                {{ item.personnel_name|default('Yetki kapsamındaki kayıt') }}
-                                {% if item.unit_name is defined and item.unit_name %}<br><small class="text-muted">{{ item.unit_name }}</small>{% endif %}
-                            </td>
-                            <td>{{ item.type_label|default('Sistem içi hatırlatma') }}</td>
-                            <td><span class="bys-md-badge">{{ item.status_label|default('Bekliyor') }}</span></td>
-                            <td>{{ item.created_at_label|default('-') }}</td>
-                        </tr>
-                        {% endfor %}
+            {% if warnings %}
+            <div class="bys-md-note">
+                <strong>Uyarı:</strong>
+                <ul class="mb-0">
+                    {% for warning in warnings %}
+                    <li>{{ warning }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
-                        {% for item in mail_items %}
-                        <tr data-search="{{ (item.subject|default('') ~ ' ' ~ item.recipient_label|default(''))|lower }}" data-status="{{ item.status_key|default('tamamlandi') }}">
-                            <td><strong>{{ item.subject|default('E-posta bilgilendirmesi') }}</strong></td>
-                            <td>{{ item.recipient_label|default('Alıcı bilgisi') }}</td>
-                            <td>{{ item.type_label|default('E-posta') }}</td>
-                            <td>
-                                <span class="bys-md-badge {% if item.status_key|default('') == 'tamamlandi' %}bys-md-badge-success{% endif %}">
-                                    {{ item.status_label|default('Kayıt Oluştu') }}
-                                </span>
-                            </td>
-                            <td>{{ item.created_at_label|default('-') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            {% if categories %}
+            <div class="bys-md-list">
+                {% for item in categories %}
+                <article class="bys-md-list-item">
+                    <span class="bys-md-dot"></span>
+                    <div>
+                        <h3 class="bys-md-item-title">{{ item.category_name|default('Kategori') }}</h3>
+                        {% if item.description %}
+                        <div class="bys-md-item-meta">{{ item.description }}</div>
+                        {% endif %}
+                    </div>
+                    <span class="bys-md-badge {% if item.is_active %}bys-md-badge-success{% else %}bys-md-badge-danger{% endif %}">
+                        {% if item.is_active %}Aktif{% else %}Pasif{% endif %}
+                    </span>
+                </article>
+                {% endfor %}
             </div>
             {% else %}
             <div class="bys-md-empty">
-                <i class="fa-solid fa-inbox"></i>
-                <div><strong>Henüz görüntülenecek hatırlatma kaydı yok.</strong></div>
-                <div>Süreç ilerledikçe bildirim ve e-posta kayıtları burada listelenir.</div>
+                <i class="fa-solid fa-layer-group"></i>
+                <div><strong>Henüz kayıtlı kategori bulunmuyor.</strong></div>
+                <div>Varsayılan kategoriler hazırlandığında bu alanda listelenir.</div>
             </div>
             {% endif %}
         </div>
@@ -230,76 +190,23 @@
     <section class="bys-md-card" style="margin-top:16px;">
         <div class="bys-md-card-header">
             <div>
-                <h2 class="bys-md-card-title">Gelişim Takibi</h2>
+                <h2 class="bys-md-card-title">Düşük Puan Kilidi Onarım Durumu</h2>
                 <p class="bys-md-card-desc">
-                    Performans sonucunun yalnızca puanla kapanmaması için gelişim önerileri ve takip notları burada izlenir.
+                    70 altı puan kilidiyle ilgili otomatik onarım kaydı, yalnızca ilgili bakım işlemi çalıştırıldığında
+                    oluşur.
                 </p>
             </div>
-            <span class="bys-md-badge bys-md-badge-success">
-                <i class="fa-solid fa-seedling"></i>
-                Gelişim odaklı takip
-            </span>
         </div>
-
         <div class="bys-md-card-body">
-            {% if development_items %}
-            <div class="bys-md-list">
-                {% for item in development_items %}
-                <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="gelisim">
-                    <span class="bys-md-dot"></span>
-                    <div>
-                        <h3 class="bys-md-item-title">{{ item.title|default('Gelişim önerisi') }}</h3>
-                        <div class="bys-md-item-meta">
-                            {{ item.personnel_name|default('Personel') }}
-                            {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
-                            {% if item.note is defined and item.note %}<br>{{ item.note }}{% endif %}
-                        </div>
-                    </div>
-                    <span class="bys-md-badge bys-md-badge-success">
-                        {{ item.status_label|default('Takipte') }}
-                    </span>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
             <div class="bys-md-empty">
-                <i class="fa-solid fa-seedling"></i>
-                <div><strong>Gelişim takibi için açık kayıt bulunmuyor.</strong></div>
-                <div>Gelişim önerileri oluşturuldukça bu alanda yetki kapsamına göre görüntülenir.</div>
+                <i class="fa-solid fa-lock"></i>
+                <div><strong>Bu ekrandan onarım işlemi başlatılmaz.</strong></div>
+                <div>
+                    Düşük puan kilidi onarım sonucu, bu salt-okunur hazırlık ekranının context'inde yer almaz; ilgili
+                    bakım işlemi ayrı bir işlem olarak çalıştırıldığında kayıt oluşur.
+                </div>
             </div>
-            {% endif %}
         </div>
     </section>
 </div>
-
-<script>
-(function () {
-    const search = document.getElementById("bysMdSearch");
-    const status = document.getElementById("bysMdStatus");
-
-    function normalize(value) {
-        return (value || "").toLocaleLowerCase("tr-TR").trim();
-    }
-
-    function applyFilters() {
-        const q = normalize(search ? search.value : "");
-        const selected = normalize(status ? status.value : "");
-        const rows = document.querySelectorAll("[data-search][data-status]");
-
-        rows.forEach(function (row) {
-            const haystack = normalize(row.getAttribute("data-search"));
-            const state = normalize(row.getAttribute("data-status"));
-            const matchesSearch = !q || haystack.indexOf(q) !== -1;
-            const matchesStatus = !selected || state === selected;
-            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-        });
-    }
-
-    if (search) search.addEventListener("input", applyFilters);
-    if (status) status.addEventListener("change", applyFilters);
-
-    const reloadBtn = document.getElementById("bysMdReloadBtn");
-    if (reloadBtn) reloadBtn.addEventListener("click", function () { window.location.reload(); });
-})();
-</script>
 {% endblock %}

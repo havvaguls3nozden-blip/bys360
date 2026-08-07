@@ -50,8 +50,23 @@ P3_REMINDERS_TEMPLATE = "app/templates/performance/meeting_p3_reminders.html"
 FINAL_CLOSURE_TEMPLATE = "app/templates/performance/meeting_final_closure.html"
 RULE_ENFORCEMENT_TEMPLATE = "app/templates/performance/meeting_rule_enforcement.html"
 
+# KOORDINATOR DUZELTMESI: meeting_p0_completion.html originally belonged to
+# this six-file "Group B" (same onclick->addEventListener reload-button
+# pattern as its siblings). A later, legitimate wave ("BYS360 Meeting UI
+# Context Adapter -- Dalga 1 / P0 Completion") rewrote that ONE template's
+# entire body into a real, read-only P0 status screen with zero
+# interactivity (no search/filter, no reload button, no <script> block at
+# all) -- see test_meeting_p0_completion_ui_context_adapter_contract.py for
+# that wave's own full evidence chain, including its own "no inline
+# handler/no javascript:/no |safe" static checks that now cover this file
+# instead. Removed from both lists below so this Wave-3 contract's OWN
+# "exactly one reload-button click listener" / "bysMdReloadBtn id present"
+# assertions no longer see that later, unrelated, in-scope redesign as a
+# regression -- same class of drift already handled for
+# test_csp_style3c_meeting_family_group_a_contract.py's own scope-guard test
+# and test_meeting_p0_completion_settings_query_dialect_fix_contract.py's
+# own MEETING_FAMILY_TEMPLATES list.
 WAVE3_MEETING_GROUP_B_FILES = [
-    P0_COMPLETION_TEMPLATE,
     P1_SCOPE_TEMPLATE,
     P2_ARCHIVE_NOTES_TEMPLATE,
     P3_REMINDERS_TEMPLATE,
@@ -59,9 +74,10 @@ WAVE3_MEETING_GROUP_B_FILES = [
     RULE_ENFORCEMENT_TEMPLATE,
 ]
 
-# "bysMdReloadBtn" id'sini kullanan dosyalar (5 tanesi byte-ayni icerige sahip).
+# "bysMdReloadBtn" id'sini kullanan dosyalar (kalan 4 tanesi byte-ayni
+# icerige sahip; meeting_p0_completion.html yukaridaki KOORDINATOR
+# DUZELTMESI nedeniyle bu listeden cikarildi).
 BYS_MD_RELOAD_BTN_FILES = [
-    P0_COMPLETION_TEMPLATE,
     P1_SCOPE_TEMPLATE,
     P2_ARCHIVE_NOTES_TEMPLATE,
     FINAL_CLOSURE_TEMPLATE,

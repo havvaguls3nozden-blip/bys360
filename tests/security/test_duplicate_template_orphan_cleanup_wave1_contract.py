@@ -115,12 +115,23 @@ PRESERVED_SHADOW_COPY_SURVIVORS: tuple[str, ...] = (
     "app/templates/_premium_workspace_macros.html",
 )
 
+# KOORDINATOR DUZELTMESI: originally included meeting_p0_completion.html --
+# correct while this orphan-cleanup wave was the most recent thing to touch
+# app/templates/performance/. A later, legitimate wave ("BYS360 Meeting UI
+# Context Adapter -- Dalga 1 / P0 Completion") rewrote ONLY that one
+# template's body (see test_meeting_p0_completion_ui_context_adapter_
+# contract.py for that wave's own full evidence chain) -- an intentional,
+# in-scope change for that later wave, not a regression of this one.
+# Removed here so this wave's OWN untouched-template assertion no longer
+# sees that later, unrelated wave's legitimate edit -- same class of drift
+# already handled for test_csp_style3c_meeting_family_group_a_contract.py's
+# own scope-guard test and test_meeting_p0_completion_settings_query_
+# dialect_fix_contract.py's own MEETING_FAMILY_TEMPLATES list.
 MEETING_FAMILY_TEMPLATES: tuple[str, ...] = (
     "app/templates/performance/meeting_development_faz3.html",
     "app/templates/performance/meeting_development_faz4.html",
     "app/templates/performance/meeting_development_scenarios.html",
     "app/templates/performance/meeting_final_closure.html",
-    "app/templates/performance/meeting_p0_completion.html",
     "app/templates/performance/meeting_p1_scope.html",
     "app/templates/performance/meeting_p2_archive_notes.html",
     "app/templates/performance/meeting_rule_enforcement.html",
