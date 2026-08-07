@@ -54,9 +54,21 @@ CONTEXT_BUILDER_FILE = "app/services/performance/meeting_p0_completion.py"
 # commit.
 PRE_WAVE_REF = "dafa242da193bc0f30e572db00ea2762341c5004"
 
-OTHER_SEVEN_MEETING_TEMPLATES: tuple[str, ...] = (
+# KOORDINATOR DUZELTMESI: originally included meeting_development_faz4.html
+# -- correct while this P0 UI wave was the most recent thing to touch
+# app/templates/performance/. A later, legitimate wave ("BYS360 Meeting UI
+# Context Adapter -- Dalga 2 / Final Gate") rewrote that ONE template's body
+# to render build_final_gate_context()'s real fields (see
+# test_meeting_final_gate_ui_context_adapter_contract.py for that wave's own
+# full evidence chain) -- an intentional, in-scope change for that later
+# wave, not a regression of this one. Removed here so this P0 wave's OWN
+# "other 7 untouched" assertion no longer sees that later, unrelated wave's
+# legitimate edit -- same class of drift already handled elsewhere in this
+# repo (Style-3C's own scope-guard test, the duplicate-template orphan
+# cleanup wave's and the P0 SQL-fix wave's own MEETING_FAMILY_TEMPLATES
+# lists).
+OTHER_SIX_MEETING_TEMPLATES: tuple[str, ...] = (
     "app/templates/performance/meeting_development_faz3.html",
-    "app/templates/performance/meeting_development_faz4.html",
     "app/templates/performance/meeting_development_scenarios.html",
     "app/templates/performance/meeting_final_closure.html",
     "app/templates/performance/meeting_p1_scope.html",
@@ -226,12 +238,13 @@ def test_p0_backend_files_are_untouched_by_this_wave(relative_path: str) -> None
     assert current == pre_wave, f"{relative_path}: byte content changed since pre-wave ref -- backend must be untouched."
 
 
-# 19) Other 7 meeting templates untouched.
-@pytest.mark.parametrize("relative_path", OTHER_SEVEN_MEETING_TEMPLATES)
-def test_other_seven_meeting_templates_are_untouched(relative_path: str) -> None:
+# 19) Other 6 meeting templates untouched (was 7 -- see
+#     OTHER_SIX_MEETING_TEMPLATES's own KOORDINATOR DUZELTMESI comment).
+@pytest.mark.parametrize("relative_path", OTHER_SIX_MEETING_TEMPLATES)
+def test_other_six_meeting_templates_are_untouched(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, relative_path))
-    assert current == pre_wave, f"{relative_path}: byte content changed -- other 7 meeting templates must be untouched."
+    assert current == pre_wave, f"{relative_path}: byte content changed -- other 6 meeting templates must be untouched."
 
 
 # ---------------------------------------------------------------------------

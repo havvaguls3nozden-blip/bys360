@@ -51,12 +51,27 @@ WAVE3_GROUP_A_FILES = [
     FEEDBACK_MEETING_GUIDE_TEMPLATE,
 ]
 
-# "Yenile" reload butonunu iceren bes dosya (feedback_meeting_guide haric).
+# KOORDINATOR DUZELTMESI: meeting_development_faz4.html originally belonged
+# to this reload-button group (same onclick->addEventListener pattern as its
+# siblings). A later, legitimate wave ("BYS360 Meeting UI Context Adapter --
+# Dalga 2 / Final Gate") rewrote that ONE template's entire body into a real,
+# read-only Final Gate status report with zero interactivity (no search/
+# filter, no reload button, no <script> block at all) -- see
+# test_meeting_final_gate_ui_context_adapter_contract.py for that wave's own
+# full evidence chain, including its own "no inline handler/no javascript:/
+# no |safe" static checks that now cover this file instead. Removed from
+# this list so this Wave-3 contract's OWN "exactly one reload-button id/
+# click listener" assertions no longer see that later, unrelated, in-scope
+# redesign as a regression -- same class of drift already handled for
+# test_csp_wave3_meeting_group_b_contract.py's own BYS_MD_RELOAD_BTN_FILES
+# list after the P0 UI wave.
+#
+# "Yenile" reload butonunu iceren dort dosya (feedback_meeting_guide ve artik
+# meeting_development_faz4.html haric).
 RELOAD_BUTTON_FILES = [
     MEETING_DEVELOPMENT_TEMPLATE,
     MEETING_DEVELOPMENT_CLEAN_TEMPLATE,
     MEETING_DEVELOPMENT_FAZ3_TEMPLATE,
-    MEETING_DEVELOPMENT_FAZ4_TEMPLATE,
     MEETING_DEVELOPMENT_SCENARIOS_TEMPLATE,
 ]
 

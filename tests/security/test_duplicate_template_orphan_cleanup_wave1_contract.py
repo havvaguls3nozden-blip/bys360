@@ -115,21 +115,22 @@ PRESERVED_SHADOW_COPY_SURVIVORS: tuple[str, ...] = (
     "app/templates/_premium_workspace_macros.html",
 )
 
-# KOORDINATOR DUZELTMESI: originally included meeting_p0_completion.html --
-# correct while this orphan-cleanup wave was the most recent thing to touch
-# app/templates/performance/. A later, legitimate wave ("BYS360 Meeting UI
-# Context Adapter -- Dalga 1 / P0 Completion") rewrote ONLY that one
-# template's body (see test_meeting_p0_completion_ui_context_adapter_
-# contract.py for that wave's own full evidence chain) -- an intentional,
-# in-scope change for that later wave, not a regression of this one.
-# Removed here so this wave's OWN untouched-template assertion no longer
-# sees that later, unrelated wave's legitimate edit -- same class of drift
-# already handled for test_csp_style3c_meeting_family_group_a_contract.py's
-# own scope-guard test and test_meeting_p0_completion_settings_query_
-# dialect_fix_contract.py's own MEETING_FAMILY_TEMPLATES list.
+# KOORDINATOR DUZELTMESI: originally included meeting_p0_completion.html and
+# meeting_development_faz4.html -- correct while this orphan-cleanup wave was
+# the most recent thing to touch app/templates/performance/. Two later,
+# legitimate waves ("BYS360 Meeting UI Context Adapter -- Dalga 1 / P0
+# Completion" and "-- Dalga 2 / Final Gate") rewrote those templates' bodies
+# (see test_meeting_p0_completion_ui_context_adapter_contract.py and
+# test_meeting_final_gate_ui_context_adapter_contract.py for each wave's own
+# full evidence chain) -- intentional, in-scope changes for those later
+# waves, not a regression of this one. Removed here so this wave's OWN
+# untouched-template assertion no longer sees those later, unrelated waves'
+# legitimate edits -- same class of drift already handled for
+# test_csp_style3c_meeting_family_group_a_contract.py's own scope-guard test
+# and test_meeting_p0_completion_settings_query_dialect_fix_contract.py's own
+# MEETING_FAMILY_TEMPLATES list.
 MEETING_FAMILY_TEMPLATES: tuple[str, ...] = (
     "app/templates/performance/meeting_development_faz3.html",
-    "app/templates/performance/meeting_development_faz4.html",
     "app/templates/performance/meeting_development_scenarios.html",
     "app/templates/performance/meeting_final_closure.html",
     "app/templates/performance/meeting_p1_scope.html",

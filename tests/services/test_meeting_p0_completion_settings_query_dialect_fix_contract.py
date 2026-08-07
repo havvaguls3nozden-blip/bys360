@@ -66,21 +66,22 @@ TARGET_FILE = "app/services/performance/meeting_p0_completion.py"
 # affected by any later commit.
 PRE_FIX_REF = "4af482e3dff5a35e6510a01159e97ec73b661b1b"
 
-# KOORDINATOR DUZELTMESI: originally included meeting_p0_completion.html --
-# correct while this SQL-only fix wave was the most recent thing to touch
-# app/templates/performance/. A later, legitimate wave ("BYS360 Meeting UI
-# Context Adapter -- Dalga 1 / P0 Completion") rewrote ONLY that one
-# template's body to render build_p0_completion_context()'s real fields
-# (see test_meeting_p0_completion_ui_context_adapter_contract.py for that
-# wave's own full evidence chain) -- an intentional, in-scope change for
-# that later wave, not a regression of this one. Removed here so this SQL-
-# fix wave's OWN untouched-template assertion no longer sees that later,
-# unrelated wave's legitimate edit -- same class of drift already handled
-# for test_csp_style3c_meeting_family_group_a_contract.py's own scope-guard
-# test after the duplicate-template orphan cleanup wave.
+# KOORDINATOR DUZELTMESI: originally included meeting_p0_completion.html and
+# meeting_development_faz4.html -- correct while this SQL-only fix wave was
+# the most recent thing to touch app/templates/performance/. Two later,
+# legitimate waves ("BYS360 Meeting UI Context Adapter -- Dalga 1 / P0
+# Completion" and "-- Dalga 2 / Final Gate") rewrote those templates' bodies
+# to render their own context builders' real fields (see
+# test_meeting_p0_completion_ui_context_adapter_contract.py and
+# test_meeting_final_gate_ui_context_adapter_contract.py for each wave's own
+# full evidence chain) -- intentional, in-scope changes for those later
+# waves, not a regression of this one. Removed here so this SQL-fix wave's
+# OWN untouched-template assertion no longer sees those later, unrelated
+# waves' legitimate edits -- same class of drift already handled for
+# test_csp_style3c_meeting_family_group_a_contract.py's own scope-guard test
+# after the duplicate-template orphan cleanup wave.
 MEETING_FAMILY_TEMPLATES: tuple[str, ...] = (
     "app/templates/performance/meeting_development_faz3.html",
-    "app/templates/performance/meeting_development_faz4.html",
     "app/templates/performance/meeting_development_scenarios.html",
     "app/templates/performance/meeting_final_closure.html",
     "app/templates/performance/meeting_p1_scope.html",

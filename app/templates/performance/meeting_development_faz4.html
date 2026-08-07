@@ -1,110 +1,106 @@
 {% extends "base.html" %}
 
-{% block title %}Hatırlatma ve Gelişim Takibi{% endblock %}
+{% block title %}Final Kontrol{% endblock %}
 
 {% block content %}
-{% set page_summary = page_summary if page_summary is defined and page_summary else {} %}
-{% set reminder_items = reminder_items if reminder_items is defined and reminder_items else [] %}
-{% set overdue_items = overdue_items if overdue_items is defined and overdue_items else [] %}
-{% set development_items = development_items if development_items is defined and development_items else [] %}
-{% set mail_items = mail_items if mail_items is defined and mail_items else [] %}
+{% set status = status if status is defined and status else 'KONTROL GEREKİYOR' %}
+{% set errors = errors if errors is defined and errors else [] %}
+{% set warnings = warnings if warnings is defined and warnings else [] %}
+{% set passed = passed if passed is defined and passed else [] %}
+{% set final_checks = final_checks if final_checks is defined and final_checks else [] %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/meeting_development_c_shared.css') }}">
 
-<div class="bys-md-shell" data-page="meeting-development-clean">
+<div class="bys-md-shell" data-page="meeting-final-gate">
     <section class="bys-md-hero">
         <div class="bys-md-eyebrow">
-            <i class="fa-solid fa-bell"></i>
-            Performans Yönetimi
+            <i class="fa-solid fa-flag-checkered"></i>
+            Performans Yönetimi · Final Kontrol
         </div>
 
-        <h1 class="bys-md-title">Hatırlatma ve Gelişim Takibi</h1>
+        <h1 class="bys-md-title">Final Kontrol</h1>
 
         <p class="bys-md-subtitle">
-            Değerlendirme sürecindeki bekleyen işler, geciken değerlendirmeler, gelişim önerileri ve bildirim kayıtları
-            tek ekranda izlenir. Bu ekran yalnızca yetki kapsamındaki bilgileri gösterir; karar veya puan üretmez.
+            Toplantı geliştirme sürecinin canlıya alınma öncesi son hazırlık kontrolüdür. Gerekli dosya, işaret,
+            tablo ve ayarların gerçek durumu bu ekranda özetlenir; bu ekran ayar değiştirmez veya onarım tetiklemez.
         </p>
+
+        {% if status == 'GEÇTİ' %}
+        <span class="bys-md-badge bys-md-badge-success">
+            <i class="fa-solid fa-circle-check"></i>
+            Genel durum: {{ status }}
+        </span>
+        {% else %}
+        <span class="bys-md-badge bys-md-badge-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Genel durum: {{ status }}
+        </span>
+        {% endif %}
 
         <div class="bys-md-grid">
             <div class="bys-md-stat">
                 <div class="bys-md-stat-icon"><i class="fa-solid fa-list-check"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.pending_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Bekleyen değerlendirme ve takip işi</div>
+                <div class="bys-md-stat-number">{{ final_checks|length }}</div>
+                <div class="bys-md-stat-label">Final kontrol kategorisi</div>
             </div>
 
             <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-clock"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.overdue_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Süresi geçen veya dikkat isteyen kayıt</div>
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                <div class="bys-md-stat-number">{{ errors|length }}</div>
+                <div class="bys-md-stat-label">Çözülmesi gereken hata</div>
             </div>
 
             <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.reminder_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Gönderilen hatırlatma ve bilgilendirme</div>
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="bys-md-stat-number">{{ warnings|length }}</div>
+                <div class="bys-md-stat-label">Gözden geçirilmesi önerilen uyarı</div>
             </div>
 
             <div class="bys-md-stat">
-                <div class="bys-md-stat-icon"><i class="fa-solid fa-seedling"></i></div>
-                <div class="bys-md-stat-number">{{ page_summary.development_count|default(0) }}</div>
-                <div class="bys-md-stat-label">Gelişim önerisi veya takip notu</div>
+                <div class="bys-md-stat-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="bys-md-stat-number">{{ passed|length }}</div>
+                <div class="bys-md-stat-label">Başarıyla doğrulanan kontrol</div>
             </div>
         </div>
     </section>
-
-    <div class="bys-md-toolbar">
-        <input id="bysMdSearch" class="bys-md-input" type="search" placeholder="Personel, birim, amir veya süreç başlığı ara...">
-        <select id="bysMdStatus" class="bys-md-select">
-            <option value="">Tüm durumlar</option>
-            <option value="bekliyor">Bekliyor</option>
-            <option value="gecikti">Gecikti</option>
-            <option value="tamamlandi">Tamamlandı</option>
-            <option value="gelisim">Gelişim Takibi</option>
-        </select>
-        <button type="button" id="bysMdReloadBtn" class="btn btn-sm btn-outline-secondary">
-            <i class="fa-solid fa-rotate-right me-1"></i> Yenile
-        </button>
-    </div>
 
     <section class="bys-md-section-grid">
         <div class="bys-md-card">
             <div class="bys-md-card-header">
                 <div>
-                    <h2 class="bys-md-card-title">Süreçte Dikkat Gerektiren Kayıtlar</h2>
+                    <h2 class="bys-md-card-title">Final Kontrol Kategorileri</h2>
                     <p class="bys-md-card-desc">
-                        Süresi yaklaşan, geciken veya yöneticinin kontrol etmesi gereken kayıtlar burada özetlenir.
+                        Bu final kontrolün kapsadığı hazırlık başlıkları ve her birinden beklenen sonuç.
                     </p>
                 </div>
-                <span class="bys-md-badge bys-md-badge-warning">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    Yetki kapsamlı görünüm
+                <span class="bys-md-badge">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    {{ final_checks|length }} kategori
                 </span>
             </div>
             <div class="bys-md-card-body">
-                {% if overdue_items %}
+                {% if final_checks %}
                 <div class="bys-md-list">
-                    {% for item in overdue_items %}
-                    <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default('') ~ ' ' ~ item.manager_name|default(''))|lower }}" data-status="{{ item.status_key|default('gecikti') }}">
+                    {% for item in final_checks %}
+                    <article class="bys-md-list-item">
                         <span class="bys-md-dot"></span>
                         <div>
-                            <h3 class="bys-md-item-title">{{ item.title|default('Dikkat gerektiren kayıt') }}</h3>
-                            <div class="bys-md-item-meta">
-                                {{ item.personnel_name|default('Personel bilgisi') }}
-                                {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
-                                {% if item.manager_name is defined and item.manager_name %} · Sorumlu: {{ item.manager_name }}{% endif %}
-                            </div>
+                            <h3 class="bys-md-item-title">{{ item.title|default(item.code)|default('Kontrol kategorisi') }}</h3>
+                            {% if item.expected %}
+                            <div class="bys-md-item-meta">{{ item.expected }}</div>
+                            {% endif %}
                         </div>
-                        <span class="bys-md-badge bys-md-badge-danger">
-                            {{ item.status_label|default('Kontrol Gerekiyor') }}
-                        </span>
+                        {% if item.priority %}
+                        <span class="bys-md-badge">{{ item.priority }}</span>
+                        {% endif %}
                     </article>
                     {% endfor %}
                 </div>
                 {% else %}
                 <div class="bys-md-empty">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <div><strong>Dikkat gerektiren gecikmiş kayıt görünmüyor.</strong></div>
-                    <div>Yetki kapsamınızda açık bir aksama yoksa bu alan boş kalır.</div>
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <div><strong>Tanımlı final kontrol kategorisi bulunmuyor.</strong></div>
+                    <div>Kategoriler tanımlandığında bu alanda listelenir.</div>
                 </div>
                 {% endif %}
             </div>
@@ -113,49 +109,36 @@
         <aside class="bys-md-card">
             <div class="bys-md-card-header">
                 <div>
-                    <h2 class="bys-md-card-title">Hızlı İşlemler</h2>
-                    <p class="bys-md-card-desc">Sık kullanılan performans takip ekranlarına güvenli geçiş.</p>
+                    <h2 class="bys-md-card-title">Hatalar</h2>
+                    <p class="bys-md-card-desc">
+                        Final kontrolün canlıya geçiş için önce çözülmesini beklediği eksikler.
+                    </p>
                 </div>
+                <span class="bys-md-badge {% if errors %}bys-md-badge-danger{% else %}bys-md-badge-success{% endif %}">
+                    <i class="fa-solid {% if errors %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
+                    {{ errors|length }} hata
+                </span>
             </div>
             <div class="bys-md-card-body">
-                <div class="bys-md-actions">
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_tracking') }}">
+                {% if errors %}
+                <div class="bys-md-list">
+                    {% for item in errors %}
+                    <article class="bys-md-list-item">
+                        <span class="bys-md-dot"></span>
                         <div>
-                            <strong>Süreç Takibine Git</strong>
-                            <span>Bekleyen ve tamamlanan süreçleri incele.</span>
+                            <h3 class="bys-md-item-title">{{ item }}</h3>
                         </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_process_reports') }}">
-                        <div>
-                            <strong>Süreç Raporlarını Aç</strong>
-                            <span>Geciken işler ve yoğunlukları değerlendir.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_interim_notes_manager') }}">
-                        <div>
-                            <strong>Dönem İçi Notlar</strong>
-                            <span>Gelişim, başarı ve gözlem notlarını yönet.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
-                    <a class="bys-md-action" href="{{ safe_url_for('main.performance_development_guidance') }}">
-                        <div>
-                            <strong>Gelişim Rehberi</strong>
-                            <span>Karne sonrası öneri ve takip alanını aç.</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+                        <span class="bys-md-badge bys-md-badge-danger">Hata</span>
+                    </article>
+                    {% endfor %}
                 </div>
-
-                <div class="bys-md-note">
-                    <strong>Bilgi:</strong> Bu ekran performans puanı üretmez ve idari karar vermez. Yalnızca
-                    yetkili olduğunuz süreçleri takip etmenizi ve gerekli ekrana güvenli şekilde geçmenizi sağlar.
+                {% else %}
+                <div class="bys-md-empty">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div><strong>Açık hata bulunmuyor.</strong></div>
+                    <div>Gerekli dosya, işaret ve tablo kontrolleri sorunsuz tamamlandı.</div>
                 </div>
+                {% endif %}
             </div>
         </aside>
     </section>
@@ -163,65 +146,34 @@
     <section class="bys-md-card" style="margin-top:16px;">
         <div class="bys-md-card-header">
             <div>
-                <h2 class="bys-md-card-title">Hatırlatma ve Bildirim Kayıtları</h2>
+                <h2 class="bys-md-card-title">Uyarılar</h2>
                 <p class="bys-md-card-desc">
-                    Değerlendirme sürecindeki hatırlatma, bildirim ve e-posta kayıtları kurumsal takip amacıyla listelenir.
+                    Canlıya geçişi engellemeyen ancak gözden geçirilmesi önerilen bulgular.
                 </p>
             </div>
-            <span class="bys-md-badge">
-                <i class="fa-solid fa-envelope-open-text"></i>
-                Kayıtlı iletişim
+            <span class="bys-md-badge {% if warnings %}bys-md-badge-warning{% endif %}">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                {{ warnings|length }} uyarı
             </span>
         </div>
-
         <div class="bys-md-card-body">
-            {% if reminder_items or mail_items %}
-            <div class="bys-md-table-wrap">
-                <table class="bys-md-table">
-                    <thead>
-                        <tr>
-                            <th>Kayıt</th>
-                            <th>İlgili Kişi / Birim</th>
-                            <th>Tür</th>
-                            <th>Durum</th>
-                            <th>Tarih</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in reminder_items %}
-                        <tr data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="{{ item.status_key|default('bekliyor') }}">
-                            <td><strong>{{ item.title|default('Hatırlatma kaydı') }}</strong></td>
-                            <td>
-                                {{ item.personnel_name|default('Yetki kapsamındaki kayıt') }}
-                                {% if item.unit_name is defined and item.unit_name %}<br><small class="text-muted">{{ item.unit_name }}</small>{% endif %}
-                            </td>
-                            <td>{{ item.type_label|default('Sistem içi hatırlatma') }}</td>
-                            <td><span class="bys-md-badge">{{ item.status_label|default('Bekliyor') }}</span></td>
-                            <td>{{ item.created_at_label|default('-') }}</td>
-                        </tr>
-                        {% endfor %}
-
-                        {% for item in mail_items %}
-                        <tr data-search="{{ (item.subject|default('') ~ ' ' ~ item.recipient_label|default(''))|lower }}" data-status="{{ item.status_key|default('tamamlandi') }}">
-                            <td><strong>{{ item.subject|default('E-posta bilgilendirmesi') }}</strong></td>
-                            <td>{{ item.recipient_label|default('Alıcı bilgisi') }}</td>
-                            <td>{{ item.type_label|default('E-posta') }}</td>
-                            <td>
-                                <span class="bys-md-badge {% if item.status_key|default('') == 'tamamlandi' %}bys-md-badge-success{% endif %}">
-                                    {{ item.status_label|default('Kayıt Oluştu') }}
-                                </span>
-                            </td>
-                            <td>{{ item.created_at_label|default('-') }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            {% if warnings %}
+            <div class="bys-md-list">
+                {% for item in warnings %}
+                <article class="bys-md-list-item">
+                    <span class="bys-md-dot"></span>
+                    <div>
+                        <h3 class="bys-md-item-title">{{ item }}</h3>
+                    </div>
+                    <span class="bys-md-badge bys-md-badge-warning">Uyarı</span>
+                </article>
+                {% endfor %}
             </div>
             {% else %}
             <div class="bys-md-empty">
-                <i class="fa-solid fa-inbox"></i>
-                <div><strong>Henüz görüntülenecek hatırlatma kaydı yok.</strong></div>
-                <div>Süreç ilerledikçe bildirim ve e-posta kayıtları burada listelenir.</div>
+                <i class="fa-solid fa-circle-check"></i>
+                <div><strong>Uyarı bulunmuyor.</strong></div>
+                <div>Gözden geçirilmesi önerilen bir bulgu oluştuğunda bu alanda listelenir.</div>
             </div>
             {% endif %}
         </div>
@@ -230,76 +182,42 @@
     <section class="bys-md-card" style="margin-top:16px;">
         <div class="bys-md-card-header">
             <div>
-                <h2 class="bys-md-card-title">Gelişim Takibi</h2>
+                <h2 class="bys-md-card-title">Başarılı Kontroller</h2>
                 <p class="bys-md-card-desc">
-                    Performans sonucunun yalnızca puanla kapanmaması için gelişim önerileri ve takip notları burada izlenir.
+                    Dosya, işaret, tablo ve ayar bazında başarıyla doğrulanan kontrollerin dökümü.
                 </p>
             </div>
             <span class="bys-md-badge bys-md-badge-success">
-                <i class="fa-solid fa-seedling"></i>
-                Gelişim odaklı takip
+                <i class="fa-solid fa-circle-check"></i>
+                {{ passed|length }} doğrulandı
             </span>
         </div>
-
         <div class="bys-md-card-body">
-            {% if development_items %}
-            <div class="bys-md-list">
-                {% for item in development_items %}
-                <article class="bys-md-list-item" data-search="{{ (item.title|default('') ~ ' ' ~ item.personnel_name|default('') ~ ' ' ~ item.unit_name|default(''))|lower }}" data-status="gelisim">
-                    <span class="bys-md-dot"></span>
-                    <div>
-                        <h3 class="bys-md-item-title">{{ item.title|default('Gelişim önerisi') }}</h3>
-                        <div class="bys-md-item-meta">
-                            {{ item.personnel_name|default('Personel') }}
-                            {% if item.unit_name is defined and item.unit_name %} · {{ item.unit_name }}{% endif %}
-                            {% if item.note is defined and item.note %}<br>{{ item.note }}{% endif %}
-                        </div>
-                    </div>
-                    <span class="bys-md-badge bys-md-badge-success">
-                        {{ item.status_label|default('Takipte') }}
-                    </span>
-                </article>
-                {% endfor %}
+            {% if passed %}
+            <div class="bys-md-table-wrap">
+                <table class="bys-md-table">
+                    <thead>
+                        <tr>
+                            <th>Doğrulanan kontrol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in passed %}
+                        <tr>
+                            <td>{{ item }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             {% else %}
             <div class="bys-md-empty">
-                <i class="fa-solid fa-seedling"></i>
-                <div><strong>Gelişim takibi için açık kayıt bulunmuyor.</strong></div>
-                <div>Gelişim önerileri oluşturuldukça bu alanda yetki kapsamına göre görüntülenir.</div>
+                <i class="fa-solid fa-clipboard-list"></i>
+                <div><strong>Henüz doğrulanan kontrol bulunmuyor.</strong></div>
+                <div>Kontroller tamamlandıkça bu alanda listelenir.</div>
             </div>
             {% endif %}
         </div>
     </section>
 </div>
-
-<script>
-(function () {
-    const search = document.getElementById("bysMdSearch");
-    const status = document.getElementById("bysMdStatus");
-
-    function normalize(value) {
-        return (value || "").toLocaleLowerCase("tr-TR").trim();
-    }
-
-    function applyFilters() {
-        const q = normalize(search ? search.value : "");
-        const selected = normalize(status ? status.value : "");
-        const rows = document.querySelectorAll("[data-search][data-status]");
-
-        rows.forEach(function (row) {
-            const haystack = normalize(row.getAttribute("data-search"));
-            const state = normalize(row.getAttribute("data-status"));
-            const matchesSearch = !q || haystack.indexOf(q) !== -1;
-            const matchesStatus = !selected || state === selected;
-            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-        });
-    }
-
-    if (search) search.addEventListener("input", applyFilters);
-    if (status) status.addEventListener("change", applyFilters);
-
-    const reloadBtn = document.getElementById("bysMdReloadBtn");
-    if (reloadBtn) reloadBtn.addEventListener("click", function(){ window.location.reload(); });
-})();
-</script>
 {% endblock %}
