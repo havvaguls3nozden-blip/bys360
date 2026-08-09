@@ -15,20 +15,38 @@ title/expected/priority describing WHAT the gate checks, not a per-item
 pass/fail result) -- deliberately rendered as a descriptive checklist,
 separate from the DYNAMIC, computed `errors`/`warnings`/`passed` lists.
 
-CRITICAL FINDING (disclosed, not fixed -- out of this wave's scope): a real,
-isolated `build_final_gate_context()` call against the actual repo currently
-returns `status="KONTROL GEREKİYOR"` with 9 real errors (missing tokens in
+CRITICAL FINDING (disclosed at the time, since FIXED by a later, separate
+navigation-wiring wave -- was out of THIS wave's own scope): a real,
+isolated `build_final_gate_context()` call against the actual repo used to
+return `status="KONTROL GEREKİYOR"` with 9 real errors (missing tokens in
 `app/templates/base.html` and `app/menu_registry.py` that `REQUIRED_TOKENS`
-expects). This is a genuinely pre-existing, previously-invisible backend
-finding -- the whole point of this wave is to surface it honestly, not to
-silently "fix" it (fixing would mean editing `base.html`/`menu_registry.py`
-content, explicitly out of scope: "Backend'in gerçekten üretmediği hiçbir
-bilgiyi uydurma" cuts both ways -- neither fabricate passing data nor hide
-real failing data). Tests below therefore assert against the REAL, current
-9-error/0-warning/27-passed shape where useful, and against controlled
-fixture data (via direct `render_template()` calls with an explicit context
-dict) where a specific error/warning/empty scenario needs to be forced
-without touching backend code.
+expects -- concretely, 4 Meeting Development screens were fully built,
+routed and auth-protected but had zero navigation entry point anywhere in
+the app). This was a genuinely pre-existing, previously-invisible backend
+finding -- the whole point of THIS wave was to surface it honestly, not to
+silently "fix" it (fixing would have meant editing `base.html`/`menu_
+registry.py` content, explicitly out of scope at the time: "Backend'in
+gerçekten üretmediği hiçbir bilgiyi uydurma" cuts both ways -- neither
+fabricate passing data nor hide real failing data).
+
+A later, separate navigation-wiring wave (see `tests/services/test_meeting_
+development_p0_navigation_contract.py` for its own full regression contract)
+then wired all 4 screens into `app/templates/base.html`, `app/menu_
+registry.py` and the surrounding live menu-visibility system, mirroring the
+exact mechanism already used by two working sibling screens
+(`performance_meeting_p3_reminders`, `performance_development_guidance`).
+A real, isolated `build_final_gate_context()` call against the current repo
+now returns `status="GEÇTİ"` with 0 errors, 0 warnings and 36 passed (up
+from the old 27) -- re-verified fresh this session, not assumed. Tests
+below have been updated accordingly: the populated-errors scenario is no
+longer real-repo-natural, so it is now asserted via the same controlled,
+explicit-context `render_template()` pattern already used for the other
+forced scenarios (warnings-populated, none/zero-rendering, etc.), while the
+real, unmocked `real_final_gate_context` fixture is asserted against its
+own real, current empty-errors shape. This keeps every assertion honest
+against the REAL, current backend output -- never a stale or fabricated
+shape -- while still exercising the populated-errors rendering path via an
+explicit, controlled fixture dict where useful.
 
 Backend is completely untouched by this wave: `build_final_gate_context()`
 and `meeting_development_faz4_routes.py` are byte-identical to the fixed
@@ -45,7 +63,6 @@ writes -- never string-interpolated SQL, never `|safe`.
 """
 from __future__ import annotations
 
-import html
 import re
 import subprocess
 import uuid
@@ -318,10 +335,12 @@ def final_gate_response_body(final_gate_env):
 @pytest.fixture(scope="module")
 def real_final_gate_context(final_gate_env):
     """The REAL, unmocked build_final_gate_context() output against the
-    actual repo -- proves this wave's fixture-independent claims (9 real
-    errors, 0 warnings, 27 passed, 6 final_checks) without hand-seeding any
-    data, and gives the rendered-HTML tests below ground truth to assert
-    against."""
+    actual repo -- proves this wave's fixture-independent claims (0 real
+    errors, 0 warnings, 36 passed -- up from the old pre-navigation-wiring
+    baseline of 27, since the separate navigation-wiring wave fixed the
+    9-error finding this file's docstring originally disclosed -- and 6
+    final_checks, unchanged) without hand-seeding any data, and gives the
+    rendered-HTML tests below ground truth to assert against."""
     app, _client = final_gate_env
     with app.app_context():
         from app.services.performance.meeting_development_final_gate import build_final_gate_context
@@ -370,21 +389,30 @@ def test_final_checks_are_rendered(final_gate_response_body, real_final_gate_con
         assert item["expected"] in body, f"Expected final_checks description in response body: {item['expected']!r}"
 
 
-# 6) errors populated scenario (real, current repo state has 9).
-def test_errors_populated_scenario_is_rendered(final_gate_response_body, real_final_gate_context) -> None:
+# 6) errors empty scenario, real repo state (current repo state has 0).
+# RENAMED + REPURPOSED from the former `test_errors_populated_scenario_is_
+# rendered`: that test asserted the then-real populated-errors scenario (9
+# errors) and explicitly documented its own successor shape in its failure
+# message ("if the underlying backend finding is ever fixed, this assertion
+# will correctly need updating to the empty-scenario test's shape instead").
+# A later, separate navigation-wiring wave fixed that finding (see module
+# docstring's updated CRITICAL FINDING section and `tests/services/test_
+# meeting_development_p0_navigation_contract.py`), so the populated-errors
+# scenario no longer occurs naturally against the real repo. Per that test's
+# own guidance, this now asserts the real, unmocked, current empty-errors
+# shape instead -- the direct real-HTTP-response counterpart to
+# `test_warnings_empty_scenario_renders_safely` below (as opposed to
+# `test_errors_empty_scenario_renders_safely`, which uses a controlled,
+# explicit-context `render_template()` call rather than the real fixture).
+def test_real_errors_empty_scenario_renders_safely(final_gate_response_body, real_final_gate_context) -> None:
     _status, body = final_gate_response_body
-    assert real_final_gate_context["errors"], (
-        "This test asserts the currently-real populated-errors scenario; if the underlying "
-        "backend finding is ever fixed, this assertion will correctly need updating to the "
-        "empty-scenario test's shape instead."
+    assert real_final_gate_context["errors"] == [], (
+        "This test now asserts the currently-real EMPTY-errors scenario -- the underlying "
+        "backend finding it used to guard (9 real errors) was fixed by a later, separate "
+        "navigation-wiring wave; see the module docstring's updated CRITICAL FINDING section."
     )
-    for entry in real_final_gate_context["errors"]:
-        # Jinja autoescape correctly turns a literal '>' in these messages
-        # (e.g. "... -> ...") into '&gt;' -- compare against the same
-        # escaped form html.escape() produces, proving escaping is genuinely
-        # active rather than bypassed with |safe.
-        assert html.escape(entry) in body, f"Expected real (HTML-escaped) error entry in response body: {entry!r}"
-    assert f"{len(real_final_gate_context['errors'])} hata" in body
+    assert "Açık hata bulunmuyor." in body
+    assert "0 hata" in body
 
 
 # 7) errors empty scenario -- direct render_template() with a controlled,

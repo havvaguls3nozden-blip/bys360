@@ -146,6 +146,12 @@ PERFORMANCE_ROLE_MATRIX_V12_ITEMS: list[dict[str, Any]] = [
     {"key": "performance_meeting_p3_reminders", "label": "Hatırlatma ve Aksatan Amirler", "icon": "fa-solid fa-bell"},
     {"key": "performance_interim_notes", "label": "Dönem İçi Notlar", "icon": "fa-regular fa-note-sticky"},
     {"key": "performance_development_guidance", "label": "Gelişim Rehberi", "icon": "fa-solid fa-seedling"},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_ITEMS
+    {"key": "performance_meeting_development", "label": "Toplantı Geliştirme", "icon": "fa-solid fa-chalkboard-user"},
+    {"key": "performance_meeting_test_scenarios", "label": "Toplantı Testleri", "icon": "fa-solid fa-vial"},
+    {"key": "performance_meeting_development_faz3", "label": "Toplantı Derinleştirme", "icon": "fa-solid fa-diagram-project"},
+    {"key": "performance_meeting_final_gate", "label": "Final Kontrol", "icon": "fa-solid fa-shield-halved"},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_ITEMS
     {"key": "performance_process_tracking", "label": "Süreç Takibi", "icon": "fa-solid fa-route"},
     {"key": "performance_process_reports", "label": "Süreç Raporları", "icon": "fa-solid fa-chart-line"},
     {"key": "performance_president_approvals", "label": "Başkan / Üst Onayları", "icon": "fa-solid fa-stamp"},
@@ -843,6 +849,12 @@ _BYS360_ALL_MENU_ROLE_MATRIX_ITEMS = [
     {'key': 'performance_interim_notes', 'label': 'Dönem İçi Notlar', 'icon': 'fa-regular fa-note-sticky', 'settings_key': 'performance_interim_notes', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
     {'key': 'performance_development_guidance', 'label': 'Gelişim Rehberi', 'icon': 'fa-solid fa-seedling', 'settings_key': 'performance_development_guidance', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
     {'key': 'performance_meeting_p3_reminders', 'label': 'Hatırlatma ve Aksatan Amirler', 'icon': 'fa-solid fa-bell', 'settings_key': 'performance_meeting_p3_reminders', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_ITEMS
+    {'key': 'performance_meeting_development', 'label': 'Toplantı Geliştirme', 'icon': 'fa-solid fa-chalkboard-user', 'settings_key': 'performance_meeting_development', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_test_scenarios', 'label': 'Toplantı Testleri', 'icon': 'fa-solid fa-vial', 'settings_key': 'performance_meeting_test_scenarios', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_development_faz3', 'label': 'Toplantı Derinleştirme', 'icon': 'fa-solid fa-diagram-project', 'settings_key': 'performance_meeting_development_faz3', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_final_gate', 'label': 'Final Kontrol', 'icon': 'fa-solid fa-shield-halved', 'settings_key': 'performance_meeting_final_gate', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_ITEMS
     {'key': 'performance_archive', 'label': 'Geçmiş Karne Arşivi', 'icon': 'fa-solid fa-box-archive', 'settings_key': 'performance_archive', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel']},
     {'key': 'performance_history_import', 'label': 'Geçmiş Puan Aktarımı', 'icon': 'fa-solid fa-file-import', 'settings_key': 'performance_history_import', 'section': 'Performans Yönetimi', 'required_roles': ['admin']},
     {'key': 'performance_mail_settings', 'label': 'Performans Mail Ayarları', 'icon': 'fa-solid fa-envelope-open-text', 'settings_key': 'performance_mail_settings', 'section': 'Performans Yönetimi', 'required_roles': ['admin']},
@@ -916,6 +928,7 @@ ROLE_MATRIX_POLICY_CONFIGS = [
             "team_performance_comparison_history", "performance_feedback_meetings", "performance_publish",
             "performance_president_approvals", "performance_personnel_support_publish_approval", "performance_process_tracking",
             "performance_process_reports", "performance_interim_notes", "performance_development_guidance", "performance_meeting_p3_reminders",
+            "performance_meeting_development", "performance_meeting_test_scenarios", "performance_meeting_development_faz3", "performance_meeting_final_gate",
             "performance_archive", "performance_history_import", "performance_mail_settings", "performance_kpi_dashboard",
             "performance_kpi_management", "performance_competency_library", "performance_self_assessment", "performance_kpi_analysis"
         ] if k in _BYS360_ALL_MENU_ROLE_MATRIX_ITEM_BY_KEY],

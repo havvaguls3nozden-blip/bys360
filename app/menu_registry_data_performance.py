@@ -35,6 +35,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "performance_task_management",
         "performance_team_compare",
         "performance_feedback_meetings",
@@ -84,6 +90,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "performance_team_compare",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -127,6 +139,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "performance_team_compare",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -169,6 +187,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "performance_team_compare",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -211,6 +235,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "performance_team_compare",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -249,6 +279,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "my_performance_comparison",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -284,6 +320,12 @@ ROLE_MENU_DEFAULTS = {  # noqa: F821 - dynamic menu registry global
         "performance_meeting_p3_reminders",
         "performance_interim_notes",
         "performance_development_guidance",
+        # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
+        "performance_meeting_development",
+        "performance_meeting_test_scenarios",
+        "performance_meeting_development_faz3",
+        "performance_meeting_final_gate",
+        # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_DEFAULTS
         "my_performance_comparison",
         "performance_feedback_meetings",
         "team_performance_comparison_history",
@@ -370,6 +412,12 @@ _BYS360_PERFORMANCE_MAIN_SWITCH_ROLE_POLICY = {
     'performance_interim_notes': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_meeting_p3_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_MAIN_SWITCH_POLICY
+    'performance_meeting_development': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_test_scenarios': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_development_faz3': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_final_gate': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_MAIN_SWITCH_POLICY
     'performance_kpi_dashboard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_kpi_management': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
     'performance_competency_library': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},

@@ -16,7 +16,7 @@ RollbackHook = Callable[[], None]
 
 _BYS360_PERFORMANCE_MAIN_KEYS = {'performance_module', 'performance_management', 'performans_yonetimi'}
 
-_BYS360_PERFORMANCE_CHILD_KEYS = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}
+_BYS360_PERFORMANCE_CHILD_KEYS = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_meeting_development', 'performance_meeting_test_scenarios', 'performance_meeting_development_faz3', 'performance_meeting_final_gate', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}
 
 _BYS360_PERFORMANCE_MAIN_KEYS_V4 = {'performance_module', 'performance_management', 'performans_yonetimi'}
 
@@ -49,6 +49,12 @@ _BYS360_PERF_RM_V8_ALIAS_GROUPS = {
     "performance_interim_notes": ["performance_interim_notes"],
     "performance_development_guidance": ["performance_development_guidance"],
     "performance_meeting_p3_reminders": ["performance_meeting_p3_reminders"],
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ALIAS_GROUPS
+    "performance_meeting_development": ["performance_meeting_development"],
+    "performance_meeting_test_scenarios": ["performance_meeting_test_scenarios"],
+    "performance_meeting_development_faz3": ["performance_meeting_development_faz3"],
+    "performance_meeting_final_gate": ["performance_meeting_final_gate"],
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ALIAS_GROUPS
     "performance_feedback_aftercare": ["performance_feedback_aftercare"],
     "performance_feedback_aftercare_new": ["performance_feedback_aftercare_new"],
     "performance_feedback_meeting_guide": ["performance_feedback_meeting_guide"],

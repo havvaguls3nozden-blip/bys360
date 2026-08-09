@@ -520,3 +520,17 @@ except Exception:
     pass
 # BYS360_PERFORMANCE_V2_1_6_CATEGORY_PERIOD_INTEGRATION_MENU_END
 
+# BYS360_MEETING_DEV_P0_NAV_FIX_LIVE_SCOPE_BEGIN
+# Toplantı Geliştirme / Testleri / Derinleştirme / Final Kontrol ekranları
+# performance_meeting_p3_reminders ve performance_development_guidance ile aynı
+# canlı ayar/rol matrisi kapsamına eklendi.
+_BYS360_MEETING_DEV_P0_NAV_FIX_KEYS = ['performance_meeting_development', 'performance_meeting_test_scenarios', 'performance_meeting_development_faz3', 'performance_meeting_final_gate']
+
+for _name in ["LIVE_SETTINGS_MENU_KEYS", "LIVE_ALLOWED_MENU_KEYS", "LIVE_MENU_KEYS", "LIVE_PERFORMANCE_MENU_KEYS"]:
+    _value = globals().get(_name)
+    if isinstance(_value, set):
+        _value.update(_BYS360_MEETING_DEV_P0_NAV_FIX_KEYS)
+    elif isinstance(_value, list):
+        _value.extend([_k for _k in _BYS360_MEETING_DEV_P0_NAV_FIX_KEYS if _k not in _value])
+# BYS360_MEETING_DEV_P0_NAV_FIX_LIVE_SCOPE_END
+

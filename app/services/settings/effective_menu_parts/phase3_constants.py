@@ -40,6 +40,12 @@ PHASE3_2_PERFORMANCE_MENU_POLICY: dict[str, set[str]] = {
     "performance_tasks": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
     "performance_interim_notes": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
     "performance_development_guidance": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_PHASE3_2_POLICY
+    "performance_meeting_development": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
+    "performance_meeting_test_scenarios": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
+    "performance_meeting_development_faz3": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
+    "performance_meeting_final_gate": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_PHASE3_2_POLICY
     "performance_feedback_meetings": {"admin", "sistem_yoneticisi", "system_admin", "super_admin", "administrator", "baskan", "başkan", "president", "baskan_yardimcisi", "başkan_yardımcısı", "grup_baskani", "grup_başkanı", "mali_musavir", "mali_müşavir", "koordinator", "koordinatör", "birim_sorumlusu"},
 
     # Başkan/Admin: genel yönetim görünümü.
@@ -71,6 +77,10 @@ PHASE3_2_MANAGER_VISIBLE_KEYS = {
     "performance_team_compare", "team_performance_comparison_history",
     "performance_evaluation_tasks", "performance_tasks", "performance_interim_notes",
     "performance_development_guidance", "performance_feedback_meetings", "performance_hierarchy_tree",
+    # BYS360_MEETING_DEV_P0_NAV_FIX_MANAGER_VISIBLE
+    "performance_meeting_development", "performance_meeting_test_scenarios",
+    "performance_meeting_development_faz3", "performance_meeting_final_gate",
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_MANAGER_VISIBLE
 }
 
 PHASE3_2_GENERAL_VISIBLE_KEYS = set(PHASE3_2_PERFORMANCE_MENU_POLICY.keys())
