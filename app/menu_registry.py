@@ -255,26 +255,6 @@ FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})
 FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_p3_reminders", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"})  # noqa: F821 - dynamic menu registry global
 # /BYS360_PHASE9_REMINDERS_FORCE_VISIBLE
 
-# BYS360_MEETING_DEV_P0_NAV_FIX_1_FORCE_VISIBLE
-FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})
-FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_development", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"})  # noqa: F821 - dynamic menu registry global
-# /BYS360_MEETING_DEV_P0_NAV_FIX_1_FORCE_VISIBLE
-
-# BYS360_MEETING_DEV_P0_NAV_FIX_2_FORCE_VISIBLE
-FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})
-FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_test_scenarios", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"})  # noqa: F821 - dynamic menu registry global
-# /BYS360_MEETING_DEV_P0_NAV_FIX_2_FORCE_VISIBLE
-
-# BYS360_MEETING_DEV_P0_NAV_FIX_3_FORCE_VISIBLE
-FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})
-FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_development_faz3", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"})  # noqa: F821 - dynamic menu registry global
-# /BYS360_MEETING_DEV_P0_NAV_FIX_3_FORCE_VISIBLE
-
-# BYS360_MEETING_DEV_P0_NAV_FIX_4_FORCE_VISIBLE
-FORCE_VISIBLE_MENU_ROLES = globals().get("FORCE_VISIBLE_MENU_ROLES", {})
-FORCE_VISIBLE_MENU_ROLES.setdefault("performance_meeting_final_gate", {"admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"})  # noqa: F821 - dynamic menu registry global
-# /BYS360_MEETING_DEV_P0_NAV_FIX_4_FORCE_VISIBLE
-
 # BYS360_SETTINGS_MANUAL_V1_MENU_REGISTRY_BEGIN
 _BYS360_MANUAL_ROLE_MENU_ADDITIONS = {'admin': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'baskan': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'baskan_yardimcisi': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'grup_baskani': ['performance_archive', 'performance_process_tracking', 'performance_process_reports', 'performance_personnel_support_publish_approval'], 'mali_musavir': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'koordinator': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'birim_sorumlusu': ['performance_archive', 'performance_process_tracking', 'performance_process_reports'], 'personel': ['performance_archive']}
 _BYS360_MANUAL_MENU_ITEMS = [{'key': 'performance_process_tracking', 'label': 'Süreç Takibi', 'icon': 'fa-solid fa-route', 'endpoint': 'main.performance_process_tracking', 'active_path_prefixes': ['/performance/process-tracking', '/performans/surec-takibi'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']}, {'key': 'performance_process_reports', 'label': 'Süreç Raporları', 'icon': 'fa-solid fa-chart-line', 'endpoint': 'main.performance_process_reports', 'active_path_prefixes': ['/performance/process-reports', '/performans/surec-raporlari'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']}, {'key': 'performance_personnel_support_publish_approval', 'label': 'Yayın Ön Onayı', 'icon': 'fa-solid fa-user-check', 'endpoint': 'main.performance_personnel_support_publish_approvals', 'active_path_prefixes': ['/performance/personnel-support-publish-approvals', '/performans/personel-destek-yayin-onayi'], 'required_roles': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani']}]

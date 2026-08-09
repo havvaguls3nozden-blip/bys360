@@ -615,16 +615,24 @@ def test_passed_count_reflects_the_new_tokens(real_gate_context) -> None:
         "Expected exactly 9 more passed entries than the documented pre-wave baseline of "
         f"{OLD_BASELINE_PASSED_COUNT}."
     )
+    # BYS360_NAV_CANONICAL_SOURCE_FIX: the 4 menu_registry.py-targeted
+    # tokens are no longer produced by a raw-text scan of that file (which
+    # was only satisfied by a dead FORCE_VISIBLE_MENU_ROLES literal --
+    # removed in a follow-up correction wave, see
+    # test_meeting_final_gate_canonical_menu_source_contract.py). They are
+    # now produced by a real behavioral check against the canonical
+    # MENU_SECTIONS registry, with a distinct "Menü kaydı doğrulandı: "
+    # message prefix.
     for token in (
         "İşaret hazır: Toplantı Geliştirme",
         "İşaret hazır: Toplantı Testleri",
         "İşaret hazır: Toplantı Derinleştirme",
         "İşaret hazır: Final Kontrol",
         "İşaret hazır: meeting-development/final-gate",
-        "İşaret hazır: performance_meeting_development",
-        "İşaret hazır: performance_meeting_test_scenarios",
-        "İşaret hazır: performance_meeting_development_faz3",
-        "İşaret hazır: performance_meeting_final_gate",
+        "Menü kaydı doğrulandı: performance_meeting_development",
+        "Menü kaydı doğrulandı: performance_meeting_test_scenarios",
+        "Menü kaydı doğrulandı: performance_meeting_development_faz3",
+        "Menü kaydı doğrulandı: performance_meeting_final_gate",
     ):
         assert token in passed, f"Expected newly-passing token {token!r} in passed list."
 

@@ -223,11 +223,21 @@ def test_shared_meeting_css_file_is_untouched() -> None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("relative_path", [ROUTE_FILE, CONTEXT_BUILDER_FILE])
+@pytest.mark.parametrize("relative_path", [ROUTE_FILE])
 def test_final_gate_backend_files_are_untouched_by_this_wave(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, relative_path))
     assert current == pre_wave, f"{relative_path}: byte content changed since pre-wave ref -- backend must be untouched."
+
+
+# BYS360_NAV_CANONICAL_SOURCE_FIX: CONTEXT_BUILDER_FILE (meeting_development_
+# final_gate.py) was intentionally, disclosedly modified by a later
+# correction wave -- it replaced a raw-text scan of app/menu_registry.py
+# (only satisfied by a dead FORCE_VISIBLE_MENU_ROLES literal) with a real
+# behavioral check against the canonical MENU_SECTIONS registry. That
+# change is no longer "untouched since PRE_WAVE_REF"; it is covered by its
+# own dedicated regression contract instead.
+# See: test_meeting_final_gate_canonical_menu_source_contract.py
 
 
 # 22) P0 template byte-identical (untouched by this wave).

@@ -61,13 +61,51 @@ REQUIRED_TOKENS = {
         "Final Kontrol",
         "meeting-development/final-gate",
     ],
-    "app/menu_registry.py": [
-        "performance_meeting_development",
-        "performance_meeting_test_scenarios",
-        "performance_meeting_development_faz3",
-        "performance_meeting_final_gate",
-    ],
 }
+
+# BYS360_NAV_CANONICAL_SOURCE_FIX: menu_registry.py bir bridge/re-export
+# dosyasıdır; menü kayıtlarının kanonik kaynağı değildir (bkz. dosyanın
+# kendi "P11-D2/P11-D3 ... veri bloğu data modülüne taşındı" yorumları).
+# Bu dört menü kaydı artık menu_registry.py'nin ham metninde literal arama
+# ile değil, gerçek kanonik registry verisine (MENU_SECTIONS) ve canlı
+# url_map'e karşı davranışsal olarak doğrulanır.
+REQUIRED_CANONICAL_MENU_ITEMS = [
+    {"key": "performance_meeting_development", "endpoint": "main.performance_meeting_development"},
+    {"key": "performance_meeting_test_scenarios", "endpoint": "main.performance_meeting_test_scenarios"},
+    {"key": "performance_meeting_development_faz3", "endpoint": "main.performance_meeting_development_faz3"},
+    {"key": "performance_meeting_final_gate", "endpoint": "main.performance_meeting_final_gate"},
+]
+
+
+def _canonical_menu_item(key: str) -> dict[str, Any] | None:
+    try:
+        from app.menu_registry_data_sections import MENU_SECTIONS
+    except Exception:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        return None
+    for section in MENU_SECTIONS:
+        for item in section.get("items", []):
+            if item.get("key") == key:
+                return item
+    return None
+
+
+def _menu_item_canonically_registered(key: str, endpoint: str) -> bool:
+    item = _canonical_menu_item(key)
+    if not item or item.get("endpoint") != endpoint:
+        return False
+    try:
+        from app.route_support import MANAGER_FAMILY_ROLES
+    except Exception:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        return False
+    if not (set(item.get("required_roles") or []) & MANAGER_FAMILY_ROLES):
+        return False
+    try:
+        return endpoint in current_app.view_functions
+    except Exception:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        return False
 
 VISIBLE_TEMPLATE_SCAN = [
     "app/templates/performance/meeting_development.html",
@@ -150,6 +188,14 @@ def build_final_gate_context() -> dict[str, Any]:
                 errors.append(f"Eksik işaret: {rel} -> {token}")
             else:
                 passed.append(f"İşaret hazır: {token}")
+
+    for item in REQUIRED_CANONICAL_MENU_ITEMS:
+        key = item["key"]
+        endpoint = item["endpoint"]
+        if _menu_item_canonically_registered(key, endpoint):
+            passed.append(f"Menü kaydı doğrulandı: {key}")
+        else:
+            errors.append(f"Menü kaydı doğrulanamadı: {key} (endpoint={endpoint})")
 
     for table in REQUIRED_TABLES:
         if _has_table(table):
