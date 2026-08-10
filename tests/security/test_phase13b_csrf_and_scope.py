@@ -225,6 +225,8 @@ def test_interim_notes_wrong_scope_denied(monkeypatch):
     with app.app_context():
         victim = db.session.get(User, victim_id)
         manager = db.session.get(User, manager_id)
+        assert victim is not None
+        assert manager is not None
         victim.yonetici_sicil = manager.sicil_no
         db.session.commit()
 
@@ -281,6 +283,7 @@ def test_support_ticket_private_cross_unit_denied(monkeypatch):
 
     with app.app_context():
         owner = db.session.query(User).filter_by(sicil_no="13d020").first()
+        assert owner is not None
         ticket = SupportTicket(
             ticket_no="P13B-TEST-0001",
             title="Confidential ticket",
