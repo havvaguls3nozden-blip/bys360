@@ -24,13 +24,18 @@ BYS360, kurum içi yönetim süreçlerini tek merkezde toplayan; personel, perfo
 
 ## Local Kurulum
 
+Desteklenen Python sürümü: **3.12** (CI'daki `actions/setup-python@v5` adımı ve `pyproject.toml` `[tool.mypy] python_version` ile aynı).
+
 ```powershell
 cd C:\bys360\project
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 copy .env.example .env
 ```
+
+`requirements-dev.txt`, CI ile birebir aynı sürümlerde kalite araçlarını (ruff, mypy, pytest, pytest-cov, pip-audit) kurar; production bağımlılıklarından (`requirements.txt`) ayrı tutulur. Bu adım atlanırsa aşağıdaki kalite komutları çalışmaz.
 
 `.env` dosyasını local ortama göre doldurun. Gerçek gizli değerler repoya eklenmez.
 
@@ -48,13 +53,24 @@ Alternatif Waitress/local çalıştırma için proje içindeki güncel deploymen
 
 ## Test ve Kalite Kontrol
 
+Aşağıdaki komutlar gerçek, çalışan komutlardır ve CI'daki (`.github/workflows/bys360-ci.yml`) karşılıklarına dayanır. `requirements-dev.txt` kurulmadan hiçbiri çalışmaz (bkz. yukarıdaki Local Kurulum).
+
 ```powershell
-ruff check .
-python -m pytest tests/security tests/critical tests/architecture
-mypy app
+# Secret / repo hijyen gate'i
+python scripts\quality\bys360_secret_repo_gate.py --root .
+
+# Ruff -- CI'daki asıl gate ("Ruff full-select gate"; pyproject.toml [tool.ruff.lint]
+# select = E,F,I,UP,B,SIM kapsamını uygular)
+python -m ruff check app config.py wsgi.py run.py scripts tests
+
+# mypy -- CI'daki asıl komut ("Type check service layer" adımı)
+python -m mypy app tests scripts --ignore-missing-imports --no-error-summary
+
+# pytest -- CI'daki "Run quality tests" adımının sadeleştirilmiş, coverage'lı hali
+python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report=term-missing --tb=short -q
 ```
 
-CI'da kullanılan özel kalite ve secret gate scriptleri `.github/workflows/bys360-ci.yml` içinde listelenir.
+Bu, ortak kullanım için doğrudan kopyalanıp çalıştırılabilecek bir alt kümedir; CI'nin gerçekte çalıştırdığı tam pytest komutları (entegrasyon/mimari/servis/migration testlerinin tamamı ve coverage ratchet gate'i dahil) çok daha uzundur ve sık değişebilir, bu yüzden burada birebir kopyalanmamıştır -- birebir güncel hali için `.github/workflows/bys360-ci.yml` tek doğru kaynaktır. Adım adım, açıklamalı kurulum ve kalite kontrol akışı (venv, `.env`, seed data, tam kalite koşumu) için `CONTRIBUTING.md` içindeki "Yeni geliştirici başlangıç akışı" bölümüne bakın.
 
 ## Doküman Haritası
 
