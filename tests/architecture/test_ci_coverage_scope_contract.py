@@ -916,3 +916,90 @@ def test_coverage_baseline_unchanged_by_drift_closure() -> None:
         "this wave (CI Coverage Gate Drift Closure) must not change the coverage ratchet baseline -- "
         "raising it is a separate, human-reviewed action (KEEP_24_16_BASELINE)"
     )
+
+
+# =====================================================================
+# BYS360 OpenAPI CI Assurance Debt Closure
+#
+# tests/quality/test_openapi_workflow_drift_cleanup_contract.py (44 tests,
+# added in commit 7a605b2 alongside docs/api/openapi_draft.json's removal of
+# 12 dead app/workflow/ OpenAPI path entries) carried no ci_safe marker and
+# was named nowhere in either CI workflow -- 0 of its 44 tests ever ran in
+# real CI. Unlike the tests/workflow drift closed above, this was not a
+# stale-path bug (the file's own path was always valid); it was simply never
+# wired in when it was written.
+#
+# Ownership: of tests/quality's 28 files, 26 (93%) already carry the
+# ci_safe marker and are collected by Step1 (`tests/quality -m "ci_safe"`)
+# with zero YAML changes -- this file and its 82-test sibling
+# (test_workflow_orphan_presentation_subsystem_cleanup_contract.py, already
+# wired into Step2 in the prior wave) were the only two exceptions. Four
+# other ci_safe-marked tests/quality files already use the identical
+# subprocess/isolated-create_app()-probe pattern this file uses
+# (test_phase12b_route_ownership_contract.py, test_route_conflict_runtime_
+# contract.py, test_president_approvals_route_contract.py, test_app_
+# factory_registers_routes_without_duplicate_endpoints.py) -- proving no
+# technical barrier to Step1. This file's own measured runtime (~0.12s/test)
+# is faster than Step1's current average (~0.30s/test). OPENAPI_CONTRACT_
+# CANONICAL_CI_OWNER = STEP1: the fix was a single pytestmark line in the
+# test file itself, not a workflow YAML change -- the Step1 command
+# (`tests/quality -m "ci_safe"`) is unchanged by this wave.
+# =====================================================================
+
+OPENAPI_CLEANUP_CONTRACT_PATH = "tests/quality/test_openapi_workflow_drift_cleanup_contract.py"
+EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT = 44
+
+
+def test_openapi_cleanup_contract_declares_ci_safe_pytestmark() -> None:
+    tree = ast.parse((ROOT / OPENAPI_CLEANUP_CONTRACT_PATH).read_text(encoding="utf-8"))
+    found = False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "pytestmark" for target in node.targets
+        ):
+            found = True
+            break
+    assert found, f"{OPENAPI_CLEANUP_CONTRACT_PATH} must declare a module-level pytestmark (pytest.mark.ci_safe)"
+
+
+def test_openapi_cleanup_contract_file_exists_on_disk() -> None:
+    assert (ROOT / OPENAPI_CLEANUP_CONTRACT_PATH).is_file()
+
+
+def test_openapi_cleanup_contract_is_selected_by_the_unchanged_ci_safe_command() -> None:
+    """Mirrors test_quality_candidate_file_is_selected_by_the_unchanged_ci_safe_command
+    above (Phase 7 precedent): the file itself is never named in the ci_safe
+    command (whole-directory-plus-marker collection) -- this asserts it still
+    lives under the exact tests/quality tree that command scopes to, and that
+    the ci_safe command itself is untouched."""
+    commands = _ci_workflow_commands()
+    matches = [c for c in commands if "tests/quality" in c and '"ci_safe"' in c]
+    assert len(matches) == 1
+    assert OPENAPI_CLEANUP_CONTRACT_PATH.startswith("tests/quality/")
+
+
+def test_openapi_cleanup_contract_is_not_explicitly_named_in_the_coverage_instrumented_ci_step() -> None:
+    """Guards against double execution the other way around: since this file
+    is Step1-owned (via ci_safe marker, not explicit naming), it must never
+    also be named in Step2's command -- that would run all 44 tests twice
+    per CI run."""
+    command = _coverage_instrumented_broad_step_command()
+    assert OPENAPI_CLEANUP_CONTRACT_PATH not in command.split()
+
+
+def test_openapi_cleanup_contract_collects_exactly_44_tests() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", OPENAPI_CLEANUP_CONTRACT_PATH],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    match = re.search(r"(\d+) tests? collected", result.stdout)
+    assert match is not None, f"could not parse a collected-test count from pytest output: {result.stdout!r}"
+    collected = int(match.group(1))
+    assert collected == EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT, (
+        f"{OPENAPI_CLEANUP_CONTRACT_PATH} now collects {collected} tests, expected "
+        f"{EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT} -- if this is a deliberate change, "
+        "update EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT with a documented reason"
+    )

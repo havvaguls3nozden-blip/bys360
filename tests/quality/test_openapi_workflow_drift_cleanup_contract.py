@@ -58,6 +58,8 @@ from pathlib import Path
 
 import pytest
 
+pytestmark = pytest.mark.ci_safe
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OPENAPI_PATH = REPO_ROOT / "docs" / "api" / "openapi_draft.json"
 
