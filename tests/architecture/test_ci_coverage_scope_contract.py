@@ -1042,3 +1042,87 @@ def test_openapi_cleanup_contract_collects_exactly_44_tests() -> None:
         f"{EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT} -- if this is a deliberate change, "
         "update EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT with a documented reason"
     )
+
+
+# =====================================================================
+# BYS360 Coverage Baseline Metadata Consistency Fix (2026-08-11)
+#
+# The elevation wave above correctly updated the ACTIVE combined_pct/lines/
+# branches/measured_at, but left coverage_baseline.json's own commands/
+# test_counts/repeatability fields describing the superseded Phase 9
+# measurement (stale tests/workflow token; Phase-9-era counts and
+# reproducibility numbers under a now-27.62 baseline). Unlike
+# previous_baseline (whose entire purpose is to hold the immediately-
+# preceding, historical snapshot), commands/test_counts/repeatability
+# describe the ACTIVE baseline and must track it. This section locks that
+# in going forward -- distinct from the existing tests above, which check
+# the CI *workflow YAML*, not coverage_baseline.json's own recorded copy
+# of those commands.
+# =====================================================================
+
+
+def test_coverage_baseline_pinned_at_current_elevated_value() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    assert data["combined_pct"] == 27.62
+    assert data["combined_pct_precise"] == pytest.approx(27.619308622802812)
+
+
+def test_coverage_baseline_recorded_commands_reference_no_stale_tests_workflow_path() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    for command in data.get("commands", []):
+        assert "tests/workflow" not in command.split(), (
+            "coverage_baseline.json's own recorded 'commands' must not reference the deleted "
+            "tests/workflow path -- it describes the ACTIVE baseline measurement, not a historical one"
+        )
+
+
+def test_coverage_baseline_recorded_commands_paths_exist_on_disk() -> None:
+    """coverage_baseline.json's own 'commands' field, not the CI workflow YAML
+    (already covered above) -- these must independently stay truthful."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    for command in data.get("commands", []):
+        for token in command.split():
+            if token.startswith("tests/") and not (token.startswith("--")):
+                assert (ROOT / token).exists(), f"coverage_baseline.json references {token!r} but it does not exist"
+
+
+def test_coverage_baseline_recorded_commands_include_current_workflow_cleanup_contract() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH in c.split() for c in commands)
+
+
+def test_coverage_baseline_recorded_commands_do_not_explicitly_name_the_step1_owned_openapi_contract() -> None:
+    """The OpenAPI contract is Step1-owned via ci_safe marker (see the
+    OPENAPI_CONTRACT_CANONICAL_CI_OWNER = STEP1 section above) -- it must
+    never appear as an explicit token in the recorded Step2 command, which
+    would misrepresent its real wiring mechanism."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert not any(OPENAPI_CLEANUP_CONTRACT_PATH in c.split() for c in commands)
+
+
+def test_coverage_baseline_test_counts_match_current_step_totals() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    counts = data["test_counts"]
+    assert counts["step1_ci_safe_passed"] + counts["step1_ci_safe_skipped"] == counts["step1_ci_safe_selected"]
+    assert (
+        counts["step2_broader_scope_passed"] + counts["step2_broader_scope_skipped"]
+        == counts["step2_broader_scope_selected"]
+    )
+    step2_sub_total = sum(v for k, v in counts.items() if k.startswith("step2_") and k.endswith("_contribution"))
+    assert step2_sub_total == counts["step2_broader_scope_selected"], (
+        f"step2_*_contribution fields sum to {step2_sub_total}, expected "
+        f"{counts['step2_broader_scope_selected']} (step2_broader_scope_selected)"
+    )
+
+
+def test_coverage_baseline_repeatability_is_zero_variance_across_all_recorded_runs() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    rep = data["repeatability"]
+    run_values = [v for k, v in rep.items() if k.startswith("run_") and k.endswith("_combined_pct_precise")]
+    assert len(run_values) >= 3, "expected at least 3 recorded independent runs for the elevated baseline"
+    assert min(run_values) == max(run_values) == data["combined_pct_precise"], (
+        "all recorded repeatability runs must be identical to each other and to the active "
+        "combined_pct_precise -- zero variance is the elevation wave's own documented finding"
+    )
