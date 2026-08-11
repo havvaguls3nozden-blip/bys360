@@ -732,7 +732,15 @@ EXPECTED_WORKFLOW_ORPHAN_CLEANUP_CONTRACT_TEST_COUNT = 82
 # This wave (CI Coverage Gate Drift Closure) intentionally does not change
 # the coverage ratchet baseline -- see reports/quality/coverage_baseline.json
 # and its KEEP_24_16_BASELINE decision (a separate, human-reviewed action).
-UNCHANGED_BASELINE_COMBINED_PCT = 24.16
+#
+# The BYS360 Coverage Baseline Ratchet Elevation wave (2026-08-11) later DID
+# raise this baseline, deliberately and human-reviewed, after 3 independent
+# zero-variance fresh measurements (see coverage_baseline.json's own
+# _history entry for the full evidence trail) -- so this constant is kept
+# as the durable historical floor this baseline must never silently drop
+# back to, matching the PRE_*_EXPANSION_BASELINE_COMBINED_PCT convention
+# used elsewhere in this file, rather than an exact-equality lock.
+PRE_BASELINE_ELEVATION_COMBINED_PCT = 24.16
 
 
 def _coverage_instrumented_broad_step_tokens() -> list[str]:
@@ -910,11 +918,42 @@ def test_no_continue_on_error_introduced_by_drift_closure() -> None:
 # --- Test: this wave's own explicit non-goal -- the coverage baseline is unchanged ---
 
 
-def test_coverage_baseline_unchanged_by_drift_closure() -> None:
+def test_coverage_ratchet_baseline_was_raised_past_pre_elevation_wave_value() -> None:
+    """CI Coverage Gate Drift Closure itself did not touch the baseline
+    (KEEP_24_16_BASELINE); the later Coverage Baseline Ratchet Elevation wave
+    is the one that deliberately raised it -- this must never silently drop
+    back to (or below) the pre-elevation floor."""
     data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
-    assert float(data["combined_pct"]) == UNCHANGED_BASELINE_COMBINED_PCT, (
-        "this wave (CI Coverage Gate Drift Closure) must not change the coverage ratchet baseline -- "
-        "raising it is a separate, human-reviewed action (KEEP_24_16_BASELINE)"
+    new_combined_pct = float(data["combined_pct"])
+    assert new_combined_pct > PRE_BASELINE_ELEVATION_COMBINED_PCT, (
+        f"new coverage_baseline.json combined_pct ({new_combined_pct}) must be strictly greater "
+        f"than the pre-elevation baseline ({PRE_BASELINE_ELEVATION_COMBINED_PCT})"
+    )
+
+
+# =====================================================================
+# BYS360 Coverage Baseline Ratchet Elevation (2026-08-11)
+# =====================================================================
+
+
+def test_coverage_baseline_tolerance_unchanged_by_elevation() -> None:
+    """The elevation wave's own stated non-goal: tolerance_pct is a separate,
+    already-reviewed safety-margin mechanism and must not be silently
+    widened or narrowed alongside a baseline raise."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    assert float(data["tolerance_pct"]) == 0.5
+
+
+def test_coverage_baseline_effective_threshold_still_well_above_pre_elevation_floor() -> None:
+    """Locks in that raising the baseline actually tightened real regression
+    protection: the new effective pass threshold (baseline - tolerance) must
+    itself sit comfortably above the pre-elevation baseline, not just above
+    the pre-elevation baseline's own (looser) effective threshold."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    effective_threshold = float(data["combined_pct"]) - float(data["tolerance_pct"])
+    assert effective_threshold > PRE_BASELINE_ELEVATION_COMBINED_PCT, (
+        f"new effective threshold ({effective_threshold}) must exceed the pre-elevation "
+        f"baseline ({PRE_BASELINE_ELEVATION_COMBINED_PCT}) for this to be a real tightening"
     )
 
 
