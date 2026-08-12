@@ -1126,3 +1126,38 @@ def test_coverage_baseline_repeatability_is_zero_variance_across_all_recorded_ru
         "all recorded repeatability runs must be identical to each other and to the active "
         "combined_pct_precise -- zero variance is the elevation wave's own documented finding"
     )
+
+
+# =====================================================================
+# BYS360 P0 Critical Coverage Hotspot Wave (2026-08-12) --
+# APPROVED_MINIMAL_CI_WIRING_EXCEPTION
+#
+# tests/test_performance_publish_preflight_rules_behavior.py (20 real
+# behavioral tests, 0%->87.4% line / 0%->89.3% branch on
+# app/services/performance/publish_preflight_rules.py) was written as a
+# brand-new top-level tests/test_*.py file -- unlike the tests/quality/
+# files above, it cannot be wired in via a ci_safe pytestmark (Step1's
+# positional scope is only `tests/quality`, so a marker on a file outside
+# that directory is a no-op); the only real wiring mechanism for a
+# top-level file is explicit naming in Step2's command, same as its
+# decoy sibling test_performance_publish_preflight_static.py already
+# is. File-existence-on-disk is already covered generically by
+# test_every_referenced_test_path_in_the_coverage_instrumented_ci_step_exists_on_disk
+# above; only the two wave-specific facts below are new.
+# =====================================================================
+
+PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH = "tests/test_performance_publish_preflight_rules_behavior.py"
+
+
+def test_publish_preflight_rules_behavior_is_explicitly_named_in_the_coverage_instrumented_ci_step() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in command.split()
+
+
+def test_publish_preflight_rules_behavior_appears_in_exactly_one_ci_workflow_run_command() -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in c.split()]
+    assert len(hits) == 1, (
+        f"expected {PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH} in exactly one CI run command, "
+        f"found {len(hits)}: {hits}"
+    )
