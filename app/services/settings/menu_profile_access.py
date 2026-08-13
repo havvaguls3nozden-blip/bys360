@@ -352,13 +352,11 @@ def clear_user_menu_overrides_handler(
     updated_by_user_id: int | None,
     user_menu_permission_model: Any,
     db_session: Any,
-    filter_live_menu_rows_func: Callable[[Iterable[Any]], list[Any]],
-    snapshot_user_override_state_func: Callable[[int | None], dict[str, bool]],
     create_settings_change_log_func: Callable[..., object],
 ) -> int:
-    """Kisi bazli override satirlarini temizler ve loglar."""
-    previous_state = snapshot_user_override_state_func(user_id)
-    rows = filter_live_menu_rows_func(user_menu_permission_model.query.filter_by(user_id=user_id).all())
+    """Kisi bazli TUM override satirlarini (canli/kaldirilmis ayrimi yapmadan) temizler ve loglar."""
+    rows = user_menu_permission_model.query.filter_by(user_id=user_id).all()
+    previous_state = {row.menu_key: bool(row.is_visible) for row in rows}
     deleted = len(rows)
     for row in rows:
         db_session.delete(row)

@@ -976,8 +976,6 @@ def test_clear_user_menu_overrides_deletes_all_rows_and_returns_count_with_audit
             updated_by_user_id=99,
             user_menu_permission_model=UserMenuPermission,
             db_session=db.session,
-            filter_live_menu_rows_func=filter_live_menu_rows,
-            snapshot_user_override_state_func=snapshot_user_override_state,
             create_settings_change_log_func=spy,
         )
 
@@ -1004,26 +1002,26 @@ def test_clear_user_menu_overrides_zero_rows_returns_zero_but_still_logs(app) ->
             updated_by_user_id=1,
             user_menu_permission_model=UserMenuPermission,
             db_session=db.session,
-            filter_live_menu_rows_func=filter_live_menu_rows,
-            snapshot_user_override_state_func=snapshot_user_override_state,
             create_settings_change_log_func=spy,
         )
 
         assert deleted == 0
         assert len(spy.calls) == 1
+        assert spy.calls[0]["previous_state"] == {}
+        assert spy.calls[0]["new_state"] == {}
 
 
-def test_clear_user_menu_overrides_skips_rows_filtered_out_by_live_row_predicate(app) -> None:
-    """Documents real behavior: rows the injected filter treats as "not live"
-    are neither counted nor deleted by "clear", so they survive a "clear all"
-    call. Production wires ``filter_live_menu_rows_func`` to the real
-    ``filter_live_menu_rows`` (menu_permissions.py), which drops rows whose
-    ``menu_key`` is flagged ``is_removed_menu_key`` -- so if a user has a
-    leftover override row for a since-quarantined module, this handler will
-    silently leave that row in the table forever, even though the caller
-    asked to clear ALL of that user's overrides. This may be intentional
-    (data preservation for the quarantined scope) but is worth a product
-    decision -- see final report for BLOCKED_PRODUCTION_FIX_REQUIRED note.
+def test_clear_user_menu_overrides_deletes_rows_regardless_of_live_scope_filter(app) -> None:
+    """REAL_FUNCTIONAL_BUG_DISCOVERED / fixed: ``clear_user_menu_overrides_handler``
+    used to apply a live-scope filter before computing the delete set, so
+    override rows for permanently-removed-module menu keys (``repository``,
+    ``education``, ``strategy`` -- see ``app/config/removed_modules.py``)
+    silently survived a "clear all overrides" call, ``deleted_count``
+    undercounted, and the audit log's ``new_state={}`` claim was false. The
+    handler signature no longer accepts a live-scope filter at all: it deletes
+    every row for the user unconditionally. This test replaces the old
+    characterization test (which asserted the removed-scope row survived) and
+    instead asserts full deletion of a mixed live + removed-scope row set.
     """
     from app.extensions import db
     from app.models import UserMenuPermission
@@ -1031,27 +1029,258 @@ def test_clear_user_menu_overrides_skips_rows_filtered_out_by_live_row_predicate
     with app.app_context():
         user = _make_user()
         db.session.add_all([
-            UserMenuPermission(user_id=user.id, menu_key="wave_live_key", is_visible=True, source_type="user_override"),
-            UserMenuPermission(user_id=user.id, menu_key="removed_key", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="repository", is_visible=True, source_type="user_override"),
         ])
         db.session.commit()
-
-        def _filter_only_live(rows):
-            return [row for row in rows if row.menu_key != "removed_key"]
 
         deleted = clear_user_menu_overrides_handler(
             user_id=user.id,
             updated_by_user_id=1,
             user_menu_permission_model=UserMenuPermission,
             db_session=db.session,
-            filter_live_menu_rows_func=_filter_only_live,
-            snapshot_user_override_state_func=snapshot_user_override_state,
             create_settings_change_log_func=ChangeLogSpy(),
         )
 
-        assert deleted == 1
+        assert deleted == 2
         remaining = {row.menu_key for row in UserMenuPermission.query.filter_by(user_id=user.id).all()}
-        assert remaining == {"removed_key"}
+        assert remaining == set()
+
+
+def test_clear_user_menu_overrides_deletes_only_removed_scope_rows(app) -> None:
+    """Scenario B: a user whose overrides are ALL on removed-scope menu keys
+    (``repository``/``education``/``strategy``) must still have every row
+    deleted and counted -- there is no "removed scope survives" carve-out.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add_all([
+            UserMenuPermission(user_id=user.id, menu_key="repository", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="education", is_visible=False, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="strategy", is_visible=True, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        deleted = clear_user_menu_overrides_handler(
+            user_id=user.id,
+            updated_by_user_id=1,
+            user_menu_permission_model=UserMenuPermission,
+            db_session=db.session,
+            create_settings_change_log_func=ChangeLogSpy(),
+        )
+
+        assert deleted == 3
+        assert UserMenuPermission.query.filter_by(user_id=user.id).count() == 0
+
+
+def test_clear_user_menu_overrides_deletes_only_live_scope_rows_no_regression(app) -> None:
+    """Scenario C: the already-correct live-only case must keep working --
+    no regression from removing the live-scope filter from the handler.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add_all([
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="personel_yetki", is_visible=False, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        deleted = clear_user_menu_overrides_handler(
+            user_id=user.id,
+            updated_by_user_id=1,
+            user_menu_permission_model=UserMenuPermission,
+            db_session=db.session,
+            create_settings_change_log_func=ChangeLogSpy(),
+        )
+
+        assert deleted == 2
+        assert UserMenuPermission.query.filter_by(user_id=user.id).count() == 0
+
+
+def test_clear_user_menu_overrides_audit_previous_state_includes_live_and_removed_keys(app) -> None:
+    """Scenario E: the audit log's ``previous_state`` must reflect BOTH the
+    live-scope and removed-scope override rows with their real ``is_visible``
+    values -- not just the live subset.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add_all([
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="repository", is_visible=False, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        spy = ChangeLogSpy()
+        clear_user_menu_overrides_handler(
+            user_id=user.id,
+            updated_by_user_id=1,
+            user_menu_permission_model=UserMenuPermission,
+            db_session=db.session,
+            create_settings_change_log_func=spy,
+        )
+
+        assert len(spy.calls) == 1
+        assert spy.calls[0]["previous_state"] == {"dashboard": True, "repository": False}
+
+
+def test_clear_user_menu_overrides_audit_new_state_matches_actual_empty_db_state(app) -> None:
+    """Scenario F: the whole point of the original bug was that the audit
+    log's ``new_state={}`` claim and DB reality diverged. Assert both
+    independently and confirm they now agree.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add_all([
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="education", is_visible=True, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        spy = ChangeLogSpy()
+        deleted = clear_user_menu_overrides_handler(
+            user_id=user.id,
+            updated_by_user_id=1,
+            user_menu_permission_model=UserMenuPermission,
+            db_session=db.session,
+            create_settings_change_log_func=spy,
+        )
+
+        assert deleted == 2
+        assert spy.calls[0]["new_state"] == {}
+        # Independently re-query the DB -- do not just trust the logged claim.
+        real_remaining_count = UserMenuPermission.query.filter_by(user_id=user.id).count()
+        assert real_remaining_count == 0
+
+
+def test_clear_user_menu_overrides_commit_failure_propagates_without_swallowing(app) -> None:
+    """Scenario G: the handler has no try/except around the commit -- an
+    exception raised during commit must propagate to the caller rather than
+    being silently swallowed. Wraps the real session so ``delete`` still
+    behaves normally but ``commit`` raises, matching this file's existing
+    ``BoomModel``-style "raising stand-in simulates a real failure" pattern.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    class _CommitFailsSession:
+        def __init__(self, real_session: Any) -> None:
+            self._real = real_session
+
+        def delete(self, obj: Any) -> None:
+            self._real.delete(obj)
+
+        def commit(self) -> None:
+            raise RuntimeError("BYS360 phase5w2 simulated commit failure for clear_user_menu_overrides")
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add(
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override")
+        )
+        db.session.commit()
+
+        with pytest.raises(RuntimeError, match="simulated commit failure"):
+            clear_user_menu_overrides_handler(
+                user_id=user.id,
+                updated_by_user_id=1,
+                user_menu_permission_model=UserMenuPermission,
+                db_session=_CommitFailsSession(db.session),
+                create_settings_change_log_func=ChangeLogSpy(),
+            )
+
+        # The failed commit never landed -- the pending delete only exists on
+        # the real session's transaction. Roll it back and confirm the row
+        # was never actually removed (no silent partial-success).
+        db.session.rollback()
+        remaining = {row.menu_key for row in UserMenuPermission.query.filter_by(user_id=user.id).all()}
+        assert remaining == {"dashboard"}
+
+
+def test_clear_user_menu_overrides_real_production_wiring_fixes_mixed_scope_bug_end_to_end(app) -> None:
+    """Section 4 (most important): exercises the REAL production call path --
+    ``settings_service.clear_user_menu_overrides`` -- with its real
+    ``UserMenuPermission``/``db.session``/``create_settings_change_log``
+    wiring baked in (no injected test doubles for the handler's dependencies).
+    This is the path actual users/admins hit, and the one that would have
+    caught the original bug: before the fix, the removed-scope ``repository``
+    row would have survived the clear and ``deleted_count`` would have been 1
+    instead of 2.
+    """
+    from app.extensions import db
+    from app.models import SettingsChangeLog, UserMenuPermission
+    from app.services import settings_service
+    from app.services.settings.change_logs import deserialize_settings_state
+
+    with app.app_context():
+        user = _make_user()
+        db.session.add_all([
+            UserMenuPermission(user_id=user.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user.id, menu_key="repository", is_visible=True, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        deleted = settings_service.clear_user_menu_overrides(user.id, updated_by_user_id=77)
+
+        assert deleted == 2
+        assert UserMenuPermission.query.filter_by(user_id=user.id).count() == 0
+
+        log_row = SettingsChangeLog.query.filter_by(
+            target_user_id=user.id, change_scope="user_menu_overrides", action_type="clear"
+        ).order_by(SettingsChangeLog.id.desc()).first()
+        assert log_row is not None
+        assert log_row.actor_user_id == 77
+        assert deserialize_settings_state(log_row.new_state_json) == {}
+        assert deserialize_settings_state(log_row.previous_state_json) == {
+            "dashboard": True, "repository": True,
+        }
+
+
+def test_clear_user_menu_overrides_does_not_affect_other_users_rows(app) -> None:
+    """Section 5: clearing user A's overrides must leave user B's rows --
+    including their removed-scope row -- completely untouched.
+    """
+    from app.extensions import db
+    from app.models import UserMenuPermission
+
+    with app.app_context():
+        user_a = _make_user(ad="UserA")
+        user_b = _make_user(ad="UserB")
+        db.session.add_all([
+            UserMenuPermission(user_id=user_a.id, menu_key="dashboard", is_visible=True, source_type="user_override"),
+            UserMenuPermission(user_id=user_a.id, menu_key="repository", is_visible=False, source_type="user_override"),
+            UserMenuPermission(user_id=user_b.id, menu_key="dashboard", is_visible=False, source_type="user_override"),
+            UserMenuPermission(user_id=user_b.id, menu_key="repository", is_visible=True, source_type="user_override"),
+        ])
+        db.session.commit()
+
+        deleted = clear_user_menu_overrides_handler(
+            user_id=user_a.id,
+            updated_by_user_id=1,
+            user_menu_permission_model=UserMenuPermission,
+            db_session=db.session,
+            create_settings_change_log_func=ChangeLogSpy(),
+        )
+
+        assert deleted == 2
+        assert UserMenuPermission.query.filter_by(user_id=user_a.id).count() == 0
+
+        user_b_rows = {
+            row.menu_key: bool(row.is_visible)
+            for row in UserMenuPermission.query.filter_by(user_id=user_b.id).all()
+        }
+        assert user_b_rows == {"dashboard": False, "repository": True}
 
 
 # ---------------------------------------------------------------------------
