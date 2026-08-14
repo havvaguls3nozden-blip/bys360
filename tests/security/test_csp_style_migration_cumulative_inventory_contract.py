@@ -148,6 +148,38 @@ markup an edit-in-place wave would touch) -- if that ever changes, it gets
 its own follow-up then. `INITIAL_*` constants and all prior wave entries
 (including their `removed_dynamic: 0` additions) are otherwise unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 7 (BYS360 Orphan Template + Dead Helper
+Micro-Cleanup, a DELETED_TEMPLATE_WAVES-class wave): `app/templates/
+weights.html` independently re-confirmed ORPHAN_CONFIRMED by 1 coordinator +
+3 cross-checking agents (zero route/render_template/include/menu/dynamic-
+loader consumer anywhere, plus a live create_app()/url_map probe showing none
+of its 4 referenced `main.performance_weight_*` endpoints are registered) and
+deleted outright — see
+`tests/security/test_weights_orphan_template_and_dead_safe_url_for_cleanup_contract.py`
+for the full evidence chain. Unlike `duplicate_template_orphan_cleanup_wave1`
+(whose 9 templates all independently measured zero style/CSP contribution),
+`weights.html` carried one incidental fully-static
+`style="min-width:250px;"` attribute (on a `<th>` column header, unrelated to
+the deletion rationale) and one `<style>` block (page-local CSS for the
+deleted table/card layout). New `"weights_orphan_template_cleanup"` entry:
+`removed_static=1`, `removed_blocks=1`, `removed_dynamic=0` — independently
+re-derived from the fixed pre-deletion git ref (HEAD of this wave's own
+investigation, `2838761cdc37d3c987ca6eb1ae1d2d0d0d9a1fff`) by the same
+`test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_ref`
+test below, never just trusted. This is the first deleted-template wave since
+`duplicate_template_orphan_cleanup_wave1` to change
+`EXPECTED_ACTIVE_STYLE_TOTAL`/`EXPECTED_STYLE_BLOCK_TOTAL` away from
+1035/225 (now 1034/224) — the other test files that hardcode those repo-wide
+totals as their own "unchanged by my wave" lock needed the same
+1-attribute/1-block adjustment (see this wave's own commit for the full
+file list). `app/templates/weight_create.html` and `app/templates/
+weight_edit.html` are explicitly OUT of scope for this wave (same orphan
+family, flagged as follow-up tech debt, not touched) and are NOT in this
+manifest entry. `template_safety.py::safe_url_for` — this same wave's OTHER
+cleanup target, a dead Jinja-shadowed Python helper — carried no template
+markup, so it contributes 0 to this style/CSP ledger. `INITIAL_*` constants
+and all prior wave entries are unaffected.
+
 CANONICAL METHODOLOGY: all counting goes through the single shared helper
 `tests/security/_bys360_style_inventory.py` (real `html.parser.HTMLParser`
 based tokenization, not a naive regex) so this file, the per-wave files,
@@ -434,6 +466,17 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         "removed_blocks": 0,
         "removed_dynamic": 0,
     },
+    # BYS360 Orphan Template + Dead Helper Micro-Cleanup: see FORWARD-
+    # COMPATIBILITY FOLLOW-UP 7 in the module docstring above for the full
+    # evidence chain and per-file rationale.
+    "weights_orphan_template_cleanup": {
+        "templates": (
+            "app/templates/weights.html",
+        ),
+        "removed_static": 1,
+        "removed_blocks": 1,
+        "removed_dynamic": 0,
+    },
 }
 
 # The fixed commit immediately BEFORE each deleted-template wave's own
@@ -445,6 +488,7 @@ DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "executive_summary_dashboard_cleanup": "c5a6a61b47caf2d39ca812b74f7fd22f329629c4",
     "workflow_orphan_presentation_cleanup": "88d148c61f11fe9cc8d323cd8cdce1d80a146dfe",
     "duplicate_template_orphan_cleanup_wave1": "d4ee2043931b37cef6df2ceef898094e0eebb04d",
+    "weights_orphan_template_cleanup": "2838761cdc37d3c987ca6eb1ae1d2d0d0d9a1fff",
 }
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)

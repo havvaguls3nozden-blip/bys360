@@ -503,12 +503,17 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 #    global <style> block total dropped by EXACTLY 8 (233 -> 225). See
 #    tests/security/test_csp_style_migration_cumulative_inventory_contract.py
 #    ::STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"] for the
-#    manifest entry this cross-checks against.
+#    manifest entry this cross-checks against. A further, unrelated later
+#    wave (weights_orphan_template_cleanup) deleted the orphan
+#    app/templates/weights.html, which independently carried its own one
+#    static style="..." attribute and one <style> block: 1035 - 1 = 1034,
+#    225 - 1 = 224. See that same ledger file's FORWARD-COMPATIBILITY
+#    FOLLOW-UP 7.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1035
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C = 64
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 225
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 224
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:

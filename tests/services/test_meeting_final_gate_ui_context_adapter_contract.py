@@ -54,8 +54,12 @@ pre-wave ref. No new CSS -- the new body reuses only pre-existing `.bys-md-*`
 classes already defined in `app/static/css/meeting_development_c_shared.css`
 (untouched, byte-identical). The template's 2 pre-existing
 `style="margin-top:16px;"` occurrences are preserved byte-for-byte (same
-count, same string) -- the repo-wide style ledger (1035/64/225) is therefore
-completely unaffected; no CSP-manifest wave entry was needed.
+count, same string) -- the repo-wide style ledger (1035/64/225 at the time
+this wave landed, later 1034/64/224 after the unrelated
+`weights_orphan_template_cleanup` wave -- see
+`test_csp_style_migration_cumulative_inventory_contract.py`'s FORWARD-
+COMPATIBILITY FOLLOW-UP 7) is therefore completely unaffected by THIS wave;
+no CSP-manifest wave entry was needed.
 
 This file uses real, isolated Flask apps (module-scoped, UUID-based temp
 SQLite, matching this repo's established fixture pattern) and real ORM
@@ -584,9 +588,9 @@ def test_url_map_route_count_is_unchanged(final_gate_env) -> None:
 # 20) Style inventory does not worsen; handler/javascript stay 0/0.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_ACTIVE_STYLE_TOTAL = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 225
+EXPECTED_STYLE_BLOCK_TOTAL = 224
 
 
 def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:

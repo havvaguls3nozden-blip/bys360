@@ -54,9 +54,13 @@ attributes, 0 dynamic style attributes, 0 <style> blocks, 0 inline event
 handlers, 0 javascript: URLs each (verified via the same canonical
 `tests.security._bys360_style_inventory` helper used by every other wave in
 this repo). This wave's `removed_static`/`removed_blocks`/`removed_dynamic`
-are therefore all 0 -- the repo-wide 1035/64/225 totals are UNCHANGED by this
-wave (see `test_csp_style_migration_cumulative_inventory_contract.py`'s
-`DELETED_TEMPLATE_WAVES["duplicate_template_orphan_cleanup_wave1"]`).
+are therefore all 0 -- the repo-wide totals were UNCHANGED by this wave
+(1035/64/225 at the time this wave landed; see
+`test_csp_style_migration_cumulative_inventory_contract.py`'s
+`DELETED_TEMPLATE_WAVES["duplicate_template_orphan_cleanup_wave1"]`). A
+LATER wave, `weights_orphan_template_cleanup` (see that same file's FORWARD-
+COMPATIBILITY FOLLOW-UP 7), reduced the repo-wide totals further to
+1034/64/224 -- unrelated to this wave, which remains a 0-contribution entry.
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 `Path.read_text()`/`Path.exists()`, `git show`/`git status`/`git diff`
@@ -407,9 +411,9 @@ def test_url_map_route_count_is_unchanged(wave1_app) -> None:
 #     files each contributed 0 to every bucket).
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_ACTIVE_STYLE_TOTAL = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 225
+EXPECTED_STYLE_BLOCK_TOTAL = 224
 
 
 def test_repo_wide_style_inventory_totals_are_unchanged() -> None:

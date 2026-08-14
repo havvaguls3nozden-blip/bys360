@@ -88,7 +88,16 @@ MEETING_SCREENS: tuple[dict[str, str], ...] = (
 )
 
 # weights.html's 4 stale endpoints -- confirmed NO_SUCCESSOR / orphan template
-# in the same investigation. This wave must not touch them.
+# in the same investigation. A LATER wave ("BYS360 Orphan Template + Dead
+# Helper Micro-Cleanup") independently re-confirmed ORPHAN_CONFIRMED (three
+# agents, cross-checked, plus a live create_app()/url_map probe) and deleted
+# the file outright -- see
+# tests/security/test_weights_orphan_template_and_dead_safe_url_for_cleanup_contract.py
+# for that wave's full evidence chain. The tests below were converted from
+# "file still contains the stale references, byte for byte" (meaningless once
+# the file no longer exists) to a "file is gone / stale strings are gone from
+# ALL active presentation code / route registry unaffected" negative contract
+# -- see that section's own comments for the exact rationale.
 WEIGHTS_TEMPLATE = "app/templates/weights.html"
 WEIGHTS_STALE_ENDPOINTS: tuple[str, ...] = (
     "main.performance_weight_create",
@@ -249,31 +258,42 @@ def test_stale_endpoints_still_do_not_exist_in_url_map(nav_app) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Negative contract: weights.html and its 4 stale endpoints are explicitly
-# OUT of scope for this fix (NO_SUCCESSOR / orphan template) and must be
-# unaffected. Also guards against an accidental performance_period_*
-# mapping ever being introduced for these endpoints (Werkzeug's fuzzy
-# suggestion was explicitly rejected -- different resource entirely).
+# Negative contract: weights.html was confirmed orphan (NO_SUCCESSOR) by this
+# wave's own investigation and later DELETED outright by the follow-up
+# "Orphan Template + Dead Helper Micro-Cleanup" wave. These tests were
+# converted from "the dead references are still there, untouched" (which
+# would raise FileNotFoundError once the file is gone) to the canonical
+# deleted-template negative contract: the file must be genuinely absent, its
+# 4 stale endpoint strings must have zero references anywhere in active
+# presentation code, and the route registry must remain unaffected.
 # ---------------------------------------------------------------------------
 
 
-def test_weights_html_still_uses_all_four_original_stale_weight_endpoints() -> None:
-    text = (REPO_ROOT / WEIGHTS_TEMPLATE).read_text(encoding="utf-8")
-    for endpoint in WEIGHTS_STALE_ENDPOINTS:
-        assert f"safe_url_for('{endpoint}'" in text, (
-            f"{WEIGHTS_TEMPLATE}: expected untouched stale reference to {endpoint!r} is missing -- "
-            "this fix must not touch weights.html (confirmed orphan template, NO_SUCCESSOR)."
-        )
+def test_weights_html_template_file_no_longer_exists() -> None:
+    assert not (REPO_ROOT / WEIGHTS_TEMPLATE).exists(), (
+        f"{WEIGHTS_TEMPLATE} still exists -- expected deleted (confirmed ORPHAN_CONFIRMED, "
+        "see tests/security/test_weights_orphan_template_and_dead_safe_url_for_cleanup_contract.py)."
+    )
+
+
+def test_stale_weight_endpoint_strings_have_zero_presentation_references() -> None:
+    """Repo-wide guard: none of weights.html's 4 stale endpoint strings may
+    reappear in any active template or Python presentation code -- covers
+    both the deleted template's own resurrection and an accidental copy-paste
+    into a different file."""
+    offenders: list[str] = []
+    for root, suffixes in ((REPO_ROOT / "app" / "templates", (".html",)), (REPO_ROOT / "app", (".py",))):
+        for suffix in suffixes:
+            for path in root.rglob(f"*{suffix}"):
+                text = path.read_text(encoding="utf-8", errors="replace")
+                if any(endpoint in text for endpoint in WEIGHTS_STALE_ENDPOINTS):
+                    offenders.append(str(path.relative_to(REPO_ROOT)))
+    assert offenders == [], f"Stale weight endpoint string(s) unexpectedly found in: {offenders!r}"
 
 
 def test_weights_html_was_not_mapped_to_period_endpoints(nav_app) -> None:
-    text = (REPO_ROOT / WEIGHTS_TEMPLATE).read_text(encoding="utf-8")
-    assert "performance_period_create" not in text
-    assert "performance_period_edit" not in text
-    assert "performance_period_delete" not in text
-    # And genuinely confirm no such weight->period rename ever landed in the
-    # real url_map either (weights.html itself is unreachable, but this
-    # closes the loop: no live route was ever wrongly wired for it).
+    # Confirms no weight->period rename was ever wrongly wired into the real
+    # url_map (weights.html itself is now deleted, but this closes the loop).
     endpoint_names = {rule.endpoint for rule in nav_app.url_map.iter_rules()}
     for endpoint in WEIGHTS_STALE_ENDPOINTS:
         assert endpoint not in endpoint_names, (

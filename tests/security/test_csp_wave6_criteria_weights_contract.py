@@ -12,10 +12,21 @@ zaman elle template'e yazılmaz. Asıl risk inline EVENT ATTRIBUTE'lardı
 (`onclick=`, `onsubmit=` vb.) -- bunlara nonce uygulanmaz ve enforce modda
 tarayıcı tarafından çalıştırılmazlar.
 
-Bu dosyanın sahiplik alanı yalnızca şu iki template:
+Bu dosyanın sahiplik alanı şu template:
     - app/templates/criteria.html  (3 handler: 2x onclick -> toggleEditBox,
       1x onsubmit -> confirm())
-    - app/templates/weights.html   (1 handler: 1x onsubmit -> confirm())
+
+Not (weights.html kaldırıldı): bu dosya başlangıçta app/templates/weights.html
+(1 handler: 1x onsubmit -> confirm()) için de aynı CSP-safety kontratını
+taşıyordu -- aşağıdaki "ÇÖZÜM (weights.html)" paragrafı o dönemin tarihsel
+kaydı olarak bırakıldı. weights.html, sonraki "BYS360 Orphan Template + Dead
+Helper Micro-Cleanup" dalgasında ORPHAN_CONFIRMED bulunup dosya olarak
+tamamen silindi (bkz.
+tests/security/test_weights_orphan_template_and_dead_safe_url_for_cleanup_contract.py);
+artık var olmayan bir dosyanın CSP-safety özelliklerini test etmenin anlamı
+kalmadığı için o dalgada weights.html'e özgü tüm testler (WAVE6_FILES
+parametrizasyonundan çıkarma dahil) buradan kaldırıldı. criteria.html'e ait
+hiçbir test bundan etkilenmedi.
 
 ÇÖZÜM (criteria.html): Bu template `{% for item in criteria_list %}...
 {% endfor %}` döngüsüyle N kriter kartı render eder; her kartta İKİ buton
@@ -85,12 +96,10 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CRITERIA_TEMPLATE = "app/templates/criteria.html"
-WEIGHTS_TEMPLATE = "app/templates/weights.html"
 
-WAVE6_FILES = [CRITERIA_TEMPLATE, WEIGHTS_TEMPLATE]
+WAVE6_FILES = [CRITERIA_TEMPLATE]
 
 DELETE_CONFIRM_MESSAGE_CRITERIA = "Bu kriter silinsin mi?"
-DELETE_CONFIRM_MESSAGE_WEIGHT = "Bu ağırlık kaydını silmek istediğinize emin misiniz?"
 
 # HTML attribute syntax: bosluk + on<harfler> + '=' + tirnak. CSS/JS icindeki
 # "javascript:" gibi metinsel string literal'leri yanlislikla yakalamaz.
@@ -110,18 +119,6 @@ def _fake_criterion(item_id: int, **overrides: object) -> types.SimpleNamespace:
         description=f"Wave6 kontrat test açıklaması {item_id}",
         weight=20.0,
         sort_order=item_id,
-        is_active=True,
-    )
-    base.update(overrides)
-    return types.SimpleNamespace(**base)
-
-
-def _fake_weight(item_id: int, **overrides: object) -> types.SimpleNamespace:
-    base: dict[str, object] = dict(
-        id=item_id,
-        period=None,
-        evaluator_1_weight=50.0,
-        evaluator_2_weight=50.0,
         is_active=True,
     )
     base.update(overrides)
@@ -220,28 +217,6 @@ def test_criteria_source_has_exactly_one_script_block() -> None:
     assert text.count("<script") == 1
 
 
-def test_weights_source_delete_form_has_data_confirm_message_verbatim() -> None:
-    text = _read(WEIGHTS_TEMPLATE)
-    assert "onsubmit=" not in text
-    assert f'data-confirm="{DELETE_CONFIRM_MESSAGE_WEIGHT}"' in text
-    assert text.count('data-confirm="') == 1
-
-
-def test_weights_source_has_exactly_one_new_script_block_with_form_confirm_delegation() -> None:
-    text = _read(WEIGHTS_TEMPLATE)
-    assert text.count("<script") == 1
-    assert text.count("querySelectorAll('form[data-confirm]')") == 1
-    assert "if (message && !window.confirm(message))" in text
-    assert "event.preventDefault();" in text
-
-
-def test_weights_source_csrf_hidden_input_untouched() -> None:
-    """CSRF hidden input'a DOKUNULMADIĞINI doğrular -- silme formu hâlâ
-    `csrf_token()` değerini taşıyan gizli input içeriyor."""
-    text = _read(WEIGHTS_TEMPLATE)
-    assert '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">' in text
-
-
 def test_criteria_source_csrf_hidden_input_untouched() -> None:
     text = _read(CRITERIA_TEMPLATE)
     assert '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">' in text
@@ -249,12 +224,12 @@ def test_criteria_source_csrf_hidden_input_untouched() -> None:
 
 def test_base_template_has_no_global_form_data_confirm_delegation() -> None:
     """Regresyon kilidi: `base.html` şu an KENDİ `form[data-confirm]`
-    submit-delegasyonuna SAHİP DEĞİL. criteria.html/weights.html render
-    testlerinin "tam sayfa çıktısında `querySelectorAll('form[data-confirm]')`
-    tam olarak 1 kez geçer" varsayımı buna dayanır -- biri ileride base.html'e
-    global bir form[data-confirm] delegasyonu eklerse bu, criteria.html/
-    weights.html'in kendi yerel delegasyonuyla ÇİFT LİSTENER (çift confirm
-    dialog'u) oluşturacağından bu test o riski erken yakalar."""
+    submit-delegasyonuna SAHİP DEĞİL. criteria.html render testlerinin
+    "tam sayfa çıktısında `querySelectorAll('form[data-confirm]')` tam olarak
+    1 kez geçer" varsayımı buna dayanır -- biri ileride base.html'e global bir
+    form[data-confirm] delegasyonu eklerse bu, criteria.html'in kendi yerel
+    delegasyonuyla ÇİFT LİSTENER (çift confirm dialog'u) oluşturacağından bu
+    test o riski erken yakalar."""
     text = _read("app/templates/base.html")
     assert "querySelectorAll('form[data-confirm]')" not in text
     assert "data-confirm" not in text
@@ -362,94 +337,3 @@ def test_criteria_render_with_empty_list_still_has_single_script_and_no_handlers
     assert html.count("event.target.closest('[data-toggle-edit-box]')") == 1
     assert not _INLINE_EVENT_ATTR_RE.findall(html)
     assert "function toggleEditBox(id) {" in html
-
-
-def test_weights_render_with_multiple_items_has_no_inline_handlers(app) -> None:
-    """En az 2 sahte `item` içeren context ile weights.html render edilir;
-    çıktıda hiçbir inline event-attribute (on*=) kalmamalı."""
-    from flask import render_template
-
-    items = [_fake_weight(401), _fake_weight(402), _fake_weight(403)]
-    with app.test_request_context("/"):
-        html = render_template(
-            "weights.html",
-            weights=items,
-            total_count=len(items),
-            active_count=len(items),
-            global_count=len(items),
-        )
-
-    assert not _INLINE_EVENT_ATTR_RE.findall(html)
-    assert not _JS_HREF_RE.search(html)
-
-
-def test_weights_render_confirm_delegation_script_rendered_exactly_once_for_n_rows(app) -> None:
-    """N (3) ağırlık satırı render edilse bile script bloğu render
-    çıktısında YALNIZ 1 kez geçer; her satır için AYNI data-confirm mesajı
-    N kez tekrarlanır (mesajın kendisi bozulmamış olmalı)."""
-    from flask import render_template
-
-    items = [_fake_weight(501), _fake_weight(502), _fake_weight(503)]
-    with app.test_request_context("/"):
-        html = render_template(
-            "weights.html",
-            weights=items,
-            total_count=len(items),
-            active_count=len(items),
-            global_count=len(items),
-        )
-
-    # Not: tam sayfa "<script" sayımı burada da kasıtlı olarak KULLANILMAZ
-    # (weights.html de base.html'i extends eder, aynı gerekçe yukarıdaki
-    # criteria.html testlerinde açıklanmıştır). base.html'de KENDİ
-    # `querySelectorAll('form[data-confirm]')` deseni bulunmadığı için
-    # (ayrıca doğrulanmıştır, bkz. test_base_template_has_no_global_form_data_confirm_delegation)
-    # bu alt-dize tam sayfa render çıktısında güvenle "tam olarak 1"
-    # bekleniyor.
-    assert html.count("querySelectorAll('form[data-confirm]')") == 1
-    assert html.count(f'data-confirm="{DELETE_CONFIRM_MESSAGE_WEIGHT}"') == 3
-
-
-def test_weights_render_with_period_object_maps_each_item_to_its_own_delete_action(app) -> None:
-    """Dönem-bazlı ve genel-varsayılan satırların birlikte render
-    edildiğinde her satırın kendi `weight_id` ile delete/toggle action'ının
-    doğru üretildiğini doğrular (çapraz-sızıntı yok)."""
-    from flask import render_template
-
-    period = types.SimpleNamespace(title="2026 Q1", start_date="01.01.2026", end_date="31.03.2026")
-    items = [
-        _fake_weight(601, period=period),
-        _fake_weight(602, period=None),
-    ]
-    with app.test_request_context("/"):
-        html = render_template(
-            "weights.html",
-            weights=items,
-            total_count=len(items),
-            active_count=len(items),
-            global_count=1,
-        )
-
-    assert "2026 Q1" in html
-    assert "Genel Varsayılan" in html
-    assert not _INLINE_EVENT_ATTR_RE.findall(html)
-
-
-def test_weights_render_with_empty_list_shows_empty_row_and_no_script_duplication(app) -> None:
-    """Boş `weights` listesiyle (Jinja `{% else %}` dalı, "Henüz ağırlık
-    tanımı bulunmuyor.") render edilse bile script bloğu tam olarak 1 kez
-    render edilir."""
-    from flask import render_template
-
-    with app.test_request_context("/"):
-        html = render_template(
-            "weights.html",
-            weights=[],
-            total_count=0,
-            active_count=0,
-            global_count=0,
-        )
-
-    assert "Henüz ağırlık tanımı bulunmuyor." in html
-    assert html.count("querySelectorAll('form[data-confirm]')") == 1
-    assert not _INLINE_EVENT_ATTR_RE.findall(html)

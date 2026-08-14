@@ -487,9 +487,9 @@ def test_url_map_route_count_is_unchanged(p0_ui_env) -> None:
 # 16-17) Style inventory does not worsen; handler/javascript stay 0/0.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_ACTIVE_STYLE_TOTAL = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 225
+EXPECTED_STYLE_BLOCK_TOTAL = 224
 
 
 def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:

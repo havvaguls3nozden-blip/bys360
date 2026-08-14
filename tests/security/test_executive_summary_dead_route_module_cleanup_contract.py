@@ -508,10 +508,14 @@ def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> N
 # A further later wave (style3c_meeting_family_group_a) extracted 8 more
 # <style> blocks from 8 active templates (no static/dynamic attributes
 # touched): 233 - 8 = 225. See that same ledger file's
-# STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
-EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+# STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"]. A further,
+# unrelated later wave (weights_orphan_template_cleanup) deleted the orphan
+# app/templates/weights.html, which independently carried its own one static
+# style="..." attribute and one <style> block: 1035 - 1 = 1034, 225 - 1 = 224.
+# See that same ledger file's FORWARD-COMPATIBILITY FOLLOW-UP 7.
+EXPECTED_ACTIVE_STYLE_TOTAL = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 225
+EXPECTED_STYLE_BLOCK_TOTAL = 224
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

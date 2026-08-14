@@ -354,12 +354,17 @@ def test_route_snapshot_and_route_registry_have_no_workflow_entries() -> None:
 #     active templates (no static/dynamic attributes touched), dropping the
 #     total from 233 to 225. See tests/security/test_csp_style_migration_
 #     cumulative_inventory_contract.py's
-#     STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"].
+#     STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"]. A further,
+#     unrelated later wave (weights_orphan_template_cleanup) deleted the
+#     orphan app/templates/weights.html, which independently carried its own
+#     one static style="..." attribute and one <style> block, dropping the
+#     totals from 1035/225 to 1034/224 -- see that same cumulative file's
+#     FORWARD-COMPATIBILITY FOLLOW-UP 7.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1035
+EXPECTED_ACTIVE_STYLE_TOTAL = 1034
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 225
+EXPECTED_STYLE_BLOCK_TOTAL = 224
 
 
 def test_style_and_handler_inventory_is_completely_unaffected() -> None:
