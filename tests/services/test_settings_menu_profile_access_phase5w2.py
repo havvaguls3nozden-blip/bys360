@@ -644,6 +644,7 @@ def test_save_role_menu_defaults_blank_role_raises_value_error(app) -> None:
             role_menu_default_model=RoleMenuDefault,
             db_session=db.session,
             filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
             snapshot_role_menu_state_func=snapshot_role_menu_state,
             build_complete_visibility_map_func=build_complete_visibility_map,
             create_settings_change_log_func=ChangeLogSpy(),
@@ -665,6 +666,7 @@ def test_save_role_menu_defaults_persists_new_rows_with_correct_fields_and_audit
             role_menu_default_model=RoleMenuDefault,
             db_session=db.session,
             filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
             snapshot_role_menu_state_func=snapshot_role_menu_state,
             build_complete_visibility_map_func=build_complete_visibility_map,
             create_settings_change_log_func=spy,
@@ -707,6 +709,7 @@ def test_save_role_menu_defaults_idempotent_second_call_reports_zero_changed(app
                 role_menu_default_model=RoleMenuDefault,
                 db_session=db.session,
                 filter_live_menu_keys_func=filter_live_menu_keys,
+                filter_live_menu_rows_func=filter_live_menu_rows,
                 snapshot_role_menu_state_func=snapshot_role_menu_state,
                 build_complete_visibility_map_func=build_complete_visibility_map,
                 create_settings_change_log_func=spy,
@@ -739,6 +742,7 @@ def test_save_role_menu_defaults_updates_existing_row_when_visibility_changes(ap
             role_menu_default_model=RoleMenuDefault,
             db_session=db.session,
             filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
             snapshot_role_menu_state_func=snapshot_role_menu_state,
             build_complete_visibility_map_func=build_complete_visibility_map,
             create_settings_change_log_func=ChangeLogSpy(),
@@ -768,6 +772,7 @@ def test_save_role_menu_defaults_prunes_rows_for_menu_keys_no_longer_present(app
             role_menu_default_model=RoleMenuDefault,
             db_session=db.session,
             filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
             snapshot_role_menu_state_func=snapshot_role_menu_state,
             build_complete_visibility_map_func=build_complete_visibility_map,
             create_settings_change_log_func=ChangeLogSpy(),
@@ -781,6 +786,7 @@ def test_save_role_menu_defaults_prunes_rows_for_menu_keys_no_longer_present(app
             role_menu_default_model=RoleMenuDefault,
             db_session=db.session,
             filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
             snapshot_role_menu_state_func=snapshot_role_menu_state,
             build_complete_visibility_map_func=build_complete_visibility_map,
             create_settings_change_log_func=ChangeLogSpy(),
@@ -789,6 +795,62 @@ def test_save_role_menu_defaults_prunes_rows_for_menu_keys_no_longer_present(app
         assert changed == 1
         remaining = {row.menu_key for row in RoleMenuDefault.query.filter_by(role_name=role).all()}
         assert remaining == {"wave_alpha", "wave_beta"}
+
+        RoleMenuDefault.query.filter_by(role_name=role).delete()
+        db.session.commit()
+
+
+def test_save_role_menu_defaults_preserves_removed_scope_row_untouched_by_form(app) -> None:
+    """Regression for the mirror-image bug of clear_user_menu_overrides_handler
+    (fixed in eac6d03): a routine "save role profile" call must not silently
+    delete a RoleMenuDefault row for a permanently-removed menu scope (e.g.
+    "repository", governed by app.config.is_removed_menu_key) just because
+    the live settings form -- which never renders removed-scope keys at all
+    -- doesn't include it in all_menu_keys. Before the fix, `existing` was
+    queried without a live-row filter, so the removed-scope row was visible
+    to the prune loop and got deleted even though the admin never saw or
+    touched it. Mirrors save_unit_menu_profile_handler's existing (correct)
+    preserve behavior.
+    """
+    from app.extensions import db
+    from app.models import RoleMenuDefault
+
+    role = f"phase5w2_role_{_uid()}"
+    with app.app_context():
+        db.session.add_all([
+            RoleMenuDefault(role_name=role, menu_key="dashboard", is_visible=True, source_type="manual"),
+            RoleMenuDefault(role_name=role, menu_key="repository", is_visible=True, source_type="manual"),
+        ])
+        db.session.commit()
+
+        before = {row.menu_key: row.is_visible for row in RoleMenuDefault.query.filter_by(role_name=role).all()}
+        assert before == {"dashboard": True, "repository": True}
+
+        spy = ChangeLogSpy()
+        changed = save_role_menu_defaults_handler(
+            role_name=role,
+            all_menu_keys=["dashboard"],
+            visible_keys={"dashboard"},
+            updated_by_user_id=1,
+            role_menu_default_model=RoleMenuDefault,
+            db_session=db.session,
+            filter_live_menu_keys_func=filter_live_menu_keys,
+            filter_live_menu_rows_func=filter_live_menu_rows,
+            snapshot_role_menu_state_func=snapshot_role_menu_state,
+            build_complete_visibility_map_func=build_complete_visibility_map,
+            create_settings_change_log_func=spy,
+        )
+
+        after = {row.menu_key: row.is_visible for row in RoleMenuDefault.query.filter_by(role_name=role).all()}
+        assert after == {"dashboard": True, "repository": True}, (
+            "removed-scope 'repository' row must survive a routine save the admin never saw it in"
+        )
+        assert changed == 0, "nothing the admin actually controls changed -- the removed row must not count"
+
+        assert len(spy.calls) == 1
+        call = spy.calls[0]
+        assert call["previous_state"] == {"dashboard": True}
+        assert call["new_state"] == {"dashboard": True}
 
         RoleMenuDefault.query.filter_by(role_name=role).delete()
         db.session.commit()
