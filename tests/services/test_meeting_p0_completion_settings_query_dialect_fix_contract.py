@@ -454,11 +454,34 @@ def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:
 # ---------------------------------------------------------------------------
 
 
+# A later, legitimate wave (the stale-endpoint navigation fix -- see
+# tests/services/test_meeting_stale_navigation_endpoint_fix_contract.py)
+# corrected exactly two safe_url_for() endpoint strings per file in these
+# same 6 templates: main.performance_development_guidance and main.
+# performance_interim_notes_manager never existed as real Flask endpoints
+# anywhere in this repo's git history -- corrected to their live,
+# independently-confirmed successors.
+_STALE_ENDPOINT_FIX_SUBSTITUTIONS: tuple[tuple[bytes, bytes], ...] = (
+    (
+        b"safe_url_for('main.performance_interim_notes_manager')",
+        b"safe_url_for('main.performance_interim_notes_tr')",
+    ),
+    (
+        b"safe_url_for('main.performance_development_guidance')",
+        b"safe_url_for('main.performance_meeting_p4_development_guidance')",
+    ),
+)
+
+
 @pytest.mark.parametrize("relative_path", MEETING_FAMILY_TEMPLATES)
 def test_meeting_family_template_is_untouched_by_this_fix(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_fix = _normalize_line_endings(_git_show(PRE_FIX_REF, relative_path))
-    assert current == pre_fix, f"{relative_path}: byte content changed since pre-fix ref -- must be untouched."
+    expected = pre_fix
+    for old, new in _STALE_ENDPOINT_FIX_SUBSTITUTIONS:
+        assert old in expected, f"{relative_path}: expected pre-fix stale pattern {old!r} not found."
+        expected = expected.replace(old, new)
+    assert current == expected, f"{relative_path}: byte content changed since pre-fix ref -- must be untouched."
 
 
 # ---------------------------------------------------------------------------

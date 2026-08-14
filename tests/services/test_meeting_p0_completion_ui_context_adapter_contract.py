@@ -240,11 +240,34 @@ def test_p0_backend_files_are_untouched_by_this_wave(relative_path: str) -> None
 
 # 19) Other 6 meeting templates untouched (was 7 -- see
 #     OTHER_SIX_MEETING_TEMPLATES's own KOORDINATOR DUZELTMESI comment).
+# A later, legitimate wave (the stale-endpoint navigation fix -- see
+# tests/services/test_meeting_stale_navigation_endpoint_fix_contract.py)
+# corrected exactly two safe_url_for() endpoint strings per file in these
+# same 6 templates: main.performance_development_guidance and main.
+# performance_interim_notes_manager never existed as real Flask endpoints
+# anywhere in this repo's git history -- corrected to their live,
+# independently-confirmed successors.
+_STALE_ENDPOINT_FIX_SUBSTITUTIONS: tuple[tuple[bytes, bytes], ...] = (
+    (
+        b"safe_url_for('main.performance_interim_notes_manager')",
+        b"safe_url_for('main.performance_interim_notes_tr')",
+    ),
+    (
+        b"safe_url_for('main.performance_development_guidance')",
+        b"safe_url_for('main.performance_meeting_p4_development_guidance')",
+    ),
+)
+
+
 @pytest.mark.parametrize("relative_path", OTHER_SIX_MEETING_TEMPLATES)
 def test_other_six_meeting_templates_are_untouched(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, relative_path))
-    assert current == pre_wave, f"{relative_path}: byte content changed -- other 6 meeting templates must be untouched."
+    expected = pre_wave
+    for old, new in _STALE_ENDPOINT_FIX_SUBSTITUTIONS:
+        assert old in expected, f"{relative_path}: expected pre-wave stale pattern {old!r} not found."
+        expected = expected.replace(old, new)
+    assert current == expected, f"{relative_path}: byte content changed -- other 6 meeting templates must be untouched."
 
 
 # ---------------------------------------------------------------------------

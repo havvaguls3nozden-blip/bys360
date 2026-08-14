@@ -220,13 +220,49 @@ def test_p0_and_final_gate_templates_are_untouched_by_this_wave() -> None:
         )
 
 
+# A LATER, separate wave (the stale-endpoint navigation fix -- see
+# tests/services/test_meeting_stale_navigation_endpoint_fix_contract.py for
+# its own full regression contract) corrected exactly two safe_url_for()
+# endpoint strings per file in these same 6 templates:
+# main.performance_development_guidance and main.performance_interim_notes_
+# manager never existed as real Flask endpoints anywhere in this repo's git
+# history (confirmed via `git log -S/-G` across `--all`: 0 hits for either
+# function definition -- not a rename, the reference was simply wrong from
+# day one), silently rendering "#" via the real safe_url_for context-
+# processor's BuildError fallback. They were corrected to their live,
+# independently-confirmed successors (main.performance_meeting_p4_
+# development_guidance and main.performance_interim_notes_tr -- the same
+# mapping this file's own SIBLING_SCREENS already documents for the first
+# one, at lines 133-138 above). This assertion now allows exactly those two
+# known substitutions and nothing else, preserving this test's original
+# scope-creep guard for every other byte in these 6 files.
+_STALE_ENDPOINT_FIX_SUBSTITUTIONS: tuple[tuple[bytes, bytes], ...] = (
+    (
+        b"safe_url_for('main.performance_interim_notes_manager')",
+        b"safe_url_for('main.performance_interim_notes_tr')",
+    ),
+    (
+        b"safe_url_for('main.performance_development_guidance')",
+        b"safe_url_for('main.performance_meeting_p4_development_guidance')",
+    ),
+)
+
+
 @pytest.mark.parametrize("relative_path", OTHER_SIX_MEETING_TEMPLATES)
 def test_other_six_meeting_templates_are_untouched_by_this_wave(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, relative_path))
-    assert current == pre_wave, (
-        f"{relative_path}: byte content changed since pre-wave ref {PRE_WAVE_REF} -- "
-        "other 6 meeting templates must be untouched by this navigation wave."
+    expected = pre_wave
+    for old, new in _STALE_ENDPOINT_FIX_SUBSTITUTIONS:
+        assert old in expected, (
+            f"{relative_path}: expected pre-wave stale pattern {old!r} not found -- "
+            "the stale-endpoint-fix substitution table may be out of date."
+        )
+        expected = expected.replace(old, new)
+    assert current == expected, (
+        f"{relative_path}: content differs from pre-wave ref {PRE_WAVE_REF} by more than the "
+        "known, documented stale-endpoint navigation fix substitutions -- "
+        "other 6 meeting templates must be untouched by anything else in this wave."
     )
 
 
