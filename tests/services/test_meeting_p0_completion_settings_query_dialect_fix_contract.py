@@ -432,9 +432,9 @@ def test_url_map_route_count_is_unchanged(p0_fix_env) -> None:
 #     touches only Python query logic, no template/CSS/JS.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1034
+EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 224
+EXPECTED_STYLE_BLOCK_TOTAL = 222
 
 
 def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:

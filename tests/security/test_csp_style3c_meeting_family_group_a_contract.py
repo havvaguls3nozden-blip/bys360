@@ -508,12 +508,17 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 #    app/templates/weights.html, which independently carried its own one
 #    static style="..." attribute and one <style> block: 1035 - 1 = 1034,
 #    225 - 1 = 224. See that same ledger file's FORWARD-COMPATIBILITY
-#    FOLLOW-UP 7.
+#    FOLLOW-UP 7. A further, unrelated later wave
+#    (weight_create_edit_orphan_cleanup) deleted the two sibling orphans
+#    app/templates/weight_create.html and app/templates/weight_edit.html,
+#    each independently carrying one static style="..." attribute and one
+#    <style> block: 1034 - 2 = 1032, 224 - 2 = 222. See that same ledger
+#    file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1034
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C = 64
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 224
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 222
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:

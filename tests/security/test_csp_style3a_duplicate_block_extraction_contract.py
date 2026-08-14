@@ -832,14 +832,18 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # dynamic style="..." attributes: 1037 - 2 = 1035, 66 - 2 = 64. A further,
 # unrelated later wave (weights_orphan_template_cleanup) deleted the orphan
 # app/templates/weights.html, which independently carried its own one static
-# style="..." attribute: 1035 - 1 = 1034. See
+# style="..." attribute: 1035 - 1 = 1034. A further, unrelated later wave
+# (weight_create_edit_orphan_cleanup) deleted the two sibling orphans
+# app/templates/weight_create.html and app/templates/weight_edit.html, each
+# independently carrying one static style="..." attribute: 1034 - 2 = 1032.
+# See
 # tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
 # DELETED_TEMPLATE_WAVES["orphan_mail_cleanup"],
 # DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"],
 # DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"], and
 # DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"] for the
 # independently re-derived evidence.
-EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1034
+EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 64
 
 
@@ -913,16 +917,20 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # STYLE_MIGRATION_WAVES["style3c_meeting_family_group_a"]). -1 from the later
 # weights_orphan_template_cleanup wave (deleted app/templates/weights.html,
 # which independently carried exactly one <style> block -- see that same
-# ledger file's FORWARD-COMPATIBILITY FOLLOW-UP 7).
-# 270 - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 = 224.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1
+# ledger file's FORWARD-COMPATIBILITY FOLLOW-UP 7). -2 from the later
+# weight_create_edit_orphan_cleanup wave (deleted app/templates/
+# weight_create.html and app/templates/weight_edit.html, each independently
+# carrying exactly one <style> block -- see that same ledger file's
+# FORWARD-COMPATIBILITY FOLLOW-UP 8).
+# 270 - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 = 222.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
         "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "

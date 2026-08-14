@@ -60,7 +60,9 @@ are therefore all 0 -- the repo-wide totals were UNCHANGED by this wave
 `DELETED_TEMPLATE_WAVES["duplicate_template_orphan_cleanup_wave1"]`). A
 LATER wave, `weights_orphan_template_cleanup` (see that same file's FORWARD-
 COMPATIBILITY FOLLOW-UP 7), reduced the repo-wide totals further to
-1034/64/224 -- unrelated to this wave, which remains a 0-contribution entry.
+1034/64/224, and a further later wave, `weight_create_edit_orphan_cleanup`
+(FORWARD-COMPATIBILITY FOLLOW-UP 8), reduced them again to 1032/64/222 --
+both unrelated to this wave, which remains a 0-contribution entry.
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 `Path.read_text()`/`Path.exists()`, `git show`/`git status`/`git diff`
@@ -411,9 +413,9 @@ def test_url_map_route_count_is_unchanged(wave1_app) -> None:
 #     files each contributed 0 to every bucket).
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1034
+EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 224
+EXPECTED_STYLE_BLOCK_TOTAL = 222
 
 
 def test_repo_wide_style_inventory_totals_are_unchanged() -> None:

@@ -359,12 +359,17 @@ def test_route_snapshot_and_route_registry_have_no_workflow_entries() -> None:
 #     orphan app/templates/weights.html, which independently carried its own
 #     one static style="..." attribute and one <style> block, dropping the
 #     totals from 1035/225 to 1034/224 -- see that same cumulative file's
-#     FORWARD-COMPATIBILITY FOLLOW-UP 7.
+#     FORWARD-COMPATIBILITY FOLLOW-UP 7. A further, unrelated later wave
+#     (weight_create_edit_orphan_cleanup) deleted the two sibling orphans
+#     app/templates/weight_create.html and app/templates/weight_edit.html,
+#     each independently carrying one static style="..." attribute and one
+#     <style> block, dropping the totals from 1034/224 to 1032/222 -- see
+#     that same cumulative file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
 # ---------------------------------------------------------------------------
 
-EXPECTED_ACTIVE_STYLE_TOTAL = 1034
+EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 224
+EXPECTED_STYLE_BLOCK_TOTAL = 222
 
 
 def test_style_and_handler_inventory_is_completely_unaffected() -> None:

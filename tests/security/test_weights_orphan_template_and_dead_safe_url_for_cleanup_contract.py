@@ -26,10 +26,41 @@ CANDIDATE A -- app/templates/weights.html (ORPHAN_CONFIRMED):
     successor, and left completely untouched by this wave.
 
     ``app/templates/weight_create.html`` and ``app/templates/weight_edit.html``
-    are the same orphan family (same zero-consumer profile) but were
-    DELIBERATELY left out of this wave's scope (flagged as follow-up tech
-    debt, not a broad cleanup) -- both are asserted below as untouched,
-    still-present, byte-identical files.
+    were the same orphan family (same zero-consumer profile) but were
+    DELIBERATELY left out of THIS candidate's original scope (flagged as
+    follow-up tech debt, not a broad cleanup).
+
+WAVE 2 FOLLOW-UP (BYS360 Weight Template Orphan-Family Closure): a dedicated
+    1-coordinator + 3-agent pass independently re-investigated both siblings
+    fresh (not assumed from weights.html's fate). ``weight_create.html``:
+    Agent 1 reached ORPHAN_CONFIRMED directly, including its own live
+    ``create_app()``/``url_map`` probe (985 routes, none of
+    ``main.performance_weight_create/edit/toggle_active/delete``
+    registered). ``weight_edit.html``: Agent 2's exhaustive static evidence
+    (zero ``render_template``/``safe_render`` call, zero
+    ``{% include/extends %}``, zero menu entry, zero JS, and no active route
+    supplying the ``weight_obj``+``periods`` context shape the template
+    requires) was self-limited to ``ORPHAN_HIGH_CONFIDENCE`` because the
+    Explore-type agent had no code-execution access to run a live probe
+    itself -- the coordinator closed that gap directly (own live probe:
+    ``main.performance_weight_edit`` not registered, 985 routes unchanged,
+    ``main.performance_hierarchy_settings`` confirmed to render only
+    ``"hierarchy_settings.html"``, never ``weight_edit.html``), upgrading it
+    to ``ORPHAN_CONFIRMED``. Agent 3 independently corroborated both: byte-
+    identical to the `d8b50c4` baseline AND to this file's own
+    ``PRE_DELETION_REF`` (zero diff either way, confirming neither was ever
+    modified), zero consumers, no dynamic/pattern-based template dispatcher
+    anywhere in the repo could reach either filename, and
+    ``performance_hierarchy_settings`` (the nearest live route touching the
+    same ``PerformanceWeightConfig`` data) genuinely renders a different
+    template. Both templates are now deleted outright -- see
+    ``DELETED_SIBLING_ORPHANS`` and its own deletion-contract tests below,
+    which replace the earlier ``PRESERVED_SIBLING_ORPHANS``/
+    ``test_preserved_sibling_orphan_template_is_untouched`` (that test
+    asserted the files stayed byte-identical; now that they're deleted, the
+    canonical negative contract is "genuinely absent + zero consumer
+    reference remains", the same shape already used for ``weights.html``
+    below).
 
 CANDIDATE B -- app/template_safety.py::safe_url_for (DEAD_SHADOWED_HELPER):
     Registered only as a Jinja *environment global*
@@ -65,6 +96,12 @@ FORWARD-COMPATIBILITY FOLLOW-UP 7 for the manifest entry and the list of
 other test files whose hardcoded repo-wide totals needed the same
 1-attribute/1-block adjustment (1035/225 -> 1034/224). ``template_safety.py``
 carries no template markup, so Candidate B contributes 0 to this ledger.
+WAVE 2 FOLLOW-UP: ``weight_create.html`` and ``weight_edit.html`` each
+independently carried one fully-static ``style="..."`` attribute and one
+``<style>`` block (measured the same way, not guessed), so their combined
+deletion legitimately drops the repo-wide totals a further 2/2:
+1034/64/224 -> 1032/64/222 (dynamic unaffected). See that same cumulative
+manifest file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 ``Path.read_text()``/``Path.exists()``, ``git show``/``git cat-file`` (read-
@@ -87,6 +124,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # template_safety.safe_url_for both still existed.
 PRE_DELETION_REF = "2838761cdc37d3c987ca6eb1ae1d2d0d0d9a1fff"
 
+# Tip of phase5-critical-lint-clean-v1 immediately before the WAVE 2 follow-up
+# ("BYS360 Weight Template Orphan-Family Closure") deletion commit -- the
+# repo state where weight_create.html/weight_edit.html still existed. This is
+# also the commit that finalized Candidate A/B above (weights.html /
+# template_safety.safe_url_for), so it is the correct "still present" ref for
+# these two siblings specifically.
+PRE_DELETION_REF_WAVE2 = "46b468a40b00e7d0a492b5f7b511349c83a7444d"
+
 WEIGHTS_TEMPLATE = "app/templates/weights.html"
 WEIGHTS_STALE_ENDPOINTS: tuple[str, ...] = (
     "main.performance_weight_create",
@@ -95,9 +140,10 @@ WEIGHTS_STALE_ENDPOINTS: tuple[str, ...] = (
     "main.performance_weight_delete",
 )
 
-# Same orphan family as weights.html -- explicitly OUT of scope for this
-# wave, must remain present and byte-identical.
-PRESERVED_SIBLING_ORPHANS: tuple[str, ...] = (
+# Same orphan family as weights.html -- deleted by the WAVE 2 follow-up
+# ("BYS360 Weight Template Orphan-Family Closure") after independent
+# re-investigation confirmed ORPHAN_CONFIRMED for both.
+DELETED_SIBLING_ORPHANS: tuple[str, ...] = (
     "app/templates/weight_create.html",
     "app/templates/weight_edit.html",
 )
@@ -179,14 +225,38 @@ def test_no_stale_weight_endpoint_string_remains_anywhere_in_app() -> None:
     assert offenders == [], f"Stale weight endpoint string(s) unexpectedly found in: {offenders!r}"
 
 
-@pytest.mark.parametrize("relative_path", PRESERVED_SIBLING_ORPHANS)
-def test_preserved_sibling_orphan_template_is_untouched(relative_path: str) -> None:
-    """weight_create.html / weight_edit.html are the same orphan family but
-    explicitly out of this wave's scope -- must still exist, byte-identical
-    to pre-wave (flagged separately as follow-up tech debt, not touched)."""
-    current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
-    pre_wave = _normalize_line_endings(_git_show(PRE_DELETION_REF, relative_path))
-    assert current == pre_wave, f"{relative_path}: byte content changed since pre-wave ref -- must be untouched."
+@pytest.mark.parametrize("relative_path", DELETED_SIBLING_ORPHANS)
+def test_deleted_sibling_orphan_template_is_genuinely_absent_from_worktree(relative_path: str) -> None:
+    assert not (REPO_ROOT / relative_path).exists(), (
+        f"{relative_path} is claimed deleted by the WAVE 2 follow-up but still exists on disk."
+    )
+
+
+@pytest.mark.parametrize("relative_path", DELETED_SIBLING_ORPHANS)
+def test_deleted_sibling_orphan_template_existed_at_wave2_pre_deletion_ref(relative_path: str) -> None:
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{PRE_DELETION_REF_WAVE2}:{relative_path}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        timeout=30,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        f"{relative_path} does not appear to have existed at {PRE_DELETION_REF_WAVE2}: {result.stderr!r}"
+    )
+
+
+@pytest.mark.parametrize("relative_path", DELETED_SIBLING_ORPHANS)
+def test_no_consumer_reference_to_deleted_sibling_orphan_remains_in_app(relative_path: str) -> None:
+    basename = Path(relative_path).name
+    offenders: list[str] = []
+    for path in (REPO_ROOT / "app").rglob("*"):
+        if not path.is_file() or path.suffix not in (".py", ".html", ".js"):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if basename in text:
+            offenders.append(str(path.relative_to(REPO_ROOT)))
+    assert offenders == [], f"Unexpected reference(s) to {basename} remain under app/: {offenders!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -325,12 +395,50 @@ def test_url_map_route_count_is_unchanged(cleanup_wave_app) -> None:
     assert total == 985, f"url_map route count is {total}; expected 985 (unchanged -- neither candidate touched routes)."
 
 
+def test_all_weight_stale_endpoints_remain_unregistered_in_url_map(cleanup_wave_app) -> None:
+    """WAVE 2 follow-up: locks that deleting weight_create.html/weight_edit.html
+    did not (and must never) coincide with resurrecting any of the 4 weight
+    endpoints they implied -- same negative route contract already used for
+    weights.html itself."""
+    endpoint_names = {rule.endpoint for rule in cleanup_wave_app.url_map.iter_rules()}
+    for endpoint in WEIGHTS_STALE_ENDPOINTS:
+        assert endpoint not in endpoint_names, (
+            f"{endpoint!r} unexpectedly registered in url_map -- this cleanup wave must not "
+            "resurrect any weight CRUD endpoint."
+        )
+
+
 def test_successor_hierarchy_settings_route_is_unaffected(cleanup_wave_app) -> None:
     """The nearest live route touching the same underlying weight data
     (explicitly NOT treated as a true successor -- see module docstring)
     must remain registered and untouched by this wave."""
     rules_by_endpoint = {rule.endpoint: rule for rule in cleanup_wave_app.url_map.iter_rules()}
     assert "main.performance_hierarchy_settings" in rules_by_endpoint
+
+
+def test_successor_hierarchy_settings_renders_its_own_template_not_a_deleted_sibling(cleanup_wave_app) -> None:
+    """WAVE 2 follow-up: independently confirms performance_hierarchy_settings
+    -- the nearest live route touching the same PerformanceWeightConfig data
+    -- renders only hierarchy_settings.html, never weight_create.html/
+    weight_edit.html, so deleting the latter two cannot break it."""
+    import inspect
+    import re as _re
+
+    from app.performance import routes as perf_routes
+
+    source = inspect.getsource(perf_routes)
+    match = _re.search(r"def performance_hierarchy_settings.*?(?=\ndef |\Z)", source, _re.DOTALL)
+    assert match is not None, "Could not locate performance_hierarchy_settings source for inspection."
+    body = match.group(0)
+    render_targets = _re.findall(r'safe_render\(\s*"([^"]+)"', body)
+    assert render_targets == ["hierarchy_settings.html"], (
+        f"performance_hierarchy_settings' safe_render target(s) are {render_targets!r}; "
+        "expected exactly ['hierarchy_settings.html']."
+    )
+    for deleted in DELETED_SIBLING_ORPHANS:
+        assert Path(deleted).name not in body, (
+            f"performance_hierarchy_settings unexpectedly references {Path(deleted).name!r}."
+        )
 
 
 # ---------------------------------------------------------------------------
