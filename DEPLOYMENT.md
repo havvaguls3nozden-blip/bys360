@@ -1,24 +1,24 @@
-﻿# BYS360 DEPLOYMENT.md
+# BYS360 DEPLOYMENT.md
 
-Bu dosya BYS360â€™Ä±n yerel geliÅŸtirme, test, canlÄ±ya alma ve geri dÃ¶nÃ¼ÅŸ adÄ±mlarÄ±nÄ± tek yerde toplar. Gizli bilgi, parola, token veya canlÄ± baÄŸlantÄ± deÄŸeri iÃ§ermez.
+Bu dosya BYS360’ın yerel geliştirme, test, canlıya alma ve geri dönüş adımlarını tek yerde toplar. Gizli bilgi, parola, token veya canlı bağlantı değeri içermez.
 
 ## 1. Ortamlar
 
-| Ortam | AmaÃ§ | Not |
+| Ortam | Amaç | Not |
 |---|---|---|
-| Lokal geliÅŸtirme | Kod geliÅŸtirme ve hÄ±zlÄ± smoke test | VarsayÄ±lan port 8000/8003 olabilir. |
-| Test / staging | Migration, rol-yetki ve kritik akÄ±ÅŸ denemesi | CanlÄ± veriyle karÄ±ÅŸtÄ±rÄ±lmamalÄ±dÄ±r. |
-| CanlÄ± | Kurumsal kullanÄ±m | Windows GÃ¶rev ZamanlayÄ±cÄ± + Waitress omurgasÄ±. |
+| Lokal geliştirme | Kod geliştirme ve hızlı smoke test | Varsayılan port 8000/8003 olabilir. |
+| Test / staging | Migration, rol-yetki ve kritik akış denemesi | Canlı veriyle karıştırılmamalıdır. |
+| Canlı | Kurumsal kullanım | Windows Görev Zamanlayıcı + Waitress omurgası. |
 
-## 2. Temel baÄŸÄ±mlÄ±lÄ±klar
+## 2. Temel bağımlılıklar
 
 - Python 3.12
-- PostgreSQL 15 veya lokal geliÅŸtirme iÃ§in SQLite
-- Redis, kullanÄ±lÄ±yorsa cache / rate-limit / queue iÃ§in
-- Windows Server Ã¼zerinde Waitress servis/gÃ¶rev yapÄ±sÄ±
+- PostgreSQL 15 veya lokal geliştirme için SQLite
+- Redis, kullanılıyorsa cache / rate-limit / queue için
+- Windows Server üzerinde Waitress servis/görev yapısı
 - PowerShell 5+ veya PowerShell 7+
 
-## 3. Ä°lk kurulum
+## 3. İlk kurulum
 
 ```powershell
 cd C:\bys360\project
@@ -28,14 +28,14 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Lokal test iÃ§in gerÃ§ek canlÄ± `.env` kopyalanmaz. `.env.example` Ã¼zerinden yeni deÄŸerler oluÅŸturulur.
+Lokal test için gerçek canlı `.env` kopyalanmaz. `.env.example` üzerinden yeni değerler oluşturulur.
 
 ```powershell
 Copy-Item .env.example .env
 notepad .env
 ```
 
-## 4. VeritabanÄ± hazÄ±rlÄ±ÄŸÄ±
+## 4. Veritabanı hazırlığı
 
 ```powershell
 cd C:\bys360\project
@@ -43,7 +43,7 @@ cd C:\bys360\project
 flask db upgrade
 ```
 
-Migration Ã¶ncesinde mutlaka yedek alÄ±nÄ±r. Yedek prosedÃ¼rÃ¼ iÃ§in `BACKUP_RUNBOOK.md` dosyasÄ±na bakÄ±lÄ±r.
+Migration öncesinde mutlaka yedek alınır. Yedek prosedürü için `BACKUP_RUNBOOK.md` dosyasına bakılır.
 
 ## 5. Lokal smoke test
 
@@ -55,27 +55,29 @@ python -m compileall app config.py scripts migrations
 python run.py
 ```
 
-AyrÄ± PowerShell penceresinde:
+Ayrı PowerShell penceresinde:
 
 ```powershell
 Invoke-WebRequest -Uri "http://127.0.0.1:8000/login" -UseBasicParsing
 ```
 
-## 6. CanlÄ±ya alma Ã¶zeti
+## 6. Canlıya alma özeti
 
-1. Kod deÄŸiÅŸikliÄŸi temiz branch Ã¼zerinde hazÄ±rlanÄ±r.
-2. `python -m compileall app config.py scripts migrations` Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r.
-3. Kritik testler Ã§alÄ±ÅŸtÄ±rÄ±lÄ±r.
-4. VeritabanÄ± yedeÄŸi alÄ±nÄ±r.
-5. Dosya yedeÄŸi alÄ±nÄ±r.
-6. Migration varsa stagingâ€™de denenir.
-7. CanlÄ± gÃ¶rev durdurulur.
-8. Kod aktarÄ±lÄ±r.
-9. Migration uygulanÄ±r.
-10. CanlÄ± gÃ¶rev baÅŸlatÄ±lÄ±r.
+1. Kod değişikliği temiz branch üzerinde hazırlanır.
+2. `python -m compileall app config.py scripts migrations` çalıştırılır.
+3. Kritik testler çalıştırılır.
+4. Veritabanı yedeği alınır.
+5. Dosya yedeği alınır.
+6. Migration varsa staging’de denenir.
+7. Canlı görev durdurulur.
+8. Kod aktarılır.
+9. Migration uygulanır.
+10. Canlı görev başlatılır.
 11. `/login`, `/healthz` ve kritik ekranlar kontrol edilir.
 
-## 7. CanlÄ± yeniden baÅŸlatma Ã¶rneÄŸi
+## 7. Canlı yeniden başlatma örneği
+
+Not: `run.py` yalnızca yerel geliştirme içindir (`app.run`, Waitress kullanmaz). Depodaki tek Waitress giriş noktası `run_server.py`dır; `APP_ENV` değeri `production` veya `staging` olduğunda `waitress.serve` çağrılır ve `APP_HOST`, `APP_PORT` (varsayılan 8000), `WAITRESS_THREADS` (varsayılan 8) ortam değişkenlerini kullanır. `.env` dosyası `config.py` tarafından otomatik yüklenir.
 
 ```powershell
 $ErrorActionPreference = "Stop"
@@ -102,11 +104,11 @@ Start-Sleep -Seconds 8
 Invoke-WebRequest -Uri "http://127.0.0.1/login" -UseBasicParsing
 ```
 
-## 8. Temiz release Ã¼retimi
+## 8. Temiz release üretimi
 
-DoÄŸrudan proje klasÃ¶rÃ¼nÃ¼ zip yapmak yasaktÄ±r. Ã‡Ã¼nkÃ¼ `.env`, `.git`, `instance`, `logs`, SQLite dosyalarÄ± veya geÃ§ici raporlar pakete girebilir.
+Doğrudan proje klasörünü zip yapmak yasaktır. Çünkü `.env`, `.git`, `instance`, `logs`, SQLite dosyaları veya geçici raporlar pakete girebilir.
 
-GÃ¼venli release iÃ§in:
+Güvenli release için:
 
 ```powershell
 cd C:\bys360\project
@@ -114,7 +116,7 @@ cd C:\bys360\project
 python scripts\security\build_bys360_secure_release_v1_5.py --project-root "C:\bys360\project"
 ```
 
-Ãœretilen zip ayrÄ±ca preflight ile kontrol edilir:
+Üretilen zip ayrıca preflight ile kontrol edilir:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_release_zip_preflight_v1.ps1 -ZipPath "C:\bys360\project\dist_secure\BYS360_SECURE_RELEASE_V1_5_*.zip"
@@ -122,15 +124,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_release_
 
 ## 9. Rollback
 
-CanlÄ±ya alma sonrasÄ± 5xx, beyaz sayfa, migration hatasÄ± veya yetki bozulmasÄ± gÃ¶rÃ¼lÃ¼rse:
+Canlıya alma sonrası 5xx, beyaz sayfa, migration hatası veya yetki bozulması görülürse:
 
-1. CanlÄ± gÃ¶rev durdurulur.
-2. Son Ã§alÄ±ÅŸan kod yedeÄŸi geri alÄ±nÄ±r.
-3. Gerekirse DB yedeÄŸi restore edilir.
-4. CanlÄ± gÃ¶rev baÅŸlatÄ±lÄ±r.
-5. `/login`, `/healthz`, performans ana ekranÄ± ve mesaj/anket ekranlarÄ± kontrol edilir.
+1. Canlı görev durdurulur.
+2. Son çalışan kod yedeği geri alınır.
+3. Gerekirse DB yedeği restore edilir.
+4. Canlı görev başlatılır.
+5. `/login`, `/healthz`, performans ana ekranı ve mesaj/anket ekranları kontrol edilir.
 
-DetaylÄ± geri dÃ¶nÃ¼ÅŸ prosedÃ¼rÃ¼ `BACKUP_RUNBOOK.md` iÃ§indedir.
+Detaylı geri dönüş prosedürü `BACKUP_RUNBOOK.md` içindedir.
 
 ## Git Geçmişi ve Kaynak Teslim Notu
 
