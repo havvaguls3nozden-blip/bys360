@@ -39,13 +39,14 @@ from __future__ import annotations
 
 import io
 import os
+import tempfile
 import uuid
 from pathlib import Path
 
 import pytest
 
-_TEST_DB_ROOT = Path("C:/bys360_pytest_tmp_agent3/hr_ops_phase5w2/dbs")
-_TEST_UPLOAD_ROOT = Path("C:/bys360_pytest_tmp_agent3/hr_ops_phase5w2/uploads")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent3" / "hr_ops_phase5w2" / "dbs"
+_TEST_UPLOAD_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent3" / "hr_ops_phase5w2" / "uploads"
 
 DEFAULT_PASSWORD = "Phase5w2HrOps1!"
 

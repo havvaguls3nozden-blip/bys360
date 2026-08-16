@@ -43,6 +43,7 @@ metninde).
 from __future__ import annotations
 
 import re
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -181,7 +182,7 @@ def test_base_html_still_provides_the_shared_fallback_src_listener() -> None:
 #    tarayicida script'lerin fiilen calistigini kanitlamaz.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_wave2_personnel/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_wave2_personnel" / "test_dbs"
 
 
 def _make_app(monkeypatch):

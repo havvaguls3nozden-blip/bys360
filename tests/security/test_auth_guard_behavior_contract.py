@@ -28,12 +28,13 @@ isolated, temporary SQLite DB.
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
 import pytest
 
-_TEST_DB_ROOT = Path("C:/bys360_pytest_tmp_final/auth_guard_behavior_contract/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp_final" / "auth_guard_behavior_contract" / "test_dbs"
 
 _PROBE_ROLE_REQUIRED_PATH = "/bys360-test-only/auth-guard/role-required-admin"
 _PROBE_MENU_VISIBLE_PATH = "/bys360-test-only/auth-guard/menu-visible-required"

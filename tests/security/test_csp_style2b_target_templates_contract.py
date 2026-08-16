@@ -74,6 +74,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -891,7 +892,7 @@ def test_pwa_offline_html_is_byte_identical_to_pre_wave_state(relative_path: str
 # dosya basi docstring (pre-existing 500 hatasi); kendi ozel testi vardir.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style2b/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_style2b" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("şablonunda hata var", "şablonu hatalı")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 

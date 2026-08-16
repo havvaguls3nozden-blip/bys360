@@ -65,6 +65,7 @@ from __future__ import annotations
 import hashlib
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -295,7 +296,7 @@ def test_template_has_route_and_render_evidence_in_owning_file(relative_path: st
 #    temp SQLite, pytest.MonkeyPatch + mp.undo(), WTF_CSRF_ENABLED=False).
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style3b/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_style3b" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("\u015fablonunda hata var", "\u015fablonu hatal\u0131")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 

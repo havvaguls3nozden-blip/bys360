@@ -74,6 +74,7 @@ from __future__ import annotations
 import hashlib
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -367,7 +368,7 @@ def test_meeting_family_shared_css_is_untouched() -> None:
 #    this is independently re-verified, not assumed.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/dup_template_wave1/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "dup_template_wave1" / "test_dbs"
 
 
 @pytest.fixture(scope="module")

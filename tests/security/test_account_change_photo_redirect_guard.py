@@ -24,12 +24,13 @@ olmadan, her testin kendi SQLite DB'sini kurması).
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
 import pytest
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase5_3b/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase5_3b" / "test_dbs"
 
 CANONICAL_HOST = "bys360.canakkaletarihialan.gov.tr"
 CANONICAL_BASE_URL = f"https://{CANONICAL_HOST}"

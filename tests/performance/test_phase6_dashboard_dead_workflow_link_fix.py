@@ -74,13 +74,14 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 import uuid
 from pathlib import Path
 
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-_TEST_DB_ROOT = Path("C:/bys360_pytest_tmp/phase6_dead_link_fix_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp" / "phase6_dead_link_fix_dbs"
 
 EXPECTED_ROUTE_COUNT = 985
 EXPECTED_ENDPOINT_LIST_SHA256 = "624e25c447915f9eaf68c8583b80e962236dcecbea962259a1a21604bb48a94a"

@@ -43,6 +43,7 @@ authored against).
 from __future__ import annotations
 
 import re
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -106,7 +107,7 @@ WEIGHTS_STALE_ENDPOINTS: tuple[str, ...] = (
     "main.performance_weight_delete",
 )
 
-_TEST_DB_ROOT = Path("C:/bys360_pytest_tmp_final/meeting_stale_endpoint_fix/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp_final" / "meeting_stale_endpoint_fix" / "test_dbs"
 _PASSWORD = "MeetingStaleEndpointFixTestKey1!"
 
 

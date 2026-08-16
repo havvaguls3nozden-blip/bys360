@@ -68,6 +68,7 @@ from __future__ import annotations
 import hashlib
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -512,7 +513,7 @@ def test_group_d_route_manifest_and_dead_group_a_route_file_remain_unreferenced(
 #    SQLite, pytest.MonkeyPatch + mp.undo(), WTF_CSRF_ENABLED=False).
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style3a/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_style3a" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("\u015fablonunda hata var", "\u015fablonu hatal\u0131")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 

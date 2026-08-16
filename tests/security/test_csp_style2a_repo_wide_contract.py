@@ -127,6 +127,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -704,7 +705,7 @@ def test_no_important_declaration_added_by_this_pilot_precise_diff_check() -> No
 # stub'u DEGIL)" seklindeki farkli, tamamlayici bir sinyali dogrular.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style2a/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_style2a" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("şablonunda hata var", "şablonu hatalı")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 

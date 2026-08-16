@@ -60,6 +60,7 @@ contract test in this suite.
 from __future__ import annotations
 
 import re
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -75,7 +76,7 @@ FOUR_KEYS_AND_ENDPOINTS: tuple[tuple[str, str], ...] = (
     ("performance_meeting_final_gate", "main.performance_meeting_final_gate"),
 )
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/meeting_dev_nav_fix/canonical_source_test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "meeting_dev_nav_fix" / "canonical_source_test_dbs"
 _PASSWORD = "MeetingDevCanonicalFixKey1!"
 
 

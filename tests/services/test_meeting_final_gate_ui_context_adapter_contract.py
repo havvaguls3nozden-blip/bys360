@@ -70,6 +70,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -288,7 +289,7 @@ def test_other_six_meeting_templates_are_untouched(relative_path: str) -> None:
 # docstring's "CRITICAL FINDING").
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/final_gate_ui_contract/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "final_gate_ui_contract" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("\u015fablonunda hata var", "\u015fablonu hatal\u0131")
 
 

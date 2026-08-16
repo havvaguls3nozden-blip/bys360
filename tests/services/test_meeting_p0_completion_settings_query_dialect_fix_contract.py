@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -293,7 +294,7 @@ def test_fixed_source_declares_an_expanding_bindparam_for_keys() -> None:
 #       key now genuinely contains the seeded fixture rows (not empty).
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/p0_settings_fix_contract/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "p0_settings_fix_contract" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("\u015fablonunda hata var", "\u015fablonu hatal\u0131")
 
 

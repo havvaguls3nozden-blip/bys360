@@ -23,10 +23,11 @@ a claimed fix.
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
-_PHASE13B_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase13b/test_dbs")
+_PHASE13B_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase13b" / "test_dbs"
 
 
 def _make_app(monkeypatch, **config_overrides):

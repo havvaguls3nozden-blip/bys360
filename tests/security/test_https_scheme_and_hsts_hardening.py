@@ -103,7 +103,7 @@ from config import (
     _resolve_trusted_hosts,
 )
 
-_HARDENING_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/https_hsts_hardening/test_dbs")
+_HARDENING_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "https_hsts_hardening" / "test_dbs"
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 

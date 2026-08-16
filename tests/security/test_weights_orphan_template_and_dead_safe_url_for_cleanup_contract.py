@@ -112,6 +112,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -320,7 +321,7 @@ def test_template_safety_no_longer_has_unused_url_for_import() -> None:
 # now-removed Jinja global is genuinely gone from app.jinja_env.globals.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360_pytest_tmp_final/weights_orphan_and_dead_helper_cleanup/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp_final" / "weights_orphan_and_dead_helper_cleanup" / "test_dbs"
 
 
 @pytest.fixture(scope="module")

@@ -25,6 +25,7 @@ kontrol eder.
 from __future__ import annotations
 
 import re
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -143,7 +144,7 @@ def test_dashboard_template_extends_base_and_has_no_other_includes() -> None:
 #    ile (harici dosya, inline degil) baglandigini dogrular.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase5_csp_wave2/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase5_csp_wave2" / "test_dbs"
 
 
 def _make_app(monkeypatch, **config_overrides):

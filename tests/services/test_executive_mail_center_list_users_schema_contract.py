@@ -50,6 +50,7 @@ and are not touched here.
 from __future__ import annotations
 
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -72,7 +73,7 @@ TEMPLATE_FILE = "app/templates/executive_summary/executive_mail_center.html"
 # bu fix'in ebeveynine kilitlendi.
 PRE_FIX_GIT_REF = "3b3a5f8496076dcc36a195c66ddf2cbc2775160c"
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/executive_mail_center_list_users_regression/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "executive_mail_center_list_users_regression" / "test_dbs"
 
 
 @pytest.fixture(scope="module")

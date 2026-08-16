@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 from typing import Any
@@ -325,7 +326,7 @@ def test_this_file_introduces_no_skip_or_xfail_usage() -> None:
 # Real, isolated, multi-role Flask app.
 # ---------------------------------------------------------------------------
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/meeting_dev_nav_fix/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "meeting_dev_nav_fix" / "test_dbs"
 _PASSWORD = "MeetingDevNavFixTestKey1!"
 
 

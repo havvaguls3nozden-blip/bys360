@@ -11,6 +11,7 @@ regress.
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -20,7 +21,7 @@ import pytest
 # ASCII-disi kullanici adi yuzunden Windows PermissionError'a duser (bkz.
 # audit calismasi notlari). Repository-disi, ASCII-only, disposable bir
 # dizin kullanilir; canli DB veya gercek kullanici verisi icermez.
-_PHASE13B_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase13b/test_dbs")
+_PHASE13B_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase13b" / "test_dbs"
 
 
 def _make_app(monkeypatch, **env_overrides):

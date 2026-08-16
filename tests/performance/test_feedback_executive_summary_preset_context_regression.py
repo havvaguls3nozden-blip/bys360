@@ -40,6 +40,7 @@ zero collateral changes there.
 from __future__ import annotations
 
 import subprocess
+import tempfile
 import uuid
 from pathlib import Path
 from unittest import mock
@@ -50,7 +51,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 ROUTE_FILE = "app/performance/engagement_feedback_routes.py"
 ROUTE_URL = "/performance/feedback-executive-summary"
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/perf_feedback_exec_summary_regression/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "perf_feedback_exec_summary_regression" / "test_dbs"
 _SAFE_RENDER_FALLBACK_MARKERS = ("şablonunda hata var", "şablonu hatalı")
 _BASE_TEMPLATE_MARKER = "topbarNotificationBadge"
 

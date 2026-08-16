@@ -39,6 +39,7 @@ negative.py and tests/integration/test_mobile_support_ticket_db_transactions.py)
 from __future__ import annotations
 
 import re
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -278,7 +279,7 @@ OLD_STYLE_LITERALS_NOTIFICATIONS = [
 ]
 
 
-_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/csp_style2a_support_notifications/test_dbs")
+_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "csp_style2a_support_notifications" / "test_dbs"
 
 
 def _make_app(monkeypatch):
