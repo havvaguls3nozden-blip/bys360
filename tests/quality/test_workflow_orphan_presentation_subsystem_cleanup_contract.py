@@ -104,6 +104,13 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # state where every file this wave removed still existed on disk.
 PRE_CLEANUP_REF = "88d148c61f11fe9cc8d323cd8cdce1d80a146dfe"
 
+# This wave's own landing commit (parent is exactly PRE_CLEANUP_REF -- a
+# single atomic commit). Fixed, historical; never affected by any later
+# commit. Used, alongside PRE_CLEANUP_REF, to prove what THIS WAVE's own
+# diff did and did not touch in migrations/versions/ -- see the two tests
+# below for why this must be ref-vs-ref, not ref-vs-current-directory.
+POST_CLEANUP_REF = "5401195cb2887a80e90c51ee6768d460c66b849b"
+
 DELETED_APP_FILES = (
     "app/workflow/routes.py",
     "app/workflow/dashboard_upgrade_routes.py",
@@ -474,9 +481,26 @@ def test_performance_president_approvals_active_consumer_still_references_it(
 # ---------------------------------------------------------------------------
 # 6) Migration files preserved -- schema ownership of workflow_instances/
 #    steps/logs/notifications/performance_president_approvals is untouched.
+#
+# TD-032 fix (2026-08-16): the two tests below used to compare a fixed
+# historical git ref (PRE_CLEANUP_REF) against the *current* directory
+# listing / working tree -- a hardcoded EXPECTED_MIGRATIONS_VERSIONS_COUNT
+# = 72 that the CURRENT directory had to match forever, and a file-SET
+# comparison against the CURRENT directory listing. Both forms conflate
+# "did this 2026-08-06 workflow-cleanup wave touch migrations/versions/?"
+# (a fixed historical fact) with "is the migrations directory identical to
+# some frozen count/set *right now*, regardless of any later, unrelated
+# wave?" (which drifts every time any legitimate migration is added --
+# exactly what the later, real TD-032 migration-graph-repair work did).
+# Fixed the same way as the companion fix in
+# tests/security/test_duplicate_template_orphan_cleanup_wave1_contract.py:
+# compare PRE_CLEANUP_REF against POST_CLEANUP_REF -- both fixed, historical
+# commits bracketing this wave's own single atomic commit (5401195's only
+# parent is PRE_CLEANUP_REF, and its own migrations/versions/ diff against
+# PRE_CLEANUP_REF is empty) -- so both assertions are permanent,
+# working-tree-independent facts about what that one commit did, and stay
+# true no matter how many legitimate migrations are added later.
 # ---------------------------------------------------------------------------
-
-EXPECTED_MIGRATIONS_VERSIONS_COUNT = 72
 
 WORKFLOW_SCHEMA_MIGRATIONS = (
     "migrations/versions/6f2b8c4d1a90_adopt_workflow_president_approval_schema.py",
@@ -489,24 +513,9 @@ def test_workflow_schema_migration_file_still_exists_untouched(relative_path: st
     assert (REPO_ROOT / relative_path).exists(), f"{relative_path} is missing."
 
 
-def test_migrations_versions_directory_file_count_is_unchanged() -> None:
-    versions_dir = REPO_ROOT / "migrations" / "versions"
-    py_files = [p for p in versions_dir.iterdir() if p.is_file() and p.suffix == ".py"]
-    assert len(py_files) == EXPECTED_MIGRATIONS_VERSIONS_COUNT, (
-        f"migrations/versions/ has {len(py_files)} .py files; expected "
-        f"{EXPECTED_MIGRATIONS_VERSIONS_COUNT}. This wave must not add, remove, or "
-        "modify any migration."
-    )
-
-
-def test_no_migration_file_was_modified_by_this_wave() -> None:
-    """Independent of git status (which only reflects the CURRENT working
-    tree at test-run time, and could theoretically be run against a dirty
-    tree) -- re-derives the migration file SET from the fixed pre-cleanup
-    git ref and confirms it is byte-identical to the current directory
-    listing."""
+def _migrations_versions_file_set_at_ref(ref: str) -> set[str]:
     result = subprocess.run(
-        ["git", "ls-tree", "-r", "--name-only", PRE_CLEANUP_REF, "migrations/versions"],
+        ["git", "ls-tree", "-r", "--name-only", ref, "migrations/versions"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
@@ -514,16 +523,52 @@ def test_no_migration_file_was_modified_by_this_wave() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stderr
-    pre_cleanup_files = {line for line in result.stdout.splitlines() if line.endswith(".py")}
+    return {line for line in result.stdout.splitlines() if line.endswith(".py")}
 
-    versions_dir = REPO_ROOT / "migrations" / "versions"
-    current_files = {
-        f"migrations/versions/{p.name}" for p in versions_dir.iterdir() if p.is_file() and p.suffix == ".py"
+
+def test_migrations_versions_directory_file_count_is_unchanged() -> None:
+    """This wave's own landing commit (POST_CLEANUP_REF) added/removed zero
+    migration files relative to its own parent (PRE_CLEANUP_REF) -- a fixed
+    historical fact, independent of the current (and any future) directory
+    state."""
+    pre_count = len(_migrations_versions_file_set_at_ref(PRE_CLEANUP_REF))
+    post_count = len(_migrations_versions_file_set_at_ref(POST_CLEANUP_REF))
+    assert post_count == pre_count, (
+        f"migrations/versions/ had {pre_count} .py files at {PRE_CLEANUP_REF} and "
+        f"{post_count} at this wave's own landing commit {POST_CLEANUP_REF}. This wave "
+        "must not have added, removed, or modified any migration."
+    )
+
+
+def test_no_migration_file_was_modified_by_this_wave() -> None:
+    """Independent of git status (which only reflects the CURRENT working
+    tree at test-run time, and could theoretically be run against a dirty
+    tree) -- re-derives the migration file SET at both PRE_CLEANUP_REF and
+    this wave's own landing commit (POST_CLEANUP_REF) and confirms they are
+    byte-identical, plus confirms the wave's own commit has an empty
+    `git diff --stat` for migrations/versions/ against its parent (catching
+    same-name content modifications, not just adds/removes)."""
+    pre_cleanup_files = _migrations_versions_file_set_at_ref(PRE_CLEANUP_REF)
+    post_cleanup_files = _migrations_versions_file_set_at_ref(POST_CLEANUP_REF)
+    assert post_cleanup_files == pre_cleanup_files, {
+        "missing": sorted(pre_cleanup_files - post_cleanup_files),
+        "added": sorted(post_cleanup_files - pre_cleanup_files),
     }
-    assert current_files == pre_cleanup_files, {
-        "missing": sorted(pre_cleanup_files - current_files),
-        "added": sorted(current_files - pre_cleanup_files),
-    }
+
+    diff_result = subprocess.run(
+        ["git", "diff", "--stat", PRE_CLEANUP_REF, POST_CLEANUP_REF, "--", "migrations/versions"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert diff_result.returncode == 0, diff_result.stderr
+    assert diff_result.stdout.strip() == "", (
+        f"migrations/versions/ has changes between {PRE_CLEANUP_REF} and this wave's own "
+        f"landing commit {POST_CLEANUP_REF}; this wave must not have modified any migration "
+        f"file's content:\n{diff_result.stdout}"
+    )
 
 
 # ---------------------------------------------------------------------------

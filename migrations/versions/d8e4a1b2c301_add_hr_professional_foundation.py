@@ -1,8 +1,14 @@
 """add hr professional foundation
 
 Revision ID: d8e4a1b2c301
-Revises: c4a1d9e2f731
+Revises: c4a1d9e2f731, fae32fb68b1b
 Create Date: 2026-04-11 21:10:00.000000
+
+TD-032: additional parent fae32fb68b1b added (multi-parent down_revision,
+Candidate B-Tuple) so Alembic's topological order guarantees the users /
+organization_units tables (created only in fae32fb68b1b) exist before this
+revision's FK references run on a genuinely empty database. No DDL below this
+header changed.
 """
 
 from alembic import op
@@ -10,7 +16,7 @@ import sqlalchemy as sa
 
 
 revision = "d8e4a1b2c301"
-down_revision = "c4a1d9e2f731"
+down_revision = ("c4a1d9e2f731", "fae32fb68b1b")
 branch_labels = None
 depends_on = None
 

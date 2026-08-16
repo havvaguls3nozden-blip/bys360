@@ -1,15 +1,23 @@
 """Portal media upload limit, comment replies and mentions V2.12.1
 
 Revision ID: bys360_portal_v2121
-Revises: 733e87cebd16
+Revises: c3d8e5f19a02
 Create Date: 2026-06-02
+
+TD-032 (portal_post_comments missing-migration repair): down_revision
+repointed from 733e87cebd16 to c3d8e5f19a02 (a newly inserted, straight-line
+predecessor that creates portal_groups/portal_posts/portal_post_comments,
+which this revision's portal_comment_mentions FK at line 46 requires).
+c3d8e5f19a02 itself chains to the original parent, 733e87cebd16, so no
+other revision's ancestry changes. No DDL/FK in this file was modified or
+removed.
 """
 from alembic import op
 import sqlalchemy as sa
 
 
 revision = "bys360_portal_v2121"
-down_revision = "733e87cebd16"
+down_revision = "c3d8e5f19a02"
 branch_labels = None
 depends_on = None
 

@@ -86,6 +86,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # historical; never affected by any later commit.
 PRE_DELETION_REF = "d4ee2043931b37cef6df2ceef898094e0eebb04d"
 
+# This wave's own landing commit (parent is exactly PRE_DELETION_REF -- a
+# single atomic commit). Fixed, historical; never affected by any later
+# commit. Used, alongside PRE_DELETION_REF, to prove what THIS WAVE's own
+# diff did and did not touch -- see test_out_of_scope_path_is_untouched_by_
+# this_wave's docstring below for why this must be ref-vs-ref, not
+# ref-vs-working-tree.
+POST_DELETION_REF = "4af482e3dff5a35e6510a01159e97ec73b661b1b"
+
 DELETED_GROUPS: dict[str, tuple[str, ...]] = {
     "portal_hero": (
         "app/templates/portal/_press_news_home_hero_v3a.html",
@@ -504,13 +512,31 @@ def test_csp_style_directives_contain_no_nonce_token(client, directive: str) -> 
 
 
 # ---------------------------------------------------------------------------
-# 13) PWA/service-worker, Workflow/OpenAPI, and migrations are untouched.
+# 13) PWA/service-worker, Workflow/OpenAPI, and migrations were untouched BY
+#     THIS WAVE'S OWN COMMIT.
+#
+# TD-032 fix (2026-08-16): this used to diff PRE_DELETION_REF against the
+# *current working tree* (a bare `git diff <ref>` with no second ref). That
+# conflates two different questions: "did this 2026-08-07 template-cleanup
+# wave touch migrations/?" (a fixed historical fact, answered once and
+# forever) versus "are there changes to migrations/ *right now*, for any
+# reason, by any later wave?" (drifts constantly -- any future, unrelated
+# migration wave breaks this "historical" scope-guard). Concretely, the
+# real, later TD-032 migration-graph-repair work legitimately added/edited
+# migrations/versions/*.py, which made the old ref-vs-working-tree form fail
+# even though the 2026-08-07 wave itself never touched migrations/. Fixed by
+# comparing PRE_DELETION_REF against POST_DELETION_REF -- both fixed,
+# historical commits bracketing this wave's own single atomic commit
+# (4af482e's only parent is PRE_DELETION_REF) -- so the assertion is a
+# permanent, working-tree-independent fact about what that one commit did,
+# and stays true no matter what any later, unrelated wave does to
+# migrations/ (or any of the other scope_path values here).
 # ---------------------------------------------------------------------------
 
 
-def _git_diff_stat_is_empty(scope_path: str) -> str:
+def _git_diff_stat_between_refs(ref_a: str, ref_b: str, scope_path: str) -> str:
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--stat", PRE_DELETION_REF, "--", scope_path],
+        ["git", "-C", str(REPO_ROOT), "diff", "--stat", ref_a, ref_b, "--", scope_path],
         capture_output=True,
         text=True,
         timeout=30,
@@ -537,9 +563,10 @@ def test_out_of_scope_path_is_untouched_by_this_wave(scope_path: str) -> None:
     except OSError:
         pytest.skip("git CLI not available in this environment.")
 
-    diff_output = _git_diff_stat_is_empty(scope_path)
+    diff_output = _git_diff_stat_between_refs(PRE_DELETION_REF, POST_DELETION_REF, scope_path)
     assert diff_output.strip() == "", (
-        f"{scope_path} has changes relative to {PRE_DELETION_REF}; this wave must not touch it:\n{diff_output}"
+        f"{scope_path} has changes between {PRE_DELETION_REF} and this wave's own landing "
+        f"commit {POST_DELETION_REF}; this wave must not have touched it:\n{diff_output}"
     )
 
 

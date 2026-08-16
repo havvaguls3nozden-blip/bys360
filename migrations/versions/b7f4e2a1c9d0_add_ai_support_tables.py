@@ -1,14 +1,19 @@
 """add ai support tables
 
 Revision ID: b7f4e2a1c9d0
-Revises: 71d0eccf02c0
+Revises: 71d0eccf02c0, fae32fb68b1b
 Create Date: 2026-04-03 12:40:00
+
+TD-032: additional parent fae32fb68b1b added (multi-parent down_revision,
+Candidate B-Tuple) so Alembic's topological order guarantees the users table
+(created only in fae32fb68b1b) exists before this revision's FK references to
+users(id) run on a genuinely empty database. No DDL below this header changed.
 """
 
 from alembic import op
 
 revision = 'b7f4e2a1c9d0'
-down_revision = '71d0eccf02c0'
+down_revision = ('71d0eccf02c0', 'fae32fb68b1b')
 branch_labels = None
 depends_on = None
 
