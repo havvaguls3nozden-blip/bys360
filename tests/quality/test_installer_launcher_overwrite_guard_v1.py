@@ -179,7 +179,22 @@ def _run_mocked_installer(target_script: Path, project_root: Path, work_dir: Pat
     oturumunda `runs` kez calistirir. Gercek Register-ScheduledTask/
     Unregister-ScheduledTask/Get-ScheduledTask ASLA cagrilmaz (mock fonksiyonlar
     devreye girer). Sonuc: {"results": [{"run":1,"success":bool,"error":str|None}, ...],
-    "mock_calls": [...]}."""
+    "mock_calls": [...]}.
+
+    Cross-platform not: install_bys360_daily_mail_tasks_v1_4.ps1 ve
+    install_bys360_daily_weather_mail_task.ps1, kendi `-ProjectRoot`
+    parametresinden BAGIMSIZ olarak, kosulsuz sekilde sabit `C:\bys360\logs`
+    yolunu olusturur (bu, gercek run_daily_weather_personnel_mail.ps1
+    launcher'inin da bagimsiz olarak referans ettigi, kasitli/gercek bir
+    production convention'idir -- degistirilmedi, bkz. TD-032 remote-CI
+    unblock dalgasi raporu). GitHub'in Linux runner'inda pwsh'ta hic `C:`
+    surucusu olmadigi icin bu satir gercek bir hata ile patlar ("Cannot find
+    drive. A drive with the name 'C' does not exist."). Bu fonksiyon, YALNIZ
+    gercek bir `C:` suruculu ortam (Windows) YOKSA, pytest-owned bir gecici
+    dizini `C:` adiyla PSDrive olarak mount eder -- boylece installer'in
+    KENDI, degistirilmemis kodu, hic sandbox-farkli davranmadan, gercek bir
+    dosya sistemi hedefine yazabilir. Windows'ta bu blok no-op'tur (gercek
+    `C:` zaten var, PSDrive olusturulmaz, hicbir davranis degismez)."""
     exe = _require_ps()
     work_dir.mkdir(parents=True, exist_ok=True)
     out_json = work_dir / "harness_out.json"
@@ -190,6 +205,15 @@ def _run_mocked_installer(target_script: Path, project_root: Path, work_dir: Pat
     harness += "$projectRoot = " + _ps_single_quote(str(project_root)) + "\n"
     harness += f"$runs = {runs}\n"
     harness += r"""
+$hasRealCDrive = $false
+try { $hasRealCDrive = [bool](Test-Path -LiteralPath 'C:\') } catch { $hasRealCDrive = $false }
+$FakeCDriveRoot = $null
+if (-not $hasRealCDrive) {
+    $FakeCDriveRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("bys360_fake_c_drive_" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $FakeCDriveRoot | Out-Null
+    New-PSDrive -Name 'C' -PSProvider FileSystem -Root $FakeCDriveRoot -Scope Global | Out-Null
+}
+
 $results = @()
 for ($i = 1; $i -le $runs; $i++) {
     $errMsg = $null
@@ -202,6 +226,12 @@ for ($i = 1; $i -le $runs; $i++) {
     }
     $results += [PSCustomObject]@{ Run = $i; Success = $success; Error = $errMsg }
 }
+
+if ($FakeCDriveRoot) {
+    Remove-PSDrive -Name 'C' -Force -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $FakeCDriveRoot -ErrorAction SilentlyContinue
+}
+
 $output = [PSCustomObject]@{
     Results = $results
     MockCalls = @($Global:MockCalls)

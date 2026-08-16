@@ -32,8 +32,21 @@ jobs:
           --health-retries=5
 
     steps:
+      # TD-032 remote-CI unblock (2026-08-16): actions/checkout@v4's default
+      # fetch-depth (1) produces a shallow clone with only the tip commit's
+      # object present. Several historical-wave contract tests (e.g.
+      # tests/quality/test_openapi_workflow_drift_cleanup_contract.py) run
+      # `git show <fixed-historical-sha>:<path>` to prove what a past commit
+      # actually contained -- a real, currently-reproduced shallow-clone
+      # error ("fatal: path ... does not exist in '<sha>'") because that
+      # commit object is absent from a depth-1 checkout, even though the
+      # path exists in the current working tree. fetch-depth: 0 fetches full
+      # history so every such fixed-ref lookup resolves identically to a
+      # local full clone. This is the only change to this step.
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
