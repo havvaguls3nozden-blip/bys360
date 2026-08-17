@@ -12,6 +12,7 @@ to be a purely additive CI change, not a rewrite of the existing gates.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -57,7 +58,61 @@ def test_migration_integrity_gate_script_exists() -> None:
 def test_gate_env_var_is_wired_and_points_at_the_ci_service_host() -> None:
     text = _workflow_text()
     assert "BYS360_REALDB_MIGRATION_TEST_URL:" in text
-    assert "@postgres:5432/bys360_migration_test_ci" in text
+    assert "@127.0.0.1:5432/bys360_migration_test_ci" in text, (
+        "TD-032 remote-CI unblock (2026-08-17): this job has no job-level `container:`, "
+        "so it cannot resolve the postgres service's Docker-network label ('postgres') -- "
+        "only its published loopback port. See "
+        "test_create_db_step_and_harness_step_use_the_same_reachable_host below for the "
+        "full regression guard."
+    )
+
+
+_DSN_HOST_RE = re.compile(r"host='([^']+)'")
+_URL_HOST_RE = re.compile(r"@([^:/]+):5432/bys360_migration_test_ci")
+
+
+def test_create_db_step_and_harness_step_use_the_same_reachable_host() -> None:
+    """Regression guard for the exact remote failure this wave fixed:
+    `psycopg2.OperationalError: could not translate host name "postgres" to
+    address: Temporary failure in name resolution`. This job has no
+    job-level `container:`, so it runs directly on the runner host, not on
+    the same Docker network as the `postgres` service container -- the
+    service's Docker-network label is only resolvable from *other
+    containers* on that job's network. A host-runner job must use the
+    service's published port on the loopback interface instead (already
+    published: `ports: - 5432:5432` on the service). If this job is ever
+    moved under a job-level `container:`, this test's premise (and the
+    workflow's DSN hosts) needs re-deriving, not just re-asserting."""
+    text = _workflow_text()
+    job_header = text[text.index("runs-on: ubuntu-latest") : text.index("\n    steps:")]
+    assert "container:" not in job_header, (
+        "quality-gate now has a job-level `container:` -- the loopback-host requirement "
+        "this test enforces no longer applies as-is; re-derive the correct DSN host for "
+        "the new topology instead of just updating this assertion."
+    )
+
+    create_step_match = _DSN_HOST_RE.search(text)
+    assert create_step_match, "Could not find the create-database step's psycopg2.connect host=... argument."
+    create_step_host = create_step_match.group(1)
+
+    harness_step_match = _URL_HOST_RE.search(text)
+    assert harness_step_match, "Could not find the migration gate's BYS360_REALDB_MIGRATION_TEST_URL host."
+    harness_step_host = harness_step_match.group(1)
+
+    assert create_step_host == "127.0.0.1", (
+        f"Create-database step host is {create_step_host!r}; a host-runner job with no "
+        "job-level `container:` cannot resolve the postgres service's Docker-network "
+        "label and must use its published loopback port (127.0.0.1) instead."
+    )
+    assert harness_step_host == "127.0.0.1", (
+        f"Migration gate host is {harness_step_host!r}; must be 127.0.0.1 for the same "
+        "host-runner-vs-service-container reason as the create-database step."
+    )
+    assert create_step_host == harness_step_host, (
+        f"Create-database step host {create_step_host!r} and migration gate host "
+        f"{harness_step_host!r} must be identical -- both connect to the same disposable "
+        "PostgreSQL service."
+    )
 
 
 def test_no_production_secret_pattern_used_for_the_ci_postgres_credentials() -> None:

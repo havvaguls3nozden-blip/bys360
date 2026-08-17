@@ -175,11 +175,27 @@ jobs:
       # one disposable target database the gate below is allowed to touch,
       # matching this gate's own naming contract
       # (bys360_postgres_migration_integrity_gate.py's SAFE_DB_NAME_RE).
+      #
+      # TD-032 remote-CI unblock (2026-08-17): this job has no job-level
+      # `container:`, so it runs directly on the ubuntu-latest HOST runner,
+      # not inside a Docker container alongside the `postgres` service. Per
+      # GitHub's own documented service-container networking model, the
+      # service's Docker-network hostname ("postgres", the service label)
+      # is only resolvable from *other containers on that same job's
+      # network -- a host-runner process has no such DNS entry, only the
+      # published host port (`ports: 5432:5432` above already publishes it
+      # to the runner). Confirmed by the exact reproduced remote error:
+      # `psycopg2.OperationalError: could not translate host name "postgres"
+      # to address: Temporary failure in name resolution`. Fixed by using
+      # 127.0.0.1 (the runner's own loopback, where the published port
+      # lands) instead of the service label -- the correct host for a
+      # host-runner job with a port-mapped service, not a DNS problem to
+      # retry around.
       - name: Create disposable PostgreSQL 15 migration-test database
         run: |
           python -c "
           import psycopg2
-          conn = psycopg2.connect(host='postgres', port=5432, user='postgres', password='bys360_ci_test_only_password', dbname='postgres')
+          conn = psycopg2.connect(host='127.0.0.1', port=5432, user='postgres', password='bys360_ci_test_only_password', dbname='postgres')
           conn.autocommit = True
           with conn.cursor() as cur:
               cur.execute('CREATE DATABASE bys360_migration_test_ci;')
@@ -194,9 +210,17 @@ jobs:
       # PostgreSQL 15 server, not SQLite. Host/db-name/PG-major guards are
       # hardcoded in the gate itself (no bypass flag); this step only
       # supplies a target that satisfies them.
+      #
+      # TD-032 remote-CI unblock (2026-08-17): host changed from the
+      # unreachable "postgres" service-label to 127.0.0.1, matching the
+      # create-database step above -- see that step's comment for the full
+      # host-runner-vs-container networking explanation. 127.0.0.1 was
+      # already in the gate's own ALLOWED_HOSTS (no harness change needed);
+      # only the now-unused "postgres" CI-host allowance in
+      # ALLOWED_CI_HOSTS is left as-is, unused but harmless.
       - name: PostgreSQL 15 migration integrity gate
         env:
-          BYS360_REALDB_MIGRATION_TEST_URL: postgresql://postgres:bys360_ci_test_only_password@postgres:5432/bys360_migration_test_ci
+          BYS360_REALDB_MIGRATION_TEST_URL: postgresql://postgres:bys360_ci_test_only_password@127.0.0.1:5432/bys360_migration_test_ci
         run: python scripts/quality/bys360_postgres_migration_integrity_gate.py
 
       # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
