@@ -807,14 +807,52 @@ ROLE_MATRIX_POLICY_CONFIGS = [
 if not any(isinstance(config, dict) and config.get("key") == "personnel" for config in ROLE_MATRIX_POLICY_CONFIGS):
     ROLE_MATRIX_POLICY_CONFIGS.insert(0, _BYS360_PERSONNEL_POLICY_CONFIG)
 
+# Kept for backward-compat: account_settings_helpers.py / account_visibility_helpers.py
+# import this name directly. It is always None (no earlier _build_role_matrix_policy_items
+# definition exists in this module) and is intentionally unused below.
 _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS = globals().get("_build_role_matrix_policy_items")
+
 
 def _build_role_matrix_policy_items(grouped_menu_definitions, flat_menu_items, matrix_key):
     if (matrix_key or "").strip() == "personnel":
         return [dict(item) for item in PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS]
-    if callable(_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS):
-        return _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS(grouped_menu_definitions, flat_menu_items, matrix_key)
-    return []
+
+    config = _role_matrix_policy_config_map().get((matrix_key or "").strip())
+    if not config:
+        return []
+
+    items = []
+    seen = set()
+    for group_label in config.get("menu_groups", []):
+        for item in list(grouped_menu_definitions.get(group_label, []) or []):
+            if not isinstance(item, dict):
+                continue
+            key = item.get("key")
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            items.append(item)
+
+    for extra_key in config.get("extra_keys", []):
+        if extra_key in seen:
+            continue
+        item = _find_menu_item_by_key(flat_menu_items, extra_key)
+        if item:
+            seen.add(extra_key)
+            items.append(item)
+
+    for synthetic_item in config.get("synthetic_items", []) or []:
+        if not isinstance(synthetic_item, dict):
+            continue
+        key = synthetic_item.get("key")
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        enriched = dict(synthetic_item)
+        enriched.setdefault("settings_key", key)
+        enriched.setdefault("section", config.get("title") or "Sanal Asistan")
+        items.append(enriched)
+    return items
 # BYS360_PERSONEL_ROLE_MATRIX_CURRENT_SCOPE_V1_END
 
 # BYS360_SETTINGS_MENU_ROLE_MATRIX_ALL_TABS_V1_BEGIN
