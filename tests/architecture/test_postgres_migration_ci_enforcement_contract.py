@@ -9,6 +9,18 @@ it does not use production secrets, it is not marked ``continue-on-error``
 (an allow-failure step would make the gate decorative), and the pre-existing
 Step1/Step2 pytest commands are unchanged by this addition -- this is meant
 to be a purely additive CI change, not a rewrite of the existing gates.
+
+Also locks in the ``quality-gate`` job's runtime budget (2026-08-17,
+job-timeout unblock): a real remote run was cancelled by GitHub Actions at
+~25m18s, mid-Step2, at 99% test progress, 0 failures/errors -- the job's own
+``timeout-minutes: 25`` firing, not a hang or a test regression (confirmed:
+no ``concurrency:`` block exists anywhere in this workflow, and no
+superseding push landed before the cancellation). Local measurement this
+session put Step2 alone at ~26-28 minutes on its own, before counting
+checkout/install/Ruff/the PostgreSQL steps/coverage/mypy/quality9/pip-audit
+that share the same job budget. The test below asserts a floor, not the
+exact chosen value, so a future, evidence-based recalibration (e.g. if
+Step2 grows further) isn't blocked by an over-fitted exact-match assertion.
 """
 from __future__ import annotations
 
@@ -28,6 +40,31 @@ def _workflow_text() -> str:
 
 def test_ci_workflow_file_exists() -> None:
     assert CI_WORKFLOW.exists(), f"{CI_WORKFLOW} not found."
+
+
+_JOB_TIMEOUT_RE = re.compile(r"timeout-minutes:\s*(\d+)")
+_MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES = 40
+
+
+def test_quality_gate_job_timeout_has_an_evidence_backed_floor() -> None:
+    """Regression guard for the exact remote failure this wave fixed: the
+    job was killed by its own `timeout-minutes` mid-Step2 at 99% progress,
+    0 test failures. Asserts a FLOOR (not the exact current value) so a
+    future, deliberate, evidence-based change (e.g. Step2 growing further)
+    isn't blocked by an over-fitted exact-match assertion -- but a
+    regression back toward the old, proven-insufficient 25 minutes is
+    caught immediately."""
+    text = _workflow_text()
+    job_header = text[text.index("runs-on: ubuntu-latest") : text.index("\n    services:")]
+    match = _JOB_TIMEOUT_RE.search(job_header)
+    assert match, "Could not find quality-gate's job-level timeout-minutes."
+    timeout_minutes = int(match.group(1))
+    assert timeout_minutes >= _MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES, (
+        f"quality-gate timeout-minutes is {timeout_minutes}; must be at least "
+        f"{_MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES} (local measurement: Step2 alone "
+        "takes ~26-28 minutes, before checkout/install/Ruff/PostgreSQL/coverage/mypy/"
+        "quality9/pip-audit in the same job budget)."
+    )
 
 
 def test_postgres_15_service_is_declared() -> None:

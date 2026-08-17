@@ -10,7 +10,19 @@ on:
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # TD-032 remote-CI unblock (2026-08-17): the prior 25-minute budget was
+    # proven insufficient by a real remote run cancelled at ~25m18s with
+    # "Run integration and architecture tests" (Step2) at 99% -- 0 test
+    # failures, 0 errors, no concurrency/superseding-push mechanism
+    # configured in this workflow, and the timing matched timeout-minutes:
+    # 25 almost exactly. Local measurement across many runs this session
+    # (canonical Python 3.12.10): Step1 ~60-65s, Step2 alone ~1570-1700s
+    # (~26-28 min) -- already exceeding the old 25-minute *job* budget
+    # before counting checkout/pip install/Ruff/PostgreSQL/coverage/mypy/
+    # quality9/pip-audit, which run before and after it in the same job.
+    # 45 minutes leaves a real margin (~6-7 min) over that estimate without
+    # being an unbounded/unnecessarily broad budget.
+    timeout-minutes: 45
 
     # TD-032 closure: real PostgreSQL 15 target for the migration-integrity
     # gate below. Disposable, CI-only credentials -- never production
