@@ -33,7 +33,7 @@ import pytest
 from flask import template_rendered
 
 _TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "settings_behavior_tmp" / "test_dbs"
-DEFAULT_PASSWORD = "SettingsBehavior1!"
+DEFAULT_PASSWORD = "SettingsBehaviorTest1!"
 
 
 def _make_app(monkeypatch, **env_overrides):
@@ -228,15 +228,15 @@ def _general_matrix_menu_key(app) -> str:
     policy items (_get_role_matrix_policy_items_or_raise). Avoids hardcoding a
     catalog key that could drift as the menu catalog changes."""
     with app.app_context():
+        from app.main_handlers.account_communication_helpers import (
+            _get_role_matrix_policy_items_or_raise,
+        )
         from app.main_handlers.account_settings_helpers import (
             _bys360_personnel_feature_matrix_v14_dedupe_grouped_menu,
             _bys360_personnel_feature_matrix_v14_dedupe_items,
             extend_flat_menu_items_with_assistant_role_matrix_items,
             flatten_settings_menu_definitions,
             get_grouped_menu_definitions,
-        )
-        from app.main_handlers.account_communication_helpers import (
-            _get_role_matrix_policy_items_or_raise,
         )
 
         grouped = _bys360_personnel_feature_matrix_v14_dedupe_grouped_menu(get_grouped_menu_definitions())
@@ -452,15 +452,15 @@ def test_save_role_matrix_group_promotes_unrelated_seed_rows_to_manual(app, clie
     general_key = _general_matrix_menu_key(app)
 
     with app.app_context():
+        from app.main_handlers.account_communication_helpers import (
+            _get_role_matrix_policy_items_or_raise,
+        )
         from app.main_handlers.account_settings_helpers import (
             _bys360_personnel_feature_matrix_v14_dedupe_grouped_menu,
             _bys360_personnel_feature_matrix_v14_dedupe_items,
             extend_flat_menu_items_with_assistant_role_matrix_items,
             flatten_settings_menu_definitions,
             get_grouped_menu_definitions,
-        )
-        from app.main_handlers.account_communication_helpers import (
-            _get_role_matrix_policy_items_or_raise,
         )
 
         grouped = _bys360_personnel_feature_matrix_v14_dedupe_grouped_menu(get_grouped_menu_definitions())
@@ -502,8 +502,8 @@ def test_save_role_matrix_group_partial_apply_when_mid_loop_role_fails(app, clie
     failure already durably committed, while the user only ever sees one
     undifferentiated danger flash -- a real partial-apply risk, not something
     this test "fixes"."""
-    from app.main_handlers import account_communication_helpers as comm_helpers
     import app.main_handlers.account_settings_helpers as settings_helpers
+    from app.main_handlers import account_communication_helpers as comm_helpers
 
     _create_user(app, sicil_no="sb033", email="sb033@ktb.gov.tr", role="admin")
     menu_key = _general_matrix_menu_key(app)
