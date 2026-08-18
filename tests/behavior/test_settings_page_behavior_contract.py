@@ -915,3 +915,137 @@ def test_save_user_visibility_default_branch_success(app, client):
         from app.models import UserMenuPermission
         row = UserMenuPermission.query.filter_by(user_id=target_id, menu_key=menu_key).first()
         assert row is not None and row.is_visible is True
+
+
+# ---------------------------------------------------------------------------
+# save_assistant_role_matrix / reset_assistant_role_matrix / rollback_settings_change_entry
+#
+# Added ahead of the settings_page() complexity refactor: these three actions
+# had zero test coverage anywhere in the repo (route level or service level)
+# before this addition, per an explicit forensic sweep of tests/ -- yet each
+# is a structurally-unique, materially-unprotected branch about to be
+# extracted into its own helper function. These are minimal, semantic
+# (DB-state and flash assertions, not source/line-position assertions)
+# regression nets for CURRENT, already-shipped behavior -- not new
+# behavior, and not a fix for anything.
+# ---------------------------------------------------------------------------
+
+
+def _assistant_module_setting_value(app, *, setting_key):
+    with app.app_context():
+        from app.models import ModuleSetting
+        row = ModuleSetting.query.filter_by(module_key="assistant", setting_key=setting_key).first()
+        return None if row is None else row.value_text
+
+
+def test_save_assistant_role_matrix_success_updates_visible_roles(app, client):
+    _create_user(app, sicil_no="sb110", email="sb110@ktb.gov.tr", role="admin")
+    _login(client, "sb110")
+
+    response = client.post(
+        "/settings",
+        data={
+            "form_action": "save_assistant_role_matrix",
+            "assistant_role_policy__admin__assistant_module": "on",
+            "assistant_role_policy__personel__assistant_module": "on",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert "section=assistant-role-policy" in response.headers.get("Location", "")
+    flashes = _flashes(client)
+    assert flashes and flashes[-1][0] == "success"
+    assert "Açık rol sayısı: 2" in flashes[-1][1]
+    assert _assistant_module_setting_value(app, setting_key="visible_roles") == "admin,personel"
+    assert _assistant_module_setting_value(app, setting_key="enabled") == "true"
+
+
+def test_reset_assistant_role_matrix_restores_default_roles(app, client):
+    from app.main_handlers.account_settings_helpers import ASSISTANT_DEFAULT_VISIBLE_ROLES
+
+    _create_user(app, sicil_no="sb111", email="sb111@ktb.gov.tr", role="admin")
+    _login(client, "sb111")
+
+    # First move it away from the default so the reset is a real assertion,
+    # not a no-op.
+    client.post(
+        "/settings",
+        data={
+            "form_action": "save_assistant_role_matrix",
+            "assistant_role_policy__personel__assistant_module": "on",
+        },
+        follow_redirects=False,
+    )
+    assert _assistant_module_setting_value(app, setting_key="visible_roles") == "personel"
+
+    response = client.post(
+        "/settings",
+        data={"form_action": "reset_assistant_role_matrix"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert "section=assistant-role-policy" in response.headers.get("Location", "")
+    flashes = _flashes(client)
+    assert flashes and flashes[-1][0] == "success"
+    assert f"Açık rol sayısı: {len(ASSISTANT_DEFAULT_VISIBLE_ROLES)}" in flashes[-1][1]
+    restored = set((_assistant_module_setting_value(app, setting_key="visible_roles") or "").split(","))
+    assert restored == ASSISTANT_DEFAULT_VISIBLE_ROLES
+
+
+def test_rollback_settings_change_entry_restores_previous_system_setting_value(app, client):
+    _create_user(app, sicil_no="sb112", email="sb112@ktb.gov.tr", role="admin")
+    _login(client, "sb112")
+
+    # GET first so phase1 seeding has already run and a baseline value exists.
+    client.get("/settings", follow_redirects=False)
+    before_value = _system_setting_value(app, setting_key="general.system_name")
+
+    save_response = client.post(
+        "/settings",
+        data={
+            "form_action": "save_system_foundation",
+            "system__general__system_name": "Rollback Contract Value",
+        },
+        follow_redirects=False,
+    )
+    assert save_response.status_code == 302
+    assert _system_setting_value(app, setting_key="general.system_name") == "Rollback Contract Value"
+
+    with app.app_context():
+        from app.models import SettingsChangeLog
+        log_row = (
+            SettingsChangeLog.query
+            .filter_by(change_scope="system_settings", is_rollback=False)
+            .order_by(SettingsChangeLog.id.desc())
+            .first()
+        )
+        assert log_row is not None
+        log_id = log_row.id
+
+    rollback_response = client.post(
+        "/settings",
+        data={"form_action": "rollback_settings_change_entry", "change_log_id": str(log_id)},
+        follow_redirects=False,
+    )
+
+    assert rollback_response.status_code == 302
+    flashes = _flashes(client)
+    assert flashes and flashes[-1][0] == "success"
+    assert _system_setting_value(app, setting_key="general.system_name") == before_value
+
+
+def test_rollback_settings_change_entry_missing_log_id_flashes_danger(app, client):
+    _create_user(app, sicil_no="sb113", email="sb113@ktb.gov.tr", role="admin")
+    _login(client, "sb113")
+
+    response = client.post(
+        "/settings",
+        data={"form_action": "rollback_settings_change_entry"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    flashes = _flashes(client)
+    assert flashes and flashes[-1] == ("danger", "Geri alınacak ayar değişikliği kaydı belirtilmedi.")
