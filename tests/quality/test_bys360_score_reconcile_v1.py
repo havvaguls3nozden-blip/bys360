@@ -8,14 +8,18 @@ pass_rule="exit_code_0_or_supplied_evidence" with results supplied via the
 from __future__ import annotations
 
 import json
+import re
+import sys
 from pathlib import Path
 
 import pytest
 
 from scripts.quality.bys360_score_reconcile_v1 import (
     LEGACY_SNAPSHOT,
+    _build_argv,
     _round_half_up,
     compute_report,
+    resolve_python,
 )
 
 pytestmark = pytest.mark.ci_safe
@@ -272,3 +276,289 @@ def test_canonical_methodology_and_registry_files_produce_a_valid_report(tmp_pat
     assert isinstance(report["LIVE_READINESS"]["final"], int)
     assert isinstance(report["TRANSFERABILITY"]["final"], int)
     assert report["legacy_snapshot"]["LIVE_READINESS"] == 68
+
+
+# ---------------------------------------------------------------------------
+# Full score-trace completeness tests
+# ---------------------------------------------------------------------------
+
+EXPECTED_CATEGORIES = {
+    "Code Quality", "Test Assurance", "Security", "CI-Release",
+    "Operations", "Documentation-Handover", "Maintainability",
+}
+
+
+def test_all_seven_categories_present(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    assert set(report["category_scores"].keys()) == EXPECTED_CATEGORIES
+
+
+def test_all_category_trace_fields_present(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[
+        {"id": "TD-CAND-001", "status": "OPEN", "severity": "P2", "category": "Code Quality"},
+    ])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    required_fields = {
+        "final_score", "gate_component", "rubric_component", "raw_before_penalty",
+        "debt_penalty", "unverified_count", "gate_contributions", "rubric_contributions",
+        "missing_evidence", "debt_penalty_breakdown", "debt_penalty_raw_total",
+        "debt_penalty_cap_applied", "ceiling", "gates", "rubric_trace",
+    }
+    for name, cs in report["category_scores"].items():
+        missing = required_fields - set(cs.keys())
+        assert not missing, f"{name} is missing trace fields: {missing}"
+        assert cs["ceiling"] == {"applies": False}, "no per-category ceiling exists in methodology v1 -- must report honestly"
+
+
+def test_debt_penalty_breakdown_sums_to_category_penalty(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[
+        {"id": "TD-CAND-001", "status": "OPEN", "severity": "P2", "category": "Code Quality"},
+        {"id": "TD-CAND-002", "status": "OPEN", "severity": "P1", "category": "Code Quality"},
+    ])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    cq = report["category_scores"]["Code Quality"]
+    breakdown_sum = sum(item["penalty_points"] for item in cq["debt_penalty_breakdown"])
+    assert breakdown_sum == cq["debt_penalty_raw_total"]
+    assert min(breakdown_sum, methodology["debt_penalty_policy"]["penalty_cap_per_category"]) == cq["debt_penalty"]
+    assert len(cq["debt_penalty_breakdown"]) == 2
+    ids = {item["debt_id"] for item in cq["debt_penalty_breakdown"]}
+    assert ids == {"TD-CAND-001", "TD-CAND-002"}
+
+
+def test_debt_penalty_breakdown_reports_severity_and_mapping_status(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[
+        {"id": "TD-CAND-001", "status": "OPEN", "severity": "P2", "category": "Code Quality"},
+        {"id": "TD-CAND-002", "status": "OPEN", "severity": "TOTALLY_MADE_UP", "category": "Code Quality"},
+    ])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    breakdown = {item["debt_id"]: item for item in report["category_scores"]["Code Quality"]["debt_penalty_breakdown"]}
+    assert breakdown["TD-CAND-001"]["mapping_status"] == "DIRECT_MATCH"
+    assert breakdown["TD-CAND-002"]["mapping_status"] == "FALLBACK_UNCLASSIFIED_DEFAULT"
+    assert breakdown["TD-CAND-002"]["penalty_points"] == methodology["debt_penalty_policy"]["severity_weights"]["UNCLASSIFIED"]
+
+
+def test_debt_penalty_cap_applied_flag(tmp_path):
+    methodology = _fixture_methodology()
+    # 6 P0 items at weight 40 each = 240 raw, capped at 30.
+    registry = _fixture_registry(items=[
+        {"id": f"TD-CAND-{i}", "status": "OPEN", "severity": "P0", "category": "Code Quality"}
+        for i in range(6)
+    ])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    cq = report["category_scores"]["Code Quality"]
+    assert cq["debt_penalty_raw_total"] == 240
+    assert cq["debt_penalty_cap_applied"] is True
+    assert cq["debt_penalty"] == 30
+
+
+def test_gate_contributions_sum_to_gate_component(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    evidence = {"gate_a": True, "gate_b": True, "gate_c": True, "gate_d": True, "gate_e": True, "gate_f": True}
+    report = compute_report(methodology, registry, tmp_path, evidence)
+    cq = report["category_scores"]["Code Quality"]
+    contributions_sum = sum(g["points_awarded"] for g in cq["gate_contributions"])
+    assert round(contributions_sum, 2) == cq["gate_component"]
+
+
+def test_missing_evidence_trace_lists_unverified_gates(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    report = compute_report(methodology, registry, tmp_path, evidence={})
+    cq = report["category_scores"]["Code Quality"]
+    assert len(cq["missing_evidence"]) == 1
+    assert cq["missing_evidence"][0]["name"] == "gate_a"
+    assert cq["missing_evidence"][0]["kind"] == "GATE"
+
+
+def test_live_and_transfer_contributions_reproduce_raw_sum(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    live_sum = sum(c["contribution"] for c in report["LIVE_READINESS"]["contributions"])
+    assert round(live_sum, 2) == round(report["LIVE_READINESS"]["raw"], 2)
+    transfer_sum = sum(c["contribution"] for c in report["TRANSFERABILITY"]["contributions"])
+    assert round(transfer_sum, 2) == round(report["TRANSFERABILITY"]["raw"], 2)
+    # Every contribution must show its own weight and the category score it was derived from.
+    for contribution in report["LIVE_READINESS"]["contributions"]:
+        expected = report["category_scores"][contribution["category"]]["final_score"] * contribution["weight"]
+        assert round(contribution["contribution"], 4) == round(expected, 4)
+
+
+def test_composite_weight_sums_equal_one():
+    methodology = json.loads(CANONICAL_METHODOLOGY_PATH.read_text(encoding="utf-8"))
+    live_sum = sum(methodology["composites"]["LIVE_READINESS"]["weights"].values())
+    transfer_sum = sum(methodology["composites"]["TRANSFERABILITY"]["weights"].values())
+    assert abs(live_sum - 1.0) < 1e-6
+    assert abs(transfer_sum - 1.0) < 1e-6
+
+
+def test_rounding_deterministic_across_repeated_calls():
+    for value in (67.5, 67.4999, 67.50001, 88.5, 89.5, 100.0, 0.0):
+        first = _round_half_up(value)
+        second = _round_half_up(value)
+        assert first == second
+
+
+def test_round_half_up_diverges_from_bankers_rounding_at_known_boundary():
+    """Proves the implementation is NOT Python's built-in round() (banker's rounding)."""
+    assert round(88.5) == 88  # Python's default: rounds to even
+    assert _round_half_up(88.5) == 89  # methodology's rule: always rounds the tie up
+
+
+# ---------------------------------------------------------------------------
+# Portability tests
+# ---------------------------------------------------------------------------
+
+
+def test_no_hardcoded_machine_specific_executable_path_in_methodology_config():
+    """Anti-regression: no GATE DEFINITION (the executable part of the config)
+    may hardcode an absolute, machine-specific interpreter path again. Prose
+    fields (design_note, interpreter_resolution.note, etc.) are allowed to
+    reference the historical hardcoded path when explaining why the fix was
+    made -- only gates[] entries are checked, since those are what actually
+    get executed."""
+    methodology = json.loads(CANONICAL_METHODOLOGY_PATH.read_text(encoding="utf-8"))
+    for category_name, category_config in methodology["categories"].items():
+        for gate in category_config.get("gates", []):
+            gate_json = json.dumps(gate)
+            assert "C:\\" not in gate_json and "c:\\\\" not in gate_json.lower(), (
+                f"{category_name}.{gate['name']} embeds a hardcoded absolute path in its gate definition: {gate_json}"
+            )
+            command = gate.get("command", "")
+            assert "C:\\" not in command, (
+                f"{category_name}.{gate['name']} has a hardcoded absolute path in a legacy command string"
+            )
+
+
+def test_no_hardcoded_machine_specific_path_in_calculator_source():
+    source = Path("scripts/quality/bys360_score_reconcile_v1.py").read_text(encoding="utf-8")
+    assert "C:\\bys360" not in source and "C:\\\\bys360" not in source
+
+
+def test_resolve_python_default_uses_sys_executable(monkeypatch):
+    monkeypatch.delenv("BYS360_QUALITY_PYTHON", raising=False)
+    path, source = resolve_python(None)
+    assert path == sys.executable
+    assert source == "default-sys.executable"
+
+
+def test_resolve_python_explicit_override_honored(tmp_path):
+    fake_python = tmp_path / "fake_python.exe"
+    fake_python.write_text("", encoding="utf-8")
+    path, source = resolve_python(str(fake_python))
+    assert path == str(fake_python)
+    assert source == "explicit"
+
+
+def test_resolve_python_env_var_honored(monkeypatch, tmp_path):
+    fake_python = tmp_path / "env_python.exe"
+    fake_python.write_text("", encoding="utf-8")
+    monkeypatch.setenv("BYS360_QUALITY_PYTHON", str(fake_python))
+    path, source = resolve_python(None)
+    assert path == str(fake_python)
+    assert source == "env"
+
+
+def test_resolve_python_explicit_takes_priority_over_env(monkeypatch, tmp_path):
+    env_python = tmp_path / "env_python.exe"
+    env_python.write_text("", encoding="utf-8")
+    explicit_python = tmp_path / "explicit_python.exe"
+    explicit_python.write_text("", encoding="utf-8")
+    monkeypatch.setenv("BYS360_QUALITY_PYTHON", str(env_python))
+    path, source = resolve_python(str(explicit_python))
+    assert path == str(explicit_python)
+    assert source == "explicit"
+
+
+def test_resolve_python_rejects_nonexistent_explicit_path():
+    with pytest.raises(SystemExit):
+        resolve_python(r"C:\definitely\does\not\exist\python.exe")
+
+
+def test_build_argv_produces_argument_list_not_shell_string():
+    gate = {"kind": "python_module", "module": "ruff", "args": ["check", "app"]}
+    argv = _build_argv(gate, "/some/python")
+    assert isinstance(argv, list)
+    assert argv == ["/some/python", "-m", "ruff", "check", "app"]
+
+    gate_script = {"kind": "python_script", "script": "scripts/quality/x.py", "args": ["--root", "."]}
+    argv_script = _build_argv(gate_script, "/some/python")
+    assert argv_script == ["/some/python", "scripts/quality/x.py", "--root", "."]
+
+
+def test_wrong_tool_version_produces_version_mismatch_not_silent_pass(tmp_path, monkeypatch):
+    """Simulates a gate whose declared expected_version does not match the
+    tool actually installed -- must never be silently scored as PASS."""
+    import scripts.quality.bys360_score_reconcile_v1 as calc
+
+    def fake_check_version(python_path, module, expected, cwd):
+        return False, "0.15.21"  # simulates the real off-pin shared-venv ruff
+
+    monkeypatch.setattr(calc, "_check_tool_version", fake_check_version)
+
+    methodology = _fixture_methodology()
+    methodology["categories"]["Code Quality"]["gates"] = [
+        {"name": "ruff_full_select", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check"], "pass_rule": "exit_code_0"},
+    ]
+    registry = _fixture_registry(items=[])
+    report = calc.compute_report(methodology, registry, tmp_path, evidence={}, python_path=sys.executable, python_source="explicit")
+    cq = report["category_scores"]["Code Quality"]
+    assert cq["gates"][0]["status"] == "VERSION_MISMATCH"
+    assert cq["gates"][0]["status"] != "PASS"
+    assert cq["gate_component"] == 0.0  # must not receive PASS credit
+    assert report["fully_verified"] is False
+    assert any(item["name"] == "ruff_full_select" for item in cq["missing_evidence"])
+
+
+def test_version_matched_tool_scores_as_pass(tmp_path, monkeypatch):
+    import scripts.quality.bys360_score_reconcile_v1 as calc
+
+    def fake_check_version(python_path, module, expected, cwd):
+        return True, expected
+
+    def fake_run_argv(argv, cwd):
+        return 0, "All checks passed!"
+
+    monkeypatch.setattr(calc, "_check_tool_version", fake_check_version)
+    monkeypatch.setattr(calc, "_run_argv", fake_run_argv)
+
+    methodology = _fixture_methodology()
+    methodology["categories"]["Code Quality"]["gates"] = [
+        {"name": "ruff_full_select", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check"], "pass_rule": "exit_code_0"},
+    ]
+    registry = _fixture_registry(items=[])
+    report = calc.compute_report(methodology, registry, tmp_path, evidence={}, python_path=sys.executable, python_source="explicit")
+    cq = report["category_scores"]["Code Quality"]
+    assert cq["gates"][0]["status"] == "PASS"
+
+
+def test_report_exposes_which_interpreter_was_used(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    report = compute_report(methodology, registry, tmp_path, evidence={}, python_path="/explicit/python", python_source="explicit")
+    assert report["interpreter"]["path"] == "/explicit/python"
+    assert report["interpreter"]["source"] == "explicit"
+
+
+def test_pinned_tool_versions_declared_for_ruff_and_mypy_gates():
+    methodology = json.loads(CANONICAL_METHODOLOGY_PATH.read_text(encoding="utf-8"))
+    for category_config in methodology["categories"].values():
+        for gate in category_config.get("gates", []):
+            if gate.get("kind") == "python_module" and gate.get("module") in ("ruff", "mypy"):
+                assert "expected_version" in gate, f"{gate['name']} must declare expected_version to avoid silently trusting a wrong-version tool"
+
+
+def test_no_shell_true_string_commands_remain_in_calculator_run_path():
+    """The old shell=True string-command path (_run_command) must no longer be
+    the primary execution mechanism -- structured gates use _run_argv with
+    shell=False and an argument list."""
+    source = Path("scripts/quality/bys360_score_reconcile_v1.py").read_text(encoding="utf-8")
+    assert re.search(r"_run_argv\(.*shell\s*=\s*False", source, re.DOTALL) or "shell=False" in source

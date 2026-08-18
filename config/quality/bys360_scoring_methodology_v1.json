@@ -23,16 +23,22 @@
     "rule": "each_measurable_gate_has_exactly_one_primary_category",
     "description": "Every CI/quality gate is assigned to exactly one category's gate_component. No gate command appears in more than one category's gates[] list. A debt-registry item's category field determines which single category's debt_penalty it affects; category is required to be a PRIMARY_CATEGORY per item, with no automatic secondary/global penalty."
   },
-  "canonical_python": "C:\\bys360\\project\\.venv\\Scripts\\python.exe",
-  "canonical_python_note": "All Python-based gate commands below invoke this exact interpreter explicitly (never a bare 'ruff'/'mypy'/'pytest' command). This is deliberate, not stylistic: this environment has been observed to have an unrelated, unpinned ruff/mypy on PATH from a different Python installation, which silently produces different findings than the project's pinned toolchain (ruff==0.16.0, mypy==2.3.0, per commit 27accc1). A methodology that relies on ambient PATH resolution is not reproducible across machines or even across shells on the same machine.",
+  "interpreter_resolution": {
+    "order": ["--python CLI flag (explicit)", "BYS360_QUALITY_PYTHON environment variable", "sys.executable (the interpreter currently running the calculator)"],
+    "note": "Gate commands below are declared as portable {kind, module|script, args} structures, never a hardcoded absolute interpreter path -- a prior version of this file hardcoded C:\\bys360\\project\\.venv\\Scripts\\python.exe, which broke on any machine/drive/checkout other than the one it was authored on. The calculator resolves and reports which interpreter it actually used (path + source) in every report. This is necessary but not sufficient: interpreter identity alone does not guarantee tool version. Gates with an expected_version are additionally version-checked before being trusted (see pinned_tool_versions and each gate's expected_version) -- a wrong-version tool result is reported as VERSION_MISMATCH, scored identically to UNKNOWN (0 contribution, counted in unverified_evidence_count), never silently accepted as PASS. This was found to be a real, not hypothetical, gap during authoring: the project's own canonical shared venv was found to have ruff 0.15.21 installed, off-pin from requirements-dev.txt's ruff==0.16.0."
+  },
+  "pinned_tool_versions": {"ruff": "0.16.0", "mypy": "2.3.0"},
   "categories": {
     "Code Quality": {
       "gate_component_weight": 0.80,
       "rubric_component_weight": 0.20,
       "gates": [
-        {"name": "ruff_full_select", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" -m ruff check app config.py wsgi.py run.py scripts tests", "pass_rule": "exit_code_0"},
-        {"name": "mypy_full_scope", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" -m mypy app tests scripts --ignore-missing-imports --no-error-summary", "pass_rule": "exit_code_0"},
-        {"name": "quality9_gate", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" scripts/quality/bys360_quality9_ci_gate.py --root .", "pass_rule": "json_ok_field_true"}
+        {"name": "ruff_full_select", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check", "app", "config.py", "wsgi.py", "run.py", "scripts", "tests"], "pass_rule": "exit_code_0"},
+        {"name": "mypy_full_scope", "kind": "python_module", "module": "mypy", "expected_version": "2.3.0",
+         "args": ["app", "tests", "scripts", "--ignore-missing-imports", "--no-error-summary"], "pass_rule": "exit_code_0"},
+        {"name": "quality9_gate", "kind": "python_script", "script": "scripts/quality/bys360_quality9_ci_gate.py",
+         "args": ["--root", "."], "pass_rule": "json_ok_field_true"}
       ],
       "rubric": [
         {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
@@ -42,7 +48,8 @@
       "gate_component_weight": 0.80,
       "rubric_component_weight": 0.20,
       "gates": [
-        {"name": "coverage_ratchet", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" scripts/quality/bys360_coverage_ratchet.py --coverage-xml reports/quality/coverage.xml --baseline reports/quality/coverage_baseline.json", "pass_rule": "exit_code_0"}
+        {"name": "coverage_ratchet", "kind": "python_script", "script": "scripts/quality/bys360_coverage_ratchet.py",
+         "args": ["--coverage-xml", "reports/quality/coverage.xml", "--baseline", "reports/quality/coverage_baseline.json"], "pass_rule": "exit_code_0"}
       ],
       "rubric": [
         {"name": "coverage_pct_progress", "source": "coverage_baseline.combined_pct", "description": "20 * min(combined_pct / 50, 1) -- 50% is the aspirational interim target, not the current floor"}
@@ -52,8 +59,11 @@
       "gate_component_weight": 0.80,
       "rubric_component_weight": 0.20,
       "gates": [
-        {"name": "secret_repo_gate", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" scripts/quality/bys360_secret_repo_gate.py --root .", "pass_rule": "json_ok_field_true"},
-        {"name": "dependency_audit", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" -m pip_audit -r requirements.txt --progress-spinner off", "pass_rule": "exit_code_0_or_supplied_evidence", "evidence_note": "Slow/network-dependent; treated UNKNOWN unless a fresh result is explicitly supplied to the calculator via --evidence."}
+        {"name": "secret_repo_gate", "kind": "python_script", "script": "scripts/quality/bys360_secret_repo_gate.py",
+         "args": ["--root", "."], "pass_rule": "json_ok_field_true"},
+        {"name": "dependency_audit", "kind": "python_module", "module": "pip_audit",
+         "args": ["-r", "requirements.txt", "--progress-spinner", "off"], "pass_rule": "exit_code_0_or_supplied_evidence",
+         "evidence_note": "Slow/network-dependent; treated UNKNOWN unless a fresh result is explicitly supplied to the calculator via --evidence."}
       ],
       "rubric": [
         {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
@@ -64,8 +74,11 @@
       "gate_component_weight": 0.80,
       "rubric_component_weight": 0.20,
       "gates": [
-        {"name": "ruff_syntax_import_sanity", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" -m ruff check app config.py wsgi.py run.py scripts --select E9,F63,F7,F82", "pass_rule": "exit_code_0"},
-        {"name": "postgres_migration_integrity_gate", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" scripts/quality/bys360_postgres_migration_integrity_gate.py", "pass_rule": "exit_code_0_or_supplied_evidence", "evidence_note": "Structurally CI-only (needs a live PostgreSQL 15 service); treated UNKNOWN in a local run unless a fresh CI result is explicitly supplied to the calculator via --evidence."}
+        {"name": "ruff_syntax_import_sanity", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check", "app", "config.py", "wsgi.py", "run.py", "scripts", "--select", "E9,F63,F7,F82"], "pass_rule": "exit_code_0"},
+        {"name": "postgres_migration_integrity_gate", "kind": "python_script", "script": "scripts/quality/bys360_postgres_migration_integrity_gate.py",
+         "args": [], "pass_rule": "exit_code_0_or_supplied_evidence",
+         "evidence_note": "Structurally CI-only (needs a live PostgreSQL 15 service); treated UNKNOWN in a local run unless a fresh CI result is explicitly supplied to the calculator via --evidence."}
       ],
       "rubric": [
         {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
@@ -75,7 +88,8 @@
       "gate_component_weight": 0.80,
       "rubric_component_weight": 0.20,
       "gates": [
-        {"name": "ops_audit", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" scripts/quality/bys360_ops_audit.py --mode ci --source-paths app config.py wsgi.py run.py", "pass_rule": "exit_code_0"}
+        {"name": "ops_audit", "kind": "python_script", "script": "scripts/quality/bys360_ops_audit.py",
+         "args": ["--mode", "ci", "--source-paths", "app", "config.py", "wsgi.py", "run.py"], "pass_rule": "exit_code_0"}
       ],
       "rubric": [
         {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
@@ -85,7 +99,8 @@
       "gate_component_weight": 0.70,
       "rubric_component_weight": 0.30,
       "gates": [
-        {"name": "handover_docs_contract", "command": "\"C:\\bys360\\project\\.venv\\Scripts\\python.exe\" -m pytest tests/test_score100_handover_docs_contract_v1.py -q", "pass_rule": "exit_code_0"}
+        {"name": "handover_docs_contract", "kind": "python_module", "module": "pytest",
+         "args": ["tests/test_score100_handover_docs_contract_v1.py", "-q"], "pass_rule": "exit_code_0"}
       ],
       "rubric": [
         {"name": "registry_reconciliation_transparency", "source": "registry.reconciliation_status", "description": "30 if FULLY_RECONCILED, 15 if PARTIALLY_RECONCILED with a documented reconciliation_note, 0 otherwise -- rewards honest disclosure, not just document existence"}
@@ -95,7 +110,7 @@
       "gate_component_weight": 0.60,
       "rubric_component_weight": 0.40,
       "gates": [
-        {"name": "no_open_p0_or_p1_anywhere", "command": "registry-derived: 0 OPEN items with severity P0 or P1 in the whole registry", "pass_rule": "boolean"}
+        {"name": "no_open_p0_or_p1_anywhere", "kind": "registry_derived", "description": "0 OPEN items with severity P0 or P1 in the whole registry", "pass_rule": "boolean"}
       ],
       "rubric": [
         {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "40 minus (4 points per OPEN item in this category, capped at 40) -- Maintainability is registry-driven since no single CI gate directly measures it"}

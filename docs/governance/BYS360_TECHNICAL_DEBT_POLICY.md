@@ -182,33 +182,85 @@ This is a human decision, not an automated one. When promoting:
 
 ## How legacy unmapped counts are handled
 
-The registry's `legacy_ledger` block preserves the historical
-`P0/P1/P2/P3/TOTAL` figures exactly as they were, unmodified, forever.
-The validator computes a separate `registry_derived_counts` block from
-the actual `items[]` array, and a `reconciliation_gap` (legacy TOTAL
-minus the number of items actually in the registry). **These two blocks
-must never be silently merged or presented as if one had been reconciled
-into the other.** `reconciliation_status` stays `PARTIALLY_RECONCILED`
-until every legacy-ledger count is genuinely backed by real, individually
-identified registry items -- which may never fully happen, given the
-squashed pre-2026-06-13 history is structurally invisible to this
-repository. That is an honest, permanent state to be in, not a defect to
-paper over.
+**Corrected accounting model (registry_version >= 1.1.0).** An earlier
+version of this registry computed an ambiguous `reconciliation_gap` as
+`legacy_ledger.TOTAL - (count of ALL registry items, including CLOSED
+ones)`. That formula was wrong and has been removed: it let closing an
+item, or discovering-and-immediately-closing a brand-new item with no
+proven relationship to the historical 38, silently shrink the reported
+gap -- unrelated hygiene work could masquerade as progress on a specific
+backlog it was never shown to be part of. Concretely, 8 of this
+registry's 9 `CLOSED` items were independently discovered and closed
+*before* this registry (or the TD-008 work session) even existed, with no
+mechanism ever proposed to match them against a specific legacy-ledger
+entry -- yet the old formula let their mere presence in `items[]` count
+against the legacy gap.
+
+The corrected model:
+
+- The legacy ledger represents **current OPEN debt only** (it has no
+  closed-count field in its own schema) -- it must only ever be
+  reconciled against currently-**active** (unresolved) registry items,
+  **never** against a count that includes `CLOSED` items.
+- Every item -- open or closed -- carries a `legacy_mapping` field:
+  `{"status": "CONFIRMED" | "UNCONFIRMED" | "NOT_LEGACY_MEMBER", "note": "..."}`.
+  `CONFIRMED` requires affirmative, checkable evidence that this specific
+  item corresponds to a specific entry in the historical ledger --
+  something that does not exist anywhere in this repository today, so
+  every item currently reads `UNCONFIRMED`. This is the honest default
+  for anything found via forensic audit rather than matched against a
+  surviving legacy document.
+- `MAPPED_LEGACY_OPEN_COUNT` = count of **active** items with
+  `legacy_mapping.status == "CONFIRMED"`.
+- `UNMAPPED_LEGACY_OPEN_COUNT` = `legacy_ledger.TOTAL - MAPPED_LEGACY_OPEN_COUNT`
+  -- the only place `legacy_ledger.TOTAL` participates in a subtraction,
+  and only against a quantity that itself only ever grows through
+  affirmative evidence, never through unrelated closure work.
+- `REGISTRY_OPEN_UNLINKED_COUNT` = `REGISTRY_ACTIVE_COUNT - MAPPED_LEGACY_OPEN_COUNT`
+  -- real, evidenced, currently-open debt that is tracked in this
+  registry but is NOT a confirmed member of the legacy backlog (i.e.
+  newly-discovered debt, distinct from the historical count).
+
+**Invariant** (validator-enforced): `legacy_ledger.TOTAL ==
+MAPPED_LEGACY_OPEN_COUNT + UNMAPPED_LEGACY_OPEN_COUNT`, always, with
+`REGISTRY_CLOSED_COUNT` never appearing on either side. A `CLOSED` item
+*may* carry `legacy_mapping.status: CONFIRMED` -- that is valuable audit
+history ("this now-fixed item was later confirmed to have been part of
+the legacy backlog") and is deliberately allowed, not rejected; it is
+simply excluded from `MAPPED_LEGACY_OPEN_COUNT` because that count is
+active-only by definition.
+
+`reconciliation_status` stays `PARTIALLY_RECONCILED` until
+`UNMAPPED_LEGACY_OPEN_COUNT` reaches exactly 0 (every one of the 38
+legacy slots affirmatively confirmed against an active registry item) --
+a very high bar that may never be reached, given the squashed
+pre-2026-06-13 history is structurally invisible to this repository.
+That is an honest, permanent state to be in, not a defect to paper over.
 
 ## Next migration step for remaining unmapped legacy debt
 
-To make further progress on `reconciliation_gap`, a future session would
-need to, for each additional item:
-1. Establish real evidence (not an assumption) that a specific gap
-   exists -- via forensic code search, a fresh Ruff/mypy/coverage run, or
-   git-history archaeology of the kind that surfaced `TD-016`/`TD-017`/
-   `TD-034`/`TD-036`/`TD-041` in this policy's own authoring pass.
-2. Apply the severity-calibration rules above and record the reasoning.
-3. Assign a `TD-CAND-NNN` ID (see numbering rules above) and add it via
+To make real progress on `UNMAPPED_LEGACY_OPEN_COUNT` (currently 38, with
+`MAPPED_LEGACY_OPEN_COUNT` at 0), a future session would need to, for
+each candidate item:
+1. Establish **affirmative** evidence (not plausibility, not chronology,
+   not "it's the right kind of issue") that a specific registry item
+   corresponds to a specific legacy-ledger entry -- e.g. a surviving
+   fragment of the original ledger document naming this exact issue. No
+   such document is known to exist; if one is ever recovered, that is
+   the only legitimate path to `legacy_mapping.status: CONFIRMED`.
+2. Until then, forensic discoveries (of the kind that surfaced
+   `TD-016`/`TD-017`/`TD-034`/`TD-036`/`TD-041` in this policy's own
+   authoring pass) should be added as new registry items with
+   `legacy_mapping.status: UNCONFIRMED` -- real, valuable, tracked debt,
+   but explicitly NOT claimed as progress against the specific historical
+   38-item backlog.
+3. Apply the severity-calibration rules above and record the reasoning.
+4. Assign a `TD-CAND-NNN` ID (see numbering rules above) and add it via
    the "How to add a debt item" procedure.
-4. Only after a human reviews and agrees, promote to a formal `TD-NNN`.
+5. Only after a human reviews and agrees, promote to a formal `TD-NNN`.
 
 Given the pre-2026-06-13 history is unrecoverable, it is expected and
-acceptable that `reconciliation_gap` may never reach exactly 0. What
-matters is that every item that *is* in the registry is real, and the gap
-is disclosed rather than hidden.
+acceptable that `UNMAPPED_LEGACY_OPEN_COUNT` may never reach exactly 0.
+What matters is that every item that *is* in the registry is real, and
+the gap is disclosed rather than hidden or artificially closed by
+unrelated work.

@@ -1,12 +1,13 @@
 {
-  "schema_version": "1.0",
-  "registry_version": "1.0.0",
+  "schema_version": "1.1",
+  "registry_version": "1.1.0",
   "generated_note": "Canonical, version-controlled source of truth for BYS360 technical debt. Machine-validated by scripts/quality/bys360_technical_debt_registry_gate.py. Do not hand-edit counts; edit items[] and let the validator compute counts.",
   "reconciliation_status": "PARTIALLY_RECONCILED",
-  "reconciliation_note": "This repository's entire git history is a single squashed baseline commit (d8b50c4cc125d5c81c5fe3ffc5850e5db1b5c45e, 2026-06-13); nothing before that date is provable from this worktree. A previously-referenced working ledger of P0=0/P1=0/P2=17/P3=21/TOTAL=38 could not be reconstructed to 38 individually-identified items after an exhaustive repo-wide and full git-history search (see legacy_ledger below). 7 real, evidenced TD-NNN items were found and are recorded as CLOSED. 7 additional currently-open issues were independently identified and evidenced; 2 of those were found, during methodology cross-verification, to already be closed by existing commits and are recorded as CLOSED with that evidence. This registry does not fabricate identities to match any historical count.",
+  "reconciliation_note": "This repository's entire git history is a single squashed baseline commit (d8b50c4cc125d5c81c5fe3ffc5850e5db1b5c45e, 2026-06-13); nothing before that date is provable from this worktree. A previously-referenced working ledger of P0=0/P1=0/P2=17/P3=21/TOTAL=38 could not be reconstructed to 38 individually-identified items after an exhaustive repo-wide and full git-history search (see legacy_ledger below). CORRECTED IN registry_version 1.1.0: every item in this registry -- closed or open -- was independently discovered via forensic code/history search, not matched against a surviving copy of the original legacy ledger (none exists). Every item's legacy_mapping.status is therefore UNCONFIRMED (plausibly related, never proven) except where explicit evidence exists. Closing an item never reduces the legacy OPEN count, and being newly-discovered-and-open never increases it either -- MAPPED_LEGACY_OPEN_COUNT only changes when a specific item is affirmatively proven to correspond to the historical ledger, which has not happened for any item yet. This registry does not fabricate identities or mappings to match any historical count.",
   "next_available_td_id": 42,
   "next_available_td_cand_id": 8,
   "id_numbering_policy": "TD-NNN is the canonical, promoted sequence. TD-CAND-NNN is a holding sequence for identified-but-not-yet-formally-promoted items, so that minting a working ID never risks colliding with a real historical TD-NNN this repo's squashed history cannot see. Promoting a TD-CAND-NNN item to TD-NNN requires: (1) incrementing next_available_td_id and using that value, (2) setting promoted_to on the TD-CAND-NNN record and promoted_from on the new TD-NNN record (neither record is deleted), (3) a human decision, not an automated one.",
+  "legacy_mapping_policy": "Every item carries a legacy_mapping = {status, note}. status is one of: CONFIRMED (affirmative, checkable evidence ties this specific item to a specific entry within the historical legacy_ledger -- e.g. a surviving fragment of the original ledger document naming this exact issue; none exists anywhere in this repo today), UNCONFIRMED (no such evidence exists either way -- the default, honest state for anything found via forensic audit rather than matched against a legacy artifact), or NOT_LEGACY_MEMBER (affirmative evidence the item is NOT part of the legacy 38 -- e.g. proven introduced after the legacy snapshot was known current; requires a dated anchor for the legacy snapshot that does not currently exist, so this value is not usable today). A CLOSED item may still carry legacy_mapping.status=CONFIRMED -- that is valuable audit-trail information (this now-fixed item was later confirmed to have been part of the legacy backlog) and is deliberately NOT excluded from the registry; it is simply excluded from MAPPED_LEGACY_OPEN_COUNT because that count is scoped to active (unresolved) items only, by definition.",
   "legacy_ledger": {
     "status": "LEGACY_UNMAPPED_WORKING_LEDGER",
     "P0": 0,
@@ -14,7 +15,7 @@
     "P2": 17,
     "P3": 21,
     "TOTAL": 38,
-    "note": "Referenced in prior working sessions as the current open-debt count. Exhaustively searched for in this repository (grep across all tracked files, git log --all across all 900+ commits, every reports/quality/*.{md,json} file, docs/, .codex/, AGENTS.md) and NOT found as a persisted, reconstructable registry anywhere. Four different, mutually-incompatible historical debt-tracking schemes exist in this repo (an A10R compat/quarantine report, a Phase2 file-hygiene P0/P1/P2-only note later deleted from the tree, an architecture debt map using low/medium/high risk tiers, and STATUS.md's own 'Faz N' PASS/FAIL journal) -- none of the four produces this 38-item count. This ledger is preserved here, unmodified, purely as a historical reference. It must never be silently overwritten by registry-derived counts, and registry-derived counts must never be silently presented as if they were this ledger reconciled."
+    "note": "Referenced in prior working sessions as the current open-debt count. Exhaustively searched for in this repository (grep across all tracked files, git log --all across all 900+ commits, every reports/quality/*.{md,json} file, docs/, .codex/, AGENTS.md) and NOT found as a persisted, reconstructable registry anywhere. Four different, mutually-incompatible historical debt-tracking schemes exist in this repo (an A10R compat/quarantine report, a Phase2 file-hygiene P0/P1/P2-only note later deleted from the tree, an architecture debt map using low/medium/high risk tiers, and STATUS.md's own 'Faz N' PASS/FAIL journal) -- none of the four produces this 38-item count. Its own origin document (docs/TECH_DEBT_PHASE2_NOTES.md, since removed, recoverable only via git show e88a17a:...) predates this repo's entire machine-checkable history and cannot be pinned to any commit. This ledger is preserved here, unmodified, purely as a historical reference. It represents CURRENT OPEN debt only (no closed-count field exists in this scheme), so it must be reconciled only against currently-ACTIVE registry items with a CONFIRMED legacy mapping -- never against registry item counts that include CLOSED items, and never inflated or deflated by unrelated debt-hygiene work that has no proven connection to this specific historical count."
   },
   "items": [
     {
@@ -39,6 +40,10 @@
       "created_at": "2026-08-17",
       "updated_at": "2026-08-18",
       "closure_reason": "Extracted each POST-action branch into its own _handle_<action> function (17 total), preserving exact behavior including documented non-uniform quirks (double-commit, missing try/except, etc.); restored the deleted generic role-matrix builder verbatim from git history; added regression tests for 3 previously-zero-coverage actions found during the extraction sweep. Remote GitHub Actions (quality-gate + BYS360 Score 100 Quality Gate V1) reported SUCCESS against this commit, per user-supplied CI evidence.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed via work that began 2026-08-17, discovered and diagnosed within this session, not matched against any surviving legacy-ledger document (none exists). Plausibly related to the legacy P1=1 slot referenced in prior working sessions, but no affirmative evidence ties this specific item to a specific legacy entry."
+      },
       "notes": null
     },
     {
@@ -62,6 +67,10 @@
       "created_at": null,
       "updated_at": "2026-08-15",
       "closure_reason": "76 new tests added across 3 files; coverage raised to 76-96% on the targeted security-critical symbol set; investigation found no fail-open security bug already present.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed 2026-08-15 08:59:48, strictly before this session's TD-008 work began (2026-08-17) and before this registry existed (created in commit bff39ed, 2026-08-18). Independently discovered via coverage-gap analysis, not matched against any legacy-ledger document."
+      },
       "notes": "remote_verified=false: no remote CI evidence for this specific commit was supplied to this registry at authoring time."
     },
     {
@@ -84,6 +93,10 @@
       "created_at": null,
       "updated_at": "2026-08-15",
       "closure_reason": "tests/performance added to Step2's pytest invocation (additive, 0 duplicate node IDs); the latent isolation bug root-caused and fixed narrowly.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Same closure commit and timing as TD-016 -- see that item's note."
+      },
       "notes": null
     },
     {
@@ -107,6 +120,10 @@
       "created_at": "2026-06-13",
       "updated_at": "2026-08-17",
       "closure_reason": "Migration chain repaired and re-verified against a fresh disposable PostgreSQL 15 instance; CI wired to a real postgres:15 service container so the gate runs on every push. Remote GitHub Actions reported PASS for POSTGRES15_EMPTY_TO_HEAD, POSTGRES15_HEAD_MATCH, POSTGRES15_SECOND_UPGRADE, POSTGRES15_SCHEMA_INTROSPECTION, per user-supplied CI evidence.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed 2026-08-16 17:32:47, before this session's TD-008 work began. Independently discovered and diagnosed as its own dedicated closure wave (TD-032), not matched against any legacy-ledger document."
+      },
       "notes": null
     },
     {
@@ -129,6 +146,10 @@
       "created_at": null,
       "updated_at": "2026-08-15",
       "closure_reason": "Dry-run-by-default installer added, targeting the verified canonical run_server.py entrypoint; contract tests use mocked Scheduled Task cmdlets only (0 real Task Scheduler mutation).",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed 2026-08-15 17:53:40, before this session's TD-008 work began. Independently discovered via an operations-tooling audit, not matched against any legacy-ledger document."
+      },
       "notes": null
     },
     {
@@ -152,6 +173,10 @@
       "created_at": null,
       "updated_at": "2026-08-15",
       "closure_reason": "Staged PREPARE/VERIFY/APPLY/HEALTHCHECK/FINALIZE rollback script added, preserving .env and runtime data, never touching DB/Alembic.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Same closure commit and timing as TD-034 -- see that item's note."
+      },
       "notes": null
     },
     {
@@ -173,6 +198,10 @@
       "created_at": null,
       "updated_at": "2026-08-15",
       "closure_reason": "Mojibake repaired with no semantic loss (verified 1:1 headings/commands/paths); run_server.py documented as the sole Waitress entry point.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Same closure commit and timing as TD-034/TD-036 -- see TD-034's note."
+      },
       "notes": null
     },
     {
@@ -195,7 +224,11 @@
       "created_at": "2026-07-26",
       "updated_at": "2026-08-18",
       "closure_reason": "Closed by commit 198f177 and subsequent hygiene work; independently reconfirmed live at registry-authoring time. reports/quality/BYS360_RUFF_GATE_DEBT_INVENTORY_FOR_CAMPAIGN2.md is a superseded, stale snapshot -- it is not evidence of current state and must not be read as such.",
-      "notes": "This item is a worked example of exactly the staleness risk this registry's own validator and closure-evidence requirements exist to prevent: an ephemeral markdown snapshot silently going out of date while still reading 'Durum: REVIEW'."
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed 2026-07-26, well before this session and before this registry existed. This item is itself a worked example of exactly the staleness risk this registry's own validator and closure-evidence requirements exist to prevent: an ephemeral markdown snapshot silently going out of date while still reading 'Durum: REVIEW'. CAUTION: the live re-verification cited above was not confirmed to have run under the exact pinned Ruff 0.16.0 toolchain -- a later audit found the canonical shared venv's installed Ruff is actually 0.15.21, off-pin from requirements-dev.txt's ruff==0.16.0. This closure should be re-confirmed against a version-verified 0.16.0 run before being treated as fully authoritative; see scripts/quality/bys360_score_reconcile_v1.py's VERSION_MISMATCH handling."
+      },
+      "notes": null
     },
     {
       "id": "TD-CAND-005",
@@ -218,6 +251,10 @@
       "created_at": "2026-07-26",
       "updated_at": "2026-08-18",
       "closure_reason": "Closed by commits 10ce630 and 27accc1 (pinned mypy==2.3.0 to keep the gate reproducible); independently reconfirmed live at registry-authoring time. reports/quality/BYS360_MYPY_DEBT_INVENTORY_FOR_CAMPAIGN2.md is a superseded, stale snapshot -- it is not evidence of current state and must not be read as such.",
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Closed 2026-08-10 (27accc1 pin) / earlier (10ce630), well before this session. Unlike TD-CAND-004, the mypy version pin (mypy==2.3.0) was independently confirmed to match the installed shared-venv version at the time of this correction, so no equivalent version-drift caveat applies here."
+      },
       "notes": "Same staleness lesson as TD-CAND-004: the report defers cleanup to 'the next campaign' but the cleanup had already happened by the time this registry was authored."
     },
     {
@@ -238,6 +275,10 @@
       "created_at": "2026-06-13",
       "updated_at": "2026-08-18",
       "closure_reason": null,
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Present since the 2026-06-13 baseline, so chronologically plausible as a legacy-38 member -- but plausibility is not a match. Discovered via code-duplication forensic search during this registry's authoring, not looked up against any legacy list. No affirmative evidence either way."
+      },
       "notes": "Severity intentionally left UNCLASSIFIED: the dead copy is provably unreachable so removing it is likely SAFE by AGENTS.md's own classification, but the removal has not been attempted or reviewed."
     },
     {
@@ -258,6 +299,10 @@
       "created_at": null,
       "updated_at": "2026-08-18",
       "closure_reason": null,
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "No dating evidence at all (introduced_commit/created_at both null). Found via cross-file comparison during recent forensic work, not matched against any legacy list."
+      },
       "notes": "Not assigned a severity because whether the two implementations have already diverged in observable behavior (a correctness bug) versus are still equivalent (pure duplication) has not been checked; that check should happen before this is tiered."
     },
     {
@@ -279,6 +324,10 @@
       "created_at": null,
       "updated_at": "2026-08-18",
       "closure_reason": null,
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Weakest evidentiary footing of the open items -- 14 of 17 candidate files not even individually confirmed as debt yet. Certainly not matchable to a specific legacy slot; found via a fresh grep sweep, not a legacy-list lookup."
+      },
       "notes": "Intentionally a triage placeholder, not a confirmed defect list. Do not treat the ~14 unverified files as debt until each is individually read; do not close this item without either individually clearing or individually confirming all 17."
     },
     {
@@ -297,6 +346,10 @@
       "created_at": null,
       "updated_at": "2026-08-18",
       "closure_reason": null,
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "Found via a repo-wide TODO/FIXME/HACK grep sweep, not via legacy-list lookup. No dating evidence."
+      },
       "notes": "Only TODO/FIXME/HACK marker found in app/ repo-wide as of registry authoring."
     },
     {
@@ -317,6 +370,10 @@
       "created_at": null,
       "updated_at": "2026-08-18",
       "closure_reason": null,
+      "legacy_mapping": {
+        "status": "UNCONFIRMED",
+        "note": "The underlying signal is itself non-deterministic/heuristic, so it cannot be matched to a specific legacy entry with any confidence."
+      },
       "notes": "Explicitly recorded as advisory/non-deterministic rather than a fixed fact -- do not cite a specific hit count from this item as authoritative; re-run the gate for a current count. finding_count (the blocking tier) is separately and reliably 0."
     }
   ]
