@@ -19,13 +19,15 @@ import pytest
 from scripts.quality.bys360_score_reconcile_v1 import (
     compute_report,
     resolve_evidence,
+    resolve_evidence_file,
     validate_evidence_manifest,
 )
 
 pytestmark = pytest.mark.ci_safe
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CANONICAL_EVIDENCE_PATH = REPO_ROOT / "config" / "quality" / "bys360_canonical_evidence.json"
+CANONICAL_EVIDENCE_EXAMPLE_PATH = REPO_ROOT / "config" / "quality" / "bys360_canonical_evidence.example.json"
+OLD_LIVE_EVIDENCE_PATH = REPO_ROOT / "config" / "quality" / "bys360_canonical_evidence.json"
 
 COMMIT_AAA = "a" * 40
 COMMIT_BBB = "b" * 40
@@ -232,35 +234,74 @@ def test_different_commits_same_gate_disagreeing_status_not_a_conflict():
 
 
 # ---------------------------------------------------------------------------
-# Real manifest file: honesty and structural checks
+# Example/historical-sample evidence file: honesty and structural checks.
+# This file is NEVER auto-loaded by the calculator -- see the
+# self-attestation/bootstrap tests further below for that guarantee.
 # ---------------------------------------------------------------------------
 
-def test_real_manifest_file_is_valid():
-    manifest = json.loads(CANONICAL_EVIDENCE_PATH.read_text(encoding="utf-8"))
+def test_old_live_attestation_path_no_longer_exists():
+    """Locks in the self-attestation fix: the old config/quality/
+    bys360_canonical_evidence.json (committed as though it were live runtime
+    truth) must no longer exist at that path -- it has been superseded by
+    the explicitly-labeled .example.json, which is never auto-loaded."""
+    assert not OLD_LIVE_EVIDENCE_PATH.exists()
+
+
+def test_example_manifest_file_is_valid():
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
     assert validate_evidence_manifest(manifest) == []
 
 
-def test_real_manifest_has_no_fabricated_urls():
-    raw_text = CANONICAL_EVIDENCE_PATH.read_text(encoding="utf-8")
+def test_example_manifest_marked_as_non_runtime_historical_sample():
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
+    assert manifest["sample_type"] == "HISTORICAL_SAMPLE_NON_RUNTIME"
+
+
+def test_example_manifest_has_no_fabricated_urls():
+    raw_text = CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8")
     assert "http://" not in raw_text
     assert "https://" not in raw_text
 
 
-def test_real_manifest_every_gate_entry_has_disclosed_provenance():
-    manifest = json.loads(CANONICAL_EVIDENCE_PATH.read_text(encoding="utf-8"))
+def test_example_manifest_every_gate_entry_has_disclosed_provenance():
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
     for gate in manifest["gates"]:
         assert gate["provenance"] == "USER_SUPPLIED_REMOTE_PROOF", (
             f"{gate['id']} must honestly disclose it was manually supplied, not silently upgraded to look machine-verified"
         )
 
 
-def test_real_manifest_ruff_full_select_has_no_evidence_entry():
+def test_example_manifest_ruff_full_select_has_no_evidence_entry():
     """The user's reported remote evidence covers only the syntax/import-sanity
     subset, not a full-select Ruff run -- these must never be conflated."""
-    manifest = json.loads(CANONICAL_EVIDENCE_PATH.read_text(encoding="utf-8"))
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
     gate_ids = {g["id"] for g in manifest["gates"]}
     assert "ruff_full_select" not in gate_ids
     assert "ruff_syntax_import_sanity" in gate_ids
+
+
+def test_example_manifest_handover_docs_contract_mapping_removed():
+    """Strict provenance re-audit: 'BYS360 Score 100 Quality Gate V1' was only
+    an inferred filename correlation to handover_docs_contract, not a direct
+    name/identity match -- the mapping must be removed, not preserved to keep
+    a historical score unchanged."""
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
+    gate_ids = {g["id"] for g in manifest["gates"]}
+    assert "handover_docs_contract" not in gate_ids
+    unmapped_ids = {g["id"] for g in manifest["deliberately_unmapped_gates"]}
+    assert "handover_docs_contract" in unmapped_ids
+
+
+def test_example_manifest_only_six_gates_have_direct_provenance():
+    """Provenance audit result: quality9_gate, coverage_ratchet,
+    ruff_syntax_import_sanity, postgres_migration_integrity_gate,
+    dependency_audit, ops_audit -- exactly these 6, no more, no fewer."""
+    manifest = json.loads(CANONICAL_EVIDENCE_EXAMPLE_PATH.read_text(encoding="utf-8"))
+    gate_ids = {g["id"] for g in manifest["gates"]}
+    assert gate_ids == {
+        "quality9_gate", "coverage_ratchet", "ruff_syntax_import_sanity",
+        "postgres_migration_integrity_gate", "dependency_audit", "ops_audit",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -490,3 +531,246 @@ def test_registry_derived_gate_bypasses_manifest_and_is_always_canonical(tmp_pat
     gate = report["category_scores"]["Maintainability"]["gate_contributions"][0]
     assert gate["canonical_source"] == "REGISTRY_DERIVED"
     assert gate["canonical_status"] == "PASS"
+
+
+# ---------------------------------------------------------------------------
+# resolve_evidence_file(): CLI/env resolution, fail-fast on bad input,
+# and -- critically -- NO default auto-load of any committed file.
+# ---------------------------------------------------------------------------
+
+def _write_valid_evidence_file(tmp_path, commit_sha=COMMIT_AAA):
+    p = tmp_path / "evidence_external.json"
+    p.write_text(json.dumps({
+        "schema_version": "1.0",
+        "evidence_set_id": "TEST_SET_1",
+        "gates": [_entry("ops_audit", commit_sha, "PASS")],
+    }), encoding="utf-8")
+    return p
+
+
+def test_no_evidence_file_or_env_yields_no_external_evidence(monkeypatch):
+    monkeypatch.delenv("BYS360_CANONICAL_EVIDENCE_FILE", raising=False)
+    manifest, trace = resolve_evidence_file(None)
+    assert manifest == {"gates": []}
+    assert trace["source"] == "NO_EXTERNAL_EVIDENCE"
+    assert trace["loaded"] is False
+    assert trace["validation_status"] == "NOT_APPLICABLE"
+
+
+def test_explicit_evidence_file_loaded_and_validated(tmp_path):
+    p = _write_valid_evidence_file(tmp_path)
+    manifest, trace = resolve_evidence_file(str(p))
+    assert trace["loaded"] is True
+    assert trace["source"] == "explicit"
+    assert trace["validation_status"] == "VALID"
+    assert trace["evidence_set_id"] == "TEST_SET_1"
+    assert trace["commit_sha_or_commit_set"] == [COMMIT_AAA]
+    assert manifest["gates"][0]["id"] == "ops_audit"
+
+
+def test_env_var_evidence_file_honored_when_no_cli_flag(tmp_path, monkeypatch):
+    p = _write_valid_evidence_file(tmp_path)
+    monkeypatch.setenv("BYS360_CANONICAL_EVIDENCE_FILE", str(p))
+    manifest, trace = resolve_evidence_file(None)
+    assert trace["source"] == "env"
+    assert trace["loaded"] is True
+    assert manifest["gates"][0]["id"] == "ops_audit"
+
+
+def test_explicit_evidence_file_takes_priority_over_env_var(tmp_path, monkeypatch):
+    cli_path = _write_valid_evidence_file(tmp_path, commit_sha=COMMIT_AAA)
+    env_path = tmp_path / "other.json"
+    env_path.write_text(json.dumps({"gates": [_entry("ops_audit", COMMIT_BBB, "PASS")]}), encoding="utf-8")
+    monkeypatch.setenv("BYS360_CANONICAL_EVIDENCE_FILE", str(env_path))
+    manifest, trace = resolve_evidence_file(str(cli_path))
+    assert trace["source"] == "explicit"
+    assert manifest["gates"][0]["commit_sha"] == COMMIT_AAA
+
+
+def test_missing_explicit_evidence_file_fails_fast_not_silent_fallback():
+    with pytest.raises(SystemExit, match="EVIDENCE_FILE_NOT_FOUND"):
+        resolve_evidence_file("C:/definitely/does/not/exist/evidence.json")
+
+
+def test_missing_env_evidence_file_fails_fast(monkeypatch, tmp_path):
+    monkeypatch.setenv("BYS360_CANONICAL_EVIDENCE_FILE", str(tmp_path / "missing.json"))
+    with pytest.raises(SystemExit, match="EVIDENCE_FILE_NOT_FOUND"):
+        resolve_evidence_file(None)
+
+
+def test_malformed_json_evidence_file_fails_fast(tmp_path):
+    p = tmp_path / "broken.json"
+    p.write_text("{not valid json", encoding="utf-8")
+    with pytest.raises(SystemExit, match="EVIDENCE_FILE_INVALID"):
+        resolve_evidence_file(str(p))
+
+
+def test_schema_invalid_evidence_file_fails_fast_not_ignored(tmp_path):
+    """A typo/tampered file (e.g. a bad SHA) must BLOCK, never be silently
+    treated as though nothing had been supplied."""
+    p = tmp_path / "bad_schema.json"
+    p.write_text(json.dumps({"gates": [{"id": "ops_audit", "commit_sha": "not-a-sha", "status": "PASS", "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF"}]}), encoding="utf-8")
+    with pytest.raises(SystemExit, match="EVIDENCE_FILE_INVALID"):
+        resolve_evidence_file(str(p))
+
+
+def test_unknown_status_evidence_file_rejected(tmp_path):
+    p = tmp_path / "unknown_status.json"
+    p.write_text(json.dumps({"gates": [{"id": "ops_audit", "commit_sha": COMMIT_AAA, "status": "MAYBE", "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF"}]}), encoding="utf-8")
+    with pytest.raises(SystemExit, match="EVIDENCE_FILE_INVALID"):
+        resolve_evidence_file(str(p))
+
+
+def test_example_file_is_never_auto_loaded_by_default(monkeypatch):
+    """The committed .example.json exists on disk in this very repo, yet
+    calling resolve_evidence_file with no CLI flag and no env var must still
+    yield NO_EXTERNAL_EVIDENCE -- proving there is no hidden default path
+    pointing at it."""
+    monkeypatch.delenv("BYS360_CANONICAL_EVIDENCE_FILE", raising=False)
+    assert CANONICAL_EVIDENCE_EXAMPLE_PATH.exists()  # sanity: the file really is there
+    manifest, trace = resolve_evidence_file(None)
+    assert trace["source"] == "NO_EXTERNAL_EVIDENCE"
+    assert manifest == {"gates": []}
+
+
+# ---------------------------------------------------------------------------
+# Self-attestation / bootstrap acceptance tests (the core point of this
+# wave): current HEAD can be scored using freshly-captured remote evidence
+# without any repository mutation, and the mechanism generalizes to
+# historical commits too.
+# ---------------------------------------------------------------------------
+
+def test_current_head_bootstrap_no_repository_mutation(tmp_path):
+    """Formal proof of SELF_ATTESTATION_BOOTSTRAP_DEFECT = CLOSED:
+    1. A commit ABC is 'pushed' (simulated -- any valid-looking 40-hex SHA).
+    2. Remote CI produces evidence for ABC, captured in an EXTERNAL file
+       (never inside the repository tree).
+    3. The checkout/scored commit remains ABC the whole time.
+    4. Scoring ABC with --evidence-file <external path> succeeds and grants
+       real canonical credit -- with zero writes to any repository-tracked
+       path, and therefore no new commit was ever required to record it."""
+    commit_abc = "ab" * 20
+    external_evidence_path = tmp_path / "evidence_ABC_from_ci_artifact.json"  # deliberately outside the repo tree
+    external_evidence_path.write_text(json.dumps({
+        "schema_version": "1.0",
+        "evidence_set_id": "CI_RUN_FOR_ABC",
+        "gates": [_entry("ops_audit", commit_abc, "PASS"), _entry("quality9_gate", commit_abc, "PASS")],
+    }), encoding="utf-8")
+
+    tracked_files_before = sorted(REPO_ROOT.rglob("*.json"))  # coarse repo-state snapshot (config dir only matters)
+    config_before = json.loads((REPO_ROOT / "config" / "quality" / "bys360_canonical_evidence.example.json").read_text(encoding="utf-8"))
+
+    manifest, trace = resolve_evidence_file(str(external_evidence_path))
+    report = compute_report(
+        _cross_env_methodology(), _cross_env_registry(), tmp_path, _cross_env_evidence(),
+        canonical_manifest=manifest, scored_commit=commit_abc, evidence_input_trace=trace,
+    )
+
+    # Canonical evidence was accepted for the exact commit being scored.
+    assert report["scored_commit"] == commit_abc
+    assert report["EVIDENCE_INPUT"]["loaded"] is True
+    assert report["EVIDENCE_INPUT"]["commit_sha_or_commit_set"] == [commit_abc]
+
+    # No repository file was touched to make this happen.
+    tracked_files_after = sorted(REPO_ROOT.rglob("*.json"))
+    assert tracked_files_before == tracked_files_after
+    config_after = json.loads((REPO_ROOT / "config" / "quality" / "bys360_canonical_evidence.example.json").read_text(encoding="utf-8"))
+    assert config_before == config_after
+
+
+def test_historical_scoring_flow_no_special_git_hack(tmp_path):
+    """An OLD scored commit with its own external evidence file scores
+    correctly too -- no special-casing needed for 'the current' vs. 'a past'
+    commit; the mechanism is identical either way."""
+    old_sha = "cd" * 20
+    p = tmp_path / "evidence_old.json"
+    p.write_text(json.dumps({"gates": [_entry("gate_e", old_sha, "PASS")]}), encoding="utf-8")
+    manifest, trace = resolve_evidence_file(str(p))
+    report = compute_report(
+        _cross_env_methodology(), _cross_env_registry(), tmp_path, _cross_env_evidence(),
+        canonical_manifest=manifest, scored_commit=old_sha, evidence_input_trace=trace,
+    )
+    assert report["scored_commit"] == old_sha
+    gate = report["category_scores"]["Operations"]["gate_contributions"][0]
+    assert gate["canonical_status"] == "PASS"
+    assert gate["canonical_source"] == "REMOTE_CI_VERIFIED"
+
+
+def test_external_evidence_file_cross_environment_reproducibility(tmp_path, monkeypatch):
+    """Section 33's required test: an ACTUAL temporary external file (not an
+    in-memory dict) drives identical canonical scores across 3 simulated
+    environments."""
+    import scripts.quality.bys360_score_reconcile_v1 as calc
+
+    evidence_path = tmp_path / "evidence_cross_env.json"
+    evidence_path.write_text(json.dumps({"gates": [_entry("ruff_full_select", COMMIT_AAA, "PASS")]}), encoding="utf-8")
+
+    def run(check_version_fn):
+        monkeypatch.setattr(calc, "_check_tool_version", check_version_fn)
+        manifest, trace = resolve_evidence_file(str(evidence_path))
+        return compute_report(
+            _cross_env_methodology(), _cross_env_registry(), tmp_path, _cross_env_evidence(),
+            canonical_manifest=manifest, scored_commit=COMMIT_AAA, evidence_input_trace=trace,
+        )
+
+    report_a = run(lambda *a, **k: (True, "0.16.0", None))
+    report_b = run(lambda *a, **k: (False, "0.15.21", None))
+    report_c = run(lambda *a, **k: (False, "n/a", "LOCAL_TOOL_MISSING"))
+
+    assert report_a["LIVE_READINESS"]["final"] == report_b["LIVE_READINESS"]["final"] == report_c["LIVE_READINESS"]["final"]
+    assert report_a["TRANSFERABILITY"]["final"] == report_b["TRANSFERABILITY"]["final"] == report_c["TRANSFERABILITY"]["final"]
+    local_statuses = {
+        r["category_scores"]["Code Quality"]["gate_contributions"][0]["local_status"]
+        for r in (report_a, report_b, report_c)
+    }
+    assert local_statuses == {"PASS", "VERSION_MISMATCH", "LOCAL_TOOL_MISSING"}
+
+
+def test_stale_external_file_rejected_for_wrong_scored_commit(tmp_path):
+    p = tmp_path / "evidence_aaa.json"
+    p.write_text(json.dumps({"gates": [_entry("gate_e", COMMIT_AAA, "PASS")]}), encoding="utf-8")
+    manifest, trace = resolve_evidence_file(str(p))
+    report = compute_report(
+        _cross_env_methodology(), _cross_env_registry(), tmp_path, _cross_env_evidence(),
+        canonical_manifest=manifest, scored_commit=COMMIT_BBB, evidence_input_trace=trace,
+    )
+    gate = report["category_scores"]["Operations"]["gate_contributions"][0]
+    assert gate["precedence_reason"] in (
+        "STALE_COMMIT_EVIDENCE_REJECTED_LOCAL_FALLBACK", "STALE_COMMIT_EVIDENCE_REJECTED_NO_LOCAL_FALLBACK",
+    )
+
+
+def test_remote_fail_external_file_precedence(tmp_path):
+    p = tmp_path / "evidence_fail.json"
+    p.write_text(json.dumps({"gates": [_entry("gate_e", COMMIT_AAA, "FAIL")]}), encoding="utf-8")
+    manifest, trace = resolve_evidence_file(str(p))
+    evidence = dict(_cross_env_evidence())
+    evidence["gate_e"] = True  # locally PASS
+    report = compute_report(
+        _cross_env_methodology(), _cross_env_registry(), tmp_path, evidence,
+        canonical_manifest=manifest, scored_commit=COMMIT_AAA, evidence_input_trace=trace,
+    )
+    gate = report["category_scores"]["Operations"]["gate_contributions"][0]
+    assert gate["canonical_status"] == "FAIL"
+    assert gate["local_status"] == "PASS"
+
+
+def test_canonical_evidence_composition_reports_completeness(tmp_path):
+    p = tmp_path / "evidence_partial.json"
+    p.write_text(json.dumps({"gates": [_entry("gate_e", COMMIT_AAA, "PASS")]}), encoding="utf-8")
+    manifest, trace = resolve_evidence_file(str(p))
+    report = compute_report(
+        _cross_env_methodology(), _cross_env_registry(), tmp_path, _cross_env_evidence(),
+        canonical_manifest=manifest, scored_commit=COMMIT_AAA, evidence_input_trace=trace,
+    )
+    comp = report["CANONICAL_EVIDENCE_COMPOSITION"]
+    assert comp["remote_verified_gates"] >= 1
+    assert comp["completeness"] in ("FULL", "LOCAL_FALLBACK_USED", "PARTIAL")
+
+
+def test_no_hardcoded_9def579_in_runtime_calculator_source():
+    """9def579... may appear in historical docs/test fixtures/example
+    evidence, never as a hardcoded assumption inside the calculator's own
+    runtime logic."""
+    source = Path("scripts/quality/bys360_score_reconcile_v1.py").read_text(encoding="utf-8")
+    assert "9def579247637390b7635c02f606449a2692ef99" not in source

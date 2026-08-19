@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -167,7 +168,6 @@ def resolve_python(cli_python: str | None) -> tuple[str, str]:
         if not Path(cli_python).exists():
             raise SystemExit(f"--python path does not exist: {cli_python}")
         return cli_python, "explicit"
-    import os
 
     env_python = os.environ.get("BYS360_QUALITY_PYTHON")
     if env_python:
@@ -392,6 +392,68 @@ def validate_evidence_manifest(manifest: dict[str, Any]) -> list[str]:
         if len(statuses) > 1:
             problems.append(f"EVIDENCE_CONFLICT: gate '{gid}' at commit {commit_sha} has disagreeing statuses {sorted(statuses)}")
     return problems
+
+
+def resolve_evidence_file(cli_evidence_file: str | None) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Resolve external commit-bound evidence: --evidence-file CLI flag >
+    BYS360_CANONICAL_EVIDENCE_FILE environment variable > NO_EXTERNAL_EVIDENCE
+    (pure local-fallback scoring). There is deliberately no third option that
+    falls back to a committed 'live' evidence file in this repository --
+    actual current-commit remote evidence is always supplied externally,
+    precisely so that recording it never requires creating a new source
+    commit (see docs/governance/BYS360_SCORING_METHODOLOGY_V1.md's
+    'Self-attestation and the bootstrap problem' section: a version-controlled
+    file describing commit X can never itself describe the commit that
+    contains the file's own addition/edit, since editing it creates a new
+    commit Y, making the file's evidence for X stale relative to HEAD=Y).
+
+    An explicitly-supplied path (via either the flag or the env var) that
+    does not exist, is not valid JSON, or fails validate_evidence_manifest(),
+    fails the whole run fast -- it is never silently treated as though no
+    evidence had been supplied. Silently falling back to local-only scoring
+    on a bad path would hide a typo or a tampered file behind ordinary,
+    unremarkable-looking local-fallback scoring, which is exactly the kind
+    of silent-degradation this methodology's missing-evidence policy exists
+    to forbid elsewhere.
+    """
+    path_str = cli_evidence_file
+    source = "explicit"
+    if not path_str:
+        path_str = os.environ.get("BYS360_CANONICAL_EVIDENCE_FILE")
+        source = "env" if path_str else "none"
+
+    if not path_str:
+        return {"gates": []}, {
+            "path": None, "source": "NO_EXTERNAL_EVIDENCE", "loaded": False,
+            "schema_version": None, "evidence_set_id": None,
+            "commit_sha_or_commit_set": [], "validation_status": "NOT_APPLICABLE",
+        }
+
+    evidence_path = Path(path_str)
+    if not evidence_path.exists():
+        flag_name = "--evidence-file" if source == "explicit" else "BYS360_CANONICAL_EVIDENCE_FILE"
+        raise SystemExit(f"EVIDENCE_FILE_NOT_FOUND: {flag_name} points at a path that does not exist: {evidence_path}")
+
+    try:
+        manifest = json.loads(evidence_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"EVIDENCE_FILE_INVALID: {evidence_path} is not valid JSON: {exc}") from exc
+
+    problems = validate_evidence_manifest(manifest)
+    if problems:
+        raise SystemExit(
+            f"EVIDENCE_FILE_INVALID: {evidence_path} failed schema/provenance validation:\n  " + "\n  ".join(problems)
+        )
+
+    commit_shas = sorted({g["commit_sha"] for g in manifest.get("gates", [])})
+    trace = {
+        "path": str(evidence_path), "source": source, "loaded": True,
+        "schema_version": manifest.get("schema_version"),
+        "evidence_set_id": manifest.get("evidence_set_id"),
+        "commit_sha_or_commit_set": commit_shas,
+        "validation_status": "VALID",
+    }
+    return manifest, trace
 
 
 def _registry_open_items(registry: dict[str, Any]) -> list[dict[str, Any]]:
@@ -626,6 +688,13 @@ def _local_composite(category_scores: dict[str, CategoryScore], weights: dict[st
     return sum(category_scores[category].local_final_score * weight for category, weight in weights.items())
 
 
+DEFAULT_EVIDENCE_INPUT_TRACE: dict[str, Any] = {
+    "path": None, "source": "NO_EXTERNAL_EVIDENCE", "loaded": False,
+    "schema_version": None, "evidence_set_id": None,
+    "commit_sha_or_commit_set": [], "validation_status": "NOT_APPLICABLE",
+}
+
+
 def compute_report(
     methodology: dict[str, Any],
     registry: dict[str, Any],
@@ -635,6 +704,7 @@ def compute_report(
     python_source: str = "not-resolved",
     canonical_manifest: dict[str, Any] | None = None,
     scored_commit: str = "",
+    evidence_input_trace: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if not python_path:
         python_path = sys.executable
@@ -643,6 +713,8 @@ def compute_report(
         canonical_manifest = {"gates": []}
     if not scored_commit:
         scored_commit = "UNKNOWN_COMMIT"
+    if evidence_input_trace is None:
+        evidence_input_trace = dict(DEFAULT_EVIDENCE_INPUT_TRACE)
 
     category_scores: dict[str, CategoryScore] = {}
     for category_name, category_config in methodology["categories"].items():
@@ -685,6 +757,22 @@ def compute_report(
         name: cs.local_environment_diagnostics for name, cs in category_scores.items()
     }
 
+    all_gate_contributions = [gc for cs in category_scores.values() for gc in cs.gate_contributions]
+    composition_counts = {
+        "remote_verified_gates": sum(1 for gc in all_gate_contributions if gc["canonical_source"] == "REMOTE_CI_VERIFIED"),
+        "local_verified_gates": sum(1 for gc in all_gate_contributions if gc["canonical_source"] == "LOCAL_VERIFIED"),
+        "registry_derived_gates": sum(1 for gc in all_gate_contributions if gc["canonical_source"] == "REGISTRY_DERIVED"),
+        "unknown_gates": sum(1 for gc in all_gate_contributions if gc["canonical_source"] == "NONE"),
+        "evidence_conflict_gates": sum(1 for gc in all_gate_contributions if gc["canonical_source"] == "EVIDENCE_CONFLICT"),
+    }
+    if composition_counts["unknown_gates"] or composition_counts["evidence_conflict_gates"]:
+        completeness = "PARTIAL"
+    elif composition_counts["local_verified_gates"]:
+        completeness = "LOCAL_FALLBACK_USED"
+    else:
+        completeness = "FULL"
+    canonical_evidence_composition = {**composition_counts, "completeness": completeness}
+
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "methodology_version": methodology["methodology_version"],
@@ -717,9 +805,17 @@ def compute_report(
             }
             for name, cs in category_scores.items()
         },
+        "EVIDENCE_INPUT": {
+            "description": "Exactly which external evidence file (if any) produced CANONICAL_PROJECT_EVIDENCE below. 'source': NO_EXTERNAL_EVIDENCE means no --evidence-file/BYS360_CANONICAL_EVIDENCE_FILE was supplied -- every gate falls through to local-verified/UNKNOWN, identical to running this calculator with no evidence mechanism at all.",
+            **evidence_input_trace,
+        },
         "CANONICAL_PROJECT_EVIDENCE": {
             "description": "The verified state of scored_commit, used to compute CANONICAL_PROJECT_SCORE below. Never affected by this machine's own tool versions when valid commit-bound remote evidence exists.",
             "by_category": canonical_project_evidence,
+        },
+        "CANONICAL_EVIDENCE_COMPOSITION": {
+            "description": "Descriptive counts only -- never a new score. completeness=FULL means every scored gate resolved via REMOTE_CI_VERIFIED; LOCAL_FALLBACK_USED means at least one gate fell back to a deterministically-correct local result; PARTIAL means at least one gate is UNKNOWN or in EVIDENCE_CONFLICT. Never present this as 'fully remote verified' unless completeness == FULL.",
+            **canonical_evidence_composition,
         },
         "LOCAL_ENVIRONMENT_DIAGNOSTICS": {
             "description": "Whether THIS machine's toolchain can reproduce the canonical quality environment. Informative only -- never used to invalidate valid canonical evidence, and never itself the official project score.",
@@ -818,7 +914,7 @@ def main() -> int:
     parser.add_argument("--methodology", default="config/quality/bys360_scoring_methodology_v1.json")
     parser.add_argument("--registry", default="config/quality/bys360_technical_debt_registry.json")
     parser.add_argument("--evidence", default=None, help="Optional JSON file supplying results for structurally-local-unverifiable gates")
-    parser.add_argument("--evidence-manifest", default="config/quality/bys360_canonical_evidence.json", help="Commit-bound canonical evidence manifest (skipped if the file does not exist)")
+    parser.add_argument("--evidence-file", default=None, help="External commit-bound canonical evidence file (default: BYS360_CANONICAL_EVIDENCE_FILE env var, else NO_EXTERNAL_EVIDENCE / local-fallback-only scoring). Never defaults to a committed file -- see docs/governance/BYS360_SCORING_METHODOLOGY_V1.md 'Self-attestation and the bootstrap problem'.")
     parser.add_argument("--scored-commit", default=None, help="Commit SHA being scored (default: git rev-parse HEAD in --root)")
     parser.add_argument("--python", default=None, help="Interpreter to use for gate commands (default: BYS360_QUALITY_PYTHON env var, else sys.executable)")
     parser.add_argument("--report-json", default=None)
@@ -831,16 +927,7 @@ def main() -> int:
     registry = json.loads(Path(args.registry).read_text(encoding="utf-8"))
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8")) if args.evidence else {}
 
-    manifest_path = Path(args.evidence_manifest)
-    if manifest_path.exists():
-        canonical_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        problems = validate_evidence_manifest(canonical_manifest)
-        if problems:
-            raise SystemExit(
-                "Invalid canonical evidence manifest (" + str(manifest_path) + "):\n  " + "\n  ".join(problems)
-            )
-    else:
-        canonical_manifest = {"gates": []}
+    canonical_manifest, evidence_input_trace = resolve_evidence_file(args.evidence_file)
 
     scored_commit, scored_commit_source = resolve_scored_commit(args.scored_commit, root)
 
@@ -852,7 +939,10 @@ def main() -> int:
                 gate["pass_rule"] = "exit_code_0_or_supplied_evidence"
                 gate.setdefault("evidence_note", "skipped via --skip-gates")
 
-    report = compute_report(methodology, registry, root, evidence, python_path, python_source, canonical_manifest, scored_commit)
+    report = compute_report(
+        methodology, registry, root, evidence, python_path, python_source,
+        canonical_manifest, scored_commit, evidence_input_trace,
+    )
     report["scored_commit_source"] = scored_commit_source
 
     print(json.dumps(report, indent=2, ensure_ascii=False))

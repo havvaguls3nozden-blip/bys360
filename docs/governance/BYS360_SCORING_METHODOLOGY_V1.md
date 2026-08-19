@@ -294,46 +294,134 @@ discrepancy itself is never hidden -- it is worth investigating why local
 and remote disagree), but `CANONICAL_PROJECT_EVIDENCE` and the composites
 it feeds only ever reflect the remote FAIL.
 
+## Self-attestation and the bootstrap problem
+
+An earlier version of this methodology stored actual, live remote CI
+evidence directly in a version-controlled repository file
+(`config/quality/bys360_canonical_evidence.json`, committed with real
+entries for a specific commit). This has a fatal defect for scoring the
+*current* commit specifically:
+
+1. Commit `A` is pushed; remote CI produces evidence for `A`.
+2. Recording that evidence means editing the committed manifest file --
+   which creates a new commit, `B`.
+3. `HEAD` is now `B`. The manifest's evidence is still for `A`.
+4. `A != B`, so by the strict commit-binding rule (below), that evidence
+   is correctly rejected as `STALE_COMMIT_EVIDENCE` when scoring `B`.
+
+A version-controlled file describing commit `A` can therefore **never**
+itself describe the commit that contains the file's own addition or edit
+-- there is no version of the file, committed at any point, that can
+correctly claim "this is the verified state of the commit I am part of."
+This was confirmed as a real, not speculative, defect in this repository's
+own history: the manifest committed in `4bf249f` held evidence for
+`9def579` (three commits earlier), and `4bf249f` itself had, and could
+have, no matching evidence of its own -- adding some would only have
+produced a `5th` commit with the same unsolvable problem one commit later.
+
+**The fix separates two things that were previously conflated in one
+file:** the evidence *schema/policy/resolver/validator* (which legitimately
+belongs in version control, since it doesn't describe any one commit) from
+the actual *evidence instances* for a specific commit (which must not).
+Concretely:
+
+- `config/quality/bys360_canonical_evidence.example.json` remains
+  committed, but is explicitly marked `"sample_type":
+  "HISTORICAL_SAMPLE_NON_RUNTIME"` and is **never auto-loaded** by the
+  calculator under any default configuration -- it exists only as a
+  schema-valid worked example and an honestly-labeled historical record.
+- Actual current-commit remote evidence is supplied **at runtime**, via
+  `--evidence-file <path>` pointing at a file that lives outside the
+  commit being scored (a CI artifact, a locally-saved copy of CI output,
+  anything not tracked by this repository). Recording it never requires,
+  and must never require, a new source commit.
+
 ## Recording remote evidence
 
-`config/quality/bys360_canonical_evidence.json` is a plain, versioned JSON
-file -- there is no database, no network client, and **no automated
-GitHub Actions ingestion in this wave** (`provenance: "AUTOMATED_INGESTION"`
-is a reserved value for a future, separately-approved CI-integration wave;
-today every entry must be `"USER_SUPPLIED_REMOTE_PROOF"`, meaning a human
-manually transcribed an actual CI result into the file). Each gate entry
-requires `id` (matching the methodology's gate `name`), `commit_sha` (a
-40-hex-char SHA), `status` (`PASS`/`FAIL`), `evidence_type`, and
-`provenance`; `validate_evidence_manifest()` rejects the file (the whole
-run fails fast) if any of these are missing or malformed, or if
-`evidence_type` is `REMOTE_CI_VERIFIED` without a `provenance` value. A CI
-job name that does not correspond 1:1 to a single scored gate ID (e.g. an
-umbrella "run tests" step) is never force-mapped to a gate just to look
-more complete -- it belongs in the manifest's `non_gate_context_only`
-array instead, for human audit trail, and is never consulted by the
-resolver. Similarly, evidence whose *scope* does not match a gate's scope
-(e.g. a CI job that type-checks only the service layer, when
-`mypy_full_scope` scores mypy across the whole repository) must not be
-mapped to that gate either -- recorded honestly as unmapped
-context instead, with the scope mismatch stated explicitly, since treating
-a narrower-scope PASS as equivalent evidence for a broader-scope gate
-would silently overstate what was actually verified.
+Actual remote evidence is external and runtime-supplied, not committed.
+The operational flow after a push:
+
+1. Push commit `ABC`.
+2. Wait for remote CI to run against `ABC`.
+3. Collect the exact remote gate results (job/step names and pass/fail
+   status) -- manually, in this wave; no GitHub API call is made by this
+   tooling (see "No automated ingestion" below).
+4. Write an evidence JSON file tied to `ABC` (see
+   `config/quality/bys360_canonical_evidence.example.json` for the exact
+   shape) -- anywhere outside the repository, or as an untracked file
+   inside it. **No source commit is required for this step.**
+5. Validate it (`validate_evidence_manifest()`, or just run the calculator
+   -- it validates on load and fails fast on a broken file).
+6. Run the score calculator with `--evidence-file <path>
+   --scored-commit ABC` (the latter defaults to `git rev-parse HEAD`, so
+   it is only needed explicitly when scoring a commit other than the one
+   currently checked out).
+7. Read the resulting `CANONICAL_PROJECT_SCORE`.
+8. If `LOCAL_ENVIRONMENT_DIAGNOSTICS` disagrees with the canonical result
+   (e.g. a local `VERSION_MISMATCH`), fix the local environment
+   separately -- it never blocks or changes the canonical score once valid
+   matching remote evidence exists.
+
+Each gate entry requires `id` (matching the methodology's gate `name`),
+`commit_sha` (a 40-hex-char SHA), `status` (`PASS`/`FAIL`),
+`evidence_type`, and `provenance`; `validate_evidence_manifest()` rejects
+the file (the whole run fails fast, whether reached via
+`--evidence-file`/`BYS360_CANONICAL_EVIDENCE_FILE` or a direct call) if
+any of these are missing or malformed, or if `evidence_type` is
+`REMOTE_CI_VERIFIED` without a `provenance` value. A CI job name that does
+not correspond 1:1 to a single scored gate ID (e.g. an umbrella "run
+tests" step) is never force-mapped to a gate just to look more complete --
+it belongs in the file's `non_gate_context_only` array instead, for human
+audit trail, and is never consulted by the resolver. Evidence whose
+*scope* does not match a gate's scope (e.g. a CI job that type-checks only
+the service layer, when `mypy_full_scope` scores mypy across the whole
+repository) must likewise not be mapped -- recorded honestly as unmapped
+context instead, with the mismatch stated explicitly. A mapping supported
+only by an *inferred* correlation (e.g. a job name that merely shares a
+substring with a test filename, with no stated identity between the two)
+is not sufficient grounds for `REMOTE_CI_VERIFIED` credit either -- see
+`config/quality/bys360_canonical_evidence.example.json`'s
+`handover_docs_contract` entry in `deliberately_unmapped_gates` for a
+worked example of a mapping that was removed on exactly this basis during
+a provenance re-audit.
+
+## No automated ingestion
+
+This wave adds no GitHub API integration, no `gh` CLI dependency, and no
+network requirement anywhere in the evidence path. Evidence ingestion is
+explicit and file-based: a human (or, in a later, separately-approved
+CI-integration wave, an automated step) produces the JSON file; this
+calculator only ever reads a local path. `provenance: "AUTOMATED_INGESTION"`
+is a reserved schema value for that future wave -- it is valid input to
+the validator today, but nothing in this repository currently produces
+it, and no default behavior assumes it exists.
+
+## Trust and honesty limits
+
+`REMOTE_CI_VERIFIED` records an *asserted* verification -- what a human
+reported having observed in CI -- not a cryptographically signed
+attestation. There is no signature, no hash-chain, no tamper-proofing
+beyond ordinary JSON schema validation and the exact-commit-SHA binding.
+This is a deliberate, disclosed limitation for v1, not an oversight: a
+malformed or logically-inconsistent file is rejected (`EVIDENCE_FILE_INVALID`),
+but a file that is well-formed and simply *asserts something untrue* would
+be accepted, exactly as `USER_SUPPLIED_REMOTE_PROOF` already discloses.
+Do not read `REMOTE_CI_VERIFIED` as a stronger guarantee than "a human
+transcribed this from an actual CI run."
 
 ## How to score a historical commit
 
-Pass `--scored-commit <sha>` to score against a specific commit's
-manifest entries regardless of what commit is currently checked out --
-useful for demonstrating that the same manifest evidence produces the
-same canonical score independent of the current machine's toolchain (see
-the cross-environment reproducibility tests in
-`tests/quality/test_bys360_canonical_evidence_resolution.py`). Note this
-replays the *manifest evidence* against whatever registry/methodology
-content is currently on disk, not the historical commit's own file tree --
-literally checking out and re-scoring an old commit is not generally
-meaningful for this repository's governance files specifically, since the
-scoring system itself (the registry, the methodology config, this
-calculator) did not exist before it was introduced; there is nothing to
-replay for a commit that predates the files being replayed.
+Pass `--scored-commit <sha>` together with `--evidence-file <path>`
+pointing at that commit's evidence to score any commit, current or past,
+identically -- there is no special-casing between "the currently checked
+out commit" and "an older commit." Note this replays the *evidence file's*
+claims against whatever registry/methodology content is currently on
+disk, not the historical commit's own file tree -- literally checking out
+and re-scoring an old commit is not generally meaningful for this
+repository's governance files specifically, since the scoring system
+itself (the registry, the methodology config, this calculator) did not
+exist before it was introduced; there is nothing to replay for a commit
+that predates the files being replayed.
 
 ## Score ceilings
 
@@ -489,25 +577,40 @@ Re-run `python scripts/quality/bys360_score_reconcile_v1.py` at any time
 to get the current, live numbers -- the values above are a point-in-time
 worked example, not a fixed constant.
 
-**Canonical evidence example.** The 66/74 above reflects HEAD (`72aeecc`
-at time of writing) scored with the real canonical evidence manifest,
-which currently only contains entries for the earlier commit `9def579`
-(the last commit CI evidence was actually reported for) -- so every
-manifest entry is correctly rejected as stale for `72aeecc`, and canonical
-falls back to local execution everywhere, identically to having no
-manifest at all. Running the same registry/methodology with
-`--scored-commit 9def579247637390b7635c02f606449a2692ef99` (matching the
-manifest's recorded commit) instead produces `LIVE_READINESS = 89`,
-`TRANSFERABILITY = 85` on the *same* machine with the *same* off-pin local
-Ruff -- `ruff_syntax_import_sanity`, `postgres_migration_integrity_gate`,
-`coverage_ratchet`, `dependency_audit`, `ops_audit`, `quality9_gate`, and
-`handover_docs_contract` all resolve to canonical `PASS` via
-`COMMIT_BOUND_REMOTE_VERIFIED` regardless of the local Ruff mismatch,
-while `ruff_full_select` (for which no remote evidence was ever reported)
-stays honestly `UNKNOWN`. `LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL` in that
-same run stays at 66/74 throughout -- proving the 89/85 uplift comes
-entirely from commit-bound canonical evidence, never from the local
-machine quietly getting more lenient.
+**Canonical evidence example.** The 66/74 above reflects HEAD (`4bf249f`
+at time of writing) scored with **no** `--evidence-file` supplied -- by
+design, this repository has no committed file that could apply to the
+current commit (see "Self-attestation and the bootstrap problem" above),
+so canonical falls back to local execution everywhere, identically to
+having no evidence mechanism at all. Running the same registry/methodology
+with `--scored-commit 9def579247637390b7635c02f606449a2692ef99
+--evidence-file config/quality/bys360_canonical_evidence.example.json`
+(pointing explicitly at the historical-sample file, which is never loaded
+by default) instead produces `LIVE_READINESS = 89`, `TRANSFERABILITY = 85`
+on the *same* machine with the *same* off-pin local Ruff --
+`ruff_syntax_import_sanity`, `postgres_migration_integrity_gate`,
+`coverage_ratchet`, `dependency_audit`, `ops_audit`, and `quality9_gate`
+resolve to canonical `PASS` via `COMMIT_BOUND_REMOTE_VERIFIED` regardless
+of the local Ruff mismatch, while `ruff_full_select` (for which no remote
+evidence was ever reported) stays honestly `UNKNOWN`.
+`LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL` in that same run stays at 66/74
+throughout -- proving the 89/85 uplift comes entirely from commit-bound
+canonical evidence, never from the local machine quietly getting more
+lenient.
+
+`handover_docs_contract` is deliberately **not** in that list: a strict
+remote-gate provenance re-audit found its earlier `REMOTE_CI_VERIFIED`
+mapping rested only on an inferred filename correlation (a CI job named
+"BYS360 Score 100 Quality Gate V1" was assumed to be this gate purely
+because the gate's underlying test file contains "score100" in its name),
+not a stated identity match -- the mapping was removed. This particular
+removal happens not to move either composite number: `handover_docs_contract`
+is a version-unpinned `pytest` invocation, so it still resolves to
+canonical `PASS` via `LOCAL_VERIFIED` (tier 2) instead of
+`REMOTE_CI_VERIFIED` (tier 1) -- same status, different, more honest,
+`canonical_source`/`precedence_reason` in the trace. A provenance
+correction is applied regardless of whether it happens to move a score;
+in this instance it did not.
 
 ## Anti-gaming notes
 
