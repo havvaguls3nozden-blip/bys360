@@ -28,6 +28,22 @@
     "note": "Gate commands below are declared as portable {kind, module|script, args} structures, never a hardcoded absolute interpreter path -- a prior version of this file hardcoded C:\\bys360\\project\\.venv\\Scripts\\python.exe, which broke on any machine/drive/checkout other than the one it was authored on. The calculator resolves and reports which interpreter it actually used (path + source) in every report. This is necessary but not sufficient: interpreter identity alone does not guarantee tool version. Gates with an expected_version are additionally version-checked before being trusted (see pinned_tool_versions and each gate's expected_version) -- a wrong-version tool result is reported as VERSION_MISMATCH, scored identically to UNKNOWN (0 contribution, counted in unverified_evidence_count), never silently accepted as PASS. This was found to be a real, not hypothetical, gap during authoring: the project's own canonical shared venv was found to have ruff 0.15.21 installed, off-pin from requirements-dev.txt's ruff==0.16.0."
   },
   "pinned_tool_versions": {"ruff": "0.16.0", "mypy": "2.3.0"},
+  "evidence_precedence_policy": {
+    "concept": "CANONICAL_PROJECT_EVIDENCE ('what is the verified state of this exact commit?') is kept strictly separate from LOCAL_ENVIRONMENT_DIAGNOSTICS ('can this machine reproduce that state?'). LIVE_READINESS and TRANSFERABILITY are always computed from CANONICAL_PROJECT_EVIDENCE only.",
+    "manifest_path": "config/quality/bys360_canonical_evidence.json",
+    "precedence_order": [
+      "1. COMMIT_BOUND_REMOTE_VERIFIED: a canonical-evidence-manifest entry whose commit_sha exactly matches the commit being scored wins unconditionally, including over a disagreeing local result. A local VERSION_MISMATCH never invalidates valid matching remote evidence; a matching remote FAIL is never overridden by a local PASS.",
+      "2. LOCAL_VERIFIED: when no matching-commit remote evidence exists, a deterministically-correct local execution (right interpreter, and the correct pinned tool version if the gate declares one) may itself serve as canonical evidence.",
+      "3. UNKNOWN: neither of the above applies. No unsupported points are ever awarded.",
+      "Evidence recorded for a *different* commit SHA is never reused -- rejected as STALE_COMMIT_EVIDENCE_REJECTED, falling through to tier 2 or 3.",
+      "Multiple manifest entries for the same gate+commit that disagree on status is an EVIDENCE_CONFLICT -- canonical becomes UNKNOWN, never an arbitrary pick."
+    ],
+    "freshness_policy": "Exact commit SHA is the only freshness criterion in v1 -- no time-based expiry. Commit-bound evidence is historical fact about that commit and does not go stale with the passage of time, only by no longer matching the commit being scored.",
+    "trusted_evidence_types": ["REMOTE_CI_VERIFIED", "LOCAL_VERIFIED", "REGISTRY_DERIVED", "STATIC_REPOSITORY_FACT", "UNKNOWN"],
+    "local_diagnostic_only_statuses": ["VERSION_MISMATCH", "LOCAL_TOOL_MISSING", "LOCAL_EXECUTION_FAILURE"],
+    "manifest_provenance_values": ["USER_SUPPLIED_REMOTE_PROOF", "AUTOMATED_INGESTION"],
+    "note": "This wave does not add automated GitHub API ingestion. Manifest entries are recorded explicitly/manually (provenance=USER_SUPPLIED_REMOTE_PROOF) unless a later, separately-approved CI-integration wave adds AUTOMATED_INGESTION. No evidence auto-sync exists today."
+  },
   "categories": {
     "Code Quality": {
       "gate_component_weight": 0.80,

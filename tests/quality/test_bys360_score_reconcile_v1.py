@@ -498,7 +498,7 @@ def test_wrong_tool_version_produces_version_mismatch_not_silent_pass(tmp_path, 
     import scripts.quality.bys360_score_reconcile_v1 as calc
 
     def fake_check_version(python_path, module, expected, cwd):
-        return False, "0.15.21"  # simulates the real off-pin shared-venv ruff
+        return False, "0.15.21", None  # simulates the real off-pin shared-venv ruff
 
     monkeypatch.setattr(calc, "_check_tool_version", fake_check_version)
 
@@ -521,10 +521,10 @@ def test_version_matched_tool_scores_as_pass(tmp_path, monkeypatch):
     import scripts.quality.bys360_score_reconcile_v1 as calc
 
     def fake_check_version(python_path, module, expected, cwd):
-        return True, expected
+        return True, expected, None
 
     def fake_run_argv(argv, cwd):
-        return 0, "All checks passed!"
+        return 0, "All checks passed!", None
 
     monkeypatch.setattr(calc, "_check_tool_version", fake_check_version)
     monkeypatch.setattr(calc, "_run_argv", fake_run_argv)
@@ -562,3 +562,99 @@ def test_no_shell_true_string_commands_remain_in_calculator_run_path():
     shell=False and an argument list."""
     source = Path("scripts/quality/bys360_score_reconcile_v1.py").read_text(encoding="utf-8")
     assert re.search(r"_run_argv\(.*shell\s*=\s*False", source, re.DOTALL) or "shell=False" in source
+
+
+# ---------------------------------------------------------------------------
+# Canonical evidence integration (report-level, using this file's full
+# 7-category fixture rather than the smaller fixture in
+# test_bys360_canonical_evidence_resolution.py's own unit tests).
+# ---------------------------------------------------------------------------
+
+def test_report_backward_compatible_without_manifest_or_scored_commit(tmp_path):
+    """Calling compute_report() the old way (no canonical_manifest/scored_commit
+    args) must still work and must still be internally consistent -- canonical
+    and local scores must be identical, since there is no manifest to diverge
+    from local execution."""
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    assert report["scored_commit"] == "UNKNOWN_COMMIT"
+    for cs in report["category_scores"].values():
+        assert cs["final_score"] == cs["local_final_score_NON_CANONICAL"]
+    assert report["LIVE_READINESS"]["final"] == report["LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL"]["LIVE_READINESS_local"]
+
+
+def test_matching_manifest_evidence_changes_canonical_but_not_local_score(tmp_path):
+    from scripts.quality.bys360_score_reconcile_v1 import compute_report as _compute_report
+
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    scored_commit = "c" * 40
+    # Locally, gate_a fails (not supplied -> UNKNOWN); remotely, it is verified PASS for this exact commit.
+    evidence = {"gate_b": True, "gate_c": True, "gate_d": True, "gate_e": True, "gate_f": True}
+    manifest = {"gates": [{
+        "id": "gate_a", "commit_sha": scored_commit, "status": "PASS",
+        "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF", "source": "test",
+    }]}
+    report_no_manifest = _compute_report(methodology, registry, tmp_path, evidence, scored_commit=scored_commit)
+    report_with_manifest = _compute_report(methodology, registry, tmp_path, evidence, canonical_manifest=manifest, scored_commit=scored_commit)
+
+    assert report_no_manifest["category_scores"]["Code Quality"]["final_score"] < report_with_manifest["category_scores"]["Code Quality"]["final_score"]
+    # Local (NON-CANONICAL) score must be unaffected by the manifest either way.
+    assert report_no_manifest["category_scores"]["Code Quality"]["local_final_score_NON_CANONICAL"] == report_with_manifest["category_scores"]["Code Quality"]["local_final_score_NON_CANONICAL"]
+
+
+def test_no_double_credit_points_awarded_never_exceeds_points_possible(tmp_path):
+    from scripts.quality.bys360_score_reconcile_v1 import compute_report as _compute_report
+
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[])
+    scored_commit = "d" * 40
+    evidence = _all_gates_pass_evidence()  # locally PASS
+    manifest = {"gates": [{
+        "id": "gate_a", "commit_sha": scored_commit, "status": "PASS",
+        "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF", "source": "test",
+    }]}  # ALSO remotely PASS -- must not double-award
+    report = _compute_report(methodology, registry, tmp_path, evidence, canonical_manifest=manifest, scored_commit=scored_commit)
+    for gc in report["category_scores"]["Code Quality"]["gate_contributions"]:
+        assert gc["points_awarded"] <= gc["points_possible"]
+
+
+def test_resolve_scored_commit_explicit_override_honored(tmp_path):
+    from scripts.quality.bys360_score_reconcile_v1 import resolve_scored_commit
+    sha, source = resolve_scored_commit("e" * 40, tmp_path)
+    assert sha == "e" * 40
+    assert source == "explicit"
+
+
+def test_resolve_scored_commit_auto_detects_real_git_head():
+    from scripts.quality.bys360_score_reconcile_v1 import resolve_scored_commit
+    sha, source = resolve_scored_commit(None, REPO_ROOT)
+    assert re.fullmatch(r"[0-9a-f]{40}", sha)
+    assert source == "git-rev-parse-HEAD"
+
+
+def test_resolve_scored_commit_falls_back_when_not_a_git_repo(tmp_path):
+    from scripts.quality.bys360_score_reconcile_v1 import resolve_scored_commit
+    sha, source = resolve_scored_commit(None, tmp_path)
+    assert sha == "UNKNOWN_COMMIT"
+    assert source == "git-unavailable"
+
+
+def test_no_weight_ceiling_penalty_rounding_diff_from_pre_wave_values():
+    """Freeze check: this wave must not have altered any scoring-math value in
+    the real methodology config -- only added the evidence_precedence_policy
+    metadata block and structural gate declarations from the prior wave."""
+    methodology = json.loads(CANONICAL_METHODOLOGY_PATH.read_text(encoding="utf-8"))
+    assert methodology["composites"]["LIVE_READINESS"]["weights"] == {
+        "Security": 0.22, "Test Assurance": 0.21, "CI-Release": 0.21, "Operations": 0.20,
+        "Code Quality": 0.10, "Maintainability": 0.03, "Documentation-Handover": 0.03,
+    }
+    assert methodology["composites"]["TRANSFERABILITY"]["weights"] == {
+        "Documentation-Handover": 0.22, "Maintainability": 0.22, "Test Assurance": 0.18,
+        "Code Quality": 0.15, "CI-Release": 0.10, "Operations": 0.06, "Security": 0.07,
+    }
+    assert methodology["debt_penalty_policy"]["severity_weights"] == {"P0": 40, "P1": 20, "P2": 8, "P3": 3, "UNCLASSIFIED": 5}
+    assert methodology["debt_penalty_policy"]["penalty_cap_per_category"] == 30
+    assert methodology["evidence_completeness_ceiling"]["value"] == 89
+    assert methodology["rounding"] == {"category_precision": 2, "composite_rule": "round_half_up", "composite_precision": 0}

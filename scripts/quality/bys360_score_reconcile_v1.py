@@ -6,6 +6,8 @@ scores (LIVE_READINESS, TRANSFERABILITY) from:
   - config/quality/bys360_technical_debt_registry.json (open-debt penalties)
   - live re-execution of each category's quality gates (ruff/mypy/coverage/
     secret-gate/ops-audit/quality9/handover-docs-contract)
+  - config/quality/bys360_canonical_evidence.json (commit-bound remote
+    evidence, when the currently-scored commit has any)
 
 Portability: gate commands are declared in the methodology config as
 structured {kind, module|script, args} entries, never a hardcoded
@@ -14,15 +16,35 @@ in order: --python CLI flag > BYS360_QUALITY_PYTHON environment variable
 > sys.executable (the interpreter currently running this script). The
 resolved interpreter and its source are reported in the output, and any
 gate with a declared expected_version is version-checked before being
-trusted -- a wrong-version tool result is reported as VERSION_MISMATCH,
-never silently scored as PASS.
+trusted -- a wrong-version tool result is a LOCAL diagnostic
+(VERSION_MISMATCH), never silently scored as PASS.
+
+Canonical evidence vs. local diagnostics: every gate's outcome is now
+resolved through resolve_evidence(), which distinguishes CANONICAL PROJECT
+EVIDENCE ("what is the verified state of this exact commit?") from LOCAL
+ENVIRONMENT DIAGNOSTICS ("can this machine reproduce that state?"). A
+commit-bound REMOTE_CI_VERIFIED entry in the evidence manifest always wins
+for CANONICAL_PROJECT_SCORE, including when it disagrees with this
+machine's own local execution -- a local VERSION_MISMATCH must never
+invalidate valid matching remote evidence, and a matching remote FAIL must
+never be overridden by a local PASS. When no matching-commit remote
+evidence exists, a deterministically-verified local execution (correct
+tool version, or no version pin) may still count as canonical
+(LOCAL_VERIFIED) -- this is what makes an ordinary local run without any
+manifest still fully functional. Evidence recorded for a *different*
+commit SHA is never reused; it is rejected as stale. See
+docs/governance/BYS360_SCORING_METHODOLOGY_V1.md's "Evidence precedence"
+section for the full policy and worked examples.
 
 Gates that are structurally impossible to verify in a local run (e.g. the
 PostgreSQL migration-integrity gate, which needs a live PostgreSQL 15
 service) are scored UNKNOWN unless a fresh result is supplied via
---evidence, per the methodology's missing-evidence policy: UNKNOWN
-contributes 0 and is never silently treated as PASS. VERSION_MISMATCH is
-treated identically to UNKNOWN for scoring purposes.
+--evidence or matched via the canonical evidence manifest, per the
+methodology's missing-evidence policy: UNKNOWN contributes 0 and is never
+silently treated as PASS. VERSION_MISMATCH, LOCAL_TOOL_MISSING, and
+LOCAL_EXECUTION_FAILURE are local-only diagnostic statuses -- none of them
+are ever canonical evidence on their own, and none invalidate a valid
+matching remote result.
 
 Legacy scores (68/61/etc.) are never read, referenced, or used as a
 calibration target by this script -- they exist only as a fixed, separate
@@ -74,13 +96,27 @@ LOCAL_OR_REMOTE_BY_PASS_RULE = {
     "boolean": "REGISTRY_DERIVED",
 }
 
+# Local-only diagnostic statuses: never canonical evidence on their own,
+# never allowed to invalidate a valid matching-commit remote result.
+LOCAL_DIAGNOSTIC_ONLY_STATUSES = {"VERSION_MISMATCH", "LOCAL_TOOL_MISSING", "LOCAL_EXECUTION_FAILURE", "UNKNOWN"}
+# A local status eligible to stand in as CANONICAL evidence (tier 2) when no
+# matching-commit remote evidence exists -- i.e. it was deterministically,
+# correctly produced (right interpreter, right pinned tool version if any).
+LOCAL_CANONICAL_ELIGIBLE_STATUSES = {"PASS", "FAIL"}
+CANONICAL_UNVERIFIED_STATUSES = {"UNKNOWN"}
+TRUSTED_EVIDENCE_TYPES = {"REMOTE_CI_VERIFIED", "LOCAL_VERIFIED", "REGISTRY_DERIVED", "STATIC_REPOSITORY_FACT", "UNKNOWN"}
+VALID_MANIFEST_PROVENANCE = {"USER_SUPPLIED_REMOTE_PROOF", "AUTOMATED_INGESTION"}
+
 
 @dataclass
 class GateResult:
     name: str
-    status: str  # PASS | FAIL | UNKNOWN | VERSION_MISMATCH
+    status: str  # PASS | FAIL | UNKNOWN | VERSION_MISMATCH | LOCAL_TOOL_MISSING | LOCAL_EXECUTION_FAILURE
     detail: str
     local_or_remote: str = "LOCAL"
+    tool: str | None = None
+    expected_version: str | None = None
+    actual_version: str | None = None
 
 
 @dataclass
@@ -100,6 +136,29 @@ class CategoryScore:
     debt_penalty_raw_total: float = 0.0
     debt_penalty_cap_applied: bool = False
     unverified_count: int = 0
+    local_gate_component: float = 0.0
+    local_final_score: float = 0.0
+    local_environment_diagnostics: list[dict[str, Any]] = field(default_factory=list)
+
+
+def resolve_scored_commit(cli_commit: str | None, cwd: Path) -> tuple[str, str]:
+    """Resolve the commit SHA this run is scoring: --scored-commit CLI flag >
+    `git rev-parse HEAD` in cwd > 'UNKNOWN_COMMIT' (git unavailable/not a repo).
+    This SHA is what resolve_evidence() matches manifest entries against --
+    getting it wrong silently accepts or rejects evidence for the wrong
+    commit, so an explicit override always wins over auto-detection."""
+    if cli_commit:
+        return cli_commit, "explicit"
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=cwd, capture_output=True, text=True, timeout=10, shell=False,
+        )
+        sha = proc.stdout.strip()
+        if proc.returncode == 0 and re.fullmatch(r"[0-9a-f]{40}", sha):
+            return sha, "git-rev-parse-HEAD"
+    except OSError:
+        pass
+    return "UNKNOWN_COMMIT", "git-unavailable"
 
 
 def resolve_python(cli_python: str | None) -> tuple[str, str]:
@@ -118,7 +177,11 @@ def resolve_python(cli_python: str | None) -> tuple[str, str]:
     return sys.executable, "default-sys.executable"
 
 
-def _run_argv(argv: list[str], cwd: Path) -> tuple[int, str]:
+def _run_argv(argv: list[str], cwd: Path) -> tuple[int, str, str | None]:
+    """Returns (returncode, combined_output, crash_kind). crash_kind is None for
+    a normal execution (whatever its exit code), or 'LOCAL_TOOL_MISSING' /
+    'LOCAL_EXECUTION_FAILURE' when the subprocess could not even complete --
+    those must never be scored as an ordinary quality-gate FAIL."""
     try:
         proc = subprocess.run(
             argv,
@@ -128,11 +191,11 @@ def _run_argv(argv: list[str], cwd: Path) -> tuple[int, str]:
             timeout=GATE_TIMEOUT_SECONDS,
             shell=False,
         )
-        return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+        return proc.returncode, (proc.stdout or "") + (proc.stderr or ""), None
     except subprocess.TimeoutExpired:
-        return -1, "TIMEOUT"
+        return -1, "TIMEOUT", "LOCAL_EXECUTION_FAILURE"
     except OSError as exc:
-        return -1, f"OSError: {exc}"
+        return -1, f"OSError: {exc}", "LOCAL_TOOL_MISSING"
 
 
 def _build_argv(gate: dict[str, Any], python_path: str) -> list[str] | None:
@@ -144,46 +207,58 @@ def _build_argv(gate: dict[str, Any], python_path: str) -> list[str] | None:
     return None
 
 
-def _check_tool_version(python_path: str, module: str, expected: str, cwd: Path) -> tuple[bool, str]:
-    returncode, output = _run_argv([python_path, "-m", module, "--version"], cwd)
+def _check_tool_version(python_path: str, module: str, expected: str, cwd: Path) -> tuple[bool, str, str | None]:
+    returncode, output, crash_kind = _run_argv([python_path, "-m", module, "--version"], cwd)
+    if crash_kind is not None:
+        return False, f"could not launch {module} ({output})", crash_kind
     if returncode != 0:
-        return False, f"could not determine {module} version (exit {returncode})"
+        return False, f"could not determine {module} version (exit {returncode})", None
     first_line = output.strip().splitlines()[0] if output.strip() else ""
     match = re.search(r"(\d+\.\d+(?:\.\d+)?)", first_line)
     actual = match.group(1) if match else first_line
-    return actual == expected, actual
+    return actual == expected, actual, None
 
 
 def _evaluate_gate(gate: dict[str, Any], python_path: str, python_source: str, cwd: Path, evidence: dict[str, Any]) -> GateResult:
     name = gate["name"]
     pass_rule = gate.get("pass_rule", "exit_code_0")
     local_or_remote = LOCAL_OR_REMOTE_BY_PASS_RULE.get(pass_rule, "LOCAL")
+    tool = gate.get("module") or gate.get("script")
+    expected_version = gate.get("expected_version")
+    actual_version: str | None = None
 
     if pass_rule == "boolean":
-        return GateResult(name, "UNKNOWN", "computed separately (registry-derived), not a subprocess gate", local_or_remote)
+        return GateResult(name, "UNKNOWN", "computed separately (registry-derived), not a subprocess gate", local_or_remote, tool)
 
     if pass_rule == "exit_code_0_or_supplied_evidence":
         supplied = evidence.get(name)
         if supplied is not None:
             status = "PASS" if supplied is True else "FAIL"
-            return GateResult(name, status, f"supplied via --evidence (interpreter irrelevant): {supplied}", local_or_remote)
-        return GateResult(name, "UNKNOWN", gate.get("evidence_note", "not measurable locally; no --evidence supplied"), local_or_remote)
+            return GateResult(name, status, f"supplied via --evidence (interpreter irrelevant): {supplied}", local_or_remote, tool)
+        return GateResult(name, "UNKNOWN", gate.get("evidence_note", "not measurable locally; no --evidence supplied"), local_or_remote, tool)
 
-    expected_version = gate.get("expected_version")
     if expected_version and gate.get("kind") == "python_module":
-        version_ok, actual_version = _check_tool_version(python_path, gate["module"], expected_version, cwd)
+        version_ok, actual_version, version_crash_kind = _check_tool_version(python_path, gate["module"], expected_version, cwd)
+        if version_crash_kind is not None:
+            return GateResult(
+                name, version_crash_kind,
+                f"could not check {gate['module']} version via {python_source} interpreter ({python_path}): {actual_version}",
+                local_or_remote, tool, expected_version, actual_version,
+            )
         if not version_ok:
             return GateResult(
                 name, "VERSION_MISMATCH",
                 f"expected {gate['module']}=={expected_version}, found '{actual_version}' via {python_source} interpreter ({python_path})",
-                local_or_remote,
+                local_or_remote, tool, expected_version, actual_version,
             )
 
     argv = _build_argv(gate, python_path)
     if argv is None:
-        return GateResult(name, "UNKNOWN", "gate has no runnable command definition (kind must be python_module or python_script)", local_or_remote)
+        return GateResult(name, "UNKNOWN", "gate has no runnable command definition (kind must be python_module or python_script)", local_or_remote, tool, expected_version, actual_version)
 
-    returncode, output = _run_argv(argv, cwd)
+    returncode, output, crash_kind = _run_argv(argv, cwd)
+    if crash_kind is not None:
+        return GateResult(name, crash_kind, f"could not execute gate command ({output})", local_or_remote, tool, expected_version, actual_version)
 
     if pass_rule == "json_ok_field_true":
         try:
@@ -195,13 +270,128 @@ def _evaluate_gate(gate: dict[str, Any], python_path: str, python_source: str, c
                 start = output.index("{")
                 payload = json.loads(output[start:])
             except Exception:
-                return GateResult(name, "UNKNOWN", f"could not parse JSON output (returncode={returncode})", local_or_remote)
+                return GateResult(name, "UNKNOWN", f"could not parse JSON output (returncode={returncode})", local_or_remote, tool, expected_version, actual_version)
         ok = bool(payload.get("ok"))
-        return GateResult(name, "PASS" if ok else "FAIL", f"ok={payload.get('ok')} finding_count={payload.get('finding_count')}", local_or_remote)
+        return GateResult(name, "PASS" if ok else "FAIL", f"ok={payload.get('ok')} finding_count={payload.get('finding_count')}", local_or_remote, tool, expected_version, actual_version)
 
     status = "PASS" if returncode == 0 else "FAIL"
     detail = "exit_code=0" if returncode == 0 else f"exit_code={returncode}"
-    return GateResult(name, status, detail, local_or_remote)
+    return GateResult(name, status, detail, local_or_remote, tool, expected_version, actual_version)
+
+
+def resolve_evidence(
+    metric_id: str,
+    scored_commit: str,
+    canonical_manifest: dict[str, Any],
+    local_status: str,
+    local_detail: str,
+) -> dict[str, Any]:
+    """Deterministically decides CANONICAL PROJECT evidence for one gate,
+    separately from LOCAL ENVIRONMENT DIAGNOSTICS.
+
+    Precedence (see docs/governance/BYS360_SCORING_METHODOLOGY_V1.md
+    'Evidence precedence' section for the full policy):
+      1. A commit-bound REMOTE_CI_VERIFIED manifest entry for the exact
+         scored_commit wins unconditionally, including over a disagreeing
+         local result -- a local VERSION_MISMATCH never invalidates valid
+         matching remote evidence, and a matching remote FAIL is never
+         overridden by a local PASS.
+      2. Otherwise, a deterministically-verified local result (PASS/FAIL --
+         i.e. produced with the correct interpreter and, if pinned, the
+         correct tool version) may itself serve as canonical evidence.
+      3. Otherwise: UNKNOWN. No unsupported points are ever awarded.
+    Evidence recorded for a *different* commit SHA is never reused -- it is
+    rejected as stale, whether or not a local fallback is available.
+    Multiple manifest entries for the same gate+commit with disagreeing
+    statuses is an EVIDENCE_CONFLICT: canonical becomes UNKNOWN, never an
+    arbitrary pick between the two.
+    """
+    entries = [g for g in canonical_manifest.get("gates", []) if g.get("id") == metric_id]
+    matching = [g for g in entries if g.get("commit_sha") == scored_commit]
+    stale = [g for g in entries if g.get("commit_sha") != scored_commit]
+
+    if matching:
+        statuses = {g["status"] for g in matching}
+        if len(statuses) > 1:
+            return {
+                "canonical_status": "UNKNOWN",
+                "canonical_source": "EVIDENCE_CONFLICT",
+                "local_status": local_status,
+                "local_detail": local_detail,
+                "precedence_reason": "EVIDENCE_CONFLICT",
+                "provenance": None,
+            }
+        entry = matching[0]
+        return {
+            "canonical_status": entry["status"],
+            "canonical_source": entry.get("evidence_type", "REMOTE_CI_VERIFIED"),
+            "local_status": local_status,
+            "local_detail": local_detail,
+            "precedence_reason": "COMMIT_BOUND_REMOTE_VERIFIED",
+            "provenance": entry.get("provenance"),
+        }
+
+    if local_status in LOCAL_CANONICAL_ELIGIBLE_STATUSES:
+        return {
+            "canonical_status": local_status,
+            "canonical_source": "LOCAL_VERIFIED",
+            "local_status": local_status,
+            "local_detail": local_detail,
+            "precedence_reason": (
+                "STALE_COMMIT_EVIDENCE_REJECTED_LOCAL_FALLBACK" if stale else "LOCAL_VERIFIED_NO_MATCHING_REMOTE_EVIDENCE"
+            ),
+            "provenance": None,
+        }
+
+    return {
+        "canonical_status": "UNKNOWN",
+        "canonical_source": "NONE",
+        "local_status": local_status,
+        "local_detail": local_detail,
+        "precedence_reason": (
+            "STALE_COMMIT_EVIDENCE_REJECTED_NO_LOCAL_FALLBACK" if stale else "NO_VALID_EVIDENCE"
+        ),
+        "provenance": None,
+    }
+
+
+def validate_evidence_manifest(manifest: dict[str, Any]) -> list[str]:
+    """Returns a list of validation problem strings; empty list = valid.
+
+    Checks: schema shape, duplicate/malformed commit SHAs, invalid status
+    or evidence_type values, REMOTE_CI_VERIFIED entries missing required
+    provenance, invalid provenance values, and duplicate gate+commit
+    entries that disagree on status (EVIDENCE_CONFLICT) -- the same
+    conflict resolve_evidence() itself refuses to arbitrate at scoring
+    time, caught earlier here so a broken manifest fails fast.
+    """
+    problems: list[str] = []
+    by_key: dict[tuple[str, str], set[str]] = {}
+    for idx, gate in enumerate(manifest.get("gates", [])):
+        gid = gate.get("id")
+        commit_sha = gate.get("commit_sha")
+        status = gate.get("status")
+        evidence_type = gate.get("evidence_type")
+        provenance = gate.get("provenance")
+        label = gid or f"<index {idx}, missing id>"
+        if not gid:
+            problems.append(f"gates[{idx}]: missing 'id'")
+        if not commit_sha or not re.fullmatch(r"[0-9a-f]{40}", str(commit_sha)):
+            problems.append(f"gates[{idx}] ({label}): missing or malformed commit_sha (must be a 40-hex-char SHA)")
+        if status not in ("PASS", "FAIL"):
+            problems.append(f"gates[{idx}] ({label}): invalid status '{status}' (manifest entries must be PASS or FAIL)")
+        if evidence_type not in TRUSTED_EVIDENCE_TYPES:
+            problems.append(f"gates[{idx}] ({label}): invalid evidence_type '{evidence_type}'")
+        if evidence_type == "REMOTE_CI_VERIFIED" and not provenance:
+            problems.append(f"gates[{idx}] ({label}): REMOTE_CI_VERIFIED evidence missing required 'provenance'")
+        if provenance is not None and provenance not in VALID_MANIFEST_PROVENANCE:
+            problems.append(f"gates[{idx}] ({label}): invalid provenance '{provenance}'")
+        if gid and commit_sha and status in ("PASS", "FAIL"):
+            by_key.setdefault((gid, commit_sha), set()).add(status)
+    for (gid, commit_sha), statuses in by_key.items():
+        if len(statuses) > 1:
+            problems.append(f"EVIDENCE_CONFLICT: gate '{gid}' at commit {commit_sha} has disagreeing statuses {sorted(statuses)}")
+    return problems
 
 
 def _registry_open_items(registry: dict[str, Any]) -> list[dict[str, Any]]:
@@ -259,6 +449,8 @@ def _score_category(
     evidence: dict[str, Any],
     python_path: str,
     python_source: str,
+    canonical_manifest: dict[str, Any],
+    scored_commit: str,
 ) -> CategoryScore:
     gate_results: list[GateResult] = []
     for gate in category_config.get("gates", []):
@@ -276,23 +468,54 @@ def _score_category(
             "REGISTRY_DERIVED",
         )]
 
+    # Resolve CANONICAL evidence per gate, separately from each gate's raw
+    # LOCAL execution result. Registry-derived gates are inherently
+    # commit-bound already (their content IS part of the checked-out
+    # commit) and bypass manifest resolution entirely.
+    resolutions: list[dict[str, Any]] = []
+    for g in gate_results:
+        if g.local_or_remote == "REGISTRY_DERIVED":
+            resolutions.append({
+                "canonical_status": g.status, "canonical_source": "REGISTRY_DERIVED",
+                "local_status": g.status, "local_detail": g.detail,
+                "precedence_reason": "REGISTRY_DERIVED_INHERENTLY_COMMIT_BOUND", "provenance": None,
+            })
+        else:
+            resolutions.append(resolve_evidence(g.name, scored_commit, canonical_manifest, g.status, g.detail))
+
     applicable = len(gate_results) or 1
-    passed = sum(1 for g in gate_results if g.status == "PASS")
-    unverified = sum(1 for g in gate_results if g.status in UNVERIFIED_STATUSES)
+    passed = sum(1 for r in resolutions if r["canonical_status"] == "PASS")
+    unverified = sum(1 for r in resolutions if r["canonical_status"] in CANONICAL_UNVERIFIED_STATUSES)
     gate_component_weight = category_config["gate_component_weight"] * 100
     gate_component = gate_component_weight * (passed / applicable)
+
+    local_passed = sum(1 for g in gate_results if g.status == "PASS")
+    local_gate_component = gate_component_weight * (local_passed / applicable)
 
     points_possible_per_gate = gate_component_weight / applicable
     gate_contributions = []
     missing_evidence: list[dict[str, Any]] = []
-    for g in gate_results:
-        points_awarded = points_possible_per_gate if g.status == "PASS" else 0.0
+    local_environment_diagnostics: list[dict[str, Any]] = []
+    for g, r in zip(gate_results, resolutions, strict=True):
+        points_awarded = points_possible_per_gate if r["canonical_status"] == "PASS" else 0.0
         gate_contributions.append({
-            "name": g.name, "status": g.status, "local_or_remote": g.local_or_remote,
+            "name": g.name,
+            "status": r["canonical_status"],  # CANONICAL status drives scoring; kept under 'status' for trace continuity
+            "local_or_remote": g.local_or_remote,
             "points_awarded": round(points_awarded, 4), "points_possible": round(points_possible_per_gate, 4),
+            "canonical_status": r["canonical_status"],
+            "canonical_source": r["canonical_source"],
+            "local_status": r["local_status"],
+            "precedence_reason": r["precedence_reason"],
+            "provenance": r["provenance"],
         })
-        if g.status in UNVERIFIED_STATUSES:
-            missing_evidence.append({"name": g.name, "kind": "GATE", "reason": g.detail})
+        if r["canonical_status"] in CANONICAL_UNVERIFIED_STATUSES:
+            missing_evidence.append({"name": g.name, "kind": "GATE", "reason": g.detail if r["local_status"] == r["canonical_status"] else f"canonical=UNKNOWN ({r['precedence_reason']}); local={g.detail}"})
+        local_environment_diagnostics.append({
+            "name": g.name, "tool": g.tool, "expected_version": g.expected_version,
+            "actual_version": g.actual_version, "local_status": g.status,
+            "interpreter": python_path, "notes": g.detail,
+        })
 
     rubric_trace: list[str] = []
     rubric_contributions: list[dict[str, Any]] = []
@@ -350,6 +573,7 @@ def _score_category(
             })
 
     raw_before_penalty = round(gate_component + rubric_component, 2)
+    local_raw_before_penalty = round(local_gate_component + rubric_component, 2)
     penalty_policy = methodology["debt_penalty_policy"]
     debt_penalty, penalty_trace, debt_breakdown = _debt_penalty(registry, category_name, penalty_policy)
     debt_penalty_raw_total = round(sum(d["penalty_points"] for d in debt_breakdown), 2)
@@ -357,6 +581,7 @@ def _score_category(
     rubric_trace.extend(penalty_trace)
 
     final_score = round(max(0.0, min(100.0, raw_before_penalty - debt_penalty)), 2)
+    local_final_score = round(max(0.0, min(100.0, local_raw_before_penalty - debt_penalty)), 2)
 
     return CategoryScore(
         category=category_name,
@@ -374,6 +599,9 @@ def _score_category(
         debt_penalty_raw_total=debt_penalty_raw_total,
         debt_penalty_cap_applied=debt_penalty_cap_applied,
         unverified_count=unverified,
+        local_gate_component=round(local_gate_component, 2),
+        local_final_score=local_final_score,
+        local_environment_diagnostics=local_environment_diagnostics,
     )
 
 
@@ -394,6 +622,10 @@ def _composite(category_scores: dict[str, CategoryScore], weights: dict[str, flo
     return total, contributions
 
 
+def _local_composite(category_scores: dict[str, CategoryScore], weights: dict[str, float]) -> float:
+    return sum(category_scores[category].local_final_score * weight for category, weight in weights.items())
+
+
 def compute_report(
     methodology: dict[str, Any],
     registry: dict[str, Any],
@@ -401,15 +633,22 @@ def compute_report(
     evidence: dict[str, Any],
     python_path: str = "",
     python_source: str = "not-resolved",
+    canonical_manifest: dict[str, Any] | None = None,
+    scored_commit: str = "",
 ) -> dict[str, Any]:
     if not python_path:
         python_path = sys.executable
         python_source = "default-sys.executable"
+    if canonical_manifest is None:
+        canonical_manifest = {"gates": []}
+    if not scored_commit:
+        scored_commit = "UNKNOWN_COMMIT"
 
     category_scores: dict[str, CategoryScore] = {}
     for category_name, category_config in methodology["categories"].items():
         category_scores[category_name] = _score_category(
             category_name, category_config, registry, methodology, cwd, evidence, python_path, python_source,
+            canonical_manifest, scored_commit,
         )
 
     total_unverified = sum(cs.unverified_count for cs in category_scores.values())
@@ -428,11 +667,30 @@ def compute_report(
     live_readiness_capped = min(live_readiness_raw, ceiling_value)
     transferability_capped = min(transferability_raw, ceiling_value)
 
+    local_live_readiness_raw = _local_composite(category_scores, live_weights)
+    local_transferability_raw = _local_composite(category_scores, transfer_weights)
+
+    canonical_project_evidence = {
+        name: [
+            {
+                "gate": gc["name"], "canonical_status": gc["canonical_status"],
+                "canonical_source": gc["canonical_source"], "commit_sha": scored_commit,
+                "provenance": gc["provenance"], "precedence_reason": gc["precedence_reason"],
+            }
+            for gc in cs.gate_contributions
+        ]
+        for name, cs in category_scores.items()
+    }
+    local_environment_diagnostics = {
+        name: cs.local_environment_diagnostics for name, cs in category_scores.items()
+    }
+
     return {
         "generated_at": datetime.now(UTC).isoformat(),
         "methodology_version": methodology["methodology_version"],
         "registry_version": registry.get("registry_version"),
         "interpreter": {"path": python_path, "source": python_source},
+        "scored_commit": scored_commit,
         "fully_verified": fully_verified,
         "unverified_evidence_count": total_unverified,
         "evidence_completeness_ceiling_applied": ceiling_applies,
@@ -454,10 +712,21 @@ def compute_report(
                 "ceiling": {"applies": False},
                 "gates": [{"name": g.name, "status": g.status, "detail": g.detail} for g in cs.gate_results],
                 "rubric_trace": cs.rubric_trace,
+                "local_gate_component": cs.local_gate_component,
+                "local_final_score_NON_CANONICAL": cs.local_final_score,
             }
             for name, cs in category_scores.items()
         },
+        "CANONICAL_PROJECT_EVIDENCE": {
+            "description": "The verified state of scored_commit, used to compute CANONICAL_PROJECT_SCORE below. Never affected by this machine's own tool versions when valid commit-bound remote evidence exists.",
+            "by_category": canonical_project_evidence,
+        },
+        "LOCAL_ENVIRONMENT_DIAGNOSTICS": {
+            "description": "Whether THIS machine's toolchain can reproduce the canonical quality environment. Informative only -- never used to invalidate valid canonical evidence, and never itself the official project score.",
+            "by_category": local_environment_diagnostics,
+        },
         "LIVE_READINESS": {
+            "label": "CANONICAL_PROJECT_SCORE",
             "weights": live_weights,
             "contributions": live_contributions,
             "raw": round(live_readiness_raw, 4),
@@ -466,12 +735,18 @@ def compute_report(
             "final": _round_half_up(live_readiness_capped),
         },
         "TRANSFERABILITY": {
+            "label": "CANONICAL_PROJECT_SCORE",
             "weights": transfer_weights,
             "contributions": transfer_contributions,
             "raw": round(transferability_raw, 4),
             "ceiling_applied_value": round(transferability_capped, 4),
             "rounding_rule": "ROUND_HALF_UP",
             "final": _round_half_up(transferability_capped),
+        },
+        "LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL": {
+            "description": "What LIVE_READINESS/TRANSFERABILITY would be using ONLY this machine's raw local gate results, ignoring the canonical evidence manifest entirely. NOT the official project score -- diagnostic only, to show a developer what fixing their local toolchain would change.",
+            "LIVE_READINESS_local": _round_half_up(min(local_live_readiness_raw, ceiling_value)),
+            "TRANSFERABILITY_local": _round_half_up(min(local_transferability_raw, ceiling_value)),
         },
         "legacy_snapshot": LEGACY_SNAPSHOT,
     }
@@ -482,28 +757,47 @@ def render_markdown(report: dict[str, Any]) -> str:
         "# BYS360 Methodology V1 Score Report",
         "",
         f"Generated: {report['generated_at']}",
+        f"Scored commit: {report.get('scored_commit', 'UNKNOWN_COMMIT')} (source={report.get('scored_commit_source', 'n/a')})",
         f"Methodology version: {report['methodology_version']}",
         f"Registry version: {report['registry_version']}",
         f"Interpreter: {report['interpreter']['path']} (source={report['interpreter']['source']})",
-        f"Fully verified: {report['fully_verified']} (unverified_evidence_count={report['unverified_evidence_count']})",
+        f"Fully verified (CANONICAL): {report['fully_verified']} (unverified_evidence_count={report['unverified_evidence_count']})",
         f"Evidence-completeness ceiling applied: {report['evidence_completeness_ceiling_applied']}"
         + (f" (value={report['evidence_completeness_ceiling_value']})" if report["evidence_completeness_ceiling_applied"] else ""),
         "",
-        "## Category scores (Methodology V1)",
+        "## Category scores -- CANONICAL_PROJECT_SCORE (Methodology V1)",
         "",
-        "| Category | Final | Gate component | Rubric component | Debt penalty |",
-        "|---|---|---|---|---|",
+        "| Category | Final (canonical) | Gate component | Rubric component | Debt penalty | Local (NON-CANONICAL) |",
+        "|---|---|---|---|---|---|",
     ]
     for name, cs in report["category_scores"].items():
-        lines.append(f"| {name} | {cs['final_score']} | {cs['gate_component']} | {cs['rubric_component']} | -{cs['debt_penalty']} |")
+        lines.append(
+            f"| {name} | {cs['final_score']} | {cs['gate_component']} | {cs['rubric_component']} | "
+            f"-{cs['debt_penalty']} | {cs['local_final_score_NON_CANONICAL']} |"
+        )
 
     lines += [
         "",
-        f"## LIVE_READINESS = {report['LIVE_READINESS']['final']}",
+        "## Local environment diagnostics (NON-CANONICAL -- this machine only)",
+        "",
+        "| Category | Gate | Tool | Expected version | Actual version | Local status |",
+        "|---|---|---|---|---|---|",
+    ]
+    for name, gates in report["LOCAL_ENVIRONMENT_DIAGNOSTICS"]["by_category"].items():
+        for g in gates:
+            lines.append(f"| {name} | {g['name']} | {g['tool'] or '-'} | {g['expected_version'] or '-'} | {g['actual_version'] or '-'} | {g['local_status']} |")
+
+    lines += [
+        "",
+        f"## LIVE_READINESS (CANONICAL_PROJECT_SCORE) = {report['LIVE_READINESS']['final']}",
         f"(raw {report['LIVE_READINESS']['raw']}, post-ceiling {report['LIVE_READINESS']['ceiling_applied_value']})",
         "",
-        f"## TRANSFERABILITY = {report['TRANSFERABILITY']['final']}",
+        f"## TRANSFERABILITY (CANONICAL_PROJECT_SCORE) = {report['TRANSFERABILITY']['final']}",
         f"(raw {report['TRANSFERABILITY']['raw']}, post-ceiling {report['TRANSFERABILITY']['ceiling_applied_value']})",
+        "",
+        "## Local environment score (NON-CANONICAL, diagnostic only)",
+        f"LIVE_READINESS_local = {report['LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL']['LIVE_READINESS_local']}, "
+        f"TRANSFERABILITY_local = {report['LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL']['TRANSFERABILITY_local']}",
         "",
         "## Legacy snapshot (historical, NOT methodology V1, NOT a like-for-like trend)",
         "",
@@ -524,6 +818,8 @@ def main() -> int:
     parser.add_argument("--methodology", default="config/quality/bys360_scoring_methodology_v1.json")
     parser.add_argument("--registry", default="config/quality/bys360_technical_debt_registry.json")
     parser.add_argument("--evidence", default=None, help="Optional JSON file supplying results for structurally-local-unverifiable gates")
+    parser.add_argument("--evidence-manifest", default="config/quality/bys360_canonical_evidence.json", help="Commit-bound canonical evidence manifest (skipped if the file does not exist)")
+    parser.add_argument("--scored-commit", default=None, help="Commit SHA being scored (default: git rev-parse HEAD in --root)")
     parser.add_argument("--python", default=None, help="Interpreter to use for gate commands (default: BYS360_QUALITY_PYTHON env var, else sys.executable)")
     parser.add_argument("--report-json", default=None)
     parser.add_argument("--report-md", default=None)
@@ -535,6 +831,19 @@ def main() -> int:
     registry = json.loads(Path(args.registry).read_text(encoding="utf-8"))
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8")) if args.evidence else {}
 
+    manifest_path = Path(args.evidence_manifest)
+    if manifest_path.exists():
+        canonical_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        problems = validate_evidence_manifest(canonical_manifest)
+        if problems:
+            raise SystemExit(
+                "Invalid canonical evidence manifest (" + str(manifest_path) + "):\n  " + "\n  ".join(problems)
+            )
+    else:
+        canonical_manifest = {"gates": []}
+
+    scored_commit, scored_commit_source = resolve_scored_commit(args.scored_commit, root)
+
     python_path, python_source = resolve_python(args.python)
 
     if args.skip_gates:
@@ -543,7 +852,8 @@ def main() -> int:
                 gate["pass_rule"] = "exit_code_0_or_supplied_evidence"
                 gate.setdefault("evidence_note", "skipped via --skip-gates")
 
-    report = compute_report(methodology, registry, root, evidence, python_path, python_source)
+    report = compute_report(methodology, registry, root, evidence, python_path, python_source, canonical_manifest, scored_commit)
+    report["scored_commit_source"] = scored_commit_source
 
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

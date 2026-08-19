@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "evidence_manifest_name": "BYS360 Canonical Commit-Bound Evidence Manifest",
+  "generated_or_recorded_at": "2026-08-19T00:00:00Z",
+  "repository_branch": "phase5-critical-lint-clean-v1",
+  "policy_note": "This manifest exists to answer one question deterministically, the same way on every developer machine: for a given exact commit SHA, what quality-gate outcomes were verified on a canonical, trusted execution environment (GitHub Actions CI)? It is consulted by scripts/quality/bys360_score_reconcile_v1.py's resolve_evidence() before falling back to the current machine's own local gate execution. This session has no direct network/API access to GitHub Actions, so every entry below with evidence_type=REMOTE_CI_VERIFIED is recorded with provenance=USER_SUPPLIED_REMOTE_PROOF -- it was manually reported by the project owner in chat, not independently fetched or verified by this tooling. That distinction is preserved in every entry and must never be silently upgraded to look machine-verified. No entry in this file was fabricated: only gate outcomes the user actually stated are present here, each tied to the exact commit_sha the user stated it for. Entries are never expired by age (schema_version 1.0 uses exact-commit-SHA matching as the only freshness criterion, per policy -- see docs/governance/BYS360_SCORING_METHODOLOGY_V1.md 'Evidence precedence' section) but ARE strictly rejected as stale the instant the scored commit's SHA no longer matches, with no branch-name or recency substitute.",
+  "sources": [
+    {
+      "id": "github_actions_bys360_ci",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "description": "GitHub Actions workflow(s) for this repository, as reported to this tooling by the project owner in chat for a specific commit SHA. Not fetched via the GitHub API by this tooling in this wave -- see provenance on each gate entry below.",
+      "trust_level": "TRUSTED_WITH_DISCLOSED_PROVENANCE"
+    }
+  ],
+  "gates": [
+    {
+      "id": "quality9_gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'BYS360 Quality 9 CI contract gate = PASS' for this commit."
+    },
+    {
+      "id": "coverage_ratchet",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Coverage ratchet gate = PASS' for this commit."
+    },
+    {
+      "id": "ruff_syntax_import_sanity",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": "0.16.0",
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Ruff syntax/import sanity = PASS' for this commit. Does NOT cover ruff_full_select (Code Quality's broader gate) -- the user's list did not report a full-select Ruff result, so ruff_full_select has no remote evidence entry here and must not be conflated with this one."
+    },
+    {
+      "id": "postgres_migration_integrity_gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": "PostgreSQL 15",
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI results: 'Create disposable PostgreSQL 15 migration-test database = PASS' and 'PostgreSQL 15 migration integrity gate = PASS', corroborated by 4 sub-checks the user named (POSTGRES15_EMPTY_TO_HEAD, POSTGRES15_HEAD_MATCH, POSTGRES15_SECOND_UPGRADE, POSTGRES15_SCHEMA_INTROSPECTION). The calculator has one gate id for this whole check; the sub-checks are recorded here as corroborating detail only, not as separate resolvable ids."
+    },
+    {
+      "id": "dependency_audit",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": "vulnerabilities=0",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Dependency vulnerability audit = PASS' for this commit."
+    },
+    {
+      "id": "ops_audit",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'BYS360 operations audit = PASS' for this commit."
+    },
+    {
+      "id": "handover_docs_contract",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'BYS360 Score 100 Quality Gate V1 = PASS' for this commit -- matched to this gate id because its args run tests/test_score100_handover_docs_contract_v1.py, the file the CI job name literally names."
+    }
+  ],
+  "deliberately_unmapped_gates": [
+    {
+      "id": "secret_repo_gate",
+      "reason": "The user's reported remote-evidence list for commit 9def579247637390b7635c02f606449a2692ef99 did not include a secret-scan gate result. No entry was fabricated for it; it simply has no manifest match and falls through to local/no-evidence resolution like any other unlisted gate."
+    },
+    {
+      "id": "ruff_full_select",
+      "reason": "The user's reported remote evidence covers only 'Ruff syntax/import sanity' (mapped to ruff_syntax_import_sanity), not a full-select Ruff run. ruff_full_select (Code Quality) therefore has no manifest match and is never satisfied by the syntax/import-sanity entry."
+    },
+    {
+      "id": "mypy_full_scope",
+      "reason": "See non_gate_context_only 'Type check service layer' below -- scope mismatch (service-layer-only vs. whole-repo), deliberately not mapped."
+    }
+  ],
+  "non_gate_context_only": [
+    {
+      "label": "Run tests / quality-gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Umbrella/overall CI job name; does not correspond to a single calculator gate id. Recorded for human audit trail only -- never consulted by resolve_evidence().",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Run quality tests",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Corresponds to the Step1 (tests/quality -m ci_safe) pytest run, not to any single scored quality-gate id. Recorded for human audit trail only.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Run integration and architecture tests",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Corresponds to (part of) the Step2 broader-scope pytest run, not to any single scored quality-gate id. Recorded for human audit trail only.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Type check service layer",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "SCOPE MISMATCH, deliberately not mapped to mypy_full_scope: this CI job type-checks the service layer only, while mypy_full_scope scores mypy across app + tests + scripts (the whole repo). Treating a narrower-scope PASS as equivalent evidence for the broader-scope gate would silently overstate verified coverage, so it is recorded here as context only and does not satisfy mypy_full_scope's canonical evidence requirement.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    }
+  ]
+}

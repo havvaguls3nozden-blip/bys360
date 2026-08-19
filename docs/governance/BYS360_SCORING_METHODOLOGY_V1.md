@@ -183,6 +183,158 @@ match the repository's pins; venvs can and do drift out of pin silently
 over time, which is exactly what was found for Ruff during this
 correction.
 
+## Canonical evidence vs. local diagnostics
+
+Portability and version-checking (above) solve "did this machine run the
+right tool?" They do not solve a related but different problem: **the same
+repository commit, scored on two different developer machines with two
+different local toolchain states, could previously produce two different
+LIVE_READINESS/TRANSFERABILITY numbers** -- e.g. a commit whose GitHub
+Actions CI genuinely passed every gate could still score lower on a
+developer's laptop purely because that laptop's shared venv has an
+off-pin Ruff, even though nothing about the *commit* changed.
+
+This methodology therefore distinguishes two concepts, computed
+separately and never silently merged:
+
+- **CANONICAL_PROJECT_EVIDENCE** answers *"what is the verified
+  quality/readiness state of this exact repository commit?"* This is what
+  LIVE_READINESS and TRANSFERABILITY are computed from.
+- **LOCAL_ENVIRONMENT_DIAGNOSTICS** answers *"can THIS machine reproduce
+  that state?"* This is informative only -- it helps a developer fix their
+  own toolchain, but it is never itself the official project score, and a
+  bad local diagnostic (wrong tool version, tool not installed) must never
+  lower CANONICAL_PROJECT_EVIDENCE when valid commit-bound proof exists
+  that the gate actually passed on that exact commit.
+
+The calculator's report always contains both, clearly labeled:
+`LIVE_READINESS`/`TRANSFERABILITY` (canonical; each carries
+`"label": "CANONICAL_PROJECT_SCORE"`), `CANONICAL_PROJECT_EVIDENCE` (per
+gate: canonical status, source, commit SHA, provenance, precedence
+reason), `LOCAL_ENVIRONMENT_DIAGNOSTICS` (per gate: tool, expected vs.
+actual version, local status, interpreter used), and
+`LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL` (what the composites would be
+using *only* this machine's raw local results, ignoring the manifest
+entirely -- explicitly labeled non-canonical, shown only as a diagnostic
+delta).
+
+## Evidence precedence
+
+For every gate, `resolve_evidence()` in
+`scripts/quality/bys360_score_reconcile_v1.py` decides canonical status in
+this order:
+
+1. **Commit-bound `REMOTE_CI_VERIFIED` evidence** (see "Commit binding"
+   below) for the *exact* commit being scored wins unconditionally --
+   including over a disagreeing local result. A local `VERSION_MISMATCH`
+   never invalidates valid matching remote evidence, and this is
+   unconditional in the other direction too: **a matching canonical remote
+   FAIL is never overridden by a local PASS** ("remote failure
+   precedence" -- see below). Remote evidence for a gate that this machine
+   cannot even execute locally (e.g. the PostgreSQL migration-integrity
+   gate, which needs a live PostgreSQL 15 service) is exactly how that
+   gate can still contribute real, non-`UNKNOWN` canonical credit on a
+   laptop with no PostgreSQL installed at all.
+2. **`LOCAL_VERIFIED` evidence.** When no matching-commit remote evidence
+   exists for a gate, a deterministically-correct local execution (right
+   interpreter, and the correct pinned tool version if the gate declares
+   one) may itself serve as canonical evidence. This is what makes an
+   ordinary local run with no manifest at all still fully functional --
+   it reproduces exactly the pre-this-wave scoring behavior when the
+   manifest has nothing to say.
+3. **`UNKNOWN`.** Neither of the above applies. No unsupported points are
+   ever awarded -- unchanged from the pre-existing missing-evidence
+   policy above, just now reached through an explicit precedence chain
+   instead of implicitly.
+
+Local-only diagnostic statuses (`VERSION_MISMATCH`, `LOCAL_TOOL_MISSING`,
+`LOCAL_EXECUTION_FAILURE`, and the pre-existing structurally-unverifiable
+`UNKNOWN`) are never, by themselves, eligible for tier 2 -- only a clean
+local `PASS` or `FAIL` (i.e. the gate genuinely ran, with the right tool
+version) can serve as canonical in the absence of remote evidence.
+`LOCAL_TOOL_MISSING` (the subprocess could not even launch -- e.g. the
+tool is not installed) and `LOCAL_EXECUTION_FAILURE` (e.g. a timeout) are
+new, more precise diagnostics added by this wave; previously both cases
+were folded indistinguishably into a plain gate `FAIL`, which risked
+looking like a genuine quality-check failure rather than an environment
+problem.
+
+## Commit binding
+
+A remote evidence entry's `commit_sha` must exactly match the commit
+currently being scored (`scored_commit`, resolved via `--scored-commit` >
+`git rev-parse HEAD` in `--root` > `UNKNOWN_COMMIT` if git is unavailable)
+before it is granted canonical credit. Evidence recorded for a *different*
+commit is never reused -- it is rejected with precedence reason
+`STALE_COMMIT_EVIDENCE_REJECTED_LOCAL_FALLBACK` (if a valid local result
+is available to fall back to) or `STALE_COMMIT_EVIDENCE_REJECTED_NO_LOCAL_FALLBACK`
+(if not). Branch name is deliberately not part of this check -- commit SHA
+is authoritative; a branch rename after the fact must not invalidate
+evidence that is still correct for that commit's content. Freshness in v1
+is exact-SHA-match only, with no time-based expiry: commit-bound evidence
+is a historical fact about that commit and does not go stale with the
+passage of time, only by no longer matching the commit being scored.
+
+Multiple manifest entries for the same gate at the same commit that
+*disagree* on status is an `EVIDENCE_CONFLICT` -- resolved to canonical
+`UNKNOWN`, never an arbitrary pick between the two. This is checked both
+by `validate_evidence_manifest()` (fails the whole run fast, before any
+scoring happens, if the manifest itself is internally inconsistent) and
+defensively again inside `resolve_evidence()` at scoring time.
+
+## Remote failure precedence
+
+Deliberately restated as its own rule because it is the one direction
+this wave's design is easiest to get backwards: if commit-bound remote
+evidence says a gate **FAILED**, that is canonical, full stop -- a local
+`PASS` on the same commit does not override it, does not average with it,
+and does not get separately reported as if it were equally credible. The
+local PASS is still visible in `LOCAL_ENVIRONMENT_DIAGNOSTICS` (so the
+discrepancy itself is never hidden -- it is worth investigating why local
+and remote disagree), but `CANONICAL_PROJECT_EVIDENCE` and the composites
+it feeds only ever reflect the remote FAIL.
+
+## Recording remote evidence
+
+`config/quality/bys360_canonical_evidence.json` is a plain, versioned JSON
+file -- there is no database, no network client, and **no automated
+GitHub Actions ingestion in this wave** (`provenance: "AUTOMATED_INGESTION"`
+is a reserved value for a future, separately-approved CI-integration wave;
+today every entry must be `"USER_SUPPLIED_REMOTE_PROOF"`, meaning a human
+manually transcribed an actual CI result into the file). Each gate entry
+requires `id` (matching the methodology's gate `name`), `commit_sha` (a
+40-hex-char SHA), `status` (`PASS`/`FAIL`), `evidence_type`, and
+`provenance`; `validate_evidence_manifest()` rejects the file (the whole
+run fails fast) if any of these are missing or malformed, or if
+`evidence_type` is `REMOTE_CI_VERIFIED` without a `provenance` value. A CI
+job name that does not correspond 1:1 to a single scored gate ID (e.g. an
+umbrella "run tests" step) is never force-mapped to a gate just to look
+more complete -- it belongs in the manifest's `non_gate_context_only`
+array instead, for human audit trail, and is never consulted by the
+resolver. Similarly, evidence whose *scope* does not match a gate's scope
+(e.g. a CI job that type-checks only the service layer, when
+`mypy_full_scope` scores mypy across the whole repository) must not be
+mapped to that gate either -- recorded honestly as unmapped
+context instead, with the scope mismatch stated explicitly, since treating
+a narrower-scope PASS as equivalent evidence for a broader-scope gate
+would silently overstate what was actually verified.
+
+## How to score a historical commit
+
+Pass `--scored-commit <sha>` to score against a specific commit's
+manifest entries regardless of what commit is currently checked out --
+useful for demonstrating that the same manifest evidence produces the
+same canonical score independent of the current machine's toolchain (see
+the cross-environment reproducibility tests in
+`tests/quality/test_bys360_canonical_evidence_resolution.py`). Note this
+replays the *manifest evidence* against whatever registry/methodology
+content is currently on disk, not the historical commit's own file tree --
+literally checking out and re-scoring an old commit is not generally
+meaningful for this repository's governance files specifically, since the
+scoring system itself (the registry, the methodology config, this
+calculator) did not exist before it was introduced; there is nothing to
+replay for a commit that predates the files being replayed.
+
 ## Score ceilings
 
 **Evidence-completeness ceiling (89):** applies to the two composites
@@ -337,6 +489,26 @@ Re-run `python scripts/quality/bys360_score_reconcile_v1.py` at any time
 to get the current, live numbers -- the values above are a point-in-time
 worked example, not a fixed constant.
 
+**Canonical evidence example.** The 66/74 above reflects HEAD (`72aeecc`
+at time of writing) scored with the real canonical evidence manifest,
+which currently only contains entries for the earlier commit `9def579`
+(the last commit CI evidence was actually reported for) -- so every
+manifest entry is correctly rejected as stale for `72aeecc`, and canonical
+falls back to local execution everywhere, identically to having no
+manifest at all. Running the same registry/methodology with
+`--scored-commit 9def579247637390b7635c02f606449a2692ef99` (matching the
+manifest's recorded commit) instead produces `LIVE_READINESS = 89`,
+`TRANSFERABILITY = 85` on the *same* machine with the *same* off-pin local
+Ruff -- `ruff_syntax_import_sanity`, `postgres_migration_integrity_gate`,
+`coverage_ratchet`, `dependency_audit`, `ops_audit`, `quality9_gate`, and
+`handover_docs_contract` all resolve to canonical `PASS` via
+`COMMIT_BOUND_REMOTE_VERIFIED` regardless of the local Ruff mismatch,
+while `ruff_full_select` (for which no remote evidence was ever reported)
+stays honestly `UNKNOWN`. `LOCAL_ENVIRONMENT_SCORE_NON_CANONICAL` in that
+same run stays at 66/74 throughout -- proving the 89/85 uplift comes
+entirely from commit-bound canonical evidence, never from the local
+machine quietly getting more lenient.
+
 ## Anti-gaming notes
 
 **Implemented in v1:** the coverage rubric uses combined (line+branch)
@@ -352,7 +524,16 @@ versions must produce the same category scores; gates with an
 `expected_version` are pre-flight version-checked and scored
 `VERSION_MISMATCH` (not PASS) when the installed tool is off-pin, closing
 the gap where simply having *a* copy of a tool on `PATH` -- any version --
-could previously earn full credit.
+could previously earn full credit; CANONICAL_PROJECT_SCORE is resolved
+through commit-bound evidence precedence (see "Evidence precedence"
+above), closing a different, subtler gap where the *same* commit could
+previously score differently depending on which developer's machine
+happened to compute it -- a developer can no longer inflate their own
+canonical score by running on a machine with a stale/lenient toolchain
+(local results only ever count as canonical when deterministically
+correct), nor can a genuinely broken commit's canonical FAIL be
+laundered into a PASS by simply computing it locally on a machine that
+disagrees with CI.
 
 **Known v1 gaps, deferred to v2 (disclosed, not hidden):**
 - Suppression-comment tracking (`# noqa`, `# type: ignore` deltas) is not
