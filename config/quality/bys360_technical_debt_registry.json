@@ -261,23 +261,28 @@
     {
       "id": "TD-CAND-001",
       "title": "Dead shadowed duplicate helper functions in account_visibility_helpers.py",
-      "status": "OPEN",
+      "status": "CLOSED",
       "severity": "P2",
       "severity_reasoning": "Meets this registry's own P2 anchor (TD-CAND-002): a real, currently-contained maintainability gap whose failure mode is specifically 'someone mistakes this for safe-to-delete dead code without realizing the live copy has since evolved,' which is exactly the mechanism that produced TD-008's P1 production break (a prior refactor deleted 'obviously dead' code that turned out to matter). Re-verified 2026-08-19 at HEAD 0d8c8da: both dead copies (462/474) and live copies (838/850, # type: ignore[no-redef]) still present, unchanged line numbers. Read both bodies in full this pass: the live copies are NOT byte-identical to the dead ones -- they added a dedupe pass (_bys360_pf_v14_dedupe_flat_menu_items), broader multi-value form-field matching (form.getlist(...) against {'on','true','1','yes'} vs. the dead copy's single form.get(...) == 'on'), and key-normalization/stripping. This confirms the dead copies are not merely stale but behaviorally inferior, strengthening (not just repeating) the original risk assessment.",
       "category": "Code Quality",
       "component": "app/main_handlers/account_visibility_helpers.py",
       "description": "_collect_form_visible_keys and _apply_visibility_keys_to_user are each defined twice in the same file: a dead copy at lines 462/474 (never reachable, shadowed by the second definition) and a live copy at 838/850 explicitly marked `# type: ignore[no-redef]`. This is exactly the class of duplication that caused the TD-008 role-matrix production bug when a prior refactor deleted 'obviously dead' code that turned out to matter -- removing the dead copy here needs the same care TD-008's forensic work applied, not a quick delete.",
       "evidence": [
-        "app/main_handlers/account_visibility_helpers.py:462,474 (dead)",
-        "app/main_handlers/account_visibility_helpers.py:838,850 (live, # type: ignore[no-redef])",
-        "2026-08-19 re-verification: live bodies read in full and confirmed non-identical to dead bodies (dedupe pass, multi-value form matching, key normalization all absent from the dead copies)"
+        "app/main_handlers/account_visibility_helpers.py:462,474 (dead, now removed)",
+        "app/main_handlers/account_visibility_helpers.py:838,850 (live, # type: ignore[no-redef] now removed as redundant)",
+        "2026-08-19 re-verification: live bodies read in full and confirmed non-identical to dead bodies (dedupe pass, multi-value form matching, key normalization all absent from the dead copies)",
+        "2026-08-19 closure: exhaustive repository-wide reference scan across app/, tests/, scripts/ for both _collect_form_visible_keys and _apply_visibility_keys_to_user found zero call sites, self-references, or dynamic lookups touching the dead copies -- only the __all__ string entries and the account_settings_helpers.py import/call sites, all of which resolve solely to the live binding per standard Python module-execution order",
+        "tests/behavior/test_settings_page_behavior_contract.py: 29 passed, 0 failed, post-removal",
+        "mypy (app config.py wsgi.py run.py scripts tests, --ignore-missing-imports --no-error-summary): 0 errors post-removal, confirming the removed # type: ignore[no-redef] suppressions are genuinely no longer needed",
+        "Ruff full-select (pinned 0.16.0): 0 findings post-removal",
+        "Quality9 gate: ok=true, finding_count=0 post-removal"
       ],
       "introduced_commit": "d8b50c4cc125d5c81c5fe3ffc5850e5db1b5c45e",
       "closure_commit": null,
       "remote_verified": false,
       "created_at": "2026-06-13",
       "updated_at": "2026-08-19",
-      "closure_reason": null,
+      "closure_reason": "Removed unreachable duplicate helper definitions after exhaustive repository reference scan; surviving implementation preserved. closure_commit is intentionally null rather than guessed: a git commit's SHA is a hash of its own content and cannot be known before the commit object exists, and amending an already-made commit to inject it afterward is against this repository's own governance rules -- the exact closing commit is trivially discoverable via `git log -- config/quality/bys360_technical_debt_registry.json` or `git blame` on this entry once committed, which is authoritative and does not need to be duplicated here.",
       "legacy_mapping": {
         "status": "UNCONFIRMED",
         "note": "Present since the 2026-06-13 baseline, so chronologically plausible as a legacy-38 member -- but plausibility is not a match. Discovered via code-duplication forensic search during this registry's authoring, not looked up against any legacy list. No affirmative evidence either way."
@@ -304,7 +309,7 @@
         "can_be_done_independently": true,
         "behavior_quirks_to_preserve": ["none identified -- the live copy is a strict superset of the dead copy's behavior"]
       },
-      "notes": "Re-verified 2026-08-19 (HEAD 0d8c8da) as part of a dedicated active-debt classification wave. Severity promoted from UNCLASSIFIED to P2 with reasoning above; this is the lowest-risk, smallest-effort item of the five and the safest candidate to implement first."
+      "notes": "Re-verified 2026-08-19 (HEAD 0d8c8da) as part of a dedicated active-debt classification wave; severity promoted from UNCLASSIFIED to P2. Closed the same day: confirmed as the lowest-risk item of the five and implemented first, exactly as recommended -- dead pair removed, redundant type:ignore suppressions removed, zero behavior change, full verification suite green."
     },
     {
       "id": "TD-CAND-002",

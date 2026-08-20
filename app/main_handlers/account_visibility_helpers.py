@@ -459,22 +459,6 @@ def _resolve_bulk_profile_keys(profile_key: str, user, grouped_menu_definitions)
     return []
 
 
-def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):
-    UserMenuPermission.query.filter_by(user_id=user.id).delete()
-    for item in flat_menu_items:
-        db.session.add(
-            UserMenuPermission(
-                user_id=user.id,
-                menu_key=item["key"],
-                is_visible=item["key"] in visible_keys,
-                source_type="user_override",
-            )
-        )
-
-def _collect_form_visible_keys(form, flat_menu_items):
-    return {item["key"] for item in flat_menu_items if form.get(f"menu_{item['key']}") == "on"}
-
-
 SETTINGS_ARCHIVE_GROUP_KEY = "settings_template_archive"
 SETTINGS_ARCHIVE_KEY_PREFIX = "settings_archive::"
 
@@ -835,7 +819,7 @@ def _bys360_pf_v14_dedupe_flat_menu_items(items):
     return result
 
 
-def _collect_form_visible_keys(form, flat_menu_items):  # type: ignore[no-redef]
+def _collect_form_visible_keys(form, flat_menu_items):
     visible = set()
     for item in _bys360_pf_v14_dedupe_flat_menu_items(flat_menu_items):
         key = str(item.get("key") or "").strip()
@@ -847,7 +831,7 @@ def _collect_form_visible_keys(form, flat_menu_items):  # type: ignore[no-redef]
     return visible
 
 
-def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):  # type: ignore[no-redef]
+def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):
     UserMenuPermission.query.filter_by(user_id=user.id).delete()
     allowed_items = _bys360_pf_v14_dedupe_flat_menu_items(flat_menu_items)
     visible_keys = {str(key).strip() for key in (visible_keys or set()) if str(key).strip()}
