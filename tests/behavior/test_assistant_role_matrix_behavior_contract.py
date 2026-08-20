@@ -1,43 +1,22 @@
-"""Pre-consolidation behavior contract for TD-CAND-002 (duplicate,
-independently-drifting assistant-role-matrix subsystem):
+"""Canonical behavior contract for TD-CAND-002 (assistant role-matrix
+consolidation): app/services/assistant_role_matrix_service.py.
 
-  - app/main_handlers/account_settings_helpers.py (BYS360_ASSISTANT_ROLE_MATRIX_V12_FIX
-    block, lines 852-1094) -- "settings" implementation. This is the only one of the two
-    with a confirmed live caller: settings_page() (account_settings_helpers.py:192,486,498),
-    routed via /settings.
-  - app/main_handlers/account_communication_helpers.py (BYS360_ASSISTANT_ROLE_MATRIX_SETTINGS_V11
-    block, lines 581-748) -- "communication" implementation. Forensic search this wave
-    (grep for every import of _build_assistant_role_matrix / save_assistant_role_matrix_from_form
-    / reset_assistant_role_matrix_defaults across app/) found no live caller: it is imported
-    and re-exported by account_visibility_helpers.py's __all__, but nothing imports those three
-    specific names from there either. Tested here anyway, directly, so its current contract is
-    still locked before any future consolidation touches it.
+This module used to be the pre-consolidation behavior-lock net for two
+independently-drifting duplicate implementations (account_settings_helpers.py's
+V12 block and account_communication_helpers.py's V11 block). Both have now
+been deleted; this file asserts the single canonical implementation's
+resolved contract, including the two explicit product decisions made during
+consolidation:
 
-This file does NOT fix, unify, or normalize the two implementations. It documents and locks
-CURRENT behavior only, per the TD-CAND-002 behavior-locking wave. Where the two implementations
-differ, both sides get their own explicitly-named test asserting their own current output --
-neither side is treated as "correct".
+  DIV-1 (missing/empty configuration): resolved to "fall back to the 7
+  recommended default roles" -- matching the confirmed-live settings-side
+  behavior (see module docstring in assistant_role_matrix_service.py).
+  An explicit "__none__" sentinel remains distinct and always resolves to
+  an empty role set.
 
-Key forensic correction to the registry's original framing: the literal null-guard line in the
-communication implementation ("if not visible_roles: visible_roles = set()") is inert dead code
-in the CURRENT implementation -- _assistant_visible_roles_from_settings() already always returns
-a set (never None), so the guard never actually fires. The real, verified divergence is in how
-each implementation's OWN _assistant_visible_roles_from_settings() falls back when the raw
-"visible_roles" string it reads is empty (not the same as an exception being raised while
-reading it -- both implementations agree on that case, see the exception-path tests below):
-  - settings:      empty raw string -> falls back to the 7 ASSISTANT_DEFAULT_VISIBLE_ROLES
-  - communication:  empty raw string -> stays an empty set (no fallback)
-
-Separately: app/services/assistant_settings_service.py::get_assistant_settings() (the shared
-data source both implementations call) has ITS OWN independent defaulting layer that currently
-never actually hands back an empty "visible_roles" string in practice (see
-test_*_visible_roles_on_fresh_unconfigured_db_returns_default_seven below) -- so today, with
-the real service, both implementations currently converge on the same 7-role default for a
-never-configured install. The two implementations' own divergent fallback logic is real code,
-correctly locked here via a mocked get_assistant_settings(), but is not currently observable
-end-to-end through the live service. A future change to get_assistant_settings() that starts
-returning a genuinely empty "visible_roles" string would make this divergence immediately
-observable in production -- these tests exist precisely so that day is caught, not surprised by.
+  DIV-2 (error-boundary behavior): a recoverable settings-row *lookup*
+  failure degrades safely (falls through to "create a new row"); a real
+  persistence (commit) failure is never swallowed and always propagates.
 """
 from __future__ import annotations
 
@@ -111,10 +90,10 @@ def _module_setting_value(*, setting_key):
 
 
 def _mock_get_assistant_settings(monkeypatch, payload):
-    """Both implementations do `from app.services.assistant_settings_service import
-    get_assistant_settings` INSIDE their own function bodies (not at module level), so
-    patching the attribute on the source module affects both call sites' next invocation --
-    there is no per-module-cached binding to route around."""
+    """assistant_role_matrix_service does `from app.services.assistant_settings_service
+    import get_assistant_settings` INSIDE its own function body (not at module level),
+    so patching the attribute on the source module affects the next invocation -- there
+    is no per-module-cached binding to route around."""
     monkeypatch.setattr(
         "app.services.assistant_settings_service.get_assistant_settings",
         lambda: payload,
@@ -128,72 +107,38 @@ def _raise_get_assistant_settings(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# A. Shared-constant sanity: both implementations must agree on the role
-# universe for the rest of these tests to be comparing like-for-like.
-# ---------------------------------------------------------------------------
-
-
-def test_role_option_catalog_and_defaults_identical_between_implementations(app):
-    with app.app_context():
-        from app.main_handlers.account_communication_helpers import (
-            ASSISTANT_DEFAULT_VISIBLE_ROLES as communication_defaults,
-            ASSISTANT_POLICY_ROLE_OPTIONS as communication_options,
-        )
-        from app.main_handlers.account_settings_helpers import (
-            ASSISTANT_DEFAULT_VISIBLE_ROLES as settings_defaults,
-            ASSISTANT_POLICY_ROLE_OPTIONS as settings_options,
-        )
-
-        assert settings_options == communication_options
-        assert settings_defaults == communication_defaults
-        assert settings_defaults == {
-            "admin", "baskan", "baskan_yardimcisi", "grup_baskani",
-            "mali_musavir", "koordinator", "birim_sorumlusu",
-        }
-
-
-# ---------------------------------------------------------------------------
-# B. Full-stack, real (unmocked) get_assistant_settings() against a genuinely
+# A. Full-stack, real (unmocked) get_assistant_settings() against a genuinely
 # empty DB -- what a never-configured install actually shows today.
 # ---------------------------------------------------------------------------
 
 
-def test_settings_visible_roles_on_fresh_unconfigured_db_returns_default_seven(app):
+def test_visible_roles_on_fresh_unconfigured_db_returns_default_seven(app):
     with app.app_context():
-        from app.main_handlers.account_settings_helpers import (
+        from app.services.assistant_role_matrix_service import (
             ASSISTANT_DEFAULT_VISIBLE_ROLES,
             _assistant_visible_roles_from_settings,
         )
         assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
 
 
-def test_communication_visible_roles_on_fresh_unconfigured_db_returns_default_seven(app):
+# ---------------------------------------------------------------------------
+# B. DIV-1: canonical contract for missing/empty/exception/explicit-none.
+# ---------------------------------------------------------------------------
+
+
+def test_div1_missing_configuration_falls_back_to_recommended_defaults(app, monkeypatch):
     with app.app_context():
-        from app.main_handlers.account_communication_helpers import (
+        from app.services.assistant_role_matrix_service import (
             ASSISTANT_DEFAULT_VISIBLE_ROLES,
             _assistant_visible_roles_from_settings,
         )
-        # Currently identical to the settings side -- NOT because this
-        # implementation's own fallback fired, but because
-        # assistant_settings_service.get_assistant_settings() never hands back
-        # an empty "visible_roles" string in the first place (it has its own
-        # ASSISTANT_ALLOWED_ROLES fallback upstream). See section C below for
-        # this implementation's OWN fallback behavior in isolation.
+        _mock_get_assistant_settings(monkeypatch, {})  # no "visible_roles" key at all
         assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
 
 
-# ---------------------------------------------------------------------------
-# C. Isolated wrapper-logic behavior: get_assistant_settings() mocked to hand
-# back exactly the payload under test, bypassing its own upstream defaulting,
-# so each implementation's OWN parsing/fallback code is what's on trial.
-# ---------------------------------------------------------------------------
-
-
-def test_settings_role_matrix_current_null_behavior_contract(app, monkeypatch):
-    """Pre-consolidation behavior lock: settings' own fallback DOES trigger on
-    an empty raw visible_roles string."""
+def test_div1_empty_string_configuration_falls_back_to_recommended_defaults(app, monkeypatch):
     with app.app_context():
-        from app.main_handlers.account_settings_helpers import (
+        from app.services.assistant_role_matrix_service import (
             ASSISTANT_DEFAULT_VISIBLE_ROLES,
             _assistant_visible_roles_from_settings,
         )
@@ -201,85 +146,61 @@ def test_settings_role_matrix_current_null_behavior_contract(app, monkeypatch):
         assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
 
 
-def test_communication_role_matrix_current_null_behavior_contract(app, monkeypatch):
-    """Pre-consolidation behavior lock: communication's own fallback does NOT
-    trigger on an empty raw visible_roles string -- this is the actual,
-    currently-real divergence from the settings side (distinct from the
-    dead-code null-guard line noted in the module docstring above)."""
+def test_div1_settings_fetch_exception_falls_back_to_recommended_defaults(app, monkeypatch):
     with app.app_context():
-        from app.main_handlers.account_communication_helpers import (
+        from app.services.assistant_role_matrix_service import (
+            ASSISTANT_DEFAULT_VISIBLE_ROLES,
             _assistant_visible_roles_from_settings,
         )
-        _mock_get_assistant_settings(monkeypatch, {"visible_roles": ""})
+        _raise_get_assistant_settings(monkeypatch)
+        assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
+
+
+def test_div1_explicit_none_sentinel_resolves_to_empty_set_not_defaults(app, monkeypatch):
+    """The mandatory distinction: "__none__" (explicitly saved as zero roles)
+    must NOT be treated the same as "never configured"."""
+    with app.app_context():
+        from app.services.assistant_role_matrix_service import (
+            _assistant_visible_roles_from_settings,
+        )
+        _mock_get_assistant_settings(monkeypatch, {"visible_roles": "__none__"})
         assert _assistant_visible_roles_from_settings() == set()
 
 
-def test_settings_role_matrix_current_exception_behavior_contract(app, monkeypatch):
+def test_div1_populated_roles_returns_exactly_configured_roles(app, monkeypatch):
     with app.app_context():
-        from app.main_handlers.account_settings_helpers import (
-            ASSISTANT_DEFAULT_VISIBLE_ROLES,
+        from app.services.assistant_role_matrix_service import (
             _assistant_visible_roles_from_settings,
         )
-        _raise_get_assistant_settings(monkeypatch)
-        assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
-
-
-def test_communication_role_matrix_current_exception_behavior_contract(app, monkeypatch):
-    """Convergent with the settings side (NOT a divergence): both fall back to
-    the same 7 default roles when the settings fetch itself raises."""
-    with app.app_context():
-        from app.main_handlers.account_communication_helpers import (
-            ASSISTANT_DEFAULT_VISIBLE_ROLES,
-            _assistant_visible_roles_from_settings,
-        )
-        _raise_get_assistant_settings(monkeypatch)
-        assert _assistant_visible_roles_from_settings() == ASSISTANT_DEFAULT_VISIBLE_ROLES
-
-
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_visible_roles_populated_multi_role_via_mock(app, monkeypatch, impl_module):
-    with app.app_context():
-        module = __import__(f"app.main_handlers.{impl_module}", fromlist=["_assistant_visible_roles_from_settings"])
         _mock_get_assistant_settings(monkeypatch, {"visible_roles": "admin,personel"})
-        assert module._assistant_visible_roles_from_settings() == {"admin", "personel"}
+        assert _assistant_visible_roles_from_settings() == {"admin", "personel"}
 
 
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_visible_roles_none_sentinel_via_mock(app, monkeypatch, impl_module):
-    """Both implementations agree: an explicit "__none__" stored value (what
-    save_assistant_role_matrix_from_form persists when zero roles are
-    selected) resolves to an empty visible-roles set, not the default set."""
+def test_visible_roles_normalization(app, monkeypatch):
+    """Whitespace-trimmed, lower-cased, dash-to-underscore, comma/semicolon/
+    newline-separated, blank tokens dropped."""
     with app.app_context():
-        module = __import__(f"app.main_handlers.{impl_module}", fromlist=["_assistant_visible_roles_from_settings"])
-        _mock_get_assistant_settings(monkeypatch, {"visible_roles": "__none__"})
-        assert module._assistant_visible_roles_from_settings() == set()
-
-
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_visible_roles_normalization_via_mock(app, monkeypatch, impl_module):
-    """Locks the shared (identical in both files) normalization behavior:
-    whitespace-trimmed, lower-cased, dash-to-underscore."""
-    with app.app_context():
-        module = __import__(f"app.main_handlers.{impl_module}", fromlist=["_assistant_visible_roles_from_settings"])
+        from app.services.assistant_role_matrix_service import (
+            _assistant_visible_roles_from_settings,
+        )
         _mock_get_assistant_settings(monkeypatch, {"visible_roles": " ADMIN , Baskan-Yardimcisi ,,"})
-        assert module._assistant_visible_roles_from_settings() == {"admin", "baskan_yardimcisi"}
+        assert _assistant_visible_roles_from_settings() == {"admin", "baskan_yardimcisi"}
 
 
 # ---------------------------------------------------------------------------
-# D. _build_assistant_role_matrix() output shape and ordering.
+# C. build_assistant_role_matrix() output shape and ordering.
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_build_role_matrix_output_shape_and_ordering(app, monkeypatch, impl_module):
+def test_build_role_matrix_output_shape_and_ordering(app, monkeypatch):
     with app.app_context():
-        module = __import__(
-            f"app.main_handlers.{impl_module}",
-            fromlist=["_build_assistant_role_matrix", "ASSISTANT_POLICY_ROLE_OPTIONS", "ASSISTANT_DEFAULT_VISIBLE_ROLES"],
+        from app.services.assistant_role_matrix_service import (
+            ASSISTANT_POLICY_ROLE_OPTIONS,
+            build_assistant_role_matrix,
         )
         _mock_get_assistant_settings(monkeypatch, {"visible_roles": "admin,personel"})
 
-        result = module._build_assistant_role_matrix()
+        result = build_assistant_role_matrix()
 
         assert set(result.keys()) == {"roles", "rows", "items", "item_count", "visible_roles"}
         assert result["visible_roles"] == sorted({"admin", "personel"})
@@ -288,7 +209,7 @@ def test_build_role_matrix_output_shape_and_ordering(app, monkeypatch, impl_modu
 
         # role_rows order is deterministic: it follows ASSISTANT_POLICY_ROLE_OPTIONS'
         # fixed declaration order, not sorted() and not visible-first.
-        expected_role_key_order = [role_key for role_key, _label in module.ASSISTANT_POLICY_ROLE_OPTIONS]
+        expected_role_key_order = [role_key for role_key, _label in ASSISTANT_POLICY_ROLE_OPTIONS]
         assert [row["role_key"] for row in result["roles"]] == expected_role_key_order
 
         admin_row = next(row for row in result["roles"] if row["role_key"] == "admin")
@@ -304,65 +225,114 @@ def test_build_role_matrix_output_shape_and_ordering(app, monkeypatch, impl_modu
         assert item["key"] == "assistant_module"
         assert item["visible_count"] == 2  # admin + personel
         assert [state["role_key"] for state in item["states"]] == expected_role_key_order
-        assert {r for r in item["recommended_roles"]}  # non-empty: recommended labels present
+        assert item["recommended_roles"]  # non-empty: recommended labels present
 
 
 # ---------------------------------------------------------------------------
-# E. save_assistant_role_matrix_from_form() -- direct call, real DB, single
-# commit. READ_ONLY: no. Both implementations commit once, after both the
-# "enabled" and "visible_roles" module_settings rows are staged.
+# D. save_assistant_role_matrix_from_form() -- direct call, real DB, single
+# commit. NOT read-only: two upserts, then one db.session.commit().
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_save_role_matrix_persists_selected_roles_and_returns_count(app, impl_module):
+def test_save_role_matrix_persists_selected_roles_and_returns_count(app):
     with app.app_context():
-        module = __import__(f"app.main_handlers.{impl_module}", fromlist=["save_assistant_role_matrix_from_form"])
+        from app.services.assistant_role_matrix_service import save_assistant_role_matrix_from_form
 
         form = {
             "assistant_role_policy__admin__assistant_module": "on",
             "assistant_role_policy__personel__assistant_module": "on",
         }
-        selected_count = module.save_assistant_role_matrix_from_form(form, updated_by_user_id=None)
+        selected_count = save_assistant_role_matrix_from_form(form, updated_by_user_id=None)
 
         assert selected_count == 2
         assert _module_setting_value(setting_key="visible_roles") == "admin,personel"
         assert _module_setting_value(setting_key="enabled") == "true"
 
 
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_save_role_matrix_with_no_roles_selected_persists_none_sentinel(app, impl_module):
+def test_save_role_matrix_with_no_roles_selected_persists_none_sentinel(app):
     with app.app_context():
-        module = __import__(f"app.main_handlers.{impl_module}", fromlist=["save_assistant_role_matrix_from_form"])
+        from app.services.assistant_role_matrix_service import save_assistant_role_matrix_from_form
 
-        selected_count = module.save_assistant_role_matrix_from_form({}, updated_by_user_id=None)
+        selected_count = save_assistant_role_matrix_from_form({}, updated_by_user_id=None)
 
         assert selected_count == 0
         assert _module_setting_value(setting_key="visible_roles") == "__none__"
 
 
 # ---------------------------------------------------------------------------
-# F. reset_assistant_role_matrix_defaults() -- direct call, real DB.
+# E. reset_assistant_role_matrix_defaults() -- direct call, real DB.
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("impl_module", ["account_settings_helpers", "account_communication_helpers"])
-def test_reset_role_matrix_persists_and_returns_default_roles(app, impl_module):
+def test_reset_role_matrix_persists_and_returns_default_roles(app):
     with app.app_context():
-        module = __import__(
-            f"app.main_handlers.{impl_module}",
-            fromlist=["reset_assistant_role_matrix_defaults", "save_assistant_role_matrix_from_form", "ASSISTANT_DEFAULT_VISIBLE_ROLES"],
+        from app.services.assistant_role_matrix_service import (
+            ASSISTANT_DEFAULT_VISIBLE_ROLES,
+            reset_assistant_role_matrix_defaults,
+            save_assistant_role_matrix_from_form,
         )
 
         # Move it away from the default first so the reset is a real assertion.
-        module.save_assistant_role_matrix_from_form(
+        save_assistant_role_matrix_from_form(
             {"assistant_role_policy__personel__assistant_module": "on"}, updated_by_user_id=None,
         )
         assert _module_setting_value(setting_key="visible_roles") == "personel"
 
-        returned_count = module.reset_assistant_role_matrix_defaults(updated_by_user_id=None)
+        returned_count = reset_assistant_role_matrix_defaults(updated_by_user_id=None)
 
-        assert returned_count == len(module.ASSISTANT_DEFAULT_VISIBLE_ROLES) == 7
+        assert returned_count == len(ASSISTANT_DEFAULT_VISIBLE_ROLES) == 7
         restored = set((_module_setting_value(setting_key="visible_roles") or "").split(","))
-        assert restored == module.ASSISTANT_DEFAULT_VISIBLE_ROLES
+        assert restored == ASSISTANT_DEFAULT_VISIBLE_ROLES
         assert _module_setting_value(setting_key="enabled") == "true"
+
+
+# ---------------------------------------------------------------------------
+# F. DIV-2: error-boundary behavior. A recoverable *lookup* failure degrades
+# safely; a real *persistence* (commit) failure is never swallowed.
+# ---------------------------------------------------------------------------
+
+
+def test_div2_recoverable_lookup_failure_falls_back_to_safe_create_no_exception(app, monkeypatch):
+    """If the existing-row lookup query itself raises (e.g. a transient
+    connection hiccup), the upsert must not blow up the caller -- it treats
+    the row as not-found and creates a fresh one, and the save still
+    succeeds end to end."""
+    with app.app_context():
+        from app.models import ModuleSetting
+        from app.services.assistant_role_matrix_service import save_assistant_role_matrix_from_form
+
+        original_filter_by = ModuleSetting.query.__class__.filter_by
+        call_count = {"n": 0}
+
+        def _flaky_filter_by(self, *args, **kwargs):
+            call_count["n"] += 1
+            if call_count["n"] == 1:
+                raise RuntimeError("simulated transient lookup failure")
+            return original_filter_by(self, *args, **kwargs)
+
+        monkeypatch.setattr(ModuleSetting.query.__class__, "filter_by", _flaky_filter_by)
+
+        selected_count = save_assistant_role_matrix_from_form(
+            {"assistant_role_policy__admin__assistant_module": "on"}, updated_by_user_id=None,
+        )
+
+        assert selected_count == 1
+        assert _module_setting_value(setting_key="visible_roles") == "admin"
+
+
+def test_div2_real_persistence_failure_is_not_swallowed(app, monkeypatch):
+    """A genuine commit failure (real persistence failure) must propagate --
+    it must never be silently treated as a successful save."""
+    with app.app_context():
+        from app.extensions import db
+        from app.services.assistant_role_matrix_service import save_assistant_role_matrix_from_form
+
+        def _raise_on_commit():
+            raise RuntimeError("simulated persistence failure")
+
+        monkeypatch.setattr(db.session, "commit", _raise_on_commit)
+
+        with pytest.raises(RuntimeError, match="simulated persistence failure"):
+            save_assistant_role_matrix_from_form(
+                {"assistant_role_policy__admin__assistant_module": "on"}, updated_by_user_id=None,
+            )

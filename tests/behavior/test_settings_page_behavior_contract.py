@@ -962,7 +962,7 @@ def test_save_assistant_role_matrix_success_updates_visible_roles(app, client):
 
 
 def test_reset_assistant_role_matrix_restores_default_roles(app, client):
-    from app.main_handlers.account_settings_helpers import ASSISTANT_DEFAULT_VISIBLE_ROLES
+    from app.services.assistant_role_matrix_service import ASSISTANT_DEFAULT_VISIBLE_ROLES
 
     _create_user(app, sicil_no="sb111", email="sb111@ktb.gov.tr", role="admin")
     _login(client, "sb111")

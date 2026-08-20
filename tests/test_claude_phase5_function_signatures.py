@@ -23,7 +23,7 @@ EXPECTED_FUNCTIONS = {
     "build_category_average_summary_for_users": {"period_id"},
     "build_phase10_report_context": {"viewer"},
     "build_evaluation_flow_status": set(),
-    "_build_assistant_role_matrix": set(),
+    "build_assistant_role_matrix": set(),
 }
 
 
