@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -1266,3 +1267,105 @@ def test_api_key_like_value_triggers_red(tmp_path: Path) -> None:
         for f in result["findings"]
     )
     assert realistic_key not in json.dumps(result)
+
+
+# --- TD-CAND-007 closure: warning_count must be the TRUE total match count,
+# never silently frozen at the report's display-readability cap. The old
+# add_warning(limit=80) stopped recording warnings past the 80th one and then
+# reported len(warnings) (already capped at <=80) as "warning_count" -- so
+# once a repository's genuine match count grew past 80 (which this repo's
+# has, well past it), the reported number could never again reflect reality,
+# creating the appearance of "drift" over time as it silently masked
+# whatever the true count actually was. The fix separates the two concerns:
+# warning_count is always len(all recorded warnings); only the *displayed*
+# "warnings" list in the report is truncated, with an explicit marker
+# entry stating the true total. ---
+
+
+def test_warning_count_reports_true_total_not_capped_at_display_limit(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    lines = "\n".join(f'SECRET_KEY = "changeme"  # line {i}' for i in range(85))
+    (repo / "many_placeholders.py").write_text(lines + "\n", encoding="utf-8")
+    _git(["add", "-f", "many_placeholders.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert result["warning_count"] == 85  # true total, not the old hardcoded 80 cap
+    assert len(result["warnings"]) == 81  # 80 displayed details + 1 truncation marker
+    marker = result["warnings"][-1]
+    assert marker["type"] == "warning_output_truncated"
+    assert "85" in marker["detail"]
+
+
+def test_warning_count_at_or_below_display_limit_has_no_truncation_marker(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    lines = "\n".join(f'SECRET_KEY = "changeme"  # line {i}' for i in range(5))
+    (repo / "few_placeholders.py").write_text(lines + "\n", encoding="utf-8")
+    _git(["add", "-f", "few_placeholders.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["warning_count"] == 5
+    assert len(result["warnings"]) == 5
+    assert not any(w["type"] == "warning_output_truncated" for w in result["warnings"])
+
+
+def test_repeated_scan_is_semantically_deterministic(tmp_path: Path) -> None:
+    """Given a fixed working tree, 10 repeated invocations of run() must
+    produce byte-identical findings/warnings content and counts -- not just
+    a stable count. This is the direct regression lock for TD-CAND-007."""
+    repo = _init_repo(tmp_path)
+    (repo / "a.py").write_text('SECRET_KEY = "changeme"\n', encoding="utf-8")
+    (repo / "b.py").write_text('DATABASE_URL = "postgresql://user:pass@db/x"\n', encoding="utf-8")
+    (repo / "c.env.example").write_text("API_KEY=\n", encoding="utf-8")
+    _git(["add", "-f", "a.py", "b.py", "c.env.example"], repo)
+    _commit(repo)
+
+    results = [run(repo) for _ in range(10)]
+
+    first = results[0]
+    for other in results[1:]:
+        assert other["finding_count"] == first["finding_count"]
+        assert other["warning_count"] == first["warning_count"]
+        assert other["findings"] == first["findings"]
+        assert other["warnings"] == first["warnings"]
+
+
+def test_scan_result_independent_of_git_add_commit_order(tmp_path: Path) -> None:
+    """The candidate list is derived from `git ls-files` (which returns
+    paths in stable sorted order regardless of add/commit order), so the
+    semantic scan result must not depend on the order files were staged."""
+    files = {
+        "alpha.py": 'SECRET_KEY = "changeme"\n',
+        "middle.py": 'PASSWORD = "changeme"\n',
+        "zeta.py": 'TOKEN = "changeme"\n',
+    }
+
+    forward_dir = tmp_path / "forward"
+    forward_dir.mkdir()
+    repo_forward = _init_repo(forward_dir)
+    for name in ("alpha.py", "middle.py", "zeta.py"):
+        (repo_forward / name).write_text(files[name], encoding="utf-8")
+        _git(["add", "-f", name], repo_forward)
+    _commit(repo_forward)
+
+    reverse_dir = tmp_path / "reverse"
+    reverse_dir.mkdir()
+    repo_reverse = _init_repo(reverse_dir)
+    for name in ("zeta.py", "middle.py", "alpha.py"):
+        (repo_reverse / name).write_text(files[name], encoding="utf-8")
+        _git(["add", "-f", name], repo_reverse)
+    _commit(repo_reverse)
+
+    result_forward = run(repo_forward)
+    result_reverse = run(repo_reverse)
+
+    def _semantic_set(result: dict[str, Any]) -> set[tuple[object, object, object]]:
+        return {(w["type"], w["path"], w["line"]) for w in result["warnings"]}
+
+    assert result_forward["warning_count"] == result_reverse["warning_count"] == 3
+    assert _semantic_set(result_forward) == _semantic_set(result_reverse)

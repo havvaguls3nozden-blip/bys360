@@ -320,9 +320,14 @@ def looks_regex_or_scanner(line: str, path: Path) -> bool:
     return any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS)
 
 
-def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any], limit: int = 80) -> None:
-    if len(warnings) < limit:
-        warnings.append(item)
+def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any]) -> None:
+    """Always records the warning. Report-readability truncation (if any) is
+    applied once, at serialization time in run() -- see TD-CAND-007: this
+    function used to silently cap at 80 entries here, which froze the
+    reported warning_count at exactly 80 forever once the true match count
+    grew past that threshold, masking the real (and fully reproducible,
+    given a fixed working tree) total instead of reporting it."""
+    warnings.append(item)
 
 
 def strip_inline_comment(value: str) -> str:
@@ -559,14 +564,24 @@ def run(root: Path) -> dict[str, Any]:
     for path in candidates.values():
         scan_file(path, root, findings, warnings)
 
+    # TD-CAND-007: warning_count must always be the TRUE total match count,
+    # fully reproducible given a fixed working tree (see bys360_secret_repo_gate
+    # tests: test_warning_count_reports_true_total_not_display_cap). Only the
+    # DISPLAYED warning list (report readability) is truncated -- the count
+    # itself is never capped, so it can no longer silently freeze at the old
+    # 80-item display limit once the true match count grows past it.
     warning_count_real = len(warnings)
-    if warning_count_real >= 80:
-        warnings.append({
+    display_limit = 80
+    if warning_count_real > display_limit:
+        displayed_warnings = warnings[:display_limit]
+        displayed_warnings.append({
             "type": "warning_output_truncated",
             "path": "-",
             "line": 0,
-            "detail": f"Uyarı listesi rapor okunabilirliği için 80 kayıtla sınırlandı. Toplam uyarı: {warning_count_real}",
+            "detail": f"Uyarı listesi rapor okunabilirliği için {display_limit} kayıtla sınırlandı. Toplam uyarı: {warning_count_real}",
         })
+    else:
+        displayed_warnings = warnings
 
     reports_dir = root / "reports" / "quality"
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -587,7 +602,7 @@ def run(root: Path) -> dict[str, Any]:
             "skipped_ignored_file_count": _count_ignored_files_best_effort(root),
         },
         "findings": findings,
-        "warnings": warnings[:81],
+        "warnings": displayed_warnings,
         "report": str(report_path),
         "next_actions": [
             "finding_count 0 ise P0 güvenlik/repo hijyen gate tamamlanmış kabul edilebilir.",
