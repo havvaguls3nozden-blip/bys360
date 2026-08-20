@@ -222,12 +222,21 @@ def _save_portal_video_file(post: PortalPost, files) -> None:
         flash("Video paylaşımınıza eklendi.", "success")
 
 
+def _host_matches_domain(host: str, domain: str) -> bool:
+    """Exact eşleşme veya nokta sınırlı alt alan adı eşleşmesi.
+
+    `str.endswith(domain)` yanlış pozitif üretir: "notyoutube.com" da
+    "youtube.com" ile biter ama onun alt alan adı değildir.
+    """
+    return host == domain or host.endswith(f".{domain}")
+
+
 def _youtube_video_id(parsed_url) -> str:
     host = (parsed_url.netloc or "").lower().replace("www.", "")
     path = (parsed_url.path or "").strip("/")
     if host == "youtu.be":
         return path.split("/", 1)[0]
-    if host.endswith("youtube.com") or host.endswith("youtube-nocookie.com"):
+    if _host_matches_domain(host, "youtube.com") or _host_matches_domain(host, "youtube-nocookie.com"):
         if path.startswith("embed/"):
             return path.split("/", 1)[1].split("/", 1)[0]
         if path.startswith("shorts/"):
@@ -245,12 +254,12 @@ def _portal_video_embed_url(raw_url: str) -> str:
     if parsed.scheme not in {"http", "https"}:
         return ""
     host = (parsed.netloc or "").lower().replace("www.", "")
-    if host == "youtu.be" or host.endswith("youtube.com") or host.endswith("youtube-nocookie.com"):
+    if host == "youtu.be" or _host_matches_domain(host, "youtube.com") or _host_matches_domain(host, "youtube-nocookie.com"):
         video_id = _youtube_video_id(parsed)
         if re.fullmatch(r"[A-Za-z0-9_-]{6,32}", video_id or ""):
             return f"https://www.youtube-nocookie.com/embed/{video_id}"
         return ""
-    if host.endswith("vimeo.com"):
+    if _host_matches_domain(host, "vimeo.com"):
         match = re.search(r"/(?:video/)?([0-9]{5,20})", parsed.path or "")
         if match:
             return f"https://player.vimeo.com/video/{match.group(1)}"

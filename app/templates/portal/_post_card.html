@@ -122,7 +122,7 @@
       {% endif %}
         {% if attachment.mime_type == 'text/x-portal-video' %}
           <div class="portal-video-frame">
-            <iframe src="{{ attachment.stored_path }}" title="Portal video paylaşımı" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="{{ attachment.stored_path }}" title="Portal video paylaşımı" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
           </div>
         {% elif attachment.mime_type and attachment.mime_type.startswith('video/') %}
           <div class="portal-native-video-frame" aria-label="Yüklenen portal videosu">

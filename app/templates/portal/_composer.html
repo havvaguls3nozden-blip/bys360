@@ -1,7 +1,7 @@
 {# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_BEGIN #}
 <section class="portal-card portal-composer-card portal-composer-accordion portal-v2c-composer" aria-label="Yeni portal paylaşımı" data-portal-composer-accordion>
   <details class="portal-composer-details" data-portal-composer-details>
-    <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat">
+    <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat. Fotoğraf, video dosyası veya YouTube/Vimeo video bağlantısı da ekleyebilirsiniz.">
       <div class="portal-composer-summary-left">
         <div class="portal-avatar portal-avatar-ring">
           {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
@@ -10,6 +10,7 @@
           <span class="portal-kicker"><i class="fa-solid fa-pen-nib"></i> Paylaşım</span>
           <h2>Ne paylaşmak istersiniz?</h2>
           <p>Duyuru, bilgilendirme, teşekkür, iyi uygulama veya etkinlik notu paylaşabilirsiniz.</p>
+          <span class="portal-badge soft"><i class="fa-brands fa-youtube"></i> Video bağlantısı ekleyebilirsiniz</span>
         </div>
       </div>
       <span class="portal-composer-summary-action"><i class="fa-solid fa-plus"></i> Paylaş</span>
