@@ -459,31 +459,41 @@
     },
     {
       "id": "TD-CAND-006",
-      "title": "TODO: missing DB index/partition, blocked on migration",
-      "status": "OPEN",
+      "title": "TODO: missing DB index/partition, blocked on migration -- investigated and closed: indexing concern already resolved",
+      "status": "CLOSED",
       "severity": "P3",
       "severity_reasoning": "Single-line, explicitly documented as blocked on a decision (not silently rotting), no behavioral risk today -- meets the P3 bar cleanly, one of the few items in this registry with an unambiguous tier. Re-verified 2026-08-19 at HEAD 0d8c8da: TODO comment still present at the exact same line (451), exact same wording; a repo-wide TODO/FIXME/HACK re-sweep of app/ confirmed no new markers were introduced and the two other regex matches found (app/services/ai_decision/scorecard_ui_policy.py, app/services/performance/feedback_corporate_cleanup_phase6.py) are pattern-definition literals (code that searches *for* the word TODO in other content), not actual TODO comments -- confirmed false positives, not new debt.",
       "category": "Maintainability",
       "component": "app/performance/task_routes.py",
-      "description": "app/performance/task_routes.py:451 -- '# TODO: index + partition lazim ama migration bekliyor.' A performance improvement is known and blocked on a migration that has not been written.",
+      "description": "app/performance/task_routes.py:451 was a dangling module-level comment '# TODO: index + partition lazim ama migration bekliyor', not textually attached to any function or query. Forensic investigation (3-agent, cross-verified) traced the only plausible target -- clear_period_task_records()'s single-predicate period_id/evaluation_id filters against PerformanceEvaluation, PerformanceEvaluationItem, EvaluationAssignment, and AssignmentCoverageLog -- and found every one of those columns already indexed. No migration or partitioning was actually needed; the comment was stale, not a real blocker.",
       "evidence": [
-        "app/performance/task_routes.py:451",
-        "2026-08-19 re-verification: still the only genuine TODO/FIXME/HACK marker in app/; 2 other regex hits confirmed false positives (pattern-definition code, not comments)"
+        "app/performance/task_routes.py:451 (comment location before removal)",
+        "app/services/performance/task_management_service.py:800-813, clear_period_task_records() -- the only function plausibly implicated by the comment; an admin-gated (@admin_required), manually-triggered bulk-delete operation, not a hot path. All 4 of its filter/delete queries are single-predicate (one WHERE column each).",
+        "app/models/performance_models.py:209 -- PerformanceEvaluation.period_id, index=True",
+        "app/models/performance_models.py:304 -- PerformanceEvaluationItem.evaluation_id, index=True",
+        "app/models/performance_models.py:351 -- EvaluationAssignment.period_id, index=True",
+        "app/models/performance_models.py:405 -- AssignmentCoverageLog.period_id, index=True",
+        "migrations/versions/b4c2d1e9f005_add_phase5_indexes.py -- adds composite indexes covering performance_evaluations(period_id,...), performance_evaluation_items(evaluation_id,...), evaluation_assignments(period_id,...); confirmed ancestor of Alembic head e0efcd07abf7 via full down_revision-chain traversal of all 74 migration files",
+        "migrations/versions/e6b7d4c2f107_add_assignment_coverage_logs.py -- adds single-column index ix_assignment_coverage_logs_period_id on assignment_coverage_logs.period_id; sufficient because the only query against this table (clear_period_task_records) filters on period_id alone, single-predicate, no benefit from a composite index; confirmed ancestor of head",
+        "Repo-wide grep for 'partition' (case-insensitive, across app/, scripts/, migrations/, docs/, reports/) found zero substantive hits beyond this TODO and unrelated str.partition()/str.rpartition() calls -- no partitioning precedent, no production slow-query evidence, no complaint anywhere in the repository",
+        "scripts/quality/bys360_postgres_migration_integrity_gate.py inspected: proves the migration graph has one head and applies cleanly to a real Postgres 15 DB, but does not introspect per-table indexes -- confirms no migration-side proof of index coverage existed before this wave's new test",
+        "tests/quality/test_td_cand_006_period_evaluation_index_coverage_contract.py (new, this wave) -- static SQLAlchemy-metadata regression lock: asserts index=True on all 4 relevant columns, and asserts the stale TODO text is gone from task_routes.py; would fail if any of the 4 indexes were ever dropped"
       ],
       "introduced_commit": null,
       "closure_commit": null,
       "remote_verified": false,
       "created_at": null,
-      "updated_at": "2026-08-19",
-      "closure_reason": null,
+      "updated_at": "2026-08-21",
+      "closure_reason": "Closed after a 3-agent, cross-verified forensic investigation (not a literal satisfaction of the original closure_criteria, which assumed a migration was needed -- that assumption was disproven, not fulfilled). The TODO comment was a dangling, module-level line with no query it was textually attached to. The only plausible candidate -- clear_period_task_records(), an admin-gated, manually-triggered bulk-delete, not a hot path -- has 4 single-predicate filter/delete queries, and every column those queries touch already carries adequate index coverage: 3 tables (performance_evaluations, performance_evaluation_items, evaluation_assignments) via composite indexes from migration b4c2d1e9f005 ('add phase5 indexes'); the 4th (assignment_coverage_logs) via a single-column index from migration e6b7d4c2f107, sufficient because its query is single-predicate (a composite index would add zero benefit). Both migrations independently confirmed as ancestors of the current Alembic head (e0efcd07abf7) via a full down_revision-chain traversal of all 74 migration files -- not assumed, traced. No partitioning precedent exists anywhere in this repository's ~75 migrations, and no production evidence (slow-query logs, documented complaints) anywhere supports adding one speculatively. Writing a new migration here would have been unjustified, speculative optimization against an already-adequately-indexed, non-hot-path operation -- the opposite of a minimal, evidence-based fix. Closure action taken: (1) removed the stale comment from app/performance/task_routes.py, (2) added tests/quality/test_td_cand_006_period_evaluation_index_coverage_contract.py, a static regression-lock test with 0 DB/network dependency that fails if any of the 4 relevant indexes is ever dropped or the stale comment text ever reappears, (3) corrected this registry record's closure_criteria to reflect what was actually found rather than leaving factually-superseded wording in place. No migration was written -- this is the correct outcome, not a shortcut: the original 'migration needed' premise was itself unverified when the item was first triaged, and this wave supplied the verification. closure_commit is intentionally null rather than guessed, per this registry's established policy (see TD-CAND-001/002/003/007): a commit's SHA cannot be known before the commit object exists. remote_verified remains false: this closure has not yet been pushed or remotely CI-attested at the time of this registry edit.",
       "legacy_mapping": {
         "status": "UNCONFIRMED",
-        "note": "Found via a repo-wide TODO/FIXME/HACK grep sweep, not via legacy-list lookup. No dating evidence."
+        "note": "Found via a repo-wide TODO/FIXME/HACK grep sweep, not via legacy-list lookup. No dating evidence. Closure does not change this classification."
       },
       "closure_criteria": [
-        "The blocking migration (DB index/partition) is written, reviewed, and merged.",
-        "The performance query at task_routes.py:451 updated to use the new index/partition where applicable.",
-        "The TODO comment removed once the underlying work is actually complete (not removed as a documentation-only edit)."
+        "SUPERSEDED (original wording assumed a migration was needed -- disproven, not satisfied): 'The blocking migration (DB index/partition) is written, reviewed, and merged.'",
+        "ACTUAL CRITERION MET: Forensic investigation proved the indexing concern the TODO described was already resolved by pre-existing migrations (b4c2d1e9f005, e6b7d4c2f107), both confirmed ancestors of the current Alembic head -- no new migration required.",
+        "ACTUAL CRITERION MET: The TODO comment removed from app/performance/task_routes.py:451 only after the underlying concern was verified resolved, not as a documentation-only edit.",
+        "ACTUAL CRITERION MET: A regression-lock test (tests/quality/test_td_cand_006_period_evaluation_index_coverage_contract.py) added, asserting the 4 relevant columns remain indexed and the stale comment text does not reappear."
       ],
       "priority_metadata": {
         "production_risk": "LOW",
@@ -495,15 +505,13 @@
         "transferability_impact": "LOW",
         "test_protection": "MEDIUM",
         "effort": "M",
-        "depends_on": [
-          "a new Alembic migration (not yet written)"
-        ],
+        "depends_on": [],
         "blocks": [],
         "related_debts": [],
-        "can_be_done_independently": false,
+        "can_be_done_independently": true,
         "behavior_quirks_to_preserve": []
       },
-      "notes": "Only TODO/FIXME/HACK marker found in app/ repo-wide, re-confirmed 2026-08-19. Explicitly blocked on external work (the migration), so this is not a good NEXT_RECOMMENDED_DEBT candidate despite its clean P3 tier -- it cannot be started independently."
+      "notes": "Closed 2026-08-21 after investigation proved the original 'blocked on a migration' premise was itself unverified -- the indexing concern was already resolved by pre-existing migrations b4c2d1e9f005 and e6b7d4c2f107, both confirmed ancestors of the current Alembic head. No migration was written; writing one would have been speculative optimization with zero production justification against an already-adequately-indexed, non-hot-path admin operation. See closure_reason for full evidence chain."
     },
     {
       "id": "TD-CAND-007",

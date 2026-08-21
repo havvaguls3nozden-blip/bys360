@@ -446,6 +446,3 @@ def performance_task_management_clear(period_id):
         flash(f"Görevler temizlenirken hata oluştu: {exc}", "danger")
 
     return redirect(url_for("main.performance_task_management", period_id=period.id, scope=selected_scope or None))
-
-
-# TODO: index + partition lazım ama migration bekliyor.
