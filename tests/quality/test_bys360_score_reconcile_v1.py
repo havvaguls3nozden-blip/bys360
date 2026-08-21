@@ -235,6 +235,84 @@ def test_no_ceiling_when_fully_verified_and_fully_reconciled(tmp_path):
     assert report["evidence_completeness_ceiling_applied"] is False
 
 
+# ---------------------------------------------------------------------------
+# BYS360-GOV-LEGACY-001: HISTORICAL_UNRECONSTRUCTABLE reconciliation state.
+# ---------------------------------------------------------------------------
+
+
+def test_ceiling_still_applies_for_historical_unreconstructable(tmp_path):
+    """Anti-gaming: the new state must not be treated as reconciled for ceiling purposes,
+    even when every gate is fully verified."""
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[], reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE")
+    evidence = _all_gates_pass_evidence()
+    report = compute_report(methodology, registry, tmp_path, evidence)
+    assert report["fully_verified"] is True
+    assert report["evidence_completeness_ceiling_applied"] is True
+    assert report["LIVE_READINESS"]["ceiling_applied_value"] <= 89
+    assert report["TRANSFERABILITY"]["ceiling_applied_value"] <= 89
+
+
+def test_historical_unreconstructable_is_not_treated_as_fully_reconciled(tmp_path):
+    """HISTORICAL_UNRECONSTRUCTABLE must produce a strictly lower ceiling outcome than
+    FULLY_RECONCILED -- it is not a backdoor synonym for full reconciliation."""
+    methodology = _fixture_methodology()
+    evidence = _all_gates_pass_evidence()
+    historical_report = compute_report(
+        methodology, _fixture_registry(items=[], reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE"),
+        tmp_path, evidence,
+    )
+    fully_report = compute_report(
+        methodology, _fixture_registry(items=[], reconciliation_status="FULLY_RECONCILED"),
+        tmp_path, evidence,
+    )
+    assert historical_report["evidence_completeness_ceiling_applied"] is True
+    assert fully_report["evidence_completeness_ceiling_applied"] is False
+    assert historical_report["LIVE_READINESS"]["final"] <= fully_report["LIVE_READINESS"]["final"]
+
+
+def test_historical_unreconstructable_documentation_handover_matches_partial_not_full(tmp_path):
+    """The Documentation-Handover reconciliation-transparency rubric must give
+    HISTORICAL_UNRECONSTRUCTABLE-with-note the same credit as PARTIALLY_RECONCILED-with-note
+    (0.5x), and strictly less than FULLY_RECONCILED (1.0x). Must not silently become 100."""
+    methodology = _fixture_methodology()
+    evidence = _all_gates_pass_evidence()
+
+    partial_report = compute_report(
+        methodology, _fixture_registry(items=[], reconciliation_status="PARTIALLY_RECONCILED"),
+        tmp_path, evidence,
+    )
+    historical_report = compute_report(
+        methodology, _fixture_registry(items=[], reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE"),
+        tmp_path, evidence,
+    )
+    full_report = compute_report(
+        methodology, _fixture_registry(items=[], reconciliation_status="FULLY_RECONCILED"),
+        tmp_path, evidence,
+    )
+
+    partial_doc = partial_report["category_scores"]["Documentation-Handover"]["final_score"]
+    historical_doc = historical_report["category_scores"]["Documentation-Handover"]["final_score"]
+    full_doc = full_report["category_scores"]["Documentation-Handover"]["final_score"]
+
+    assert historical_doc == partial_doc
+    assert historical_doc < full_doc
+    assert full_doc == pytest.approx(100.0)
+
+
+def test_historical_unreconstructable_without_note_gets_zero_reconciliation_credit(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[], reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE")
+    registry["reconciliation_note"] = ""  # no documented note
+    evidence = _all_gates_pass_evidence()
+    report = compute_report(methodology, registry, tmp_path, evidence)
+    doc_rubric = next(
+        r for r in report["category_scores"]["Documentation-Handover"]["rubric_contributions"]
+        if r["name"] == "registry_reconciliation_transparency"
+    )
+    assert doc_rubric["points_awarded"] == 0.0
+
+
 def test_legacy_snapshot_never_mutated_by_calculation(tmp_path):
     methodology = _fixture_methodology()
     registry = _fixture_registry(items=[

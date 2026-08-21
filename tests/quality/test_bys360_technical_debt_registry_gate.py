@@ -6,7 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from scripts.quality.bys360_technical_debt_registry_gate import validate_registry
+from scripts.quality.bys360_technical_debt_registry_gate import (
+    GOV_LEGACY_001_DECISION_ID,
+    validate_registry,
+)
 
 pytestmark = pytest.mark.ci_safe
 
@@ -301,6 +304,121 @@ def test_legacy_ledger_never_overwritten_by_registry_derived_counts():
     assert result.legacy_counts["LEGACY_P3"] == 21
     assert result.legacy_counts["LEGACY_OPEN_TOTAL"] == 38
     assert result.legacy_counts["LEGACY_OPEN_TOTAL"] != result.registry_counts["REGISTRY_TOTAL"]
+
+
+# ---------------------------------------------------------------------------
+# BYS360-GOV-LEGACY-001: HISTORICAL_UNRECONSTRUCTABLE reconciliation state.
+# ---------------------------------------------------------------------------
+
+
+def _valid_gov_decision(**overrides):
+    decision = {
+        "decision_id": GOV_LEGACY_001_DECISION_ID,
+        "decision_status": "APPROVED",
+        "preserved_legacy_total": 38,
+        "preserved_legacy_priority_split": {"P0": 0, "P1": 0, "P2": 17, "P3": 21},
+    }
+    decision.update(overrides)
+    return decision
+
+
+def test_historical_unreconstructable_accepted_with_valid_decision_metadata():
+    registry = _minimal_valid_registry(
+        reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE",
+        reconciliation_governance_decision=_valid_gov_decision(),
+    )
+    result = validate_registry(registry)
+    assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
+    assert result.findings == []
+
+
+def test_historical_unreconstructable_rejected_without_decision_metadata():
+    """Bare manual status flip with no governance-decision object at all must fail."""
+    registry = _minimal_valid_registry(reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE")
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "historical_unreconstructable_missing_decision" for f in result.findings)
+
+
+def test_historical_unreconstructable_rejected_with_wrong_decision_id():
+    registry = _minimal_valid_registry(
+        reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE",
+        reconciliation_governance_decision=_valid_gov_decision(decision_id="SOME-OTHER-DECISION"),
+    )
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "historical_unreconstructable_wrong_decision_id" for f in result.findings)
+
+
+def test_historical_unreconstructable_rejected_when_not_approved():
+    registry = _minimal_valid_registry(
+        reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE",
+        reconciliation_governance_decision=_valid_gov_decision(decision_status="PROPOSED_NOT_APPROVED"),
+    )
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "historical_unreconstructable_not_approved" for f in result.findings)
+
+
+def test_historical_unreconstructable_rejected_when_preserved_total_drifts():
+    """Anti-gaming: the historical 38 cannot be silently changed while riding this decision."""
+    registry = _minimal_valid_registry(
+        reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE",
+        reconciliation_governance_decision=_valid_gov_decision(preserved_legacy_total=0),
+    )
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "historical_unreconstructable_total_drift" for f in result.findings)
+
+
+def test_historical_unreconstructable_rejected_when_preserved_split_drifts():
+    """Anti-gaming: the historical P2/P3 split cannot be silently changed while riding this decision."""
+    registry = _minimal_valid_registry(
+        reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE",
+        reconciliation_governance_decision=_valid_gov_decision(
+            preserved_legacy_priority_split={"P0": 0, "P1": 0, "P2": 0, "P3": 0}
+        ),
+    )
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "historical_unreconstructable_split_drift" for f in result.findings)
+
+
+def test_unknown_reconciliation_status_still_rejected_after_adding_new_state():
+    """Adding HISTORICAL_UNRECONSTRUCTABLE must not accidentally widen the enum to 'anything'."""
+    registry = _minimal_valid_registry(reconciliation_status="SOME_MADE_UP_STATUS")
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "invalid_reconciliation_status" for f in result.findings)
+
+
+def test_fully_reconciled_semantics_unweakened_by_new_state():
+    """FULLY_RECONCILED still requires UNMAPPED_LEGACY_OPEN_COUNT == 0 -- HISTORICAL_UNRECONSTRUCTABLE
+    is not a backdoor to a weaker FULLY_RECONCILED."""
+    registry = _minimal_valid_registry(reconciliation_status="FULLY_RECONCILED")
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "reconciliation_status_inconsistent" for f in result.findings)
+
+
+def test_canonical_registry_now_uses_historical_unreconstructable_with_valid_decision():
+    """End-to-end: the real, currently-committed registry reflects the approved
+    BYS360-GOV-LEGACY-001 decision and validates cleanly."""
+    registry = json.loads(CANONICAL_REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert registry["reconciliation_status"] == "HISTORICAL_UNRECONSTRUCTABLE"
+    decision = registry["reconciliation_governance_decision"]
+    assert decision["decision_id"] == GOV_LEGACY_001_DECISION_ID
+    assert decision["decision_status"] == "APPROVED"
+    assert decision["preserved_legacy_total"] == 38
+    assert decision["preserved_legacy_priority_split"] == {"P0": 0, "P1": 0, "P2": 17, "P3": 21}
+    # Historical values themselves remain byte-identical to before this decision.
+    assert registry["legacy_ledger"]["TOTAL"] == 38
+    assert registry["legacy_ledger"]["P0"] == 0
+    assert registry["legacy_ledger"]["P1"] == 0
+    assert registry["legacy_ledger"]["P2"] == 17
+    assert registry["legacy_ledger"]["P3"] == 21
+    result = validate_registry(registry)
+    assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
 
 
 def test_fully_reconciled_requires_zero_unmapped():

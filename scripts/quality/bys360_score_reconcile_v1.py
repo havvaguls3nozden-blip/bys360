@@ -616,7 +616,13 @@ def _score_category(
             has_note = bool(registry.get("reconciliation_note"))
             if status == "FULLY_RECONCILED":
                 value = rubric_component_weight
-            elif status == "PARTIALLY_RECONCILED" and has_note:
+            elif status in ("PARTIALLY_RECONCILED", "HISTORICAL_UNRECONSTRUCTABLE") and has_note:
+                # HISTORICAL_UNRECONSTRUCTABLE gets the same disclosure credit as a
+                # documented PARTIALLY_RECONCILED -- it is not FULLY_RECONCILED (no
+                # item-level reconciliation occurred or is claimed), but the honest
+                # documentation of *why* reconciliation is impossible is itself the
+                # thing being rewarded here, same as for PARTIALLY_RECONCILED. See
+                # BYS360-GOV-LEGACY-001 (docs/governance/BYS360_GOV_LEGACY_001_DECISION_RECORD.md).
                 value = rubric_component_weight * 0.5
             else:
                 value = 0.0

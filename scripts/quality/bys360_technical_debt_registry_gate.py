@@ -30,6 +30,12 @@ from typing import Any
 VALID_STATUSES = {"OPEN", "BLOCKED", "IN_PROGRESS", "CLOSED", "ACCEPTED_RISK", "DEFERRED"}
 VALID_SEVERITIES = {"P0", "P1", "P2", "P3", "UNCLASSIFIED"}
 VALID_LEGACY_MAPPING_STATUSES = {"CONFIRMED", "UNCONFIRMED", "NOT_LEGACY_MEMBER"}
+VALID_RECONCILIATION_STATUSES = {"FULLY_RECONCILED", "PARTIALLY_RECONCILED", "HISTORICAL_UNRECONSTRUCTABLE"}
+# BYS360-GOV-LEGACY-001: the only governance decision currently authorized to set
+# reconciliation_status=HISTORICAL_UNRECONSTRUCTABLE. See
+# docs/governance/BYS360_GOV_LEGACY_001_DECISION_RECORD.md. A bare manual status
+# flip without matching reconciliation_governance_decision metadata is rejected below.
+GOV_LEGACY_001_DECISION_ID = "BYS360-GOV-LEGACY-001"
 ACTIVE_STATUSES = {"OPEN", "BLOCKED", "IN_PROGRESS", "DEFERRED", "ACCEPTED_RISK"}
 CLOSED_LIKE_STATUSES = {"CLOSED"}
 REQUIRED_ITEM_FIELDS = (
@@ -191,10 +197,11 @@ def validate_registry(registry: dict[str, Any]) -> RegistryValidationResult:
             ))
 
     reconciliation_status = registry.get("reconciliation_status")
-    if reconciliation_status not in {"FULLY_RECONCILED", "PARTIALLY_RECONCILED"}:
+    if reconciliation_status not in VALID_RECONCILIATION_STATUSES:
         findings.append(RegistryFinding(
             "invalid_reconciliation_status", None,
-            f"reconciliation_status '{reconciliation_status}' must be FULLY_RECONCILED or PARTIALLY_RECONCILED",
+            f"reconciliation_status '{reconciliation_status}' must be one of "
+            f"{sorted(VALID_RECONCILIATION_STATUSES)}",
         ))
     if reconciliation_status == "FULLY_RECONCILED" and unmapped_legacy_open_count not in (0, None):
         findings.append(RegistryFinding(
@@ -202,6 +209,47 @@ def validate_registry(registry: dict[str, Any]) -> RegistryValidationResult:
             "reconciliation_status=FULLY_RECONCILED requires UNMAPPED_LEGACY_OPEN_COUNT == 0 "
             "(every legacy-38 slot confirmed-mapped to an active registry item)",
         ))
+    if reconciliation_status == "HISTORICAL_UNRECONSTRUCTABLE":
+        decision = registry.get("reconciliation_governance_decision")
+        if not isinstance(decision, dict):
+            findings.append(RegistryFinding(
+                "historical_unreconstructable_missing_decision", None,
+                "reconciliation_status=HISTORICAL_UNRECONSTRUCTABLE requires a "
+                "reconciliation_governance_decision object recording the approved governance decision",
+            ))
+        else:
+            if decision.get("decision_id") != GOV_LEGACY_001_DECISION_ID:
+                findings.append(RegistryFinding(
+                    "historical_unreconstructable_wrong_decision_id", None,
+                    f"reconciliation_governance_decision.decision_id must be "
+                    f"'{GOV_LEGACY_001_DECISION_ID}', got {decision.get('decision_id')!r}",
+                ))
+            if decision.get("decision_status") != "APPROVED":
+                findings.append(RegistryFinding(
+                    "historical_unreconstructable_not_approved", None,
+                    f"reconciliation_governance_decision.decision_status must be 'APPROVED', "
+                    f"got {decision.get('decision_status')!r}",
+                ))
+            preserved_total = decision.get("preserved_legacy_total")
+            if preserved_total != legacy_total:
+                findings.append(RegistryFinding(
+                    "historical_unreconstructable_total_drift", None,
+                    f"reconciliation_governance_decision.preserved_legacy_total ({preserved_total}) "
+                    f"does not match current legacy_ledger.TOTAL ({legacy_total}) -- the historical "
+                    f"reference must not drift",
+                ))
+            preserved_split = decision.get("preserved_legacy_priority_split") or {}
+            current_split = {
+                "P0": legacy_ledger.get("P0"), "P1": legacy_ledger.get("P1"),
+                "P2": legacy_ledger.get("P2"), "P3": legacy_ledger.get("P3"),
+            }
+            if preserved_split != current_split:
+                findings.append(RegistryFinding(
+                    "historical_unreconstructable_split_drift", None,
+                    f"reconciliation_governance_decision.preserved_legacy_priority_split "
+                    f"{preserved_split} does not match current legacy_ledger P0/P1/P2/P3 "
+                    f"{current_split} -- the historical split must not drift",
+                ))
 
     ok = not findings
     return RegistryValidationResult(
