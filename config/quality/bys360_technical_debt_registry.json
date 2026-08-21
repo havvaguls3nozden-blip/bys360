@@ -305,9 +305,13 @@
         "effort": "S",
         "depends_on": [],
         "blocks": [],
-        "related_debts": ["TD-CAND-003"],
+        "related_debts": [
+          "TD-CAND-003"
+        ],
         "can_be_done_independently": true,
-        "behavior_quirks_to_preserve": ["none identified -- the live copy is a strict superset of the dead copy's behavior"]
+        "behavior_quirks_to_preserve": [
+          "none identified -- the live copy is a strict superset of the dead copy's behavior"
+        ]
       },
       "notes": "Re-verified 2026-08-19 (HEAD 0d8c8da) as part of a dedicated active-debt classification wave; severity promoted from UNCLASSIFIED to P2. Closed the same day: confirmed as the lowest-risk item of the five and implemented first, exactly as recommended -- dead pair removed, redundant type:ignore suppressions removed, zero behavior change, full verification suite green."
     },
@@ -361,7 +365,9 @@
         "effort": "M",
         "depends_on": [],
         "blocks": [],
-        "related_debts": ["TD-CAND-003"],
+        "related_debts": [
+          "TD-CAND-003"
+        ],
         "can_be_done_independently": true,
         "behavior_quirks_to_preserve": [
           "Whichever of the two visible_roles null-handling behaviors is currently load-bearing for its own caller must not silently change without an explicit product decision.",
@@ -372,34 +378,39 @@
     },
     {
       "id": "TD-CAND-003",
-      "title": "Systemic `# type: ignore[no-redef]` shadow-patch pattern across app/ -- all 17 candidate files individually verified",
-      "status": "OPEN",
+      "title": "Systemic `# type: ignore[no-redef]` shadow-patch pattern across app/ -- final re-audit confirms zero remaining genuine dead shadows",
+      "status": "CLOSED",
       "severity": "P2",
       "severity_reasoning": "Same P2 reasoning class as TD-CAND-001/002 (recurring instances of the same accidental-duplication risk pattern that produced TD-008's P1 break), now fully evidence-backed rather than a triage placeholder. Re-verified 2026-08-19 at HEAD 0d8c8da: `grep -rl \"no-redef\" app/` still returns exactly 17 files (unchanged). All 17 -- not 3 -- were individually read this pass. Result: 8 files show a genuine accidental/legacy shadow-redefinition of the TD-CAND-001 kind (a second `def <name>` silently overrides an earlier, unrelated one in the same scope) -- account_visibility_helpers.py (=TD-CAND-001, tracked there, not double-counted here), route_support.py, app/services/menu_visibility.py (both previously verified), plus four newly-verified this pass: app/api/mobile/domains/kpi_target_management.py (3 separate shadow pairs in one file), app/schema_guard_engine.py, app/services/home_dashboard_service.py, app/view_helpers.py. One file, app/services/role_matrix_ui_service.py, uses a DIFFERENT and distinctly fragile pattern -- deliberate sequential monkey-patch layering (each redefinition captures and calls through to the prior definition via a `_PREVIOUS_...` module global before adding its own behavior) -- functionally live, not dead code, but ordering-dependent and easily mistaken for TD-CAND-001-style dead duplication by a future maintainer who does not read the capture-and-delegate lines carefully, which is its own real risk. The remaining 9 files are confirmed LEGITIMATE, not debt: 5 use a `try: from .module import X / except ImportError: from module import X  # type: ignore[no-redef]` fallback pattern for supporting both package-relative and flat-namespace execution contexts (app/services/analytics_center/{dashboard_surface,communication_support_insights,personnel_performance_insights,summary_pipeline,survey_feedback_insights}.py), 1 uses the same fallback pattern for a typed stub class (app/services/personnel/workflow.py), 1 uses the same fallback pattern for a deferred model import (app/services/performance/common.py), and 2 use a deliberate caching-wrapper idiom that captures the original function before shadowing it with a cached version (app/main_handlers/dashboard_handlers.py, app/performance/v2_routes.py) -- structurally identical in spirit to role_matrix_ui_service.py's pattern but simpler (single wrap, not a chain) and not flagged as a separate risk.",
       "category": "Code Quality",
       "component": "app/ (17 files matched by grep -rl \"no-redef\" app/; see evidence for the confirmed per-file classification)",
-      "description": "17 files carry a `# type: ignore[no-redef]` suppression. As of this classification wave, all 17 have been individually read and classified: 8 exhibit the genuine accidental shadow-duplication anti-pattern (same class as TD-CAND-001), 1 (role_matrix_ui_service.py) uses a distinct but also-fragile deliberate monkey-patch-chain pattern, and 9 are confirmed legitimate (import-fallback or caching-wrapper idioms) and are not debt.",
+      "description": "Fresh complete re-audit (2026-08-21, HEAD 80810c42db31917d570ae1079e2dbb47bf8defb0) of every current `# type: ignore[no-redef]` occurrence in app/ (16 occurrences across 14 files) individually classified each remaining case as INTENTIONAL_RUNTIME_LAYERING (5 occurrences / 4 files), COMPATIBILITY_WRAPPER / caching-wrapper (3 occurrences / 3 files), or LEGITIMATE_FALLBACK import-compatibility pattern (8 occurrences / 7 files). GENUINE_DEAD_SHADOW_COUNT = 0, UNKNOWN_RISK_COUNT = 0. Wave 1 (commit 187333f785284b004d23e3bed8ea010bd57a96a7) had already removed the only two proven genuine dead shadows, in app/services/menu_visibility.py and app/api/mobile/domains/kpi_target_management.py (21 occurrences/16 files -> 16 occurrences/14 files). This closure wave required zero further source or test changes -- every remaining occurrence was already a correctly-implemented, live, intentional pattern.",
       "evidence": [
-        "grep -rl \"no-redef\" app/ -> 17 files (re-confirmed 2026-08-19, unchanged from prior count)",
-        "Genuine shadow-duplication (8 files): app/main_handlers/account_visibility_helpers.py (TD-CAND-001), app/route_support.py:404,507,525, app/services/menu_visibility.py:235,277, app/api/mobile/domains/kpi_target_management.py:91/97,160/164,219/223 (3 pairs), app/schema_guard_engine.py:25/264, app/services/home_dashboard_service.py:58/220, app/view_helpers.py:86/148",
-        "Fragile monkey-patch chain (1 file, distinct risk): app/services/role_matrix_ui_service.py:550,731 (each redefinition captures the prior via a module global and delegates to it -- functionally live, not dead, but ordering-dependent and easily misread as dead duplication)",
-        "Confirmed legitimate, not debt (9 files): app/services/analytics_center/{dashboard_surface,communication_support_insights,personnel_performance_insights,summary_pipeline,survey_feedback_insights}.py and app/services/personnel/workflow.py and app/services/performance/common.py (all try/except ImportError fallback pattern), app/main_handlers/dashboard_handlers.py and app/performance/v2_routes.py (deliberate caching-wrapper pattern)"
+        "2026-08-19 (HEAD 0d8c8da) prior evidence, SUPERSEDED by this re-audit: claimed 17 files / 8 genuine-duplication files including route_support.py, schema_guard_engine.py, home_dashboard_service.py, view_helpers.py as accidental shadow-duplication (TD-CAND-001-class). That evidence was built on a file-count metric conflated with a separately-tracked item (account_visibility_helpers.py, TD-CAND-001) and, per the TD-CAND-003 Wave 1 fresh forensic, mischaracterized 4 of those files -- each is actually a deliberate capture-and-delegate pattern (INTENTIONAL_RUNTIME_LAYERING or COMPATIBILITY_WRAPPER), not dead code. Preserved here for auditability, not as current fact.",
+        "TD-CAND-003 Wave 1 (2026-08-20/21, commit 187333f785284b004d23e3bed8ea010bd57a96a7, parent 334247b893b1fa92252d7040088c6a74fb477b41): fresh forensic across all then-existing no-redef occurrences found 21 occurrences / 16 files. Confirmed exactly 2 files (app/services/menu_visibility.py: _bys360_assistant_apply_key, _bys360_assistant_collect_from_db; app/api/mobile/domains/kpi_target_management.py: 3 legacy wrapper pairs) had genuinely dead, unreachable earlier definitions with no capture/delegate mechanism -- these were deleted (behavior-locked first via 20 new tests in tests/quality/test_menu_visibility_assistant_apply_key_behavior_contract.py, verified via deliberate mutation-sensitivity proof). Also corrected the 2026-08-19 evidence for route_support.py (:507 captures the original build_menu_visibility_map into _BYS360_V13_ORIGINAL_BUILD_MENU_VISIBILITY_MAP, :525 delegates to it -- 1 pair, INTENTIONAL_RUNTIME_LAYERING, not the multi-pair accidental duplication previously claimed), schema_guard_engine.py, view_helpers.py (both same capture-and-delegate pattern), and home_dashboard_service.py (caching-wrapper capture at :217, not accidental duplication). Result: 21->16 occurrences, 16->14 files.",
+        "This final re-audit (2026-08-21, HEAD 80810c42db31917d570ae1079e2dbb47bf8defb0): fresh grep for 'type: ignore[no-redef]' confirms exactly 16 occurrences / 14 files (unchanged since Wave 1, proving no new suppressions were introduced). Every occurrence individually read and classified with direct source-level reachability/fallback proof (not inference from comments alone):",
+        "INTENTIONAL_RUNTIME_LAYERING (5 occurrences / 4 files) -- each captures the immediately-prior definition into a module-level variable before redefining, and the new definition unconditionally calls through to the captured original: app/route_support.py:525 (captures :404 via _BYS360_V13_ORIGINAL_BUILD_MENU_VISIBILITY_MAP at :507, delegates at :526), app/schema_guard_engine.py:264 (captures the prior should_auto_repair_schema via _BYS360_V13_ORIGINAL_SHOULD_AUTO_REPAIR_SCHEMA at :254, delegates at :266/:269), app/view_helpers.py:148 (captures via _BYS360_PHASE3_6_ORIGINAL_BUILD_SURFACE_SCOPE_CONTEXT at :145, delegates at :149), app/services/role_matrix_ui_service.py:550 and :731 (a genuine 3-layer chain: base _build_role_matrix_ui_context_base at :340 -> layer1 at :425 -> layer2 [:550, this item's first occurrence] captures layer1 at :548 and delegates at :551 -> layer3 [:731, this item's second occurrence] captures layer2 dynamically via globals().get(...) at :730 and delegates at :733, guarded by callable() with a safe {} fallback). Confirmed via grep that every live external caller (app/admin/role_matrix_routes.py:22, tests/security/test_csp_wave4_admin_contract.py:226) calls the exported symbol positionally, so the parameter-name drift across layers (active_group_key vs selected_module) never surfaces as a defect in practice -- flagged as a non-blocking FUTURE_DEBT_CANDIDATE code-smell (see behavior_quirks_to_preserve), not TD-CAND-003 scope.",
+        "COMPATIBILITY_WRAPPER / caching-wrapper (3 occurrences / 3 files) -- each captures the original uncached implementation into a _..._uncached module variable and wraps it with a short-TTL in-memory cache that always calls through to the original on cache miss or on any exception: app/main_handlers/dashboard_handlers.py:23 (captures the :11 import at :20, calls through at :27/:33), app/performance/v2_routes.py:96 (captures at :64, calls through at :100/:102/:107), app/services/home_dashboard_service.py:220 (captures at :217, calls through at :224).",
+        "LEGITIMATE_FALLBACK (8 occurrences / 7 files) -- textbook try/except import-compatibility pattern, mutually-exclusive execution paths, no dead duplicate body: app/services/analytics_center/communication_support_insights.py:11, dashboard_surface.py:12 and :16, personnel_performance_insights.py:12, summary_pipeline.py:22, survey_feedback_insights.py:11 (all: package-relative import in try, flat-namespace analytics_center.*/ai_decision.* import in except ImportError, explicitly supporting a documented standalone 'python -S gate' execution context distinct from normal package import), app/services/performance/common.py:324 (from app.models import User try, from app.models.user import User except, layout-compatibility fallback, returns None gracefully if both fail), app/services/personnel/workflow.py:20 (try imports the real PersonnelFormPayload dataclass from .form_payload; except ImportError/AttributeError defines a minimal safe stand-in dataclass with identical field names/defaults so consumers never hit NameError in a broken-import environment; explicitly pragma: no cover as a break-glass path).",
+        "GENUINE_DEAD_SHADOW_COUNT = 0. UNKNOWN_RISK_COUNT = 0. Classification totals (5 INTENTIONAL_RUNTIME_LAYERING + 3 COMPATIBILITY_WRAPPER + 8 LEGITIMATE_FALLBACK = 16) match Wave 1's own forward-looking estimate exactly, independently re-derived from fresh source reading rather than copied from that estimate.",
+        "Source/test diff for this closure wave: git diff -- app/ tests/ is EMPTY. Zero source changes and zero new tests were required -- every remaining occurrence was already a correctly-implemented, adequately-protected, live pattern; existing test coverage (e.g. tests/security/test_csp_wave4_admin_contract.py::test_role_matrix_center_render_uses_real_service_context exercising the full role_matrix_ui_service layering chain end-to-end through template render; tests/test_10_10_core_static_gate.py, tests/quality/test_effective_menu_facade_v1_contract.py, tests/test_live_scope_and_security_static.py and others exercising build_menu_visibility_map/should_auto_repair_schema) was independently confirmed adequate rather than supplemented.",
+        "Full regression/quality gate suite re-run at this exact HEAD after the registry edit: Ruff 0.16.0 full-select 0 findings, Ruff syntax/import sanity PASS, mypy 2.3.0 (app tests scripts --ignore-missing-imports --no-error-summary) 0 errors, secret gate finding_count=0, Quality9 finding_count=0, Ops audit PASS, registry/governance validator PASS with corrected counts, fresh Step1 and Step2 both 0 failed/0 errors, coverage ratchet PASS against the unmodified 27.62% baseline."
       ],
       "introduced_commit": null,
       "closure_commit": null,
       "remote_verified": false,
       "created_at": null,
-      "updated_at": "2026-08-19",
-      "closure_reason": null,
+      "updated_at": "2026-08-21",
+      "closure_reason": "Closed after a final, fresh, complete re-audit of every one of the 16 current no-redef occurrences (14 files) at HEAD 80810c42db31917d570ae1079e2dbb47bf8defb0, performed independently of and skeptically toward all prior registry evidence per this project's established practice (the 2026-08-19 evidence was itself found to be partly stale/inaccurate by TD-CAND-003 Wave 1, and is preserved in the evidence array only for auditability, not as current fact). Wave 1 (commit 187333f) already removed the only two occurrences that were genuinely dead, unreachable shadow definitions with no capture/delegate mechanism (app/services/menu_visibility.py, app/api/mobile/domains/kpi_target_management.py), behavior-locking the surviving implementations with 20 new tests first. This final re-audit independently re-derived the classification of all 16 remaining occurrences from direct source inspection -- reading each earlier definition, each later definition, each capture assignment, each delegation call site, and every live external caller -- rather than trusting labels: 5 occurrences (4 files) are INTENTIONAL_RUNTIME_LAYERING (explicit module-level capture of the prior definition, unconditionally called through), 3 occurrences (3 files) are COMPATIBILITY_WRAPPER caching idioms (same capture-and-delegate shape, applied for a short-TTL cache), and 8 occurrences (7 files) are LEGITIMATE_FALLBACK try/except import-compatibility patterns on mutually-exclusive execution paths. GENUINE_DEAD_SHADOW_COUNT = 0 and UNKNOWN_RISK_COUNT = 0 across all 16 -- the closure criterion (genuine unresolved technical debt == 0, not grep count == 0) is satisfied. This closure required zero source or test changes: git diff -- app/ tests/ is empty for this wave: only this registry record and one pinned governance-test expectation (tests/quality/test_bys360_technical_debt_registry_gate.py::test_canonical_registry_matches_expected_corrected_values, REGISTRY_CLOSED_COUNT 12->13 and REGISTRY_ACTIVE_COUNT 2->1) were updated. A latent, non-blocking code smell was noted but explicitly NOT fixed in this wave (out of scope, no source edit permitted): in app/services/role_matrix_ui_service.py's 3-layer build_role_matrix_ui_context chain, the middle layer's matrix_version context value is always silently overwritten by the outer layer's own assignment -- recorded as a FUTURE_DEBT_CANDIDATE, not TD-CAND-003 scope, since the layering itself is intentional and fully reachable, not dead. closure_commit is intentionally null rather than guessed, per this registry's established policy (see TD-CAND-001/TD-CAND-002/TD-CAND-007): a commit's SHA cannot be known before the commit object exists. remote_verified remains false: this closure has not yet been pushed or remotely CI-attested at the time of this registry edit; per this project's canonical scoring methodology, its actual Code Quality score impact is PENDING_REMOTE_ATTESTATION until a future exact-head CI + canonical score-lock wave, not claimed here.",
       "legacy_mapping": {
         "status": "UNCONFIRMED",
-        "note": "Now fully evidence-backed at the current-code level (all 17 files individually verified), but still not matchable to any specific legacy-ledger slot -- found via a fresh grep sweep in this session, not a legacy-list lookup."
+        "note": "Not matchable to any specific legacy-ledger slot -- found and resolved via fresh grep-based forensic sweeps across this session, not a legacy-list lookup. Closure does not change legacy reconciliation counts (MAPPED_LEGACY_OPEN_COUNT remains 0, UNMAPPED_LEGACY_OPEN_COUNT remains 38)."
       },
       "closure_criteria": [
-        "Each of the 8 genuine-duplication files individually triaged and either fixed (single canonical definition) or explicitly deferred with its own tracked reasoning -- this item should not be closed as one bulk action across 8 unrelated files.",
-        "app/services/role_matrix_ui_service.py's monkey-patch-chain pattern separately triaged: either kept with an explicit comment/test documenting the intentional layering (minimum bar) or refactored into explicit composition (higher bar) -- not silently collapsed by someone assuming it is dead code.",
-        "The 9 confirmed-legitimate files require no action and should not be touched by any closure work on this item.",
-        "No new `# type: ignore[no-redef]` suppressions introduced elsewhere without individual triage against this same rubric."
+        "DONE: Wave 1 individually triaged and fixed the 2 files with genuine accidental shadow-duplication (app/services/menu_visibility.py, app/api/mobile/domains/kpi_target_management.py), behavior-locked first via dedicated tests, not as one bulk action.",
+        "DONE: app/services/role_matrix_ui_service.py's monkey-patch-chain pattern separately triaged this wave and confirmed intentional and fully reachable via direct source inspection and live-caller analysis -- kept as-is (refactor is a separate, not-yet-scoped FUTURE_DEBT_CANDIDATE, not required for this item's closure).",
+        "DONE: the remaining legitimate-pattern files (import-fallback and caching-wrapper groups) were independently re-verified this wave, not merely left untouched on the strength of the old evidence -- confirmed no action needed.",
+        "DONE: fresh complete re-audit at closure time confirmed GENUINE_DEAD_SHADOW_COUNT = 0 and UNKNOWN_RISK_COUNT = 0 across all 16 current occurrences before status was changed to CLOSED."
       ],
       "priority_metadata": {
         "production_risk": "LOW",
@@ -407,19 +418,22 @@
         "data_risk": "NONE",
         "security_relevance": "NONE",
         "operational_risk": "LOW",
-        "maintainability_impact": "HIGH",
+        "maintainability_impact": "LOW",
         "transferability_impact": "MEDIUM",
-        "test_protection": "WEAK",
+        "test_protection": "MEDIUM",
         "effort": "L",
         "depends_on": [],
         "blocks": [],
-        "related_debts": ["TD-CAND-001", "TD-CAND-002"],
+        "related_debts": [
+          "TD-CAND-001",
+          "TD-CAND-002"
+        ],
         "can_be_done_independently": false,
         "behavior_quirks_to_preserve": [
-          "role_matrix_ui_service.py's layered context fields (matrix_version, personel_visibility_v7_note, period_center_role_matrix_note) must all survive any refactor -- each layer is live, user-visible UI content, not dead code."
+          "role_matrix_ui_service.py's layered context fields (matrix_version, personel_visibility_v7_note, period_center_role_matrix_note) come from a genuine 3-layer capture-and-delegate chain and must all continue to be produced by a live call path in any future refactor -- each layer is live, user-visible UI content, not dead code. Note: the middle layer's matrix_version value is currently always overwritten by the outer layer's own assignment (a pre-existing, non-blocking quirk noted but not fixed in this closure -- see closure_reason)."
         ]
       },
-      "notes": "Re-verified 2026-08-19 (HEAD 0d8c8da) as part of a dedicated active-debt classification wave -- upgraded from a 3-of-17-verified triage placeholder to a fully-verified (17-of-17) item. Severity promoted from UNCLASSIFIED to P2. This is the largest-effort item of the five (8+1 distinct files spanning multiple subsystems) and should be sequenced as several small, independently-reviewable sub-changes rather than one large commit."
+      "notes": "Closed 2026-08-21 (HEAD 80810c4) after a final fresh re-audit found zero remaining genuine dead-shadow debt among the 16 current no-redef occurrences; see closure_reason and evidence for the full per-file classification and reachability/fallback proof. Status prior to this closure was OPEN/P2, promoted from UNCLASSIFIED on 2026-08-19; TD-CAND-003 Wave 1 (commit 187333f) removed the only 2 genuine dead shadows on 2026-08-20/21 but left the item OPEN pending this dedicated final re-audit, exactly as that wave's own instructions required."
     },
     {
       "id": "TD-CAND-006",
@@ -459,7 +473,9 @@
         "transferability_impact": "LOW",
         "test_protection": "MEDIUM",
         "effort": "M",
-        "depends_on": ["a new Alembic migration (not yet written)"],
+        "depends_on": [
+          "a new Alembic migration (not yet written)"
+        ],
         "blocks": [],
         "related_debts": [],
         "can_be_done_independently": false,
@@ -515,7 +531,9 @@
         "blocks": [],
         "related_debts": [],
         "can_be_done_independently": true,
-        "behavior_quirks_to_preserve": ["The blocking finding_count=0 behavior must not change while investigating the warning-tier variance."]
+        "behavior_quirks_to_preserve": [
+          "The blocking finding_count=0 behavior must not change while investigating the warning-tier variance."
+        ]
       },
       "notes": "Explicitly recorded as advisory/non-deterministic rather than a fixed fact -- do not cite a specific hit count from this item as authoritative; re-run the gate for a current count. finding_count (the blocking tier) is separately and reliably 0. Severity promoted from UNCLASSIFIED to P3 in the 2026-08-19 classification wave."
     }

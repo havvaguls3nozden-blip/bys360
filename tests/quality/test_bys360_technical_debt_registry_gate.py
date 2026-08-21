@@ -287,8 +287,8 @@ def test_canonical_registry_matches_expected_corrected_values():
     result = validate_registry(registry)
     assert result.ok
     assert result.registry_counts["REGISTRY_TOTAL"] == 14
-    assert result.registry_counts["REGISTRY_CLOSED_COUNT"] == 12
-    assert result.registry_counts["REGISTRY_ACTIVE_COUNT"] == 2
+    assert result.registry_counts["REGISTRY_CLOSED_COUNT"] == 13
+    assert result.registry_counts["REGISTRY_ACTIVE_COUNT"] == 1
     assert result.legacy_counts["LEGACY_OPEN_TOTAL"] == 38
     assert result.legacy_counts["MAPPED_LEGACY_OPEN_COUNT"] == 0
     assert result.legacy_counts["UNMAPPED_LEGACY_OPEN_COUNT"] == 38
