@@ -89,12 +89,6 @@ def mobile_kpi_target_management_v2853(*args, **kwargs):
     return mobile_kpi_target_management_v2853_delegate(_bys360_legacy_mobile_kpi_target_management_v2853, *args, **kwargs)
 
 def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):
-    from app.api.mobile.services.dashboard_service import (
-        delegate_mobile_kpi_target_management_v2853,
-    )
-    return delegate_mobile_kpi_target_management_v2853(_bys360_legacy_mobile_kpi_target_management_v2853, user)
-
-def _bys360_legacy_mobile_kpi_target_management_v2853(user: User):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return _module_payload([
@@ -158,10 +152,6 @@ def mobile_kpi_target_create_v2853(*args, **kwargs):
     return mobile_kpi_target_create_v2853_delegate(_bys360_legacy_mobile_kpi_target_create_v2853, *args, **kwargs)
 
 def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):
-    from app.api.mobile.services.dashboard_service import delegate_mobile_kpi_target_create_v2853
-    return delegate_mobile_kpi_target_create_v2853(_bys360_legacy_mobile_kpi_target_create_v2853, user)
-
-def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return jsonify({'message': 'KPI/Hedef modeli bu kurulumda bulunamadı.'}), 503
@@ -217,10 +207,6 @@ def mobile_kpi_target_progress_v2853(*args, **kwargs):
     return mobile_kpi_target_progress_v2853_delegate(_bys360_legacy_mobile_kpi_target_progress_v2853, *args, **kwargs)
 
 def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):
-    from app.api.mobile.services.dashboard_service import delegate_mobile_kpi_target_progress_v2853
-    return delegate_mobile_kpi_target_progress_v2853(_bys360_legacy_mobile_kpi_target_progress_v2853, user, target_id)
-
-def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):  # type: ignore[no-redef]
     Target, TargetPeriod = _v2853_target_models()
     if Target is None:
         return jsonify({'message': 'KPI/Hedef modeli bu kurulumda bulunamadı.'}), 503

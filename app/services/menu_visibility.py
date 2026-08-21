@@ -70,27 +70,6 @@ def _bys360_assistant_get_db():
         return None
 
 
-def _bys360_assistant_apply_key(menu_map, raw_key, raw_value=True):
-    key_norm = _bys360_assistant_norm(raw_key)
-    if key_norm in {
-        "assistant_module",
-        "ai_agent_panel",
-        "ai_agent",
-        "ai_agent_module",
-        "virtual_assistant",
-        "sanal_asistan",
-        "guvenli_sanal_asistan",
-        "güvenli_sanal_asistan",
-        "ai_teaching_center",
-        "asistan_ogretim_merkezi",
-        "asistan_öğretim_merkezi",
-    }:
-        allowed = _bys360_assistant_truthy(raw_value)
-        menu_map["assistant_module"] = allowed
-        menu_map["ai_agent_panel"] = allowed
-        menu_map["ai_teaching_center"] = allowed
-
-
 def _bys360_assistant_collect_from_user_attrs(user, menu_map):
     for attr in ("menu_map", "menu_permissions", "permissions", "allowed_menus", "feature_flags"):
         value = getattr(user, attr, None)
@@ -102,96 +81,6 @@ def _bys360_assistant_collect_from_user_attrs(user, menu_map):
         elif isinstance(value, (list, tuple, set)):
             for key in value:
                 _bys360_assistant_apply_key(menu_map, key, True)
-
-
-def _bys360_assistant_collect_from_db(user, menu_map):
-    db = _bys360_assistant_get_db()
-    if db is None:
-        return
-
-    try:
-        from sqlalchemy import inspect, text
-        inspector = inspect(db.engine)
-        table_names = set(inspector.get_table_names())
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/menu_visibility.py:115")
-        return
-
-    uid = getattr(user, "id", None)
-    role_values = [str(v) for v in _bys360_assistant_user_role_values(user) if v]
-
-    candidate_tables = [
-        "user_menu_permissions",
-        "role_menu_defaults",
-        "unit_menu_profiles",
-        "module_settings",
-        "system_settings",
-    ]
-
-    key_cols = ["menu_key", "key", "setting_key", "module_key", "feature_key", "permission_key", "code", "name"]
-    value_cols = ["is_visible", "visible", "is_enabled", "enabled", "allowed", "can_view", "value", "setting_value", "status"]
-    user_cols = ["user_id", "personel_id", "personnel_id", "employee_id"]
-    role_cols = ["role", "role_name", "role_code", "user_role"]
-
-    for table in candidate_tables:
-        if table not in table_names:
-            continue
-
-        try:
-            cols = [c["name"] for c in inspector.get_columns(table)]
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/menu_visibility.py:137)")
-            continue
-
-        table_key_cols = [c for c in key_cols if c in cols]
-        table_value_cols = [c for c in value_cols if c in cols]
-        table_user_cols = [c for c in user_cols if c in cols]
-        table_role_cols = [c for c in role_cols if c in cols]
-
-        if not table_key_cols:
-            continue
-
-        where_parts = []
-        params = {}
-        if uid is not None and table_user_cols:
-            where_parts.append("(" + " OR ".join([f"{c} = :uid" for c in table_user_cols]) + ")")
-            params["uid"] = uid
-        if role_values and table_role_cols:
-            role_filters = []
-            for index, role in enumerate(role_values):
-                pname = f"role_{index}"
-                params[pname] = role
-                role_filters.extend([f"{c} = :{pname}" for c in table_role_cols])
-            where_parts.append("(" + " OR ".join(role_filters) + ")")
-
-        where_sql = ""
-        if where_parts:
-            where_sql = " WHERE " + " OR ".join(where_parts)
-        elif table in {"user_menu_permissions", "role_menu_defaults", "unit_menu_profiles"}:
-            continue
-
-        try:
-            rows = db.session.execute(text(f"SELECT * FROM {table}" + where_sql), params).mappings().all()
-        except Exception:
-            __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/services/menu_visibility.py:170)")
-            continue
-
-        for row in rows:
-            raw_key = None
-            for col in table_key_cols:
-                if row.get(col):
-                    raw_key = row.get(col)
-                    break
-            if not raw_key:
-                continue
-
-            raw_value = True
-            for col in table_value_cols:
-                if col in row and row.get(col) is not None:
-                    raw_value = row.get(col)
-                    break
-
-            _bys360_assistant_apply_key(menu_map, raw_key, raw_value)
 
 
 def _legacy_build_menu_visibility_map_v1(user=None):
@@ -232,7 +121,7 @@ _BYS360_ASSISTANT_PANEL_ROLES = {'admin', 'baskan', 'baskan_yardimcisi', 'grup_b
 _BYS360_ASSISTANT_ADMIN_ROLES = {'admin', 'baskan'}
 _BYS360_ASSISTANT_ALL_TAB_KEYS = {'assistant_module', 'ai_agent_panel', 'ai_agent_knowledge', 'ai_agent_teaching_center', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
 
-def _bys360_assistant_apply_key(menu_map, raw_key, raw_value=True):  # type: ignore[no-redef]
+def _bys360_assistant_apply_key(menu_map, raw_key, raw_value=True):
     key_norm = _bys360_assistant_norm(raw_key)
     allowed = _bys360_assistant_truthy(raw_value)
     if key_norm in ('assistant_module', 'ai_agent', 'ai_agent_module', 'virtual_assistant', 'sanal_asistan', 'guvenli_sanal_asistan', 'güvenli_sanal_asistan'):
@@ -274,7 +163,7 @@ def _bys360_assistant_default_map_for_role(role_key):
     return _map
 
 
-def _bys360_assistant_collect_from_db(user, menu_map):  # type: ignore[no-redef]
+def _bys360_assistant_collect_from_db(user, menu_map):
     db = _bys360_assistant_get_db()
     if db is None:
         return
