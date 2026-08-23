@@ -126,11 +126,14 @@ Yeni özellik için önce mevcut servis, test ve script altyapısı aranır. Zor
 
 ### 8. Temiz release üretimi
 
-Teslim edilecek zip elle sıkıştırılmaz. Güvenli release üretimi ve preflight birlikte çalıştırılır.
+Teslim edilecek zip elle sıkıştırılmaz. Tek yetkili (canonical) release builder
+`scripts\release\build_bys360_safe_release.py`'dir; üretim ve doğrulama birlikte çalıştırılır.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1 -ProjectRoot "C:\bys360\project"
+python scripts\release\build_bys360_safe_release.py --root . --output "C:\bys360\dist\bys360_release.zip"
+python scripts\release\build_bys360_safe_release.py --verify "C:\bys360\dist\bys360_release.zip"
 ```
 
-Bu işlemden sonra rapor `reports/security/release_zip_preflight_v1/` altında oluşur. Preflight PASS vermeden zip paylaşılmaz.
+`--verify` PASS vermeden zip paylaşılmaz.
+(`scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1` DEPRECATED'dır.)
 

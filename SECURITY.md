@@ -51,14 +51,19 @@ Bu işlem uzak repo ve ekip kopyalarını etkiler. Önce tam yedek alınmadan ç
 
 ## 4. Release paket kuralı
 
-Proje klasörü doğrudan zip yapılmaz. Release yalnızca güvenli builder ile üretilir.
+Proje klasörü doğrudan zip yapılmaz. Release yalnızca tek yetkili (canonical) builder ile
+üretilir: `scripts\release\build_bys360_safe_release.py`. Kaynak dosya listesi yalnızca
+Git-tracked dosyalardan gelir (fiziksel dizin taramasına geri düşüş yoktur), ve build,
+HEAD ile çalışma ağacı arasında herhangi bir uyuşmazlık/kirlilik varsa başarısız olur.
 
 ```powershell
-python scripts\security\build_bys360_secure_release_v1_5.py --project-root "C:\bys360\project"
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_release_zip_preflight_v1.ps1 -ZipPath "C:\bys360\project\dist_secure\BYS360_SECURE_RELEASE_V1_5_*.zip"
+python scripts\release\build_bys360_safe_release.py --root . --output "C:\bys360\dist\bys360_release.zip"
+python scripts\release\build_bys360_safe_release.py --verify "C:\bys360\dist\bys360_release.zip"
 ```
 
-Preflight FAIL verirse zip paylaşılmaz.
+`--verify` FAIL verirse zip paylaşılmaz. (`scripts\security\build_bys360_secure_release_v1_5.py`
+ve ona bağlı eski preflight akışı artık DEPRECATED'dır -- companion preflight betiği
+arşivlenmiştir ve o akış zaten çalışmamaktadır.)
 
 ## 5. Yetki ve görünürlük
 

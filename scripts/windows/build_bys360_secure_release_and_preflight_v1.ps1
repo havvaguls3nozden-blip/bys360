@@ -1,30 +1,24 @@
+<#
+DEPRECATED (BYS360 deterministic-package-builder hardening, 2026-08-23).
+
+This wrapper called scripts\security\build_bys360_secure_release_v1_5.py and
+then scripts\security\bys360_release_zip_preflight_v1.py. The preflight
+script no longer exists at that path (moved to
+scripts\archive\pre_handover_20260708\security\ by commit 4f41319), so this
+wrapper has been broken end-to-end since that commit -- it always threw
+"Preflight script bulunamadı" before producing a usable, verified release.
+
+Use the canonical production release builder instead:
+
+  python scripts\release\build_bys360_safe_release.py --root . --output <path\to\release.zip>
+  python scripts\release\build_bys360_safe_release.py --verify <path\to\release.zip>
+
+The --verify step performs the equivalent (and stronger: SHA256-checked,
+forbidden-path-checked, required-content-checked) role the old preflight
+script was meant to provide.
+#>
 param(
     [string]$ProjectRoot = "C:\bys360\project"
 )
 
-$ErrorActionPreference = "Stop"
-
-Set-Location $ProjectRoot
-
-$PythonExe = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
-if (-not (Test-Path $PythonExe)) {
-    $PythonExe = "python"
-}
-
-Write-Host "BYS360 güvenli release üretimi başlıyor..."
-& $PythonExe "scripts\security\build_bys360_secure_release_v1_5.py" --project-root $ProjectRoot
-if ($LASTEXITCODE -ne 0) { throw "Güvenli release üretimi başarısız." }
-
-$LatestZip = Get-ChildItem -Path (Join-Path $ProjectRoot "dist_secure") -Filter "BYS360_SECURE_RELEASE_V1_5_*.zip" |
-    Sort-Object LastWriteTime -Descending |
-    Select-Object -First 1
-
-if (-not $LatestZip) { throw "dist_secure altında release zip bulunamadı." }
-
-Write-Host "Preflight çalışıyor: $($LatestZip.FullName)"
-& $PythonExe "scripts\security\bys360_release_zip_preflight_v1.py" --zip $LatestZip.FullName --output-dir "reports\security\release_zip_preflight_v1"
-if ($LASTEXITCODE -ne 0) { throw "Preflight FAIL verdi. Zip paylaşılmamalı." }
-
-Write-Host "BYS360_SECURE_RELEASE_AND_PREFLIGHT_OK"
-Write-Host "Zip: $($LatestZip.FullName)"
-Write-Host "Rapor: reports\security\release_zip_preflight_v1"
+throw "DEPRECATED: scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1 kaldirildi/artik desteklenmiyor. Bunun yerine: python scripts\release\build_bys360_safe_release.py --root . --output <zip-yolu>  ardindan  python scripts\release\build_bys360_safe_release.py --verify <zip-yolu>"

@@ -1,3 +1,37 @@
+# DEPRECATED (BYS360 deterministic-package-builder hardening, 2026-08-23):
+# this script is NOT the canonical production FULL release builder. Use
+# scripts/release/build_bys360_safe_release.py instead.
+#
+# Why: (1) source discovery here is an unconditional filesystem walk
+# (Path.rglob), which is non-deterministic in file ordering and -- on
+# Python <3.13 -- follows symlinked directories, so a stray symlink under
+# --project-root could pull in and package files from outside the project
+# root; scripts/release/build_bys360_safe_release.py discovers files
+# exclusively via `git ls-files` (tracked-only, deterministic, fails closed
+# instead of falling back if git is unavailable). (2) this script is not
+# exercised by CI (scripts/release/build_bys360_safe_release.py is invoked
+# twice per run in .github/workflows/bys360-ci.yml). (3) its documented
+# companion, scripts/security/bys360_release_zip_preflight_v1.py, was moved
+# to scripts/archive/pre_handover_20260708/security/ by commit 4f41319 and
+# no longer exists at the path scripts/windows/check_bys360_release_zip_
+# preflight_v1.ps1 and every live doc (DEPLOYMENT.md, SECURITY.md,
+# CONTRIBUTING.md, scripts/README.md) instructed operators to use -- that
+# documented workflow is broken today, independent of this change.
+#
+# This script is kept, unmodified, rather than deleted, since removal was
+# not proven necessary for closing the deterministic-packaging blocker this
+# change addresses; do not treat its continued presence as an endorsement
+# of its use for producing a release package.
+#
+# Not yet ported to the canonical builder: this script's validate_zip()
+# performs a narrow, content-level scan for a small number of known
+# leaked-secret literals -- a real capability scripts/release/build_
+# bys360_safe_release.py does not have (that builder only checks file
+# names/paths, never opens file content). If that capability is still
+# needed, prefer running the repository's existing secret gate
+# (scripts/quality/bys360_secret_repo_gate.py) against the built package's
+# extracted contents rather than reviving this script.
+
 from __future__ import annotations
 
 import datetime as dt

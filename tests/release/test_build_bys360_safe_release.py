@@ -1,0 +1,488 @@
+"""Focused + adversarial tests for scripts/release/build_bys360_safe_release.py
+(the canonical, deterministic, git-tracked-only production release builder).
+
+BYS360 deterministic-package-builder hardening wave (2026-08-23). Every test
+uses a real, disposable git repository under tmp_path (the established
+pattern already used by tests/quality/test_bys360_score_reconcile_v1.py's
+test_registry_matches_scored_commit_tree_rejects_parent_scored_child_registry_substitution)
+-- no mocking of git or of the builder's own functions. Adapted from Agent 3's
+25-scenario adversarial design (this wave's coordinator dispatch), grounded
+against the real, implemented function signatures.
+"""
+
+from __future__ import annotations
+
+import importlib.util
+import json
+import os
+import subprocess
+import zipfile
+from pathlib import Path
+
+import pytest
+
+_MODULE_PATH = (
+    Path(__file__).resolve().parents[2] / "scripts" / "release" / "build_bys360_safe_release.py"
+)
+_spec = importlib.util.spec_from_file_location("build_bys360_safe_release", _MODULE_PATH)
+builder = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(builder)
+
+
+def _git(args: list[str], cwd: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", *args], cwd=cwd, check=True, capture_output=True, text=True
+    )
+
+
+def _head(cwd: Path) -> str:
+    return _git(["rev-parse", "HEAD"], cwd).stdout.strip()
+
+
+BASE_FILES: dict[str, bytes] = {
+    "app/__init__.py": b"# app init\n",
+    "app/routes.py": b"# routes\n",
+    "templates/index.html": b"<html></html>\n",
+    "static/app.js": b"console.log(1);\n",
+    "migrations/versions/0001_init.py": b"# migration\n",
+    "requirements.txt": b"flask\n",
+    "wsgi.py": b"# wsgi\n",
+    "run_server.py": b"# run server\n",
+    "config.py": b"# config\n",
+    "DEPLOYMENT.md": b"# deploy docs\n",
+}
+
+
+def _write_files(root: Path, files: dict[str, bytes]) -> None:
+    for rel, content in files.items():
+        p = root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(content)
+
+
+def _init_repo(root: Path, files: dict[str, bytes]) -> str:
+    root.mkdir(parents=True, exist_ok=True)
+    _git(["init", "-q"], root)
+    _git(["config", "user.email", "t@t.com"], root)
+    _git(["config", "user.name", "t"], root)
+    _write_files(root, files)
+    _git(["add", "-A"], root)
+    _git(["commit", "-q", "-m", "init"], root)
+    return _head(root)
+
+
+def _commit_all(root: Path, message: str = "update") -> str:
+    _git(["add", "-A"], root)
+    _git(["commit", "-q", "-m", message], root)
+    return _head(root)
+
+
+@pytest.fixture
+def repo(tmp_path: Path) -> tuple[Path, str]:
+    root = tmp_path / "repo"
+    sha = _init_repo(root, BASE_FILES)
+    return root, sha
+
+
+def _build(root: Path, output: Path, *, source_sha: str | None = None) -> int:
+    argv = ["--root", str(root), "--output", str(output)]
+    if source_sha is not None:
+        argv += ["--source-sha", source_sha]
+    return builder.main(argv)
+
+
+def _verify(zip_path: Path, *, expected_source_sha: str | None = None) -> int:
+    argv = ["--verify", str(zip_path)]
+    if expected_source_sha is not None:
+        argv += ["--expected-source-sha", expected_source_sha]
+    return builder.main(argv)
+
+
+def _names(zip_path: Path) -> set[str]:
+    with zipfile.ZipFile(zip_path) as zf:
+        return set(zf.namelist())
+
+
+def _sidecars(output: Path) -> tuple[Path, Path]:
+    return builder._default_sidecar_paths(output)
+
+
+# ---------------------------------------------------------------------------
+# 1-3: untracked contamination must have zero effect on output
+# ---------------------------------------------------------------------------
+
+
+def test_untracked_random_file_cannot_enter(repo, tmp_path):
+    root, sha = repo
+    (root / "random_untracked.txt").write_bytes(b"not tracked\n")
+    output = tmp_path / "out1.zip"
+    assert _build(root, output) == 0
+    assert "random_untracked.txt" not in _names(output)
+
+
+def test_untracked_coverage_file_cannot_enter(repo, tmp_path):
+    root, sha = repo
+    (root / ".coverage").write_bytes(b"coverage-binary-data")
+    output = tmp_path / "out2.zip"
+    assert _build(root, output) == 0
+    assert ".coverage" not in _names(output)
+
+
+def test_untracked_secret_looking_file_cannot_enter(repo, tmp_path):
+    root, sha = repo
+    (root / ".env").write_bytes(b"SECRET_KEY=untracked-should-never-ship\n")
+    output = tmp_path / "out3.zip"
+    assert _build(root, output) == 0
+    assert ".env" not in _names(output)
+
+
+# ---------------------------------------------------------------------------
+# 4-8: hard-excluded directories
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "rel_path",
+    [
+        "tests/test_something.py",
+        "mobile_flutter/lib/main.dart",
+        ".codex/config.toml",
+        ".claude/settings.json",
+        "reports/quality/some_report.json",
+    ],
+)
+def test_hard_excluded_directory_is_excluded(repo, tmp_path, rel_path):
+    root, _ = repo
+    _write_files(root, {rel_path: b"content\n"})
+    sha = _commit_all(root)
+    output = tmp_path / f"out_{rel_path.split('/')[0].strip('.')}.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert rel_path not in _names(output)
+
+
+# ---------------------------------------------------------------------------
+# 9-13: required content survives
+# ---------------------------------------------------------------------------
+
+
+def test_required_content_survives(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_required.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    names = _names(output)
+    for expected in (
+        "app/__init__.py",
+        "app/routes.py",
+        "templates/index.html",
+        "static/app.js",
+        "migrations/versions/0001_init.py",
+        "requirements.txt",
+        "wsgi.py",
+        "run_server.py",
+        "config.py",
+        "DEPLOYMENT.md",
+    ):
+        assert expected in names, f"{expected} missing from package"
+
+
+# ---------------------------------------------------------------------------
+# 14: .env / secret path rejected even if (hypothetically) tracked
+# ---------------------------------------------------------------------------
+
+
+def test_tracked_env_file_rejected(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {".env": b"SECRET_KEY=should-never-ship\n"})
+    sha = _commit_all(root)
+    output = tmp_path / "out_env.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert ".env" not in _names(output)
+
+
+def test_key_and_pem_suffixes_rejected(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {"secrets/prod.key": b"key\n", "secrets/prod.pem": b"pem\n"})
+    sha = _commit_all(root)
+    output = tmp_path / "out_keys.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    names = _names(output)
+    assert "secrets/prod.key" not in names
+    assert "secrets/prod.pem" not in names
+
+
+# ---------------------------------------------------------------------------
+# 15: unsafe symlink / path traversal fail closed
+# ---------------------------------------------------------------------------
+
+
+def test_is_unsafe_archive_path_rejects_traversal_and_absolute_names():
+    unsafe = [
+        "../etc/passwd",
+        "/etc/passwd",
+        "a/../../b",
+        "a/../b",
+        "C:/windows/system32/x",
+        "C:\\windows\\x",
+        "..",
+        "a/..",
+    ]
+    for name in unsafe:
+        assert builder.is_unsafe_archive_path(name), f"expected unsafe: {name!r}"
+    safe = ["app/__init__.py", "a/b/c.txt", "requirements.txt"]
+    for name in safe:
+        assert not builder.is_unsafe_archive_path(name), f"expected safe: {name!r}"
+
+
+def test_tracked_symlink_excluded_if_creatable(repo, tmp_path):
+    root, _ = repo
+    target = root / "app" / "routes.py"
+    link = root / "app" / "routes_link.py"
+    try:
+        os.symlink(target, link)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlink creation not permitted in this environment")
+    sha = _commit_all(root)
+    # A symlink entry must never appear in the package -- either because it
+    # was excluded (is_symlink() check) or because it wasn't a regular file.
+    output = tmp_path / "out_symlink.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert "app/routes_link.py" not in _names(output)
+
+
+# ---------------------------------------------------------------------------
+# 16-18: determinism (logical content, manifest, SHA256SUMS ordering)
+# ---------------------------------------------------------------------------
+
+
+def test_repeated_build_logical_content_identical(repo, tmp_path):
+    root, sha = repo
+    out1 = tmp_path / "out_a.zip"
+    out2 = tmp_path / "out_b.zip"
+    assert _build(root, out1, source_sha=sha) == 0
+    assert _build(root, out2, source_sha=sha) == 0
+
+    manifest1_path, sha256_1 = _sidecars(out1)
+    manifest2_path, sha256_2 = _sidecars(out2)
+    manifest1 = json.loads(manifest1_path.read_text(encoding="utf-8"))
+    manifest2 = json.loads(manifest2_path.read_text(encoding="utf-8"))
+
+    assert manifest1["files"] == manifest2["files"]
+    assert manifest1["source_sha"] == manifest2["source_sha"] == sha
+    assert sha256_1.read_text(encoding="utf-8") == sha256_2.read_text(encoding="utf-8")
+    assert _names(out1) == _names(out2)
+
+
+def test_manifest_files_are_sorted(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_sorted.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["files"] == sorted(manifest["files"])
+
+
+def test_sha256sums_lines_are_sorted_by_path(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_sha_sorted.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    _, sha256_path = _sidecars(output)
+    lines = [line for line in sha256_path.read_text(encoding="utf-8").splitlines() if line]
+    paths = [line.split("  ", 1)[1] for line in lines]
+    assert paths == sorted(paths)
+    assert sha256_path.read_text(encoding="utf-8").count("\r\n") == 0  # LF only
+
+
+# ---------------------------------------------------------------------------
+# 19-20: content sensitivity -- tracked change alters hash, excluded/untracked
+# change does not alter output
+# ---------------------------------------------------------------------------
+
+
+def test_packaged_tracked_file_modification_changes_hash(repo, tmp_path):
+    root, sha1 = repo
+    out1 = tmp_path / "out_before.zip"
+    assert _build(root, out1, source_sha=sha1) == 0
+    _, sha256_1 = _sidecars(out1)
+    hashes1 = dict(
+        line.split("  ", 1)[::-1] for line in sha256_1.read_text(encoding="utf-8").splitlines() if line
+    )
+
+    (root / "app" / "routes.py").write_bytes(b"# routes CHANGED\n")
+    sha2 = _commit_all(root, "modify routes")
+    out2 = tmp_path / "out_after.zip"
+    assert _build(root, out2, source_sha=sha2) == 0
+    _, sha256_2 = _sidecars(out2)
+    hashes2 = dict(
+        line.split("  ", 1)[::-1] for line in sha256_2.read_text(encoding="utf-8").splitlines() if line
+    )
+
+    assert hashes1["app/routes.py"] != hashes2["app/routes.py"]
+
+
+def test_excluded_or_untracked_change_does_not_change_output(repo, tmp_path):
+    root, sha = repo
+    out1 = tmp_path / "out_stable_1.zip"
+    assert _build(root, out1, source_sha=sha) == 0
+    _, sha256_1 = _sidecars(out1)
+    before = sha256_1.read_text(encoding="utf-8")
+
+    (root / "random_scratch.txt").write_bytes(b"untracked scratch\n")
+    out2 = tmp_path / "out_stable_2.zip"
+    assert _build(root, out2, source_sha=sha) == 0
+    _, sha256_2 = _sidecars(out2)
+    after = sha256_2.read_text(encoding="utf-8")
+
+    assert before == after
+
+
+# ---------------------------------------------------------------------------
+# 21-22: fail-closed source integrity
+# ---------------------------------------------------------------------------
+
+
+def test_dirty_tracked_worktree_fails_closed(repo, tmp_path):
+    root, sha = repo
+    (root / "app" / "routes.py").write_bytes(b"# uncommitted change\n")
+    output = tmp_path / "out_dirty.zip"
+    rc = _build(root, output, source_sha=sha)
+    assert rc != 0
+    assert not output.exists() or output.stat().st_size == 0 or not zipfile.is_zipfile(output)
+
+
+def test_dirty_staged_worktree_fails_closed(repo, tmp_path):
+    root, sha = repo
+    (root / "app" / "new_staged.py").write_bytes(b"# staged, not committed\n")
+    _git(["add", "app/new_staged.py"], root)
+    output = tmp_path / "out_staged_dirty.zip"
+    rc = _build(root, output, source_sha=sha)
+    assert rc != 0
+
+
+def test_wrong_source_sha_fails_closed(repo, tmp_path):
+    root, sha = repo
+    wrong_sha = "0" * 40
+    output = tmp_path / "out_wrong_sha.zip"
+    rc = _build(root, output, source_sha=wrong_sha)
+    assert rc != 0
+
+
+def test_auto_resolved_source_sha_matches_head(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_auto.zip"
+    assert _build(root, output) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["source_sha"] == sha
+
+
+# ---------------------------------------------------------------------------
+# Baseline: a genuinely valid package passes --verify
+# ---------------------------------------------------------------------------
+
+
+def test_valid_package_passes_verify(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_valid.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert _verify(output, expected_source_sha=sha) == 0
+
+
+# ---------------------------------------------------------------------------
+# 23-25: verify mode adversarial tamper detection
+# ---------------------------------------------------------------------------
+
+
+def _rewrite_zip_with_extra_entry(src: Path, dst: Path, name: str, content: bytes) -> None:
+    with zipfile.ZipFile(src) as zin, zipfile.ZipFile(dst, "w") as zout:
+        for item in zin.infolist():
+            zout.writestr(item, zin.read(item.filename))
+        zout.writestr(name, content)
+
+
+def _rewrite_zip_without_prefix(src: Path, dst: Path, prefix: str) -> None:
+    with zipfile.ZipFile(src) as zin, zipfile.ZipFile(dst, "w") as zout:
+        for item in zin.infolist():
+            if item.filename.startswith(prefix):
+                continue
+            zout.writestr(item, zin.read(item.filename))
+
+
+def test_forbidden_path_added_to_package_verify_fails(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_tamper1.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    tampered = tmp_path / "out_tamper1_tampered.zip"
+    _rewrite_zip_with_extra_entry(output, tampered, ".env", b"SECRET_KEY=leaked\n")
+    tampered_manifest, tampered_sha256 = _sidecars(tampered)
+    tampered_manifest.write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+    tampered_sha256.write_text(sha256_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    assert _verify(tampered) != 0
+
+
+def test_required_path_removed_verify_fails(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_tamper2.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    tampered = tmp_path / "out_tamper2_tampered.zip"
+    _rewrite_zip_without_prefix(output, tampered, "app/")
+    tampered_manifest, tampered_sha256 = _sidecars(tampered)
+    tampered_manifest.write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+    tampered_sha256.write_text(sha256_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    result_rc = _verify(tampered)
+    assert result_rc != 0
+
+
+def test_path_traversal_entry_verify_fails(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_tamper3.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    tampered = tmp_path / "out_tamper3_tampered.zip"
+    _rewrite_zip_with_extra_entry(output, tampered, "../outside.txt", b"escape\n")
+    tampered_manifest, tampered_sha256 = _sidecars(tampered)
+    tampered_manifest.write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+    tampered_sha256.write_text(sha256_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    assert _verify(tampered) != 0
+
+
+def test_sha256_mismatch_verify_fails(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_tamper4.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    tampered = tmp_path / "out_tamper4_tampered.zip"
+    with zipfile.ZipFile(output) as zin, zipfile.ZipFile(tampered, "w") as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename == "config.py":
+                data = b"# TAMPERED CONTENT\n"
+            zout.writestr(item, data)
+    tampered_manifest, tampered_sha256 = _sidecars(tampered)
+    tampered_manifest.write_text(manifest_path.read_text(encoding="utf-8"), encoding="utf-8")
+    tampered_sha256.write_text(sha256_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    assert _verify(tampered) != 0
+
+
+def test_source_sha_metadata_mismatch_verify_fails(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "out_tamper5.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert _verify(output, expected_source_sha="1" * 40) != 0
+
+
+def test_verify_missing_manifest_fails(tmp_path):
+    fake_zip = tmp_path / "no_manifest.zip"
+    with zipfile.ZipFile(fake_zip, "w") as zf:
+        zf.writestr("app/__init__.py", b"x")
+    assert _verify(fake_zip) != 0

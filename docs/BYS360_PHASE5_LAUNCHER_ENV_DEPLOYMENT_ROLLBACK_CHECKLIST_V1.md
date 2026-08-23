@@ -20,7 +20,9 @@ Windows Görev Zamanlayıcı bu görev kapsamında değiştirilmemiştir.
       alınır (`git archive` veya eşdeğeri) — geliştirme sırasında oluşan
       `__pycache__`, `.pytest_cache`, geçici test dosyaları export'a dahil
       edilmez.
-- [ ] Mevcut tooling: `scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1`
+- [ ] HISTORICAL_REFERENCE (2026-08-23 güncellemesi): aşağıdaki "mevcut tooling" artık
+      DEPRECATED'dır; canonical builder için DEPLOYMENT.md §8'e bakınız. Orijinal madde,
+      değiştirilmeden korunmuştur: Mevcut tooling: `scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1`
       → `scripts\security\build_bys360_secure_release_v1_5.py` ile zip üretip
       `scripts\security\bys360_release_zip_preflight_v1.py` ile preflight
       raporu (`reports\security\release_zip_preflight_v1`) üretiyor. Bu akış
@@ -28,6 +30,16 @@ Windows Görev Zamanlayıcı bu görev kapsamında değiştirilmemiştir.
       SHA256/manifest üretimi **tespit edilmedi** (grep ile doğrulandı).
 
 ## 2. Manifest ve SHA256 listesi (mevcut tooling'de eksik — manuel tamamlanmalı)
+
+**Güncelleme notu (2026-08-23, deterministic-package-builder hardening görevi):** bu bölümdeki
+"eksik" bulgusu artık geçmişe aittir (HISTORICAL_REFERENCE) — orijinal metin altta korunmuştur,
+değiştirilmemiştir. Canonical release builder `scripts\release\build_bys360_safe_release.py`
+artık her build'de otomatik olarak `<output>.sha256sums.txt` (SHA256, göreli yol, sabit
+sıralama) ve `<output>.manifest.json` (source SHA, dosya listesi, deterministik sıralama) üretir
+ve bunları `--verify` ile doğrular. `scripts\security\build_bys360_secure_release_v1_5.py` ve
+bu bölümde anılan eski preflight akışı artık DEPRECATED'dır; bkz. DEPLOYMENT.md §8.
+
+Orijinal (2026 launcher/env görevi zamanındaki) metin, değiştirilmeden:
 
 - [ ] Release zip'i üretildikten sonra, zip içindeki her dosya için SHA256
       hesaplanıp bir manifest dosyasına yazılır. Örnek (yalnızca referans,

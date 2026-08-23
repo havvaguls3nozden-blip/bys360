@@ -108,19 +108,37 @@ Invoke-WebRequest -Uri "http://127.0.0.1/login" -UseBasicParsing
 
 Doğrudan proje klasörünü zip yapmak yasaktır. Çünkü `.env`, `.git`, `instance`, `logs`, SQLite dosyaları veya geçici raporlar pakete girebilir.
 
+Tek yetkili (canonical) production release builder: `scripts\release\build_bys360_safe_release.py`.
+(`scripts\security\build_bys360_secure_release_v1_5.py` ve ona bağlı eski PowerShell
+sarmalayıcıları/preflight betiği artık DEPRECATED'dır -- bkz. o dosyanın başındaki not.)
+
+Kaynak dosya listesi yalnızca Git'in takip ettiği (tracked) dosyalardan üretilir; dosya
+sistemine geri düşüş (fallback) yoktur -- git kullanılamıyorsa build başarısız olur (fail
+closed). Build, HEAD ile tracked/staged çalışma ağacı tamamen temiz değilse de başarısız olur.
+
 Güvenli release için:
 
 ```powershell
 cd C:\bys360\project
 .\.venv\Scripts\Activate.ps1
-python scripts\security\build_bys360_secure_release_v1_5.py --project-root "C:\bys360\project"
+python scripts\release\build_bys360_safe_release.py --root . --output "C:\bys360\dist\bys360_release.zip"
 ```
 
-Üretilen zip ayrıca preflight ile kontrol edilir:
+Bu komut zip'in yanına iki ek dosya üretir: `bys360_release.manifest.json` (source SHA, paket
+içeriğinin göreli yol listesi, deterministik sıralama) ve `bys360_release.sha256sums.txt`
+(her paketlenmiş dosyanın SHA256'sı, göreli yol, sabit sıralama). Hiçbiri mutlak yerel yol,
+Windows kullanıcı adı, geçici dizin yolu veya secret içermez.
+
+Üretilen zip ayrıca kendi doğrulama modu ile kontrol edilir:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_release_zip_preflight_v1.ps1 -ZipPath "C:\bys360\project\dist_secure\BYS360_SECURE_RELEASE_V1_5_*.zip"
+python scripts\release\build_bys360_safe_release.py --verify "C:\bys360\dist\bys360_release.zip"
 ```
+
+`--verify` şunları FAIL eder: eksik gerekli dosya, yasaklı yol (ör. `.env`, `tests/`,
+`mobile_flutter/`, `.codex/`, `.claude/`, sertifika/anahtar uzantıları), beklenmeyen ekstra
+dosya, SHA256 uyuşmazlığı, güvensiz/traversal yol adı. Zip'in sadece açılabiliyor olması
+paketin geçerli olduğu anlamına gelmez -- her release bu komutla doğrulanmalıdır.
 
 ## 9. Rollback
 
