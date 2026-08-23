@@ -25,8 +25,9 @@ _MODULE_PATH = (
     Path(__file__).resolve().parents[2] / "scripts" / "release" / "build_bys360_safe_release.py"
 )
 _spec = importlib.util.spec_from_file_location("build_bys360_safe_release", _MODULE_PATH)
-builder = importlib.util.module_from_spec(_spec)
+assert _spec is not None
 assert _spec.loader is not None
+builder = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(builder)
 
 
