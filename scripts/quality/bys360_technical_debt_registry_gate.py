@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
+import re
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -130,7 +130,7 @@ def _validate_item(item: dict[str, Any], seen_ids: set[str]) -> list[RegistryFin
     return findings
 
 
-def validate_registry(registry: dict[str, Any], *, current_commit: str | None = None) -> RegistryValidationResult:
+def validate_registry(registry: dict[str, Any]) -> RegistryValidationResult:
     findings: list[RegistryFinding] = []
     items = registry.get("items", [])
 
@@ -332,21 +332,31 @@ def validate_registry(registry: dict[str, Any], *, current_commit: str | None = 
                         f"{current_waiver_split} -- the historical split must not drift",
                     ))
 
-                target_scored_commit = ceiling_waiver.get("target_scored_commit")
-                if current_commit is None:
+                # WAIVER_BINDING_HARDENING (2026-08-23): approval_baseline_commit is
+                # documentary/anchoring only -- the already-attested commit the human
+                # governance decision was reasoned about (mirrors
+                # reconciliation_governance_decision.target_baseline_commit's own,
+                # never-code-compared precedent). It is deliberately NEVER compared for
+                # equality against "the commit currently being scored": the prior
+                # target_scored_commit design conflated the two, which both created a
+                # self-SHA circularity (a decision-adding commit cannot declare its own
+                # not-yet-computed SHA) and, more seriously, permitted a real commit's
+                # genuine, unforged CI evidence to be paired with a DIFFERENT commit's
+                # registry content while both were merely asserted to be the same
+                # scored_commit -- nothing tied the registry dict's actual provenance to
+                # that claim. Closing that gap is the calculator's job now
+                # (_registry_matches_scored_commit_tree in bys360_score_reconcile_v1.py),
+                # not this pure, I/O-free validator's -- this function only checks the
+                # baseline field's own shape.
+                approval_baseline_commit = ceiling_waiver.get("approval_baseline_commit")
+                if not isinstance(approval_baseline_commit, str) or not re.fullmatch(
+                    r"[0-9a-f]{40}", approval_baseline_commit,
+                ):
                     findings.append(RegistryFinding(
-                        "ceiling_waiver_commit_unverified", None,
-                        "reconciliation_ceiling_waiver_decision is APPROVED but no current_commit was "
-                        "supplied to validate_registry() to check target_scored_commit against -- the "
-                        "real scored commit must be verified, never assumed",
-                    ))
-                elif target_scored_commit != current_commit:
-                    findings.append(RegistryFinding(
-                        "ceiling_waiver_commit_mismatch", None,
-                        f"reconciliation_ceiling_waiver_decision.target_scored_commit "
-                        f"({target_scored_commit!r}) does not match the actual current commit "
-                        f"({current_commit!r}) -- this waiver only authorizes the exact commit it "
-                        "was approved against",
+                        "ceiling_waiver_invalid_approval_baseline_commit", None,
+                        "reconciliation_ceiling_waiver_decision is APPROVED but "
+                        f"approval_baseline_commit ({approval_baseline_commit!r}) is not a "
+                        "well-formed 40-hex-character commit SHA",
                     ))
 
     ok = not findings
@@ -411,29 +421,13 @@ def main() -> int:
         return 2
 
     registry = _load_registry(registry_path)
-
-    current_commit: str | None = None
-    try:
-        git_result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=registry_path.resolve().parent,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if git_result.returncode == 0:
-            current_commit = git_result.stdout.strip()
-    except OSError:
-        current_commit = None
-
-    result = validate_registry(registry, current_commit=current_commit)
+    result = validate_registry(registry)
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
         "ok": result.ok,
         "registry_version": registry.get("registry_version"),
         "reconciliation_status": registry.get("reconciliation_status"),
-        "current_commit": current_commit,
         "registry_counts": result.registry_counts,
         "legacy_counts": result.legacy_counts,
         "findings": [

@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -18,6 +20,7 @@ from scripts.quality.bys360_score_reconcile_v1 import (
     LEGACY_SNAPSHOT,
     SCORE100_WORKFLOW_GATE_ID,
     _build_argv,
+    _registry_matches_scored_commit_tree,
     _round_half_up,
     compute_report,
     resolve_python,
@@ -744,12 +747,20 @@ def test_no_weight_ceiling_penalty_rounding_diff_from_pre_wave_values():
 
 
 # ---------------------------------------------------------------------------
-# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22):
-# reconciliation_ceiling_waiver_decision. Orthogonal to reconciliation_status
-# (stays HISTORICAL_UNRECONSTRUCTABLE, never rewritten) and to the
-# registry_reconciliation_transparency rubric (Documentation-Handover credit
-# must be provably unaffected). Every scenario below must fail closed unless
-# ALL eligibility terms hold simultaneously.
+# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22), binding
+# hardened 2026-08-23: reconciliation_ceiling_waiver_decision. Orthogonal to
+# reconciliation_status (stays HISTORICAL_UNRECONSTRUCTABLE, never rewritten)
+# and to the registry_reconciliation_transparency rubric (Documentation-
+# Handover credit must be provably unaffected). approval_baseline_commit is
+# documentary/anchoring only -- it is never compared to scored_commit (that
+# conflation caused a self-SHA circularity and a real evidence-substitution
+# gap in the pre-hardening design). registry_commit_verified is the actual
+# fix: an independently-resolved boolean (real git verification lives in
+# _registry_matches_scored_commit_tree(), tested directly below; here it is
+# always explicitly injected, exactly like scored_commit/canonical_manifest
+# already are, keeping compute_report() itself git-free and fast to test).
+# Every scenario must fail closed unless ALL eligibility terms hold
+# simultaneously.
 # ---------------------------------------------------------------------------
 
 WAIVER_TARGET_COMMIT = "f" * 40
@@ -772,7 +783,7 @@ def _valid_waiver(**overrides):
     decision = {
         "decision_id": GOV_CEILING_WAIVER_001_DECISION_ID,
         "decision_status": "APPROVED",
-        "target_scored_commit": WAIVER_TARGET_COMMIT,
+        "approval_baseline_commit": WAIVER_TARGET_COMMIT,
         "preserved_legacy_total": 38,
         "preserved_legacy_priority_split": {"P0": 0, "P1": 0, "P2": 17, "P3": 21},
     }
@@ -795,6 +806,7 @@ def _fully_eligible_report(tmp_path, **registry_overrides):
     return compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
 
 
@@ -803,6 +815,7 @@ def test_ceiling_waiver_active_when_fully_eligible(tmp_path):
     report = _fully_eligible_report(tmp_path)
     assert report["fully_verified"] is True
     assert report["registry_structurally_valid"] is True
+    assert report["registry_commit_verified"] is True
     assert report["reconciliation_ceiling_waiver_active"] is True
     assert report["evidence_completeness_ceiling_applied"] is False
 
@@ -814,6 +827,7 @@ def test_ceiling_waiver_does_not_mutate_registry_or_legacy_ledger(tmp_path):
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report["reconciliation_ceiling_waiver_active"] is True
     assert registry == registry_before
@@ -833,10 +847,12 @@ def test_ceiling_waiver_active_does_not_change_documentation_handover(tmp_path):
     report_no_waiver = compute_report(
         methodology, registry_no_waiver, tmp_path, evidence,
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     report_with_waiver = compute_report(
         methodology, registry_with_waiver, tmp_path, evidence,
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report_no_waiver["reconciliation_ceiling_waiver_active"] is False
     assert report_with_waiver["reconciliation_ceiling_waiver_active"] is True
@@ -851,6 +867,7 @@ def test_ceiling_waiver_blocked_when_decision_missing(tmp_path):
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
@@ -862,20 +879,46 @@ def test_ceiling_waiver_blocked_when_decision_status_not_approved(tmp_path):
     assert report["evidence_completeness_ceiling_applied"] is True
 
 
-def test_ceiling_waiver_blocked_when_bound_to_wrong_commit(tmp_path):
-    report = _fully_eligible_report(tmp_path, reconciliation_ceiling_waiver_decision=_valid_waiver(target_scored_commit="0" * 40))
+def test_ceiling_waiver_blocked_when_registry_content_not_verified_against_scored_commit(tmp_path):
+    """CRITICAL, THE central hardening property: a well-formed, approved, otherwise
+    fully-eligible waiver decision must NOT activate when registry_commit_verified is
+    False -- i.e. when nothing has cryptographically confirmed that the registry
+    content being scored genuinely came from scored_commit's own git tree. This is
+    exactly the case a real (non-injected) run would produce if someone tried the
+    parent-scored-child-registry substitution: genuine Score100/Quality evidence for
+    a real, already-attested commit, combined with a DIFFERENT commit's registry
+    content, both merely claimed under the same scored_commit label."""
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=False,
+    )
+    assert report["fully_verified"] is True
+    assert report["registry_structurally_valid"] is True
+    assert report["registry_commit_verified"] is False
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
 
 
+def test_ceiling_waiver_registry_commit_verified_defaults_to_false():
+    """No truthy default anywhere: a caller that forgets to pass
+    registry_commit_verified must fail closed, never silently activate a waiver."""
+    import inspect
+    sig = inspect.signature(compute_report)
+    assert sig.parameters["registry_commit_verified"].default is False
+
+
 def test_ceiling_waiver_blocked_when_quality_evidence_incomplete(tmp_path):
     """fully_verified=False (some gate UNKNOWN) must block the waiver, even with an
-    otherwise fully valid, approved, commit-bound decision."""
+    otherwise fully valid, approved, verified decision."""
     methodology = _fixture_methodology()
     registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
     report = compute_report(
         methodology, registry, tmp_path, evidence={},  # nothing supplied -> UNKNOWN
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report["fully_verified"] is False
     assert report["reconciliation_ceiling_waiver_active"] is False
@@ -890,7 +933,7 @@ def test_ceiling_waiver_blocked_when_score100_evidence_missing(tmp_path):
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest={"gates": []},  # Quality-style gates all pass, but no Score100 entry at all
-        scored_commit=WAIVER_TARGET_COMMIT,
+        scored_commit=WAIVER_TARGET_COMMIT, registry_commit_verified=True,
     )
     assert report["fully_verified"] is True
     assert report["reconciliation_ceiling_waiver_active"] is False
@@ -906,7 +949,7 @@ def test_ceiling_waiver_blocked_when_score100_evidence_is_fail(tmp_path):
     }]}
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
-        canonical_manifest=manifest, scored_commit=WAIVER_TARGET_COMMIT,
+        canonical_manifest=manifest, scored_commit=WAIVER_TARGET_COMMIT, registry_commit_verified=True,
     )
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
@@ -921,6 +964,7 @@ def test_ceiling_waiver_blocked_when_active_debt_present(tmp_path):
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
@@ -942,6 +986,7 @@ def test_ceiling_waiver_blocked_when_reconciliation_status_not_historical_unreco
     report = compute_report(
         methodology, registry, tmp_path, _all_gates_pass_evidence(),
         canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+        registry_commit_verified=True,
     )
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
@@ -999,3 +1044,115 @@ def test_real_17be109_registry_has_no_active_waiver_and_ceiling_still_applies(tm
     report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
+
+
+# ---------------------------------------------------------------------------
+# WAIVER_BINDING_HARDENING (2026-08-23): _registry_matches_scored_commit_tree(),
+# tested against a REAL, disposable git repository (not mocked) -- this is the
+# actual fix for the parent-scored-child-registry substitution gap: genuine,
+# unforged Score100/Quality evidence for one real commit could previously be
+# combined with a DIFFERENT commit's registry content, both merely asserted to
+# share one scored_commit label.
+# ---------------------------------------------------------------------------
+
+
+def _run_git(cwd, *args):
+    proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True)
+    return proc.stdout.strip()
+
+
+def test_registry_matches_scored_commit_tree_accepts_own_content(tmp_path):
+    """Legitimate case: scoring a commit while reading THAT SAME commit's own
+    registry content must verify True."""
+    (tmp_path / "config").mkdir()
+    registry_relpath = "config/registry.json"
+    _run_git(tmp_path, "init", "-q")
+    _run_git(tmp_path, "config", "user.email", "test@example.com")
+    _run_git(tmp_path, "config", "user.name", "Test")
+
+    baseline_registry = {"reconciliation_status": "HISTORICAL_UNRECONSTRUCTABLE", "items": []}
+    (tmp_path / registry_relpath).write_text(json.dumps(baseline_registry), encoding="utf-8")
+    _run_git(tmp_path, "add", registry_relpath)
+    _run_git(tmp_path, "commit", "-q", "-m", "baseline")
+    baseline_sha = _run_git(tmp_path, "rev-parse", "HEAD")
+
+    assert _registry_matches_scored_commit_tree(tmp_path, registry_relpath, baseline_sha, baseline_registry) is True
+
+
+def test_registry_matches_scored_commit_tree_rejects_parent_scored_child_registry_substitution(tmp_path):
+    """CRITICAL: the exact exploit this hardening closes. A child commit E adds a
+    ceiling-waiver decision to the registry -- nothing else. Someone tries to score
+    the already-attested PARENT (baseline_sha) while actually reading E's registry
+    content (the one that activates the waiver). Must be rejected, even though
+    baseline_sha is a completely real, legitimately-existing commit and nothing here
+    is forged -- only mismatched."""
+    (tmp_path / "config").mkdir()
+    registry_relpath = "config/registry.json"
+    _run_git(tmp_path, "init", "-q")
+    _run_git(tmp_path, "config", "user.email", "test@example.com")
+    _run_git(tmp_path, "config", "user.name", "Test")
+
+    baseline_registry: dict[str, Any] = {"reconciliation_status": "HISTORICAL_UNRECONSTRUCTABLE", "items": []}
+    (tmp_path / registry_relpath).write_text(json.dumps(baseline_registry), encoding="utf-8")
+    _run_git(tmp_path, "add", registry_relpath)
+    _run_git(tmp_path, "commit", "-q", "-m", "baseline")
+    baseline_sha = _run_git(tmp_path, "rev-parse", "HEAD")
+
+    child_registry: dict[str, Any] = dict(baseline_registry)
+    child_registry["reconciliation_ceiling_waiver_decision"] = {
+        "decision_status": "APPROVED", "approval_baseline_commit": baseline_sha,
+    }
+    (tmp_path / registry_relpath).write_text(json.dumps(child_registry), encoding="utf-8")
+    _run_git(tmp_path, "add", registry_relpath)
+    _run_git(tmp_path, "commit", "-q", "-m", "add waiver decision")
+    child_sha = _run_git(tmp_path, "rev-parse", "HEAD")
+
+    # Each commit verifies True against its own genuine content.
+    assert _registry_matches_scored_commit_tree(tmp_path, registry_relpath, baseline_sha, baseline_registry) is True
+    assert _registry_matches_scored_commit_tree(tmp_path, registry_relpath, child_sha, child_registry) is True
+
+    # THE ATTACK: claim scored_commit=baseline_sha (real, already-attested) while the
+    # registry content actually being scored is the CHILD's (the one with the waiver).
+    assert _registry_matches_scored_commit_tree(tmp_path, registry_relpath, baseline_sha, child_registry) is False
+    # And the reverse direction also must not silently pass.
+    assert _registry_matches_scored_commit_tree(tmp_path, registry_relpath, child_sha, baseline_registry) is False
+
+
+def test_registry_matches_scored_commit_tree_fails_closed_when_not_a_git_repo(tmp_path):
+    result = _registry_matches_scored_commit_tree(tmp_path, "config/registry.json", "a" * 40, {})
+    assert result is False
+
+
+def test_registry_matches_scored_commit_tree_fails_closed_for_malformed_commit_sha():
+    result = _registry_matches_scored_commit_tree(REPO_ROOT, "config/quality/bys360_technical_debt_registry.json", "not-a-real-sha", {})
+    assert result is False
+
+
+def test_registry_matches_scored_commit_tree_fails_closed_for_missing_path(tmp_path):
+    _run_git(tmp_path, "init", "-q")
+    _run_git(tmp_path, "config", "user.email", "test@example.com")
+    (tmp_path / "placeholder.txt").write_text("x", encoding="utf-8")
+    _run_git(tmp_path, "config", "user.name", "Test")
+    _run_git(tmp_path, "add", "placeholder.txt")
+    _run_git(tmp_path, "commit", "-q", "-m", "no registry file here")
+    sha = _run_git(tmp_path, "rev-parse", "HEAD")
+    result = _registry_matches_scored_commit_tree(tmp_path, "config/registry.json", sha, {})
+    assert result is False
+
+
+def test_registry_matches_scored_commit_tree_real_repo_17be109(tmp_path):
+    """Sanity check against this repository's own real history: 17be109's actual
+    committed registry content must verify True when scored as 17be109 itself."""
+    sha = "17be109d66dfb5f91554b28e7573f01c1572c73b"
+    real_registry_at_sha = json.loads(_run_git(REPO_ROOT, "show", f"{sha}:config/quality/bys360_technical_debt_registry.json"))
+    assert _registry_matches_scored_commit_tree(
+        REPO_ROOT, "config/quality/bys360_technical_debt_registry.json", sha, real_registry_at_sha,
+    ) is True
+    # Content-based, not commit-label-based: even the exact SHA that genuinely
+    # produced this content must reject a TAMPERED copy of it (proves the check
+    # verifies actual content, not just "does this commit exist").
+    tampered = dict(real_registry_at_sha)
+    tampered["reconciliation_ceiling_waiver_decision"] = {"decision_status": "APPROVED"}
+    assert _registry_matches_scored_commit_tree(
+        REPO_ROOT, "config/quality/bys360_technical_debt_registry.json", sha, tampered,
+    ) is False

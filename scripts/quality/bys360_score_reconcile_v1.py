@@ -712,6 +712,48 @@ def _score100_evidence_verified(canonical_manifest: dict[str, Any], scored_commi
     return False
 
 
+def _registry_matches_scored_commit_tree(
+    root: Path, registry_relpath: str, scored_commit: str, registry: dict[str, Any],
+) -> bool:
+    """WAIVER_BINDING_HARDENING (2026-08-23): cryptographically ties the REGISTRY
+    CONTENT actually being scored to scored_commit's real git tree.
+
+    Without this, scored_commit and every evidence-manifest entry's commit_sha could
+    all genuinely, correctly agree, while the registry dict passed in still came from
+    a completely different commit's working-tree file -- e.g. a child commit that adds
+    a ceiling-waiver decision, scored via an explicit --scored-commit override naming
+    its already-CI-attested parent. Nothing else in this module ties "the commit whose
+    evidence was verified" to "the commit whose registry state is being read": the
+    evidence-manifest checks (resolve_evidence(), _score100_evidence_verified()) only
+    match commit_sha == scored_commit, which is necessary but not sufficient -- they
+    say nothing about where the registry dict itself came from. This function closes
+    that gap for the one place it matters (the ceiling-waiver eligibility check) by
+    independently reading the registry file as it existed IN scored_commit's own git
+    object database, then comparing it byte-for-byte to what was actually loaded and
+    scored. Fails closed (False) whenever this cannot be positively confirmed --
+    not a git repository, unknown/malformed commit, path missing at that commit, git
+    unavailable, or any content mismatch. A normal run (working tree checked out at
+    scored_commit) always passes this trivially; it only ever blocks the mismatched
+    case.
+    """
+    if not re.fullmatch(r"[0-9a-f]{40}", scored_commit or ""):
+        return False
+    try:
+        proc = subprocess.run(
+            ["git", "show", f"{scored_commit}:{registry_relpath}"],
+            cwd=root, capture_output=True, text=True, timeout=10, shell=False,
+        )
+    except OSError:
+        return False
+    if proc.returncode != 0:
+        return False
+    try:
+        committed_registry = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return False
+    return committed_registry == registry
+
+
 def _round_half_up(value: float) -> int:
     return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
@@ -750,6 +792,7 @@ def compute_report(
     canonical_manifest: dict[str, Any] | None = None,
     scored_commit: str = "",
     evidence_input_trace: dict[str, Any] | None = None,
+    registry_commit_verified: bool = False,
 ) -> dict[str, Any]:
     if not python_path:
         python_path = sys.executable
@@ -778,7 +821,7 @@ def compute_report(
     # ceiling even if the registry itself failed its own gate invariants (e.g. a
     # drifted legacy_ledger or an internally inconsistent unmapped count). Applied
     # symmetrically to both paths, not scoped only to the new mechanism.
-    registry_validation = validate_registry(registry, current_commit=scored_commit)
+    registry_validation = validate_registry(registry)
     registry_structurally_valid = registry_validation.ok
 
     reconciled = (
@@ -786,21 +829,33 @@ def compute_report(
         and registry_structurally_valid
     )
 
-    # FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22): an
-    # orthogonal ceiling-waiver decision, distinct from reconciliation_status,
-    # which stays HISTORICAL_UNRECONSTRUCTABLE and is never rewritten by this
-    # mechanism (see docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md).
-    # Every term below must independently and affirmatively hold; there is no
-    # truthy default anywhere, so a missing/malformed/unapproved/wrongly-bound
-    # decision object always fails closed to waiver_active=False.
+    # FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22), hardened
+    # 2026-08-23: an orthogonal ceiling-waiver decision, distinct from
+    # reconciliation_status, which stays HISTORICAL_UNRECONSTRUCTABLE and is never
+    # rewritten by this mechanism (see
+    # docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md).
+    # approval_baseline_commit (validated for shape only by validate_registry(), as
+    # part of registry_structurally_valid) is documentary/anchoring -- it is
+    # deliberately NEVER compared against scored_commit; conflating "which commit
+    # approved this decision" with "which commit is being scored right now" was the
+    # prior design's flaw (self-SHA circularity, and a real gap where genuine
+    # evidence for one commit could be paired with a DIFFERENT commit's registry
+    # content under a shared scored_commit claim). registry_commit_verified below is
+    # the actual fix: it independently, cryptographically confirms the registry
+    # CONTENT being scored right now genuinely came from scored_commit's own git
+    # tree (see _registry_matches_scored_commit_tree()), so no other commit's state
+    # can ever be smuggled in under a borrowed, already-attested SHA. Every term
+    # below must independently and affirmatively hold; there is no truthy default
+    # anywhere, so a missing/malformed/unapproved/unverified decision always fails
+    # closed to waiver_active=False.
     ceiling_waiver = registry.get("reconciliation_ceiling_waiver_decision")
     waiver_active = (
         fully_verified
         and registry_structurally_valid
+        and registry_commit_verified
         and isinstance(ceiling_waiver, dict)
         and ceiling_waiver.get("decision_status") == "APPROVED"
         and registry.get("reconciliation_status") == "HISTORICAL_UNRECONSTRUCTABLE"
-        and ceiling_waiver.get("target_scored_commit") == scored_commit
         and registry_validation.registry_counts.get("REGISTRY_ACTIVE_COUNT") == 0
         and _score100_evidence_verified(canonical_manifest, scored_commit)
     )
@@ -863,6 +918,7 @@ def compute_report(
         "registry_validation_findings": [
             {"code": f.code, "item_id": f.item_id, "detail": f.detail} for f in registry_validation.findings
         ],
+        "registry_commit_verified": registry_commit_verified,
         "reconciliation_ceiling_waiver_active": waiver_active,
         "evidence_completeness_ceiling_applied": ceiling_applies,
         "evidence_completeness_ceiling_value": ceiling_value if ceiling_applies else None,
@@ -1022,9 +1078,16 @@ def main() -> int:
                 gate["pass_rule"] = "exit_code_0_or_supplied_evidence"
                 gate.setdefault("evidence_note", "skipped via --skip-gates")
 
+    # WAIVER_BINDING_HARDENING (2026-08-23): resolved here, at the CLI/git boundary
+    # (mirroring resolve_scored_commit()'s own architecture), never inside
+    # compute_report() itself -- keeps compute_report() pure and unit-testable with
+    # injected booleans, exactly like scored_commit/canonical_manifest already are.
+    registry_commit_verified = _registry_matches_scored_commit_tree(root, args.registry, scored_commit, registry)
+
     report = compute_report(
         methodology, registry, root, evidence, python_path, python_source,
         canonical_manifest, scored_commit, evidence_input_trace,
+        registry_commit_verified=registry_commit_verified,
     )
     report["scored_commit_source"] = scored_commit_source
 

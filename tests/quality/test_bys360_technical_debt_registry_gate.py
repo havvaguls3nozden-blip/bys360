@@ -437,21 +437,28 @@ def test_invalid_reconciliation_status_rejected():
 
 
 # ---------------------------------------------------------------------------
-# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22):
-# reconciliation_ceiling_waiver_decision -- orthogonal to reconciliation_status
-# and reconciliation_governance_decision. Never claims FULLY_RECONCILED, never
-# rewrites the historical fact; only a separate, commit-bound, drift-checked
-# governance decision about whether the ceiling still needs to apply.
+# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22), binding
+# hardened 2026-08-23: reconciliation_ceiling_waiver_decision -- orthogonal to
+# reconciliation_status and reconciliation_governance_decision. Never claims
+# FULLY_RECONCILED, never rewrites the historical fact; only a separate,
+# drift-checked governance decision about whether the ceiling still needs to
+# apply. approval_baseline_commit is documentary/anchoring only (mirroring
+# reconciliation_governance_decision.target_baseline_commit's own precedent) --
+# this validator checks only its shape, never compares it to "the commit
+# currently being scored" (that binding conflation was the pre-hardening
+# design's flaw). The actual current-commit provenance check now lives in the
+# calculator (bys360_score_reconcile_v1.py's
+# _registry_matches_scored_commit_tree()), not here.
 # ---------------------------------------------------------------------------
 
-TARGET_COMMIT = "17be109d66dfb5f91554b28e7573f01c1572c73b"
+APPROVAL_BASELINE_COMMIT = "8529ca57e37a1c8c10a513584e61998f799dd1af"
 
 
 def _valid_ceiling_waiver_decision(**overrides):
     decision = {
         "decision_id": GOV_CEILING_WAIVER_001_DECISION_ID,
         "decision_status": "APPROVED",
-        "target_scored_commit": TARGET_COMMIT,
+        "approval_baseline_commit": APPROVAL_BASELINE_COMMIT,
         "preserved_legacy_total": 38,
         "preserved_legacy_priority_split": {"P0": 0, "P1": 0, "P2": 17, "P3": 21},
     }
@@ -475,11 +482,11 @@ def test_ceiling_waiver_absent_is_still_a_valid_registry():
     assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
 
 
-def test_ceiling_waiver_accepted_with_valid_metadata_and_matching_commit():
+def test_ceiling_waiver_accepted_with_valid_metadata():
     registry = _historical_unreconstructable_registry(
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
 
 
@@ -487,7 +494,7 @@ def test_ceiling_waiver_rejected_with_wrong_decision_id():
     registry = _historical_unreconstructable_registry(
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(decision_id="SOME-OTHER-ID"),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_wrong_decision_id" for f in result.findings)
 
@@ -500,7 +507,7 @@ def test_ceiling_waiver_rejected_when_reusing_gov_legacy_001_decision_id():
             decision_id=GOV_LEGACY_001_DECISION_ID,
         ),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_decision_id_reuses_gov_legacy_001" for f in result.findings)
 
@@ -509,7 +516,7 @@ def test_ceiling_waiver_rejected_with_invalid_decision_status():
     registry = _historical_unreconstructable_registry(
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(decision_status="MADE_UP"),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_invalid_decision_status" for f in result.findings)
 
@@ -520,7 +527,7 @@ def test_ceiling_waiver_revoked_status_is_inert_not_a_failing_finding():
     registry = _historical_unreconstructable_registry(
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(decision_status="REVOKED"),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
 
 
@@ -529,7 +536,7 @@ def test_ceiling_waiver_rejected_when_reconciliation_status_not_historical_unrec
         reconciliation_status="PARTIALLY_RECONCILED",
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_requires_historical_unreconstructable" for f in result.findings)
 
@@ -538,7 +545,7 @@ def test_ceiling_waiver_rejected_when_preserved_total_drifts():
     registry = _historical_unreconstructable_registry(
         reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(preserved_legacy_total=0),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_total_drift" for f in result.findings)
 
@@ -549,33 +556,49 @@ def test_ceiling_waiver_rejected_when_preserved_split_drifts():
             preserved_legacy_priority_split={"P0": 0, "P1": 0, "P2": 0, "P3": 0},
         ),
     )
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_split_drift" for f in result.findings)
 
 
-def test_ceiling_waiver_rejected_when_bound_to_wrong_commit():
+def test_ceiling_waiver_rejected_when_approval_baseline_commit_missing():
     registry = _historical_unreconstructable_registry(
-        reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(),
-    )
-    result = validate_registry(registry, current_commit="0" * 40)
-    assert not result.ok
-    assert any(f.code == "ceiling_waiver_commit_mismatch" for f in result.findings)
-
-
-def test_ceiling_waiver_rejected_when_commit_unverified():
-    """No current_commit supplied at all -- must fail closed, never assume a match."""
-    registry = _historical_unreconstructable_registry(
-        reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(),
+        reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(approval_baseline_commit=None),
     )
     result = validate_registry(registry)
     assert not result.ok
-    assert any(f.code == "ceiling_waiver_commit_unverified" for f in result.findings)
+    assert any(f.code == "ceiling_waiver_invalid_approval_baseline_commit" for f in result.findings)
+
+
+def test_ceiling_waiver_rejected_when_approval_baseline_commit_malformed():
+    registry = _historical_unreconstructable_registry(
+        reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(
+            approval_baseline_commit="not-a-real-sha",
+        ),
+    )
+    result = validate_registry(registry)
+    assert not result.ok
+    assert any(f.code == "ceiling_waiver_invalid_approval_baseline_commit" for f in result.findings)
+
+
+def test_ceiling_waiver_approval_baseline_commit_not_compared_to_any_current_commit():
+    """The hardened design's central property: approval_baseline_commit is purely
+    documentary and is never checked against any notion of "the current commit" --
+    validate_registry() no longer even accepts a current_commit parameter. Any
+    well-formed SHA is accepted here; provenance-to-scored-commit binding is the
+    calculator's job now, not this validator's."""
+    registry = _historical_unreconstructable_registry(
+        reconciliation_ceiling_waiver_decision=_valid_ceiling_waiver_decision(
+            approval_baseline_commit="0" * 40,
+        ),
+    )
+    result = validate_registry(registry)
+    assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
 
 
 def test_ceiling_waiver_invalid_object_type_rejected():
     registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision="not-an-object")
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert not result.ok
     assert any(f.code == "ceiling_waiver_invalid_object" for f in result.findings)
 
@@ -586,5 +609,5 @@ def test_canonical_registry_has_no_ceiling_waiver_decision_yet():
     to real Score100/Quality CI proof for a specific commit."""
     registry = json.loads(CANONICAL_REGISTRY_PATH.read_text(encoding="utf-8"))
     assert registry.get("reconciliation_ceiling_waiver_decision") is None
-    result = validate_registry(registry, current_commit=TARGET_COMMIT)
+    result = validate_registry(registry)
     assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
